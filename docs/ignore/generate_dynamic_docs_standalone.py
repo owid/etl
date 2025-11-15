@@ -22,6 +22,7 @@ DOCS_DIR = BASE_DIR / "docs"
 header_metadata = """---
 tags:
   - Metadata
+icon: material/api
 ---
 
 # Metadata reference
@@ -65,12 +66,22 @@ def generate_metadata_reference():
 
 def generate_catalog_api_docs():
     """Generate catalog API documentation"""
-    output_path = DOCS_DIR / "api/example-usage.md"
+    output_path = DOCS_DIR / "api/catalog-api.md"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load catalog README
+    # Generate ETL catalog API docs
+    ## Load template (intro)
+    with open(DOCS_DIR / "ignore/catalog-api.md", "r") as f:
+        docs_intro = f.read()
+
+    ## Load catalog README from python library
     with open(LIB_DIR / "catalog/README.md", "r") as f:
         docs_catalog = f.read()
+
+    # Indent docs_catalog by 4 spaces to fit inside the Python tab
+    docs_catalog = "\n".join("    " + line if line.strip() else "" for line in docs_catalog.splitlines())
+
+    docs_catalog = docs_intro + f"\n{docs_catalog}"
 
     with open(output_path, "w") as f:
         f.write(docs_catalog)
@@ -87,6 +98,7 @@ tags:
   - Collections
   - Multidim
   - Explorers
+icon: material/api
 ---
 
 # Collections reference

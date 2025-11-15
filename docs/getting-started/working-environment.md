@@ -1,9 +1,13 @@
-# Installation
-The ETL can be used by OWID staff or the general public to build a copy of our data catalog. It is supported and regularly run on Linux, MacOS and Windows via WSL. Here's how to get set up.
+---
+icon: lucide/hard-drive-download
+---
+
+# Installatione
+The use of ETL is mainly addressed to OWID staff, but open to the general public. It is supported and regularly run on Linux, MacOS and Windows via WSL. Here's how to get set up.
 
 !!! warning
 
-    This documentation is still under construction. Please [report any issue](https://github.com/owid/etl/issues/new?assignees=&labels=&template=docs-issue---.md) that you may find so we can keep improving our docs.
+    Some parts of ETL rely on other internal tools and resources, making it less suitable for external uses. Still, we believe that there is value in having this project open to the public for transparency and reproducibility purposes.
 
 
 *[WSL]: Windows Subsystem for Linux
@@ -16,7 +20,7 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
 
     !!! tip
 
-        We recommend using [Homebrew](https://brew.sh/) to install dependencies.
+        We recommend using [:octicons-link-external-16: Homebrew](https://brew.sh/) to install dependencies.
 
     Ensure you have XCode command line tools:
 
@@ -24,7 +28,7 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
     xcode-select --install
     ```
 
-    Then install Python 3.10+ and MySQL client and [UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
+    Then install Python 3.10+ and MySQL client and [:octicons-link-external-16: UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
 
     ```bash
     brew install python mysql-client uv pkg-config
@@ -77,6 +81,8 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
 
     Then, enter your Linux console and follow the instructions for Ubuntu 22.04.
 
+---
+
 ??? "Extra config for staff"
 
     OWID staff who want to upsert data from ETL to grapher database will also need access to Cloudflare R2.
@@ -112,9 +118,9 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
 
     `pyenv` is not crucial now after switching to `uv` as a package manager. However, it is still recommended to use it to manage your Python versions.
 
-Even though it's not compulsory, it is **highly recommended** to install [pyenv](https://github.com/pyenv/pyenv#installation) to manage your Python versions. This will allow you to have multiple Python versions installed in your machine and switch between them easily. You will also avoid issues caused by updating system wide Python.
+Even though it's not compulsory, it is **highly recommended** to install [:fontawesome-brands-github: pyenv](https://github.com/pyenv/pyenv#installation) to manage your Python versions. This will allow you to have multiple Python versions installed in your machine and switch between them easily. You will also avoid issues caused by updating system wide Python.
 
-Follow the instructions in the [pyenv installation guide](https://github.com/pyenv/pyenv#installation) or follow the steps below.
+Follow the instructions in the [:fontawesome-brands-github: pyenv installation guide](https://github.com/pyenv/pyenv#installation) or follow the steps below.
 
 === "MacOS"
 
@@ -135,6 +141,7 @@ Follow the instructions in the [pyenv installation guide](https://github.com/pye
     ```
 
     For more details visit our other project: https://github.com/pyenv/pyenv-installer
+---
 
 
 Add these lines to `~/.zshrc`, `~/.bash_profile` or `~/.bashrc`:
@@ -176,7 +183,7 @@ Now check that `which python3` prints path `.../.pyenv/shims/python3` and `pytho
 
 
 ## Clone the project
-First of all, you need to have the [ETL project](https://github.com/owid/etl) in your working environment. Run:
+First of all, you need to have the [:fontawesome-brands-github: ETL project](https://github.com/owid/etl) in your working environment. Run:
 
 ```bash
 git clone https://github.com/owid/etl.git
@@ -200,7 +207,7 @@ make test
 
 This will install the project, and then run all CI checks.
 
-If `make test` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, please raise a [Github issue](https://github.com/owid/etl/issues) (if OWID staff, you can also ask using the `#tech-issues` Slack channel).
+If `make test` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, please raise a [:fontawesome-brands-github: Github issue](https://github.com/owid/etl/issues) (if OWID staff, you can also ask using the `#tech-issues` Slack channel).
 
 
 !!! tip
@@ -213,8 +220,8 @@ If `make test` succeeds, then you should be able to build any dataset you like, 
 ### Recommended extensions
 We highly recommended installing the following extensions:
 
-* [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
-* [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+* [:octicons-link-external-16: Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+* [:octicons-link-external-16: YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
 ### Custom extensions
 
@@ -244,7 +251,7 @@ Add this to your User `settings.json` (View -> Command Palette -> Preferences: O
 
 ## Improve your terminal experience
 
-We recommend using [Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugins and themes that can make your life easier.
+We recommend using [:octicons-link-external-16: Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugins and themes that can make your life easier.
 
 
 ???  "Automatic virtualenv activation"
@@ -269,7 +276,7 @@ We recommend using [Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugin
     load-py-venv
     ```
 
-    Some staff members also use [Nushell](https://www.nushell.sh/), which supports similar hooks. Edit your `$nu.config-path` file, find the `hooks` section, and add to it an `env_change` stanza:
+    Some staff members also use [:octicons-link-external-16: Nushell](https://www.nushell.sh/), which supports similar hooks. Edit your `$nu.config-path` file, find the `hooks` section, and add to it an `env_change` stanza:
 
     ```
     hooks:
@@ -300,31 +307,3 @@ We recommend using [Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugin
     ```
 
     and then type `j etl` or `j grapher` to jump to the right folder.
-
-
-## Project folder
-The project has multiple folders and directories. Let's try to make sense of them.
-
-Start by listing all the files in the project:
-
-```bash
-cd etl/
-ls
-```
-
-This will list all the folders and directories in the project. Find a brief explanation on the most relevant ones in the following table.
-
-
-| Folder (or file)      | Description                          |
-| ----------- | ------------------------------------ |
-| `etl/`       | This is home to our ETL library. This is where all the recipes to generate our datasets live. |
-| `snapshots/`       | This is the entry point to ETL. This folder contains metadata and code to get external data and import it to our pipeline. |
-| `dag/`    | Contains the dataset dependencies. That is, if `dataset A` needs `dataset B` to be up to date, this should be listed here. |
-| `apps/`    | Apps built around and for ETL management. Some include `wizard`, `backport`, `fasttrack`, etc. |
-| `data/`    | When you run the recipe code for a dataset, the dataset will be created under this directory. Note that not all the content from this directory is added to git. |
-| `schemas/`    | Metadata schemas for ETL datasets. |
-| `scripts/`    | Various scripts. |
-| `tests/`    | ETL library tests. |
-| `lib/`    | Other OWID sub-packages. |
-| `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
-| `Makefile`, `default.mk`    | `make`-related files. |

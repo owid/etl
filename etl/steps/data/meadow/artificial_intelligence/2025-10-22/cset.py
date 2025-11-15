@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 from typing import List
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -48,7 +49,7 @@ def run() -> None:
     # Merge all dataframes on the 'year', 'country', and 'field' columns
     final_df = all_dfs[0]
     for df in all_dfs[1:]:
-        final_df = pd.merge(final_df, df, on=["year", "country", "field"], how="outer")
+        final_df = pr.merge(final_df, df, on=["year", "country", "field"], how="outer")
 
     tb = Table(final_df, short_name=paths.short_name, underscore=True)
 
@@ -66,7 +67,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> pd.DataFrame:
+def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str):
     """
     Reads data from a list of CSV files inside a temporary directory, cleans them, and merges into a single DataFrame.
     """
@@ -76,19 +77,54 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
         file_path = os.path.join(temp_dir, "cat", file_name)
 
         # Read the CSV file
-        df_add = pd.read_csv(file_path)
-        if "complete" in df_add.columns:
+        df_add = pr.read_csv(file_path)
+
+        # Handle estimated investment data with projections
+        if file_name == "companies_yearly_estimated.csv" and "complete" in df_add.columns:
+            df_add["complete"] = df_add["complete"].astype(str)
+
+            # Get value columns
+            value_cols = [col for col in df_add.columns if col not in ["country", "year", "field", "complete"]]
+
+            # Filter actual data (complete = True)
+            df_actual = df_add[df_add["complete"] == "True"].copy()
+            df_actual = df_actual.drop(columns=["complete"])
+            df_actual = df_actual.dropna(subset=value_cols, how="all")
+
+            # For projected data (complete = False), we only want the previous year's value
+            df_projected_rows = df_add[df_add["complete"] == "False"].copy()
+            df_projected_rows = df_projected_rows.drop(columns=["complete"])
+
+            # Find the last actual year for each country/field
+            df_last_actual = df_actual.loc[df_actual.groupby(["country", "field"])["year"].idxmax()].copy()
+            # Create projected data with last actual values
+
+            # Merge last actual values (rename columns to _projected)
+            df_last_values = df_last_actual[["country", "field", "year"] + value_cols].copy()
+            for col in value_cols:
+                df_last_values = df_last_values.rename(columns={col: f"{col}_projected"})
+                df_projected_rows = df_projected_rows.rename(columns={col: f"{col}_projected"})
+
+            df_projected_final = pr.concat([df_projected_rows, df_last_values], ignore_index=True)
+
+            # Combine actual and projected data
+            df_add = pr.merge(df_actual, df_projected_final, on=["country", "year", "field"], how="outer")
+        # Filter by 'complete' column for other datasets
+        elif "complete" in df_add.columns:
             df_add["complete"] = df_add["complete"].astype(str)
             df_add = df_add[df_add["complete"] == "True"]
             df_add = df_add.drop(columns=["complete"])
+
         # Normalize 'field' capitalization
         df_add["field"] = df_add["field"].apply(lambda s: s[0] + s[1:].lower() if isinstance(s, str) else s)
 
         # Aggregate duplicates by summing numeric columns
         # Group by country, year, and field, then sum all numeric columns
-        numeric_cols = df_add.select_dtypes(include=["number"]).columns.tolist()
-        if numeric_cols:
-            df_add = df_add.groupby(["country", "year", "field"], as_index=False)[numeric_cols].sum()
+        # Skip groupby for estimated investment file as it's already been processed
+        if file_name != "companies_yearly_estimated.csv":
+            numeric_cols = df_add.select_dtypes(include=["number"]).columns.tolist()
+            if numeric_cols:
+                df_add = df_add.groupby(["country", "year", "field"], as_index=False)[numeric_cols].sum()
 
         all_dfs_list.append(df_add)
 

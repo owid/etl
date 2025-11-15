@@ -1,4 +1,8 @@
-Our World in Data has a whole team dedicated to data management that takes data from publicly available sources (e.g. the _UN Food and Agriculture Organisation_), and makes it available to our researchers to analyse and create visualisation for their articles.
+# ETL steps
+
+We have designed an ETL (Extract, Transform, Load) system that allows us to manage the entire lifecycle of data, from ingestion to publication.
+
+There are three main types of ETL steps: snapshots (ingest data from source), data steps (process and curate data), and export steps (make data available to other parts of the system). We elaborate on these below.
 
 ## Five stages
 
@@ -15,7 +19,8 @@ The design of the ETL involves steps that mirror the stages above, which help us
 1. [Snapshot step](#snapshot): Take a **snapshot** of the upstream data product and store it.
 2. [Meadow step](#meadow): Bring the data into a **common format**.
 3. [Garden step](#garden): **Harmonise** the names of countries, genders and any other columns we may want to join on. Also do the necessary **data processing** to make the dataset usable for our needs.
-4. [Grapher step](#grapher): **Import** the data to our internal MySQL database.
+4. [Grapher step](#grapher): **Adapt** the data to our internal MySQL database.
+5. [Export step](#export-steps): **Publish** the data to other parts of the system, such as data explorers or multi-dimensional indicators.
 
 A data manager must implement all these steps to make something chartable on the Our World in Data site.
 
@@ -51,7 +56,7 @@ flowchart LR
     classDef node_ss fill:#002147,color:#fff
 ```
 
-The snapshot step typically consists of a DVC file and a script that downloads the upstream data and saves it to our snapshot catalog. Snapshot files are located in the [`snapshots/`](https://github.com/owid/etl/tree/master/snapshots) directory of the project.
+The snapshot step typically consists of a DVC file and a script that downloads the upstream data and saves it to our snapshot catalog. Snapshot files are located in the [:fontawesome-brands-github: `snapshots/`](https://github.com/owid/etl/tree/master/snapshots) directory of the project.
 
 Note that we need a DVC file per upstream data file; hence, in some instances, if the source publishes a dataset using multiple files, we need multiple DVC files.
 
@@ -61,44 +66,46 @@ A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an 
 
 The metadata in Snapshot consists mainly of one object: `meta.origin`.
 
-!!! info "Learn more in our [metadata reference](../metadata/reference#origin)."
+!!! info "Learn more in our [metadata reference](../metadata/reference/#origin){data-preview}."
 
     This metadata is captured in a DVC file (similar to a YAML file), which contains all the snapshot metadata fields as key-value pairs.
 
-??? example "Example of [`snapshots/animal_welfare/2023-10-24/fur_laws.xlsx.dvc`](https://github.com/owid/etl/blob/master/snapshots/animal_welfare/2023-10-24/fur_laws.xlsx.dvc)"
+??? example "Example of [:fontawesome-brands-github: `snapshots/animal_welfare/2024-12-17/fur_laws.csv.dvc`](https://github.com/owid/etl/blob/master/snapshots/animal_welfare/2024-12-17/fur_laws.csv.dvc)"
 
     This file specifies all the upstream source file details (including link to download it, metadata fields, etc.). Filling the fields of this file requires some manual work, as we are "translating" all the information that the source provides into our snaphsot metadata format.
 
-    ```yaml title="snapshots/animal_welfare/2023-10-24/fur_laws.xlsx.dvc"
+    ```yaml title="snapshots/animal_welfare/2024-12-17/fur_laws.csv.dvc"
     meta:
         origin:
             title: Fur banning
+            description: |-
+            Legal status of fur farming around the world.
             producer: Fur Free Alliance
-            citation_full: Overview national fur legislation, Fur Free Alliance (2023).
+            citation_full: Overview national fur legislation, Fur Free Alliance (2024).
             url_main: https://www.furfreealliance.com/fur-bans/
-            url_download:
-            https://www.furfreealliance.com/wp-content/uploads/2023/10/Overview-national-fur-legislation.xlsx
-            date_published: '2023-10-01'
-            date_accessed: '2023-10-24'
+            date_published: 2024-12-17
+            date_accessed: 2024-12-17
             license:
             name: CC BY 4.0
-
-    wdir: ../../../data/snapshots/animal_welfare/2023-10-24
-    outs:
-        - md5: bb6e0f8b9a05a8d7c446be2f1d6f9613
-          size: 28585
-          path: fur_laws.xlsx
+            url: https://www.furfreealliance.com/fur-bans/
+        outs:
+        - md5: 6b46a8a465453c383e6ffda96deb1d2f
+            size: 44197
+            path: fur_laws.csv
     ```
 
-## Meadow
+## Data steps
+There are different kinds of data steps, depending on the stage of data curation: `meadow`, `garden` and `grapher`.
 
-The meadow step is the first Transform step of our ETL. In it, we load a [`Snapshot`](../../architecture/design/phases/#snapshot) and adapt it to be in a convenient format. A convenient format means creating an instance of a [`Dataset`](../../architecture/design/phases/#datasets), with the appropriate data as a `Table` (or tables).
+### Meadow
+
+The meadow step is the first Transform step of our ETL. In it, we load a [`Snapshot`](../../architecture/design/phases/#snapshots){data-preview} and adapt it to be in a convenient format. A convenient format means creating an instance of a [`Dataset`](../../architecture/design/phases/#datasets){data-preview}, with the appropriate data as a `Table` (or tables).
 
 In this step, you can add and define metadata, but we rarely do this. Instead, we propagate the metadata defined in the Snapshot step and leave it to the Garden step to enhance the metadata.
 
 Meadow steps should only have `snapshot` dependencies and ー by definition ー should not depend on `garden` or any other steps.
 
-## Garden
+### Garden
 
 The Garden step is where most of the work falls in. This is where the data manager needs to carefully look at the data, filter outliers, harmonize labels (e.g. country names), improve the dataset metadata, etc.
 
@@ -145,7 +152,7 @@ However, Garden steps could also depend on other garden steps. This is often the
 
     A long-run indicator is an indicator that has datapoints spanning over a broad period of time and that typically relies on multiple sources.
 
-    For instance, we have a [population indicator](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
+    For instance, we have a [:octicons-link-external-16: population indicator](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
 
     This is how the dependency graph our population indicator looks like:
 
@@ -159,15 +166,13 @@ However, Garden steps could also depend on other garden steps. This is often the
 
 An important processing step in Garden is to standardize (or harmonize) the country names. You can learn more about this in our [country harmonization guide](../../guides/harmonize-countries).
 
-### Garden metadata
+#### Garden metadata
 
 After adapting and processing the origin's data, we have a curated dataset. This dataset, contains indicators (maybe not present in the origin) that we need to properly document.
 
-The metadata in Garden consists mainly of two objects: [`Dataset`](../../architecture/metadata/reference/#dataset) and [`Table`](../../architecture/metadata/reference/#table) (list). The metadata comes as a YAML file next to the processing scripts.
+The metadata in Garden consists mainly of two objects: [`Dataset`](../../architecture/metadata/reference/#dataset){data-preview} and a list of [`Table`](../../architecture/metadata/reference/#table){data-preview}, which contains various [`Indicator`](../metadata/reference/#variable){data-preview} columns. The metadata comes as a YAML file next to the processing scripts.
 
-!!! info "Learn more in our [dataset reference](../metadata/reference/#dataset), [tables reference](../metadata/reference/#table) and [indicator reference](../metadata/reference/#variable)."
-
-## Grapher
+### Grapher
 
 In the Grapher step the work should be minimal. Here, we create a `Grapher` view by adapting our Garden dataset to adhere to the Grapher requirements.
 
@@ -246,10 +251,10 @@ In ETL, we define these by grouping indicators together into "collections". Thes
 
 These steps must depend only on `data://grapher` steps, since they require indicators to be in the Database. This is because explorers and multidims on the site access indicators in the database.
 
-!!! info "Learn more about creating Data explorers [on Notion :octicons-arrow-right-24:](https://www.notion.so/owid/Creating-Data-Explorers-cf47a5ef90f14c1fba8fc243aba79be7)."
+!!! info "Learn more about creating Data explorers on [:fontawesome-brands-notion: Notion](https://www.notion.so/owid/Creating-Data-Explorers-cf47a5ef90f14c1fba8fc243aba79be7)."
 
 !!! note "Legacy explorers"
 
-    In the past Explorers were manually defined from our Admin. Data was sourced by CSV files generated by ETL [served from S3](https://dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/r2/default/buckets/owid-catalog), or on GitHub.
+    In the past Explorers were manually defined from our Admin. Data was sourced by CSV files generated by ETL [:octicons-link-external-16: served from S3](https://dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/r2/default/buckets/owid-catalog), or on GitHub.
 
     We have slowly transitioned into a new system where explorers are generated from the ETL pipeline. This is a more scalable and maintainable solution.

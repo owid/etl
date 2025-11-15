@@ -127,8 +127,13 @@ def ask_for_table(dataset):
         index=None if len(table_names) != 1 else 0,
     )
     if table_name:
-        return dataset[table_name].reset_index()
+        return _get_table_cached(dataset, dataset_uri=dataset.m.uri, table_name=table_name)
     return
+
+
+@st.cache_data
+def _get_table_cached(_dataset, dataset_uri, table_name):
+    return _dataset[table_name].reset_index()
 
 
 def ask_for_indicator(tb):
@@ -187,6 +192,28 @@ def show_manual_mapping(harmonizer, entity, i, border=False):
     # Add defined mapping (only if not ignored)
     if not value_ignore:
         st.session_state.entity_mapping[entity] = value_selected
+
+
+@st.fragment
+def show_submit_section(path_export: str):
+    if ENV_IS_REMOTE:
+        # Submit button
+        export_btn = st.button(
+            label="Generate mapping",
+            type="primary",
+        )
+
+    else:
+        path_export = st.text_input(
+            label="Export to...",
+            value=path_export,
+        )
+        # Submit button
+        export_btn = st.button(
+            label="Export mapping",
+            type="primary",
+        )
+    return export_btn
 
 
 def render(step_uri):
@@ -275,23 +302,7 @@ def render(step_uri):
 
                     # 3/ PATH to export & export button
                     path_export = cast(str, harmonizer.output_file)
-                    if ENV_IS_REMOTE:
-                        # Submit button
-                        export_btn = st.button(
-                            label="Generate mapping",
-                            type="primary",
-                        )
-
-                    else:
-                        path_export = st.text_input(
-                            label="Export to...",
-                            value=path_export,
-                        )
-                        # Submit button
-                        export_btn = st.button(
-                            label="Export mapping",
-                            type="primary",
-                        )
+                    export_btn = show_submit_section(path_export)
 
                 ####################################################################################################
                 # EXPORT

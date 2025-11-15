@@ -26,6 +26,7 @@ from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
+from etl.config import DRY_RUN
 from etl.helpers import PathFinder
 
 # Initialize logger.
@@ -103,12 +104,10 @@ def run() -> None:
             local_file = temp_dir_path / file_name
             # Path (within bucket) to S3 file.
             s3_file = S3_DATA_DIR / file_name
-            tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
 
-            # Upload file to S3 and force download instead of displaying in browser
-            s3_utils.upload(
-                f"s3://{S3_BUCKET_NAME}/{str(s3_file)}",
-                local_file,
-                public=True,
-                downloadable=True,
-            )
+            if DRY_RUN:
+                tqdm.write(f"[DRY RUN] Would upload file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+            else:
+                tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+                # Upload file to S3
+                s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True, downloadable=True)

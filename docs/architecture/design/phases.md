@@ -1,3 +1,5 @@
+# ETL Model
+
 ??? info "This section presents a high-level view of our ETL processes."
 
     The ETL has different types of steps (e.g. `garden`, `meadow` and `grapher`, among others). Some steps, can be understood under the same principle (e.g. `meadow` and `garden` are both "Transform" steps within the ETL).This section does not cover all these steps in detail, but rather describes the very high-level meachanics of ETL.
@@ -14,9 +16,9 @@ Our ETL follows these same principles, with different names, and has the followi
 
 - [**Snapshots**](#snapshots): We download files from external sources and store them as snapshots.
 - [**Datasets**](#datasets): Next, we curate the downloaded data to have clean datasets. These datasets can depend on snapshots, but also on other curated datasets.
-- [**Grapher views**](#grapher-views): We adapt the curated datasets for [Grapher](https://ourworldindata.org/owid-grapher), which are then loaded to Grapher.
+- [**Grapher views**](#grapher-views): We adapt the curated datasets for [:octicons-link-external-16: Grapher](https://ourworldindata.org/owid-grapher), which are then loaded to Grapher.
 
-As a consequence, nodes in [our DAG](dag.md) can come in different flavours.
+As a consequence, nodes in [our DAG](dag/#dag){data-preview} can come in different flavours.
 <!-- In the next section, we explore these three different types of nodes. -->
 
 ## Snapshots
@@ -37,7 +39,7 @@ flowchart LR
 
 Snapshots are managed in the ETL using DVC, which allows tracking of different file versions and metadata.
 
-[Their URI](../uri/#path-for-snapshot) begins with the prefix `snapshot://`, therefore using the following format:
+[Their URI](uri/#path-for-snapshot){data-preview} begins with the prefix `snapshot://`, therefore using the following format:
 
 ```
 snapshot://<namespace>/<version>/<filename>
@@ -54,7 +56,7 @@ snapshot://<namespace>/<version>/<filename>
 
 Datasets are nodes in the computational graph and the main units of work in the ETL. They represent a transformation from one or more ingredients into a new (and potentially better and more useful) output.
 
-[Their URI](../uri/#path-for-data) begins with the prefix `data://`, and use the following convention:
+[Their URI](uri/#path-for-data){data-preview} begins with the prefix `data://`, and use the following convention:
 
 ```
 data://<channel>/<namespace>/<version>/<dataset-name>
@@ -92,7 +94,7 @@ The Grapher codebase can only accept datasets that are in a particular shape:
 (entity, year, variable, value)
 ```
 
-They present a [long format](https://towardsdatascience.com/long-and-wide-formats-in-data-explained-e48d7c9a06cb), where each row is a particular datapoint of a variable:
+They present a [:octicons-link-external-16: long format](https://towardsdatascience.com/long-and-wide-formats-in-data-explained-e48d7c9a06cb), where each row is a particular datapoint of a variable:
 
 - `entity`: Identifies the entity (typically a country).
 - `year`: Pinpoints the data point to a particular year

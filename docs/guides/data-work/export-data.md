@@ -1,3 +1,7 @@
+---
+icon: lucide/forward
+---
+
 # Export steps
 
 Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag:

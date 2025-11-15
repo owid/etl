@@ -1,39 +1,20 @@
 ---
 tags:
     - 👷 Staff
+icon: material/plus
 ---
+# New data
 
 There are different ways you can add data to the catalog, depending on your technical expertise. This section describes these different options, explaining when are they most useful.
 
 
-<div class="grid cards" markdown>
+* **[Wizard](#using-wizard-recommended) **(recommended): Create ETL steps using default templates.**
+* [Manual](#manually-add-a-dataset-to-the-etl): Create complex steps manually.
+* [Fast-Track](#using-the-fast-track): For small datasets and when reproducibility is not a concern.
+* Unsure: Report on Slack: :fontawesome-brands-slack: #data-architecture
 
--   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](#using-wizard-recommended)__ (recommended)
 
-    ---
-
-    Create ETL steps using default templates.
-
--   __[:material-tools: &nbsp; Manual](#manually-add-a-dataset-to-the-etl)__
-
-    ---
-
-    Create complex steps manually.
-
--   __[:material-run-fast: &nbsp; Fast-Track](#using-the-fast-track)__
-
-    ---
-
-    For small datasets and when reproducibility is not a concern.
-
--   __:octicons-question-16: &nbsp; Unsure__
-
-    ---
-
-    Report on Slack: [#data-scientists  :octicons-link-external-16:](https://app.slack.com/client/T3DR40MTQ/C025BDNS5AA/)
-
-</div>
-
+!!! tip "[Try AI-powered workflow](ai-workflow/)! (experimental)"
 
 ## Using Wizard (recommended)
 Wizard is an interactive web app that serves as OWID's ETL admin. One of the main uses of Wizard is to create ETL steps, as it is has provides templates to ease the creation of a new step.
@@ -46,7 +27,7 @@ When creating a step, you will be presented with a form to submit the metadata d
 
     **Wizard will guide you through the whole process, describing all the steps you need to follow to successfully create a new ETL step.**
 
-    Learn more about Wizard in [this dedicated guideline :octicons-arrow-right-24:](wizard.md).
+    Learn more about Wizard in [this dedicated guideline :octicons-arrow-right-24:](../wizard.md).
 
 ### Adding the dataset to Grapher
 Once you have created all the steps, you can run them _and_ push the final version to Grapher with
@@ -55,16 +36,6 @@ Once you have created all the steps, you can run them _and_ push the final versi
 etl run <short_name> --grapher
 ```
 
-
-
-
-!!! info "Report issues with Wizard"
-
-    Minor issues with wizard<br>
-    [Add a comment to this central issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/1563)<br>
-
-    Major issue<br>
-    [Create a new issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/new)
 
 ## Using the Fast-Track
 
@@ -83,17 +54,14 @@ etl --> mysql
 ```
 
 
-### Import CSV files using Fast-Track
-!!! warning "_Super_ fast-track should only be used for data exploration, and never for production datasets."
-
-_Super_ fast-track is a variation of fast-track that imports data directly from CSV files without needing a Google Spreadsheet. It is useful for exploring datasets in Grapher but isn't intended for production datasets. _Super_ fast-track was developed to replace the "Import CSV" functionality in the admin interface. However, it doesn't support adding complex metadata in the ETL like regular fast-track does.
-
 
 ## Manually add a dataset to the ETL
 
 !!! warning "If possible, use [the Wizard](#using-wizard-recommended)"
 
     If you are not familiar with the ETL, it is recommended to use Wizard to add a new dataset. This will ensure that the dataset is added in a consistent way and that all necessary metadata is included.
+
+    The guide below might be out of date. Please report any issues.
 
 You will need to add a step to the ETL for each stage of data processing you need to do. The steps are:
 

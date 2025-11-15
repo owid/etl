@@ -3,10 +3,6 @@ tags:
   - 👷 Staff
 ---
 
-!!! warning "This is a work in progress"
-
-    Things might change in the near-future. To stay up-to-date with the latest updates, [join the discussion on GitHub!](https://github.com/owid/etl/issues/3016)
-
 ETL was initially conceived to maintain and publish datasets that are updated once a year. This is still the most common kind of update that we do this days.
 
 However, sometimes we need to update datasets more frequently. This is the case for instance for the COVID-19 dataset, and other examples, which need weekly or monthly updates.

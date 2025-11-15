@@ -75,7 +75,7 @@ with open(LIB_DIR / "catalog/README.md", "r") as f2:
     docs_catalog = f2.readlines()
 
 docs_catalog1 = "    ".join(docs_catalog)
-docs_catalog = "".join(docs_catalog)
+# docs_catalog = "".join(docs_catalog)
 docs_api = "".join(docs_api)
 
 docs_api = ""

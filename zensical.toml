@@ -1,10 +1,10 @@
 [project]
 # Top-level settings
-site_name = "ETL documentation"
-site_url = "https://docs.owid.io/projects/etl"
+site_name = "OWID's Technical Documentation"
+site_url = "https://docs.owid.io/projects/etl/"
 site_description = "Learn about the ETL pipeline at Our World in Data."
 site_author = "Our World in Data"
-copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="privacy/">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
+copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/privacy">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
 docs_dir = "docs"
 
 # Repository information
@@ -17,6 +17,7 @@ nav = [
     { "Getting started" = [
         "getting-started/index.md",
         { "Installation" = "getting-started/working-environment.md" },
+        { "Project content" = "getting-started/project-content.md" },
         { "First steps" = "getting-started/building-datasets.md" },
         { "Contributing" = "contributing.md" },
     ] },
@@ -24,49 +25,46 @@ nav = [
         "guides/index.md",
         { "Data work" = [
             "guides/data-work/index.md",
-            { "AI workflow" = "guides/data-work/ai-workflow.md" },
             { "New data" = "guides/data-work/add-data.md" },
             { "Updating data" = "guides/data-work/update-data.md" },
             { "Update charts" = "guides/data-work/update-charts.md" },
             { "MDIMs and Explorers" = "guides/data-work/mdims.md" },
             { "Export data" = "guides/data-work/export-data.md" },
-            { "Access archived data" = "guides/data-work/access-archived-data.md" },
-            { "Publish indicator and metadata with GSheet" = "guides/data-work/create-gsheet.md" },
-        ] },
-        { "Admin" = [
+            { "Publish indicator metadata" = "guides/data-work/create-gsheet.md" },
             { "Wizard" = "guides/wizard.md" },
+            { "AI workflow" = "guides/data-work/ai-workflow.md" },
             { "CLI" = "guides/etl-cli.md" },
         ] },
-        { "Other ETL tasks" = [
-            { "Harmonize country names" = "guides/harmonize-countries.md" },
-            { "Backport from database" = "guides/backport.md" },
-            { "Regular updates" = "guides/auto-regular-updates.md" },
-            { "Automatic updates via metadata" = "guides/autoupdate-cli.md" },
+        { "Other tasks" = [
+            { "Harmonize names" = "guides/harmonize-countries.md" },
+            { "Auto data updates" = "guides/autoupdate-cli.md" },
+            { "Access archived data" = "guides/data-work/access-archived-data.md" },
+            # { "Regular updates" = "guides/auto-regular-updates.md" },
             { "Pull requests" = "guides/pull-requests.md" },
-            { "Tips when working with ETL" = "guides/etl-tips.md" },
-            { "Metadata in data pages" = "guides/metadata-play.md" },
+            { "Tips and tricks in ETL" = "guides/etl-tips.md" },
+            { "Private datasets" = "guides/private-import.md" },
+            { "Backport from db" = "guides/backport.md" },
+            # { "Metadata in data pages" = "guides/metadata-play.md" },
         ] },
-        { "Servers & settings" = [
+        { "Documentation" = [
+            "dev/docs/index.md",
+            # { "Add a technical publication" = "dev/docs.md" },
+        ] },
+        { "Settings & servers" = [
             { "Upgrade Python version" = "guides/upgrade-python-version.md" },
             { "Environments" = "guides/environment.md" },
             { "Staging servers" = "guides/staging-servers.md" },
             { "Public servers" = "guides/sharing-external.md" },
-            { "Private datasets" = "guides/private-import.md" },
             { "Types in Tables" = "guides/types-tables.md" },
             { "OpenAI setup" = "guides/openai.md" },
-            { "Edit the documentation" = "dev/docs.md" },
             { "Google API" = "guides/configure-google-api.md" },
         ] },
+
     ] },
     { "Design principles" = [
         { "Design principles & workflow" = "architecture/index.md" },
-        { "Our journey" = [
-            "architecture/our-journey/index.md",
-        ] },
-        { "Fundamentals" = [
-            { "Computational graph" = [
-                { "Computational graph" = "architecture/design/compute-graph/index.md" },
-            ] },
+        { "Principles" = [
+            { "Computational graph" = "architecture/design/compute-graph.md" },
             { "ETL model" = "architecture/design/phases.md" },
             { "Data model" = "architecture/design/common-format.md" },
             { "Features and constraints" = "architecture/design/features-constraints.md" },
@@ -77,6 +75,9 @@ nav = [
             { "ETL steps" = "architecture/workflow/index.md" },
             { "Other steps" = "architecture/workflow/other-steps.md" },
         ] },
+        { "Our journey" = [
+            "architecture/our-journey/index.md",
+        ] },
     ] },
     { "Metadata" = [
         { "Metadata" = "architecture/metadata/index.md" },
@@ -85,9 +86,9 @@ nav = [
         { "Working with Metadata" = [
             { "Structuring YAML file" = "architecture/metadata/structuring-yaml.md" },
             { "Data Pages Workflow" = "architecture/metadata/data_pages_workflow.md" },
-            { "ETL MetaGPT Tool" = "architecture/metadata/metadata_chatgpt_update.md" },
             { "Propagation of metadata" = "architecture/metadata/propagation.md" },
             { "Processing log" = "architecture/metadata/processing_log.md" },
+            { "ETL MetaGPT Tool" = "architecture/metadata/metadata_chatgpt_update.md" },
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
@@ -95,14 +96,16 @@ nav = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
         { "ETL catalog API" = "api/catalog-api.md" },
-        { "Example API usage" = "api/example-usage.md" },
+        # { "Example API usage" = "api/example-usage.md" },
         { "Querying data via Datasette" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
-        { "COVID-19" = "api/covid.md" },
+        { "COVID-19" = "api/covid/" },
     ] },
     { "Technical publications" = [
         "analyses/index.md",
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
+        # { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
+        # { "Our COVID work" = "api/covid.md" },
         { "Our COVID work" = "api/covid.md" },
     ] },
 ]
@@ -116,6 +119,7 @@ extra_javascript = [
     "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
     "javascripts/tablesort.js",
     "javascripts/cell-toggles.js",
+    "javascripts/notebook-copy.js",
     "javascripts/mermaid.mjs",
 ]
 
@@ -169,29 +173,44 @@ link = "https://linkedin.com/company/ourworldindata"
 [project.theme]
 variant = "modern"                    # Use "classic" for Material for MkDocs appearance
 language = "en"
-custom_dir = "docs/overrides"
+custom_dir = "docs/overrides/"
 logo = "assets/site-logo.svg"
 favicon = "assets/images/favicon.png"
 
-# Theme features
 features = [
     "content.code.copy",
+    "content.code.select",
     "content.code.annotate",
     "content.tooltips",
     "navigation.expand",
+    "navigation.footer",
     "navigation.indexes",
     "navigation.instant",
     "navigation.instant.progress",
     "navigation.instant.prefetch",
     "navigation.sections",
     "navigation.tabs",
+    # "navigation.tabs.sticky",
     "navigation.top",
     "navigation.tracking",
     "search.share",
     "search.suggest",
     "search.highlight",
     "toc.follow",
-]
+    "navigation.path",
+    # "toc.integrate",
+] # Theme features
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+
+# Palette toggle for automatic mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
 
 # Theme palette - light mode
 [[project.theme.palette]]
@@ -199,25 +218,21 @@ media = "(prefers-color-scheme: light)"
 scheme = "default"
 primary = "indigo"
 accent = "pink"
-
-[project.theme.palette.toggle]
-icon = "material/brightness-7"
-name = "Switch to dark mode"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
 
 # Theme palette - dark mode
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
 scheme = "slate"
-primary = "black"
+primary = "blue"
 accent = "amber"
-
-[project.theme.palette.toggle]
-icon = "material/brightness-4"
-name = "Switch to light mode"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
 
 # Theme fonts
 [project.theme.font]
-text = "Helvetica Neue"
+text = "Stack Sans Text"
 
 # Custom homepage configuration
 [project.home]
@@ -243,7 +258,7 @@ name = "Technical publications"
 url = "analyses/"
 theme = "md-button"
 
-# Markdown extensions
+# MARKDOWN EXTENSIONS
 [project.markdown_extensions]
 abbr = {}
 admonition = {}
@@ -252,27 +267,21 @@ footnotes = {}
 md_in_html = {}
 "mkdocs-click" = {}
 
-[project.markdown_extensions.pymdownx.critic]
+[project.markdown_extensions.pymdownx]
+critic = {}
+details = {}
+keys = {}
+snippets = {}
+inlinehilite = {}
 
-[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
 
 [project.markdown_extensions.pymdownx.emoji]
 emoji_index = "material.extensions.emoji.twemoji"
 emoji_generator = "material.extensions.emoji.to_svg"
-
-[project.markdown_extensions.pymdownx.keys]
-
-[project.markdown_extensions.pymdownx.snippets]
-
-[project.markdown_extensions.pymdownx.superfences]
-custom_fences = [
-    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
-]
-# [project.markdown_extensions.pymdownx.superfences]
-# [project.markdown_extensions.pymdownx.superfences.custom_fences]
-# name = "mermaid"
-# class = "mermaid"
-# format = "pymdownx.superfences.fence_code_format"
 
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
@@ -282,7 +291,23 @@ permalink = true
 title = "On this page"
 permalink_title = "Anchor link to this section for reference"
 
-# Plugins
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+# [project.markdown_extensions.pymdownx.superfences]
+# custom_fences = [
+#     { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+# ]
+# [project.markdown_extensions.pymdownx.superfences]
+# [project.markdown_extensions.pymdownx.superfences.custom_fences]
+# name = "mermaid"
+# class = "mermaid"
+# format = "pymdownx.superfences.fence_code_format"
+
+
+# PLUGINS
 [project.plugins]
 
 [project.plugins."mkdocs-jupyter"]
@@ -301,7 +326,7 @@ glob = ["ignore/"]
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]
 
-# [project.plugins.blog]
+[project.plugins.blog]
 
 # [project.plugins.git-authors]
 # show_email_address = false
