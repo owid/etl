@@ -117,6 +117,9 @@ def run() -> None:
     # China imports as share of GDP (attached to counterpart=World rows)
     tb = add_china_imports_share_of_gdp(tb, gdp_data)
 
+    # Add categorical variable for China imports share
+    tb = add_china_imports_category(tb)
+
     # Total imports as share of GDP (only for counterpart=World rows)
     tb_world = tb[(tb["country"].isin(members)) & (tb["counterpart_country"] == "World")].copy()
     total_imports = add_total_imports_share_of_gdp(tb_world, gdp_data)
@@ -336,6 +339,32 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
                 )
             ).copy_metadata(tb)
             tb = pr.concat([tb, new_row], ignore_index=True)
+
+    return tb
+
+
+def add_china_imports_category(tb: Table) -> Table:
+    """Add categorical variable for China imports share of GDP."""
+
+    def categorize_china_imports(value):
+        if pd.isna(value):
+            return None
+        elif value == -1:
+            return "China"
+        elif 0 <= value < 2:
+            return "0-2%"
+        elif 2 <= value < 4:
+            return "2-4%"
+        elif 4 <= value < 6:
+            return "4-6%"
+        elif 6 <= value < 8:
+            return "6-8%"
+        elif 8 <= value < 10:
+            return "8-10%"
+        else:
+            return ">10%"
+
+    tb["china_imports_share_of_gdp_category"] = tb["china_imports_share_of_gdp"].apply(categorize_china_imports)
 
     return tb
 

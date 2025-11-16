@@ -204,6 +204,23 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      china_imports_share_of_gdp_category:
+        title: |-
+          <% if counterpart_country == 'World' %>
+          Imports from China as a share of GDP category
+          <%- endif -%>
+        unit: ""
+        short_unit: ""
+        description_short: A categorical version of the imports from China as a share of GDP indicator, grouping countries based on the significance of Chinese imports relative to their economic size.
+        description_key:
+          - This indicator categorizes countries based on the share of their GDP that is represented by imports from China.
+          - *cif_basis
+          - Categories include "Very high" (above 10%), "High" (5-10%), "Moderate" (1-5%), "Low" (0.1-1%), and "Very low" (below 0.1%).
+          - This categorical approach helps to quickly identify countries with varying levels of economic dependence on Chinese imports.
+        description_processing: We calculated the share of imports from China by dividing the value of CIF imports by GDP and multiplying by 100. Countries were then grouped into categories based on predefined thresholds for the share of GDP. Import data came from official trade statistics and were valued in current US dollars. GDP was taken from World Bank data, both in current US dollars.
+        display:
+          numDecimalPlaces: 0
+
       total_imports_share_of_gdp:
         title: |-
           <% if counterpart_country == 'World' %>
