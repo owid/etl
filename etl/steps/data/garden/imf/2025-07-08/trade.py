@@ -325,7 +325,7 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
         china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World") & (tb["year"] == year)
         if china_mask.any():
             # Update existing rows
-            tb.loc[china_mask, "china_imports_share_of_gdp"] = -1
+            tb.loc[china_mask, "china_imports_share_of_gdp"] = "China"
         else:
             # Add new row if it doesn't exist
             new_row = Table(
