@@ -117,6 +117,12 @@ definitions:
   description_key_employment_services: |-
     The services sector includes wholesale and retail trade; restaurants and hotels; transport, storage, and communications; financing, insurance, real estate, and business and administrative services; and public administration, community, social, and personal services, as defined by the International Standard Industrial Classification of All Economic Activities (ISIC).
 
+  description_key_modelling_status: |-
+    This indicator shows how [national](#dod:ilo-national-estimates) and [modeled](#dod:ilo-modelled-estimates) unemployment rate estimates from the International Labour Organization (ILO) compare for each country. It indicates whether the ILO used the same value for national and modeled estimates, a different value, or if the data is only available in one of these datasets. This is obtained by calculating the absolute difference between the two estimates for each country and year. A difference of less than 0.1 percentage points is considered to be the same value.
+
+  description_key_no_published_estimates: |-
+    A few countries — such as Ukraine, Palestine, and Sudan in recent years — have no published modeled estimates. This usually happens when comparable national data cannot be obtained, or when the ILO considers modeled estimates unreliable, for example, during conflict or major disruption.
+
   note_icls_13: |-
     Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
 
@@ -1896,11 +1902,19 @@ tables:
           tolerance: 0
 
       unemployment_rate_ilo_modeling_comparison_absolute:
-        title: "Unemployment rate difference: ILO modeled vs. national estimates (absolute)"
+        title: Availability of unemployment estimates by source
         unit: ""
         short_unit: ""
+        description_short: |-
+          Compares the availability and differences between ILO [modeled estimates](#dod:ilo-modelled-estimates) and [national estimates](#dod:ilo-national-estimates) of unemployment rates.
+        description_key:
+          - "{definitions.description_key_modelling_status}"
+          - "{definitions.description_key_no_published_estimates}"
+        processing_level: "major"
+        description_processing: |-
+          We derive this indicator by calculating the absolute difference between the ILO modeled unemployment rate estimates and the national unemployment rate estimates for each country and year. If the absolute difference is less than 0.1 percentage points, we consider the estimates to be the same value. If the absolute difference is 0.1 percentage points or more, we classify it as a different value. If data is only available in one of the datasets, we indicate that as well.
         display:
-          name: "Unemployment rate difference: ILO modeled vs. national estimates (absolute)"
+          name: Availability of unemployment estimates by source
           numDecimalPlaces: 0
           tolerance: 0
 
@@ -1914,10 +1928,10 @@ tables:
           tolerance: 0
 
       unemployment_rate_absolute_difference:
-        title: "Unemployment rate absolute difference: ILO modeled vs. national estimates"
+        title: "Unemployment rate difference: ILO modeled vs. national estimates"
         unit: ""
         short_unit: ""
         display:
-          name: "Unemployment rate absolute difference: ILO modeled vs. national estimates"
+          name: "Unemployment rate difference: ILO modeled vs. national estimates"
           numDecimalPlaces: 1
           tolerance: 0
