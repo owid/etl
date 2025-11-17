@@ -194,3 +194,23 @@ steps:
     - data://meadow/artificial_intelligence/2025-08-25/robotaxis
   data://grapher/artificial_intelligence/2025-08-25/robotaxis:
     - data://garden/artificial_intelligence/2025-08-25/robotaxis
+
+  #
+  # TSMC Monthly Revenue
+  #
+  data://meadow/tsmc/2025-11-10/monthly_revenue:
+    - snapshot://tsmc/2025-11-10/monthly_revenue.xlsx
+  data://garden/tsmc/2025-11-10/monthly_revenue:
+    - data://meadow/tsmc/2025-11-10/monthly_revenue
+  data://grapher/tsmc/2025-11-10/monthly_revenue:
+    - data://garden/tsmc/2025-11-10/monthly_revenue
+
+  #
+  # TSMC Historical Operating Data
+  #
+  data://meadow/tsmc/2025-11-10/operating_data:
+    - snapshot://tsmc/2025-11-10/operating_data.xlsx
+  data://garden/tsmc/2025-11-10/operating_data:
+    - data://meadow/tsmc/2025-11-10/operating_data
+  data://grapher/tsmc/2025-11-10/operating_data:
+    - data://garden/tsmc/2025-11-10/operating_data
