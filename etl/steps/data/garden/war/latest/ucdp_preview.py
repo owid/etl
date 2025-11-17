@@ -288,12 +288,20 @@ def compare_versions(path_1, path_2, country: str | None = None):
     # Group by end date to detect differences at a high level
     _compare_by_date(df1, df2)
 
-    def _compare(df1, df2, dt):
-        dfa = df1.loc[df1.date_end == dt, ["relid", "conflict_name", "best"]]
-        dfb = df2.loc[df2.date_end == dt, ["relid", "conflict_name", "best"]]
+    def _compare(df1, df2, dt: str | None = None, nrows=40, col_sort="diff"):
+        columns = ["relid", "conflict_name", "best"]
+        dfa = df1[columns]
+        dfb = df2[columns]
+
+        if dt is not None:
+            dfa = df1.loc[df1.date_end == dt]
+            dfb = df2.loc[df2.date_end == dt]
+
         dfc = dfa.merge(dfb[["relid", "best"]], on=["relid"], suffixes=["_q2", "_q3"], how="left")
         dfc["diff"] = (dfc["best_q2"] - dfc["best_q3"]) / dfc["best_q2"]
-        return dfc.sort_values("diff", ascending=False).head(40)
+        return dfc.sort_values(col_sort, ascending=False).head(nrows)
 
-    DATE = ""
-    _compare(df1, df2, DATE)
+    DATE = None  # Replace with specific date string
+    _compare(df1, df2, DATE, 40, "diff")
+
+    # TODO: Check the code_status of the conflicts that have changed significantly.
