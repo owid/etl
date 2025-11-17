@@ -17,3 +17,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
+outs:
+  - md5: 33ed330d9cacde41ff7d1b12e9251193
+    size: 14054
+    path: n2o_concentration_monthly.csv

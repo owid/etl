@@ -21,3 +21,7 @@ meta:
       name: CC BY 4.0
       url: |-
         https://www.ncei.noaa.gov/sites/g/files/anmtlf171/files/2023-12/NCEI%20PD-10-2-02%20-%20Open%20Data%20Policy%20Signed.pdf
+outs:
+  - md5: 6a20dd8b0da80097165d9eaebf1cf866
+    size: 4047
+    path: ocean_heat_content_annual_world_700m.csv
