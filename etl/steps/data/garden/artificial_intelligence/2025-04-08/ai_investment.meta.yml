@@ -22,13 +22,12 @@ definitions:
     - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
 
   desc_short_generative: &desc_short_generative |-
-    Money put into privately held [generative](#dod:generative-ai) AI companies by private investors. This excludes publicly traded companies and companies’ own internal spending, such as R&D, wages, or infrastructure. Expressed in US dollars, adjusted for inflation.
-
+    Money put into privately held [generative](#dod:generative-ai) AI companies by private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D, wages, or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_private: &desc_short_private |-
-    Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies and companies’ own internal spending, such as R&D, wages, or infrastructure. Expressed in US dollars, adjusted for inflation.
-
+    Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_corporate: &desc_short_corporate |-
-    Annual corporate-finance transactions involving privately held AI companies, broken down by type. This excludes publicly traded companies and companies’ own internal spending, such as R&D, wages, or infrastructure. Expressed in US dollars, adjusted for inflation.
+    Annual corporate-finance transactions involving privately held AI companies, broken down by type. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+
 
   desc_key_corporate: &desc_key_corporate
   - This data focuses on transactions involving privately held AI companies,.
