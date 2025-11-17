@@ -1892,21 +1892,12 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
-      unemployment_rate_ilo_modeling_comparison:
-        title: "Unemployment rate comparison: ILO modeled vs. national estimates"
-        unit: ""
-        short_unit: ""
-        display:
-          name: "Unemployment rate comparison: ILO modeled vs. national estimates"
-          numDecimalPlaces: 0
-          tolerance: 0
-
       unemployment_rate_ilo_modeling_comparison_absolute:
         title: Availability of unemployment estimates by source
         unit: ""
         short_unit: ""
         description_short: |-
-          Compares the availability and differences between ILO [modeled estimates](#dod:ilo-modelled-estimates) and [national estimates](#dod:ilo-national-estimates) of unemployment rates.
+          Availability and differences between ILO [modeled estimates](#dod:ilo-modelled-estimates) and [national estimates](#dod:ilo-national-estimates) of unemployment rates.
         description_key:
           - "{definitions.description_key_modelling_status}"
           - "{definitions.description_key_no_published_estimates}"
@@ -1916,22 +1907,4 @@ tables:
         display:
           name: Availability of unemployment estimates by source
           numDecimalPlaces: 0
-          tolerance: 0
-
-      unemployment_rate_ratio:
-        title: "Unemployment rate ratio: ILO modeled vs. national estimates"
-        unit: ""
-        short_unit: ""
-        display:
-          name: "Unemployment rate ratio: ILO modeled vs. national estimates"
-          numDecimalPlaces: 2
-          tolerance: 0
-
-      unemployment_rate_absolute_difference:
-        title: "Unemployment rate difference: ILO modeled vs. national estimates"
-        unit: ""
-        short_unit: ""
-        display:
-          name: "Unemployment rate difference: ILO modeled vs. national estimates"
-          numDecimalPlaces: 1
           tolerance: 0

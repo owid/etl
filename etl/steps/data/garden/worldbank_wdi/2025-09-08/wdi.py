@@ -923,43 +923,12 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         ind_modeled = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][0]
         ind_national = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][1]
 
-        # Calculate the ratio and add it as a new column
-        tb[f"{indicator}_ratio"] = (tb[ind_modeled] / tb[ind_national]).round(3)
-
         # Also calculate the absolute difference
         # Round each value to 1 decimal (using floor + 0.5 to avoid banker's rounding),
         # then calculate the absolute difference
         tb[f"{indicator}_absolute_difference"] = (
             (np.floor(tb[ind_modeled] * 10 + 0.5) / 10 - np.floor(tb[ind_national] * 10 + 0.5) / 10).abs().round(1)
         )
-
-        # Create a categorical variable based on the ratio
-        # If only available in ind_national, set as 'Survey only'
-        # If only available in ind_modeled, set as 'Modeled only'
-        # If the ratio is between 1-MAXIMUM_ALLOWED_RATIO_DIFFERENCE and 1+MAXIMUM_ALLOWED_RATIO_DIFFERENCE, set as 'Both matching'
-        # If the ratio is outside this range, set as 'Both not matching'
-        # If neither is available, set as NaN
-        tb[f"{indicator}_ilo_modeling_comparison"] = pd.NA
-        tb.loc[tb[ind_national].notna() & tb[ind_modeled].isna(), f"{indicator}_ilo_modeling_comparison"] = (
-            "Survey only"
-        )
-        tb.loc[tb[ind_national].isna() & tb[ind_modeled].notna(), f"{indicator}_ilo_modeling_comparison"] = (
-            "Modeled only"
-        )
-        tb.loc[
-            tb[f"{indicator}_ratio"].between(
-                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE, "neither"
-            ),
-            f"{indicator}_ilo_modeling_comparison",
-        ] = "Both matching"
-        tb.loc[
-            ~tb[f"{indicator}_ratio"].between(
-                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE, "neither"
-            )
-            & tb[ind_national].notna()
-            & tb[ind_modeled].notna(),
-            f"{indicator}_ilo_modeling_comparison",
-        ] = "Both not matching"
 
         # Create a categorical variable based on the absolute difference
         # If only available in ind_national, set as 'Survey only'
@@ -986,9 +955,6 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         ] = "Both not matching"
 
         # Copy metadata from the modeled indicator to the new comparison indicator
-        tb[f"{indicator}_ilo_modeling_comparison"] = tb[f"{indicator}_ilo_modeling_comparison"].copy_metadata(
-            tb[f"{indicator}_ratio"]
-        )
         tb[f"{indicator}_ilo_modeling_comparison_absolute"] = tb[
             f"{indicator}_ilo_modeling_comparison_absolute"
         ].copy_metadata(tb[f"{indicator}_absolute_difference"])
@@ -998,12 +964,11 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         max_year_national = tb.loc[tb[ind_national].notna(), "year"].max()
         max_year_for_comparison = min(max_year_modeled, max_year_national)
 
-        # Make ilo_modeling_comparison NaN for years greater than the maximum year with data for both indicators
-        tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison"] = pd.NA
+        # Make ilo_modeling_comparison NaN for years greater than the maximum year with data
         tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
 
-        # # Drop ratio column
-        # tb = tb.drop(columns=[f"{indicator}_ratio", f"{indicator}_absolute_difference"], errors="raise")
+        # # Drop columns no longer needed
+        tb = tb.drop(columns=[f"{indicator}_absolute_difference"], errors="raise")
 
     # Set index again
     tb = tb.format()
