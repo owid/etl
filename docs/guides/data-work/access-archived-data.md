@@ -1,8 +1,12 @@
-Sometimes, you may need to access archived datasets or snapshots and compare them with current datasets. Here are the recommended approaches:
-
+---
+icon: lucide/package-open
 ---
 
-### Going Back in Git History
+# Access archived data
+Sometimes, you may need to access archived datasets or snapshots and compare them with current datasets. Below, we present three strategies for different use cases.
+
+
+### Git History
 
 The simplest way to access older datasets is by checking out a previous Git commit and running the ETL process from that point in time.
 
@@ -22,22 +26,25 @@ The simplest way to access older datasets is by checking out a previous Git comm
    etlr <dataset>
    ```
 
-💡 **Tip**: Run this in a separate folder (e.g., `etl2`) to retain access to the current datasets. This setup allows you to compare datasets in a notebook.
+!!! tip
 
-Example comparison in Python:
-```python
-from etl.dataset import Dataset
+      Run this in a separate folder (e.g., `etl2`) to retain access to the current datasets. This setup allows you to compare datasets in a notebook.
 
-# Load current dataset
-tb_current = Dataset("~/projects/etl/data/garden/climate/latest/weekly_wildfires").read_table('wildfires')
+!!! example "Example comparison in Python"
 
-# Load dataset from a previous commit
-tb_old = Dataset("~/projects/etl2/data/garden/climate/latest/weekly_wildfires").read_table('wildfires')
-```
+      ```python
+      from etl.dataset import Dataset
+
+      # Load current dataset
+      tb_current = Dataset("~/projects/etl/data/garden/climate/latest/weekly_wildfires").read_table('wildfires')
+
+      # Load dataset from a previous commit
+      tb_old = Dataset("~/projects/etl2/data/garden/climate/latest/weekly_wildfires").read_table('wildfires')
+      ```
 
 ---
 
-### Updating Snapshot MD5 for Archived Snapshots
+### Update MD5 for archived Snapshots
 
 If the code hasn’t changed and only new snapshots have been created (e.g., for automatically updated datasets), you can modify the snapshot MD5 in the `.dvc` file to point to an older snapshot.
 
@@ -54,7 +61,10 @@ If the code hasn’t changed and only new snapshots have been created (e.g., for
    etlr <dataset>
    ```
 
-💡 **Tip**: For chart comparisons, create a PR with the updated `.dvc` file, commit the changes, and use the chart diff tool. Enable "Show all charts" to view them side-by-side.
+!!! tip
+
+
+      For chart comparisons, create a PR with the updated `.dvc` file, commit the changes, and use the chart diff tool. Enable "Show all charts" to view them side-by-side.
 
 ---
 
@@ -83,5 +93,3 @@ To directly compare snapshots, use the `etl.snapshot` module.
      snap.pull()
      pd.read_csv(snap.path).shape
      ```
-
----

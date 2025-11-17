@@ -346,9 +346,9 @@ def dataclass_from_dict(cls: type[T] | None, d: dict[str, Any]) -> T:
 def remove_details_on_demand(text: str) -> str:
     # Remove references to details on demand from a text.
     # Example: "This is a [description](#dod:something)." -> "This is a description."
-    regex = r"\(\#dod\:.*\)"
-    if "(#dod:" in text:
-        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
+    # The regex matches the entire markdown link syntax [text](#dod:keyword) and replaces it with just the text
+    regex = r"\[([^\]]+)\]\(#dod:[^\)]+\)"
+    text = re.sub(regex, r"\1", text)
 
     return text
 

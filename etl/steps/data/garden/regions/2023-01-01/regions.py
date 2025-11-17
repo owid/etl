@@ -61,6 +61,10 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     duplicated_codes = df[df["code"].duplicated()]["code"].tolist()
     assert len(duplicated_codes) == 0, f"Duplicated codes found: {duplicated_codes}"
 
+    # Check that there are no repeated names (to ensure unique name -> code mapping).
+    duplicated_names = df[df["name"].duplicated()]["name"].tolist()
+    assert len(duplicated_names) == 0, f"Duplicated names found: {duplicated_names}"
+
     # Check that all regions defined in lists exist as properly defined regions.
     for column_of_lists in ["members", "successors", "related"]:
         all_region_codes_in_lists = sum(df[column_of_lists].dropna().tolist(), [])

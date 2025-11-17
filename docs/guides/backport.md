@@ -1,4 +1,5 @@
 ---
+icon: material/history
 tags:
     - 👷 Staff
 ---
