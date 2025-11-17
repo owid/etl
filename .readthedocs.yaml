@@ -5,11 +5,16 @@ build:
   tools:
     python: "3.10"
   commands:
+    # Init submodules
     - git submodule init
     - git submodule update
+    # Install dependencies
     - pip install -U uv
     - uv sync --all-extras
-    - uv run mkdocs build
+    # Build docs using Makefile target
+    # - make docs.build
+    - make docs.build
+    # Move docs to expected location by RTD
     - mkdir -p _readthedocs
     - cp -r site/ _readthedocs/html/
 
