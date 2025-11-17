@@ -315,6 +315,7 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
         on=["country", "year", "counterpart_country"],
         how="left",
     )
+    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype(str)
 
     # Create China rows for each year with china_imports_share_of_gdp = -1
     china_years = tb[tb["counterpart_country"] == "World"]["year"].unique()
@@ -322,7 +323,7 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
         china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World") & (tb["year"] == year)
         if china_mask.any():
             # Update existing rows
-            tb.loc[china_mask, "china_imports_share_of_gdp"] = -1
+            tb.loc[china_mask, "china_imports_share_of_gdp"] = "China"
         else:
             # Add new row if it doesn't exist
             new_row = Table(
@@ -331,7 +332,7 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
                         "country": ["China"],
                         "year": [year],
                         "counterpart_country": ["World"],
-                        "china_imports_share_of_gdp": [-1],
+                        "china_imports_share_of_gdp": ["China"],
                     }
                 )
             ).copy_metadata(tb)
