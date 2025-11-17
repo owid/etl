@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import owid.catalog.processing as pr
 import pandas as pd
 
 from etl.helpers import PathFinder
