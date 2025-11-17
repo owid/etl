@@ -13,7 +13,7 @@ NOTE:
     - November: Add Q3 (Jul-Sep) data of current year
 
 
-INSTRUCTIONS TO UPDATE SNAPSHOT:
+INSTRUCTIONS TO UPDATE DATA (complete procedure):
     1. Go to the DVC file that is currently in use in the pipeline, copy it and create a new one.
 
     2. Modify its name and edit the fields to reflect the new version (dates, producer's version, links, etc.).
@@ -32,6 +32,10 @@ INSTRUCTIONS TO UPDATE SNAPSHOT:
     7. Go to the Garden step (`garden/war/latest/ucdp_preview`), update `LAST_YEAR`, `LAST_YEAR_PREVIEW` variables if applicable, and run it. Probably you will need to also update `NUM_MISSING_LOCATIONS`.
 
     8. Go back to the GitHub issue to address further steps that concern chart and Grapher updates (e.g. subtitle edits).
+
+NOTES:
+- Explore major differences between previous and current version of the dataset. Major differences might be due to the data having been revised (check code_status field).
+    - To do so, you'll have to get data for this and previous snapshot. More instructions in garden step, `garden/war/latest/ucdp_preview.py`, method `compare_versions`.
 """
 
 from pathlib import Path

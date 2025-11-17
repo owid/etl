@@ -233,3 +233,67 @@ def add_ced_data(tb_ged: Table, tb_ced: Table, last_year_ged: int, last_year_ced
     tb_ged = pr.concat([tb_ged, tb_ced], ignore_index=True)
 
     return tb_ged
+
+
+def compare_versions(path_1, path_2, country: str | None = None):
+    """Compare two versions of the dataset (snapshots).
+
+    Get data from running the pipeline up until country location assignment. You'll have to change the DAG to run the pipeline with previous snapshot."""
+    # Read data
+    df1 = pd.read_csv(path_1)
+    df2 = pd.read_csv(path_2)
+
+    # Select relevant columns & active conflicts
+    columns = [
+        "id",
+        "relid",
+        "conflict_type",
+        "conflict_new_id",
+        "conflict_name",
+        "where_coordinates",
+        "date_end",
+        "source_article",
+        "country",
+        "country_name_location",
+        "deaths_a",
+        "deaths_b",
+        "deaths_civilians",
+        "deaths_unknown",
+        "best",
+        "high",
+        "low",
+    ]
+
+    df1 = df1.loc[df1.active_year, columns]
+    df2 = df2.loc[df2.active_year, columns]
+
+    # Filter and keep only certain country
+    if country is not None:
+        df1 = df1[(df1.country_name_location == country)]
+        df2 = df2[(df2.country_name_location == country)]
+
+    # Group by end date to detect differences at a high level
+    def _compare_by_date(df1, df2):  # -> Any:
+        df_d1 = df1.groupby("date_end", as_index=False).best.sum()
+        df_d1 = df_d1[df_d1.date_end > "2024-12-31"]
+        df_d2 = df2.groupby("date_end", as_index=False).best.sum()
+        df_d2 = df_d2[df_d2.date_end > "2024-12-31"]
+
+        df = df_d1.merge(df_d2, on="date_end", suffixes=["_q2", "_q3"])
+        df = df.fillna(0)
+        df["diff"] = (df["best_q2"] - df["best_q3"]) / df["best_q2"]
+
+        return df.sort_values("diff", ascending=False).head(40)
+
+    # Group by end date to detect differences at a high level
+    _compare_by_date(df1, df2)
+
+    def _compare(df1, df2, dt):
+        dfa = df1.loc[df1.date_end == dt, ["relid", "conflict_name", "best"]]
+        dfb = df2.loc[df2.date_end == dt, ["relid", "conflict_name", "best"]]
+        dfc = dfa.merge(dfb[["relid", "best"]], on=["relid"], suffixes=["_q2", "_q3"], how="left")
+        dfc["diff"] = (dfc["best_q2"] - dfc["best_q3"]) / dfc["best_q2"]
+        return dfc.sort_values("diff", ascending=False).head(40)
+
+    DATE = ""
+    _compare(df1, df2, DATE)
