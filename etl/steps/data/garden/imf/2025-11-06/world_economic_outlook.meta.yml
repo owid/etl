@@ -12,7 +12,7 @@ tables:
   world_economic_outlook:
     variables:
       # GDP growth
-      gross_domestic_product__constant_prices__percent_change_observation:
+      gross_domestic_product__gdp__constant_prices__percent_change_observation:
         title: Gross domestic product, constant prices - Percent change - Observations
         unit: "%"
         short_unit: "%"
@@ -23,7 +23,7 @@ tables:
           tableDisplay:
             hideRelativeChange: True
 
-      gross_domestic_product__constant_prices__percent_change_forecast:
+      gross_domestic_product__gdp__constant_prices__percent_change_forecast:
         title: Gross domestic product, constant prices - Percent change - Forecasts
         unit: "%"
         short_unit: "%"
@@ -35,7 +35,7 @@ tables:
             hideRelativeChange: True
 
       # Unemployment rate
-      unemployment_rate__percent_of_total_labor_force_observation:
+      unemployment_rate_observation:
         title: Unemployment rate - Percent of total labor force - Observations
         unit: "%"
         short_unit: "%"
@@ -46,7 +46,7 @@ tables:
           tableDisplay:
             hideRelativeChange: True
 
-      unemployment_rate__percent_of_total_labor_force_forecast:
+      unemployment_rate_forecast:
         title: Unemployment rate - Percent of total labor force - Forecasts
         unit: "%"
         short_unit: "%"

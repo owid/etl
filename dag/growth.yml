@@ -35,13 +35,13 @@ steps:
   data://garden/ggdc/2022-12-23/maddison_database:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
-    # IMF World Economic Outlook
-  data://meadow/imf/2025-04-25/world_economic_outlook:
-    - snapshot://imf/2025-04-25/world_economic_outlook.xls
-  data://garden/imf/2025-04-25/world_economic_outlook:
-    - data://meadow/imf/2025-04-25/world_economic_outlook
-  data://grapher/imf/2025-04-25/world_economic_outlook:
-    - data://garden/imf/2025-04-25/world_economic_outlook
+     # IMF World Economic Outlook
+  data://meadow/imf/2025-11-06/world_economic_outlook:
+    - snapshot://imf/2025-11-06/world_economic_outlook.csv
+  data://garden/imf/2025-11-06/world_economic_outlook:
+    - data://meadow/imf/2025-11-06/world_economic_outlook
+  data://grapher/imf/2025-11-06/world_economic_outlook:
+    - data://garden/imf/2025-11-06/world_economic_outlook
 
   #
   # Average working hours - Huberman and Minns (2007)
@@ -80,10 +80,3 @@ steps:
     - data://garden/un/2025-05-07/undp_hdr
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-  # IMF World Economic Outlook
-  data://meadow/imf/2025-11-06/world_economic_outlook:
-    - snapshot://imf/2025-11-06/world_economic_outlook.csv
-  data://garden/imf/2025-11-06/world_economic_outlook:
-    - data://meadow/imf/2025-11-06/world_economic_outlook
-  data://grapher/imf/2025-11-06/world_economic_outlook:
-    - data://garden/imf/2025-11-06/world_economic_outlook
