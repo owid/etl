@@ -19,9 +19,17 @@ jobs:
             - uses: actions/checkout@v5
             - uses: actions/setup-python@v5
               with:
-                  python-version: 3.x
-            - run: pip install zensical
-            - run: zensical build --clean
+                  python-version: 3.11
+
+            - name: Submodule init
+              run: git submodule init && git submodule update
+
+            - name: Install dependencies and build docs
+              run: |
+                  pip install -U uv && uv sync --all-extras
+            - name: Build docs
+              run: make docs.build
+
             - uses: actions/upload-pages-artifact@v4
               with:
                   path: site
