@@ -194,3 +194,14 @@ steps:
     - data://meadow/artificial_intelligence/2025-08-25/robotaxis
   data://grapher/artificial_intelligence/2025-08-25/robotaxis:
     - data://garden/artificial_intelligence/2025-08-25/robotaxis
+
+  #
+  # IEA Energy and AI dataset
+  #
+  data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea:
+    - snapshot://artificial_intelligence/2025-11-07/energy_ai_iea.xlsx
+  data://garden/artificial_intelligence/2025-11-07/energy_ai_iea:
+    - data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea
+    - data://garden/energy/2025-06-27/electricity_mix
+  data://grapher/artificial_intelligence/2025-11-07/energy_ai_iea:
+    - data://garden/artificial_intelligence/2025-11-07/energy_ai_iea
