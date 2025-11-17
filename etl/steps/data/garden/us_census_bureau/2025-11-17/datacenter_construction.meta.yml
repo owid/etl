@@ -1,0 +1,23 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+dataset:
+  update_period_days: 30
+
+tables:
+  datacenter_construction:
+    variables:
+      datacenter_construction_spending:
+        title: Datacenter construction spending
+        unit: US dollars
+        short_unit: $
+        description_short: Private construction spending on datacenters in the United States, measured as seasonally adjusted annual rate.
+        description_key:
+          - The value represents the seasonally adjusted annual rate - an estimate of total construction spending that would occur if the current monthly rate continued for a full year.
+          - Data is collected through the Census Bureau's Value of Construction Put in Place Survey (VIP).
+          - Includes new construction and improvements to existing datacenter facilities.
+        display:
+          numDecimalPlaces: 0
