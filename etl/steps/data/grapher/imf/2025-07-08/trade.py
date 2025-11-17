@@ -15,6 +15,8 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("trade", reset_index=False)
+    tb["import_rank"] = tb["import_rank"].astype("string")
+    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype("string")
 
     #
     # Save outputs.
