@@ -15,7 +15,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_ced = paths.load_snapshot(short_name="ucdp_ced_v25_01_25_06.csv")
+    snap_ced = paths.load_snapshot(short_name="ucdp_ced_v25_01_25_09.csv")
 
     # Read as tables
     tb_ced = snap_ced.read_csv()
