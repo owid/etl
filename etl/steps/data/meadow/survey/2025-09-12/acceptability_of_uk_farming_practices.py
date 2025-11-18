@@ -16,17 +16,24 @@ MINIMUM_MINUTES = 2
 
 # Columns on people's acceptability on animal welfare issues.
 COLUMNS_ACCEPTABILILTY = {
-    "Cutting or grinding the teeth of new-born piglets": "Cutting or grinding the teeth of new-born piglets",
+    "Cutting or grinding the teeth of new-born piglets": "Cutting or grinding the teeth of newborn piglets",
     # NOTE: The following is empty, but another one with a similar name is not empty.
     #'Keeping chickens in cages with 750cm2 space (about the size of an A4 piece of paper)',
-    "Keeping chickens in cages with 750 sqcm space (about the size of an A4 piece of paper)": "Keeping chickens in cages about the size of an A4 piece of paper",
-    "Killing new-born calves who cannot produce milk": "Killing new-born calves who cannot produce milk",
-    "Cutting the beaks of new-born chickens": "Cutting the beaks of new-born chickens",
-    "Cutting the tails off new-born piglets": "Cutting the tails off new-born piglets",
-    "Killing new-born chicks by use of CO2 gassing or meat-grinders": "Killing new-born chicks by use of CO₂ gassing or meat-grinders",
+    "Keeping chickens in cages with 750 sqcm space (about the size of an A4 piece of paper)": "Keeping chickens in cages with about the space of an A4 sheet of printer paper per bird",
+    # Clarification: I can't think of a better phrasing that doesn't significantly change the meaning.
+    # I think the ideal phrasing would be something like "Killing newborn male calves who are not profitable for dairy farms" (which implies that not all male are killed).
+    # However, that would change the meaning of the survey too much. I think using “as” is not too bad. It’s exposing a practice that happens somewhat frequently, not always, and it happens because newborn male calves cannot produce milk.
+    "Killing new-born calves who cannot produce milk": "Killing newborn male calves as they cannot produce milk",
+    # Clarification here: It would be more accurate to say "Cutting off part of the beak", but I suppose we should stick to something closer to the original survey.
+    "Cutting the beaks of new-born chickens": "Cutting the beaks of newborn chicks",
+    # Clarification: It would be more accurate to say "part of", but I suppose we should stick to the original phrasing of the survey.
+    "Cutting the tails off new-born piglets": "Cutting the tails off newborn piglets",
+    "Killing new-born chicks by use of CO2 gassing or meat-grinders": "Killing newborn chicks using CO₂ gassing or meat-grinders",
     "Removing calves' horn buds using hot iron": "Removing calves' horn buds using hot iron",
-    "Keeping pigs in cages which prevent them from turning around for several weeks": "Keeping pigs in cages which prevent them from turning around for several weeks",
-    "Castrating new-born calves by cutting or crushing the testicles": "Castrating new-born calves by cutting or crushing the testicles",
+    "Keeping pigs in cages which prevent them from turning around for several weeks": "Keeping pigs in cages in which they cannot turn around for several weeks",
+    # Clarification: "crushing the testicles" is not inaccurate, but may be misinterpreted.
+    # What actually happens is that the spermatic cords are crushed with a clamp.
+    "Castrating new-born calves by cutting or crushing the testicles": "Castrating newborn calves by cutting or crushing the testicles",
 }
 # NOTE: There were other potentially interesting columns, but the survey results for these were less complete.
 COLUMNS_AGREEMENT = {
