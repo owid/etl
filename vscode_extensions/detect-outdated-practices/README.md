@@ -46,16 +46,34 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     {
         pattern: /\bdest_dir\b/,
         message: 'Use of "dest_dir" is outdated. Please use the recommended alternative.',
-        severity: vscode.DiagnosticSeverity.Warning
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'  // Optional: restrict to specific paths
     },
     // Add more patterns here
     {
         pattern: /\bold_function\b/,
         message: 'old_function is deprecated, use new_function instead',
         severity: vscode.DiagnosticSeverity.Warning
+        // No scope = applies to all Python files
     }
 ];
 ```
+
+### Scope Configuration
+
+Each pattern can optionally include a `scope` field to restrict where it applies:
+
+- **No scope** (undefined): Pattern applies to all Python files in the workspace
+- **Single glob pattern**: `scope: 'etl/steps/data/**'` - Applies only to files matching this pattern
+- **Multiple patterns**: `scope: ['etl/steps/**', 'apps/**']` - Applies to files matching any pattern
+
+**Glob pattern syntax:**
+- `*` - Matches any characters except `/` (single directory level)
+- `**` - Matches any characters including `/` (multiple directory levels)
+- Examples:
+  - `etl/steps/data/**` - All files under `etl/steps/data/`
+  - `etl/**/*.py` - All Python files under `etl/`
+  - `apps/*/utils.py` - `utils.py` files in any direct subdirectory of `apps/`
 
 After making changes:
 
@@ -75,6 +93,16 @@ Each pattern can specify:
   - `vscode.DiagnosticSeverity.Warning` (yellow squiggles)
   - `vscode.DiagnosticSeverity.Information` (blue squiggles)
   - `vscode.DiagnosticSeverity.Hint` (gray dots)
+- **scope**: Optional path restriction (glob pattern or array of patterns)
+
+## Testing the Scope Feature
+
+To test the scope functionality, open these files in VS Code:
+
+1. **`etl/steps/data/test_scope/inside_scope.py`** - Inside scope, all patterns will be detected
+2. **`outside_scope.py`** - Outside scope, no patterns will be detected
+
+Both files contain the same outdated code patterns, but only the file inside `etl/steps/data/**` will show warnings.
 
 ## Development
 
