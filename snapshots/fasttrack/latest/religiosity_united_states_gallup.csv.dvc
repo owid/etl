@@ -5,7 +5,7 @@ meta:
     citation_full: Gallup (2024). Religion.
     url_main: https://news.gallup.com/poll/1690/religion.aspx
     url_download: |-
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vR7QGUnjQJRpiMrHLVHS6cm_LEpd0v10MsePcypx84gT_XYLwwl2XacXBQ24edEpjk2LCZ_21A6mmS9/pub?output=csv
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSPaMNzRGdOQ6Pi6jvuGTaMggq1GJ33JzE7iWhHZS8gniZqkMLkFE9upAGx_0YSrZYEybADvaZ46zNe/pub?output=csv
     date_accessed: '2025-11-18'
   name: Religiosity in the United States (Gallup)
   description: Trends in religiosity, and participation in public services in the United States.
