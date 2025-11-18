@@ -15,40 +15,44 @@ definitions:
         chartTypes: ["SlopeChart", "DiscreteBar"]
         hasMapTab: true
         originUrl: ourworldindata.org/religion
-    - dimensions:
-        indicator: share_change_2010_2020
-      config:
-        chartTypes: []
-        hasMapTab: true
-        map:
-          colorScale:
-            baseColorScheme: RdBu
-            binningStrategy: manual
-            customNumericValues:
-              - 1
-              - -10
-              - -5
-              - -2
-              - -1
-              # - 0
-              - 1
-              - 2
-              - 5
-              - 10
-              - -1
+    # - dimensions:
+    #     indicator: share_change_2010_2020
+    #   config:
+    #     chartTypes: []
+    #     hasMapTab: true
+    #     map:
+    #       colorScale:
+    #         baseColorScheme: RdBu
+    #         binningStrategy: manual
+    #         customNumericValues:
+    #           - 1
+    #           - -10
+    #           - -5
+    #           - -2
+    #           - -1
+    #           # - 0
+    #           - 1
+    #           - 2
+    #           - 5
+    #           - 10
+    #           - -1
 
 dimensions:
   - slug: religion
     name: Religion
     choices:
-      - slug: "religion_distrib"
-        name: "Religious composition"
-        group: "Aggregates"
-        description: Distribution of population by religion
       - slug: "any_religion"
         name: "Any religion"
         group: "Aggregates"
         description: People affiliated to any religion
+      - slug: "religiously_unaffiliated"
+        name: "No religion"
+        group: "Aggregates"
+      - slug: "religion_distrib"
+        name: "Religious composition"
+        group: "Aggregates"
+        description: Distribution of population by religion
+
       - slug: "christians"
         name: "Christianity"
         group: "Major religions"
@@ -66,9 +70,6 @@ dimensions:
         group: "Major religions"
       - slug: "other_religions"
         name: "Other religions"
-        group: "Major religions"
-      - slug: "religiously_unaffiliated"
-        name: "No religion"
         group: "Major religions"
 
   - slug: indicator

@@ -11,8 +11,8 @@ COLORS_DISTRIB = {
     "muslims": "#58AC8C",
     "hindus": "#C05917",
     "buddhists": "#BC8E5A",
-    "jews": "#7C4DA0",
-    "other_religions": "#9A5129",
+    "jews": "#00295B",
+    "other_religions": "#7C4DA0",
     "religiously_unaffiliated": "#81C0C9",
 }
 
@@ -27,7 +27,7 @@ def run() -> None:
     # Load grapher dataset.
     ds = paths.load_dataset("religious_composition")
     tb = ds.read("religious_composition", load_data=False)
-    tb_pct = ds.read("share_change", load_data=False)
+    # tb_pct = ds.read("share_change", load_data=False)
 
     #
     # (optional) Adjust dimensions if needed
@@ -41,11 +41,11 @@ def run() -> None:
         short_name="religious_composition",
         tb=[
             tb,
-            tb_pct,
+            # tb_pct,
         ],
         indicator_names=[
             ["share", "count_unrounded"],
-            ["share_change_2010_2020"],
+            # ["share_change_2010_2020"],
         ],
         # dimensions={},
     )
@@ -86,12 +86,12 @@ def run() -> None:
         },
     )
 
-    c.drop_views(
-        dimensions={
-            "religion": "religion_distrib",
-            "indicator": "share_change_2010_2020",
-        },
-    )
+    # c.drop_views(
+    #     dimensions={
+    #         "religion": "religion_distrib",
+    #         "indicator": "share_change_2010_2020",
+    #     },
+    # )
     #
     # (optional) Edit views
     #
