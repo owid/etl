@@ -99,11 +99,6 @@ def run(dest_dir: str) -> None:
     # Rename causes
     tb = rename_causes(tb=tb, cause_renaming_dict=cause_renaming_dict, broad_cause_dict=broad_cause_dict)
     # Check for duplicates
-    # index_cols = ["country", "age", "cause", "metric", "year"]
-    # duplicates = tb[tb.duplicated(subset=index_cols, keep=False)]
-    # if len(duplicates) > 0:
-    #    print(f"\nFound {len(duplicates)} duplicate rows:")
-    #    print(duplicates.sort_values(index_cols))
     # Format the tables
     tb = tb.format(["country", "age", "broad_cause", "cause", "metric", "year"], short_name="gbd_child_treemap")
 
