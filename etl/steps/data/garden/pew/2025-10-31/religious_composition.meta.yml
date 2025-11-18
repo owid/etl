@@ -1,24 +1,45 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  common:
-    presentation:
-      grapher_config:
-        subtitle: "{definitions.others.subtitle}"
-      topic_tags:
-        - Uncategorized
   others:
     methodology: |-
       Estimates are based on more than 2,700 censuses and surveys. You can read complete methodology in [Pew's report](https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/).
     other_religions: |-
-      Other religions include Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
+      Other religions include Baha'is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
     note: |-
       These estimates are unrounded counts, which should be used with caution.
     subtitle: |-
       <% if religion == "religiously_unaffiliated" -%>
       This includes people that are not affiliated with any religion.
       <% elif religion == "other_religions" %>
-      This includes Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians, and many small groups, some of which can be described as folk or traditional religions.
+      This includes Baha'is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians, and many small groups, some of which can be described as folk or traditional religions.
       <% endif -%>
+    wysk_complete: &wysk_complete
+      - "{definitions.others.wysk.1_census}"
+      - "{definitions.others.wysk.2_identity}"
+      - "{definitions.others.wysk.3_nonrel_1}"
+      - "{definitions.others.wysk.4_nonrel_2}"
+      - "{definitions.others.wysk.5_children}"
+      - "{definitions.others.wysk.6_method}"
+    wysk_partial: &wysk_partial
+      - "{definitions.others.wysk.1_census}"
+      - "{definitions.others.wysk.2_identity}"
+      - "{definitions.others.wysk.5_children}"
+      - "{definitions.others.wysk.6_method}"
+    wysk:
+      1_census: These estimates are [sourced from](https://www.pewresearch.org/religion/2025/06/09/global-religious-change-methodology/) more than 2,700 censuses and surveys.
+      2_identity: People are categorized based on how they describe their own religious identity. If someone identifies with a religious group, they're classified as being part of that group regardless of their practices or beliefs.
+      3_nonrel_1: The religiously unaffiliated population includes people who say they do not identify with any religion or that they are atheist or agnostic in surveys and censuses.
+      4_nonrel_2: Some people categorised as “non-religious” or “religiously unaffiliated” may engage in activities and hold beliefs that can be considered religious or spiritual, even though they don't describe themselves as belonging to any religion. This is particularly important for Chinese data, since “religiously unaffiliated” is by far the largest group. Pew [discusses this](https://www.pewresearch.org/religion/2023/08/30/measuring-religion-in-china/) in detail.
+      5_children: While censuses often provide information on people of all ages, most surveys only report on the religious composition of adults. In such cases, researchers use indirect demographic methods to estimate this data for children. For example, Pew uses data on the age structure and fertility rates of women in different religious groups to estimate the proportion of each religious group in the child population. This assumes that children share their mother's religion.
+      6_method: Pew's methodology has changed over time, as improved data sources have become available. That means its latest estimates for 2010 — shown in this dataset — may differ from its earlier publications. You can see these changes and the reasons for these revisions in [its updated methodology](https://www.pewresearch.org/religion/2025/06/09/why-we-revised-our-estimates-for-2010/).
+  common:
+    presentation:
+      grapher_config:
+        subtitle: "{definitions.others.subtitle}"
+      topic_tags:
+        - Uncategorized
+    description_key: *wysk_complete
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
