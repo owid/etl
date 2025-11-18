@@ -8,7 +8,7 @@ Important - You need and account to access the data.
 * In 'GBD Estimate' select 'Cause of death or injury'
 * In Measure select 'Deaths'
 * In Metric select 'Number'
-* In Cause select: "Neonatal preterm birth","Neonatal encephalopathy due to birth asphyxia and trauma","Neonatal sepsis and other neonatal infections","Hemolytic disease and other neonatal jaundice","Other neonatal disorders","Nutritional deficiencies","All causes","Communicable, maternal, neonatal, and nutritional diseases","Tuberculosis","HIV/AIDS","Diarrheal diseases","Pertussis","Measles","Non-communicable diseases","Neoplasms","Sexually transmitted infections excluding HIV","Neurological disorders","Neglected tropical diseases and malaria","Malaria","Chronic respiratory diseases","Cardiovascular diseases","Digestive diseases","Falls","Drowning","Fire, heat, and hot substances","Poisonings","Adverse effects of medical treatment","Animal contact","Pulmonary aspiration and foreign body in airway","Self-harm and interpersonal violence","Musculoskeletal disorders","Other non-communicable diseases","Conflict and terrorism","Respiratory infections and tuberculosis","Enteric infections","Neural tube defects","Congenital heart anomalies","Digestive congenital anomalies","Skin and subcutaneous diseases","Sudden infant death syndrome","Injuries","Transport injuries","Invasive Non-typhoidal Salmonella (iNTS)","Other infectious diseases","Substance use disorders","Diabetes and kidney diseases","Unintentional injuries"
+* In Cause select: "Neonatal preterm birth","Neonatal encephalopathy due to birth asphyxia and trauma","Neonatal sepsis and other neonatal infections","Hemolytic disease and other neonatal jaundice","Other neonatal disorders","Nutritional deficiencies","Tuberculosis","HIV/AIDS","Diarrheal diseases","Pertussis","Measles","Non-communicable diseases","Neoplasms","Sexually transmitted infections excluding HIV","Neurological disorders","Neglected tropical diseases and malaria","Malaria","Chronic respiratory diseases","Cardiovascular diseases","Digestive diseases","Falls","Drowning","Fire, heat, and hot substances","Poisonings","Adverse effects of medical treatment","Animal contact","Pulmonary aspiration and foreign body in airway","Self-harm and interpersonal violence","Musculoskeletal disorders","Other non-communicable diseases","Conflict and terrorism","Respiratory infections and tuberculosis","Enteric infections","Neural tube defects","Congenital heart anomalies","Digestive congenital anomalies","Skin and subcutaneous diseases","Sudden infant death syndrome","Transport injuries","Invasive Non-typhoidal Salmonella (iNTS)","Other infectious diseases","Substance use disorders","Diabetes and kidney diseases","Unintentional injuries", "Meningitis
 * In Location select 'Global', 'China', 'United States', 'Central African Republic', 'Brazil', 'France'
 * In Age select 'All ages',
 * In Sex select 'Both'
@@ -38,7 +38,7 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2023-public/82a576602bba2b385988cd88252b11ec_files/IHME-GBD_2023_DATA-82a57660-"
+BASE_URL = "https://dl.healthdata.org:443/gbd-api-2023-public/af26ef7cf4eec4624bb33888999852fc_files/IHME-GBD_2023_DATA-af26ef7c-"
 NUMBER_OF_FILES = 1
 
 

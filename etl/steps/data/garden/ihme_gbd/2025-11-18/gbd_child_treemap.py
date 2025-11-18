@@ -11,6 +11,7 @@ paths = PathFinder(__file__)
 
 cause_renaming_dict = {
     "Adverse effects of medical treatment": "Medical accidents",
+    "Animal contact": "Animal attacks",
     "Conflict and terrorism": "Conflict",
     "Congenital heart anomalies": "Heart abnormalities",
     "Digestive congenital anomalies": "Digestive defects",
@@ -21,17 +22,18 @@ cause_renaming_dict = {
     "Neonatal preterm birth": "Preterm birth",
     "Neonatal sepsis and other neonatal infections": "Neonatal sepsis & other infections",
     "Neoplasms": "Cancers",
+    "Neural tube defects": "Neural tube disorders",
     "Nutritional deficiencies": "Malnutrition",
     "Other neonatal disorders": "Other birth disorders",
     "Pertussis": "Whooping cough",
-    "Pulmonary aspirations and foreign body in airway": "Suffocation by objects",
+    "Pulmonary aspiration and foreign body in airway": "Suffocation by objects",
     "Sexually transmitted infections excluding HIV": "Syphilis and other STDs",
     "Transport injuries": "Transport accidents",
     "Respiratory infections and tuberculosis excluding Tuberculosis": "Respiratory infections",
 }
 
 broad_cause_dict = {
-    "Animal contact": "Injuries",
+    "Animal attacks": "Injuries",
     "Cancers": "Non-communicable diseases",
     "Conflict": "Injuries",
     "Diarrheal diseases": "Infectious diseases",
@@ -49,7 +51,7 @@ broad_cause_dict = {
     "Medical accidents": "Injuries",
     "Neonatal asphyxia (suffocation) and trauma": "Birth disorders",
     "Neonatal sepsis & other infections": "Birth disorders",
-    "Neural tube defects": "Birth disorders",
+    "Neural tube disorders": "Birth disorders",
     "Other birth disorders": "Birth disorders",
     "Other infectious diseases": "Infectious diseases",
     "Other injuries": "Injuries",
@@ -123,16 +125,6 @@ def reaggregate_causes(tb: Table) -> Table:
     """
     We want to reaggregate some causes to pull out some important causes of death and to combine some smaller ones.
 
-    Specifically, we want to:
-    - Pull out Malaria from Neglected tropical diseases and malaria
-    - Pull out HIV/AIDS from HIV/AIDS and sexually transmitted infections
-    - Pull out Tuberculosis from Respiratory infections and tuberculosis
-    - Pull out Diarrheal diseases from Enteric infections
-    - Pull out Self-harm from Self-harm and interpersonal violence
-    - Pull out Interpersonal violence from Self-harm and interpersonal violence excluding Self-harm #created in the previous line
-    - Combine 'Musculoskeletal disorders', 'Mental disorders', 'Skin and subcutaneous diseases', 'Substance use disorders' and 'Other non-communicable diseases'  into 'Other non-communicable diseases'
-    - Combine 'HIV/AIDS and sexually transmitted infections excluding HIV/AIDS','Respiratory infections and tuberculosis excluding Tuberculosis', 'Enteric infections excluding Diarrheal diseases' and 'Other infectious diseases' into 'Other infectious diseases'
-    - Combine 'Unintentional injuries', 'Self-harm and interpersonal violence excluding Self-harm excluding Interpersonal violence' into 'Other injuries
     """
     tb = pull_out_cause(tb, pull_out_cause="Tuberculosis", aggregate_cause="Respiratory infections and tuberculosis")
     tb = pull_out_cause(
@@ -141,9 +133,16 @@ def reaggregate_causes(tb: Table) -> Table:
         aggregate_cause="Enteric infections",
     )
     tb = pull_out_cause(tb, pull_out_cause="Malaria", aggregate_cause="Neglected tropical diseases and malaria")
-    tb = pull_out_cause(tb, pull_out_cause=["Pertussis", "Measles"], aggregate_cause="Other infectious diseases")
     tb = pull_out_cause(
-        tb, pull_out_cause="Conflict and terrorism", aggregate_cause="Self-harm and interpersonal violence"
+        tb, pull_out_cause=["Pertussis", "Measles", "Meningitis"], aggregate_cause="Other infectious diseases"
+    )
+    tb = pull_out_cause(
+        tb,
+        pull_out_cause=[
+            "Conflict and terrorism"
+        ],  # Self-harm is also technically in this group but it's empty for children
+        aggregate_cause="Self-harm and interpersonal violence",
+        residual_name="Violence",
     )
     tb = pull_out_cause(
         tb,
@@ -167,7 +166,7 @@ def reaggregate_causes(tb: Table) -> Table:
             "Animal contact",
         ],
         aggregate_cause="Unintentional injuries",
-        residual_name="Unintentional injuries excluding multiple causes",
+        residual_name="Other injuries",
     )
     tb = combine_causes(
         tb=tb,
@@ -188,20 +187,13 @@ def reaggregate_causes(tb: Table) -> Table:
     tb = combine_causes(
         tb=tb,
         causes_to_combine=[
-            "Other infectious diseases excluding Pertussis excluding Measles",
+            "Other infectious diseases excluding Pertussis excluding Measles excluding Meningitis",
             "Neglected tropical diseases and malaria excluding Malaria",
             "Enteric infections excluding Diarrheal diseases excluding Invasive Non-typhoidal Salmonella (iNTS)",
         ],
         new_cause_name="Other infectious diseases",
     )
-    tb = combine_causes(
-        tb=tb,
-        causes_to_combine=[
-            "Unintentional injuries excluding multiple causes",
-            "Self-harm and interpersonal violence excluding Conflict and terrorism",
-        ],
-        new_cause_name="Other injuries",
-    )
+
     return tb
 
 
