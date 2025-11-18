@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+    processing_level: minor
+  description_key: |-
+    <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
+  annotation: |-
+    <% if cause == 'Maternal disorders' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
+
+dataset:
+  update_period_days: 1460
+tables:
+  gbd_child_treemap:
+    dimensions:
+      - name: Cause of death
+        slug: cause
+      - name: Age group
+        slug: age
+      - name: Metric
+        slug: metric
+    variables:
+      value:
+        title: |-
+          {macros}
+          << format_title(metric, age, format_cause(cause), 'deaths') >>
+        unit: |-
+          {macros}
+          << format_unit(metric, 'deaths') >>
+        short_unit: |-
+          {definitions.short_unit}
+        description_short: |-
+          {macros}
+          << format_description_short(metric, age, format_cause(cause), 'deaths') >>
+        description_key:
+          - |-
+            {definitions.description_key}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+          entityAnnotationsMap: |-
+            {definitions.annotation}
+          name: << cause >>
