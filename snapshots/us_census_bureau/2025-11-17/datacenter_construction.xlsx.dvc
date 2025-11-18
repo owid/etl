@@ -29,6 +29,6 @@ meta:
       name: Public Domain
       url: https://www.census.gov/about/policies/privacy.html
 outs:
-  - md5: 07bdac0a483298aac9241f473a647d81
-    size: 190498
+  - md5: 3956897fb15190eda603c8acf807b5eb
+    size: 194582
     path: datacenter_construction.xlsx
