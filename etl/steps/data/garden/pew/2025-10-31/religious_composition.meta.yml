@@ -34,8 +34,6 @@ definitions:
       6_method: Pew's methodology has changed over time, as improved data sources have become available. That means its latest estimates for 2010 — shown in this dataset — may differ from its earlier publications. You can see these changes and the reasons for these revisions in [its updated methodology](https://www.pewresearch.org/religion/2025/06/09/why-we-revised-our-estimates-for-2010/).
   common:
     presentation:
-      grapher_config:
-        subtitle: "{definitions.others.subtitle}"
       topic_tags:
         - Uncategorized
     description_key: *wysk_complete
@@ -84,6 +82,10 @@ tables:
           - "{definitions.others.methodology}"
 
   religious_composition:
+    common:
+      presentation:
+        grapher_config:
+          subtitle: "{definitions.others.subtitle}"
     variables:
       share:
         title: |-
