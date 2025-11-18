@@ -16,6 +16,7 @@ tables:
         unit: US dollars
         short_unit: $
         description_short: Monthly private construction spending on data center buildings in the United States, covering materials, labor, and contractor costs for work done at construction sites. This excludes equipment like servers and IT hardware. The data is not adjusted for inflation.
+        description_key:
           - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
           - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only part of total data center investment, since IT hardware represents a significant additional cost.
           - The values shown are monthly spending figures that have been seasonally adjusted to remove typical seasonal patterns. This adjustment makes it easier to compare different months throughout the year by accounting for regular variations like slower winter construction or busier summer periods.
