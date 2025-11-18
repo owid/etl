@@ -2,6 +2,8 @@
 definitions:
   common:
     presentation:
+      grapher_config:
+        subtitle: "{definitions.others.subtitle}"
       topic_tags:
         - Uncategorized
   others:
@@ -9,6 +11,14 @@ definitions:
       Estimates are based on more than 2,700 censuses and surveys. You can read complete methodology in [Pew's report](https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/).
     other_religions: |-
       Other religions include Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
+    note: |-
+      These estimates are unrounded counts, which should be used with caution.
+    subtitle: |-
+      <% if religion == "religiously_unaffiliated" -%>
+      This includes people that are not affiliated with any religion.
+      <% elif religion == "other_religions" %>
+      This includes Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians, and many small groups, some of which can be described as folk or traditional religions.
+      <% endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -68,7 +78,7 @@ tables:
           <% endif %>
         presentation:
           title_public: |-
-            Share of people
+            Share of population
             <%- if religion == "religiously_unaffiliated" %>
              that are not religious
             <%- elif religion == "any_religion" %>
@@ -110,9 +120,9 @@ tables:
         unit: people
         description_short: |-
           <%- if religion == "religiously_unaffiliated" -%>
-          Estimates of the number of people of all ages that are religiously unaffiliated.
+          Estimates of the number of people that are religiously unaffiliated.
           <%- elif religion == "other_religions" -%>
-          Estimates of the number of people of all ages affiliated to other religions. {definitions.others.other_religions}
+          Estimates of the number of people affiliated to other religions. {definitions.others.other_religions}
           <%- elif religion == "any_religion" -%>
           Estimates of the number of people affiliated to any religion.
           <%- else -%>
@@ -150,7 +160,7 @@ tables:
           <%- endif -%>
         unit: people
         description_short: |-
-          {tables.religious_composition.variables.count.description_short} These estimates are unrounded counts, which should be used with caution.
+          {tables.religious_composition.variables.count.description_short} {definitions.others.note}
         description_key:
           - "{definitions.others.methodology}"
         display:
