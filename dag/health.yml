@@ -1354,3 +1354,10 @@ steps:
     - data-private://meadow/ihme_gbd/2025-11-18/gbd_child_treemap
   data-private://grapher/ihme_gbd/2025-11-18/gbd_child_treemap:
     - data-private://garden/ihme_gbd/2025-11-18/gbd_child_treemap
+  # European Society for Cardiology datasets
+  data://meadow/cardiovascular_diseases/2025-10-21/esc:
+    - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
+  data://garden/cardiovascular_diseases/2025-10-21/esc:
+    - data://meadow/cardiovascular_diseases/2025-10-21/esc
+  data://grapher/cardiovascular_diseases/2025-10-21/esc:
+    - data://garden/cardiovascular_diseases/2025-10-21/esc

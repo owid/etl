@@ -199,4 +199,4 @@ def upload_analysis_as_zip(
     return public_url
 
 
-# upload_analysis_as_zip(analysis_folder="/Users/tunaacisu/Code/etl/docs/analyses/media_deaths", folder_name="media-deaths-analysis")
+# upload_analysis_as_zip(analysis_folder="/Users/tunaacisu/Code/etl/docs/analyses/media_deaths", folder_name="media-deaths-analysis-data")

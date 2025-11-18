@@ -61,6 +61,10 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     duplicated_codes = df[df["code"].duplicated()]["code"].tolist()
     assert len(duplicated_codes) == 0, f"Duplicated codes found: {duplicated_codes}"
 
+    # Check that there are no repeated names (to ensure unique name -> code mapping).
+    duplicated_names = df[df["name"].duplicated()]["name"].tolist()
+    assert len(duplicated_names) == 0, f"Duplicated names found: {duplicated_names}"
+
     # Check that all regions defined in lists exist as properly defined regions.
     for column_of_lists in ["members", "successors", "related"]:
         all_region_codes_in_lists = sum(df[column_of_lists].dropna().tolist(), [])
@@ -92,6 +96,17 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
         "If this duplicate was intended, add it to DUPLICATED_ALIASES at the beginning of the regions.py garden step."
     )
     assert len(aliases_duplicated) == 0, error
+
+    # Sanity check the definitions of Northern and Southern Hemispheres.
+    nh = df[df["name"] == "Northern Hemisphere"]["members"].item()
+    sh = df[df["name"] == "Southern Hemisphere"]["members"].item()
+    countries = df[(df["region_type"] == "country") & (df["defined_by"] == "owid")]["code"].unique().tolist()
+    error = "Overlap between countries in the Northern and Southern Hemispheres."
+    assert set(nh) & set(sh) == set(), error
+    error = "Unexpected countries in the aggregates of the Northern and Southern Hemispheres."
+    assert (set(nh) | set(sh)) - set(countries) == set(), error
+    error = "Northern and Southern Hemispheres do not contain all countries."
+    assert set(countries) - (set(nh) | set(sh)) == set(), error
 
 
 def check_unique_members_within_regions(df: pd.DataFrame) -> None:

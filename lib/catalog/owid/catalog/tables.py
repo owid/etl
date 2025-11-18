@@ -215,36 +215,82 @@ class Table(pd.DataFrame):
     def codebook(self) -> pd.DataFrame:
         """
         Return a codebook for this table.
+
+        The codebook contains:
+        - column: Column name (including index columns)
+        - title: Title of the indicator
+        - description: Short description
+        - unit: Unit of measurement (with short unit in parentheses)
+        - source: Formatted source attribution with URLs
         """
-
-        # Define how to show attributions and URLs in the sources column.
-        def _prepare_attributions(attribution: str, url_main: str) -> str:
-            return f"{attribution} ( {url_main} )"
-
         # Initialize lists to store the codebook information.
         columns = []
         titles = []
         descriptions = []
+        units = []
         sources = []
-        for column in self.columns:
-            md = self[column].metadata
+
+        # Use all_columns to include both index and regular columns.
+        for column in self.all_columns:
+            # Use get_column_or_index to access both regular and index columns.
+            md = self.get_column_or_index(column).metadata
             columns.append(column)
-            titles.append(getattr(md.presentation, "title_public", None) or md.title)
-            # Use short description (after removing details on demand, if any).
-            descriptions.append(utils.remove_details_on_demand(md.description_short))
-            sources.append(
-                "; ".join(
-                    dict.fromkeys(
-                        _prepare_attributions(
-                            origin.attribution if origin.attribution else origin.producer, origin.url_main
-                        )
-                        for origin in md.origins
-                    )
-                )
-            )
+
+            # Determine the best title to use.
+            # Priority: presentation.title_public > display.name > title
+            title = md.title or ""
+            if md.presentation and md.presentation.title_public:
+                title = md.presentation.title_public
+            elif md.display and "name" in md.display:
+                title = md.display["name"]
+
+            titles.append(title)
+
+            # Use short description.
+            descriptions.append(md.description_short or "")
+
+            # Prepare indicator's unit, including short_unit if available.
+            unit = md.unit or ""
+            if md.short_unit and md.short_unit != md.unit:
+                unit += f" ({md.short_unit})"
+            units.append(unit)
+
+            # Gather unique origins of current variable.
+            unique_sources = []
+            for origin in md.origins:
+                # Construct the source name from the origin's attribution.
+                # If not defined, build it using the default format "Producer - Data product (year)".
+                if origin.attribution:
+                    source_name = origin.attribution
+                else:
+                    # Build default format
+                    source_name = origin.producer
+                    if origin.title or origin.title_snapshot:
+                        source_name += f" - {origin.title or origin.title_snapshot}"
+                    if origin.date_published:
+                        # Extract year from date_published (can be YYYY or YYYY-MM-DD)
+                        year = str(origin.date_published).split("-")[0]
+                        source_name += f" ({year})"
+
+                # Add URL at the end of the source in brackets.
+                if origin.url_main:
+                    source_name += f" [{origin.url_main}]"
+
+                # Add the source to the list of unique sources.
+                if source_name not in unique_sources:
+                    unique_sources.append(source_name)
+
+            # Concatenate all sources.
+            sources_combined = "; ".join(unique_sources)
+            sources.append(sources_combined)
+
+        # Apply remove_details_on_demand to all descriptions at once.
+        descriptions = [utils.remove_details_on_demand(desc) for desc in descriptions]
 
         # Create a DataFrame with the codebook.
-        codebook = pd.DataFrame({"column": columns, "title": titles, "description": descriptions, "sources": sources})
+        codebook = pd.DataFrame(
+            {"column": columns, "title": titles, "description": descriptions, "unit": units, "source": sources}
+        )
 
         return codebook
 
@@ -257,10 +303,17 @@ class Table(pd.DataFrame):
         **kwargs: Any,
     ) -> None:
         # Save data and codebook to an excel file.
-        with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
-            super().to_excel(writer, sheet_name=sheet_name, **kwargs)
+        if isinstance(excel_writer, pd.ExcelWriter):
+            # If excel_writer is already an ExcelWriter instance, use it, to avoid nested contexts.
+            super().to_excel(excel_writer, sheet_name=sheet_name, **kwargs)
             if with_metadata:
-                self.codebook.to_excel(writer, sheet_name=metadata_sheet_name)
+                self.codebook.to_excel(excel_writer, sheet_name=metadata_sheet_name, index=False)
+        else:
+            # If excel_writer is a file path, create a new ExcelWriter context.
+            with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
+                super().to_excel(writer, sheet_name=sheet_name, **kwargs)
+                if with_metadata:
+                    self.codebook.to_excel(writer, sheet_name=metadata_sheet_name, index=False)
 
     def to_feather(
         self,
@@ -1920,6 +1973,36 @@ def read_custom(
     *args,
     **kwargs,
 ) -> Table:
+    """Read data using a custom reader function and return a Table with metadata.
+
+    This function allows using any custom data reading function while automatically
+    attaching metadata and origin information to the resulting Table. Useful when
+    standard read functions (read_csv, read_excel, etc.) don't meet specific needs.
+
+    Parameters
+    ----------
+    read_function : Callable
+        Custom function to read the data. Must accept filepath_or_buffer as first argument
+        and return a DataFrame or Table.
+    filepath_or_buffer : str | Path | IO[AnyStr]
+        Path to the file or file-like object to read.
+    metadata : TableMeta
+        Table metadata.
+    origin : Origin | None, optional
+        Origin of the table data.
+    underscore : bool, optional
+        True to make all column names snake case.
+    *args
+        Additional positional arguments to pass to read_function.
+    **kwargs
+        Additional keyword arguments to pass to read_function.
+
+    Returns
+    -------
+    Table
+        Data read by the custom function as a Table with attached metadata and origin.
+
+    """
     table = Table(read_function(filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)

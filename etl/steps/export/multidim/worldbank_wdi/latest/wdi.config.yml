@@ -1,0 +1,150 @@
+title:
+  title: "Comparison of labor estimates: national vs. modeled data"
+  title_variant: ILO
+topic_tags:
+  - Work & Employment
+default_selection:
+  - United Kingdom
+  - United States
+  - South Korea
+  - Rwanda
+  - Angola
+  - Mali
+
+default_dimensions:
+  indicator: unemployment_rate
+
+definitions:
+  description_short_labor_force_participation_rate: |-
+    Share of the working-age population who are economically active (employed or unemployed).
+  description_short_unemployment_rate: |-
+    Share of the [labor force](#dod:labor-force) without work, but actively looking for a job and available to start soon.
+  description_short_employment_to_population_ratio: |-
+    Share of the working-age population who are employed.
+
+  description_short_modeled_vs_national: |-
+    [National estimates](#dod:ilo-national-estimates) are based on each country's own data collection and definitions, while [modeled estimates](#dod:ilo-modelled-estimates) are produced by the ILO using statistical methods to improve comparability across countries and over time.
+
+  description_key_labor_force_participation_1: |-
+    The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
+  description_key_labor_force_participation_2: |-
+    People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
+  description_key_unemployment: |-
+    The unemployment rate measures the share of the [labor force](#dod:labor-force) that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
+
+  description_key_iloest_modelled_data: |-
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+  description_key_national_estimates: |-
+    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
+  description_key_13th_icls: |-
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). Under this framework, employment includes work for pay or profit, including self-employment, as well as the production of goods for own use (such as subsistence farming). Changes in the definition of employment also affect who is counted as unemployed or outside the labor force. Because definitions were updated under the [19th ICLS](#dod:19-icls), data using the newer definitions is not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+
+  description_key_working_age_ilo_modeled: |-
+    When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_modeled_employment: |-
+    When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_national: |-
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO’s guidelines define it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
+
+  note_icls_13: |-
+    Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
+
+dimensions:
+  - name: Metric
+    slug: indicator
+    choices:
+      - slug: unemployment_rate
+        name: Unemployment rate
+        description: Share of the labor force without work, but actively looking for a job and available to start soon
+      - slug: labor_force_participation_rate
+        name: Labor force participation rate
+        description: Share of the working-age population who are economically active (employed or unemployed)
+      - slug: employment_to_population_ratio
+        name: Employment-to-population ratio
+        description: Share of the working-age population who are employed
+views:
+  - dimensions:
+      indicator: unemployment_rate
+    indicators:
+      y:
+        - catalogPath: wdi#sl_uem_totl_ne_zs
+          display:
+            name: Unemployment rate, national
+            plotMarkersOnlyInLineChart: true
+        - catalogPath: wdi#sl_uem_totl_zs
+          display:
+            name: Unemployment rate, modeled
+    config:
+      title: "Unemployment rate estimates: national vs. modeled data"
+      subtitle: "{definitions.description_short_unemployment_rate} {definitions.description_short_modeled_vs_national}"
+      note: "{definitions.note_icls_13}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
+    metadata:
+      description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_13th_icls}"
+      description_short: "{definitions.description_short_unemployment_rate}"
+
+  - dimensions:
+      indicator: labor_force_participation_rate
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_cact_ne_zs
+          display:
+            name: Labor force participation rate, national
+            plotMarkersOnlyInLineChart: true
+        - catalogPath: wdi#sl_tlf_cact_zs
+          display:
+            name: Labor force participation rate, modeled
+    config:
+      title: "Labor force participation rate estimates: national vs. modeled data"
+      subtitle: "{definitions.description_short_labor_force_participation_rate} {definitions.description_short_modeled_vs_national}"
+      note: "{definitions.note_icls_13}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
+    metadata:
+      description_key:
+        - "{definitions.description_key_labor_force_participation_1}"
+        - "{definitions.description_key_labor_force_participation_2}"
+        - "{definitions.description_key_13th_icls}"
+      description_short: "{definitions.description_short_labor_force_participation_rate}"
+
+  - dimensions:
+      indicator: employment_to_population_ratio
+    indicators:
+      y:
+        - catalogPath: wdi#sl_emp_totl_sp_ne_zs
+          display:
+            name: Employment-to-population ratio, national
+            plotMarkersOnlyInLineChart: true
+        - catalogPath: wdi#sl_emp_totl_sp_zs
+          display:
+            name: Employment-to-population ratio, modeled
+    config:
+      title: "Employment-to-population ratio estimates: national vs. modeled data"
+      subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"
+      note: "{definitions.note_icls_13}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
+    metadata:
+      description_key:
+        - "{definitions.employment_for_employment_to_population_ratio}"
+        - "{definitions.description_key_13th_icls}"
+      description_short: "{definitions.description_short_employment_to_population_ratio}"

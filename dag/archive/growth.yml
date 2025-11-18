@@ -1,1 +1,22 @@
 steps:
+  # Penn World Table
+data://meadow/ggdc/2025-07-31/penn_world_table:
+  - snapshot://ggdc/2025-07-31/penn_world_table.xlsx
+data://meadow/ggdc/2025-07-31/penn_world_table_national_accounts:
+  - data://garden/regions/2023-01-01/regions
+  - snapshot://ggdc/2025-07-31/penn_world_table_national_accounts.xlsx
+data://garden/ggdc/2025-07-31/penn_world_table_national_accounts:
+  - data://meadow/ggdc/2025-07-31/penn_world_table_national_accounts
+data://garden/ggdc/2025-07-31/penn_world_table:
+  - data://garden/ggdc/2025-07-31/penn_world_table_national_accounts
+  - data://meadow/ggdc/2025-07-31/penn_world_table
+data://grapher/ggdc/2025-07-31/penn_world_table:
+  - data://garden/ggdc/2025-07-31/penn_world_table
+
+    # IMF World Economic Outlook
+data://meadow/imf/2025-04-25/world_economic_outlook:
+  - snapshot://imf/2025-04-25/world_economic_outlook.xls
+data://garden/imf/2025-04-25/world_economic_outlook:
+  - data://meadow/imf/2025-04-25/world_economic_outlook
+data://grapher/imf/2025-04-25/world_economic_outlook:
+  - data://garden/imf/2025-04-25/world_economic_outlook

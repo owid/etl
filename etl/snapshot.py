@@ -110,7 +110,9 @@ class Snapshot:
 
         if retries > 1:
             for attempt in Retrying(
-                retry=retry_if_exception_type(requests.exceptions.HTTPError),
+                retry=retry_if_exception_type(
+                    (requests.exceptions.HTTPError, requests.exceptions.ChunkedEncodingError, DownloadCorrupted)
+                ),
                 stop=stop_after_attempt(retries),
                 wait=wait_exponential(multiplier=1, min=1, max=10),
             ):
@@ -357,11 +359,51 @@ class Snapshot:
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
 
+    def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
+        """Read data file using a custom reader function, and return a Table with metadata.
+
+        Use this method when standard read methods (read_csv, read_excel, etc.) don't meet
+        your needs. The custom function receives the snapshot file path and should return
+        a pandas DataFrame or compatible data structure.
+
+        Parameters
+        ----------
+        read_function : Callable
+            Custom function to read the data. Must accept a file path as first argument
+            and return a DataFrame or Table.
+        *args
+            Additional positional arguments to pass to read_function.
+        **kwargs
+            Additional keyword arguments to pass to read_function.
+
+        Returns
+        -------
+        Table
+            Data read by the custom function as a Table with snapshot metadata.
+
+        Examples
+        --------
+        Read a table from an HTML file:
+
+        ```python
+        tb = snap.read_custom(read_function=lambda x: pd.read_html(x)[0])
+        ```
+        """
+        return pr.read_custom(
+            filepath_or_buffer=self.path,
+            read_function=read_function,
+            *args,
+            metadata=self.to_table_metadata(),
+            origin=self.metadata.origin,
+            **kwargs,
+        )
+
     # Methods to deal with archived files
-    @deprecated("This function will be deprecated. Use `open_archive` context manager instead.")
+    @deprecated("This function will be deprecated. Use `open_archive()` context manager instead.")
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
+    @deprecated("This function will be deprecated. Use `open_archive()` context manager instead.")
     def extract_to_tempdir(self) -> Any:
         # Create temporary directory
         temp_dir = tempfile.TemporaryDirectory()
@@ -424,19 +466,29 @@ class Snapshot:
     @property
     def path_unarchived(self) -> Path:
         if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
-            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.open_archive():' context manager.")
 
         return self._unarchived_dir
 
     def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
-        Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+        Use this function within a 'with snap.open_archive():' context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
 
         The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
+
+        Example:
+
+        ```python
+        snap = Snapshot(...)
+
+        with snap.open_archive():
+            table1 = snap.read_from_archive("filename1.csv")
+            table2 = snap.read_from_archive("filename2.csv")
+        ```
         """
         if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
-            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.open_archive()' context manager.")
 
         if force_extension is None:
             new_extension = filename.split(".")[-1]

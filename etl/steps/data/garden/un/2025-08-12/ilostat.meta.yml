@@ -10,9 +10,12 @@ definitions:
     display: &common_display
       tolerance: 5
 
-  employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
+  employment: Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
 
-  icse_93: This status in employment is provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
+  icse_93: The concept of status in employment refers to a person's relationship with their job — that is, who they work for or with. It does not refer to the sector, their skill level, or the quality of their work. This is based on the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93), which groups jobs according to the type of relationship between the worker and their job or employer.
+
+  icse_93_short: This status in employment is provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   isco_08: This is based on the International Standard Classification of Occupations 2008 (ISCO-08). More information can be found in the [ISCO documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/).
 
@@ -38,7 +41,7 @@ definitions:
 
   age: |-
     <% if classif1 == "Age (youth, adults): 15+" %>
-     (15+)
+     (ages 15 and over)
     <%- elif classif1 == "Age (youth, adults): 15-24" %>
      aged 15-24
     <%- elif classif1 == "Age (youth, adults): 15-64" %>
@@ -54,7 +57,7 @@ definitions:
     <%- elif classif1 == "Age (aggregate): 65+" %>
      aged 65 and older
     <%- elif classif1 == "Age (aggregate): Total" %>
-     (15+)
+     (ages 15 and over)
     <%- endif %>
 
   age_unemployment: |-
@@ -85,18 +88,37 @@ definitions:
       contributing family workers
     <%- endif %>
 
+  description_key_labor_force_participation_1: |-
+    The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
+  description_key_labor_force_participation_2: |-
+    People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
+
+  description_key_unemployment: |-
+    The unemployment rate measures the share of the [labor force](#dod:labor-force) that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+
+  description_key_employees: |-
+    Employees are defined as workers in paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which gives them remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93_short}
   description_key_status_in_employment: |-
     <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
-      _Employees_ are defined as workers on paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which give them a remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93}
+      {definitions.description_key_employees}
     <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
-      _Employers_ are defined as workers working on self-employment jobs who, and that have engaged one or more persons to work for them as employees. {definitions.icse_93}
+      Employers are defined as workers in self-employment jobs who have engaged one or more persons to work for them as employees. {definitions.icse_93_short}
     <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
-      _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them. {definitions.icse_93}
+      Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. {definitions.icse_93_short}
     <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
-      _Contributing family workers_ are defined as workers working on self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93}
+      Contributing family workers are defined as workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93_short}
     <%- endif %>
-  description_key_informal_employment: |-
-    Informal employment encompasses all jobs that lack basic social or legal protection and employment benefits, regardless of the type of organization in which they are performed. It includes own-account workers, employers, and members of producers’ cooperatives operating in the informal sector; own-account workers engaged in producing goods exclusively for their household’s final use (such as subsistence farming); and contributing family workers, whether in formal or informal sector enterprises. It also covers employees in informal jobs, whether they are working in formal enterprises, informal enterprises, or employed as paid domestic workers by households.
+  description_key_informal_employment_1: |-
+    Informal employment encompasses all work activities done without formal arrangements (in law or in practice). Informality is a characteristic of the job, not the worker. These are often jobs without basic social or legal protection and employment benefits. It excludes illegal and illicit activities.
+  description_key_informal_employment_2: |-
+    This indicator is particularly important in low- and middle-income countries, where informal employment accounts for a large share of total work and provides a main source of income for many households.
+
+  description_key_no_published_estimates: |-
+    A few countries — such as Ukraine, Palestine, and Sudan in recent years — have no published modeled estimates. This usually happens when comparable national data cannot be obtained, or when the ILO considers modeled estimates unreliable, for example, during conflict or major disruption.
+
+  description_key_modelling_status: |-
+    This indicator shows how the International Labour Organization (ILO) obtains unemployment data for each country. It indicates whether the ILO used a country-reported survey value, filled a missing value with a modeled estimate, or had no data available. This information comes from the “obs_status” (observation status) variable in the ILO Modelled Estimates (ILOEST) dataset. The code “R” identifies country-reported survey data (“Real value”) — we label it as “Survey data (national)”. When no observation status is available but the ILO provides a modeled estimate, we label it “Estimated by ILO models (modeled)”.
+
   description_key_child_labor: |-
     <% if classif1 == "Age (child labour): 5-11" %>
       Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
@@ -123,9 +145,9 @@ definitions:
     <% if classif1 == "Occupation (Skill level): Low" %>
       The skill level of occupations classified as _Low_ (level 1) refers to the performance of simple and routine tasks which may require the use of hand-held tools and considerable physical effort. Examples typically include cleaners and helpers, industry laborers, and other similar roles. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): Medium" %>
-      The skill level of occupations classified as _Medium_ (level 2) includes workers on clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
+      The skill level of occupations classified as _Medium_ (level 2) includes workers in clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): High" %>
-      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, and technicians and associate professionals. {definitions.isco_08}
+      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, technicians, and associate professionals. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): Not elsewhere classified" %>
       The skill level of occupations classified as _Not elsewhere classified_ includes armed forces occupations and occupations not classified in any of the skill levels 1 to 4. {definitions.isco_08}
     <%- endif %>
@@ -134,9 +156,18 @@ definitions:
   description_key_international_dollars: |-
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
   description_key_iloest_modelled_data: |-
-    This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+  description_key_ilo_national_estimates: |-
+    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
   description_key_13th_icls: |-
-    This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to the [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). Under this framework, employment includes work for pay or profit, including self-employment, as well as the production of goods for own use (such as subsistence farming). Changes in the definition of employment also affect who is counted as unemployed or outside the labor force. Because definitions were updated under the [19th ICLS](#dod:19-icls), data using the newer definitions is not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+
+  description_key_working_age_ilo_modeled: |-
+    When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_modeled_employment: |-
+    When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_national: |-
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO recommends defining it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
 
   description_key_extreme_poverty: |-
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
@@ -187,6 +218,17 @@ definitions:
   description_processing_avg_earnings_outliers: |-
     We excluded observations where average hourly earnings were below 0.2 or above 100 international-$ in {definitions.ppp_year} prices. Such values are highly unlikely as national averages and are therefore probably the result of miscalculation.
 
+  description_processing_projections: |-
+    We excluded projections from the ILO Modelled Estimates (ILOEST) series. These projections are indicated by the absence of an observation status (`obs_status`) across all countries in a given year.
+
+  description_processing_obs_status: |-
+    We modified the observation status (`obs_status`) variable to show the data is modeled whenever the original observation status was missing and there is a non-missing value for the corresponding ILO Modelled Estimates indicator.
+
+  # Common sort values for ordinal obs_status variables
+  sort_obs_status: &sort_obs_status
+    - Survey data (national)
+    - Estimated by ILO models (modeled)
+
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
@@ -212,8 +254,11 @@ tables:
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -225,9 +270,9 @@ tables:
         short_unit: "%"
         description_short: Share of{definitions.sex} employed population who are working in jobs that lack basic social or legal protection and employment benefits.
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
-          - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         display:
           name: Informal employment rate - <<sex>>
@@ -238,10 +283,12 @@ tables:
         title: Labor force - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
-        description_short: Sum of all persons of working age who are employed and those who are unemployed.
+        description_short: Working-age population who are economically active (employed or unemployed).
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Labor force - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -253,11 +300,35 @@ tables:
         short_unit: "%"
         description_short: Share of the{definitions.sex} working-age population{definitions.age} who are economically active (employed or unemployed).
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Labor force participation rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
+          <<: *common_display
+
+      obs_status_labour_force_participation_rate_by_sex_and_age:
+        title: Labor force participation rate status - <<sex>> - <<classif1>>
+        unit: ""
+        short_unit: ""
+        description_short: Shows whether the International Labour Organization uses country-reported national survey data or fills gaps with modeled estimates for labor force participation rate.
+        description_key:
+          - "{definitions.description_key_modelling_status}"
+          - "{definitions.description_key_no_published_estimates}"
+          - "{definitions.description_key_iloest_modelled_data}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_obs_status}"
+        type: ordinal
+        sort: *sort_obs_status
+        display:
+          name: Labor force participation rate status - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          tolerance: 0
           <<: *common_display
 
       unemployment_rate_by_sex_and_age:
@@ -266,11 +337,34 @@ tables:
         short_unit: "%"
         description_short: Share of the{definitions.sex} [labor force](#dod:labor-force){definitions.age_unemployment} without work, but actively looking for a job and available to start soon.
         description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Unemployment rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
+          <<: *common_display
+
+      obs_status_unemployment_rate_by_sex_and_age:
+        title: Unemployment rate status - <<sex>> - <<classif1>>
+        unit: ""
+        short_unit: ""
+        description_short: Shows whether the International Labour Organization uses country-reported national survey data or fills gaps with modeled estimates for unemployment rate.
+        description_key:
+          - "{definitions.description_key_modelling_status}"
+          - "{definitions.description_key_no_published_estimates}"
+          - "{definitions.description_key_iloest_modelled_data}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_obs_status}"
+        type: ordinal
+        sort: *sort_obs_status
+        display:
+          name: Unemployment rate status - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          tolerance: 0
           <<: *common_display
 
       #############################################################
@@ -332,6 +426,7 @@ tables:
         description_short: Gross remuneration for time worked or work done, vacation, and other types of paid leave.
         description_key:
           - "{definitions.description_key_earnings}"
+          - "{definitions.description_key_employees}"
           - "{definitions.description_key_international_dollars}"
         processing_level: major
         description_processing: |-
@@ -420,8 +515,10 @@ tables:
         short_unit: "%"
         description_short: Share of{definitions.sex} employed population who are working in jobs that lack basic social or legal protection and employment benefits.
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_13th_icls}"
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:
