@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 import requests
@@ -24,6 +25,16 @@ paths = PathFinder(__file__)
 
 # Define GDP/GDP per capita indicators in current US$ and their counterpart in constant LCU
 GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
+
+ILO_MODELED_AND_NATIONAL_INDICATORS = {
+    "unemployment_rate": ["sl_uem_totl_zs", "sl_uem_totl_ne_zs"],
+}
+
+# Set maximum ratio difference between ILO modeled and national values
+MAXIMUM_ALLOWED_RATIO_DIFFERENCE = 0.01  # 1%
+
+# Set maximum absolute difference between ILO modeled and national values
+MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE = 0.1  # 0.1 percentage points
 
 # Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
 BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
@@ -119,6 +130,8 @@ def run() -> None:
     tb_garden = add_energy_access_variables(tb_garden)
 
     tb_garden = add_patents_articles_per_million_people(tb_garden)
+
+    tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
 
     # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
     #  I tried to calculate them myself, but some large countries such as India have missing values and
@@ -895,4 +908,69 @@ def add_patents_articles_per_million_people(tb: Table) -> Table:
     tb["articles_per_million_people"] = tb["ip_jrn_artc_sc"] / tb["sp_pop_totl"] * 1000000
 
     tb = tb.format(["country", "year"])
+    return tb
+
+
+def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
+    """
+    Add ILO modeling comparison indicators to the table.
+    Each indicator is added as a new column with the suffix '_ilo_modeling_comparison'.
+    """
+
+    tb = tb.reset_index()
+
+    for indicator in ILO_MODELED_AND_NATIONAL_INDICATORS.keys():
+        ind_modeled = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][0]
+        ind_national = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][1]
+
+        # Also calculate the absolute difference
+        # Round each value to 1 decimal (using floor + 0.5 to avoid banker's rounding),
+        # then calculate the absolute difference
+        tb[f"{indicator}_absolute_difference"] = (
+            (np.floor(tb[ind_modeled] * 10 + 0.5) / 10 - np.floor(tb[ind_national] * 10 + 0.5) / 10).abs().round(1)
+        )
+
+        # Create a categorical variable based on the absolute difference
+        # If only available in ind_national, set as 'Survey only'
+        # If only available in ind_modeled, set as 'Modeled only'
+        # If the absolute difference is less than or equal to MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE, set as 'Both matching'
+        # If the absolute difference is greater than MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE, set as 'Both not matching'
+        # If neither is available, set as NaN
+        tb[f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
+        tb.loc[tb[ind_national].notna() & tb[ind_modeled].isna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
+            "Survey only"
+        )
+        tb.loc[tb[ind_national].isna() & tb[ind_modeled].notna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
+            "Modeled only"
+        )
+        tb.loc[
+            tb[f"{indicator}_absolute_difference"] < MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE,
+            f"{indicator}_ilo_modeling_comparison_absolute",
+        ] = "Both matching"
+        tb.loc[
+            (tb[f"{indicator}_absolute_difference"] >= MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE)
+            & tb[ind_national].notna()
+            & tb[ind_modeled].notna(),
+            f"{indicator}_ilo_modeling_comparison_absolute",
+        ] = "Both not matching"
+
+        # Copy metadata from the modeled indicator to the new comparison indicator
+        tb[f"{indicator}_ilo_modeling_comparison_absolute"] = tb[
+            f"{indicator}_ilo_modeling_comparison_absolute"
+        ].copy_metadata(tb[f"{indicator}_absolute_difference"])
+
+        # Calculate the maximum year with data for each indicator
+        max_year_modeled = tb.loc[tb[ind_modeled].notna(), "year"].max()
+        max_year_national = tb.loc[tb[ind_national].notna(), "year"].max()
+        max_year_for_comparison = min(max_year_modeled, max_year_national)
+
+        # Make ilo_modeling_comparison NaN for years greater than the maximum year with data
+        tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
+
+        # # Drop columns no longer needed
+        tb = tb.drop(columns=[f"{indicator}_absolute_difference"], errors="raise")
+
+    # Set index again
+    tb = tb.format()
+
     return tb
