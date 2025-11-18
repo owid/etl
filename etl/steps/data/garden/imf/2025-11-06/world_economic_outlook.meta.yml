@@ -4,6 +4,15 @@ definitions:
       topic_tags:
         - Economic Growth
     processing_level: minor
+    display: &common-display
+      tolerance: 0
+      entityAnnotationsMap: |-
+        G7 (IMF): Canada, France, Germany, Italy, Japan, UK, US
+        ASEAN-5 (IMF): Indonesia, Malaysia, Philippines, Singapore, Thailand
+        Euro area (IMF): EU countries that have adopted the euro as their currency
+        Advanced economies (IMF): i.e. US, Euro area, Japan, UK, Canada, Australia, among others
+      tableDisplay:
+        hideRelativeChange: True
 
 dataset:
   update_period_days: 365
@@ -20,9 +29,7 @@ tables:
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
         display:
           numDecimalPlaces: 1
-          tolerance: 0
-          tableDisplay:
-            hideRelativeChange: True
+          <<: *common-display
 
       gross_domestic_product__gdp__constant_prices__percent_change_forecast:
         title: Gross domestic product, constant prices - Percent change - Forecasts
@@ -32,10 +39,8 @@ tables:
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
         display:
           numDecimalPlaces: 1
-          tolerance: 0
           isProjection: true
-          tableDisplay:
-            hideRelativeChange: True
+          <<: *common-display
 
       # Unemployment rate
       unemployment_rate_observation:
@@ -46,10 +51,7 @@ tables:
         description_from_producer: "Unemployment rate can be defined by either the national definition, the ILO harmonized definition, or the OECD harmonized definition. The OECD harmonized unemployment rate gives the number of unemployed persons as a percentage of the labor force (the total number of people employed plus unemployed). [OECD Main Economic Indicators, OECD, monthly] As defined by the International Labour Organization, unemployed workers are those who are currently not working but are willing and able to work for pay, currently available to work, and have actively searched for work. [ILO, http://www.ilo.org/public/english/bureau/stat/res/index.htm]"
         display:
           numDecimalPlaces: 1
-          tolerance: 0
-          isProjection: true
-          tableDisplay:
-            hideRelativeChange: True
+          <<: *common-display
 
       unemployment_rate_forecast:
         title: Unemployment rate - Percent of total labor force - Forecasts
@@ -59,7 +61,6 @@ tables:
         description_from_producer: "Unemployment rate can be defined by either the national definition, the ILO harmonized definition, or the OECD harmonized definition. The OECD harmonized unemployment rate gives the number of unemployed persons as a percentage of the labor force (the total number of people employed plus unemployed). [OECD Main Economic Indicators, OECD, monthly] As defined by the International Labour Organization, unemployed workers are those who are currently not working but are willing and able to work for pay, currently available to work, and have actively searched for work. [ILO, http://www.ilo.org/public/english/bureau/stat/res/index.htm]"
         display:
           numDecimalPlaces: 1
-          tolerance: 0
-          tableDisplay:
-            hideRelativeChange: True
+          isProjection: true
+          <<: *common-display
 
