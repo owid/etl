@@ -2,7 +2,7 @@
 icon: lucide/hard-drive-download
 ---
 
-# Installatione
+# Installation
 The use of ETL is mainly addressed to OWID staff, but open to the general public. It is supported and regularly run on Linux, MacOS and Windows via WSL. Here's how to get set up.
 
 !!! warning
