@@ -8,21 +8,32 @@ definitions:
     note: |-
       These estimates are unrounded counts, which should be used with caution.
     subtitle: |-
-      <% if religion == "religiously_unaffiliated" -%>
-      This includes people that are not affiliated with any religion.
-      <% elif religion == "other_religions" %>
-      This includes Baha'is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians, and many small groups, some of which can be described as folk or traditional religions.
+      Estimates are based on how people describe their own religious identity. This self-identification is taken regardless of their practices or beliefs.
+      <%- if religion == "religiously_unaffiliated" %>
+       Estimates include people that are _not_ affiliated with any religion.
+      <%- elif religion == "any_religion" %>
+       Estimates include people that are affiliated with any religion.
+      <%- elif religion == "other_religions" %>
+       Estimates include Baha'is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians, and many small groups, some of which can be described as folk or traditional religions.
       <% endif -%>
+    wysk_cond: &wysk_cond
+      - "{definitions.others.wysk.1_census}"
+      - "{definitions.others.wysk.2_identity}"
+      - |-
+        <% if religion in ("religiously_unaffiliated", "any_religion", "religious_composition") -%>
+        {definitions.others.wysk.3_nonrel_1}
+        <% endif -%>
+      - |-
+        <% if religion in ("religiously_unaffiliated", "any_religion", "religious_composition") -%>
+        {definitions.others.wysk.4_nonrel_2}
+        <% endif -%>
+      - "{definitions.others.wysk.5_children}"
+      - "{definitions.others.wysk.6_method}"
     wysk_complete: &wysk_complete
       - "{definitions.others.wysk.1_census}"
       - "{definitions.others.wysk.2_identity}"
       - "{definitions.others.wysk.3_nonrel_1}"
       - "{definitions.others.wysk.4_nonrel_2}"
-      - "{definitions.others.wysk.5_children}"
-      - "{definitions.others.wysk.6_method}"
-    wysk_partial: &wysk_partial
-      - "{definitions.others.wysk.1_census}"
-      - "{definitions.others.wysk.2_identity}"
       - "{definitions.others.wysk.5_children}"
       - "{definitions.others.wysk.6_method}"
     wysk:
@@ -35,8 +46,8 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Uncategorized
-    description_key: *wysk_complete
+        - Religion
+    description_key: *wysk_cond
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -45,14 +56,34 @@ dataset:
 
 tables:
   most_popular_religion:
+    common:
+      description_key: *wysk_complete
     variables:
       most_popular_religion:
+        type: ordinal
+        sort:
+          - "Christians"
+          - "Muslims"
+          - "Hindus"
+          - "Buddhists"
+          - "Jews"
+          - "Other Religions"
+          - "Religiously Unaffiliated"
         title: Most popular religion in a country
         description_short: The most popular religion in each country and year, based on share of population.
         unit: ""
-        description_key:
-          - "{definitions.others.methodology}"
-
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryColors:
+                  "Christians": "#4C6A9C"
+                  "Muslims": "#578145"
+                  "Hindus": "#C05917"
+                  "Buddhists": "#BC8E5A"
+                  "Jews": "#00295B"
+                  "Other Religions": "#7C4DA0"
+                  "Religiously Unaffiliated": "#81C0C9"
   share_change:
     variables:
       share_change_2010_2020:
@@ -78,8 +109,6 @@ tables:
           <% endif -%>
         unit: "%"
         short_unit: "%"
-        description_key:
-          - "{definitions.others.methodology}"
 
   religious_composition:
     common:
@@ -89,7 +118,7 @@ tables:
     variables:
       share:
         title: |-
-          Share of population -
+          Share of the population -
           <% if religion == "religiously_unaffiliated" %>
            No religion
           <% elif religion == "other_religions" %>
@@ -101,7 +130,7 @@ tables:
           <% endif %>
         presentation:
           title_public: |-
-            Share of population
+            Share of the population
             <%- if religion == "religiously_unaffiliated" %>
              that are not religious
             <%- elif religion == "any_religion" %>
@@ -125,8 +154,6 @@ tables:
           <% endif -%>
         display:
           numDecimalPlaces: 1
-        description_key:
-          - "{definitions.others.methodology}"
 
       count:
         title: |-
@@ -151,9 +178,8 @@ tables:
           <%- else -%>
           Estimates of the number of people that are << religion >>.
           <%- endif %>
-        description_key:
-          - "{definitions.others.methodology}"
-          - In most countries, it is not possible to precisely count the number of people who identify with each religion. Because our estimates are not precise, the tables in this report and accompanying data files show rounded population counts (often to the nearest 10,000) and show counts below 10,000 as “<10,000.”
+        # description_key:
+        #   - In most countries, it is not possible to precisely count the number of people who identify with each religion. Because our estimates are not precise, the tables in this report and accompanying data files show rounded population counts (often to the nearest 10,000) and show counts below 10,000 as “<10,000.”
         display:
           numDecimalPlaces: 1
         presentation:
@@ -184,11 +210,11 @@ tables:
         unit: people
         description_short: |-
           {tables.religious_composition.variables.count.description_short} {definitions.others.note}
-        description_key:
-          - "{definitions.others.methodology}"
         display:
           numDecimalPlaces: 1
         presentation:
+          grapher_config:
+            note: "{definitions.others.note}"
           title_public: |-
             Number of people
             <%- if religion == "religiously_unaffiliated" %>
