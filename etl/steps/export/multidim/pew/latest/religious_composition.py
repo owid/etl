@@ -8,12 +8,12 @@ paths = PathFinder(__file__)
 COMMON_CONFIG = {}
 COLORS_DISTRIB = {
     "christians": "#4C6A9C",
-    "muslims": "#58AC8C",
+    "muslims": "#578145",
     "hindus": "#C05917",
     "buddhists": "#BC8E5A",
     "jews": "#00295B",
     "other_religions": "#7C4DA0",
-    "religiously_unaffiliated": "#81C0C9",
+    "religiously_unaffiliated": "#38AABA",
 }
 
 
@@ -82,7 +82,9 @@ def run() -> None:
             }
         ],
         params={
-            "indicator": lambda view: "Share of population" if view.matches(indicator="share") else "Number of people",
+            "indicator": lambda view: "Share of the population"
+            if view.matches(indicator="share")
+            else "Number of people",
         },
     )
 

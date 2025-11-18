@@ -2,13 +2,20 @@ title:
   title: Religious composition
   title_variant: ""
 default_selection:
+  - World
   - India
   - Indonesia
   - United Kingdom
   - Egypt
-  - World
   - United States
   - China
+topic_tags:
+  - Religion
+  - Demographics
+default_dimensions:
+  indicator: share
+  religion: any_religion
+
 definitions:
   common_views:
     - config:
@@ -22,6 +29,7 @@ definitions:
         map:
           colorScale:
             baseColorScheme: Blues
+
     # - dimensions:
     #     indicator: share_change_2010_2020
     #   config:
@@ -43,9 +51,6 @@ definitions:
     #           - 5
     #           - 10
     #           - -1
-default_dimensions:
-  indicator: share
-  religion: any_religion
 
 dimensions:
   - slug: religion
