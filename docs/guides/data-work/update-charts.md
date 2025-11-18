@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+icon: lucide/circle-fading-arrow-up
 ---
 
 # Update charts
@@ -9,10 +10,9 @@ Consider as an example that the UN releases a new dataset on their Population es
 
 This process is very common in our workflow, and we have tools to help us with it. This guide will walk you through these.
 
-This guide assumes:
-
-- [You have created your environment](../#create-environment).
-- You have [added](add-data) (or [updated](update-data)) the new dataset in the ETL catalog. Also, the dataset should be available in the database from your staging server.
+!!! note "Prior steps"
+    - You need a working [environment](../data-work/index.md#create-environment){ data-preview }.
+    - You have [added](add-data) (or [updated](update-data)) the new dataset in the ETL catalog. Also, the dataset should be available in the database from your staging server.
 
 <!--
 ## Create the new steps
@@ -61,9 +61,8 @@ etlwiz
 
 !!! tip "Make sure to use the database from the staging server"
 
-    Make sure to use Tailscale and set `STAGING=1` in your local `.env` file to connect to the staging server from your local machine.
-
-    [→ More information](../../environment/#working-with-staging-environments)
+    Use Tailscale and set `STAGING=1` in your local `.env` file to connect to the staging server from your local machine.
+    [More information](../environment/#working-with-staging-environments){ data-preview }
 
 This tool will help you match indicators from an old dataset to indicators from the new one. By default, it attempts to detect what is the new dataset your environment (compared to production), and matches it with the old one. You can also manually specify the datasets you want to compare with the various options available in the tool.
 
@@ -79,7 +78,7 @@ There is also an "explore" mode which you can use to quickly compare two indicat
 Once you have finished mapping indicators, you will see a preview of the affected charts. Now, you just need to approve all new charts, and these will become live on your staging server.
 
 <figure markdown="span">
-  ![Chart Upgrader](../../../assets/indicator-upgrader-2.png)
+  ![Chart Upgrader](../../assets/indicator-upgrader-2.png)
   <figcaption>.</figcaption>
 </figure>
 
@@ -114,7 +113,7 @@ To detect these changes, we use checksums and compare them to detect changes.
 Using chart diff is straightforward. Just start `etlwiz` and go to "Chart diff". In there you will have a preview of all charts that have been modified in your PR staging server.
 
 <figure markdown="span">
-  ![Chart Upgrader](../../../assets/chart-diff.png)
+  ![Chart Upgrader](../../assets/chart-diff.png)
   <figcaption>Example of chart diff. On the left, the version in production. On the right, the version in your staging server. You can share a link to an individual chart-diff using the link shown in the upper-right part of the container.</figcaption>
 </figure>
 

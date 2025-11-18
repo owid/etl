@@ -2,8 +2,7 @@
 
 from typing import Optional
 
-import click
-from rich_click import RichCommand
+import rich_click as click
 
 from apps.housekeeper.charts import send_slack_chart_review
 
@@ -20,7 +19,7 @@ SLACK_USERNAME = "housekeeper"
 ICON_EMOJI = "sus-blue"
 
 
-@click.command("housekeeper", cls=RichCommand, help=__doc__)
+@click.command("housekeeper", help=__doc__)
 @click.option(
     "--review-type",
     "-t",

@@ -88,93 +88,93 @@ make watch
 ## Changelog
 
 - `v0.4.3`
-  - Fixed minor bugs
+    - Fixed minor bugs
 - `v0.4.0`
-  - **Highlights**
-    - Support for Python 3.10-3.13 (was 3.11-3.13)
-    - Drop support for Python 3.9 (breaking change)
-  - **Others**
-    - Deprecate Walden.
-    - Dependencies: Change `rdata` for `pyreadr`.
-    - Support: indicator dimensions.
-    - Support: MDIMs.
-    - Switched from Poetry to UV package manager.
-    - New decorator `@keep_metadata` to propagate metadata in pandas functions.
-  - Fixes: `Table.apply`, `groupby.apply`, metadata propagation, type hinting, etc.
+    - **Highlights**
+      - Support for Python 3.10-3.13 (was 3.11-3.13)
+      - Drop support for Python 3.9 (breaking change)
+    - **Others**
+      - Deprecate Walden.
+      - Dependencies: Change `rdata` for `pyreadr`.
+      - Support: indicator dimensions.
+      - Support: MDIMs.
+      - Switched from Poetry to UV package manager.
+      - New decorator `@keep_metadata` to propagate metadata in pandas functions.
+    - Fixes: `Table.apply`, `groupby.apply`, metadata propagation, type hinting, etc.
 - `v0.3.11`
-  - Add support for Python 3.12 in `pypackage.toml`
+    - Add support for Python 3.12 in `pypackage.toml`
 - `v0.3.10`
-  - Add experimental chart data API in `owid.catalog.charts`
+    - Add experimental chart data API in `owid.catalog.charts`
 - `v0.3.9`
-  - Switch from isort & black & fake8 to ruff
+    - Switch from isort & black & fake8 to ruff
 - `v0.3.8`
-  - Pin dataclasses-json==0.5.8 to fix error with python3.9
+    - Pin dataclasses-json==0.5.8 to fix error with python3.9
 - `v0.3.7`
-  - Fix bugs.
-  - Improve metadata propagation.
-  - Improve metadata YAML file handling, to have common definitions.
-  - Remove `DatasetMeta.origins`.
+    - Fix bugs.
+    - Improve metadata propagation.
+    - Improve metadata YAML file handling, to have common definitions.
+    - Remove `DatasetMeta.origins`.
 - `v0.3.6`
-  - Fixed tons of bugs
-  - `processing.py` module with pandas-like functions that propagate metadata
-  - Support for Dynamic YAML files
-  - Support for R2 alongside S3
+    - Fixed tons of bugs
+    - `processing.py` module with pandas-like functions that propagate metadata
+    - Support for Dynamic YAML files
+    - Support for R2 alongside S3
 - `v0.3.5`
-  - Remove `catalog.frames`; use `owid-repack` package instead
-  - Relax dependency constraints
-  - Add optional `channel` argument to `DatasetMeta`
-  - Stop supporting metadata in Parquet format, load JSON sidecar instead
-  - Fix errors when creating new Table columns
+    - Remove `catalog.frames`; use `owid-repack` package instead
+    - Relax dependency constraints
+    - Add optional `channel` argument to `DatasetMeta`
+    - Stop supporting metadata in Parquet format, load JSON sidecar instead
+    - Fix errors when creating new Table columns
 - `v0.3.4`
-  - Bump `pyarrow` dependency to enable Python 3.11 support
+    - Bump `pyarrow` dependency to enable Python 3.11 support
 - `v0.3.3`
-  - Add more arguments to `Table.__init__` that are often used in ETL
-  - Add `Dataset.update_metadata` function for updating metadata from YAML file
-  - Python 3.11 support via update of `pyarrow` dependency
+    - Add more arguments to `Table.__init__` that are often used in ETL
+    - Add `Dataset.update_metadata` function for updating metadata from YAML file
+    - Python 3.11 support via update of `pyarrow` dependency
 - `v0.3.2`
-  - Fix a bug in `Catalog.__getitem__()`
-  - Replace `mypy` type checker by `pyright`
+    - Fix a bug in `Catalog.__getitem__()`
+    - Replace `mypy` type checker by `pyright`
 - `v0.3.1`
-  - Sort imports with `isort`
-  - Change black line length to 120
-  - Add `grapher` channel
-  - Support path-based indexing into catalogs
+    - Sort imports with `isort`
+    - Change black line length to 120
+    - Add `grapher` channel
+    - Support path-based indexing into catalogs
 - `v0.3.0`
-  - Update `OWID_CATALOG_VERSION` to 3
-  - Support multiple formats per table
-  - Support reading and writing `parquet` files with embedded metadata
-  - Optional `repack` argument when adding tables to dataset
-  - Underscore `|`
-  - Get `version` field from `DatasetMeta` init
-  - Resolve collisions of `underscore_table` function
-  - Convert `version` to `str` and load json `dimensions`
+    - Update `OWID_CATALOG_VERSION` to 3
+    - Support multiple formats per table
+    - Support reading and writing `parquet` files with embedded metadata
+    - Optional `repack` argument when adding tables to dataset
+    - Underscore `|`
+    - Get `version` field from `DatasetMeta` init
+    - Resolve collisions of `underscore_table` function
+    - Convert `version` to `str` and load json `dimensions`
 - `v0.2.9`
-  - Allow multiple channels in `catalog.find` function
+    - Allow multiple channels in `catalog.find` function
 - `v0.2.8`
-  - Update `OWID_CATALOG_VERSION` to 2
+    - Update `OWID_CATALOG_VERSION` to 2
 - `v0.2.7`
-  - Split datasets into channels (`garden`, `meadow`, `open_numbers`, ...) and make garden default one
-  - Add `.find_latest` method to Catalog
+    - Split datasets into channels (`garden`, `meadow`, `open_numbers`, ...) and make garden default one
+    - Add `.find_latest` method to Catalog
 - `v0.2.6`
-  - Add flag `is_public` for public/private datasets
-  - Enforce snake_case for table, dataset and variable short names
-  - Add fields `published_by` and `published_at` to Source
-  - Added a list of supported and unsupported operations on columns
-  - Updated `pyarrow`
+    - Add flag `is_public` for public/private datasets
+    - Enforce snake_case for table, dataset and variable short names
+    - Add fields `published_by` and `published_at` to Source
+    - Added a list of supported and unsupported operations on columns
+    - Updated `pyarrow`
 - `v0.2.5`
-  - Fix ability to load remote CSV tables
+    - Fix ability to load remote CSV tables
 - `v0.2.4`
-  - Update the default catalog URL to use a CDN
+    - Update the default catalog URL to use a CDN
 - `v0.2.3`
-  - Fix methods for finding and loading data from a `LocalCatalog`
+    - Fix methods for finding and loading data from a `LocalCatalog`
 - `v0.2.2`
-  - Repack frames to compact dtypes on `Table.to_feather()`
+    - Repack frames to compact dtypes on `Table.to_feather()`
 - `v0.2.1`
-  - Fix key typo used in version check
+    - Fix key typo used in version check
 - `v0.2.0`
-  - Copy dataset metadata into tables, to make tables more traceable
-  - Add API versioning, and a requirement to update if your version of this library is too old
+    - Copy dataset metadata into tables, to make tables more traceable
+    - Add API versioning, and a requirement to update if your version of this library is too old
 - `v0.1.1`
-  - Add support for Python 3.8
+    - Add support for Python 3.8
 - `v0.1.0`
-  - Initial release, including searching and fetching data from a remote catalog
+    - Initial release, including searching and fetching data from a remote catalog

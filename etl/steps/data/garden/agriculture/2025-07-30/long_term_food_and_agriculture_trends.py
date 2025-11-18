@@ -524,5 +524,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb], formats=["feather", "parquet", "csv"])
     ds_garden.save()

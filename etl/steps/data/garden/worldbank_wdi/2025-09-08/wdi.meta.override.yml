@@ -53,9 +53,10 @@ definitions:
   # ILOSTAT definitions
   ####################################################################################
 
-  employment: Employment refers to people of working age who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+  employment: Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
 
-  icse_93: These statuses in employment are provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
+  icse_93: The concept of status in employment refers to a person's relationship with their job — that is, who they work for or with. It does not refer to the sector, their skill level, or the quality of their work. This is based on the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93), which groups jobs according to the type of relationship between the worker and their job or employer.
 
   description_short_labor_force_participation_rate: |-
     Share of the << sex >>working-age population << age >>who are economically active (employed or unemployed).
@@ -74,7 +75,7 @@ definitions:
   description_short_employment_services: |-
     Share of total employment working in the services sector.
   description_short_ratio_female_male_labor_force_participation_rate: |-
-    The labor force participation rate is the labor force (all working-age persons employed and unemployed) divided the working-age population. This ratio is the division of the female and male rates, expressed as a percentage.
+    This ratio is calculated by dividing the labor force participation rate among women by the corresponding rate for men. The labor force participation rate is the share of the working-age population << age >>who are economically active (employed or unemployed).
   description_short_children_in_employment: |-
     Share of children aged 7-14 years involved in economic activity for at least one hour in the reference week of the survey.
   description_short_children_in_employment_work_only: |-
@@ -87,32 +88,54 @@ definitions:
   description_key_labor_force_participation_2: |-
     People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
   description_key_unemployment: |-
-    The unemployment rate measures the share of the labor force that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+    The unemployment rate measures the share of the [labor force](#dod:labor-force) that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
 
   description_key_iloest_modelled_data: |-
-    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This ensures that the data follows harmonized definitions and is comparable across countries and over time. It also allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_national_estimates: |-
     This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
   description_key_13th_icls: |-
-    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). One important point is that employment encompasses work for pay or profit, including self-employment, and also the production of goods for own use (such as subsistence farming). Changes in the definition of employment imply changes in the identification of the unemployed and of those out of the labor force. Because definitions changed under the [19th ICLS](#dod:19-icls), data using those newer definitions are not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). Under this framework, employment includes work for pay or profit, including self-employment, as well as the production of goods for own use (such as subsistence farming). Changes in the definition of employment also affect who is counted as unemployed or outside the labor force. Because definitions were updated under the [19th ICLS](#dod:19-icls), data using the newer definitions is not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
 
   description_key_working_age_ilo_modeled: |-
     When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
   description_key_working_age_ilo_modeled_employment: |-
     When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
   description_key_working_age_ilo_national: |-
-    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO recommends defining it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO’s guidelines define it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
 
-  description_key_own_account_workers: |-
-    _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them.
-  description_key_contributing_family_workers: |-
-    _Contributing family workers_ are defined as workers working on self-employment jobs who work in an enterprise operated by a related person living in the same household.
+  description_key_vulnerable_employment_1: |-
+    This indicator shows the share of employed people in vulnerable employment – those working as own-account workers or as contributing family members. These groups are more likely to lack formal arrangements and social protection, and to have variable income.
+  description_key_vulnerable_employment_2: |-
+    Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. Contributing family members are workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. These groups are defined according to the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93).
+  description_key_vulnerable_employment_3: |-
+    A higher share indicates greater labor market vulnerability, which is more common in lower-income countries. Over time, the share tends to fall as countries get richer and more workers move into wage and salaried employment. It’s important to note that this is a broad measure: even within this category, people’s work circumstances can vary widely. For example, some own-account workers in rich countries are highly paid professionals or freelancers, and would not usually be considered “vulnerable”.
   description_key_employment_agriculture: |-
-    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (category A in ISIC revision 4).
+    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
   description_key_employment_industry: |-
-    The industry sector includes mining and quarrying, manufacturing, electricity, gas, steam and air conditioning supply, water supply, and construction activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (categories B to F in ISIC revision 4).
+    The industry sector includes mining and quarrying, manufacturing, construction, and public utilities (electricity, gas, and water), as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
   description_key_employment_services: |-
-    The services sector includes market services (trade, transportation, accommodation and food, and business and administrative services), and non-market services (public administration, community, social, and other services and activities) as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (categories G to U in ISIC revision 4).
+    The services sector includes wholesale and retail trade; restaurants and hotels; transport, storage, and communications; financing, insurance, real estate, and business and administrative services; and public administration, community, social, and personal services, as defined by the International Standard Industrial Classification of All Economic Activities (ISIC).
+
+  description_key_modelling_status: |-
+    This indicator shows how [national](#dod:ilo-national-estimates) and [modeled](#dod:ilo-modelled-estimates) unemployment rate estimates from the International Labour Organization (ILO) compare for each country. It indicates whether the ILO used the same value for national and modeled estimates, a different value, or if the data is only available in one of these datasets. This is obtained by calculating the absolute difference between the two estimates for each country and year. A difference of less than 0.1 percentage points is considered to be the same value.
+
+  description_key_no_published_estimates: |-
+    A few countries — such as Ukraine, Palestine, and Sudan in recent years — have no published modeled estimates. This usually happens when comparable national data cannot be obtained, or when the ILO considers modeled estimates unreliable, for example, during conflict or major disruption.
+
+  note_icls_13: |-
+    Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
+
+  note_iloest_modelled_data: |-
+    All figures correspond to [modeled ILO estimates](#dod:ilo-modelled-estimates).
+  note_national_estimates: |-
+    Figures refer to [national estimates](#dod:ilo-national-estimates) and may not be fully comparable across countries.
+
+  note_icse_93: |-
+    Types of jobs are classified by status according to the [ICSE-93 standard](#dod:icse-93).
+
+  variant_name_iloest_modelled_data: Modeled estimates
+  variant_name_national_estimates: National estimates
 
   ####################################################################################
   # Education definitions
@@ -362,18 +385,18 @@ tables:
           attribution_short: World Bank
           topic_tags:
             - Economic Growth
-        grapher_config:
-          title: GDP per capita
-          subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
-          note: This data is expressed in constant 2015 US$.
-          variantName: In constant US$ - World Bank
-          originUrl: https://ourworldindata.org/economic-growth
-          map:
-            colorScale:
-              binningStrategy: manual
-              baseColorScheme: GnBu
-              customNumericValues: *map_brackets_gdp_per_capita
-          selectedEntityNames: *selected_entity_names_gdp_per_capita
+          grapher_config:
+            title: GDP per capita
+            subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+            note: This data is expressed in constant 2015 US$.
+            variantName: In constant US$ - World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: GnBu
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
 
           yAxis:
             canChangeScaleType: true
@@ -408,24 +431,24 @@ tables:
           attribution_short: World Bank
           topic_tags:
             - Economic Growth
-        grapher_config:
-          title: Gross domestic product (GDP)
-          subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
-          note: This data is expressed in constant 2015 US$.
-          variantName: In constant US$ - World Bank
-          originUrl: https://ourworldindata.org/economic-growth
-          map:
-            colorScale:
-              binningStrategy: manual
-              baseColorScheme: PuBu
-              customNumericValues: *map_brackets_gdp
-          selectedEntityNames: *selected_entity_names_gdp
-          yAxis:
-            canChangeScaleType: true
-            min: 0
-          tab: map
-          hideRelativeToggle: false
-          hasMapTab: true
+          grapher_config:
+            title: Gross domestic product (GDP)
+            subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+            note: This data is expressed in constant 2015 US$.
+            variantName: In constant US$ - World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: PuBu
+                customNumericValues: *map_brackets_gdp
+            selectedEntityNames: *selected_entity_names_gdp
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
 
       ny_gdp_mktp_cd_adjusted:
         title: GDP (constant 2021 US$)
@@ -1106,7 +1129,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "" %>
-          <%- set age = "(15+) " %>
+          <%- set age = "(ages 15 and over) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
@@ -1118,6 +1141,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Labor force participation rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Labor force participation rate
           numDecimalPlaces: 1
@@ -1129,7 +1157,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "male " %>
-          <%- set age = "(15+) " %>
+          <%- set age = "(ages 15 and over) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
@@ -1141,6 +1169,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Male labor force participation rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Male labor force participation rate
           numDecimalPlaces: 1
@@ -1152,7 +1185,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "female " %>
-          <%- set age = "(15+) " %>
+          <%- set age = "(ages 15 and over) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
@@ -1164,6 +1197,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Female labor force participation rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Female labor force participation rate
           numDecimalPlaces: 1
@@ -1176,7 +1214,7 @@ tables:
         description_short: |-
           <%- set sex = "" %>
           <%- set age = "" %>
-          {definitions.description_short_labor_force_participation_rate}
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
           - "{definitions.description_key_labor_force_participation_2}"
@@ -1187,6 +1225,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Labor force participation rate
           numDecimalPlaces: 1
@@ -1199,7 +1242,7 @@ tables:
         description_short: |-
           <%- set sex = "male " %>
           <%- set age = "" %>
-          {definitions.description_short_labor_force_participation_rate}
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
           - "{definitions.description_key_labor_force_participation_2}"
@@ -1210,6 +1253,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Male labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Male labor force participation rate
           numDecimalPlaces: 1
@@ -1222,7 +1270,7 @@ tables:
         description_short: |-
           <%- set sex = "female " %>
           <%- set age = "" %>
-          {definitions.description_short_labor_force_participation_rate}
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
           - "{definitions.description_key_labor_force_participation_2}"
@@ -1233,6 +1281,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Female labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Female labor force participation rate
           numDecimalPlaces: 1
@@ -1245,7 +1298,7 @@ tables:
         description_short: |-
           <%- set sex = "female " %>
           <%- set age = "aged 15-24 " %>
-          {definitions.description_short_labor_force_participation_rate}
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
           - "{definitions.description_key_labor_force_participation_2}"
@@ -1255,6 +1308,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Youth female labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Female labor force participation rate, ages 15-24
           numDecimalPlaces: 1
@@ -1277,6 +1335,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Unemployment rate
           numDecimalPlaces: 1
@@ -1299,6 +1362,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Male unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Male unemployment rate
           numDecimalPlaces: 1
@@ -1321,6 +1389,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Female unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Female unemployment rate
           numDecimalPlaces: 1
@@ -1342,6 +1415,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Youth unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Unemployment rate, ages 15-24
           numDecimalPlaces: 1
@@ -1354,7 +1432,7 @@ tables:
         description_short: |-
           <%- set sex = "" %>
           <%- set age = "" %>
-          {definitions.description_short_unemployment_rate}
+          {definitions.description_short_unemployment_rate} {definitions.note_national_estimates}
         description_key:
           - "{definitions.description_key_unemployment}"
           - "{definitions.description_key_working_age_ilo_national}"
@@ -1364,6 +1442,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Unemployment rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Unemployment rate
           numDecimalPlaces: 1
@@ -1375,10 +1458,10 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "" %>
-          <%- set age = "(15+) " %>
+          <%- set age = "(ages 15 and older) " %>
           {definitions.description_short_employment_to_population_ratio}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1386,6 +1469,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Employment-to-population ratio
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Employment-to-population ratio
           numDecimalPlaces: 1
@@ -1397,10 +1485,10 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "male " %>
-          <%- set age = "(15+) " %>
+          <%- set age = "(ages 15 and older) " %>
           {definitions.description_short_employment_to_population_ratio}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1408,6 +1496,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Male employment-to-population ratio
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Male employment-to-population ratio
           numDecimalPlaces: 1
@@ -1419,10 +1512,10 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "female " %>
-          <%- set age = "(15+) " %>
+          <%- set age = "(ages 15 and older) " %>
           {definitions.description_short_employment_to_population_ratio}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1430,6 +1523,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Female employment-to-population ratio
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Female employment-to-population ratio
           numDecimalPlaces: 1
@@ -1442,9 +1540,9 @@ tables:
         description_short: |-
           <%- set sex = "" %>
           <%- set age = "" %>
-          {definitions.description_short_employment_to_population_ratio}
+          {definitions.description_short_employment_to_population_ratio} {definitions.note_national_estimates}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1452,6 +1550,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Employment-to-population ratio
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Employment-to-population ratio
           numDecimalPlaces: 1
@@ -1464,9 +1567,9 @@ tables:
         description_short: |-
           <%- set sex = "female " %>
           <%- set age = "" %>
-          {definitions.description_short_employment_to_population_ratio}
+          {definitions.description_short_employment_to_population_ratio} {definitions.note_national_estimates}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1474,6 +1577,11 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Female employment-to-population ratio
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
           name: Female employment-to-population ratio
           numDecimalPlaces: 1
@@ -1485,16 +1593,21 @@ tables:
         short_unit: "%"
         description_short: "{definitions.description_short_vulnerable_employment}"
         description_key:
-          - "{definitions.employment}"
-          - "{definitions.description_key_own_account_workers}"
-          - "{definitions.description_key_contributing_family_workers}"
-          - "{definitions.icse_93}"
+          - "{definitions.description_key_vulnerable_employment_1}"
+          - "{definitions.description_key_vulnerable_employment_2}"
+          - "{definitions.description_key_vulnerable_employment_3}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Share of workers in vulnerable employment
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icse_93} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
           name: Share in vulnerable employment
           numDecimalPlaces: 1
@@ -1760,7 +1873,9 @@ tables:
         title: Ratio of female to male labor force participation rate (%) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_ratio_female_male_labor_force_participation_rate}"
+        description_short: |-
+          <%- set age = "(ages 15 and over) " %>
+          {definitions.description_short_ratio_female_male_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1768,7 +1883,28 @@ tables:
           attribution_short: ILO
           topic_tags:
             - Work & Employment
+          grapher_config:
+            title: Ratio of female to male labor force participation rates
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
         display:
           name: Ratio of female to male labor force participation rate
           numDecimalPlaces: 1
           tolerance: 5
+
+      unemployment_rate_ilo_modeling_comparison_absolute:
+        title: Availability of unemployment estimates by source
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Availability and differences between ILO [modeled estimates](#dod:ilo-modelled-estimates) and [national estimates](#dod:ilo-national-estimates) of unemployment rate.
+        description_key:
+          - "{definitions.description_key_modelling_status}"
+          - "{definitions.description_key_no_published_estimates}"
+        processing_level: "major"
+        description_processing: |-
+          We derive this indicator by calculating the absolute difference between the ILO modeled estimates and the national estimates for unemployment rate in each country and year. If the absolute difference is less than 0.1 percentage points, we consider the estimates to be the same value. If the absolute difference is 0.1 percentage points or more, we classify it as a different value. If data is only available in one of the datasets, we indicate that as well.
+        display:
+          name: Availability of unemployment estimates by source
+          numDecimalPlaces: 0
+          tolerance: 0
