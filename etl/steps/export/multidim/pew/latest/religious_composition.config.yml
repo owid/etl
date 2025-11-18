@@ -15,6 +15,13 @@ definitions:
         chartTypes: ["SlopeChart", "DiscreteBar"]
         hasMapTab: true
         originUrl: ourworldindata.org/religion
+        tab: "map"
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+        map:
+          colorScale:
+            baseColorScheme: Blues
     # - dimensions:
     #     indicator: share_change_2010_2020
     #   config:
@@ -36,11 +43,18 @@ definitions:
     #           - 5
     #           - 10
     #           - -1
+default_dimensions:
+  indicator: share
+  religion: any_religion
 
 dimensions:
   - slug: religion
     name: Religion
     choices:
+      - slug: "religion_distrib"
+        name: "Religious composition"
+        group: "Aggregates"
+        description: Distribution of population by religion
       - slug: "any_religion"
         name: "Any religion"
         group: "Aggregates"
@@ -48,10 +62,6 @@ dimensions:
       - slug: "religiously_unaffiliated"
         name: "No religion"
         group: "Aggregates"
-      - slug: "religion_distrib"
-        name: "Religious composition"
-        group: "Aggregates"
-        description: Distribution of population by religion
 
       - slug: "christians"
         name: "Christianity"
