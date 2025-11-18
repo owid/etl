@@ -12,7 +12,7 @@ COLORS_DISTRIB = {
     "hindus": "#C05917",
     "buddhists": "#BC8E5A",
     "jews": "#00295B",
-    "other_religions": "#7C4DA0",
+    "other_religions": "#A2559C",
     "religiously_unaffiliated": "#38AABA",
 }
 

@@ -82,7 +82,7 @@ tables:
                   "Hindus": "#C05917"
                   "Buddhists": "#BC8E5A"
                   "Jews": "#00295B"
-                  "Other Religions": "#7C4DA0"
+                  "Other Religions": "#A2559C"
                   "Religiously Unaffiliated": "#81C0C9"
   share_change:
     variables:
