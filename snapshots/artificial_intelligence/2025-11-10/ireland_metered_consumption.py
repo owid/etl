@@ -1,3 +1,8 @@
+"""This script creates a snapshot for Ireland Metered Consumption dataset.
+To download the file go to  https://www.cso.ie/en/statistics/energy/datacentresmeteredelectricityconsumption/ and click on PxStat tables.
+Select all checkoboxes under Statistic, Quarter, and Electricity Consumption. Then click on Download and select CSV format.
+"""
+
 from pathlib import Path
 
 import click
