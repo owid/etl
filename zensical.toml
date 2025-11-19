@@ -51,6 +51,7 @@ nav = [
             # { "Add a technical publication" = "dev/docs.md" },
         ] },
         { "Settings & servers" = [
+            { "VS Code extensions" = "guides/vscode-extensions.md" },
             { "Upgrade Python version" = "guides/upgrade-python-version.md" },
             { "Environments" = "guides/environment.md" },
             { "Staging servers" = "guides/staging-servers.md" },
