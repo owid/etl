@@ -46,8 +46,6 @@ docs.build: .venv
 	.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
 	@echo '==> Building documentation with Zensical'
 	DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
-	@echo '==> Converting Jupyter notebooks to HTML'
-	.venv/bin/python docs/ignore/convert_notebooks.py
 	@echo '==> Post-processing documentation files'
 	@make docs.post
 
@@ -56,7 +54,7 @@ docs.serve: .venv
 
 docs.post: .venv
 	@echo '==> Post-processing documentation files'
-	.venv/bin/python docs/ignore/migrate_docs_files.py
+	.venv/bin/python docs/ignore/convert_notebooks.py
 
 docs-mkdocs.build: .venv
 	@echo '==> Building documentation with MkDocs'
