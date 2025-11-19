@@ -1,3 +1,9 @@
+---
+tags:
+  - API
+icon: material/api
+---
+
 # Data APIs
 
 Our World in Data offers a curated collection of charts on our website, with data and metadata accessible via our [Chart API](chart-api/#chart-api){data-preview}. The API provides data in CSV and JSON formats over HTTP, enabling seamless integration with any programming language. It is specifically designed to support the creation of interactive charts.

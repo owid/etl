@@ -64,7 +64,6 @@ dependencies = [
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
     "pyreadr>=0.5.2",
-    "streamlit-aggrid>=1.1.0,!=1.1.8.*",
     "sentry-sdk>=2.20.0",
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
@@ -130,9 +129,10 @@ api = [
     "slack-sdk>=3.26.2",
     "joblib>=1.3.2",
 ]
+
 wizard = [
-    "streamlit>=1.50.0",
-    "streamlit-aggrid>=0.3.4.post3",
+    "streamlit>=1.51.0",
+    "streamlit-aggrid>=1.1.0,!=1.1.8.*",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",
     "streamlit-agraph>=0.0.45",

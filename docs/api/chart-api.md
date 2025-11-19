@@ -1,4 +1,6 @@
 ---
+tags:
+  - API
 icon: material/api
 ---
 # Chart API

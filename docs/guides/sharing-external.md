@@ -1,4 +1,5 @@
 ---
+icon: material/share-variant
 tags:
     - 👷 Staff
 ---
