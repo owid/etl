@@ -30,7 +30,6 @@ In the past, we relied on [:octicons-link-external-16: Material for MkDocs](http
 The documentation is (mostly) written in markdown files, under [:fontawesome-brands-github: `docs/`](https://github.com/owid/etl/tree/master/docs). If you are not familiar with markdown, please check out [:octicons-link-external-16: this guide](https://www.markdownguide.org/getting-started/). Zensical also has its own set of features and syntax that you can explore in their documentation.
 
 The documentation is organized hierarchically using the [:fontawesome-brands-github: `zensical.toml`](https://github.com/owid/etl/tree/master/zensical.toml) configuration file. This file defines the site structure, navigation, and various settings that control how the documentation is rendered.
-
 !!! tip "[Preview documentation examples](../../guides/demo.md)"
 
     We have drafted a demo page showcasing various Zensical features that you can use in our documentation.
