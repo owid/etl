@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/vscode": "^1.100.0",
     "@types/node": "20.x",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.0",
     "typescript": "^5.6.2"
   }
 }
