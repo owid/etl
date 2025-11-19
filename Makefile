@@ -18,6 +18,7 @@ help:
 	@echo '  make deploy    	Re-run the full ETL on production'
 	@echo '  make docs.build    Build documentation'
 	@echo '  make docs.serve    Serve documentation locally'
+	@echo '  make docs.post     Transform non-md files in docs/ after build (e.g. notebooks)'
 	@echo '  make dot       	Build a visual graph of the dependencies'
 	@echo '  make etl       	Fetch data and run all transformations for garden'
 	@echo '  make format    	Format code'
@@ -47,9 +48,15 @@ docs.build: .venv
 	DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 	@echo '==> Converting Jupyter notebooks to HTML'
 	.venv/bin/python docs/ignore/convert_notebooks.py
+	@echo '==> Post-processing documentation files'
+	@make docs.post
 
 docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
+
+docs.post: .venv
+	@echo '==> Post-processing documentation files'
+	.venv/bin/python docs/ignore/migrate_docs_files.py
 
 docs-mkdocs.build: .venv
 	@echo '==> Building documentation with MkDocs'
