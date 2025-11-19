@@ -182,6 +182,7 @@ features = [
     "content.code.copy",
     "content.code.select",
     "content.code.annotate",
+    "content.tabs.link",
     "content.tooltips",
     "navigation.expand",
     "navigation.footer",
