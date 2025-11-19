@@ -6,6 +6,7 @@ site_description = "Learn about the ETL pipeline at Our World in Data."
 site_author = "Our World in Data"
 copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/privacy">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
 docs_dir = "docs"
+edit_uri = "edit/master/docs/"
 
 # Repository information
 repo_name = "owid/etl"
@@ -179,6 +180,8 @@ logo = "assets/site-logo.svg"
 favicon = "assets/images/favicon.png"
 
 features = [
+    # "content.action.edit",         # Edit this page
+    "content.action.view",         # View source of this page
     "content.code.copy",
     "content.code.select",
     "content.code.annotate",
