@@ -1,5 +1,7 @@
 ---
 icon: lucide/hard-drive-download
+tags:
+  - Setup
 ---
 
 # Installation

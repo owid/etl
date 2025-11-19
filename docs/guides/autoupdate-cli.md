@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+  - Automation
 icon: lucide/calendar-clock
 ---
 

@@ -114,11 +114,13 @@ Catch outdated code patterns as you type with configurable warnings.
 **Use case**: You copy code from an old step that uses `dest_dir`. The extension highlights it with a warning: "Use `paths.create_dataset` instead."
 
 **Detected patterns**:
+
 - `dest_dir` usage → Use modern path handling
 - `geo.harmonize_countries()` → Use `paths.regions.harmonize_names(tb)`
 - `paths.load_dependency()` → Use `paths.load_dataset()` or `paths.load_snapshot()`
 
 **How it works**:
+
 - Patterns apply only to files in `etl/steps/data/**` (scope-based detection)
 - Yellow squiggles appear under outdated code
 - Hover for suggested alternatives
