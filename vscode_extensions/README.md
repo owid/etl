@@ -1,13 +1,15 @@
-# Install all VS Code extensions available for ETL
+# VS Code Extensions for ETL
 
-To install the latest available version of all VS Code extensions for ETL, simply run:
-```
+## Installing extensions
+
+To install all available extensions:
+```bash
 make install-vscode-extensions
 ```
 
-# Creating a new extension
+## Creating a new extension
 
-## Initialize code
+### Initialize code
 
 Prerequisites to be able to create an extension: Node.js, npm
 
@@ -35,7 +37,7 @@ This will create a new folder with all boilerplate. Then:
 
 For convenience, drag this new window to the left of the screen (the right will be for testing).
 
-## Develop the extension
+### Develop the extension
 
 Modify the `src/extension.ts` file to define what the extension should do (AI will be helpful at this stage).
 
@@ -52,7 +54,7 @@ On the right window, you can now test the behaviour of the extension. You may, e
 
 If you make changes to the code (on the left window) you need to re-compile on the terminal (with `npm run compile`) and then click on the reload button at the top right (on the bar with buttons to run the extension).Alternatively, go to the right window and click `cmd+r` to refresh the window.
 
-## Package the extension
+### Package the extension
 
 Once you are happy with the result, bump up the version in package.json, go to the terminal, ensure the extension compiles, and package it.
 ```
@@ -62,7 +64,7 @@ vsce package
 
 This creates a new .vsix file for the new version.
 
-## Install a specific extension
+### Install a specific extension
 
 Press `cmd+shift+p` and select "Extensions: Install from VSIX". Select the `*.vsix` file of the extension you want to install. Restart VSCode to ensure the new version is installed (although it may not be necessary).
 
@@ -70,3 +72,27 @@ Alternatively, from the command line, go to the root folder of the extension cod
 ```
 code --install-extension [name-of-the-extension-with-version].vsix
 ```
+
+## Updating dependencies
+
+Extensions have npm dependencies that should be updated periodically for security patches and bug fixes.
+
+### Quick workflow
+
+1. **Check for updates**: `npm outdated` and `npm audit`
+2. **Update dependencies**: Accept Dependabot PR or run `npm update`
+3. **Verify build**: `npm run compile && npm audit`
+4. **Test packaging**: `npx @vscode/vsce package` (then delete the `.vsix` file)
+5. **Commit changes**: Only commit `package-lock.json` (don't bump extension version)
+
+### Key concepts
+
+- **package.json**: Defines acceptable version ranges (e.g., `^9.11.1` = any 9.x >= 9.11.1)
+- **package-lock.json**: Records exact versions installed; should be committed to git
+- **Transitive dependencies**: Dependencies of your dependencies (e.g., `js-yaml` via `eslint`)
+
+### When to bump extension version
+
+**Bump version** when you change extension code or features.
+
+**Don't bump version** when only updating dev dependencies or `package-lock.json` - version numbers signal changes to your extension's functionality, not build tools.

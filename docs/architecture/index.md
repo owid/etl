@@ -1,3 +1,9 @@
+---
+tags:
+  - Architecture
+icon: material/sitemap
+---
+
 # Design principles & workflow
 
 _Our World in Data_ is a publication that makes very heavy use of data to communicate about global issues.
@@ -28,6 +34,3 @@ Learn more about our architecture in the following sections: -->
 
     ***
 
-    A bit of history. Learn how we got here.
-
-</div>

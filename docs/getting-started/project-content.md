@@ -1,5 +1,7 @@
 ---
 icon: material/folder
+tags:
+  - Reference
 ---
 
 # Project content

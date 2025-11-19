@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+  - Data Workflow
 icon: lucide/circle-fading-arrow-up
 ---
 

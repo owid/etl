@@ -1,5 +1,7 @@
 ---
 icon: material/account-school
+tags:
+  - Data workflow
 ---
 
 # First steps

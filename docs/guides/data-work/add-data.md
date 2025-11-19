@@ -1,6 +1,7 @@
 ---
 tags:
-    - 👷 Staff
+  - 👷 Staff
+  - Data Workflow
 icon: material/plus
 ---
 # New data

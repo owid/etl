@@ -1,4 +1,6 @@
 ---
+tags:
+  - Automation
 icon: material/wizard-hat
 ---
 

@@ -1,6 +1,8 @@
 ---
 tags:
   - 👷 Staff
+  - Data Workflow
+  - Advanced
 icon: lucide/lock
 ---
 

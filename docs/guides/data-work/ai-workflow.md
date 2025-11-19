@@ -1,6 +1,8 @@
 ---
 tags:
   - 👷 Staff
+  - Data Workflow
+  - AI
 status: new
 icon: lucide/sparkles
 ---

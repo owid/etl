@@ -1,6 +1,8 @@
 ---
 tags:
   - 👷 Staff
+  - Data Workflow
+icon: lucide/refresh-cw
 ---
 
 ETL was initially conceived to maintain and publish datasets that are updated once a year. This is still the most common kind of update that we do this days.

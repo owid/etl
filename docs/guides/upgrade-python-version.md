@@ -1,4 +1,8 @@
-# Python upgrade
+---
+icon: simple/python
+---
+
+# Python version update
 
 Python releases [:octicons-link-external-16: new major versions annually](https://devguide.python.org/versions/). Our current recommendation is to add support for the new version to the project short after this happens.
 

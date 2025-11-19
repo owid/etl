@@ -1,4 +1,6 @@
 ---
+tags:
+  - Data Workflow
 icon: lucide/layout-grid
 ---
 
