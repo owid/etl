@@ -17,12 +17,20 @@ The markdown files powering the documentation are in the same repository, under 
 
 
 ## What can Zensical do?
-Zensical is a static site generator that converts markdown files into a website. It offers several features that are useful for our documentation: code blocks, syntax highlighting, automatic table of contents generation, search functionality, navigation, and much more. You can learn more about its features in [their official documentation](https://zensical.org/docs/get-started/).
+Zensical is a static site generator that converts markdown files into a website. It offers several features that are useful for our documentation: code blocks, syntax highlighting, automatic table of contents generation, search functionality, navigation, and much more. You can learn more about its features in [:octicons-link-external-16: their official documentation](https://zensical.org/docs/get-started/).
 
 
 In the past, we relied on [:octicons-link-external-16: Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build our documentation. However, we are transitioning to Zensical due to its better support for modern web standards, improved performance, and enhanced customization options.
 
-!!! tip "Before you start, make sure you are familiar with markdown and [Zensical](https://zensical.org/docs/get-started/)."
+!!! tip "Before you start, make sure you are familiar with markdown and Zensical."
+
+    - [:octicons-link-external-16: Setup](https://zensical.org/docs/setup/basics/): Intro, layout, configuration, etc.
+    - [:octicons-link-external-16: Authoring](https://zensical.org/docs/authoring/markdown/): Features, syntax, etc.
+    - [:octicons-link-external-16: `zensical.toml` template](https://github.com/zensical/zensical/blob/master/python/zensical/bootstrap/zensical.toml)
+
+The documentation is (mostly) written in markdown files, under [:fontawesome-brands-github: `docs/`](https://github.com/owid/etl/tree/master/docs). If you are not familiar with markdown, please check out [:octicons-link-external-16: this guide](https://www.markdownguide.org/getting-started/). Zensical also has its own set of features and syntax that you can explore in their documentation.
+
+The documentation is organized hierarchically using the [:fontawesome-brands-github: `zensical.toml`](https://github.com/owid/etl/tree/master/zensical.toml) configuration file. This file defines the site structure, navigation, and various settings that control how the documentation is rendered.
 
 
 ## Step-by-step guide to modify the documentation
@@ -35,7 +43,7 @@ Any change you make to markdown files in  `docs/` will be reflected live on your
 
 !!! info "Modifying notebooks"
 
-    If you are modifying a notebook, you will need to build the documentation from scratch with `make docs.build` before serving it with `make docs.serve`. This might take an e xtra 10 seconds.
+    If you are modifying a notebook, you will need to build the documentation from scratch with `make docs.build` before (or while) serving it with `make docs.serve`. This might take an e xtra 10 seconds.
 
 
 ### Adding a new entry
