@@ -43,7 +43,7 @@ Any change you make to markdown files in  `docs/` will be reflected live on your
 
 !!! info "Modifying notebooks"
 
-    If you are modifying a notebook, you will need to build the documentation from scratch with `make docs.build` before (or while) serving it with `make docs.serve`. This might take an e xtra 10 seconds.
+    If you are modifying a notebook, you will need to build the documentation from scratch with `make docs.build` before (or while) serving it with `make docs.serve`. This might take an extra 10 seconds.
 
 
 ### Adding a new entry
@@ -66,14 +66,31 @@ Exploit the multiple features that Zensical provides to make your report more en
 Finally, make sure to link your report in the documentation navigation by adding it to the `zensical.toml` file.
 
 ### Previewing your work
-Run `make docs.serve` and go to [localhost:8000](http://localhost:8000) to preview your report locally.
+Run `make docs.serve` and go to [localhost:8000](http://localhost:8000) to preview your report locally. You can edit the markdown files and see the changes live.
 
-If you are adding notebooks, you will need to run `make docs.build` before serving it with `make docs.serve`. This is because notebooks need to be converted to markdown before being served.
+### Notebooks in technical publications
+
+If you are adding notebooks, you will need to run `make docs.build` before serving it with `make docs.serve`. This is because we need to be convert notebooks to HTML before being served.
+
+Some guidelines:
+
+* **Linking notebooks in the docs**: If you want to link to a notebook in the documentation, please replace its extension from `.ipynb` to `.html`. This is because we convert the notebook to an HTML during build time so that it can be previewed. Leaving a reference with `.ipynb` will cause the notebook to be downloaded on click.
+* **Adding notebooks to the docs navigation**: I you want, you can have a notebook appear in the documentation navigation (e.g. in the left sidebar). To do so, please add the notebook with the `.html` extension in the `zensical.toml` file.
+* **Faster preview**: If you are already serving the docs with `make docs.serve`, you can speed up the process of previewing notebook changes by running `make docs.post`. This will only convert the notebooks to HTML without rebuilding the entire documentation site.
+* **Other file types (e.g. python)**: These are currently not supported and won't be rendered.
+
+!!! warning "Future"
+
+    We hope that Zensical will support notebooks natively in the future, which will simplify the process of adding notebooks to the documentation. References:
+
+    - [:octicons-link-external-16: Zensical backlog](https://github.com/zensical/backlog/issues/9)
+    - [:octicons-link-external-16: Zensical Module system](https://github.com/zensical/backlog/issues/41)
+    - [:octicons-link-external-16: mkdocs-jupyter](https://github.com/danielfrg/mkdocs-jupyter/issues/257)
 
 
-!!! danger "Links to notebooks in the docs"
+<!-- !!! danger "Links to notebooks in the docs"
 
     If you want to link to a notebook in the documentation, please replace its extension from `.ipynb` to `.html`. This is because we convert the notebook to an HTML during build time so that it can be previewed.
 
-    Leaving a reference with `.ipynb` will cause the notebook to be downloaded on click.
+    Leaving a reference with `.ipynb` will cause the notebook to be downloaded on click. -->
 
