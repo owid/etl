@@ -204,7 +204,7 @@ def run() -> None:
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "choices": {"preprimary", "primary", "secondary", "tertiary"},
+                "choices": ["preprimary", "primary", "secondary", "tertiary"],
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},

@@ -10,6 +10,7 @@ from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 
+from etl.config import DOCS_BUILD
 from etl.paths import CACHE_DIR
 
 memory = Memory(CACHE_DIR, verbose=0)
@@ -23,12 +24,12 @@ def set_device() -> str:
 
     # Set the default device. We use CPU on our servers, but you can change this to "cuda" if you have a GPU.
     device = os.environ.get("DEVICE", default_device)
-
-    try:
-        torch.set_default_device(device)
-    except RuntimeError:
-        # If was already called, this can happen in streamlit apps
-        pass
+    if DOCS_BUILD:
+        try:
+            torch.set_default_device(device)
+        except RuntimeError:
+            # If was already called, this can happen in streamlit apps
+            pass
 
     return device
 

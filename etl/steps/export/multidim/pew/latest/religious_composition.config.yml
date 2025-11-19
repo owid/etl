@@ -3,13 +3,53 @@ title:
   title_variant: ""
 default_selection:
   - World
+  - India
+  - Indonesia
+  - United Kingdom
+  - Egypt
+  - United States
+  - China
+topic_tags:
+  - Religion
+default_dimensions:
+  indicator: share
+  religion: any_religion
 
 definitions:
   common_views:
     - config:
-        chartTypes: ["SlopeChart"]
+        chartTypes: ["SlopeChart", "DiscreteBar"]
         hasMapTab: true
-        originUrl: ourworldindata.org/war-and-peace
+        originUrl: ourworldindata.org/religion
+        tab: "map"
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+        map:
+          colorScale:
+            baseColorScheme: Blues
+
+    # - dimensions:
+    #     indicator: share_change_2010_2020
+    #   config:
+    #     chartTypes: []
+    #     hasMapTab: true
+    #     map:
+    #       colorScale:
+    #         baseColorScheme: RdBu
+    #         binningStrategy: manual
+    #         customNumericValues:
+    #           - 1
+    #           - -10
+    #           - -5
+    #           - -2
+    #           - -1
+    #           # - 0
+    #           - 1
+    #           - 2
+    #           - 5
+    #           - 10
+    #           - -1
 
 dimensions:
   - slug: religion
@@ -17,26 +57,34 @@ dimensions:
     choices:
       - slug: "religion_distrib"
         name: "Religious composition"
-        group: "Aggregate"
+        group: "Aggregates"
         description: Distribution of population by religion
       - slug: "any_religion"
         name: "Any religion"
-        group: "Aggregate"
+        group: "Aggregates"
         description: People affiliated to any religion
-      - slug: "christians"
-        name: "Christianity"
-      - slug: "muslims"
-        name: "Islam"
-      - slug: "hindus"
-        name: "Hinduism"
-      - slug: "buddhists"
-        name: "Buddhism"
-      - slug: "jews"
-        name: "Judaism"
-      - slug: "other_religions"
-        name: "Other religions"
       - slug: "religiously_unaffiliated"
         name: "No religion"
+        group: "Aggregates"
+
+      - slug: "christians"
+        name: "Christianity"
+        group: "Major religions"
+      - slug: "muslims"
+        name: "Islam"
+        group: "Major religions"
+      - slug: "hindus"
+        name: "Hinduism"
+        group: "Major religions"
+      - slug: "buddhists"
+        name: "Buddhism"
+        group: "Major religions"
+      - slug: "jews"
+        name: "Judaism"
+        group: "Major religions"
+      - slug: "other_religions"
+        name: "Other religions"
+        group: "Major religions"
 
   - slug: indicator
     name: Measure
@@ -47,4 +95,7 @@ dimensions:
       - slug: "count_unrounded"
         name: "Number of people"
         description: Number of deaths divided by the total population
+      - slug: "share_change_2010_2020"
+        name: "Percentage point change"
+        description: Percentage point change between 2010 and 2020
 views: []

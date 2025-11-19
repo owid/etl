@@ -1,0 +1,344 @@
+[project]
+# Top-level settings
+site_name = "OWID's Technical Documentation"
+site_url = "https://docs.owid.io/projects/etl/"
+site_description = "Learn about the ETL pipeline at Our World in Data."
+site_author = "Our World in Data"
+copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/privacy">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
+docs_dir = "docs"
+
+# Repository information
+repo_name = "owid/etl"
+repo_url = "https://github.com/owid/etl"
+
+# Navigation structure
+nav = [
+    { "Home" = "index.md" },
+    { "Getting started" = [
+        "getting-started/index.md",
+        { "Installation" = "getting-started/working-environment.md" },
+        { "Project content" = "getting-started/project-content.md" },
+        { "First steps" = "getting-started/building-datasets.md" },
+        { "Contributing" = "contributing.md" },
+    ] },
+    { "Guides" = [
+        "guides/index.md",
+        { "Data work" = [
+            "guides/data-work/index.md",
+            { "New data" = "guides/data-work/add-data.md" },
+            { "Updating data" = "guides/data-work/update-data.md" },
+            { "Update charts" = "guides/data-work/update-charts.md" },
+            { "MDIMs and Explorers" = "guides/data-work/mdims.md" },
+            { "Export data" = "guides/data-work/export-data.md" },
+            { "Publish indicator metadata" = "guides/data-work/create-gsheet.md" },
+            { "Wizard" = "guides/wizard.md" },
+            { "AI workflow" = "guides/data-work/ai-workflow.md" },
+            { "CLI" = "guides/etl-cli.md" },
+        ] },
+        { "Other tasks" = [
+            { "Harmonize names" = "guides/harmonize-countries.md" },
+            { "Auto data updates" = "guides/autoupdate-cli.md" },
+            { "Access archived data" = "guides/data-work/access-archived-data.md" },
+            # { "Regular updates" = "guides/auto-regular-updates.md" },
+            { "Pull requests" = "guides/pull-requests.md" },
+            { "Tips and tricks in ETL" = "guides/etl-tips.md" },
+            { "Private datasets" = "guides/private-import.md" },
+            { "Backport from db" = "guides/backport.md" },
+            # { "Metadata in data pages" = "guides/metadata-play.md" },
+        ] },
+        { "Documentation" = [
+            "dev/docs/index.md",
+            # { "Add a technical publication" = "dev/docs.md" },
+        ] },
+        { "Settings & servers" = [
+            { "VSC extensions" = "guides/vscode-extensions.md" },
+            { "Update Python" = "guides/upgrade-python-version.md" },
+            { "Environments" = "guides/environment.md" },
+            { "Staging servers" = "guides/staging-servers.md" },
+            { "Public servers" = "guides/sharing-external.md" },
+            { "Types in Tables" = "guides/types-tables.md" },
+            { "OpenAI API" = "guides/openai.md" },
+            { "Google API" = "guides/configure-google-api.md" },
+        ] },
+
+    ] },
+    { "Design principles" = [
+        { "Design principles & workflow" = "architecture/index.md" },
+        { "Principles" = [
+            { "Computational graph" = "architecture/design/compute-graph.md" },
+            { "ETL model" = "architecture/design/phases.md" },
+            { "Data model" = "architecture/design/common-format.md" },
+            { "Features and constraints" = "architecture/design/features-constraints.md" },
+            { "The DAG" = "architecture/design/dag.md" },
+            { "The URI" = "architecture/design/uri.md" },
+        ] },
+        { "ETL steps" = [
+            { "ETL steps" = "architecture/workflow/index.md" },
+            { "Other steps" = "architecture/workflow/other-steps.md" },
+        ] },
+        { "Our journey" = [
+            "architecture/our-journey/index.md",
+        ] },
+    ] },
+    { "Metadata" = [
+        { "Metadata" = "architecture/metadata/index.md" },
+        { "Reference" = "architecture/metadata/reference/index.md" },
+        { "Collections reference" = "architecture/metadata/reference/collections.md" },
+        { "Working with Metadata" = [
+            { "Structuring YAML file" = "architecture/metadata/structuring-yaml.md" },
+            { "Data Pages Workflow" = "architecture/metadata/data_pages_workflow.md" },
+            { "Propagation of metadata" = "architecture/metadata/propagation.md" },
+            { "Processing log" = "architecture/metadata/processing_log.md" },
+            { "ETL MetaGPT Tool" = "architecture/metadata/metadata_chatgpt_update.md" },
+            { "FAQs" = "architecture/metadata/faqs.md" },
+        ] },
+    ] },
+    { "API and catalog" = [
+        { "API" = "api/index.md" },
+        { "Charts API" = "api/chart-api.md" },
+        { "ETL catalog API" = "api/catalog-api.md" },
+        # { "Example API usage" = "api/example-usage.md" },
+        { "Querying data via Datasette" = "api/datasette.md" },
+        { "Maintenance" = "api/maintenance.md" },
+        { "COVID-19" = "api/covid/" },
+    ] },
+    { "Technical publications" = [
+        "analyses/index.md",
+        { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
+        # { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
+        # { "Our COVID work" = "api/covid.md" },
+        { "Our COVID work" = "api/covid.md" },
+    ] },
+]
+
+# Extra CSS
+extra_css = ["css/extra.css"]
+
+
+# Extra JavaScript
+extra_javascript = [
+    "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
+    "javascripts/tablesort.js",
+    "javascripts/cell-toggles.js",
+    "javascripts/notebook-copy.js",
+    "javascripts/mermaid.mjs",
+]
+
+
+# Extra settings
+[project.extra]
+homepage = "https://docs.owid.io/projects/etl"
+generator = true
+
+[project.extra.status]
+new = "Recently added"
+deprecated = "Deprecated"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/owid"
+
+[[project.extra.social]]
+icon = "fontawesome/solid/globe"
+link = "https://ourworldindata.org"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/instagram"
+link = "https://instagram.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/bluesky"
+link = "https://bsky.app/profile/ourworldindata.org"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/x-twitter"
+link = "https://twitter.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/facebook"
+link = "https://facebook.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/threads"
+link = "https://threads.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/bluesky"
+link = "https://bsky.app/profile/ourworldindata.org"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/linkedin"
+link = "https://linkedin.com/company/ourworldindata"
+
+# Theme configuration
+[project.theme]
+variant = "modern"                    # Use "classic" for Material for MkDocs appearance
+language = "en"
+custom_dir = "docs/overrides/"
+logo = "assets/site-logo.svg"
+favicon = "assets/images/favicon.png"
+
+features = [
+    "content.code.copy",
+    "content.code.select",
+    "content.code.annotate",
+    "content.tabs.link",
+    "content.tooltips",
+    "navigation.expand",
+    "navigation.footer",
+    "navigation.indexes",
+    "navigation.instant",
+    "navigation.instant.progress",
+    "navigation.instant.prefetch",
+    "navigation.sections",
+    "navigation.tabs",
+    # "navigation.tabs.sticky",
+    "navigation.top",
+    "navigation.tracking",
+    "search.share",
+    "search.suggest",
+    "search.highlight",
+    "toc.follow",
+    "navigation.path",
+    # "toc.integrate",
+] # Theme features
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+
+# Palette toggle for automatic mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+
+# Theme palette - light mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "indigo"
+accent = "pink"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
+
+# Theme palette - dark mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "blue"
+accent = "amber"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
+
+# Theme fonts
+[project.theme.font]
+text = "Stack Sans Text"
+
+# Custom homepage configuration
+[project.home]
+tagline = "Our World in Data - Technical documentation"
+gradient_hsla = "hsla(0, 0%, 100%, 0)"
+description = """
+This documentation explains our data workflow and tooling — both to help OWID team members work effectively and to give external readers insight into how we manage and publish our data.
+You can also find selected public analyses related to our work. LOL
+"""
+
+[[project.home.buttons]]
+name = "Get started"
+url = "getting-started"
+theme = "md-button md-button--primary"
+
+[[project.home.buttons]]
+name = "Internal guides"
+url = "guides"
+theme = "md-button"
+
+[[project.home.buttons]]
+name = "Technical publications"
+url = "analyses/"
+theme = "md-button"
+
+# MARKDOWN EXTENSIONS
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+footnotes = {}
+md_in_html = {}
+"mkdocs-click" = {}
+
+[project.markdown_extensions.pymdownx]
+critic = {}
+details = {}
+keys = {}
+snippets = {}
+inlinehilite = {}
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "material.extensions.emoji.twemoji"
+emoji_generator = "material.extensions.emoji.to_svg"
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+
+[project.markdown_extensions.toc]
+permalink = true
+title = "On this page"
+permalink_title = "Anchor link to this section for reference"
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+# [project.markdown_extensions.pymdownx.superfences]
+# custom_fences = [
+#     { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+# ]
+# [project.markdown_extensions.pymdownx.superfences]
+# [project.markdown_extensions.pymdownx.superfences.custom_fences]
+# name = "mermaid"
+# class = "mermaid"
+# format = "pymdownx.superfences.fence_code_format"
+
+
+# PLUGINS
+[project.plugins]
+
+[project.plugins."mkdocs-jupyter"]
+ignore_h1_titles = true
+include_source = true
+execute = false
+allow_errors = false
+show_input = true
+include_requirejs = true
+
+[project.plugins.search]
+
+[project.plugins.exclude]
+glob = ["ignore/"]
+
+# [project.plugins."gen-files"]
+# scripts = ["docs/ignore/generate_dynamic_docs.py"]
+
+[project.plugins.blog]
+
+# [project.plugins.git-authors]
+# show_email_address = false
+# show_contribution = true
+# ignore_authors = ["owidbot"]
+# sort_authors_by = "contribution"
+
+# [project.plugins.git-revision-date-localized]
+
+[project.plugins.tags]
+tags_file = "tags.md"
+
+[project.plugins.glightbox]

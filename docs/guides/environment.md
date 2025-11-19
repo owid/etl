@@ -1,4 +1,5 @@
 ---
+icon: material/cog
 tags:
   - 👷 Staff
 ---
@@ -10,7 +11,7 @@ tags:
 
 In ETL, we often have to interact with a external services (including some of ours), such as our database, OpenAI models, cloud buckets, APIs, etc.
 
-To this end, we work with `.env` files, where we define all the required environment variables. An example template is available in the root directory of the repository (see [.env.example](https://github.com/owid/etl/blob/master/.env.example)). Based on this file, staff members create their own `.env` file.
+To this end, we work with `.env` files, where we define all the required environment variables. An example template is available in the root directory of the repository (see [:fontawesome-brands-github: .env.example](https://github.com/owid/etl/blob/master/.env.example)). Based on this file, staff members create their own `.env` file.
 
 !!! note "Which environment is used?"
 
@@ -42,7 +43,7 @@ STAGING=feature-123 etl run <short_name> --grapher
 
 ### Personal staging environment
 
-Working with a personal remote staging server is an alternative to working with a local environment. It is very easy to set up and you don't have to worry about cloning [owid-grapher](https://github.com/owid/owid-grapher).
+Working with a personal remote staging server is an alternative to working with a local environment. It is very easy to set up and you don't have to worry about cloning [:fontawesome-brands-github: owid-grapher](https://github.com/owid/owid-grapher).
 
 To set it up, follow these steps:
 
@@ -76,9 +77,9 @@ git fetch && git rebase origin/master && git push -f
 
 Whenever you create a pull request in the etl repository, a dedicated staging server is automatically created. This server runs the OWID admin site and database, and includes all the changes from your PR (e.g. new datasets). This allows you to test your changes before they are merged into the live site.
 
-These servers are useful to share your changes with other members of the team, and, for instance, to [update charts with new indicators](data-work/update-charts.md#match-old-indicators-to-new-ones).
+These servers are useful to share your changes with other members of the team, and, for instance, to [update charts](data-work/update-charts/){data-preview} with new indicators.
 
-!!! info "Learn more about [PR staging servers](../staging-servers)"
+!!! info "Learn more about [PR staging servers](staging-servers)"
 
 ### Useful Operations with Staging Servers
 
@@ -126,7 +127,7 @@ To test explorers on data from your staging server, change their URL to:
 
 for instance
 
-http://staging-site-mojmir:8881/explorers/who/latest/flu/flu.csv
+[http://staging-site-mojmir:8881/explorers/who/latest/flu/flu.csv](http://staging-site-mojmir:8881/explorers/who/latest/flu/flu.csv)
 
 ## Commonly used environment variables
 

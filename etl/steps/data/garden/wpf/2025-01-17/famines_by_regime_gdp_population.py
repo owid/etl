@@ -178,7 +178,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     Table: The updated Table with GDP information added.
 
     The function performs the following steps:
-    1. Replaces 'Former Sudan' with 'Sudan' in the 'country' column of tb_gdp.
+    1. Replaces 'Sudan (former)' with 'Sudan' in the 'country' column of tb_gdp.
     2. Merges the famine table (tb) with the GDP table (tb_gdp) on 'country' and 'year'.
     3. Defines and applies replacement rules for specific countries and years, using either a reference year or an average GDP over a range of years.
     4. Handles special cases for multiple countries, replacing GDP values for specified years with either a specific year's GDP or an average GDP.
@@ -193,8 +193,8 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     - For China, the GDP values for the years 1876 to 1879 are replaced with the average GDP from 1870 to 1887.
     """
 
-    # Replace 'former Sudan' with 'Sudan' in the 'country' column of tb_gdp
-    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Former Sudan", "Sudan")
+    # Replace 'Sudan (former)' with 'Sudan' in the 'country' column of tb_gdp
+    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Sudan (former)", "Sudan")
 
     tb = pr.merge(tb, tb_gdp, on=["country", "year"], how="left")
 

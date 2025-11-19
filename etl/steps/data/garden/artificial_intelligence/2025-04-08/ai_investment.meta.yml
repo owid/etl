@@ -22,32 +22,38 @@ definitions:
     - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
 
   desc_short_generative: &desc_short_generative |-
-    Generative AI refers to AI systems that can create new content, such as images, text, or music, based on patterns learned from existing data. This data is expressed in US dollars, adjusted for inflation.
-
+    Money put into privately held [generative](#dod:generative-ai) AI companies by private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D, wages, or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_private: &desc_short_private |-
-    Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
-
+    Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_corporate: &desc_short_corporate |-
-    This data is expressed in US dollars, adjusted for inflation. This data is expressed in US dollars, adjusted for inflation.
+    Annual corporate-finance transactions involving privately held AI companies, broken down by type. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+
 
   desc_key_corporate: &desc_key_corporate
-    - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
-    - This data focuses on traditional corporate finance deals, but the source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
-    - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
-    - A merger is a corporate strategy involving two companies joining together to form a new company. An acquisition is a corporate strategy involving one company buying another company.
-    - Private investment is defined as investment in AI companies of more than $1.5 million (in current US dollars).
-    - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
-    - A minority stake is an ownership interest of less than 50% of the total shares of a company.
+  - This data focuses on transactions involving privately held AI companies,.
+  - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+  - Because this data covers only one form of financing, it underestimates total global spending on AI.
+  - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+  - |-
+    This data includes four types of corporate deals:
+      - A merger is a corporate strategy involving two companies joining together to form a new company. An acquisition is a corporate strategy involving one company buying another company.
+      - Private investment is defined as investment in AI companies of more than $1.5 million (in current US dollars).
+      - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
+      - A minority stake is an ownership interest of less than 50% of the total shares of a company.
 
   desc_key_private: &desc_key_private
-      - AI companies and their focus areas are identified using keyword searches in company descriptions and websites.
-      - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
-      - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
-      - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
+    - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
+    - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+    - Because this data covers only one form of financing, it underestimates total global spending on AI.
+    - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+    - AI firms are identified by the source based on keywords and industry tags; some misclassification is possible.
+
   desc_key_generative: &desc_key_generative
-      - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
-      - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
-      - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
+    - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
+    - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+    - Because this data covers only one form of financing, it underestimates total global spending on AI.
+    - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+    - Generative AI firms are identified by the source based on keywords and industry tags; some misclassification is possible.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
