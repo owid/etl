@@ -42,7 +42,7 @@ tables:
         display:
           numDecimalPlaces: 2
 
-      customers_other_than_data_centers:
+      customers_other_than_data_centres:
         title: Electricity consumption by non-data center customers
         unit: terawatt-hours
         short_unit: TWh
