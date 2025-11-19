@@ -49,7 +49,7 @@ nav = [
         ] },
         { "Documentation" = [
             "dev/docs/index.md",
-            # { "Add a technical publication" = "dev/docs.md" },
+            { "Zensical demo" = "guides/demo.md" },
         ] },
         { "Settings & servers" = [
             { "VSC extensions" = "guides/vscode-extensions.md" },
@@ -106,7 +106,7 @@ nav = [
     { "Technical publications" = [
         "analyses/index.md",
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
-        # { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
+        { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         # { "Our COVID work" = "api/covid.md" },
         { "Our COVID work" = "api/covid.md" },
     ] },

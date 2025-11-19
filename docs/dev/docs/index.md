@@ -15,7 +15,6 @@ The markdown files powering the documentation are in the same repository, under 
     Whenever you are working on a project and you create a pull request, make sure that the documentation still makes sense with your changes. If necessary, please adapt the documentation it in the same PR.
 
 
-
 ## What can Zensical do?
 Zensical is a static site generator that converts markdown files into a website. It offers several features that are useful for our documentation: code blocks, syntax highlighting, automatic table of contents generation, search functionality, navigation, and much more. You can learn more about its features in [:octicons-link-external-16: their official documentation](https://zensical.org/docs/get-started/).
 
@@ -32,6 +31,9 @@ The documentation is (mostly) written in markdown files, under [:fontawesome-bra
 
 The documentation is organized hierarchically using the [:fontawesome-brands-github: `zensical.toml`](https://github.com/owid/etl/tree/master/zensical.toml) configuration file. This file defines the site structure, navigation, and various settings that control how the documentation is rendered.
 
+!!! tip "[Preview documentation examples](../../guides/demo.md)"
+
+    We have drafted a demo page showcasing various Zensical features that you can use in our documentation.
 
 ## Step-by-step guide to modify the documentation
 

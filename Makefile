@@ -38,23 +38,24 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
+docs.post: .venv
+	@echo '==> Post-processing documentation files'
+	.venv/bin/python docs/ignore/convert_notebooks.py
+
 docs.build: .venv
 	@echo '==> Cleaning previous build'
-	rm -rf site/ .cache/
-	mkdir -p .cache
+	@rm -rf site/ .cache/
+	@mkdir -p .cache
 	@echo '==> Generating dynamic documentation files'
-	.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
+	@.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
 	@echo '==> Building documentation with Zensical'
-	DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
+	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 	@echo '==> Post-processing documentation files'
-	@make docs.post
+	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
 
-docs.post: .venv
-	@echo '==> Post-processing documentation files'
-	.venv/bin/python docs/ignore/convert_notebooks.py
 
 docs-mkdocs.build: .venv
 	@echo '==> Building documentation with MkDocs'
