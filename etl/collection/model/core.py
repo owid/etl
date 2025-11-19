@@ -703,6 +703,8 @@ class Collection(MDIMBase):
             if "choices" not in group:
                 return self.get_dimension(dimension).choice_slugs
             else:
+                if not isinstance(group["choices"], list):
+                    raise TypeError("`choices` must be a list!")
                 return group["choices"]
 
         new_views_all = []
