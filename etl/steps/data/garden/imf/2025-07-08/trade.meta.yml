@@ -196,9 +196,9 @@ tables:
         short_unit: "%"
         description_short: The value of goods imported from China, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
         description_key:
-          - This indicator shows how much of a country’s economic output is equivalent to the value of goods it imports from China.
+          - This indicator shows the value of merchandise goods a country imports from China relative to a country’s economic output.
           - *cif_basis
-          - Expressing imports as a share of GDP highlights the scale of economic dependence on Chinese goods relative to the overall size of the economy.
+          - This indicator highlights how large imports from China are in economic terms. A high percentage indicates that the value of merchandise goods a country imports from China is large compared with the size of its economy. A low percentage means these imports are small in comparison.
           - A higher percentage indicates that Chinese imports play a larger role in the economy, while a lower percentage suggests less reliance on China as a supplier.
         description_processing: We calculated the share of imports from China by dividing the value of CIF imports by GDP and multiplying by 100. Import data came from official trade statistics and were valued in current US dollars. GDP was taken from World Bank data, both in current US dollars.
         display:
@@ -215,7 +215,7 @@ tables:
         description_key:
           - This indicator measures how large a country’s total imports are compared with the size of its economy.
           - *cif_basis
-          - A high percentage means the country relies heavily on imports; a low percentage means it is less dependent on them.
+          - A high percentage means that imports are large relative to the size of the economy. A low percentage means they make up a smaller share.
         description_processing: We calculated the share of imports by comparing the total value of CIF imports to the size of the economy (GDP). Specifically, total imports were divided by GDP and multiplied by 100. GDP was taken from World Bank data, both in current US dollars.
         display:
           numDecimalPlaces: 1
@@ -229,7 +229,7 @@ tables:
           - This indicator shows the rank of << counterpart_country >> among a country's import partners.
           - *cif_basis
           - Rank 1 indicates that << counterpart_country >> was the largest import partner for that country in a given year; rank 2 indicates the second largest, and higher numbers represent lower positions.
-          - This ranking highlights whether << counterpart_country >> was a dominant supplier or played a smaller role in a country's imports.
+          - This ranking highlights whether << counterpart_country >> was a dominant supplier of [merchandise imports](#dod:merchandise-imports) or played a smaller role in a country's imports.
         description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> in this ranking was then recorded: 1 if it was the top supplier, 2 if the second largest, and so on. Rankings were produced separately for each year."
         display:
           numDecimalPlaces: 0
