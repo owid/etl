@@ -51,13 +51,13 @@ nav = [
             # { "Add a technical publication" = "dev/docs.md" },
         ] },
         { "Settings & servers" = [
-            { "VS Code extensions" = "guides/vscode-extensions.md" },
-            { "Upgrade Python version" = "guides/upgrade-python-version.md" },
+            { "VSC extensions" = "guides/vscode-extensions.md" },
+            { "Update Python" = "guides/upgrade-python-version.md" },
             { "Environments" = "guides/environment.md" },
             { "Staging servers" = "guides/staging-servers.md" },
             { "Public servers" = "guides/sharing-external.md" },
             { "Types in Tables" = "guides/types-tables.md" },
-            { "OpenAI setup" = "guides/openai.md" },
+            { "OpenAI API" = "guides/openai.md" },
             { "Google API" = "guides/configure-google-api.md" },
         ] },
 

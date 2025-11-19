@@ -1,4 +1,5 @@
 ---
+icon: simple/google
 tags:
   - 👷 Staff
 ---

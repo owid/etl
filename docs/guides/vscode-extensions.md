@@ -1,5 +1,7 @@
 ---
 icon: material/microsoft-visual-studio-code
+status:
+    - new
 ---
 
 # VS Code Extensions
@@ -14,7 +16,7 @@ While VS Code offers excellent built-in features and a rich marketplace, our ETL
 - **DAG file management**: Quickly jumping from YAML entries to their corresponding Python files
 - **Interactive workflow**: Executing code up to cursor position for step-by-step debugging
 - **Code quality**: Detecting deprecated patterns specific to our codebase
-- **Metadata references**: Working with Definition of Data (DoD) references across files
+- **Metadata references**: Working with Details on Demand (DoD) references across files
 
 These extensions save time and reduce errors by understanding the ETL project structure and conventions.
 
@@ -90,7 +92,7 @@ Quickly compare the current file with its previous version.
 
 ### DoD Syntax
 
-**Features**: Syntax highlighting, autocomplete, and hover tooltips for Definition of Data references
+**Features**: Syntax highlighting, autocomplete, and hover tooltips for Details on Demand references
 
 Work seamlessly with DoD references in YAML and Python files.
 
