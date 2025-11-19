@@ -1,7 +1,10 @@
 ---
+icon: simple/openai
 tags:
     - 👷 Staff
 ---
+# OpenAI API configuration
+
 ## Setting Up OpenAI API Key
 
 Some of our tooling require access to OpenAI's models. To use these tools, you need to set up an API key:

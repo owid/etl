@@ -1,4 +1,6 @@
 ---
+tags:
+  - Development
 icon: lucide/lightbulb
 ---
 
