@@ -24,8 +24,21 @@ def run() -> None:
     tb = data.parse(sheet_name="Batteries", skiprows=35)[
         [
             "Year",
+            # Price.
             "Li-ion batteries All cells Price Global (Representative), USD(2024)/kWh",
+            "Li-ion batteries Cylindrical cells Price Global (Representative), USD(2024)/kWh",
+            "Li-ion batteries EV battery pack Price Global (Representative), USD(2024)/kWh",
+            "Li-ion batteries Utility-scale BESS Cost Global (Representative), USD(2024)/kWh",
+            "Li-ion batteries Residential BESS Cost Germany (Representative), USD(2024)/kWh",
+            # Annual production and annual additions.
+            "Li-ion batteries All Li-ion batteries Annual production Global (Representative), GWh/yr",
+            "Li-ion batteries EV batteries Annual additions Global (Representative), GWh/yr",
+            "Li-ion batteries Utility-scale BESS Annual additions Global (Representative), GWh/yr",
+            # Cumulative production.
+            # NOTE: In Rupert's data the EV and BESS cumulative series are in GWh/yr, but they are cumulative stocks, so I understand they should be in GWh.
             "Li-ion batteries All Li-ion batteries Cumulative production Global (Representative), GWh",
+            "Li-ion batteries EV batteries Cumulative additions Global (Representative), GWh/yr",
+            "Li-ion batteries Utility-scale BESS Cumulative additions Global (Representative), GWh/yr",
         ]
     ]
 
