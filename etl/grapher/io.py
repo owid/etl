@@ -993,3 +993,14 @@ def trim_long_variable_name(short_name: str) -> str:
         return short_name[: (255 - len(unique_hash))] + unique_hash
     else:
         return short_name
+
+
+#
+
+
+def get_tags(owid_env: OWIDEnv = OWID_ENV) -> List[str]:
+    with Session(owid_env.engine) as session:
+        # with get_session() as session:
+        tag_list_ = gm.Tag.load_tags(session)
+        tag_list = sorted(tag.name for tag in tag_list_)
+    return tag_list

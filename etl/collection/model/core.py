@@ -703,6 +703,8 @@ class Collection(MDIMBase):
             if "choices" not in group:
                 return self.get_dimension(dimension).choice_slugs
             else:
+                if not isinstance(group["choices"], list):
+                    raise TypeError("`choices` must be a list!")
                 return group["choices"]
 
         new_views_all = []
@@ -914,13 +916,16 @@ class Collection(MDIMBase):
         new_views = []
         new_view_groups = list(grouped.values())
         for view_group in new_view_groups:
+            # Sort view_group according to the order in choices list
+            # This ensures indicators appear in the same order as specified in choices
+            view_group_sorted = sorted(view_group, key=lambda v: choices.index(v.dimensions[dimension]))
             # Create dimensions for new view
-            new_dimensions = view_group[0].dimensions.copy()
+            new_dimensions = view_group_sorted[0].dimensions.copy()
             new_dimensions[dimension] = choice_new_slug
             # Create new view
             new_view = View(
                 dimensions=new_dimensions,
-                indicators=_combine_view_indicators(view_group),
+                indicators=_combine_view_indicators(view_group_sorted),
             )
             # Mark as grouped view
             new_view.mark_as_grouped()

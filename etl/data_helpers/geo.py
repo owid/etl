@@ -2095,8 +2095,7 @@ class Regions:
     ) -> "RegionAggregator":
         """Create a RegionAggregator for efficient multi-operation workflows.
 
-        Use this method when you need to perform multiple operations (e.g., both add_aggregates
-        and add_per_capita) on the same table for better performance.
+        Use this method when you need to perform multiple operations (e.g., both add_aggregates and add_per_capita) on the same table for better performance.
 
         For simple single-operation cases, consider using the convenience methods:
         - regions.add_aggregates(tb)
@@ -2645,6 +2644,7 @@ class RegionAggregator:
         tb: Table,
         only_informed_countries_in_regions: bool = False,
         columns: list[str] | None = None,
+        column_new_name: str | None = None,
         prefix: str = "",
         suffix: str = "_per_capita",
         suffix_informed_population: str = "_region_population",
@@ -2664,6 +2664,8 @@ class RegionAggregator:
             True to construct per-capita indicators of regions taking into account the data coverage of that region each year. For example, if "Africa" is among countries, the population of Africa will be calculated, for each indicator, based on the African countries informed each year for that indicator. Otherwise, if only_informed_countries_in_regions is False, the indicator will be divided by the entire population of Africa each year, regardless of data coverage.
         columns : list[str] or None
             Columns to convert to per-capita. If None, all columns except country and year will be used.
+        column_new_name : str or None
+            Name of the new per-capita column. If None, the new column name will be created using the given prefix and suffix.
         prefix : str
             Prefix to prepend to the original column names to create the name of the new per-capita column.
         suffix : str
@@ -2739,7 +2741,10 @@ class RegionAggregator:
             )
 
         for col in columns:
-            new_col_name = f"{prefix}{col}{suffix}"
+            if column_new_name is None:
+                new_col_name = f"{prefix}{col}{suffix}"
+            else:
+                new_col_name = column_new_name
             if only_informed_countries_in_regions:
                 # Divide the original column by the population of informed countries in the region each year.
                 # NOTE: The auxiliary columns of informed population have only data for regions. For individual countries, we fill missing values with the full population.

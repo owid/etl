@@ -16,7 +16,8 @@ def run() -> None:
     # Read table from garden dataset.
     tbs = [
         ds_garden.read("religious_composition", reset_index=False),
-        ds_garden.read("most_popular_religion", reset_index=False),
+        ds_garden.read(name="most_popular_religion", reset_index=False),
+        ds_garden.read(name="share_change", reset_index=False),
     ]
 
     #

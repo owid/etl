@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Data Centres Metered Electricity Consumption
+    description: |-
+      Contains quarterly consumption data from ESB Networks on data centres connected to the mains electricity network in Ireland. The dataset includes metered electricity consumption for data centres, other customers, and total consumption from Q1 2015 to Q4 2024.
+
+      The data were extracted by the CSO from meter data received from the Electricity Supply Board (ESB Networks). Data centres were identified by examining around 2.5 million meters to identify Meter Point Reference Numbers (MPRNs) with high electricity consumption that were not associated with high employment nor with other activities such as cement manufacture.
+    date_published: "2025-06-10"
+    title_snapshot: Data Centres Metered Electricity Consumption - Quarterly data
+
+    # Citation
+    producer: Central Statistics Office (CSO) Ireland
+    citation_full: |-
+      Central Statistics Office (CSO) Ireland - Data Centres Metered Electricity Consumption (2025)
+    attribution_short: CSO Ireland
+
+    # Files
+    url_main: https://www.cso.ie/en/statistics/energy/datacentresmeteredelectricityconsumption/
+    date_accessed: '2025-11-10'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cso.ie/en/aboutus/lgdp/csodatapolicies/dataforpublication/
+outs:
+  - md5: 79ef21fe80ef11676d676e97542226cb
+    size: 8407
+    path: ireland_metered_consumption.csv

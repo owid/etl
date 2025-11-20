@@ -1093,6 +1093,7 @@
                           "Polio",
                           "Population Growth",
                           "Poverty",
+                          "Religion",
                           "Renewable Energy",
                           "Research & Development",
                           "Sanitation",
@@ -1281,10 +1282,10 @@
                           }
                         },
                         "baseColorScheme": {
-                                                        "type": "string",
-                              "default": "default",
-                              "description": "The default color scheme if no color overrides are specified"
-                                                    },
+                          "type": "string",
+                          "default": "default",
+                          "description": "The default color scheme if no color overrides are specified"
+                        },
                         "yAxis": {
                           "$ref": "#/$defs/axis"
                         },

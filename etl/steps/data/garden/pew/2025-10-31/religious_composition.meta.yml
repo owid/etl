@@ -1,14 +1,54 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  common:
-    presentation:
-      topic_tags:
-        - Uncategorized
   others:
     methodology: |-
       Estimates are based on more than 2,700 censuses and surveys. You can read complete methodology in [Pew's report](https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/).
     other_religions: |-
-      of people of all ages affiliated to other religions. Other religions include Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
+      Other religions include Baha'is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
+    note: |-
+      These estimates are unrounded counts, which should be used with caution.
+    subtitle: |-
+      Estimates are based on how people describe their own religious identity. This self-identification is taken regardless of their practices or beliefs.
+      <%- if religion == "religiously_unaffiliated" %>
+       Estimates include people that are _not_ affiliated with any religion.
+      <%- elif religion == "any_religion" %>
+       Estimates include people that are affiliated with any religion.
+      <%- elif religion == "other_religions" %>
+       Estimates include Baha'is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians, and many small groups, some of which can be described as folk or traditional religions.
+      <% endif -%>
+    wysk_cond: &wysk_cond
+      - "{definitions.others.wysk.1_census}"
+      - "{definitions.others.wysk.2_identity}"
+      - |-
+        <% if religion in ("religiously_unaffiliated", "any_religion", "religious_composition") -%>
+        {definitions.others.wysk.3_nonrel_1}
+        <% endif -%>
+      - |-
+        <% if religion in ("religiously_unaffiliated", "any_religion", "religious_composition") -%>
+        {definitions.others.wysk.4_nonrel_2}
+        <% endif -%>
+      - "{definitions.others.wysk.5_children}"
+      - "{definitions.others.wysk.6_method}"
+    wysk_complete: &wysk_complete
+      - "{definitions.others.wysk.1_census}"
+      - "{definitions.others.wysk.2_identity}"
+      - "{definitions.others.wysk.3_nonrel_1}"
+      - "{definitions.others.wysk.4_nonrel_2}"
+      - "{definitions.others.wysk.5_children}"
+      - "{definitions.others.wysk.6_method}"
+    wysk:
+      1_census: These estimates are [sourced from](https://www.pewresearch.org/religion/2025/06/09/global-religious-change-methodology/) more than 2,700 censuses and surveys.
+      2_identity: People are categorized based on how they describe their own religious identity. If someone identifies with a religious group, they're classified as being part of that group regardless of their practices or beliefs.
+      3_nonrel_1: The religiously unaffiliated population includes people who say they do not identify with any religion or that they are atheist or agnostic in surveys and censuses.
+      4_nonrel_2: Some people categorised as “non-religious” or “religiously unaffiliated” may engage in activities and hold beliefs that can be considered religious or spiritual, even though they don't describe themselves as belonging to any religion. This is particularly important for Chinese data, since “religiously unaffiliated” is by far the largest group. Pew [discusses this](https://www.pewresearch.org/religion/2023/08/30/measuring-religion-in-china/) in detail.
+      5_children: While censuses often provide information on people of all ages, most surveys only report on the religious composition of adults. In such cases, researchers use indirect demographic methods to estimate this data for children. For example, Pew uses data on the age structure and fertility rates of women in different religious groups to estimate the proportion of each religious group in the child population. This assumes that children share their mother's religion.
+      6_method: Pew's methodology has changed over time, as improved data sources have become available. That means its latest estimates for 2010 — shown in this dataset — may differ from its earlier publications. You can see these changes and the reasons for these revisions in [its updated methodology](https://www.pewresearch.org/religion/2025/06/09/why-we-revised-our-estimates-for-2010/).
+  common:
+    presentation:
+      topic_tags:
+        - Religion
+    description_key: *wysk_cond
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -16,18 +56,69 @@ dataset:
 
 tables:
   most_popular_religion:
+    common:
+      description_key: *wysk_complete
     variables:
       most_popular_religion:
+        type: ordinal
+        sort:
+          - "Christians"
+          - "Muslims"
+          - "Hindus"
+          - "Buddhists"
+          - "Jews"
+          - "Other Religions"
+          - "Religiously Unaffiliated"
         title: Most popular religion in a country
         description_short: The most popular religion in each country and year, based on share of population.
         unit: ""
-        description_key:
-          - "{definitions.others.methodology}"
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryColors:
+                  "Christians": "#4C6A9C"
+                  "Muslims": "#578145"
+                  "Hindus": "#C05917"
+                  "Buddhists": "#BC8E5A"
+                  "Jews": "#00295B"
+                  "Other Religions": "#A2559C"
+                  "Religiously Unaffiliated": "#81C0C9"
+  share_change:
+    variables:
+      share_change_2010_2020:
+        title: |-
+          <% if religion == "religiously_unaffiliated" -%>
+          Percentage point change in share of people that are not religious (2010-2020)
+          <% elif religion == "other_religions" -%>
+          Percentage point change in share of people that are affiliated to other religions (2010-2020)
+          <% elif religion == "any_religion" %>
+          Percentage point change in share of people that is religious (2010-2020)
+          <% else -%>
+          Percentage point change in share of people that are <<religion.title()>> (2010-2020)
+          <% endif -%>
+        description_short: |-
+          <% if religion == "religiously_unaffiliated" -%>
+          The difference in the share of of people that are religiously unaffiliated between 2010 and 2020.
+          <% elif religion == "other_religions" -%>
+          The difference in the share of of people that are affiliated to other religions between 2010 and 2020. {{definitions.others.other_religions}}
+          <% elif religion == "any_religion" %>
+          The difference in the share of of people that are affiliated to any religion between 2010 and 2020.
+          <% else -%>
+          The difference in the share of of people that are <<religion>> between 2010 and 2020.
+          <% endif -%>
+        unit: "%"
+        short_unit: "%"
+
   religious_composition:
+    common:
+      presentation:
+        grapher_config:
+          subtitle: "{definitions.others.subtitle}"
     variables:
       share:
         title: |-
-          Share of population -
+          Share of the population -
           <% if religion == "religiously_unaffiliated" %>
            No religion
           <% elif religion == "other_religions" %>
@@ -39,23 +130,23 @@ tables:
           <% endif %>
         presentation:
           title_public: |-
-            Share of people
-            <% if religion == "religiously_unaffiliated" -%>
+            Share of the population
+            <%- if religion == "religiously_unaffiliated" %>
              that are not religious
-            <% elif religion == "any_religion" -%>
+            <%- elif religion == "any_religion" %>
              that are religious
-            <% elif religion == "other_religions" -%>
+            <%- elif religion == "other_religions" %>
              affiliated to other religions
-            <% else -%>
+            <%- else %>
              that are <<religion>>
-            <% endif -%>
+            <% endif %>
         unit: percentage
         short_unit: "%"
         description_short: |-
           <% if religion == "religiously_unaffiliated" -%>
           Estimates of the percentage of people of all ages that are religiously unaffiliated.
           <% elif religion == "other_religions" -%>
-          Estimates of the percentage  {definitions.others.other_religions}
+          Estimates of the percentage of people of all ages affiliated to other religions. {definitions.others.other_religions}
           <% elif religion == "any_religion" %>
           Estimates of the percentage of people affiliated to any religion.
           <% else -%>
@@ -63,35 +154,32 @@ tables:
           <% endif -%>
         display:
           numDecimalPlaces: 1
-        description_key:
-          - "{definitions.others.methodology}"
 
       count:
         title: |-
           Number of people -
-          <% if religion == "religiously_unaffiliated" %>
+          <%- if religion == "religiously_unaffiliated" %>
            No religion
-          <% elif religion == "other_religions" %>
+          <%- elif religion == "other_religions" %>
            Other religions
-          <% elif religion == "any_religion" %>
+          <%- elif religion == "any_religion" %>
            Any religion
-          <% else %>
+          <%- else %>
            <<religion.title()>>
-          <% endif %>
+          <%- endif %>
         unit: people
         description_short: |-
-          <% if religion == "religiously_unaffiliated" -%>
-          Estimates of the number of people of all ages that are religiously unaffiliated.
-          <% elif religion == "other_religions" -%>
-          Estimates of the number {definitions.others.other_religions}
-          <% elif religion == "any_religion" %>
+          <%- if religion == "religiously_unaffiliated" -%>
+          Estimates of the number of people that are religiously unaffiliated.
+          <%- elif religion == "other_religions" -%>
+          Estimates of the number of people affiliated to other religions. {definitions.others.other_religions}
+          <%- elif religion == "any_religion" -%>
           Estimates of the number of people affiliated to any religion.
-          <% else -%>
+          <%- else -%>
           Estimates of the number of people that are << religion >>.
-          <% endif -%>
-        description_key:
-          - "{definitions.others.methodology}"
-          - In most countries, it is not possible to precisely count the number of people who identify with each religion. Because our estimates are not precise, the tables in this report and accompanying data files show rounded population counts (often to the nearest 10,000) and show counts below 10,000 as “<10,000.”
+          <%- endif %>
+        # description_key:
+        #   - In most countries, it is not possible to precisely count the number of people who identify with each religion. Because our estimates are not precise, the tables in this report and accompanying data files show rounded population counts (often to the nearest 10,000) and show counts below 10,000 as “<10,000.”
         display:
           numDecimalPlaces: 1
         presentation:
@@ -110,31 +198,31 @@ tables:
       count_unrounded:
         title: |-
           Number of people (unrounded) -
-          <% if religion == "religiously_unaffiliated" %>
+          <%- if religion == "religiously_unaffiliated" %>
            No religion
-          <% elif religion == "other_religions" %>
+          <%- elif religion == "other_religions" %>
            Other religions
-          <% elif religion == "any_religion" %>
+          <%- elif religion == "any_religion" %>
            Any religion
-          <% else %>
+          <%- else %>
            <<religion.title()>>
-          <% endif %>
+          <%- endif -%>
         unit: people
         description_short: |-
-          {tables.religious_composition.variables.count.description_short} These estimates are unrounded counts, which should be used with caution.
-        description_key:
-          - "{definitions.others.methodology}"
+          {tables.religious_composition.variables.count.description_short} {definitions.others.note}
         display:
           numDecimalPlaces: 1
         presentation:
+          grapher_config:
+            note: "{definitions.others.note}"
           title_public: |-
             Number of people
-            <% if religion == "religiously_unaffiliated" -%>
+            <%- if religion == "religiously_unaffiliated" %>
              that are not religious
-            <% elif religion == "any_religion" -%>
+            <%- elif religion == "any_religion" %>
              that are religious
-            <% elif religion == "other_religions" -%>
+            <%- elif religion == "other_religions" %>
              affiliated to other religions
-            <% else -%>
+            <%- else %>
              that are <<religion>>
             <% endif -%>
