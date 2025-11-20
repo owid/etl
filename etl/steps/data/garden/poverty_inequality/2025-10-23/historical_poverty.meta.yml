@@ -122,3 +122,10 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+
+      population_share_of_omm:
+        title: Population as a share of OMM population
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2

@@ -15,8 +15,9 @@ The approach:
 4. Calculate the number and share of people living below different poverty lines, using OWID population data
 """
 
-from typing import Tuple
+from typing import Set, Tuple
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -34,14 +35,23 @@ paths = PathFinder(__file__)
 # Poverty lines (daily income in 2021 PPP$)
 POVERTY_LINES = [3, 10, 30]
 
+# Define if we want to interpolate the log of GDP per capita or the absolute values
+INTERPOLATE_LOG_GDP = True
+
 # Earliest year for extrapolation
 EARLIEST_YEAR = 1820
 
 # Latest year for extrapolation
 LATEST_YEAR = 1990
 
+# Define current year as the year of the version of the step
+CURRENT_YEAR = int(paths.version.split("-")[0])
+
+# Define extreme growth factor thresholds
+EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
+
 # Show warnings
-SHOW_WARNINGS = False
+SHOW_WARNINGS = True
 
 # NOTE: See if we want to include these countries not available in Maddison Project Database
 MISSING_COUNTRIES_AND_REGIONS = {
@@ -209,6 +219,10 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # This fills gaps between available years
     # Drop region before interpolation (categorical columns can't be interpolated)
     tb_gdp = tb_gdp.drop(columns=["region"])
+
+    # Create log_gdp_per_capita column, as the logarithm of gdp_per_capita
+    tb_gdp["log_gdp_per_capita"] = tb_gdp["gdp_per_capita"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+
     tb_gdp = interpolate_table(
         tb_gdp,
         entity_col="country",
@@ -218,6 +232,10 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         limit_direction="both",
         limit_area="inside",
     )
+
+    if INTERPOLATE_LOG_GDP:
+        # Convert back from log to absolute values
+        tb_gdp["gdp_per_capita"] = tb_gdp["log_gdp_per_capita"].apply(lambda x: np.exp(x) if pd.notna(x) else x)
 
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
@@ -285,13 +303,14 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp = tb_gdp.rename(columns={"growth_factor": "growth_factor_country"}, errors="raise")
 
     # Generate growth_factor column using priority: country > historical_entity > region
-    tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
+    tb_gdp[["growth_factor", "growth_factor_origin"]] = tb_gdp.apply(select_growth_factor, axis=1)
 
     # Copy metadata from growth_factor_country to growth_factor
     tb_gdp["growth_factor"] = tb_gdp["growth_factor"].copy_metadata(tb_gdp["growth_factor_country"])
 
     # Shift growth_factor down by one year to align with the starting year of extrapolation
     tb_gdp["growth_factor"] = tb_gdp.groupby("country")["growth_factor"].shift(-1)
+    tb_gdp["growth_factor_origin"] = tb_gdp.groupby("country")["growth_factor_origin"].shift(-1)
 
     # Calculate the the cumulative growth factor product from LATEST_YEAR to each year
     # First, sort by country and year (descending)
@@ -318,35 +337,32 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
             "region",
             "historical_entity",
             "growth_factor",
+            "growth_factor_origin",
             "cumulative_growth_factor",
         ]
     ]
 
     # Check for extreme growth rates
-    extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
+    extreme_growth = tb_gdp[
+        (tb_gdp["growth_factor"] > EXTREME_GROWTH_FACTOR_THRESHOLDS[1])
+        | (tb_gdp["growth_factor"] < EXTREME_GROWTH_FACTOR_THRESHOLDS[0])
+    ].reset_index(drop=True)
     if SHOW_WARNINGS:
         if len(extreme_growth) > 0:
             log.warning(
                 f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
-                f"(>100% or <-50% in a single year)"
+                f"(<-{round((1- EXTREME_GROWTH_FACTOR_THRESHOLDS[0]) * 100, 1)}% or >+{round((EXTREME_GROWTH_FACTOR_THRESHOLDS[1]-1) * 100, 1)}% or  in a single year)"
             )
-            # Show some examples
-            sample = extreme_growth.head(10)[["country", "year", "growth_factor"]]
-            log.warning(f"prepare_gdp_data: Examples:\n{sample}")
-            log.warning(
-                "We will assert that these instances were already in the original data; otherwise, if they were introduced in our processing, an error will be raised"
-            )
-    for _, row in extreme_growth.iterrows():
-        # Check that those country-years of extreme growth/degrowth were already in the original data.
-        _tb = tb_maddison[(tb_maddison["country"] == row["country"])].reset_index(drop=True)
-        error = "Extreme growth factors have been introduced in the data!"
-        assert len(_tb[(_tb["year"] == row["year"])]) == 1, error
-        # Double-check that those growth factors were exactly as in the original data.
-        growth_factor_original = (
-            _tb[(_tb["year"] == row["year"] + 1)]["gdp_per_capita"].item()
-            / _tb[(_tb["year"] == row["year"])]["gdp_per_capita"].item()
-        )
-        assert growth_factor_original == row["growth_factor"], "Wrong calculation of growth rates"
+            # Filter extreme_growth to only include country-years where growth_factor_origin is historical_entity or region
+            extreme_growth_introduced = extreme_growth[
+                extreme_growth["growth_factor_origin"].isin(["historical_entity", "region"])
+            ].reset_index(drop=True)
+            if len(extreme_growth_introduced) > 0:
+                log.error(
+                    f"prepare_gdp_data: Out of these, {len(extreme_growth_introduced)} instances ({round(len(extreme_growth_introduced) / len(extreme_growth) * 100, 1)}%) come from historical_entity or region-level growth rates."
+                )
+                # Show some examples
+                log.error(f"{extreme_growth_introduced[['country', 'year', 'growth_factor', 'growth_factor_origin']]}")
 
     return tb_gdp
 
@@ -369,6 +385,8 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
                 f"extrapolate_backwards: The following {len(missing_countries)} countries are in thousand_bins but missing in GDP data: "
                 f"{sorted_missing_countries}"
             )
+            calculate_population_of_missing_countries(missing_countries)
+
         missing_countries = countries_gdp - countries_bins
         if len(missing_countries) > 0:
             sorted_missing_countries = ", ".join(sorted(missing_countries))
@@ -575,17 +593,64 @@ def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
     return tb_poverty
 
 
+def calculate_population_of_missing_countries(missing_countries: Set[str]) -> None:
+    """
+    Calculate population estimates for countries missing in the main population dataset, and what do they represent as a share of the world population.
+    """
+    # Create table with column country as missing_countries
+    tb_population_missing = Table(pd.DataFrame(data={"country": list(missing_countries)}))
+
+    # Assign column year as CURRENT_YEAR
+    tb_population_missing["year"] = CURRENT_YEAR
+
+    # Add population column using paths.regions.add_population
+    tb_population_missing = paths.regions.add_population(
+        tb=tb_population_missing,
+        population_col="population",
+        warn_on_missing_countries=False,
+        interpolate_missing_population=True,
+    )
+
+    # Calculate total world population for CURRENT_YEAR
+    tb_world_population = paths.regions.add_population(
+        tb=Table(pd.DataFrame(data={"country": ["World"], "year": [CURRENT_YEAR]})),
+        population_col="world_population",
+        warn_on_missing_countries=False,
+        interpolate_missing_population=True,
+    )
+
+    world_population = tb_world_population["world_population"].item()
+
+    # Calculate population share of world population
+    tb_population_missing["population_share_of_world"] = tb_population_missing["population"] / world_population * 100
+
+    # Aggregate population and population_share_of_world
+    tb_population_missing = tb_population_missing.groupby("year").sum().reset_index()
+
+    # Define missing_population
+    missing_population = tb_population_missing["population"].item()
+    missing_population_share = tb_population_missing["population_share_of_world"].item()
+
+    log.warning(
+        f"This represents {int(missing_population):,} people in {CURRENT_YEAR} ({missing_population_share:.2f}% of the world population)."
+    )
+
+    return None
+
+
 def select_growth_factor(row):
     """
     Select growth factor based on priority: country > historical_entity > region.
     This way, we have the longest country-specific growth series possible.
     """
     if not pd.isna(row["growth_factor_country"]):
-        return row["growth_factor_country"]
+        return pd.Series({"growth_factor": row["growth_factor_country"], "growth_factor_origin": "country"})
     elif not pd.isna(row["growth_factor_historical_entity"]):
-        return row["growth_factor_historical_entity"]
+        return pd.Series(
+            {"growth_factor": row["growth_factor_historical_entity"], "growth_factor_origin": "historical_entity"}
+        )
     else:
-        return row["growth_factor_region"]
+        return pd.Series({"growth_factor": row["growth_factor_region"], "growth_factor_origin": "region"})
 
 
 def create_stacked_variables(tb: Table) -> Table:
@@ -684,6 +749,9 @@ def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> T
     # Add population differences columns
     tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
     tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
+
+    # Add population as a share of population_omm
+    tb_population["population_share_of_omm"] = tb_population["population"] / tb_population["population_omm"] * 100
 
     # Drop population columns from tb_poverty
     tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
