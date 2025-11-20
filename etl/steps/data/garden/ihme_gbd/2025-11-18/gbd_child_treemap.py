@@ -33,7 +33,7 @@ cause_renaming_dict = {
 }
 
 broad_cause_dict = {
-    "Animal attacks": "Injuries",
+    # "Animal attacks": "Injuries",
     "Cancers": "Non-communicable diseases",
     "Conflict": "Injuries",
     "Diarrheal diseases": "Infectious diseases",
@@ -56,7 +56,7 @@ broad_cause_dict = {
     "Other infectious diseases": "Infectious diseases",
     "Other injuries": "Injuries",
     "Other non-communicable diseases": "Non-communicable diseases",
-    "Poisonings": "Injuries",
+    # "Poisonings": "Injuries",
     "Preterm birth": "Birth disorders",
     "Pulmonary aspiration and foreign body in airway": "Injuries",
     "Respiratory infections": "Infectious diseases",
@@ -161,9 +161,9 @@ def reaggregate_causes(tb: Table) -> Table:
             "Pulmonary aspiration and foreign body in airway",
             "Fire, heat, and hot substances",
             "Falls",
-            "Poisonings",
+            # "Poisonings",
             "Adverse effects of medical treatment",
-            "Animal contact",
+            # "Animal contact",
         ],
         aggregate_cause="Unintentional injuries",
         residual_name="Other injuries",
