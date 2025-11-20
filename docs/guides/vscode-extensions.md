@@ -6,19 +6,10 @@ status:
 
 # VS Code Extensions
 
+While VS Code offers excellent built-in features and a rich marketplace, our ETL workflow has specific needs that generic extensions can't address. These extensions save time and reduce errors by understanding the ETL project structure and conventions.
+
 Custom VS Code extensions enhance your ETL development workflow by automating repetitive tasks, improving navigation, and catching code quality issues early.
 
-## Why custom extensions?
-
-While VS Code offers excellent built-in features and a rich marketplace, our ETL workflow has specific needs that generic extensions can't address:
-
-- **ETL-specific navigation**: Finding the latest version of a step among hundreds of dated directories
-- **DAG file management**: Quickly jumping from YAML entries to their corresponding Python files
-- **Interactive workflow**: Executing code up to cursor position for step-by-step debugging
-- **Code quality**: Detecting deprecated patterns specific to our codebase
-- **Metadata references**: Working with Details on Demand (DoD) references across files
-
-These extensions save time and reduce errors by understanding the ETL project structure and conventions.
 
 ## Installing extensions
 
@@ -34,21 +25,22 @@ This installs both marketplace extensions (Ruff, YAML) and our custom extensions
 
 ### Find Latest ETL Step
 
-**Shortcut**: ++ctrl+shift+l++
+!!! tip "**Shortcut**: ++ctrl+shift+l++"
 
 Navigate ETL steps efficiently by searching only the latest version of each step.
 
 **Use case**: You want to open the garden step for `energy/electricity_mix` but there are multiple versions (`2023-01-15`, `2023-06-20`, `2024-02-10`). This extension shows only the latest version files.
 
-**How it works**:
-1. Press ++ctrl+shift+l++
-2. Type the step name (e.g., "electricity_mix")
-3. See only files from the latest version
-4. Press Enter to open
+!!! note "How it works"
+
+    1. Press ++ctrl+shift+l++
+    2. Type the step name (e.g., "electricity_mix")
+    3. See only files from the latest version
+    4. Press Enter to open
 
 ### Clickable DAG Steps
 
-**Features**: Makes `dag.yml` entries clickable with status indicators
+!!! tip "Makes `dag.yml` entries clickable with status indicators"
 
 Turn DAG entries into clickable links with visual status feedback:
 
@@ -59,55 +51,57 @@ Turn DAG entries into clickable links with visual status feedback:
 
 **Use case**: While editing `dag/energy.yml`, you want to check the implementation of a dependency. Click the step URI to jump directly to the Python file.
 
-**How it works**:
-- Click any DAG entry to open its `.py` file (data/export steps) or `.dvc` file (snapshots)
-- Status emoji appears based on step version and health
-- Works across all DAG files in the project
+!!! note "How it works"
+
+    - Click any DAG entry to open its `.py` file (data/export steps) or `.dvc` file (snapshots)
+    - Status emoji appears based on step version and health
+    - Works across all DAG files in the project
 
 ### Run Until Cursor
 
-**Shortcut**: ++cmd+enter++ (macOS) / ++ctrl+enter++ (Windows/Linux)
+!!! tip "**Use it**: ++cmd+enter++, or ++ctrl+enter++ (Windows)"
 
 Execute code from the start of `run()` function up to your cursor position in the Interactive Window.
 
 **Use case**: You're developing a garden step and want to test the first 10 lines of `run()` without executing the entire function.
 
-**How it works**:
-- **Outside `run()`**: Press ++cmd+enter++ → executes entire script, cursor moves to start of `run()`
-- **Inside `run()`**: Press ++cmd+enter++ → executes from start of `run()` to cursor
-- Useful for step-by-step debugging and iterative development
+!!! note "How it works"
+
+    - **Outside `run()`**: Press ++cmd+enter++ → executes entire script, cursor moves to start of `run()`
+    - **Inside `run()`**: Press ++cmd+enter++ → executes from start of `run()` to cursor
+    - Useful for step-by-step debugging and iterative development
 
 ### Compare Previous Version
 
-**Shortcut**: ++cmd+shift+d++ (macOS) / ++ctrl+shift+d++ (Windows/Linux)
+!!! tip "**Use it**: ++cmd+shift+d++, or ++ctrl+shift+d++ (Windows)"
 
 Quickly compare the current file with its previous version.
 
 **Use case**: You're reviewing changes in `energy/2024-02-10/electricity_mix.py` and want to see what changed from `2023-06-20`.
 
-**How it works**:
-1. Open a file with date-versioned paths (e.g., `energy/2024-02-10/file.py`)
-2. Press ++cmd+shift+d++
-3. Diff view opens comparing with previous version (`2023-06-20`)
+!!! note "How it works"
+
+    1. Open a file with date-versioned paths (e.g., `energy/2024-02-10/file.py`)
+    2. Press ++cmd+shift+d++
+    3. Diff view opens comparing with previous version (`2023-06-20`)
 
 ### DoD Syntax
-
-**Features**: Syntax highlighting, autocomplete, and hover tooltips for Details on Demand references
+!!! tip "Syntax highlighting, autocomplete, and hover tooltips for Details on Demand references"
 
 Work seamlessly with DoD references in YAML and Python files.
 
 **Use case**: You're documenting indicator metadata and need to reference DoD entries. Start typing `#dod:` and get autocomplete suggestions with descriptions.
 
-**How it works**:
-- **Autocomplete**: Type `#dod:` → dropdown shows all available DoD names
-- **Hover tooltips**: Hover over `[Title](#dod:key)` → see full definition
-- **Syntax highlighting**: DoD references are underlined and clickable
-- **Multi-language**: Works in YAML files and Python strings
-- **Smart loading**: Pre-fetches definitions when you open a file
+!!! note "How it works"
+
+    - **Autocomplete**: Type `#dod:` → dropdown shows all available DoD names
+    - **Hover tooltips**: Hover over `[Title](#dod:key)` → see full definition
+    - **Syntax highlighting**: DoD references are underlined and clickable
+    - **Multi-language**: Works in YAML files and Python strings
+    - **Smart loading**: Pre-fetches definitions when you open a file
 
 ### Detect Outdated Practices
-
-**Features**: Real-time detection of deprecated code patterns
+!!! tip "Real-time detection of deprecated code patterns"
 
 Catch outdated code patterns as you type with configurable warnings.
 
@@ -119,12 +113,12 @@ Catch outdated code patterns as you type with configurable warnings.
 - `geo.harmonize_countries()` → Use `paths.regions.harmonize_names(tb)`
 - `paths.load_dependency()` → Use `paths.load_dataset()` or `paths.load_snapshot()`
 
-**How it works**:
+!!! note "How it works"
 
-- Patterns apply only to files in `etl/steps/data/**` (scope-based detection)
-- Yellow squiggles appear under outdated code
-- Hover for suggested alternatives
-- Extensible: add new patterns in `src/extension.ts`
+    - Patterns apply only to files in `etl/steps/data/**` (scope-based detection)
+    - Yellow squiggles appear under outdated code
+    - Hover for suggested alternatives
+    - Extensible: add new patterns in `src/extension.ts`
 
 ## Developing extensions
 

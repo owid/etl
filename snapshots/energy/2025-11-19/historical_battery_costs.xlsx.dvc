@@ -1,0 +1,28 @@
+meta:
+  origin:
+    ####################################################################################################################
+    # TODO: This dataset was created for internal investigation purposes.
+    #  If we decide to publish it, and the data provider agrees, rephrase this metadata appropriately.
+    ####################################################################################################################
+    title: "Historical battery costs and production"
+    description: |-
+      This dataset is a compilation of historical and recent data on the battery costs and production.
+    date_published: "2025-11-19"
+
+    # Citation
+    producer: Rupert Way
+    citation_full: |-
+      Rupert Way - Historical costs of batteries and cumulative production (2025). The original data was sent to Our World in Data in a private communication.
+
+    url_main: https://www.smithschool.ox.ac.uk/person/rupert-way
+    date_accessed: '2025-11-19'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.smithschool.ox.ac.uk/person/rupert-way
+  is_public: false
+outs:
+  - md5: fab8c4c53ac56c9202e1ce65d2af74e4
+    size: 40024
+    path: historical_battery_costs.xlsx
