@@ -5,7 +5,7 @@ import yaml
 from etl.paths import BASE_DIR
 
 # Path to shared model pricing configuration
-MODELS_YAML_PATH = BASE_DIR / "apps" / "wizard" / "app_pages" / "expert_agent" / "models.yml"
+MODELS_YAML_PATH = BASE_DIR / "apps" / "utils" / "llms" / "models.yml"
 
 # Claude model configuration
 # Choose model based on speed vs quality tradeoff:
@@ -94,7 +94,7 @@ def _load_model_pricing() -> dict[str, dict[str, float]]:
 
 
 # Model pricing (USD per million tokens)
-# Loaded from apps/wizard/app_pages/expert_agent/models.yml
+# Loaded from apps/utils/llms/models.yml
 MODEL_PRICING = _load_model_pricing()
 
 # Fields to inspect for typos and semantic issues
