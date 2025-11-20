@@ -14,7 +14,9 @@ tables:
     variables:
       # Li-ion batteries All cells Price Global (Representative), USD(2024)/kWh
       price:
-        title: Prices of lithium-ion batteries
+        title: Price of lithium-ion battery cells
+        description_short: |-
+          Representative estimate of the price of [battery cells](#dod:battery-cell) for [lithium-ion batteries](#dod:lithium-ion-battery), across all major cell chemistries. Prices are in US dollars per [kilowatt-hour](#dod:watt-hours), adjusted for inflation.
         unit: 'constant 2024 US$ per kilowatt-hour'
         short_unit: '$/kWh'
         display:
@@ -26,6 +28,8 @@ tables:
       # Li-ion batteries All Li-ion batteries Cumulative production Global (Representative), GWh
       cumulative_production:
         title: Cumulative production of lithium-ion batteries
+        description_short: |-
+          Cumulative global production of [lithium-ion batteries](#dod:lithium-ion-battery), across all main applications, including consumer electronics, electric vehicles, and stationary storage. Measured in [gigawatt-hours](#dod:gigawatt-hour).
         unit: 'gigawatt-hours'
         short_unit: 'GWh'
         display:
