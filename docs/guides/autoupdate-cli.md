@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+  - Automation
 icon: lucide/calendar-clock
 ---
 
@@ -8,7 +9,7 @@ icon: lucide/calendar-clock
 
 Our ETL system includes an automatic update system that runs daily to update snapshots that are marked for automatic updating. This system identifies snapshots by looking for the `autoupdate`  metadata field in their `.dvc` files, runs the corresponding Python scripts to fetch the latest data, and creates pull requests when data has changed.
 
-!!! info "It relies on [etl autoupdate](etl-cli/#etl-autoupdate){ data-preview } command"
+!!! info "It relies on [etl autoupdate](etl-cli/#autoupdate){ data-preview } command"
 
 It is then up to you to review, optionally edit and merge that PR. Use `chart-diff` and enable **Show all charts** in Options to check all affected charts. `data-diff` can also be helpful. Once you merge the PR, autoupdate will automatically create a new PR when there's new data available.
 

@@ -18,6 +18,7 @@ help:
 	@echo '  make deploy    	Re-run the full ETL on production'
 	@echo '  make docs.build    Build documentation'
 	@echo '  make docs.serve    Serve documentation locally'
+	@echo '  make docs.post     Transform non-md files in docs/ after build (e.g. notebooks)'
 	@echo '  make dot       	Build a visual graph of the dependencies'
 	@echo '  make etl       	Fetch data and run all transformations for garden'
 	@echo '  make format    	Format code'
@@ -37,19 +38,24 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
+docs.post: .venv
+	@echo '==> Post-processing documentation files'
+	.venv/bin/python docs/ignore/convert_notebooks.py
+
 docs.build: .venv
 	@echo '==> Cleaning previous build'
-	rm -rf site/ .cache/
-	mkdir -p .cache
+	@rm -rf site/ .cache/
+	@mkdir -p .cache
 	@echo '==> Generating dynamic documentation files'
-	.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
+	@.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
 	@echo '==> Building documentation with Zensical'
-	DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
-	@echo '==> Converting Jupyter notebooks to HTML'
-	.venv/bin/python docs/ignore/convert_notebooks.py
+	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
+	@echo '==> Post-processing documentation files'
+	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
+
 
 docs-mkdocs.build: .venv
 	@echo '==> Building documentation with MkDocs'
@@ -174,7 +180,7 @@ install-vscode-extensions:
 	@echo '==> Checking and installing required VS Code extensions'
 	@if command -v code > /dev/null; then \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
 			if ! code --list-extensions | grep -q "$$EXT"; then \

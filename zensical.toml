@@ -6,6 +6,7 @@ site_description = "Learn about the ETL pipeline at Our World in Data."
 site_author = "Our World in Data"
 copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/privacy">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
 docs_dir = "docs"
+edit_uri = "edit/master/docs/"
 
 # Repository information
 repo_name = "owid/etl"
@@ -48,15 +49,16 @@ nav = [
         ] },
         { "Documentation" = [
             "dev/docs/index.md",
-            # { "Add a technical publication" = "dev/docs.md" },
+            { "Zensical demo" = "guides/demo.md" },
         ] },
         { "Settings & servers" = [
-            { "Upgrade Python version" = "guides/upgrade-python-version.md" },
+            { "VSC extensions" = "guides/vscode-extensions.md" },
+            { "Update Python" = "guides/upgrade-python-version.md" },
             { "Environments" = "guides/environment.md" },
             { "Staging servers" = "guides/staging-servers.md" },
             { "Public servers" = "guides/sharing-external.md" },
             { "Types in Tables" = "guides/types-tables.md" },
-            { "OpenAI setup" = "guides/openai.md" },
+            { "OpenAI API" = "guides/openai.md" },
             { "Google API" = "guides/configure-google-api.md" },
         ] },
 
@@ -178,9 +180,12 @@ logo = "assets/site-logo.svg"
 favicon = "assets/images/favicon.png"
 
 features = [
+    # "content.action.edit",         # Edit this page
+    "content.action.view",         # View source of this page
     "content.code.copy",
     "content.code.select",
     "content.code.annotate",
+    "content.tabs.link",
     "content.tooltips",
     "navigation.expand",
     "navigation.footer",

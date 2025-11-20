@@ -1,4 +1,7 @@
 ---
+tags:
+  - Automation
+  - Reference
 icon: lucide/terminal
 ---
 
