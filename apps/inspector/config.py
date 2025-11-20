@@ -1,7 +1,5 @@
 """Configuration for the inspector app."""
 
-import yaml
-
 from etl.paths import BASE_DIR
 
 # Path to shared model pricing configuration
@@ -56,39 +54,24 @@ def _load_model_pricing() -> dict[str, dict[str, float]]:
         Dictionary mapping API model names to pricing info with 'input' and 'output' keys.
         For models with tiered pricing, uses the first tier (lowest price).
     """
-    with open(MODELS_YAML_PATH) as f:
-        data = yaml.safe_load(f)
+    from apps.utils.llms import LLM_MODELS_COST
 
-    pricing = {}
-
-    for model in data.get("models", []):
-        yaml_name = model.get("name", "")
-        cost = model.get("cost", {})
-
-        # Handle simple pricing (single value)
-        if isinstance(cost.get("in"), (int, float)):
-            input_price = float(cost["in"])
-        # Handle tiered pricing (use first tier/lowest price)
-        elif isinstance(cost.get("in"), dict):
-            values = cost["in"].get("value", [])
-            input_price = float(values[0]) if values else 0.0
+    def _parse_cost(cost):
+        if isinstance(cost, (int, float)):
+            return float(cost)
+        elif isinstance(cost, dict) and "value" in cost and "brackets" in cost:
+            return float(cost["value"][0])  # Return the lowest tier price
         else:
-            continue
+            raise ValueError("Invalid cost format")
+        return cost
 
-        if isinstance(cost.get("out"), (int, float)):
-            output_price = float(cost["out"])
-        elif isinstance(cost.get("out"), dict):
-            values = cost["out"].get("value", [])
-            output_price = float(values[0]) if values else 0.0
-        else:
-            continue
-
-        # Store with API model name if we have a mapping, otherwise use YAML name
-        api_name = MODEL_API_NAMES.get(yaml_name, yaml_name)
-        pricing[api_name] = {
-            "input": input_price,
-            "output": output_price,
+    pricing = {
+        MODEL_API_NAMES.get(k, k): {
+            "input": _parse_cost(v["in"]),
+            "output": _parse_cost(v["out"]),
         }
+        for k, v in LLM_MODELS_COST.items()
+    }
 
     return pricing
 
