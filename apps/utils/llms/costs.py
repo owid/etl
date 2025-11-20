@@ -1,4 +1,4 @@
-from apps.utils.llms import LLM_MODELS
+from apps.utils.llms.models import LLM_MODELS
 
 # Get costs
 MODELS_COST = {m["name"]: m["cost"] for m in LLM_MODELS["models"]}
