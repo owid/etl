@@ -38,8 +38,10 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2023-public/7546df23d408353796f1dc9b24fee60d_files/IHME-GBD_2023_DATA-7546df23-"
-NUMBER_OF_FILES = 1
+URLS = [
+    "https://dl.healthdata.org:443/gbd-api-2023-public/1f94ae2438d8b6691929aab0007928ad_files/IHME-GBD_2023_DATA-1f94ae24-1.zip",  # Both Sexes
+    "https://dl.healthdata.org:443/gbd-api-2023-public/f616351b3e5526bef393f0ed9d1622b2_files/IHME-GBD_2023_DATA-f616351b-1.zip",
+]
 
 
 @click.command()
@@ -49,10 +51,9 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_treemap.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
-    for file_number in range(1, NUMBER_OF_FILES + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
-        df = download_data(file_number, base_url=BASE_URL)
-        log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
+    for file in URLS:
+        df = download_data(file)
+        log.info(f"Download of file {file} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
         dfs.append(df)
 
     # Concatenate the dataframes while keeping categorical columns to reduce memory usage.
@@ -62,10 +63,9 @@ def main(upload: bool) -> None:
     snap.create_snapshot(upload=upload, data=df)
 
 
-def download_data(file_number: int, base_url: str) -> pd.DataFrame:
+def download_data(url: str) -> pd.DataFrame:
     # Unique URL for each file
-    url_to_download = f"{base_url}{file_number}.zip"
-    csv_file_name = f"{base_url.split('/')[-1]}{file_number}.csv"
+    csv_file_name = f"{url.split('/')[-1]}".replace(".zip", ".csv")
 
     # Retry logic
     max_retries = 5
@@ -73,7 +73,7 @@ def download_data(file_number: int, base_url: str) -> pd.DataFrame:
 
     for attempt in range(max_retries):
         try:
-            response = requests.get(url_to_download)
+            response = requests.get(url)
             response.raise_for_status()
             break  # If request is successful, exit the loop
         except requests.RequestException as e:
@@ -85,7 +85,7 @@ def download_data(file_number: int, base_url: str) -> pd.DataFrame:
                 print(f"Failed to download the file after {max_retries} attempts. Error: {e}")
                 raise
     # Download data from source, open the csv within and return that.
-    response = requests.get(url_to_download)
+    response = requests.get(url)
 
     # Load the ZIP file into a BytesIO object
     zip_file = BytesIO(response.content)

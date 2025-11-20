@@ -68,7 +68,7 @@ def run() -> None:
     #    print(f"\nFound {len(duplicates)} duplicate rows:")
     #    print(duplicates.sort_values(index_cols))
     # Format the tables
-    tb = tb.format(["country", "age", "broad_cause", "cause", "metric", "year"], short_name="gbd_treemap")
+    tb = tb.format(["country", "year", "broad_cause", "cause", "metric", "age", "sex"], short_name="gbd_treemap")
 
     #
     # Save outputs.
@@ -181,7 +181,7 @@ def combine_causes(tb: Table, causes_to_combine: list[str], new_cause_name: str)
         raise ValueError(f"Causes not found in data: {missing_causes}. Available causes: {sorted(unique_causes)}")
 
     # Define grouping keys explicitly (should match your index structure)
-    groupby_cols = ["country", "year", "metric", "age"]
+    groupby_cols = ["country", "year", "metric", "age", "sex"]
 
     # Filter rows for the causes to combine
     tb_to_combine = tb[tb["cause"].isin(causes_to_combine)].reset_index(drop=True)
@@ -247,7 +247,7 @@ def pull_out_cause(
         raise ValueError(f"Cause '{aggregate_cause}' not found in data. Available causes: {sorted(unique_causes)}")
 
     # Define merge keys for clarity
-    merge_keys = ["country", "year", "metric", "age"]
+    merge_keys = ["country", "year", "metric", "age", "sex"]
 
     # Extract the aggregate subset
     tb_aggregate = tb[tb["cause"] == aggregate_cause].reset_index(drop=True).copy()
