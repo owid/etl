@@ -40,7 +40,7 @@ macros: |-
           <% elif age == 'Age-standardized' %>
               Age-standardized << unit >> from << cause >> in << sex >><< attrText >>
           <% elif age == 'All ages' %>
-              Total number of << unit >> from << cause >> in all << sex >><< attrText >>
+              Total number of << unit >> from << cause >> in << sex >><< attrText >>
           <% endif %>
       <% elif metric == "Rate" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
