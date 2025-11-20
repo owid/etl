@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 
 cause_renaming_dict = {
     "Adverse effects of medical treatment": "Medical accidents",
-    "Animal contact": "Animal attacks",
+    # "Animal contact": "Animal attacks",
     "Conflict and terrorism": "Conflict",
     "Congenital heart anomalies": "Heart abnormalities",
     "Digestive congenital anomalies": "Digestive defects",
