@@ -1,7 +1,9 @@
 from apps.utils.llms.models import LLM_MODELS
 
 # Get costs
-MODELS_COST = {m["name"]: m["cost"] for m in LLM_MODELS["models"]}
+LLM_MODELS_COST: dict[str, dict[str, float | dict[str, list[float]]]] = {
+    m["name"]: m["cost"] for m in LLM_MODELS["models"]
+}
 
 
 def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) -> float:
@@ -22,10 +24,10 @@ def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) ->
     if input_tokens < 0 or output_tokens < 0:
         raise ValueError("Token counts must be non-negative")
 
-    if model_name not in MODELS_COST:
+    if model_name not in LLM_MODELS_COST:
         raise KeyError(f"Model '{model_name}' not found in MODELS_COST")
 
-    cost_config = MODELS_COST[model_name]
+    cost_config = LLM_MODELS_COST[model_name]
 
     # Calculate input cost
     input_cost = _calculate_tiered_cost(cost_config["in"], input_tokens)
