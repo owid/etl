@@ -56,7 +56,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
-from apps.utils.gpt import OpenAIWrapper
+from apps.utils.llms.gpt import OpenAIWrapper
 from etl.config import GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 

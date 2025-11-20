@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from .costs import estimate_llm_cost, generate_pricing_text
+from apps.utils.llms.costs import estimate_llm_cost, generate_pricing_text
 
 # Surface relevant cost functions
 __all__ = [
