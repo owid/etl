@@ -1347,7 +1347,8 @@ steps:
     - data-private://meadow/ihme_gbd/2025-10-13/gbd_treemap
   data-private://grapher/ihme_gbd/2025-10-13/gbd_treemap:
     - data-private://garden/ihme_gbd/2025-10-13/gbd_treemap
-
+  data://external/ihme_gbd/latest/gbd_treemap:
+    - data-private://garden/ihme_gbd/2025-10-13/gbd_treemap
   # Under-fives mortality treemap
   data-private://meadow/ihme_gbd/2025-11-18/gbd_child_treemap:
     - snapshot://ihme_gbd/2025-11-18/gbd_child_treemap.feather
@@ -1355,6 +1356,7 @@ steps:
     - data-private://meadow/ihme_gbd/2025-11-18/gbd_child_treemap
   data-private://grapher/ihme_gbd/2025-11-18/gbd_child_treemap:
     - data-private://garden/ihme_gbd/2025-11-18/gbd_child_treemap
+
   # European Society for Cardiology datasets
   data://meadow/cardiovascular_diseases/2025-10-21/esc:
     - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
