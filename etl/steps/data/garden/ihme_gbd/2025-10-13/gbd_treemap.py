@@ -106,12 +106,13 @@ def reaggregate_causes(tb: Table) -> Table:
     tb = pull_out_cause(tb, pull_out_cause="HIV/AIDS", aggregate_cause="HIV/AIDS and sexually transmitted infections")
     tb = pull_out_cause(tb, pull_out_cause="Tuberculosis", aggregate_cause="Respiratory infections and tuberculosis")
     tb = pull_out_cause(tb, pull_out_cause="Diarrheal diseases", aggregate_cause="Enteric infections")
-    tb = pull_out_cause(tb, pull_out_cause="Self-harm", aggregate_cause="Self-harm and interpersonal violence")
     tb = pull_out_cause(
         tb,
-        pull_out_cause="Interpersonal violence",
-        aggregate_cause="Self-harm and interpersonal violence excluding Self-harm",
+        pull_out_cause=["Self-harm", "Interpersonal violence"],
+        aggregate_cause="Self-harm and interpersonal violence",
     )
+    tb = pull_out_cause(tb, pull_out_cause="Falls", aggregate_cause="Unintentional injuries")
+
     # We have both maternal disorders and neonatal disorders in the data so we can remove their combined grouping
     tb = tb[tb["cause"] != "Maternal and neonatal disorders"]
     tb = combine_causes(
@@ -138,7 +139,7 @@ def reaggregate_causes(tb: Table) -> Table:
     tb = combine_causes(
         tb=tb,
         causes_to_combine=[
-            "Unintentional injuries",
+            "Unintentional injuries excluding Falls",
             "Self-harm and interpersonal violence excluding Self-harm excluding Interpersonal violence",
         ],
         new_cause_name="Other injuries",
@@ -205,71 +206,101 @@ def combine_causes(tb: Table, causes_to_combine: list[str], new_cause_name: str)
     return tb_result
 
 
-def pull_out_cause(tb: Table, pull_out_cause: str, aggregate_cause: str) -> Table:
+def pull_out_cause(
+    tb: Table, pull_out_cause: str | list[str], aggregate_cause: str, residual_name: str | None = None
+) -> Table:
     """
-    Pull out a specific cause from a broader cause category and create a residual category.
+    Pull out one or more specific causes from a broader cause category and create a residual category.
 
-    Example: Pull out "Malaria" from "Neglected tropical diseases and malaria"
-    to create three separate categories:
+    Example 1 (single cause): Pull out "Malaria" from "Neglected tropical diseases and malaria"
+    to create:
     1. "Malaria" (kept as-is)
     2. "Neglected tropical diseases and malaria excluding Malaria" (residual)
     3. All other causes (unchanged)
 
+    Example 2 (multiple causes with custom name):
+    Pull out ["HIV/AIDS", "Tuberculosis"] from "Combined infectious diseases" with residual_name="Other infectious diseases"
+    to create:
+    1. "HIV/AIDS" (kept as-is)
+    2. "Tuberculosis" (kept as-is)
+    3. "Other infectious diseases" (residual with custom name)
+    4. All other causes (unchanged)
+
     Args:
         tb: Input table with cause data
-        pull_out_cause: Specific cause to extract (e.g., "Malaria")
+        pull_out_cause: Specific cause(s) to extract (e.g., "Malaria" or ["HIV/AIDS", "Tuberculosis"])
         aggregate_cause: Broader category to subtract from (e.g., "Neglected tropical diseases and malaria")
+        residual_name: Optional custom name for the residual category. If None, uses auto-generated
+                      "aggregate_cause excluding cause1 excluding cause2..." format
 
     Returns:
-        Table with the pulled-out cause and residual category
+        Table with the pulled-out cause(s) and residual category
     """
-    # Validate that both causes exist in the data
+    # Convert single cause to list for uniform handling
+    pull_out_causes = [pull_out_cause] if isinstance(pull_out_cause, str) else pull_out_cause
+
+    # Validate that all causes exist in the data
     unique_causes = set(tb["cause"].unique())
-    if pull_out_cause not in unique_causes:
-        raise ValueError(f"Cause '{pull_out_cause}' not found in data. Available causes: {sorted(unique_causes)}")
+    for cause in pull_out_causes:
+        if cause not in unique_causes:
+            raise ValueError(f"Cause '{cause}' not found in data. Available causes: {sorted(unique_causes)}")
     if aggregate_cause not in unique_causes:
         raise ValueError(f"Cause '{aggregate_cause}' not found in data. Available causes: {sorted(unique_causes)}")
 
     # Define merge keys for clarity
     merge_keys = ["country", "year", "metric", "age"]
 
-    # Extract the two relevant subsets (copy to avoid SettingWithCopyWarning)
-    tb_specific = tb[tb["cause"] == pull_out_cause].reset_index(drop=True)
-    tb_aggregate = tb[tb["cause"] == aggregate_cause].reset_index(drop=True)
+    # Extract the aggregate subset
+    tb_aggregate = tb[tb["cause"] == aggregate_cause].reset_index(drop=True).copy()
 
-    # Validate we have data for both causes
-    if len(tb_specific) == 0:
-        raise ValueError(f"No data found for cause '{pull_out_cause}'")
+    # Validate we have data for aggregate cause
     if len(tb_aggregate) == 0:
         raise ValueError(f"No data found for cause '{aggregate_cause}'")
 
-    # Merge to calculate residual (aggregate - specific)
-    tb_residual = pr.merge(
-        tb_aggregate,
-        tb_specific,
-        how="left",  # Keep all aggregate rows
-        on=merge_keys,
-        suffixes=("_aggregate", "_specific"),
-    )
+    # Initialize residual with aggregate values
+    tb_residual = tb_aggregate.copy()
+    tb_residual = tb_residual.rename(columns={"value": "residual_value"})
 
-    # Calculate residual value (handling potential missing data)
-    tb_residual["value"] = tb_residual["value_aggregate"] - tb_residual["value_specific"].fillna(0)
+    # Subtract each specific cause from the aggregate
+    for cause in pull_out_causes:
+        tb_specific = tb[tb["cause"] == cause].reset_index(drop=True)
+
+        # Validate we have data for this cause
+        if len(tb_specific) == 0:
+            raise ValueError(f"No data found for cause '{cause}'")
+
+        # Merge and subtract
+        tb_residual = pr.merge(
+            tb_residual,
+            tb_specific[merge_keys + ["value"]],
+            how="left",
+            on=merge_keys,
+            suffixes=("", f"_{cause}"),
+        )
+        tb_residual["residual_value"] = tb_residual["residual_value"] - tb_residual["value"].fillna(0)
+        tb_residual = tb_residual.drop(columns=["value"])
 
     # Validate that residual values are non-negative
-    negative_residuals = tb_residual[tb_residual["value"] < 0]
+    negative_residuals = tb_residual[tb_residual["residual_value"] < 0]
     if len(negative_residuals) > 0:
+        causes_str = "', '".join(pull_out_causes)
         raise ValueError(
-            f"Found {len(negative_residuals)} negative residuals when subtracting '{pull_out_cause}' "
-            f"from '{aggregate_cause}'. This suggests '{pull_out_cause}' is not properly nested within '{aggregate_cause}'."
+            f"Found {len(negative_residuals)} negative residuals when subtracting '{causes_str}' "
+            f"from '{aggregate_cause}'. This suggests these causes are not properly nested within '{aggregate_cause}'."
         )
 
     # Set the new cause name for residual
-    tb_residual["cause"] = f"{aggregate_cause} excluding {pull_out_cause}"
+    if residual_name is not None:
+        tb_residual["cause"] = residual_name
+    else:
+        exclusions = " excluding ".join([""] + pull_out_causes)
+        tb_residual["cause"] = f"{aggregate_cause}{exclusions}"
+    tb_residual = tb_residual.rename(columns={"residual_value": "value"})
 
     # Keep only necessary columns
     tb_residual = tb_residual[merge_keys + ["cause", "value"]]
 
-    # Combine: all other causes + residual cause
+    # Combine: all other causes (excluding aggregate) + residual cause
     tb_other = tb[~tb["cause"].isin([aggregate_cause])].reset_index(drop=True)
     tb_result = pr.concat([tb_other, tb_residual], ignore_index=True)
 
