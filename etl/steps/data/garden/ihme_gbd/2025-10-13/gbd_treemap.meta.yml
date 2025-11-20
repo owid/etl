@@ -20,13 +20,15 @@ tables:
         slug: cause
       - name: Age group
         slug: age
+      - name: Sex
+        slug: sex
       - name: Metric
         slug: metric
     variables:
       value:
         title: |-
           {macros}
-          << format_title(metric, age, format_cause(cause), 'deaths') >>
+          << format_title(metric, age, format_sex(sex), format_cause(cause), 'deaths') >>
         unit: |-
           {macros}
           << format_unit(metric, 'deaths') >>
@@ -34,7 +36,7 @@ tables:
           {definitions.short_unit}
         description_short: |-
           {macros}
-          << format_description_short(metric, age, format_cause(cause), 'deaths') >>
+          << format_description_short(metric, age, format_sex(sex), format_cause(cause), 'deaths') >>
         description_processing: |-
           <% if cause == "All forms of violence" %>
           This was calculated by summing the number of deaths from 'Interpersonal violence', 'Conflict and terrorism', and 'Police conflict and executions'.
