@@ -67,7 +67,7 @@ definitions:
   description_short_vulnerable_employment: |-
     Share of employed population who are working as own-account workers (self-employed without staff), or contributing family workers (self-employed in a household business or farm).
   description_short_labor_force_female: |-
-    Share of the working-age population (15+) who are female.
+    Share of the working-age population economically active (employed or unemployed) who are female.
   description_short_employment_agriculture: |-
     Share of total employment working in the agriculture sector.
   description_short_employment_industry: |-
