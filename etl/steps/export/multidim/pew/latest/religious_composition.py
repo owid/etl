@@ -57,10 +57,10 @@ def run() -> None:
                 "dimension": "religion",
                 "choices": [
                     "christians",
-                    "jews",
                     "muslims",
                     "hindus",
                     "buddhists",
+                    "jews",
                     "other_religions",
                     "religiously_unaffiliated",
                 ],
