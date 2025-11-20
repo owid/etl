@@ -17,7 +17,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], formats=["csv"])
+    ds_garden = paths.create_dataset(tables=[tb], formats=["csv", "json"])
     # Save garden dataset.
 
     ds_garden.save()
