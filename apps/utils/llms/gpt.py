@@ -1,4 +1,7 @@
-"""Auxiliary classes, functions and variables."""
+"""Auxiliary classes, functions and variables.
+
+This is mainly focused on GPT interaction. Please use pydantic-ai for LLMs now.
+"""
 
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple

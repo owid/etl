@@ -25,7 +25,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection, load_detector, pretty_print_number
-from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
+from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
     create_tables,
