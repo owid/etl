@@ -25,11 +25,11 @@ from owid.catalog.processing_log import disable_processing_log
 from owid.catalog.properties import metadata_property
 from owid.repack import to_safe_types
 
-FileFormat = Literal["csv", "feather", "parquet"]
+FileFormat = Literal["csv", "feather", "parquet", "json"]
 
 # the formats we can serialise and deserialise; in some cases they
 # will be tried in this order if we don't specify one explicitly
-SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
+SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv", "json"]
 
 # the formats we generate by default
 DEFAULT_FORMATS: list[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
