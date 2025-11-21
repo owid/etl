@@ -41,6 +41,8 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    tb = duplicate_latin_america_rows(tb)
     # Create a new table with the processed data.
     all_tables = create_tables(tb)
 
@@ -389,3 +391,13 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
         new_tabs.append(table)
 
     return new_tabs
+
+
+def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Duplicate rows for 'Latin America and the Caribbean (UN SDG)' and rename the country to 'Latin America and the Caribbean (UN)'.
+    """
+    df_lac = df[df["country"] == "Latin America and the Caribbean (UN SDG)"].copy()
+    df_lac["country"] = "Latin America and the Caribbean (UN)"
+    df = pd.concat([df, df_lac], ignore_index=True)
+    return df
