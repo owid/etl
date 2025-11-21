@@ -1,0 +1,64 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  non_redistributable: true
+
+tables:
+  summary_reporting_system_estimates:
+    variables:
+      violent_crime:
+        title: Esimates number of violent crimes
+        unit: violent crimes
+      homicide:
+        title: Estimates number of homicides
+        unit: homicides
+      robbery:
+        title: Estimates number of robberies
+        unit: robberies
+      aggravated_assault:
+        title: Estimates number of aggravated assaults
+        unit: aggravated assaults
+      property_crime:
+        title: Estimates number of property crimes
+        unit: property crimes
+      burglary:
+        title: Estimates number of burglaries
+        unit: burglaries
+      larceny:
+        title: Estimates number of larceny-thefts
+        unit: larceny-thefts
+      motor_vehicle_theft:
+        title: Estimates number of motor vehicle thefts
+        unit: motor vehicle thefts
+      violent_crime_per_100k:
+        title: Estimated violent crime rate per 100,000 population
+        unit: violent crimes per 100,000 population
+      homicide_per_100k:
+        title: Estimated homicide rate per 100,000 population
+        unit: homicides per 100,000 population
+      robbery_per_100k:
+        title: Estimated robbery rate per 100,000 population
+        unit: robberies per 100,000 population
+      aggravated_assault_per_100k:
+        title: Estimated aggravated assault rate per 100,000 population
+        unit: aggravated assaults per 100,000 population
+      property_crime_per_100k:
+        title: Estimated property crime rate per 100,000 population
+        unit: property crimes per 100,000 population
+      burglary_per_100k:
+        title: Estimated burglary rate per 100,000 population
+        unit: burglaries per 100,000 population
+      larceny_per_100k:
+        title: Estimated larceny-theft rate per 100,000 population
+        unit: larceny-thefts per 100,000 population
+      motor_vehicle_theft_per_100k:
+        title: Estimated motor vehicle theft rate per 100,000 population
+        unit: motor vehicle thefts per 100,000 population
