@@ -15,7 +15,7 @@ def run() -> None:
 
     # Load data from snapshot.
     tb = snap.read()
-    tb.loc[tb["state_name"].isna(), "state_abbr"] = "US"
+    tb.loc[tb["state_abbr"].isna(), "state_abbr"] = "US"
     tb.loc[tb["state_abbr"] == "US", "state_name"] = "United States"
 
     tb = tb[tb["state_name"] == "United States"]

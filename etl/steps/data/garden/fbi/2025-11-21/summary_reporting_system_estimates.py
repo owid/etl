@@ -49,6 +49,8 @@ def calculate_crime_rates(tb):
         "larceny",
         "motor_vehicle_theft",
     ]
+    tb["population"] = tb["population"].replace(",", "", regex=True).astype(float)
+    tb[crime_columns] = tb[crime_columns].replace(",", "", regex=True).astype(float)
     for column in crime_columns:
         rate_column = f"{column}_per_100k"
         tb[rate_column] = (tb[column] / tb["population"]) * 100000
