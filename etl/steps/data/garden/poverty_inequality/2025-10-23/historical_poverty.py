@@ -151,7 +151,9 @@ def run() -> None:
     #
     # Create dataset
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_population, tb_extended], default_metadata=ds_thousand_bins.metadata
+        tables=[tb, tb_population, tb_extended],
+        default_metadata=ds_thousand_bins.metadata,
+        repack=False,
     )
 
     # Save dataset
@@ -358,11 +360,13 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
                 extreme_growth["growth_factor_origin"].isin(["historical_entity", "region"])
             ].reset_index(drop=True)
             if len(extreme_growth_introduced) > 0:
-                log.error(
+                log.warning(
                     f"prepare_gdp_data: Out of these, {len(extreme_growth_introduced)} instances ({round(len(extreme_growth_introduced) / len(extreme_growth) * 100, 1)}%) come from historical_entity or region-level growth rates."
                 )
                 # Show some examples
-                log.error(f"{extreme_growth_introduced[['country', 'year', 'growth_factor', 'growth_factor_origin']]}")
+                log.warning(
+                    f"{extreme_growth_introduced[['country', 'year', 'growth_factor', 'growth_factor_origin']]}"
+                )
 
     return tb_gdp
 
@@ -432,15 +436,60 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     # Divide pop into quantiles (1000 quantiles)
     tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
-    # Sanity check.
+    # Sanity check: Check for missing population data at country-year level.
+    missing_pop_mask = tb_thousand_bins_to_extrapolate["pop"].isna()
 
-    set_countries_missing_pop = set(
-        tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]["country"]
-    )
-    error = (
-        f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
-    )
-    assert set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION), error
+    if missing_pop_mask.any():
+        # Get all country-year combinations with missing population
+        missing_pop_rows = tb_thousand_bins_to_extrapolate[missing_pop_mask][["country", "year"]].drop_duplicates()
+
+        # Get unexpected missing data (countries not in the expected list)
+        unexpected_missing = missing_pop_rows[~missing_pop_rows["country"].isin(COUNTRIES_WITHOUT_POPULATION)]
+
+        if not unexpected_missing.empty:
+            # Group by country to show detailed year information
+            unexpected_summary = []
+            for country in unexpected_missing["country"].unique():
+                years = sorted(unexpected_missing[unexpected_missing["country"] == country]["year"].tolist())
+
+                # Find consecutive year ranges to display more clearly
+                ranges = []
+                start = years[0]
+                end = years[0]
+
+                for i in range(1, len(years)):
+                    if years[i] == end + 1:
+                        end = years[i]
+                    else:
+                        ranges.append(f"{start}-{end}" if start != end else str(start))
+                        start = years[i]
+                        end = years[i]
+                ranges.append(f"{start}-{end}" if start != end else str(start))
+
+                # Format output - show all ranges
+                years_display = ", ".join(ranges)
+                unexpected_summary.append(f"  - {country}: {years_display} ({len(years)} years total)")
+
+            # Log the error details
+            log.error(
+                f"Found {len(unexpected_missing)} unexpected country-year combinations with missing population data:\n"
+                + "\n".join(unexpected_summary)
+            )
+
+            # Calculate and log population impact
+            affected_countries = set(unexpected_missing["country"].unique())
+            calculate_population_of_missing_countries(affected_countries)
+
+            # Raise assertion error
+            raise AssertionError(
+                f"Found {len(unexpected_missing)} unexpected country-year combinations with missing population data. See log for details."
+            )
+
+        # Verify that all missing data is from expected countries
+        set_countries_missing_pop = set(missing_pop_rows["country"])
+        assert (
+            set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION)
+        ), f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
 
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
@@ -454,81 +503,6 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     )
 
     return tb_thousand_bins_extended
-
-
-def apply_backward_extrapolation(
-    country: str, baseline_year: int, baseline_quantiles: Table, growth_data: Table, method: str
-) -> Table:
-    """Apply backward extrapolation to income distribution.
-
-    Parameters
-    ----------
-    country : str
-        Country name
-    baseline_year : int
-        Starting year
-    baseline_quantiles : Table
-        Baseline income distribution (1000 quantiles)
-    growth_data : Table
-        GDP growth factors
-    method : str
-        Extrapolation method used
-
-    Returns
-    -------
-    Table
-        Extended income distribution (EARLIEST_YEAR to baseline_year-1)
-    """
-    extended_rows = []
-
-    # Sort growth data by year (descending, going backwards)
-    growth_data = growth_data.sort_values("year", ascending=False)
-
-    # Initialize with baseline values
-    current_income = baseline_quantiles.set_index("quantile")["avg"].to_dict()
-    current_pop = baseline_quantiles.set_index("quantile")["pop"].to_dict()
-
-    # Get region if available
-    region = baseline_quantiles["region"].iloc[0] if "region" in baseline_quantiles.columns else None
-
-    # Go backwards year by year
-    for year in range(baseline_year - 1, EARLIEST_YEAR - 1, -1):
-        # Get growth factor for year+1 to year
-        growth_row = growth_data[growth_data["year"] == year + 1]
-
-        if len(growth_row) == 0 or pd.isna(growth_row["growth_factor"].iloc[0]):
-            # No growth data for this year, skip
-            continue
-
-        growth_factor = growth_row["growth_factor"].iloc[0]
-
-        # Apply backward extrapolation to all quantiles
-        # income(t-1) = income(t) / growth_factor(t)
-        for quantile in current_income.keys():
-            current_income[quantile] = current_income[quantile] / growth_factor
-
-            # Floor negative values at 0
-            if current_income[quantile] < 0:
-                current_income[quantile] = 0
-                log.warning(
-                    f"apply_backward_extrapolation: {country} year {year} quantile {quantile} - negative income, floored at 0"
-                )
-
-        # Create rows for this year
-        for quantile in current_income.keys():
-            extended_rows.append(
-                {
-                    "country": country,
-                    "year": year,
-                    "quantile": quantile,
-                    "avg": current_income[quantile],
-                    "pop": current_pop[quantile],
-                    "region": region,
-                    "extrapolation_method": method,
-                }
-            )
-
-    return Table(extended_rows)
 
 
 def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
