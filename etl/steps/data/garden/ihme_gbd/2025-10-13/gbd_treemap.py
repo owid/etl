@@ -14,6 +14,8 @@ cause_renaming_dict = {
     "Neoplasms": "Cancers",
     "Respiratory infections and tuberculosis excluding Tuberculosis": "Respiratory infections",
     "Self-harm": "Suicide",
+    "Neurological disorders": "Neurological diseases",
+    "Neonatal disorders": "Neonatal deaths",
 }
 
 broad_cause_dict = {
@@ -26,9 +28,9 @@ broad_cause_dict = {
     "Interpersonal violence": "Injuries",
     "Malaria": "Infectious diseases",
     "Maternal disorders": "Maternal, neonatal and nutritional diseases",
-    "Neonatal disorders": "Maternal, neonatal and nutritional diseases",
+    "Neonatal deaths": "Maternal, neonatal and nutritional diseases",
     "Cancers": "Non-communicable diseases",
-    "Neurological disorders": "Non-communicable diseases",
+    "Neurological diseases": "Non-communicable diseases",
     "Nutritional deficiencies": "Maternal, neonatal and nutritional diseases",
     "Suicide": "Injuries",
     "Transport injuries": "Injuries",
@@ -37,6 +39,8 @@ broad_cause_dict = {
     "Other non-communicable diseases": "Non-communicable diseases",
     "Other infectious diseases": "Infectious diseases",
     "Other injuries": "Injuries",
+    "Falls": "Injuries",
+    "Respiratory infections": "Infectious diseases",
 }
 
 

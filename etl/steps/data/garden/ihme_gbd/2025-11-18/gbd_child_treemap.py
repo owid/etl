@@ -48,6 +48,7 @@ broad_cause_dict = {
     "Malaria": "Infectious diseases",
     "Malnutrition": "Non-communicable diseases",
     "Measles": "Infectious diseases",
+    "Meningitis": "Infectious diseases",
     "Medical accidents": "Injuries",
     "Neonatal asphyxia (suffocation) and trauma": "Birth disorders",
     "Neonatal sepsis & other infections": "Birth disorders",
@@ -58,12 +59,13 @@ broad_cause_dict = {
     "Other non-communicable diseases": "Non-communicable diseases",
     # "Poisonings": "Injuries",
     "Preterm birth": "Birth disorders",
-    "Pulmonary aspiration and foreign body in airway": "Injuries",
+    "Suffocation by objects": "Injuries",
     "Respiratory infections": "Infectious diseases",
     "Sudden infant death syndrome": "Non-communicable diseases",
     "Syphilis and other STDs": "Infectious diseases",
     "Transport accidents": "Injuries",
     "Tuberculosis": "Infectious diseases",
+    "Violence": "Injuries",
     "Whooping cough": "Infectious diseases",
 }
 
@@ -84,6 +86,7 @@ def run() -> None:
 
     # Drop the measure column
     tb = tb.drop(columns="measure")
+    tb = tb[~tb["cause"].isin(["Animal contact", "Poisonings"])]
     # Drop the really high level causes
     tb = tb[
         ~tb["cause"].isin(

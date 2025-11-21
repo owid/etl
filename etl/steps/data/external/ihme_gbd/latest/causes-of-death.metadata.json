@@ -1,0 +1,546 @@
+{
+  "timeRange": {
+    "start": 1980,
+    "end": 2023
+  },
+  "source": "IHME, Global Burden of Disease (2025)",
+  "categories": [
+    {
+      "id": 1,
+      "name": "Birth disorders"
+    },
+    {
+      "id": 2,
+      "name": "Infectious diseases"
+    },
+    {
+      "id": 3,
+      "name": "Injuries"
+    },
+    {
+      "id": 4,
+      "name": "Maternal, neonatal and nutritional diseases"
+    },
+    {
+      "id": 5,
+      "name": "Non-communicable diseases"
+    }
+  ],
+  "dimensions": {
+    "entities": [
+      {
+        "id": 1,
+        "name": "Brazil"
+      },
+      {
+        "id": 2,
+        "name": "Central African Republic"
+      },
+      {
+        "id": 3,
+        "name": "China"
+      },
+      {
+        "id": 4,
+        "name": "France"
+      },
+      {
+        "id": 5,
+        "name": "Papua New Guinea"
+      },
+      {
+        "id": 6,
+        "name": "South Africa"
+      },
+      {
+        "id": 7,
+        "name": "United States"
+      },
+      {
+        "id": 8,
+        "name": "World"
+      }
+    ],
+    "ageGroups": [
+      {
+        "id": 1,
+        "name": "All ages"
+      },
+      {
+        "id": 2,
+        "name": "Children under 5"
+      },
+      {
+        "id": 3,
+        "name": "Children aged 5 to 14"
+      },
+      {
+        "id": 4,
+        "name": "Adults aged 15 to 49"
+      },
+      {
+        "id": 5,
+        "name": "Adults aged 50 to 69"
+      },
+      {
+        "id": 6,
+        "name": "Adults aged 70+"
+      }
+    ],
+    "sexes": [
+      {
+        "id": 1,
+        "name": "Both sexes"
+      },
+      {
+        "id": 2,
+        "name": "Female"
+      },
+      {
+        "id": 3,
+        "name": "Male"
+      }
+    ],
+    "variables": [
+      {
+        "id": 1,
+        "name": "Cancers",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 5
+      },
+      {
+        "id": 2,
+        "name": "Chronic respiratory diseases",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "description": "COPD, Asthma, and others",
+        "category": 5
+      },
+      {
+        "id": 3,
+        "name": "Conflict",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 4,
+        "name": "Diabetes and kidney diseases",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 5
+      },
+      {
+        "id": 5,
+        "name": "Diarrheal diseases",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 2
+      },
+      {
+        "id": 6,
+        "name": "Digestive defects",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 7,
+        "name": "Digestive diseases",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "description": "Cirrhosis and others",
+        "category": 5
+      },
+      {
+        "id": 8,
+        "name": "Drowning",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 9,
+        "name": "Falls",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 3
+      },
+      {
+        "id": 10,
+        "name": "Fire & temperature",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 11,
+        "name": "HIV/AIDS",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 2
+      },
+      {
+        "id": 12,
+        "name": "Heart abnormalities",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 13,
+        "name": "Heart diseases",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "description": "Heart attacks, strokes, and other cardiovascular diseases",
+        "category": 5
+      },
+      {
+        "id": 14,
+        "name": "Hemolytic disorders",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 15,
+        "name": "Interpersonal violence",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 3
+      },
+      {
+        "id": 16,
+        "name": "Invasive non-typhoidal salmonella",
+        "ageGroup": [
+          2
+        ],
+        "category": 2
+      },
+      {
+        "id": 17,
+        "name": "Malaria",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 2
+      },
+      {
+        "id": 18,
+        "name": "Malnutrition",
+        "ageGroup": [
+          2
+        ],
+        "category": 5
+      },
+      {
+        "id": 19,
+        "name": "Maternal disorders",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "category": 4
+      },
+      {
+        "id": 20,
+        "name": "Measles",
+        "ageGroup": [
+          2
+        ],
+        "category": 2
+      },
+      {
+        "id": 21,
+        "name": "Medical accidents",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 22,
+        "name": "Meningitis",
+        "ageGroup": [
+          2
+        ],
+        "category": 2
+      },
+      {
+        "id": 23,
+        "name": "Neonatal asphyxia (suffocation) and trauma",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 24,
+        "name": "Neonatal deaths",
+        "ageGroup": [
+          1
+        ],
+        "description": "Babies who died in the first 28 days of life",
+        "category": 4
+      },
+      {
+        "id": 25,
+        "name": "Neonatal sepsis & other infections",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 26,
+        "name": "Neural tube disorders",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 27,
+        "name": "Neurological diseases",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "description": "Alzheimer's disease, Parkinson's disease, epilepsy, and others",
+        "category": 5
+      },
+      {
+        "id": 28,
+        "name": "Nutritional deficiencies",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 4
+      },
+      {
+        "id": 29,
+        "name": "Other birth disorders",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 30,
+        "name": "Other infectious diseases",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 2
+      },
+      {
+        "id": 31,
+        "name": "Other injuries",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 3
+      },
+      {
+        "id": 32,
+        "name": "Other non-communicable diseases",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 5
+      },
+      {
+        "id": 33,
+        "name": "Preterm birth",
+        "ageGroup": [
+          2
+        ],
+        "category": 1
+      },
+      {
+        "id": 34,
+        "name": "Respiratory infections",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "description": "Pneumonia, influenza, COVID-19 and others",
+        "category": 2
+      },
+      {
+        "id": 35,
+        "name": "Sudden infant death syndrome",
+        "ageGroup": [
+          2
+        ],
+        "category": 5
+      },
+      {
+        "id": 36,
+        "name": "Suffocation by objects",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 37,
+        "name": "Suicide",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 3
+      },
+      {
+        "id": 38,
+        "name": "Syphilis and other STDs",
+        "ageGroup": [
+          2
+        ],
+        "category": 2
+      },
+      {
+        "id": 39,
+        "name": "Transport accidents",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 40,
+        "name": "Transport injuries",
+        "ageGroup": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 3
+      },
+      {
+        "id": 41,
+        "name": "Tuberculosis",
+        "ageGroup": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "category": 2
+      },
+      {
+        "id": 42,
+        "name": "Violence",
+        "ageGroup": [
+          2
+        ],
+        "category": 3
+      },
+      {
+        "id": 43,
+        "name": "Whooping cough",
+        "ageGroup": [
+          2
+        ],
+        "category": 2
+      }
+    ]
+  }
+}
