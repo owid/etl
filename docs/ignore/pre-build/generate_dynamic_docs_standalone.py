@@ -71,7 +71,7 @@ def generate_catalog_api_docs():
 
     # Generate ETL catalog API docs
     ## Load template (intro)
-    with open(DOCS_DIR / "ignore/catalog-api.md", "r") as f:
+    with open(DOCS_DIR / "ignore/pre-build/catalog-api.md", "r") as f:
         docs_intro = f.read()
 
     ## Load catalog README from python library
