@@ -447,6 +447,7 @@ def anomaly_detection(
     force: bool = False,
     reset_db: bool = False,
     sample_n: Optional[int] = None,
+    append: bool = False,
 ) -> None:
     """Detect anomalies."""
     engine = get_engine()
@@ -519,7 +520,8 @@ def anomaly_detection(
             if anomaly_type not in ANOMALY_DETECTORS:
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
 
-            if not force:
+            # Skip update check if force or append is enabled
+            if not force and not append:
                 if not needs_update(engine, dataset, anomaly_type):
                     log.info(f"Anomaly type {anomaly_type} for dataset {dataset_id} already exists in the database.")
                     continue
@@ -591,21 +593,58 @@ def anomaly_detection(
 
             if not dry_run:
                 with Session(engine) as session:
-                    # log.info("Deleting existing anomalies")
-                    session.query(gm.Anomaly).filter(
-                        gm.Anomaly.datasetId == dataset_id,
-                        gm.Anomaly.anomalyType == anomaly_type,
-                    ).delete(synchronize_session=False)
-                    session.commit()
+                    if append:
+                        # Load existing anomaly record and append new data
+                        try:
+                            existing_anomaly = gm.Anomaly.load(
+                                session,
+                                dataset_id=dataset_id,
+                                anomaly_type=anomaly_type,
+                            )
+                            log.info("Appending to existing anomaly record")
 
-                    # Don't save anomalies if there are none
-                    if df_score_long.empty:
-                        log.info(f"No anomalies found for anomaly type {anomaly_type} in dataset {dataset_id}")
+                            # Use the model's append method
+                            records_before = (
+                                len(existing_anomaly.dfReduced) if existing_anomaly.dfReduced is not None else 0
+                            )
+                            existing_anomaly.append_anomalies(df_score_long_reduced)
+                            records_after = (
+                                len(existing_anomaly.dfReduced) if existing_anomaly.dfReduced is not None else 0
+                            )
+
+                            # Update checksum
+                            existing_anomaly.datasetSourceChecksum = dataset.sourceChecksum
+
+                            log.info(
+                                f"Appended anomalies: {len(df_score_long_reduced)} new, {records_after} total "
+                                f"(was {records_before})"
+                            )
+
+                            session.commit()
+                        except Exception as e:
+                            log.info(f"No existing anomaly found, creating new record: {e}")
+                            # No existing record, create new one
+                            if not df_score_long.empty:
+                                session.add(anomaly)
+                                session.commit()
+                                log.info(f"Created new anomaly record with {len(df_score_long_reduced)} records")
                     else:
-                        # Insert new anomalies
-                        log.info("Writing anomaly to database")
-                        session.add(anomaly)
+                        # Original behavior: delete and replace
+                        # log.info("Deleting existing anomalies")
+                        session.query(gm.Anomaly).filter(
+                            gm.Anomaly.datasetId == dataset_id,
+                            gm.Anomaly.anomalyType == anomaly_type,
+                        ).delete(synchronize_session=False)
                         session.commit()
+
+                        # Don't save anomalies if there are none
+                        if df_score_long.empty:
+                            log.info(f"No anomalies found for anomaly type {anomaly_type} in dataset {dataset_id}")
+                        else:
+                            # Insert new anomalies
+                            log.info("Writing anomaly to database")
+                            session.add(anomaly)
+                            session.commit()
 
 
 def needs_update(engine: Engine, dataset: gm.Dataset, anomaly_type: str) -> bool:

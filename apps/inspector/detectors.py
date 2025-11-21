@@ -50,6 +50,7 @@ def calculate_cost(
 ) -> float:
     """Calculate cost in USD for given token counts including cache costs.
 
+    TODO: This could be integrated into function `estimate_llm_cost` from `apps.utils.llms.costs`
     Args:
         input_tokens: Number of regular input tokens (non-cached)
         output_tokens: Number of output tokens

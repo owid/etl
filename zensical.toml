@@ -49,7 +49,7 @@ nav = [
         ] },
         { "Documentation" = [
             "dev/docs/index.md",
-            { "Zensical demo" = "guides/demo.md" },
+            # { "Zensical demo" = "guides/demo.md" },
         ] },
         { "Settings & servers" = [
             { "VSC extensions" = "guides/vscode-extensions.md" },

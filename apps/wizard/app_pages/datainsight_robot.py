@@ -3,7 +3,7 @@ from typing import Tuple, cast
 import pandas as pd
 import streamlit as st
 
-from apps.utils.gpt import OpenAIWrapper
+from apps.utils.llms.gpt import OpenAIWrapper
 from apps.wizard.utils.components import st_title_with_expert
 from apps.wizard.utils.insights import (
     fetch_chart_data,

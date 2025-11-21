@@ -1956,6 +1956,36 @@ class Anomaly(Base):
                 return []
             raise
 
+    def append_anomalies(self, new_df: pd.DataFrame) -> None:
+        """Append new anomalies to existing dfReduced data.
+
+        Combines existing and new anomaly data, removing duplicates by keeping
+        the highest anomaly score for each entity-variable combination.
+
+        Parameters
+        ----------
+        new_df : pd.DataFrame
+            New anomaly data to append with columns: entity_name, variable_id, anomaly_score, etc.
+        """
+        if new_df.empty:
+            return
+
+        if self.dfReduced is not None:
+            # Combine existing and new anomalies
+            df_combined = pd.concat([self.dfReduced, new_df], ignore_index=True)
+
+            # Remove duplicates, keeping the highest anomaly score for each entity-variable combination
+            df_combined = (
+                df_combined.sort_values("anomaly_score", ascending=False)
+                .drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
+                .reset_index(drop=True)
+            )
+
+            self.dfReduced = df_combined
+        else:
+            # No existing data, just use new data
+            self.dfReduced = new_df
+
 
 class Explorer(Base):
     __tablename__ = "explorers"

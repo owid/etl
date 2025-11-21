@@ -8,7 +8,7 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 from structlog import get_logger
 
-from apps.utils.gpt import GPTQuery, OpenAIWrapper
+from apps.utils.llms.gpt import GPTQuery, OpenAIWrapper
 from apps.wizard.app_pages.similar_charts.data import Chart
 from apps.wizard.utils import embeddings as emb
 from etl.db import read_sql
