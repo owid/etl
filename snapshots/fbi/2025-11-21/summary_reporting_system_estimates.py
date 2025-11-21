@@ -2,8 +2,9 @@
 
 from pathlib import Path
 
-from etl.helpers import PathFinder
 import click
+
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
