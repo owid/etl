@@ -14,7 +14,7 @@ from etl.docs import (
     render_origin,
     render_table,
 )
-from etl.paths import BASE_DIR, LIB_DIR
+from etl.paths import BASE_DIR
 
 # Base directory for generated docs
 DOCS_DIR = BASE_DIR / "docs"
@@ -55,36 +55,6 @@ def generate_metadata_reference():
 
     with open(output_path, "w") as f:
         f.write(text)
-
-    print(f"✓ Generated {output_path.relative_to(BASE_DIR)}")
-
-
-############################################################
-# owid-catalog
-############################################################
-
-
-def generate_catalog_api_docs():
-    """Generate catalog API documentation"""
-    output_path = DOCS_DIR / "api/catalog-api.md"
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    # Generate ETL catalog API docs
-    ## Load template (intro)
-    with open(DOCS_DIR / "ignore/pre-build/catalog-api.md", "r") as f:
-        docs_intro = f.read()
-
-    ## Load catalog README from python library
-    with open(LIB_DIR / "catalog/README.md", "r") as f:
-        docs_catalog = f.read()
-
-    # Indent docs_catalog by 4 spaces to fit inside the Python tab
-    docs_catalog = "\n".join("    " + line if line.strip() else "" for line in docs_catalog.splitlines())
-
-    docs_catalog = docs_intro + f"\n{docs_catalog}"
-
-    with open(output_path, "w") as f:
-        f.write(docs_catalog)
 
     print(f"✓ Generated {output_path.relative_to(BASE_DIR)}")
 
@@ -146,7 +116,6 @@ def main():
     print()
 
     generate_metadata_reference()
-    generate_catalog_api_docs()
     generate_collections_reference()
 
     print()

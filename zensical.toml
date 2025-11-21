@@ -98,6 +98,7 @@ nav = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
         { "ETL catalog API" = "api/catalog-api.md" },
+        { "Search API" = "api/search-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
         { "Querying data via Datasette" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },

@@ -38,16 +38,22 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
+docs.pre: .venv
+	@echo '==> Fetching external documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_catalog_api.py
+	@echo '==> Generating dynamic documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_metadata_reference.py
+
 docs.post: .venv
-	@echo '==> Post-processing documentation files'
-	.venv/bin/python docs/ignore/convert_notebooks.py
+	@echo '==> Covnerting Jupyter Notebooks to HTML'
+	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
 
 docs.build: .venv
 	@echo '==> Cleaning previous build'
 	@rm -rf site/ .cache/
 	@mkdir -p .cache
-	@echo '==> Generating dynamic documentation files'
-	@.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
+	@echo '==> Pre-processing documentation files'
+	@$(MAKE) --no-print-directory docs.pre
 	@echo '==> Building documentation with Zensical'
 	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 	@echo '==> Post-processing documentation files'
