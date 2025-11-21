@@ -19,22 +19,22 @@ def generate_catalog_api_docs():
     output_path = DOCS_DIR / "api/catalog-api.md"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Generate ETL catalog API docs
-    ## Load template (intro)
-    with open(DOCS_DIR / "ignore/pre-build/catalog-api.md", "r") as f:
-        docs_intro = f.read()
+    # Load template
+    with open(DOCS_DIR / "ignore/pre-build/catalog-api.template.md", "r") as f:
+        template = f.read()
 
-    ## Load catalog README from python library
+    # Load Python content from catalog README
     with open(LIB_DIR / "catalog/README.md", "r") as f:
-        docs_catalog = f.read()
+        python_content = f.read()
 
-    # Indent docs_catalog by 4 spaces to fit inside the Python tab
-    docs_catalog = "\n".join("    " + line if line.strip() else "" for line in docs_catalog.splitlines())
+    # Indent Python content by 4 spaces to fit inside the Python tab
+    python_content = "\n".join("    " + line if line.strip() else "" for line in python_content.splitlines())
 
-    docs_catalog = docs_intro + f"\n{docs_catalog}"
+    # Format template with Python content
+    final_content = template.format(python_content=python_content)
 
     with open(output_path, "w") as f:
-        f.write(docs_catalog)
+        f.write(final_content)
 
     print(f"✓ Generated {output_path.relative_to(BASE_DIR)}")
 
