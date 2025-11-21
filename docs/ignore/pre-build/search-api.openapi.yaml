@@ -1,6 +1,6 @@
 openapi: 3.0.4
 info:
-  title: Our World in Data Search API
+  title: Search API
   version: 1.0.0
   description: |
     Search API for accessing Our World in Data charts and content pages.
@@ -17,7 +17,7 @@ info:
 
 servers:
   - url: https://ourworldindata.org/api
-    description: Production API
+    description: Site API
 
 paths:
   /search:
@@ -80,8 +80,6 @@ paths:
           in: query
           description: |
             Country names separated by `~` (tilde). Only applicable when `type=charts`.
-
-            Example: `United States~China~India`
           required: false
           schema:
             type: string
@@ -91,8 +89,6 @@ paths:
           in: query
           description: |
             Topic name for filtering charts. Only applicable when `type=charts`.
-
-            Example: `Health`, `Energy`, `Environment`
           required: false
           schema:
             type: string
