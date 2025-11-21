@@ -6,14 +6,18 @@ meta:
     ####################################################################################################################
     title: "Historical battery costs and production"
     description: |-
-      This dataset is a compilation of historical and recent data on the battery costs and production.
+      This dataset is a compilation of historical and recent data on battery costs and production.
     date_published: "2025-11-19"
 
     # Citation
     producer: Rupert Way
     citation_full: |-
-      Rupert Way - Historical costs of batteries and cumulative production (2025). The original data was sent to Our World in Data in a private communication.
+      Rupert Way - Historical costs of batteries and cumulative production (2025).
+      Compiled by Rupert Way, based on data from Ziegler and Trancik (Energy Environ. Sci., 2021,14, 1635-1651), BloombergNEF, and Avicenne Energy.
+      The original data was sent to Our World in Data in a private communication.
 
+    attribution: |-
+      Rupert Way (2025) based on Ziegler and Trancik (2021), BloombergNEF, and Avicenne Energy
     url_main: https://www.smithschool.ox.ac.uk/person/rupert-way
     date_accessed: '2025-11-19'
 
