@@ -199,7 +199,9 @@ def fix_units_millions_to_dollars(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=False)
 
     # Target indicators 1.5.2 and 11.5.2 and units "Millions of current United States dollars"
-    mask = (df["indicator"].isin(["1.5.2", "11.5.2"])) & (df["long_unit"] == "Millions of current United States dollars")
+    mask = (df["indicator"].isin(["1.5.2", "11.5.2"])) & (
+        df["long_unit"] == "Millions of current United States dollars"
+    )
 
     # Multiply value by 1,000,000
     df.loc[mask, "value"] *= 1_000_000
