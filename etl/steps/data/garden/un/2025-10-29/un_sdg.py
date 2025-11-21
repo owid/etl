@@ -154,6 +154,9 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # Fix data quality issues for indicator 12.2.2
     df = fix_indicator_12_2_2(df)
 
+    # Fix unit for indicators 1.5.2 and 11.5.2
+    df = fix_units_millions_to_dollars(df)
+
     return df
 
 
@@ -185,6 +188,29 @@ def fix_indicator_12_2_2(df: pd.DataFrame) -> pd.DataFrame:
 
     # Replace zeros in 2023 with NaN (likely incomplete data submission)
     df.loc[mask_12_2_2 & (df["year"] == 2023) & (df["value"] == 0), "value"] = np.nan
+
+    return df
+
+
+def fix_units_millions_to_dollars(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convert values from millions of dollars to dollars for indicators 1.5.2 and 11.5.2.
+    """
+    df = df.copy(deep=False)
+
+    # Target indicators 1.5.2 and 11.5.2 and units "Millions of current United States dollars"
+    mask = (df["indicator"].isin(["1.5.2", "11.5.2"])) & (df["long_unit"] == "Millions of current United States dollars")
+
+    # Multiply value by 1,000,000
+    df.loc[mask, "value"] *= 1_000_000
+
+    # Update units
+    # Convert to string to avoid categorical error if new unit is not in categories
+    df["long_unit"] = df["long_unit"].astype("string")
+    df["short_unit"] = df["short_unit"].astype("string")
+
+    df.loc[mask, "long_unit"] = "current United States dollars"
+    df.loc[mask, "short_unit"] = "$"
 
     return df
 
