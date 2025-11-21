@@ -6,6 +6,7 @@ info:
     Search API for accessing Our World in Data charts and content pages.
 
     This API allows you to search through:
+
     - **Charts**: Interactive data visualizations with country-specific filtering
     - **Pages**: Articles, research papers, and informational pages
   contact:
@@ -347,7 +348,7 @@ components:
           example: "2023-05-15"
         content:
           type: string
-          description: Excerpt or snippet of page content
+          description: cerpt or snippet of page content
           example: "Carbon dioxide emissions are the primary driver of global climate change..."
         authors:
           type: array

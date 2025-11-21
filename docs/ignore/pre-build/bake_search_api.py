@@ -214,13 +214,22 @@ def render_endpoint(path: str, method: str, operation: Dict[str, Any], component
     """Render a single API endpoint."""
     lines = []
 
-    # Endpoint header
+    # Endpoint header with theme-aware colors
     method_upper = method.upper()
-    method_badge_color = {"get": "blue", "post": "green", "put": "orange", "delete": "red", "patch": "purple"}.get(
-        method, "grey"
-    )
 
-    lines.append(f'## <span style="color: {method_badge_color}; font-weight: bold;">{method_upper}</span> `{path}`')
+    # Use colors that work in both light and dark themes
+    # These are carefully chosen to have good contrast in both modes
+    method_colors = {
+        "get": "#5e81ac",     # muted blue - works in both themes
+        "post": "#10b981",    # green - works in both themes
+        "put": "#f59e0b",     # amber - works in both themes
+        "delete": "#ef4444",  # red - works in both themes
+        "patch": "#a78bfa"    # lighter purple - works in both themes
+    }
+    color = method_colors.get(method, "#6b7280")
+    method_badge = f'<span style="color: {color}; font-weight: bold;">{method_upper}</span>'
+
+    lines.append(f'## {method_badge} `{path}`')
     lines.append("")
 
     # Summary
@@ -418,7 +427,10 @@ def generate_markdown(spec: Dict[str, Any]) -> str:
     lines.append("")
 
     if "description" in info:
-        lines.append(info["description"])
+        # Handle multi-line descriptions properly
+        description = info["description"].strip()
+        for line in description.split("\n"):
+            lines.append(line)
         lines.append("")
 
     # Key information in a single admonition
