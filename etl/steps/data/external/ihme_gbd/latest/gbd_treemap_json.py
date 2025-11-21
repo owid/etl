@@ -12,12 +12,12 @@ ds_garden_child = paths.load_dataset("gbd_child_treemap")
 
 tb = ds_garden["gbd_treemap"].reset_index()
 tb_child = ds_garden_child["gbd_child_treemap"].reset_index()
-tb_child["sex"] = "Both"
 tb = pr.concat([tb, tb_child], ignore_index=True)
 
 # Filter data for Number metric only (keep all sexes)
 tb_filtered = tb[tb["metric"] == "Number"].copy()
 
+tb_filtered.set_index(["country", "year", "age", "sex", "broad_cause", "cause", "metric"], verify_integrity=True)
 # Get unique values for mappings
 countries = sorted(tb_filtered["country"].unique())
 causes = sorted(tb_filtered["cause"].unique())
