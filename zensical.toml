@@ -97,10 +97,10 @@ nav = [
     { "API and catalog" = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
-        { "ETL catalog API" = "api/catalog-api.md" },
+        { "Catalog API" = "api/catalog-api.md" },
         { "Search API" = "api/search-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
-        { "Querying data via Datasette" = "api/datasette.md" },
+        # { "Content database" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
         { "COVID-19" = "api/covid/" },
     ] },
