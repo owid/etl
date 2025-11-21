@@ -90,6 +90,8 @@ paths:
           in: query
           description: |
             Topic name for filtering charts. Only applicable when `type=charts`.
+
+            [View all available topics](https://datasette-public.owid.io/owid/tags?slug__notnull=1&_sort=createdAt)
           required: false
           schema:
             type: string
@@ -118,6 +120,7 @@ paths:
               examples:
                 chartSearch:
                   summary: Chart search results
+                  x-schema-ref: "#/components/schemas/ChartSearchResponse"
                   value:
                     query: "gdp"
                     results:
@@ -141,6 +144,7 @@ paths:
 
                 pageSearch:
                   summary: Page search results
+                  x-schema-ref: "#/components/schemas/PageSearchResponse"
                   value:
                     query: "climate change"
                     results:
@@ -181,6 +185,7 @@ components:
   schemas:
     ChartSearchResponse:
       type: object
+      description: Response object for chart search queries, containing search results and pagination metadata.
       required:
         - query
         - results
@@ -217,6 +222,7 @@ components:
 
     ChartResult:
       type: object
+      description: Individual chart search result with metadata about the visualization.
       required:
         - title
         - slug
@@ -287,6 +293,7 @@ components:
 
     PageSearchResponse:
       type: object
+      description: Response object for page/article search queries, containing search results and pagination metadata.
       required:
         - query
         - results
@@ -318,6 +325,7 @@ components:
 
     PageResult:
       type: object
+      description: Individual page/article search result with metadata about the content.
       required:
         - title
         - slug
@@ -348,7 +356,7 @@ components:
           example: "2023-05-15"
         content:
           type: string
-          description: cerpt or snippet of page content
+          description: Excerpt or snippet of page content
           example: "Carbon dioxide emissions are the primary driver of global climate change..."
         authors:
           type: array
@@ -366,6 +374,7 @@ components:
 
     Error:
       type: object
+      description: Error response object returned when a request fails.
       required:
         - error
       properties:

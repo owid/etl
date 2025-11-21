@@ -53,10 +53,10 @@ def format_constraints(schema: Dict[str, Any]) -> str:
     constraints = []
 
     if "default" in schema:
-        default_val = schema['default']
+        default_val = schema["default"]
         # Handle empty string default
         if default_val == "":
-            constraints.append("default: `\"\"`")
+            constraints.append('default: `""`')
         else:
             constraints.append(f"default: `{default_val}`")
     if "minimum" in schema:
@@ -108,6 +108,7 @@ def render_json_example(example: Any, indent: int = 2) -> str:
 def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
     """Build a complete request URL from base URL, path, and parameters."""
     from urllib.parse import urlencode
+
     url = f"{base_url}{path}"
     if params:
         url += "?" + urlencode(params)
@@ -125,31 +126,31 @@ def generate_code_samples(base_url: str, path: str, params: Dict[str, Any]) -> D
 
     # Python
     params_dict_str = json.dumps(params, indent=4) if params else "{}"
-    samples["python"] = f'''import requests
+    samples["python"] = f"""import requests
 
 params = {params_dict_str}
 response = requests.get("{base_url}{path}", params=params)
-data = response.json()'''
+data = response.json()"""
 
     # JavaScript/TypeScript
     params_obj = ", ".join(f'{k}: "{v}"' for k, v in params.items()) if params else ""
-    samples["javascript"] = f'''const params = new URLSearchParams({{ {params_obj} }});
+    samples["javascript"] = f"""const params = new URLSearchParams({{ {params_obj} }});
 const response = await fetch(`{base_url}{path}?${{params}}`);
-const data = await response.json();'''
+const data = await response.json();"""
 
     # Rust
     if params:
-        rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])'for k, v in params.items())
-        samples["rust"] = f'''let response = reqwest::get("{base_url}{path}")
+        rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])' for k, v in params.items())
+        samples["rust"] = f"""let response = reqwest::get("{base_url}{path}")
 {rust_params}
     .await?
     .json::<serde_json::Value>()
-    .await?;'''
+    .await?;"""
     else:
-        samples["rust"] = f'''let response = reqwest::get("{base_url}{path}")
+        samples["rust"] = f"""let response = reqwest::get("{base_url}{path}")
     .await?
     .json::<serde_json::Value>()
-    .await?;'''
+    .await?;"""
 
     return samples
 
@@ -165,13 +166,31 @@ def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any])
     lines = ["| Property | Type | Required | Description |", "|----------|------|----------|-------------|"]
 
     for prop_name, prop_schema in properties.items():
-        # Resolve $ref if present
+        original_prop_schema = prop_schema
+
+        # Check if this is a reference before resolving
+        ref_name = None
         if "$ref" in prop_schema:
             ref_path = prop_schema["$ref"].split("/")
             if ref_path[0] == "#" and ref_path[1] == "components":
-                prop_schema = components["schemas"][ref_path[-1]]
+                ref_name = ref_path[-1]
+                prop_schema = components["schemas"][ref_name]
 
         prop_type = format_type(prop_schema)
+
+        # If it's an array with $ref items, create a link
+        if original_prop_schema.get("type") == "array" and "items" in original_prop_schema:
+            items = original_prop_schema["items"]
+            if "$ref" in items:
+                ref_path = items["$ref"].split("/")
+                if ref_path[0] == "#" and ref_path[1] == "components":
+                    item_ref_name = ref_path[-1]
+                    # Create link to the schema
+                    prop_type = f"array[[{item_ref_name}](#{item_ref_name.lower()})]"
+        elif ref_name:
+            # Direct reference (not array)
+            prop_type = f"[{ref_name}](#{ref_name.lower()})"
+
         required = "✓" if prop_name in required_fields else ""
         description = prop_schema.get("description", "").replace("\n", " ")
 
@@ -210,7 +229,9 @@ def extract_params_from_example(example_value: Dict[str, Any]) -> Dict[str, Any]
     return params
 
 
-def render_endpoint(path: str, method: str, operation: Dict[str, Any], components: Dict[str, Any], base_url: str = "") -> str:
+def render_endpoint(
+    path: str, method: str, operation: Dict[str, Any], components: Dict[str, Any], base_url: str = ""
+) -> str:
     """Render a single API endpoint."""
     lines = []
 
@@ -220,16 +241,16 @@ def render_endpoint(path: str, method: str, operation: Dict[str, Any], component
     # Use colors that work in both light and dark themes
     # These are carefully chosen to have good contrast in both modes
     method_colors = {
-        "get": "#5e81ac",     # muted blue - works in both themes
-        "post": "#10b981",    # green - works in both themes
-        "put": "#f59e0b",     # amber - works in both themes
+        "get": "#5e81ac",  # muted blue - works in both themes
+        "post": "#10b981",  # green - works in both themes
+        "put": "#f59e0b",  # amber - works in both themes
         "delete": "#ef4444",  # red - works in both themes
-        "patch": "#a78bfa"    # lighter purple - works in both themes
+        "patch": "#a78bfa",  # lighter purple - works in both themes
     }
     color = method_colors.get(method, "#6b7280")
     method_badge = f'<span style="color: {color}; font-weight: bold;">{method_upper}</span>'
 
-    lines.append(f'## {method_badge} `{path}`')
+    lines.append(f"## {method_badge} `{path}`")
     lines.append("")
 
     # Summary
@@ -290,6 +311,24 @@ def render_endpoint(path: str, method: str, operation: Dict[str, Any], component
             lines.append(f'{collapsible} {response_type} "{status_emoji} {status_code} - {description}"')
             lines.append("")
 
+            # Extract schema references to show response type
+            schema_refs = []
+            if "content" in response:
+                content = response["content"]
+                for content_type, content_schema in content.items():
+                    if "schema" in content_schema:
+                        schema = content_schema["schema"]
+                        # Handle oneOf (multiple possible schemas)
+                        if "oneOf" in schema:
+                            for one_of_schema in schema["oneOf"]:
+                                if "$ref" in one_of_schema:
+                                    ref_name = one_of_schema["$ref"].split("/")[-1]
+                                    schema_refs.append(ref_name)
+                        # Handle direct $ref
+                        elif "$ref" in schema:
+                            ref_name = schema["$ref"].split("/")[-1]
+                            schema_refs.append(ref_name)
+
             # Response content
             if "content" in response:
                 content = response["content"]
@@ -303,7 +342,7 @@ def render_endpoint(path: str, method: str, operation: Dict[str, Any], component
                         if len(examples) > 1:
                             # Use tabs for multiple examples - directly, without parent tab
                             for idx, (example_name, example_data) in enumerate(examples.items()):
-                                tab_title = example_data.get('summary', example_name)
+                                tab_title = example_data.get("summary", example_name)
                                 lines.append(f'    === "{tab_title}"')
                                 lines.append("")
 
@@ -351,8 +390,16 @@ def render_endpoint(path: str, method: str, operation: Dict[str, Any], component
                                 lines.append("")
 
                                 # Response example
-                                lines.append("        **Response:**")
-                                lines.append("")
+                                if "x-schema-ref" in example_data:
+                                    schema_ref = example_data["x-schema-ref"]
+                                    ref_name = schema_ref.split("/")[-1]
+                                    response_type = f"[`{ref_name}`](#{ref_name.lower()})"
+                                    lines.append(f"        **Response ({response_type}):**")
+                                    lines.append("")
+                                else:
+                                    lines.append("        **Response:**")
+                                    lines.append("")
+
                                 lines.append("        ```json")
                                 for line in render_json_example(example_data["value"]).split("\n"):
                                     lines.append(f"        {line}")
@@ -399,13 +446,17 @@ def render_schema(schema_name: str, schema: Dict[str, Any], components: Dict[str
 
     description = schema.get("description", "")
 
-    # Use collapsible block for schema
-    lines.append(f'??? info "{schema_name}"')
+    # Add heading with anchor for linking (use code style for schema name)
+    lines.append(f"### `{schema_name}` {{#{schema_name.lower()}}}")
     lines.append("")
 
     if description:
-        lines.append(f"    {description}")
+        lines.append(description)
         lines.append("")
+
+    # Use collapsible block for the properties
+    lines.append('??? info "Properties"')
+    lines.append("")
 
     # Properties table (indented for collapsible block)
     properties_table = render_schema_properties(schema, components)
