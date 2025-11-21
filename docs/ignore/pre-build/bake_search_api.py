@@ -421,6 +421,12 @@ def generate_markdown(spec: Dict[str, Any]) -> str:
     """Generate complete markdown documentation from OpenAPI spec."""
     lines = []
 
+    # Frontmatter for Zensical/MkDocs
+    lines.append("---")
+    lines.append("icon: material/api")
+    lines.append("---")
+    lines.append("")
+
     # Header
     info = spec.get("info", {})
     lines.append(f"# {info.get('title', 'API Documentation')}")
