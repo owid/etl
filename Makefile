@@ -46,7 +46,7 @@ docs.pre: .venv
 	@.venv/bin/python docs/ignore/pre-build/bake_search_api.py
 
 docs.post: .venv
-	@echo '==> Covnerting Jupyter Notebooks to HTML'
+	@echo '==> Converting Jupyter Notebooks to HTML'
 	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
 
 docs.build: .venv
