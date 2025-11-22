@@ -149,6 +149,10 @@ class Table(pd.DataFrame):
         elif path.endswith(".parquet"):
             return self.to_parquet(path, repack=repack)
 
+        elif path.endswith(".json"):
+            # ignore repacking
+            return self.to_json(path)
+
         else:
             raise ValueError(f"could not detect a suitable format to save to: {path}")
 
@@ -165,6 +169,10 @@ class Table(pd.DataFrame):
 
         elif path.endswith(".parquet"):
             table = cls.read_parquet(path, **kwargs)
+
+        elif path.endswith(".json"):
+            table = cls.read_json(path, **kwargs)
+
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
@@ -207,6 +215,44 @@ class Table(pd.DataFrame):
             # NOTE: By default pandas does store the index, and users often explicitly add "index=False".
             kwargs["index"] = self.primary_key != []
         df.to_csv(path, **kwargs)
+
+        metadata_filename = splitext(path)[0] + ".meta.json"
+        self._save_metadata(metadata_filename)
+
+    @overload
+    def to_json(self, path: None = None, **kwargs: Any) -> str: ...
+
+    @overload
+    def to_json(self, path: Any, **kwargs: Any) -> None: ...
+
+    def to_json(self, path: Any | None = None, **kwargs: Any) -> None | str:
+        """
+        Save this table as a JSON file plus accompanying JSON metadata file.
+        If the table is stored at "mytable.json", the metadata will be at
+        "mytable.meta.json".
+        """
+        # return string
+        if path is None:
+            return super().to_json(**kwargs)
+
+        if not str(path).endswith(".json"):
+            raise ValueError(f'filename must end in ".json": {path}')
+
+        df = pd.DataFrame(self)
+
+        # Set default orient if not specified
+        if "orient" not in kwargs:
+            # Use 'table' format by default as it supports index and is well-structured
+            kwargs["orient"] = "table"
+
+        # Handle index parameter based on orient
+        if "index" not in kwargs:
+            orient = kwargs.get("orient", "table")
+            # Only set index parameter for orientations that support it
+            if orient in ["split", "table", "index", "columns"]:
+                kwargs["index"] = self.primary_key != []
+
+        df.to_json(path, **kwargs)
 
         metadata_filename = splitext(path)[0] + ".meta.json"
         self._save_metadata(metadata_filename)
@@ -453,7 +499,10 @@ class Table(pd.DataFrame):
 
         # NOTE: setting index is really slow for large datasets
         if primary_key:
-            tb.set_index(primary_key, inplace=True)
+            # Check if the index is already set correctly (e.g., from JSON orient='table')
+            current_index_names = [name for name in tb.index.names if name is not None]
+            if current_index_names != primary_key:
+                tb.set_index(primary_key, inplace=True)
 
     @classmethod
     def read_feather(cls, path: str | Path, load_data: bool = True, **kwargs) -> Table:
@@ -494,6 +543,29 @@ class Table(pd.DataFrame):
 
         # load the data and add metadata
         df = Table(pd.read_parquet(path))
+        cls._add_metadata(df, path, **kwargs)
+        return df
+
+    @classmethod
+    def read_json(cls, path: str | Path, **kwargs) -> Table:
+        """
+        Read the table from a JSON file plus accompanying JSON sidecar.
+
+        The path may be a local file path or a URL.
+        """
+        if isinstance(path, Path):
+            path = path.as_posix()
+
+        if not path.endswith(".json"):
+            raise ValueError(f'filename must end in ".json": {path}')
+
+        # Try to read with orient='table' first (our default format)
+        # If that fails, let pandas auto-detect the format
+        try:
+            df = Table(pd.read_json(path, orient="table"))
+        except (ValueError, KeyError):
+            df = Table(pd.read_json(path))
+
         cls._add_metadata(df, path, **kwargs)
         return df
 

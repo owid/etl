@@ -26,11 +26,11 @@ from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
 from .processing_log import disable_processing_log
 from .properties import metadata_property
 
-FileFormat = Literal["csv", "feather", "parquet"]
+FileFormat = Literal["csv", "feather", "parquet", "json"]
 
 # the formats we can serialise and deserialise; in some cases they
 # will be tried in this order if we don't specify one explicitly
-SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
+SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv", "json"]
 
 # the formats we generate by default
 DEFAULT_FORMATS: list[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
@@ -353,6 +353,12 @@ class Dataset:
         for format in SUPPORTED_FORMATS:
             pattern = join(self.path, f"*.{format}")
             files.extend(glob(pattern))
+
+        # Exclude metadata files from data files
+        # - index.json is the dataset metadata file
+        # - *.meta.json are table metadata sidecar files
+        index_file = join(self.path, "index.json")
+        files = [f for f in files if f != index_file and not f.endswith(".meta.json")]
 
         return sorted(files)
 
