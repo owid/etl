@@ -1,9 +1,5 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  patents_general: &patents_general |-
-    Patents are a form of intellectual property that give their holders exclusive rights to an invention for a limited period, typically 20 years from the filing date.
-
-    It prevents others from making, using, selling, or distributing the patented invention without the patent holder's permission.
   patents_data: &patents_data |-
     The number of patents granted by a patent office is an indicator of innovation and research activity within a country or region. It is sometimes used as a proxy for technological advancement and economic development, as patents often lead to new products, services, and industries.
   filing_office: &filing_office |-
@@ -29,7 +25,6 @@ definitions:
       entityAnnotationsMap: |-
         Patent Office of the Cooperation Council for the Arab States of the Gulf: Stopped accepting applications in 2021
     description_key: &common_description
-      - *patents_general
       - *patents_data
       - *filing_office
       - *regional_filing_office
@@ -46,22 +41,19 @@ tables:
     variables:
       all_patents:
         title: Life science patents granted, by filing office
-        description_short: Patents granted within the fields of medical technology, biotechnology, and pharmaceuticals by filing office. These patents cover a wide range of innovations, such as medical devices, diagnostic methods, genetic engineering techniques, biotechnological processes and new drugs.
+        description_short: |-
+          [Patents](#dod:patents) granted within the fields of medical technology, biotechnology, and pharmaceuticals by filing office. These patents cover a wide range of innovations, such as medical devices, diagnostic methods, genetic engineering techniques, biotechnological processes and new drugs.
         unit: patents
-        short_unit: ""
       medical_technology_patents:
         title: Medical technology patents granted by filing office
-        description_short: Number of medical technology patents granted by the filing office in a given year. Medical technology patents can include medical and surgical equipment, diagnostic tools and other devices, materials or processes used in medical treatment.
+        description_short: Number of medical technology [patents](#dod:patents) granted by the filing office in a given year. Medical technology patents can include medical and surgical equipment, diagnostic tools and other devices, materials or processes used in medical treatment.
         unit: patents
-        short_unit: ""
       biotechnology_patents:
         title: Biotechnology patents granted by filing office
-        description_short: Number of biotechnology patents granted by the filing office in a given year. Examples for biotechnology patents could be genetic engineering methods to improve agriculture or novel processes using microorganisms to produce bio-fuel.
+        description_short: Number of biotechnology [patents](#dod:patents) granted by the filing office in a given year. Examples for biotechnology patents could be genetic engineering methods to improve agriculture or novel processes using microorganisms to produce bio-fuel.
         unit: patents
-        short_unit: ""
       pharmaceutical_patents:
         title: Pharmaceutical patents granted by filing office
-        description_short: Number of pharmaceutical patents granted by the filing office in a given year. Pharmaceutical patents typically cover new drugs, biological treatments or vaccines.
+        description_short: Number of pharmaceutical [patents](#dod:patents) granted by the filing office in a given year. Pharmaceutical patents typically cover new drugs, biological treatments or vaccines.
         unit: patents
-        short_unit: ""
 

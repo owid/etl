@@ -1,5 +1,4 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# This data is not currently used but kept in preparation for a larger patent data update.
 meta:
   origin:
     # Data product / Snapshot
@@ -23,7 +22,7 @@ meta:
 
     # Files
     url_main: https://www.wipo.int/en/web/ip-statistics
-    #url_download: https://www.wipo.int/documents/2948119/3215563/wipo_ip_historical_data.zip
+    url_download: https://www.wipo.int/documents/2948119/3215563/wipo_ip_historical_data.zip
     date_accessed: '2025-10-27'
 
     # License
