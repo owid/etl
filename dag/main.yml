@@ -719,6 +719,16 @@ steps:
   data://grapher/un/2025-10-29/un_sdg:
     - data://garden/un/2025-10-29/un_sdg
 
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/fbi/2025-11-21/summary_reporting_system_estimates:
+    - snapshot://fbi/2025-11-21/summary_reporting_system_estimates.csv
+  data://garden/fbi/2025-11-21/summary_reporting_system_estimates:
+    - data://meadow/fbi/2025-11-21/summary_reporting_system_estimates
+  data://grapher/fbi/2025-11-21/summary_reporting_system_estimates:
+    - data://garden/fbi/2025-11-21/summary_reporting_system_estimates
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
