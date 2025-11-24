@@ -204,6 +204,8 @@ def add_vehicles_per_1000(tables_dict: dict[str, Table], ds_population: Dataset)
     tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
 
     tb = tb.dropna(subset=["population"])
-    tb["registered_vehicles_per_thousand"] = (tb["number_of_registered_vehicles"] / tb["population"] * 1000).round(2)
+    tb["number_of_registered_vehicles_per_thousand"] = (
+        tb["number_of_registered_vehicles"] / tb["population"] * 1000
+    ).round(2)
 
     tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])
