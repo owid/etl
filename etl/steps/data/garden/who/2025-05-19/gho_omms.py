@@ -33,6 +33,7 @@ def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_region
     #    new_ind_name_long="Indicator:Under-ten mortality rate (per 1000 live births)",
     #    new_ind_desc="Definition: Under ten mortality rate is the share of newborns who die before reaching the age of 10. It is calculated by OWID based on WHO Global Health Observatory data.",
     # )
+    add_vehicles_per_1000(tables_dict, ds_population)
 
 
 def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], ds_regions: Dataset) -> None:
@@ -192,5 +193,17 @@ def add_neonatal_tetanus_cases_per_mil(tables_dict: dict[str, Table], ds_populat
     tb["neonatal_tetanus__number_of_reported_cases_per_million"] = (
         tb["neonatal_tetanus__number_of_reported_cases"] / tb["population"] * 1000000
     ).round(2)
+
+    tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])
+
+
+def add_vehicles_per_1000(tables_dict: dict[str, Table], ds_population: Dataset) -> None:
+    # Merge
+    indicator_name = "Number of registered vehicles - Residence area type: Total"
+    tb = tables_dict[indicator_name]
+    tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
+
+    tb = tb.dropna(subset=["population"])
+    tb["registered_vehicles_per_thousand"] = (tb["number_of_registered_vehicles"] / tb["population"] * 1000).round(2)
 
     tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])
