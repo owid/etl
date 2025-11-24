@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""Fetch documentation files from external sources (GitHub, etc.)
+"""Generate catalog API documentation by combining a local template with the catalog README.
 
-This script fetches documentation from external repositories and places them
-in the docs directory. Run this before building docs with Zensical.
+This script reads a template and the local catalog README, combines them, and writes the result
+to the docs directory. Run this before building docs with Zensical.
 """
 
 from etl.paths import BASE_DIR, LIB_DIR
@@ -11,7 +11,7 @@ from etl.paths import BASE_DIR, LIB_DIR
 DOCS_DIR = BASE_DIR / "docs"
 
 # GitHub raw content base URL
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com"
+
 
 
 def generate_catalog_api_docs():

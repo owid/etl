@@ -210,14 +210,7 @@ def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any])
     return "\n".join(lines)
 
 
-def extract_example_params(operation: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract example parameters from operation definition."""
-    params = {}
-    if "parameters" in operation:
-        for param in operation["parameters"]:
-            if "example" in param:
-                params[param["name"]] = param["example"]
-    return params
+
 
 
 def extract_params_from_example(example_value: Dict[str, Any]) -> Dict[str, Any]:
