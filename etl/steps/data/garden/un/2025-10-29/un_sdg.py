@@ -398,21 +398,44 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
 def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
     """
     Duplicate rows for 'Latin America and the Caribbean (UN SDG)' and rename to 'Latin America and the Caribbean (UN)'.
-    Only duplicate for indicators that also have other (UN) regions (e.g., Africa (UN), Asia (UN)).
+    Only duplicate for indicators that have both:
+    - Other (UN) regions (e.g., Africa (UN), Asia (UN))
+    - Other (UN SDG) regions (not just Latin America (UN SDG) alone)
     """
-    # Identify rows with other (UN) regions (not UN SDG)
-    un_region_mask = df["country"].str.contains(r"\(UN\)$", na=False, regex=True)
+    # Count total Latin America (UN SDG) indicators
+    lac_sdg_indicators = df[df["country"] == "Latin America and the Caribbean (UN SDG)"]["indicator"].nunique()
 
-    # For each indicator, check if it has any other (UN) regions
+    # Identify rows with (UN) and (UN SDG) regions
+    un_region_mask = df["country"].str.contains(r"\(UN\)$", na=False, regex=True)
+    un_sdg_mask = df["country"].str.contains(r"\(UN SDG\)$", na=False, regex=True)
+
+    # For each indicator, check if it has other (UN) regions
     indicators_with_un_regions = df[un_region_mask].groupby("indicator").size().index
+
+    # For each indicator, check if it has other (UN SDG) regions (not just Latin America)
+    other_un_sdg_mask = un_sdg_mask & (df["country"] != "Latin America and the Caribbean (UN SDG)")
+    indicators_with_other_un_sdg = df[other_un_sdg_mask].groupby("indicator").size().index
+
+    # Only duplicate if indicator has both other (UN) regions AND other (UN SDG) regions
+    indicators_to_duplicate = indicators_with_un_regions.intersection(indicators_with_other_un_sdg)
+
+    log.info(
+        "duplicate_latin_america_rows.stats",
+        total_lac_indicators=lac_sdg_indicators,
+        indicators_with_un_regions=len(indicators_with_un_regions),
+        indicators_with_other_un_sdg=len(indicators_with_other_un_sdg),
+        indicators_to_duplicate=len(indicators_to_duplicate),
+        indicators_excluded=lac_sdg_indicators - len(indicators_to_duplicate),
+    )
 
     # Filter Latin America rows to only those indicators
     lac_mask = (df["country"] == "Latin America and the Caribbean (UN SDG)") & (
-        df["indicator"].isin(indicators_with_un_regions)
+        df["indicator"].isin(indicators_to_duplicate)
     )
     df_lac = df[lac_mask].copy()
     df_lac["country"] = "Latin America and the Caribbean (UN)"
 
-    df = pd.concat([df, df_lac], ignore_index=True)
+    if not df_lac.empty:
+        df = pd.concat([df, df_lac], ignore_index=True)
 
     return df
