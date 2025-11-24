@@ -14,7 +14,8 @@ Outputs:
 import json
 from pathlib import Path
 
-from owid.catalog import Table, processing as pr, s3_utils
+from owid.catalog import Table, s3_utils
+from owid.catalog import processing as pr
 from structlog import get_logger
 from tqdm.auto import tqdm
 
@@ -33,7 +34,7 @@ S3_DATA_DIR = Path("data/gbd")
 paths = PathFinder(__file__)
 
 
-def create_metadata_json(tb_filtered: Table) -> dict:
+def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
     """Create the metadata JSON structure."""
     # Get unique values for mappings
     countries = sorted(tb_filtered["country"].unique())
@@ -147,6 +148,33 @@ def create_entity_data_json(tb_filtered: Table, country: str, mappings: dict) ->
     return data
 
 
+def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
+    """Save JSON data to local file and upload to S3.
+
+    Args:
+        data: Dictionary to save as JSON
+        filename: Name of the file (e.g., "causes-of-death.1.json")
+        s3_data_dir: S3 directory path (within bucket)
+    """
+    # Create export directory using paths
+    export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
+    export_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create full paths
+    local_file = export_dir / filename
+    s3_path = s3_data_dir / filename
+
+    # Save locally
+    with open(local_file, "w") as f:
+        json.dump(data, f, indent=2)
+
+    # Upload to S3
+    if DRY_RUN:
+        tqdm.write(f"[DRY RUN] Would upload {local_file} to s3://{S3_BUCKET_NAME}/{s3_path}")
+    else:
+        s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
+
+
 def run() -> None:
     #
     # Load data.
@@ -160,7 +188,7 @@ def run() -> None:
     tb = pr.concat([tb, tb_child], ignore_index=True)
 
     # Filter data for Number metric only (keep all sexes)
-    tb_filtered = tb[tb["metric"] == "Number"].copy()
+    tb_filtered = tb.loc[tb["metric"] == "Number"].copy()
 
     tb_filtered.set_index(["country", "year", "age", "sex", "broad_cause", "cause", "metric"], verify_integrity=True)
 
@@ -172,62 +200,26 @@ def run() -> None:
     # Create metadata
     metadata, mappings = create_metadata_json(tb_filtered)
 
-    # Create export directory using paths
-    export_dir = EXPORT_DIR / "s3" / paths.namespace / paths.version / paths.short_name
-    export_dir.mkdir(parents=True, exist_ok=True)
+    #
+    # Generate and upload JSON files.
+    #
+    log.info(f"Creating and uploading {len(mappings['countries']) + 1} JSON files.")
 
-    # Save metadata file
-    log.info("Creating metadata JSON file.")
-    metadata_file = export_dir / "causes-of-death.metadata.json"
-    with open(metadata_file, "w") as f:
-        json.dump(metadata, f, indent=2)
+    # Save and upload metadata file
+    save_and_upload_json(metadata, "causes-of-death.metadata.json", S3_DATA_DIR)
 
-    # Create one data file per entity
-    log.info(f"Creating {len(mappings['countries'])} entity data JSON files.")
+    # Save and upload entity data files
     country_to_id = {country: i + 1 for i, country in enumerate(mappings["countries"])}
-
-    for country in tqdm(mappings["countries"], desc="Creating entity files"):
+    for country in tqdm(mappings["countries"], desc="Processing entities"):
         entity_id = country_to_id[country]
         data = create_entity_data_json(tb_filtered, country, mappings)
+        save_and_upload_json(data, f"causes-of-death.{entity_id}.json", S3_DATA_DIR)
 
-        # Save entity data file
-        entity_file = export_dir / f"causes-of-death.{entity_id}.json"
-        with open(entity_file, "w") as f:
-            json.dump(data, f, indent=2)
-
-    #
-    # Upload to S3.
-    #
-    log.info(f"Uploading {len(mappings['countries']) + 1} files to S3.")
-
-    # Upload metadata file
-    metadata_s3_path = S3_DATA_DIR / "causes-of-death.metadata.json"
-    if DRY_RUN:
-        log.info(f"[DRY RUN] Would upload {metadata_file} to s3://{S3_BUCKET_NAME}/{metadata_s3_path}")
-    else:
-        log.info(f"Uploading {metadata_file} to s3://{S3_BUCKET_NAME}/{metadata_s3_path}")
-        s3_utils.upload(
-            f"s3://{S3_BUCKET_NAME}/{str(metadata_s3_path)}", metadata_file, public=True, downloadable=True
-        )
-
-    # Upload entity data files
-    for country in tqdm(mappings["countries"], desc="Uploading to S3"):
-        entity_id = country_to_id[country]
-        entity_file = export_dir / f"causes-of-death.{entity_id}.json"
-        entity_s3_path = S3_DATA_DIR / f"causes-of-death.{entity_id}.json"
-
-        if DRY_RUN:
-            tqdm.write(f"[DRY RUN] Would upload {entity_file} to s3://{S3_BUCKET_NAME}/{entity_s3_path}")
-        else:
-            s3_utils.upload(
-                f"s3://{S3_BUCKET_NAME}/{str(entity_s3_path)}", entity_file, public=True, downloadable=True
-            )
-
-        log.info(
-            f"""Successfully created and uploaded {len(mappings['countries']) + 1} files:
-            - 1 metadata file
-            - {len(mappings['countries'])} entity data files
-            - {len(metadata['dimensions']['variables'])} variables
-            - {len(metadata['dimensions']['ageGroups'])} age groups
-            - {len(metadata['dimensions']['sexes'])} sexes"""
-        )
+    log.info(
+        f"""Successfully created and uploaded {len(mappings['countries']) + 1} files:
+        - 1 metadata file
+        - {len(mappings['countries'])} entity data files
+        - {len(metadata['dimensions']['variables'])} variables
+        - {len(metadata['dimensions']['ageGroups'])} age groups
+        - {len(metadata['dimensions']['sexes'])} sexes"""
+    )
