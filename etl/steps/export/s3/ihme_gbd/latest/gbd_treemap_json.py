@@ -125,7 +125,6 @@ def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
 
 def create_entity_data_json(tb_filtered: Table, country: str, mappings: dict) -> dict:
     """Create data JSON for a specific entity."""
-    country_to_id = {country: i + 1 for i, country in enumerate(mappings["countries"])}
     cause_to_id = {cause: i + 1 for i, cause in enumerate(mappings["causes"])}
     age_to_id = {age: mappings["age_group_map"][age]["id"] for age in mappings["age_group_map"].keys()}
     sex_to_id = {sex: mappings["sex_map"][sex]["id"] for sex in mappings["sex_map"].keys()}
