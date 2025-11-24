@@ -397,9 +397,22 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
 
 def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Duplicate rows for 'Latin America and the Caribbean (UN SDG)' and rename the country to 'Latin America and the Caribbean (UN)'.
+    Duplicate rows for 'Latin America and the Caribbean (UN SDG)' and rename to 'Latin America and the Caribbean (UN)'.
+    Only duplicate for indicators that also have other (UN) regions (e.g., Africa (UN), Asia (UN)).
     """
-    df_lac = df[df["country"] == "Latin America and the Caribbean (UN SDG)"].copy()
+    # Identify rows with other (UN) regions (not UN SDG)
+    un_region_mask = df["country"].str.contains(r"\(UN\)$", na=False, regex=True)
+
+    # For each indicator, check if it has any other (UN) regions
+    indicators_with_un_regions = df[un_region_mask].groupby("indicator").size().index
+
+    # Filter Latin America rows to only those indicators
+    lac_mask = (df["country"] == "Latin America and the Caribbean (UN SDG)") & (
+        df["indicator"].isin(indicators_with_un_regions)
+    )
+    df_lac = df[lac_mask].copy()
     df_lac["country"] = "Latin America and the Caribbean (UN)"
+
     df = pd.concat([df, df_lac], ignore_index=True)
+
     return df
