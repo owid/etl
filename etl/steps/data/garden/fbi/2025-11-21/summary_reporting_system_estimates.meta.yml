@@ -6,6 +6,8 @@ definitions:
         - War & Peace
   description_key_hierarchy: &description_key_hierarchy
     - This data reflects the hierarchy rule, which requires that only the most serious offense in a case be counted. The descending order of violent crimes are homicide, rape, robbery, and aggravated assault, followed by the property crimes of burglary, larceny-theft, and motor vehicle theft.
+  description_key_estimates: &description_key_estimates
+    - These estimates are based on data reported to the FBI by law enforcement agencies that participate in the Summary Reporting System (SRS). Not all law enforcement agencies report data to the SRS, and those that do may not report data for all years. Therefore, these estimates may not represent the total number of crimes known to law enforcement in the United States.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -22,7 +24,7 @@ tables:
           - *description_key_hierarchy
         unit: violent crimes
       homicide:
-        title: Estimates number of homicides
+        title: Estimated number of homicides
         description_short: Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence.
         description_key:
           - *description_key_hierarchy
@@ -31,32 +33,33 @@ tables:
           - Deaths of individuals due to their own negligence, accidental deaths not resulting from gross negligence, and traffic fatalities are not included.
         unit: homicides
       robbery:
-        title: Estimates number of robberies
+        title: Estimated number of robberies
+        description_short: The taking or attempting to take anything of value from the care, custody, or control of a person or persons by force or threat of force or violence and/or by putting the victim in fear.
         description_key:
           - *description_key_hierarchy
         unit: robberies
       aggravated_assault:
-        title: Estimates number of aggravated assaults
+        title: Estimated number of aggravated assaults
         description_key:
           - *description_key_hierarchy
         unit: aggravated assaults
       property_crime:
-        title: Estimates number of property crimes
+        title: Estimated number of property crimes
         description_key:
           - *description_key_hierarchy
         unit: property crimes
       burglary:
-        title: Estimates number of burglaries
+        title: Estimated number of burglaries
         description_key:
           - *description_key_hierarchy
         unit: burglaries
       larceny:
-        title: Estimates number of larceny-thefts
+        title: Estimated number of larceny-thefts
         description_key:
           - *description_key_hierarchy
         unit: larceny-thefts
       motor_vehicle_theft:
-        title: Estimates number of motor vehicle thefts
+        title: Estimated number of motor vehicle thefts
         description_key:
           - *description_key_hierarchy
         unit: motor vehicle thefts
