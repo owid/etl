@@ -6,10 +6,9 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table, Variable, utils
+from owid.catalog import Table, Variable, utils
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -414,7 +413,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
-def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Tuple[Table, Table]:
+def create_tables_of_event_sizes(tb: Table) -> Tuple[Table, Table]:
     # We can try to replicate the chart from Guha-Sapir et al. (2004).
     # According to them:
     # * The human impact of a natural disaster is considered by CRED as "small" when the number of deaths was lower than
@@ -517,12 +516,9 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     tb_yearly = pr.concat([tb_yearly, _tb_global], ignore_index=True)
 
     # Add region aggregates.
-    tb_yearly = geo.add_regions_to_table(
+    tb_yearly = paths.regions.add_aggregates(
         tb=tb_yearly,
         regions=REGIONS,
-        index_columns=["country", "year"],
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
@@ -574,9 +570,7 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     return tb_yearly, tb_decadal
 
 
-def calculate_n_events_over_a_threshold_of_deaths(
-    tb: Table, ds_regions: Dataset, ds_income_groups: Dataset
-) -> Tuple[Table, Table]:
+def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> Tuple[Table, Table]:
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.
@@ -607,14 +601,7 @@ def calculate_n_events_over_a_threshold_of_deaths(
         tb_yearly[column] = tb_yearly[column].fillna(0)
 
     # Add region aggregates.
-    tb_yearly = geo.add_regions_to_table(
-        tb=tb_yearly,
-        regions=REGIONS,
-        index_columns=["country", "year"],
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        accepted_overlaps=[],
-    )
+    tb_yearly = paths.regions.add_aggregates(tb=tb_yearly, regions=REGIONS, accepted_overlaps=[])
 
     # Create a table with the decadal count of events.
     tb_decadal = tb_yearly.copy()
@@ -721,10 +708,10 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
     return tb
 
 
-def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table) -> Table:
+def create_additional_variables(tb: Table, tb_gdp: Table) -> Table:
     """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
     # Add population to table.
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
+    tb = paths.regions.add_population(tb=tb)
 
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
@@ -785,7 +772,7 @@ def create_decadal_average_data(tb: Table) -> Table:
     return tb_decadal
 
 
-def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) -> None:
+def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
     """Run sanity checks on output (yearly or decadal) data.
 
     Parameters
@@ -835,7 +822,7 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) ->
     assert tb[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
 
     # Get names of historical regions in the data.
-    regions = ds_regions["regions"].reset_index()
+    regions = paths.regions.tb_regions
     historical_regions_in_data = set(regions[regions["is_historical"]]["name"]) & set(tb["country"])
 
     # Sanity checks only for yearly data.
@@ -906,20 +893,12 @@ def run() -> None:
     #
     # Load natural disasters dataset from meadow and read its main table.
     ds_meadow = paths.load_dataset("natural_disasters")
-    tb_meadow = ds_meadow["natural_disasters"].reset_index()
+    tb_meadow = ds_meadow.read("natural_disasters")
 
-    # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$).
+    # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$) and GDP deflator (linked series).
     ds_wdi = paths.load_dataset("wdi")
     tb_gdp = ds_wdi["wdi"][["ny_gdp_mktp_cd"]].reset_index()
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
+    # tb_gdp_deflator = ds_wdi["wdi"][["ny_gdp_defl_zs_ad"]].reset_index()
 
     #
     # Process data.
@@ -943,15 +922,11 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Create a (yearly and decadal) table with the number and share of small, medium and large events.
-    tb_yearly_sizes, tb_decadal_sizes = create_tables_of_event_sizes(
-        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    tb_yearly_sizes, tb_decadal_sizes = create_tables_of_event_sizes(tb=tb)
 
     # Calculate the number of events over a certain threshold of casualties.
     # This is useful to notice a possible underestimate of small events in early data.
-    tb_yearly_deaths, tb_decadal_deaths = calculate_n_events_over_a_threshold_of_deaths(
-        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    tb_yearly_deaths, tb_decadal_deaths = calculate_n_events_over_a_threshold_of_deaths(tb=tb)
 
     # Calculate start and end dates of disasters.
     tb = calculate_start_and_end_dates(tb=tb)
@@ -977,7 +952,7 @@ def run() -> None:
     )
 
     # Add damages per GDP, and rates per 100,000 people.
-    tb = create_additional_variables(tb=tb, ds_population=ds_population, tb_gdp=tb_gdp)
+    tb = create_additional_variables(tb=tb, tb_gdp=tb_gdp)
 
     # Change disaster types to snake, lower case.
     tb["type"] = tb["type"].replace({value: utils.underscore(value) for value in tb["type"].unique()})
@@ -986,10 +961,10 @@ def run() -> None:
     tb_decadal = create_decadal_average_data(tb=tb)
 
     # Run sanity checks on output yearly data.
-    sanity_checks_on_outputs(tb=tb, is_decade=False, ds_regions=ds_regions)
+    sanity_checks_on_outputs(tb=tb, is_decade=False)
 
     # Run sanity checks on output decadal data.
-    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True, ds_regions=ds_regions)
+    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True)
 
     # Set an appropriate index to yearly data and sort conveniently.
     tb = tb.format(keys=["country", "year", "type"], sort_columns=True, short_name="natural_disasters_yearly")
