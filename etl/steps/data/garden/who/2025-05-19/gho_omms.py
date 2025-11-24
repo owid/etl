@@ -199,7 +199,7 @@ def add_neonatal_tetanus_cases_per_mil(tables_dict: dict[str, Table], ds_populat
 
 def add_vehicles_per_1000(tables_dict: dict[str, Table], ds_population: Dataset) -> None:
     # Merge
-    indicator_name = "Number of registered vehicles - Residence area type: Total"
+    indicator_name = "Number of registered vehicles"
     tb = tables_dict[indicator_name]
     tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
 
