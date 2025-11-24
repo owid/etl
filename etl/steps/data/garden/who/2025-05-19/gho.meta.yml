@@ -62,3 +62,15 @@ tables:
           #### Method of estimation
           Modelled estimates. A non-parametrical statistical model based on household survey data and time as inputs is applied to derive estimates. For further information on the model, see Stoner O et al, 2020: Global Household Energy Model: A Multivariate Hierarchical Approach to Estimating Trends in the Use of Polluting and Clean Fuels for Cooking (see link below).
           Input data for the model is found in the WHO Household Energy Database. This database compiles data from nationally-representative surveys and censuses that provide estimates of primary cooking fuels and technologies. In cases where estimates of the population not cooking at home, with missing data or cooking with other fuels are provided, these populations are removed from the denominator for estimation purposes. The population data is calculated by OWID and is available at: https://ourworldindata.org/grapher/population-past-future
+  number_of_registered_vehicles:
+    variables:
+      number_of_registered_vehicles_per_thousand:
+        title: Registered vehicles per 1,000 people
+        description_short: "Total number of registered vehicles (i.e., vehicles reported to a government agency and given some form of registration) per 1,000 people in each country."
+        description_key:
+          - "Registered vehicles per 1,000 people are calculated by Our World in Data based on vehicle registration from the World Health Organization's Global Health Observatory, and population estimates from the United Nations World Population Prospects."
+        description_from_producer: "The total number of registered vehicles (i.e. vehicles reported to a government agency and given some form of registration) in each country. Data were collected from a number of different sectors and stakeholders in each country and were submitted to the World Health Organization after consensus meetings, facilitated by   national data coordinators. All legislative documents were analysed by lawyers at WHO headquarters who extracted the relevant information. The legal analysis was then shared with National Data Coordinators and a validation process resolved any data conflicts through discussion and submission of new legal documents."
+        short_unit: ""
+        unit: vehicles per 1,000 people
+        display:
+          numDecimalPlaces: 0
