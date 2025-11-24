@@ -382,20 +382,20 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     countries_bins = set(tb_thousand_bins_to_extrapolate["country"].unique())
     countries_gdp = set(tb_gdp["country"].unique())
     if SHOW_WARNINGS:
-        missing_countries = countries_bins - countries_gdp
-        if len(missing_countries) > 0:
-            sorted_missing_countries = ", ".join(sorted(missing_countries))
+        missing_countries_gdp = countries_bins - countries_gdp
+        if len(missing_countries_gdp) > 0:
+            sorted_missing_countries = ", ".join(sorted(missing_countries_gdp))
             log.warning(
-                f"extrapolate_backwards: The following {len(missing_countries)} countries are in thousand_bins but missing in GDP data: "
+                f"extrapolate_backwards: The following {len(missing_countries_gdp)} countries are in thousand_bins but missing in GDP data: "
                 f"{sorted_missing_countries}"
             )
-            calculate_population_of_missing_countries(missing_countries)
+            calculate_population_of_missing_countries(missing_countries_gdp)
 
-        missing_countries = countries_gdp - countries_bins
-        if len(missing_countries) > 0:
-            sorted_missing_countries = ", ".join(sorted(missing_countries))
+        missing_countries_bins = countries_gdp - countries_bins
+        if len(missing_countries_bins) > 0:
+            sorted_missing_countries = ", ".join(sorted(missing_countries_bins))
             log.warning(
-                f"extrapolate_backwards: The following {len(missing_countries)} countries are in GDP data but missing in thousand_bins: "
+                f"extrapolate_backwards: The following {len(missing_countries_gdp)} countries are in GDP data but missing in thousand_bins: "
                 f"{sorted_missing_countries}"
             )
 
@@ -408,6 +408,11 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
 
     # Drop population column, we will add other data on population later
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["pop"])
+
+    # Drop countries in missing_countries_bins from tb_thousand_bins_to_extrapolate
+    tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate[
+        ~tb_thousand_bins_to_extrapolate["country"].isin(missing_countries_gdp)
+    ].reset_index(drop=True)
 
     # Merge with tb_gdp to get growth factors
     tb_thousand_bins_to_extrapolate = pr.merge(
@@ -468,7 +473,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
 
                 # Format output - show all ranges
                 years_display = ", ".join(ranges)
-                unexpected_summary.append(f"  - {country}: {years_display} ({len(years)} years total)")
+                unexpected_summary.append(f"{country}: {years_display} ({len(years)} years total)")
 
             # Log the error details
             log.error(
