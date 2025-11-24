@@ -228,9 +228,6 @@ def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any])
     return "\n".join(lines)
 
 
-
-
-
 def extract_params_from_example(example_value: Dict[str, Any]) -> Dict[str, Any]:
     """Extract request parameters from response example (infer from query field)."""
     params = {}

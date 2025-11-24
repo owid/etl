@@ -13,7 +13,6 @@ DOCS_DIR = BASE_DIR / "docs"
 # GitHub raw content base URL
 
 
-
 def generate_catalog_api_docs():
     """Generate catalog API documentation"""
     output_path = DOCS_DIR / "api/catalog-api.md"
