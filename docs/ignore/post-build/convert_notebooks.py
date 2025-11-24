@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+NOTE: THIS SCRIPT IS CALLED FROM `make docs.post`
+
 Convert Jupyter notebooks to HTML wrapped in full Zensical theme.
 
 This script finds all .ipynb files in the docs directory and converts them
