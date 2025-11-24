@@ -6,7 +6,7 @@ This script converts an OpenAPI YAML spec into a beautiful, interactive-looking
 markdown file compatible with Zensical/Material for MkDocs.
 
 Called from: make docs.pre
-Input: docs/ignore/pre-build/search-api.openapi.yaml
+Input: Fetched from owid/owid-grapher repository on GitHub (functions/search-api.openapi.yaml)
 Output: docs/api/search-api.md
 """
 
@@ -16,11 +16,29 @@ from typing import Any, Dict, List
 
 import yaml
 
+from etl.git_api_helpers import GithubApiRepo
 
-def load_openapi_spec(spec_path: Path) -> Dict[str, Any]:
-    """Load OpenAPI specification from YAML file."""
-    with open(spec_path) as f:
-        return yaml.safe_load(f)
+
+def load_openapi_spec_from_github(
+    org: str = "owid",
+    repo: str = "owid-grapher",
+    file_path: str = "functions/search-api.openapi.yaml",
+    branch: str = "master",
+) -> Dict[str, Any]:
+    """Load OpenAPI specification from GitHub repository.
+
+    Args:
+        org: GitHub organization name
+        repo: Repository name
+        file_path: Path to the OpenAPI spec file in the repository
+        branch: Branch to fetch from
+
+    Returns:
+        Parsed OpenAPI specification
+    """
+    github_repo = GithubApiRepo(org=org, repo_name=repo)
+    content = github_repo.fetch_file_content(file_path, branch)
+    return yaml.safe_load(content)
 
 
 def format_type(schema: Dict[str, Any]) -> str:
@@ -553,11 +571,12 @@ def main():
     """Generate Search API documentation from OpenAPI spec."""
     # Paths relative to repository root
     repo_root = Path(__file__).parent.parent.parent.parent
-    spec_path = repo_root / "docs" / "ignore" / "pre-build" / "search-api.openapi.yaml"
     output_path = repo_root / "docs" / "api" / "search-api.md"
 
-    print(f"Loading OpenAPI spec from {spec_path}...")
-    spec = load_openapi_spec(spec_path)
+    print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
+    spec = load_openapi_spec_from_github(
+        org="owid", repo="owid-grapher", file_path="functions/search-api.openapi.yaml", branch="master"
+    )
 
     print("Generating markdown documentation...")
     markdown = generate_markdown(spec)

@@ -327,7 +327,10 @@ include_requirejs = true
 [project.plugins.search]
 
 [project.plugins.exclude]
-glob = ["ignore/"]
+glob = [
+    "ignore/**",
+    "ignore/",
+]
 
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]
