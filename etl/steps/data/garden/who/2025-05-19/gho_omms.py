@@ -207,5 +207,6 @@ def add_vehicles_per_1000(tables_dict: dict[str, Table], ds_population: Dataset)
     tb["number_of_registered_vehicles_per_thousand"] = (
         tb["number_of_registered_vehicles"] / tb["population"] * 1000
     ).round(2)
+    tb = tb.drop(columns=["residence_area_type"])
 
     tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])
