@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+  description_key_hierarchy: &description_key_hierarchy
+    - This data reflects the hierarchy rule, which requires that only the most serious offense in a case be counted. The descending order of violent crimes are homicide, rape, robbery, and aggravated assault, followed by the property crimes of burglary, larceny-theft, and motor vehicle theft.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -15,49 +17,86 @@ tables:
     variables:
       violent_crime:
         title: Esimates number of violent crimes
+        description_short: "Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Violent crimes involve force or threat of force."
+        description_key:
+          - *description_key_hierarchy
         unit: violent crimes
       homicide:
         title: Estimates number of homicides
+        description_short: Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence.
+        description_key:
+          - *description_key_hierarchy
+          - Deaths caused by negligence, attempts to kill, assaults to kill, suicides, and accidental deaths are excluded.
+          - "Justifiable homicides are classified separately the definition is limited to: (1) the killing of a felon by a law enforcement officer in the line of duty; or (2) the killing of a felon, during the commission of a felony, by a private citizen."
+          - Deaths of individuals due to their own negligence, accidental deaths not resulting from gross negligence, and traffic fatalities are not included.
         unit: homicides
       robbery:
         title: Estimates number of robberies
+        description_key:
+          - *description_key_hierarchy
         unit: robberies
       aggravated_assault:
         title: Estimates number of aggravated assaults
+        description_key:
+          - *description_key_hierarchy
         unit: aggravated assaults
       property_crime:
         title: Estimates number of property crimes
+        description_key:
+          - *description_key_hierarchy
         unit: property crimes
       burglary:
         title: Estimates number of burglaries
+        description_key:
+          - *description_key_hierarchy
         unit: burglaries
       larceny:
         title: Estimates number of larceny-thefts
+        description_key:
+          - *description_key_hierarchy
         unit: larceny-thefts
       motor_vehicle_theft:
         title: Estimates number of motor vehicle thefts
+        description_key:
+          - *description_key_hierarchy
         unit: motor vehicle thefts
       violent_crime_per_100k:
         title: Estimated violent crime rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: violent crimes per 100,000 population
       homicide_per_100k:
         title: Estimated homicide rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: homicides per 100,000 population
       robbery_per_100k:
         title: Estimated robbery rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: robberies per 100,000 population
       aggravated_assault_per_100k:
         title: Estimated aggravated assault rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: aggravated assaults per 100,000 population
       property_crime_per_100k:
         title: Estimated property crime rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: property crimes per 100,000 population
       burglary_per_100k:
         title: Estimated burglary rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: burglaries per 100,000 population
       larceny_per_100k:
         title: Estimated larceny-theft rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: larceny-thefts per 100,000 population
       motor_vehicle_theft_per_100k:
         title: Estimated motor vehicle theft rate per 100,000 population
+        description_key:
+          - *description_key_hierarchy
         unit: motor vehicle thefts per 100,000 population
