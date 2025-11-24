@@ -14,6 +14,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Base year for GDP deflation.
+BASE_YEAR = 2024
+
 # List of expected disaster types in the raw data to consider, and how to rename them.
 # We consider only natural disasters of subgroups Geophysical, Meteorological, Hydrological and Climatological.
 # We therefore ignore Extra-terrestrial (of which there is just one meteorite impact event) and Biological subgroups.
@@ -708,24 +711,56 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
     return tb
 
 
-def create_additional_variables(tb: Table, tb_gdp: Table) -> Table:
+def create_adjusted_cost_variables(tb: Table, tb_wdi: Table) -> Table:
+    tb = tb.copy()
+    tb_gdp = tb_wdi.copy()
+
+    # Fill missing GDP deflator for World using current and constant GDP.
+    missing_world_deflator = (tb_gdp["country"] == "World") & tb_gdp["ny_gdp_defl_zs_ad"].isna()
+    tb_gdp.loc[missing_world_deflator, "ny_gdp_defl_zs_ad"] = (
+        tb_gdp.loc[missing_world_deflator, "ny_gdp_mktp_cd"]
+        / tb_gdp.loc[missing_world_deflator, "ny_gdp_mktp_kd"]
+        * 100
+    )
+
+    # Selecte and rename GDP columns for convenience.
+    tb_gdp = tb_gdp[["country", "year", "ny_gdp_mktp_cd", "ny_gdp_defl_zs_ad"]].rename(
+        columns={"ny_gdp_mktp_cd": "gdp", "ny_gdp_defl_zs_ad": "gdp_deflator"}, errors="raise"
+    )
+
+    # Get the deflator in the base year for each country.
+    base_deflator = tb_gdp.loc[tb_gdp["year"] == BASE_YEAR, ["country", "gdp_deflator"]].rename(
+        columns={"gdp_deflator": "gdp_deflator_base"}
+    )
+
+    # Add a column with the value of the GDP deflator on the base year.
+    tb_gdp = tb_gdp.merge(base_deflator, on="country", how="left")
+
+    # Combine natural disasters with GDP data.
+    tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
+
+    # Create variables of costs (in current US$) as a share of GDP (in current US$).
+    for variable in COST_VARIABLES:
+        tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
+
+    # Create cost variables in constant {BASE_YEAR} US$.
+    for variable in COST_VARIABLES:
+        tb[f"{variable}_constant_usd"] = tb[variable] * tb["gdp_deflator_base"] / tb["gdp_deflator"]
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["gdp", "gdp_deflator", "gdp_deflator_base"], errors="raise")
+
+    return tb
+
+
+def create_additional_variables(tb: Table) -> Table:
     """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
     # Add population to table.
     tb = paths.regions.add_population(tb=tb)
 
-    # Combine natural disasters with GDP data.
-    tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
-    # Prepare cost variables.
-    for variable in COST_VARIABLES:
-        # Create variables of costs (in current US$) as a share of GDP (in current US$).
-        tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
-
     # Add rates per 100,000 people.
     for column in VARIABLES_PER_100K_PEOPLE:
         tb[f"{column}_per_100k_people"] = tb[column] * 1e5 / tb["population"]
-
-    # Fix issue with faulty dtypes (see more details in the function's documentation).
-    tb = fix_faulty_dtypes(tb=tb)
 
     return tb
 
@@ -897,8 +932,7 @@ def run() -> None:
 
     # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$) and GDP deflator (linked series).
     ds_wdi = paths.load_dataset("wdi")
-    tb_gdp = ds_wdi["wdi"][["ny_gdp_mktp_cd"]].reset_index()
-    # tb_gdp_deflator = ds_wdi["wdi"][["ny_gdp_defl_zs_ad"]].reset_index()
+    tb_wdi = ds_wdi.read("wdi")
 
     #
     # Process data.
@@ -951,8 +985,14 @@ def run() -> None:
         tb=tb, index_columns=["country", "year", "type"], regions=REGIONS, accepted_overlaps=ACCEPTED_OVERLAPS
     )
 
-    # Add damages per GDP, and rates per 100,000 people.
-    tb = create_additional_variables(tb=tb, tb_gdp=tb_gdp)
+    # Add cost variables adjusted for inflation, and as a share of GDP.
+    tb = create_adjusted_cost_variables(tb=tb, tb_wdi=tb_wdi)
+
+    # Add damages per GDP, rates per 100,000 people, and damages adjusted for inflation.
+    tb = create_additional_variables(tb=tb)
+
+    # Fix issue with faulty dtypes (see more details in the function's documentation).
+    tb = fix_faulty_dtypes(tb=tb)
 
     # Change disaster types to snake, lower case.
     tb["type"] = tb["type"].replace({value: utils.underscore(value) for value in tb["type"].unique()})
@@ -981,5 +1021,6 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes, tb_yearly_deaths, tb_decadal_deaths],
         default_metadata=ds_meadow.metadata,
+        yaml_params={"BASE_YEAR": BASE_YEAR},
     )
     ds_garden.save()
