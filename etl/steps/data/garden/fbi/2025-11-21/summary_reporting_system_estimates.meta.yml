@@ -6,9 +6,36 @@ definitions:
         - War & Peace
   description_key_hierarchy: &description_key_hierarchy
     - This data reflects the hierarchy rule, which requires that only the most serious offense in a case be counted. The descending order of violent crimes are homicide, rape, robbery, and aggravated assault, followed by the property crimes of burglary, larceny-theft, and motor vehicle theft.
-  description_key_estimates: &description_key_estimates
-    - These estimates are based on data reported to the FBI by law enforcement agencies that participate in the Summary Reporting System (SRS). Not all law enforcement agencies report data to the SRS, and those that do may not report data for all years. Therefore, these estimates may not represent the total number of crimes known to law enforcement in the United States.
+  #description_key_estimates: &description_key_estimates
+  violent_crime_desc_short: &violent_crime_desc_short |-
+    "Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Violent crimes involve force or threat of force."
+  homicide_desc_short: &homicide_desc_short |-
+    "Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence."
+  robbery_desc_short: &robbery_desc_short |-
+    The taking or attempting to take anything of value from the care, custody, or control of a person or persons by force or threat of force or violence and/or by putting the victim in fear.
+  aggravated_assault_desc_short: &aggravated_assault_desc_short |-
+    An unlawful attack by one person upon another for the purpose of inflicting severe or aggravated bodily injury.
+  property_crime_desc_short: &property_crime_desc_short |-
+    Property crime includes the offenses of burglary, larceny-theft, motor vehicle theft, and arson.
+  burglary_desc_short: &burglary_desc_short |-
+    The unlawful entry of a building to commit a felony or a theft. Attempted forcible entry is included.
+  larceny_desc_short: &larceny_desc_short |-
+    The unlawful taking, carrying, leading, or riding away of property from the possession or constructive possession of another.
+  motor_vehicle_theft_desc_short: &motor_vehicle_theft_desc_short |-
+    "Motor vehicle theft is the theft or attempted theft of a motor vehicle."
 
+  homicide_desc_key: &homicide_desc_key
+    - Deaths caused by negligence, attempts to kill, assaults to kill, suicides, and accidental deaths are excluded.
+    - "Justifiable homicides are classified separately the definition is limited to: (1) the killing of a felon by a law enforcement officer in the line of duty; or (2) the killing of a felon, during the commission of a felony, by a private citizen."
+    - Deaths of individuals due to their own negligence, accidental deaths not resulting from gross negligence, and traffic fatalities are not included.
+  aggravated_assault_desc_key: &aggravated_assault_desc_key
+    - This type of assault usually is accompanied by the use of a weapon or by means likely to produce death or great bodily harm. Simple assaults are excluded, simple assaults are defined as assaults and attempted assaults where no weapon was used or no serious or aggravated injury resulted to the victim. Stalking, intimidation, coercion, and hazing are included.
+  larceny_theft_desc_key: &larceny_theft_desc_key
+    - Examples are thefts of bicycles, motor vehicle parts and accessories, shoplifting, pocket-picking, or the stealing of any property or article that is not taken by force and violence or by fraud.
+    - Attempted larcenies are included. Embezzlement, confidence games, forgery, check fraud, etc., are excluded.
+  motor_vehicle_theft_desc_key: &motor_vehicle_theft_desc_key
+    - A motor vehicle is self-propelled and runs on land surface and not on rails.
+    - Motorboats, construction equipment, airplanes, and farming equipment are specifically excluded from this category.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -19,87 +46,105 @@ tables:
     variables:
       violent_crime:
         title: Esimates number of violent crimes
-        description_short: "Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Violent crimes involve force or threat of force."
+        description_short: *violent_crime_desc_short
         description_key:
           - *description_key_hierarchy
         unit: violent crimes
       homicide:
         title: Estimated number of homicides
-        description_short: Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence.
+        description_short: *homicide_desc_short
         description_key:
           - *description_key_hierarchy
-          - Deaths caused by negligence, attempts to kill, assaults to kill, suicides, and accidental deaths are excluded.
-          - "Justifiable homicides are classified separately the definition is limited to: (1) the killing of a felon by a law enforcement officer in the line of duty; or (2) the killing of a felon, during the commission of a felony, by a private citizen."
-          - Deaths of individuals due to their own negligence, accidental deaths not resulting from gross negligence, and traffic fatalities are not included.
+          - *homicide_desc_key
         unit: homicides
       robbery:
         title: Estimated number of robberies
-        description_short: The taking or attempting to take anything of value from the care, custody, or control of a person or persons by force or threat of force or violence and/or by putting the victim in fear.
+        description_short: *robbery_desc_short
         description_key:
           - *description_key_hierarchy
         unit: robberies
       aggravated_assault:
         title: Estimated number of aggravated assaults
+        description_short: *aggravated_assault_desc_short
         description_key:
           - *description_key_hierarchy
+          - *aggravated_assault_desc_key
         unit: aggravated assaults
       property_crime:
         title: Estimated number of property crimes
+        description_short: *property_crime_desc_short
         description_key:
           - *description_key_hierarchy
         unit: property crimes
       burglary:
         title: Estimated number of burglaries
+        description_short: *burglary_desc_short
         description_key:
           - *description_key_hierarchy
         unit: burglaries
       larceny:
         title: Estimated number of larceny-thefts
+        description_short: *larceny_desc_short
         description_key:
           - *description_key_hierarchy
+          - *larceny_theft_desc_key
         unit: larceny-thefts
       motor_vehicle_theft:
         title: Estimated number of motor vehicle thefts
+        description_short: *motor_vehicle_theft_desc_short
         description_key:
           - *description_key_hierarchy
+          - *motor_vehicle_theft_desc_key
         unit: motor vehicle thefts
       violent_crime_per_100k:
         title: Estimated violent crime rate per 100,000 population
+        description_short: *violent_crime_desc_short
         description_key:
           - *description_key_hierarchy
         unit: violent crimes per 100,000 population
       homicide_per_100k:
         title: Estimated homicide rate per 100,000 population
+        description_short: *homicide_desc_short
         description_key:
           - *description_key_hierarchy
+          - *homicide_desc_key
         unit: homicides per 100,000 population
       robbery_per_100k:
         title: Estimated robbery rate per 100,000 population
+        description_short: *robbery_desc_short
         description_key:
           - *description_key_hierarchy
         unit: robberies per 100,000 population
       aggravated_assault_per_100k:
         title: Estimated aggravated assault rate per 100,000 population
+        description_short: *aggravated_assault_desc_short
         description_key:
           - *description_key_hierarchy
+          - *aggravated_assault_desc_key
         unit: aggravated assaults per 100,000 population
       property_crime_per_100k:
         title: Estimated property crime rate per 100,000 population
+        description_short: *property_crime_desc_short
         description_key:
           - *description_key_hierarchy
         unit: property crimes per 100,000 population
       burglary_per_100k:
         title: Estimated burglary rate per 100,000 population
+        description_short: *burglary_desc_short
         description_key:
           - *description_key_hierarchy
         unit: burglaries per 100,000 population
       larceny_per_100k:
         title: Estimated larceny-theft rate per 100,000 population
+        description_short: *larceny_desc_short
         description_key:
           - *description_key_hierarchy
+          - *larceny_theft_desc_key
         unit: larceny-thefts per 100,000 population
       motor_vehicle_theft_per_100k:
         title: Estimated motor vehicle theft rate per 100,000 population
+        description_from_producer: *motor_vehicle_theft_desc_short
         description_key:
           - *description_key_hierarchy
+          - *motor_vehicle_theft_desc_key
         unit: motor vehicle thefts per 100,000 population
