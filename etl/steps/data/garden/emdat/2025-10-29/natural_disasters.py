@@ -732,21 +732,13 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
     return tb
 
 
-def create_adjusted_cost_variables(tb: Table, tb_wdi: Table) -> Table:
+def create_cost_variables_adjusted_for_inflation(tb: Table, tb_wdi: Table) -> Table:
     tb = tb.copy()
     tb_gdp = tb_wdi.copy()
 
-    # Fill missing GDP deflator for World using current and constant GDP.
-    missing_world_deflator = (tb_gdp["country"] == "World") & tb_gdp["ny_gdp_defl_zs_ad"].isna()
-    tb_gdp.loc[missing_world_deflator, "ny_gdp_defl_zs_ad"] = (
-        tb_gdp.loc[missing_world_deflator, "ny_gdp_mktp_cd"]
-        / tb_gdp.loc[missing_world_deflator, "ny_gdp_mktp_kd"]
-        * 100
-    )
-
     # Selecte and rename GDP columns for convenience.
-    tb_gdp = tb_gdp[["country", "year", "ny_gdp_mktp_cd", "ny_gdp_defl_zs_ad"]].rename(
-        columns={"ny_gdp_mktp_cd": "gdp", "ny_gdp_defl_zs_ad": "gdp_deflator"}, errors="raise"
+    tb_gdp = tb_gdp[["country", "year", "ny_gdp_defl_zs_ad"]].rename(
+        columns={"ny_gdp_defl_zs_ad": "gdp_deflator"}, errors="raise"
     )
 
     # Get the deflator in the base year for each country.
@@ -760,16 +752,32 @@ def create_adjusted_cost_variables(tb: Table, tb_wdi: Table) -> Table:
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
 
-    # Create variables of costs (in current US$) as a share of GDP (in current US$).
-    for variable in COST_VARIABLES:
-        tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
-
     # Create cost variables in constant {BASE_YEAR} US$.
     for variable in COST_VARIABLES:
         tb[f"{variable}_constant_usd"] = tb[variable] * tb["gdp_deflator_base"] / tb["gdp_deflator"]
 
     # Drop unnecessary columns.
-    tb = tb.drop(columns=["gdp", "gdp_deflator", "gdp_deflator_base"], errors="raise")
+    tb = tb.drop(columns=["gdp_deflator", "gdp_deflator_base"], errors="raise")
+
+    return tb
+
+
+def create_cost_variables_per_gdp(tb: Table, tb_wdi: Table) -> Table:
+    tb = tb.copy()
+    tb_gdp = tb_wdi.copy()
+
+    # Selecte and rename GDP columns for convenience.
+    tb_gdp = tb_gdp[["country", "year", "ny_gdp_mktp_cd"]].rename(columns={"ny_gdp_mktp_cd": "gdp"}, errors="raise")
+
+    # Combine natural disasters with GDP data.
+    tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
+
+    # Create variables of costs (in current US$) as a share of GDP (in current US$).
+    for variable in COST_VARIABLES:
+        tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["gdp"], errors="raise")
 
     return tb
 
@@ -966,7 +974,7 @@ def run() -> None:
     tb = prepare_input_data(tb_meadow=tb_meadow)
 
     ####################################################################################################################
-    # TODO: Contact EM-DAT about these issues:
+    # I already contacted EM-DAT about this issue, but they haven't fixed it yet:
     # * Even with end date prior to start date: China, Wet mass movement, 10 deaths, starting in 2025-06, ending in 2024-06-04.
     # The most likely explanation is that the end year is wrong and should be 2025. Also, the day when it starts is missing. I'll assume it's this event:
     #   https://eos.org/thelandslideblog/muta-1
@@ -1005,13 +1013,16 @@ def run() -> None:
     # Add a new category (or "type") corresponding to the total of all natural disasters.
     tb = create_a_new_type_for_all_disasters_combined(tb=tb)
 
+    # Add cost variables adjusted for inflation (using the GDP deflator).
+    tb = create_cost_variables_adjusted_for_inflation(tb=tb, tb_wdi=tb_wdi)
+
     # Add region aggregates.
     tb = paths.regions.add_aggregates(
         tb=tb, index_columns=["country", "year", "type"], regions=REGIONS, accepted_overlaps=ACCEPTED_OVERLAPS
     )
 
-    # Add cost variables adjusted for inflation (using the GDP deflator), and costs per GDP.
-    tb = create_adjusted_cost_variables(tb=tb, tb_wdi=tb_wdi)
+    # Add cost variables per GDP.
+    tb = create_cost_variables_per_gdp(tb=tb, tb_wdi=tb_wdi)
 
     # Add rates per 100,000 people.
     tb = create_rate_variables(tb=tb)
