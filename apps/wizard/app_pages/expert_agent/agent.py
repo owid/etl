@@ -1,3 +1,4 @@
+import sys
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Literal
@@ -73,10 +74,12 @@ def cached_analytics_docs():
 ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
-try:
-    import tomllib  # Python 3.11+
-except ImportError:
-    import tomli as tomllib  # Fallback for older Python
+
+version = sys.version_info
+if (version.major >= 3) & (version.minor >= 11):
+    import tomllib
+else:
+    import tomli as tomllib  # type: ignore
 
 p = BASE_DIR / "zensical.toml"
 with p.open("rb") as f:  # Note: tomllib requires binary mode
