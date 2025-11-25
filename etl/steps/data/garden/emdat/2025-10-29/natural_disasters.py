@@ -64,25 +64,41 @@ COLUMNS = {
     # The following columns are kept for the analysis on the share of small, medium and large events.
     "cpi": "cpi",
     "entry_date": "entry_date",
+    # Load the cost variables adjusted for inflation that EMDAT provides.
+    # They will be used for comparison, but we will do our own adjustment using the GDP deflator (instead of the US CPI that they use).
+    "reconstruction_costs_adjusted": "reconstruction_costs_adjusted",
+    "total_damages_adjusted": "total_damages_adjusted",
+    "insured_damages_adjusted": "insured_damages_adjusted",
 }
-
-# Columns of values related to natural disaster impacts.
-IMPACT_COLUMNS = [
-    "total_dead",
-    "injured",
-    "affected",
-    "homeless",
-    "total_affected",
-    "reconstruction_costs",
-    "insured_damages",
-    "total_damages",
-]
 
 # Variables related to costs, measured in thousand current US$ (not adjusted for inflation or PPP).
 COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
 
+# Variables related to costs, measured in thousands of constant US$ (adjusted for inflation by EMDAt using the US CPI).
+COST_VARIABLES_ADJUSTED_WITH_CPI = [
+    "reconstruction_costs_adjusted",
+    "insured_damages_adjusted",
+    "total_damages_adjusted",
+]
+
+# Columns of values related to natural disaster impacts.
+IMPACT_COLUMNS = (
+    [
+        "total_dead",
+        "injured",
+        "affected",
+        "homeless",
+        "total_affected",
+    ]
+    + COST_VARIABLES
+    + COST_VARIABLES_ADJUSTED_WITH_CPI
+)
+
+
 # Variables to calculate per 100,000 people.
-VARIABLES_PER_100K_PEOPLE = [column for column in IMPACT_COLUMNS if column not in COST_VARIABLES] + ["n_events"]
+VARIABLES_PER_100K_PEOPLE = [
+    column for column in IMPACT_COLUMNS if column not in (COST_VARIABLES + COST_VARIABLES_ADJUSTED_WITH_CPI)
+] + ["n_events"]
 
 # New natural disaster types corresponding to the sum of all disasters, and the sum of all disasters excluding certain types.
 ALL_DISASTERS_TYPE = "all_disasters"
@@ -178,51 +194,56 @@ def get_last_day_of_month(year: int, month: int):
     return last_day
 
 
-def prepare_input_data(tb: Table) -> Table:
+def prepare_input_data(tb_meadow: Table) -> Table:
     """Prepare input data, and fix some known issues."""
+    tb_meadow = tb_meadow.copy()
+
     # Select and rename columns.
-    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    tb_meadow = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Add a year column (assume the start of the event).
-    tb["year"] = tb["start_year"].copy()
+    tb_meadow["year"] = tb_meadow["start_year"].copy()
 
     # Correct wrong data points (defined above in DATA_CORRECTIONS).
-    tb = correct_data_points(tb=tb, corrections=DATA_CORRECTIONS)
+    tb_meadow = correct_data_points(tb=tb_meadow, corrections=DATA_CORRECTIONS)
 
     # Remove spurious spaces in entities.
-    tb["type"] = tb["type"].str.strip()
+    tb_meadow["type"] = tb_meadow["type"].str.strip()
 
     # Sanity check
     error = "List of expected disaster types has changed. Consider updating EXPECTED_DISASTER_TYPES."
-    assert set(tb["type"]) == set(EXPECTED_DISASTER_TYPES), error
+    assert set(tb_meadow["type"]) == set(EXPECTED_DISASTER_TYPES), error
 
     # Rename disaster types conveniently.
-    tb["type"] = map_series(
-        series=tb["type"], mapping=EXPECTED_DISASTER_TYPES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    tb_meadow["type"] = map_series(
+        series=tb_meadow["type"],
+        mapping=EXPECTED_DISASTER_TYPES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
     )
 
     # Drop rows for disaster types that are not relevant.
-    tb = tb.dropna(subset="type").reset_index(drop=True)
+    tb_meadow = tb_meadow.dropna(subset="type").reset_index(drop=True)
 
     # Ensure "CPI" column is not empty. Currently it is missing the last year and a half
     # (and so is CPI data from World Bank). We forward fill the last rows of data.
     tb_cpi = (
-        tb[["year", "cpi"]]
+        tb_meadow[["year", "cpi"]]
         .sort_values("year")
         .drop_duplicates(subset="year", keep="last")
         .reset_index(drop=True)
         .ffill()
     )
-    tb = tb.drop(columns=["cpi"]).merge(tb_cpi, on="year", how="left")
+    tb_meadow = tb_meadow.drop(columns=["cpi"]).merge(tb_cpi, on="year", how="left")
 
     # Make "entry_date" a datetime column.
-    tb["entry_date"] = pd.to_datetime(tb["entry_date"], errors="coerce")
+    tb_meadow["entry_date"] = pd.to_datetime(tb_meadow["entry_date"], errors="coerce")
 
-    # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
-    for variable in COST_VARIABLES:
-        tb[variable] *= 1000
+    # Convert costs, given in '000 US$ (aka thousand dollars) into US$.
+    for variable in COST_VARIABLES + COST_VARIABLES_ADJUSTED_WITH_CPI:
+        tb_meadow[variable] *= 1000
 
-    return tb
+    return tb_meadow
 
 
 def sanity_checks_on_inputs(tb: Table) -> None:
@@ -753,8 +774,8 @@ def create_adjusted_cost_variables(tb: Table, tb_wdi: Table) -> Table:
     return tb
 
 
-def create_additional_variables(tb: Table) -> Table:
-    """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
+def create_rate_variables(tb: Table) -> Table:
+    """Create impacts per 100,000 people."""
     # Add population to table.
     tb = paths.regions.add_population(tb=tb)
 
@@ -937,8 +958,12 @@ def run() -> None:
     #
     # Process data.
     #
+    # Get the base year for the US CPI adjustment performed by EM-DAT.
+    assert len(set(tb_meadow[(tb_meadow["cpi"] == 100)]["start_year"])) == 1
+    base_year_us_cpi = int(tb_meadow[(tb_meadow["cpi"] == 100)]["start_year"].unique()[0])
+
     # Prepare input data (prepare time columns, convert cost variables to dollars, and fix some known issues).
-    tb = prepare_input_data(tb=tb_meadow)
+    tb = prepare_input_data(tb_meadow=tb_meadow)
 
     ####################################################################################################################
     # TODO: Contact EM-DAT about these issues:
@@ -985,11 +1010,11 @@ def run() -> None:
         tb=tb, index_columns=["country", "year", "type"], regions=REGIONS, accepted_overlaps=ACCEPTED_OVERLAPS
     )
 
-    # Add cost variables adjusted for inflation, and as a share of GDP.
+    # Add cost variables adjusted for inflation (using the GDP deflator), and costs per GDP.
     tb = create_adjusted_cost_variables(tb=tb, tb_wdi=tb_wdi)
 
-    # Add damages per GDP, rates per 100,000 people, and damages adjusted for inflation.
-    tb = create_additional_variables(tb=tb)
+    # Add rates per 100,000 people.
+    tb = create_rate_variables(tb=tb)
 
     # Fix issue with faulty dtypes (see more details in the function's documentation).
     tb = fix_faulty_dtypes(tb=tb)
@@ -1021,6 +1046,6 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes, tb_yearly_deaths, tb_decadal_deaths],
         default_metadata=ds_meadow.metadata,
-        yaml_params={"BASE_YEAR": BASE_YEAR},
+        yaml_params={"BASE_YEAR": BASE_YEAR, "BASE_YEAR_US_CPI": base_year_us_cpi},
     )
     ds_garden.save()

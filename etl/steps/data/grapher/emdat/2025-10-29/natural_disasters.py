@@ -21,12 +21,15 @@ TITLE_PUBLIC_START = {
     "Insured damages": "Annual insured damages from ",
     "Insured damages as a share of GDP": "Annual insured damages as a share of GDP from ",
     "Insured damages adjusted for inflation": "Annual insured damages, adjusted for inflation, from ",
+    "Insured damages adjusted for inflation using the US CPI": "Annual insured damages, adjusted for inflation using the US CPI, from ",
     "Reconstruction costs": "Annual reconstruction costs from ",
     "Reconstruction costs as a share of GDP": "Annual reconstruction costs as a share of GDP from ",
     "Reconstruction costs adjusted for inflation": "Annual reconstruction costs, adjusted for inflation, from ",
+    "Reconstruction costs adjusted for inflation using the US CPI": "Annual reconstruction costs, adjusted for inflation using the US CPI, from ",
     "Total economic damages": "Annual economic damages from ",
     "Total economic damages as a share of GDP": "Annual economic damages as a share of GDP from ",
     "Total economic damages adjusted for inflation": "Annual economic damages, adjusted for inflation, from ",
+    "Total economic damages adjusted for inflation using the US CPI": "Annual economic damages, adjusted for inflation using the US CPI, from ",
 }
 # Map disaster type to their name at the end of the public title (plural).
 TITLE_PUBLIC_END = {
