@@ -73,11 +73,14 @@ def cached_analytics_docs():
 ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
-p = BASE_DIR / "mkdocs.yml"
-with p.open("r") as f:
-    DOCS_INDEX = ruamel_load(f)
-DOCS_INDEX = dict(DOCS_INDEX)
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    import tomli as tomllib  # Fallback for older Python
 
+p = BASE_DIR / "zensical.toml"
+with p.open("rb") as f:  # Note: tomllib requires binary mode
+    ZENSICAL_CONFIG = tomllib.load(f)
 #######################################################
 # MCPs
 #######################################################
@@ -274,7 +277,8 @@ async def get_docs_index() -> str:
     #     message_type="markdown",
     #     text="**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`",
     # )
-    docs = ruamel_dump(DOCS_INDEX["nav"])
+    navigation = ZENSICAL_CONFIG["project"]["nav"]
+    docs = ruamel_dump(navigation)
     return docs
 
 
