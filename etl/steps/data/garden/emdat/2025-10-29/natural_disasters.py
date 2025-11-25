@@ -1010,11 +1010,11 @@ def run() -> None:
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
 
-    # Add a new category (or "type") corresponding to the total of all natural disasters.
-    tb = create_a_new_type_for_all_disasters_combined(tb=tb)
-
     # Add cost variables adjusted for inflation (using the GDP deflator).
     tb = create_cost_variables_adjusted_for_inflation(tb=tb, tb_wdi=tb_wdi)
+
+    # Add a new category (or "type") corresponding to the total of all natural disasters.
+    tb = create_a_new_type_for_all_disasters_combined(tb=tb)
 
     # Add region aggregates.
     tb = paths.regions.add_aggregates(
