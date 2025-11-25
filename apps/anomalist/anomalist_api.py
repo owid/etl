@@ -508,7 +508,10 @@ def anomaly_detection(
         except FileNotFoundError as e:
             # This happens when a dataset is in DB, but not in a local catalog.
             log.error("loading_data.error", error=str(e))
-            continue
+            raise FileNotFoundError(
+                f"Dataset {dataset.catalogPath} (ID: {dataset_id}) not found in local catalog. "
+                f"Run the ETL step to generate it locally."
+            ) from e
 
         log.info("loading_data.end", t=time.time() - t)
 
