@@ -53,6 +53,29 @@ EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 # Show warnings
 SHOW_WARNINGS = True
 
+# Countries that appear in the thousand bins dataset for which we don't have population data.
+COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
+
+# Define categories to filter in PIP
+PIP_CATEGORIES = {
+    "gini": {
+        "ppp_version": 2021,
+        "poverty_line": "No poverty line",
+        "welfare_type": "income or consumption",
+        "table": "Income or consumption consolidated",
+        "survey_comparability": "No spells",
+        "decile": pd.NA,
+    },
+    "mean": {
+        "ppp_version": 2021,
+        "poverty_line": "No poverty line",
+        "welfare_type": "income or consumption",
+        "table": "Income or consumption intra/extrapolated",
+        "survey_comparability": "No spells",
+        "decile": pd.NA,
+    },
+}
+
 # NOTE: See if we want to include these countries not available in Maddison Project Database
 MISSING_COUNTRIES_AND_REGIONS = {
     "American Samoa": "East Asia",
@@ -107,9 +130,6 @@ MISSING_COUNTRIES_AND_REGIONS = {
     "Vanuatu": "East Asia",
 }
 
-# Countries that appear in the thousand bins dataset for which we don't have population data.
-COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
-
 
 def run() -> None:
     #
@@ -118,13 +138,23 @@ def run() -> None:
     # Load thousand bins dataset, and read its main table.
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
     tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
+
     # Load Maddison Project Database, and read its main table.
     ds_maddison = paths.load_dataset("maddison_project_database")
     tb_maddison = ds_maddison.read("maddison_project_database")
 
+    # Load World Bank PIP dataset, and read its main table.
+    ds_pip = paths.load_dataset("world_bank_pip")
+    tb_pip = ds_pip.read("world_bank_pip")
+
+    # Load historical inequality dataset, and read its main table.
+    ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
+    tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al")
+
     #
     # Prepare data.
     #
+
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
 
@@ -139,6 +169,9 @@ def run() -> None:
 
     # Calculate an alternative method with our population dataset
     tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
+
+    # Prepare World Bank PIP data
+    tb_pip = prepare_pip_data(tb_pip)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -736,3 +769,64 @@ def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> T
     tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
 
     return tb_poverty, tb_population
+
+
+def prepare_pip_data(tb_pip: Table) -> Table:
+    """
+    Prepare World Bank PIP data to use it in extrapolations.
+    I want to have the consolidated Gini and the extrapolated mean here.
+    """
+
+    tb_pip = tb_pip[
+        [
+            "country",
+            "year",
+            "ppp_version",
+            "poverty_line",
+            "welfare_type",
+            "decile",
+            "table",
+            "survey_comparability",
+        ]
+        + [col for col in tb_pip.columns if col in PIP_CATEGORIES.keys()]
+    ]
+
+    # Check if all categories I want to filter are present
+    for category_name, category_filters in PIP_CATEGORIES.items():
+        for field, value in category_filters.items():
+            unique_values = tb_pip[field].unique()
+            assert value in unique_values, (
+                f"prepare_pip_data: Category '{category_name}' - Value '{value}' for field '{field}' not found in PIP data. "
+                f"Available values: {unique_values}"
+            )
+
+    # Filter data for each category and concatenate
+    tb_pip_gini = tb_pip[
+        (tb_pip["ppp_version"] == PIP_CATEGORIES["gini"]["ppp_version"])
+        & (tb_pip["poverty_line"] == PIP_CATEGORIES["gini"]["poverty_line"])
+        & (tb_pip["welfare_type"] == PIP_CATEGORIES["gini"]["welfare_type"])
+        & (tb_pip["table"] == PIP_CATEGORIES["gini"]["table"])
+        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["gini"]["survey_comparability"])
+        & (tb_pip["decile"] == PIP_CATEGORIES["gini"]["decile"])
+    ].reset_index(drop=True)
+
+    tb_pip_mean = tb_pip[
+        (tb_pip["ppp_version"] == PIP_CATEGORIES["mean"]["ppp_version"])
+        & (tb_pip["poverty_line"] == PIP_CATEGORIES["mean"]["poverty_line"])
+        & (tb_pip["welfare_type"] == PIP_CATEGORIES["mean"]["welfare_type"])
+        & (tb_pip["table"] == PIP_CATEGORIES["mean"]["table"])
+        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["mean"]["survey_comparability"])
+        & (tb_pip["decile"] == PIP_CATEGORIES["mean"]["decile"])
+    ].reset_index(drop=True)
+
+    print(tb_pip_gini)
+
+    # Merge both tables
+    tb_pip = pr.merge(
+        tb_pip_gini[["country", "year", "gini"]],
+        tb_pip_mean[["country", "year", "mean"]],
+        on=["country", "year"],
+        how="outer",
+    )
+
+    return tb_pip
