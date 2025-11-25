@@ -1,4 +1,3 @@
-import sys
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Literal
@@ -8,6 +7,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import tomli as tomllib  # Use tomlib once we deprecate python 3.10
 import yaml
 from pydantic_ai import Agent
 
@@ -75,11 +75,6 @@ ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
 
-version = sys.version_info
-if (version.major >= 3) & (version.minor >= 11):
-    import tomllib
-else:
-    import tomli as tomllib  # type: ignore
 
 p = BASE_DIR / "zensical.toml"
 with p.open("rb") as f:  # Note: tomllib requires binary mode
