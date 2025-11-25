@@ -74,7 +74,7 @@ COLUMNS = {
 # Variables related to costs, measured in thousand current US$ (not adjusted for inflation or PPP).
 COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
 
-# Variables related to costs, measured in thousands of constant US$ (adjusted for inflation by EMDAt using the US CPI).
+# Variables related to costs, measured in thousands of constant US$ (adjusted for inflation by EM-DAT using the US CPI).
 COST_VARIABLES_ADJUSTED_WITH_CPI = [
     "reconstruction_costs_adjusted",
     "insured_damages_adjusted",
