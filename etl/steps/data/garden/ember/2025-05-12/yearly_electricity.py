@@ -3,7 +3,7 @@
 from typing import Dict
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Table, utils
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
@@ -290,7 +290,7 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
     return tb
 
 
-def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def make_wide_table(tb: Table, category: str) -> Table:
     """Convert data from long to wide format for a specific category.
 
     This is a common processing for all categories in the data.
@@ -301,10 +301,6 @@ def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_gro
         Data, after harmonizing country names.
     category : str
         Name of category (as defined above in CATEGORIES) to process.
-    ds_regions : Dataset
-        Regions dataset.
-    ds_income : Dataset
-        Income groups dataset.
 
     Returns
     -------
@@ -330,28 +326,18 @@ def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_gro
 
     # Add region aggregates.
     aggregates = {column: "sum" for column in SUM_AGGREGATES if column in table.columns}
-    table = geo.add_regions_to_table(
-        table,
-        aggregations=aggregates,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        ignore_overlaps_of_zeros=True,
-    )
+    table = paths.regions.add_aggregates(tb=table, aggregations=aggregates, ignore_overlaps_of_zeros=True)
 
     return table
 
 
-def make_table_electricity_generation(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def make_table_electricity_generation(tb: Table) -> Table:
     """Create table with processed data of category "Electricity generation".
 
     Parameters
     ----------
     tb : Table
         Data in long format for all categories, after harmonizing country names.
-    ds_regions : Dataset
-        Regions dataset.
-    ds_income_groups : Dataset
-        Income groups dataset.
 
     Returns
     -------
@@ -360,9 +346,7 @@ def make_table_electricity_generation(tb: Table, ds_regions: Dataset, ds_income_
 
     """
     # Prepare wide table.
-    table = make_wide_table(
-        tb=tb, category="Electricity generation", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    table = make_wide_table(tb=tb, category="Electricity generation")
 
     # Recalculate the share of electricity generates for region aggregates.
     for column in table.columns:
@@ -378,21 +362,13 @@ def make_table_electricity_generation(tb: Table, ds_regions: Dataset, ds_income_
     return table
 
 
-def make_table_electricity_demand(
-    tb: Table, ds_population: Dataset, ds_regions: Dataset, ds_income_groups: Dataset
-) -> Table:
+def make_table_electricity_demand(tb: Table) -> Table:
     """Create table with processed data of category "Electricity demand".
 
     Parameters
     ----------
     tb : Table
         Data in long format for all categories, after harmonizing country names.
-    ds_population : Dataset
-        Population dataset.
-    ds_regions : Dataset
-        Regions dataset.
-    ds_income_groups : Dataset
-        Income groups dataset.
 
     Returns
     -------
@@ -401,12 +377,10 @@ def make_table_electricity_demand(
 
     """
     # Prepare wide table.
-    table = make_wide_table(
-        tb=tb, category="Electricity demand", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    table = make_wide_table(tb=tb, category="Electricity demand")
 
     # Add population to data
-    table = geo.add_population_to_table(tb=table, ds_population=ds_population, warn_on_missing_countries=False)
+    table = paths.regions.add_population(tb=table, warn_on_missing_countries=False)
 
     # Recalculate demand per capita.
     # We could do this only for region aggregates (since they do not have per capita values),
@@ -419,17 +393,13 @@ def make_table_electricity_demand(
     return table
 
 
-def make_table_power_sector_emissions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def make_table_power_sector_emissions(tb: Table) -> Table:
     """Create table with processed data of category "Power sector emissions".
 
     Parameters
     ----------
     tb : Table
         Data in long format for all categories, after harmonizing country names.
-    ds_regions : Dataset
-        Regions dataset.
-    ds_income_groups : Dataset
-        Income groups dataset.
 
     Returns
     -------
@@ -438,17 +408,15 @@ def make_table_power_sector_emissions(tb: Table, ds_regions: Dataset, ds_income_
 
     """
     # Prepare wide table of emissions data.
-    table = make_wide_table(
-        tb=tb, category="Power sector emissions", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    table = make_wide_table(tb=tb, category="Power sector emissions")
 
     # Add carbon intensity.
     # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
     # the results are consistent with the original data.
     # Prepare wide table also for electricity generation (required to calculate carbon intensity).
-    electricity = make_wide_table(
-        tb=tb, category="Electricity generation", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )[["country", "year", "Total generation - TWh"]]
+    electricity = make_wide_table(tb=tb, category="Electricity generation")[
+        ["country", "year", "Total generation - TWh"]
+    ]
     # Add total electricity generation to emissions table.
     table = pr.merge(table, electricity, on=["country", "year"], how="left")
     # Rename the original carbon intensity column as a temporary column called "check".
@@ -547,15 +515,6 @@ def run() -> None:
     tb_global = ds_meadow.read("yearly_electricity__global")
     tb_europe = ds_meadow.read("yearly_electricity__europe")
 
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -571,21 +530,11 @@ def run() -> None:
 
     # Split data into different tables, one per category, and process each one individually.
     tables = {
-        "capacity": make_wide_table(
-            tb=tb, category="Capacity", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-        ),
-        "electricity_demand": make_table_electricity_demand(
-            tb=tb, ds_population=ds_population, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-        ),
-        "electricity_generation": make_table_electricity_generation(
-            tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-        ),
-        "electricity_imports": make_wide_table(
-            tb=tb, category="Electricity imports", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-        ),
-        "power_sector_emissions": make_table_power_sector_emissions(
-            tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-        ),
+        "capacity": make_wide_table(tb=tb, category="Capacity"),
+        "electricity_demand": make_table_electricity_demand(tb=tb),
+        "electricity_generation": make_table_electricity_generation(tb=tb),
+        "electricity_imports": make_wide_table(tb=tb, category="Electricity imports"),
+        "power_sector_emissions": make_table_power_sector_emissions(tb=tb),
     }
 
     for table_name in tables:
