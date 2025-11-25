@@ -410,6 +410,21 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     return combined
 
 
+def check_or_recalculate_carbon_intensity(combined: Table) -> Table:
+    # There is already a carbon intensity variable in the Ember dataset, but now that we have combined EI and Ember data, intensities might need to be recalculated for consistency.
+    # However, before doing that, check if it's necessary. If the resulting calculated intensity is very similar to the original, just keep the original.
+    combined = combined.copy()
+    co2_intensity = (combined["total_emissions__mtco2"] * MT_TO_G) / (combined["total_generation__twh"] * TWH_TO_KWH)
+    error = "Expected carbon intensities would not need to be calculated. Either increase relative tolerance, or consider recalculating intensities."
+    assert combined[
+        ~np.isclose(co2_intensity.to_numpy(), combined["co2_intensity__gco2_kwh"].to_numpy(), rtol=1e-5, equal_nan=True)
+    ].empty, error
+    # If the assertion is not fulfilled, consider simply recalculating intensities.
+    # combined["co2_intensity__gco2_kwh"] = co2_intensity.copy()
+
+    return combined
+
+
 def run() -> None:
     #
     # Load data.
@@ -484,12 +499,8 @@ def run() -> None:
     # This way we avoid spurious jumps in the combined series.
     combined = fix_discrepancies_in_aggregate_regions(tb_review=tb_review, tb_ember=tb_ember, combined=combined)
 
-    # Add carbon intensities.
-    # There is already a variable for this in the Ember dataset, but now that we have combined
-    # EI and Ember data, intensities should be recalculated for consistency.
-    combined["co2_intensity__gco2_kwh"] = (combined["total_emissions__mtco2"] * MT_TO_G) / (
-        combined["total_generation__twh"] * TWH_TO_KWH
-    )
+    # Check if carbon intensity needs to be recalculated.
+    combined = check_or_recalculate_carbon_intensity(combined=combined)
 
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined, ds_population=ds_population)
