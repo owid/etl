@@ -68,6 +68,12 @@ memory = Memory(CACHE_DIR, verbose=0)
     default=500,
     help="Sample at most N variables from a dataset",
 )
+@click.option(
+    "--append/--no-append",
+    default=False,
+    type=bool,
+    help="Append anomalies to existing records instead of replacing them.",
+)
 def cli(
     anomaly_types: Optional[Tuple[str, ...]],
     dataset_ids: Optional[list[int]],
@@ -77,6 +83,7 @@ def cli(
     force: bool,
     reset_db: bool,
     sample_n: Optional[int],
+    append: bool,
 ) -> None:
     """TBD
 
@@ -148,6 +155,7 @@ def cli(
         force=force,
         reset_db=reset_db,
         sample_n=sample_n,
+        append=append,
     )
 
 

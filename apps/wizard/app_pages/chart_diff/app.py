@@ -479,7 +479,7 @@ def _show_options_display():
             ],
             key="charts-per-page",
             help="Select the number of charts to display per page.",
-            index=1,
+            index=2,  # Default to 20
         )
 
     with col3:
@@ -549,7 +549,15 @@ def _show_summary_top(chart_diffs):
     num_charts_approved = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_approved])
     num_charts_rejected = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_rejected])
     num_charts_reviewed = num_charts_approved + num_charts_rejected
+    num_charts_pending = num_charts_total - num_charts_reviewed
     text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed :small[:gray[(:material/thumb_up: {num_charts_approved} :material/thumb_down: {num_charts_rejected})]]"
+
+    # Show CLI tip if there are many pending charts
+    if num_charts_pending > 50:
+        st.info(
+            f"💡 **Tip:** You have {num_charts_pending} charts pending review. "
+            "You can use the CLI command `etl approve --dry-run` to automatically approve charts with identical configs & data."
+        )
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:

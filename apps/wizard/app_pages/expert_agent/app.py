@@ -14,6 +14,7 @@ import pytz
 import streamlit as st
 from pydantic_core import to_json
 
+from apps.utils.llms import estimate_llm_cost, generate_pricing_text
 from apps.wizard.app_pages.expert_agent.agent import recommender_agent, run_agent_stream
 from apps.wizard.app_pages.expert_agent.media import display_generated_plots
 from apps.wizard.app_pages.expert_agent.stream import set_status_container
@@ -21,8 +22,6 @@ from apps.wizard.app_pages.expert_agent.utils import (
     MODEL_DEFAULT,
     MODELS_AVAILABLE_LIST,
     MODELS_DISPLAY,
-    estimate_llm_cost,
-    generate_pricing_text,
 )
 from etl.config import load_env
 

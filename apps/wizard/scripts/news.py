@@ -1,20 +1,88 @@
 """Methods to update Wizard DB to have the necessary PR data."""
 
+import glob
 from typing import Tuple
 
 import requests
 from structlog import get_logger
 
-from apps.utils.gpt import GPTQuery, OpenAIWrapper, get_cost_and_tokens
-from apps.wizard.app_pages.expert.prompts import SYSTEM_PROMPT_GENERIC
+from apps.utils.llms.gpt import GPTQuery, OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.utils.db import WizardDB
-from etl.config import GITHUB_API_URL
+from etl.config import GITHUB_API_URL, load_env
+from etl.docs import render_dataset, render_grapher_config, render_indicator, render_origin, render_table
+from etl.paths import DOCS_DIR
 
 # Logger
 log = get_logger()
 
 # GPT model
 MODEL_DEFAULT = "gpt-5"
+
+# ENVIRONMENT CONFIG
+load_env()
+
+
+# SEPARATOR between documentation pages.
+PAGE_SEPARATOR = "--=+=+--"
+
+
+def generate_documentation(pages_md: list[str]) -> str:
+    """Get prompt-friendly documentation for a given list of pages."""
+
+    def read_page_md(page_path: str) -> str:
+        """Read text from MD page, add header with page path."""
+        with open(page_path, "r") as f:
+            text = f.read()
+        text = f"_page: {page_path}_\n\n" + text
+        return text
+
+    PAGES_TEXT = [read_page_md(page_path) for page_path in pages_md]
+    PAGES_TEXT = PAGE_SEPARATOR + "\n\n" + ("\n" + PAGE_SEPARATOR + "\n\n").join(PAGES_TEXT)
+    return PAGES_TEXT
+
+
+# GENERIC
+PAGE_SEPARATOR = "--=+=+--"
+NOTE = f"""To help you with this task, find below the required ETL documentation. Each documentation page is separated by '{PAGE_SEPARATOR}', followed by the path to the page "_page: <page_path>_" (or documentation file). The documentation content is mostly given as markdown text (suitable for mkdocs).
+"""
+METADATA_REFERENCE = f"""
+# Datasets:
+{render_dataset()}
+
+------
+# Tables:
+{render_table()}
+
+------
+# Indicators:
+{render_indicator()}
+
+------
+# Origins:
+{render_origin()}
+
+------
+#### `variable.presentation.grapher_config`
+
+{render_grapher_config()}
+"""
+PAGES_MD = (
+    glob.glob(str(DOCS_DIR) + "/guides/**/*.md", recursive=True)
+    + glob.glob(str(DOCS_DIR) + "/architecture/metadata/**/*.md", recursive=True)
+    + glob.glob(str(DOCS_DIR) + "/api/**/*.md", recursive=True)
+)
+PAGES_TEXT = generate_documentation(PAGES_MD)
+
+SYSTEM_PROMPT_GENERIC = f"""{NOTE}
+
+{PAGES_TEXT}
+
+{PAGE_SEPARATOR}
+_page: architecture/metadata/reference/index.md
+
+{METADATA_REFERENCE}
+
+"""
 
 
 def get_json_url(url: str):

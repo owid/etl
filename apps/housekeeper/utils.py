@@ -3,7 +3,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from apps.utils.gpt import GPTQuery, GPTResponse, OpenAIWrapper
+from apps.utils.llms.gpt import GPTQuery, GPTResponse, OpenAIWrapper
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher import model as gm
