@@ -110,7 +110,7 @@ definitions:
   description_short_constant_usd: &description-short-constant-usd |-
     This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
   footnote_constant_usd: &footnote-constant-usd |-
-    This data is expressed in constant constant {BASE_YEAR} US$.
+    This data is expressed in constant {BASE_YEAR} US$.
   description_key_inflation_adjustment: &description-key-inflation-adjustment
     - This variable has been adjusted for inflation using the OWID Deflator dataset (Our World in Data, 2025).
     - Cost variables, originally expressed in current US dollars, were converted to constant {BASE_YEAR} US dollars using a GDP deflator, to account for the effects of inflation in each country. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD).
