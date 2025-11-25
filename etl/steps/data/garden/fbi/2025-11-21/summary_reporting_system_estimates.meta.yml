@@ -8,9 +8,9 @@ definitions:
     - This data reflects the hierarchy rule, which requires that only the most serious offense in a case be counted. The descending order of violent crimes are homicide, rape, robbery, and aggravated assault, followed by the property crimes of burglary, larceny-theft, and motor vehicle theft.
   #description_key_estimates: &description_key_estimates
   violent_crime_desc_short: &violent_crime_desc_short |-
-    "Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Violent crimes involve force or threat of force."
+    Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Violent crimes involve force or threat of force.
   homicide_desc_short: &homicide_desc_short |-
-    "Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence."
+    Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence.
   robbery_desc_short: &robbery_desc_short |-
     The taking or attempting to take anything of value from the care, custody, or control of a person or persons by force or threat of force or violence and/or by putting the victim in fear.
   aggravated_assault_desc_short: &aggravated_assault_desc_short |-
