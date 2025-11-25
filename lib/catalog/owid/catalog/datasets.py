@@ -358,7 +358,15 @@ class Dataset:
 
     @property
     def table_names(self) -> list[str]:
-        return sorted({Path(f).stem for f in self._data_files})
+        # Only include files that have a corresponding .meta.json sidecar
+        # This excludes non-table files (like raw JSON exports) from being treated as tables
+        table_names = []
+        for f in self._data_files:
+            stem = Path(f).stem
+            meta_file = Path(self.path) / f"{stem}.meta.json"
+            if meta_file.exists():
+                table_names.append(stem)
+        return sorted(set(table_names))
 
     @property
     def _metadata_files(self) -> list[str]:
