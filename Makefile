@@ -38,16 +38,23 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
+docs.pre: .venv
+	@echo '==> Fetching external documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_catalog_api.py
+	@echo '==> Generating dynamic documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_metadata_reference.py
+	@.venv/bin/python docs/ignore/pre-build/bake_search_api.py
+
 docs.post: .venv
-	@echo '==> Post-processing documentation files'
-	.venv/bin/python docs/ignore/convert_notebooks.py
+	@echo '==> Converting Jupyter Notebooks to HTML'
+	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
 
 docs.build: .venv
 	@echo '==> Cleaning previous build'
 	@rm -rf site/ .cache/
 	@mkdir -p .cache
-	@echo '==> Generating dynamic documentation files'
-	@.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
+	@echo '==> Pre-processing documentation files'
+	@$(MAKE) --no-print-directory docs.pre
 	@echo '==> Building documentation with Zensical'
 	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 	@echo '==> Post-processing documentation files'
@@ -55,15 +62,6 @@ docs.build: .venv
 
 docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
-
-
-docs-mkdocs.build: .venv
-	@echo '==> Building documentation with MkDocs'
-	.venv/bin/mkdocs build --clean
-
-docs-mkdocs.serve: .venv
-	@echo '==> Serving documentation with MkDocs'
-	.venv/bin/mkdocs serve
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
