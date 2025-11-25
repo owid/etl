@@ -56,23 +56,24 @@ SHOW_WARNINGS = True
 # Countries that appear in the thousand bins dataset for which we don't have population data.
 COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
 
-# Define categories to filter in PIP
+# Define indicator to extract from PIP
+PIP_INDICATORS = ["gini", "mean"]
+
+# Define categories to filter in PIP, for survey-based and filled data
 PIP_CATEGORIES = {
-    "gini": {
+    "survey": {
         "ppp_version": 2021,
         "poverty_line": "No poverty line",
         "welfare_type": "income or consumption",
         "table": "Income or consumption consolidated",
         "survey_comparability": "No spells",
-        "decile": pd.NA,
     },
-    "mean": {
+    "filled": {
         "ppp_version": 2021,
         "poverty_line": "No poverty line",
         "welfare_type": "income or consumption",
         "table": "Income or consumption intra/extrapolated",
         "survey_comparability": "No spells",
-        "decile": pd.NA,
     },
 }
 
@@ -153,25 +154,30 @@ def run() -> None:
 
     #
     # Prepare data.
-    #
+    # #
+    # # Prepare GDP data
+    # tb_gdp = prepare_gdp_data(tb_maddison)
 
-    # Prepare GDP data
-    tb_gdp = prepare_gdp_data(tb_maddison)
+    # # Perform backward extrapolation
+    # tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
-    # Perform backward extrapolation
-    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
+    # # Calculate poverty measures
+    # tb = calculate_poverty_measures(tb=tb_extended)
 
-    # Calculate poverty measures
-    tb = calculate_poverty_measures(tb=tb_extended)
+    # # Create stacked variables for stacked area/bar charts
+    # tb = create_stacked_variables(tb=tb)
 
-    # Create stacked variables for stacked area/bar charts
-    tb = create_stacked_variables(tb=tb)
-
-    # Calculate an alternative method with our population dataset
-    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
+    # # Calculate an alternative method with our population dataset
+    # tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
 
     # Prepare World Bank PIP data
     tb_pip = prepare_pip_data(tb_pip)
+
+    # Calculate Ginis from thousand bins distribution
+    tb_pip = create_ginis_from_thousand_bins_distribution(tb_thousand_bins=tb_thousand_bins, tb_pip=tb_pip)
+
+    # Add ginis from Van Zanden et al.
+    tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -777,6 +783,9 @@ def prepare_pip_data(tb_pip: Table) -> Table:
     I want to have the consolidated Gini and the extrapolated mean here.
     """
 
+    tb_pip = tb_pip.copy()
+
+    # Keep only relevant columns
     tb_pip = tb_pip[
         [
             "country",
@@ -788,45 +797,173 @@ def prepare_pip_data(tb_pip: Table) -> Table:
             "table",
             "survey_comparability",
         ]
-        + [col for col in tb_pip.columns if col in PIP_CATEGORIES.keys()]
+        + PIP_INDICATORS
     ]
 
     # Check if all categories I want to filter are present
-    for category_name, category_filters in PIP_CATEGORIES.items():
-        for field, value in category_filters.items():
-            unique_values = tb_pip[field].unique()
-            assert value in unique_values, (
-                f"prepare_pip_data: Category '{category_name}' - Value '{value}' for field '{field}' not found in PIP data. "
+    for filled_or_survey, category_filters in PIP_CATEGORIES.items():
+        for column, category in category_filters.items():
+            unique_values = tb_pip[column].unique()
+            assert category in unique_values, (
+                f"prepare_pip_data: Type of data '{filled_or_survey}' - Category '{category}' for column '{column}' not found in PIP data. "
                 f"Available values: {unique_values}"
             )
 
     # Filter data for each category and concatenate
-    tb_pip_gini = tb_pip[
-        (tb_pip["ppp_version"] == PIP_CATEGORIES["gini"]["ppp_version"])
-        & (tb_pip["poverty_line"] == PIP_CATEGORIES["gini"]["poverty_line"])
-        & (tb_pip["welfare_type"] == PIP_CATEGORIES["gini"]["welfare_type"])
-        & (tb_pip["table"] == PIP_CATEGORIES["gini"]["table"])
-        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["gini"]["survey_comparability"])
-        & (tb_pip["decile"] == PIP_CATEGORIES["gini"]["decile"])
+    # I need two tables, tb_pip_survey and tb_pip_filled, for both mean and gini
+    tb_pip_survey = tb_pip[
+        (tb_pip["ppp_version"] == PIP_CATEGORIES["survey"]["ppp_version"])
+        & (tb_pip["poverty_line"] == PIP_CATEGORIES["survey"]["poverty_line"])
+        & (tb_pip["welfare_type"] == PIP_CATEGORIES["survey"]["welfare_type"])
+        & (tb_pip["table"] == PIP_CATEGORIES["survey"]["table"])
+        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["survey"]["survey_comparability"])
+        & (tb_pip["decile"].isna())
     ].reset_index(drop=True)
 
-    tb_pip_mean = tb_pip[
-        (tb_pip["ppp_version"] == PIP_CATEGORIES["mean"]["ppp_version"])
-        & (tb_pip["poverty_line"] == PIP_CATEGORIES["mean"]["poverty_line"])
-        & (tb_pip["welfare_type"] == PIP_CATEGORIES["mean"]["welfare_type"])
-        & (tb_pip["table"] == PIP_CATEGORIES["mean"]["table"])
-        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["mean"]["survey_comparability"])
-        & (tb_pip["decile"] == PIP_CATEGORIES["mean"]["decile"])
+    tb_pip_filled = tb_pip[
+        (tb_pip["ppp_version"] == PIP_CATEGORIES["filled"]["ppp_version"])
+        & (tb_pip["poverty_line"] == PIP_CATEGORIES["filled"]["poverty_line"])
+        & (tb_pip["welfare_type"] == PIP_CATEGORIES["filled"]["welfare_type"])
+        & (tb_pip["table"] == PIP_CATEGORIES["filled"]["table"])
+        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["filled"]["survey_comparability"])
+        & (tb_pip["decile"].isna())
     ].reset_index(drop=True)
-
-    print(tb_pip_gini)
 
     # Merge both tables
     tb_pip = pr.merge(
-        tb_pip_gini[["country", "year", "gini"]],
-        tb_pip_mean[["country", "year", "mean"]],
+        tb_pip_survey[["country", "year", "gini", "mean"]],
+        tb_pip_filled[["country", "year", "mean"]],  # There is no gini in filled data
+        on=["country", "year"],
+        how="outer",
+        suffixes=("_survey", "_filled"),
+    )
+
+    return tb_pip
+
+
+def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip: Table) -> Table:
+    """
+    Create Gini coefficients from the 1000-binned income distribution data and merge with World Bank PIP data.
+
+    The Gini coefficient is calculated using the trapezoidal approximation of the Lorenz curve:
+    Gini = 1 - sum((cumulative_income_share[i] + cumulative_income_share[i-1]) * pop_share[i])
+
+    Where:
+    - cumulative_income_share is the cumulative share of total income at each quantile
+    - pop_share is the population share for each quantile (1/1000 for each bin)
+
+    Args:
+        tb_thousand_bins: Table with 1000 quantiles per country-year containing 'avg' (income) and 'pop' (population)
+        tb_pip: Table with World Bank PIP Gini data to merge with
+
+    Returns:
+        Table with Gini coefficients calculated from thousand bins distribution, merged with PIP data for comparison
+    """
+
+    # Create a copy to avoid modifying the original
+    tb = tb_thousand_bins.copy()
+
+    # Keep only necessary columns
+    tb = tb[["country", "year", "quantile", "avg", "pop"]].copy()
+
+    # Sort by country, year, and quantile to ensure correct ordering
+    tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
+    # Calculate total income for each quantile (income per capita * population)
+    tb["total_income"] = tb["avg"] * tb["pop"]
+
+    # Calculate total income and population by country-year
+    country_year_totals = (
+        tb.groupby(["country", "year"])
+        .agg(total_income_sum=("total_income", "sum"), total_pop_sum=("pop", "sum"))
+        .reset_index()
+    )
+
+    # Merge totals back to main table
+    tb = pr.merge(tb, country_year_totals, on=["country", "year"], how="left")
+
+    # Calculate cumulative income share for each quantile
+    tb["cumulative_income"] = tb.groupby(["country", "year"])["total_income"].cumsum()
+    tb["cumulative_income_share"] = tb["cumulative_income"] / tb["total_income_sum"]
+
+    # Calculate population share (should be uniform 1/1000 for each quantile, but we calculate it to handle edge cases)
+    tb["pop_share"] = tb["pop"] / tb["total_pop_sum"]
+
+    # Calculate Gini using trapezoidal rule
+    # Gini = 1 - sum of areas under Lorenz curve
+    # For each segment: area = (y[i] + y[i-1]) / 2 * (x[i] - x[i-1])
+    # Where y is cumulative income share and x is cumulative population share
+
+    # Get previous cumulative income share (for trapezoidal calculation)
+    tb["cumulative_income_share_prev"] = tb.groupby(["country", "year"])["cumulative_income_share"].shift(1).fillna(0)
+
+    # Calculate area under Lorenz curve for each segment
+    # Area = average of two heights * width
+    tb["lorenz_area"] = (tb["cumulative_income_share"] + tb["cumulative_income_share_prev"]) * tb["pop_share"] / 2
+
+    # Sum areas by country-year to get total area under Lorenz curve
+    gini_calc = tb.groupby(["country", "year"]).agg(lorenz_area_total=("lorenz_area", "sum")).reset_index()
+
+    # Gini coefficient = 1 - 2 * (area under Lorenz curve)
+    # The factor of 2 comes from the fact that the area under the perfect equality line is 0.5
+    gini_calc["gini"] = 1 - 2 * gini_calc["lorenz_area_total"]
+
+    # Drop intermediate calculation column
+    gini_calc = gini_calc.drop(columns=["lorenz_area_total"])
+
+    # Sanity check: Gini should be between 0 and 1
+    invalid_gini = gini_calc[(gini_calc["gini"] < 0) | (gini_calc["gini"] > 1)]
+    if len(invalid_gini) > 0:
+        log.warning(
+            f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range)"
+        )
+        # Clip to valid range
+        gini_calc["gini"] = gini_calc["gini"].clip(0, 1)
+
+    # Merge with PIP data for comparison
+    tb_pip = pr.merge(
+        tb_pip,
+        gini_calc[["country", "year", "gini"]],
+        on=["country", "year"],
+        how="outer",
+        suffixes=("_survey", "_filled"),
+    )
+
+    # Calculate difference between thousand bins Gini and PIP Gini
+    tb_pip["gini_difference"] = tb_pip["gini_filled"] - tb_pip["gini_survey"]
+    tb_pip["gini_difference_pct"] = (tb_pip["gini_difference"] / tb_pip["gini_survey"]) * 100
+
+    # Log summary statistics
+    if SHOW_WARNINGS:
+        comparison_valid = tb_pip.dropna(subset=["gini_filled", "gini_survey"])
+        if len(comparison_valid) > 0:
+            mean_diff = comparison_valid["gini_difference"].abs().mean()
+            max_diff = comparison_valid["gini_difference"].abs().max()
+            log.info(
+                f"create_ginis_from_thousand_bins_distribution: Comparison with PIP data - "
+                f"Mean absolute difference: {mean_diff:.4f}, Max absolute difference: {max_diff:.4f}"
+            )
+
+    # Keep relevant columns for output
+    tb_pip = tb_pip[["country", "year", "mean_survey", "mean_filled", "gini_survey", "gini_filled"]]
+
+    return tb_pip
+
+
+def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
+    """
+    Add Gini coefficients from Van Zanden et al. (2014) to the PIP data table for historical comparison.
+    """
+
+    # Merge tb_pip with tb_van_zanden on country and year
+    tb = pr.merge(
+        tb_pip,
+        tb_van_zanden[["country", "year", "gini"]],
         on=["country", "year"],
         how="outer",
     )
 
-    return tb_pip
+    # Rename gini column to gini_van_zanden
+    tb = tb.rename(columns={"gini": "gini_van_zanden"}, errors="raise")
+
+    return tb
