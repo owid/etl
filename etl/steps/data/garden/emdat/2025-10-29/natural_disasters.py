@@ -736,7 +736,7 @@ def create_cost_variables_adjusted_for_inflation(tb: Table, tb_wdi: Table) -> Ta
     tb = tb.copy()
     tb_gdp = tb_wdi.copy()
 
-    # Selecte and rename GDP columns for convenience.
+    # Select and rename GDP columns for convenience.
     tb_gdp = tb_gdp[["country", "year", "ny_gdp_defl_zs_ad"]].rename(
         columns={"ny_gdp_defl_zs_ad": "gdp_deflator"}, errors="raise"
     )
