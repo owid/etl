@@ -7,7 +7,6 @@ from owid.catalog import Table, utils
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Initialize log.
@@ -175,6 +174,17 @@ SUM_AGGREGATES = [
     "Wind and solar - mtCO2",
 ]
 
+# Regions for which aggregates will be created.
+REGIONS = {
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    "European Union (27)": {},
+}
+
 
 def sanity_check_inputs(tb_global: Table, tb_europe: Table) -> None:
     assert set(tb_global.columns) == set(tb_europe.columns), "Columns in global and European data have changed."
@@ -197,13 +207,9 @@ def prepare_input_data(tb: Table) -> Table:
         tb[field] = [value.capitalize().replace("Co2", "CO2") for value in tb[field]]
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        warn_on_missing_countries=True,
-        # For debugging, set it to True (the only unused country in global data should be "Türkiye", which is only used in European data).
-        warn_on_unused_countries=False,
-    )
+    # For debugging, set warn_on_unused_countries to True
+    # (the only unused country in global data should be "Türkiye", which is only used in European data).
+    tb = paths.regions.harmonize_names(tb=tb, warn_on_missing_countries=True, warn_on_unused_countries=False)
 
     return tb
 
@@ -356,7 +362,7 @@ def make_table_electricity_generation(tb: Table) -> Table:
             if value_column not in table.columns:
                 raise ValueError(f"Column {value_column} not found.")
             # Select only regions.
-            select_regions = table["country"].isin(list(geo.REGIONS))
+            select_regions = table["country"].isin(list(REGIONS))
             table.loc[select_regions, column] = table[value_column] / table["Total generation - TWh"] * 100
 
     return table
@@ -552,7 +558,7 @@ def run() -> None:
     for table_name in tables:
         latest_year = tables[table_name].reset_index()["year"].max()
         for column in tables[table_name].columns:
-            for region in geo.REGIONS:
+            for region in REGIONS:
                 tables[table_name].loc[(region, latest_year), column] = None
 
     # Similarly, data prior to 2000 exists only for European countries.
@@ -577,7 +583,7 @@ def run() -> None:
     for table_name in tables:
         for column in tables[table_name].columns:
             tables[table_name].loc[
-                (tables[table_name].index.get_level_values(0).isin(geo.REGIONS))
+                (tables[table_name].index.get_level_values(0).isin(REGIONS))
                 & (tables[table_name].index.get_level_values(1) < 2000),
                 :,
             ] = None
