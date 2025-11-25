@@ -1,6 +1,9 @@
-"""Generate documentation files dynamically"""
+#!/usr/bin/env python
+"""Generate documentation files dynamically (standalone version for Zensical)
 
-import mkdocs_gen_files
+This script generates dynamic markdown files that were previously generated
+by mkdocs-gen-files plugin. Run this before building docs with Zensical.
+"""
 
 from etl.docs import (
     render_collection,
@@ -11,11 +14,15 @@ from etl.docs import (
     render_origin,
     render_table,
 )
-from etl.paths import BASE_DIR, LIB_DIR
+from etl.paths import BASE_DIR
+
+# Base directory for generated docs
+DOCS_DIR = BASE_DIR / "docs"
 
 header_metadata = """---
 tags:
   - Metadata
+icon: material/api
 ---
 
 # Metadata reference
@@ -34,65 +41,23 @@ tags:
 # METADATA
 ############################################################
 
-# Combined reference (BEING used now)
-with mkdocs_gen_files.open("architecture/metadata/reference/index.md", "w") as f:
+
+def generate_metadata_reference():
+    """Generate combined metadata reference"""
+    output_path = DOCS_DIR / "architecture/metadata/reference/index.md"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
     text_origin = render_origin(level=2)
     text_dataset = render_dataset(level=2)
     text_table = render_table(level=2)
     text_indicator = render_indicator(level=2)
     text = header_metadata + text_indicator + text_origin + text_table + text_dataset
-    print(text, file=f)
 
-# # Origin reference
-# with mkdocs_gen_files.open("architecture/metadata/reference/origin.md", "w") as f:
-#     text_origin = header_metadata + render_origin()
-#     print(text_origin, file=f)
+    with open(output_path, "w") as f:
+        f.write(text)
 
-# # Dataset reference
-# with mkdocs_gen_files.open("architecture/metadata/reference/dataset.md", "w") as f:
-#     text_dataset = header_metadata + render_dataset()
-#     print(text_dataset, file=f)
+    print(f"✓ Generated {output_path.relative_to(BASE_DIR)}")
 
-# # Tables reference
-# with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as f:
-#     text_table = header_metadata + render_table()
-#     print(text_table, file=f)
-
-# # Indicator reference
-# with mkdocs_gen_files.open("architecture/metadata/reference/indicator.md", "w") as f:
-#     text_indicator = header_metadata + render_indicator()
-#     print(text_indicator, file=f)
-
-
-############################################################
-# owid-catalog
-############################################################
-# Load index.md and concatenate with catalog README.md
-with open(BASE_DIR / "docs/api/index.md", "r") as f2:
-    docs_api = f2.readlines()
-
-with open(LIB_DIR / "catalog/README.md", "r") as f2:
-    docs_catalog = f2.readlines()
-
-docs_catalog1 = "    ".join(docs_catalog)
-# docs_catalog = "".join(docs_catalog)
-docs_api = "".join(docs_api)
-
-docs_api = ""
-docs = """
-{docs_api}
-
-
-{docs_catalog}
-""".format(docs_catalog=f"    {docs_catalog1}", docs_api=docs_api)
-
-# docs = """
-# {docs_catalog}
-# """.format(docs_catalog=f"    {docs_catalog}")
-
-# Dynamically create the API documentation
-with mkdocs_gen_files.open("api/example-usage.md", "w") as f:
-    print(docs_catalog, file=f)
 
 ############################################################
 # COLLECTIONS (MULTIDIM)
@@ -103,6 +68,7 @@ tags:
   - Collections
   - Multidim
   - Explorers
+icon: material/api
 ---
 
 # Collections reference
@@ -122,10 +88,39 @@ Multi-dimensional collections (MDIMs) are interactive data explorers that allow 
 
 """
 
-# Combined collections reference
-with mkdocs_gen_files.open("architecture/metadata/reference/collections.md", "w") as f:
+
+def generate_collections_reference():
+    """Generate collections reference"""
+    output_path = DOCS_DIR / "architecture/metadata/reference/collections.md"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
     text_collection = render_collection(level=2)
     text_view_config = render_collection_view_config(level=2)
     text_view_metadata = render_collection_view_metadata(level=2)
     text = header_collections + text_collection + text_view_config + text_view_metadata
-    print(text, file=f)
+
+    with open(output_path, "w") as f:
+        f.write(text)
+
+    print(f"✓ Generated {output_path.relative_to(BASE_DIR)}")
+
+
+############################################################
+# MAIN
+############################################################
+
+
+def main():
+    """Generate all dynamic documentation files"""
+    print("Generating dynamic documentation files...")
+    print()
+
+    generate_metadata_reference()
+    generate_collections_reference()
+
+    print()
+    print("✓ All dynamic documentation files generated successfully!")
+
+
+if __name__ == "__main__":
+    main()

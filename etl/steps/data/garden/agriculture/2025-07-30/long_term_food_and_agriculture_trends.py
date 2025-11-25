@@ -1,8 +1,8 @@
-"""This dataset creates region aggregates for important indicators on food and agriculture, corrected for two issues:
+"""This dataset creates region aggregates for important indicators on food and agriculture, adjusted for two issues:
 (1) changes in historical regions, and
 (2) changes in data coverage.
 
-These corrected regions let us visualize long-term trends without having abrupt jumps due to, e.g. the USSR dissolution, or countries being added to the data on arbitrary years.
+These adjusted regions let us visualize long-term trends without having abrupt jumps due to, e.g. the USSR dissolution, or countries being added to the data on arbitrary years.
 
 """
 
@@ -113,7 +113,7 @@ OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
 ]
 
 
-def create_corrected_lists_of_region_members(tb, tb_regions):
+def create_adjusted_lists_of_region_members(tb, tb_regions):
     # List countries in different OWID regions.
     regions = {
         region: sorted(
@@ -137,46 +137,46 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
     # Add USSR successor countries in Asia.
     regions["USSR Asia"] = sorted(set(regions["USSR"]) & set(regions["Asia"]))
 
-    # Create a list of countries that will be assigned to "Europe (corrected)".
+    # Create a list of countries that will be assigned to "Europe (adjusted)".
     # For now, add all European countries, plus USSR Asia successors.
     # NOTE: To be able to replicate FAO's Europe data, we need to add 'Belgium-Luxembourg (FAO)'.
     regions["Europe"] = sorted(set(regions["Europe"]) | set(["Belgium-Luxembourg (FAO)"]))
-    regions["Europe (corrected)"] = sorted(set(regions["Europe"]) | set(regions["USSR Asia"]))
+    regions["Europe (adjusted)"] = sorted(set(regions["Europe"]) | set(regions["USSR Asia"]))
     ####################################################################################################################
     # We noticed that agricultural land area doesn't seem to include Turkmenistan prior to 1992.
     # This can be noticed by plotting the USSR land area before and after 1992 (the later being the sum of USSR successors). When Turkmenistan is included, there is a jump of an additional ~33M ha.
     # In terms of food supply, however, it's unclear; it seems likely that Turkmenistan is indeed included.
     # So, there is no perfect solution. But it seems that the sudden increase in land use has a larger effect in Europe and the sudden decrease in food supply.
-    # So we will remove Turkmenistan from the corrected Europe.
+    # So we will remove Turkmenistan from the adjusted Europe.
     # NOTE: Consider revisiting this.
     # As a visual check, see the effect in the USSR of removing Turkmenistan.
-    # tb_ussr_corrected = tb[(tb["country"].isin(sorted(set(regions["USSR"]) - set(["Turkmenistan"]))))].drop(columns="country").groupby("year", as_index=False).sum().assign(**{"country": "USSR (corrected)"})
+    # tb_ussr_adjusted = tb[(tb["country"].isin(sorted(set(regions["USSR"]) - set(["Turkmenistan"]))))].drop(columns="country").groupby("year", as_index=False).sum().assign(**{"country": "USSR (adjusted)"})
     # tb_ussr = tb[(tb["country"] == "USSR")].reset_index(drop=True)
     # for column in ["population", "agricultural_land", "food_supply"]:
-    #     px.line(pr.concat([tb_ussr, tb_ussr_corrected], ignore_index=True), x="year", y=column, markers=True, color="country", range_y=[0, None]).show()
-    regions["Europe (corrected)"] = sorted(set(regions["Europe (corrected)"]) - set(["Turkmenistan"]))
+    #     px.line(pr.concat([tb_ussr, tb_ussr_adjusted], ignore_index=True), x="year", y=column, markers=True, color="country", range_y=[0, None]).show()
+    regions["Europe (adjusted)"] = sorted(set(regions["Europe (adjusted)"]) - set(["Turkmenistan"]))
 
-    # For "Asia (corrected)", add all Asian countries, and remove USSR Asia successors (which are kept in Europe).
+    # For "Asia (adjusted)", add all Asian countries, and remove USSR Asia successors (which are kept in Europe).
     # NOTE: The issue with Turkmenistan mentioned above is irrelevant here, since we remove all USSR Asian successors anyway.
     # Additional issues in FBS: in 2010, data for Brunei is removed (unclear why), and data for Syria is added. Overall, this causes a small increase in Asia's population. Then, in 2019 (unclear why precisely this year), 3 countries are added to the data, namely Bahrain, Qatar, and Bhutan; but this jump is not significant (as they don't make a significant fraction of the Asian population).
-    regions["Asia (corrected)"] = sorted(
+    regions["Asia (adjusted)"] = sorted(
         set(regions["Asia"])
         - set(regions["USSR Asia"])
         - set(["Bahrain", "Bhutan", "Brunei", "North Korea", "Oman", "Qatar", "Syria"])
     )
 
-    # For "Oceania (corrected", remove all countries that are added after 2010 (namely Papua New Guinea, and other small islands that are added in 2019 to food supply data).
+    # For "Oceania (adjusted)", remove all countries that are added after 2010 (namely Papua New Guinea, and other small islands that are added in 2019 to food supply data).
     assert tb[tb["country"].isin(["Papua New Guinea"])]["year"].min() == 2010
     assert (
         tb[tb["country"].isin(["Marshall Islands", "Micronesia (country)", "Nauru", "Tonga", "Tuvalu"])]["year"].min()
         == 2019
     )
-    regions["Oceania (corrected)"] = sorted(
+    regions["Oceania (adjusted)"] = sorted(
         set(regions["Oceania"])
         - set(["Marshall Islands", "Micronesia (country)", "Nauru", "Papua New Guinea", "Tonga", "Tuvalu"])
     )
 
-    # For "Africa (corrected)":
+    # For "Africa (adjusted)":
     # - From 2009 to 2010, we gain data for Burundi, Comoros, Democratic Republic of Congo, Libya, Seychelles, and Somalia. These countries didn't have data in FBSH, but do have in FBS.
     # - In 2011, data for Sudan (former) ends, but in 2012 we only have data for Sudan (referring to North Sudan). Unfortunately, data for South Sudan in FBS starts in 2019 (hence we are missing data for South Sudan between 2012 and 2018). This causes an abrupt decrease during those years.
     assert (
@@ -188,7 +188,7 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
     assert tb[tb["country"] == "Sudan (former)"]["year"].max() == 2011
     assert tb[tb["country"] == "Sudan"]["year"].min() == 2012
     assert tb[tb["country"] == "South Sudan"]["year"].min() == 2019
-    regions["Africa (corrected)"] = sorted(
+    regions["Africa (adjusted)"] = sorted(
         set(regions["Africa"])
         - set(
             [
@@ -207,11 +207,11 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
         )
     )
 
-    # For "North America (corrected)":
-    regions["North America (corrected)"] = sorted(set(regions["North America"]) - {"Bermuda", "Netherlands Antilles"})
+    # For "North America (adjusted)":
+    regions["North America (adjusted)"] = sorted(set(regions["North America"]) - {"Bermuda", "Netherlands Antilles"})
 
-    # South America doesn't need any corrections, but we include it here for convenience.
-    regions["South America (corrected)"] = regions["South America"]
+    # South America doesn't need any adjustments, but we include it here for convenience.
+    regions["South America (adjusted)"] = regions["South America"]
 
     # For each of the defined regions, remove countries that are not included in the data.
     countries_informed = set(tb["country"])
@@ -250,7 +250,7 @@ def sanity_check_data_coverage(tb, regions):
         "Sudan": (2012, max_year),
         # NOTE: One would expect South Sudan to start in 2012, but it starts in 2019.
         # Changes in historical regions in North America.
-        # NOTE: Successors of Netherlands Antilles are not informed in the data, hence we exclude it from North America (corrected).
+        # NOTE: Successors of Netherlands Antilles are not informed in the data, hence we exclude it from North America (adjusted).
         "Netherlands Antilles": (min_year, 2009),
         # Changes in data coverage in Africa.
         "Seychelles": (2010, max_year),
@@ -389,13 +389,13 @@ def additional_debugging_checks():
     return tb_fbsc
 
 
-def plot_corrected_data(tb):
+def plot_adjusted_data(tb):
     import plotly.express as px
 
     for region in sorted(REGIONS):
-        regions_to_plot = [f"{region} (FAO)", f"{region} (corrected)"]
+        regions_to_plot = [f"{region} (FAO)", f"{region} (adjusted)"]
         # Uncomment to plot the OWID region (it shouldn't be significantly different to FAO's region).
-        # regions_to_plot = [region, f"{region} (FAO)", f"{region} (corrected)"]
+        # regions_to_plot = [region, f"{region} (FAO)", f"{region} (adjusted)"]
         for column in ["agricultural_land", "food_supply", "population"]:
             unit = {"food_supply": "daily kilocalories", "population": "people", "agricultural_land": "hectares"}[
                 column
@@ -412,7 +412,7 @@ def plot_corrected_data(tb):
                     color_discrete_map={
                         f"{region} (FAO)": "blue",
                         f"{region}": "red",
-                        f"{region} (corrected)": "green",
+                        f"{region} (adjusted)": "green",
                     },
                     # NOTE: If the upper limit is set to None, when exporting, the png doesn't respect the limits.
                     range_y=[0, _tb[column].max() * 1.05],
@@ -421,7 +421,7 @@ def plot_corrected_data(tb):
 
                 # Uncomment to export as png (after doing "uv add kaleido").
                 # from pathlib import Path
-                # fig.write_image(Path.home() / "Downloads" / "plots_corrected" / f"{region}_{column}.png", scale=2)
+                # fig.write_image(Path.home() / "Downloads" / "plots_adjusted" / f"{region}_{column}.png", scale=2)
 
 
 def run() -> None:
@@ -450,7 +450,7 @@ def run() -> None:
     # Uncomment the following line to replace the loaded FBSC dataset from garden, and instead load the original FBSH and FBS datasets from meadow. This ensures that the results are not affected by any further processing in the FAOSTAT garden step.
     # tb_fbsc = additional_debugging_checks()
 
-    # Correct units of population data.
+    # Adjust units of population data.
     tb_fbsc["population"] *= 1000
 
     # Select and rename columns in land use data.
@@ -483,26 +483,26 @@ def run() -> None:
     )
     tb = pr.concat([tb, tb_north_america_fao], ignore_index=True)
 
-    # Create corrected lists of region members.
+    # Create adjusted lists of region members.
     # Before, we ensured that data coverage is the same for food supply and land use.
     # However, we still have the problem that the series may have abrupt jumps, due to changes in historical regions, and also due to countries being removed or added to the data at different times.
     # Here we fix some of those issues.
-    regions = create_corrected_lists_of_region_members(tb=tb, tb_regions=tb_regions)
+    regions = create_adjusted_lists_of_region_members(tb=tb, tb_regions=tb_regions)
 
     sanity_check_data_coverage(tb=tb, regions=regions)
 
-    # Add new definitions of continents, corrected for changes in historical regions and changes in data coverage.
-    tables_corrected = [
-        tb[tb["country"].isin(regions[f"{region} (corrected)"])]
+    # Add new definitions of continents, adjusted for changes in historical regions and changes in data coverage.
+    tables_adjusted = [
+        tb[tb["country"].isin(regions[f"{region} (adjusted)"])]
         .groupby("year", as_index=False)
         .agg({"food_supply": "sum", "population": "sum", "agricultural_land": "sum"})
-        .assign(**{"country": f"{region} (corrected)"})
+        .assign(**{"country": f"{region} (adjusted)"})
         for region in REGIONS
     ]
-    tb = pr.concat([tb] + tables_corrected, ignore_index=True)
+    tb = pr.concat([tb] + tables_adjusted, ignore_index=True)
 
     # Sanity check.
-    countries_in_regions = set(sum([list(regions[region]) for region in regions if "(corrected)" in region], []))
+    countries_in_regions = set(sum([list(regions[region]) for region in regions if "(adjusted)" in region], []))
     other_countries_excluded_from_aggregates = [
         country
         for country in sorted(countries_original - countries_in_regions - COUNTRIES_EXPECTED_TO_MISS_DATA)
@@ -515,7 +515,7 @@ def run() -> None:
     assert set(other_countries_excluded_from_aggregates) - set(OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES) == set(), error
 
     # Uncomment to visually inspect all changes.
-    # plot_corrected_data(tb=tb)
+    # plot_adjusted_data(tb=tb)
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)

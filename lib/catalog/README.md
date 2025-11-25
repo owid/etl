@@ -87,6 +87,9 @@ make watch
 
 ## Changelog
 
+<details>
+<summary>Click to expand changelog</summary>
+
 - `v0.4.3`
     - Fixed minor bugs
 - `v0.4.0`
@@ -178,3 +181,5 @@ make watch
     - Add support for Python 3.8
 - `v0.1.0`
     - Initial release, including searching and fetching data from a remote catalog
+
+</details>
