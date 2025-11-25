@@ -34,7 +34,7 @@ from etl.docs import (
     render_origin,
     render_table,
 )
-from etl.files import ruamel_dump, ruamel_load
+from etl.files import ruamel_dump
 from etl.paths import BASE_DIR, DOCS_DIR
 
 logfire.configure(token=LOGFIRE_TOKEN_EXPERT)
