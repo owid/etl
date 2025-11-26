@@ -196,9 +196,18 @@ def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any])
     return "\n".join(lines)
 
 
-def extract_params_from_example(example_value: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract request parameters from response example (infer from query field)."""
+def extract_params_from_example(example_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract request parameters from example data.
+
+    First checks for x-request-params field, then falls back to inferring from response value.
+    """
+    # Check if x-request-params is specified
+    if "x-request-params" in example_data:
+        return example_data["x-request-params"]
+
+    # Fall back to inferring from response value
     params = {}
+    example_value = example_data.get("value", {})
     if "query" in example_value:
         params["q"] = example_value["query"]
     # Add other common params if they can be inferred
@@ -323,7 +332,7 @@ def render_endpoint(
                                 lines.append("")
 
                                 # Add request URL for this example
-                                example_params = extract_params_from_example(example_data.get("value", {}))
+                                example_params = extract_params_from_example(example_data)
                                 if base_url and example_params:
                                     request_url = build_request_url(base_url, path, example_params)
                                     lines.append(f"        **Request:** `GET {request_url}`")
@@ -388,7 +397,7 @@ def render_endpoint(
                                 lines.append("")
 
                                 # Add request URL
-                                example_params = extract_params_from_example(example_data.get("value", {}))
+                                example_params = extract_params_from_example(example_data)
                                 if base_url and example_params:
                                     request_url = build_request_url(base_url, path, example_params)
                                     lines.append(f"    **Request:** `GET {request_url}`")
