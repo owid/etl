@@ -20,6 +20,20 @@ from etl.git_api_helpers import GithubApiRepo
 from .openapi_to_markdown import generate_markdown
 
 
+def load_openapi_spec_from_file(file_path: str) -> Dict[str, Any]:
+    """Load OpenAPI specification from a local YAML file.
+
+    Use this one for testing.
+
+    Args:
+        file_path: Path to the OpenAPI spec file
+    Returns:
+        Parsed OpenAPI specification
+    """
+    with open(file_path, "r") as f:
+        return yaml.safe_load(f)  # type: ignore[return-value]
+
+
 def load_openapi_spec_from_github(
     org: str = "owid",
     repo: str = "owid-grapher",
@@ -52,6 +66,7 @@ def main():
     spec = load_openapi_spec_from_github(
         org="owid", repo="owid-grapher", file_path="functions/search-api.openapi.yaml", branch="master"
     )
+    # spec = load_openapi_spec_from_file("/home/x/repos/owid-grapher/functions/search-api.openapi.yaml")
 
     print("Generating markdown documentation...")
     markdown = generate_markdown(spec)
