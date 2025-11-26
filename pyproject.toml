@@ -78,6 +78,7 @@ dependencies = [
     "codespell>=2.4.1",
     "zensical>=0.0.7",
     "pandas-gbq>=0.29.2",
+    "tomli>=2.2.1",
 ]
 
 [tool.uv.sources]
