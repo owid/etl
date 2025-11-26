@@ -60,9 +60,9 @@ st.set_page_config(
 
 def search_indicators_api(query: str, limit: int = MAX_RESULTS) -> list[Indicator]:
     """Search indicators using the Search API."""
-    response = requests.post(
+    response = requests.get(
         f"{SEARCH_API_URL}/indicators",
-        json={"query": query, "limit": limit},
+        params={"query": query, "limit": limit},
         timeout=30,
     )
     response.raise_for_status()

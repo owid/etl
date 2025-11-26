@@ -20,7 +20,7 @@ async def semantic_search_indicators(query: str, limit: int = 10) -> List[Dict[s
     """
     # Make HTTP request to the Search API
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        response = await client.post(f"{SEARCH_API_URL}/indicators", json={"query": query, "limit": limit})
+        response = await client.get(f"{SEARCH_API_URL}/indicators", params={"query": query, "limit": limit})
         response.raise_for_status()
         data = response.json()
 

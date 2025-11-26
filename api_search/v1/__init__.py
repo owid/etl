@@ -19,8 +19,8 @@ def health() -> dict:
     return {"status": "ok"}
 
 
-@v1.post("/indicators", response_model=SemanticSearchResponse)
-async def search_indicators_semantic(request: SemanticSearchRequest) -> SemanticSearchResponse:
+@v1.get("/indicators", response_model=SemanticSearchResponse)
+async def search_indicators_semantic(query: str, limit: int = 10) -> SemanticSearchResponse:
     """
     Search for indicators using semantic similarity.
 
@@ -28,7 +28,7 @@ async def search_indicators_semantic(request: SemanticSearchRequest) -> Semantic
     and returns the most relevant results.
     """
     # Perform semantic search using preloaded model
-    raw_results = search_indicators(request.query, request.limit)
+    raw_results = search_indicators(query, limit)
 
     # Convert results to API schema format
     results = []
@@ -46,10 +46,10 @@ async def search_indicators_semantic(request: SemanticSearchRequest) -> Semantic
             )
         )
 
-    return SemanticSearchResponse(results=results, query=request.query, total_results=len(results))
+    return SemanticSearchResponse(results=results, query=query, total_results=len(results))
 
 
-@v1.get("/indicators/info")
+@v1.get("/indicators/info", include_in_schema=False)
 async def get_semantic_search_info():
     """Get information about the semantic search model status."""
     return get_model_info()

@@ -171,11 +171,11 @@ version-tracker: .venv
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
-	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
+	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0 --reload-exclude '.cache/*'
 
 api-search: .venv
 	@echo '==> Starting Search API on http://localhost:8084/indicators'
-	.venv/bin/uvicorn api_search.main:app --reload --port 8084 --host 0.0.0.0
+	.venv/bin/uvicorn api_search.main:app --reload --port 8084 --host 0.0.0.0 --reload-exclude '.cache/*'
 
 fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'
