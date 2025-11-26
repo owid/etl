@@ -13,7 +13,7 @@ Follow the instructions at the Reproducibility package (https://reproducibility.
     After these steps, you will find the file `pip_2021_projections_202505.dta` in the data/02_processed/ folder.
 
     Copy that file to this folder and run the script:
-    python snapshots/wb/{version}/poverty_projections.py --path-to-file snapshots/wb/{version}/pip_2021_projections_202505.dta
+    etls wb/{version}/poverty_projections --path-to-file snapshots/wb/{version}/pip_2021_projections_202505.dta
 
 """
 

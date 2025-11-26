@@ -14,7 +14,7 @@ The data needs to be uploaded manually following these steps:
     10. Click on "Save".
     11. Copy the downloaded file to this folder.
     12. Run the script:
-        python snapshots/statfin/{version}/share_wealth.py --path-to-file {path_to_file}
+        etls statfin/{version}/share_wealth --path-to-file {path_to_file}
     13. Delete the downloaded file.
 """
 
