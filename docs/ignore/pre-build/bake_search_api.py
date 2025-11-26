@@ -17,7 +17,7 @@ import yaml
 
 from etl.git_api_helpers import GithubApiRepo
 
-from openapi_to_markdown import generate_markdown
+from .openapi_to_markdown import generate_markdown
 
 
 def load_openapi_spec_from_github(

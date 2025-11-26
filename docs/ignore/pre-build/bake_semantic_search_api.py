@@ -11,13 +11,12 @@ Input: Fetched from https://search.owid.io/openapi.json
 Output: docs/api/semantic-search-api.md
 """
 
-import json
 from pathlib import Path
 from typing import Any, Dict
 
 import requests
 
-from openapi_to_markdown import generate_markdown
+from .openapi_to_markdown import generate_markdown
 
 
 def load_openapi_spec_from_url(url: str = "https://search.owid.io/openapi.json") -> Dict[str, Any]:

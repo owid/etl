@@ -444,7 +444,7 @@ def render_schema(schema_name: str, schema: Dict[str, Any], components: Dict[str
     return "\n".join(lines)
 
 
-def generate_markdown(spec: Dict[str, Any], interactive_docs_url: str = None) -> str:
+def generate_markdown(spec: Dict[str, Any], interactive_docs_url: str | None = None) -> str:
     """Generate complete markdown documentation from OpenAPI spec.
 
     Args:

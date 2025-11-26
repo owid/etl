@@ -44,8 +44,8 @@ docs.pre: .venv
 	@.venv/bin/python docs/ignore/pre-build/bake_catalog_api.py
 	@echo '==> Generating dynamic documentation files'
 	@.venv/bin/python docs/ignore/pre-build/bake_metadata_reference.py
-	@.venv/bin/python docs/ignore/pre-build/bake_search_api.py
-	@.venv/bin/python docs/ignore/pre-build/bake_semantic_search_api.py
+	@.venv/bin/python -m docs.ignore.pre-build.bake_search_api
+	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
 
 docs.post: .venv
 	@echo '==> Converting Jupyter Notebooks to HTML'

@@ -4,7 +4,6 @@ from fastapi import APIRouter
 from api_search.semantic_search import get_model_info, search_indicators
 
 from .schemas import (
-    SemanticSearchRequest,
     SemanticSearchResponse,
     SemanticSearchResult,
 )
