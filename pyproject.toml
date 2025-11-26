@@ -190,7 +190,6 @@ exclude = [
     ".cache/",
     "etl/steps",
     "snapshots/",
-    "docs/ignore/pre-build/",
 ]
 
 [tool.pytest.ini_options]
