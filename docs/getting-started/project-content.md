@@ -17,7 +17,7 @@ You don't need to understand all of them to get started, but as you work more wi
 | `apps/`    | Apps built around and for ETL management. Some include `wizard`, `backport`, `fasttrack`, etc. |
 | `dag/`    | Contains the dataset dependencies. That is, if `dataset A` needs `dataset B` to be up to date, this should be listed here. |
 | `data/`    | When you run the recipe code for a dataset, the dataset will be created under this directory. Note that not all the content from this directory is added to git. |
-| `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
+| `docs/`, `.readthedocs.yaml`    | Project documentation config files and directory. |
 | `etl/`       | This is home to our ETL library. This is where all the recipes to generate our datasets live. |
 | `export/`    | Similar to `data/` but for `export` steps. |
 | `lib/`    | Other OWID sub-packages. |

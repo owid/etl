@@ -7,6 +7,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import tomli as tomllib  # Use tomlib once we deprecate python 3.10
 import yaml
 from pydantic_ai import Agent
 
@@ -34,7 +35,7 @@ from etl.docs import (
     render_origin,
     render_table,
 )
-from etl.files import ruamel_dump, ruamel_load
+from etl.files import ruamel_dump
 from etl.paths import BASE_DIR, DOCS_DIR
 
 logfire.configure(token=LOGFIRE_TOKEN_EXPERT)
@@ -73,11 +74,11 @@ def cached_analytics_docs():
 ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
-p = BASE_DIR / "mkdocs.yml"
-with p.open("r") as f:
-    DOCS_INDEX = ruamel_load(f)
-DOCS_INDEX = dict(DOCS_INDEX)
 
+
+p = BASE_DIR / "zensical.toml"
+with p.open("rb") as f:  # Note: tomllib requires binary mode
+    ZENSICAL_CONFIG = tomllib.load(f)
 #######################################################
 # MCPs
 #######################################################
@@ -274,7 +275,8 @@ async def get_docs_index() -> str:
     #     message_type="markdown",
     #     text="**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`",
     # )
-    docs = ruamel_dump(DOCS_INDEX["nav"])
+    navigation = ZENSICAL_CONFIG["project"]["nav"]
+    docs = ruamel_dump(navigation)
     return docs
 
 
