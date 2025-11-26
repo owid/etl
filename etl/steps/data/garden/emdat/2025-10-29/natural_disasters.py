@@ -1,4 +1,7 @@
-"""Process and harmonize EM-DAT natural disasters dataset."""
+"""Process and harmonize EM-DAT natural disasters dataset.
+
+NOTE: Some of the processing is related to inflation adjustments, which we decided to not use in the end. See further comments on this topic below.
+"""
 
 import datetime
 from typing import Any, Dict, List, Tuple
@@ -1010,8 +1013,16 @@ def run() -> None:
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
 
+    ####################################################################################################################
+    # After some internal discussion (see https://owid.slack.com/archives/C094QM38BGQ/p1761817309853539 ), we decided to include variables adjusted for inflation, but not use them in charts or the explorer.
+    # EM-DAT provides variables adjusted for inflation using the US CPI for all countries.
+    # We thought that a more appropriate adjustment would be to use the GDP deflator.
+    # The results of both methods are very different, especially for some countries. In fact, for countries with instances of hyperinflation (like Belarus and Zimbabwe), the inflation adjustments lead to unrealistically high economic damages. Those cases would need to be handled separately.
+    # So, at least for now, we decided to not use the inflation-adjusted variables (neither those from EM-DAT not our own). Instead, we do show some of the cost variables as a percentage of GDP, which is a meaningful metric, and avoids some of those issues.
+
     # Add cost variables adjusted for inflation (using the GDP deflator).
     tb = create_cost_variables_adjusted_for_inflation(tb=tb, tb_wdi=tb_wdi)
+    ####################################################################################################################
 
     # Add a new category (or "type") corresponding to the total of all natural disasters.
     tb = create_a_new_type_for_all_disasters_combined(tb=tb)
