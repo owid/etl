@@ -21,7 +21,11 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
+    tb = tb.drop(columns="month")
+    # Get all columns except country and year
 
+    cols = [col for col in tb.columns if col not in ["country", "year"]]
+    tb[cols] = tb[cols].astype(float) * 1000
     # Improve table format.
     tb = tb.format(["country", "year"])
 
