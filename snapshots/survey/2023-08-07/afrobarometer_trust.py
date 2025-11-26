@@ -10,7 +10,7 @@ INSTRUCTIONS
         3. Runafrobarometer_trust.do in Stata. If it fails, check the name of the dta file in the first line of the code.
         4. The code generates a csv file called afrobarometer_trust.csv. Copy this file to the snapshots/ess/{version} directory.
         5. Add snapshot. The command is:
-                python snapshots/survey/{version}/afrobarometer_trust.py --path-to-file snapshots/survey/{version}/afrobarometer_trust.csv
+                etls survey/{version}/afrobarometer_trust --path-to-file snapshots/survey/{version}/afrobarometer_trust.csv
         6. Delete csv file (and sav file)
         7. Run `etl afrobarometer_trust`
 

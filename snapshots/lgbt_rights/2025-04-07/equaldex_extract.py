@@ -12,9 +12,9 @@ EQUALDEX_KEY="your_api_key"
 You can obtain your API key by registering at https://www.equaldex.com/ and then copying it from your account settings: https://www.equaldex.com/settings
 
 After running this script, add the long.csv and the current.csv file to snapshots (change the date in the path for future updates):
-    python snapshots/lgbt_rights/2025-04-07/equaldex.py --path-to-file snapshots/lgbt_rights/2025-04-07/long.csv
-    python snapshots/lgbt_rights/2025-04-07/equaldex_current.py --path-to-file snapshots/lgbt_rights/2025-04-07/current.csv
-    python snapshots/lgbt_rights/2025-04-07/equaldex_indices.py --path-to-file snapshots/lgbt_rights/2025-04-07/indices.csv
+    etls lgbt_rights/2025-04-07/equaldex --path-to-file snapshots/lgbt_rights/2025-04-07/long.csv
+    etls lgbt_rights/2025-04-07/equaldex_current --path-to-file snapshots/lgbt_rights/2025-04-07/current.csv
+    etls lgbt_rights/2025-04-07/equaldex_indices --path-to-file snapshots/lgbt_rights/2025-04-07/indices.csv
 
 """
 
