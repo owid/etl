@@ -1,22 +1,35 @@
+from contextlib import asynccontextmanager
+
 import logfire
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
-from api.v1 import v1
+from api_search.semantic_search import initialize_semantic_search_async
+from api_search.v1 import v1
 from etl import config
-from etl.db import get_engine
 
 log = structlog.get_logger()
 
 config.enable_sentry()
 
-engine = get_engine()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize semantic search on API startup."""
+    initialize_semantic_search_async()
+    yield
 
 
 def get_application():
-    _app = FastAPI(title="ETL API")
+    _app = FastAPI(
+        title="OWID Search API",
+        lifespan=lifespan,
+        servers=[
+            {"url": "https://search.owid.io", "description": "Production server"},
+        ],
+    )
 
     _app.add_middleware(
         CORSMiddleware,
@@ -35,8 +48,6 @@ def get_application():
 
 app = get_application()
 
-# NOTE: I tried using subapplications, but they don't propagate errors to middleware
-# see https://github.com/tiangolo/fastapi/discussions/8577 (even the latest versions didn't help)
 app.include_router(v1)
 
 if config.LOGFIRE_TOKEN_ETL_API:
