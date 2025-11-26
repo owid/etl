@@ -44,7 +44,7 @@ def main():
     spec = load_openapi_spec_from_url()
 
     print("Generating markdown documentation...")
-    markdown = generate_markdown(spec)
+    markdown = generate_markdown(spec, interactive_docs_url="https://search.owid.io/docs")
 
     print(f"Writing documentation to {output_path}...")
     output_path.write_text(markdown)

@@ -23,7 +23,13 @@ async def lifespan(app: FastAPI):
 
 
 def get_application():
-    _app = FastAPI(title="OWID Search API", lifespan=lifespan)
+    _app = FastAPI(
+        title="OWID Search API",
+        lifespan=lifespan,
+        servers=[
+            {"url": "https://search.owid.io", "description": "Production server"},
+        ],
+    )
 
     _app.add_middleware(
         CORSMiddleware,

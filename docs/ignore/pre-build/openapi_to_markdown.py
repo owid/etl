@@ -444,8 +444,13 @@ def render_schema(schema_name: str, schema: Dict[str, Any], components: Dict[str
     return "\n".join(lines)
 
 
-def generate_markdown(spec: Dict[str, Any]) -> str:
-    """Generate complete markdown documentation from OpenAPI spec."""
+def generate_markdown(spec: Dict[str, Any], interactive_docs_url: str = None) -> str:
+    """Generate complete markdown documentation from OpenAPI spec.
+
+    Args:
+        spec: OpenAPI specification dictionary
+        interactive_docs_url: Optional URL to interactive API documentation (e.g., Swagger UI)
+    """
     lines = []
 
     # Frontmatter for Zensical/MkDocs
@@ -464,6 +469,13 @@ def generate_markdown(spec: Dict[str, Any]) -> str:
         description = info["description"].strip()
         for line in description.split("\n"):
             lines.append(line)
+        lines.append("")
+
+    # Add interactive docs callout if URL provided
+    if interactive_docs_url:
+        lines.append('!!! tip "Try it out"')
+        lines.append("")
+        lines.append(f"    You can try out the API interactively at [{interactive_docs_url}]({interactive_docs_url})")
         lines.append("")
 
     # Key information in a single admonition
