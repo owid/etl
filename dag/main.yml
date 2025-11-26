@@ -719,6 +719,17 @@ steps:
   data://grapher/un/2025-10-29/un_sdg:
     - data://garden/un/2025-10-29/un_sdg
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/ons/2025-11-26/crime_survey:
+    - snapshot://ons/2025-11-26/crime_survey.csv
+  data://garden/ons/2025-11-26/crime_survey:
+    - data://meadow/ons/2025-11-26/crime_survey
+  data://grapher/ons/2025-11-26/crime_survey:
+    - data://garden/ons/2025-11-26/crime_survey
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
