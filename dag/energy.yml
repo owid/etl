@@ -140,6 +140,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://meadow/ember/2025-05-12/yearly_electricity
+    - data://garden/emissions/2025-11-26/emission_factors
   #
   # IRENA - Renewable energy patents.
   #

@@ -521,6 +521,13 @@ def run() -> None:
     tb_global = ds_meadow.read("yearly_electricity__global")
     tb_europe = ds_meadow.read("yearly_electricity__europe")
 
+    # Load emission factors dataset.
+    ds_factors = paths.load_dataset("emission_factors")
+    # Read the electricity emission factors table (to calculate emissions and intensity for gas and coal).
+    tb_electricity_factors = ds_factors.read("electricity_emission_factors")
+    # Read the energy emission factors table (to calculate emissions and intensity for other fossil).
+    tb_energy_factors = ds_factors.read("energy_emission_factors")
+
     #
     # Process data.
     #
@@ -533,6 +540,10 @@ def run() -> None:
 
     # Combine global and European data.
     tb = combine_global_and_europe_data(tb_global=tb_global, tb_europe=tb_europe)
+
+    # TODO: Create a function that checks that the emissions agree with the lifecycle factors (at least a few, maybe not coal and other that are a bit more complicated to calculate and possibly change at the country level).
+    #  Then use the direct emission factors to create data for direct emissions, as well as carbon intensity of direct emissions.
+    #  For that, use the same factor Coal-PC for Coal, Hard coal, and Lignite; then Gas-Combined Cycle for Gas; Residual Fuel Oil for Other fossil; zero for all other sources.
 
     # Split data into different tables, one per category, and process each one individually.
     tables = {
