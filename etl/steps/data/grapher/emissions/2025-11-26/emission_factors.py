@@ -14,13 +14,13 @@ def run() -> None:
     ds_garden = paths.load_dataset("emission_factors")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("emission_factors")
+    tb = ds_garden.read("energy_emission_factors")
 
     #
     # Process data.
     #
     # For compatibility with grapher, add a country and year column.
-    tb = tb.rename(columns={"fuel": "country"}, errors="raise")
+    tb = tb.rename(columns={"source": "country"}, errors="raise")
     tb["year"] = paths.version.split("-")[0]
 
     # Improve table format.
