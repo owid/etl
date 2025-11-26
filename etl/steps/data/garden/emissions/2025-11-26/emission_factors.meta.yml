@@ -1,0 +1,20 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
+
+dataset:
+  update_period_days: 365
+
+tables:
+  emission_factors:
+    variables:
+      emission_factor:
+        title: CO₂ emission factor
+        description_short: Amount of carbon dioxide emissions produced per unit of a specific energy source.
+        unit: kilograms per megawatt-hour
+        short_unit: kg/MWh
+        processing_level: minor
+        description_processing: |-
+          - Data has been converted from kilograms per terajoule (kg/TJ) to kilograms per megawatt-hour (kg/MWh) using a conversion factor of 0.0036.
