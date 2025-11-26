@@ -522,11 +522,11 @@ def run() -> None:
     tb_europe = ds_meadow.read("yearly_electricity__europe")
 
     # Load emission factors dataset.
-    ds_factors = paths.load_dataset("emission_factors")
+    # ds_factors = paths.load_dataset("emission_factors")
     # Read the electricity emission factors table (to calculate emissions and intensity for gas and coal).
-    tb_electricity_factors = ds_factors.read("electricity_emission_factors")
+    # tb_electricity_factors = ds_factors.read("electricity_emission_factors")
     # Read the energy emission factors table (to calculate emissions and intensity for other fossil).
-    tb_energy_factors = ds_factors.read("energy_emission_factors")
+    # tb_energy_factors = ds_factors.read("energy_emission_factors")
 
     #
     # Process data.
