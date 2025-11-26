@@ -640,20 +640,24 @@ if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datase
         # Reset flag
         st.session_state.anomalist_anomalies_out_of_date = False
 
-        with st.spinner("Scanning for anomalies... This can take some time.", show_time=True):
-            anomaly_detection(
-                anomaly_types=ANOMALY_TYPES_TO_DETECT,
-                variable_ids=variable_ids,
-                variable_mapping=st.session_state.anomalist_mapping,
-                dry_run=False,
-                reset_db=False,
-            )
+        try:
+            with st.spinner("Scanning for anomalies... This can take some time.", show_time=True):
+                anomaly_detection(
+                    anomaly_types=ANOMALY_TYPES_TO_DETECT,
+                    variable_ids=variable_ids,
+                    variable_mapping=st.session_state.anomalist_mapping,
+                    dry_run=False,
+                    reset_db=False,
+                )
 
-        # Fill list of anomalies...
-        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
+            # Fill list of anomalies...
+            st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
-        # Reset manual trigger
-        st.session_state.anomalist_trigger_detection = False
+            # Reset manual trigger
+            st.session_state.anomalist_trigger_detection = False
+        except FileNotFoundError as e:
+            st.error(f"**Error loading dataset:** {str(e)}")
+            st.stop()
 
     # 3.3/ Anomalies found in DB. If outdated, set FLAG to True, so we can show a warning later on.
     else:
@@ -742,31 +746,43 @@ if st.session_state.anomalist_df is not None:
                 indicators_without_anomalies = new_indicators - indicators_with_anomalies
 
                 if indicators_without_anomalies:
-                    with st.spinner(
-                        f"Calculating anomalies for {len(indicators_without_anomalies)} new indicator(s)..."
-                    ):
-                        # Run anomaly detection with append for these indicators
-                        anomaly_detection(
-                            anomaly_types=ANOMALY_TYPES_TO_DETECT,
-                            variable_ids=list(indicators_without_anomalies),
-                            variable_mapping=st.session_state.anomalist_mapping,
-                            dry_run=False,
-                            append=True,
-                        )
+                    # Update previous selection BEFORE processing to avoid infinite loop
+                    st.session_state.anomalist_filter_indicators_prev = current_selection
 
-                        # Reload anomalies from DB
-                        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(
-                            st.session_state.anomalist_datasets_selected
-                        )
+                    try:
+                        with st.spinner(
+                            f"Calculating anomalies for {len(indicators_without_anomalies)} new indicator(s)..."
+                        ):
+                            # Run anomaly detection with append for these indicators
+                            anomaly_detection(
+                                anomaly_types=ANOMALY_TYPES_TO_DETECT,
+                                variable_ids=list(indicators_without_anomalies),
+                                variable_mapping=st.session_state.anomalist_mapping,
+                                dry_run=False,
+                                append=True,
+                            )
 
-                        # Reparse into dataframe
-                        if len(st.session_state.anomalist_anomalies) > 0:
-                            df = get_scores(anomalies=st.session_state.anomalist_anomalies)
-                            st.session_state.anomalist_df = df
+                            # Reload anomalies from DB
+                            st.session_state.anomalist_anomalies = WizardDB.load_anomalies(
+                                st.session_state.anomalist_datasets_selected
+                            )
+
+                            # Reparse into dataframe
+                            if len(st.session_state.anomalist_anomalies) > 0:
+                                df = get_scores(anomalies=st.session_state.anomalist_anomalies)
+                                st.session_state.anomalist_df = df
+                                # Update INDICATORS_AVAILABLE before rerunning
+                                INDICATORS_AVAILABLE = st.session_state.anomalist_df["indicator_id"].unique()
                             st.rerun()
-
-            # Update previous selection
-            st.session_state.anomalist_filter_indicators_prev = current_selection
+                    except FileNotFoundError as e:
+                        st.error(f"**Error loading dataset:** {str(e)}")
+                        # Don't stop here, just show the error and continue
+                else:
+                    # All new indicators already have anomalies, just update the tracking
+                    st.session_state.anomalist_filter_indicators_prev = current_selection
+            else:
+                # No new indicators, update tracking anyway to stay in sync
+                st.session_state.anomalist_filter_indicators_prev = current_selection
 
         with col2:
             # Entity

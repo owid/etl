@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl snapshots apps api tests docs owid_mcp
+SRC = etl snapshots apps api api_search tests docs owid_mcp
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -29,6 +29,7 @@ help:
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
 	@echo '  make api   		Start the ETL API on port 8081'
+	@echo '  make api-search   	Start the Search API on port 8084'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
@@ -38,16 +39,24 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
+docs.pre: .venv
+	@echo '==> Fetching external documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_catalog_api.py
+	@echo '==> Generating dynamic documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_metadata_reference.py
+	@.venv/bin/python -m docs.ignore.pre-build.bake_search_api
+	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
+
 docs.post: .venv
-	@echo '==> Post-processing documentation files'
-	.venv/bin/python docs/ignore/convert_notebooks.py
+	@echo '==> Converting Jupyter Notebooks to HTML'
+	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
 
 docs.build: .venv
 	@echo '==> Cleaning previous build'
 	@rm -rf site/ .cache/
 	@mkdir -p .cache
-	@echo '==> Generating dynamic documentation files'
-	@.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
+	@echo '==> Pre-processing documentation files'
+	@$(MAKE) --no-print-directory docs.pre
 	@echo '==> Building documentation with Zensical'
 	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 	@echo '==> Post-processing documentation files'
@@ -55,15 +64,6 @@ docs.build: .venv
 
 docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
-
-
-docs-mkdocs.build: .venv
-	@echo '==> Building documentation with MkDocs'
-	.venv/bin/mkdocs build --clean
-
-docs-mkdocs.serve: .venv
-	@echo '==> Serving documentation with MkDocs'
-	.venv/bin/mkdocs serve
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
@@ -163,7 +163,11 @@ version-tracker: .venv
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
-	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
+	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0 --reload-exclude '.cache/*'
+
+api-search: .venv
+	@echo '==> Starting Search API on http://localhost:8084/indicators'
+	.venv/bin/uvicorn api_search.main:app --reload --port 8084 --host 0.0.0.0 --reload-exclude '.cache/*'
 
 fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'

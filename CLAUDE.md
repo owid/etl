@@ -14,6 +14,7 @@ This file provides guidance to automation agents working with code in this repos
 - **ALWAYS** trace issues upstream through the pipeline: snapshot → meadow → garden → grapher
 - **ALWAYS** provide full error tracebacks - don't truncate diagnostic information
 - **If unsure, ASK THE USER** - don't guess or mask issues
+- **Never** push or commit unless explicitly told to do so
 
 ## Architecture Overview
 
