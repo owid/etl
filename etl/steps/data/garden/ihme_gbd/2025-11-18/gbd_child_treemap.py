@@ -16,8 +16,8 @@ cause_renaming_dict = {
     "Congenital heart anomalies": "Heart abnormalities",
     "Digestive congenital anomalies": "Digestive defects",
     "Fire, heat, and hot substances": "Fire & temperature",
-    "Hemolytic disease and other neonatal jaundice": "Hemolytic disorders",
-    "Invasive Non-typhoidal Salmonella (iNTS)": "Invasive non-typhoidal salmonella",
+    # "Hemolytic disease and other neonatal jaundice": "Hemolytic disorders",
+    # "Invasive Non-typhoidal Salmonella (iNTS)": "Invasive non-typhoidal salmonella",
     "Interpersonal violence": "Homicide",
     "Neonatal encephalopathy due to birth asphyxia and trauma": "Neonatal asphyxia (suffocation) and trauma",
     "Neonatal preterm birth": "Preterm birth",
@@ -45,7 +45,7 @@ broad_cause_dict = {
     "HIV/AIDS": "Infectious diseases",
     "Heart abnormalities": "Birth disorders",
     "Hemolytic disorders": "Birth disorders",
-    "Invasive non-typhoidal salmonella": "Infectious diseases",
+    # "Invasive non-typhoidal salmonella": "Infectious diseases",
     "Malaria": "Infectious diseases",
     "Malnutrition": "Non-communicable diseases",
     "Measles": "Infectious diseases",
@@ -132,7 +132,7 @@ def reaggregate_causes(tb: Table) -> Table:
     tb = pull_out_cause(tb, pull_out_cause="Tuberculosis", aggregate_cause="Respiratory infections and tuberculosis")
     tb = pull_out_cause(
         tb,
-        pull_out_cause=["Diarrheal diseases", "Invasive Non-typhoidal Salmonella (iNTS)"],
+        pull_out_cause=["Diarrheal diseases"],
         aggregate_cause="Enteric infections",
     )
     tb = pull_out_cause(tb, pull_out_cause="Malaria", aggregate_cause="Neglected tropical diseases and malaria")
@@ -188,6 +188,12 @@ def reaggregate_causes(tb: Table) -> Table:
             "Enteric infections excluding Diarrheal diseases excluding Invasive Non-typhoidal Salmonella (iNTS)",
         ],
         new_cause_name="Other infectious diseases",
+    )
+
+    tb = combine_causes(
+        tb=tb,
+        causes_to_combine=["Hemolytic disease and other neonatal jaundice", "Other birth disorders"],
+        new_cause_name="Other birth disorders",
     )
 
     return tb
