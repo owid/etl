@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 from api_search.semantic_search import get_model_info, search_indicators
 
 from .schemas import (
+    INDICATOR_SEARCH_EXAMPLES,
     SemanticSearchResponse,
     SemanticSearchResult,
 )
@@ -18,7 +19,16 @@ def health() -> dict:
     return {"status": "ok"}
 
 
-@v1.get("/indicators", response_model=SemanticSearchResponse)
+@v1.get(
+    "/indicators",
+    response_model=SemanticSearchResponse,
+    responses={
+        200: {
+            "description": "Successful response with search results",
+            "content": {"application/json": {"examples": INDICATOR_SEARCH_EXAMPLES}},
+        }
+    },
+)
 async def search_indicators_semantic(
     query: str = Query(..., description="Search query", examples=["gdp", "population"]),
     limit: int = Query(10, description="Limit the number of results", le=100),
