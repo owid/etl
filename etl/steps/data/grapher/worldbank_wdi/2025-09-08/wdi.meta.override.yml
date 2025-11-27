@@ -1,0 +1,6 @@
+tables:
+  wdi:
+    variables:
+      sl_tlf_cact_zs:
+        description_short: Share of the working-age population (ages 15 and over) who are economically active (employed or
+          unemployed)..
