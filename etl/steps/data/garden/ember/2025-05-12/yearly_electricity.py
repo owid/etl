@@ -308,49 +308,6 @@ def make_table_electricity_demand(tb: Table) -> Table:
     return table
 
 
-def make_table_power_sector_emissions(tb: Table) -> Table:
-    """Create table with processed data of category "Power sector emissions".
-
-    Parameters
-    ----------
-    tb : Table
-        Data in long format for all categories, after harmonizing country names.
-
-    Returns
-    -------
-    table : Table
-        Table of processed data for the given category.
-
-    """
-    # Prepare wide table of emissions data.
-    table = make_wide_table(tb=tb, category="Power sector emissions")
-
-    # Add carbon intensity.
-    # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
-    # the results are consistent with the original data.
-    # Prepare wide table also for electricity generation (required to calculate carbon intensity).
-    electricity = make_wide_table(tb=tb, category="Electricity generation")[
-        ["country", "year", "Total generation - TWh"]
-    ]
-    # Add total electricity generation to emissions table.
-    table = pr.merge(table, electricity, on=["country", "year"], how="left")
-    # Rename the original carbon intensity column as a temporary column called "check".
-    intensity_col = "CO2 intensity - gCO2/kWh"
-    table = table.rename(columns={intensity_col: "check"}, errors="raise")
-    # Calculate carbon intensity for all countries and regions.
-    table[intensity_col] = table["Total emissions - mtCO2"] * MT_TO_G / (table["Total generation - TWh"] * TWH_TO_KWH)
-
-    # Check that the new carbon intensities agree (within 1 % of mean average percentage error, aka mape) with the
-    # original ones (where carbon intensity was given, namely for countries, not aggregate regions).
-    mape = 100 * abs(table.dropna(subset="check")[intensity_col] - table["check"].dropna()) / table["check"].dropna()
-    assert mape.max() < 1, "Calculated carbon intensities differ from original ones by more than 1 percent."
-
-    # Remove temporary column.
-    table = table.drop(columns=["check"], errors="raise")
-
-    return table
-
-
 def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
     """Combine all tables in Ember's Yearly Electricity Data into one table.
 
@@ -371,7 +328,7 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         "electricity_demand": "",
         "electricity_generation": "Generation - ",
         "electricity_imports": "",
-        "power_sector_emissions": "Emissions - ",
+        "lifecycle_emissions": "Emissions - ",
     }
     error = "Tables in yearly electricity dataset have changed"
     assert set(category_renaming) == set(tables), error
@@ -403,17 +360,8 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         errors="raise",
     )
 
-    # Sanity check.
-    error = "Total generation column in emissions and generation tables are not identical."
-    assert all(
-        tb_combined["emissions__total_generation__twh"].fillna(-1)
-        == tb_combined["generation__total_generation__twh"].fillna(-1)
-    ), error
-
     # Remove unnecessary columns and any possible rows with no data.
-    tb_combined = tb_combined.drop(columns=["population", "emissions__total_generation__twh"], errors="raise").dropna(
-        how="all"
-    )
+    tb_combined = tb_combined.drop(columns=["population"], errors="raise").dropna(how="all")
 
     # Set a convenient index and sort rows and columns conveniently.
     tb_combined = tb_combined.format(sort_columns=True)
@@ -731,7 +679,7 @@ def run() -> None:
         "electricity_demand": make_table_electricity_demand(tb=tb),
         "electricity_generation": make_wide_table(tb=tb, category="Electricity generation"),
         "electricity_imports": make_wide_table(tb=tb, category="Electricity imports"),
-        "power_sector_emissions": make_table_power_sector_emissions(tb=tb),
+        "lifecycle_emissions": make_wide_table(tb=tb, category="Power sector emissions"),
     }
 
     for table_name in tables:
