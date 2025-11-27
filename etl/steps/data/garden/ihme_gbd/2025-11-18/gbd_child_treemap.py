@@ -185,15 +185,15 @@ def reaggregate_causes(tb: Table) -> Table:
         causes_to_combine=[
             "Other infectious diseases excluding Pertussis excluding Measles excluding Meningitis",
             "Neglected tropical diseases and malaria excluding Malaria",
-            "Enteric infections excluding Diarrheal diseases excluding Invasive Non-typhoidal Salmonella (iNTS)",
+            "Enteric infections excluding Diarrheal diseases",
         ],
         new_cause_name="Other infectious diseases",
     )
 
     tb = combine_causes(
         tb=tb,
-        causes_to_combine=["Hemolytic disease and other neonatal jaundice", "Other birth disorders"],
-        new_cause_name="Other birth disorders",
+        causes_to_combine=["Hemolytic disease and other neonatal jaundice", "Other neonatal disorders"],
+        new_cause_name="Other neonatal disorders",
     )
 
     return tb
