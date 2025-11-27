@@ -104,75 +104,6 @@ VARIABLES_EUROPE = [
     "Wind",
     "Wind and solar",
 ]
-# Choose columns for which region aggregates should be created.
-SUM_AGGREGATES = [
-    # "Bioenergy - %",
-    "Bioenergy - GW",
-    "Bioenergy - TWh",
-    "Bioenergy - mtCO2",
-    # "CO2 intensity - gCO2/kWh",
-    # "Clean - %",
-    "Clean - GW",
-    "Clean - TWh",
-    "Clean - mtCO2",
-    # "Coal - %",
-    "Coal - GW",
-    "Coal - TWh",
-    "Coal - mtCO2",
-    "Demand - TWh",
-    # "Demand per capita - MWh",
-    # "Fossil - %",
-    "Fossil - GW",
-    "Fossil - TWh",
-    "Fossil - mtCO2",
-    # "Gas - %",
-    "Gas - GW",
-    "Gas - TWh",
-    "Gas - mtCO2",
-    "Gas and other fossil - %",
-    "Gas and other fossil - GW",
-    "Gas and other fossil - TWh",
-    "Gas and other fossil - mtCO2",
-    # "Hydro - %",
-    "Hydro - GW",
-    "Hydro - TWh",
-    "Hydro - mtCO2",
-    "Hydro, bioenergy and other renewables - %",
-    "Hydro, bioenergy and other renewables - GW",
-    "Hydro, bioenergy and other renewables - TWh",
-    "Hydro, bioenergy and other renewables - mtCO2",
-    "Net imports - TWh",
-    # "Nuclear - %",
-    "Nuclear - GW",
-    "Nuclear - TWh",
-    "Nuclear - mtCO2",
-    # "Other Fossil - %",
-    "Other fossil - GW",
-    "Other fossil - TWh",
-    "Other fossil - mtCO2",
-    # "Other Renewables - %",
-    "Other renewables - GW",
-    "Other renewables - TWh",
-    "Other renewables - mtCO2",
-    # "Renewables - %",
-    "Renewables - GW",
-    "Renewables - TWh",
-    "Renewables - mtCO2",
-    # "Solar - %",
-    "Solar - GW",
-    "Solar - TWh",
-    "Solar - mtCO2",
-    "Total generation - TWh",
-    "Total emissions - mtCO2",
-    # "Wind - %",
-    "Wind - GW",
-    "Wind - TWh",
-    "Wind - mtCO2",
-    # "Wind and Solar - %",
-    "Wind and solar - GW",
-    "Wind and solar - TWh",
-    "Wind and solar - mtCO2",
-]
 
 # Regions for which aggregates will be created.
 REGIONS = {
@@ -331,10 +262,6 @@ def make_wide_table(tb: Table, category: str) -> Table:
         Table in wide format.
 
     """
-    # Sanity check.
-    error = "Combinations of variable and unit expected to create aggregates are missing."
-    assert set(SUM_AGGREGATES) < set(tb["variable"] + " - " + tb["unit"]), error
-
     # Select data for given category.
     _tb = tb[tb["category"] == category].copy()
 
@@ -346,41 +273,6 @@ def make_wide_table(tb: Table, category: str) -> Table:
         join_column_levels_with=" - ",
         fill_dimensions=False,
     )
-
-    # Add region aggregates.
-    aggregates = {column: "sum" for column in SUM_AGGREGATES if column in table.columns}
-    table = paths.regions.add_aggregates(tb=table, aggregations=aggregates, ignore_overlaps_of_zeros=True)
-
-    return table
-
-
-def make_table_electricity_generation(tb: Table) -> Table:
-    """Create table with processed data of category "Electricity generation".
-
-    Parameters
-    ----------
-    tb : Table
-        Data in long format for all categories, after harmonizing country names.
-
-    Returns
-    -------
-    table : Table
-        Table of processed data for the given category.
-
-    """
-    # Prepare wide table.
-    table = make_wide_table(tb=tb, category="Electricity generation")
-
-    # Recalculate the share of electricity generates for region aggregates.
-    for column in table.columns:
-        if "%" in column:
-            # Find corresponding column with units instead of percentages.
-            value_column = column.replace("%", "TWh")
-            if value_column not in table.columns:
-                raise ValueError(f"Column {value_column} not found.")
-            # Select only regions.
-            select_regions = table["country"].isin(list(REGIONS))
-            table.loc[select_regions, column] = table[value_column] / table["Total generation - TWh"] * 100
 
     return table
 
@@ -529,6 +421,85 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
     return tb_combined
 
 
+def add_region_aggregates(tb: Table) -> Table:
+    # NOTE: For % variables and carbon intensities, aggregates will be recalculated later.
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        index_columns=["country", "year", "variable", "unit", "category", "subcategory"],
+        ignore_overlaps_of_zeros=True,
+    )
+
+    # Recalculate share variables for regions.
+    # Add a temporary column for the total generation of each country-year.
+    tb = tb.merge(
+        tb[(tb["unit"] == "TWh") & (tb["variable"] == "Total generation")][["country", "year", "value"]].rename(
+            columns={"value": "_total_generation"}
+        ),
+        on=["country", "year"],
+        how="left",
+    )
+    # Add a temporary column for the generation of each country-year-variable.
+    tb = tb.merge(
+        tb[(tb["unit"] == "TWh")][["country", "year", "variable", "value"]].rename(columns={"value": "_generation"}),
+        on=["country", "year", "variable"],
+        how="left",
+    )
+    tb["_percentage"] = 100 * tb["_generation"] / tb["_total_generation"]
+    select_regions_pct = (tb["unit"] == "%") & (tb["country"].isin(REGIONS))
+    tb.loc[select_regions_pct, "value"] = tb.loc[select_regions_pct, "_percentage"]
+
+    # Sanity check.
+    assert (
+        abs(
+            tb[
+                (tb["country"].isin(REGIONS))
+                & (tb["unit"] == "%")
+                & (
+                    tb["variable"].isin(
+                        [
+                            "Bioenergy",
+                            "Hydro",
+                            "Nuclear",
+                            "Solar",
+                            "Wind",
+                            "Gas",
+                            "Coal",
+                            "Other fossil",
+                            "Other renewables",
+                        ]
+                    )
+                )
+            ]
+            .groupby(["country", "year"])
+            .agg({"value": "sum"})["value"]
+            - 100
+        )
+        < 1
+    ).all()
+
+    # Add lifecycle carbon intensity for regions.
+    # Add a temporary column for the total emissions of each country-year.
+    tb = tb.merge(
+        tb[(tb["unit"] == "mtCO2") & (tb["variable"] == "Total emissions")][["country", "year", "value"]].rename(
+            columns={"value": "_total_emissions"}
+        ),
+        on=["country", "year"],
+        how="left",
+    )
+    # Convert mtCO2 / TWh to gCO2/kWh.
+    # X (1e12 gCO2 / 1 mtCO2) * (1 TWh / 1e9) = X * 1e3 gCO2/kWh
+    tb["_intensity"] = 1e3 * tb["_total_emissions"] / tb["_total_generation"]
+    select_regions_intensity = (tb["unit"] == "gCO2/kWh") & (tb["country"].isin(REGIONS))
+    tb.loc[select_regions_intensity, "value"] = tb.loc[select_regions_intensity, "_intensity"]
+
+    # Remove temporary columns.
+    tb = tb.drop(
+        columns=["_total_generation", "_generation", "_percentage", "_total_emissions", "_intensity"], errors="raise"
+    )
+
+    return tb
+
+
 def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # To check we understand how lifecycle emissions are calculated by Ember, I'll calculate the emissions of a few sources, and compare the result with theirs.
     # The emission factor for coal, gas, nuclear and wind, as Ember's methodology explains, are a bit more complicated; they come from different sources and may change at the country level.
@@ -544,7 +515,9 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # The origin of the value of "Other fossil" is unclear.
     # Using the median values. We check that we can reproduce their results reasonably well.
     for source, emission_factor in lifecycle_factors.items():
-        _tb = tb[(tb["unit"] == "TWh") & (tb["variable"] == source)].reset_index(drop=True)
+        _tb = tb[(~tb["country"].isin(REGIONS)) & (tb["unit"] == "TWh") & (tb["variable"] == source)].reset_index(
+            drop=True
+        )
         # Generation is in TWh, and the emission factor is in gCO2e/kWh. To convert to MtCO2:
         # X TWH * (1e9 kWh / 1 TWh) * (1 MtCO2e / 1e12 gCO2e) * gCO2e / kWh = X * 1e-3 MtCO2e
         _tb["value"] *= emission_factor * 1e-3
@@ -686,7 +659,7 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     )
     error = "Failed to reconstruct the original generation of aggregates."
     assert tb_generation[
-        (100 * abs(tb_generation["value"] - tb_generation["value_original"]) / tb_generation["value_original"]) > 0.001
+        (100 * abs(tb_generation["value"] - tb_generation["value_original"]) / tb_generation["value_original"]) > 1
     ].empty, error
     # After this check, we can expect that the aggregates for direct emissions are also well calculated.
 
@@ -743,19 +716,20 @@ def run() -> None:
     # Combine global and European data.
     tb = combine_global_and_europe_data(tb_global=tb_global, tb_europe=tb_europe)
 
+    # Create region aggregates.
+    tb = add_region_aggregates(tb=tb)
+
     # Add emissions and carbon intensity of direct combustion.
     # NOTE: Ember provides only lifecycle emissions and intensities.
     tb = add_emissions_and_carbon_intensity_of_direct_combustion(
         tb=tb, tb_electricity_factors=tb_electricity_factors, tb_energy_factors=tb_energy_factors
     )
 
-    # TODO: Compare intensities of a few countries with those from other data sources.
-
     # Split data into different tables, one per category, and process each one individually.
     tables = {
         "capacity": make_wide_table(tb=tb, category="Capacity"),
         "electricity_demand": make_table_electricity_demand(tb=tb),
-        "electricity_generation": make_table_electricity_generation(tb=tb),
+        "electricity_generation": make_wide_table(tb=tb, category="Electricity generation"),
         "electricity_imports": make_wide_table(tb=tb, category="Electricity imports"),
         "power_sector_emissions": make_table_power_sector_emissions(tb=tb),
     }
