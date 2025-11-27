@@ -4,7 +4,7 @@ Next time this data needs to be updated, the code below needs to be adapted to c
 Command:
 
     FILE_DIR=''
-    python snapshots/un/2024-07-11/un_wpp.py \
+    etls un/2024-07-11/un_wpp \
         --deaths-age-f $FILE_DIR/deaths_age_female.xlsx \
         --deaths-age-m $FILE_DIR/deaths_age_male.xlsx \
         --death-rate $FILE_DIR/death_rate.xlsx \

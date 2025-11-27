@@ -18,7 +18,7 @@ STEPS TO OBTAIN THE DATA:
     7. Select "Copy link address".
     8. Paste the link in the `url_download` field in the income_distribution_database.csv.dvc file.
     9. Run
-        python snapshots/oecd/{version}/decile_ratios.py
+        etls oecd/{version}/decile_ratios
 
 """
 

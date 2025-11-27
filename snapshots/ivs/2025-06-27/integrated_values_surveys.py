@@ -9,7 +9,7 @@ INSTRUCTIONS
         2.	Run the EVS_WVS_Merge_Syntax_stata 4.do file in Stata. This will generate the IVS main dataset.
         3.	Run ivs_create_file.do in Stata. It will generate the file ivs.csv
         4.	Add snapshot. Currently the command is
-                        python snapshots/ivs/{date}/integrated_values_surveys.py --path-to-file snapshots/ivs/{date}/ivs.csv
+                        etls ivs/{date}/integrated_values_surveys --path-to-file snapshots/ivs/{date}/ivs.csv
         5.	Delete csv file
 """
 

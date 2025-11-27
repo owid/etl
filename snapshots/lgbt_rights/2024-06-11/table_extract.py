@@ -15,7 +15,7 @@ The table will probably not be updated, but in that case you need to follow thes
     3. Change the pages in the function extract table_from_pdf I call in the run function.
     4. Run this script.
     5. Run the snapshot:
-        python snapshots/lgbt_rights/{version}/criminalization_mignot.py --path-to-file snapshots/lgbt_rights/{version}/table1.csv
+        etls lgbt_rights/{version}/criminalization_mignot --path-to-file snapshots/lgbt_rights/{version}/table1.csv
 """
 
 from pathlib import Path

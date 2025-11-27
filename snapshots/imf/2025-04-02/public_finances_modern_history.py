@@ -5,7 +5,7 @@ To update:
     1. Go to https://www.imf.org/external/datamapper/datasets/FPP and click the "Full data in Excel" link.
     2. Save the file in this folder.
     3. Run the script.
-        python snapshots/imf/{version}/public_finances_modern_history.py --path-to-file "snapshots/imf/{version}/{file_name}.xlsx"
+        etls imf/{version}/public_finances_modern_history --path-to-file "snapshots/imf/{version}/{file_name}.xlsx"
 
 """
 

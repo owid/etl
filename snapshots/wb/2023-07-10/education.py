@@ -136,7 +136,7 @@ def get_data():
 
 def used_world_bank_ids():
     # This will connect to MySQL from specified ENV, so to run it against production you'd run
-    # ETL=.env.prod python snapshots/wb/2023-07-10/education.py
+    # ETL=.env.prod etls wb/2023-07-10/education
     engine = get_engine()
     q = """
     select distinct

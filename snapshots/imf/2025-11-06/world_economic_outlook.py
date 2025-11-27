@@ -12,7 +12,7 @@ The IMF doesn't allow automatic download of the dataset, so we need to manually 
     4. Click "Download"
     5. Save the file to this folder.
     6. Run this command on the terminal:
-        python snapshots/imf/{version}/world_economic_outlook.py --path-to-file <path-to-file>
+        etls imf/{version}/world_economic_outlook --path-to-file <path-to-file>
     7. Delete the file from the folder.
 """
 

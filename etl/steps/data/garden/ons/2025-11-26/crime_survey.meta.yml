@@ -1,0 +1,68 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+  description_key_survey: &description_key_survey
+    - "Survey data covers different time periods: 1981 to 1999 data are for calendar years; from year ending (YE) March 2002 onwards data are for the 12 months before the interview."
+    - Estimates for 2021 and 2022 are not available because of the suspension of face-to-face interviewing between March 2020 and October 2021, during the coronavirus (COVID-19) pandemic.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  crime_survey:
+    variables:
+      all_theft:
+        title: All thefts
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      domestic_burglary:
+        title: Domestic burglary
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      vehicle_related_theft:
+        title: Vehicle-related theft
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      other_household_theft:
+        title: Other household theft
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      theft_from_the_person:
+        title: Theft from the person
+        description_short: Includes snatch thefts (where some degree of force is directed to the property but not to the victim) and stealth thefts (where the victim is unaware of the offence being committed, for example, pick-pocketing).
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      all_theft__ye_june:
+        title: All thefts (year ending June)
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      domestic_burglary__ye_june:
+        title: Domestic burglary (year ending June)
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      vehicle_related_theft__ye_june:
+        title: Vehicle-related theft (year ending June)
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      other_household_theft__ye_june:
+        title: Other household theft (year ending June)
+        unit: thefts
+        description_key:
+          - *description_key_survey
+      theft_from_the_person__ye_june:
+        title: Theft from the person (year ending June)
+        unit: thefts
+        description_key:
+          - *description_key_survey

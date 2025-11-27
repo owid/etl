@@ -1,4 +1,7 @@
-"""Process and harmonize EM-DAT natural disasters dataset."""
+"""Process and harmonize EM-DAT natural disasters dataset.
+
+NOTE: Some of the processing is related to inflation adjustments, which we decided to not use in the end. See further comments on this topic below.
+"""
 
 import datetime
 from typing import Any, Dict, List, Tuple
@@ -6,14 +9,16 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table, Variable, utils
+from owid.catalog import Table, Variable, utils
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Base year for GDP deflation.
+BASE_YEAR = 2024
 
 # List of expected disaster types in the raw data to consider, and how to rename them.
 # We consider only natural disasters of subgroups Geophysical, Meteorological, Hydrological and Climatological.
@@ -62,25 +67,41 @@ COLUMNS = {
     # The following columns are kept for the analysis on the share of small, medium and large events.
     "cpi": "cpi",
     "entry_date": "entry_date",
+    # Load the cost variables adjusted for inflation that EMDAT provides.
+    # They will be used for comparison, but we will do our own adjustment using the GDP deflator (instead of the US CPI that they use).
+    "reconstruction_costs_adjusted": "reconstruction_costs_adjusted",
+    "total_damages_adjusted": "total_damages_adjusted",
+    "insured_damages_adjusted": "insured_damages_adjusted",
 }
-
-# Columns of values related to natural disaster impacts.
-IMPACT_COLUMNS = [
-    "total_dead",
-    "injured",
-    "affected",
-    "homeless",
-    "total_affected",
-    "reconstruction_costs",
-    "insured_damages",
-    "total_damages",
-]
 
 # Variables related to costs, measured in thousand current US$ (not adjusted for inflation or PPP).
 COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
 
+# Variables related to costs, measured in thousands of constant US$ (adjusted for inflation by EM-DAT using the US CPI).
+COST_VARIABLES_ADJUSTED_WITH_CPI = [
+    "reconstruction_costs_adjusted",
+    "insured_damages_adjusted",
+    "total_damages_adjusted",
+]
+
+# Columns of values related to natural disaster impacts.
+IMPACT_COLUMNS = (
+    [
+        "total_dead",
+        "injured",
+        "affected",
+        "homeless",
+        "total_affected",
+    ]
+    + COST_VARIABLES
+    + COST_VARIABLES_ADJUSTED_WITH_CPI
+)
+
+
 # Variables to calculate per 100,000 people.
-VARIABLES_PER_100K_PEOPLE = [column for column in IMPACT_COLUMNS if column not in COST_VARIABLES] + ["n_events"]
+VARIABLES_PER_100K_PEOPLE = [
+    column for column in IMPACT_COLUMNS if column not in (COST_VARIABLES + COST_VARIABLES_ADJUSTED_WITH_CPI)
+] + ["n_events"]
 
 # New natural disaster types corresponding to the sum of all disasters, and the sum of all disasters excluding certain types.
 ALL_DISASTERS_TYPE = "all_disasters"
@@ -176,51 +197,56 @@ def get_last_day_of_month(year: int, month: int):
     return last_day
 
 
-def prepare_input_data(tb: Table) -> Table:
+def prepare_input_data(tb_meadow: Table) -> Table:
     """Prepare input data, and fix some known issues."""
+    tb_meadow = tb_meadow.copy()
+
     # Select and rename columns.
-    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    tb_meadow = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Add a year column (assume the start of the event).
-    tb["year"] = tb["start_year"].copy()
+    tb_meadow["year"] = tb_meadow["start_year"].copy()
 
     # Correct wrong data points (defined above in DATA_CORRECTIONS).
-    tb = correct_data_points(tb=tb, corrections=DATA_CORRECTIONS)
+    tb_meadow = correct_data_points(tb=tb_meadow, corrections=DATA_CORRECTIONS)
 
     # Remove spurious spaces in entities.
-    tb["type"] = tb["type"].str.strip()
+    tb_meadow["type"] = tb_meadow["type"].str.strip()
 
     # Sanity check
     error = "List of expected disaster types has changed. Consider updating EXPECTED_DISASTER_TYPES."
-    assert set(tb["type"]) == set(EXPECTED_DISASTER_TYPES), error
+    assert set(tb_meadow["type"]) == set(EXPECTED_DISASTER_TYPES), error
 
     # Rename disaster types conveniently.
-    tb["type"] = map_series(
-        series=tb["type"], mapping=EXPECTED_DISASTER_TYPES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    tb_meadow["type"] = map_series(
+        series=tb_meadow["type"],
+        mapping=EXPECTED_DISASTER_TYPES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
     )
 
     # Drop rows for disaster types that are not relevant.
-    tb = tb.dropna(subset="type").reset_index(drop=True)
+    tb_meadow = tb_meadow.dropna(subset="type").reset_index(drop=True)
 
     # Ensure "CPI" column is not empty. Currently it is missing the last year and a half
     # (and so is CPI data from World Bank). We forward fill the last rows of data.
     tb_cpi = (
-        tb[["year", "cpi"]]
+        tb_meadow[["year", "cpi"]]
         .sort_values("year")
         .drop_duplicates(subset="year", keep="last")
         .reset_index(drop=True)
         .ffill()
     )
-    tb = tb.drop(columns=["cpi"]).merge(tb_cpi, on="year", how="left")
+    tb_meadow = tb_meadow.drop(columns=["cpi"]).merge(tb_cpi, on="year", how="left")
 
     # Make "entry_date" a datetime column.
-    tb["entry_date"] = pd.to_datetime(tb["entry_date"], errors="coerce")
+    tb_meadow["entry_date"] = pd.to_datetime(tb_meadow["entry_date"], errors="coerce")
 
-    # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
-    for variable in COST_VARIABLES:
-        tb[variable] *= 1000
+    # Convert costs, given in '000 US$ (aka thousand dollars) into US$.
+    for variable in COST_VARIABLES + COST_VARIABLES_ADJUSTED_WITH_CPI:
+        tb_meadow[variable] *= 1000
 
-    return tb
+    return tb_meadow
 
 
 def sanity_checks_on_inputs(tb: Table) -> None:
@@ -414,7 +440,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
-def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Tuple[Table, Table]:
+def create_tables_of_event_sizes(tb: Table) -> Tuple[Table, Table]:
     # We can try to replicate the chart from Guha-Sapir et al. (2004).
     # According to them:
     # * The human impact of a natural disaster is considered by CRED as "small" when the number of deaths was lower than
@@ -517,12 +543,9 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     tb_yearly = pr.concat([tb_yearly, _tb_global], ignore_index=True)
 
     # Add region aggregates.
-    tb_yearly = geo.add_regions_to_table(
+    tb_yearly = paths.regions.add_aggregates(
         tb=tb_yearly,
         regions=REGIONS,
-        index_columns=["country", "year"],
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
@@ -574,9 +597,7 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     return tb_yearly, tb_decadal
 
 
-def calculate_n_events_over_a_threshold_of_deaths(
-    tb: Table, ds_regions: Dataset, ds_income_groups: Dataset
-) -> Tuple[Table, Table]:
+def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> Tuple[Table, Table]:
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.
@@ -607,14 +628,7 @@ def calculate_n_events_over_a_threshold_of_deaths(
         tb_yearly[column] = tb_yearly[column].fillna(0)
 
     # Add region aggregates.
-    tb_yearly = geo.add_regions_to_table(
-        tb=tb_yearly,
-        regions=REGIONS,
-        index_columns=["country", "year"],
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        accepted_overlaps=[],
-    )
+    tb_yearly = paths.regions.add_aggregates(tb=tb_yearly, regions=REGIONS, accepted_overlaps=[])
 
     # Create a table with the decadal count of events.
     tb_decadal = tb_yearly.copy()
@@ -721,24 +735,64 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
     return tb
 
 
-def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table) -> Table:
-    """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
-    # Add population to table.
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
+def create_cost_variables_adjusted_for_inflation(tb: Table, tb_wdi: Table) -> Table:
+    tb = tb.copy()
+    tb_gdp = tb_wdi.copy()
+
+    # Select and rename GDP columns for convenience.
+    tb_gdp = tb_gdp[["country", "year", "ny_gdp_defl_zs_ad"]].rename(
+        columns={"ny_gdp_defl_zs_ad": "gdp_deflator"}, errors="raise"
+    )
+
+    # Get the deflator in the base year for each country.
+    base_deflator = tb_gdp.loc[tb_gdp["year"] == BASE_YEAR, ["country", "gdp_deflator"]].rename(
+        columns={"gdp_deflator": "gdp_deflator_base"}
+    )
+
+    # Add a column with the value of the GDP deflator on the base year.
+    tb_gdp = tb_gdp.merge(base_deflator, on="country", how="left")
 
     # Combine natural disasters with GDP data.
-    tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
-    # Prepare cost variables.
+    tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
+
+    # Create cost variables in constant {BASE_YEAR} US$.
     for variable in COST_VARIABLES:
-        # Create variables of costs (in current US$) as a share of GDP (in current US$).
+        tb[f"{variable}_constant_usd"] = tb[variable] * tb["gdp_deflator_base"] / tb["gdp_deflator"]
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["gdp_deflator", "gdp_deflator_base"], errors="raise")
+
+    return tb
+
+
+def create_cost_variables_per_gdp(tb: Table, tb_wdi: Table) -> Table:
+    tb = tb.copy()
+    tb_gdp = tb_wdi.copy()
+
+    # Selecte and rename GDP columns for convenience.
+    tb_gdp = tb_gdp[["country", "year", "ny_gdp_mktp_cd"]].rename(columns={"ny_gdp_mktp_cd": "gdp"}, errors="raise")
+
+    # Combine natural disasters with GDP data.
+    tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
+
+    # Create variables of costs (in current US$) as a share of GDP (in current US$).
+    for variable in COST_VARIABLES:
         tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["gdp"], errors="raise")
+
+    return tb
+
+
+def create_rate_variables(tb: Table) -> Table:
+    """Create impacts per 100,000 people."""
+    # Add population to table.
+    tb = paths.regions.add_population(tb=tb)
 
     # Add rates per 100,000 people.
     for column in VARIABLES_PER_100K_PEOPLE:
         tb[f"{column}_per_100k_people"] = tb[column] * 1e5 / tb["population"]
-
-    # Fix issue with faulty dtypes (see more details in the function's documentation).
-    tb = fix_faulty_dtypes(tb=tb)
 
     return tb
 
@@ -785,7 +839,7 @@ def create_decadal_average_data(tb: Table) -> Table:
     return tb_decadal
 
 
-def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) -> None:
+def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
     """Run sanity checks on output (yearly or decadal) data.
 
     Parameters
@@ -835,7 +889,7 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) ->
     assert tb[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
 
     # Get names of historical regions in the data.
-    regions = ds_regions["regions"].reset_index()
+    regions = paths.regions.tb_regions
     historical_regions_in_data = set(regions[regions["is_historical"]]["name"]) & set(tb["country"])
 
     # Sanity checks only for yearly data.
@@ -906,29 +960,24 @@ def run() -> None:
     #
     # Load natural disasters dataset from meadow and read its main table.
     ds_meadow = paths.load_dataset("natural_disasters")
-    tb_meadow = ds_meadow["natural_disasters"].reset_index()
+    tb_meadow = ds_meadow.read("natural_disasters")
 
-    # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$).
+    # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$) and GDP deflator (linked series).
     ds_wdi = paths.load_dataset("wdi")
-    tb_gdp = ds_wdi["wdi"][["ny_gdp_mktp_cd"]].reset_index()
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
+    tb_wdi = ds_wdi.read("wdi")
 
     #
     # Process data.
     #
+    # Get the base year for the US CPI adjustment performed by EM-DAT.
+    assert len(set(tb_meadow[(tb_meadow["cpi"] == 100)]["start_year"])) == 1
+    base_year_us_cpi = int(tb_meadow[(tb_meadow["cpi"] == 100)]["start_year"].unique()[0])
+
     # Prepare input data (prepare time columns, convert cost variables to dollars, and fix some known issues).
-    tb = prepare_input_data(tb=tb_meadow)
+    tb = prepare_input_data(tb_meadow=tb_meadow)
 
     ####################################################################################################################
-    # TODO: Contact EM-DAT about these issues:
+    # I already contacted EM-DAT about this issue, but they haven't fixed it yet:
     # * Even with end date prior to start date: China, Wet mass movement, 10 deaths, starting in 2025-06, ending in 2024-06-04.
     # The most likely explanation is that the end year is wrong and should be 2025. Also, the day when it starts is missing. I'll assume it's this event:
     #   https://eos.org/thelandslideblog/muta-1
@@ -943,15 +992,11 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Create a (yearly and decadal) table with the number and share of small, medium and large events.
-    tb_yearly_sizes, tb_decadal_sizes = create_tables_of_event_sizes(
-        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    tb_yearly_sizes, tb_decadal_sizes = create_tables_of_event_sizes(tb=tb)
 
     # Calculate the number of events over a certain threshold of casualties.
     # This is useful to notice a possible underestimate of small events in early data.
-    tb_yearly_deaths, tb_decadal_deaths = calculate_n_events_over_a_threshold_of_deaths(
-        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    tb_yearly_deaths, tb_decadal_deaths = calculate_n_events_over_a_threshold_of_deaths(tb=tb)
 
     # Calculate start and end dates of disasters.
     tb = calculate_start_and_end_dates(tb=tb)
@@ -968,6 +1013,17 @@ def run() -> None:
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
 
+    ####################################################################################################################
+    # After some internal discussion (see https://owid.slack.com/archives/C094QM38BGQ/p1761817309853539 ), we decided to include variables adjusted for inflation, but not use them in charts or the explorer.
+    # EM-DAT provides variables adjusted for inflation using the US CPI for all countries.
+    # We thought that a more appropriate adjustment would be to use the GDP deflator.
+    # The results of both methods are very different, especially for some countries. In fact, for countries with instances of hyperinflation (like Belarus and Zimbabwe), the inflation adjustments lead to unrealistically high economic damages. Those cases would need to be handled separately.
+    # So, at least for now, we decided to not use the inflation-adjusted variables (neither those from EM-DAT not our own). Instead, we do show some of the cost variables as a percentage of GDP, which is a meaningful metric, and avoids some of those issues.
+
+    # Add cost variables adjusted for inflation (using the GDP deflator).
+    tb = create_cost_variables_adjusted_for_inflation(tb=tb, tb_wdi=tb_wdi)
+    ####################################################################################################################
+
     # Add a new category (or "type") corresponding to the total of all natural disasters.
     tb = create_a_new_type_for_all_disasters_combined(tb=tb)
 
@@ -976,8 +1032,14 @@ def run() -> None:
         tb=tb, index_columns=["country", "year", "type"], regions=REGIONS, accepted_overlaps=ACCEPTED_OVERLAPS
     )
 
-    # Add damages per GDP, and rates per 100,000 people.
-    tb = create_additional_variables(tb=tb, ds_population=ds_population, tb_gdp=tb_gdp)
+    # Add cost variables per GDP.
+    tb = create_cost_variables_per_gdp(tb=tb, tb_wdi=tb_wdi)
+
+    # Add rates per 100,000 people.
+    tb = create_rate_variables(tb=tb)
+
+    # Fix issue with faulty dtypes (see more details in the function's documentation).
+    tb = fix_faulty_dtypes(tb=tb)
 
     # Change disaster types to snake, lower case.
     tb["type"] = tb["type"].replace({value: utils.underscore(value) for value in tb["type"].unique()})
@@ -986,10 +1048,10 @@ def run() -> None:
     tb_decadal = create_decadal_average_data(tb=tb)
 
     # Run sanity checks on output yearly data.
-    sanity_checks_on_outputs(tb=tb, is_decade=False, ds_regions=ds_regions)
+    sanity_checks_on_outputs(tb=tb, is_decade=False)
 
     # Run sanity checks on output decadal data.
-    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True, ds_regions=ds_regions)
+    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True)
 
     # Set an appropriate index to yearly data and sort conveniently.
     tb = tb.format(keys=["country", "year", "type"], sort_columns=True, short_name="natural_disasters_yearly")
@@ -1006,5 +1068,6 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes, tb_yearly_deaths, tb_decadal_deaths],
         default_metadata=ds_meadow.metadata,
+        yaml_params={"BASE_YEAR": BASE_YEAR, "BASE_YEAR_US_CPI": base_year_us_cpi},
     )
     ds_garden.save()

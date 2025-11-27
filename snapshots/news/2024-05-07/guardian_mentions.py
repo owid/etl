@@ -184,7 +184,7 @@ OR
 RUN SNAPSHOT STEP
 =================
 
-python snapshots/news/2024-05-07/guardian_mentions.py --tags snapshots/news/2024-05-07/news-yearly-combined.csv --mentions snapshots/news/2024-05-07/news-b-yearly-combined.csv
+etls news/2024-05-07/guardian_mentions --tags snapshots/news/2024-05-07/news-yearly-combined.csv --mentions snapshots/news/2024-05-07/news-b-yearly-combined.csv
 """
 
 import ast

@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Literal, Optional, Union
 
+# NOTE: SemanticSearch* schemas moved to api_search/v1/schemas.py
 from pydantic import BaseModel
 
 from .. import utils
@@ -68,40 +69,6 @@ class UpdateIndicatorRequest(BaseModel):
     dataApiUrl: str
     dryRun: bool = False
     triggerETL: bool = False
-
-    class Config:
-        extra = "forbid"
-
-
-class SemanticSearchRequest(BaseModel):
-    """JSON schema for semantic search request."""
-
-    query: str
-    limit: int = 10
-
-    class Config:
-        extra = "forbid"
-
-
-class SemanticSearchResult(BaseModel):
-    """JSON schema for individual semantic search result."""
-
-    title: str
-    indicator_id: int
-    snippet: str
-    score: float
-    metadata: Dict[str, Any]
-
-    class Config:
-        extra = "forbid"
-
-
-class SemanticSearchResponse(BaseModel):
-    """JSON schema for semantic search response."""
-
-    results: List[SemanticSearchResult]
-    query: str
-    total_results: int
 
     class Config:
         extra = "forbid"

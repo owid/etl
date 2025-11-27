@@ -30,10 +30,10 @@ HOW TO EXECUTE:
 
 9. Repeat the process for the different settings you want to extract.
 10. Once all the files have been created, copy them into the lis snapshot directory in the ETL, run concat_files.py and then update the snapshot, by using these comands one by one:
-	python snapshots/lis/2023-01-18/concat_files.py
-	python snapshots/lis/2023-01-18/lis_keyvars.py --path-to-file snapshots/lis/2023-01-18/lis_keyvars.csv
-	python snapshots/lis/2023-01-18/lis_abs_poverty.py --path-to-file snapshots/lis/2023-01-18/lis_abs_poverty.csv
-	python snapshots/lis/2023-01-18/lis_distribution.py --path-to-file snapshots/lis/2023-01-18/lis_distribution.csv
+	etls lis/2023-01-18/concat_files
+	etls lis/2023-01-18/lis_keyvars --path-to-file snapshots/lis/2023-01-18/lis_keyvars.csv
+	etls lis/2023-01-18/lis_abs_poverty --path-to-file snapshots/lis/2023-01-18/lis_abs_poverty.csv
+	etls lis/2023-01-18/lis_distribution --path-to-file snapshots/lis/2023-01-18/lis_distribution.csv
 
 	(Change the date for future updates)
 
@@ -87,7 +87,7 @@ program define make_variables
 	gen miss_comp = 0
 	quietly replace miss_comp=1 if dhi==. | dhci==. | hifactor==. | hiprivate==. | hi33==. | hcexp==.
 	quietly drop if miss_comp==1
-	
+
 	*Defines different number of member of households depending on age selected
 	if "$age" == "all" {
 		gen number_household = nhhmem
@@ -104,11 +104,11 @@ program define make_variables
 		quietly sum `var'
 		local max_`var' = r(max)
 	}
-	
+
 	if `max_hifactor' > 0 & `max_hiprivate' > 0 & `max_hi33' > 0 {
 		gen mi = hifactor + hiprivate + hi33
 	}
-	
+
 	else {
 		gen mi = .
 	}
@@ -409,7 +409,7 @@ foreach ccyy in `countries' {
 			}
 		}
 	}
-	
+
 	* Option 4 is to get percentile thresholds and shares of the income distribution
 	else if "$menu_option" == "4" {
 		foreach var in $inc_cons_vars {

@@ -16,9 +16,7 @@ def run() -> None:
     #
     # Select data for the World and remove unnecessary columns.
     tb_global = (
-        tb[tb["country"] == "World"]
-        .drop(columns=["country", "population", "gdp"], errors="raise")
-        .reset_index(drop=True)
+        tb[tb["country"] == "World"].drop(columns=["country", "population"], errors="raise").reset_index(drop=True)
     )
     # Assign human-readable names to disaster types.
     tb_global["type"] = tb_global.astype({"type": str})["type"].replace(

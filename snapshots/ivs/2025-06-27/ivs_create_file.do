@@ -10,7 +10,7 @@ INSTRUCTIONS
 	2.	In the EVS_WVS_Merge_Syntax_stata.do file, fill in your local path for the global macros WVS_TF, EVS_TF and IVS. Run the code. This will generate the IVS main dataset (it takes some time).
 	3.	Run _this_ do-file in Stata. It will generate the file ivs.csv
 	4.	Add snapshot. Currently the command is
- 			python snapshots/ivs/{date}/integrated_values_survey.py --path-to-file snapshots/ivs/{date}/ivs.csv
+ 			etls ivs/{date}/integrated_values_survey --path-to-file snapshots/ivs/{date}/ivs.csv
 	5.	Delete csv file
 	6.	Run `etl integrated_values_survey`
 
@@ -1339,25 +1339,25 @@ foreach var in $religion_how_often {
 
 	gen more_once_week_`var' = 0
 	replace more_once_week_`var' = 1 if `var' == 1
-	
+
 	gen once_week_`var' = 0
 	replace once_week_`var' = 1 if `var' == 2
-	
+
 	gen once_month_`var' = 0
 	replace once_month_`var' = 1 if `var' == 3
-	
+
 	gen holydays_chr_`var' = 0
 	replace holydays_chr_`var' = 1 if `var' == 4
-	
+
 	gen holydays_oth_`var' = 0
 	replace holydays_oth_`var' = 1 if `var' == 5
-	
+
 	gen once_year_`var' = 0
 	replace once_year_`var' = 1 if `var' == 6
-	
+
 	gen less_often_`var' = 0
 	replace less_often_`var' = 1 if `var' == 7
-	
+
 	gen never_`var' = 0
 	replace never_`var' = 1 if `var' == 8
 

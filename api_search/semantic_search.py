@@ -76,6 +76,10 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
                 "snippet": (indicator.description or "")[:160],
                 "score": float(indicator.similarity or 0.0),
                 "metadata": metadata,
+                # Additional fields for wizard app
+                "catalog_path": indicator.catalogPath,
+                "n_charts": indicator.n_charts,
+                "description": indicator.description,
             }
         )
 

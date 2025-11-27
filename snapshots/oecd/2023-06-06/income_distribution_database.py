@@ -12,7 +12,7 @@ Steps to follow for an update:
 3. Export the data as CSV, by selecting Export > Text file (CSV) > Default format > Download.
 4. Save the file in the same folder as this script.
 5. Run this script with the path to the file as argument:
-    python snapshots/oecd/2023-06-06/income_distribution_database.py --path-to-file <path-to-file>
+    etls oecd/2023-06-06/income_distribution_database --path-to-file <path-to-file>
 
 """
 

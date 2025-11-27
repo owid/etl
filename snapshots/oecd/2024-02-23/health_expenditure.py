@@ -19,7 +19,7 @@ STEPS TO OBTAIN THE DATA:
     7. Just for convenience, copy the file to this directory and rename it health_expenditure.csv.
     8. Run the script with the `--path-to-file` option:
         ```
-        python snapshots/oecd/{version}/health_expenditure.py --path-to-file <path_to_file>
+        etls oecd/{version}/health_expenditure --path-to-file <path_to_file>
         ```
 
 """

@@ -4,7 +4,7 @@ Script to create a snapshot of dataset.
 The file comes from Appendix C in the original book, available to buy here: https://academic.oup.com/book/38708.
 I use a xls file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1zxuxAXriOrp0x_dxklVbULKGqG3fEOGBkouUNWx7AY8/edit?gid=1521965312#gid=1521965312
 After creating the file, run
-    python snapshots/chartbook/2024-08-05/atkinson_2008_canada.py --path-to-file <path-to-file>
+    etls chartbook/2024-08-05/atkinson_2008_canada --path-to-file <path-to-file>
 """
 
 from pathlib import Path

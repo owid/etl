@@ -9,7 +9,7 @@ The table will probably not be updated, but in that case you need to follow thes
     5. Clean the CSV file by keeping these columns: year,top_0_1,top_0_5,top_1
     6. Run this script.
     7. Run the snapshot:
-        python snapshots/chartbook/{version}/davies_di_matteo_2020_canada.py --path-to-file snapshots/chartbook/{version}/davies_di_matteo_2020.csv
+        etls chartbook/{version}/davies_di_matteo_2020_canada --path-to-file snapshots/chartbook/{version}/davies_di_matteo_2020.csv
 """
 
 from pathlib import Path

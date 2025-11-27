@@ -8,7 +8,7 @@ INSTRUCTIONS TO UPDATE THIS SNAPSHOT
     3. Inside the zip file, extract the NMC-{version}-abridged.zip file.
     4. Inside this zip file, copy the file "NMC-{version}-abridged.csv" to the this folder.
     5. Run this script with the path to the file as an argument.
-        python snapshots/cow/{version}/national_material_capabilities.py --path-to-file NMC-{version}-abridged.csv
+        etls cow/{version}/national_material_capabilities --path-to-file NMC-{version}-abridged.csv
 """
 
 from pathlib import Path

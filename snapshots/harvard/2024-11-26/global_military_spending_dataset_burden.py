@@ -4,7 +4,7 @@ Script to create a snapshot of dataset.
 This file was provided by Christopher Fariss to update an error in the dataset.
 
 Run
-    python snapshots/harvard/2024-11-26/global_military_spending_dataset_burden.py --path-to-file <path-to-file>
+    etls harvard/2024-11-26/global_military_spending_dataset_burden --path-to-file <path-to-file>
 
 
 """

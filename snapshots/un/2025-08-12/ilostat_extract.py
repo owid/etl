@@ -14,8 +14,8 @@ To run this code from scratch,
     - (If needed) Delete the files in R2:
         rclone delete r2:owid-private/cache/ilostat/ --fast-list --transfers 32 --checkers 32 --verbose
     - Run the code. You have two options to see the output, in the terminal or in the background:
-        python snapshots/un/{version}/ilostat_extract.py
-        nohup uv run python snapshots/un/{version}/ilostat_extract.py > output_ilostat.log 2>&1 &
+        etls un/{version}/ilostat_extract
+        nohup uv run etls un/{version}/ilostat_extract > output_ilostat.log 2>&1 &
     - You can kill the process with:
         pkill -f ilostat_extract
 

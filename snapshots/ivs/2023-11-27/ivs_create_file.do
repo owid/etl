@@ -10,7 +10,7 @@ INSTRUCTIONS
 	2.	Run the EVS_WVS_Merge_Syntax_stata 4.do file in Stata. This will generate the IVS main dataset.
 	3.	Run this do-file in Stata. It will generate the file ivs.csv
 	4.	Add snapshot. Currently the command is
- 			python snapshots/ivs/{date}/integrated_values_survey.py --path-to-file snapshots/ivs/{date}/ivs.csv
+ 			etls ivs/{date}/integrated_values_survey --path-to-file snapshots/ivs/{date}/ivs.csv
 	5.	Delete csv file
 	6.	Run `etl integrated_values_survey`
 
@@ -228,25 +228,25 @@ foreach var in $important_in_life_questions {
 
 	gen important_in_life_`var' = 0
 	replace important_in_life_`var' = 1 if `var' == 1 | `var' == 2
-	
+
 	gen not_important_in_life_`var' = 0
 	replace not_important_in_life_`var' = 1 if `var' == 3 | `var' == 4
-	
+
 	gen very_important_in_life_`var' = 0
 	replace very_important_in_life_`var' = 1 if `var' == 1
-	
+
 	gen rather_important_in_life_`var' = 0
 	replace rather_important_in_life_`var' = 1 if `var' == 2
-	
+
 	gen not_very_important_in_life_`var' = 0
 	replace not_very_important_in_life_`var' = 1 if `var' == 3
-	
+
 	gen notatall_important_in_life_`var' = 0
 	replace notatall_important_in_life_`var' = 1 if `var' == 4
-	
+
 	gen dont_know_important_in_life_`var' = 0
 	replace dont_know_important_in_life_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_important_in_life_`var' = 0
 	replace no_answer_important_in_life_`var' = 1 if `var' == .b
 
@@ -326,7 +326,7 @@ global interest_politics E023
 global rest_politics_questions : list global(politics_questions) - global(interest_politics)
 
 foreach var of varlist $rest_politics_questions {
-	
+
 	keep if `var' >= 1
 	keep if `var' != .c
 	keep if `var' != .d
@@ -334,23 +334,23 @@ foreach var of varlist $rest_politics_questions {
 
 	gen have_done_political_action_`var' = 0
 	replace have_done_political_action_`var' = 1 if `var' == 1
-	
+
 	gen might_do_political_action_`var' = 0
 	replace might_do_political_action_`var' = 1 if `var' == 2
-	
+
 	gen never_political_action_`var' = 0
 	replace never_political_action_`var' = 1 if `var' == 3
-	
+
 	gen dont_know_political_action_`var' = 0
 	replace dont_know_political_action_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_political_action_`var' = 0
 	replace no_answer_political_action_`var' = 1 if `var' == .b
 
 	collapse (mean) have_done_political_action_`var' might_do_political_action_`var' never_political_action_`var' dont_know_political_action_`var' no_answer_political_action_`var' [w=S017], by (year country)
 	tempfile politics_`var'_file
 	save "`politics_`var'_file'"
-	
+
 	restore
 	preserve
 }
@@ -475,31 +475,31 @@ foreach var in $schwartz_questions {
 
 	gen like_me_agg_`var' = 0
 	replace like_me_agg_`var' = 1 if `var' == 4 | `var' == 5 | `var' == 6
-	
+
 	gen not_like_me_agg_`var' = 0
 	replace not_like_me_agg_`var' = 1 if `var' == 1 | `var' == 2
-	
+
 	gen very_much_like_me_`var' = 0
 	replace very_much_like_me_`var' = 1 if `var' == 6
-	
+
 	gen like_me_`var' = 0
 	replace like_me_`var' = 1 if `var' == 5
-	
+
 	gen somewhat_like_me_`var' = 0
 	replace somewhat_like_me_`var' = 1 if `var' == 4
-	
+
 	gen a_little_like_me_`var' = 0
 	replace a_little_like_me_`var' = 1 if `var' == 3
-	
+
 	gen not_like_me_`var' = 0
 	replace not_like_me_`var' = 1 if `var' == 2
-	
+
 	gen not_at_all_like_me_`var' = 0
 	replace not_at_all_like_me_`var' = 1 if `var' == 1
-	
+
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_`var' = 0
 	replace no_answer_`var' = 1 if `var' == .b
 
@@ -593,28 +593,28 @@ foreach var in $work_questions {
 
 	gen agree_agg_`var' = 0
 	replace agree_agg_`var' = 1 if `var' == 1 | `var' == 2
-	
+
 	gen disagree_agg_`var' = 0
 	replace disagree_agg_`var' = 1 if `var' == 4 | `var' == 5
-	
+
 	gen strongly_agree_`var' = 0
 	replace strongly_agree_`var' = 1 if `var' == 1
-	
+
 	gen agree_`var' = 0
 	replace agree_`var' = 1 if `var' == 2
-	
+
 	gen neither_`var' = 0
 	replace neither_`var' = 1 if `var' == 3
-	
+
 	gen disagree_`var' = 0
 	replace disagree_`var' = 1 if `var' == 4
-	
+
 	gen strongly_disagree_`var' = 0
 	replace strongly_disagree_`var' = 1 if `var' == 5
-	
+
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_`var' = 0
 	replace no_answer_`var' = 1 if `var' == .b
 
@@ -707,25 +707,25 @@ foreach var in $justifiable_questions {
 
 	gen never_just_agg_`var' = 0
 	replace never_just_agg_`var' = 1 if `var' <= 4
-	
+
 	gen always_just_agg_`var' = 0
 	replace always_just_agg_`var' = 1 if `var' >= 6 & `var' <= 10
-	
+
 	gen never_just_`var' = 0
 	replace never_just_`var' = 1 if `var' == 1
-	
+
 	gen always_just_`var' = 0
 	replace always_just_`var' = 1 if `var' == 10
-	
+
 	gen neutral_`var' = 0
 	replace neutral_`var' = 1 if `var' == 5
-	
+
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_`var' = 0
 	replace no_answer_`var' = 1 if `var' == .b
-	
+
 	gen avg_score_`var' = `var'
 
 	collapse (mean) never_just_agg_`var' always_just_agg_`var' never_just_`var' always_just_`var' neutral_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
@@ -759,28 +759,28 @@ foreach var in $worries_questions {
 
 	gen worry_`var' = 0
 	replace worry_`var' = 1 if `var' <= 2
-	
+
 	gen not_worry_`var' = 0
 	replace not_worry_`var' = 1 if `var' == 3 | `var' == 4
-	
+
 	gen very_much_`var' = 0
 	replace very_much_`var' = 1 if `var' == 1
-	
+
 	gen a_great_deal_`var' = 0
 	replace a_great_deal_`var' = 1 if `var' == 2
-	
+
 	gen not_much_`var' = 0
 	replace not_much_`var' = 1 if `var' == 3
-	
+
 	gen not_at_all_`var' = 0
 	replace not_at_all_`var' = 1 if `var' == 4
-	
+
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_`var' = 0
 	replace no_answer_`var' = 1 if `var' == .b
-	
+
 	gen avg_score_`var' = `var'
 
 	collapse (mean) worry_`var' not_worry_`var' very_much_`var' a_great_deal_`var' not_much_`var' not_at_all_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
@@ -865,13 +865,13 @@ foreach var in $neighbors_questions {
 
 	gen notmentioned_neighbors_`var' = 0
 	replace notmentioned_neighbors_`var' = 1 if `var' == 0
-	
+
 	gen mentioned_neighbors_`var' = 0
 	replace mentioned_neighbors_`var' = 1 if `var' == 1
-	
+
 	gen dont_know_neighbors_`var' = 0
 	replace dont_know_neighbors_`var' = 1 if `var' == .a
-	
+
 	gen no_answer_neighbors_`var' = 0
 	replace no_answer_neighbors_`var' = 1 if `var' == .b
 

@@ -109,7 +109,7 @@ Ensure that all snapshot scripts and ETL steps run successfully. Adapt the code 
 - **Ensure the snapshot steps work**:
 
     ```bash
-    python snapshots/met_office_hadley_centre/2024-07-02/near_surface_temperature.py
+    etls met_office_hadley_centre/2024-07-02/near_surface_temperature
     ```
 
 - **Ensure the `meadow`, `garden`, and `grapher` steps work**: Edit these steps and execute them. You can do that either one by one:

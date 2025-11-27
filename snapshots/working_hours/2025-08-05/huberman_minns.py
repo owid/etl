@@ -17,7 +17,7 @@ I renamed the columns have more manageable names:
 country,year,working_hours_week,working_hours_year,vacation_days
 
 Upload that file by running this script with the `--path-to-file` option pointing to the csv file.
-    python snapshots/working_hours/{version}/huberman_minns.py --path-to-file {path_to_file}
+    etls working_hours/{version}/huberman_minns --path-to-file {path_to_file}
 
 """
 
