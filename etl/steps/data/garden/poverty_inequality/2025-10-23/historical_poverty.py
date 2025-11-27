@@ -21,6 +21,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from scipy import stats
 from structlog import get_logger
 
 from etl.data_helpers.misc import interpolate_table
@@ -182,25 +183,43 @@ def run() -> None:
     # Add ginis from Van Zanden et al.
     tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
-    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean)
+    # Prepare mean and gini data for extrapolation
+    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
 
-    tb_gini_mean.to_csv("tb_gini_mean.csv", index=False)
+    # Create 1000 bins from mean and gini data
+    tb_thousand_bins_from_mean_gini = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins
+    )
 
-    # Extrapolate means from PIP backwards using GDP growth rates
-    tb_gini_mean_extended = extrapolate_mean_with_gdp(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
+    # Calculate poverty measures
+    tb = calculate_poverty_measures(tb=tb_thousand_bins_from_mean_gini)
+
+    # Create stacked variables for stacked area/bar charts
+    tb = create_stacked_variables(tb=tb)
+
+    # Calculate an alternative method with our population dataset
+    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
-    tb_extended = tb_extended.format(
-        ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
-    )
+    # tb_extended = tb_extended.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
+    # )
+    # tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
+    # )
 
     #
     # Save outputs.
     #
     # Create dataset
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_population, tb_extended],
+        tables=[
+            tb,
+            tb_population,
+            # tb_extended,
+            # tb_thousand_bins_from_mean_gini,
+        ],
         default_metadata=ds_thousand_bins.metadata,
         repack=False,
     )
@@ -283,8 +302,6 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         limit_direction="both",
         limit_area="inside",
     )
-
-    tb_gdp.to_csv("debug_interpolated_gdp.csv", index=False)
 
     if INTERPOLATE_LOG_GDP:
         # Convert back from log to absolute values
@@ -450,6 +467,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate[
         ~tb_thousand_bins_to_extrapolate["country"].isin(missing_in_gdp)
     ].reset_index(drop=True)
+
     # Merge with tb_gdp to get growth factors
     tb_thousand_bins_to_extrapolate = pr.merge(
         tb_thousand_bins_to_extrapolate,
@@ -546,7 +564,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     return tb_thousand_bins_extended
 
 
-def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
+def calculate_poverty_measures(tb: Table) -> Table:
     """
     Calculate poverty headcount and headcount ratios and for all poverty lines.
     For each year, the data is sorted by income avg, and the cumulative population is calculated.
@@ -1009,12 +1027,34 @@ def compare_countries_available_in_two_tables(
     return missing_in_tb_1, missing_in_tb_2
 
 
-def prepare_mean_gini_data(tb_gini_mean: Table) -> Table:
+def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
     """
     Prepare mean income and Gini coefficient data for extrapolation.
-    It selects the relevant columns of mean and gini
+    It consolidates mean and Gini columns based on priority rules, interpolates missing values, and extrapolates means using GDP growth factors.
     """
     tb_gini_mean = tb_gini_mean.copy()
+    tb_gdp = tb_gdp.copy()
+
+    # Check countries missing in either table
+    missing_in_gini_mean, missing_in_gdp = compare_countries_available_in_two_tables(
+        tb_1=tb_gini_mean,
+        tb_2=tb_gdp,
+        name_tb_1="gini_mean",
+        name_tb_2="gdp",
+    )
+
+    # Filter tb_gini_mean to drop missing_in_gini_mean and missing_in_gdp
+    tb_gini_mean = tb_gini_mean[
+        ~tb_gini_mean["country"].isin(missing_in_gdp) & ~tb_gini_mean["country"].isin(missing_in_gini_mean)
+    ].reset_index(drop=True)
+
+    # Filter tb_gini_mean to show data from EARLIEST_YEAR only
+    tb_gini_mean = tb_gini_mean[tb_gini_mean["year"] >= EARLIEST_YEAR].reset_index(drop=True)
+
+    # Filter tb_gdp to show data from EARLIEST_YEAR to LATEST_YEAR_PIP_FILLED only
+    tb_gdp = tb_gdp[(tb_gdp["year"] >= EARLIEST_YEAR) & (tb_gdp["year"] <= LATEST_YEAR_PIP_FILLED)].reset_index(
+        drop=True
+    )
 
     # Generate mean column using priority: survey > filled
     tb_gini_mean[["mean", "mean_origin"]] = tb_gini_mean.apply(select_mean, axis=1)
@@ -1028,8 +1068,11 @@ def prepare_mean_gini_data(tb_gini_mean: Table) -> Table:
     tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
 
     # Separate mean and gini tables, to interpolate differently
-    tb_gini = tb_gini_mean[["country", "year", "gini"]]
-    tb_mean = tb_gini_mean[["country", "year", "mean"]]
+    tb_gini = tb_gini_mean[["country", "year", "gini"]].copy()
+    tb_mean = tb_gini_mean[["country", "year", "mean"]].copy()
+
+    # Also create a table with ginis to only extrapolate (repeat values from min year to earliest value)
+    tb_gini_outside_extrapolation = tb_gini_mean[["country", "year", "gini"]]
 
     # Interpolate mean and gini separately
 
@@ -1043,11 +1086,6 @@ def prepare_mean_gini_data(tb_gini_mean: Table) -> Table:
         limit_area=None,  # Interpolate/extrapolate everywhere, including outside existing data ranges (repeating first/last known value)
     )
 
-    tb_gini.to_csv("debug_interpolated_gini.csv", index=False)
-
-    # Debug: save tb_mean BEFORE interpolation
-    tb_mean.to_csv("debug_mean_before_interpolation.csv", index=False)
-
     tb_mean = interpolate_table(
         tb_mean,
         entity_col="country",
@@ -1057,7 +1095,17 @@ def prepare_mean_gini_data(tb_gini_mean: Table) -> Table:
         limit_direction="both",
         limit_area="inside",  # Only interpolate inside existing data ranges
     )
-    tb_mean.to_csv("debug_interpolated_mean.csv", index=False)
+
+    # Also interpolate tb_gini_outside_extrapolation, to replicate values from 1820 to earliest observation
+    tb_gini_outside_extrapolation = interpolate_table(
+        tb_gini_outside_extrapolation,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # Interpolate for the full range of years
+        method="linear",
+        limit_direction="both",
+        limit_area="outside",  # Only extrapolate outside existing data ranges
+    )
 
     # Merge back both tables
     tb_gini_mean_interpolated = pr.merge(tb_mean, tb_gini, on=["country", "year"], how="outer")
@@ -1065,13 +1113,88 @@ def prepare_mean_gini_data(tb_gini_mean: Table) -> Table:
     # Add original columns back
     tb_gini_mean = pr.merge(
         tb_gini_mean_interpolated,
-        tb_gini_mean,
+        tb_gini_mean[["country", "year", "mean"]],
         on=["country", "year"],
         how="left",
         suffixes=("", "_original"),
     )
 
-    tb_gini_mean.to_csv("debug_final_gini_mean_prepared.csv", index=False)
+    # Add "original" gini (original data + extrapolation repeating values up to 1820)
+    tb_gini_mean = pr.merge(
+        tb_gini_mean, tb_gini_outside_extrapolation, on=["country", "year"], how="left", suffixes=("", "_original")
+    )
+
+    # Separate data in two parts: before (or equal to) and after LATEST_YEAR_PIP_FILLED
+    tb_before_pip = tb_gini_mean[tb_gini_mean["year"] <= LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+    tb_after_pip = tb_gini_mean[tb_gini_mean["year"] > LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+
+    # Calculate growth factors for mean in tb_before_pip
+    tb_before_pip = tb_before_pip.sort_values(["country", "year"])
+    tb_before_pip["growth_factor"] = tb_before_pip.groupby("country")["mean"].transform(lambda x: x / x.shift(1))
+
+    # From tb_gdp, sort values and shift growth_factor to align with calculation in mean
+    tb_gdp = tb_gdp.sort_values(["country", "year"])
+    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["growth_factor"].shift(1)
+
+    # Merge both tables
+    tb_before_pip = pr.merge(
+        tb_before_pip,
+        tb_gdp[["country", "year", "growth_factor"]],
+        on=["country", "year"],
+        how="left",
+        suffixes=("_mean", "_gdp"),
+    )
+
+    # Select growth factor for mean using priority: original > gdp
+    tb_before_pip[["growth_factor", "growth_factor_origin"]] = tb_before_pip.apply(
+        select_growth_factor_for_mean, axis=1
+    )
+
+    # Shift growth_factor down by one year to align with the starting year of extrapolation
+    tb_before_pip["growth_factor"] = tb_before_pip.groupby("country")["growth_factor"].shift(-1)
+    tb_before_pip["growth_factor_origin"] = tb_before_pip.groupby("country")["growth_factor_origin"].shift(-1)
+
+    # Calculate the cumulative growth factor product from LATEST_YEAR_PIP_FILLED to each year
+    # Make growth_factor Float64 to avoid issues with cumprod
+    tb_before_pip["growth_factor"] = tb_before_pip["growth_factor"].astype("Float64")
+
+    # For years before 1981: Calculate cumulative growth factor going backwards from 1981
+    # Sort by country and year (descending) and apply cumprod
+    tb_before_pip = tb_before_pip.sort_values(["country", "year"], ascending=[True, False])
+    tb_before_pip["cumulative_growth_factor"] = tb_before_pip.groupby("country")["growth_factor"].cumprod()
+
+    # Sort values back to original order
+    tb_before_pip = tb_before_pip.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # For each country, add mean_reference, which is the mean at LATEST_YEAR_PIP_FILLED
+    tb_before_pip = pr.merge(
+        tb_before_pip,
+        tb_before_pip[tb_before_pip["year"] == LATEST_YEAR_PIP_FILLED][["country", "mean"]].rename(
+            columns={"mean": "mean_reference"}
+        ),
+        on="country",
+        how="left",
+    )
+
+    # Extrapolate mean backwards using mean_reference and cumulative_growth_factor
+    tb_before_pip["mean"] = tb_before_pip["mean_reference"] / tb_before_pip["cumulative_growth_factor"]
+
+    # As cumulative_growth_factor can be NaN for the last year (if no growth factor is available), fill mean with mean_reference in that case (only if year == LATEST_YEAR_PIP_FILLED)
+    tb_before_pip.loc[tb_before_pip["year"] == LATEST_YEAR_PIP_FILLED, "mean"] = tb_before_pip["mean_reference"]
+
+    # Concatenate back together
+    tb_gini_mean = pd.concat([tb_before_pip, tb_after_pip], ignore_index=True)
+    tb_gini_mean = tb_gini_mean.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Keep only relevant columns
+    tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini", "mean_original", "gini_original"]]
+
+    # Check if there are any remaining NaN values in mean or gini
+    remaining_nans = tb_gini_mean[tb_gini_mean["mean"].isna() | tb_gini_mean["gini"].isna()]
+    assert (
+        len(remaining_nans) == 0
+    ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation."
+    f'{remaining_nans[["country", "year", "mean", "gini"]]}'
 
     return tb_gini_mean
 
@@ -1100,44 +1223,128 @@ def select_gini(row):
         return pd.Series({"gini": row["gini_van_zanden"], "gini_origin": "van_zanden"})
 
 
-def extrapolate_mean_with_gdp(tb_gini_mean: Table, tb_gdp: Table) -> Table:
+def select_growth_factor_for_mean(row):
     """
-    Extrapolate mean income values using GDP per capita growth factors.
-    The function prepares the GDP data, calculates growth factors, and merges them with the mean income data.
-    It handles regions and historical entities to ensure comprehensive coverage.
+    Select growth factor for mean on priority: original > gdp.
+    This way, we have the longest country-specific mean growth series possible.
     """
-
-    tb_gdp = tb_gdp.copy()
-    tb_gini_mean = tb_gini_mean.copy()
-
-    # Merge both tables
-    tb = pr.merge(
-        tb_gini_mean, tb_gdp[["country", "year", "cumulative_growth_factor"]], on=["country", "year"], how="outer"
-    )
-
-    # Rebase cumulative growth factor from LATEST_YEAR to LATEST_YEAR_PIP_FILLED
-
-    tb = tb.groupby("country", group_keys=False).apply(rebase_growth_factor)
-
-    tb.to_csv("debug_extrapolated_mean_with_gdp.csv", index=False)
-
-    return tb
+    if not pd.isna(row["growth_factor_mean"]):
+        return pd.Series({"growth_factor": row["growth_factor_mean"], "growth_factor_origin": "mean"})
+    else:
+        return pd.Series({"growth_factor": row["growth_factor_gdp"], "growth_factor_origin": "gdp"})
 
 
-def rebase_growth_factor(group):
+def expand_means_and_ginis_to_thousand_bins(tb_gini_mean: Table, tb_thousand_bins: Table) -> Table:
     """
-    Rebase cumulative growth factor for a country group to use LATEST_YEAR_PIP_FILLED as the base year.
+    Expand mean and Gini data to a 1000-binned income distribution table.
+    This is done by assuming a log-normal distribution for income within each country-year and using the mean and Gini to parameterize the distribution.
 
-    This function divides all cumulative_growth_factor values by the value at LATEST_YEAR_PIP_FILLED,
-    effectively making that year the reference point (value = 1.0) for the growth series.
-
-    Args:
-        group: DataFrame subset for a single country containing year and cumulative_growth_factor columns.
+    For a log-normal distribution:
+    - Gini = 2 * Φ(σ/√2) - 1, where Φ is the standard normal CDF and σ is the std dev of log(income)
+    - Mean income relates to the log-normal parameters through: mean = exp(μ + σ²/2)
 
     Returns:
-        DataFrame with rebased cumulative_growth_factor values.
+        Table with columns: country, year, quantile (1-1000), avg (income), pop (population)
     """
-    base_value = group.loc[group["year"] == LATEST_YEAR_PIP_FILLED, "cumulative_growth_factor"]
-    if len(base_value) > 0:
-        group["cumulative_growth_factor"] = group["cumulative_growth_factor"] / base_value.iloc[0]
-    return group
+    # Filter tb_gini_mean to only country-years not in tb_thousand_bins
+    existing_country_years = set(tb_thousand_bins[["country", "year"]].drop_duplicates().apply(tuple, axis=1))
+    tb_new = tb_gini_mean[~tb_gini_mean[["country", "year"]].apply(tuple, axis=1).isin(existing_country_years)].copy()
+
+    # Drop rows with missing mean or gini
+    tb_new = tb_new.dropna(subset=["mean", "gini"]).reset_index(drop=True)
+
+    if len(tb_new) == 0:
+        # No new country-years to add, return original tb_thousand_bins
+        return tb_thousand_bins
+
+    # Calculate sigma for each row
+    tb_new["sigma"] = tb_new["gini"].apply(gini_to_sigma)
+
+    # Drop rows where sigma couldn't be calculated
+    tb_new = tb_new.dropna(subset=["sigma"]).reset_index(drop=True)
+
+    if len(tb_new) == 0:
+        return tb_thousand_bins
+
+    # Calculate mu parameter: mean = exp(μ + σ²/2), so μ = log(mean) - σ²/2
+    tb_new["mu"] = np.log(tb_new["mean"]) - (tb_new["sigma"] ** 2) / 2
+
+    # Create expanded table with 1000 quantiles per country-year
+    expanded_rows = []
+
+    for _, row in tb_new.iterrows():
+        country = row["country"]
+        year = row["year"]
+        mu = row["mu"]
+        sigma = row["sigma"]
+
+        # Generate 1000 quantiles
+        quantiles = np.arange(1, 1001)
+
+        # For each quantile, calculate the income level
+        # Use percentile points of the log-normal distribution
+        percentiles = (quantiles - 0.5) / 1000  # Midpoint of each bin
+
+        # Income at each percentile from log-normal distribution
+        incomes = stats.lognorm.ppf(percentiles, s=sigma, scale=np.exp(mu))
+
+        for quantile, income in zip(quantiles, incomes):
+            expanded_rows.append(
+                {
+                    "country": country,
+                    "year": year,
+                    "quantile": quantile,
+                    "avg": income,
+                }
+            )
+
+    # Create expanded table
+    tb_expanded = Table(pd.DataFrame(expanded_rows))
+
+    # Add population
+    tb_expanded = paths.regions.add_population(
+        tb=tb_expanded,
+        population_col="pop",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+    )
+
+    # Divide population equally among 1000 quantiles
+    tb_expanded["pop"] /= 1000
+
+    # Add region and region_old columns, from tb_thousand_bins
+    # Create a mapping of country to region and region_old
+    country_region_map = tb_thousand_bins[["country", "region", "region_old"]].drop_duplicates()
+    tb_expanded = pr.merge(
+        tb_expanded,
+        country_region_map,
+        on="country",
+        how="left",
+    )
+
+    # Concatenate with original thousand_bins
+    tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+    tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.sort_values(
+        ["country", "year", "quantile"]
+    ).reset_index(drop=True)
+
+    return tb_thousand_bins_from_mean_gini
+
+
+def gini_to_sigma(gini):
+    """
+    Convert Gini coefficient to sigma parameter of log-normal distribution.
+    """
+    if gini <= 0 or gini >= 1:
+        return np.nan
+    try:
+        # Gini = 2 * Φ(σ/√2) - 1
+        # Solve for σ: Φ(σ/√2) = (Gini + 1) / 2
+        target_cdf = (gini + 1) / 2
+        # Use inverse CDF to find σ/√2
+        z_value = stats.norm.ppf(target_cdf)
+        sigma = z_value * np.sqrt(2)
+        return sigma
+    except Exception:
+        return np.nan
