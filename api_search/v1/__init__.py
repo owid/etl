@@ -1,5 +1,5 @@
 import structlog
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from api_search.semantic_search import get_model_info, search_indicators
 
@@ -19,7 +19,10 @@ def health() -> dict:
 
 
 @v1.get("/indicators", response_model=SemanticSearchResponse)
-async def search_indicators_semantic(query: str, limit: int = 10) -> SemanticSearchResponse:
+async def search_indicators_semantic(
+    query: str = Query(..., description="Search query", examples=["gdp", "population"]),
+    limit: int = Query(10, description="Limit the number of results", le=100),
+) -> SemanticSearchResponse:
     """
     Search for indicators using semantic similarity.
 
