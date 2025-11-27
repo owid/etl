@@ -4,7 +4,7 @@ from typing import Dict
 
 import owid.catalog.processing as pr
 from owid.catalog import Table, utils
-from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from owid.datautils.dataframes import combine_two_overlapping_dataframes, map_series
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -230,6 +230,8 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
     #   'Aggregate fuel - Gas and other fossil',
     #   'Fuel - Coal',
     #   'Fuel - Wind',
+    # - Units differ slightly: for global, emissions and intensity units are called "mtCO2" and "gCO2/kWh", while for European data, units are called "MtCO2e" and "gCO2e per kWh". After inspection of a few countries, the values seem to be in good agreement, so the units are most likely the same. As explained in their methodology, it should refer to CO2 equivalents over a 100 year timescale:
+    # https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf
     # - Global data includes data for all European countries from 2000 onwards. European data includes the same data from 2000 onwards, but also data from 1990 to 1999.
 
     error = "Variables in global and European data have changed."
@@ -250,11 +252,22 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
         "subcategory",
     ] = "Fuel"
 
+    # Harmonize units. Arbitrarily, adopt the global ones.
+    # NOTE: All units will be redefined at the end of this step, using the definitions in the accompanying meta.yaml file.
+    error = "Units have changed."
+    assert set(tb_europe[(tb_europe["category"] == "Power sector emissions")]["unit"]) == {
+        "MtCO2e",
+        "gCO2e per kWh",
+    }, error
+    assert set(tb_global[(tb_global["category"] == "Power sector emissions")]["unit"]) == {"mtCO2", "gCO2/kWh"}, error
+    tb_europe.loc[tb_europe["unit"] == "MtCO2e", "unit"] = "mtCO2"
+    tb_europe.loc[tb_europe["unit"] == "gCO2e per kWh", "unit"] = "gCO2/kWh"
+
     # Create the gas and other fossil aggregate for European data.
     error = "Expected European data to not include 'Gas and other fossil' variable."
     assert not (tb_europe["variable"] == "Gas and other fossil").any(), error
     tb_europe_gas_and_other_fossil = (
-        tb_europe[(tb_europe["variable"].isin(["Gas", "Other fossil"])) & (tb_europe["unit"].isin(["TWh", "MtCO2e"]))]
+        tb_europe[(tb_europe["variable"].isin(["Gas", "Other fossil"])) & (tb_europe["unit"].isin(["TWh", "mtCO2"]))]
         .groupby(["country", "year", "unit", "category"], as_index=False)
         .agg({"value": "sum"})
         .assign(**{"variable": "Gas and other fossil", "subcategory": "Aggregate fuel"})
@@ -628,8 +641,6 @@ def run() -> None:
     ].reset_index(drop=True)
     assert set(tb_generation["subcategory"]) == {"Fuel"}
 
-    from owid.datautils.dataframes import map_series
-
     # Add a column with emission factors.
     tb_generation["emission_factor"] = map_series(
         tb_generation["variable"], mapping=emission_factors, warn_on_missing_mappings=True, warn_on_unused_mappings=True
@@ -683,7 +694,6 @@ def run() -> None:
     )
     tb_intensity.loc[(tb_intensity["variable"] == "Total generation"), "variable"] = "CO2 intensity"
 
-    # TODO: Units of emissions and carbon intensity of global and european data are different! Harmonize them, and also check that they refer to the same thing. Maybe assert they are equal before combining.
     # Append the new direct emissions and intensities to the original table.
     tb = pr.concat([tb, tb_emissions, tb_intensity], ignore_index=True)
     ####################################################################################################################
