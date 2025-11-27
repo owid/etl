@@ -182,10 +182,12 @@ def run() -> None:
     # Add ginis from Van Zanden et al.
     tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
-    # Extrapolate means from PIP backwards using GDP growth rates
-    tb_gini_mean_extended = extrapolate_mean_with_gdp(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
+    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean)
 
     tb_gini_mean.to_csv("tb_gini_mean.csv", index=False)
+
+    # Extrapolate means from PIP backwards using GDP growth rates
+    tb_gini_mean_extended = extrapolate_mean_with_gdp(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -276,11 +278,13 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         tb_gdp,
         entity_col="country",
         time_col="year",
-        time_mode="full_range",
+        time_mode="full_range",  # All the years between min and max year of the table for each country
         method="linear",
         limit_direction="both",
         limit_area="inside",
     )
+
+    tb_gdp.to_csv("debug_interpolated_gdp.csv", index=False)
 
     if INTERPOLATE_LOG_GDP:
         # Convert back from log to absolute values
@@ -1008,18 +1012,66 @@ def compare_countries_available_in_two_tables(
 def prepare_mean_gini_data(tb_gini_mean: Table) -> Table:
     """
     Prepare mean income and Gini coefficient data for extrapolation.
-    It select the relevant columns of mean and gini
+    It selects the relevant columns of mean and gini
     """
     tb_gini_mean = tb_gini_mean.copy()
 
     # Generate mean column using priority: survey > filled
     tb_gini_mean[["mean", "mean_origin"]] = tb_gini_mean.apply(select_mean, axis=1)
+    tb_gini_mean["mean"] = tb_gini_mean["mean"].astype("Float64")
 
     # Generate gini column using priority: survey > filled > van_zanden
     tb_gini_mean[["gini", "gini_origin"]] = tb_gini_mean.apply(select_gini, axis=1)
+    tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
 
     # Keep only relevant columns
-    tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]].reset_index(drop=True)
+    tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
+
+    # Separate mean and gini tables, to interpolate differently
+    tb_gini = tb_gini_mean[["country", "year", "gini"]]
+    tb_mean = tb_gini_mean[["country", "year", "mean"]]
+
+    # Interpolate mean and gini separately
+
+    tb_gini = interpolate_table(
+        tb_gini,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # Interpolate for the full range of years
+        method="linear",
+        limit_direction="both",
+        limit_area=None,  # Interpolate/extrapolate everywhere, including outside existing data ranges (repeating first/last known value)
+    )
+
+    tb_gini.to_csv("debug_interpolated_gini.csv", index=False)
+
+    # Debug: save tb_mean BEFORE interpolation
+    tb_mean.to_csv("debug_mean_before_interpolation.csv", index=False)
+
+    tb_mean = interpolate_table(
+        tb_mean,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # Interpolate for the full range of years
+        method="linear",
+        limit_direction="both",
+        limit_area="inside",  # Only interpolate inside existing data ranges
+    )
+    tb_mean.to_csv("debug_interpolated_mean.csv", index=False)
+
+    # Merge back both tables
+    tb_gini_mean_interpolated = pr.merge(tb_mean, tb_gini, on=["country", "year"], how="outer")
+
+    # Add original columns back
+    tb_gini_mean = pr.merge(
+        tb_gini_mean_interpolated,
+        tb_gini_mean,
+        on=["country", "year"],
+        how="left",
+        suffixes=("", "_original"),
+    )
+
+    tb_gini_mean.to_csv("debug_final_gini_mean_prepared.csv", index=False)
 
     return tb_gini_mean
 
