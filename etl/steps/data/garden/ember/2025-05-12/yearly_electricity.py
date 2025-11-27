@@ -183,6 +183,10 @@ REGIONS = {
     "Oceania": {},
     "South America": {},
     "European Union (27)": {},
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
 }
 
 
