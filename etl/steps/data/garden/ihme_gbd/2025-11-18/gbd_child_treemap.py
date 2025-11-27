@@ -12,12 +12,13 @@ paths = PathFinder(__file__)
 cause_renaming_dict = {
     "Adverse effects of medical treatment": "Medical accidents",
     # "Animal contact": "Animal attacks",
-    "Conflict and terrorism": "Conflict",
+    "Self-harm and interpersonal violence": "Conflict, terrorism, and homicide",  # Self-harm is null for children
     "Congenital heart anomalies": "Heart abnormalities",
     "Digestive congenital anomalies": "Digestive defects",
     "Fire, heat, and hot substances": "Fire & temperature",
     "Hemolytic disease and other neonatal jaundice": "Hemolytic disorders",
     "Invasive Non-typhoidal Salmonella (iNTS)": "Invasive non-typhoidal salmonella",
+    "Interpersonal violence": "Homicide",
     "Neonatal encephalopathy due to birth asphyxia and trauma": "Neonatal asphyxia (suffocation) and trauma",
     "Neonatal preterm birth": "Preterm birth",
     "Neonatal sepsis and other neonatal infections": "Neonatal sepsis & other infections",
@@ -35,7 +36,7 @@ cause_renaming_dict = {
 broad_cause_dict = {
     # "Animal attacks": "Injuries",
     "Cancers": "Non-communicable diseases",
-    "Conflict": "Injuries",
+    "Conflict, terrorism, and homicide": "Injuries",
     "Diarrheal diseases": "Infectious diseases",
     "Digestive defects": "Birth disorders",
     "Drowning": "Injuries",
@@ -65,7 +66,7 @@ broad_cause_dict = {
     "Syphilis and other STDs": "Infectious diseases",
     "Transport accidents": "Injuries",
     "Tuberculosis": "Infectious diseases",
-    "Violence": "Injuries",
+    # "Violence": "Injuries",
     "Whooping cough": "Infectious diseases",
 }
 
@@ -138,14 +139,7 @@ def reaggregate_causes(tb: Table) -> Table:
     tb = pull_out_cause(
         tb, pull_out_cause=["Pertussis", "Measles", "Meningitis"], aggregate_cause="Other infectious diseases"
     )
-    tb = pull_out_cause(
-        tb,
-        pull_out_cause=[
-            "Conflict and terrorism"
-        ],  # Self-harm is also technically in this group but it's empty for children
-        aggregate_cause="Self-harm and interpersonal violence",
-        residual_name="Violence",
-    )
+
     tb = pull_out_cause(
         tb,
         pull_out_cause=[

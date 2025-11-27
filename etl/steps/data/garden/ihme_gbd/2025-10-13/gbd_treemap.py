@@ -16,6 +16,7 @@ cause_renaming_dict = {
     "Self-harm": "Suicide",
     "Neurological disorders": "Neurological diseases",
     "Neonatal disorders": "Neonatal deaths",
+    "Interpersonal violence": "Homicide",
 }
 
 broad_cause_dict = {
