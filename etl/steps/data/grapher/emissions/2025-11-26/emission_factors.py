@@ -24,7 +24,7 @@ def run() -> None:
     tb["year"] = paths.version.split("-")[0]
 
     # Improve table format.
-    tb = tb.format(keys=["country", "year"])
+    tb = tb.format(keys=["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
