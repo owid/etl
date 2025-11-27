@@ -525,6 +525,43 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
     return tb_combined
 
 
+def replicate_ember_lifecycle_emissions(tb: Table) -> None:
+    # To check we understand how lifecycle emissions are calculated by Ember, I'll calculate the emissions of a few sources, and compare the result with theirs.
+    # Let's take the lifecycle emission factors from Ember's methodology:
+    # https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf
+    lifecycle_factors = {"Bioenergy": 230, "Hydro": 24, "Solar": 48, "Other renewables": 38, "Other fossil": 700}
+    # In principle, most of them come from Table A.III.2 of
+    # https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
+    # Indeed, the numbers for hydro and solar come from this table; hydro seems to be the sum of (infrastructure & supply chain emissions) + (biogenic CO2 emissions and albedo effect), rounded to two significant figures.
+    # The value for "Other renwables" corresponds to the median value of geothermal.
+    # The origin of the value of "Other fossil" is unclear.
+    # Using the median values. We check that we can reproduce their results reasonably well.
+    for source, emission_factor in lifecycle_factors.items():
+        _tb = tb[(tb["unit"] == "TWh") & (tb["variable"] == source)].reset_index(drop=True)
+        # Generation is in TWh, and the emission factor is in gCO2e/kWh. To convert to MtCO2:
+        # X TWH * (1e9 kWh / 1 TWh) * (1 MtCO2e / 1e12 gCO2e) * gCO2e / kWh = X * 1e-3 MtCO2e
+        _tb["value"] *= emission_factor * 1e-3
+        _tb = (
+            tb[(tb["unit"] == "mtCO2") & (tb["variable"] == source) & (tb["value"] > 0)]
+            .drop(columns=["unit", "category"])
+            .merge(
+                _tb.drop(columns=["unit", "category"]),
+                on=["country", "year", "variable", "subcategory"],
+                how="inner",
+                suffixes=("_true", "_pred"),
+            )
+        )
+        # The true values seem to be rounded to 2 decimals. I'll check that there are no instances where the true value of emissions differs from the predicted one by more than 2% and 0.02 in absolute value.
+        error = f"Unable to reproduce Ember's lifecycle emissions for {source}"
+        assert _tb[
+            ((100 * abs(_tb["value_true"].round(2) - _tb["value_pred"].round(2)) / (_tb["value_true"].round(2))) > 15)
+            & (abs(_tb["value_true"].round(2) - _tb["value_pred"].round(2)) > 0.02)
+        ].empty, error
+
+    # The emission factor for coal, gas, nuclear and wind, as Ember's methodology explains, are a bit more complicated; they come from different sources and may change at the country level.
+    # So we will not attempt to replicate those.
+
+
 def run() -> None:
     #
     # Load data.
@@ -556,7 +593,9 @@ def run() -> None:
 
     ####################################################################################################################
     # TODO: Create a function.
-    # TODO: Check that the emissions agree with the lifecycle factors (at least a few, maybe not coal and other that are a bit more complicated to calculate and possibly change at the country level).
+
+    # Sanity check: replicate Ember's lifecycle emissions for a few sources.
+    replicate_ember_lifecycle_emissions(tb=tb)
 
     # Create a harmonized table of electricity emission factors.
     # NOTE: Biomass has no factor; we simply assign zero
@@ -696,6 +735,9 @@ def run() -> None:
 
     # Append the new direct emissions and intensities to the original table.
     tb = pr.concat([tb, tb_emissions, tb_intensity], ignore_index=True)
+
+    # TODO: Compare intensities of a few countries with those from other data sources.
+
     ####################################################################################################################
 
     # Split data into different tables, one per category, and process each one individually.
