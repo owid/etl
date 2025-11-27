@@ -26,6 +26,7 @@ broad_cause_dict = {
     "Diarrheal diseases": "Infectious diseases",
     "Digestive diseases": "Non-communicable diseases",
     "HIV/AIDS": "Infectious diseases",
+    "Homicide": "Injuries",
     "Interpersonal violence": "Injuries",
     "Malaria": "Infectious diseases",
     "Maternal disorders": "Maternal, neonatal and nutritional diseases",
