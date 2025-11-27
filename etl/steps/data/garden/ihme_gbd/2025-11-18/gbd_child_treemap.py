@@ -45,6 +45,7 @@ broad_cause_dict = {
     "HIV/AIDS": "Infectious diseases",
     "Heart abnormalities": "Birth disorders",
     "Hemolytic disorders": "Birth disorders",
+    "Homicide": "Injuries",
     # "Invasive non-typhoidal salmonella": "Infectious diseases",
     "Malaria": "Infectious diseases",
     "Malnutrition": "Non-communicable diseases",
@@ -96,6 +97,8 @@ def run() -> None:
                 "Communicable, maternal, neonatal, and nutritional diseases",
                 "Non-communicable diseases",
                 "Injuries",
+                "Invasive Non-typhoidal Salmonella (iNTS)",
+                "Conflict and terrorism",
             ]
         )
     ]
@@ -212,6 +215,7 @@ def rename_causes(tb: Table, cause_renaming_dict: dict[str, str], broad_cause_di
     """
     tb["cause"] = tb["cause"].replace(cause_renaming_dict, regex=False)
     tb["broad_cause"] = tb["cause"].map(broad_cause_dict)
+    assert tb["broad_cause"].isnull().sum() == 0, "Some broad causes were not mapped correctly."
     return tb
 
 
