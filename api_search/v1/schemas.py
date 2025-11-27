@@ -40,7 +40,7 @@ class SemanticSearchResult(BaseModel):
                     "parquet_url": "https://catalog.ourworldindata.org/grapher/worldbank_wdi/2023-05-29/wdi.parquet",
                     "run_sql_template": "SELECT country, year, ny_gdp_pcap_pp_kd FROM 'https://catalog.ourworldindata.org/grapher/worldbank_wdi/2023-05-29/wdi.parquet' WHERE country = 'France' LIMIT 100",
                     "column": "ny_gdp_pcap_pp_kd",
-                    "unit": "constant 2017 international $"
+                    "unit": "constant 2017 international $",
                 },
                 "catalog_path": "grapher/worldbank_wdi/2023-05-29/wdi/ny_gdp_pcap_pp_kd",
                 "n_charts": 12,
@@ -72,7 +72,7 @@ class SemanticSearchResponse(BaseModel):
                             "parquet_url": "https://catalog.ourworldindata.org/grapher/worldbank_wdi/2023-05-29/wdi.parquet",
                             "run_sql_template": "SELECT country, year, ny_gdp_pcap_pp_kd FROM 'https://catalog.ourworldindata.org/grapher/worldbank_wdi/2023-05-29/wdi.parquet' WHERE country = 'France' LIMIT 100",
                             "column": "ny_gdp_pcap_pp_kd",
-                            "unit": "constant 2017 international $"
+                            "unit": "constant 2017 international $",
                         },
                         "catalog_path": "grapher/worldbank_wdi/2023-05-29/wdi/ny_gdp_pcap_pp_kd",
                         "n_charts": 12,
