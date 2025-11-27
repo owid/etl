@@ -11,7 +11,7 @@ start_time=$(date +%s)
 
 echo '--- Update COVID-19 sequences'
 cd /home/owid/etl
-uv run python snapshots/covid/latest/sequence.py
+uv run etls covid/latest/sequence
 
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'

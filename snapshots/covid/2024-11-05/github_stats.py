@@ -10,7 +10,7 @@ If you want to retrieve this data again, please look at the script `get_stats.py
 
 Run this snapshot script as:
 
-    python snapshots/covid/2024-11-05/github_stats.py \
+    etls covid/2024-11-05/github_stats \
         --issues gh_stats/issues-20241106211832.csv \
         --issues-comments gh_stats/comments-issues-20241106211832.csv \
         --issues-users gh_stats/users-issues-20241106211832.csv \
