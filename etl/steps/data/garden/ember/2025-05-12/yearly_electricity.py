@@ -527,6 +527,9 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
 
 def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # To check we understand how lifecycle emissions are calculated by Ember, I'll calculate the emissions of a few sources, and compare the result with theirs.
+    # The emission factor for coal, gas, nuclear and wind, as Ember's methodology explains, are a bit more complicated; they come from different sources and may change at the country level.
+    # So we will not attempt to replicate those.
+
     # Let's take the lifecycle emission factors from Ember's methodology:
     # https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf
     lifecycle_factors = {"Bioenergy": 230, "Hydro": 24, "Solar": 48, "Other renewables": 38, "Other fossil": 700}
@@ -558,42 +561,10 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
             & (abs(_tb["value_true"].round(2) - _tb["value_pred"].round(2)) > 0.02)
         ].empty, error
 
-    # The emission factor for coal, gas, nuclear and wind, as Ember's methodology explains, are a bit more complicated; they come from different sources and may change at the country level.
-    # So we will not attempt to replicate those.
 
-
-def run() -> None:
-    #
-    # Load data.
-    #
-    # Load dataset from meadow and read its main table.
-    ds_meadow = paths.load_dataset("yearly_electricity")
-    tb_global = ds_meadow.read("yearly_electricity__global")
-    tb_europe = ds_meadow.read("yearly_electricity__europe")
-
-    # Load emission factors dataset.
-    ds_factors = paths.load_dataset("emission_factors")
-    # Read the electricity emission factors table (to calculate emissions and intensity for gas and coal).
-    tb_electricity_factors = ds_factors.read("electricity_emission_factors")
-    # Read the energy emission factors table (to calculate emissions and intensity for other fossil).
-    tb_energy_factors = ds_factors.read("energy_emission_factors")
-
-    #
-    # Process data.
-    #
-    # Sanity check inputs.
-    sanity_check_inputs(tb_global=tb_global, tb_europe=tb_europe)
-
-    # Prepare global and European input data.
-    tb_global = prepare_input_data(tb=tb_global)
-    tb_europe = prepare_input_data(tb=tb_europe)
-
-    # Combine global and European data.
-    tb = combine_global_and_europe_data(tb_global=tb_global, tb_europe=tb_europe)
-
-    ####################################################################################################################
-    # TODO: Create a function.
-
+def add_emissions_and_carbon_intensity_of_direct_combustion(
+    tb: Table, tb_electricity_factors: Table, tb_energy_factors: Table
+) -> Table:
     # Sanity check: replicate Ember's lifecycle emissions for a few sources.
     replicate_ember_lifecycle_emissions(tb=tb)
 
@@ -736,9 +707,45 @@ def run() -> None:
     # Append the new direct emissions and intensities to the original table.
     tb = pr.concat([tb, tb_emissions, tb_intensity], ignore_index=True)
 
-    # TODO: Compare intensities of a few countries with those from other data sources.
+    return tb
 
-    ####################################################################################################################
+
+def run() -> None:
+    #
+    # Load data.
+    #
+    # Load dataset from meadow and read its main table.
+    ds_meadow = paths.load_dataset("yearly_electricity")
+    tb_global = ds_meadow.read("yearly_electricity__global")
+    tb_europe = ds_meadow.read("yearly_electricity__europe")
+
+    # Load emission factors dataset.
+    ds_factors = paths.load_dataset("emission_factors")
+    # Read the electricity emission factors table (to calculate emissions and intensity for gas and coal).
+    tb_electricity_factors = ds_factors.read("electricity_emission_factors")
+    # Read the energy emission factors table (to calculate emissions and intensity for other fossil).
+    tb_energy_factors = ds_factors.read("energy_emission_factors")
+
+    #
+    # Process data.
+    #
+    # Sanity check inputs.
+    sanity_check_inputs(tb_global=tb_global, tb_europe=tb_europe)
+
+    # Prepare global and European input data.
+    tb_global = prepare_input_data(tb=tb_global)
+    tb_europe = prepare_input_data(tb=tb_europe)
+
+    # Combine global and European data.
+    tb = combine_global_and_europe_data(tb_global=tb_global, tb_europe=tb_europe)
+
+    # Add emissions and carbon intensity of direct combustion.
+    # NOTE: Ember provides only lifecycle emissions and intensities.
+    add_emissions_and_carbon_intensity_of_direct_combustion(
+        tb=tb, tb_electricity_factors=tb_electricity_factors, tb_energy_factors=tb_energy_factors
+    )
+
+    # TODO: Compare intensities of a few countries with those from other data sources.
 
     # Split data into different tables, one per category, and process each one individually.
     tables = {
