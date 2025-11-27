@@ -29,6 +29,9 @@ async def search_indicators_semantic(
     This endpoint performs semantic search on OWID indicators using preloaded embeddings
     and returns the most relevant results.
     """
+    # Cap limit at 100 to match API maximum
+    limit = min(limit, 100)
+
     # Perform semantic search using preloaded model
     raw_results = search_indicators(query, limit)
 
