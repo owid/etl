@@ -741,7 +741,7 @@ def run() -> None:
 
     # Add emissions and carbon intensity of direct combustion.
     # NOTE: Ember provides only lifecycle emissions and intensities.
-    add_emissions_and_carbon_intensity_of_direct_combustion(
+    tb = add_emissions_and_carbon_intensity_of_direct_combustion(
         tb=tb, tb_electricity_factors=tb_electricity_factors, tb_energy_factors=tb_energy_factors
     )
 
