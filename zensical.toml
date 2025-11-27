@@ -99,6 +99,7 @@ nav = [
         { "Charts API" = "api/chart-api.md" },
         { "Catalog API" = "api/catalog-api.md" },
         { "Search API" = "api/search-api.md" },
+        { "Semantic Search API" = "api/semantic-search-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
         # { "Content database" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
