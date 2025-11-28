@@ -683,7 +683,7 @@ for tab in range(len(tables)):
         df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
         df_graphers.loc[j, "Period Radio"] = f"{income_aggregation['aggregation'][agg].capitalize()}"
         df_graphers.loc[j, "subtitle"] = (
-            f"This data is adjusted for inflation and for differences in the cost of living between countries."
+            "This data is adjusted for inflation and for differences in the cost of living between countries."
         )
         df_graphers.loc[j, "note"] = (
             f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices."
@@ -706,7 +706,7 @@ for tab in range(len(tables)):
         df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
         df_graphers.loc[j, "Period Radio"] = f"{income_aggregation['aggregation'][agg].capitalize()}"
         df_graphers.loc[j, "subtitle"] = (
-            f"This data is adjusted for inflation and for differences in the cost of living between countries."
+            "This data is adjusted for inflation and for differences in the cost of living between countries."
         )
         df_graphers.loc[j, "note"] = (
             f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices."
