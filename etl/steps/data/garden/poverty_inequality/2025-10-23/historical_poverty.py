@@ -1004,12 +1004,9 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
 
     # Sanity check: Gini should be between 0 and 1
     invalid_gini = gini_calc[(gini_calc["gini"] < 0) | (gini_calc["gini"] > 1)]
-    if len(invalid_gini) > 0:
-        log.warning(
-            f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range)"
-        )
-        # Clip to valid range
-        gini_calc["gini"] = gini_calc["gini"].clip(0, 1)
+    assert (
+        len(invalid_gini) == 0
+    ), f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range):\n{invalid_gini}"
 
     # Merge with PIP data for comparison
     tb_pip = pr.merge(
@@ -1021,18 +1018,19 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
     )
 
     # Calculate difference between thousand bins Gini and PIP Gini
-    tb_pip["gini_difference"] = tb_pip["gini_filled"] - tb_pip["gini_survey"]
-    tb_pip["gini_difference_pct"] = (tb_pip["gini_difference"] / tb_pip["gini_survey"]) * 100
+    tb_pip["gini_difference"] = (tb_pip["gini_filled"] - tb_pip["gini_survey"]).abs()
+    tb_pip["gini_difference_pct"] = (tb_pip["gini_difference"] / tb_pip["gini_survey"]).abs() * 100
 
     # Log summary statistics
     if SHOW_WARNINGS:
         comparison_valid = tb_pip.dropna(subset=["gini_filled", "gini_survey"])
         if len(comparison_valid) > 0:
-            mean_diff = comparison_valid["gini_difference"].abs().mean()
-            max_diff = comparison_valid["gini_difference"].abs().max()
-            log.info(
+            median_diff = comparison_valid["gini_difference"].median()
+            max_diff = comparison_valid["gini_difference"].max()
+            log.warning(
                 f"create_ginis_from_thousand_bins_distribution: Comparison with PIP data - "
-                f"Mean absolute difference: {mean_diff:.4f}, Max absolute difference: {max_diff:.4f}"
+                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f}. See the top 10 largest differences below:"
+                f"{comparison_valid[['country', 'year', 'gini_survey', 'gini_filled', 'gini_difference']].sort_values(by='gini_difference', ascending=False).head(10)}"
             )
 
     # Keep relevant columns for output
