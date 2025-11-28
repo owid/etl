@@ -616,7 +616,7 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     tb_emissions = (
         tb_generation.drop(columns=["unit", "category", "value", "value_original", "emission_factor", "intensity"])
         .rename(columns={"emissions": "value"}, errors="raise")
-        .assign(**{"unit": "MtCO2e", "category": "Direct emissions"})
+        .assign(**{"unit": "mtCO2", "category": "Direct emissions"})
     )
     tb_emissions.loc[(tb_emissions["variable"] == "Total generation"), "variable"] = "Total emissions"
 

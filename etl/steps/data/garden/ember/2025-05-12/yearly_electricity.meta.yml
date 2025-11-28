@@ -622,3 +622,157 @@ tables:
           Greenhouse gases emitted per unit of generated electricity, measured in grams of CO₂ equivalents per kilowatt-hour.
         presentation:
           title_public: Lifecycle CO₂ intensity of electricity generation
+      emissions__direct__clean__mtco2:
+        title: Direct emissions from clean sources - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Low-carbon
+        description_short: *description_short_low_carbon
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from low-carbon sources
+      emissions__direct__fossil__mtco2:
+        title: Direct emissions from fossil sources - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Fossil
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from fossil fuels
+      emissions__direct__gas_and_other_fossil__mtco2:
+        title: Direct emissions from gas and other fossil sources - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Gas and other fossil
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from gas and other fossil fuels
+      emissions__direct__hydro__bioenergy_and_other_renewables__mtco2:
+        title: Direct emissions from hydro, bioenergy and other renewables - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Hydro, bioenergy and other renewables
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from hydropower, bioenergy and other renewables
+      emissions__direct__renewables__mtco2:
+        title: Direct emissions from renewables - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Renewables
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from renewables
+      emissions__direct__wind_and_solar__mtco2:
+        title: Direct emissions from wind and solar - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Wind and solar
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from wind and solar power
+      emissions__direct__bioenergy__mtco2:
+        title: Direct emissions from bioenergy - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Bioenergy
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from bioenergy
+      emissions__direct__coal__mtco2:
+        title: Direct emissions from coal - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Coal
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from coal
+      emissions__direct__gas__mtco2:
+        title: Direct emissions from gas - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Gas
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from gas
+      emissions__direct__hydro__mtco2:
+        title: Direct emissions from hydro - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Hydro
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from hydropower
+      emissions__direct__nuclear__mtco2:
+        title: Direct emissions from nuclear - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Nuclear
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from nuclear power
+      emissions__direct__other_fossil__mtco2:
+        title: Direct emissions from other fossil sources - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Other fossil
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from other fossil fuels
+      emissions__direct__other_renewables__mtco2:
+        title: Direct emissions from other renewables - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Other renewables
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from other renewables
+      emissions__direct__solar__mtco2:
+        title: Direct emissions from solar - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Solar
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from solar power
+      emissions__direct__wind__mtco2:
+        title: Direct emissions from wind - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Wind
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Direct CO₂ emissions from electricity generation from wind power
+      emissions__direct__total_emissions__mtco2:
+        title: Total direct emissions - mtCO2eq
+        short_unit: mtCO₂eq
+        unit: megatonnes of CO₂ equivalents
+        display:
+          name: Total direct emissions
+        description_short: *description_short_mtco2
+        presentation:
+          title_public: Total direct CO₂ emissions from electricity generation
+      emissions__direct__co2_intensity__gco2_kwh:
+        title: Direct CO2 intensity - gCO2eq/kWh
+        short_unit: gCO₂eq/kWh
+        unit: grams of CO₂ equivalents per kilowatt-hour
+        display:
+          name: Direct CO₂ intensity
+        description_short: |-
+          Greenhouse gases emitted per unit of generated electricity, measured in grams of CO₂ equivalents per kilowatt-hour.
+        presentation:
+          title_public: Direct CO₂ intensity of electricity generation
