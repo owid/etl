@@ -329,7 +329,7 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         "electricity_generation": "Generation - ",
         "electricity_imports": "",
         "lifecycle_emissions": "Emissions (lifecycle) - ",
-        "direct_emissions": "Emissions (direct) - ",
+        "direct_emissions": "Emissions (direct combustion) - ",
     }
     error = "Tables in yearly electricity dataset have changed"
     assert set(category_renaming) == set(tables), error
@@ -497,9 +497,9 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     # Create a harmonized table of electricity emission factors.
     # NOTE: Biomass has no factor; we simply assign zero
     tb_factors = (
-        tb_electricity_factors[["source", "median_direct_emission_factor"]]
+        tb_electricity_factors[["source", "median_direct_combustion_emission_factor"]]
         .fillna(0)
-        .rename(columns={"median_direct_emission_factor": "emission_factor"}, errors="raise")
+        .rename(columns={"median_direct_combustion_emission_factor": "emission_factor"}, errors="raise")
     )
     # Take oil from the "Residual Fuel Oil" energy factor.
     tb_factors = pr.concat(

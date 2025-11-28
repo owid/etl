@@ -20,7 +20,7 @@ def run() -> None:
     # Process data.
     #
     # The data was manually extracted from Table A.III.2 | Emissions of selected electricity supply technologies (gCO2eq/kWh).
-    # Specifically, we will simply extract the direct emissions factors.
+    # Specifically, we will simply extract the direct combustion emissions factors.
     tb = pr.read_from_dict(
         {
             "Coal": {"min": 670, "median": 760, "max": 870},
@@ -49,7 +49,9 @@ def run() -> None:
     tb = tb.transpose()
 
     # Rename conveniently.
-    tb = tb.rename(columns={level: f"{level}_direct_emission_factor" for level in tb.columns}, errors="raise")
+    tb = tb.rename(
+        columns={level: f"{level}_direct_combustion_emission_factor" for level in tb.columns}, errors="raise"
+    )
 
     # Add metadata.
     for column in tb.columns:

@@ -24,11 +24,11 @@ tables:
       unit: grams of CO₂ equivalents per kilowatt-hour
       short_unit: gCO₂eq/kWh
     variables:
-      median_direct_emission_factor:
-        title: Electricity direct emission factor - median value
+      median_direct_combustion_emission_factor:
+        title: Electricity direct combustion emission factor - median value
         description_short: |-
           Amount of carbon dioxide equivalent emissions produced per unit of electricity generated from a specific source.
-      min_direct_emission_factor:
-        title: Electricity direct emission factor - minimum value
-      max_direct_emission_factor:
-        title: Electricity direct emission factor - maximum value
+      min_direct_combustion_emission_factor:
+        title: Electricity direct combustion emission factor - minimum value
+      max_direct_combustion_emission_factor:
+        title: Electricity direct combustion emission factor - maximum value
