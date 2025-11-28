@@ -866,7 +866,7 @@ def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> T
 def prepare_pip_data(tb_pip: Table, tb_thousand_bins: Table) -> Table:
     """
     Prepare World Bank PIP data to use it in extrapolations.
-    I want to have the consolidated Gini and the extrapolated mean here.
+    Here we extract Ginis (survey-based) and means (survey-based and filled) from the latest PIP dataset
     """
 
     tb_pip = tb_pip.copy()
@@ -1038,8 +1038,7 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
             max_diff = comparison_valid["gini_difference"].max()
             log.warning(
                 f"create_ginis_from_thousand_bins_distribution: Comparison with PIP data - "
-                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f} ({len(comparison_valid)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
-                f"{comparison_valid.head(NUM_OBSERVATIONS_TO_SHOW)}"
+                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f} ({len(comparison_valid)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below\n:{comparison_valid.head(NUM_OBSERVATIONS_TO_SHOW)}"
             )
 
             if EXPORT_COMPARISON_CSV:
@@ -1436,7 +1435,7 @@ def expand_means_and_ginis_to_thousand_bins(
             max_diff = tb_comparison["mean_difference_pct"].max()
             log.info(
                 f"expand_means_and_ginis_to_thousand_bins: Comparison of original means with distribution-derived means - "
-                f"Median relative difference: {median_diff:.4f}, Max relative difference: {max_diff:.4f} ({len(tb_comparison)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
+                f"Median relative difference: {median_diff:.4f}%, Max relative difference: {max_diff:.4f}% ({len(tb_comparison)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
                 f"{tb_comparison.head(NUM_OBSERVATIONS_TO_SHOW)}"
             )
 
