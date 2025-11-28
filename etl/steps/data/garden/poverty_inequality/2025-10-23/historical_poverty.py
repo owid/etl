@@ -226,6 +226,10 @@ def run() -> None:
         tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini_original"
     )
 
+    tb_thousand_bins_from_interpolated_mean = interpolate_quantiles_in_thousand_bins(
+        tb_thousand_bins_from_interpolated_mean=tb_thousand_bins_from_interpolated_mean
+    )
+
     # Calculate poverty measures
     tb_from_interpolated_mean = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean)
 
@@ -1417,3 +1421,81 @@ def gini_to_sigma(gini):
         return sigma
     except Exception:
         return np.nan
+
+
+def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_mean: Table) -> Table:
+    """
+    Interpolate missing values in the 1000-binned income distribution table.
+    This function interpolates missing 'avg' values for each country-year across quantiles.
+
+    We do this to complete country series where Gini is not available for all years, but mean is.
+    """
+
+    tb_thousand_bins_from_interpolated_mean = tb_thousand_bins_from_interpolated_mean.copy()
+
+    # Separate PIP-based data from extrapolated data
+    # I am keeping LATEST_YEAR in both tables so I can interpolate propertly. Then I will reinstate the original bins
+    tb_thousand_bins = tb_thousand_bins_from_interpolated_mean[
+        tb_thousand_bins_from_interpolated_mean["year"] >= LATEST_YEAR
+    ].reset_index(drop=True)
+
+    tb_expanded = tb_thousand_bins_from_interpolated_mean[
+        tb_thousand_bins_from_interpolated_mean["year"] <= LATEST_YEAR
+    ].reset_index(drop=True)
+
+    # Also have one table with data before LATEST_YEAR_PIP_FILLED so we can drop countries without data
+    tb_expanded_before_pip_filled = tb_expanded[tb_expanded["year"] < LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+
+    # Find missing countries in tb_expanded_before_pip_filled
+    missing_countries_in_thousand_bins, missing_countries_in_pip_filled = compare_countries_available_in_two_tables(
+        tb_1=tb_thousand_bins,
+        tb_2=tb_expanded_before_pip_filled,
+        name_tb_1="thousand_bins",
+        name_tb_2="extrapolated_before_pip_filled",
+    )
+
+    # Remove countries missing in pip_filled from tb_expanded
+    tb_expanded = tb_expanded[~tb_expanded["country"].isin(missing_countries_in_pip_filled)].reset_index(drop=True)
+
+    # Drop pop column
+    tb_expanded = tb_expanded.drop(columns=["pop"])
+
+    # Make table wide
+    tb_expanded = tb_expanded.pivot_table(index=["country", "year"], columns="quantile", values="avg").reset_index()
+
+    # Interpolate missing values across quantiles for each country-year
+    tb_expanded = interpolate_table(
+        tb_expanded,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # All the years between min and max year of the table for each country
+        method="linear",
+        limit_direction="both",
+        limit_area="inside",
+    )
+
+    # Make the table long again
+    tb_expanded = tb_expanded.melt(id_vars=["country", "year"], var_name="quantile", value_name="avg")
+
+    # Add population
+    tb_expanded = paths.regions.add_population(
+        tb=tb_expanded,
+        population_col="pop",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+    )
+
+    # Divide population equally among 1000 quantiles
+    tb_expanded["pop"] /= 1000
+
+    # Drop data for the year LATEST_YEAR from tb_expanded to reinstate original bins
+    tb_expanded = tb_expanded[tb_expanded["year"] < LATEST_YEAR].reset_index(drop=True)
+
+    # Concatenate both tables back together
+    tb = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+
+    # Sort by country, year, and quantile
+    tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
+    return tb
