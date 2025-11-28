@@ -19,8 +19,8 @@ MAX_DATASETS = 5
 # How many indicators in each dataset
 MAX_INDICATORS_IN_DATASET = 10
 
-# Maximum number of results to fetch from API
-MAX_RESULTS = 500
+# Maximum number of results to fetch from API (API limit is 100)
+MAX_RESULTS = 100
 
 
 @dataclass

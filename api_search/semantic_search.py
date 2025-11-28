@@ -20,6 +20,8 @@ def _initialize_semantic_search():
 
     try:
         # Fetch all data indicators.
+        # NOTE: we could avoid fetching indicators from DB (and hence not needing credentials on server)
+        #  by fetching them from Datasette with ".csv?_stream=on"
         _indicators = _get_data_indicators_from_db()
 
         # Get embedding model.

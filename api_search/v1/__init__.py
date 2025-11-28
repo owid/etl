@@ -1,9 +1,10 @@
 import structlog
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from api_search.semantic_search import get_model_info, search_indicators
 
 from .schemas import (
+    INDICATOR_SEARCH_EXAMPLES,
     SemanticSearchResponse,
     SemanticSearchResult,
 )
@@ -18,14 +19,29 @@ def health() -> dict:
     return {"status": "ok"}
 
 
-@v1.get("/indicators", response_model=SemanticSearchResponse)
-async def search_indicators_semantic(query: str, limit: int = 10) -> SemanticSearchResponse:
+@v1.get(
+    "/indicators",
+    response_model=SemanticSearchResponse,
+    responses={
+        200: {
+            "description": "Successful response with search results",
+            "content": {"application/json": {"examples": INDICATOR_SEARCH_EXAMPLES}},
+        }
+    },
+)
+async def search_indicators_semantic(
+    query: str = Query(..., description="Search query", examples=["gdp", "population"]),
+    limit: int = Query(10, description="Limit the number of results", le=100),
+) -> SemanticSearchResponse:
     """
     Search for indicators using semantic similarity.
 
     This endpoint performs semantic search on OWID indicators using preloaded embeddings
     and returns the most relevant results.
     """
+    # Cap limit at 100 to match API maximum
+    limit = min(limit, 100)
+
     # Perform semantic search using preloaded model
     raw_results = search_indicators(query, limit)
 
