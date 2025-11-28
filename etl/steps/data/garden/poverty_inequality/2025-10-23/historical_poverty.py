@@ -1029,8 +1029,8 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
             max_diff = comparison_valid["gini_difference"].max()
             log.warning(
                 f"create_ginis_from_thousand_bins_distribution: Comparison with PIP data - "
-                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f}. See the top 10 largest differences below:"
-                f"{comparison_valid[['country', 'year', 'gini_survey', 'gini_filled', 'gini_difference']].sort_values(by='gini_difference', ascending=False).head(10)}"
+                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f} ({len(comparison_valid)} observations). See the top 20 largest differences below:"
+                f"{comparison_valid[['country', 'year', 'gini_survey', 'gini_filled', 'gini_difference', 'gini_difference_pct']].sort_values(by='gini_difference', ascending=False).head(20)}"
             )
 
     # Keep relevant columns for output
