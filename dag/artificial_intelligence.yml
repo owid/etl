@@ -194,3 +194,31 @@ steps:
     - data://meadow/artificial_intelligence/2025-08-25/robotaxis
   data://grapher/artificial_intelligence/2025-08-25/robotaxis:
     - data://garden/artificial_intelligence/2025-08-25/robotaxis
+
+  #
+  # Ireland Data Centres Metered Electricity Consumption
+  #
+  data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption:
+    - snapshot://artificial_intelligence/2025-11-10/ireland_metered_consumption.csv
+  data://garden/artificial_intelligence/2025-11-10/ireland_metered_consumption:
+    - data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption
+  data://grapher/artificial_intelligence/2025-11-10/ireland_metered_consumption:
+    - data://garden/artificial_intelligence/2025-11-10/ireland_metered_consumption
+
+
+  # NVIDIA quarterly revenue dataset
+  data://meadow/artificial_intelligence/2025-11-11/nvidia_revenue:
+    - snapshot://artificial_intelligence/2025-11-11/nvidia_revenue.csv
+  data://garden/artificial_intelligence/2025-11-11/nvidia_revenue:
+    - data://meadow/artificial_intelligence/2025-11-11/nvidia_revenue
+    - data://garden/bls/2025-04-12/us_consumer_prices
+  data://grapher/artificial_intelligence/2025-11-11/nvidia_revenue:
+    - data://garden/artificial_intelligence/2025-11-11/nvidia_revenue
+
+  # Datacenter construction spending (U.S. Census Bureau)
+  data://meadow/us_census_bureau/2025-11-17/datacenter_construction:
+    - snapshot://us_census_bureau/2025-11-17/datacenter_construction.xlsx
+  data://garden/us_census_bureau/2025-11-17/datacenter_construction:
+    - data://meadow/us_census_bureau/2025-11-17/datacenter_construction
+  data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
+    - data://garden/us_census_bureau/2025-11-17/datacenter_construction

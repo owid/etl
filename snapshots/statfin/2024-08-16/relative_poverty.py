@@ -13,7 +13,7 @@ The data needs to be uploaded manually following these steps:
     9. Click on "Save".
     10. Copy the downloaded file to this folder.
     11. Run the script:
-        python snapshots/statfin/{version}/relative_poverty.py --path-to-file {path_to_file}
+        etls statfin/{version}/relative_poverty --path-to-file {path_to_file}
     12. Delete the downloaded file.
 """
 

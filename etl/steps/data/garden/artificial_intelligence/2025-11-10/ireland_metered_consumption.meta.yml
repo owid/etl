@@ -1,0 +1,55 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+  description_key_datacenters: &description_key_datacenters
+    - Metered consumption refers to usage recorded by physical electricity meters (actual or estimated reads). It excludes flat-rate or unmetered services and network losses.
+    - Because there is no single definition of a data center, the Central Statistics Office (CSO) of Ireland identified them using electricity consumption data rather than formal classifications.
+    - The CSO analysed roughly 2.5 million electricity meters to find sites that used large amounts of power but had few employees and were not involved in manufacturing.
+    - Identification was based on several checks, including known data center operators, high-use business park customers, and meters consuming more than 1 GWh per year.
+    - The data can be updated retrospectively as new facilities are identified and as electricity use changes over time.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  ireland_metered_consumption:
+    variables:
+      all_metered_electricity_consumption:
+        title: Total metered electricity consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Total metered electricity consumption from all metered customers in Ireland measured in [terawatt-hours](#dod:watt-hours).
+        description_key:
+          - This includes all metered electricity consumption across Ireland, covering data centers, residential, commercial, and industrial customers.
+          - Metered consumption refers to usage recorded by physical electricity meters (actual or estimated reads). It excludes flat-rate or unmetered services and network losses.
+          - The data is sourced from around 2.5 million meters connected to the mains electricity network.
+          - Data for all years are subject to revision as new meters are identified or classifications are corrected.
+        display:
+          numDecimalPlaces: 2
+
+      data_centres:
+        title: Data centers electricity consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Metered electricity consumption by data centers in Ireland measured in [terawatt-hours](#dod:watt-hours). Data centers run the full spectrum of internet services from shopping to streaming, not solely AI. The exact split between AI and other uses is not available.
+        description_key: *description_key_datacenters
+        display:
+          numDecimalPlaces: 2
+
+      customers_other_than_data_centres:
+        title: Electricity consumption by non-data center customers
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Metered electricity consumption by all other customers except data centers measured in [terawatt-hours](#dod:watt-hours).
+        description_key:
+          - This includes residential, commercial, and industrial customers, but excludes data centers.
+          - *description_key_datacenters
+        display:
+          numDecimalPlaces: 2
+

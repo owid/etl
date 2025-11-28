@@ -11,7 +11,7 @@ The data is uploaded manually. To get the most recent data follow these steps:
     8. Extract the "data.csv" file from the zip
     9. Copy the file to this folder
     10. Upload the dataset by running (current version)
-        python snapshots/eth/2023-03-15/growup.py --path-to-file snapshots/eth/2023-03-15/data.csv
+        etls eth/2023-03-15/growup --path-to-file snapshots/eth/2023-03-15/data.csv
     11. Delete the "data.csv" file from this folder
 
 """

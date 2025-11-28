@@ -1,3 +1,4 @@
+# DAG
 All the steps and dependencies are listed on our DAG. If a step is not listed in the DAG, it will not be tracked by the ETL.
 
 ## Format
@@ -43,7 +44,7 @@ D2:
 ## Our DAG
 Now that you are familiar with the format of the DAG, we can dive into the actual DAG that we use.
 
-One key difference with the example DAG presented in the section above is that it consists of several DAG files. All of these coexist in the [`dag/`](https://github.com/owid/etl/tree/master/dag) directory:
+One key difference with the example DAG presented in the section above is that it consists of several DAG files. All of these coexist in the [:fontawesome-brands-github:  `dag/`](https://github.com/owid/etl/tree/master/dag) directory:
 
 
 ```
@@ -56,7 +57,7 @@ dag/
 ...
 ```
 
-We do this to avoid having a very large single file, which could easily end up having several thousands of lines and would be hard to read. To keep track of all the single files, we have a [`main.yml`](https://github.com/owid/etl/tree/master/dag/main.yml), which has a section that lists them:
+We do this to avoid having a very large single file, which could easily end up having several thousands of lines and would be hard to read. To keep track of all the single files, we have a [:fontawesome-brands-github:  `main.yml`](https://github.com/owid/etl/tree/master/dag/main.yml), which has a section that lists them:
 
 
 ```yaml title="dag/main.yml"

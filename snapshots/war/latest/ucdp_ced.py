@@ -13,7 +13,7 @@ NOTE:
     - November: Add Q3 (Jul-Sep) data of current year
 
 
-INSTRUCTIONS TO UPDATE SNAPSHOT:
+INSTRUCTIONS TO UPDATE DATA (complete procedure):
     1. Go to the DVC file that is currently in use in the pipeline, copy it and create a new one.
 
     2. Modify its name and edit the fields to reflect the new version (dates, producer's version, links, etc.).
@@ -22,7 +22,7 @@ INSTRUCTIONS TO UPDATE SNAPSHOT:
     3. Update the value of VERSIONS in this script.
         - Variable VERSIONS is a list in case we need to add multiple versions in the future. However, it generally should only contain one version (corresponding to the DVC's that you created in 2), which is the latest cumulated preview data released in the year (e.g. Q1, or Q1+Q2, etc.)
 
-    4. Run the script to download the latest version of the dataset and upload it to Snapshot. python snapshots/war/latest/ucdp_ced.py
+    4. Run the script to download the latest version of the dataset and upload it to Snapshot. etls war/latest/ucdp_ced
 
 
     5. Update the war.yml DAG dependency of `meadow/war/latest/ucdp_ced` to reflect the new version(s) of the DVC file.
@@ -32,6 +32,10 @@ INSTRUCTIONS TO UPDATE SNAPSHOT:
     7. Go to the Garden step (`garden/war/latest/ucdp_preview`), update `LAST_YEAR`, `LAST_YEAR_PREVIEW` variables if applicable, and run it. Probably you will need to also update `NUM_MISSING_LOCATIONS`.
 
     8. Go back to the GitHub issue to address further steps that concern chart and Grapher updates (e.g. subtitle edits).
+
+NOTES:
+- Explore major differences between previous and current version of the dataset. Major differences might be due to the data having been revised (check code_status field).
+    - To do so, you'll have to get data for this and previous snapshot. More instructions in garden step, `garden/war/latest/ucdp_preview.py`, method `compare_versions`.
 """
 
 from pathlib import Path
@@ -44,7 +48,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 VERSIONS = [
-    "v25_01_25_06",
+    "v25_01_25_09",
 ]
 
 

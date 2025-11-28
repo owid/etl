@@ -26,6 +26,7 @@ from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
+from etl.config import DRY_RUN
 from etl.helpers import PathFinder
 
 # Initialize logger.
@@ -71,54 +72,42 @@ def save_data_to_json(tb: Table, output_path: str) -> None:
         file.write(json.dumps(output_dict, indent=4))
 
 
-def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) -> None:
-    # Create a csv file.
-    log.info("Creating csv file.")
-    pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False, float_format="%.3f")
-
-    # Create a json file.
-    log.info("Creating json file.")
-    save_data_to_json(tb, str(temp_dir_path / "owid-co2-data.json"))
-
-    # Create an excel file.
-    log.info("Creating excel file.")
-    with pd.ExcelWriter(temp_dir_path / "owid-co2-data.xlsx") as writer:
-        # Always write the data sheet first to ensure at least one visible sheet exists
-        tb.to_excel(writer, sheet_name="Data", index=False, float_format="%.3f")
-        pd.DataFrame(codebook).to_excel(writer, sheet_name="Metadata", index=False)
-
-
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load the owid_co2 emissions dataset from garden, and read its main table.
     ds_gcp = paths.load_dataset("owid_co2")
     tb = ds_gcp.read("owid_co2")
-    codebook = ds_gcp.read("owid_co2_codebook")
 
     #
     # Save outputs.
     #
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
-        ################################################################################################################
-        # TODO: Create new public files and update the way we write to them.
-        log.warning(
-            "This implementation currently does not work. We should create an R2 public bucket and update the way we write to it. For now, manually update files in Digital Ocean using the web interface."
-        )
-        ################################################################################################################
-
         temp_dir_path = Path(temp_dir)
 
-        prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
+        # Create a csv file.
+        log.info("Creating csv file.")
+        pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False)
+
+        # Create a json file.
+        log.info("Creating json file.")
+        save_data_to_json(tb, str(temp_dir_path / "owid-co2-data.json"))
+
+        # Create an excel file.
+        log.info("Creating excel file.")
+        tb.to_excel(temp_dir_path / "owid-co2-data.xlsx", index=False)
 
         for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
             # Path to local file.
             local_file = temp_dir_path / file_name
             # Path (within bucket) to S3 file.
             s3_file = S3_DATA_DIR / file_name
-            tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
 
-            # Upload file to S3
-            s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True)
+            if DRY_RUN:
+                tqdm.write(f"[DRY RUN] Would upload file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+            else:
+                tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+                # Upload file to S3
+                s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True, downloadable=True)

@@ -42,7 +42,7 @@ This will create a new branch, push it to the remote repository, and create a dr
 
 !!! note
 
-  Ensure that, in your `.env` file, you have set STAGING=1
+    Ensure that, in your `.env` file, you have set `STAGING=1`
 
 
 ## Data work

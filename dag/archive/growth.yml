@@ -12,3 +12,11 @@ data://garden/ggdc/2025-07-31/penn_world_table:
   - data://meadow/ggdc/2025-07-31/penn_world_table
 data://grapher/ggdc/2025-07-31/penn_world_table:
   - data://garden/ggdc/2025-07-31/penn_world_table
+
+    # IMF World Economic Outlook
+data://meadow/imf/2025-04-25/world_economic_outlook:
+  - snapshot://imf/2025-04-25/world_economic_outlook.xls
+data://garden/imf/2025-04-25/world_economic_outlook:
+  - data://meadow/imf/2025-04-25/world_economic_outlook
+data://grapher/imf/2025-04-25/world_economic_outlook:
+  - data://garden/imf/2025-04-25/world_economic_outlook

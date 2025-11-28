@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="md-content__inner md-typeset">
+  <div class="notebook-content">
+    {{ notebook_html | safe }}
+  </div>
+</article>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+  /* Ensure notebook content integrates well with Zensical */
+  .notebook-content {
+    width: 100%;
+  }
+
+  /* Override some Jupyter styles to work better with Zensical */
+  .notebook-content .highlight pre {
+    background-color: var(--md-code-bg-color);
+  }
+
+  .notebook-content code {
+    font-family: var(--md-code-font);
+  }
+
+  /* Hide extra prompts if needed */
+  .notebook-content .prompt {
+    /* Optionally hide or style prompts */
+  }
+</style>
+{% endblock %}

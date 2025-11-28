@@ -1,0 +1,38 @@
+{
+  "name": "detect-outdated-practices",
+  "displayName": "Detect Outdated Practices",
+  "description": "Detects and highlights outdated code practices in Python files",
+  "version": "0.0.1",
+  "publisher": "owid",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owid/etl"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": ["Linters"],
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "python",
+        "extensions": [".py"]
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "node esbuild.config.js",
+    "watch": "node esbuild.config.js --watch",
+    "package": "node esbuild.config.js --production"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "@types/node": "20.x",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.2"
+  }
+}

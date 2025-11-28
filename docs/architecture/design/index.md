@@ -1,3 +1,7 @@
+---
+tags:
+  - Architecture
+---
 
 !!! quote "In computing, extract, transform, load (ETL) is a three-phase process where data is extracted, transformed (cleaned, sanitized, scrubbed) and loaded into an output data container ([source](https://en.wikipedia.org/wiki/Extract,_transform,_load))."
 

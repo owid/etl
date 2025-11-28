@@ -1,7 +1,13 @@
 (function () {
   function attach(cell) {
-    // Find the rendered input area produced by mkdocs-jupyter
-    const input = cell.querySelector('.jp-InputArea, .nbinput, .nbsphinx-input, .highlight-ipynb');
+    // If cell has "hidden" tag, hide it completely
+    if (cell.classList.contains('celltag_hidden')) {
+      cell.style.display = 'none';
+      return;
+    }
+
+    // Find the rendered input area - now supporting nbconvert basic template
+    const input = cell.querySelector('.jp-InputArea, .nbinput, .nbsphinx-input, .highlight-ipynb, .input_area');
     if (!input || !input.parentNode) return;
 
     // Remove any old toggle before adding a new one (prevents duplicates on soft reload)

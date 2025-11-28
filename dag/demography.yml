@@ -362,6 +362,8 @@ steps:
     - snapshot://pew/2025-10-31/religious_composition.zip
   data://garden/pew/2025-10-31/religious_composition:
     - data://meadow/pew/2025-10-31/religious_composition
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
   data://grapher/pew/2025-10-31/religious_composition:
     - data://garden/pew/2025-10-31/religious_composition
   export://multidim/pew/latest/religious_composition:

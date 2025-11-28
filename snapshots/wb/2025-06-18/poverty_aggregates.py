@@ -6,7 +6,7 @@ HOW TO OBTAIN THE FILE:
     2. Find the file `pip_2021_aggregate_202505.dta` in the data/02_processed/ folder.
 
     Copy that file to this folder and run the script:
-    python snapshots/wb/{version}/poverty_aggregates.py --path-to-file snapshots/wb/{version}/pip_2021_aggregate_202505.dta
+    etls wb/{version}/poverty_aggregates --path-to-file snapshots/wb/{version}/pip_2021_aggregate_202505.dta
 
 """
 

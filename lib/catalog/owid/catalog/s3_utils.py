@@ -122,11 +122,34 @@ def download_s3_folder(
             file.unlink()
 
 
-def upload(s3_url: str, filename: str | Path, public: bool = False, quiet: bool = False) -> None:
-    """Upload the file at the given local filename to the S3 URL."""
+def upload(
+    s3_url: str, filename: str | Path, public: bool = False, quiet: bool = False, downloadable: bool = False
+) -> None:
+    """Upload the file at the given local filename to the S3 URL.
+
+    Parameters
+    ----------
+    s3_url : str
+        S3 URL to upload to
+    filename : str | Path
+        Local file to upload
+    public : bool
+        Whether to make the file publicly readable
+    quiet : bool
+        Whether to suppress log messages
+    downloadable : bool
+        If True, force browsers to download the file instead of displaying it inline.
+        Sets Content-Disposition header to 'attachment; filename="..."'
+    """
     client = connect_r2()
     bucket, key = s3_bucket_key(s3_url)
     extra_args = {"ACL": "public-read"} if public else {}
+
+    # Add Content-Disposition header to force download with correct filename
+    if downloadable:
+        file_name = Path(filename).name
+        extra_args["ContentDisposition"] = f'attachment; filename="{file_name}"'
+
     filename_str = str(filename)
     try:
         client.upload_file(filename_str, bucket, key, ExtraArgs=extra_args)

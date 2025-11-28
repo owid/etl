@@ -805,7 +805,9 @@ def _check_public_private_steps(dag: DAG) -> None:
 
     common = private_steps & public_steps
     if common:
-        raise ValueError(f"Dataset has both public and private version: {common}")
+        raise ValueError(
+            f"The same step was found in the dag as both public (data://) and private (data-private://): {common}"
+        )
 
 
 def _check_dag_completeness(dag: DAG) -> None:

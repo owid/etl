@@ -1,7 +1,7 @@
-import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
+from etl.catalog_helpers import last_date_accessed
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -60,21 +60,20 @@ def run() -> None:
         tb[f"{col}_per_mil"] = tb[col] / (tb["population"] / 1e6)
 
     tb = tb.drop("population", axis=1)
-    # Set values to NaN for regional aggregates except for specific columns
-    columns_to_exclude = ["num_articles_per_mil", "num_citations", "num_articles"]
-    regional_aggregates = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
-
-    # Identify columns to set to NaN
-    columns_to_nan = [col for col in tb.columns if col not in columns_to_exclude + ["country", "year", "field"]]
 
     # Set values to NaN for the specified regions and columns
-    tb.loc[tb["country"].isin(regional_aggregates), columns_to_nan] = np.nan
+    # tb.loc[tb["country"].isin(regional_aggregates), columns_to_nan] = np.nan
     tb = tb.format(["country", "year", "field"])
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
+    )
 
     ds_garden.save()
 
@@ -86,7 +85,7 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
         regions=REGIONS,
         index_columns=["country", "year", "field"],
         ds_regions=ds_regions,
-        min_num_values_per_year=1,
+        frac_allowed_nans_per_year=0.85,
     )
 
     return tb

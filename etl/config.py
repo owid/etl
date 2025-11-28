@@ -177,9 +177,19 @@ if STAGING is not None:
 if DATA_API_ENV == "production":
     BAKED_VARIABLES_PATH = "s3://owid-api/v1/indicators"
     DATA_API_URL = "https://api.ourworldindata.org/v1/indicators"
-else:
+    SEARCH_API_URL = "https://search.owid.io"
+elif STAGING is not None:
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
     DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+    SEARCH_API_URL = f"http://staging-site-{get_container_name(STAGING)}/etl/search"
+else:
+    # Local development
+    BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
+    DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+    SEARCH_API_URL = "http://localhost:8084"
+
+# Override URLs from env variables if set
+SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
 
 
 def variable_data_url(variable_id):
@@ -212,6 +222,9 @@ INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
+
+# if set, export steps will not upload/commit files (e.g. S3, GitHub)
+DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
 
 # Filter to speed up development - works as regex for both data processing and grapher upload
 # - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
@@ -300,6 +313,9 @@ def enable_sentry(enable_logs: bool = False) -> None:
             kwargs["_experiments"] = {"enable_logs": True}
 
         sentry_sdk.init(**kwargs)
+
+
+DOCS_BUILD = "DOCS_BUILD" not in os.environ
 
 
 # Wizard config
