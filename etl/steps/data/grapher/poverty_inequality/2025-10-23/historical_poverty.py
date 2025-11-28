@@ -16,12 +16,28 @@ def run() -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("historical_poverty", reset_index=False)
     tb_population = ds_garden.read("population", reset_index=False)
+    tb_from_interpolated_mean_gini = ds_garden.read("historical_poverty_from_interpolated_mean_gini", reset_index=False)
+    tb_population_from_interpolated_mean_gini = ds_garden.read(
+        "population_from_interpolated_mean_gini", reset_index=False
+    )
+    tb_from_interpolated_mean = ds_garden.read("historical_poverty_from_interpolated_mean", reset_index=False)
+    tb_population_from_interpolated_mean = ds_garden.read("population_from_interpolated_mean", reset_index=False)
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb, tb_population], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(
+        tables=[
+            tb,
+            tb_from_interpolated_mean_gini,
+            tb_from_interpolated_mean,
+            tb_population,
+            tb_population_from_interpolated_mean_gini,
+            tb_population_from_interpolated_mean,
+        ],
+        default_metadata=ds_garden.metadata,
+    )
 
     # Save grapher dataset.
     ds_grapher.save()

@@ -57,6 +57,9 @@ EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 # Show warnings
 SHOW_WARNINGS = True
 
+# Keep original thousand bins series when calculating bins from mean and gini
+KEEP_ORIGINAL_THOUSAND_BINS = True
+
 # Countries that appear in the thousand bins dataset for which we don't have population data.
 COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
 
@@ -162,17 +165,25 @@ def run() -> None:
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
 
-    # # Perform backward extrapolation
-    # tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
+    ###############################################################################
+    # 1. KEEPING INEQUALITY CONSTANT
+    ###############################################################################
 
-    # # Calculate poverty measures
-    # tb = calculate_poverty_measures(tb=tb_extended)
+    # Perform backward extrapolation
+    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
-    # # Create stacked variables for stacked area/bar charts
-    # tb = create_stacked_variables(tb=tb)
+    # Calculate poverty measures
+    tb = calculate_poverty_measures(tb=tb_extended)
 
-    # # Calculate an alternative method with our population dataset
-    # tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
+    # Create stacked variables for stacked area/bar charts
+    tb = create_stacked_variables(tb=tb)
+
+    # Calculate an alternative method with our population dataset
+    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
+
+    ###############################################################################
+    # 2. WITH INEQUALITY CHANGES
+    ###############################################################################
 
     # Prepare World Bank PIP data
     tb_pip = prepare_pip_data(tb_pip=tb_pip, tb_thousand_bins=tb_thousand_bins)
@@ -186,27 +197,72 @@ def run() -> None:
     # Prepare mean and gini data for extrapolation
     tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
 
+    ###############################################################################
+    # 2.1 USING EXTRAPOLATED MEANS AND GINIS
+    ###############################################################################
+
     # Create 1000 bins from mean and gini data
-    tb_thousand_bins_from_mean_gini = expand_means_and_ginis_to_thousand_bins(
-        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins
+    tb_thousand_bins_from_interpolated_mean_gini = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
     )
 
     # Calculate poverty measures
-    tb = calculate_poverty_measures(tb=tb_thousand_bins_from_mean_gini)
+    tb_from_interpolated_mean_gini = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean_gini)
 
     # Create stacked variables for stacked area/bar charts
-    tb = create_stacked_variables(tb=tb)
+    tb_from_interpolated_mean_gini = create_stacked_variables(tb=tb_from_interpolated_mean_gini)
 
     # Calculate an alternative method with our population dataset
-    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
+    tb_from_interpolated_mean_gini, tb_from_interpolated_mean_gini_population = (
+        calculate_alternative_method_with_population_dataset(tb_poverty=tb_from_interpolated_mean_gini)
+    )
+
+    ###############################################################################
+    # 2.2 USING EXTRAPOLATED MEANS (BUT NOT GINIS) AND INTERPOLATING THOUSAND BINS
+    ###############################################################################
+
+    # Create 1000 bins from inter/extrapolated means and original Ginis, except for years between the earliest year and first year with data
+    tb_thousand_bins_from_interpolated_mean = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini_original"
+    )
+
+    # Calculate poverty measures
+    tb_from_interpolated_mean = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean)
+
+    # Create stacked variables for stacked area/bar charts
+    tb_from_interpolated_mean = create_stacked_variables(tb=tb_from_interpolated_mean)
+
+    # Calculate an alternative method with our population dataset
+    tb_from_interpolated_mean, tb_from_interpolated_mean_population = (
+        calculate_alternative_method_with_population_dataset(tb_poverty=tb_from_interpolated_mean)
+    )
+
+    ###############################################################################
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
     # tb_extended = tb_extended.format(
     #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
     # )
-    # tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
+
+    tb_from_interpolated_mean_gini = tb_from_interpolated_mean_gini.format(
+        ["country", "year", "poverty_line"], short_name="historical_poverty_from_interpolated_mean_gini"
+    )
+    tb_from_interpolated_mean_gini_population = tb_from_interpolated_mean_gini_population.format(
+        ["country", "year"], short_name="population_from_interpolated_mean_gini"
+    )
+    # tb_thousand_bins_from_interpolated_mean_gini = tb_thousand_bins_from_interpolated_mean_gini.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean_gini"
+    # )
+
+    tb_from_interpolated_mean = tb_from_interpolated_mean.format(
+        ["country", "year", "poverty_line"], short_name="historical_poverty_from_interpolated_mean"
+    )
+    tb_from_interpolated_mean_population = tb_from_interpolated_mean_population.format(
+        ["country", "year"], short_name="population_from_interpolated_mean"
+    )
+    # tb_thousand_bins_from_interpolated_mean = tb_thousand_bins_from_interpolated_mean.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean"
     # )
 
     #
@@ -217,8 +273,13 @@ def run() -> None:
         tables=[
             tb,
             tb_population,
+            tb_from_interpolated_mean_gini,
+            tb_from_interpolated_mean_gini_population,
+            tb_from_interpolated_mean,
+            tb_from_interpolated_mean_population,
             # tb_extended,
-            # tb_thousand_bins_from_mean_gini,
+            # tb_thousand_bins_from_interpolated_mean_gini,
+            # tb_thousand_bins_from_interpolated_mean,
         ],
         default_metadata=ds_thousand_bins.metadata,
         repack=False,
@@ -1234,7 +1295,9 @@ def select_growth_factor_for_mean(row):
         return pd.Series({"growth_factor": row["growth_factor_gdp"], "growth_factor_origin": "gdp"})
 
 
-def expand_means_and_ginis_to_thousand_bins(tb_gini_mean: Table, tb_thousand_bins: Table) -> Table:
+def expand_means_and_ginis_to_thousand_bins(
+    tb_gini_mean: Table, tb_thousand_bins: Table, mean_column: str, gini_column: str
+) -> Table:
     """
     Expand mean and Gini data to a 1000-binned income distribution table.
     This is done by assuming a log-normal distribution for income within each country-year and using the mean and Gini to parameterize the distribution.
@@ -1246,19 +1309,25 @@ def expand_means_and_ginis_to_thousand_bins(tb_gini_mean: Table, tb_thousand_bin
     Returns:
         Table with columns: country, year, quantile (1-1000), avg (income), pop (population)
     """
-    # Filter tb_gini_mean to only country-years not in tb_thousand_bins
-    existing_country_years = set(tb_thousand_bins[["country", "year"]].drop_duplicates().apply(tuple, axis=1))
-    tb_new = tb_gini_mean[~tb_gini_mean[["country", "year"]].apply(tuple, axis=1).isin(existing_country_years)].copy()
+
+    if KEEP_ORIGINAL_THOUSAND_BINS:
+        # Filter tb_gini_mean to only country-years not in tb_thousand_bins
+        existing_country_years = set(tb_thousand_bins[["country", "year"]].drop_duplicates().apply(tuple, axis=1))
+        tb_new = tb_gini_mean[
+            ~tb_gini_mean[["country", "year"]].apply(tuple, axis=1).isin(existing_country_years)
+        ].copy()
+    else:
+        tb_new = tb_gini_mean.copy()
 
     # Drop rows with missing mean or gini
-    tb_new = tb_new.dropna(subset=["mean", "gini"]).reset_index(drop=True)
+    tb_new = tb_new.dropna(subset=[mean_column, gini_column]).reset_index(drop=True)
 
     if len(tb_new) == 0:
         # No new country-years to add, return original tb_thousand_bins
         return tb_thousand_bins
 
     # Calculate sigma for each row
-    tb_new["sigma"] = tb_new["gini"].apply(gini_to_sigma)
+    tb_new["sigma"] = tb_new[gini_column].apply(gini_to_sigma)
 
     # Drop rows where sigma couldn't be calculated
     tb_new = tb_new.dropna(subset=["sigma"]).reset_index(drop=True)
@@ -1267,7 +1336,7 @@ def expand_means_and_ginis_to_thousand_bins(tb_gini_mean: Table, tb_thousand_bin
         return tb_thousand_bins
 
     # Calculate mu parameter: mean = exp(μ + σ²/2), so μ = log(mean) - σ²/2
-    tb_new["mu"] = np.log(tb_new["mean"]) - (tb_new["sigma"] ** 2) / 2
+    tb_new["mu"] = np.log(tb_new[mean_column]) - (tb_new["sigma"] ** 2) / 2
 
     # Create expanded table with 1000 quantiles per country-year
     expanded_rows = []

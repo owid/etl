@@ -129,3 +129,173 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 2
+
+  historical_poverty_from_interpolated_mean_gini:
+    variables:
+      headcount_ratio:
+        title: Share below $<<poverty_line>> a day (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount:
+        title: Number below $<<poverty_line>> a day (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above:
+        title: Share above $<<poverty_line>> a day (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above:
+        title: Number above $<<poverty_line>> a day (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between:
+        title: Share between {definitions.poverty_line_between} a day (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between:
+        title: Number between {definitions.poverty_line_between} a day (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_omm:
+        title: Share below $<<poverty_line>> a day (OMM) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+  population_from_interpolated_mean_gini:
+    variables:
+      population:
+        title: Population (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_omm:
+        title: Population (OMM)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff:
+        title: Population difference (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff_pct:
+        title: Population difference (%) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      population_share_of_omm:
+        title: Population as a share of OMM population (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+
+  historical_poverty_from_interpolated_mean:
+    variables:
+      headcount_ratio:
+        title: Share below $<<poverty_line>> a day (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount:
+        title: Number below $<<poverty_line>> a day (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above:
+        title: Share above $<<poverty_line>> a day (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above:
+        title: Number above $<<poverty_line>> a day (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between:
+        title: Share between {definitions.poverty_line_between} a day (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between:
+        title: Number between {definitions.poverty_line_between} a day (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_omm:
+        title: Share below $<<poverty_line>> a day (OMM) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+  population_from_interpolated_mean:
+    variables:
+      population:
+        title: Population (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_omm:
+        title: Population (OMM)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff:
+        title: Population difference (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff_pct:
+        title: Population difference (%) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      population_share_of_omm:
+        title: Population as a share of OMM population (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
