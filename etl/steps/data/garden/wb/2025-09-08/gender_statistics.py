@@ -174,6 +174,9 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
                     meta.description_from_producer = "\n\n".join(description_parts)
                 else:
                     meta.description_from_producer = f"World Bank indicator: {column}"
+
+                # Fix detected typo:
+                meta.description_from_producer = meta.description_from_producer.replace("inidcator", "indicator")
             else:
                 # Column not found in metadata - set defaults
                 meta.title = column
