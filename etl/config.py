@@ -177,9 +177,19 @@ if STAGING is not None:
 if DATA_API_ENV == "production":
     BAKED_VARIABLES_PATH = "s3://owid-api/v1/indicators"
     DATA_API_URL = "https://api.ourworldindata.org/v1/indicators"
-else:
+    SEARCH_API_URL = "https://search.owid.io"
+elif STAGING is not None:
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
     DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+    SEARCH_API_URL = f"http://staging-site-{get_container_name(STAGING)}/etl/search"
+else:
+    # Local development
+    BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
+    DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+    SEARCH_API_URL = "http://localhost:8084"
+
+# Override URLs from env variables if set
+SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
 
 
 def variable_data_url(variable_id):

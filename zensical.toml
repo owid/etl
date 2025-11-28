@@ -49,7 +49,7 @@ nav = [
         ] },
         { "Documentation" = [
             "dev/docs/index.md",
-            { "Zensical demo" = "guides/demo.md" },
+            # { "Zensical demo" = "guides/demo.md" },
         ] },
         { "Settings & servers" = [
             { "VSC extensions" = "guides/vscode-extensions.md" },
@@ -97,9 +97,11 @@ nav = [
     { "API and catalog" = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
-        { "ETL catalog API" = "api/catalog-api.md" },
+        { "Catalog API" = "api/catalog-api.md" },
+        { "Search API" = "api/search-api.md" },
+        { "Semantic Search API" = "api/semantic-search-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
-        { "Querying data via Datasette" = "api/datasette.md" },
+        # { "Content database" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
         { "COVID-19" = "api/covid/" },
     ] },
@@ -326,7 +328,10 @@ include_requirejs = true
 [project.plugins.search]
 
 [project.plugins.exclude]
-glob = ["ignore/"]
+glob = [
+    "ignore/**",
+    "ignore/",
+]
 
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]

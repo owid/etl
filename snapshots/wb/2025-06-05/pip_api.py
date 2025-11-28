@@ -27,8 +27,8 @@ To run this code from scratch,
             https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=320&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
-        python snapshots/wb/{version}/pip_api.py
-        nohup uv run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
+        etls wb/{version}/pip_api
+        nohup uv run etls wb/{version}/pip_api > output.log 2>&1 &
     - You can kill the process with:
         pkill -f pip_api
 
@@ -38,9 +38,9 @@ When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip_regions.csv: file with the definitions of the regions used in the API.
 
 Copy these files to this folder and run in the terminal:
-    python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
-    python snapshots/wb/{version}/world_bank_pip_percentiles.py --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
-    python snapshots/wb/{version}/world_bank_pip_regions.py --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
+    etls wb/{version}/world_bank_pip --path-to-file snapshots/wb/{version}/world_bank_pip.csv
+    etls wb/{version}/world_bank_pip_percentiles --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
+    etls wb/{version}/world_bank_pip_regions --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
 
 You can delete the files after this.
 
