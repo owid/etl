@@ -328,7 +328,8 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         "electricity_demand": "",
         "electricity_generation": "Generation - ",
         "electricity_imports": "",
-        "lifecycle_emissions": "Emissions - ",
+        "lifecycle_emissions": "Emissions (lifecycle) - ",
+        "direct_emissions": "Emissions (direct) - ",
     }
     error = "Tables in yearly electricity dataset have changed"
     assert set(category_renaming) == set(tables), error
@@ -680,6 +681,7 @@ def run() -> None:
         "electricity_generation": make_wide_table(tb=tb, category="Electricity generation"),
         "electricity_imports": make_wide_table(tb=tb, category="Electricity imports"),
         "lifecycle_emissions": make_wide_table(tb=tb, category="Power sector emissions"),
+        "direct_emissions": make_wide_table(tb=tb, category="Direct emissions"),
     }
 
     for table_name in tables:

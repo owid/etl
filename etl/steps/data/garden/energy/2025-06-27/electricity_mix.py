@@ -132,8 +132,8 @@ def process_ember_data(tb_ember: Table) -> Table:
         "generation__fossil__twh": "fossil_generation__twh",
         "generation__total_generation__twh": "total_generation__twh",
         "demand__total_demand__twh": "total_demand__twh",
-        "emissions__total_emissions__mtco2": "total_emissions__mtco2",
-        "emissions__co2_intensity__gco2_kwh": "co2_intensity__gco2_kwh",
+        "emissions__lifecycle__total_emissions__mtco2": "total_emissions__mtco2",
+        "emissions__lifecycle__co2_intensity__gco2_kwh": "co2_intensity__gco2_kwh",
         "imports__total_net_imports__twh": "total_net_imports__twh",
     }
     tb_ember = tb_ember[list(columns)].rename(columns=columns, errors="raise")
