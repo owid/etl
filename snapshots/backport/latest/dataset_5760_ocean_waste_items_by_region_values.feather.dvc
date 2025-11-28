@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/5760
-    date_accessed: 2025-11-12 17:43:49.013569
+    date_accessed: 2025-11-28 12:09:01.540092
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: ocean_waste_items_by_region
