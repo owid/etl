@@ -55,7 +55,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 
 # Show warnings
-SHOW_WARNINGS = True
+SHOW_WARNINGS = False
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -1278,10 +1278,10 @@ def select_mean(row):
     Select mean on priority: survey > filled.
     This way, we have the longest country-specific mean series possible.
     """
-    if not pd.isna(row["mean_survey"]):
-        return pd.Series({"mean": row["mean_survey"], "mean_origin": "survey"})
-    else:
+    if not pd.isna(row["mean_filled"]):
         return pd.Series({"mean": row["mean_filled"], "mean_origin": "filled"})
+    else:
+        return pd.Series({"mean": row["mean_survey"], "mean_origin": "survey"})
 
 
 def select_gini(row):
@@ -1289,10 +1289,10 @@ def select_gini(row):
     Select Gini on priority: survey > filled > van_zanden.
     This way, we have the longest country-specific Gini series possible.
     """
-    if not pd.isna(row["gini_survey"]):
-        return pd.Series({"gini": row["gini_survey"], "gini_origin": "survey"})
-    elif not pd.isna(row["gini_filled"]):
+    if not pd.isna(row["gini_filled"]):
         return pd.Series({"gini": row["gini_filled"], "gini_origin": "filled"})
+    elif not pd.isna(row["gini_survey"]):
+        return pd.Series({"gini": row["gini_survey"], "gini_origin": "survey"})
     else:
         return pd.Series({"gini": row["gini_van_zanden"], "gini_origin": "van_zanden"})
 
