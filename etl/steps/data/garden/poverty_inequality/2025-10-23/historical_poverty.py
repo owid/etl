@@ -57,8 +57,14 @@ EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 # Show warnings
 SHOW_WARNINGS = True
 
+# Export comparison files to csv
+EXPORT_COMPARISON_CSV = False
+
+# Set number of observations to show in Gini/mean comparison logs
+NUM_OBSERVATIONS_TO_SHOW = 20
+
 # Keep original thousand bins series when calculating bins from mean and gini
-KEEP_ORIGINAL_THOUSAND_BINS = True
+KEEP_ORIGINAL_THOUSAND_BINS = False
 
 # Countries that appear in the thousand bins dataset for which we don't have population data.
 COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
@@ -1024,14 +1030,20 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
     # Log summary statistics
     if SHOW_WARNINGS:
         comparison_valid = tb_pip.dropna(subset=["gini_filled", "gini_survey"])
+        comparison_valid = comparison_valid[
+            ["country", "year", "gini_survey", "gini_filled", "gini_difference", "gini_difference_pct"]
+        ].sort_values(by="gini_difference", ascending=False)
         if len(comparison_valid) > 0:
             median_diff = comparison_valid["gini_difference"].median()
             max_diff = comparison_valid["gini_difference"].max()
             log.warning(
                 f"create_ginis_from_thousand_bins_distribution: Comparison with PIP data - "
-                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f} ({len(comparison_valid)} observations). See the top 20 largest differences below:"
-                f"{comparison_valid[['country', 'year', 'gini_survey', 'gini_filled', 'gini_difference', 'gini_difference_pct']].sort_values(by='gini_difference', ascending=False).head(20)}"
+                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f} ({len(comparison_valid)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
+                f"{comparison_valid.head(NUM_OBSERVATIONS_TO_SHOW)}"
             )
+
+            if EXPORT_COMPARISON_CSV:
+                comparison_valid.to_csv("gini_comparison_pip_thousand_bins.csv", index=False)
 
     # Keep relevant columns for output
     tb_pip = tb_pip[["country", "year", "mean_survey", "mean_filled", "gini_survey", "gini_filled"]]
@@ -1383,6 +1395,56 @@ def expand_means_and_ginis_to_thousand_bins(
 
     # Divide population equally among 1000 quantiles
     tb_expanded["pop"] /= 1000
+
+    # Compare means: calculate weighted mean from the generated distribution and compare with original mean
+    # Calculate total income for each quantile
+    tb_expanded["total_income"] = tb_expanded["avg"] * tb_expanded["pop"]
+
+    # Calculate mean from distribution as weighted average: sum(income * pop) / sum(pop)
+    tb_mean_from_distribution = (
+        tb_expanded.groupby(["country", "year"])
+        .agg(
+            total_income_sum=("total_income", "sum"),
+            total_pop_sum=("pop", "sum"),
+        )
+        .reset_index()
+    )
+    tb_mean_from_distribution["mean_from_distribution"] = (
+        tb_mean_from_distribution["total_income_sum"] / tb_mean_from_distribution["total_pop_sum"]
+    )
+
+    # Merge with original means for comparison
+    tb_comparison = pr.merge(
+        tb_mean_from_distribution[["country", "year", "mean_from_distribution"]],
+        tb_new[["country", "year", mean_column]],
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Calculate differences
+    tb_comparison["mean_difference"] = (tb_comparison["mean_from_distribution"] - tb_comparison[mean_column]).abs()
+    tb_comparison["mean_difference_pct"] = (tb_comparison["mean_difference"] / tb_comparison[mean_column]).abs() * 100
+
+    tb_comparison = tb_comparison[
+        ["country", "year", mean_column, "mean_from_distribution", "mean_difference", "mean_difference_pct"]
+    ].sort_values(by="mean_difference_pct", ascending=False)
+
+    # Log summary statistics
+    if SHOW_WARNINGS:
+        if len(tb_comparison) > 0:
+            median_diff = tb_comparison["mean_difference_pct"].median()
+            max_diff = tb_comparison["mean_difference_pct"].max()
+            log.info(
+                f"expand_means_and_ginis_to_thousand_bins: Comparison of original means with distribution-derived means - "
+                f"Median relative difference: {median_diff:.4f}, Max relative difference: {max_diff:.4f} ({len(tb_comparison)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
+                f"{tb_comparison.head(NUM_OBSERVATIONS_TO_SHOW)}"
+            )
+
+            if EXPORT_COMPARISON_CSV:
+                tb_comparison.to_csv("mean_comparison_original_distribution.csv", index=False)
+
+    # Drop temporary column
+    tb_expanded = tb_expanded.drop(columns=["total_income"])
 
     # Add region and region_old columns, from tb_thousand_bins
     # Create a mapping of country to region and region_old
