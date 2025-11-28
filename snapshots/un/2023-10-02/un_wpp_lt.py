@@ -10,7 +10,7 @@ To download this files:
         - https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/CSV_FILES/WPP2022_Life_Table_Complete_Medium_Female_1950-2021.zip
         - https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/CSV_FILES/WPP2022_Life_Table_Complete_Medium_Male_1950-2021.zip
     3. Run the snapshot script and wait for it to be ingested into S3:
-        python snapshots/un/2023-10-02/un_wpp_lt.py --path-to-file-all /path/WPP2022_Life_Table_Complete_Medium_Both_1950-2021.zip --path-to-file-f path/WPP2022_Life_Table_Complete_Medium_Female_1950-2021.zip --path-to-file-m path/WPP2022_Life_Table_Complete_Medium_Male_1950-2021.zip
+        etls un/2023-10-02/un_wpp_lt --path-to-file-all /path/WPP2022_Life_Table_Complete_Medium_Both_1950-2021.zip --path-to-file-f path/WPP2022_Life_Table_Complete_Medium_Female_1950-2021.zip --path-to-file-m path/WPP2022_Life_Table_Complete_Medium_Male_1950-2021.zip
 
 """
 

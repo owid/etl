@@ -5,7 +5,7 @@ The dataset file is downloaded manually from the source and saved to the local. 
 - Visit https://www.gallup.com/analytics/468179/global-wellbeing-initiative-dataset.aspx
 - Fill the form at the bottom of the page (need to enter mail, phone number)
 - Download the dataset file
-- Run script as `python snapshots/health/2023-05-04/gallup.py --path-to-file <path-to-file>`
+- Run script as `etls health/2023-05-04/gallup --path-to-file <path-to-file>`
 """
 
 from pathlib import Path

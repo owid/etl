@@ -12,7 +12,7 @@ The data needs to be uploaded manually following these steps:
     8. Click on "Save".
     9. Copy the downloaded file to this folder.
     10. Run the script:
-        python snapshots/statfin/{version}/gini_coefficient.py --path-to-file {path_to_file}
+        etls statfin/{version}/gini_coefficient --path-to-file {path_to_file}
     11. Delete the downloaded file.
 """
 
