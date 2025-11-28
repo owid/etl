@@ -253,4 +253,6 @@ steps:
   data://grapher/fasttrack/latest/smoking_young_people_england: !!set
     ? snapshot://fasttrack/latest/smoking_young_people_england.csv
   data://grapher/fasttrack/latest/religiosity_united_states_gallup: !!set
-    snapshot://fasttrack/latest/religiosity_united_states_gallup.csv:
+    ? snapshot://fasttrack/latest/religiosity_united_states_gallup.csv
+  data-private://grapher/fasttrack/latest/cleaned_traced_news_sentiment: !!set
+    snapshot-private://fasttrack/latest/cleaned_traced_news_sentiment.csv:
