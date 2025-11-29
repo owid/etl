@@ -15,11 +15,13 @@ The approach:
 4. Calculate the number and share of people living below different poverty lines, using OWID population data
 """
 
-from typing import Tuple
+from typing import Set, Tuple
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from scipy import stats
 from structlog import get_logger
 
 from etl.data_helpers.misc import interpolate_table
@@ -34,14 +36,59 @@ paths = PathFinder(__file__)
 # Poverty lines (daily income in 2021 PPP$)
 POVERTY_LINES = [3, 10, 30]
 
+# Define if we want to interpolate the log of GDP per capita or the absolute values
+INTERPOLATE_LOG_GDP = True
+
 # Earliest year for extrapolation
 EARLIEST_YEAR = 1820
 
 # Latest year for extrapolation
 LATEST_YEAR = 1990
 
+# Latest year for extrapolation (filled PIP data)
+LATEST_YEAR_PIP_FILLED = 1981
+
+# Define current year as the year of the version of the step
+CURRENT_YEAR = int(paths.version.split("-")[0])
+
+# Define extreme growth factor thresholds
+EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
+
 # Show warnings
 SHOW_WARNINGS = False
+
+# Export comparison files to csv
+EXPORT_COMPARISON_CSV = False
+
+# Set number of observations to show in Gini/mean comparison logs
+NUM_OBSERVATIONS_TO_SHOW = 20
+
+# Keep original thousand bins series when calculating bins from mean and gini
+KEEP_ORIGINAL_THOUSAND_BINS = True
+
+# Countries that appear in the thousand bins dataset for which we don't have population data.
+COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
+
+# Define indicator to extract from PIP
+PIP_INDICATORS = ["gini", "mean"]
+
+# Define categories to filter in PIP, for survey-based and filled data
+PIP_CATEGORIES = {
+    "survey": {
+        "ppp_version": 2021,
+        "poverty_line": "No poverty line",
+        "welfare_type": "income or consumption",
+        "table": "Income or consumption consolidated",
+        "survey_comparability": "No spells",
+    },
+    "filled": {
+        "ppp_version": 2021,
+        "poverty_line": "No poverty line",
+        "welfare_type": "income or consumption",
+        "table": "Income or consumption intra/extrapolated",
+        "survey_comparability": "No spells",
+    },
+}
 
 # NOTE: See if we want to include these countries not available in Maddison Project Database
 MISSING_COUNTRIES_AND_REGIONS = {
@@ -97,9 +144,6 @@ MISSING_COUNTRIES_AND_REGIONS = {
     "Vanuatu": "East Asia",
 }
 
-# Countries that appear in the thousand bins dataset for which we don't have population data.
-COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
-
 
 def run() -> None:
     #
@@ -108,15 +152,28 @@ def run() -> None:
     # Load thousand bins dataset, and read its main table.
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
     tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
+
     # Load Maddison Project Database, and read its main table.
     ds_maddison = paths.load_dataset("maddison_project_database")
     tb_maddison = ds_maddison.read("maddison_project_database")
 
+    # Load World Bank PIP dataset, and read its main table.
+    ds_pip = paths.load_dataset("world_bank_pip")
+    tb_pip = ds_pip.read("world_bank_pip")
+
+    # Load historical inequality dataset, and read its main table.
+    ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
+    tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al")
+
     #
     # Prepare data.
-    #
+    # #
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
+
+    ###############################################################################
+    # 1. KEEPING INEQUALITY CONSTANT
+    ###############################################################################
 
     # Perform backward extrapolation
     tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
@@ -130,18 +187,112 @@ def run() -> None:
     # Calculate an alternative method with our population dataset
     tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
 
+    ###############################################################################
+    # 2. WITH INEQUALITY CHANGES
+    ###############################################################################
+
+    # Prepare World Bank PIP data
+    tb_pip = prepare_pip_data(tb_pip=tb_pip, tb_thousand_bins=tb_thousand_bins)
+
+    # Calculate Ginis from thousand bins distribution
+    tb_pip = create_ginis_from_thousand_bins_distribution(tb_thousand_bins=tb_thousand_bins, tb_pip=tb_pip)
+
+    # Add ginis from Van Zanden et al.
+    tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
+
+    # Prepare mean and gini data for extrapolation
+    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
+
+    ###############################################################################
+    # 2.1 USING EXTRAPOLATED MEANS AND GINIS
+    ###############################################################################
+
+    # Create 1000 bins from mean and gini data
+    tb_thousand_bins_from_interpolated_mean_gini = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
+    )
+
+    # Calculate poverty measures
+    tb_from_interpolated_mean_gini = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean_gini)
+
+    # Create stacked variables for stacked area/bar charts
+    tb_from_interpolated_mean_gini = create_stacked_variables(tb=tb_from_interpolated_mean_gini)
+
+    # Calculate an alternative method with our population dataset
+    tb_from_interpolated_mean_gini, tb_from_interpolated_mean_gini_population = (
+        calculate_alternative_method_with_population_dataset(tb_poverty=tb_from_interpolated_mean_gini)
+    )
+
+    ###############################################################################
+    # 2.2 USING EXTRAPOLATED MEANS (BUT NOT GINIS) AND INTERPOLATING THOUSAND BINS
+    ###############################################################################
+
+    # Create 1000 bins from inter/extrapolated means and original Ginis, except for years between the earliest year and first year with data
+    tb_thousand_bins_from_interpolated_mean = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini_original"
+    )
+
+    tb_thousand_bins_from_interpolated_mean = interpolate_quantiles_in_thousand_bins(
+        tb_thousand_bins_from_interpolated_mean=tb_thousand_bins_from_interpolated_mean
+    )
+
+    # Calculate poverty measures
+    tb_from_interpolated_mean = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean)
+
+    # Create stacked variables for stacked area/bar charts
+    tb_from_interpolated_mean = create_stacked_variables(tb=tb_from_interpolated_mean)
+
+    # Calculate an alternative method with our population dataset
+    tb_from_interpolated_mean, tb_from_interpolated_mean_population = (
+        calculate_alternative_method_with_population_dataset(tb_poverty=tb_from_interpolated_mean)
+    )
+
+    ###############################################################################
+
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
-    tb_extended = tb_extended.format(
-        ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
+    # tb_extended = tb_extended.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
+    # )
+
+    tb_from_interpolated_mean_gini = tb_from_interpolated_mean_gini.format(
+        ["country", "year", "poverty_line"], short_name="historical_poverty_from_interpolated_mean_gini"
     )
+    tb_from_interpolated_mean_gini_population = tb_from_interpolated_mean_gini_population.format(
+        ["country", "year"], short_name="population_from_interpolated_mean_gini"
+    )
+    # tb_thousand_bins_from_interpolated_mean_gini = tb_thousand_bins_from_interpolated_mean_gini.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean_gini"
+    # )
+
+    tb_from_interpolated_mean = tb_from_interpolated_mean.format(
+        ["country", "year", "poverty_line"], short_name="historical_poverty_from_interpolated_mean"
+    )
+    tb_from_interpolated_mean_population = tb_from_interpolated_mean_population.format(
+        ["country", "year"], short_name="population_from_interpolated_mean"
+    )
+    # tb_thousand_bins_from_interpolated_mean = tb_thousand_bins_from_interpolated_mean.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean"
+    # )
 
     #
     # Save outputs.
     #
     # Create dataset
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_population, tb_extended], default_metadata=ds_thousand_bins.metadata
+        tables=[
+            tb,
+            tb_population,
+            tb_from_interpolated_mean_gini,
+            tb_from_interpolated_mean_gini_population,
+            tb_from_interpolated_mean,
+            tb_from_interpolated_mean_population,
+            # tb_extended,
+            # tb_thousand_bins_from_interpolated_mean_gini,
+            # tb_thousand_bins_from_interpolated_mean,
+        ],
+        default_metadata=ds_thousand_bins.metadata,
+        repack=False,
     )
 
     # Save dataset
@@ -209,15 +360,23 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # This fills gaps between available years
     # Drop region before interpolation (categorical columns can't be interpolated)
     tb_gdp = tb_gdp.drop(columns=["region"])
+
+    # Create log_gdp_per_capita column, as the logarithm of gdp_per_capita
+    tb_gdp["log_gdp_per_capita"] = tb_gdp["gdp_per_capita"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+
     tb_gdp = interpolate_table(
         tb_gdp,
         entity_col="country",
         time_col="year",
-        time_mode="full_range",
+        time_mode="full_range",  # All the years between min and max year of the table for each country
         method="linear",
         limit_direction="both",
         limit_area="inside",
     )
+
+    if INTERPOLATE_LOG_GDP:
+        # Convert back from log to absolute values
+        tb_gdp["gdp_per_capita"] = tb_gdp["log_gdp_per_capita"].apply(lambda x: np.exp(x) if pd.notna(x) else x)
 
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
@@ -285,13 +444,14 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp = tb_gdp.rename(columns={"growth_factor": "growth_factor_country"}, errors="raise")
 
     # Generate growth_factor column using priority: country > historical_entity > region
-    tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
+    tb_gdp[["growth_factor", "growth_factor_origin"]] = tb_gdp.apply(select_growth_factor, axis=1)
 
     # Copy metadata from growth_factor_country to growth_factor
     tb_gdp["growth_factor"] = tb_gdp["growth_factor"].copy_metadata(tb_gdp["growth_factor_country"])
 
     # Shift growth_factor down by one year to align with the starting year of extrapolation
     tb_gdp["growth_factor"] = tb_gdp.groupby("country")["growth_factor"].shift(-1)
+    tb_gdp["growth_factor_origin"] = tb_gdp.groupby("country")["growth_factor_origin"].shift(-1)
 
     # Calculate the the cumulative growth factor product from LATEST_YEAR to each year
     # First, sort by country and year (descending)
@@ -318,35 +478,34 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
             "region",
             "historical_entity",
             "growth_factor",
+            "growth_factor_origin",
             "cumulative_growth_factor",
         ]
     ]
 
     # Check for extreme growth rates
-    extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
+    extreme_growth = tb_gdp[
+        (tb_gdp["growth_factor"] > EXTREME_GROWTH_FACTOR_THRESHOLDS[1])
+        | (tb_gdp["growth_factor"] < EXTREME_GROWTH_FACTOR_THRESHOLDS[0])
+    ].reset_index(drop=True)
     if SHOW_WARNINGS:
         if len(extreme_growth) > 0:
             log.warning(
                 f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
-                f"(>100% or <-50% in a single year)"
+                f"(<-{round((1- EXTREME_GROWTH_FACTOR_THRESHOLDS[0]) * 100, 1)}% or >+{round((EXTREME_GROWTH_FACTOR_THRESHOLDS[1]-1) * 100, 1)}% or  in a single year)"
             )
-            # Show some examples
-            sample = extreme_growth.head(10)[["country", "year", "growth_factor"]]
-            log.warning(f"prepare_gdp_data: Examples:\n{sample}")
-            log.warning(
-                "We will assert that these instances were already in the original data; otherwise, if they were introduced in our processing, an error will be raised"
-            )
-    for _, row in extreme_growth.iterrows():
-        # Check that those country-years of extreme growth/degrowth were already in the original data.
-        _tb = tb_maddison[(tb_maddison["country"] == row["country"])].reset_index(drop=True)
-        error = "Extreme growth factors have been introduced in the data!"
-        assert len(_tb[(_tb["year"] == row["year"])]) == 1, error
-        # Double-check that those growth factors were exactly as in the original data.
-        growth_factor_original = (
-            _tb[(_tb["year"] == row["year"] + 1)]["gdp_per_capita"].item()
-            / _tb[(_tb["year"] == row["year"])]["gdp_per_capita"].item()
-        )
-        assert growth_factor_original == row["growth_factor"], "Wrong calculation of growth rates"
+            # Filter extreme_growth to only include country-years where growth_factor_origin is historical_entity or region
+            extreme_growth_introduced = extreme_growth[
+                extreme_growth["growth_factor_origin"].isin(["historical_entity", "region"])
+            ].reset_index(drop=True)
+            if len(extreme_growth_introduced) > 0:
+                log.warning(
+                    f"prepare_gdp_data: Out of these, {len(extreme_growth_introduced)} instances ({round(len(extreme_growth_introduced) / len(extreme_growth) * 100, 1)}%) come from historical_entity or region-level growth rates."
+                )
+                # Show some examples
+                log.warning(
+                    f"{extreme_growth_introduced[['country', 'year', 'growth_factor', 'growth_factor_origin']]}"
+                )
 
     return tb_gdp
 
@@ -358,24 +517,12 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     # Create tb_thousand_bins_to_extrapolate
     tb_thousand_bins_to_extrapolate = tb_thousand_bins[tb_thousand_bins["year"] == LATEST_YEAR].reset_index(drop=True)
 
-    # Assert that countries coincide in both tables
-    countries_bins = set(tb_thousand_bins_to_extrapolate["country"].unique())
-    countries_gdp = set(tb_gdp["country"].unique())
-    if SHOW_WARNINGS:
-        missing_countries = countries_bins - countries_gdp
-        if len(missing_countries) > 0:
-            sorted_missing_countries = ", ".join(sorted(missing_countries))
-            log.warning(
-                f"extrapolate_backwards: The following {len(missing_countries)} countries are in thousand_bins but missing in GDP data: "
-                f"{sorted_missing_countries}"
-            )
-        missing_countries = countries_gdp - countries_bins
-        if len(missing_countries) > 0:
-            sorted_missing_countries = ", ".join(sorted(missing_countries))
-            log.warning(
-                f"extrapolate_backwards: The following {len(missing_countries)} countries are in GDP data but missing in thousand_bins: "
-                f"{sorted_missing_countries}"
-            )
+    missing_in_thousand_bins_to_extrapolate, missing_in_gdp = compare_countries_available_in_two_tables(
+        tb_1=tb_thousand_bins_to_extrapolate,
+        tb_2=tb_gdp,
+        name_tb_1="thousand_bins_to_extrapolate",
+        name_tb_2="gdp",
+    )
 
     # For tb_thousand_bins_to_extrapolate, column year, assign a list of years from EARLIEST_YEAR to LATEST_YEAR - 1 and then explode
     tb_thousand_bins_to_extrapolate = (
@@ -386,6 +533,11 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
 
     # Drop population column, we will add other data on population later
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["pop"])
+
+    # Drop countries in missing_countries_bins from tb_thousand_bins_to_extrapolate
+    tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate[
+        ~tb_thousand_bins_to_extrapolate["country"].isin(missing_in_gdp)
+    ].reset_index(drop=True)
 
     # Merge with tb_gdp to get growth factors
     tb_thousand_bins_to_extrapolate = pr.merge(
@@ -414,15 +566,60 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     # Divide pop into quantiles (1000 quantiles)
     tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
-    # Sanity check.
+    # Sanity check: Check for missing population data at country-year level.
+    missing_pop_mask = tb_thousand_bins_to_extrapolate["pop"].isna()
 
-    set_countries_missing_pop = set(
-        tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]["country"]
-    )
-    error = (
-        f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
-    )
-    assert set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION), error
+    if missing_pop_mask.any():
+        # Get all country-year combinations with missing population
+        missing_pop_rows = tb_thousand_bins_to_extrapolate[missing_pop_mask][["country", "year"]].drop_duplicates()
+
+        # Get unexpected missing data (countries not in the expected list)
+        unexpected_missing = missing_pop_rows[~missing_pop_rows["country"].isin(COUNTRIES_WITHOUT_POPULATION)]
+
+        if not unexpected_missing.empty:
+            # Group by country to show detailed year information
+            unexpected_summary = []
+            for country in unexpected_missing["country"].unique():
+                years = sorted(unexpected_missing[unexpected_missing["country"] == country]["year"].tolist())
+
+                # Find consecutive year ranges to display more clearly
+                ranges = []
+                start = years[0]
+                end = years[0]
+
+                for i in range(1, len(years)):
+                    if years[i] == end + 1:
+                        end = years[i]
+                    else:
+                        ranges.append(f"{start}-{end}" if start != end else str(start))
+                        start = years[i]
+                        end = years[i]
+                ranges.append(f"{start}-{end}" if start != end else str(start))
+
+                # Format output - show all ranges
+                years_display = ", ".join(ranges)
+                unexpected_summary.append(f"{country}: {years_display} ({len(years)} years total)")
+
+            # Log the error details
+            log.error(
+                f"Found {len(unexpected_missing)} unexpected country-year combinations with missing population data:\n"
+                + "\n".join(unexpected_summary)
+            )
+
+            # Calculate and log population impact
+            affected_countries = set(unexpected_missing["country"].unique())
+            calculate_population_of_missing_countries(affected_countries)
+
+            # Raise assertion error
+            raise AssertionError(
+                f"Found {len(unexpected_missing)} unexpected country-year combinations with missing population data. See log for details."
+            )
+
+        # Verify that all missing data is from expected countries
+        set_countries_missing_pop = set(missing_pop_rows["country"])
+        assert (
+            set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION)
+        ), f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
 
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
@@ -438,82 +635,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     return tb_thousand_bins_extended
 
 
-def apply_backward_extrapolation(
-    country: str, baseline_year: int, baseline_quantiles: Table, growth_data: Table, method: str
-) -> Table:
-    """Apply backward extrapolation to income distribution.
-
-    Parameters
-    ----------
-    country : str
-        Country name
-    baseline_year : int
-        Starting year
-    baseline_quantiles : Table
-        Baseline income distribution (1000 quantiles)
-    growth_data : Table
-        GDP growth factors
-    method : str
-        Extrapolation method used
-
-    Returns
-    -------
-    Table
-        Extended income distribution (EARLIEST_YEAR to baseline_year-1)
-    """
-    extended_rows = []
-
-    # Sort growth data by year (descending, going backwards)
-    growth_data = growth_data.sort_values("year", ascending=False)
-
-    # Initialize with baseline values
-    current_income = baseline_quantiles.set_index("quantile")["avg"].to_dict()
-    current_pop = baseline_quantiles.set_index("quantile")["pop"].to_dict()
-
-    # Get region if available
-    region = baseline_quantiles["region"].iloc[0] if "region" in baseline_quantiles.columns else None
-
-    # Go backwards year by year
-    for year in range(baseline_year - 1, EARLIEST_YEAR - 1, -1):
-        # Get growth factor for year+1 to year
-        growth_row = growth_data[growth_data["year"] == year + 1]
-
-        if len(growth_row) == 0 or pd.isna(growth_row["growth_factor"].iloc[0]):
-            # No growth data for this year, skip
-            continue
-
-        growth_factor = growth_row["growth_factor"].iloc[0]
-
-        # Apply backward extrapolation to all quantiles
-        # income(t-1) = income(t) / growth_factor(t)
-        for quantile in current_income.keys():
-            current_income[quantile] = current_income[quantile] / growth_factor
-
-            # Floor negative values at 0
-            if current_income[quantile] < 0:
-                current_income[quantile] = 0
-                log.warning(
-                    f"apply_backward_extrapolation: {country} year {year} quantile {quantile} - negative income, floored at 0"
-                )
-
-        # Create rows for this year
-        for quantile in current_income.keys():
-            extended_rows.append(
-                {
-                    "country": country,
-                    "year": year,
-                    "quantile": quantile,
-                    "avg": current_income[quantile],
-                    "pop": current_pop[quantile],
-                    "region": region,
-                    "extrapolation_method": method,
-                }
-            )
-
-    return Table(extended_rows)
-
-
-def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
+def calculate_poverty_measures(tb: Table) -> Table:
     """
     Calculate poverty headcount and headcount ratios and for all poverty lines.
     For each year, the data is sorted by income avg, and the cumulative population is calculated.
@@ -575,17 +697,64 @@ def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
     return tb_poverty
 
 
+def calculate_population_of_missing_countries(missing_countries: Set[str]) -> None:
+    """
+    Calculate population estimates for countries missing in the main population dataset, and what do they represent as a share of the world population.
+    """
+    # Create table with column country as missing_countries
+    tb_population_missing = Table(pd.DataFrame(data={"country": list(missing_countries)}))
+
+    # Assign column year as CURRENT_YEAR
+    tb_population_missing["year"] = CURRENT_YEAR
+
+    # Add population column using paths.regions.add_population
+    tb_population_missing = paths.regions.add_population(
+        tb=tb_population_missing,
+        population_col="population",
+        warn_on_missing_countries=False,
+        interpolate_missing_population=True,
+    )
+
+    # Calculate total world population for CURRENT_YEAR
+    tb_world_population = paths.regions.add_population(
+        tb=Table(pd.DataFrame(data={"country": ["World"], "year": [CURRENT_YEAR]})),
+        population_col="world_population",
+        warn_on_missing_countries=False,
+        interpolate_missing_population=True,
+    )
+
+    world_population = tb_world_population["world_population"].item()
+
+    # Calculate population share of world population
+    tb_population_missing["population_share_of_world"] = tb_population_missing["population"] / world_population * 100
+
+    # Aggregate population and population_share_of_world
+    tb_population_missing = tb_population_missing.groupby("year").sum().reset_index()
+
+    # Define missing_population
+    missing_population = tb_population_missing["population"].item()
+    missing_population_share = tb_population_missing["population_share_of_world"].item()
+
+    log.warning(
+        f"This represents {int(missing_population):,} people in {CURRENT_YEAR} ({missing_population_share:.2f}% of the world population)."
+    )
+
+    return None
+
+
 def select_growth_factor(row):
     """
     Select growth factor based on priority: country > historical_entity > region.
     This way, we have the longest country-specific growth series possible.
     """
     if not pd.isna(row["growth_factor_country"]):
-        return row["growth_factor_country"]
+        return pd.Series({"growth_factor": row["growth_factor_country"], "growth_factor_origin": "country"})
     elif not pd.isna(row["growth_factor_historical_entity"]):
-        return row["growth_factor_historical_entity"]
+        return pd.Series(
+            {"growth_factor": row["growth_factor_historical_entity"], "growth_factor_origin": "historical_entity"}
+        )
     else:
-        return row["growth_factor_region"]
+        return pd.Series({"growth_factor": row["growth_factor_region"], "growth_factor_origin": "region"})
 
 
 def create_stacked_variables(tb: Table) -> Table:
@@ -685,7 +854,712 @@ def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> T
     tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
     tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
 
+    # Add population as a share of population_omm
+    tb_population["population_share_of_omm"] = tb_population["population"] / tb_population["population_omm"] * 100
+
     # Drop population columns from tb_poverty
     tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
 
     return tb_poverty, tb_population
+
+
+def prepare_pip_data(tb_pip: Table, tb_thousand_bins: Table) -> Table:
+    """
+    Prepare World Bank PIP data to use it in extrapolations.
+    Here we extract Ginis (survey-based) and means (survey-based and filled) from the latest PIP dataset
+    """
+
+    tb_pip = tb_pip.copy()
+    tb_thousand_bins = tb_thousand_bins.copy()
+
+    # Keep only relevant columns
+    tb_pip = tb_pip[
+        [
+            "country",
+            "year",
+            "ppp_version",
+            "poverty_line",
+            "welfare_type",
+            "decile",
+            "table",
+            "survey_comparability",
+        ]
+        + PIP_INDICATORS
+    ]
+
+    # As Argentina is only available in PIP as "Argentina (urban)", rename it to "Argentina" to match with thousand_bins
+    tb_pip["country"] = tb_pip["country"].replace({"Argentina (urban)": "Argentina"})
+
+    missing_in_thousand_bins, missing_in_pip = compare_countries_available_in_two_tables(
+        tb_1=tb_thousand_bins, tb_2=tb_pip, name_tb_1="thousand_bins", name_tb_2="pip"
+    )
+
+    # Drop countries missing in thousand_bins from tb_pip
+    tb_pip = tb_pip[~tb_pip["country"].isin(missing_in_thousand_bins)].reset_index(drop=True)
+
+    # Check if all categories I want to filter are present
+    for filled_or_survey, category_filters in PIP_CATEGORIES.items():
+        for column, category in category_filters.items():
+            unique_values = tb_pip[column].unique()
+            assert category in unique_values, (
+                f"prepare_pip_data: Type of data '{filled_or_survey}' - Category '{category}' for column '{column}' not found in PIP data. "
+                f"Available values: {unique_values}"
+            )
+
+    # Filter data for each category and concatenate
+    # I need two tables, tb_pip_survey and tb_pip_filled, for both mean and gini
+    tb_pip_survey = tb_pip[
+        (tb_pip["ppp_version"] == PIP_CATEGORIES["survey"]["ppp_version"])
+        & (tb_pip["poverty_line"] == PIP_CATEGORIES["survey"]["poverty_line"])
+        & (tb_pip["welfare_type"] == PIP_CATEGORIES["survey"]["welfare_type"])
+        & (tb_pip["table"] == PIP_CATEGORIES["survey"]["table"])
+        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["survey"]["survey_comparability"])
+        & (tb_pip["decile"].isna())
+    ].reset_index(drop=True)
+
+    tb_pip_filled = tb_pip[
+        (tb_pip["ppp_version"] == PIP_CATEGORIES["filled"]["ppp_version"])
+        & (tb_pip["poverty_line"] == PIP_CATEGORIES["filled"]["poverty_line"])
+        & (tb_pip["welfare_type"] == PIP_CATEGORIES["filled"]["welfare_type"])
+        & (tb_pip["table"] == PIP_CATEGORIES["filled"]["table"])
+        & (tb_pip["survey_comparability"] == PIP_CATEGORIES["filled"]["survey_comparability"])
+        & (tb_pip["decile"].isna())
+    ].reset_index(drop=True)
+
+    # Merge both tables
+    tb_pip = pr.merge(
+        tb_pip_survey[["country", "year", "gini", "mean"]],
+        tb_pip_filled[["country", "year", "mean"]],  # There is no gini in filled data
+        on=["country", "year"],
+        how="outer",
+        suffixes=("_survey", "_filled"),
+    )
+
+    return tb_pip
+
+
+def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip: Table) -> Table:
+    """
+    Create Gini coefficients from the 1000-binned income distribution data and merge with World Bank PIP data.
+
+    The Gini coefficient is calculated using the trapezoidal approximation of the Lorenz curve:
+    Gini = 1 - sum((cumulative_income_share[i] + cumulative_income_share[i-1]) * pop_share[i])
+
+    Where:
+    - cumulative_income_share is the cumulative share of total income at each quantile
+    - pop_share is the population share for each quantile (1/1000 for each bin)
+
+    Args:
+        tb_thousand_bins: Table with 1000 quantiles per country-year containing 'avg' (income) and 'pop' (population)
+        tb_pip: Table with World Bank PIP Gini data to merge with
+
+    Returns:
+        Table with Gini coefficients calculated from thousand bins distribution, merged with PIP data for comparison
+    """
+
+    # Create a copy to avoid modifying the original
+    tb = tb_thousand_bins.copy()
+
+    # Keep only necessary columns
+    tb = tb[["country", "year", "quantile", "avg", "pop"]].copy()
+
+    # Sort by country, year, and quantile to ensure correct ordering
+    tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
+    # Calculate total income for each quantile (income per capita * population)
+    tb["total_income"] = tb["avg"] * tb["pop"]
+
+    # Calculate total income and population by country-year
+    country_year_totals = (
+        tb.groupby(["country", "year"])
+        .agg(total_income_sum=("total_income", "sum"), total_pop_sum=("pop", "sum"))
+        .reset_index()
+    )
+
+    # Merge totals back to main table
+    tb = pr.merge(tb, country_year_totals, on=["country", "year"], how="left")
+
+    # Calculate cumulative income share for each quantile
+    tb["cumulative_income"] = tb.groupby(["country", "year"])["total_income"].cumsum()
+    tb["cumulative_income_share"] = tb["cumulative_income"] / tb["total_income_sum"]
+
+    # Calculate population share (should be uniform 1/1000 for each quantile, but we calculate it to handle edge cases)
+    tb["pop_share"] = tb["pop"] / tb["total_pop_sum"]
+
+    # Calculate Gini using trapezoidal rule
+    # Gini = 1 - sum of areas under Lorenz curve
+    # For each segment: area = (y[i] + y[i-1]) / 2 * (x[i] - x[i-1])
+    # Where y is cumulative income share and x is cumulative population share
+
+    # Get previous cumulative income share (for trapezoidal calculation)
+    tb["cumulative_income_share_prev"] = tb.groupby(["country", "year"])["cumulative_income_share"].shift(1).fillna(0)
+
+    # Calculate area under Lorenz curve for each segment
+    # Area = average of two heights * width
+    tb["lorenz_area"] = (tb["cumulative_income_share"] + tb["cumulative_income_share_prev"]) * tb["pop_share"] / 2
+
+    # Sum areas by country-year to get total area under Lorenz curve
+    gini_calc = tb.groupby(["country", "year"]).agg(lorenz_area_total=("lorenz_area", "sum")).reset_index()
+
+    # Gini coefficient = 1 - 2 * (area under Lorenz curve)
+    # The factor of 2 comes from the fact that the area under the perfect equality line is 0.5
+    gini_calc["gini"] = 1 - 2 * gini_calc["lorenz_area_total"]
+
+    # Drop intermediate calculation column
+    gini_calc = gini_calc.drop(columns=["lorenz_area_total"])
+
+    # Sanity check: Gini should be between 0 and 1
+    invalid_gini = gini_calc[(gini_calc["gini"] < 0) | (gini_calc["gini"] > 1)]
+    assert (
+        len(invalid_gini) == 0
+    ), f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range):\n{invalid_gini}"
+
+    # Merge with PIP data for comparison
+    tb_pip = pr.merge(
+        tb_pip,
+        gini_calc[["country", "year", "gini"]],
+        on=["country", "year"],
+        how="outer",
+        suffixes=("_survey", "_filled"),
+    )
+
+    # Calculate difference between thousand bins Gini and PIP Gini
+    tb_pip["gini_difference"] = (tb_pip["gini_filled"] - tb_pip["gini_survey"]).abs()
+    tb_pip["gini_difference_pct"] = (tb_pip["gini_difference"] / tb_pip["gini_survey"]).abs() * 100
+
+    # Log summary statistics
+    if SHOW_WARNINGS:
+        comparison_valid = tb_pip.dropna(subset=["gini_filled", "gini_survey"])
+        comparison_valid = comparison_valid[
+            ["country", "year", "gini_survey", "gini_filled", "gini_difference", "gini_difference_pct"]
+        ].sort_values(by="gini_difference", ascending=False)
+        if len(comparison_valid) > 0:
+            median_diff = comparison_valid["gini_difference"].median()
+            max_diff = comparison_valid["gini_difference"].max()
+            log.warning(
+                f"create_ginis_from_thousand_bins_distribution: Comparison with PIP data - "
+                f"Median absolute difference: {median_diff:.4f}, Max absolute difference: {max_diff:.4f} ({len(comparison_valid)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below\n:{comparison_valid.head(NUM_OBSERVATIONS_TO_SHOW)}"
+            )
+
+            if EXPORT_COMPARISON_CSV:
+                comparison_valid.to_csv("gini_comparison_pip_thousand_bins.csv", index=False)
+
+    # Keep relevant columns for output
+    tb_pip = tb_pip[["country", "year", "mean_survey", "mean_filled", "gini_survey", "gini_filled"]]
+
+    return tb_pip
+
+
+def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
+    """
+    Add Gini coefficients from Van Zanden et al. (2014) to the PIP data table for historical comparison.
+    """
+
+    # Merge tb_pip with tb_van_zanden on country and year
+    tb = pr.merge(
+        tb_pip,
+        tb_van_zanden[["country", "year", "gini"]],
+        on=["country", "year"],
+        how="outer",
+    )
+
+    # Rename gini column to gini_van_zanden
+    tb = tb.rename(columns={"gini": "gini_van_zanden"}, errors="raise")
+
+    return tb
+
+
+def compare_countries_available_in_two_tables(
+    tb_1: Table, tb_2: Table, name_tb_1: str, name_tb_2: str
+) -> Tuple[Set[str], Set[str]]:
+    """
+    Compare countries available in two tables and log warnings if there are discrepancies (if SHOW_WARNINGS is True).
+    Returns two sets: countries missing in tb_2 compared to tb_1, and countries missing in tb_1 compared to tb_2.
+    """
+    countries_tb_1 = set(tb_1["country"].unique())
+    countries_tb_2 = set(tb_2["country"].unique())
+
+    missing_in_tb_2 = countries_tb_1 - countries_tb_2
+    missing_in_tb_1 = countries_tb_2 - countries_tb_1
+
+    if SHOW_WARNINGS:
+        if len(missing_in_tb_2) > 0:
+            sorted_missing = ", ".join(sorted(missing_in_tb_2))
+            log.warning(
+                f"The following {len(missing_in_tb_2)} countries are in '{name_tb_1}' but missing in '{name_tb_2}': "
+                f"{sorted_missing}"
+            )
+            calculate_population_of_missing_countries(missing_in_tb_2)
+
+        if len(missing_in_tb_1) > 0:
+            sorted_missing = ", ".join(sorted(missing_in_tb_1))
+            log.warning(
+                f"The following {len(missing_in_tb_1)} countries are in '{name_tb_2}' but missing in '{name_tb_1}': "
+                f"{sorted_missing}"
+            )
+
+    return missing_in_tb_1, missing_in_tb_2
+
+
+def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
+    """
+    Prepare mean income and Gini coefficient data for extrapolation.
+    It consolidates mean and Gini columns based on priority rules, interpolates missing values, and extrapolates means using GDP growth factors.
+    """
+    tb_gini_mean = tb_gini_mean.copy()
+    tb_gdp = tb_gdp.copy()
+
+    # Check countries missing in either table
+    missing_in_gini_mean, missing_in_gdp = compare_countries_available_in_two_tables(
+        tb_1=tb_gini_mean,
+        tb_2=tb_gdp,
+        name_tb_1="gini_mean",
+        name_tb_2="gdp",
+    )
+
+    # Filter tb_gini_mean to drop missing_in_gini_mean and missing_in_gdp
+    tb_gini_mean = tb_gini_mean[
+        ~tb_gini_mean["country"].isin(missing_in_gdp) & ~tb_gini_mean["country"].isin(missing_in_gini_mean)
+    ].reset_index(drop=True)
+
+    # Filter tb_gini_mean to show data from EARLIEST_YEAR only
+    tb_gini_mean = tb_gini_mean[tb_gini_mean["year"] >= EARLIEST_YEAR].reset_index(drop=True)
+
+    # Filter tb_gdp to show data from EARLIEST_YEAR to LATEST_YEAR_PIP_FILLED only
+    tb_gdp = tb_gdp[(tb_gdp["year"] >= EARLIEST_YEAR) & (tb_gdp["year"] <= LATEST_YEAR_PIP_FILLED)].reset_index(
+        drop=True
+    )
+
+    # Generate mean column using priority: survey > filled
+    tb_gini_mean[["mean", "mean_origin"]] = tb_gini_mean.apply(select_mean, axis=1)
+    tb_gini_mean["mean"] = tb_gini_mean["mean"].astype("Float64")
+
+    # Generate gini column using priority: survey > filled > van_zanden
+    tb_gini_mean[["gini", "gini_origin"]] = tb_gini_mean.apply(select_gini, axis=1)
+    tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
+
+    # Keep only relevant columns
+    tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
+
+    # Separate mean and gini tables, to interpolate differently
+    tb_gini = tb_gini_mean[["country", "year", "gini"]].copy()
+    tb_mean = tb_gini_mean[["country", "year", "mean"]].copy()
+
+    # Also create a table with ginis to only extrapolate (repeat values from min year to earliest value)
+    tb_gini_outside_extrapolation = tb_gini_mean[["country", "year", "gini"]]
+
+    # Interpolate mean and gini separately
+
+    tb_gini = interpolate_table(
+        tb_gini,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # Interpolate for the full range of years
+        method="linear",
+        limit_direction="both",
+        limit_area=None,  # Interpolate/extrapolate everywhere, including outside existing data ranges (repeating first/last known value)
+    )
+
+    tb_mean = interpolate_table(
+        tb_mean,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # Interpolate for the full range of years
+        method="linear",
+        limit_direction="both",
+        limit_area="inside",  # Only interpolate inside existing data ranges
+    )
+
+    # Also interpolate tb_gini_outside_extrapolation, to replicate values from 1820 to earliest observation
+    tb_gini_outside_extrapolation = interpolate_table(
+        tb_gini_outside_extrapolation,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # Interpolate for the full range of years
+        method="linear",
+        limit_direction="both",
+        limit_area="outside",  # Only extrapolate outside existing data ranges
+    )
+
+    # Merge back both tables
+    tb_gini_mean_interpolated = pr.merge(tb_mean, tb_gini, on=["country", "year"], how="outer")
+
+    # Add original columns back
+    tb_gini_mean = pr.merge(
+        tb_gini_mean_interpolated,
+        tb_gini_mean[["country", "year", "mean"]],
+        on=["country", "year"],
+        how="left",
+        suffixes=("", "_original"),
+    )
+
+    # Add "original" gini (original data + extrapolation repeating values up to 1820)
+    tb_gini_mean = pr.merge(
+        tb_gini_mean, tb_gini_outside_extrapolation, on=["country", "year"], how="left", suffixes=("", "_original")
+    )
+
+    # Separate data in two parts: before (or equal to) and after LATEST_YEAR_PIP_FILLED
+    tb_before_pip = tb_gini_mean[tb_gini_mean["year"] <= LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+    tb_after_pip = tb_gini_mean[tb_gini_mean["year"] > LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+
+    # Calculate growth factors for mean in tb_before_pip
+    tb_before_pip = tb_before_pip.sort_values(["country", "year"])
+    tb_before_pip["growth_factor"] = tb_before_pip.groupby("country")["mean"].transform(lambda x: x / x.shift(1))
+
+    # From tb_gdp, sort values and shift growth_factor to align with calculation in mean
+    tb_gdp = tb_gdp.sort_values(["country", "year"])
+    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["growth_factor"].shift(1)
+
+    # Merge both tables
+    tb_before_pip = pr.merge(
+        tb_before_pip,
+        tb_gdp[["country", "year", "growth_factor"]],
+        on=["country", "year"],
+        how="left",
+        suffixes=("_mean", "_gdp"),
+    )
+
+    # Select growth factor for mean using priority: original > gdp
+    tb_before_pip[["growth_factor", "growth_factor_origin"]] = tb_before_pip.apply(
+        select_growth_factor_for_mean, axis=1
+    )
+
+    # Shift growth_factor down by one year to align with the starting year of extrapolation
+    tb_before_pip["growth_factor"] = tb_before_pip.groupby("country")["growth_factor"].shift(-1)
+    tb_before_pip["growth_factor_origin"] = tb_before_pip.groupby("country")["growth_factor_origin"].shift(-1)
+
+    # Calculate the cumulative growth factor product from LATEST_YEAR_PIP_FILLED to each year
+    # Make growth_factor Float64 to avoid issues with cumprod
+    tb_before_pip["growth_factor"] = tb_before_pip["growth_factor"].astype("Float64")
+
+    # For years before 1981: Calculate cumulative growth factor going backwards from 1981
+    # Sort by country and year (descending) and apply cumprod
+    tb_before_pip = tb_before_pip.sort_values(["country", "year"], ascending=[True, False])
+    tb_before_pip["cumulative_growth_factor"] = tb_before_pip.groupby("country")["growth_factor"].cumprod()
+
+    # Sort values back to original order
+    tb_before_pip = tb_before_pip.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # For each country, add mean_reference, which is the mean at LATEST_YEAR_PIP_FILLED
+    tb_before_pip = pr.merge(
+        tb_before_pip,
+        tb_before_pip[tb_before_pip["year"] == LATEST_YEAR_PIP_FILLED][["country", "mean"]].rename(
+            columns={"mean": "mean_reference"}
+        ),
+        on="country",
+        how="left",
+    )
+
+    # Extrapolate mean backwards using mean_reference and cumulative_growth_factor
+    tb_before_pip["mean"] = tb_before_pip["mean_reference"] / tb_before_pip["cumulative_growth_factor"]
+
+    # As cumulative_growth_factor can be NaN for the last year (if no growth factor is available), fill mean with mean_reference in that case (only if year == LATEST_YEAR_PIP_FILLED)
+    tb_before_pip.loc[tb_before_pip["year"] == LATEST_YEAR_PIP_FILLED, "mean"] = tb_before_pip["mean_reference"]
+
+    # Concatenate back together
+    tb_gini_mean = pd.concat([tb_before_pip, tb_after_pip], ignore_index=True)
+    tb_gini_mean = tb_gini_mean.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Keep only relevant columns
+    tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini", "mean_original", "gini_original"]]
+
+    # Check if there are any remaining NaN values in mean or gini
+    remaining_nans = tb_gini_mean[tb_gini_mean["mean"].isna() | tb_gini_mean["gini"].isna()]
+    assert (
+        len(remaining_nans) == 0
+    ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation."
+    f'{remaining_nans[["country", "year", "mean", "gini"]]}'
+
+    return tb_gini_mean
+
+
+def select_mean(row):
+    """
+    Select mean on priority: survey > filled.
+    This way, we have the longest country-specific mean series possible.
+    """
+    if not pd.isna(row["mean_filled"]):
+        return pd.Series({"mean": row["mean_filled"], "mean_origin": "filled"})
+    else:
+        return pd.Series({"mean": row["mean_survey"], "mean_origin": "survey"})
+
+
+def select_gini(row):
+    """
+    Select Gini on priority: survey > filled > van_zanden.
+    This way, we have the longest country-specific Gini series possible.
+    """
+    if not pd.isna(row["gini_filled"]):
+        return pd.Series({"gini": row["gini_filled"], "gini_origin": "filled"})
+    elif not pd.isna(row["gini_survey"]):
+        return pd.Series({"gini": row["gini_survey"], "gini_origin": "survey"})
+    else:
+        return pd.Series({"gini": row["gini_van_zanden"], "gini_origin": "van_zanden"})
+
+
+def select_growth_factor_for_mean(row):
+    """
+    Select growth factor for mean on priority: original > gdp.
+    This way, we have the longest country-specific mean growth series possible.
+    """
+    if not pd.isna(row["growth_factor_mean"]):
+        return pd.Series({"growth_factor": row["growth_factor_mean"], "growth_factor_origin": "mean"})
+    else:
+        return pd.Series({"growth_factor": row["growth_factor_gdp"], "growth_factor_origin": "gdp"})
+
+
+def expand_means_and_ginis_to_thousand_bins(
+    tb_gini_mean: Table, tb_thousand_bins: Table, mean_column: str, gini_column: str
+) -> Table:
+    """
+    Expand mean and Gini data to a 1000-binned income distribution table.
+    This is done by assuming a log-normal distribution for income within each country-year and using the mean and Gini to parameterize the distribution.
+
+    For a log-normal distribution:
+    - Gini = 2 * Φ(σ/√2) - 1, where Φ is the standard normal CDF and σ is the std dev of log(income)
+    - Mean income relates to the log-normal parameters through: mean = exp(μ + σ²/2)
+
+    Returns:
+        Table with columns: country, year, quantile (1-1000), avg (income), pop (population)
+    """
+
+    if KEEP_ORIGINAL_THOUSAND_BINS:
+        # Filter tb_gini_mean to only country-years not in tb_thousand_bins
+        existing_country_years = set(tb_thousand_bins[["country", "year"]].drop_duplicates().apply(tuple, axis=1))
+        tb_new = tb_gini_mean[
+            ~tb_gini_mean[["country", "year"]].apply(tuple, axis=1).isin(existing_country_years)
+        ].copy()
+    else:
+        tb_new = tb_gini_mean.copy()
+
+    # Drop rows with missing mean or gini
+    tb_new = tb_new.dropna(subset=[mean_column, gini_column]).reset_index(drop=True)
+
+    if len(tb_new) == 0:
+        # No new country-years to add, return original tb_thousand_bins
+        return tb_thousand_bins
+
+    # Calculate sigma for each row
+    tb_new["sigma"] = tb_new[gini_column].apply(gini_to_sigma)
+
+    # Drop rows where sigma couldn't be calculated
+    tb_new = tb_new.dropna(subset=["sigma"]).reset_index(drop=True)
+
+    if len(tb_new) == 0:
+        return tb_thousand_bins
+
+    # Calculate mu parameter: mean = exp(μ + σ²/2), so μ = log(mean) - σ²/2
+    tb_new["mu"] = np.log(tb_new[mean_column]) - (tb_new["sigma"] ** 2) / 2
+
+    # Create expanded table with 1000 quantiles per country-year
+    expanded_rows = []
+
+    for _, row in tb_new.iterrows():
+        country = row["country"]
+        year = row["year"]
+        mu = row["mu"]
+        sigma = row["sigma"]
+
+        # Generate 1000 quantiles
+        quantiles = np.arange(1, 1001)
+
+        # For each quantile, calculate the income level
+        # Use percentile points of the log-normal distribution
+        percentiles = (quantiles - 0.5) / 1000  # Midpoint of each bin
+
+        # Income at each percentile from log-normal distribution
+        incomes = stats.lognorm.ppf(percentiles, s=sigma, scale=np.exp(mu))
+
+        for quantile, income in zip(quantiles, incomes):
+            expanded_rows.append(
+                {
+                    "country": country,
+                    "year": year,
+                    "quantile": quantile,
+                    "avg": income,
+                }
+            )
+
+    # Create expanded table
+    tb_expanded = Table(pd.DataFrame(expanded_rows))
+
+    # Add population
+    tb_expanded = paths.regions.add_population(
+        tb=tb_expanded,
+        population_col="pop",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+    )
+
+    # Divide population equally among 1000 quantiles
+    tb_expanded["pop"] /= 1000
+
+    # Compare means: calculate weighted mean from the generated distribution and compare with original mean
+    # Calculate total income for each quantile
+    tb_expanded["total_income"] = tb_expanded["avg"] * tb_expanded["pop"]
+
+    # Calculate mean from distribution as weighted average: sum(income * pop) / sum(pop)
+    tb_mean_from_distribution = (
+        tb_expanded.groupby(["country", "year"])
+        .agg(
+            total_income_sum=("total_income", "sum"),
+            total_pop_sum=("pop", "sum"),
+        )
+        .reset_index()
+    )
+    tb_mean_from_distribution["mean_from_distribution"] = (
+        tb_mean_from_distribution["total_income_sum"] / tb_mean_from_distribution["total_pop_sum"]
+    )
+
+    # Merge with original means for comparison
+    tb_comparison = pr.merge(
+        tb_mean_from_distribution[["country", "year", "mean_from_distribution"]],
+        tb_new[["country", "year", mean_column]],
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Calculate differences
+    tb_comparison["mean_difference"] = (tb_comparison["mean_from_distribution"] - tb_comparison[mean_column]).abs()
+    tb_comparison["mean_difference_pct"] = (tb_comparison["mean_difference"] / tb_comparison[mean_column]).abs() * 100
+
+    tb_comparison = tb_comparison[
+        ["country", "year", mean_column, "mean_from_distribution", "mean_difference", "mean_difference_pct"]
+    ].sort_values(by="mean_difference_pct", ascending=False)
+
+    # Log summary statistics
+    if SHOW_WARNINGS:
+        if len(tb_comparison) > 0:
+            median_diff = tb_comparison["mean_difference_pct"].median()
+            max_diff = tb_comparison["mean_difference_pct"].max()
+            log.info(
+                f"expand_means_and_ginis_to_thousand_bins: Comparison of original means with distribution-derived means - "
+                f"Median relative difference: {median_diff:.4f}%, Max relative difference: {max_diff:.4f}% ({len(tb_comparison)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
+                f"{tb_comparison.head(NUM_OBSERVATIONS_TO_SHOW)}"
+            )
+
+            if EXPORT_COMPARISON_CSV:
+                tb_comparison.to_csv("mean_comparison_original_distribution.csv", index=False)
+
+    # Drop temporary column
+    tb_expanded = tb_expanded.drop(columns=["total_income"])
+
+    # Add region and region_old columns, from tb_thousand_bins
+    # Create a mapping of country to region and region_old
+    country_region_map = tb_thousand_bins[["country", "region", "region_old"]].drop_duplicates()
+    tb_expanded = pr.merge(
+        tb_expanded,
+        country_region_map,
+        on="country",
+        how="left",
+    )
+
+    # Concatenate with original thousand_bins
+    if KEEP_ORIGINAL_THOUSAND_BINS:
+        # Only concatenate if we're keeping original data (tb_expanded has only new country-years)
+        tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+    else:
+        tb_thousand_bins_from_mean_gini = tb_expanded.copy()
+
+    tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.sort_values(
+        ["country", "year", "quantile"]
+    ).reset_index(drop=True)
+
+    return tb_thousand_bins_from_mean_gini
+
+
+def gini_to_sigma(gini):
+    """
+    Convert Gini coefficient to sigma parameter of log-normal distribution.
+    """
+    if gini <= 0 or gini >= 1:
+        return np.nan
+    try:
+        # Gini = 2 * Φ(σ/√2) - 1
+        # Solve for σ: Φ(σ/√2) = (Gini + 1) / 2
+        target_cdf = (gini + 1) / 2
+        # Use inverse CDF to find σ/√2
+        z_value = stats.norm.ppf(target_cdf)
+        sigma = z_value * np.sqrt(2)
+        return sigma
+    except Exception:
+        return np.nan
+
+
+def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_mean: Table) -> Table:
+    """
+    Interpolate missing values in the 1000-binned income distribution table.
+    This function interpolates missing 'avg' values for each country-year across quantiles.
+
+    We do this to complete country series where Gini is not available for all years, but mean is.
+    """
+
+    tb_thousand_bins_from_interpolated_mean = tb_thousand_bins_from_interpolated_mean.copy()
+
+    # Separate PIP-based data from extrapolated data
+    # I am keeping LATEST_YEAR in both tables so I can interpolate propertly. Then I will reinstate the original bins
+    tb_thousand_bins = tb_thousand_bins_from_interpolated_mean[
+        tb_thousand_bins_from_interpolated_mean["year"] >= LATEST_YEAR
+    ].reset_index(drop=True)
+
+    tb_expanded = tb_thousand_bins_from_interpolated_mean[
+        tb_thousand_bins_from_interpolated_mean["year"] <= LATEST_YEAR
+    ].reset_index(drop=True)
+
+    # Also have one table with data before LATEST_YEAR_PIP_FILLED so we can drop countries without data
+    tb_expanded_before_pip_filled = tb_expanded[tb_expanded["year"] < LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+
+    # Find missing countries in tb_expanded_before_pip_filled
+    missing_countries_in_thousand_bins, missing_countries_in_pip_filled = compare_countries_available_in_two_tables(
+        tb_1=tb_thousand_bins,
+        tb_2=tb_expanded_before_pip_filled,
+        name_tb_1="thousand_bins",
+        name_tb_2="extrapolated_before_pip_filled",
+    )
+
+    # Remove countries missing in pip_filled from tb_expanded
+    tb_expanded = tb_expanded[~tb_expanded["country"].isin(missing_countries_in_pip_filled)].reset_index(drop=True)
+
+    # Drop pop column
+    tb_expanded = tb_expanded.drop(columns=["pop"])
+
+    # Make table wide
+    tb_expanded = tb_expanded.pivot_table(index=["country", "year"], columns="quantile", values="avg").reset_index()
+
+    # Interpolate missing values across quantiles for each country-year
+    tb_expanded = interpolate_table(
+        tb_expanded,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range",  # All the years between min and max year of the table for each country
+        method="linear",
+        limit_direction="both",
+        limit_area="inside",
+    )
+
+    # Make the table long again
+    tb_expanded = tb_expanded.melt(id_vars=["country", "year"], var_name="quantile", value_name="avg")
+
+    # Add population
+    tb_expanded = paths.regions.add_population(
+        tb=tb_expanded,
+        population_col="pop",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+    )
+
+    # Divide population equally among 1000 quantiles
+    tb_expanded["pop"] /= 1000
+
+    # Drop data for the year LATEST_YEAR from tb_expanded to reinstate original bins
+    tb_expanded = tb_expanded[tb_expanded["year"] < LATEST_YEAR].reset_index(drop=True)
+
+    # Concatenate both tables back together
+    tb = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+
+    # Sort by country, year, and quantile
+    tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
+    return tb
