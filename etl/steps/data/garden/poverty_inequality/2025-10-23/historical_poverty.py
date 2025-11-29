@@ -64,7 +64,7 @@ EXPORT_COMPARISON_CSV = False
 NUM_OBSERVATIONS_TO_SHOW = 20
 
 # Keep original thousand bins series when calculating bins from mean and gini
-KEEP_ORIGINAL_THOUSAND_BINS = False
+KEEP_ORIGINAL_THOUSAND_BINS = True
 
 # Countries that appear in the thousand bins dataset for which we don't have population data.
 COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
@@ -1456,7 +1456,12 @@ def expand_means_and_ginis_to_thousand_bins(
     )
 
     # Concatenate with original thousand_bins
-    tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+    if KEEP_ORIGINAL_THOUSAND_BINS:
+        # Only concatenate if we're keeping original data (tb_expanded has only new country-years)
+        tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+    else:
+        tb_thousand_bins_from_mean_gini = tb_expanded.copy()
+
     tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.sort_values(
         ["country", "year", "quantile"]
     ).reset_index(drop=True)
