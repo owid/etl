@@ -62,7 +62,7 @@ nav = [
             { "Google API" = "guides/configure-google-api.md" },
         ] },
         { "Analytics" = [
-            { "Google Analytics Events" = "guides/analytics-events.md" },
+            { "GA Events" = "guides/analytics-events.md" },
         ] },
 
     ] },
@@ -331,10 +331,7 @@ include_requirejs = true
 [project.plugins.search]
 
 [project.plugins.exclude]
-glob = [
-    "ignore/**",
-    "ignore/",
-]
+glob = ["ignore/**", "ignore/"]
 
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]
