@@ -248,7 +248,7 @@ def generate_introduction(header_comments: str) -> str:
     doc += "# GA Events\n\n"
     doc += "This reference documents all custom Google Analytics (GA4) events tracked on Our World in Data's website and interactive visualizations.\n\n"
 
-    doc += '!!! warning "Auto-Generated Documentation"\n'
+    doc += '!!! warning "Auto-generated documentation"\n'
     doc += "    This documentation is automatically generated from the TypeScript type definitions in [`analyticsTypes.ts`](https://github.com/owid/owid-grapher/blob/master/packages/%40ourworldindata/types/src/analyticsTypes/analyticsTypes.ts). We are working on improving the source of truth (see [:fontawesome-brands-github: #owid-grapher/5730](https://github.com/owid/owid-grapher/issues/5730)).\n\n"
 
     if guidelines_match:
