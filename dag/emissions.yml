@@ -193,3 +193,24 @@ steps:
   #
   data://grapher/gcp/2025-11-13/global_carbon_budget:
     - data://garden/gcp/2025-11-13/global_carbon_budget
+  #
+  # IPCC - Electricity emission factors.
+  #
+  data://meadow/emissions/2025-11-26/electricity_emission_factors:
+    - snapshot://emissions/2025-11-26/technology_specific_cost_and_performance_parameters.pdf
+  #
+  # IPCC - Emission Factor Database.
+  #
+  data://meadow/emissions/2025-11-26/emission_factors:
+    - snapshot://emissions/2025-11-26/emission_factors.xlsx
+  #
+  # IPCC - Emission Factor Database.
+  #
+  data://garden/emissions/2025-11-26/emission_factors:
+    - data://meadow/emissions/2025-11-26/emission_factors
+    - data://meadow/emissions/2025-11-26/electricity_emission_factors
+  #
+  # IPCC - Emission Factor Database.
+  #
+  data://grapher/emissions/2025-11-26/emission_factors:
+    - data://garden/emissions/2025-11-26/emission_factors
