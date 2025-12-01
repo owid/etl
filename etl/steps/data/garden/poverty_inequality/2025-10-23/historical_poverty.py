@@ -55,7 +55,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 
 # Show warnings
-SHOW_WARNINGS = False
+SHOW_WARNINGS = True
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -1117,7 +1117,7 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
         name_tb_2="gdp",
     )
 
-    # Filter tb_gini_mean to drop missing_in_gini_mean and missing_in_gdp
+    # Filter tb_gini_mean to drop countries missing in either table
     tb_gini_mean = tb_gini_mean[
         ~tb_gini_mean["country"].isin(missing_in_gdp) & ~tb_gini_mean["country"].isin(missing_in_gini_mean)
     ].reset_index(drop=True)
@@ -1140,6 +1140,110 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
 
     # Keep only relevant columns
     tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
+
+    # Calculate earliest year with data available for each country
+    if SHOW_WARNINGS:
+        # Calculate total world population for CURRENT_YEAR
+        tb_world_population = paths.regions.add_population(
+            tb=Table(pd.DataFrame(data={"country": ["World"], "current_year": [CURRENT_YEAR]})),
+            year_col="current_year",
+            population_col="world_population",
+            warn_on_missing_countries=False,
+            interpolate_missing_population=True,
+        )
+
+        # For mean column
+        earliest_mean = (
+            tb_gini_mean[tb_gini_mean["mean"].notna()]
+            .groupby("country")["year"]
+            .min()
+            .reset_index()
+            .rename(columns={"year": "earliest_year_mean"})
+            .sort_values("earliest_year_mean", ascending=False)
+        )
+
+        # Create column current_year
+        earliest_mean["current_year"] = CURRENT_YEAR
+
+        # Add population data for earliest_mean
+        earliest_mean = paths.regions.add_population(
+            tb=earliest_mean,
+            year_col="current_year",
+            population_col="population",
+            warn_on_missing_countries=True,
+            interpolate_missing_population=True,
+        )
+
+        # Add world population for CURRENT_YEAR
+        earliest_mean = pr.merge(
+            earliest_mean,
+            tb_world_population[["current_year", "world_population"]],
+            on="current_year",
+            how="left",
+        )
+
+        # Calculate population share of world population
+        earliest_mean["population_share"] = earliest_mean["population"] / earliest_mean["world_population"] * 100
+
+        # Calculate cumulative population share
+        earliest_mean["cumulative_population_share"] = earliest_mean["population_share"].cumsum()
+
+        # Keep relevant columns
+        earliest_mean = earliest_mean[["country", "earliest_year_mean", "cumulative_population_share"]].reset_index(
+            drop=True
+        )
+
+        log.warning(
+            f"Earliest year with mean data available for each country:\n{earliest_mean.head(NUM_OBSERVATIONS_TO_SHOW)}"
+        )
+
+        # For gini column
+        earliest_gini = (
+            tb_gini_mean[tb_gini_mean["gini"].notna()]
+            .groupby("country")["year"]
+            .min()
+            .reset_index()
+            .rename(columns={"year": "earliest_year_gini"})
+            .sort_values("earliest_year_gini", ascending=False)
+        )
+        # Create column current_year
+        earliest_gini["current_year"] = CURRENT_YEAR
+
+        # Add population data for earliest_gini
+        earliest_gini = paths.regions.add_population(
+            tb=earliest_gini,
+            year_col="current_year",
+            population_col="population",
+            warn_on_missing_countries=True,
+            interpolate_missing_population=True,
+        )
+
+        # Add world population for CURRENT_YEAR
+        earliest_gini = pr.merge(
+            earliest_gini,
+            tb_world_population[["current_year", "world_population"]],
+            on="current_year",
+            how="left",
+        )
+
+        # Calculate population share of world population
+        earliest_gini["population_share"] = earliest_gini["population"] / earliest_gini["world_population"] * 100
+
+        # Calculate cumulative population share
+        earliest_gini["cumulative_population_share"] = earliest_gini["population_share"].cumsum()
+
+        # Keep relevant columns
+        earliest_gini = earliest_gini[["country", "earliest_year_gini", "cumulative_population_share"]].reset_index(
+            drop=True
+        )
+
+        log.warning(
+            f"Earliest year with gini data available for each country:\n{earliest_gini.head(NUM_OBSERVATIONS_TO_SHOW)}"
+        )
+
+        if EXPORT_COMPARISON_CSV:
+            earliest_mean.to_csv("earliest_year_mean_data.csv", index=False)
+            earliest_gini.to_csv("earliest_year_gini_data.csv", index=False)
 
     # Separate mean and gini tables, to interpolate differently
     tb_gini = tb_gini_mean[["country", "year", "gini"]].copy()
