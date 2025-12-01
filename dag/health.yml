@@ -1366,3 +1366,8 @@ steps:
     - data://meadow/cardiovascular_diseases/2025-10-21/esc
   data://grapher/cardiovascular_diseases/2025-10-21/esc:
     - data://garden/cardiovascular_diseases/2025-10-21/esc
+
+  data://garden/who/2025-12-01/hpv_vaccination_coverage:
+    - data://meadow/who/2025-07-15/vaccination_coverage
+  data://grapher/who/2025-12-01/hpv_vaccination_coverage:
+    - data://garden/who/2025-12-01/hpv_vaccination_coverage
