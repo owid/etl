@@ -3,15 +3,16 @@
 Generate Chart API documentation from OpenAPI specification and description file.
 
 Called from: make docs.pre
-Input: Fetched from owid/owid-grapher repository on GitHub (docs/chart-api.openapi.yaml and docs/chart-api.md)
+Input: Local files from ../owid-grapher/docs/ if available, otherwise from GitHub
 Output: docs/api/chart-api.md
 """
 
 from pathlib import Path
 
+import yaml
+
 from .openapi_to_markdown import generate_markdown
 from .openapi_utils import (
-    get_current_branch,
     load_openapi_spec_from_github,
     load_text_from_github,
     resolve_parameter_refs,
@@ -23,23 +24,33 @@ def main():
     repo_root = Path(__file__).parent.parent.parent.parent
     output_path = repo_root / "docs" / "api" / "chart-api.md"
 
-    # Get current branch for logging
-    current_branch = get_current_branch()
-    print(f"Current branch: {current_branch}")
+    # Check if owid-grapher repo exists locally
+    grapher_repo = repo_root.parent / "owid-grapher"
+    openapi_local = grapher_repo / "docs" / "chart-api.openapi.yaml"
+    description_local = grapher_repo / "docs" / "chart-api.md"
 
-    print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
-    spec = load_openapi_spec_from_github(
-        org="owid",
-        repo="owid-grapher",
-        file_path="docs/chart-api.openapi.yaml",
-    )
+    if openapi_local.exists() and description_local.exists():
+        print(f"Loading OpenAPI spec from local file: {openapi_local}")
+        with open(openapi_local) as f:
+            spec = yaml.safe_load(f)
 
-    print("Fetching description from GitHub (owid/owid-grapher)...")
-    description = load_text_from_github(
-        org="owid",
-        repo="owid-grapher",
-        file_path="docs/chart-api.md",
-    )
+        print(f"Loading description from local file: {description_local}")
+        description = description_local.read_text()
+    else:
+        print("Local owid-grapher repo not found, fetching from GitHub...")
+        print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
+        spec = load_openapi_spec_from_github(
+            org="owid",
+            repo="owid-grapher",
+            file_path="docs/chart-api.openapi.yaml",
+        )
+
+        print("Fetching description from GitHub (owid/owid-grapher)...")
+        description = load_text_from_github(
+            org="owid",
+            repo="owid-grapher",
+            file_path="docs/chart-api.md",
+        )
 
     print("Resolving parameter references...")
     spec = resolve_parameter_refs(spec)
@@ -52,8 +63,8 @@ def main():
     description_body = strip_frontmatter(description)
 
     print(f"Writing documentation to {output_path}...")
-    # Combine: api_docs (with frontmatter) + description_body
-    full_docs = f"{api_docs}\n\n{description_body}"
+    # Combine: description_body + api_docs
+    full_docs = f"{description_body}\n\n{api_docs}"
     output_path.write_text(full_docs)
 
     print("✓ Chart API documentation generated successfully!")
