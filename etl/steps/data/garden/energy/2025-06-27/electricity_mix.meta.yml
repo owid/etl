@@ -69,11 +69,12 @@ tables:
       direct_combustion_co2_intensity__gco2_kwh:
         title: Direct combustion carbon intensity of electricity - gCO2/kWh
         short_unit: gCO₂
-        unit: grams of CO₂ equivalents per kilowatt-hour
+        unit: grams of CO₂ per kilowatt-hour
         description_short: |-
-          [Greenhouse gases](#dod:ghgemissions) emitted per unit of generated electricity, measured in grams of [CO₂ equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours).
+          Measured in grams of carbon dioxide (CO₂) emitted per [kilowatt-hour](#dod:watt-hours) of generated electricity. Includes only direct emissions from fuel combustion at power plants, excluding upstream, fugitive and non-CO₂ greenhouse gases.
         display:
           name: Carbon intensity
+          shortUnit: g
         presentation:
           title_public: Direct combustion carbon intensity of electricity generation
       coal_generation__twh:
