@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Generate Zensical-friendly documentation from analyticsTypes.ts
 
@@ -97,7 +97,7 @@ def parse_interface(content: str, interface_name: str) -> tuple:
         Tuple of (properties list, line number where interface is defined)
     """
     # Find the interface definition
-    pattern = rf"export interface {interface_name} \{{([^}}]+)\}}"
+    pattern = rf"export interface {interface_name} \{{([^}]+)\}}"
     match = re.search(pattern, content, re.DOTALL)
 
     if not match:
