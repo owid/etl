@@ -63,6 +63,7 @@ tables:
           [Greenhouse gases](#dod:ghgemissions) emitted per unit of generated electricity, measured in grams of [CO₂ equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours).
         display:
           name: Carbon intensity
+          shortUnit: g
         presentation:
           title_public: Lifecycle carbon intensity of electricity generation
       direct_combustion_co2_intensity__gco2_kwh:
