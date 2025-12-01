@@ -22,6 +22,7 @@ def run() -> None:
     )
     tb_from_interpolated_mean = ds_garden.read("historical_poverty_from_interpolated_mean", reset_index=False)
     tb_population_from_interpolated_mean = ds_garden.read("population_from_interpolated_mean", reset_index=False)
+    tb_comparison = ds_garden.read("comparison", reset_index=False)
 
     #
     # Save outputs.
@@ -35,6 +36,7 @@ def run() -> None:
             tb_population,
             tb_population_from_interpolated_mean_gini,
             tb_population_from_interpolated_mean,
+            tb_comparison,
         ],
         default_metadata=ds_garden.metadata,
     )

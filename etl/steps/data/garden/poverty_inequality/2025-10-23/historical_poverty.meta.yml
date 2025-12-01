@@ -299,3 +299,26 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 2
+
+  comparison:
+    variables:
+      diff_mean_gini_vs_constant:
+        title: "Difference in headcount ratio: Mean+Gini extrapolation vs. constant inequality"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      diff_mean_only_vs_constant:
+        title: "Difference in headcount ratio: Mean-only extrapolation vs. constant inequality"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      diff_mean_gini_vs_mean_only:
+        title: "Difference in headcount ratio: Mean+Gini extrapolation vs. Mean-only extrapolation"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1

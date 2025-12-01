@@ -248,6 +248,16 @@ def run() -> None:
     )
 
     ###############################################################################
+    # COMPARE VALUES BETWEEN DIFFERENT METHODS
+    ###############################################################################
+
+    tb_comparison = compare_headcount_ratios_across_methods(
+        tb_constant_inequality=tb,
+        tb_mean_gini=tb_from_interpolated_mean_gini,
+        tb_mean_only=tb_from_interpolated_mean,
+    )
+
+    ###############################################################################
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -275,6 +285,8 @@ def run() -> None:
     #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean"
     # )
 
+    tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
+
     #
     # Save outputs.
     #
@@ -287,6 +299,7 @@ def run() -> None:
             tb_from_interpolated_mean_gini_population,
             tb_from_interpolated_mean,
             tb_from_interpolated_mean_population,
+            tb_comparison,
             # tb_extended,
             # tb_thousand_bins_from_interpolated_mean_gini,
             # tb_thousand_bins_from_interpolated_mean,
@@ -1667,3 +1680,112 @@ def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_me
     tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
 
     return tb
+
+
+def compare_headcount_ratios_across_methods(
+    tb_constant_inequality: Table, tb_mean_gini: Table, tb_mean_only: Table
+) -> Table:
+    """
+    Compare headcount_ratio values across three different estimation methods.
+
+    This function merges the three tables and calculates absolute differences in headcount_ratio
+    between the different methods:
+    - Constant inequality (baseline)
+    - Mean + Gini interpolation/extrapolation
+    - Mean only interpolation/extrapolation
+
+    Args:
+        tb_constant_inequality: Table with constant inequality assumption (baseline method)
+        tb_mean_gini: Table with interpolated/extrapolated mean and gini
+        tb_mean_only: Table with interpolated/extrapolated mean only
+
+    Returns:
+        Table with comparison statistics including absolute differences between methods
+    """
+    # Keep only relevant columns for comparison
+    tb_constant = tb_constant_inequality[["country", "year", "poverty_line", "headcount_ratio"]].copy()
+    tb_mean_gini_comp = tb_mean_gini[["country", "year", "poverty_line", "headcount_ratio"]].copy()
+    tb_mean_only_comp = tb_mean_only[["country", "year", "poverty_line", "headcount_ratio"]].copy()
+
+    # Merge all three tables
+    tb_comparison = pr.merge(
+        tb_constant,
+        tb_mean_gini_comp,
+        on=["country", "year", "poverty_line"],
+        how="outer",
+        suffixes=("_constant", "_mean_gini"),
+    )
+
+    tb_comparison = pr.merge(
+        tb_comparison,
+        tb_mean_only_comp,
+        on=["country", "year", "poverty_line"],
+        how="outer",
+    )
+
+    # Rename the last headcount_ratio column
+    tb_comparison = tb_comparison.rename(columns={"headcount_ratio": "headcount_ratio_mean_only"})
+
+    # Calculate absolute differences
+    tb_comparison["diff_mean_gini_vs_constant"] = (
+        tb_comparison["headcount_ratio_mean_gini"] - tb_comparison["headcount_ratio_constant"]
+    ).abs()
+
+    tb_comparison["diff_mean_only_vs_constant"] = (
+        tb_comparison["headcount_ratio_mean_only"] - tb_comparison["headcount_ratio_constant"]
+    ).abs()
+
+    tb_comparison["diff_mean_gini_vs_mean_only"] = (
+        tb_comparison["headcount_ratio_mean_gini"] - tb_comparison["headcount_ratio_mean_only"]
+    ).abs()
+
+    # Sort by differences to see largest discrepancies
+    tb_comparison = tb_comparison.sort_values("diff_mean_gini_vs_constant", ascending=False).reset_index(drop=True)
+
+    # Log summary statistics if SHOW_WARNINGS is enabled
+    if SHOW_WARNINGS:
+        # Calculate statistics for each poverty line
+        for poverty_line in POVERTY_LINES:
+            tb_pl = tb_comparison[tb_comparison["poverty_line"] == str(poverty_line)].copy()
+
+            if len(tb_pl) > 0:
+                median_diff_mg_const = tb_pl["diff_mean_gini_vs_constant"].median()
+                max_diff_mg_const = tb_pl["diff_mean_gini_vs_constant"].max()
+                max_diff_mg_const_year = tb_pl.loc[
+                    tb_pl["diff_mean_gini_vs_constant"] == max_diff_mg_const, "year"
+                ].iloc[0]
+
+                median_diff_mo_const = tb_pl["diff_mean_only_vs_constant"].median()
+                max_diff_mo_const = tb_pl["diff_mean_only_vs_constant"].max()
+                max_diff_mo_const_year = tb_pl.loc[
+                    tb_pl["diff_mean_only_vs_constant"] == max_diff_mo_const, "year"
+                ].iloc[0]
+
+                median_diff_mg_mo = tb_pl["diff_mean_gini_vs_mean_only"].median()
+                max_diff_mg_mo = tb_pl["diff_mean_gini_vs_mean_only"].max()
+                max_diff_mg_mo_year = tb_pl.loc[tb_pl["diff_mean_gini_vs_mean_only"] == max_diff_mg_mo, "year"].iloc[0]
+
+                log.info(
+                    f"compare_headcount_ratios_across_methods (poverty_line=${poverty_line}):\n"
+                    f"  Mean+Gini vs Constant: Median diff={median_diff_mg_const:.2f}pp, Max diff={max_diff_mg_const:.2f}pp (in {max_diff_mg_const_year})\n"
+                    f"  Mean-only vs Constant: Median diff={median_diff_mo_const:.2f}pp, Max diff={max_diff_mo_const:.2f}pp (in {max_diff_mo_const_year})\n"
+                    f"  Mean+Gini vs Mean-only: Median diff={median_diff_mg_mo:.2f}pp, Max diff={max_diff_mg_mo:.2f}pp (in {max_diff_mg_mo_year})"
+                )
+
+        # Keep relevant columns for output
+        tb_comparison = tb_comparison[
+            [
+                "country",
+                "year",
+                "poverty_line",
+                "diff_mean_gini_vs_constant",
+                "diff_mean_only_vs_constant",
+                "diff_mean_gini_vs_mean_only",
+            ]
+        ]
+
+        # Export to CSV if enabled
+        if EXPORT_COMPARISON_CSV:
+            tb_comparison.to_csv("headcount_ratio_comparison_across_methods.csv", index=False)
+
+    return tb_comparison
