@@ -236,7 +236,6 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
 
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
         resp = await client.get(datasette_json_url)
-        resp.raise_for_status()
 
         json_data = resp.json()
 
