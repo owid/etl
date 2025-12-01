@@ -8,6 +8,7 @@ Output: docs/api/chart-api.md
 """
 
 from pathlib import Path
+from typing import Any, Dict
 
 import yaml
 
@@ -20,37 +21,64 @@ from .openapi_utils import (
 )
 
 
-def main():
-    repo_root = Path(__file__).parent.parent.parent.parent
-    output_path = repo_root / "docs" / "api" / "chart-api.md"
+def load_openapi_spec(repo_root: Path) -> Dict[str, Any]:
+    """Load OpenAPI spec from local file if available, otherwise from GitHub.
 
+    Args:
+        repo_root: Root directory of the etl repository
+
+    Returns:
+        OpenAPI specification as a dictionary
+    """
     # Check if owid-grapher repo exists locally
     grapher_repo = repo_root.parent / "owid-grapher"
     openapi_local = grapher_repo / "docs" / "chart-api.openapi.yaml"
-    description_local = grapher_repo / "docs" / "chart-api.md"
 
-    if openapi_local.exists() and description_local.exists():
+    if openapi_local.exists():
         print(f"Loading OpenAPI spec from local file: {openapi_local}")
         with open(openapi_local) as f:
-            spec = yaml.safe_load(f)
-
-        print(f"Loading description from local file: {description_local}")
-        description = description_local.read_text()
+            return yaml.safe_load(f)
     else:
-        print("Local owid-grapher repo not found, fetching from GitHub...")
-        print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
-        spec = load_openapi_spec_from_github(
+        print("Local owid-grapher repo not found, fetching OpenAPI spec from GitHub...")
+        return load_openapi_spec_from_github(
             org="owid",
             repo="owid-grapher",
             file_path="docs/chart-api.openapi.yaml",
         )
 
-        print("Fetching description from GitHub (owid/owid-grapher)...")
-        description = load_text_from_github(
+
+def load_description(repo_root: Path) -> str:
+    """Load description from local file if available, otherwise from GitHub.
+
+    Args:
+        repo_root: Root directory of the etl repository
+
+    Returns:
+        Description text content
+    """
+    # Check if owid-grapher repo exists locally
+    grapher_repo = repo_root.parent / "owid-grapher"
+    description_local = grapher_repo / "docs" / "chart-api.md"
+
+    if description_local.exists():
+        print(f"Loading description from local file: {description_local}")
+        return description_local.read_text()
+    else:
+        print("Local owid-grapher repo not found, fetching description from GitHub...")
+        return load_text_from_github(
             org="owid",
             repo="owid-grapher",
             file_path="docs/chart-api.md",
         )
+
+
+def main():
+    repo_root = Path(__file__).parent.parent.parent.parent
+    output_path = repo_root / "docs" / "api" / "chart-api.md"
+
+    # Load OpenAPI spec and description (local or GitHub)
+    spec = load_openapi_spec(repo_root)
+    description = load_description(repo_root)
 
     print("Resolving parameter references...")
     spec = resolve_parameter_refs(spec)
