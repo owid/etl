@@ -7,26 +7,32 @@ Input: Fetched from owid/owid-grapher repository on GitHub (docs/chart-api.opena
 Output: docs/api/chart-api.md
 """
 
-from pathlib import Path
-import yaml
 import re
+from pathlib import Path
+
+import yaml
+
 from etl.git_api_helpers import GithubApiRepo
+
 from .openapi_to_markdown import generate_markdown
+
 
 def load_openapi_spec_from_github(org: str, repo: str, file_path: str, branch: str = "master") -> dict:
     github_repo = GithubApiRepo(org=org, repo_name=repo)
     content = github_repo.fetch_file_content(file_path, branch)
     return yaml.safe_load(content)
 
+
 def load_text_from_github(org: str, repo: str, file_path: str, branch: str = "master") -> str:
     github_repo = GithubApiRepo(org=org, repo_name=repo)
     return github_repo.fetch_file_content(file_path, branch)
+
 
 def resolve_parameter_refs(spec: dict) -> dict:
     """Resolve $ref references in parameters."""
     components = spec.get("components", {})
     parameters = components.get("parameters", {})
-    
+
     for path, path_item in spec.get("paths", {}).items():
         for method in ["get", "post", "put", "delete", "patch"]:
             if method in path_item:
@@ -48,26 +54,29 @@ def resolve_parameter_refs(spec: dict) -> dict:
                         else:
                             resolved_params.append(param)
                     operation["parameters"] = resolved_params
-    
+
     return spec
+
 
 def extract_frontmatter(content: str) -> tuple[dict, str]:
     """Extract YAML frontmatter from markdown content."""
-    pattern = r'^---\s*\n(.*?)\n---\s*\n(.*)$'
+    pattern = r"^---\s*\n(.*?)\n---\s*\n(.*)$"
     match = re.match(pattern, content, re.DOTALL)
-    
+
     if match:
         frontmatter_str = match.group(1)
         body = match.group(2)
         frontmatter = yaml.safe_load(frontmatter_str)
         return frontmatter, body
-    
+
     return {}, content
+
 
 def strip_frontmatter(content: str) -> str:
     """Remove YAML frontmatter from markdown content."""
-    pattern = r'^---\s*\n.*?\n---\s*\n'
-    return re.sub(pattern, '', content, count=1, flags=re.DOTALL)
+    pattern = r"^---\s*\n.*?\n---\s*\n"
+    return re.sub(pattern, "", content, count=1, flags=re.DOTALL)
+
 
 def main():
     repo_root = Path(__file__).parent.parent.parent.parent
@@ -92,7 +101,7 @@ def main():
     print("Extracting frontmatter...")
     # Extract frontmatter from description
     desc_frontmatter, desc_body = extract_frontmatter(description)
-    
+
     # Strip frontmatter from generated API docs
     api_docs_body = strip_frontmatter(api_docs)
 
@@ -103,6 +112,7 @@ def main():
     output_path.write_text(full_docs)
 
     print("✓ Chart API documentation generated successfully!")
+
 
 if __name__ == "__main__":
     main()
