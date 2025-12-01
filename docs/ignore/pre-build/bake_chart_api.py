@@ -9,6 +9,7 @@ Output: docs/api/chart-api.md
 
 from pathlib import Path
 import yaml
+import re
 from etl.git_api_helpers import GithubApiRepo
 from .openapi_to_markdown import generate_markdown
 
@@ -50,6 +51,24 @@ def resolve_parameter_refs(spec: dict) -> dict:
     
     return spec
 
+def extract_frontmatter(content: str) -> tuple[dict, str]:
+    """Extract YAML frontmatter from markdown content."""
+    pattern = r'^---\s*\n(.*?)\n---\s*\n(.*)$'
+    match = re.match(pattern, content, re.DOTALL)
+    
+    if match:
+        frontmatter_str = match.group(1)
+        body = match.group(2)
+        frontmatter = yaml.safe_load(frontmatter_str)
+        return frontmatter, body
+    
+    return {}, content
+
+def strip_frontmatter(content: str) -> str:
+    """Remove YAML frontmatter from markdown content."""
+    pattern = r'^---\s*\n.*?\n---\s*\n'
+    return re.sub(pattern, '', content, count=1, flags=re.DOTALL)
+
 def main():
     repo_root = Path(__file__).parent.parent.parent.parent
     output_path = repo_root / "docs" / "api" / "chart-api.md"
@@ -70,9 +89,17 @@ def main():
     print("Generating markdown documentation...")
     api_docs = generate_markdown(spec)
 
+    print("Extracting frontmatter...")
+    # Extract frontmatter from description
+    desc_frontmatter, desc_body = extract_frontmatter(description)
+    
+    # Strip frontmatter from generated API docs
+    api_docs_body = strip_frontmatter(api_docs)
+
     print(f"Writing documentation to {output_path}...")
-    # Combine description and API docs
-    full_docs = description + "\n\n" + api_docs
+    # Reconstruct with proper frontmatter
+    frontmatter_yaml = yaml.dump(desc_frontmatter, default_flow_style=False, sort_keys=False)
+    full_docs = f"---\n{frontmatter_yaml}---\n\n{desc_body}\n\n{api_docs_body}"
     output_path.write_text(full_docs)
 
     print("✓ Chart API documentation generated successfully!")
