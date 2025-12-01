@@ -123,7 +123,7 @@ def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
     return url
 
 
-def generate_code_samples(base_url: str, path: str, params: Dict[str, Any]) -> Dict[str, str]:
+def generate_code_samples(base_url: str, path: str, params: Dict[str, Any], content_type: str = "application/json") -> Dict[str, str]:
     """Generate code samples in multiple languages."""
     request_url = build_request_url(base_url, path, params)
 
@@ -139,12 +139,22 @@ def generate_code_samples(base_url: str, path: str, params: Dict[str, Any]) -> D
 
     samples = {}
 
+    # Determine response handler based on content type
+    is_text = content_type.startswith("text/")
+
     # HTTP/cURL
     samples["curl"] = f'curl "{request_url}"'
 
     # Python
     params_dict_str = json.dumps(query_params, indent=4) if query_params else "{}"
-    samples["python"] = f"""import requests
+    if is_text:
+        samples["python"] = f"""import requests
+
+params = {params_dict_str}
+response = requests.get("{base_url}{code_path}", params=params)
+data = response.text"""
+    else:
+        samples["python"] = f"""import requests
 
 params = {params_dict_str}
 response = requests.get("{base_url}{code_path}", params=params)
@@ -152,26 +162,28 @@ data = response.json()"""
 
     # JavaScript/TypeScript
     params_obj = ", ".join(f'{k}: "{v}"' for k, v in query_params.items()) if query_params else ""
+    response_handler = "text()" if is_text else "json()"
     if params_obj:
         samples["javascript"] = f"""const params = new URLSearchParams({{ {params_obj} }});
 const response = await fetch(`{base_url}{code_path}?${{params}}`);
-const data = await response.json();"""
+const data = await response.{response_handler};"""
     else:
         samples["javascript"] = f"""const response = await fetch("{base_url}{code_path}");
-const data = await response.json();"""
+const data = await response.{response_handler};"""
 
     # Rust
+    rust_response = "text()" if is_text else "json::<serde_json::Value>()"
     if query_params:
         rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])' for k, v in query_params.items())
         samples["rust"] = f"""let response = reqwest::get("{base_url}{code_path}")
 {rust_params}
     .await?
-    .json::<serde_json::Value>()
+    .{rust_response}
     .await?;"""
     else:
         samples["rust"] = f"""let response = reqwest::get("{base_url}{code_path}")
     .await?
-    .json::<serde_json::Value>()
+    .{rust_response}
     .await?;"""
 
     return samples
@@ -377,7 +389,7 @@ def render_endpoint(
                                 # Add code samples
                                 lines.append("        **Code samples:**")
                                 lines.append("")
-                                code_samples = generate_code_samples(base_url, path, example_params)
+                                code_samples = generate_code_samples(base_url, path, example_params, content_type)
 
                                 lines.append('        === "cURL"')
                                 lines.append("")
@@ -421,10 +433,22 @@ def render_endpoint(
                                     lines.append("        **Response:**")
                                     lines.append("")
 
-                                lines.append("        ```json")
-                                for line in render_json_example(example_data["value"]).split("\n"):
-                                    lines.append(f"        {line}")
-                                lines.append("        ```")
+                                # Determine response format based on content type
+                                if content_type == "text/csv":
+                                    lines.append("        ```csv")
+                                    # For CSV, render the raw string value without JSON encoding
+                                    response_value = example_data["value"]
+                                    if isinstance(response_value, str):
+                                        for line in response_value.split("\n"):
+                                            if line:  # Skip empty lines
+                                                lines.append(f"        {line}")
+                                    lines.append("        ```")
+                                else:
+                                    # For JSON and other types, use JSON rendering
+                                    lines.append("        ```json")
+                                    for line in render_json_example(example_data["value"]).split("\n"):
+                                        lines.append(f"        {line}")
+                                    lines.append("        ```")
                                 lines.append("")
                         else:
                             # Single example without tabs
@@ -439,10 +463,20 @@ def render_endpoint(
                                     lines.append(f"    **Request:** `GET {request_url}`")
                                     lines.append("")
 
-                                lines.append("    ```json")
-                                for line in render_json_example(example_data["value"]).split("\n"):
-                                    lines.append(f"    {line}")
-                                lines.append("    ```")
+                                # Determine response format based on content type
+                                if content_type == "text/csv":
+                                    lines.append("    ```csv")
+                                    response_value = example_data["value"]
+                                    if isinstance(response_value, str):
+                                        for line in response_value.split("\n"):
+                                            if line:
+                                                lines.append(f"    {line}")
+                                    lines.append("    ```")
+                                else:
+                                    lines.append("    ```json")
+                                    for line in render_json_example(example_data["value"]).split("\n"):
+                                        lines.append(f"    {line}")
+                                    lines.append("    ```")
                                 lines.append("")
 
                     # Show example (singular)
