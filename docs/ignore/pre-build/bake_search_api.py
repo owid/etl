@@ -11,18 +11,15 @@ Output: docs/api/search-api.md
 """
 
 from pathlib import Path
-from .openapi_utils import load_openapi_spec_from_github, get_current_branch
+
 from .openapi_to_markdown import generate_markdown
+from .openapi_utils import load_openapi_spec_from_github
 
 
 def main():
     """Generate Search API documentation from OpenAPI spec."""
     repo_root = Path(__file__).parent.parent.parent.parent
     output_path = repo_root / "docs" / "api" / "search-api.md"
-
-    # Get current branch for logging
-    current_branch = get_current_branch()
-    print(f"Current branch: {current_branch}")
 
     print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
     spec = load_openapi_spec_from_github(

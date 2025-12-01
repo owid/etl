@@ -8,16 +8,15 @@ Output: docs/api/chart-api.md
 """
 
 from pathlib import Path
-import yaml
+
+from .openapi_to_markdown import generate_markdown
 from .openapi_utils import (
+    get_current_branch,
     load_openapi_spec_from_github,
     load_text_from_github,
-    get_current_branch,
     resolve_parameter_refs,
-    extract_frontmatter,
     strip_frontmatter,
 )
-from .openapi_to_markdown import generate_markdown
 
 
 def main():
@@ -48,17 +47,13 @@ def main():
     print("Generating markdown documentation...")
     api_docs = generate_markdown(spec)
 
-    print("Extracting frontmatter...")
-    # Extract frontmatter from description
-    desc_frontmatter, desc_body = extract_frontmatter(description)
-    
-    # Strip frontmatter from generated API docs
-    api_docs_body = strip_frontmatter(api_docs)
+    print("Stripping frontmatter from description...")
+    # Strip frontmatter from description (api_docs already has its own)
+    description_body = strip_frontmatter(description)
 
     print(f"Writing documentation to {output_path}...")
-    # Reconstruct with proper frontmatter
-    frontmatter_yaml = yaml.dump(desc_frontmatter, default_flow_style=False, sort_keys=False)
-    full_docs = f"---\n{frontmatter_yaml}---\n\n{desc_body}\n\n{api_docs_body}"
+    # Combine: api_docs (with frontmatter) + description_body
+    full_docs = f"{api_docs}\n\n{description_body}"
     output_path.write_text(full_docs)
 
     print("✓ Chart API documentation generated successfully!")
