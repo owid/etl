@@ -104,7 +104,7 @@ def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
     query_params = {}
 
     # Find all path parameter placeholders in the path
-    path_param_names = re.findall(r'\{(\w+)\}', path)
+    path_param_names = re.findall(r"\{(\w+)\}", path)
 
     for key, value in params.items():
         if key in path_param_names:
@@ -115,7 +115,7 @@ def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
     # Substitute path parameters
     url_path = path
     for param_name, param_value in path_params.items():
-        url_path = url_path.replace(f'{{{param_name}}}', str(param_value))
+        url_path = url_path.replace(f"{{{param_name}}}", str(param_value))
 
     url = f"{base_url}{url_path}"
     if query_params:
@@ -123,19 +123,21 @@ def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
     return url
 
 
-def generate_code_samples(base_url: str, path: str, params: Dict[str, Any], content_type: str = "application/json") -> Dict[str, str]:
+def generate_code_samples(
+    base_url: str, path: str, params: Dict[str, Any], content_type: str = "application/json"
+) -> Dict[str, str]:
     """Generate code samples in multiple languages."""
     request_url = build_request_url(base_url, path, params)
 
     # Separate path and query parameters
-    path_param_names = re.findall(r'\{(\w+)\}', path)
+    path_param_names = re.findall(r"\{(\w+)\}", path)
     path_params = {k: v for k, v in params.items() if k in path_param_names}
     query_params = {k: v for k, v in params.items() if k not in path_param_names}
 
     # Substitute path parameters in the path
     code_path = path
     for param_name, param_value in path_params.items():
-        code_path = code_path.replace(f'{{{param_name}}}', str(param_value))
+        code_path = code_path.replace(f"{{{param_name}}}", str(param_value))
 
     samples = {}
 
