@@ -39,6 +39,7 @@ tables:
     variables:
       coverage:
         title: <<antigen_description>>
-        description_short: <<antigen_description_short>>
+        description_short: |-
+          { definitions.antigen_description_short }
         unit: "%"
         short_unit: "%"
