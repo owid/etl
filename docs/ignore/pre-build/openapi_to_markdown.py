@@ -6,6 +6,7 @@ into beautiful, interactive-looking markdown files compatible with Zensical/Mate
 """
 
 import json
+import re
 from typing import Any, Dict, List
 
 
@@ -92,12 +93,33 @@ def render_json_example(example: Any, indent: int = 2) -> str:
 
 
 def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
-    """Build a complete request URL from base URL, path, and parameters."""
+    """Build a complete request URL from base URL, path, and parameters.
+
+    Handles both path parameters (e.g., {slug}) and query parameters.
+    """
     from urllib.parse import urlencode
 
-    url = f"{base_url}{path}"
-    if params:
-        url += "?" + urlencode(params)
+    # Separate path parameters from query parameters
+    path_params = {}
+    query_params = {}
+
+    # Find all path parameter placeholders in the path
+    path_param_names = re.findall(r'\{(\w+)\}', path)
+
+    for key, value in params.items():
+        if key in path_param_names:
+            path_params[key] = value
+        else:
+            query_params[key] = value
+
+    # Substitute path parameters
+    url_path = path
+    for param_name, param_value in path_params.items():
+        url_path = url_path.replace(f'{{{param_name}}}', str(param_value))
+
+    url = f"{base_url}{url_path}"
+    if query_params:
+        url += "?" + urlencode(query_params)
     return url
 
 
@@ -105,35 +127,49 @@ def generate_code_samples(base_url: str, path: str, params: Dict[str, Any]) -> D
     """Generate code samples in multiple languages."""
     request_url = build_request_url(base_url, path, params)
 
+    # Separate path and query parameters
+    path_param_names = re.findall(r'\{(\w+)\}', path)
+    path_params = {k: v for k, v in params.items() if k in path_param_names}
+    query_params = {k: v for k, v in params.items() if k not in path_param_names}
+
+    # Substitute path parameters in the path
+    code_path = path
+    for param_name, param_value in path_params.items():
+        code_path = code_path.replace(f'{{{param_name}}}', str(param_value))
+
     samples = {}
 
     # HTTP/cURL
     samples["curl"] = f'curl "{request_url}"'
 
     # Python
-    params_dict_str = json.dumps(params, indent=4) if params else "{}"
+    params_dict_str = json.dumps(query_params, indent=4) if query_params else "{}"
     samples["python"] = f"""import requests
 
 params = {params_dict_str}
-response = requests.get("{base_url}{path}", params=params)
+response = requests.get("{base_url}{code_path}", params=params)
 data = response.json()"""
 
     # JavaScript/TypeScript
-    params_obj = ", ".join(f'{k}: "{v}"' for k, v in params.items()) if params else ""
-    samples["javascript"] = f"""const params = new URLSearchParams({{ {params_obj} }});
-const response = await fetch(`{base_url}{path}?${{params}}`);
+    params_obj = ", ".join(f'{k}: "{v}"' for k, v in query_params.items()) if query_params else ""
+    if params_obj:
+        samples["javascript"] = f"""const params = new URLSearchParams({{ {params_obj} }});
+const response = await fetch(`{base_url}{code_path}?${{params}}`);
+const data = await response.json();"""
+    else:
+        samples["javascript"] = f"""const response = await fetch("{base_url}{code_path}");
 const data = await response.json();"""
 
     # Rust
-    if params:
-        rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])' for k, v in params.items())
-        samples["rust"] = f"""let response = reqwest::get("{base_url}{path}")
+    if query_params:
+        rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])' for k, v in query_params.items())
+        samples["rust"] = f"""let response = reqwest::get("{base_url}{code_path}")
 {rust_params}
     .await?
     .json::<serde_json::Value>()
     .await?;"""
     else:
-        samples["rust"] = f"""let response = reqwest::get("{base_url}{path}")
+        samples["rust"] = f"""let response = reqwest::get("{base_url}{code_path}")
     .await?
     .json::<serde_json::Value>()
     .await?;"""
