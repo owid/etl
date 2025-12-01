@@ -64,7 +64,7 @@ def main():
 
     print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
     spec = load_openapi_spec_from_github(
-        org="owid", repo="owid-grapher", file_path="docs/search-api.openapi.yaml", branch="master"
+        org="owid", repo="owid-grapher", file_path="docs/search-api.openapi.yaml", branch="feat/chart-api-docs"
     )
     # spec = load_openapi_spec_from_file("/home/x/repos/owid-grapher/docs/search-api.openapi.yaml")
 
