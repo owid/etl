@@ -501,46 +501,29 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
         .fillna(0)
         .rename(columns={"median_direct_combustion_emission_factor": "emission_factor"}, errors="raise")
     )
-    # Take oil from the "Residual Fuel Oil" energy factor.
+    # Add oil from the "Residual Fuel Oil" energy factor.
     tb_factors = pr.concat(
-        [
-            tb_factors,
-            Table(
-                {
-                    "source": ["Other fossil"],
-                    "emission_factor": float(
-                        tb_energy_factors[tb_energy_factors["source"] == "Residual Fuel Oil"]["emission_factor"].item()
-                    ),
-                }
-            ),
-        ]
+        [tb_factors, tb_energy_factors[tb_energy_factors["source"] == "Residual Fuel Oil"]], ignore_index=True
     )
-    # Select only non-zero elements.
-    assert (tb_factors[~tb_factors["source"].isin(["Gas", "Coal", "Other fossil"])]["emission_factor"] == 0).all()
-    tb_factors = tb_factors[tb_factors["source"].isin(["Gas", "Coal", "Other fossil"])].reset_index()
-
-    # Individual sources mapped to their direct combustion emissions.
-    emission_factors = {
-        # Individual fossil sources.
-        "Coal": tb_factors[tb_factors["source"] == "Coal"]["emission_factor"].item(),
-        "Gas": tb_factors[tb_factors["source"] == "Gas"]["emission_factor"].item(),
-        "Other fossil": tb_factors[tb_factors["source"] == "Other fossil"]["emission_factor"].item(),
-        # We map hard coal and lignite to the same emission factor as coal.
-        "Hard coal": tb_factors[tb_factors["source"] == "Coal"]["emission_factor"].item(),
-        "Lignite": tb_factors[tb_factors["source"] == "Coal"]["emission_factor"].item(),
+    # Map ember sources to each of the emission factor sources.
+    technology_to_emission_factor = {
+        "Bioenergy": "Biomass-dedicated",
+        "Coal": "Coal",
+        "Gas": "Gas",
+        "Hard coal": "Coal",
+        "Hydro": "Hydropower",
+        "Lignite": "Coal",
+        "Nuclear": "Nuclear",
+        "Offshore wind": "Wind offshore",
+        "Onshore wind": "Wind onshore",
+        "Other fossil": "Residual Fuel Oil",
+        "Other renewables": "Geothermal",
+        "Solar": "Solar PV—utility",
+        "Wind": "Wind onshore",
     }
-    # Add individual clean sources (which, as we asserted before, should all have zero direct emissions).
-    for source in [
-        "Bioenergy",
-        "Hydro",
-        "Other renewables",
-        "Nuclear",
-        "Offshore wind",
-        "Onshore wind",
-        "Wind",
-        "Solar",
-    ]:
-        emission_factors[source] = 0
+    error = "Incorrect mapping of emission factor source names."
+    assert set(technology_to_emission_factor.values()) <= set(tb_factors["source"]), error
+
     # Aggregate sources and their individual componets.
     # NOTE: Ensure that the components are not aggregates, to ensure they will always be found.
     aggregate_sources = {
@@ -566,21 +549,27 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     # Check that the list of individual and aggregate sources are as expected.
     error = "List of individual or aggregate sources may have changed."
     assert set(tb[(tb["category"] == "Electricity generation") & (tb["unit"] == "TWh")]["variable"]) == (
-        set(emission_factors) | set(aggregate_sources)
+        set(technology_to_emission_factor) | set(aggregate_sources)
     ), error
 
     # Create a temporary table of electricity generation and emissions.
     tb_generation = tb[
         (tb["category"] == "Electricity generation")
         & (tb["unit"] == "TWh")
-        & (tb["variable"].isin(list(emission_factors)))
+        & (tb["variable"].isin(list(technology_to_emission_factor)))
     ].reset_index(drop=True)
     assert set(tb_generation["subcategory"]) == {"Fuel"}
 
     # Add a column with emission factors.
-    tb_generation["emission_factor"] = map_series(
-        tb_generation["variable"], mapping=emission_factors, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    ).astype("Float64")
+    tb_generation["source"] = map_series(
+        tb_generation["variable"],
+        mapping=technology_to_emission_factor,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
+    tb_generation = tb_generation.merge(tb_factors, how="left", on=["source"]).drop(columns=["source"], errors="raise")
+    assert tb_generation["emission_factor"].notnull().all()
+
     # Add a column with emissions.
     tb_generation["emissions"] = tb_generation["value"] * tb_generation["emission_factor"]
     # Calculate aggregate emissions (and also aggregate generation, for sanity checks).
