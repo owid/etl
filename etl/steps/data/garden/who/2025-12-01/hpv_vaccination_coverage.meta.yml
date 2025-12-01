@@ -40,6 +40,6 @@ tables:
       coverage:
         title: <<antigen_description>>
         description_short: |-
-          { definitions.antigen_description_short }
+          {definitions.antigen_description_short}
         unit: "%"
         short_unit: "%"
