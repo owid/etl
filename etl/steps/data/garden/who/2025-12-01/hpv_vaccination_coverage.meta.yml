@@ -1,0 +1,24 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+      grapher_config:
+        selectedEntityNames:
+          - World
+        hasMapTab: true
+        hideAnnotationFieldsInTitle:
+          time: true
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  hpv_vaccination_coverage:
+    variables:
+      coverage:
+        title: <<antigen_description>>
+        unit: "%"
+        short_unit: "%"
