@@ -457,12 +457,12 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # Let's take the lifecycle emission factors from Ember's methodology:
     # https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf
     lifecycle_factors = {"Bioenergy": 230, "Hydro": 24, "Solar": 48, "Other renewables": 38, "Other fossil": 700}
-    # In principle, most of them come from Table A.III.2 of
+    # In principle, most of them come from the median valeus of Table A.III.2 of
     # https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
     # Indeed, the numbers for hydro and solar come from this table; hydro seems to be the sum of (infrastructure & supply chain emissions) + (biogenic CO2 emissions and albedo effect), rounded to two significant figures.
     # The value for "Other renwables" corresponds to the median value of geothermal.
     # The origin of the value of "Other fossil" is unclear.
-    # Using the median values. We check that we can reproduce their results reasonably well.
+    # We check that we can reproduce their results reasonably well.
     for source, emission_factor in lifecycle_factors.items():
         _tb = tb[(~tb["country"].isin(REGIONS)) & (tb["unit"] == "TWh") & (tb["variable"] == source)].reset_index(
             drop=True
