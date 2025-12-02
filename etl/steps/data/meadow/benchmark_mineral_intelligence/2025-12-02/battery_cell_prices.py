@@ -25,7 +25,7 @@ def run() -> None:
     tb = tb.dropna(axis=1, how="all")
     tb_by_chemistry = tb_by_chemistry.dropna(axis=1, how="all")
 
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    # Improve table formats.
     tb = tb.format(["year"])
     tb_by_chemistry = tb_by_chemistry.format(["date"])
 
