@@ -1945,9 +1945,6 @@ def compare_headcount_ratios_across_methods(
         tb_comparison["headcount_ratio_mean_gini"] - tb_comparison["headcount_ratio_mean_only"]
     ).abs()
 
-    # Sort by differences to see largest discrepancies
-    tb_comparison = tb_comparison.sort_values("diff_mean_gini_vs_constant", ascending=False).reset_index(drop=True)
-
     # Log summary statistics if SHOW_WARNINGS is enabled
     if SHOW_WARNINGS:
         # Calculate statistics for each poverty line
@@ -1978,20 +1975,20 @@ def compare_headcount_ratios_across_methods(
                     f"  Mean+Gini vs Mean-only: Median diff={median_diff_mg_mo:.2f}pp, Max diff={max_diff_mg_mo:.2f}pp (in {max_diff_mg_mo_year})"
                 )
 
-        # Keep relevant columns for output
-        tb_comparison = tb_comparison[
-            [
-                "country",
-                "year",
-                "poverty_line",
-                "diff_mean_gini_vs_constant",
-                "diff_mean_only_vs_constant",
-                "diff_mean_gini_vs_mean_only",
-            ]
-        ]
-
         # Export to CSV if enabled
         if EXPORT_COMPARISON_CSV:
             tb_comparison.to_csv("headcount_ratio_comparison_across_methods.csv", index=False)
+
+    # Keep relevant columns for output
+    tb_comparison = tb_comparison[
+        [
+            "country",
+            "year",
+            "poverty_line",
+            "diff_mean_gini_vs_constant",
+            "diff_mean_only_vs_constant",
+            "diff_mean_gini_vs_mean_only",
+        ]
+    ]
 
     return tb_comparison
