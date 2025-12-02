@@ -15,6 +15,10 @@ definitions:
     Measured in megatonnes of CO₂ equivalents.
   description_short_low_carbon: &description_short_low_carbon |-
     Low-carbon sources correspond to renewables and nuclear power, that produce significantly less greenhouse-gas emissions than fossil fuels.
+  description_processing_emissions_direct: &description_processing_emissions_direct |-
+    To estimate the direct combustion CO₂ emissions of electricity generation, we multiply each country's electricity generation by fuel (from Ember) by fixed emission factors for CO₂ per kWh. We use IPCC-based factors of 760 gCO₂/kWh for coal, 370 gCO₂/kWh for gas, 279 gCO₂/kWh for other fossil fuels, and 0 for all other sources. These emissions include only CO₂ released at power plants during fuel combustion, excluding other greenhouse gases, fugitive emissions, and all upstream or lifecycle components.
+  description_processing_intensity_direct: |-
+    To estimate the carbon intensity of direct combustion emissions, we sum the direct combustion CO₂ emissions from all fuels in each country, and divide the sum by their total electricity generation.
 
 dataset:
   title: Yearly Electricity Data
@@ -622,15 +626,16 @@ tables:
           Greenhouse gases emitted per unit of generated electricity, measured in grams of CO₂ equivalents per kilowatt-hour.
         presentation:
           title_public: Lifecycle CO₂ intensity of electricity generation
-      emissions__direct_combustion__clean__mtco2:
-        title: Direct combustion emissions from clean sources - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Low-carbon
-        description_short: *description_short_low_carbon
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from low-carbon sources
+      # emissions__direct_combustion__clean__mtco2:
+      #   title: Direct combustion emissions from clean sources - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Low-carbon
+      #   description_short: *description_short_low_carbon
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from low-carbon sources
+      #   description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__fossil__mtco2:
         title: Direct combustion emissions from fossil sources - mtCO2eq
         short_unit: mtCO₂eq
@@ -640,6 +645,7 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Direct combustion CO₂ emissions from electricity generation from fossil fuels
+        description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__gas_and_other_fossil__mtco2:
         title: Direct combustion emissions from gas and other fossil sources - mtCO2eq
         short_unit: mtCO₂eq
@@ -649,42 +655,47 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Direct combustion CO₂ emissions from electricity generation from gas and other fossil fuels
-      emissions__direct_combustion__hydro__bioenergy_and_other_renewables__mtco2:
-        title: Direct combustion emissions from hydro, bioenergy and other renewables - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Hydro, bioenergy and other renewables
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from hydropower, bioenergy and other renewables
-      emissions__direct_combustion__renewables__mtco2:
-        title: Direct combustion emissions from renewables - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Renewables
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from renewables
-      emissions__direct_combustion__wind_and_solar__mtco2:
-        title: Direct combustion emissions from wind and solar - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Wind and solar
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from wind and solar power
-      emissions__direct_combustion__bioenergy__mtco2:
-        title: Direct combustion emissions from bioenergy - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Bioenergy
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from bioenergy
+        description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__hydro__bioenergy_and_other_renewables__mtco2:
+      #   title: Direct combustion emissions from hydro, bioenergy and other renewables - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Hydro, bioenergy and other renewables
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from hydropower, bioenergy and other renewables
+      #   description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__renewables__mtco2:
+      #   title: Direct combustion emissions from renewables - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Renewables
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from renewables
+      #   description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__wind_and_solar__mtco2:
+      #   title: Direct combustion emissions from wind and solar - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Wind and solar
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from wind and solar power
+      #   description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__bioenergy__mtco2:
+      #   title: Direct combustion emissions from bioenergy - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Bioenergy
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from bioenergy
+      #   description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__coal__mtco2:
         title: Direct combustion emissions from coal - mtCO2eq
         short_unit: mtCO₂eq
@@ -694,6 +705,7 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Direct combustion CO₂ emissions from electricity generation from coal
+        description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__gas__mtco2:
         title: Direct combustion emissions from gas - mtCO2eq
         short_unit: mtCO₂eq
@@ -703,24 +715,27 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Direct combustion CO₂ emissions from electricity generation from gas
-      emissions__direct_combustion__hydro__mtco2:
-        title: Direct combustion emissions from hydro - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Hydro
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from hydropower
-      emissions__direct_combustion__nuclear__mtco2:
-        title: Direct combustion emissions from nuclear - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Nuclear
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from nuclear power
+        description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__hydro__mtco2:
+      #   title: Direct combustion emissions from hydro - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Hydro
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from hydropower
+      #   description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__nuclear__mtco2:
+      #   title: Direct combustion emissions from nuclear - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Nuclear
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from nuclear power
+      #   description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__other_fossil__mtco2:
         title: Direct combustion emissions from other fossil sources - mtCO2eq
         short_unit: mtCO₂eq
@@ -730,33 +745,37 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Direct combustion CO₂ emissions from electricity generation from other fossil fuels
-      emissions__direct_combustion__other_renewables__mtco2:
-        title: Direct combustion emissions from other renewables - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Other renewables
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from other renewables
-      emissions__direct_combustion__solar__mtco2:
-        title: Direct combustion emissions from solar - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Solar
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from solar power
-      emissions__direct_combustion__wind__mtco2:
-        title: Direct combustion emissions from wind - mtCO2eq
-        short_unit: mtCO₂eq
-        unit: megatonnes of CO₂ equivalents
-        display:
-          name: Wind
-        description_short: *description_short_mtco2
-        presentation:
-          title_public: Direct combustion CO₂ emissions from electricity generation from wind power
+        description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__other_renewables__mtco2:
+      #   title: Direct combustion emissions from other renewables - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Other renewables
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from other renewables
+      #   description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__solar__mtco2:
+      #   title: Direct combustion emissions from solar - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Solar
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from solar power
+      #   description_processing: *description_processing_emissions_direct
+      # emissions__direct_combustion__wind__mtco2:
+      #   title: Direct combustion emissions from wind - mtCO2eq
+      #   short_unit: mtCO₂eq
+      #   unit: megatonnes of CO₂ equivalents
+      #   display:
+      #     name: Wind
+      #   description_short: *description_short_mtco2
+      #   presentation:
+      #     title_public: Direct combustion CO₂ emissions from electricity generation from wind power
+      #   description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__total_emissions__mtco2:
         title: Total direct emissions - mtCO2eq
         short_unit: mtCO₂eq
@@ -766,6 +785,7 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Total direct CO₂ emissions from electricity generation
+        description_processing: *description_processing_emissions_direct
       emissions__direct_combustion__co2_intensity__gco2_kwh:
         title: Direct combustion CO₂ intensity - gCO2/kWh
         short_unit: gCO₂/kWh
@@ -776,3 +796,6 @@ tables:
           Measured in grams of carbon dioxide (CO₂) emitted per [kilowatt-hour](#dod:watt-hours) of generated electricity. Includes only direct emissions from fuel combustion at power plants, excluding upstream, fugitive and non-CO₂ greenhouse gases.
         presentation:
           title_public: Direct combustion CO₂ intensity of electricity generation
+        description_processing: |-
+          - {definitions.description_processing_emissions_direct}
+          - {definitions.description_processing_intensity_direct}

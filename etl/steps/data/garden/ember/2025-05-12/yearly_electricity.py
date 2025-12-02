@@ -619,6 +619,28 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     )
     tb_intensity.loc[(tb_intensity["variable"] == "Total generation"), "variable"] = "CO2 intensity"
 
+    # Check that clean variables have no emissions.
+    _all_zero_variables = tb_emissions.groupby(["variable"], as_index=False).agg(
+        {"value": lambda x: (sum(x) == 0).all()}
+    )
+    _all_zero_variables = set(_all_zero_variables[_all_zero_variables["value"] == 1]["variable"])
+    assert _all_zero_variables == {
+        "Bioenergy",
+        "Clean",
+        "Hydro",
+        "Hydro, bioenergy and other renewables",
+        "Nuclear",
+        "Offshore wind",
+        "Onshore wind",
+        "Other renewables",
+        "Renewables",
+        "Solar",
+        "Wind",
+        "Wind and solar",
+    }
+    # To avoid having columns with only zeros, remove those variables.
+    tb_emissions = tb_emissions[~tb_emissions["variable"].isin(_all_zero_variables)].reset_index(drop=True)
+
     # Append the new direct emissions and intensities to the original table.
     tb = pr.concat([tb, tb_emissions, tb_intensity], ignore_index=True)
 
