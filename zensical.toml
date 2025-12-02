@@ -61,6 +61,9 @@ nav = [
             { "OpenAI API" = "guides/openai.md" },
             { "Google API" = "guides/configure-google-api.md" },
         ] },
+        { "Analytics" = [
+            { "GA Events" = "guides/analytics-events.md" },
+        ] },
 
     ] },
     { "Design principles" = [
@@ -328,10 +331,7 @@ include_requirejs = true
 [project.plugins.search]
 
 [project.plugins.exclude]
-glob = [
-    "ignore/**",
-    "ignore/",
-]
+glob = ["ignore/**", "ignore/"]
 
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]

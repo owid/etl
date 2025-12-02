@@ -1,0 +1,45 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+      grapher_config:
+        selectedEntityNames:
+          - World
+        hasMapTab: true
+        hideAnnotationFieldsInTitle:
+          time: true
+  antigen_description_short: |-
+    <% if antigen_description == "HPV vaccination program coverage, first dose, females" %>
+    Target population of women who received the first dose of HPV vaccine in the reporting year.
+    <%- elif antigen_description == "HPV vaccination program coverage, last dose, females" %>
+    Target population of women who received the last dose of HPV vaccine in the reporting year.
+    <%- elif antigen_description == "HPV vaccination coverage by age 15, first dose, females" %>
+    Population of girls turning 15 in the reporting year that received any time between age 9- 14 at least one dose of HPV vaccine.
+    <%- elif antigen_description == "HPV vaccination coverage by age 15, last dose, females" %>
+    Population of girls turning 15 in the reporting year that received any time between age 9-14 the full recommended schedule of HPV vaccine.
+
+    <%- elif antigen_description == "HPV vaccination program coverage, first dose, males" %>
+    Target population of men who received the first dose of HPV vaccine in the reporting year.
+    <%- elif antigen_description == "HPV vaccination program coverage, last dose, males" %>
+    Target population of men who received the last dose of HPV vaccine in the reporting year.
+    <%- elif antigen_description == "HPV vaccination coverage by age 15, first dose, males" %>
+    Population of boys turning 15 in the reporting year that received any time between age 9- 14 at least one dose of HPV vaccine.
+    <%- elif antigen_description == "HPV vaccination coverage by age 15, last dose, males" %>
+    Population of boys turning 15 in the reporting year that received any time between age 9-14 the full recommended schedule of HPV vaccine.
+    <%- endif %>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  hpv_vaccination_coverage:
+    variables:
+      coverage:
+        title: <<antigen_description>>
+        description_short: |-
+          {definitions.antigen_description_short}
+        unit: "%"
+        short_unit: "%"
