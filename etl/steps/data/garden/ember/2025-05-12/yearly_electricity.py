@@ -488,12 +488,9 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
         ].empty, error
 
 
-def add_emissions_and_carbon_intensity_of_direct_combustion(
+def estimate_emissions_and_carbon_intensity_of_direct_combustion(
     tb: Table, tb_electricity_factors: Table, tb_energy_factors: Table
 ) -> Table:
-    # Sanity check: replicate Ember's lifecycle emissions for a few sources.
-    replicate_ember_lifecycle_emissions(tb=tb)
-
     # Create a harmonized table of electricity emission factors.
     # NOTE: Biomass has no factor; we simply assign zero
     tb_factors = (
@@ -642,9 +639,9 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     tb_emissions = tb_emissions[~tb_emissions["variable"].isin(_all_zero_variables)].reset_index(drop=True)
 
     # Append the new direct emissions and intensities to the original table.
-    tb = pr.concat([tb, tb_emissions, tb_intensity], ignore_index=True)
+    tb_emissions_and_intensities = pr.concat([tb_emissions, tb_intensity], ignore_index=True)
 
-    return tb
+    return tb_emissions_and_intensities
 
 
 def run() -> None:
@@ -679,9 +676,12 @@ def run() -> None:
     # Create region aggregates.
     tb = add_region_aggregates(tb=tb)
 
-    # Add emissions and carbon intensity of direct combustion.
+    # Sanity check: replicate Ember's lifecycle emissions for a few sources.
+    replicate_ember_lifecycle_emissions(tb=tb)
+
+    # Calculate emissions and carbon intensity of direct combustion.
     # NOTE: Ember provides only lifecycle emissions and intensities.
-    tb = add_emissions_and_carbon_intensity_of_direct_combustion(
+    tb_direct_emissions_and_intensities = estimate_emissions_and_carbon_intensity_of_direct_combustion(
         tb=tb, tb_electricity_factors=tb_electricity_factors, tb_energy_factors=tb_energy_factors
     )
 
@@ -692,7 +692,7 @@ def run() -> None:
         "electricity_generation": make_wide_table(tb=tb, category="Electricity generation"),
         "electricity_imports": make_wide_table(tb=tb, category="Electricity imports"),
         "lifecycle_emissions": make_wide_table(tb=tb, category="Power sector emissions"),
-        "direct_emissions": make_wide_table(tb=tb, category="Direct emissions"),
+        "direct_emissions": make_wide_table(tb=tb_direct_emissions_and_intensities, category="Direct emissions"),
     }
 
     for table_name in tables:
