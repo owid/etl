@@ -451,7 +451,7 @@ def add_region_aggregates(tb: Table) -> Table:
 
 def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # To check we understand how lifecycle emissions are calculated by Ember, I'll calculate the emissions of a few sources, and compare the result with theirs.
-    # The emission factor for coal, gas, nuclear and wind, as Ember's methodology explains, are a bit more complicated; they come from different sources and may change at the country level.
+    # The emission factors for coal, gas, nuclear and wind, as Ember's methodology explains, are a bit more complicated; they come from different sources and may change at the country level.
     # So we will not attempt to replicate those.
 
     # Let's take the lifecycle emission factors from Ember's methodology:
@@ -460,7 +460,7 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # In principle, most of them come from the median valeus of Table A.III.2 of
     # https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
     # Indeed, the numbers for hydro and solar come from this table; hydro seems to be the sum of (infrastructure & supply chain emissions) + (biogenic CO2 emissions and albedo effect), rounded to two significant figures.
-    # The value for "Other renwables" corresponds to the median value of geothermal.
+    # The value for "Other renewables" corresponds to the median value of geothermal.
     # The origin of the value of "Other fossil" is unclear.
     # We check that we can reproduce their results reasonably well.
     for source, emission_factor in lifecycle_factors.items():
@@ -524,7 +524,7 @@ def add_emissions_and_carbon_intensity_of_direct_combustion(
     error = "Incorrect mapping of emission factor source names."
     assert set(technology_to_emission_factor.values()) <= set(tb_factors["source"]), error
 
-    # Aggregate sources and their individual componets.
+    # Aggregate sources and their individual components.
     # NOTE: Ensure that the components are not aggregates, to ensure they will always be found.
     aggregate_sources = {
         "Gas and other fossil": ["Gas", "Other fossil"],

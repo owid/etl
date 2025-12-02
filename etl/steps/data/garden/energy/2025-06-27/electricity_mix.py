@@ -419,7 +419,7 @@ def check_carbon_intensity(combined: Table) -> None:
     _combined["_co2_intensity"] = (combined["total_emissions__mtco2"] * MT_TO_G) / (
         combined["total_generation__twh"] * TWH_TO_KWH
     )
-    error = "Expected carbon intensities would need to be calculated. Either increase relative tolerance, or consider recalculating intensities."
+    error = "Carbon intensities differ from expected values by more than the tolerance. Consider recalculating intensities or increasing the relative tolerance."
     assert (
         _combined[
             ~np.isclose(
