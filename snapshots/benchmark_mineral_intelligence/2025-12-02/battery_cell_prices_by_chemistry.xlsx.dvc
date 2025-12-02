@@ -1,9 +1,9 @@
 meta:
   origin:
     producer: Benchmark Mineral Intelligence
-    title: Batteries prices by chemistry
+    title: Battery prices by chemistry
     description: Prices of different types of battery cells.
-    citation_full: Benchmark Mineral Intelligence - Batteries prices by chemistry (2025).
+    citation_full: Benchmark Mineral Intelligence - Battery prices by chemistry (2025).
     url_main: |-
       https://www.benchmarkminerals.com/lithium/prices?utm_campaign=132909249-Media%20Appearances&utm_source=Our%20World%20in%20Data&utm_medium=Referrals&utm_content=Our%20World%20in%20Data
     date_accessed: '2025-12-02'
