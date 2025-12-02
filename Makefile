@@ -47,6 +47,7 @@ docs.pre: .venv
 	@.venv/bin/python -m docs.ignore.pre-build.bake_search_api
 	@.venv/bin/python -m docs.ignore.pre-build.bake_chart_api
 	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
+	@.venv/bin/python docs/ignore/pre-build/generate_analytics_docs.py
 
 docs.post: .venv
 	@echo '==> Converting Jupyter Notebooks to HTML'
