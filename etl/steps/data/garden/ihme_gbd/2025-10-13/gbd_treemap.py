@@ -43,6 +43,7 @@ broad_cause_dict = {
     "Other injuries": "Injuries",
     "Falls": "Injuries",
     "Respiratory infections": "Infectious diseases",
+    "Conflict and terrorism": "Injuries",
 }
 
 
