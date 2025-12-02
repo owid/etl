@@ -25,6 +25,13 @@ async def lifespan(app: FastAPI):
 def get_application():
     _app = FastAPI(
         title="OWID Search API",
+        description="""
+Semantic search API for Our World in Data indicators using embeddings and vector similarity.
+
+This API enables you to find relevant indicators using natural language queries. Results are ranked by semantic similarity to your query, making it easy to discover indicators even if you don't know the exact terminology.
+
+For searching charts and articles by title or content, see our [Search API](https://docs.owid.io/projects/etl/api/search-api/).
+""".strip(),
         lifespan=lifespan,
         servers=[
             {"url": "https://search.owid.io", "description": "Production server"},
