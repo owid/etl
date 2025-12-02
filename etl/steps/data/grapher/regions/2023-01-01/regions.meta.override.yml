@@ -54,19 +54,19 @@ tables:
         origins:
           - producer: Our World in Data
             title: Regions
-        presentation:
-          grapher_config:
-            map:
-              colorScale:
-                customCategoryLabels:
-                  "North America": "North America"
-                  "South America": "South America"
-                  "Africa": "Africa"
-                  "Europe": "Europe"
-                  "Asia": "Asia"
-                  "Oceania": "Oceania"
-                customHiddenCategories:
-                  "No data": true
+        # presentation:
+        #   grapher_config:
+        #     map:
+        #       colorScale:
+        #         customCategoryLabels:
+        #           "North America": "North America"
+        #           "South America": "South America"
+        #           "Africa": "Africa"
+        #           "Europe": "Europe"
+        #           "Asia": "Asia"
+        #           "Oceania": "Oceania"
+        #         customHiddenCategories:
+        #           "No data": true
 
       # UN
       un_region:
