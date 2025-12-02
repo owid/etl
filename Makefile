@@ -45,6 +45,7 @@ docs.pre: .venv
 	@echo '==> Generating dynamic documentation files'
 	@.venv/bin/python docs/ignore/pre-build/bake_metadata_reference.py
 	@.venv/bin/python -m docs.ignore.pre-build.bake_search_api
+	@.venv/bin/python -m docs.ignore.pre-build.bake_chart_api
 	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
 	@.venv/bin/python docs/ignore/pre-build/generate_analytics_docs.py
 
