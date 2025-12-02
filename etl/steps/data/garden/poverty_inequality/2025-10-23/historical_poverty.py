@@ -808,7 +808,7 @@ def smooth_estimates(tb: Table) -> Table:
     """
     Create smoothed estimates using 10-year rolling averages for headcount and headcount_ratio.
     This addresses uncertainty in historical estimates.
-    Only keeps decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1.
+    Only keeps decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1 (plus all years from LATEST_YEAR_PIP_FILLED onwards).
     """
 
     # Select only relevant columns
