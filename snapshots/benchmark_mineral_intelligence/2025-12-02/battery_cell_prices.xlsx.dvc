@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: Benchmark Mineral Intelligence
+    title: Lithium ion batteries prices
+    description: Historic prices on lithium ion battery cells.
+    citation_full: Benchmark Mineral Intelligence - Lithium ion batteries prices (2024).
+    url_main: |-
+      https://www.benchmarkminerals.com/lithium/prices?utm_campaign=132909249-Media%20Appearances&utm_source=Our%20World%20in%20Data&utm_medium=Referrals&utm_content=Our%20World%20in%20Data
+    date_accessed: '2025-12-02'
+    date_published: '2024-11-26'
+    license:
+      name: © Benchmark Mineral Intelligence 2024
+      url: https://www.benchmarkminerals.com/lithium/prices
+  is_public: false
