@@ -7,6 +7,7 @@ into beautiful, interactive-looking markdown files compatible with Zensical/Mate
 
 import json
 import re
+import textwrap
 from typing import Any, Dict, List
 
 
@@ -264,6 +265,107 @@ def extract_params_from_example(example_data: Dict[str, Any]) -> Dict[str, Any]:
     return params
 
 
+def render_example_content(
+    example_data: Dict[str, Any],
+    base_url: str,
+    path: str,
+    content_type: str,
+    content_schema: Dict[str, Any],
+    indent: str = "    ",
+) -> List[str]:
+    """Render the content for a single example (request URL, code samples, response).
+
+    Args:
+        example_data: The example data from OpenAPI spec
+        base_url: Base URL for code samples
+        path: API endpoint path
+        content_type: Response content type
+        content_schema: Schema for the content
+        indent: Base indentation for the content
+
+    Returns:
+        List of lines for the example content
+    """
+    lines = []
+    nested_indent = indent + "    "  # For nested code blocks in tabs
+
+    # Add request URL
+    example_params = extract_params_from_example(example_data)
+    if base_url and example_params:
+        request_url = build_request_url(base_url, path, example_params)
+        lines.append(f"{indent}**Request:** `GET {request_url}`")
+        lines.append("")
+
+    # Add code samples
+    if base_url:
+        lines.append(f"{indent}**Code samples:**")
+        lines.append("")
+        code_samples = generate_code_samples(base_url, path, example_params, content_type)
+
+        lines.append(f'{indent}=== "cURL"')
+        lines.append("")
+        lines.append(f"{nested_indent}```bash")
+        lines.append(f"{nested_indent}{code_samples['curl']}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+        lines.append(f'{indent}=== "Python"')
+        lines.append("")
+        lines.append(f"{nested_indent}```python")
+        for line in code_samples["python"].split("\n"):
+            lines.append(f"{nested_indent}{line}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+        lines.append(f'{indent}=== "JavaScript"')
+        lines.append("")
+        lines.append(f"{nested_indent}```javascript")
+        for line in code_samples["javascript"].split("\n"):
+            lines.append(f"{nested_indent}{line}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+        lines.append(f'{indent}=== "Rust"')
+        lines.append("")
+        lines.append(f"{nested_indent}```rust")
+        for line in code_samples["rust"].split("\n"):
+            lines.append(f"{nested_indent}{line}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+    # Add schema link if available
+    if "schema" in content_schema:
+        schema = content_schema["schema"]
+        if "$ref" in schema:
+            ref_name = schema["$ref"].split("/")[-1]
+            lines.append(f"{indent}**Response schema:** [`{ref_name}`](#{ref_name.lower()})")
+            lines.append("")
+
+    # Render response based on content type
+    response_value = example_data.get("value")
+    if content_type == "text/csv":
+        lines.append(f"{indent}```csv")
+        if isinstance(response_value, str):
+            for line in response_value.split("\n"):
+                if line:  # Skip empty lines
+                    lines.append(f"{indent}{line}")
+        lines.append(f"{indent}```")
+    elif content_type == "text/markdown":
+        lines.append(f"{indent}```markdown")
+        if isinstance(response_value, str):
+            for line in response_value.split("\n"):
+                lines.append(f"{indent}{line}")
+        lines.append(f"{indent}```")
+    else:
+        lines.append(f"{indent}```json")
+        for line in render_json_example(response_value).split("\n"):
+            lines.append(f"{indent}{line}")
+        lines.append(f"{indent}```")
+    lines.append("")
+
+    return lines
+
+
 def render_endpoint(
     path: str, method: str, operation: Dict[str, Any], components: Dict[str, Any], base_url: str = ""
 ) -> str:
@@ -295,7 +397,7 @@ def render_endpoint(
 
     # Description in an info admonition
     if "description" in operation:
-        lines.append(operation["description"])
+        lines.append(textwrap.dedent(operation["description"]).strip())
         lines.append("")
 
     # Parameters in a collapsible block
@@ -371,115 +473,29 @@ def render_endpoint(
                     lines.append(f"    **Content-Type:** `{content_type}`")
                     lines.append("")
 
-                    # Show examples with tabs if multiple
+                    # Show examples
                     if "examples" in content_schema:
                         examples = content_schema["examples"]
-                        if len(examples) > 1:
-                            # Use tabs for multiple examples - directly, without parent tab
-                            for idx, (example_name, example_data) in enumerate(examples.items()):
+                        use_tabs = len(examples) > 1
+
+                        for example_name, example_data in examples.items():
+                            if use_tabs:
+                                # Multiple examples: wrap in tabs with deeper indentation
                                 tab_title = example_data.get("summary", example_name)
                                 lines.append(f'    === "{tab_title}"')
                                 lines.append("")
-
-                                # Add request URL for this example
-                                example_params = extract_params_from_example(example_data)
-                                if base_url and example_params:
-                                    request_url = build_request_url(base_url, path, example_params)
-                                    lines.append(f"        **Request:** `GET {request_url}`")
-                                    lines.append("")
-
-                                # Add code samples
-                                lines.append("        **Code samples:**")
-                                lines.append("")
-                                code_samples = generate_code_samples(base_url, path, example_params, content_type)
-
-                                lines.append('        === "cURL"')
-                                lines.append("")
-                                lines.append("            ```bash")
-                                lines.append(f"            {code_samples['curl']}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                lines.append('        === "Python"')
-                                lines.append("")
-                                lines.append("            ```python")
-                                for line in code_samples["python"].split("\n"):
-                                    lines.append(f"            {line}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                lines.append('        === "JavaScript"')
-                                lines.append("")
-                                lines.append("            ```javascript")
-                                for line in code_samples["javascript"].split("\n"):
-                                    lines.append(f"            {line}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                lines.append('        === "Rust"')
-                                lines.append("")
-                                lines.append("            ```rust")
-                                for line in code_samples["rust"].split("\n"):
-                                    lines.append(f"            {line}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                # Response example
-                                if "x-schema-ref" in example_data:
-                                    schema_ref = example_data["x-schema-ref"]
-                                    ref_name = schema_ref.split("/")[-1]
-                                    response_type = f"[`{ref_name}`](#{ref_name.lower()})"
-                                    lines.append(f"        **Response ({response_type}):**")
-                                    lines.append("")
-                                else:
-                                    lines.append("        **Response:**")
-                                    lines.append("")
-
-                                # Determine response format based on content type
-                                if content_type == "text/csv":
-                                    lines.append("        ```csv")
-                                    # For CSV, render the raw string value without JSON encoding
-                                    response_value = example_data["value"]
-                                    if isinstance(response_value, str):
-                                        for line in response_value.split("\n"):
-                                            if line:  # Skip empty lines
-                                                lines.append(f"        {line}")
-                                    lines.append("        ```")
-                                else:
-                                    # For JSON and other types, use JSON rendering
-                                    lines.append("        ```json")
-                                    for line in render_json_example(example_data["value"]).split("\n"):
-                                        lines.append(f"        {line}")
-                                    lines.append("        ```")
-                                lines.append("")
-                        else:
-                            # Single example without tabs
-                            for example_name, example_data in examples.items():
+                                indent = "        "
+                            else:
+                                # Single example: just show the title
                                 lines.append(f"    **Example: {example_data.get('summary', example_name)}**")
                                 lines.append("")
+                                indent = "    "
 
-                                # Add request URL
-                                example_params = extract_params_from_example(example_data)
-                                if base_url and example_params:
-                                    request_url = build_request_url(base_url, path, example_params)
-                                    lines.append(f"    **Request:** `GET {request_url}`")
-                                    lines.append("")
-
-                                # Determine response format based on content type
-                                if content_type == "text/csv":
-                                    lines.append("    ```csv")
-                                    response_value = example_data["value"]
-                                    if isinstance(response_value, str):
-                                        for line in response_value.split("\n"):
-                                            if line:
-                                                lines.append(f"    {line}")
-                                    lines.append("    ```")
-                                else:
-                                    lines.append("    ```json")
-                                    for line in render_json_example(example_data["value"]).split("\n"):
-                                        lines.append(f"    {line}")
-                                    lines.append("    ```")
-                                lines.append("")
+                            lines.extend(
+                                render_example_content(
+                                    example_data, base_url, path, content_type, content_schema, indent
+                                )
+                            )
 
                     # Show example (singular)
                     elif "example" in content_schema:
@@ -490,6 +506,14 @@ def render_endpoint(
                             lines.append(f"    {line}")
                         lines.append("    ```")
                         lines.append("")
+
+                    # If no examples but we have a schema reference, show it
+                    elif "schema" in content_schema:
+                        schema = content_schema["schema"]
+                        if "$ref" in schema:
+                            ref_name = schema["$ref"].split("/")[-1]
+                            lines.append(f"    **Schema:** [`{ref_name}`](#{ref_name.lower()})")
+                            lines.append("")
 
     lines.append("---")
     lines.append("")
