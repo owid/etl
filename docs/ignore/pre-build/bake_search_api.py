@@ -6,7 +6,7 @@ This script converts an OpenAPI YAML spec into a beautiful, interactive-looking
 markdown file compatible with Zensical/Material for MkDocs.
 
 Called from: make docs.pre
-Input: Fetched from owid/owid-grapher repository on GitHub (functions/search-api.openapi.yaml)
+Input: Fetched from owid/owid-grapher repository on GitHub (docs/search-api.openapi.yaml)
 Output: docs/api/search-api.md
 """
 
@@ -35,9 +35,9 @@ def load_openapi_spec_from_file(file_path: str) -> Dict[str, Any]:
 
 
 def load_openapi_spec_from_github(
-    org: str = "owid",
-    repo: str = "owid-grapher",
-    file_path: str = "functions/search-api.openapi.yaml",
+    org: str,
+    repo: str,
+    file_path: str,
     branch: str = "master",
 ) -> Dict[str, Any]:
     """Load OpenAPI specification from GitHub repository.
@@ -64,9 +64,11 @@ def main():
 
     print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
     spec = load_openapi_spec_from_github(
-        org="owid", repo="owid-grapher", file_path="functions/search-api.openapi.yaml", branch="master"
+        org="owid",
+        repo="owid-grapher",
+        file_path="docs/search-api.openapi.yaml",
+        branch="master",
     )
-    # spec = load_openapi_spec_from_file("/home/x/repos/owid-grapher/functions/search-api.openapi.yaml")
 
     print("Generating markdown documentation...")
     markdown = generate_markdown(spec)
