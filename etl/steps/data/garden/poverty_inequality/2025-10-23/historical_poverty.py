@@ -810,34 +810,62 @@ def smooth_estimates(tb: Table) -> Table:
     This addresses uncertainty in historical estimates.
     Only keeps decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1.
     """
-    tb = tb.copy()
+
+    # Select only relevant columns
+    tb = tb[
+        [
+            "country",
+            "year",
+            "poverty_line",
+            "headcount_ratio",
+            "headcount",
+        ]
+    ].copy()
+
+    # Separate table between years before LATEST_YEAR_PIP_FILLED and from LATEST_YEAR_PIP_FILLED onwards
+    tb_avg = tb[tb["year"] < LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+    tb_pip = tb[tb["year"] >= LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
 
     # Sort by country, year, and poverty line
-    tb = tb.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
+    tb_avg = tb_avg.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
 
     # Calculate 10-year rolling averages per country and poverty line for headcount_ratio
-    tb["headcount_ratio_rolling_avg"] = tb.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
+    tb_avg["headcount_ratio"] = tb_avg.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
         lambda x: x.rolling(window=10, min_periods=1).mean()
     )
 
     # Calculate 10-year rolling averages per country and poverty line for headcount
-    tb["headcount_rolling_avg"] = tb.groupby(["country", "poverty_line"])["headcount"].transform(
+    tb_avg["headcount"] = tb_avg.groupby(["country", "poverty_line"])["headcount"].transform(
         lambda x: x.rolling(window=10, min_periods=1).mean()
     )
 
     # Replace values at LATEST_YEAR_PIP_FILLED - 1 with original values (to ensure continuity with PIP data)
-    mask_last_year = tb["year"] == (LATEST_YEAR_PIP_FILLED - 1)
-    tb.loc[mask_last_year, "headcount_ratio_rolling_avg"] = tb.loc[mask_last_year, "headcount_ratio"]
-    tb.loc[mask_last_year, "headcount_rolling_avg"] = tb.loc[mask_last_year, "headcount"]
+    mask_last_year = tb_avg["year"] == (LATEST_YEAR_PIP_FILLED - 1)
+    tb_avg.loc[mask_last_year, "headcount_ratio"] = tb_avg.loc[mask_last_year, "headcount_ratio"]
+    tb_avg.loc[mask_last_year, "headcount"] = tb_avg.loc[mask_last_year, "headcount"]
 
     # Keep only decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1
-    tb = tb[
-        (tb["year"].astype(int) % 10 == 0) | (tb["year"] == EARLIEST_YEAR) | (tb["year"] == LATEST_YEAR_PIP_FILLED - 1)
+    tb_avg = tb_avg[
+        (tb_avg["year"].astype(int) % 10 == 0)
+        | (tb_avg["year"] == EARLIEST_YEAR)
+        | (tb_avg["year"] == LATEST_YEAR_PIP_FILLED - 1)
     ].reset_index(drop=True)
 
     # Copy metadata
-    tb["headcount_ratio_rolling_avg"] = tb["headcount_ratio_rolling_avg"].copy_metadata(tb["headcount_ratio"])
-    tb["headcount_rolling_avg"] = tb["headcount_rolling_avg"].copy_metadata(tb["headcount"])
+    tb_avg["headcount_ratio"] = tb_avg["headcount_ratio"].copy_metadata(tb["headcount_ratio"])
+    tb_avg["headcount"] = tb_avg["headcount"].copy_metadata(tb["headcount"])
+
+    # Concatenate with pip table
+    tb_avg = pr.concat([tb_avg, tb_pip], ignore_index=True)
+
+    # Merge with original table
+    tb = pr.merge(
+        tb,
+        tb_avg,
+        on=["country", "year", "poverty_line"],
+        how="left",
+        suffixes=("", "_rolling_avg"),
+    )
 
     return tb
 
