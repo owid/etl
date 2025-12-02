@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("emission_factors.xls")
+    snap = paths.load_snapshot("emission_factors.xlsx")
 
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
