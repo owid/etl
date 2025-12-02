@@ -86,12 +86,83 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      headcount_ratio_omm:
-        title: Share below $<<poverty_line>> a day (OMM)
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
 
   population:
     variables:
@@ -171,12 +242,83 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      headcount_ratio_omm:
-        title: Share below $<<poverty_line>> a day (OMM) (from mean and Gini extrapolation)
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark) (from mean and Gini extrapolation)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark) (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark) (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark) (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average) (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average) (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average) (from mean and Gini extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average) (from mean and Gini extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
 
   population_from_interpolated_mean_gini:
     variables:
@@ -256,12 +398,83 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      headcount_ratio_omm:
-        title: Share below $<<poverty_line>> a day (OMM) (from mean extrapolation)
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark) (from mean extrapolation)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark) (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark) (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark) (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average) (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average) (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average) (from mean extrapolation)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average) (from mean extrapolation)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
 
   population_from_interpolated_mean:
     variables:

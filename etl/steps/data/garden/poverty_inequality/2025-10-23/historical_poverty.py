@@ -36,8 +36,8 @@ paths = PathFinder(__file__)
 # Poverty lines (daily income in 2021 PPP$)
 POVERTY_LINES = [3, 10, 30]
 
-# Define if we want to interpolate the log of GDP per capita or the absolute values
-INTERPOLATE_LOG_GDP = True
+# Define if we want to interpolate the log of GDP per capita/mean or the absolute values
+INTERPOLATE_LOG = True
 
 # Earliest year for extrapolation
 EARLIEST_YEAR = 1820
@@ -54,8 +54,8 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 # Define extreme growth factor thresholds
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 
-# Show warnings
-SHOW_WARNINGS = True
+# Show warnings and comparisons
+SHOW_WARNINGS = False
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -171,6 +171,15 @@ def run() -> None:
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
 
+    # Extract years where World has data in Maddison for benchmark columns (only before LATEST_YEAR_PIP_FILLED)
+    maddison_world_years = set(
+        tb_maddison[
+            (tb_maddison["country"] == "World")
+            & (tb_maddison["gdp_per_capita"].notna())
+            & (tb_maddison["year"] < LATEST_YEAR_PIP_FILLED)
+        ]["year"].tolist()
+    )
+
     ###############################################################################
     # 1. KEEPING INEQUALITY CONSTANT
     ###############################################################################
@@ -179,13 +188,13 @@ def run() -> None:
     tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     # Calculate poverty measures
-    tb = calculate_poverty_measures(tb=tb_extended)
+    tb = calculate_poverty_measures(tb=tb_extended, maddison_world_years=maddison_world_years)
 
     # Create stacked variables for stacked area/bar charts
     tb = create_stacked_variables(tb=tb)
 
-    # Calculate an alternative method with our population dataset
-    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
+    # Add population comparison with OWID population data
+    tb, tb_population = add_population_comparison(tb_poverty=tb)
 
     ###############################################################################
     # 2. WITH INEQUALITY CHANGES
@@ -204,27 +213,7 @@ def run() -> None:
     tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
 
     ###############################################################################
-    # 2.1 USING EXTRAPOLATED MEANS AND GINIS
-    ###############################################################################
-
-    # Create 1000 bins from mean and gini data
-    tb_thousand_bins_from_interpolated_mean_gini = expand_means_and_ginis_to_thousand_bins(
-        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
-    )
-
-    # Calculate poverty measures
-    tb_from_interpolated_mean_gini = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean_gini)
-
-    # Create stacked variables for stacked area/bar charts
-    tb_from_interpolated_mean_gini = create_stacked_variables(tb=tb_from_interpolated_mean_gini)
-
-    # Calculate an alternative method with our population dataset
-    tb_from_interpolated_mean_gini, tb_from_interpolated_mean_gini_population = (
-        calculate_alternative_method_with_population_dataset(tb_poverty=tb_from_interpolated_mean_gini)
-    )
-
-    ###############################################################################
-    # 2.2 USING EXTRAPOLATED MEANS (BUT NOT GINIS) AND INTERPOLATING THOUSAND BINS
+    # 2.1 USING EXTRAPOLATED MEANS (BUT NOT GINIS) AND INTERPOLATING THOUSAND BINS
     ###############################################################################
 
     # Create 1000 bins from inter/extrapolated means and original Ginis, except for years between the earliest year and first year with data
@@ -233,18 +222,42 @@ def run() -> None:
     )
 
     tb_thousand_bins_from_interpolated_mean = interpolate_quantiles_in_thousand_bins(
-        tb_thousand_bins_from_interpolated_mean=tb_thousand_bins_from_interpolated_mean
+        tb_thousand_bins_from_interpolated_mean=tb_thousand_bins_from_interpolated_mean, tb_gini_mean=tb_gini_mean
     )
 
     # Calculate poverty measures
-    tb_from_interpolated_mean = calculate_poverty_measures(tb=tb_thousand_bins_from_interpolated_mean)
+    tb_from_interpolated_mean = calculate_poverty_measures(
+        tb=tb_thousand_bins_from_interpolated_mean, maddison_world_years=maddison_world_years
+    )
 
     # Create stacked variables for stacked area/bar charts
     tb_from_interpolated_mean = create_stacked_variables(tb=tb_from_interpolated_mean)
 
-    # Calculate an alternative method with our population dataset
-    tb_from_interpolated_mean, tb_from_interpolated_mean_population = (
-        calculate_alternative_method_with_population_dataset(tb_poverty=tb_from_interpolated_mean)
+    # Add population comparison with OWID population data
+    tb_from_interpolated_mean, tb_from_interpolated_mean_population = add_population_comparison(
+        tb_poverty=tb_from_interpolated_mean
+    )
+
+    ###############################################################################
+    # 2.2 USING EXTRAPOLATED MEANS AND GINIS
+    ###############################################################################
+
+    # Create 1000 bins from mean and gini data
+    tb_thousand_bins_from_interpolated_mean_gini = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
+    )
+
+    # Calculate poverty measures
+    tb_from_interpolated_mean_gini = calculate_poverty_measures(
+        tb=tb_thousand_bins_from_interpolated_mean_gini, maddison_world_years=maddison_world_years
+    )
+
+    # Create stacked variables for stacked area/bar charts
+    tb_from_interpolated_mean_gini = create_stacked_variables(tb=tb_from_interpolated_mean_gini)
+
+    # Add population comparison with OWID population data
+    tb_from_interpolated_mean_gini, tb_from_interpolated_mean_gini_population = add_population_comparison(
+        tb_poverty=tb_from_interpolated_mean_gini
     )
 
     ###############################################################################
@@ -374,8 +387,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Drop region before interpolation (categorical columns can't be interpolated)
     tb_gdp = tb_gdp.drop(columns=["region"])
 
-    # Create log_gdp_per_capita column, as the logarithm of gdp_per_capita
-    tb_gdp["log_gdp_per_capita"] = tb_gdp["gdp_per_capita"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+    if INTERPOLATE_LOG:
+        # Create log_gdp_per_capita column, as the logarithm of gdp_per_capita
+        tb_gdp["log_gdp_per_capita"] = tb_gdp["gdp_per_capita"].apply(lambda x: np.log(x) if pd.notna(x) else x)
 
     tb_gdp = interpolate_table(
         tb_gdp,
@@ -387,9 +401,12 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         limit_area="inside",
     )
 
-    if INTERPOLATE_LOG_GDP:
+    if INTERPOLATE_LOG:
         # Convert back from log to absolute values
         tb_gdp["gdp_per_capita"] = tb_gdp["log_gdp_per_capita"].apply(lambda x: np.exp(x) if pd.notna(x) else x)
+
+        # Drop log_gdp_per_capita column
+        tb_gdp = tb_gdp.drop(columns=["log_gdp_per_capita"], errors="raise")
 
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
@@ -648,7 +665,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     return tb_thousand_bins_extended
 
 
-def calculate_poverty_measures(tb: Table) -> Table:
+def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Table:
     """
     Calculate poverty headcount and headcount ratios and for all poverty lines.
     For each year, the data is sorted by income avg, and the cumulative population is calculated.
@@ -656,6 +673,9 @@ def calculate_poverty_measures(tb: Table) -> Table:
     The headcount ratio is the headcount as a percentage of the global population.
 
     This function returns two tables - one with poverty measures and another with population estimates (only to deal with duplicates in the dimension poverty_line).
+
+    Also creates benchmark columns (headcount_benchmark and headcount_ratio_benchmark) that only include data
+    for years where World has data in the Maddison dataset.
     """
     # Sort table by year and avg
     tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
@@ -706,6 +726,20 @@ def calculate_poverty_measures(tb: Table) -> Table:
 
     # Add country column
     tb_poverty["country"] = "World"
+
+    # Create benchmark columns: same as headcount/headcount_ratio but only for:
+    # 1. Years in Maddison World data (before LATEST_YEAR_PIP_FILLED)
+    # 2. All years >= LATEST_YEAR_PIP_FILLED
+    tb_poverty["headcount_benchmark"] = tb_poverty["headcount"]
+    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio"]
+
+    # Set to pd.NA for years not in Maddison World data AND before LATEST_YEAR_PIP_FILLED
+    mask_not_benchmark = ~tb_poverty["year"].isin(maddison_world_years) & (tb_poverty["year"] < LATEST_YEAR_PIP_FILLED)
+    tb_poverty.loc[mask_not_benchmark, "headcount_benchmark"] = pd.NA
+    tb_poverty.loc[mask_not_benchmark, "headcount_ratio_benchmark"] = pd.NA
+
+    # Create smoothed estimates using rolling averages
+    tb_poverty = smooth_estimates(tb=tb_poverty)
 
     return tb_poverty
 
@@ -770,6 +804,44 @@ def select_growth_factor(row):
         return pd.Series({"growth_factor": row["growth_factor_region"], "growth_factor_origin": "region"})
 
 
+def smooth_estimates(tb: Table) -> Table:
+    """
+    Create smoothed estimates using 10-year rolling averages for headcount and headcount_ratio.
+    This addresses uncertainty in historical estimates.
+    Only keeps decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1.
+    """
+    tb = tb.copy()
+
+    # Sort by country, year, and poverty line
+    tb = tb.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
+
+    # Calculate 10-year rolling averages per country and poverty line for headcount_ratio
+    tb["headcount_ratio_rolling_avg"] = tb.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
+        lambda x: x.rolling(window=10, min_periods=1).mean()
+    )
+
+    # Calculate 10-year rolling averages per country and poverty line for headcount
+    tb["headcount_rolling_avg"] = tb.groupby(["country", "poverty_line"])["headcount"].transform(
+        lambda x: x.rolling(window=10, min_periods=1).mean()
+    )
+
+    # Replace values at LATEST_YEAR_PIP_FILLED - 1 with original values (to ensure continuity with PIP data)
+    mask_last_year = tb["year"] == (LATEST_YEAR_PIP_FILLED - 1)
+    tb.loc[mask_last_year, "headcount_ratio_rolling_avg"] = tb.loc[mask_last_year, "headcount_ratio"]
+    tb.loc[mask_last_year, "headcount_rolling_avg"] = tb.loc[mask_last_year, "headcount"]
+
+    # Keep only decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1
+    tb = tb[
+        (tb["year"].astype(int) % 10 == 0) | (tb["year"] == EARLIEST_YEAR) | (tb["year"] == LATEST_YEAR_PIP_FILLED - 1)
+    ].reset_index(drop=True)
+
+    # Copy metadata
+    tb["headcount_ratio_rolling_avg"] = tb["headcount_ratio_rolling_avg"].copy_metadata(tb["headcount_ratio"])
+    tb["headcount_rolling_avg"] = tb["headcount_rolling_avg"].copy_metadata(tb["headcount"])
+
+    return tb
+
+
 def create_stacked_variables(tb: Table) -> Table:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
@@ -780,10 +852,31 @@ def create_stacked_variables(tb: Table) -> Table:
     tb["headcount_above"] = tb["population"] - tb["headcount"]
     tb["headcount_ratio_above"] = 100 * (tb["headcount_above"] / tb["population"])
 
+    # Define headcount_above_benchmark and headcount_ratio_above_benchmark variables
+    tb["headcount_above_benchmark"] = tb["population"] - tb["headcount_benchmark"]
+    tb["headcount_ratio_above_benchmark"] = 100 * (tb["headcount_above_benchmark"] / tb["population"])
+
+    # Define rolling average above variables
+    tb["headcount_above_rolling_avg"] = tb["population"] - tb["headcount_rolling_avg"]
+    tb["headcount_ratio_above_rolling_avg"] = 100 * (tb["headcount_above_rolling_avg"] / tb["population"])
+
     # Define stacked variables as headcount and headcount_ratio between poverty lines
     # Select only the necessary columns and pivot
     tb_pivot = pr.pivot(
-        data=tb[["country", "year", "poverty_line", "headcount_ratio", "headcount", "population"]],
+        data=tb[
+            [
+                "country",
+                "year",
+                "poverty_line",
+                "headcount_ratio",
+                "headcount",
+                "headcount_ratio_benchmark",
+                "headcount_benchmark",
+                "headcount_rolling_avg",
+                "headcount_ratio_rolling_avg",
+                "population",
+            ]
+        ],
         index=["country", "year"],
         columns=["poverty_line"],
     )
@@ -803,7 +896,35 @@ def create_stacked_variables(tb: Table) -> Table:
             )
             tb_pivot[varname_pct] = 100 * (tb_pivot[varname_n] / tb_pivot[("population", POVERTY_LINES[i])])
 
-    # Now, only keep headcount_between and headcount_ratio_between, and headcount_above and headcount_ratio_above
+            # Add benchmark between variables
+            varname_n_benchmark = ("headcount_between_benchmark", f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}")
+            varname_pct_benchmark = (
+                "headcount_ratio_between_benchmark",
+                f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}",
+            )
+            tb_pivot[varname_n_benchmark] = (
+                tb_pivot[("headcount_benchmark", POVERTY_LINES[i])]
+                - tb_pivot[("headcount_benchmark", POVERTY_LINES[i - 1])]
+            )
+            tb_pivot[varname_pct_benchmark] = 100 * (
+                tb_pivot[varname_n_benchmark] / tb_pivot[("population", POVERTY_LINES[i])]
+            )
+
+            # Add rolling average between variables
+            varname_n_rolling = ("headcount_between_rolling_avg", f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}")
+            varname_pct_rolling = (
+                "headcount_ratio_between_rolling_avg",
+                f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}",
+            )
+            tb_pivot[varname_n_rolling] = (
+                tb_pivot[("headcount_rolling_avg", POVERTY_LINES[i])]
+                - tb_pivot[("headcount_rolling_avg", POVERTY_LINES[i - 1])]
+            )
+            tb_pivot[varname_pct_rolling] = 100 * (
+                tb_pivot[varname_n_rolling] / tb_pivot[("population", POVERTY_LINES[i])]
+            )
+
+    # Now, only keep headcount_between and headcount_ratio_between (including benchmark and rolling average versions)
     tb_pivot = tb_pivot.loc[
         :,
         tb_pivot.columns.get_level_values(0).isin(
@@ -812,6 +933,10 @@ def create_stacked_variables(tb: Table) -> Table:
                 "year",
                 "headcount_between",
                 "headcount_ratio_between",
+                "headcount_between_benchmark",
+                "headcount_ratio_between_benchmark",
+                "headcount_between_rolling_avg",
+                "headcount_ratio_between_rolling_avg",
             ]
         ),
     ]
@@ -833,13 +958,21 @@ def create_stacked_variables(tb: Table) -> Table:
     # Copy metadata to recover origin
     tb["headcount_between"] = tb["headcount_between"].copy_metadata(tb["headcount"])
     tb["headcount_ratio_between"] = tb["headcount_ratio_between"].copy_metadata(tb["headcount_ratio"])
+    tb["headcount_between_benchmark"] = tb["headcount_between_benchmark"].copy_metadata(tb["headcount_benchmark"])
+    tb["headcount_ratio_between_benchmark"] = tb["headcount_ratio_between_benchmark"].copy_metadata(
+        tb["headcount_ratio_benchmark"]
+    )
+    tb["headcount_between_rolling_avg"] = tb["headcount_between_rolling_avg"].copy_metadata(tb["headcount_rolling_avg"])
+    tb["headcount_ratio_between_rolling_avg"] = tb["headcount_ratio_between_rolling_avg"].copy_metadata(
+        tb["headcount_ratio_rolling_avg"]
+    )
 
     return tb
 
 
-def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> Tuple[Table, Table]:
+def add_population_comparison(tb_poverty: Table) -> Tuple[Table, Table]:
     """
-    Calculate an alternative method with our population dataset, to compare results in Grapher. It calculates headcount_ratio_omm using population_omm from Our World in Data and also saves a population table with population differences.
+    Add population_omm from Our World in Data and create a population table with population differences.
     """
     # First, add population_omm column, the population of the world from Our World in Data
     tb_poverty = paths.regions.add_population(
@@ -848,9 +981,6 @@ def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> T
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
     )
-
-    # Calculate headcount_ratio_omm
-    tb_poverty["headcount_ratio_omm"] = tb_poverty["headcount"] / tb_poverty["population_omm"] * 100
 
     # Create a different table to keep population estimates
     tb_population = tb_poverty[["country", "year", "poverty_line", "population", "population_omm"]].reset_index(
@@ -1027,7 +1157,7 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
         len(invalid_gini) == 0
     ), f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range):\n{invalid_gini}"
 
-    # Merge with PIP data for comparison
+    # Merge with PIP data
     tb_pip = pr.merge(
         tb_pip,
         gini_calc[["country", "year", "gini"]],
@@ -1036,12 +1166,12 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
         suffixes=("_survey", "_filled"),
     )
 
-    # Calculate difference between thousand bins Gini and PIP Gini
-    tb_pip["gini_difference"] = (tb_pip["gini_filled"] - tb_pip["gini_survey"]).abs()
-    tb_pip["gini_difference_pct"] = (tb_pip["gini_difference"] / tb_pip["gini_survey"]).abs() * 100
-
     # Log summary statistics
     if SHOW_WARNINGS:
+        # Calculate difference between thousand bins Gini and PIP Gini
+        tb_pip["gini_difference"] = (tb_pip["gini_filled"] - tb_pip["gini_survey"]).abs()
+        tb_pip["gini_difference_pct"] = (tb_pip["gini_difference"] / tb_pip["gini_survey"]).abs() * 100
+
         comparison_valid = tb_pip.dropna(subset=["gini_filled", "gini_survey"])
         comparison_valid = comparison_valid[
             ["country", "year", "gini_survey", "gini_filled", "gini_difference", "gini_difference_pct"]
@@ -1277,6 +1407,10 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
         limit_area=None,  # Interpolate/extrapolate everywhere, including outside existing data ranges (repeating first/last known value)
     )
 
+    if INTERPOLATE_LOG:
+        # Create log_mean column for log-linear interpolation
+        tb_mean["log_mean"] = tb_mean["mean"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+
     tb_mean = interpolate_table(
         tb_mean,
         entity_col="country",
@@ -1286,6 +1420,12 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
         limit_direction="both",
         limit_area="inside",  # Only interpolate inside existing data ranges
     )
+
+    if INTERPOLATE_LOG:
+        # Convert back from log to absolute values
+        tb_mean["mean"] = tb_mean["log_mean"].apply(lambda x: np.exp(x) if pd.notna(x) else x)
+
+        tb_mean = tb_mean.drop(columns=["log_mean"], errors="raise")
 
     # Also interpolate tb_gini_outside_extrapolation, to replicate values from 1820 to earliest observation
     tb_gini_outside_extrapolation = interpolate_table(
@@ -1512,41 +1652,43 @@ def expand_means_and_ginis_to_thousand_bins(
     # Divide population equally among 1000 quantiles
     tb_expanded["pop"] /= 1000
 
-    # Compare means: calculate weighted mean from the generated distribution and compare with original mean
-    # Calculate total income for each quantile
-    tb_expanded["total_income"] = tb_expanded["avg"] * tb_expanded["pop"]
-
-    # Calculate mean from distribution as weighted average: sum(income * pop) / sum(pop)
-    tb_mean_from_distribution = (
-        tb_expanded.groupby(["country", "year"])
-        .agg(
-            total_income_sum=("total_income", "sum"),
-            total_pop_sum=("pop", "sum"),
-        )
-        .reset_index()
-    )
-    tb_mean_from_distribution["mean_from_distribution"] = (
-        tb_mean_from_distribution["total_income_sum"] / tb_mean_from_distribution["total_pop_sum"]
-    )
-
-    # Merge with original means for comparison
-    tb_comparison = pr.merge(
-        tb_mean_from_distribution[["country", "year", "mean_from_distribution"]],
-        tb_new[["country", "year", mean_column]],
-        on=["country", "year"],
-        how="left",
-    )
-
-    # Calculate differences
-    tb_comparison["mean_difference"] = (tb_comparison["mean_from_distribution"] - tb_comparison[mean_column]).abs()
-    tb_comparison["mean_difference_pct"] = (tb_comparison["mean_difference"] / tb_comparison[mean_column]).abs() * 100
-
-    tb_comparison = tb_comparison[
-        ["country", "year", mean_column, "mean_from_distribution", "mean_difference", "mean_difference_pct"]
-    ].sort_values(by="mean_difference_pct", ascending=False)
-
     # Log summary statistics
     if SHOW_WARNINGS:
+        # Compare means: calculate weighted mean from the generated distribution and compare with original mean
+        # Calculate total income for each quantile
+        tb_expanded["total_income"] = tb_expanded["avg"] * tb_expanded["pop"]
+
+        # Calculate mean from distribution as weighted average: sum(income * pop) / sum(pop)
+        tb_mean_from_distribution = (
+            tb_expanded.groupby(["country", "year"])
+            .agg(
+                total_income_sum=("total_income", "sum"),
+                total_pop_sum=("pop", "sum"),
+            )
+            .reset_index()
+        )
+        tb_mean_from_distribution["mean_from_distribution"] = (
+            tb_mean_from_distribution["total_income_sum"] / tb_mean_from_distribution["total_pop_sum"]
+        )
+
+        # Merge with original means for comparison
+        tb_comparison = pr.merge(
+            tb_mean_from_distribution[["country", "year", "mean_from_distribution"]],
+            tb_new[["country", "year", mean_column]],
+            on=["country", "year"],
+            how="left",
+        )
+
+        # Calculate differences
+        tb_comparison["mean_difference"] = (tb_comparison["mean_from_distribution"] - tb_comparison[mean_column]).abs()
+        tb_comparison["mean_difference_pct"] = (
+            tb_comparison["mean_difference"] / tb_comparison[mean_column]
+        ).abs() * 100
+
+        tb_comparison = tb_comparison[
+            ["country", "year", mean_column, "mean_from_distribution", "mean_difference", "mean_difference_pct"]
+        ].sort_values(by="mean_difference_pct", ascending=False)
+
         if len(tb_comparison) > 0:
             median_diff = tb_comparison["mean_difference_pct"].median()
             max_diff = tb_comparison["mean_difference_pct"].max()
@@ -1559,8 +1701,8 @@ def expand_means_and_ginis_to_thousand_bins(
             if EXPORT_COMPARISON_CSV:
                 tb_comparison.to_csv("mean_comparison_original_distribution.csv", index=False)
 
-    # Drop temporary column
-    tb_expanded = tb_expanded.drop(columns=["total_income"])
+        # Drop temporary column
+        tb_expanded = tb_expanded.drop(columns=["total_income"])
 
     # Add region and region_old columns, from tb_thousand_bins
     # Create a mapping of country to region and region_old
@@ -1604,7 +1746,9 @@ def gini_to_sigma(gini):
         return np.nan
 
 
-def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_mean: Table) -> Table:
+def interpolate_quantiles_in_thousand_bins(
+    tb_thousand_bins_from_interpolated_mean: Table, tb_gini_mean: Table
+) -> Table:
     """
     Interpolate missing values in the 1000-binned income distribution table.
     This function interpolates missing 'avg' values for each country-year across quantiles.
@@ -1641,6 +1785,10 @@ def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_me
     # Drop pop column
     tb_expanded = tb_expanded.drop(columns=["pop"])
 
+    if INTERPOLATE_LOG:
+        # Create column for log-linear interpolation
+        tb_expanded["avg"] = tb_expanded["avg"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+
     # Make table wide
     tb_expanded = tb_expanded.pivot_table(index=["country", "year"], columns="quantile", values="avg").reset_index()
 
@@ -1658,6 +1806,10 @@ def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_me
     # Make the table long again
     tb_expanded = tb_expanded.melt(id_vars=["country", "year"], var_name="quantile", value_name="avg")
 
+    if INTERPOLATE_LOG:
+        # Convert back from log to absolute values
+        tb_expanded["avg"] = tb_expanded["avg"].apply(lambda x: np.exp(x) if pd.notna(x) else x)
+
     # Add population
     tb_expanded = paths.regions.add_population(
         tb=tb_expanded,
@@ -1669,6 +1821,60 @@ def interpolate_quantiles_in_thousand_bins(tb_thousand_bins_from_interpolated_me
 
     # Divide population equally among 1000 quantiles
     tb_expanded["pop"] /= 1000
+
+    # Log summary statistics
+    if SHOW_WARNINGS:
+        # Compare means: calculate weighted mean from the interpolated distribution and compare with original mean
+        # Only for years where mean_original is not available (i.e., where we used interpolated/extrapolated means)
+        # Calculate total income for each quantile
+        tb_expanded["total_income"] = tb_expanded["avg"] * tb_expanded["pop"]
+
+        # Calculate mean from distribution as weighted average: sum(income * pop) / sum(pop)
+        tb_mean_from_distribution = (
+            tb_expanded.groupby(["country", "year"])
+            .agg(
+                total_income_sum=("total_income", "sum"),
+                total_pop_sum=("pop", "sum"),
+            )
+            .reset_index()
+        )
+        tb_mean_from_distribution["mean_from_distribution"] = (
+            tb_mean_from_distribution["total_income_sum"] / tb_mean_from_distribution["total_pop_sum"]
+        )
+
+        # Merge with original means for comparison
+        tb_comparison = pr.merge(
+            tb_mean_from_distribution[["country", "year", "mean_from_distribution"]],
+            tb_gini_mean[["country", "year", "mean", "mean_original"]],
+            on=["country", "year"],
+            how="left",
+        )
+
+        # Filter to only compare years where mean_original is not available (NaN)
+        tb_comparison = tb_comparison[tb_comparison["mean_original"].isna()].reset_index(drop=True)
+
+        # Calculate differences
+        tb_comparison["mean_difference"] = (tb_comparison["mean_from_distribution"] - tb_comparison["mean"]).abs()
+        tb_comparison["mean_difference_pct"] = (tb_comparison["mean_difference"] / tb_comparison["mean"]).abs() * 100
+
+        tb_comparison = tb_comparison[
+            ["country", "year", "mean", "mean_from_distribution", "mean_difference", "mean_difference_pct"]
+        ].sort_values(by="mean_difference_pct", ascending=False)
+
+        if len(tb_comparison) > 0:
+            median_diff = tb_comparison["mean_difference_pct"].median()
+            max_diff = tb_comparison["mean_difference_pct"].max()
+            log.info(
+                f"interpolate_quantiles_in_thousand_bins: Comparison of original means with interpolated distribution-derived means - "
+                f"Median relative difference: {median_diff:.4f}%, Max relative difference: {max_diff:.4f}% ({len(tb_comparison)} observations). See the top {NUM_OBSERVATIONS_TO_SHOW} largest differences below:"
+                f"{tb_comparison.head(NUM_OBSERVATIONS_TO_SHOW)}"
+            )
+
+            if EXPORT_COMPARISON_CSV:
+                tb_comparison.to_csv("mean_comparison_interpolated_distribution.csv", index=False)
+
+        # Drop temporary column
+        tb_expanded = tb_expanded.drop(columns=["total_income"])
 
     # Drop data for the year LATEST_YEAR from tb_expanded to reinstate original bins
     tb_expanded = tb_expanded[tb_expanded["year"] < LATEST_YEAR].reset_index(drop=True)
