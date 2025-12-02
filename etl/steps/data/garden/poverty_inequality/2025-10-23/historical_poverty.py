@@ -830,19 +830,19 @@ def smooth_estimates(tb: Table) -> Table:
     tb_avg = tb_avg.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
 
     # Calculate 10-year rolling averages per country and poverty line for headcount_ratio
-    tb_avg["headcount_ratio"] = tb_avg.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
+    tb_avg["headcount_ratio_avg"] = tb_avg.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
         lambda x: x.rolling(window=10, min_periods=1).mean()
     )
 
     # Calculate 10-year rolling averages per country and poverty line for headcount
-    tb_avg["headcount"] = tb_avg.groupby(["country", "poverty_line"])["headcount"].transform(
+    tb_avg["headcount_avg"] = tb_avg.groupby(["country", "poverty_line"])["headcount"].transform(
         lambda x: x.rolling(window=10, min_periods=1).mean()
     )
 
     # Replace values at LATEST_YEAR_PIP_FILLED - 1 with original values (to ensure continuity with PIP data)
     mask_last_year = tb_avg["year"] == (LATEST_YEAR_PIP_FILLED - 1)
-    tb_avg.loc[mask_last_year, "headcount_ratio"] = tb_avg.loc[mask_last_year, "headcount_ratio"]
-    tb_avg.loc[mask_last_year, "headcount"] = tb_avg.loc[mask_last_year, "headcount"]
+    tb_avg.loc[mask_last_year, "headcount_ratio_avg"] = tb_avg.loc[mask_last_year, "headcount_ratio"]
+    tb_avg.loc[mask_last_year, "headcount_avg"] = tb_avg.loc[mask_last_year, "headcount"]
 
     # Keep only decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1
     tb_avg = tb_avg[
@@ -852,8 +852,17 @@ def smooth_estimates(tb: Table) -> Table:
     ].reset_index(drop=True)
 
     # Copy metadata
-    tb_avg["headcount_ratio"] = tb_avg["headcount_ratio"].copy_metadata(tb["headcount_ratio"])
-    tb_avg["headcount"] = tb_avg["headcount"].copy_metadata(tb["headcount"])
+    tb_avg["headcount_ratio_avg"] = tb_avg["headcount_ratio_avg"].copy_metadata(tb_avg["headcount_ratio"])
+    tb_avg["headcount_avg"] = tb_avg["headcount_avg"].copy_metadata(tb_avg["headcount"])
+
+    # Drop headcount_ratio and headcount columns
+    tb_avg = tb_avg.drop(columns=["headcount_ratio", "headcount"], errors="raise")
+
+    # Rename columns
+    tb_avg = tb_avg.rename(
+        columns={"headcount_ratio_avg": "headcount_ratio", "headcount_avg": "headcount"},
+        errors="raise",
+    )
 
     # Concatenate with pip table
     tb_avg = pr.concat([tb_avg, tb_pip], ignore_index=True)
