@@ -812,7 +812,7 @@ def smooth_estimates(tb: Table) -> Table:
     """
 
     # Select only relevant columns
-    tb = tb[
+    tb_avg = tb[
         [
             "country",
             "year",
@@ -823,8 +823,8 @@ def smooth_estimates(tb: Table) -> Table:
     ].copy()
 
     # Separate table between years before LATEST_YEAR_PIP_FILLED and from LATEST_YEAR_PIP_FILLED onwards
-    tb_avg = tb[tb["year"] < LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
-    tb_pip = tb[tb["year"] >= LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+    tb_avg = tb_avg[tb_avg["year"] < LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+    tb_pip = tb_avg[tb_avg["year"] >= LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
 
     # Sort by country, year, and poverty line
     tb_avg = tb_avg.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
