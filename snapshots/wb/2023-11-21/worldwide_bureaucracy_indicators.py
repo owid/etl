@@ -7,7 +7,7 @@ Instructions:
 # TODO: Download the link automatically.
 2.  Unzip the file and place the csv file in the data folder.
 3.  Run the script with the following command:
-    python snapshots/wb/{date}/worldwide_bureaucracy_indicators.py --path-to-file <relative-path-to-file>
+    etls wb/{date}/worldwide_bureaucracy_indicators --path-to-file <relative-path-to-file>
 """
 
 from pathlib import Path

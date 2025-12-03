@@ -104,7 +104,7 @@ git checkout -b data/new-dataset
 
 2. **Add snapshot data**
     ```bash
-    uv run python snapshots/<namespace>/<version>/<dataset_short_name>.py
+    uv run etls <namespace>/<version>/<dataset_short_name>
     ```
 
 ### Meadow step

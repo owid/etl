@@ -152,9 +152,7 @@ def migrate(
     # Print instructions
     print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
     print("[green]1.[/green] Create a PR")
-    print(
-        f"[green]2.[/green] Execute snapshot with [bold]`python snapshots/{namespace}/{version}/{short_name}.py`[/bold]"
-    )
+    print(f"[green]2.[/green] Execute snapshot with [bold]`etls {namespace}/{version}/{short_name}`[/bold]")
     print(f"[green]3.[/green] Run dataset with [bold]`etlr {namespace}/{version}/{short_name} --grapher`[/bold]")
     print("[green]4.[/green] Run indicator upgrader in [bold]`make wizard`[/bold]")
     print("[green]5.[/green] Merge your PR, then [bold]delete[/bold] or archive the old dataset")

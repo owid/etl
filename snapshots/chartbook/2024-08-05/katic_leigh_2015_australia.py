@@ -4,7 +4,7 @@ Script to create a snapshot of dataset.
 The file comes from the original paper, available here: https://onlinelibrary.wiley.com/doi/abs/10.1111/roiw.12177.
 I use a xlsx file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1_WIBAjDLO7ufWuBFhRFr-GMl6dLgLz47-uF5EvC48ZY/edit?gid=0#gid=0
 After creating the file, run
-    python snapshots/chartbook/2024-08-05/katic_leigh_2015_australia.py --path-to-file <path-to-file>
+    etls chartbook/2024-08-05/katic_leigh_2015_australia --path-to-file <path-to-file>
 """
 
 from pathlib import Path
