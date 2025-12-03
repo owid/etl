@@ -6,6 +6,8 @@ into beautiful, interactive-looking markdown files compatible with Zensical/Mate
 """
 
 import json
+import re
+import textwrap
 from typing import Any, Dict, List
 
 
@@ -92,50 +94,99 @@ def render_json_example(example: Any, indent: int = 2) -> str:
 
 
 def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
-    """Build a complete request URL from base URL, path, and parameters."""
+    """Build a complete request URL from base URL, path, and parameters.
+
+    Handles both path parameters (e.g., {slug}) and query parameters.
+    """
     from urllib.parse import urlencode
 
-    url = f"{base_url}{path}"
-    if params:
-        url += "?" + urlencode(params)
+    # Separate path parameters from query parameters
+    path_params = {}
+    query_params = {}
+
+    # Find all path parameter placeholders in the path
+    path_param_names = re.findall(r"\{(\w+)\}", path)
+
+    for key, value in params.items():
+        if key in path_param_names:
+            path_params[key] = value
+        else:
+            query_params[key] = value
+
+    # Substitute path parameters
+    url_path = path
+    for param_name, param_value in path_params.items():
+        url_path = url_path.replace(f"{{{param_name}}}", str(param_value))
+
+    url = f"{base_url}{url_path}"
+    if query_params:
+        url += "?" + urlencode(query_params)
     return url
 
 
-def generate_code_samples(base_url: str, path: str, params: Dict[str, Any]) -> Dict[str, str]:
+def generate_code_samples(
+    base_url: str, path: str, params: Dict[str, Any], content_type: str = "application/json"
+) -> Dict[str, str]:
     """Generate code samples in multiple languages."""
     request_url = build_request_url(base_url, path, params)
 
+    # Separate path and query parameters
+    path_param_names = re.findall(r"\{(\w+)\}", path)
+    path_params = {k: v for k, v in params.items() if k in path_param_names}
+    query_params = {k: v for k, v in params.items() if k not in path_param_names}
+
+    # Substitute path parameters in the path
+    code_path = path
+    for param_name, param_value in path_params.items():
+        code_path = code_path.replace(f"{{{param_name}}}", str(param_value))
+
     samples = {}
+
+    # Determine response handler based on content type
+    is_text = content_type.startswith("text/")
 
     # HTTP/cURL
     samples["curl"] = f'curl "{request_url}"'
 
     # Python
-    params_dict_str = json.dumps(params, indent=4) if params else "{}"
-    samples["python"] = f"""import requests
+    params_dict_str = json.dumps(query_params, indent=4) if query_params else "{}"
+    if is_text:
+        samples["python"] = f"""import requests
 
 params = {params_dict_str}
-response = requests.get("{base_url}{path}", params=params)
+response = requests.get("{base_url}{code_path}", params=params)
+data = response.text"""
+    else:
+        samples["python"] = f"""import requests
+
+params = {params_dict_str}
+response = requests.get("{base_url}{code_path}", params=params)
 data = response.json()"""
 
     # JavaScript/TypeScript
-    params_obj = ", ".join(f'{k}: "{v}"' for k, v in params.items()) if params else ""
-    samples["javascript"] = f"""const params = new URLSearchParams({{ {params_obj} }});
-const response = await fetch(`{base_url}{path}?${{params}}`);
-const data = await response.json();"""
+    params_obj = ", ".join(f'{k}: "{v}"' for k, v in query_params.items()) if query_params else ""
+    response_handler = "text()" if is_text else "json()"
+    if params_obj:
+        samples["javascript"] = f"""const params = new URLSearchParams({{ {params_obj} }});
+const response = await fetch(`{base_url}{code_path}?${{params}}`);
+const data = await response.{response_handler};"""
+    else:
+        samples["javascript"] = f"""const response = await fetch("{base_url}{code_path}");
+const data = await response.{response_handler};"""
 
     # Rust
-    if params:
-        rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])' for k, v in params.items())
-        samples["rust"] = f"""let response = reqwest::get("{base_url}{path}")
+    rust_response = "text()" if is_text else "json::<serde_json::Value>()"
+    if query_params:
+        rust_params = "\n".join(f'        .query(&[("{k}", "{v}")])' for k, v in query_params.items())
+        samples["rust"] = f"""let response = reqwest::get("{base_url}{code_path}")
 {rust_params}
     .await?
-    .json::<serde_json::Value>()
+    .{rust_response}
     .await?;"""
     else:
-        samples["rust"] = f"""let response = reqwest::get("{base_url}{path}")
+        samples["rust"] = f"""let response = reqwest::get("{base_url}{code_path}")
     .await?
-    .json::<serde_json::Value>()
+    .{rust_response}
     .await?;"""
 
     return samples
@@ -214,6 +265,107 @@ def extract_params_from_example(example_data: Dict[str, Any]) -> Dict[str, Any]:
     return params
 
 
+def render_example_content(
+    example_data: Dict[str, Any],
+    base_url: str,
+    path: str,
+    content_type: str,
+    content_schema: Dict[str, Any],
+    indent: str = "    ",
+) -> List[str]:
+    """Render the content for a single example (request URL, code samples, response).
+
+    Args:
+        example_data: The example data from OpenAPI spec
+        base_url: Base URL for code samples
+        path: API endpoint path
+        content_type: Response content type
+        content_schema: Schema for the content
+        indent: Base indentation for the content
+
+    Returns:
+        List of lines for the example content
+    """
+    lines = []
+    nested_indent = indent + "    "  # For nested code blocks in tabs
+
+    # Add request URL
+    example_params = extract_params_from_example(example_data)
+    if base_url and example_params:
+        request_url = build_request_url(base_url, path, example_params)
+        lines.append(f"{indent}**Request:** `GET {request_url}`")
+        lines.append("")
+
+    # Add code samples
+    if base_url:
+        lines.append(f"{indent}**Code samples:**")
+        lines.append("")
+        code_samples = generate_code_samples(base_url, path, example_params, content_type)
+
+        lines.append(f'{indent}=== "cURL"')
+        lines.append("")
+        lines.append(f"{nested_indent}```bash")
+        lines.append(f"{nested_indent}{code_samples['curl']}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+        lines.append(f'{indent}=== "Python"')
+        lines.append("")
+        lines.append(f"{nested_indent}```python")
+        for line in code_samples["python"].split("\n"):
+            lines.append(f"{nested_indent}{line}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+        lines.append(f'{indent}=== "JavaScript"')
+        lines.append("")
+        lines.append(f"{nested_indent}```javascript")
+        for line in code_samples["javascript"].split("\n"):
+            lines.append(f"{nested_indent}{line}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+        lines.append(f'{indent}=== "Rust"')
+        lines.append("")
+        lines.append(f"{nested_indent}```rust")
+        for line in code_samples["rust"].split("\n"):
+            lines.append(f"{nested_indent}{line}")
+        lines.append(f"{nested_indent}```")
+        lines.append("")
+
+    # Add schema link if available
+    if "schema" in content_schema:
+        schema = content_schema["schema"]
+        if "$ref" in schema:
+            ref_name = schema["$ref"].split("/")[-1]
+            lines.append(f"{indent}**Response schema:** [`{ref_name}`](#{ref_name.lower()})")
+            lines.append("")
+
+    # Render response based on content type
+    response_value = example_data.get("value")
+    if content_type == "text/csv":
+        lines.append(f"{indent}```csv")
+        if isinstance(response_value, str):
+            for line in response_value.split("\n"):
+                if line:  # Skip empty lines
+                    lines.append(f"{indent}{line}")
+        lines.append(f"{indent}```")
+    elif content_type == "text/markdown":
+        lines.append(f"{indent}```markdown")
+        if isinstance(response_value, str):
+            for line in response_value.split("\n"):
+                lines.append(f"{indent}{line}")
+        lines.append(f"{indent}```")
+    else:
+        lines.append(f"{indent}```json")
+        for line in render_json_example(response_value).split("\n"):
+            lines.append(f"{indent}{line}")
+        lines.append(f"{indent}```")
+    lines.append("")
+
+    return lines
+
+
 def render_endpoint(
     path: str, method: str, operation: Dict[str, Any], components: Dict[str, Any], base_url: str = ""
 ) -> str:
@@ -245,7 +397,7 @@ def render_endpoint(
 
     # Description in an info admonition
     if "description" in operation:
-        lines.append(operation["description"])
+        lines.append(textwrap.dedent(operation["description"]).strip())
         lines.append("")
 
     # Parameters in a collapsible block
@@ -321,93 +473,29 @@ def render_endpoint(
                     lines.append(f"    **Content-Type:** `{content_type}`")
                     lines.append("")
 
-                    # Show examples with tabs if multiple
+                    # Show examples
                     if "examples" in content_schema:
                         examples = content_schema["examples"]
-                        if len(examples) > 1:
-                            # Use tabs for multiple examples - directly, without parent tab
-                            for idx, (example_name, example_data) in enumerate(examples.items()):
+                        use_tabs = len(examples) > 1
+
+                        for example_name, example_data in examples.items():
+                            if use_tabs:
+                                # Multiple examples: wrap in tabs with deeper indentation
                                 tab_title = example_data.get("summary", example_name)
                                 lines.append(f'    === "{tab_title}"')
                                 lines.append("")
-
-                                # Add request URL for this example
-                                example_params = extract_params_from_example(example_data)
-                                if base_url and example_params:
-                                    request_url = build_request_url(base_url, path, example_params)
-                                    lines.append(f"        **Request:** `GET {request_url}`")
-                                    lines.append("")
-
-                                # Add code samples
-                                lines.append("        **Code samples:**")
-                                lines.append("")
-                                code_samples = generate_code_samples(base_url, path, example_params)
-
-                                lines.append('        === "cURL"')
-                                lines.append("")
-                                lines.append("            ```bash")
-                                lines.append(f"            {code_samples['curl']}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                lines.append('        === "Python"')
-                                lines.append("")
-                                lines.append("            ```python")
-                                for line in code_samples["python"].split("\n"):
-                                    lines.append(f"            {line}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                lines.append('        === "JavaScript"')
-                                lines.append("")
-                                lines.append("            ```javascript")
-                                for line in code_samples["javascript"].split("\n"):
-                                    lines.append(f"            {line}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                lines.append('        === "Rust"')
-                                lines.append("")
-                                lines.append("            ```rust")
-                                for line in code_samples["rust"].split("\n"):
-                                    lines.append(f"            {line}")
-                                lines.append("            ```")
-                                lines.append("")
-
-                                # Response example
-                                if "x-schema-ref" in example_data:
-                                    schema_ref = example_data["x-schema-ref"]
-                                    ref_name = schema_ref.split("/")[-1]
-                                    response_type = f"[`{ref_name}`](#{ref_name.lower()})"
-                                    lines.append(f"        **Response ({response_type}):**")
-                                    lines.append("")
-                                else:
-                                    lines.append("        **Response:**")
-                                    lines.append("")
-
-                                lines.append("        ```json")
-                                for line in render_json_example(example_data["value"]).split("\n"):
-                                    lines.append(f"        {line}")
-                                lines.append("        ```")
-                                lines.append("")
-                        else:
-                            # Single example without tabs
-                            for example_name, example_data in examples.items():
+                                indent = "        "
+                            else:
+                                # Single example: just show the title
                                 lines.append(f"    **Example: {example_data.get('summary', example_name)}**")
                                 lines.append("")
+                                indent = "    "
 
-                                # Add request URL
-                                example_params = extract_params_from_example(example_data)
-                                if base_url and example_params:
-                                    request_url = build_request_url(base_url, path, example_params)
-                                    lines.append(f"    **Request:** `GET {request_url}`")
-                                    lines.append("")
-
-                                lines.append("    ```json")
-                                for line in render_json_example(example_data["value"]).split("\n"):
-                                    lines.append(f"    {line}")
-                                lines.append("    ```")
-                                lines.append("")
+                            lines.extend(
+                                render_example_content(
+                                    example_data, base_url, path, content_type, content_schema, indent
+                                )
+                            )
 
                     # Show example (singular)
                     elif "example" in content_schema:
@@ -418,6 +506,14 @@ def render_endpoint(
                             lines.append(f"    {line}")
                         lines.append("    ```")
                         lines.append("")
+
+                    # If no examples but we have a schema reference, show it
+                    elif "schema" in content_schema:
+                        schema = content_schema["schema"]
+                        if "$ref" in schema:
+                            ref_name = schema["$ref"].split("/")[-1]
+                            lines.append(f"    **Schema:** [`{ref_name}`](#{ref_name.lower()})")
+                            lines.append("")
 
     lines.append("---")
     lines.append("")
