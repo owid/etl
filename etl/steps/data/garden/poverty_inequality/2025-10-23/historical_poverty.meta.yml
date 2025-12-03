@@ -535,3 +535,18 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+
+  gini_mean:
+    variables:
+      gini:
+        title: Gini coefficient
+        unit: ""
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+      mean:
+        title: Mean
+        unit: "international-$ in 2021 prices"
+        short_unit: "$"
+        display:
+          numDecimalPlaces: 2

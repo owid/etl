@@ -214,7 +214,7 @@ def run() -> None:
     tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
     # Prepare mean and gini data for extrapolation
-    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
+    tb_gini_mean = prepare_mean_gini_data(tb=tb_gini_mean, tb_gdp=tb_gdp)
 
     ###############################################################################
     # 2.1 INTERPOLATING QUANTILES BETWEEN YEARS WITH GINIS
@@ -275,6 +275,14 @@ def run() -> None:
     )
 
     ###############################################################################
+    # EDIT TABLE WITH GINI AND MEAN VALUES
+    ###############################################################################
+
+    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb_gini_mean=tb_gini_mean)
+
+    ###############################################################################
+    # FORMAT AND SAVE DATA
+    ###############################################################################
 
     tb_constant_inequality = tb_constant_inequality.format(
         ["country", "year", "poverty_line"], short_name="constant_inequality"
@@ -308,6 +316,8 @@ def run() -> None:
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
 
+    tb_gini_mean = tb_gini_mean.format(["country", "year"], short_name="gini_mean")
+
     #
     # Save outputs.
     #
@@ -324,6 +334,7 @@ def run() -> None:
             # tb_thousand_bins_constant_inequality,
             # tb_thousand_bins_interpolated_quantiles,
             tb_thousand_bins_interpolated_ginis,
+            tb_gini_mean,
         ],
         default_metadata=ds_thousand_bins.metadata,
         repack=False,
@@ -1289,12 +1300,12 @@ def compare_countries_available_in_two_tables(
     return missing_in_tb_1, missing_in_tb_2
 
 
-def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
+def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
     """
     Prepare mean income and Gini coefficient data for extrapolation.
     It consolidates mean and Gini columns based on priority rules, interpolates missing values, and extrapolates means using GDP growth factors.
     """
-    tb_gini_mean = tb_gini_mean.copy()
+    tb_gini_mean = tb.copy()
     tb_gdp = tb_gdp.copy()
 
     # Check countries missing in either table
@@ -1325,6 +1336,12 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
     # Generate gini column using priority: survey > filled > van_zanden
     tb_gini_mean[["gini", "gini_origin"]] = tb_gini_mean.apply(select_gini, axis=1)
     tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
+
+    # Copy metadata from original columns
+    tb_gini_mean["mean"] = tb_gini_mean["mean"].copy_metadata(tb["mean_filled"] + tb["mean_survey"])
+    tb_gini_mean["gini"] = tb_gini_mean["gini"].copy_metadata(
+        tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]
+    )
 
     # Keep only relevant columns
     tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
@@ -1562,8 +1579,16 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
     tb_gini_mean = pd.concat([tb_before_pip, tb_after_pip], ignore_index=True)
     tb_gini_mean = tb_gini_mean.sort_values(["country", "year"]).reset_index(drop=True)
 
+    # Add the regions available from tb_gdp to tb_gini_mean
+    tb_gini_mean = pr.merge(
+        tb_gini_mean,
+        tb_gdp[["country", "region"]],
+        on="country",
+        how="left",
+    )
+
     # Keep only relevant columns
-    tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini", "mean_original", "gini_original"]]
+    tb_gini_mean = tb_gini_mean[["country", "year", "region", "mean", "gini", "mean_original", "gini_original"]]
 
     # Check if there are any remaining NaN values in mean or gini
     remaining_nans = tb_gini_mean[tb_gini_mean["mean"].isna() | tb_gini_mean["gini"].isna()]
@@ -2040,3 +2065,92 @@ def compare_headcount_ratios_across_methods(
     ]
 
     return tb_comparison
+
+
+def prepare_and_aggregate_gini_mean_data(tb_gini_mean: Table) -> Table:
+    """
+    Prepare historical Gini and mean data to create a long-run mean chart.
+    Also, create aggregations at world and region levels.
+    """
+
+    tb_gini_mean = tb_gini_mean[["country", "year", "region", "mean", "gini"]]
+
+    # Add population
+    tb_gini_mean = paths.regions.add_population(
+        tb=tb_gini_mean,
+        population_col="population",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+    )
+
+    # Calculate total income for each country-year
+    tb_gini_mean["total_income"] = tb_gini_mean["mean"] * tb_gini_mean["population"]
+
+    # Aggregate to region level
+    tb_region = (
+        tb_gini_mean.groupby(["region", "year"])
+        .agg(
+            total_income_region=("total_income", "sum"),
+            total_population_region=("population", "sum"),
+        )
+        .rename(columns={"region": "country"})
+        .reset_index()
+    )
+
+    tb_region["mean"] = tb_region["total_income_region"] / tb_region["total_population_region"]
+
+    # Calculate the same for world level
+    tb_world = (
+        tb_gini_mean.groupby(["year"])
+        .agg(
+            total_income_world=("total_income", "sum"),
+            total_population_world=("population", "sum"),
+        )
+        .reset_index()
+    )
+
+    # Add country column with value "World"
+    tb_world["country"] = "World"
+
+    tb_world["mean"] = tb_world["total_income_world"] / tb_world["total_population_world"]
+
+    # Aggregate US and Canada
+    tb_us_can = tb_gini_mean[tb_gini_mean["country"].isin(["United States", "Canada"])].copy()
+    tb_us_can = (
+        tb_us_can.groupby(["year"])
+        .agg(
+            total_income_us_can=("total_income", "sum"),
+            total_population_us_can=("population", "sum"),
+        )
+        .reset_index()
+    )
+
+    tb_us_can["country"] = "US and Canada"
+
+    tb_us_can["mean"] = tb_us_can["total_income_us_can"] / tb_us_can["total_population_us_can"]
+
+    # Aggregate Australia and New Zealand
+    tb_aus_nz = tb_gini_mean[tb_gini_mean["country"].isin(["Australia", "New Zealand"])].copy()
+    tb_aus_nz = (
+        tb_aus_nz.groupby(["year"])
+        .agg(
+            total_income_aus_nz=("total_income", "sum"),
+            total_population_aus_nz=("population", "sum"),
+        )
+        .reset_index()
+    )
+
+    tb_aus_nz["country"] = "Australia and New Zealand"
+
+    tb_aus_nz["mean"] = tb_aus_nz["total_income_aus_nz"] / tb_aus_nz["total_population_aus_nz"]
+
+    # Concatenate all together
+    tb_gini_mean = pr.concat([tb_gini_mean, tb_region, tb_world, tb_us_can, tb_aus_nz], ignore_index=True)
+
+    # Keep only relevant columns
+    tb_gini_mean = (
+        tb_gini_mean[["country", "year", "mean", "gini"]].sort_values(["country", "year"]).reset_index(drop=True)
+    )
+
+    return tb_gini_mean

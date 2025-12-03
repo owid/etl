@@ -23,6 +23,8 @@ def run() -> None:
 
     tb_comparison = ds_garden.read("comparison", reset_index=False)
 
+    tb_gini_mean = ds_garden.read("gini_mean", reset_index=False)
+
     #
     # Save outputs.
     #
@@ -36,6 +38,7 @@ def run() -> None:
             tb_population_interpolated_ginis,
             tb_population_interpolated_quantiles,
             tb_comparison,
+            tb_gini_mean,
         ],
         default_metadata=ds_garden.metadata,
     )
