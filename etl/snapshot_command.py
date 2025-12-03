@@ -3,6 +3,7 @@
 import importlib.util
 import inspect
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
@@ -70,7 +71,6 @@ def check_for_version_ambiguity(dataset_name: str) -> None:
 
     # Group DVC files by (namespace, short_name) to find different versions
     # We want to detect if the same snapshot exists in multiple versions
-    from collections import defaultdict
 
     # Extract version from each path
     versions_by_snapshot: defaultdict[str, list[str]] = defaultdict(list)
