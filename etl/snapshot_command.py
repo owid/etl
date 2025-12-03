@@ -16,6 +16,92 @@ from etl.snapshot import Snapshot
 log = structlog.get_logger()
 
 
+def check_for_version_ambiguity(dataset_name: str) -> None:
+    """Check if there are multiple versions of the snapshot and fail if so.
+
+    This prevents accidentally overwriting an existing snapshot when multiple
+    versions exist for the same short_name.
+
+    Args:
+        dataset_name: Dataset path in one of several formats
+
+    Raises:
+        click.ClickException: If multiple versions are found
+    """
+    # Remove snapshot:// prefix if supplied by user
+    dataset_name = dataset_name.removeprefix("snapshot://")
+
+    # Handle full file path with snapshots/ prefix
+    if dataset_name.startswith("snapshots/"):
+        dataset_name = dataset_name.removeprefix("snapshots/")
+
+    # Remove any file extension if present (e.g., .py, .csv, .xlsx)
+    if "." in dataset_name:
+        # Find the last dot and check if it's likely a file extension
+        dot_index = dataset_name.rfind(".")
+        if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
+            dataset_name = dataset_name[:dot_index]
+
+    # Count the number of path separators to determine the type of path
+    path_parts = dataset_name.split("/")
+
+    # Only check for ambiguity when the path is partial (not a full path)
+    # Full paths (3 parts: namespace/version/short_name) are unambiguous
+    if len(path_parts) == 3:
+        return
+
+    # For partial paths, search for all matching .dvc files across different versions
+    if len(path_parts) == 2:
+        # Partial path: version/short_name
+        # Check if there are multiple namespaces with this version/short_name
+        version, filename = path_parts
+        pattern = f"*/{version}/{filename}.*.dvc"
+        dvc_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
+
+    elif len(path_parts) == 1:
+        # Just short_name - search for all versions
+        filename = path_parts[0]
+        pattern = f"**/{filename}.*.dvc"
+        dvc_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
+
+    else:
+        # Invalid or unknown format, let other functions handle it
+        return
+
+    # Group DVC files by (namespace, short_name) to find different versions
+    # We want to detect if the same snapshot exists in multiple versions
+    from collections import defaultdict
+
+    # Extract version from each path
+    versions_by_snapshot: defaultdict[str, list[str]] = defaultdict(list)
+    for dvc_file in dvc_files:
+        relative_path = dvc_file.relative_to(paths.SNAPSHOTS_DIR)
+        parts = relative_path.parts
+        if len(parts) >= 3:
+            namespace = parts[0]
+            version = parts[1]
+            # Get the filename without .dvc extension
+            filename_with_ext = relative_path.stem  # e.g., "battery_cell_prices.xlsx"
+            snapshot_key = f"{namespace}/{filename_with_ext}"
+            versions_by_snapshot[snapshot_key].append(version)
+
+    # Check if any snapshot has multiple versions
+    for snapshot_key, versions in versions_by_snapshot.items():
+        if len(versions) > 1:
+            # Multiple versions found - this is ambiguous
+            log.error(f"Multiple versions found for '{snapshot_key}':")
+            for version in sorted(versions):
+                namespace = snapshot_key.split("/")[0]
+                filename_part = "/".join(snapshot_key.split("/")[1:])
+                log.error(f"  {namespace}/{version}/{filename_part}")
+
+            raise click.ClickException(
+                f"Multiple snapshot versions found for '{dataset_name}'. "
+                "Please specify the full path including the version (e.g., namespace/version/short_name) "
+                "to disambiguate which version you want to use."
+            )
+
+
 @click.command("snapshot")
 @click.argument("dataset_name", type=str, metavar="DATASET_PATH")
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
@@ -52,6 +138,9 @@ def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str] = 
         etl snapshot dataset_name --skip-upload
         etls dataset_name --skip-upload
     """
+    # Check for version ambiguity before proceeding
+    check_for_version_ambiguity(dataset_name)
+
     # Find the snapshot script
     script_path = find_snapshot_script(dataset_name)
 
