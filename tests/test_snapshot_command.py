@@ -27,7 +27,9 @@ class TestCheckForVersionAmbiguity:
         mock_paths.SNAPSHOTS_DIR = mock_snapshots_dir
 
         mock_file = MagicMock()
-        mock_file.relative_to.return_value = Path("benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc")
+        mock_file.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc"
+        )
         mock_file.stem = "battery_cell_prices.xlsx"
         mock_file.parts = ("benchmark_mineral_intelligence", "2024-11-29", "battery_cell_prices.xlsx.dvc")
 
@@ -45,12 +47,16 @@ class TestCheckForVersionAmbiguity:
 
         # Create two mock DVC files for different versions
         mock_file1 = MagicMock()
-        mock_file1.relative_to.return_value = Path("benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc")
+        mock_file1.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc"
+        )
         mock_file1.stem = "battery_cell_prices.xlsx"
         mock_file1.parts = ("benchmark_mineral_intelligence", "2024-11-29", "battery_cell_prices.xlsx.dvc")
 
         mock_file2 = MagicMock()
-        mock_file2.relative_to.return_value = Path("benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx.dvc")
+        mock_file2.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx.dvc"
+        )
         mock_file2.stem = "battery_cell_prices.xlsx"
         mock_file2.parts = ("benchmark_mineral_intelligence", "2025-12-02", "battery_cell_prices.xlsx.dvc")
 
@@ -72,12 +78,16 @@ class TestCheckForVersionAmbiguity:
 
         # Create two mock DVC files for different versions
         mock_file1 = MagicMock()
-        mock_file1.relative_to.return_value = Path("benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc")
+        mock_file1.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc"
+        )
         mock_file1.stem = "battery_cell_prices.xlsx"
         mock_file1.parts = ("benchmark_mineral_intelligence", "2024-11-29", "battery_cell_prices.xlsx.dvc")
 
         mock_file2 = MagicMock()
-        mock_file2.relative_to.return_value = Path("benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx.dvc")
+        mock_file2.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx.dvc"
+        )
         mock_file2.stem = "battery_cell_prices.xlsx"
         mock_file2.parts = ("benchmark_mineral_intelligence", "2025-12-02", "battery_cell_prices.xlsx.dvc")
 
@@ -98,12 +108,16 @@ class TestCheckForVersionAmbiguity:
 
         # Create mock DVC files for different snapshots (not different versions of the same)
         mock_file1 = MagicMock()
-        mock_file1.relative_to.return_value = Path("benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc")
+        mock_file1.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx.dvc"
+        )
         mock_file1.stem = "battery_cell_prices.xlsx"
         mock_file1.parts = ("benchmark_mineral_intelligence", "2024-11-29", "battery_cell_prices.xlsx.dvc")
 
         mock_file2 = MagicMock()
-        mock_file2.relative_to.return_value = Path("benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx.dvc")
+        mock_file2.relative_to.return_value = Path(
+            "benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx.dvc"
+        )
         mock_file2.stem = "battery_cell_prices_by_chemistry.xlsx"
         mock_file2.parts = ("benchmark_mineral_intelligence", "2024-11-29", "battery_cell_prices_by_chemistry.xlsx.dvc")
 
