@@ -55,7 +55,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 
 # Show warnings and comparisons
-SHOW_WARNINGS = True
+SHOW_WARNINGS = False
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
