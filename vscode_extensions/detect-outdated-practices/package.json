@@ -2,7 +2,7 @@
   "name": "detect-outdated-practices",
   "displayName": "Detect Outdated Practices",
   "description": "Detects and highlights outdated code practices in Python files",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "owid",
   "repository": {
     "type": "git",
@@ -11,7 +11,9 @@
   "engines": {
     "vscode": "^1.100.0"
   },
-  "categories": ["Linters"],
+  "categories": [
+    "Linters"
+  ],
   "activationEvents": [
     "onLanguage:python"
   ],
@@ -20,7 +22,9 @@
     "languages": [
       {
         "id": "python",
-        "extensions": [".py"]
+        "extensions": [
+          ".py"
+        ]
       }
     ]
   },

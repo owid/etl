@@ -36,7 +36,3 @@ def main(upload: bool, path_to_file: str) -> None:
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
-
-
-if __name__ == "__main__":
-    main()

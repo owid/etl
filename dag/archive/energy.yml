@@ -627,3 +627,19 @@ steps:
   #
   data://grapher/lazard/2025-02-25/levelized_cost_of_energy:
     - data://garden/lazard/2025-02-25/levelized_cost_of_energy
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
+    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx
+    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
+    - data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://grapher/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
+    - data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices

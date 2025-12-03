@@ -14,13 +14,13 @@ meta:
       Benchmark Mineral Intelligence - Batteries prices by chemistry (2024).
 
     # Files
-    url_main: https://www.benchmarkminerals.com/lithium-ion-batteries/lithium-ion-batteries-prices/table?utm_source=Our%20World%20in%20Data&utm_medium=Website&utm_campaign=Battery%20cell%20data
+    url_main: https://www.benchmarkminerals.com/lithium/prices?utm_campaign=132909249-Media%20Appearances&utm_source=Our%20World%20in%20Data&utm_medium=Referrals&utm_content=Our%20World%20in%20Data
     date_accessed: 2024-11-29
 
     # License
     license:
       name: © Benchmark Mineral Intelligence 2024
-      url: https://www.benchmarkminerals.com/lithium-ion-batteries/lithium-ion-batteries-prices/table
+      url: https://www.benchmarkminerals.com/lithium/prices
 
   is_public: false
 outs:

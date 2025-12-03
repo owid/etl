@@ -53,22 +53,6 @@ steps:
   data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
     - data://garden/iea/2024-11-20/fossil_fuel_subsidies
   #
-  # Benchmark Mineral Intelligence - Battery cell prices.
-  #
-  data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
-    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx
-    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx
-  #
-  # Benchmark Mineral Intelligence - Battery cell prices.
-  #
-  data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
-    - data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
-  #
-  # Benchmark Mineral Intelligence - Battery cell prices.
-  #
-  data-private://grapher/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
-    - data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
-  #
   # Eurostat - Harmonised index of consumer prices (HICP)
   #
   data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
@@ -389,3 +373,19 @@ steps:
   #
   export://s3/energy_data/latest/owid_energy:
     - data://garden/energy_data/2025-11-11/owid_energy
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://meadow/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
+    - snapshot-private://benchmark_mineral_intelligence/2025-12-02/battery_cell_prices_by_chemistry.xlsx
+    - snapshot-private://benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://garden/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
+    - data-private://meadow/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://grapher/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
+    - data-private://garden/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices

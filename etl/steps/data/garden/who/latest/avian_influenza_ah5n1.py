@@ -37,8 +37,8 @@ def run() -> None:
     # Process data.
     #
     mask = tb["range"] == "All"
-    tb_year = tb[mask].drop(columns=["range"])
-    tb_month = tb[~mask].drop(columns=["range"])
+    tb_year = tb.loc[mask].drop(columns=["range"])
+    tb_month = tb.loc[~mask].drop(columns=["range"])
 
     # Obtain date
     ## Yearly data
@@ -53,8 +53,8 @@ def run() -> None:
     tb_month = tb_month.drop(columns=["month"])
 
     # Harmonize country names
-    tb_month = geo.harmonize_countries(df=tb_month, countries_file=paths.country_mapping_path)
-    tb_year = geo.harmonize_countries(df=tb_year, countries_file=paths.country_mapping_path)
+    tb_month = paths.regions.harmonize_names(tb=tb_month)
+    tb_year = paths.regions.harmonize_names(tb=tb_year)
 
     # Add aggregates
     tb_month = add_regions(tb_month, ds_regions)
