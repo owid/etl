@@ -302,9 +302,9 @@ def run() -> None:
     tb_population_interpolated_ginis = tb_population_interpolated_ginis.format(
         ["country", "year"], short_name="population_interpolated_ginis"
     )
-    # tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
-    # )
+    tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
+        ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
+    )
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
 
@@ -323,7 +323,7 @@ def run() -> None:
             tb_population_interpolated_ginis,
             # tb_thousand_bins_constant_inequality,
             # tb_thousand_bins_interpolated_quantiles,
-            # tb_thousand_bins_interpolated_ginis,
+            tb_thousand_bins_interpolated_ginis,
         ],
         default_metadata=ds_thousand_bins.metadata,
         repack=False,
