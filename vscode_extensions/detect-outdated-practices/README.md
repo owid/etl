@@ -92,19 +92,19 @@ After making changes to the extension code:
 ### Option 1: Compile and Install in One Command (Fastest)
 ```bash
 # From project root - compile, package, and install immediately
-make vsc-ext-compile EXT=detect-outdated-practices INSTALL=1
+make vsce-compile EXT=detect-outdated-practices INSTALL=1
 
 # Or bump version first (patch, minor, major)
-make vsc-ext-compile EXT=detect-outdated-practices BUMP=patch INSTALL=1
+make vsce-compile EXT=detect-outdated-practices BUMP=patch INSTALL=1
 ```
 
 ### Option 2: Compile Then Sync All Extensions
 ```bash
 # Step 1: Compile and package (without version bump)
-make vsc-ext-compile EXT=detect-outdated-practices
+make vsce-compile EXT=detect-outdated-practices
 
 # Step 2: Install all custom extensions with latest versions
-make vsc-ext-sync
+make vsce-sync
 ```
 
 ### Option 3: Manual Method
@@ -118,13 +118,13 @@ mv *.vsix install/
 
 # Then install
 cd ../..
-make vsc-ext-sync
+make vsce-sync
 ```
 
 **Notes:**
 - Without `BUMP`, the current version is kept
 - `INSTALL=1` installs immediately after compilation
-- `make vsc-ext-sync` force-reinstalls all custom extensions with their latest versions
+- `make vsce-sync` force-reinstalls all custom extensions with their latest versions
 
 ## Pattern Configuration
 
