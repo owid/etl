@@ -55,7 +55,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 
 # Show warnings and comparisons
-SHOW_WARNINGS = False
+SHOW_WARNINGS = True
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -185,16 +185,20 @@ def run() -> None:
     ###############################################################################
 
     # Perform backward extrapolation
-    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
+    tb_thousand_bins_constant_inequality = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     # Calculate poverty measures
-    tb = calculate_poverty_measures(tb=tb_extended, maddison_world_years=maddison_world_years)
+    tb_constant_inequality = calculate_poverty_measures(
+        tb=tb_thousand_bins_constant_inequality, maddison_world_years=maddison_world_years
+    )
 
     # Create stacked variables for stacked area/bar charts
-    tb = create_stacked_variables(tb=tb)
+    tb_constant_inequality = create_stacked_variables(tb=tb_constant_inequality)
 
     # Add population comparison with OWID population data
-    tb, tb_population = add_population_comparison(tb_poverty=tb)
+    tb_constant_inequality, tb_population_constant_inequality = add_population_comparison(
+        tb_poverty=tb_constant_inequality
+    )
 
     ###############################################################################
     # 2. WITH INEQUALITY CHANGES
@@ -213,51 +217,51 @@ def run() -> None:
     tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
 
     ###############################################################################
-    # 2.1 USING EXTRAPOLATED MEANS (BUT NOT GINIS) AND INTERPOLATING THOUSAND BINS
+    # 2.1 INTERPOLATING QUANTILES BETWEEN YEARS WITH GINIS
     ###############################################################################
 
     # Create 1000 bins from inter/extrapolated means and original Ginis, except for years between the earliest year and first year with data
-    tb_thousand_bins_from_interpolated_mean = expand_means_and_ginis_to_thousand_bins(
+    tb_thousand_bins_interpolated_quantiles = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini_original"
     )
 
-    tb_thousand_bins_from_interpolated_mean = interpolate_quantiles_in_thousand_bins(
-        tb_thousand_bins_from_interpolated_mean=tb_thousand_bins_from_interpolated_mean, tb_gini_mean=tb_gini_mean
+    tb_thousand_bins_interpolated_quantiles = interpolate_quantiles_in_thousand_bins(
+        tb_thousand_bins_interpolated_quantiles=tb_thousand_bins_interpolated_quantiles, tb_gini_mean=tb_gini_mean
     )
 
     # Calculate poverty measures
-    tb_from_interpolated_mean = calculate_poverty_measures(
-        tb=tb_thousand_bins_from_interpolated_mean, maddison_world_years=maddison_world_years
+    tb_interpolated_quantiles = calculate_poverty_measures(
+        tb=tb_thousand_bins_interpolated_quantiles, maddison_world_years=maddison_world_years
     )
 
     # Create stacked variables for stacked area/bar charts
-    tb_from_interpolated_mean = create_stacked_variables(tb=tb_from_interpolated_mean)
+    tb_interpolated_quantiles = create_stacked_variables(tb=tb_interpolated_quantiles)
 
     # Add population comparison with OWID population data
-    tb_from_interpolated_mean, tb_from_interpolated_mean_population = add_population_comparison(
-        tb_poverty=tb_from_interpolated_mean
+    tb_interpolated_quantiles, tb_population_interpolated_quantiles = add_population_comparison(
+        tb_poverty=tb_interpolated_quantiles
     )
 
     ###############################################################################
-    # 2.2 USING EXTRAPOLATED MEANS AND GINIS
+    # 2.2 INTERPOLATING GINI
     ###############################################################################
 
     # Create 1000 bins from mean and gini data
-    tb_thousand_bins_from_interpolated_mean_gini = expand_means_and_ginis_to_thousand_bins(
+    tb_thousand_bins_interpolated_ginis = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
     )
 
     # Calculate poverty measures
-    tb_from_interpolated_mean_gini = calculate_poverty_measures(
-        tb=tb_thousand_bins_from_interpolated_mean_gini, maddison_world_years=maddison_world_years
+    tb_interpolated_ginis = calculate_poverty_measures(
+        tb=tb_thousand_bins_interpolated_ginis, maddison_world_years=maddison_world_years
     )
 
     # Create stacked variables for stacked area/bar charts
-    tb_from_interpolated_mean_gini = create_stacked_variables(tb=tb_from_interpolated_mean_gini)
+    tb_interpolated_ginis = create_stacked_variables(tb=tb_interpolated_ginis)
 
     # Add population comparison with OWID population data
-    tb_from_interpolated_mean_gini, tb_from_interpolated_mean_gini_population = add_population_comparison(
-        tb_poverty=tb_from_interpolated_mean_gini
+    tb_interpolated_ginis, tb_population_interpolated_ginis = add_population_comparison(
+        tb_poverty=tb_interpolated_ginis
     )
 
     ###############################################################################
@@ -265,37 +269,41 @@ def run() -> None:
     ###############################################################################
 
     tb_comparison = compare_headcount_ratios_across_methods(
-        tb_constant_inequality=tb,
-        tb_mean_gini=tb_from_interpolated_mean_gini,
-        tb_mean_only=tb_from_interpolated_mean,
+        tb_constant_inequality=tb_constant_inequality,
+        tb_interpolated_quantiles=tb_interpolated_quantiles,
+        tb_interpolated_ginis=tb_interpolated_ginis,
     )
 
     ###############################################################################
 
-    tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
-    tb_population = tb_population.format(["country", "year"], short_name="population")
-    # tb_extended = tb_extended.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
+    tb_constant_inequality = tb_constant_inequality.format(
+        ["country", "year", "poverty_line"], short_name="constant_inequality"
+    )
+    tb_population_constant_inequality = tb_population_constant_inequality.format(
+        ["country", "year"], short_name="population_constant_inequality"
+    )
+    # tb_thousand_bins_constant_inequality = tb_thousand_bins_constant_inequality.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_constant_inequality"
     # )
 
-    tb_from_interpolated_mean_gini = tb_from_interpolated_mean_gini.format(
-        ["country", "year", "poverty_line"], short_name="historical_poverty_from_interpolated_mean_gini"
+    tb_interpolated_quantiles = tb_interpolated_quantiles.format(
+        ["country", "year", "poverty_line"], short_name="interpolated_quantiles"
     )
-    tb_from_interpolated_mean_gini_population = tb_from_interpolated_mean_gini_population.format(
-        ["country", "year"], short_name="population_from_interpolated_mean_gini"
+    tb_population_interpolated_quantiles = tb_population_interpolated_quantiles.format(
+        ["country", "year"], short_name="population_interpolated_quantiles"
     )
-    # tb_thousand_bins_from_interpolated_mean_gini = tb_thousand_bins_from_interpolated_mean_gini.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean_gini"
+    # tb_thousand_bins_interpolated_quantiles = tb_thousand_bins_interpolated_quantiles.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_quantiles"
     # )
 
-    tb_from_interpolated_mean = tb_from_interpolated_mean.format(
-        ["country", "year", "poverty_line"], short_name="historical_poverty_from_interpolated_mean"
+    tb_interpolated_ginis = tb_interpolated_ginis.format(
+        ["country", "year", "poverty_line"], short_name="interpolated_ginis"
     )
-    tb_from_interpolated_mean_population = tb_from_interpolated_mean_population.format(
-        ["country", "year"], short_name="population_from_interpolated_mean"
+    tb_population_interpolated_ginis = tb_population_interpolated_ginis.format(
+        ["country", "year"], short_name="population_interpolated_ginis"
     )
-    # tb_thousand_bins_from_interpolated_mean = tb_thousand_bins_from_interpolated_mean.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution_from_interpolated_mean"
+    # tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
     # )
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
@@ -306,16 +314,16 @@ def run() -> None:
     # Create dataset
     ds_garden = paths.create_dataset(
         tables=[
-            tb,
-            tb_population,
-            tb_from_interpolated_mean_gini,
-            tb_from_interpolated_mean_gini_population,
-            tb_from_interpolated_mean,
-            tb_from_interpolated_mean_population,
+            tb_constant_inequality,
+            tb_interpolated_quantiles,
+            tb_interpolated_ginis,
             tb_comparison,
-            # tb_extended,
-            # tb_thousand_bins_from_interpolated_mean_gini,
-            # tb_thousand_bins_from_interpolated_mean,
+            tb_population_constant_inequality,
+            tb_population_interpolated_quantiles,
+            tb_population_interpolated_ginis,
+            # tb_thousand_bins_constant_inequality,
+            # tb_thousand_bins_interpolated_quantiles,
+            # tb_thousand_bins_interpolated_ginis,
         ],
         default_metadata=ds_thousand_bins.metadata,
         repack=False,
@@ -1784,7 +1792,7 @@ def gini_to_sigma(gini):
 
 
 def interpolate_quantiles_in_thousand_bins(
-    tb_thousand_bins_from_interpolated_mean: Table, tb_gini_mean: Table
+    tb_thousand_bins_interpolated_quantiles: Table, tb_gini_mean: Table
 ) -> Table:
     """
     Interpolate missing values in the 1000-binned income distribution table.
@@ -1793,16 +1801,16 @@ def interpolate_quantiles_in_thousand_bins(
     We do this to complete country series where Gini is not available for all years, but mean is.
     """
 
-    tb_thousand_bins_from_interpolated_mean = tb_thousand_bins_from_interpolated_mean.copy()
+    tb_thousand_bins_interpolated_quantiles = tb_thousand_bins_interpolated_quantiles.copy()
 
     # Separate PIP-based data from extrapolated data
     # I am keeping LATEST_YEAR in both tables so I can interpolate propertly. Then I will reinstate the original bins
-    tb_thousand_bins = tb_thousand_bins_from_interpolated_mean[
-        tb_thousand_bins_from_interpolated_mean["year"] >= LATEST_YEAR
+    tb_thousand_bins = tb_thousand_bins_interpolated_quantiles[
+        tb_thousand_bins_interpolated_quantiles["year"] >= LATEST_YEAR
     ].reset_index(drop=True)
 
-    tb_expanded = tb_thousand_bins_from_interpolated_mean[
-        tb_thousand_bins_from_interpolated_mean["year"] <= LATEST_YEAR
+    tb_expanded = tb_thousand_bins_interpolated_quantiles[
+        tb_thousand_bins_interpolated_quantiles["year"] <= LATEST_YEAR
     ].reset_index(drop=True)
 
     # Also have one table with data before LATEST_YEAR_PIP_FILLED so we can drop countries without data
@@ -1926,7 +1934,7 @@ def interpolate_quantiles_in_thousand_bins(
 
 
 def compare_headcount_ratios_across_methods(
-    tb_constant_inequality: Table, tb_mean_gini: Table, tb_mean_only: Table
+    tb_constant_inequality: Table, tb_interpolated_quantiles: Table, tb_interpolated_ginis: Table
 ) -> Table:
     """
     Compare headcount_ratio values across three different estimation methods.
@@ -1947,39 +1955,40 @@ def compare_headcount_ratios_across_methods(
     """
     # Keep only relevant columns for comparison
     tb_constant = tb_constant_inequality[["country", "year", "poverty_line", "headcount_ratio"]].copy()
-    tb_mean_gini_comp = tb_mean_gini[["country", "year", "poverty_line", "headcount_ratio"]].copy()
-    tb_mean_only_comp = tb_mean_only[["country", "year", "poverty_line", "headcount_ratio"]].copy()
+    tb_ginis = tb_interpolated_ginis[["country", "year", "poverty_line", "headcount_ratio"]].copy()
+    tb_quantiles = tb_interpolated_quantiles[["country", "year", "poverty_line", "headcount_ratio"]].copy()
 
     # Merge all three tables
     tb_comparison = pr.merge(
         tb_constant,
-        tb_mean_gini_comp,
+        tb_ginis,
         on=["country", "year", "poverty_line"],
         how="outer",
-        suffixes=("_constant", "_mean_gini"),
+        suffixes=("_constant", "_ginis"),
     )
 
     tb_comparison = pr.merge(
         tb_comparison,
-        tb_mean_only_comp,
+        tb_quantiles,
         on=["country", "year", "poverty_line"],
         how="outer",
     )
 
     # Rename the last headcount_ratio column
-    tb_comparison = tb_comparison.rename(columns={"headcount_ratio": "headcount_ratio_mean_only"})
+    tb_comparison = tb_comparison.rename(columns={"headcount_ratio": "headcount_ratio_quantiles"})
 
     # Calculate absolute differences
-    tb_comparison["diff_mean_gini_vs_constant"] = (
-        tb_comparison["headcount_ratio_mean_gini"] - tb_comparison["headcount_ratio_constant"]
+
+    tb_comparison["diff_quantiles_vs_constant"] = (
+        tb_comparison["headcount_ratio_quantiles"] - tb_comparison["headcount_ratio_constant"]
     ).abs()
 
-    tb_comparison["diff_mean_only_vs_constant"] = (
-        tb_comparison["headcount_ratio_mean_only"] - tb_comparison["headcount_ratio_constant"]
+    tb_comparison["diff_ginis_vs_constant"] = (
+        tb_comparison["headcount_ratio_ginis"] - tb_comparison["headcount_ratio_constant"]
     ).abs()
 
-    tb_comparison["diff_mean_gini_vs_mean_only"] = (
-        tb_comparison["headcount_ratio_mean_gini"] - tb_comparison["headcount_ratio_mean_only"]
+    tb_comparison["diff_quantiles_vs_ginis"] = (
+        tb_comparison["headcount_ratio_quantiles"] - tb_comparison["headcount_ratio_ginis"]
     ).abs()
 
     # Log summary statistics if SHOW_WARNINGS is enabled
@@ -1989,27 +1998,29 @@ def compare_headcount_ratios_across_methods(
             tb_pl = tb_comparison[tb_comparison["poverty_line"] == str(poverty_line)].copy()
 
             if len(tb_pl) > 0:
-                median_diff_mg_const = tb_pl["diff_mean_gini_vs_constant"].median()
-                max_diff_mg_const = tb_pl["diff_mean_gini_vs_constant"].max()
-                max_diff_mg_const_year = tb_pl.loc[
-                    tb_pl["diff_mean_gini_vs_constant"] == max_diff_mg_const, "year"
+                median_diff_quantiles_constant = tb_pl["diff_quantiles_vs_constant"].median()
+                max_diff_quantiles_constant = tb_pl["diff_quantiles_vs_constant"].max()
+                max_diff_quantiles_constant_year = tb_pl.loc[
+                    tb_pl["diff_quantiles_vs_constant"] == max_diff_quantiles_constant, "year"
                 ].iloc[0]
 
-                median_diff_mo_const = tb_pl["diff_mean_only_vs_constant"].median()
-                max_diff_mo_const = tb_pl["diff_mean_only_vs_constant"].max()
-                max_diff_mo_const_year = tb_pl.loc[
-                    tb_pl["diff_mean_only_vs_constant"] == max_diff_mo_const, "year"
+                median_diff_ginis_constant = tb_pl["diff_ginis_vs_constant"].median()
+                max_diff_ginis_constant = tb_pl["diff_ginis_vs_constant"].max()
+                max_diff_ginis_constant_year = tb_pl.loc[
+                    tb_pl["diff_ginis_vs_constant"] == max_diff_ginis_constant, "year"
                 ].iloc[0]
 
-                median_diff_mg_mo = tb_pl["diff_mean_gini_vs_mean_only"].median()
-                max_diff_mg_mo = tb_pl["diff_mean_gini_vs_mean_only"].max()
-                max_diff_mg_mo_year = tb_pl.loc[tb_pl["diff_mean_gini_vs_mean_only"] == max_diff_mg_mo, "year"].iloc[0]
+                median_diff_quantiles_ginis = tb_pl["diff_quantiles_vs_ginis"].median()
+                max_diff_quantiles_ginis = tb_pl["diff_quantiles_vs_ginis"].max()
+                max_diff_quantiles_ginis_year = tb_pl.loc[
+                    tb_pl["diff_quantiles_vs_ginis"] == max_diff_quantiles_ginis, "year"
+                ].iloc[0]
 
                 log.info(
                     f"compare_headcount_ratios_across_methods (poverty_line=${poverty_line}):\n"
-                    f"  Mean+Gini vs Constant: Median diff={median_diff_mg_const:.2f}pp, Max diff={max_diff_mg_const:.2f}pp (in {max_diff_mg_const_year})\n"
-                    f"  Mean-only vs Constant: Median diff={median_diff_mo_const:.2f}pp, Max diff={max_diff_mo_const:.2f}pp (in {max_diff_mo_const_year})\n"
-                    f"  Mean+Gini vs Mean-only: Median diff={median_diff_mg_mo:.2f}pp, Max diff={max_diff_mg_mo:.2f}pp (in {max_diff_mg_mo_year})"
+                    f"  Interpolated quantiles vs. constant inequality: Median diff={median_diff_quantiles_constant:.2f}pp, Max diff={max_diff_quantiles_constant:.2f}pp (in {max_diff_quantiles_constant_year})\n"
+                    f"  Interpolated Ginis vs. constant inequality: Median diff={median_diff_ginis_constant:.2f}pp, Max diff={max_diff_ginis_constant:.2f}pp (in {max_diff_ginis_constant_year})\n"
+                    f"  Interpolated quantiles vs. interpolated Ginis: Median diff={median_diff_quantiles_ginis:.2f}pp, Max diff={max_diff_quantiles_ginis:.2f}pp (in {max_diff_quantiles_ginis_year})"
                 )
 
         # Export to CSV if enabled
@@ -2022,9 +2033,9 @@ def compare_headcount_ratios_across_methods(
             "country",
             "year",
             "poverty_line",
-            "diff_mean_gini_vs_constant",
-            "diff_mean_only_vs_constant",
-            "diff_mean_gini_vs_mean_only",
+            "diff_quantiles_vs_constant",
+            "diff_ginis_vs_constant",
+            "diff_quantiles_vs_ginis",
         ]
     ]
 

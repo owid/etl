@@ -14,14 +14,13 @@ def run() -> None:
     ds_garden = paths.load_dataset("historical_poverty")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("historical_poverty", reset_index=False)
-    tb_population = ds_garden.read("population", reset_index=False)
-    tb_from_interpolated_mean_gini = ds_garden.read("historical_poverty_from_interpolated_mean_gini", reset_index=False)
-    tb_population_from_interpolated_mean_gini = ds_garden.read(
-        "population_from_interpolated_mean_gini", reset_index=False
-    )
-    tb_from_interpolated_mean = ds_garden.read("historical_poverty_from_interpolated_mean", reset_index=False)
-    tb_population_from_interpolated_mean = ds_garden.read("population_from_interpolated_mean", reset_index=False)
+    tb_constant_inequality = ds_garden.read("constant_inequality", reset_index=False)
+    tb_population_constant_inequality = ds_garden.read("population_constant_inequality", reset_index=False)
+    tb_interpolated_quantiles = ds_garden.read("interpolated_quantiles", reset_index=False)
+    tb_population_interpolated_quantiles = ds_garden.read("population_interpolated_quantiles", reset_index=False)
+    tb_interpolated_ginis = ds_garden.read("interpolated_ginis", reset_index=False)
+    tb_population_interpolated_ginis = ds_garden.read("population_interpolated_ginis", reset_index=False)
+
     tb_comparison = ds_garden.read("comparison", reset_index=False)
 
     #
@@ -30,12 +29,12 @@ def run() -> None:
     # Initialize a new grapher dataset.
     ds_grapher = paths.create_dataset(
         tables=[
-            tb,
-            tb_from_interpolated_mean_gini,
-            tb_from_interpolated_mean,
-            tb_population,
-            tb_population_from_interpolated_mean_gini,
-            tb_population_from_interpolated_mean,
+            tb_constant_inequality,
+            tb_interpolated_ginis,
+            tb_interpolated_quantiles,
+            tb_population_constant_inequality,
+            tb_population_interpolated_ginis,
+            tb_population_interpolated_quantiles,
             tb_comparison,
         ],
         default_metadata=ds_garden.metadata,
