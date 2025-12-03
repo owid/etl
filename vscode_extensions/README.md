@@ -1,10 +1,82 @@
 # VS Code Extensions for ETL
 
-## Installing extensions
+## Quick Reference
 
-To install all available extensions:
+### Available Commands
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `make install-vscode-extensions` | Install all extensions for first time | Initial setup only (skips already-installed) |
+| `make vsc-ext-sync` | Force-reinstall all extensions | After compiling any extension to update it |
+| `make vsc-ext-compile EXT=name INSTALL=1` | Compile and install single extension | Quick development iteration |
+| `make vsc-ext-compile EXT=name BUMP=patch INSTALL=1` | Bump version, compile, and install | Before committing new features |
+
+### Common Workflows
+
+**Rapid development (most common):**
 ```bash
-make install-vscode-extensions
+# Edit code → compile → install immediately (keeps current version)
+make vsc-ext-compile EXT=detect-outdated-practices INSTALL=1
+```
+
+**Before committing (bump version):**
+```bash
+# Bump version → compile → install
+make vsc-ext-compile EXT=detect-outdated-practices BUMP=patch INSTALL=1
+```
+
+**Alternative workflow (compile then sync):**
+```bash
+# Step 1: Compile one or more extensions
+make vsc-ext-compile EXT=detect-outdated-practices
+
+# Step 2: Sync all extensions at once
+make vsc-ext-sync
+```
+
+### Key Concepts
+
+**Version Bumping:**
+- **No BUMP parameter**: Keeps current version (use during development)
+- **BUMP=patch**: Increment patch version (0.0.1 → 0.0.2) for bug fixes
+- **BUMP=minor**: Increment minor version (0.1.0 → 0.2.0) for new features
+- **BUMP=major**: Increment major version (1.0.0 → 2.0.0) for breaking changes
+
+**Installation:**
+- **INSTALL=1**: Immediately installs after compilation with `--force` flag
+- **make vsc-ext-sync**: Force-reinstalls ALL custom extensions with their latest VSIX files
+- **make install-vscode-extensions**: Only installs extensions not already installed (skips updates)
+
+**File Structure:**
+```
+vscode_extensions/
+├── extension-name/
+│   ├── src/extension.ts          # Your extension code
+│   ├── package.json               # Version and metadata
+│   ├── install/                   # Generated VSIX files
+│   │   ├── extension-0.0.3.vsix  # Latest version
+│   │   └── archived/             # Old versions (auto-archived on BUMP)
+│   └── dist/extension.js          # Compiled output
+```
+
+**Note**: When using `BUMP`, old versions are automatically moved to `install/archived/` to keep the directory clean.
+
+### Troubleshooting
+
+**Problem: "I ran `make install-vscode-extensions` but my extension didn't update"**
+- **Cause**: This command skips already-installed extensions
+- **Solution**: Use `make vsc-ext-sync` instead to force-reinstall all extensions
+
+**Problem: "Changes to my code aren't showing up in VS Code"**
+- **Cause**: Extension wasn't reinstalled with the new version
+- **Solution**: After compiling, run `make vsc-ext-sync` or use `INSTALL=1` flag
+
+**Problem: "I want to test without bumping the version"**
+- **Solution**: Omit the `BUMP` parameter: `make vsc-ext-compile EXT=name INSTALL=1`
+
+**Problem: "How do I know which version is installed?"**
+```bash
+code --list-extensions --show-versions | grep extension-name
 ```
 
 ## Creating a new extension
@@ -43,35 +115,53 @@ Modify the `src/extension.ts` file to define what the extension should do (AI wi
 
 Modify the `package.json` file accordingly (and possibly other files).
 
-From the new window (on the left), open a terminal (cmd+j) and run
-```
+**Testing during development:**
+
+From the extension directory, open a terminal (cmd+j) and run:
+```bash
 npm run compile
 ```
 
-Then hit F5 to run the extension. This will open a new VS Code window; for convenience, drag it to the right of the screen.
+Then hit F5 to run the extension in debug mode. This opens a new VS Code window for testing.
 
-On the right window, you can now test the behaviour of the extension. You may, e.g. hit cmd+shift+p and type the name of the extension (or its shortcut).
+On the test window, you can test the extension behavior (e.g., cmd+shift+p to search for commands).
 
-If you make changes to the code (on the left window) you need to re-compile on the terminal (with `npm run compile`) and then click on the reload button at the top right (on the bar with buttons to run the extension).Alternatively, go to the right window and click `cmd+r` to refresh the window.
+**Making changes:**
+- Edit code in the main window
+- Recompile: `npm run compile`
+- Reload test window: Click reload button or press `cmd+r`
 
-### Package the extension
+### Package and Install the Extension
 
-Once you are happy with the result, bump up the version in package.json, go to the terminal, ensure the extension compiles, and package it.
+**Modern workflow (recommended):**
+
+From the project root:
+```bash
+# Option 1: Compile and install in one step
+make vsc-ext-compile EXT=your-extension-name INSTALL=1
+
+# Option 2: Compile, then sync all extensions
+make vsc-ext-compile EXT=your-extension-name
+make vsc-ext-sync
+
+# With version bump (patch, minor, or major)
+make vsc-ext-compile EXT=your-extension-name BUMP=patch INSTALL=1
 ```
+
+**Legacy workflow:**
+
+From extension directory:
+```bash
 npm run compile
-vsce package
+npx @vscode/vsce package
+mkdir -p install
+mv *.vsix install/
 ```
 
-This creates a new .vsix file for the new version.
-
-### Install a specific extension
-
-Press `cmd+shift+p` and select "Extensions: Install from VSIX". Select the `*.vsix` file of the extension you want to install. Restart VSCode to ensure the new version is installed (although it may not be necessary).
-
-Alternatively, from the command line, go to the root folder of the extension code and run:
-```
-code --install-extension [name-of-the-extension-with-version].vsix
-```
+Then install via:
+- GUI: `cmd+shift+p` → "Extensions: Install from VSIX"
+- CLI: `code --install-extension install/extension-name-version.vsix --force`
+- Or: `make vsc-ext-sync` from project root
 
 ## Updating dependencies
 
