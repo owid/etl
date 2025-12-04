@@ -33,6 +33,14 @@ log = get_logger()
 # Get paths and naming conventions for current step
 paths = PathFinder(__file__)
 
+##############################################################################
+# Profiling mode: if True, process only a subset of countries for performance testing
+PROFILING_MODE = True
+
+# Countries to use in profiling mode
+PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India"]
+##############################################################################
+
 # Poverty lines (daily income in 2021 PPP$)
 POVERTY_LINES = [3, 10, 30]
 
@@ -55,7 +63,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
 
 # Show warnings and comparisons
-SHOW_WARNINGS = False
+SHOW_WARNINGS = True
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -165,6 +173,32 @@ def run() -> None:
     ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
     tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al")
 
+    # Filter to profiling countries if in profiling mode
+    if PROFILING_MODE:
+        log.info(f"PROFILING_MODE enabled - filtering to {len(PROFILING_COUNTRIES)} countries: {PROFILING_COUNTRIES}")
+        tb_thousand_bins = tb_thousand_bins[tb_thousand_bins["country"].isin(PROFILING_COUNTRIES)].reset_index(
+            drop=True
+        )
+
+        # For Maddison, keep profiling countries + World + regional aggregates + historical entities
+        # Regional aggregates are needed for fallback GDP growth when country data is missing
+        regions = [
+            "East Asia",
+            "South and South East Asia",
+            "Middle East and North Africa",
+            "Sub Saharan Africa",
+            "Western Europe",
+            "Eastern Europe",
+            "Western Offshoots",
+            "Latin America",
+        ]
+        historical_entities = ["USSR", "Yugoslavia", "Czechoslovakia", "Sudan (former)"]
+        countries_to_keep = PROFILING_COUNTRIES + ["World"] + regions + historical_entities
+        tb_maddison = tb_maddison[tb_maddison["country"].isin(countries_to_keep)].reset_index(drop=True)
+
+        tb_pip = tb_pip[tb_pip["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
+        tb_van_zanden = tb_van_zanden[tb_van_zanden["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
+
     #
     # Prepare data.
     # #
@@ -199,6 +233,9 @@ def run() -> None:
     tb_constant_inequality, tb_population_constant_inequality = add_population_comparison(
         tb_poverty=tb_constant_inequality
     )
+
+    # Free memory from large intermediate table
+    del tb_thousand_bins_constant_inequality
 
     ###############################################################################
     # 2. WITH INEQUALITY CHANGES
@@ -242,6 +279,9 @@ def run() -> None:
         tb_poverty=tb_interpolated_quantiles
     )
 
+    # Free memory from large intermediate table
+    del tb_thousand_bins_interpolated_quantiles
+
     ###############################################################################
     # 2.2 INTERPOLATING GINI
     ###############################################################################
@@ -263,6 +303,9 @@ def run() -> None:
     tb_interpolated_ginis, tb_population_interpolated_ginis = add_population_comparison(
         tb_poverty=tb_interpolated_ginis
     )
+
+    # Free memory from large intermediate table
+    del tb_thousand_bins_interpolated_ginis
 
     ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
@@ -310,9 +353,9 @@ def run() -> None:
     tb_population_interpolated_ginis = tb_population_interpolated_ginis.format(
         ["country", "year"], short_name="population_interpolated_ginis"
     )
-    tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
-        ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
-    )
+    # tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
+    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
+    # )
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
 
@@ -333,7 +376,7 @@ def run() -> None:
             tb_population_interpolated_ginis,
             # tb_thousand_bins_constant_inequality,
             # tb_thousand_bins_interpolated_quantiles,
-            tb_thousand_bins_interpolated_ginis,
+            # tb_thousand_bins_interpolated_ginis,
             tb_gini_mean,
         ],
         default_metadata=ds_thousand_bins.metadata,
@@ -1592,10 +1635,18 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
 
     # Check if there are any remaining NaN values in mean or gini
     remaining_nans = tb_gini_mean[tb_gini_mean["mean"].isna() | tb_gini_mean["gini"].isna()]
-    assert (
-        len(remaining_nans) == 0
-    ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation."
-    f'{remaining_nans[["country", "year", "mean", "gini"]]}'
+
+    # In profiling mode, drop rows with NaN values instead of asserting
+    if PROFILING_MODE and len(remaining_nans) > 0:
+        log.warning(
+            f"prepare_mean_gini_data: Dropping {len(remaining_nans)} rows with NaN values in PROFILING_MODE. "
+            f"Countries affected: {remaining_nans['country'].unique().tolist()}"
+        )
+        tb_gini_mean = tb_gini_mean[tb_gini_mean["mean"].notna() & tb_gini_mean["gini"].notna()].reset_index(drop=True)
+    else:
+        assert (
+            len(remaining_nans) == 0
+        ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation. {remaining_nans[['country', 'year', 'mean', 'gini']]}"
 
     return tb_gini_mean
 
