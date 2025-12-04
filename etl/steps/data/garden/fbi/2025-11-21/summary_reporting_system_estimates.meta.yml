@@ -5,14 +5,13 @@ definitions:
       topic_tags:
         - War & Peace
   description_key_hierarchy: &description_key_hierarchy
-    - This data reflects the hierarchy rule, which requires that only the most serious offense in a case be counted. The descending order of violent crimes are homicide, rape, robbery, and aggravated assault, followed by the property crimes of burglary, larceny-theft, and motor vehicle theft.
-  #description_key_estimates: &description_key_estimates
+    - This data reflects the hierarchy rule, which requires that only the most serious offense in a case be counted. The descending order of violent crimes are homicide, rape, robbery, and aggravated assault, followed by the property crimes of burglary, larceny-theft, and motor vehicle theft. For example, if a robbery occurs during which a homicide takes place, only the homicide is counted.
   violent_crime_desc_short: &violent_crime_desc_short |-
-    Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Violent crimes involve force or threat of force.
+    Violent crime is composed of four offenses: murder and nonnegligent manslaughter, rape, robbery, and aggravated assault.
   homicide_desc_short: &homicide_desc_short |-
-    Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another, and manslaughter by negligence.
+    Homicide includes murder and non-negligent manslaughter, the willful killing of one human being by another.
   robbery_desc_short: &robbery_desc_short |-
-    The taking or attempting to take anything of value from the care, custody, or control of a person or persons by force or threat of force or violence and/or by putting the victim in fear.
+    Robbery is the (successful or unsuccessful) attempt to take something of value from another person, either by using force or by threatening the victim.
   aggravated_assault_desc_short: &aggravated_assault_desc_short |-
     An unlawful attack by one person upon another for the purpose of inflicting severe or aggravated bodily injury.
   property_crime_desc_short: &property_crime_desc_short |-
@@ -25,13 +24,11 @@ definitions:
     "Motor vehicle theft is the theft or attempted theft of a motor vehicle."
 
   homicide_desc_key: &homicide_desc_key
-    - Deaths caused by negligence, attempts to kill, assaults to kill, suicides, and accidental deaths are excluded.
-    - "Justifiable homicides are classified separately the definition is limited to: (1) the killing of a felon by a law enforcement officer in the line of duty; or (2) the killing of a felon, during the commission of a felony, by a private citizen."
-    - Deaths of individuals due to their own negligence, accidental deaths not resulting from gross negligence, and traffic fatalities are not included.
+    - "This excludes unsucessful attempts, suicides, deaths caused by negligence or accidental deaths. This data also excludes so called 'justifiable homicides', which are defined as the (1) killing of a felon by a law enforcement officer in the line of duty or (2) the killing of a felon, during the commission of a felony, by a private citizen."
   aggravated_assault_desc_key: &aggravated_assault_desc_key
     - This type of assault usually is accompanied by the use of a weapon or by means likely to produce death or great bodily harm. Simple assaults are excluded, simple assaults are defined as assaults and attempted assaults where no weapon was used or no serious or aggravated injury resulted to the victim. Stalking, intimidation, coercion, and hazing are included.
   larceny_theft_desc_key: &larceny_theft_desc_key
-    - Examples are thefts of bicycles, motor vehicle parts and accessories, shoplifting, pocket-picking, or the stealing of any property or article that is not taken by force and violence or by fraud.
+    - Examples are thefts of bicycles, motor vehicle parts and accessories, shoplifting, pickpocketing, or the stealing of any property or article that is not taken by force and violence or by fraud.
     - Attempted larcenies are included. Embezzlement, confidence games, forgery, check fraud, etc., are excluded.
   motor_vehicle_theft_desc_key: &motor_vehicle_theft_desc_key
     - A motor vehicle is self-propelled and runs on land surface and not on rails.

@@ -1,4 +1,12 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+* Go to: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads
+* Scroll down to 'Additional Datasets' section
+* Click on the 'Summary Reporting System (SRS) tab
+* Click Download
+* Upload the downloaded file using the --path-to-file/-f option when running this script.
+
+"""
 
 from pathlib import Path
 
