@@ -364,6 +364,148 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
+## Performance Profiling and Optimization
+
+### Memory Profiling
+
+Use `etl d profile` to identify memory bottlenecks:
+
+```bash
+# Profile memory usage line-by-line
+etl d profile --mem garden/namespace/version/dataset
+
+# Profile specific functions for cleaner output
+etl d profile --mem garden/namespace/version/dataset -f function_name
+
+# Profile CPU usage
+etl d profile --cpu garden/namespace/version/dataset
+```
+
+### Common Memory Issues and Solutions
+
+#### 1. Object vs Categorical Dtypes
+
+**Problem**: String columns stored as `object` dtype consume 10-100x more memory than `category`.
+
+**Solution**: Always load datasets with `safe_types=False` and ensure categorical dtypes are preserved:
+
+```python
+# Load with categorical dtypes preserved
+ds = paths.load_dataset("dataset_name")
+tb = ds.read("table_name", safe_types=False)
+
+# Verify dtypes
+assert isinstance(tb["country"].dtype, pd.CategoricalDtype), "country must be categorical"
+
+# If categorical is lost, convert it back
+if not isinstance(tb["country"].dtype, pd.CategoricalDtype):
+    tb["country"] = tb["country"].astype("category")
+```
+
+**Common causes of categorical → object conversion:**
+- Using `np.asarray()` on categorical columns (use `.array` instead)
+- `.apply()` operations that return new values
+- Some merge/concat operations (usually preserved with `owid.catalog.processing`)
+
+**Memory savings**: 96-99% reduction for string columns (e.g., 21 MB → 0.8 MB)
+
+#### 2. Vectorization vs Row-by-Row Operations
+
+**Problem**: Using `.apply(func, axis=1)` is 100x+ slower than vectorized operations.
+
+**Bad** (slow):
+```python
+tb["result"] = tb.apply(lambda row: func(row), axis=1)
+tb["log_value"] = tb["value"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+```
+
+**Good** (fast):
+```python
+# Use np.select for conditional logic
+conditions = [tb["col1"].notna(), tb["col2"].notna()]
+choices = [tb["col1"], tb["col2"]]
+tb["result"] = np.select(conditions, choices, default=tb["col3"])
+
+# Use vectorized functions with proper NaN handling
+def safe_log(values):
+    arr = np.asarray(values, dtype=float).copy()
+    valid_mask = np.isfinite(arr) & (arr > 0)
+    np.log(arr, out=arr, where=valid_mask)
+    return arr
+
+tb["log_value"] = safe_log(tb["value"])
+```
+
+**Performance gain**: 100-1000x speedup for large datasets
+
+#### 3. Large DataFrame Expansion
+
+When expanding dataframes (e.g., creating 1000 quantiles per row):
+
+**Expected behavior**: Output size scales linearly with input
+- 14,000 rows → 14M rows (1000x expansion) = ~1-2 GB output
+- This is **unavoidable** if you need all the data
+
+**Optimization strategies**:
+- Use categorical dtypes for repeated values (country, region)
+- Use appropriate numeric types (Float32 instead of Float64 when precision allows)
+- Process in batches if memory constrained
+- Use `del` to free intermediate variables immediately
+
+### Profiling Workflow
+
+1. **Run initial profile** to identify hotspots:
+   ```bash
+   etl d profile --mem garden/namespace/version/dataset
+   ```
+
+2. **Analyze memory spikes**:
+   - Look for large increments (>100 MB jumps)
+   - Check if output size is inherent or wasteful
+   - Verify categorical dtypes are preserved
+
+3. **Create isolated test** to verify optimizations:
+   ```python
+   # Test with small representative data
+   # Measure before/after memory usage
+   # Verify output is identical
+   ```
+
+4. **Apply optimizations**:
+   - Preserve categorical dtypes
+   - Vectorize row-by-row operations
+   - Add assertions to prevent regressions
+
+5. **Re-profile** to confirm improvements
+
+### Memory Estimation
+
+Quick estimation for DataFrame memory:
+```python
+# Rough memory estimate
+n_rows = 14_000_000
+n_numeric_cols = 3  # Float64 = 8 bytes each
+n_categorical_cols = 2  # Category ~0.1 MB per million rows
+
+numeric_mb = (n_rows * n_numeric_cols * 8) / (1024**2)  # ~320 MB
+categorical_mb = n_categorical_cols * (n_rows / 1_000_000) * 0.1  # ~3 MB
+total_mb = numeric_mb + categorical_mb  # ~323 MB
+
+print(f"Expected memory: {total_mb:.0f} MB")
+
+# Actual memory (with pandas overhead ~30-50%)
+actual_mb = total_mb * 1.4
+print(f"Actual memory: {actual_mb:.0f} MB")
+```
+
+### Best Practices
+
+- **Profile first, optimize later**: Don't guess where bottlenecks are
+- **Measure impact**: Verify optimizations actually help
+- **Document expectations**: Add comments explaining expected memory usage
+- **Add assertions**: Catch dtype regressions early
+- **Use appropriate dtypes**: Category for strings, UInt16/Float32 when possible
+
 ## Database Access
 
 ### MySQL Connection
