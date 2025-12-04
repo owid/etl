@@ -38,7 +38,7 @@ paths = PathFinder(__file__)
 PROFILING_MODE = True
 
 # Countries to use in profiling mode
-PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India"]
+PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India", "World"]
 ##############################################################################
 # Show warnings and comparisons
 SHOW_WARNINGS = False
@@ -70,19 +70,6 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 
 # Define extreme growth factor thresholds
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
-
-# Show warnings and comparisons
-SHOW_WARNINGS = False
-
-# DEBUG: Enable profiling mode (filters to subset of countries)
-_PROFILING_MODE = True
-_PROFILE_COUNTRIES = ["France", "Germany", "World"]
-
-# Export comparison files to csv
-EXPORT_COMPARISON_CSV = False
-
-# Set number of observations to show in Gini/mean comparison logs
-NUM_OBSERVATIONS_TO_SHOW = 20
 
 # Keep original thousand bins series when calculating bins from mean and gini
 KEEP_ORIGINAL_THOUSAND_BINS = True
@@ -187,12 +174,12 @@ def run() -> None:
     tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al", safe_types=False)
 
     # DEBUG: Filter to subset of countries for profiling
-    if _PROFILING_MODE:
-        tb_thousand_bins = tb_thousand_bins.loc[tb_thousand_bins["country"].isin(_PROFILE_COUNTRIES)].reset_index(
+    if PROFILING_MODE:
+        tb_thousand_bins = tb_thousand_bins.loc[tb_thousand_bins["country"].isin(PROFILING_COUNTRIES)].reset_index(
             drop=True
         )
-        tb_pip = tb_pip.loc[tb_pip["country"].isin(_PROFILE_COUNTRIES)].reset_index(drop=True)
-        tb_van_zanden = tb_van_zanden.loc[tb_van_zanden["country"].isin(_PROFILE_COUNTRIES)].reset_index(drop=True)
+        tb_pip = tb_pip.loc[tb_pip["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
+        tb_van_zanden = tb_van_zanden.loc[tb_van_zanden["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
 
     # Filter to profiling countries if in profiling mode
     if PROFILING_MODE:
@@ -375,7 +362,7 @@ def run() -> None:
         ["country", "year"], short_name="population_interpolated_ginis"
     )
     # Drop duplicates in profiling mode (filtering causes duplicates in merge logic)
-    if _PROFILING_MODE:
+    if PROFILING_MODE:
         tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.drop_duplicates(
             subset=["country", "year", "region", "region_old", "quantile"]
         )
@@ -386,7 +373,7 @@ def run() -> None:
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
 
     # Drop duplicates in profiling mode (filtering causes duplicates in merge logic)
-    if _PROFILING_MODE:
+    if PROFILING_MODE:
         tb_gini_mean = tb_gini_mean.drop_duplicates(subset=["country", "year"])
     tb_gini_mean = tb_gini_mean.format(["country", "year"], short_name="gini_mean")
 
@@ -440,7 +427,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"]).reset_index(drop=True)
 
     # Skip historical entities assertions in profiling mode
-    if not _PROFILING_MODE:
+    if not PROFILING_MODE:
         # Assert that historical_entities keys and successor states are in tb_gdp
         all_countries = set(tb_gdp["country"].unique())
         for entity_name, entity_data in historical_entities.items():
