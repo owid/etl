@@ -35,11 +35,10 @@ paths = PathFinder(__file__)
 
 ##############################################################################
 # Profiling mode: if True, process only a subset of countries for performance testing
-PROFILING_MODE = True
+PROFILING_MODE = False
 
 # Countries to use in profiling mode
-PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India", "World"]
-# PROFILING_COUNTRIES = ["France", "Germany", "World"]
+PROFILING_COUNTRIES = ["United States", "Zimbabwe", "Brazil", "China", "India"]
 ##############################################################################
 # Show warnings and comparisons
 SHOW_WARNINGS = False
