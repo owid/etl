@@ -1781,10 +1781,8 @@ def expand_means_and_ginis_to_thousand_bins(
     tb_new = tb_new[valid_mask].reset_index(drop=True)
     gini_valid = gini_values[valid_mask]
 
-    # Vectorized sigma and mu calculation
-    # Gini = 2 * Φ(σ/√2) - 1, so σ = √2 * Φ⁻¹((Gini + 1) / 2)
-    target_cdf = (gini_valid + 1) / 2
-    sigmas = stats.norm.ppf(target_cdf) * np.sqrt(2)
+    # Calculate sigma from Gini using vectorized function
+    sigmas = gini_to_sigma(gini_valid)
     mean_values = tb_new[mean_column].values.astype(float)
     mus = np.log(mean_values) - (sigmas**2) / 2
     scales = np.exp(mus)
@@ -1915,22 +1913,41 @@ def expand_means_and_ginis_to_thousand_bins(
     return tb_thousand_bins_from_mean_gini
 
 
-def gini_to_sigma(gini):
+def gini_to_sigma(gini_values: np.ndarray) -> np.ndarray:
     """
-    Convert Gini coefficient to sigma parameter of log-normal distribution.
+    Convert Gini coefficient(s) to sigma parameter of log-normal distribution.
+
+    Vectorized implementation that handles arrays efficiently.
+
+    Formula:
+    - Gini = 2 * Φ(σ/√2) - 1, where Φ is the standard normal CDF
+    - Solving for σ: σ = √2 * Φ⁻¹((Gini + 1) / 2)
+
+    Args:
+        gini_values: Gini coefficient(s) as scalar or array. Valid range: (0, 1)
+
+    Returns:
+        Sigma value(s) for log-normal distribution. Invalid inputs return NaN.
     """
-    if gini <= 0 or gini >= 1:
-        return np.nan
-    try:
+    # Convert to array if scalar
+    gini_array = np.atleast_1d(gini_values)
+
+    # Initialize output with NaN
+    sigmas = np.full_like(gini_array, np.nan, dtype=float)
+
+    # Mask for valid gini values (0 < gini < 1)
+    valid_mask = (gini_array > 0) & (gini_array < 1)
+
+    if valid_mask.any():
         # Gini = 2 * Φ(σ/√2) - 1
         # Solve for σ: Φ(σ/√2) = (Gini + 1) / 2
-        target_cdf = (gini + 1) / 2
+        target_cdf = (gini_array[valid_mask] + 1) / 2
         # Use inverse CDF to find σ/√2
-        z_value = stats.norm.ppf(target_cdf)
-        sigma = z_value * np.sqrt(2)
-        return sigma
-    except Exception:
-        return np.nan
+        z_values = stats.norm.ppf(target_cdf)
+        sigmas[valid_mask] = z_values * np.sqrt(2)
+
+    # Return scalar if input was scalar
+    return sigmas if gini_values.ndim > 0 else sigmas[0]
 
 
 def interpolate_quantiles_in_thousand_bins(
