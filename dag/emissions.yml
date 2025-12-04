@@ -46,8 +46,10 @@ steps:
   #
   # Emissions - CO2 dataset.
   #
+  # NOTE: The following step should be run after the github step, which is why the latter is added as a dependency.
   export://s3/co2_data/latest/owid_co2:
     - data://garden/emissions/2025-12-04/owid_co2
+    - export://github/co2_data/latest/owid_co2
   #
   # Hoesly et al. (2024): CEDS air pollutants
   #
