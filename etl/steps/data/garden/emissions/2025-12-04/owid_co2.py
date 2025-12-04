@@ -209,7 +209,7 @@ def combine_tables(
     tb_gcp : Table
         Global Carbon Budget table (from Global Carbon Project).
     tb_jones : Table
-        National contributions to climate change (from Jones et al. (2023)).
+        National contributions to climate change (from Jones et al.).
     # tb_climate_watch_ghg : Table
     #     Greenhouse gas emissions table (from Climate Watch).
     # tb_climate_watch_ch4 : Table
