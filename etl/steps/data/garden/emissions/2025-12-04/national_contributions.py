@@ -1,10 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, Variable
+from owid.catalog import Table, Variable
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -180,26 +179,6 @@ def add_share_variables(tb: Table) -> Table:
     return tb
 
 
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
-    tb = tb.copy()
-
-    # Add population to data.
-    tb = geo.add_population_to_table(
-        tb=tb,
-        ds_population=ds_population,
-        warn_on_missing_countries=False,
-    )
-
-    # Add per-capita variables.
-    for variable in PER_CAPITA_VARIABLES:
-        tb[f"{variable}_per_capita"] = tb[variable] / tb["population"]
-
-    # Drop population column.
-    tb = tb.drop(columns="population", errors="raise")
-
-    return tb
-
-
 def fix_emissions_jump_in_1850(tb: Table) -> Table:
     # There is data from 1830 for some variables and from 1850 for others.
     # However, when inspecting data between 1830 and 1850 (e.g. annual_emissions_co2_total) there is an abrupt jump
@@ -254,15 +233,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("national_contributions")
     tb = ds_meadow.read("national_contributions")
 
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
-
     #
     # Process data.
     #
@@ -299,11 +269,7 @@ def run() -> None:
     tb = add_kuwaiti_oil_fires_to_kuwait(tb=tb)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        tb,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-    )
+    tb = paths.regions.harmonize_names(tb)
 
     # Replace spurious negative values with zeros (and ensure they are small numbers, within the uncertainty).
     columns_that_cannot_be_negative = [column for column in tb.columns if "fossil" in column]
@@ -325,9 +291,7 @@ def run() -> None:
         tb[column] = tb[column].clip(lower=0)
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
-        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS, min_num_values_per_year=1
-    )
+    tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=1)
 
     # Add columns for emissions in terms of CO2 equivalents.
     tb = add_emissions_in_co2_equivalents(tb=tb)
@@ -336,7 +300,7 @@ def run() -> None:
     tb = add_share_variables(tb=tb)
 
     # Add per-capita variables.
-    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
+    tb = paths.regions.add_per_capita(tb=tb, warn_on_missing_countries=False, columns=PER_CAPITA_VARIABLES)
 
     # Fix spurious jump in the data in 1850.
     tb = fix_emissions_jump_in_1850(tb=tb)
