@@ -4,12 +4,12 @@ from typing import Any, Dict, List
 
 import httpx
 
-from owid_mcp.config import ETL_API_URL, HTTP_TIMEOUT
+from owid_mcp.config import HTTP_TIMEOUT, SEARCH_API_URL
 
 
 async def semantic_search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     """
-    Search for indicators using semantic similarity via ETL API.
+    Search for indicators using semantic similarity via Search API.
 
     Args:
         query: Search query text
@@ -18,9 +18,9 @@ async def semantic_search_indicators(query: str, limit: int = 10) -> List[Dict[s
     Returns:
         List of indicator results with similarity scores
     """
-    # Make HTTP request to the ETL API
+    # Make HTTP request to the Search API
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        response = await client.post(f"{ETL_API_URL}/search/indicators", json={"query": query, "limit": limit})
+        response = await client.get(f"{SEARCH_API_URL}/indicators", params={"query": query, "limit": limit})
         response.raise_for_status()
         data = response.json()
 

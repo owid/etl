@@ -41,6 +41,8 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    tb = duplicate_latin_america_rows(tb)
     # Create a new table with the processed data.
     all_tables = create_tables(tb)
 
@@ -154,6 +156,9 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # Fix data quality issues for indicator 12.2.2
     df = fix_indicator_12_2_2(df)
 
+    # Fix unit for indicators 1.5.2 and 11.5.2
+    df = fix_units_millions_to_dollars(df)
+
     return df
 
 
@@ -185,6 +190,31 @@ def fix_indicator_12_2_2(df: pd.DataFrame) -> pd.DataFrame:
 
     # Replace zeros in 2023 with NaN (likely incomplete data submission)
     df.loc[mask_12_2_2 & (df["year"] == 2023) & (df["value"] == 0), "value"] = np.nan
+
+    return df
+
+
+def fix_units_millions_to_dollars(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convert values from millions of dollars to dollars for indicators 1.5.2 and 11.5.2.
+    """
+    df = df.copy(deep=False)
+
+    # Target indicators 1.5.2 and 11.5.2 and units "Millions of current United States dollars"
+    mask = (df["indicator"].isin(["1.5.2", "11.5.2"])) & (
+        df["long_unit"] == "Millions of current United States dollars"
+    )
+
+    # Multiply value by 1,000,000
+    df.loc[mask, "value"] *= 1_000_000
+
+    # Update units
+    # Convert to string to avoid categorical error if new unit is not in categories
+    df["long_unit"] = df["long_unit"].astype("string")
+    df["short_unit"] = df["short_unit"].astype("string")
+
+    df.loc[mask, "long_unit"] = "current United States dollars"
+    df.loc[mask, "short_unit"] = "$"
 
     return df
 
@@ -363,3 +393,49 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
         new_tabs.append(table)
 
     return new_tabs
+
+
+def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Duplicate rows for 'Latin America and the Caribbean (UN SDG)' and rename to 'Latin America and the Caribbean (UN)'.
+    Only duplicate for indicators that have both:
+    - Other (UN) regions (e.g., Africa (UN), Asia (UN))
+    - Other (UN SDG) regions (not just Latin America (UN SDG) alone)
+    """
+    # Count total Latin America (UN SDG) indicators
+    lac_sdg_indicators = df[df["country"] == "Latin America and the Caribbean (UN SDG)"]["indicator"].nunique()
+
+    # Identify rows with (UN) and (UN SDG) regions
+    un_region_mask = df["country"].str.contains(r"\(UN\)$", na=False, regex=True)
+    un_sdg_mask = df["country"].str.contains(r"\(UN SDG\)$", na=False, regex=True)
+
+    # For each indicator, check if it has other (UN) regions
+    indicators_with_un_regions = df[un_region_mask].groupby("indicator").size().index
+
+    # For each indicator, check if it has other (UN SDG) regions (not just Latin America)
+    other_un_sdg_mask = un_sdg_mask & (df["country"] != "Latin America and the Caribbean (UN SDG)")
+    indicators_with_other_un_sdg = df[other_un_sdg_mask].groupby("indicator").size().index
+
+    # Only duplicate if indicator has both other (UN) regions AND other (UN SDG) regions
+    indicators_to_duplicate = indicators_with_un_regions.intersection(indicators_with_other_un_sdg)
+
+    log.info(
+        "duplicate_latin_america_rows.stats",
+        total_lac_indicators=lac_sdg_indicators,
+        indicators_with_un_regions=len(indicators_with_un_regions),
+        indicators_with_other_un_sdg=len(indicators_with_other_un_sdg),
+        indicators_to_duplicate=len(indicators_to_duplicate),
+        indicators_excluded=lac_sdg_indicators - len(indicators_to_duplicate),
+    )
+
+    # Filter Latin America rows to only those indicators
+    lac_mask = (df["country"] == "Latin America and the Caribbean (UN SDG)") & (
+        df["indicator"].isin(indicators_to_duplicate)
+    )
+    df_lac = df[lac_mask].copy()
+    df_lac["country"] = "Latin America and the Caribbean (UN)"
+
+    if not df_lac.empty:
+        df = pd.concat([df, df_lac], ignore_index=True)
+
+    return df

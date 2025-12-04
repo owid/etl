@@ -6,7 +6,7 @@ icon: lucide/newspaper
 
 !!! info "This is the methodology for the data analysis used in our article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)"
 
-    **Resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
+    **Resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code, and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
 
     **Contact**: [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death).
 
@@ -23,10 +23,10 @@ In this document, we detail the methodology we used to do this analysis and high
 
 The first step was to compile data on what Americans die from.
 
--   We used deaths data from the CDC Wonder database: “[:octicons-link-external-16:  Underlying cause of death](https://wonder.cdc.gov/deaths-by-underlying-cause.html)”.
+-   We used death data from the CDC Wonder database: “[:octicons-link-external-16:  Underlying cause of death](https://wonder.cdc.gov/deaths-by-underlying-cause.html)”.
 -   In this database, every death in the U.S. is assigned one main cause, classified in the [:octicons-link-external-16:  International Classification of Diseases](https://www.who.int/standards/classifications/classification-of-diseases) (ICD). Each cause of death has a unique “ICD-10” code.
--   We used the “15 leading causes of death”, given by the CDC. Of those we selected the twelve most common causes and additionally included the categories "drug overdoses" and "homicides", as these are commonly covered in the media.
--   The specific CDC category, ICD-10 code, and name we use in the article is shown in the table below.
+-   We used the “15 leading causes of death”, given by the CDC. Of those, we selected the twelve most common causes and additionally included the categories "drug overdoses" and "homicides", as these are commonly covered in the media.
+-   The specific CDC category, ICD-10 code, and name we use in the article are shown in the table below.
 
 | **Cause of death (CDC category)**                                      | **ICD-10 codes**           | **Category name in the article**   |
 | ---------------------------------------------------------------------- | -------------------------- | ---------------------------------- |
@@ -47,12 +47,12 @@ The first step was to compile data on what Americans die from.
 
 -   Since terrorism is often covered in the media, we also included this category in the analysis. The CDC does not have data specifically on terrorism deaths, so we used the [:octicons-link-external-16:  Global Terrorism Index](https://www.visionofhumanity.org/maps/global-terrorism-index/#/) (US Terrorism deaths for 2023).
 -   We used 2023 data, as this is the latest year for which complete data from the CDC was available.
--   During the COVID-19 pandemic, especially 2020-2022, COVID-19 was a major cause of death in the United States. In 2023 it still ranks under the 10 most common causes, but there are less deaths attributed to the disease than in 2020-2022.
+-   During the COVID-19 pandemic, especially 2020-2022, COVID-19 was a major cause of death in the United States. In 2023, it still ranks under the 10 most common causes, but there are fewer deaths attributed to the disease than in 2020-2022.
 
 ### Media coverage from Media Cloud
 
--   Our media coverage data comes from [:octicons-link-external-16:  Media Cloud](https://www.mediacloud.org/). Media cloud is an open source platform for media analysis, which provides a queryable database of newspaper articles from many outlets around the world. Their database includes all articles published online under the domain of the newspaper.
--   We queried the newspaper articles from three outlets. We selected these for several reasons. First, they are large and well-read across the US, so it’s likely that a large share of the population get their news from them. Second, they are popular outlets that span the political spectrum, so our results are not limited to just left- or right-leaning media:
+-   Our media coverage data comes from [:octicons-link-external-16:  Media Cloud](https://www.mediacloud.org/). Media Cloud is an open-source platform for media analysis, which provides a queryable database of newspaper articles from many outlets around the world. Their database includes all articles published online under the domain of the newspaper.
+-   We queried the newspaper articles from three outlets. We selected these for several reasons. First, they are large and well-read across the US, so it’s likely that a large share of the population gets their news from them. Second, they are popular outlets that span the political spectrum, so our results are not limited to just left- or right-leaning media:
 
     - [:octicons-link-external-16: The New York Times](https://www.nytimes.com) ([:octicons-link-external-16:  Source ID 1](https://search.mediacloud.org/sources/1))
     - [:octicons-link-external-16: The Washington Post](https://www.washingtonpost.com/) ([:octicons-link-external-16:  Source ID 2](https://search.mediacloud.org/sources/2))
@@ -63,21 +63,21 @@ The first step was to compile data on what Americans die from.
 
 This analysis will never give a perfect result that only captures the relevant mentions, but we think that the results are still solid and representative of overall coverage. Here are some caveats or limitations to keep in mind about this data:
 
--   Articles can include links to other news stories. If these include our keywords the article was also counted.
--   Some articles have multiple URLs (often in “Briefing” or “News of the Week” formats), which can lead to double counting.
+-   Articles can include links to other news stories. If these include our keywords, the article was also counted.
+-   Some articles have multiple URLs (often in “Briefing” or “News of the Week” formats), which can lead to double-counting.
 -   We didn’t just include articles about deaths, but also those discussing underlying causes or prevention, if they mentioned our keywords. For example: insulin prices (diabetes), air quality (respiratory disease), or terrorism in conflicts. We count these because they still raise awareness about the cause of death and ways to prevent it.
--   Some false positives remain. After testing and iterating we arrived at this balance between being sensitive enough to capture most relevant coverage while keeping irrelevant articles to a minimum.
+-   Some false positives remain. After testing and iterating, we arrived at this balance between being sensitive enough to capture most of the relevant coverage while keeping irrelevant articles to a minimum.
 
 ## Queries for each cause of death
 
 This is how we build our queries:
 
 - We picked relevant keywords and synonyms for each cause of death.
-- The first part of our query is an “OR” list of all those key words (e.g. “heart disease” OR “heart attack” OR “high blood pressure”...). Articles need to include at least one of these terms exactly to be included in the result.
-- The second part of our query makes sure the keywords appear more than once. For that we used a “proximity search” query: The query (“heart disease cardiac arrest”~1000) returns all articles where the words heart, disease, cardiac and arrest appear within 1000 words of each other. We use one proximity search for each combination of terms.
-- We repeated this a few times and adjusted the queries where needed. Sometimes we excluded specific terms if they returned many false positives (e.g. excluding “golf” for the “stroke” query). Sometimes we added new synonyms we found in related articles.
+- The first part of our query is an “OR” list of all those keywords (e.g., “heart disease” OR “heart attack” OR “high blood pressure”...). Articles need to include at least one of these terms exactly to be included in the result.
+- The second part of our query makes sure the keywords appear more than once. For that, we used a “proximity search” query: The query (“heart disease cardiac arrest”~1000) returns all articles where the words heart, disease, cardiac, and arrest appear within 1000 words of each other. We use one proximity search for each combination of terms.
+- We repeated this a few times and adjusted the queries where needed. Sometimes we excluded specific terms if they returned many false positives (e.g., excluding “golf” for the “stroke” query). Sometimes we added new synonyms we found in related articles.
 
-Below you can find the actual keywords we used for each cause of death and the full query for reproducibility.
+Below, you can find the actual keywords we used for each cause of death and the full query for reproducibility.
 
 ??? quote "Heart Disease"
 
@@ -168,40 +168,39 @@ Below you can find the actual keywords we used for each cause of death and the f
 
 ### Differences between single and multiple mentions
 
-The first run of our analysis included all articles which mention any keyword at all, even if it was only mentioned once. One issue is that many articles will mention a cause of death in passing, without it being a central part of the coverage or covered in any detail. To reduce these false positives, we switched to the “multiple mentions” approach (s. above).
+The first run of our analysis included all articles that mention any keyword at all, even if it was only mentioned once. One issue is that many articles will mention a cause of death in passing, without it being a central part of the coverage or covered in any detail. To reduce these false positives, we switched to the “multiple mentions” approach (s. above).
 
 Below you can see the comparison of results between single and multiple mentions for the New York Times in absolute and relative terms.
 
 ![NYT: Comparison between single and multiple mention approaches, absolute terms](data/media_deaths_nyt_single_vs_multiple_absolute.png){: style="width:600px"} ![NYT: Comparison between single and multiple mention approaches, relative shares](data/media_deaths_nyt_single_vs_multiple_relative.png){: style="width:600px"}
 
-Overall using multiple mentions decrease the amount of relevant articles by a lot, often by 50% or more.
+Overall, using multiple mentions decreases the amount of relevant articles by a lot, often by 50% or more.
 
-Many categories with very little coverage like strokes, cancers, alzheimers or kidney and liver disease shrank even further if we exclude articles with only one mention. This is mostly due to obituaries, where the cause of death is mentioned, but never discussed, or one-off mentions in interviews.
+Many categories with very little coverage, like strokes, cancers, alzheimers or kidney and liver disease, shrank even further if we exclude articles with only one mention. This is mostly due to obituaries, where the cause of death is mentioned, but never discussed, or one-off mentions in interviews.
 
-The category that shrank most significantly in relative terms is COVID-19. Many of these mentions are one-off mentions discussing effects of the COVID-19 pandemic on society more broadly e.g. in the context of education, economy or policy.
+The category that shrank most significantly in relative terms is COVID-19. Many of these mentions are one-off mentions discussing effects of the COVID-19 pandemic on society more broadly, e.g., in the context of education, economy, or policy.
 
-Overall we found that excluding “single mention” articles filtered out a lot of noise and did not exclude relevant articles. Therefore we believe that this method gives a clearer picture of actual news coverage.
+Overall, we found that excluding “single mention” articles filtered out a lot of noise and did not exclude relevant articles. Therefore, we believe that this method gives a clearer picture of actual news coverage.
 
 ### Comparison to a larger set of media outlets
 
-One question is also whether the New York Times, Washington Post, and Fox News are broadly representative of American news media.
-To check, we reran our queries on a larger dataset of different news outlets. For this we used the Media Cloud Collection “[:octicons-link-external-16: United States - National](https://search.mediacloud.org/collections/34412234)”, which includes over 200 news sources in the US.
+One question is also whether the New York Times, Washington Post, and Fox News are broadly representative of American news media. To check, we reran our queries on a larger dataset of different news outlets. For this, we used the Media Cloud Collection “[:octicons-link-external-16: United States - National](https://search.mediacloud.org/collections/34412234)”, which includes over 200 news sources in the US.
 
-The results are similar to the results for the news outlets we used in the article. While the coverage for cancer and COVID-19 is higher in the collection and coverage for terrorism is slightly lower, the overall shares are very comparable. The column for the US Collection looks more similar to the columns for the other news sources than it looks like the column for actual deaths.
+The results are similar to the results for the news outlets we used in the article. While the coverage for cancer and COVID-19 is higher in the collection, and terrorism coverage is slightly lower, the overall shares are very comparable. The column for the US Collection looks more similar to the columns for the other news sources than it does to the column for actual deaths.
 
-![Comparison of news coverage between NYT, WaPo, Fox and a larger set of media outlets (US collection)](data/media_deaths_by_source.png){: style="width:600px"}
+![Comparison of news coverage between NYT, WaPo, Fox, and a larger set of media outlets (US collection)](data/media_deaths_by_source.png){: style="width:600px"}
 
 ### Comparison to global causes of death
 
-Finally, we might argue that large US news media shouldn’t only represent causes of death in the US, but should discuss the biggest issues facing the world. Indeed, at Our World in Data we want to see more people focused on the world’s biggest problems, not just national ones.
+Finally, we might argue that large US news media shouldn’t only represent causes of death in the US, but should also discuss the biggest issues facing the world. Indeed, at Our World in Data, we want to see more people focused on the world’s biggest problems, not just national ones.
 
-The [ :octicons-link-external-16: main causes of death globally](https://ourworldindata.org/causes-of-death) are not the same as in the United States. To see how the results differ when looking at global causes of death, we reran the analysis and included causes that are more prevalent outside the United States such as HIV/AIDS, malaria, tuberculosis (TB) and diarrheal diseases.
+The [ :octicons-link-external-16: main causes of death globally](https://ourworldindata.org/causes-of-death) are not the same as in the United States. To see how the results differ when looking at global causes of death, we reran the analysis. We included causes that are more prevalent outside the United States, such as HIV/AIDS, malaria, tuberculosis (TB), and diarrheal diseases.
 
 ![something](data/media_mentions_global.png){: style="width:600px"}
 
 
-Since the latest data for global causes of death is from 2021, this data is heavily dominated by news coverage of COVID-19. But even so it is clear that the overall distribution of news coverage is not representative of the global causes of death.
+Since the latest data for global causes of death is from 2021, this data is heavily dominated by news coverage of COVID-19. But even so, it is clear that the overall distribution of news coverage is not representative of the global causes of death.
 
-Diseases that are major causes of death worldwide but less common in the US (e.g. malaria or TB) receive almost no news coverage. The same is true for other causes, which are more common in the US, like strokes or lower respiratory diseases.
+Diseases that are major causes of death worldwide but less common in the US (e.g., malaria or TB) receive almost no news coverage. The same is true for other causes, which are more common in the US, like strokes or lower respiratory diseases.
 
-This result also shows that even when an event as significant as a global pandemic is taking place, homicide and terrorism is still overrepresented by a large factor in the data. This is remarkably stable over different years.
+This result also shows that even when an event as significant as a global pandemic is taking place, homicide and terrorism are still overrepresented by a large factor in the data. This is remarkably stable over different years.

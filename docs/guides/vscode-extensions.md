@@ -13,6 +13,8 @@ Custom VS Code extensions enhance your ETL development workflow by automating re
 
 ## Installing extensions
 
+### First-time setup
+
 To install all custom extensions:
 
 ```bash
@@ -20,6 +22,16 @@ make install-vscode-extensions
 ```
 
 This installs both marketplace extensions (Ruff, YAML) and our custom extensions from `vscode_extensions/*/install/*.vsix`.
+
+### Updating extensions
+
+After compiling an extension, force-reinstall all extensions with their latest versions:
+
+```bash
+make vsce-sync
+```
+
+This command force-reinstalls all custom extensions, ensuring you get the latest compiled versions even if they're already installed.
 
 ## Available extensions
 
@@ -112,6 +124,7 @@ Catch outdated code patterns as you type with configurable warnings.
 - `dest_dir` usage → Use modern path handling
 - `geo.harmonize_countries()` → Use `paths.regions.harmonize_names(tb)`
 - `paths.load_dependency()` → Use `paths.load_dataset()` or `paths.load_snapshot()`
+- `if __name__ == "__main__"` in snapshots → Remove this outdated pattern
 
 !!! note "How it works"
 
@@ -122,49 +135,76 @@ Catch outdated code patterns as you type with configurable warnings.
 
 ## Developing extensions
 
-Want to improve an existing extension or create a new one? See the [extension development README](https://github.com/owid/etl/blob/master/vscode_extensions/README.md) for detailed instructions.
+Improving existing extensions or creating a new ones is simple. Below, we outline the basic workflow for extension development.
 
-### Quick start
 
-1. **Modify code**: Edit `vscode_extensions/[extension-name]/src/extension.ts`
-2. **Compile**: `npm run compile`
-3. **Package**: `npx @vscode/vsce package`
-4. **Install**: `code --install-extension [extension-name]-[version].vsix --force`
-5. **Test**: Reload VS Code window (++cmd+shift+p++ → "Developer: Reload Window")
+!!! info "See the [extension development README](https://github.com/owid/etl/blob/master/vscode_extensions/README.md) for detailed instructions."
 
-### Contributing improvements
 
-When you improve an extension:
+### Edit the extension
 
-1. ✅ Test thoroughly in your local environment
-2. ✅ Update the extension's README with new features
-3. ✅ Bump version in `package.json` (for code changes, not dependency updates)
-4. ✅ Package and move `.vsix` to `install/` directory
-5. ✅ Create a pull request with your changes
+Edit code in `vscode_extensions/[extension-name]/src/extension.ts`
 
-### Adding new patterns (Detect Outdated Practices)
+### Compile the extension
 
-To add new code quality checks:
+Run the following command from the ETL root directory:
 
-```typescript
-// vscode_extensions/detect-outdated-practices/src/extension.ts
-const OUTDATED_PATTERNS: OutdatedPattern[] = [
-    {
-        pattern: /old_function\(/g,
-        message: 'old_function is deprecated. Use new_function() instead.',
-        severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'  // Optional: limit to specific paths
-    }
-];
+```bash
+make vsce-compile EXT=extension-name
 ```
 
-Then compile, package, and reinstall.
+This compiles the extension and packages it into a `.vsix` file located in `vscode_extensions/[extension-name]/install/`.
+
+Optionally, you can add `BUMP=patch` (or `minor`/`major`) to increment the version in `package.json`. And `INSTALL=1` to install the compiled extension into your local VS Code.
+
+
+### Sync extensions
+Install latest versions (including the one you just compiled) of all extensions:
+```bash
+make vsce-sync
+```
+
+### Reload VS Code
+
+Reload VS Code: cmd+shift+p → "Developer: Reload Window"
+
 
 ## Troubleshooting
 
 ### Extension not working after update
 
-**Solution**: Force reinstall from the project root:
+**Problem**: Ran `make install-vscode-extensions` but extension didn't update.
+
+**Cause**: This command skips already-installed extensions.
+
+**Solution**: Use `make vsce-sync` to force-reinstall all extensions:
+
+```bash
+make vsce-sync
+```
+
+Then reload VS Code: ++cmd+shift+p++ → "Developer: Reload Window"
+
+### Changes not taking effect
+
+**Problem**: Modified extension code but changes don't appear in VS Code.
+
+**Solution**: Compile and reinstall the extension:
+
+```bash
+# Quick method
+make vsce-compile EXT=extension-name INSTALL=1
+
+# Or compile then sync
+make vsce-compile EXT=extension-name
+make vsce-sync
+```
+
+Then reload VS Code: ++cmd+shift+p++ → "Developer: Reload Window"
+
+### Manual troubleshooting
+
+If the automated commands don't work, try manual reinstallation:
 
 ```bash
 cd /path/to/etl
@@ -172,17 +212,6 @@ code --install-extension vscode_extensions/[extension]/install/[extension]-[vers
 ```
 
 Then reload VS Code: ++cmd+shift+p++ → "Developer: Reload Window"
-
-### Changes not taking effect
-
-**Solution**: Ensure you completed all steps:
-
-1. Modified source code
-2. Ran `npm run compile`
-3. Ran `npx @vscode/vsce package`
-4. Moved `.vsix` to `install/` directory
-5. Force reinstalled the extension
-6. Reloaded VS Code window
 
 ### Extension conflicts
 
