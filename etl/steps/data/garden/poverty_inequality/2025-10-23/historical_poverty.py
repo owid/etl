@@ -39,6 +39,7 @@ PROFILING_MODE = True
 
 # Countries to use in profiling mode
 PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India", "World"]
+# PROFILING_COUNTRIES = ["France", "Germany", "World"]
 ##############################################################################
 # Show warnings and comparisons
 SHOW_WARNINGS = False
@@ -311,9 +312,6 @@ def run() -> None:
     tb_interpolated_ginis, tb_population_interpolated_ginis = add_population_comparison(
         tb_poverty=tb_interpolated_ginis
     )
-
-    # Free memory from large intermediate table
-    del tb_thousand_bins_interpolated_ginis
 
     ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
