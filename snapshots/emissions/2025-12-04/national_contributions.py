@@ -1,7 +1,7 @@
 """Script to create a snapshot of dataset National contributions to climate change (Jones et al.).
 
-NOTE: All metadata fields are automatically updated by this script. However, the dataset description may change a bit
-(for example they may cite more recent papers). Visually inspect the dataset description and manually make small
+NOTE: All metadata fields are automatically updated by this script.
+Visually inspect them, especially the dataset description and manually make small
 modifications, if needed.
 
 """
@@ -34,7 +34,7 @@ DATA_FILES = [
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     for data_file in DATA_FILES:
         # Create a new snapshot.
         snap = Snapshot(f"emissions/{SNAPSHOT_VERSION}/national_contributions_{data_file}")
@@ -94,16 +94,22 @@ def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
     # Extract the full citation.
     citation_full = response_citation.text
 
+    # Extract the description between "Background" and "Data records: overview".
+    description = soup.text.split("Background")[1].split("Data records: overview")[0].strip()
+    # Replace non-breaking spaces and normalize whitespace.
+    description = description.replace("\xa0", " ").replace("  ", " ").replace("\n", "\n\n")
+
     # Gather all extracted fields.
     extracted_fields = {
         "date_published": date_published,
         "version_producer": version_producer,
         "url_download": url_download,
         "citation_full": citation_full,
+        "description": description,
     }
 
     return extracted_fields
 
 
 if __name__ == "__main__":
-    main()
+    run()

@@ -5,7 +5,7 @@ from owid.catalog import Dataset, Table, Variable
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -246,7 +246,7 @@ def run_sanity_checks_on_outputs(tb: Table) -> None:
         assert check[(check[column] - check[f"{column}_global"]) / check[f"{column}_global"] > 0.00001].empty, error
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -351,5 +351,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

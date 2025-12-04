@@ -3,29 +3,29 @@ meta:
     producer: Jones et al.
     title: National contributions to climate change
     description: |-
-      A dataset describing the global warming response to national emissions CO₂, CH4 and N2O from fossil and land use sources.
+      A dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2024.
 
-      National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide.
+      National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2025; Friedlingstein et al., 2025). 
 
-      This dataset describes the global warming response to national emissions CO₂, CH₄ and N₂O from fossil and land use sources since 1851.
+      National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2024).
 
-      National CO₂ emissions data are collated from the Global Carbon Project (Andrew and Peters, 2023; Friedlingstein et al., 2023).
+      We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
 
-      National CH₄ and N₂O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2023).
+      Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
 
-      A time series of cumulative CO₂-equivalent emissions is constructed for each country, gas, and emissions source (fossil or land use). Emissions of CH₄ and N₂O emissions are related to cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
-
-      Warming in response to cumulative CO₂-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
-
-      The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO₂, CH₄, N₂O or 3-GHG total) and source (fossil emissions, land use emissions or the total).
+      The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG total) and source (fossil emissions, land use emissions or the total).
     title_snapshot: National contributions to climate change - Cumulative emissions
     citation_full: |-
-      Jones, Matthew W., Glen P. Peters, Thomas Gasser, Robbie M. Andrew, Clemens Schwingshackl, Johannes Gütschow, Richard A. Houghton, Pierre Friedlingstein, Julia Pongratz, and Corinne Le Quéré. “National Contributions to Climate Change Due to Historical Emissions of Carbon Dioxide, Methane and Nitrous Oxide”. Scientific Data. Zenodo, November 13, 2024. https://doi.org/10.5281/zenodo.14054503.
-    version_producer: '2024.2'
+      Jones, Matthew W., Glen P. Peters, Thomas Gasser, Robbie M. Andrew, Clemens Schwingshackl, Johannes Gütschow, Richard A. Houghton, Pierre Friedlingstein, Julia Pongratz, and Corinne Le Quéré. “National Contributions to Climate Change Due to Historical Emissions of Carbon Dioxide, Methane and Nitrous Oxide”. Scientific Data. Zenodo, November 13, 2025. https://doi.org/10.5281/zenodo.16640595.
+    version_producer: '2025.1'
     url_main: https://zenodo.org/records/7636699/latest
-    url_download: https://zenodo.org/records/14054503/files/EMISSIONS_CUMULATIVE_CO2e100_1851-2023.csv
+    url_download: https://zenodo.org/records/16640595/files/EMISSIONS_CUMULATIVE_CO2e100_1851-2024.csv
     date_accessed: '2025-12-04'
-    date_published: '2024-11-13'
+    date_published: '2025-11-13'
     license:
       name: CC BY 4.0
       url: https://zenodo.org/records/7636699/latest
+outs:
+  - md5: 8bc5aab2e7e40fdb31c42ca83afd000b
+    size: 33870799
+    path: national_contributions_cumulative_emissions.csv
