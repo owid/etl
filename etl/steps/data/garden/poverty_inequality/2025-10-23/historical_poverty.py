@@ -482,7 +482,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     if INTERPOLATE_LOG:
         # Create log_gdp_per_capita column, as the logarithm of gdp_per_capita
-        tb_gdp["log_gdp_per_capita"] = tb_gdp["gdp_per_capita"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+        tb_gdp["log_gdp_per_capita"] = safe_log(tb_gdp["gdp_per_capita"])
 
     tb_gdp = interpolate_table(
         tb_gdp,
@@ -1913,6 +1913,60 @@ def expand_means_and_ginis_to_thousand_bins(
     return tb_thousand_bins_from_mean_gini
 
 
+def safe_log(values: pd.Series | np.ndarray) -> np.ndarray:
+    """
+    Compute natural logarithm preserving NaN/inf values.
+
+    Vectorized implementation that handles missing/invalid values correctly.
+
+    Args:
+        values: Input values as pandas Series or numpy array
+
+    Returns:
+        Natural logarithm of values. NaN/inf preserved as-is.
+    """
+    # Convert to float array
+    if isinstance(values, pd.Series):
+        arr = values.values.astype(float)
+    else:
+        arr = np.asarray(values, dtype=float).copy()
+
+    # Mask for finite positive values (where log is valid)
+    valid_mask = np.isfinite(arr) & (arr > 0)
+
+    # Apply log only to valid values
+    np.log(arr, out=arr, where=valid_mask)
+
+    return arr
+
+
+def safe_exp(values: pd.Series | np.ndarray) -> np.ndarray:
+    """
+    Compute exponential preserving NaN/inf values.
+
+    Vectorized implementation that handles missing/invalid values correctly.
+
+    Args:
+        values: Input values as pandas Series or numpy array
+
+    Returns:
+        Exponential of values. NaN/inf preserved as-is.
+    """
+    # Convert to float array
+    if isinstance(values, pd.Series):
+        arr = values.values.astype(float)
+    else:
+        arr = np.asarray(values, dtype=float).copy()
+
+    # Mask for finite values (where exp is valid)
+    valid_mask = np.isfinite(arr)
+
+    # Apply exp only to valid values
+    np.exp(arr, out=arr, where=valid_mask)
+
+    return arr
+
+
 def gini_to_sigma(gini_values: np.ndarray) -> np.ndarray:
     """
     Convert Gini coefficient(s) to sigma parameter of log-normal distribution.
@@ -1990,11 +2044,8 @@ def interpolate_quantiles_in_thousand_bins(
     tb_expanded = tb_expanded.drop(columns=["pop"])
 
     if INTERPOLATE_LOG:
-        # Create column for log-linear interpolation (vectorized)
-        avg_values = tb_expanded["avg"].values.copy().astype(float)
-        valid_mask = np.isfinite(avg_values)
-        np.log(avg_values, out=avg_values, where=valid_mask)
-        tb_expanded["avg"] = avg_values
+        # Create column for log-linear interpolation
+        tb_expanded["avg"] = safe_log(tb_expanded["avg"])
 
     # Make table wide
     tb_expanded = tb_expanded.pivot_table(index=["country", "year"], columns="quantile", values="avg").reset_index()
@@ -2014,11 +2065,8 @@ def interpolate_quantiles_in_thousand_bins(
     tb_expanded = tb_expanded.melt(id_vars=["country", "year"], var_name="quantile", value_name="avg")
 
     if INTERPOLATE_LOG:
-        # Convert back from log to absolute values (vectorized)
-        avg_values = tb_expanded["avg"].values.copy().astype(float)
-        valid_mask = np.isfinite(avg_values)
-        np.exp(avg_values, out=avg_values, where=valid_mask)
-        tb_expanded["avg"] = avg_values
+        # Convert back from log to absolute values
+        tb_expanded["avg"] = safe_exp(tb_expanded["avg"])
 
     # Add population
     tb_expanded = paths.regions.add_population(
