@@ -1,6 +1,6 @@
 steps:
   #
-  # Andrew - CO2 mitigation curves (2019).
+  # Andrew - CO2 mitigation curves.
   #
   data://meadow/andrew/2019-12-03/co2_mitigation_curves:
     - snapshot://andrew/2019-12-03/co2_mitigation_curves_1p5celsius.csv
@@ -12,16 +12,7 @@ steps:
   data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
   #
-  # IPCC - Emission Factor Database (2023-10-24).
-  #
-  data://meadow/emissions/2023-10-24/emission_factors:
-    - snapshot://emissions/2023-10-24/emission_factors.xlsx
-  data://garden/emissions/2023-10-24/emission_factors:
-    - data://meadow/emissions/2023-10-24/emission_factors
-  data://grapher/emissions/2023-10-24/emission_factors:
-    - data://garden/emissions/2023-10-24/emission_factors
-  #
-  # Net zero tracker (2023-10-10).
+  # Net zero tracker.
   #
   data://meadow/emissions/2023-10-10/net_zero_tracker:
     - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
@@ -155,7 +146,7 @@ steps:
     - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget
   #
-  # Decoupling of GDP and CO2 (2023).
+  # Decoupling of GDP and CO2.
   #
   data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2025-09-08/wdi
