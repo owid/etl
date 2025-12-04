@@ -242,9 +242,6 @@ def run() -> None:
         tb_poverty=tb_constant_inequality
     )
 
-    # Free memory from large intermediate table
-    del tb_thousand_bins_constant_inequality
-
     ###############################################################################
     # 2. WITH INEQUALITY CHANGES
     ###############################################################################
@@ -259,7 +256,7 @@ def run() -> None:
     tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
     # Prepare mean and gini data for extrapolation
-    tb_gini_mean = prepare_mean_gini_data(tb=tb_gini_mean, tb_gdp=tb_gdp)
+    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
 
     ###############################################################################
     # 2.1 INTERPOLATING QUANTILES BETWEEN YEARS WITH GINIS
@@ -286,9 +283,6 @@ def run() -> None:
     tb_interpolated_quantiles, tb_population_interpolated_quantiles = add_population_comparison(
         tb_poverty=tb_interpolated_quantiles
     )
-
-    # Free memory from large intermediate table
-    del tb_thousand_bins_interpolated_quantiles
 
     ###############################################################################
     # 2.2 INTERPOLATING GINI
@@ -389,7 +383,7 @@ def run() -> None:
             tb_population_interpolated_ginis,
             # tb_thousand_bins_constant_inequality,
             # tb_thousand_bins_interpolated_quantiles,
-            # tb_thousand_bins_interpolated_ginis,
+            tb_thousand_bins_interpolated_ginis,
             tb_gini_mean,
         ],
         default_metadata=ds_thousand_bins.metadata,
@@ -1383,12 +1377,12 @@ def compare_countries_available_in_two_tables(
     return missing_in_tb_1, missing_in_tb_2
 
 
-def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
+def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
     """
     Prepare mean income and Gini coefficient data for extrapolation.
     It consolidates mean and Gini columns based on priority rules, interpolates missing values, and extrapolates means using GDP growth factors.
     """
-    tb_gini_mean = tb.copy()
+    tb_gini_mean = tb_gini_mean.copy()
     tb_gdp = tb_gdp.copy()
 
     # Check countries missing in either table
@@ -1421,9 +1415,9 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
     tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
 
     # Copy metadata from original columns
-    tb_gini_mean["mean"] = tb_gini_mean["mean"].copy_metadata(tb["mean_filled"] + tb["mean_survey"])
+    tb_gini_mean["mean"] = tb_gini_mean["mean"].copy_metadata(tb_gini_mean["mean_filled"] + tb_gini_mean["mean_survey"])
     tb_gini_mean["gini"] = tb_gini_mean["gini"].copy_metadata(
-        tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]
+        tb_gini_mean["gini_filled"] + tb_gini_mean["gini_survey"] + tb_gini_mean["gini_van_zanden"]
     )
 
     # Keep only relevant columns
@@ -1665,7 +1659,7 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
     # Add the regions available from tb_gdp to tb_gini_mean
     tb_gini_mean = pr.merge(
         tb_gini_mean,
-        tb_gdp[["country", "region"]],
+        tb_gdp[["country", "region"]].drop_duplicates(),
         on="country",
         how="left",
     )
@@ -2284,8 +2278,8 @@ def prepare_and_aggregate_gini_mean_data(tb_gini_mean: Table) -> Table:
             total_income_region=("total_income", "sum"),
             total_population_region=("population", "sum"),
         )
-        .rename(columns={"region": "country"})
         .reset_index()
+        .rename(columns={"region": "country"}, errors="raise")
     )
 
     tb_region["mean"] = tb_region["total_income_region"] / tb_region["total_population_region"]
