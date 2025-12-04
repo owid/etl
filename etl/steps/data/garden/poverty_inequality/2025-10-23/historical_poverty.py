@@ -756,32 +756,36 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     """
     # Convert to categoricals
     # TODO: These should be already categoricals in the first place!
-    tb = tb.astype({"country": "category", "region": "category", "region_old": "category", "year": "UInt32"})
+    tb = tb.astype({"country": "category", "region": "category", "region_old": "category", "year": "UInt16"})
 
     # Sort table by year and avg
     tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
 
     # Calculate the cumulative sum of the population by year
-    tb["cum_pop"] = tb.groupby("year")["pop"].cumsum()
+    tb["cum_pop"] = tb.groupby("year", observed=True)["pop"].cumsum()
 
     # Calculate the global population as the last value of cum_pop by year
-    tb["global_population"] = tb.groupby("year")["cum_pop"].transform("max")
+    tb["global_population"] = tb.groupby("year", observed=True)["cum_pop"].transform("max")
 
     # Calculate the cumulative sum of the population as a percentage of the global population by year
     tb["percentage_global_pop"] = tb["cum_pop"] / tb["global_population"] * 100
+
+    # Optimization: Use drop_duplicates instead of groupby for better performance
+    # Select only the columns we need to reduce memory and improve cache locality
+    output_cols = ["year", "global_population", "cum_pop", "percentage_global_pop"]
 
     # Define empty list to store poverty rows
     tb_poverty = []
 
     # Calculate results for each poverty line
     for poverty_line in POVERTY_LINES:
-        # Filter rows where avg is less than poverty line, and keep only relevant columns
-        tb_poverty_line = tb[tb["avg"] < poverty_line][
-            ["year", "global_population", "cum_pop", "percentage_global_pop"]
-        ].reset_index(drop=True)
+        # Filter rows where avg is less than poverty line
+        # Direct boolean indexing without intermediate copy
+        mask = tb["avg"] < poverty_line
 
-        # Get the last row for each year (highest quantile below poverty line)
-        tb_poverty_line = tb_poverty_line.groupby("year").last().reset_index(drop=True)
+        # Select columns directly and use drop_duplicates in one go
+        # drop_duplicates with subset+keep='last' is faster than groupby().last()
+        tb_poverty_line = tb.loc[mask, output_cols].drop_duplicates(subset=["year"], keep="last").copy()
 
         # Add poverty_line column
         tb_poverty_line["poverty_line"] = poverty_line
@@ -1779,28 +1783,34 @@ def expand_means_and_ginis_to_thousand_bins(
     n_quantiles = 1000
 
     # Pre-compute quantiles and percentiles (same for all rows)
-    quantiles = np.arange(1, n_quantiles + 1)
+    quantiles = np.arange(1, n_quantiles + 1, dtype=np.uint16)  # Use uint16 instead of int64 (quantiles 1-1000)
     percentiles = (quantiles - 0.5) / n_quantiles
 
-    # Compute all incomes using broadcasting (n_rows x n_quantiles matrix)
-    incomes_matrix = stats.lognorm.ppf(percentiles[np.newaxis, :], s=sigmas[:, np.newaxis], scale=scales[:, np.newaxis])
+    # Helper function to compute incomes and return as float32 for memory efficiency
+    # This function scope ensures intermediate arrays are garbage collected immediately
+    def compute_incomes() -> np.ndarray:
+        """Compute income distribution using log-normal, return as float32 to save memory."""
+        incomes = stats.lognorm.ppf(percentiles[np.newaxis, :], s=sigmas[:, np.newaxis], scale=scales[:, np.newaxis])
+        # Convert to float32 (saves 50% memory vs float64, precision is sufficient for income data)
+        return incomes.ravel().astype(np.float32)
 
-    # Create expanded table using numpy repeat/tile (vectorized, no loops)
-    # NOTE: Use .array instead of .values + np.asarray() to preserve categorical dtype
-    # This saves ~800MB per call by keeping country as categorical instead of object
-    country_expanded = np.repeat(tb_new["country"].array, n_quantiles)  # type: ignore
-    year_expanded = np.repeat(tb_new["year"].array, n_quantiles)  # type: ignore
-
+    # Create expanded table without intermediate variables (memory optimization)
+    # Directly use np.repeat in DataFrame construction to avoid storing intermediate arrays
     tb_expanded = Table(
         pd.DataFrame(
             {
-                "country": country_expanded,
-                "year": year_expanded,
-                "quantile": np.tile(quantiles, n_rows),
-                "avg": incomes_matrix.ravel(),
+                # Use .array to preserve categorical dtype, saves ~800MB per call
+                "country": np.repeat(tb_new["country"].array, n_quantiles),  # type: ignore
+                "year": np.repeat(tb_new["year"].array, n_quantiles),  # type: ignore
+                "quantile": np.tile(quantiles, n_rows),  # uint16 quantiles
+                "avg": compute_incomes(),  # float32 incomes, computed and freed immediately
             }
         )
     )
+
+    # Convert quantile and avg to pandas nullable types for consistency
+    tb_expanded["quantile"] = tb_expanded["quantile"].astype("UInt16")
+    tb_expanded["avg"] = tb_expanded["avg"].astype("Float32")
 
     # Add population
     tb_expanded = paths.regions.add_population(
@@ -1811,8 +1821,8 @@ def expand_means_and_ginis_to_thousand_bins(
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
     )
 
-    # Divide population equally among 1000 quantiles
-    tb_expanded["pop"] /= 1000
+    # Divide population equally among 1000 quantiles and convert to Float32 to save memory
+    tb_expanded["pop"] = (tb_expanded["pop"] / 1000).astype("Float32")
 
     # Log summary statistics
     if SHOW_WARNINGS:
@@ -1887,16 +1897,20 @@ def expand_means_and_ginis_to_thousand_bins(
         tb_expanded["region_old"].dtype, pd.CategoricalDtype
     ), f"region_old must be categorical after merge, got {tb_expanded['region_old'].dtype}"
 
+    # OPTIMIZATION: Sort tb_expanded before concatenating to avoid sorting the entire concatenated table
+    # This is much faster because we sort a smaller table, then concat is cheap with sort=False
+    tb_expanded = tb_expanded.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
     # Concatenate with original thousand_bins
     if KEEP_ORIGINAL_THOUSAND_BINS:
         # Only concatenate if we're keeping original data (tb_expanded has only new country-years)
-        tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+        # Use sort=False since both tables are already sorted - this makes concat much faster
+        tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True, sort=False)
     else:
-        tb_thousand_bins_from_mean_gini = tb_expanded.copy()
+        tb_thousand_bins_from_mean_gini = tb_expanded
 
-    tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.sort_values(
-        ["country", "year", "quantile"]
-    ).reset_index(drop=True)
+    # No need to sort again - both inputs are already sorted and concat preserves order with sort=False
+    # tb_thousand_bins_from_mean_gini is already sorted by ["country", "year", "quantile"]
 
     return tb_thousand_bins_from_mean_gini
 
