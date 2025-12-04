@@ -40,6 +40,15 @@ PROFILING_MODE = True
 # Countries to use in profiling mode
 PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India"]
 ##############################################################################
+# Show warnings and comparisons
+SHOW_WARNINGS = False
+
+# Export comparison files to csv
+EXPORT_COMPARISON_CSV = False
+
+# Set number of observations to show in Gini/mean comparison logs
+NUM_OBSERVATIONS_TO_SHOW = 20
+##############################################################################
 
 # Poverty lines (daily income in 2021 PPP$)
 POVERTY_LINES = [3, 10, 30]
@@ -61,15 +70,6 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 
 # Define extreme growth factor thresholds
 EXTREME_GROWTH_FACTOR_THRESHOLDS = [0.8, 1.20]
-
-# Show warnings and comparisons
-SHOW_WARNINGS = True
-
-# Export comparison files to csv
-EXPORT_COMPARISON_CSV = False
-
-# Set number of observations to show in Gini/mean comparison logs
-NUM_OBSERVATIONS_TO_SHOW = 20
 
 # Keep original thousand bins series when calculating bins from mean and gini
 KEEP_ORIGINAL_THOUSAND_BINS = True
