@@ -796,12 +796,10 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
         errors="raise",
     )
 
-    # Copy metadata from avg to headcount
-    tb_poverty["headcount"] = tb_poverty["headcount"].copy_metadata(tb["avg"])
-    tb_poverty["headcount_ratio"] = tb_poverty["headcount_ratio"].copy_metadata(tb["avg"])
-    # Fix units
-    tb_poverty["headcount"].metadata.unit = "people"
-    tb_poverty["headcount"].metadata.short_unit = ""
+    # Copy origins from avg to headcount
+    tb_poverty["headcount"].m.origins = (tb["avg"] + tb["pop"]).m.origins
+    tb_poverty["headcount_ratio"].m.origins = (tb["avg"] + tb["pop"]).m.origins
+    tb_poverty["population"].m.origins = tb["pop"].m.origins
 
     # Add country column
     tb_poverty["country"] = "World"
@@ -809,8 +807,14 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     # Create benchmark columns: same as headcount/headcount_ratio but only for:
     # 1. Years in Maddison World data (before LATEST_YEAR_PIP_FILLED)
     # 2. All years >= LATEST_YEAR_PIP_FILLED
-    tb_poverty["headcount_benchmark"] = tb_poverty["headcount"]
-    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio"]
+    tb_poverty["headcount_benchmark"] = tb_poverty["headcount"].copy()
+    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio"].copy()
+
+    # Copy metadata
+    tb_poverty["headcount_benchmark"] = tb_poverty["headcount_benchmark"].copy_metadata(tb_poverty["headcount"])
+    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio_benchmark"].copy_metadata(
+        tb_poverty["headcount_ratio"]
+    )
 
     # Set to pd.NA for years not in Maddison World data AND before LATEST_YEAR_PIP_FILLED
     mask_not_benchmark = ~tb_poverty["year"].isin(maddison_world_years) & (tb_poverty["year"] < LATEST_YEAR_PIP_FILLED)
