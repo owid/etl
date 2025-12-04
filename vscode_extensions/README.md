@@ -7,31 +7,31 @@
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
 | `make install-vscode-extensions` | Install all extensions for first time | Initial setup only (skips already-installed) |
-| `make vsc-ext-sync` | Force-reinstall all extensions | After compiling any extension to update it |
-| `make vsc-ext-compile EXT=name INSTALL=1` | Compile and install single extension | Quick development iteration |
-| `make vsc-ext-compile EXT=name BUMP=patch INSTALL=1` | Bump version, compile, and install | Before committing new features |
+| `make vsce-sync` | Force-reinstall all extensions | After compiling any extension to update it |
+| `make vsce-compile EXT=name INSTALL=1` | Compile and install single extension | Quick development iteration |
+| `make vsce-compile EXT=name BUMP=patch INSTALL=1` | Bump version, compile, and install | Before committing new features |
 
 ### Common Workflows
 
 **Rapid development (most common):**
 ```bash
 # Edit code → compile → install immediately (keeps current version)
-make vsc-ext-compile EXT=detect-outdated-practices INSTALL=1
+make vsce-compile EXT=detect-outdated-practices INSTALL=1
 ```
 
 **Before committing (bump version):**
 ```bash
 # Bump version → compile → install
-make vsc-ext-compile EXT=detect-outdated-practices BUMP=patch INSTALL=1
+make vsce-compile EXT=detect-outdated-practices BUMP=patch INSTALL=1
 ```
 
 **Alternative workflow (compile then sync):**
 ```bash
 # Step 1: Compile one or more extensions
-make vsc-ext-compile EXT=detect-outdated-practices
+make vsce-compile EXT=detect-outdated-practices
 
 # Step 2: Sync all extensions at once
-make vsc-ext-sync
+make vsce-sync
 ```
 
 ### Key Concepts
@@ -44,7 +44,7 @@ make vsc-ext-sync
 
 **Installation:**
 - **INSTALL=1**: Immediately installs after compilation with `--force` flag
-- **make vsc-ext-sync**: Force-reinstalls ALL custom extensions with their latest VSIX files
+- **make vsce-sync**: Force-reinstalls ALL custom extensions with their latest VSIX files
 - **make install-vscode-extensions**: Only installs extensions not already installed (skips updates)
 
 **File Structure:**
@@ -65,14 +65,14 @@ vscode_extensions/
 
 **Problem: "I ran `make install-vscode-extensions` but my extension didn't update"**
 - **Cause**: This command skips already-installed extensions
-- **Solution**: Use `make vsc-ext-sync` instead to force-reinstall all extensions
+- **Solution**: Use `make vsce-sync` instead to force-reinstall all extensions
 
 **Problem: "Changes to my code aren't showing up in VS Code"**
 - **Cause**: Extension wasn't reinstalled with the new version
-- **Solution**: After compiling, run `make vsc-ext-sync` or use `INSTALL=1` flag
+- **Solution**: After compiling, run `make vsce-sync` or use `INSTALL=1` flag
 
 **Problem: "I want to test without bumping the version"**
-- **Solution**: Omit the `BUMP` parameter: `make vsc-ext-compile EXT=name INSTALL=1`
+- **Solution**: Omit the `BUMP` parameter: `make vsce-compile EXT=name INSTALL=1`
 
 **Problem: "How do I know which version is installed?"**
 ```bash
@@ -138,14 +138,14 @@ On the test window, you can test the extension behavior (e.g., cmd+shift+p to se
 From the project root:
 ```bash
 # Option 1: Compile and install in one step
-make vsc-ext-compile EXT=your-extension-name INSTALL=1
+make vsce-compile EXT=your-extension-name INSTALL=1
 
 # Option 2: Compile, then sync all extensions
-make vsc-ext-compile EXT=your-extension-name
-make vsc-ext-sync
+make vsce-compile EXT=your-extension-name
+make vsce-sync
 
 # With version bump (patch, minor, or major)
-make vsc-ext-compile EXT=your-extension-name BUMP=patch INSTALL=1
+make vsce-compile EXT=your-extension-name BUMP=patch INSTALL=1
 ```
 
 **Legacy workflow:**
@@ -161,7 +161,7 @@ mv *.vsix install/
 Then install via:
 - GUI: `cmd+shift+p` → "Extensions: Install from VSIX"
 - CLI: `code --install-extension install/extension-name-version.vsix --force`
-- Or: `make vsc-ext-sync` from project root
+- Or: `make vsce-sync` from project root
 
 ## Updating dependencies
 
