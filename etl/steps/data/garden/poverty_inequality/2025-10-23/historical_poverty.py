@@ -755,6 +755,10 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     Also creates benchmark columns (headcount_benchmark and headcount_ratio_benchmark) that only include data
     for years where World has data in the Maddison dataset.
     """
+    # Convert to categoricals
+    # TODO: These should be already categoricals in the first place!
+    tb = tb.astype({"country": "category", "region": "category", "region_old": "category", "year": "UInt32"})
+
     # Sort table by year and avg
     tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
 
@@ -778,7 +782,7 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
         ].reset_index(drop=True)
 
         # Get the last row for each year (highest quantile below poverty line)
-        tb_poverty_line = tb_poverty_line.groupby("year").tail(1).reset_index(drop=True)
+        tb_poverty_line = tb_poverty_line.groupby("year").last().reset_index(drop=True)
 
         # Add poverty_line column
         tb_poverty_line["poverty_line"] = poverty_line
@@ -1740,11 +1744,11 @@ def expand_means_and_ginis_to_thousand_bins(
     tb_gini_mean["region"] = tb_gini_mean["region"].astype("category")
 
     if KEEP_ORIGINAL_THOUSAND_BINS:
-        # Filter tb_gini_mean to only country-years not in tb_thousand_bins
-        existing_country_years = set(tb_thousand_bins[["country", "year"]].drop_duplicates().apply(tuple, axis=1))
-        tb_new = tb_gini_mean[
-            ~tb_gini_mean[["country", "year"]].apply(tuple, axis=1).isin(existing_country_years)
-        ].copy()
+        # Filter tb_gini_mean to only country-years not in tb_thousand_bins using vectorized merge
+        existing = tb_thousand_bins[["country", "year"]].drop_duplicates()
+        existing["_exists"] = True
+        tb_merged = tb_gini_mean.merge(existing, on=["country", "year"], how="left")
+        tb_new = tb_gini_mean[tb_merged["_exists"].isna()].copy()
     else:
         tb_new = tb_gini_mean.copy()
 
