@@ -260,7 +260,11 @@ def run() -> None:
 
     # Transpose data.
     tb = tb.pivot(
-        index=["country", "year"], columns=["file", "gas", "component"], values="data", join_column_levels_with="_"
+        index=["country", "year"],
+        columns=["file", "gas", "component"],
+        values="data",
+        join_column_levels_with="_",
+        fill_dimensions=False,
     )
 
     # We add the emissions from the Kuwaiti oil fires in 1991 (which are also included as a separate country) as part
