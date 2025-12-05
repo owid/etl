@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global Forest Resources Assessment"
+    date_published: "2025-10-24"
+
+    # Citation
+    producer: Food and Agriculture Organization of the United Nations
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations. 2025. Global Forest Resources Assessment 2025. Rome.
+    attribution_short: FAO
+    # Files
+    url_main: https://www.fao.org/forest-resources-assessment/en
+    url_download: https://fra-data.fao.org/api/file/bulk-download?assessmentName=fra&cycleName=2025&countryIso=WO
+    date_accessed: '2025-12-05'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 64c2208199037e6c68c5ca1c658a15b1
+    size: 1212430
+    path: fra.zip
