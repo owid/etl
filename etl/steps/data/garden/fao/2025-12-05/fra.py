@@ -67,6 +67,9 @@ def run() -> None:
     tb[["_1a_forestarea", "_1d_expansion", "_1d_afforestation", "_1d_nat_exp", "_1d_deforestation"]] = (
         tb[["_1a_forestarea", "_1d_expansion", "_1d_afforestation", "_1d_nat_exp", "_1d_deforestation"]] * 1000
     )
+    # Linearly interpolate forest area for missing years
+    tb = linearly_interpolate_forest_area(tb)
+    # Calculate additional variables
     tb = calculate_net_change_in_forest_area(tb)
     tb = calculate_share_of_global_forest_area(tb)
     tb = calculate_annual_change_in_forest_area_as_share_forest_area(tb)
@@ -84,6 +87,26 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def linearly_interpolate_forest_area(tb: Table) -> Table:
+    # Add rows for missing years and linearly interpolate forest area
+    all_years = range(tb["year"].min(), tb["year"].max() + 1)
+    country_all_years = (
+        tb[["country"]]
+        .drop_duplicates()
+        .assign(key=1)
+        .merge(Table.from_dict({"year": all_years}).assign(key=1), on="key")
+        .drop(columns=["key"])
+    )
+    tb = country_all_years.merge(tb, on=["country", "year"], how="left")
+
+    tb = tb.sort_values(by=["country", "year"])
+    # linearly interpolate forest area
+    tb["_1a_forestarea"] = tb.groupby("country")["_1a_forestarea"].transform(
+        lambda group: group.interpolate(method="linear")
+    )
+    return tb
 
 
 def calculate_share_of_global_forest_area(tb: Table) -> Table:
