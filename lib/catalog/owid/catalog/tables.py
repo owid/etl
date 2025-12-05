@@ -2968,22 +2968,23 @@ def keep_metadata(func: Callable[..., pd.DataFrame | pd.Series]) -> Callable[...
     on Table or Variable and preserves metadata.  If the decorated function renames columns, their
     metadata won't be copied.
 
-    Usage:
+    Example:
+        ```python
+        import owid.catalog.processing as pr
 
-    import owid.catalog.processing as pr
+        @pr.keep_metadata
+        def my_df_func(df: pd.DataFrame) -> pd.DataFrame:
+            return df + 1
 
-    @pr.keep_metadata
-    def my_df_func(df: pd.DataFrame) -> pd.DataFrame:
-        return df + 1
-
-    tb = my_df_func(tb)
+        tb = my_df_func(tb)
 
 
-    @pr.keep_metadata
-    def my_series_func(s: pd.Series) -> pd.Series:
-        return s + 1
+        @pr.keep_metadata
+        def my_series_func(s: pd.Series) -> pd.Series:
+            return s + 1
 
-    tb.a = my_series_func(tb.a)
+        tb.a = my_series_func(tb.a)
+        ```
     """
 
     def wrapper(*args: Any, **kwargs: Any) -> Table | variables.Variable:
