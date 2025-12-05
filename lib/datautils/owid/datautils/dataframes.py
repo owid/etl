@@ -27,18 +27,30 @@ def to_file(*args: Any, **kwargs: Any) -> None:
 
 
 def has_index(df: pd.DataFrame) -> bool:
-    """Return True if a dataframe has an index, and False if it does not (i.e. if it has a dummy index).
+    """Check if a DataFrame has a meaningful index.
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Dataframe whose index will be checked.
+    Determines whether a DataFrame has an actual index set, or just the
+    default dummy integer index created by pandas.
 
-    Returns
-    -------
-    df_has_index : bool
-        True if dataframe has a non-dummy (single- or multi-) index.
+    Args:
+        df: DataFrame to check for index.
 
+    Returns:
+        True if DataFrame has a non-dummy (single or multi) index, False otherwise.
+
+    Example:
+        ```python
+        import pandas as pd
+        from owid.datautils import has_index
+
+        # DataFrame with dummy index
+        df1 = pd.DataFrame({"a": [1, 2, 3]})
+        print(has_index(df1))  # False
+
+        # DataFrame with actual index
+        df2 = df1.set_index("a")
+        print(has_index(df2))  # True
+        ```
     """
     # Dataframes always have an attribute index.names, which is a frozen list.
     # If the dataframe has no set index (i.e. if it has a dummy index), that list contains only [None].
@@ -63,37 +75,46 @@ def compare(
     absolute_tolerance: float = 1e-8,
     relative_tolerance: float = 1e-8,
 ) -> pd.DataFrame:
-    """Compare two dataframes element by element to see if they are equal.
+    """Compare two DataFrames element-wise for equality.
 
-    It assumes that nans are all identical, and allows for certain absolute and relative tolerances for the comparison
-    of floats.
+    Performs element-by-element comparison of two DataFrames, treating NaN values
+    as equal and allowing tolerance for floating-point comparisons.
 
-    NOTE: Dataframes must have the same number of rows to be able to compare them.
+    Args:
+        df1: First DataFrame to compare.
+        df2: Second DataFrame to compare.
+        columns: List of column names to compare (must exist in both DataFrames).
+            If None, all common columns are compared.
+        absolute_tolerance: Maximum absolute difference allowed for values to be
+            considered equal: `abs(a - b) <= absolute_tolerance`.
+        relative_tolerance: Maximum relative difference allowed for values to be
+            considered equal: `abs(a - b) / abs(b) <= relative_tolerance`.
 
-    Parameters
-    ----------
-    df1 : pd.DataFrame
-        First dataframe.
-    df2 : pd.DataFrame
-        Second dataframe.
-    columns : list or None
-        List of columns to compare (they both must exist in both dataframes). If None, common columns will be compared.
-    absolute_tolerance : float
-        Absolute tolerance to assume in the comparison of each cell in the dataframes. A value a of an element in df1 is
-        considered equal to the corresponding element b at the same position in df2, if:
-        abs(a - b) <= absolute_tolerance
-    relative_tolerance : float
-        Relative tolerance to assume in the comparison of each cell in the dataframes. A value a of an element in df1 is
-        considered equal to the corresponding element b at the same position in df2, if:
-        abs(a - b) / abs(b) <= relative_tolerance
+    Returns:
+        DataFrame of booleans with the same shape as the comparison. Each element
+        is True if the corresponding values in df1 and df2 are equal (within tolerance).
 
-    Returns
-    -------
-    compared : pd.DataFrame
-        Dataframe of booleans, with as many rows as df1 and df2, and as many columns as specified by `columns` argument
-        (or as many common columns between df1 and df2, if `columns` is None). The (i, j) element is True if df1 and f2
-        have the same value (for the given tolerances) at that same position.
+    Raises:
+        ObjectsAreNotDataframes: If either input is not a DataFrame.
+        DataFramesHaveDifferentLengths: If DataFrames have different row counts.
 
+    Example:
+        ```python
+        import pandas as pd
+        from owid.datautils.dataframes import compare
+
+        df1 = pd.DataFrame({"a": [1.0, 2.0], "b": [3.0, 4.0]})
+        df2 = pd.DataFrame({"a": [1.0001, 2.0], "b": [3.0, 4.1]})
+
+        result = compare(df1, df2, absolute_tolerance=0.01)
+        print(result)
+        #       a      b
+        # 0  True   True
+        # 1  True  False
+        ```
+
+    Note:
+        DataFrames must have the same number of rows to be compared.
     """
     # Ensure dataframes can be compared.
     if (not isinstance(df1, pd.DataFrame)) or (not isinstance(df2, pd.DataFrame)):
@@ -285,55 +306,84 @@ def groupby_agg(
     frac_allowed_nans: Optional[float] = None,
     min_num_values: Optional[int] = None,
 ) -> pd.DataFrame:
-    """Group dataframe by certain columns, and aggregate using a certain method, and decide how to handle nans.
+    """Group DataFrame with intelligent NaN handling during aggregation.
 
-    This function is similar to the usual
-    > df.groupby(groupby_columns).agg(aggregations)
-    However, pandas by default ignores nans in aggregations. This implies, for example, that
-    > df.groupby(groupby_columns).sum()
-    will treat nans as zeros, which can be misleading.
+    Enhanced version of `pandas.DataFrame.groupby().agg()` that provides control over
+    how NaN values are treated during aggregation. By default, pandas ignores NaNs,
+    which can produce misleading results (e.g., treating NaNs as zeros in sums).
 
-    When both num_allowed_nans, frac_allowed_nans, and min_num_values are None, this function behaves like the default
-    pandas groupby().agg() (and nans may be treated as zeros).
+    This function supports weighted aggregations using the special syntax
+    `mean_weighted_by_<column_name>` for any aggregation.
 
-    Otherwise, if any of those parameters is not None, then the following conditions are applied (one after the other):
+    Behavior:
+        - When all NaN parameters are None: behaves like standard pandas groupby
+        - When any NaN parameter is set: applies sequential validation rules
 
-    1. If num_allowed_nans is not None, then a group will be nan if the number of nans in that group is larger than
-      num_allowed_nans.
-      For example, if num_allowed_nans is set to 1, and there are 2 or more nans in a group, the aggregate will be nan.
+    NaN Handling Rules (applied in order):
+        1. If `num_allowed_nans` is set: group becomes NaN if it has more NaNs
+        2. If `frac_allowed_nans` is set: group becomes NaN if NaN fraction exceeds threshold
+        3. If `min_num_values` is set: group becomes NaN if valid values < threshold
 
-    2. If frac_allowed_nans is not None, then a group will be nan if the fraction of nans in that group is larger than
-      frac_allowed_nans.
-      For example, if frac_allowed_nans is set to 0.2, and the fraction of nans in a group 0.201, the aggregate will be
-      nan.
+    Args:
+        df: Source DataFrame to group and aggregate.
+        groupby_columns: Column name(s) to group by. Can be a single string or list.
+        aggregations: Dictionary mapping column names to aggregation functions.
+            If None, applies 'sum' to all columns. Supports weighted means with
+            syntax: `{'col': 'mean_weighted_by_weight_col'}`.
+        num_allowed_nans: Maximum number of NaN values allowed in a group before
+            the aggregate becomes NaN.
+        frac_allowed_nans: Maximum fraction of NaN values allowed (0.0-1.0).
+            Group becomes NaN if NaN fraction exceeds this threshold.
+        min_num_values: Minimum number of non-NaN values required. Group becomes
+            NaN if it has fewer valid values (and at least one NaN).
 
-    3. If min_num_values is not None, then a group will be nan if the number of non-nan values is smaller than
-      min_num_values. Note that, for this condition to be relevant, min_num_values must be >= 1.
-      For example, if min_num_values is set to 1, and all values in a group are nan, the aggregate will be nan (instead
-      of a spurious zero, as it commonly happens).
+    Returns:
+        Grouped and aggregated DataFrame with NaN handling applied.
 
-    NOTE: This function won't work when using multiple aggregations for the same column (e.g. {'a': ('sum', 'mean')}).
+    Example:
+        Basic groupby with NaN control
+        ```python
+        import pandas as pd
+        from owid.datautils.dataframes import groupby_agg
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Original dataframe.
-    groupby_columns : list or str
-        List of columns to group by. It can be given as a string, if it is only one column.
-    aggregations : dict or None
-        Aggregations to apply to each column in df. If None, 'sum' will be applied to all columns.
-    num_allowed_nans : int or None
-        Maximum number of nans that are allowed in a group.
-    frac_allowed_nans : float or None
-        Maximum fraction of nans that are allowed in a group.
-    min_num_values : int or None
-        Minimum number of non-nan values that a group must have. If fewer values are found, the aggregate will be nan.
+        df = pd.DataFrame({
+            "country": ["USA", "USA", "UK", "UK"],
+            "year": [2020, 2021, 2020, 2021],
+            "value": [100, None, 200, 300]
+        })
 
-    Returns
-    -------
-    grouped : pd.DataFrame
-        Grouped dataframe after applying aggregations.
+        # Standard pandas sum treats NaN as 0
+        # result = df.groupby("country").sum()  # USA: 100
 
+        # With min_num_values=1, NaN if all values are NaN
+        result = groupby_agg(
+            df,
+            groupby_columns="country",
+            aggregations={"value": "sum"},
+            min_num_values=1
+        )
+        # USA: 100 (has 1 valid value), UK: 500 (has 2 valid values)
+        ```
+
+        Weighted mean aggregation
+        ```python
+        df = pd.DataFrame({
+            "country": ["USA", "USA", "UK"],
+            "value": [10, 20, 30],
+            "population": [100, 200, 300]
+        })
+
+        result = groupby_agg(
+            df,
+            groupby_columns="country",
+            aggregations={"value": "mean_weighted_by_population"}
+        )
+        # USA: 16.67 = (10*100 + 20*200)/(100+200)
+        ```
+
+    Note:
+        Does not support multiple aggregations for the same column
+        (e.g., `{'a': ('sum', 'mean')}`).
     """
     if isinstance(groupby_columns, str):
         groupby_columns = [groupby_columns]
@@ -440,24 +490,35 @@ def count_missing_in_groups(df: pd.DataFrame, groupby_columns: List[str], **kwar
 
 
 def multi_merge(dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "inner") -> pd.DataFrame:
-    """Merge multiple dataframes.
+    """Merge multiple DataFrames on common columns.
 
-    This is a helper function when merging more than two dataframes on common columns.
+    Convenience function for merging more than two DataFrames sequentially.
+    Equivalent to chaining multiple `pd.merge()` calls.
 
-    Parameters
-    ----------
-    dfs : list
-        Dataframes to be merged.
-    on : list or str
-        Column or list of columns on which to merge. These columns must have the same name on all dataframes.
-    how : str
-        Method to use for merging (with the same options available in pd.merge).
+    Args:
+        dfs: List of DataFrames to merge.
+        on: Column name(s) to merge on. Must exist in all DataFrames with
+            the same name.
+        how: Type of merge to perform. Options: 'inner', 'outer', 'left', 'right'.
+            Default is 'inner'.
 
-    Returns
-    -------
-    merged : pd.DataFrame
-        Input dataframes merged.
+    Returns:
+        Merged DataFrame containing all input DataFrames joined on specified columns.
 
+    Example:
+        ```python
+        import pandas as pd
+        from owid.datautils.dataframes import multi_merge
+
+        df1 = pd.DataFrame({"country": ["USA", "UK"], "gdp": [20, 3]})
+        df2 = pd.DataFrame({"country": ["USA", "UK"], "pop": [330, 67]})
+        df3 = pd.DataFrame({"country": ["USA", "UK"], "area": [9.8, 0.24]})
+
+        result = multi_merge([df1, df2, df3], on="country")
+        #   country  gdp  pop  area
+        # 0     USA   20  330  9.80
+        # 1      UK    3   67  0.24
+        ```
     """
     merged = dfs[0].copy()
     for df in dfs[1:]:
@@ -474,38 +535,60 @@ def map_series(
     warn_on_unused_mappings: bool = False,
     show_full_warning: bool = False,
 ) -> pd.Series:
-    """Map values of a series given a certain mapping.
+    """Map Series values with performance optimization and flexible NaN handling.
 
-    This function does almost the same as
-    > series.map(mapping)
-    However, map() translates values into nan if those values are not in the mapping, whereas this function allows to
-    optionally keep the original values.
+    Enhanced version of `pandas.Series.map()` that:
+    - Preserves unmapped values instead of converting to NaN (optional)
+    - Much faster than `Series.replace()` for large DataFrames
+    - Supports categorical Series with automatic category management
+    - Provides warnings for missing or unused mappings
 
-    This function should do the same as
-    > series.replace(mapping)
-    However .replace() becomes very slow on big dataframes.
+    Behavior differences from `pandas.Series.map()`:
+        - Default: unmapped values keep original values (not NaN)
+        - With `make_unmapped_values_nan=True`: same as `Series.map()`
 
-    Parameters
-    ----------
-    series : pd.Series
-        Original series to be mapped.
-    mapping : dict
-        Mapping.
-    make_unmapped_values_nan : bool
-        If true, values in the series that are not in the mapping will be translated into nan; otherwise, they will keep
-        their original values.
-    warn_on_missing_mappings : bool
-        True to warn if elements in series are missing in mapping.
-    warn_on_unused_mappings : bool
-        True to warn if the mapping contains values that are not present in the series. False to ignore.
-    show_full_warning : bool
-        True to print the entire list of unused mappings (only relevant if warn_on_unused_mappings is True).
+    Args:
+        series: Series to map values from.
+        mapping: Dictionary mapping old values to new values.
+        make_unmapped_values_nan: If True, unmapped values become NaN.
+            If False, they retain original values.
+        warn_on_missing_mappings: If True, warn about values in Series
+            that don't exist in mapping.
+        warn_on_unused_mappings: If True, warn about mapping entries
+            not used by any value in Series.
+        show_full_warning: If True, print full list of missing/unused
+            values in warnings.
 
-    Returns
-    -------
-    series_mapped : pd.Series
-        Mapped series.
+    Returns:
+        Series with mapped values.
 
+    Example:
+        Basic mapping
+        ```python
+        import pandas as pd
+        from owid.datautils.dataframes import map_series
+
+        series = pd.Series(["usa", "uk", "france"])
+        mapping = {"usa": "United States", "uk": "United Kingdom"}
+
+        # Default: unmapped values preserved
+        result = map_series(series, mapping)
+        # ["United States", "United Kingdom", "france"]
+
+        # With NaN for unmapped
+        result = map_series(series, mapping, make_unmapped_values_nan=True)
+        # ["United States", "United Kingdom", NaN]
+        ```
+
+        With warnings
+        ```python
+        result = map_series(
+            series,
+            mapping,
+            warn_on_missing_mappings=True,  # Warns about "france"
+            warn_on_unused_mappings=True    # Warns if mapping has unused keys
+        )
+        ```
     """
     # If given category, only map category names and return category type.
     if series.dtype == "category":

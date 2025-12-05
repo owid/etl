@@ -10,23 +10,35 @@ from requests.packages.urllib3.util.ssl_ import create_urllib3_context  # type: 
 
 
 def get_base_url(url: str, include_scheme: bool = True) -> str:
-    """Get base URL from an arbitrary URL path (e.g. "https://example.com/some/path" -> "https://example.com").
+    """Extract base URL from a full URL path.
 
-    If the given URL does not start with "http(s)://"
+    Parses a URL and returns just the base domain with optional scheme.
+    Automatically adds `http://` scheme if not present in input.
 
-    Parameters
-    ----------
-    url : str
-        Input URL.
-    include_scheme : bool, optional
-        True to include "http(s)://" at the beginning of the returned base URL.
-        False to hide the "http(s)://" (so that "https://example.com/some/path" -> "example.com").
+    Args:
+        url: Input URL to parse (e.g., "https://example.com/some/path").
+        include_scheme: If True, include "http(s)://" in result.
+            If False, return domain only.
 
-    Returns
-    -------
-    base_url : str
-        Base URL.
+    Returns:
+        Base URL extracted from input.
 
+    Example:
+        ```python
+        from owid.datautils.web import get_base_url
+
+        # With scheme
+        get_base_url("https://example.com/some/path")
+        # Returns: "https://example.com"
+
+        # Without scheme
+        get_base_url("https://example.com/some/path", include_scheme=False)
+        # Returns: "example.com"
+
+        # URL without scheme (assumes http://)
+        get_base_url("example.com/path")
+        # Returns: "http://example.com"
+        ```
     """
     # Function urlparse cannot parse a url if it does not start with http(s)://.
     # If such a url is passed, assume "http://".
@@ -72,23 +84,49 @@ def download_file_from_url(
     verify: bool = True,
     ciphers_low: bool = False,
 ) -> None:
-    """Download file from a URL into a local file.
+    """Download a file from URL to local filesystem.
 
-    Parameters
-    ----------
-    url : str
-        URL of the file to be downloaded.
-    local_path : str
-        Path to local file that will be created.
-    chunk_size : float, optional
-        Maximum size of the chunks of the response of a request.
-    timeout : float, optional
-        Timeout for standard GET requests.
-    verify : bool, optional
-        Verify SSL certificate for HTTPS requests.
-    ciphers_low : bool, optional
-        Use less restrictive encryption for request (required by certain old web sites).
+    Downloads files in chunks to handle large files efficiently. Supports
+    legacy websites requiring lower encryption standards.
 
+    Args:
+        url: URL of the file to download.
+        local_path: Destination path for the downloaded file.
+        chunk_size: Size of download chunks in bytes. Default is 1MB.
+        timeout: Request timeout in seconds. Default is 30 seconds.
+        verify: If True, verify SSL certificates for HTTPS requests.
+            Set to False for self-signed certificates.
+        ciphers_low: If True, use less restrictive encryption (Triple DES).
+            Required for some legacy websites with outdated SSL configurations.
+
+    Example:
+        Basic download
+        ```python
+        from owid.datautils.web import download_file_from_url
+
+        download_file_from_url(
+            "https://example.com/data.csv",
+            "local_data.csv"
+        )
+        ```
+
+        Download from legacy website
+        ```python
+        download_file_from_url(
+            "https://old-site.com/file.zip",
+            "local_file.zip",
+            ciphers_low=True  # Enable Triple DES for old SSL
+        )
+        ```
+
+        Large file with custom chunk size
+        ```python
+        download_file_from_url(
+            "https://example.com/bigfile.bin",
+            "bigfile.bin",
+            chunk_size=10 * 1024 * 1024  # 10MB chunks
+        )
+        ```
     """
     # Create a persistent request session.
     with requests.Session() as session:
