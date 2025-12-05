@@ -59,3 +59,13 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/forests/2025-08-26/tree_cover_loss_by_driver:
     - data://garden/forests/2025-08-26/tree_cover_loss_by_driver
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/fao/2025-12-05/fra:
+    - snapshot://fao/2025-12-05/fra.zip
+  data://garden/fao/2025-12-05/fra:
+    - data://meadow/fao/2025-12-05/fra
+  data://grapher/fao/2025-12-05/fra:
+    - data://garden/fao/2025-12-05/fra
