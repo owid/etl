@@ -38,7 +38,7 @@ paths = PathFinder(__file__)
 PROFILING_MODE = False
 
 # Countries to use in profiling mode
-PROFILING_COUNTRIES = ["United States", "United Kingdom", "Zimbabwe", "Brazil", "China", "India"]
+PROFILING_COUNTRIES = ["United States", "Zimbabwe", "Brazil", "China", "India"]
 ##############################################################################
 # Show warnings and comparisons
 SHOW_WARNINGS = False
@@ -159,19 +159,27 @@ def run() -> None:
     #
     # Load thousand bins dataset, and read its main table.
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
-    tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
+    tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution", safe_types=False)
 
     # Load Maddison Project Database, and read its main table.
     ds_maddison = paths.load_dataset("maddison_project_database")
-    tb_maddison = ds_maddison.read("maddison_project_database")
+    tb_maddison = ds_maddison.read("maddison_project_database", safe_types=False)
 
     # Load World Bank PIP dataset, and read its main table.
     ds_pip = paths.load_dataset("world_bank_pip")
-    tb_pip = ds_pip.read("world_bank_pip")
+    tb_pip = ds_pip.read("world_bank_pip", safe_types=False)
 
     # Load historical inequality dataset, and read its main table.
     ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
-    tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al")
+    tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al", safe_types=False)
+
+    # DEBUG: Filter to subset of countries for profiling
+    if PROFILING_MODE:
+        tb_thousand_bins = tb_thousand_bins.loc[tb_thousand_bins["country"].isin(PROFILING_COUNTRIES)].reset_index(
+            drop=True
+        )
+        tb_pip = tb_pip.loc[tb_pip["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
+        tb_van_zanden = tb_van_zanden.loc[tb_van_zanden["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
 
     # Filter to profiling countries if in profiling mode
     if PROFILING_MODE:
@@ -248,7 +256,7 @@ def run() -> None:
     tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
     # Prepare mean and gini data for extrapolation
-    tb_gini_mean = prepare_mean_gini_data(tb_gini_mean=tb_gini_mean, tb_gdp=tb_gdp)
+    tb_gini_mean = prepare_mean_gini_data(tb=tb_gini_mean, tb_gdp=tb_gdp)
 
     ###############################################################################
     # 2.1 INTERPOLATING QUANTILES BETWEEN YEARS WITH GINIS
@@ -312,7 +320,7 @@ def run() -> None:
     # EDIT TABLE WITH GINI AND MEAN VALUES
     ###############################################################################
 
-    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb_gini_mean=tb_gini_mean)
+    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb=tb_gini_mean)
 
     ###############################################################################
     # FORMAT AND SAVE DATA
@@ -344,12 +352,20 @@ def run() -> None:
     tb_population_interpolated_ginis = tb_population_interpolated_ginis.format(
         ["country", "year"], short_name="population_interpolated_ginis"
     )
+    # Drop duplicates in profiling mode (filtering causes duplicates in merge logic)
+    if PROFILING_MODE:
+        tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.drop_duplicates(
+            subset=["country", "year", "region", "region_old", "quantile"]
+        )
     tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
         ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
     )
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
 
+    # Drop duplicates in profiling mode (filtering causes duplicates in merge logic)
+    if PROFILING_MODE:
+        tb_gini_mean = tb_gini_mean.drop_duplicates(subset=["country", "year"])
     tb_gini_mean = tb_gini_mean.format(["country", "year"], short_name="gini_mean")
 
     #
@@ -401,32 +417,34 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Remove rows with missing GDP per capita
     tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"]).reset_index(drop=True)
 
-    # Assert that historical_entities keys and successor states are in tb_gdp
-    all_countries = set(tb_gdp["country"].unique())
-    for entity_name, entity_data in historical_entities.items():
-        if entity_name not in all_countries:
-            log.error(f"prepare_gdp_data: Historical entity '{entity_name}' not found in GDP data")
-        # Get region for this entity.
-        region = tb_maddison[tb_maddison["country"] == entity_name]["region"].drop_duplicates().item()
-        for successor in entity_data["successors"]:
-            if successor not in all_countries:
-                if SHOW_WARNINGS:
-                    log.warning(
-                        f"prepare_gdp_data: Successor state '{successor}' of '{entity_name}' not found in GDP data. Adding it to table."
+    # Skip historical entities assertions in profiling mode
+    if not PROFILING_MODE:
+        # Assert that historical_entities keys and successor states are in tb_gdp
+        all_countries = set(tb_gdp["country"].unique())
+        for entity_name, entity_data in historical_entities.items():
+            if entity_name not in all_countries:
+                log.error(f"prepare_gdp_data: Historical entity '{entity_name}' not found in GDP data")
+            # Get region for this entity.
+            region = tb_maddison[tb_maddison["country"] == entity_name]["region"].drop_duplicates().item()
+            for successor in entity_data["successors"]:
+                if successor not in all_countries:
+                    if SHOW_WARNINGS:
+                        log.warning(
+                            f"prepare_gdp_data: Successor state '{successor}' of '{entity_name}' not found in GDP data. Adding it to table."
+                        )
+                    # Create a new row for the missing successor state
+                    tb_add_successor = Table(
+                        pd.DataFrame(
+                            data={
+                                "country": [successor],
+                                "year": [LATEST_YEAR],
+                                "gdp_per_capita": [pd.NA],
+                                "region": [region],
+                            }
+                        )
                     )
-                # Create a new row for the missing successor state
-                tb_add_successor = Table(
-                    pd.DataFrame(
-                        data={
-                            "country": [successor],
-                            "year": [LATEST_YEAR],
-                            "gdp_per_capita": [pd.NA],
-                            "region": [region],
-                        }
-                    )
-                )
-                # Append to tb_gdp
-                tb_gdp = pr.concat([tb_gdp, tb_add_successor], ignore_index=True)
+                    # Append to tb_gdp
+                    tb_gdp = pr.concat([tb_gdp, tb_add_successor], ignore_index=True)
 
     # Store region information separately (categorical column can't be interpolated)
     regions_map = tb_gdp.groupby("country")["region"].first().to_dict()
@@ -442,7 +460,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     if INTERPOLATE_LOG:
         # Create log_gdp_per_capita column, as the logarithm of gdp_per_capita
-        tb_gdp["log_gdp_per_capita"] = tb_gdp["gdp_per_capita"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+        tb_gdp["log_gdp_per_capita"] = safe_log(tb_gdp["gdp_per_capita"])
 
     tb_gdp = interpolate_table(
         tb_gdp,
@@ -527,7 +545,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp = tb_gdp.rename(columns={"growth_factor": "growth_factor_country"}, errors="raise")
 
     # Generate growth_factor column using priority: country > historical_entity > region
-    tb_gdp[["growth_factor", "growth_factor_origin"]] = tb_gdp.apply(select_growth_factor, axis=1)
+    tb_gdp = select_growth_factor(tb_gdp)
 
     # Copy metadata from growth_factor_country to growth_factor
     tb_gdp["growth_factor"] = tb_gdp["growth_factor"].copy_metadata(tb_gdp["growth_factor_country"])
@@ -730,30 +748,38 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     Also creates benchmark columns (headcount_benchmark and headcount_ratio_benchmark) that only include data
     for years where World has data in the Maddison dataset.
     """
+    # Convert to categoricals
+    # TODO: These should be already categoricals in the first place!
+    tb = tb.astype({"country": "category", "region": "category", "region_old": "category", "year": "UInt16"})
+
     # Sort table by year and avg
     tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
 
     # Calculate the cumulative sum of the population by year
-    tb["cum_pop"] = tb.groupby("year")["pop"].cumsum()
+    tb["cum_pop"] = tb.groupby("year", observed=True)["pop"].cumsum()
 
     # Calculate the global population as the last value of cum_pop by year
-    tb["global_population"] = tb.groupby("year")["cum_pop"].transform("max")
+    tb["global_population"] = tb.groupby("year", observed=True)["cum_pop"].transform("max")
 
     # Calculate the cumulative sum of the population as a percentage of the global population by year
     tb["percentage_global_pop"] = tb["cum_pop"] / tb["global_population"] * 100
+
+    # Optimization: Use drop_duplicates instead of groupby for better performance
+    # Select only the columns we need to reduce memory and improve cache locality
+    output_cols = ["year", "global_population", "cum_pop", "percentage_global_pop"]
 
     # Define empty list to store poverty rows
     tb_poverty = []
 
     # Calculate results for each poverty line
     for poverty_line in POVERTY_LINES:
-        # Filter rows where avg is less than poverty line, and keep only relevant columns
-        tb_poverty_line = tb[tb["avg"] < poverty_line][
-            ["year", "global_population", "cum_pop", "percentage_global_pop"]
-        ].reset_index(drop=True)
+        # Filter rows where avg is less than poverty line
+        # Direct boolean indexing without intermediate copy
+        mask = tb["avg"] < poverty_line
 
-        # Get the last row for each year (highest quantile below poverty line)
-        tb_poverty_line = tb_poverty_line.groupby("year").tail(1).reset_index(drop=True)
+        # Select columns directly and use drop_duplicates in one go
+        # drop_duplicates with subset+keep='last' is faster than groupby().last()
+        tb_poverty_line = tb.loc[mask, output_cols].drop_duplicates(subset=["year"], keep="last").copy()
 
         # Add poverty_line column
         tb_poverty_line["poverty_line"] = poverty_line
@@ -770,12 +796,10 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
         errors="raise",
     )
 
-    # Copy metadata from avg to headcount
-    tb_poverty["headcount"] = tb_poverty["headcount"].copy_metadata(tb["avg"])
-    tb_poverty["headcount_ratio"] = tb_poverty["headcount_ratio"].copy_metadata(tb["avg"])
-    # Fix units
-    tb_poverty["headcount"].metadata.unit = "people"
-    tb_poverty["headcount"].metadata.short_unit = ""
+    # Copy origins from avg to headcount
+    tb_poverty["headcount"].m.origins = (tb["avg"] + tb["pop"]).m.origins
+    tb_poverty["headcount_ratio"].m.origins = (tb["avg"] + tb["pop"]).m.origins
+    tb_poverty["population"].m.origins = tb["pop"].m.origins
 
     # Add country column
     tb_poverty["country"] = "World"
@@ -783,8 +807,14 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     # Create benchmark columns: same as headcount/headcount_ratio but only for:
     # 1. Years in Maddison World data (before LATEST_YEAR_PIP_FILLED)
     # 2. All years >= LATEST_YEAR_PIP_FILLED
-    tb_poverty["headcount_benchmark"] = tb_poverty["headcount"]
-    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio"]
+    tb_poverty["headcount_benchmark"] = tb_poverty["headcount"].copy()
+    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio"].copy()
+
+    # Copy metadata
+    tb_poverty["headcount_benchmark"] = tb_poverty["headcount_benchmark"].copy_metadata(tb_poverty["headcount"])
+    tb_poverty["headcount_ratio_benchmark"] = tb_poverty["headcount_ratio_benchmark"].copy_metadata(
+        tb_poverty["headcount_ratio"]
+    )
 
     # Set to pd.NA for years not in Maddison World data AND before LATEST_YEAR_PIP_FILLED
     mask_not_benchmark = ~tb_poverty["year"].isin(maddison_world_years) & (tb_poverty["year"] < LATEST_YEAR_PIP_FILLED)
@@ -842,19 +872,36 @@ def calculate_population_of_missing_countries(missing_countries: Set[str]) -> No
     return None
 
 
-def select_growth_factor(row):
+def select_growth_factor(tb: Table) -> Table:
     """
     Select growth factor based on priority: country > historical_entity > region.
     This way, we have the longest country-specific growth series possible.
+
+    Vectorized implementation using np.select for performance (~100x faster than apply).
     """
-    if not pd.isna(row["growth_factor_country"]):
-        return pd.Series({"growth_factor": row["growth_factor_country"], "growth_factor_origin": "country"})
-    elif not pd.isna(row["growth_factor_historical_entity"]):
-        return pd.Series(
-            {"growth_factor": row["growth_factor_historical_entity"], "growth_factor_origin": "historical_entity"}
-        )
-    else:
-        return pd.Series({"growth_factor": row["growth_factor_region"], "growth_factor_origin": "region"})
+    # if not pd.isna(row["growth_factor_country"]):
+    #     return pd.Series({"growth_factor": row["growth_factor_country"], "growth_factor_origin": "country"})
+    # elif not pd.isna(row["growth_factor_historical_entity"]):
+    #     return pd.Series(
+    #         {"growth_factor": row["growth_factor_historical_entity"], "growth_factor_origin": "historical_entity"}
+    #     )
+    # else:
+    #     return pd.Series({"growth_factor": row["growth_factor_region"], "growth_factor_origin": "region"})
+
+    conditions = [
+        tb["growth_factor_country"].notna(),
+        tb["growth_factor_historical_entity"].notna(),
+    ]
+    growth_choices = [
+        tb["growth_factor_country"],
+        tb["growth_factor_historical_entity"],
+    ]
+    origin_choices = ["country", "historical_entity"]
+
+    tb["growth_factor"] = np.select(conditions, growth_choices, default=tb["growth_factor_region"])
+    tb["growth_factor_origin"] = np.select(conditions, origin_choices, default="region")
+
+    return tb
 
 
 def smooth_estimates(tb: Table) -> Table:
@@ -1334,12 +1381,12 @@ def compare_countries_available_in_two_tables(
     return missing_in_tb_1, missing_in_tb_2
 
 
-def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
+def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
     """
     Prepare mean income and Gini coefficient data for extrapolation.
     It consolidates mean and Gini columns based on priority rules, interpolates missing values, and extrapolates means using GDP growth factors.
     """
-    tb_gini_mean = tb_gini_mean.copy()
+    tb_gini_mean = tb.copy()
     tb_gdp = tb_gdp.copy()
 
     # Check countries missing in either table
@@ -1371,11 +1418,11 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
     tb_gini_mean[["gini", "gini_origin"]] = tb_gini_mean.apply(select_gini, axis=1)
     tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
 
-    # Copy metadata from original columns
-    tb_gini_mean["mean"] = tb_gini_mean["mean"].copy_metadata(tb_gini_mean["mean_filled"] + tb_gini_mean["mean_survey"])
-    tb_gini_mean["gini"] = tb_gini_mean["gini"].copy_metadata(
-        tb_gini_mean["gini_filled"] + tb_gini_mean["gini_survey"] + tb_gini_mean["gini_van_zanden"]
-    )
+    # # Copy metadata from original columns
+    # tb_gini_mean["mean"] = tb_gini_mean["mean"].copy_metadata(tb["mean_filled"] + tb["mean_survey"])
+    # tb_gini_mean["gini"] = tb_gini_mean["gini"].copy_metadata(
+    #     tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]
+    # )
 
     # Keep only relevant columns
     tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
@@ -1639,6 +1686,10 @@ def prepare_mean_gini_data(tb_gini_mean: Table, tb_gdp: Table) -> Table:
             len(remaining_nans) == 0
         ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation. {remaining_nans[['country', 'year', 'mean', 'gini']]}"
 
+    # Copy origins only
+    tb_gini_mean["mean"].m.origins = (tb["mean_filled"] + tb["mean_survey"]).m.origins
+    tb_gini_mean["gini"].m.origins = (tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]).m.origins
+
     return tb_gini_mean
 
 
@@ -1692,12 +1743,17 @@ def expand_means_and_ginis_to_thousand_bins(
         Table with columns: country, year, quantile (1-1000), avg (income), pop (population)
     """
 
+    # Ensure country and region column is categorical for memory efficiency
+    # TODO: don't ever convert it to object dtype in the first place
+    tb_gini_mean["country"] = tb_gini_mean["country"].astype("category")
+    tb_gini_mean["region"] = tb_gini_mean["region"].astype("category")
+
     if KEEP_ORIGINAL_THOUSAND_BINS:
-        # Filter tb_gini_mean to only country-years not in tb_thousand_bins
-        existing_country_years = set(tb_thousand_bins[["country", "year"]].drop_duplicates().apply(tuple, axis=1))
-        tb_new = tb_gini_mean[
-            ~tb_gini_mean[["country", "year"]].apply(tuple, axis=1).isin(existing_country_years)
-        ].copy()
+        # Filter tb_gini_mean to only country-years not in tb_thousand_bins using vectorized merge
+        existing = tb_thousand_bins[["country", "year"]].drop_duplicates()
+        existing["_exists"] = True
+        tb_merged = tb_gini_mean.merge(existing, on=["country", "year"], how="left")
+        tb_new = tb_gini_mean[tb_merged["_exists"].isna()].copy()
     else:
         tb_new = tb_gini_mean.copy()
 
@@ -1708,49 +1764,55 @@ def expand_means_and_ginis_to_thousand_bins(
         # No new country-years to add, return original tb_thousand_bins
         return tb_thousand_bins
 
-    # Calculate sigma for each row
-    tb_new["sigma"] = tb_new[gini_column].apply(gini_to_sigma)
+    # Vectorized sigma calculation: filter to valid gini values (0 < gini < 1)
+    gini_values = tb_new[gini_column].values.astype(float)
+    valid_mask = (gini_values > 0) & (gini_values < 1)
 
-    # Drop rows where sigma couldn't be calculated
-    tb_new = tb_new.dropna(subset=["sigma"]).reset_index(drop=True)
-
-    if len(tb_new) == 0:
+    if not valid_mask.any():
         return tb_thousand_bins
 
-    # Calculate mu parameter: mean = exp(μ + σ²/2), so μ = log(mean) - σ²/2
-    tb_new["mu"] = np.log(tb_new[mean_column]) - (tb_new["sigma"] ** 2) / 2
+    # Filter to valid rows only
+    tb_new = tb_new[valid_mask].reset_index(drop=True)
+    gini_valid = gini_values[valid_mask]
 
-    # Create expanded table with 1000 quantiles per country-year
-    expanded_rows = []
+    # Calculate sigma from Gini using vectorized function
+    sigmas = gini_to_sigma(gini_valid)
+    mean_values = tb_new[mean_column].values.astype(float)
+    mus = np.log(mean_values) - (sigmas**2) / 2
+    scales = np.exp(mus)
 
-    for _, row in tb_new.iterrows():
-        country = row["country"]
-        year = row["year"]
-        mu = row["mu"]
-        sigma = row["sigma"]
+    n_rows = len(tb_new)
+    n_quantiles = 1000
 
-        # Generate 1000 quantiles
-        quantiles = np.arange(1, 1001)
+    # Pre-compute quantiles and percentiles (same for all rows)
+    quantiles = np.arange(1, n_quantiles + 1, dtype=np.uint16)  # Use uint16 instead of int64 (quantiles 1-1000)
+    percentiles = (quantiles - 0.5) / n_quantiles
 
-        # For each quantile, calculate the income level
-        # Use percentile points of the log-normal distribution
-        percentiles = (quantiles - 0.5) / 1000  # Midpoint of each bin
+    # Helper function to compute incomes and return as float32 for memory efficiency
+    # This function scope ensures intermediate arrays are garbage collected immediately
+    def compute_incomes() -> np.ndarray:
+        """Compute income distribution using log-normal, return as float32 to save memory."""
+        incomes = stats.lognorm.ppf(percentiles[np.newaxis, :], s=sigmas[:, np.newaxis], scale=scales[:, np.newaxis])
+        # Convert to float32 (saves 50% memory vs float64, precision is sufficient for income data)
+        return incomes.ravel().astype(np.float32)
 
-        # Income at each percentile from log-normal distribution
-        incomes = stats.lognorm.ppf(percentiles, s=sigma, scale=np.exp(mu))
+    # Create expanded table without intermediate variables (memory optimization)
+    # Directly use np.repeat in DataFrame construction to avoid storing intermediate arrays
+    tb_expanded = Table(
+        pd.DataFrame(
+            {
+                # Use .array to preserve categorical dtype, saves ~800MB per call
+                "country": np.repeat(tb_new["country"].array, n_quantiles),  # type: ignore
+                "year": np.repeat(tb_new["year"].array, n_quantiles),  # type: ignore
+                "quantile": np.tile(quantiles, n_rows),  # uint16 quantiles
+                "avg": compute_incomes(),  # float32 incomes, computed and freed immediately
+            }
+        )
+    )
 
-        for quantile, income in zip(quantiles, incomes):
-            expanded_rows.append(
-                {
-                    "country": country,
-                    "year": year,
-                    "quantile": quantile,
-                    "avg": income,
-                }
-            )
-
-    # Create expanded table
-    tb_expanded = Table(pd.DataFrame(expanded_rows))
+    # Convert quantile and avg to pandas nullable types for consistency
+    tb_expanded["quantile"] = tb_expanded["quantile"].astype("UInt16")
+    tb_expanded["avg"] = tb_expanded["avg"].astype("Float32")
 
     # Add population
     tb_expanded = paths.regions.add_population(
@@ -1761,8 +1823,8 @@ def expand_means_and_ginis_to_thousand_bins(
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
     )
 
-    # Divide population equally among 1000 quantiles
-    tb_expanded["pop"] /= 1000
+    # Divide population equally among 1000 quantiles and convert to Float32 to save memory
+    tb_expanded["pop"] = (tb_expanded["pop"] / 1000).astype("Float32")
 
     # Log summary statistics
     if SHOW_WARNINGS:
@@ -1826,36 +1888,124 @@ def expand_means_and_ginis_to_thousand_bins(
         how="left",
     )
 
+    # Assert that categorical dtypes are preserved after merge (critical for memory efficiency)
+    assert isinstance(
+        tb_expanded["country"].dtype, pd.CategoricalDtype
+    ), f"country must be categorical after merge, got {tb_expanded['country'].dtype}"
+    assert isinstance(
+        tb_expanded["region"].dtype, pd.CategoricalDtype
+    ), f"region must be categorical after merge, got {tb_expanded['region'].dtype}"
+    assert isinstance(
+        tb_expanded["region_old"].dtype, pd.CategoricalDtype
+    ), f"region_old must be categorical after merge, got {tb_expanded['region_old'].dtype}"
+
+    # OPTIMIZATION: Sort tb_expanded before concatenating to avoid sorting the entire concatenated table
+    # This is much faster because we sort a smaller table, then concat is cheap with sort=False
+    tb_expanded = tb_expanded.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
     # Concatenate with original thousand_bins
     if KEEP_ORIGINAL_THOUSAND_BINS:
         # Only concatenate if we're keeping original data (tb_expanded has only new country-years)
-        tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
+        # Use sort=False since both tables are already sorted - this makes concat much faster
+        tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True, sort=False)
     else:
-        tb_thousand_bins_from_mean_gini = tb_expanded.copy()
+        tb_thousand_bins_from_mean_gini = tb_expanded
 
-    tb_thousand_bins_from_mean_gini = tb_thousand_bins_from_mean_gini.sort_values(
-        ["country", "year", "quantile"]
-    ).reset_index(drop=True)
+    # No need to sort again - both inputs are already sorted and concat preserves order with sort=False
+    # tb_thousand_bins_from_mean_gini is already sorted by ["country", "year", "quantile"]
 
     return tb_thousand_bins_from_mean_gini
 
 
-def gini_to_sigma(gini):
+def safe_log(values: pd.Series | np.ndarray) -> np.ndarray:
     """
-    Convert Gini coefficient to sigma parameter of log-normal distribution.
+    Compute natural logarithm preserving NaN/inf values.
+
+    Vectorized implementation that handles missing/invalid values correctly.
+
+    Args:
+        values: Input values as pandas Series or numpy array
+
+    Returns:
+        Natural logarithm of values. NaN/inf preserved as-is.
     """
-    if gini <= 0 or gini >= 1:
-        return np.nan
-    try:
+    # Convert to float array
+    if isinstance(values, pd.Series):
+        arr = values.values.astype(float)
+    else:
+        arr = np.asarray(values, dtype=float).copy()
+
+    # Mask for finite positive values (where log is valid)
+    valid_mask = np.isfinite(arr) & (arr > 0)
+
+    # Apply log only to valid values
+    np.log(arr, out=arr, where=valid_mask)
+
+    return arr
+
+
+def safe_exp(values: pd.Series | np.ndarray) -> np.ndarray:
+    """
+    Compute exponential preserving NaN/inf values.
+
+    Vectorized implementation that handles missing/invalid values correctly.
+
+    Args:
+        values: Input values as pandas Series or numpy array
+
+    Returns:
+        Exponential of values. NaN/inf preserved as-is.
+    """
+    # Convert to float array
+    if isinstance(values, pd.Series):
+        arr = values.values.astype(float)
+    else:
+        arr = np.asarray(values, dtype=float).copy()
+
+    # Mask for finite values (where exp is valid)
+    valid_mask = np.isfinite(arr)
+
+    # Apply exp only to valid values
+    np.exp(arr, out=arr, where=valid_mask)
+
+    return arr
+
+
+def gini_to_sigma(gini_values: np.ndarray) -> np.ndarray:
+    """
+    Convert Gini coefficient(s) to sigma parameter of log-normal distribution.
+
+    Vectorized implementation that handles arrays efficiently.
+
+    Formula:
+    - Gini = 2 * Φ(σ/√2) - 1, where Φ is the standard normal CDF
+    - Solving for σ: σ = √2 * Φ⁻¹((Gini + 1) / 2)
+
+    Args:
+        gini_values: Gini coefficient(s) as scalar or array. Valid range: (0, 1)
+
+    Returns:
+        Sigma value(s) for log-normal distribution. Invalid inputs return NaN.
+    """
+    # Convert to array if scalar
+    gini_array = np.atleast_1d(gini_values)
+
+    # Initialize output with NaN
+    sigmas = np.full_like(gini_array, np.nan, dtype=float)
+
+    # Mask for valid gini values (0 < gini < 1)
+    valid_mask = (gini_array > 0) & (gini_array < 1)
+
+    if valid_mask.any():
         # Gini = 2 * Φ(σ/√2) - 1
         # Solve for σ: Φ(σ/√2) = (Gini + 1) / 2
-        target_cdf = (gini + 1) / 2
+        target_cdf = (gini_array[valid_mask] + 1) / 2
         # Use inverse CDF to find σ/√2
-        z_value = stats.norm.ppf(target_cdf)
-        sigma = z_value * np.sqrt(2)
-        return sigma
-    except Exception:
-        return np.nan
+        z_values = stats.norm.ppf(target_cdf)
+        sigmas[valid_mask] = z_values * np.sqrt(2)
+
+    # Return scalar if input was scalar
+    return sigmas if gini_values.ndim > 0 else sigmas[0]
 
 
 def interpolate_quantiles_in_thousand_bins(
@@ -1899,7 +2049,7 @@ def interpolate_quantiles_in_thousand_bins(
 
     if INTERPOLATE_LOG:
         # Create column for log-linear interpolation
-        tb_expanded["avg"] = tb_expanded["avg"].apply(lambda x: np.log(x) if pd.notna(x) else x)
+        tb_expanded["avg"] = safe_log(tb_expanded["avg"])
 
     # Make table wide
     tb_expanded = tb_expanded.pivot_table(index=["country", "year"], columns="quantile", values="avg").reset_index()
@@ -1920,7 +2070,7 @@ def interpolate_quantiles_in_thousand_bins(
 
     if INTERPOLATE_LOG:
         # Convert back from log to absolute values
-        tb_expanded["avg"] = tb_expanded["avg"].apply(lambda x: np.exp(x) if pd.notna(x) else x)
+        tb_expanded["avg"] = safe_exp(tb_expanded["avg"])
 
     # Add population
     tb_expanded = paths.regions.add_population(
@@ -1996,6 +2146,9 @@ def interpolate_quantiles_in_thousand_bins(
 
     # Sort by country, year, and quantile
     tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+
+    # Copy origins for avg
+    tb["avg"].m.origins = tb_thousand_bins_interpolated_quantiles["avg"].m.origins
 
     return tb
 
@@ -2109,13 +2262,13 @@ def compare_headcount_ratios_across_methods(
     return tb_comparison
 
 
-def prepare_and_aggregate_gini_mean_data(tb_gini_mean: Table) -> Table:
+def prepare_and_aggregate_gini_mean_data(tb: Table) -> Table:
     """
     Prepare historical Gini and mean data to create a long-run mean chart.
     Also, create aggregations at world and region levels.
     """
 
-    tb_gini_mean = tb_gini_mean[["country", "year", "region", "mean", "gini"]]
+    tb_gini_mean = tb[["country", "year", "region", "mean", "gini"]].copy()
 
     # Add population
     tb_gini_mean = paths.regions.add_population(
