@@ -67,10 +67,11 @@ def run() -> None:
     tb[["_1a_forestarea", "_1d_expansion", "_1d_afforestation", "_1d_nat_exp", "_1d_deforestation"]] = (
         tb[["_1a_forestarea", "_1d_expansion", "_1d_afforestation", "_1d_nat_exp", "_1d_deforestation"]] * 1000
     )
-    # Linearly interpolate forest area for missing years
-    tb = linearly_interpolate_forest_area(tb)
+
     # Calculate additional variables
     tb = calculate_net_change_in_forest_area(tb)
+    # Linearly interpolate forest area for missing years
+    tb = linearly_interpolate_forest_area(tb)
     tb = calculate_share_of_global_forest_area(tb)
     tb = calculate_annual_change_in_forest_area_as_share_forest_area(tb)
     tb = calculate_annual_deforestation_as_share_of_forest_area(tb)
@@ -123,7 +124,10 @@ def calculate_share_of_global_forest_area(tb: Table) -> Table:
 
 
 def calculate_net_change_in_forest_area(tb: Table) -> Table:
-    tb["net_change_forest_area"] = tb["_1d_expansion"] - tb["_1d_deforestation"]
+    # Calculate the difference between grouped countries values for forest area
+    tb = tb.sort_values(by=["country", "year"])
+    tb["net_change_forest_area"] = tb.groupby("country")["_1a_forestarea"].diff().fillna(0)
+
     return tb
 
 
