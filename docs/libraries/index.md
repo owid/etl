@@ -16,3 +16,6 @@ Data packaging and optimization. Automatically reduces memory usage of pandas Da
 
 ## [`owid.datautils`](datautils.md)
 Data processing utilities. Examples are functions to help with data cleaning, transformation, and geographic data harmonization.
+
+## [`owid-grapher-py`](https://docs.owid.io/projects/owid-grapher-py/en/latest/)
+Python library for programmatic creation and management of Our World in Data charts. Provides a high-level interface to the Grapher configuration system.
