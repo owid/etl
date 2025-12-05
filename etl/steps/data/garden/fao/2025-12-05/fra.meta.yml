@@ -19,6 +19,7 @@ tables:
         description_short: Forest area is land under natural or planted stands of trees of at least 5 meters in situ, whether productive or not, and excludes tree stands in agricultural production systems.
         unit: ha
         short_unit: ha
+        description_processing: "Annual forest area values are linearly interpolated for missing years."
       _1d_expansion:
         title: Forest expansion
         description_short: Forest expansion is the sum of afforestation (the establishment of forest through planting and/or deliberate seeding) and natural forest expansion (expansion of forests through natural succession on land that, until then, was under another land use).
