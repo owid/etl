@@ -27,23 +27,28 @@ def _load_json_data_and_duplicated_keys(ordered_pairs: List[Tuple[Hashable, Any]
 
 @enable_file_download(path_arg_name="json_file")
 def load_json(json_file: Union[str, Path], warn_on_duplicated_keys: bool = True) -> Any:
-    """Load data from json file, and optionally warn if there are duplicated keys.
+    """Load data from JSON file with optional duplicate key detection.
 
-    If json file contains duplicated keys, a warning is optionally raised, and only the value of the latest duplicated
-    key is kept.
+    If the JSON file contains duplicated keys, a warning is optionally raised,
+    and only the value of the latest duplicated key is kept.
 
-    Parameters
-    ----------
-    json_file : Path or str
-        Path to json file.
-    warn_on_duplicated_keys : bool
-        True to raise a warning if there are duplicated keys in json file. False to ignore.
+    Args:
+        json_file: Path to JSON file. Supports local files and URLs (via decorator).
+        warn_on_duplicated_keys: If True, warn about duplicate keys in JSON file.
 
-    Returns
-    -------
-    data : dict
-        Data loaded from json file.
+    Returns:
+        Data loaded from JSON file (typically a dict or list).
 
+    Example:
+        ```python
+        from owid.datautils.io.json import load_json
+
+        # Load JSON file
+        data = load_json("data.json")
+
+        # Disable duplicate key warnings
+        data = load_json("data.json", warn_on_duplicated_keys=False)
+        ```
     """
     with open(json_file, "r") as _json_file:
         json_content = _json_file.read()
@@ -56,17 +61,25 @@ def load_json(json_file: Union[str, Path], warn_on_duplicated_keys: bool = True)
 
 
 def save_json(data: Any, json_file: Union[str, Path], **kwargs: Any) -> None:
-    """Save data to a json file.
+    """Save data to a JSON file.
 
-    Parameters
-    ----------
-    data : list
-        Data to be stored in a json file.
-    json_file : str
-        Path to output json file.
-    kwargs:
-        Additional keyword arguments for json.dump (e.g. indent=4, sort_keys=True).
+    Args:
+        data: Data to be stored in JSON file (typically a dict or list).
+        json_file: Path to output JSON file. Parent directories are created if needed.
+        **kwargs: Additional keyword arguments for `json.dump()` (e.g., `indent=4`, `sort_keys=True`).
 
+    Example:
+        ```python
+        from owid.datautils.io.json import save_json
+
+        data = {"name": "John", "age": 30}
+
+        # Save JSON file
+        save_json(data, "output.json")
+
+        # Save with formatting
+        save_json(data, "output.json", indent=4, sort_keys=True)
+        ```
     """
     # Ensure json_file is a path.
     json_file = Path(json_file)

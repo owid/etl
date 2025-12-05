@@ -76,7 +76,7 @@ dependencies = [
     "cfgrib>=0.9.15.0",
     "metabase-api>=3.5.2",
     "codespell>=2.4.1",
-    "zensical>=0.0.7",
+    "zensical>=0.0.11",
     "pandas-gbq>=0.29.2",
     "tomli>=2.2.1",
 ]
@@ -102,6 +102,7 @@ dev-dependencies = [
     "gspread>=5.12.4",
     "jsonref>=1.1.0",
     "kaleido==1.1.0",
+    "mkdocstrings-python>=2.0.1",
     "mkdocs-material>=9.5.34",
     "mkdocs-jupyter>=0.24.8",
     "mkdocs-exclude>=1.0.2",

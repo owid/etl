@@ -71,6 +71,57 @@ UNNAMED_VARIABLE = "**TEMPORARY UNNAMED VARIABLE**"
 
 
 class Variable(pd.Series):
+    """Enhanced pandas Series with variable-level metadata support.
+
+    Variable is a pandas Series subclass that stores rich metadata about individual
+    indicators. It serves as the column type in Table objects and automatically
+    propagates metadata through operations.
+
+    Key features:
+
+    - Automatic metadata propagation through arithmetic operations
+    - Processing log tracking for data provenance
+    - Integration with OWID catalog metadata system
+    - Support for rich metadata including sources, origins, licenses
+
+    Attributes:
+        _name: Internal name storage for metadata mapping.
+        _fields: Dictionary mapping variable names to their VariableMeta objects.
+        metadata: Variable-level metadata accessible via `.metadata` or `.m` property.
+
+    Example:
+        Create a variable with metadata:
+
+        ```python
+        from owid.catalog import Variable, VariableMeta
+
+        var = Variable(
+            [1, 2, 3],
+            name="gdp",
+            metadata=VariableMeta(
+                title="GDP",
+                unit="trillion USD",
+                description="Gross Domestic Product"
+            )
+        )
+        ```
+
+        Access metadata using shortcuts:
+
+        ```python
+        print(var.metadata.title)  # Full property access
+        print(var.m.title)         # Shorthand alias
+        print(var.title)           # Direct property access
+        ```
+
+        Metadata propagates through operations:
+
+        ```python
+        gdp_per_capita = var / population
+        # Result combines metadata from both variables
+        ```
+    """
+
     _name: str | None = None
     _fields: dict[str, VariableMeta]
 
@@ -83,6 +134,38 @@ class Variable(pd.Series):
         metadata: VariableMeta | None = None,
         **kwargs: Any,
     ) -> None:
+        """Initialize a Variable with data and metadata.
+
+        Args:
+            data: Array-like data for the variable (list, numpy array, pandas Series, etc.).
+            index: Index labels for the data. If None, uses default integer index.
+            name: Name of the variable. Required if metadata is provided.
+            _fields: Internal metadata dictionary. Don't use directly - use `metadata` parameter instead.
+            metadata: VariableMeta object with variable-level metadata (title, unit, sources, etc.).
+            **kwargs: Additional arguments passed to `pandas.Series.__init__`.
+
+        Raises:
+            AssertionError: If both `metadata` and `_fields` are provided, or if `metadata`
+                is provided without a `name`.
+
+        Example:
+            Create a simple variable:
+
+            ```python
+            var = Variable([1, 2, 3], name="population")
+            ```
+
+            Create with metadata:
+
+            ```python
+            meta = VariableMeta(
+                title="Population",
+                unit="people",
+                description="Total population"
+            )
+            var = Variable([1e6, 2e6, 3e6], name="population", metadata=meta)
+            ```
+        """
         if metadata:
             assert not _fields, "cannot pass both metadata and _fields"
             assert name or self.name, "cannot pass metadata without a name"
@@ -100,7 +183,21 @@ class Variable(pd.Series):
 
     @property
     def m(self) -> VariableMeta:
-        """Metadata alias to save typing."""
+        """Metadata alias for shorter access.
+
+        Provides convenient shorthand access to variable metadata.
+
+        Returns:
+            The variable's VariableMeta object.
+
+        Example:
+            ```python
+            # These are equivalent:
+            var.metadata.title
+            var.m.title
+            var.title  # Direct property access
+            ```
+        """
         return self.metadata
 
     @property
@@ -309,6 +406,37 @@ class Variable(pd.Series):
         variable: str | None = None,
         comment: str | None = None,
     ) -> Variable:
+        """Add an entry to the variable's processing log.
+
+        Records data transformation operations for data provenance tracking.
+
+        Args:
+            operation: Name of the operation performed (e.g., "merge", "aggregate").
+            parents: List of parent variables that contributed to this operation.
+                If None, uses the variable itself as the only parent.
+            variable: Name of the variable for the log entry. If None, uses the
+                variable's name or UNNAMED_VARIABLE.
+            comment: Optional comment describing the operation in detail.
+
+        Returns:
+            The variable itself (for method chaining).
+
+        Example:
+            ```python
+            # Log a custom transformation
+            var.update_log(
+                operation="normalize",
+                comment="Normalized to 2015 baseline"
+            )
+
+            # Log a merge operation
+            result.update_log(
+                operation="merge",
+                parents=[var1, var2],
+                comment="Combined GDP and population data"
+            )
+            ```
+        """
         if variable is None:
             # If a variable name is not specified, take it from the variable, or otherwise use UNNAMED_VARIABLE.
             variable = self.name or UNNAMED_VARIABLE
@@ -327,10 +455,51 @@ class Variable(pd.Series):
         return self
 
     def rolling(self, *args, **kwargs) -> VariableRolling:
-        """Rolling operation that preserves metadata."""
+        """Create a rolling window operation that preserves metadata.
+
+        This method wraps pandas rolling operations while maintaining the variable's metadata.
+
+        Args:
+            *args: Arguments passed to `pandas.Series.rolling`.
+            **kwargs: Keyword arguments passed to `pandas.Series.rolling`.
+
+        Returns:
+            VariableRolling object that applies operations while preserving metadata.
+
+        Example:
+            Calculate 7-day rolling average
+            ```python
+            rolling_avg = var.rolling(window=7).mean()
+            ```
+
+            The result retains the original variable's metadata
+            ```python
+            assert rolling_avg.metadata.title == var.metadata.title
+            ```
+        """
         return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
 
     def copy_metadata(self, from_variable: Variable, inplace: bool = False) -> Variable | None:
+        """Copy metadata from another variable.
+
+        Args:
+            from_variable: Source variable to copy metadata from.
+            inplace: If True, modifies the current variable. If False, returns a new variable.
+
+        Returns:
+            New variable with copied metadata if `inplace=False`, otherwise None.
+
+        Example:
+            Create new variable with copied metadata
+            ```python
+            new_var = var1.copy_metadata(from_variable=var2)
+            ```
+
+            Copy metadata in-place
+            ```python
+            var1.copy_metadata(from_variable=var2, inplace=True)
+            ```
+        """
         return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
 
     def copy(self, deep: bool = True) -> Variable:
@@ -350,15 +519,58 @@ for k in VariableMeta.__dataclass_fields__:
 
 
 class VariableRolling:
+    """Wrapper for pandas rolling window operations that preserves Variable metadata.
+
+    This class intercepts rolling window operations (mean, sum, std, etc.) and ensures
+    that the resulting Variable retains the original metadata.
+
+    Attributes:
+        rolling: The underlying pandas Rolling object.
+        metadata: Variable metadata to preserve through operations.
+        name: Variable name to preserve through operations.
+
+    Example:
+        Create a rolling average
+        ```python
+        rolling_avg = var.rolling(window=7).mean()
+        ```
+
+        Metadata is preserved
+        ```python
+        assert rolling_avg.metadata == var.metadata
+        assert rolling_avg.name == var.name
+        ```
+
+    Note:
+        You typically don't instantiate this class directly. Use `Variable.rolling()` instead.
+    """
+
     # fixes type hints
     __annotations__ = {}
 
     def __init__(self, rolling: pd.core.window.rolling.Rolling, metadata: VariableMeta, name: str | None = None):
+        """Initialize a VariableRolling wrapper.
+
+        Args:
+            rolling: The pandas Rolling object to wrap.
+            metadata: Metadata to preserve through operations.
+            name: Variable name to preserve through operations.
+        """
         self.rolling = rolling
         self.metadata = metadata
         self.name = name
 
     def __getattr__(self, name: str) -> Callable[..., Variable]:
+        """Dynamically wrap rolling methods to return Variables with metadata.
+
+        Args:
+            name: Name of the rolling method (e.g., "mean", "sum", "std").
+
+        Returns:
+            A function that applies the rolling operation and returns a Variable
+            with preserved metadata.
+        """
+
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
             x = getattr(self.rolling, name)(*args, **kwargs)
@@ -416,6 +628,23 @@ def _get_metadata_value_from_variables_if_all_identical(
 
 
 def get_unique_sources_from_variables(variables: list[Variable]) -> list[Source]:
+    """Get unique sources from a list of variables.
+
+    Collects all unique Source objects from the metadata of multiple variables,
+    preserving order of first occurrence.
+
+    Args:
+        variables: List of Variable objects to extract sources from.
+
+    Returns:
+        List of unique Source objects in order of first appearance.
+
+    Example:
+        ```python
+        sources = get_unique_sources_from_variables([var1, var2, var3])
+        print(f"Combined {len(sources)} unique sources")
+        ```
+    """
     # Make a list of all sources of all variables.
     sources = []
     for variable in variables:
@@ -424,6 +653,24 @@ def get_unique_sources_from_variables(variables: list[Variable]) -> list[Source]
 
 
 def get_unique_origins_from_variables(variables: list[Variable]) -> list[Origin]:
+    """Get unique origins from a list of variables.
+
+    Collects all unique Origin objects from the metadata of multiple variables,
+    preserving order of first occurrence.
+
+    Args:
+        variables: List of Variable objects to extract origins from.
+
+    Returns:
+        List of unique Origin objects in order of first appearance.
+
+    Example:
+        ```python
+        origins = get_unique_origins_from_variables([var1, var2, var3])
+        for origin in origins:
+            print(f"Producer: {origin.producer}")
+        ```
+    """
     # Make a list of all origins of all variables.
     origins = []
     for variable in variables:
@@ -433,6 +680,23 @@ def get_unique_origins_from_variables(variables: list[Variable]) -> list[Origin]
 
 
 def get_unique_licenses_from_variables(variables: list[Variable]) -> list[License]:
+    """Get unique licenses from a list of variables.
+
+    Collects all unique License objects from the metadata of multiple variables,
+    preserving order of first occurrence.
+
+    Args:
+        variables: List of Variable objects to extract licenses from.
+
+    Returns:
+        List of unique License objects in order of first appearance.
+
+    Example:
+        ```python
+        licenses = get_unique_licenses_from_variables([var1, var2, var3])
+        print(f"Data uses {len(licenses)} different licenses")
+        ```
+    """
     # Make a list of all licenses of all variables.
     licenses = []
     for variable in variables:
@@ -441,6 +705,24 @@ def get_unique_licenses_from_variables(variables: list[Variable]) -> list[Licens
 
 
 def get_unique_description_key_points_from_variables(variables: list[Variable]) -> list[str]:
+    """Get unique description key points from a list of variables.
+
+    Collects all unique key points from the description_key field of multiple variables,
+    preserving order of first occurrence.
+
+    Args:
+        variables: List of Variable objects to extract description key points from.
+
+    Returns:
+        List of unique description key points in order of first appearance.
+
+    Example:
+        ```python
+        key_points = get_unique_description_key_points_from_variables([var1, var2])
+        for point in key_points:
+            print(f"- {point}")
+        ```
+    """
     # Make a list of all description key points of all variables.
     description_key_points = []
     for variable in variables:
@@ -449,6 +731,23 @@ def get_unique_description_key_points_from_variables(variables: list[Variable]) 
 
 
 def combine_variables_processing_logs(variables: list[Variable]) -> ProcessingLog:
+    """Combine processing logs from multiple variables.
+
+    Merges all processing log entries from the provided variables into a single
+    ProcessingLog object, maintaining chronological order.
+
+    Args:
+        variables: List of Variable objects whose processing logs should be combined.
+
+    Returns:
+        ProcessingLog object containing all entries from all variables.
+
+    Example:
+        ```python
+        combined_log = combine_variables_processing_logs([var1, var2, var3])
+        print(f"Combined log has {len(combined_log)} entries")
+        ```
+    """
     # Make a list with all entries in the processing log of all variables.
     processing_log = sum(
         [
@@ -533,6 +832,49 @@ def combine_variables_sort(variables: list[Variable]) -> list[str]:
 def combine_variables_metadata(
     variables: list[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
 ) -> VariableMeta:
+    """Combine metadata from multiple variables based on an operation.
+
+    This function intelligently merges metadata from multiple variables when they are
+    combined through operations like addition, division, etc. The logic varies by field:
+
+    - If all variables have identical values for a field, that value is preserved
+    - For lists (sources, origins, licenses), all unique values are combined
+    - For some operations (e.g., division), only the first variable's metadata is kept
+    - Processing logs are merged and a new entry is added for the operation
+
+    Args:
+        variables: List of variables (or other objects) to combine metadata from.
+            Non-Variable objects are automatically filtered out.
+        operation: Type of operation being performed ("+", "-", "*", "/", etc.).
+            Affects how metadata fields are combined.
+        name: Name for the resulting variable. Defaults to UNNAMED_VARIABLE.
+
+    Returns:
+        Combined VariableMeta object with merged metadata from all variables.
+
+    Example:
+        Metadata from addition
+        ```python
+        result_meta = combine_variables_metadata(
+            variables=[var1, var2],
+            operation="+",
+            name="sum"
+        )
+        ```
+
+        Metadata from division (keeps first variable's metadata)
+        ```python
+        ratio_meta = combine_variables_metadata(
+            variables=[numerator, denominator],
+            operation="/",
+            name="ratio"
+        )
+        ```
+
+    Note:
+        This function is typically called automatically by Variable arithmetic operations.
+        You rarely need to call it directly.
+    """
     # Initialise an empty metadata.
     metadata = VariableMeta()
 
@@ -600,6 +942,27 @@ def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Liter
 
 
 def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Variable | None:
+    """Copy metadata from one variable to another.
+
+    Args:
+        from_variable: Source variable to copy metadata from.
+        to_variable: Target variable to copy metadata to.
+        inplace: If True, modifies `to_variable` in place. If False, returns a new variable.
+
+    Returns:
+        New variable with copied metadata if `inplace=False`, otherwise None.
+
+    Example:
+        Create new variable with copied metadata
+        ```python
+        new_var = copy_metadata(from_variable=source, to_variable=target)
+        ```
+
+        Copy metadata in-place
+        ```python
+        copy_metadata(from_variable=source, to_variable=target, inplace=True)
+        ```
+    """
     if inplace:
         to_variable.metadata = from_variable.metadata.copy()
     else:
@@ -609,7 +972,38 @@ def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool 
 
 
 def is_nullable_series(s: Any) -> bool:
-    """Check if a series has a nullable pandas dtype."""
+    """Check if a series has a nullable pandas dtype.
+
+    Determines whether a pandas Series uses one of the nullable integer, float, or
+    boolean dtypes (as opposed to traditional numpy dtypes).
+
+    Args:
+        s: Any object to check. Typically a pandas Series.
+
+    Returns:
+        True if the object has a nullable pandas dtype, False otherwise.
+
+    Example:
+        ```python
+        import pandas as pd
+
+        # Nullable integer dtype
+        s1 = pd.Series([1, 2, None], dtype="Int64")
+        assert is_nullable_series(s1) == True
+
+        # Traditional numpy dtype
+        s2 = pd.Series([1, 2, 3], dtype="int64")
+        assert is_nullable_series(s2) == False
+
+        # Nullable boolean dtype
+        s3 = pd.Series([True, False, None], dtype="boolean")
+        assert is_nullable_series(s3) == True
+        ```
+
+    Note:
+        Nullable dtypes (capitalized like `Int64`) differ from numpy dtypes (`int64`)
+        in that they can represent missing values using `pd.NA` instead of `np.nan`.
+    """
     if not hasattr(s, "dtype"):
         return False
 

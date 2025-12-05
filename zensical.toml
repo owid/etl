@@ -97,12 +97,21 @@ nav = [
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
+    { "Our libraries" = [
+        { "Python" = [
+            "libraries/index.md",
+            { "owid.catalog" = "libraries/catalog.md" },
+            { "owid-grapher-py" = "libraries/grapher-py.md" },
+            { "owid.repack" = "libraries/repack.md" },
+            { "owid.datautils" = "libraries/datautils.md" },
+        ] },
+    ] },
     { "API and catalog" = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
-        { "Catalog API" = "api/catalog-api.md" },
         { "Search API" = "api/search-api.md" },
-        { "Semantic Search API" = "api/semantic-search-api.md" },
+        { "Indicators API" = "api/semantic-search-api.md" },
+        { "Catalog API" = "api/catalog-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
         # { "Content database" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
@@ -318,6 +327,26 @@ custom_fences = [
 
 
 # PLUGINS
+## MKDOCSTRINGS
+[project.plugins.mkdocstrings.handlers.python]
+inventories = ["https://docs.python.org/3/objects.inv"]
+paths = ["lib/catalog", "lib/datautils", "lib/repack"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+inherited_members = false
+show_source = false
+members_order = "source"
+filters = ["!^_"]
+show_root_heading = true
+show_root_toc_entry = false
+heading_level = 2
+show_signature_annotations = true
+separate_signature = true
+docstring_section_style = "spacy"
+
+
+## Others
 [project.plugins]
 
 [project.plugins."mkdocs-jupyter"]
