@@ -125,6 +125,8 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 
 ## Changelog
 
+- 2025-12-04:
+  - Update greenhouse gases using the latest data from Jones et al. (2025).
 - 2025-11-13:
   - Updated dataset to use the latest version of the Global Carbon Budget (2025).
 - 2024-11-21:

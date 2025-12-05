@@ -43,6 +43,7 @@ broad_cause_dict = {
     "Other injuries": "Injuries",
     "Falls": "Injuries",
     "Respiratory infections": "Infectious diseases",
+    "Conflict and terrorism": "Injuries",
 }
 
 
@@ -113,8 +114,9 @@ def reaggregate_causes(tb: Table) -> Table:
     tb = pull_out_cause(tb, pull_out_cause="Diarrheal diseases", aggregate_cause="Enteric infections")
     tb = pull_out_cause(
         tb,
-        pull_out_cause=["Self-harm", "Interpersonal violence"],
+        pull_out_cause=["Self-harm", "Interpersonal violence", "Conflict and terrorism"],
         aggregate_cause="Self-harm and interpersonal violence",
+        residual_name="Police conflict and executions",
     )
     tb = pull_out_cause(tb, pull_out_cause="Falls", aggregate_cause="Unintentional injuries")
 
@@ -145,7 +147,7 @@ def reaggregate_causes(tb: Table) -> Table:
         tb=tb,
         causes_to_combine=[
             "Unintentional injuries excluding Falls",
-            "Self-harm and interpersonal violence excluding Self-harm excluding Interpersonal violence",
+            "Police conflict and executions",
         ],
         new_cause_name="Other injuries",
     )

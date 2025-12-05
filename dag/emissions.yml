@@ -42,32 +42,14 @@ steps:
   # Emissions - CO2 dataset.
   #
   export://github/co2_data/latest/owid_co2:
-    - data://garden/emissions/2025-11-13/owid_co2
+    - data://garden/emissions/2025-12-04/owid_co2
   #
   # Emissions - CO2 dataset.
   #
+  # NOTE: The following step should be run after the github step, which is why the latter is added as a dependency.
   export://s3/co2_data/latest/owid_co2:
-    - data://garden/emissions/2025-11-13/owid_co2
-  #
-  # Jones et al. - National contributions to climate change.
-  #
-  data://meadow/emissions/2024-11-21/national_contributions:
-    - snapshot://emissions/2024-11-21/national_contributions_temperature_response.csv
-    - snapshot://emissions/2024-11-21/national_contributions_cumulative_emissions.csv
-    - snapshot://emissions/2024-11-21/national_contributions_annual_emissions.csv
-  #
-  # Jones et al. - National contributions to climate change.
-  #
-  data://garden/emissions/2024-11-21/national_contributions:
-    - data://meadow/emissions/2024-11-21/national_contributions
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Jones et al. - National contributions to climate change.
-  #
-  data://grapher/emissions/2024-11-21/national_contributions:
-    - data://garden/emissions/2024-11-21/national_contributions
+    - data://garden/emissions/2025-12-04/owid_co2
+    - export://github/co2_data/latest/owid_co2
   #
   # Hoesly et al. (2024): CEDS air pollutants
   #
@@ -173,16 +155,6 @@ steps:
     - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget
   #
-  # Emissions - CO2 dataset.
-  #
-  data://garden/emissions/2025-11-13/owid_co2:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-    - data://garden/emissions/2024-11-21/national_contributions
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/primary_energy_consumption
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-  #
   # Decoupling of GDP and CO2 (2023).
   #
   data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
@@ -193,3 +165,33 @@ steps:
   #
   data://grapher/gcp/2025-11-13/global_carbon_budget:
     - data://garden/gcp/2025-11-13/global_carbon_budget
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://meadow/emissions/2025-12-04/national_contributions:
+    - snapshot://emissions/2025-12-04/national_contributions_temperature_response.csv
+    - snapshot://emissions/2025-12-04/national_contributions_annual_emissions.csv
+    - snapshot://emissions/2025-12-04/national_contributions_cumulative_emissions.csv
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://garden/emissions/2025-12-04/national_contributions:
+    - data://meadow/emissions/2025-12-04/national_contributions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://grapher/emissions/2025-12-04/national_contributions:
+    - data://garden/emissions/2025-12-04/national_contributions
+  #
+  # Emissions - CO2 dataset.
+  #
+  data://garden/emissions/2025-12-04/owid_co2:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/emissions/2025-12-04/national_contributions
+    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/demography/2024-07-15/population

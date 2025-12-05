@@ -72,6 +72,7 @@ def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
     category_name_to_id = {cat: i + 1 for i, cat in enumerate(categories)}
 
     # Optional descriptions for specific causes
+    # General descriptions (apply to all age groups unless age-specific override exists)
     cause_descriptions = {
         "Heart diseases": "Heart attacks, strokes, and other cardiovascular diseases",
         "Chronic respiratory diseases": "COPD, Asthma, and others",
@@ -79,6 +80,23 @@ def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
         "Digestive diseases": "Cirrhosis and others",
         "Respiratory infections": "Pneumonia, influenza, COVID-19 and others",
         "Neonatal deaths": "Babies who died in the first 28 days of life",
+        "Other infectious diseases": "Meningitis, measles, whooping cough and others",
+        "Other non-communicable diseases": "Congenital birth defects, urinary tract infections, endocrine disorders and others",
+        "Maternal disorders": "Maternal hemorrhage, hypertensive disorders of pregnancy and others",
+        "Other injuries": "Drowning, fire, foreign bodies and others",
+        "Diarrheal diseases": "Rotavirus, cholera, and other diarrheal diseases",
+    }
+
+    # Age-specific descriptions that override general descriptions
+    # Format: (cause, age_group) -> description
+    age_specific_descriptions = {
+        ("Other infectious diseases", "<5 years"): "iNTS infections, typhoid and others ",
+        (
+            "Other non-communicable diseases",
+            "<5 years",
+        ): "Cardiovascular diseases, digestive diseases, genetic blood disorders, and others",
+        ("Other injuries", "<5 years"): "Animal contact, forces of naturue and others",
+        # Add more age-specific descriptions as needed
     }
 
     # Create variables list with age group associations
@@ -99,9 +117,23 @@ def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
             "ageGroup": sorted(age_group_ids),
         }
 
-        # Only add description if it exists for this cause
-        if cause in cause_descriptions:
-            variable_entry["description"] = cause_descriptions[cause]
+        # Determine description based on age groups
+        # If this cause appears in only one age group and has an age-specific description, use it
+        # Otherwise, use the general description if it exists
+        description = None
+        if len(age_groups_for_cause) == 1:
+            # Check for age-specific description
+            age_key = (cause, age_groups_for_cause[0])
+            if age_key in age_specific_descriptions:
+                description = age_specific_descriptions[age_key]
+
+        # Fall back to general description if no age-specific one found
+        if description is None and cause in cause_descriptions:
+            description = cause_descriptions[cause]
+
+        # Only add description if one was found
+        if description:
+            variable_entry["description"] = description
 
         variable_entry["category"] = category_id
 

@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp vsc-ext-compile vsc-ext-sync
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp vsce-compile vsce-sync
 
 include default.mk
 
@@ -35,7 +35,8 @@ help:
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
-	@echo '  make vsc-ext-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
+	@echo '  make vsce-sync 	Sync all custom VS Code extensions (reinstalling them)'
+# 	@echo '  make vsce-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
 	@echo '  make watch     	Run all tests, watching for changes'
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
@@ -210,7 +211,7 @@ install-vscode-extensions:
 	fi
 
 # Reinstall all custom VS Code extensions (forces update even if already installed)
-vsc-ext-sync:
+vsce-sync:
 	@echo '==> Reinstalling all custom VS Code extensions'
 	@if command -v code > /dev/null; then \
 		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
@@ -233,11 +234,11 @@ vscode-exclude-archived: .venv
 	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
 
 # Compile and package a VS Code extension
-# Usage: make vsc-ext-compile EXT=detect-outdated-practices [BUMP=patch|minor|major] [INSTALL=1]
-vsc-ext-compile:
+# Usage: make vsce-compile EXT=detect-outdated-practices [BUMP=patch|minor|major] [INSTALL=1]
+vsce-compile:
 	@if [ -z "$(EXT)" ]; then \
 		echo "❌ Error: EXT parameter is required."; \
-		echo "Usage: make vsc-ext-compile EXT=extension-name [BUMP=patch|minor|major] [INSTALL=1]"; \
+		echo "Usage: make vsce-compile EXT=extension-name [BUMP=patch|minor|major] [INSTALL=1]"; \
 		echo ""; \
 		echo "Available extensions:"; \
 		find vscode_extensions -maxdepth 1 -type d ! -name vscode_extensions ! -name '.*' -exec basename {} \; | sed 's/^/  - /'; \
@@ -280,6 +281,6 @@ vsc-ext-compile:
 		echo "✅ Extension installed!"; \
 	else \
 		echo ""; \
-		echo "To install, run: make vsc-ext-compile EXT=$(EXT) INSTALL=1"; \
+		echo "To install, run: make vsce-compile EXT=$(EXT) INSTALL=1"; \
 		echo "Or install directly: code --install-extension $$VSIX_PATH --force"; \
 	fi
