@@ -16,14 +16,16 @@ def run() -> None:
     # Load data from snapshot.
     with snap.open_archive():
         tb = snap.read_from_archive(filename="FRA_Years_2025_12_05.csv")
-        tb_int = snap.read_from_archive(filename="Intervals_2025_12_05.csv")
+        tb_intervals = snap.read_from_archive(filename="Intervals_2025_12_05.csv")
 
-    # take first 4 digits of year range to get starting year
-    tb_int["year"] = tb_int["year"].astype(str).str[:4].astype(int)
+    # Extract starting year from year range format (e.g., "2020-2025" -> 2020)
+    tb_intervals["year"] = tb_intervals["year"].astype(str).str[:4].astype(int)
 
     # merge the two tables
     tb = tb.merge(
-        tb_int, on=["name", "year", "regions", "iso3", "boreal", "temperate", "tropical", "subtropical"], how="outer"
+        tb_intervals,
+        on=["name", "year", "regions", "iso3", "boreal", "temperate", "tropical", "subtropical"],
+        how="left",
     )
 
     tb = tb.drop(
@@ -37,8 +39,7 @@ def run() -> None:
             "name": "country",
         }
     )
-    # Process data.
-    #
+
     # Improve tables format.
     tables = [tb.format(["country", "year"])]
 

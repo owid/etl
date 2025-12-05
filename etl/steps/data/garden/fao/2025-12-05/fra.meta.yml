@@ -17,13 +17,13 @@ tables:
       _1a_forestarea:
         title: Forest area
         description_short: Forest area is land under natural or planted stands of trees of at least 5 meters in situ, whether productive or not, and excludes tree stands in agricultural production systems.
-        unit: ha
+        unit: hectares
         short_unit: ha
-        description_processing: "Annual forest area values are linearly interpolated for missing years."
+        description_processing: Annual forest area values are linearly interpolated for missing years, based on available data points from the FAO Forest Resources Assessment (FRA) reports.
       _1d_expansion:
         title: Forest expansion
         description_short: Forest expansion is the sum of afforestation (the establishment of forest through planting and/or deliberate seeding) and natural forest expansion (expansion of forests through natural succession on land that, until then, was under another land use).
-        unit: ha/year
+        unit: hectares per year
         short_unit: ha/year
         presentation:
           grapher_config:
@@ -31,37 +31,37 @@ tables:
       _1d_afforestation:
         title: Afforestation
         description_short: Afforestation is the establishment of forest through planting and/or deliberate seeding on land that, until then, was not classified as forest.
-        unit: ha/year
+        unit: hectares per year
         short_unit: ha/year
         presentation:
           grapher_config:
             note: *footnote_intervals
       _1d_nat_exp:
         title: Natural expansion
-        description_short: "Natural expansion refers to the increase in forest area due to natural processes such as seed dispersal and vegetative growth."
-        unit: ha/year
+        description_short: Natural expansion refers to the increase in forest area due to natural processes such as seed dispersal and vegetative growth.
+        unit: hectares per year
         short_unit: ha/year
         presentation:
           grapher_config:
             note: *footnote_intervals
       _1d_deforestation:
         title: Deforestation
-        unit: ha/year
+        unit: hectares per year
         short_unit: ha/year
         presentation:
           grapher_config:
             note: *footnote_intervals
       net_change_forest_area:
         title: Annual change in forest area
-        description_short: Net change in forest area measures forest expansion (the sum of afforestation and natural expansion) minus deforestation
-        unit: ha/year
+        description_short: Net change in forest area measures forest expansion (the sum of afforestation and natural expansion) minus deforestation.
+        unit: hectares per year
         short_unit: ha/year
         presentation:
           grapher_config:
             note: *footnote_intervals
       forestarea_share_global:
         title: Share of global forest area
-        description_short: "Share of global forest area represents the proportion of a country's forest area relative to the total global forest area."
+        description_short: Share of global forest area represents the proportion of a country's forest area relative to the total global forest area.
         unit: "%"
         short_unit: "%"
       annual_change_forest_area_share:
@@ -74,7 +74,7 @@ tables:
             note: *footnote_intervals
       annual_deforestation_share_forest_area:
         title: Annual deforestation as share of forest area
-        description_short: "Annual deforestation as share of forest area represents the yearly percentage of forest area lost due to deforestation relative to the total forest area."
+        description_short: Annual deforestation as share of forest area represents the yearly percentage of forest area lost due to deforestation relative to the total forest area.
         unit: "%"
         short_unit: "%"
         presentation:
@@ -82,7 +82,7 @@ tables:
             note: *footnote_intervals
       deforestation_share_global:
         title: Share of global deforestation
-        description_short: "Share of global deforestation represents the proportion of a country's deforestation relative to the total global deforestation."
+        description_short: Share of global deforestation represents the proportion of a country's deforestation relative to the total global deforestation.
         unit: "%"
         short_unit: "%"
         presentation:
@@ -90,7 +90,7 @@ tables:
             note: *footnote_intervals
       expansion_share_global:
         title: Share of annual global forest expansion
-        description_short: "Share of annual global forest expansion indicates the proportion of a country's forest expansion relative to the total global forest expansion."
+        description_short: Share of annual global forest expansion indicates the proportion of a country's forest expansion relative to the total global forest expansion.
         unit: "%"
         short_unit: "%"
         presentation:

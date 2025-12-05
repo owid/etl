@@ -11,10 +11,11 @@ meta:
     citation_full: |-
       Food and Agriculture Organization of the United Nations. 2025. Global Forest Resources Assessment 2025. Rome.
     attribution_short: FAO
+    version_producer: 2025
     # Files
     url_main: https://www.fao.org/forest-resources-assessment/en
     url_download: https://fra-data.fao.org/api/file/bulk-download?assessmentName=fra&cycleName=2025&countryIso=WO
-    date_accessed: '2025-12-05'
+    date_accessed: "2025-12-05"
 
     # License
     license:

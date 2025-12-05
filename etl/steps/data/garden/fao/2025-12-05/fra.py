@@ -114,7 +114,7 @@ def calculate_share_of_global_forest_area(tb: Table) -> Table:
         columns={"_1a_forestarea": "global_forest_area"}
     )
     tb = tb.merge(tb_global, on="year", how="left")
-    tb["forestarea_share_global"] = (tb["_1a_forestarea"] / tb["global_forest_area"]) * 100
+    tb["forestarea_share_global"] = tb["_1a_forestarea"].div(tb["global_forest_area"]).mul(100)
     tb = tb.drop(columns=["global_forest_area"])
     assert (
         tb["forestarea_share_global"].max() <= 100
@@ -128,12 +128,12 @@ def calculate_net_change_in_forest_area(tb: Table) -> Table:
 
 
 def calculate_annual_change_in_forest_area_as_share_forest_area(tb: Table) -> Table:
-    tb["annual_change_forest_area_share"] = (tb["net_change_forest_area"] / tb["_1a_forestarea"]) * 100
+    tb["annual_change_forest_area_share"] = tb["net_change_forest_area"].div(tb["_1a_forestarea"]).mul(100)
     return tb
 
 
 def calculate_annual_deforestation_as_share_of_forest_area(tb: Table) -> Table:
-    tb["annual_deforestation_share_forest_area"] = (tb["_1d_deforestation"] / tb["_1a_forestarea"]) * 100
+    tb["annual_deforestation_share_forest_area"] = tb["_1d_deforestation"].div(tb["_1a_forestarea"]).mul(100)
     return tb
 
 
@@ -142,7 +142,7 @@ def calculate_share_of_global_deforestation(tb: Table) -> Table:
         columns={"_1d_deforestation": "global_deforestation"}
     )
     tb = tb.merge(tb_global_deforestation, on="year", how="left")
-    tb["deforestation_share_global"] = (tb["_1d_deforestation"] / tb["global_deforestation"]) * 100
+    tb["deforestation_share_global"] = tb["_1d_deforestation"].div(tb["global_deforestation"]).mul(100)
     tb = tb.drop(columns=["global_deforestation"])
     assert (
         tb["deforestation_share_global"].max() <= 100
@@ -155,7 +155,7 @@ def calculate_share_of_annual_global_forest_expansion(tb: Table) -> Table:
         columns={"_1d_expansion": "global_forest_expansion"}
     )
     tb = tb.merge(tb_global_expansion, on="year", how="left")
-    tb["expansion_share_global"] = (tb["_1d_expansion"] / tb["global_forest_expansion"]) * 100
+    tb["expansion_share_global"] = tb["_1d_expansion"].div(tb["global_forest_expansion"]).mul(100)
     tb = tb.drop(columns=["global_forest_expansion"])
     assert (
         tb["expansion_share_global"].max() <= 100
