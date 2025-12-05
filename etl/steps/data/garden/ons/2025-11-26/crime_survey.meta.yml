@@ -40,28 +40,3 @@ tables:
         unit: thefts
         description_key:
           - *description_key_survey
-      all_theft__ye_june:
-        title: All thefts (year ending June)
-        unit: thefts
-        description_key:
-          - *description_key_survey
-      domestic_burglary__ye_june:
-        title: Domestic burglary (year ending June)
-        unit: thefts
-        description_key:
-          - *description_key_survey
-      vehicle_related_theft__ye_june:
-        title: Vehicle-related theft (year ending June)
-        unit: thefts
-        description_key:
-          - *description_key_survey
-      other_household_theft__ye_june:
-        title: Other household theft (year ending June)
-        unit: thefts
-        description_key:
-          - *description_key_survey
-      theft_from_the_person__ye_june:
-        title: Theft from the person (year ending June)
-        unit: thefts
-        description_key:
-          - *description_key_survey
