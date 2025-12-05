@@ -72,6 +72,7 @@ def run() -> None:
     tb = calculate_net_change_in_forest_area(tb)
     # Linearly interpolate forest area for missing years
     tb = linearly_interpolate_forest_area(tb)
+
     tb = calculate_share_of_global_forest_area(tb)
     tb = calculate_annual_change_in_forest_area_as_share_forest_area(tb)
     tb = calculate_annual_deforestation_as_share_of_forest_area(tb)
@@ -88,6 +89,22 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def calculate_net_change_in_forest_area(tb: Table) -> Table:
+    tb = tb.sort_values(by=["country", "year"])
+
+    # Calculate difference in forest area and years between observations
+    tb["forest_area_diff"] = tb.groupby("country")["_1a_forestarea"].diff()
+    tb["year_diff"] = tb.groupby("country")["year"].diff()
+
+    # Calculate annualized change and shift back one period
+    tb["net_change_forest_area"] = tb["forest_area_diff"].div(tb["year_diff"]).groupby(tb["country"]).shift(-1)
+
+    # Clean up temporary columns
+    tb = tb.drop(columns=["forest_area_diff", "year_diff"])
+
+    return tb
 
 
 def linearly_interpolate_forest_area(tb: Table) -> Table:
@@ -120,14 +137,6 @@ def calculate_share_of_global_forest_area(tb: Table) -> Table:
     assert (
         tb["forestarea_share_global"].max() <= 100
     ), "Error in calculating share of global forest area: values exceed 100%"
-    return tb
-
-
-def calculate_net_change_in_forest_area(tb: Table) -> Table:
-    # Calculate the difference between grouped countries values for forest area
-    tb = tb.sort_values(by=["country", "year"])
-    tb["net_change_forest_area"] = tb.groupby("country")["_1a_forestarea"].diff().fillna(0)
-
     return tb
 
 
