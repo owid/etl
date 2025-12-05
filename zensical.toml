@@ -98,11 +98,13 @@ nav = [
         ] },
     ] },
     { "Our libraries" = [
-        "libraries/index.md",
-        { "owid.catalog" = "libraries/catalog.md" },
-        { "owid-grapher-py" = "libraries/grapher-py.md" },
-        { "owid.repack" = "libraries/repack.md" },
-        { "owid.datautils" = "libraries/datautils.md" },
+        { "Python" = [
+            "libraries/index.md",
+            { "owid.catalog" = "libraries/catalog.md" },
+            { "owid-grapher-py" = "libraries/grapher-py.md" },
+            { "owid.repack" = "libraries/repack.md" },
+            { "owid.datautils" = "libraries/datautils.md" },
+        ] },
     ] },
     { "API and catalog" = [
         { "API" = "api/index.md" },
