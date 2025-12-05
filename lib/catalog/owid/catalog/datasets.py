@@ -72,15 +72,20 @@ class Dataset:
         path: Path to the dataset directory.
         metadata: Dataset-level metadata (title, description, sources, etc).
 
-    Examples:
-        >>> # Load an existing dataset:
+    Example:
+        Load an existing dataset:
+
+        ```python
         >>> ds = Dataset("data://garden/demography/2023-03-31/population")
         >>> table = ds["population"]
+        ```
 
-        >>> # Create a new dataset:
+        Create a new dataset:
+        ```python
         >>> ds = Dataset.create_empty("path/to/dataset")
         >>> ds.add(table)
         >>> ds.save()
+        ```
     """
 
     path: str
@@ -146,10 +151,12 @@ class Dataset:
             PrimaryKeyMissing: If table has no primary key and OWID_STRICT is set.
             NonUniqueIndex: If table index has duplicates and OWID_STRICT is set.
 
-        Examples:
+        Example:
+            ```python
             >>> ds.add(table)  # Save in default format
             >>> ds.add(table, formats=["csv"])  # Save only as CSV
             >>> ds.add(table, repack=False)  # Skip optimization
+            ```
         """
 
         utils.validate_underscore(table.metadata.short_name, "Table's short_name")
@@ -228,11 +235,26 @@ class Dataset:
             ValueError: If name is None but dataset contains multiple tables.
             KeyError: If the specified table name doesn't exist.
 
-        Examples:
-            >>> table = ds.read()  # Read single table with safe defaults
-            >>> table = ds.read("population", reset_index=False)  # Keep index
-            >>> table = ds.read("large_table", safe_types=False)  # Faster, less memory
-            >>> meta_only = ds.read(load_data=False)  # Only metadata
+        Example:
+            Read single table with safe defaults
+            ```python
+            table = ds.read()
+            ```
+
+            Keep index
+            ```python
+            >>> table = ds.read("population", reset_index=False)
+            ```
+
+            Faster, less memory
+            ```python
+            >>> table = ds.read("large_table", safe_types=False)
+            ```
+
+            Only metadata
+            ```python
+            >>> meta_only = ds.read(load_data=False)
+            ```
         """
         if name is None:
             if len(self.table_names) == 1:
@@ -334,13 +356,15 @@ class Dataset:
                 - "raise" (default): Raise exception
                 - "ignore": Skip extra variables
 
-        Examples:
+        Example:
+            ```python
             >>> ds.update_metadata(Path("dataset.meta.yml"))
             >>> ds.update_metadata(
             ...     Path("dataset.meta.yml"),
             ...     if_origins_exist="append",
             ...     errors="warn"
             ... )
+            ```
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
@@ -376,12 +400,13 @@ class Dataset:
             catalog_path: Base path for calculating relative paths. Defaults to "/".
 
         Returns:
-            DataFrame with columns: namespace, dataset, version, table, checksum,
-            is_public, dimensions, path, and channel.
+            DataFrame with columns: namespace, dataset, version, table, checksum, is_public, dimensions, path, and channel.
 
-        Examples:
+        Example:
+            ```python
             >>> index = ds.index()
             >>> print(index[["table", "dimensions", "checksum"]])
+            ```
         """
         base = {
             "namespace": self.metadata.namespace,
@@ -456,9 +481,11 @@ class Dataset:
         Returns:
             MD5 checksum as a hexadecimal string.
 
-        Examples:
+        Example:
+            ```python
             >>> checksum = ds.checksum()
             >>> print(f"Dataset checksum: {checksum}")
+            ```
         """
         _hash = hashlib.md5()
         _hash.update(checksum_file(self._index_file).digest())
@@ -490,9 +517,11 @@ def checksum_file(filename: str) -> Any:
     Returns:
         MD5 hash object (use .hexdigest() to get string representation).
 
-    Examples:
+    Example:
+        ```python
         >>> checksum = checksum_file("data.csv")
         >>> print(checksum.hexdigest())
+        ```
     """
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()

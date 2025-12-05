@@ -59,17 +59,23 @@ class Table(pd.DataFrame):
         _fields: Dictionary mapping column names to their VariableMeta objects.
         DEBUG: Set to True to enable metadata validation debugging.
 
-    Examples:
+    Example:
         Create a table from a DataFrame:
-            >>> df = pd.DataFrame({"country": ["USA", "UK"], "gdp": [20, 3]})
-            >>> table = Table(df, short_name="gdp")
+        ```
+        df = pd.DataFrame({"country": ["USA", "UK"], "gdp": [20, 3]})
+        table = Table(df, short_name="gdp")
+        ```
 
         Create with metadata:
-            >>> meta = TableMeta(short_name="gdp", title="GDP by country")
-            >>> table = Table(df, metadata=meta)
+        ```python
+        meta = TableMeta(short_name="gdp", title="GDP by country")
+        table = Table(df, metadata=meta)
+        ```
 
         Copy metadata from another table:
-            >>> new_table = Table(df, like=old_table)
+        ```python
+        new_table = Table(df, like=old_table)
+        ```
     """
 
     # metdata about the entire table
@@ -120,10 +126,12 @@ class Table(pd.DataFrame):
                 Alternative to manually copying metadata for all columns.
             **kwargs: Keyword arguments passed to pandas.DataFrame.__init__.
 
-        Examples:
-            >>> table = Table(df, short_name="population")
-            >>> table = Table(df, metadata=meta, underscore=True)
-            >>> table = Table(df, like=existing_table)
+        Example:
+            ```python
+            table = Table(df, short_name="population")
+            table = Table(df, metadata=meta, underscore=True)
+            table = Table(df, like=existing_table)
+            ```
         """
 
         super().__init__(*args, **kwargs)
@@ -167,9 +175,11 @@ class Table(pd.DataFrame):
         Returns:
             List of index level names (excluding None values).
 
-        Examples:
-            >>> table = table.set_index(["country", "year"])
-            >>> print(table.primary_key)  # ["country", "year"]
+        Example:
+            ```python
+            table = table.set_index(["country", "year"])
+            print(table.primary_key)  # ["country", "year"]
+            ```
         """
         return [n for n in self.index.names if n]
 
@@ -184,10 +194,12 @@ class Table(pd.DataFrame):
             repack: If True, optimize column dtypes to reduce file size.
                 Set to False for very large tables if optimization fails.
 
-        Examples:
-            >>> table.to("data.feather")  # Save as Feather with optimization
-            >>> table.to("data.csv")  # Save as CSV
-            >>> table.to("data.parquet", repack=False)  # Skip optimization
+        Example:
+            ```python
+            table.to("data.feather")  # Save as Feather with optimization
+            table.to("data.csv")  # Save as CSV
+            table.to("data.parquet", repack=False)  # Skip optimization
+            ```
         """
         # Add entry in the processing log about operation "save".
         self = update_processing_logs_when_saving_table(table=self, path=path)
@@ -225,10 +237,12 @@ class Table(pd.DataFrame):
         Raises:
             ValueError: If file extension is not recognized.
 
-        Examples:
-            >>> table = Table.read("data.feather")
-            >>> table = Table.read("data.csv")
-            >>> table = Table.read("data.parquet")
+        Example:
+            ```python
+            table = Table.read("data.feather")
+            table = Table.read("data.csv")
+            table = Table.read("data.parquet")
+            ```
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -278,9 +292,11 @@ class Table(pd.DataFrame):
         Returns:
             CSV string if path is None, otherwise None.
 
-        Examples:
-            >>> table.to_csv("data.csv")  # Saves data.csv and data.meta.json
-            >>> csv_str = table.to_csv()  # Returns CSV as string
+        Example:
+            ```python
+            table.to_csv("data.csv")  # Saves data.csv and data.meta.json
+            csv_str = table.to_csv()  # Returns CSV as string
+            ```
         """
         # return string
         if path is None:
@@ -308,15 +324,18 @@ class Table(pd.DataFrame):
 
         Returns:
             DataFrame with columns:
+
                 - column: Column name (including index columns)
                 - title: Title from metadata (title_public > display.name > title)
                 - description: Short description of the indicator
                 - unit: Unit of measurement with short unit in parentheses
                 - source: Formatted source attribution with URLs
 
-        Examples:
-            >>> codebook = table.codebook
-            >>> print(codebook.to_markdown())
+        Example:
+            ```python
+            codebook = table.codebook
+            print(codebook.to_markdown())
+            ```
         """
         # Initialize lists to store the codebook information.
         columns = []
@@ -409,9 +428,11 @@ class Table(pd.DataFrame):
             metadata_sheet_name: Name for the metadata sheet. Default is "metadata".
             **kwargs: Additional arguments passed to pandas.DataFrame.to_excel.
 
-        Examples:
-            >>> table.to_excel("output.xlsx")  # With metadata
-            >>> table.to_excel("output.xlsx", with_metadata=False)  # Data only
+        Example:
+            ```python
+            table.to_excel("output.xlsx")  # With metadata
+            table.to_excel("output.xlsx", with_metadata=False)  # Data only
+            ```
         """
         if isinstance(excel_writer, pd.ExcelWriter):
             # If excel_writer is already an ExcelWriter instance, use it, to avoid nested contexts.
@@ -456,10 +477,12 @@ class Table(pd.DataFrame):
             ValueError: If path doesn't end with .feather or if index names
                 overlap with column names.
 
-        Examples:
-            >>> table.to_feather("data.feather")  # With compression
-            >>> table.to_feather("data.feather", repack=False)  # Skip optimization
-            >>> table.to_feather("data.feather", compression="lz4")  # Fast compression
+        Example:
+            ```python
+            table.to_feather("data.feather")  # With compression
+            table.to_feather("data.feather", repack=False)  # Skip optimization
+            table.to_feather("data.feather", compression="lz4")  # Fast compression
+            ```
         """
         if not str(path).endswith(".feather"):
             raise ValueError(f'filename must end in ".feather": {path}')
@@ -508,9 +531,11 @@ class Table(pd.DataFrame):
         Raises:
             ValueError: If path doesn't end with .parquet.
 
-        Examples:
-            >>> table.to_parquet("data.parquet")  # With optimization
-            >>> table.to_parquet("data.parquet", repack=False)  # Skip optimization
+        Example:
+            ```python
+            table.to_parquet("data.parquet")  # With optimization
+            table.to_parquet("data.parquet", repack=False)  # Skip optimization
+            ```
         """
         if not str(path).endswith(".parquet"):
             raise ValueError(f'filename must end in ".parquet": {path}')
@@ -579,9 +604,11 @@ class Table(pd.DataFrame):
         Raises:
             ValueError: If path doesn't end with .csv.
 
-        Examples:
-            >>> table = Table.read_csv("data.csv")
-            >>> table = Table.read_csv(Path("data.csv"))
+        Example:
+            ```python
+            table = Table.read_csv("data.csv")
+            table = Table.read_csv(Path("data.csv"))
+            ```
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -609,9 +636,11 @@ class Table(pd.DataFrame):
         Raises:
             AssertionError: If any field name is not a valid TableMeta attribute.
 
-        Examples:
-            >>> table.update_metadata(title="GDP Data", description="GDP by country")
-            >>> table.update_metadata(short_name="gdp_data")
+        Example:
+            ```python
+            table.update_metadata(title="GDP Data", description="GDP by country")
+            table.update_metadata(short_name="gdp_data")
+            ```
         """
         for k, v in kwargs.items():
             assert hasattr(self.metadata, k), f"unknown metadata field {k} in TableMeta"
@@ -656,10 +685,12 @@ class Table(pd.DataFrame):
         Raises:
             ValueError: If path doesn't end with .feather.
 
-        Examples:
-            >>> table = Table.read_feather("data.feather")
-            >>> table = Table.read_feather("https://example.com/data.feather")
-            >>> metadata_only = Table.read_feather("data.feather", load_data=False)
+        Example:
+            ```python
+            table = Table.read_feather("data.feather")
+            table = Table.read_feather("https://example.com/data.feather")
+            metadata_only = Table.read_feather("data.feather", load_data=False)
+            ```
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -695,9 +726,11 @@ class Table(pd.DataFrame):
         Raises:
             ValueError: If path doesn't end with .parquet.
 
-        Examples:
-            >>> table = Table.read_parquet("data.parquet")
-            >>> table = Table.read_parquet("https://example.com/data.parquet")
+        Example:
+            ```python
+            table = Table.read_parquet("data.parquet")
+            table = Table.read_parquet("https://example.com/data.parquet")
+            ```
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -772,9 +805,11 @@ class Table(pd.DataFrame):
             NaN values are handled specially to ensure consistent comparison
             even when NaN values are present.
 
-        Examples:
-            >>> if table1.equals_table(table2):
-            ...     print("Tables are identical")
+        Example:
+            ```python
+            if table1.equals_table(table2):
+            ... print("Tables are identical")
+            ```
         """
         return (
             isinstance(table, Table)
@@ -815,9 +850,11 @@ class Table(pd.DataFrame):
         Returns:
             Renamed table if inplace=False (default), None if inplace=True.
 
-        Examples:
-            >>> new_table = table.rename(columns={"old_name": "new_name"})
-            >>> table.rename(columns={"gdp": "gdp_usd"}, inplace=True)
+        Example:
+            ```python
+            new_table = table.rename(columns={"old_name": "new_name"})
+            table.rename(columns={"gdp": "gdp_usd"}, inplace=True)
+            ```
         """
         inplace = kwargs.get("inplace")
         old_cols = self.all_columns
@@ -868,9 +905,11 @@ class Table(pd.DataFrame):
         Returns:
             List of all column names and index level names.
 
-        Examples:
-            >>> table = table.set_index(["country", "year"])
-            >>> print(table.all_columns)  # ["country", "year", "gdp", "population"]
+        Example:
+            ```python
+            table = table.set_index(["country", "year"])
+            print(table.all_columns)  # ["country", "year", "gdp", "population"]
+            ```
         """
         combined: list[str] = filter(None, list(self.index.names) + list(self.columns))  # type: ignore
         return combined
@@ -891,9 +930,11 @@ class Table(pd.DataFrame):
         Raises:
             ValueError: If name is not found in either columns or index.
 
-        Examples:
-            >>> var = table.get_column_or_index("country")  # Works for column or index
-            >>> print(var.metadata.title)
+        Example:
+            ```python
+            var = table.get_column_or_index("country")  # Works for column or index
+            print(var.metadata.title)
+            ```
         """
         if name in self.columns:
             return self[name]
@@ -929,13 +970,15 @@ class Table(pd.DataFrame):
                 - "append": Append new origin to existing origins
                 - "fail": Raise exception if origin already exists
 
-        Examples:
+        Example:
+            ```python
             >>> table.update_metadata_from_yaml("dataset.meta.yml", "population")
             >>> table.update_metadata_from_yaml(
             ...     Path("dataset.meta.yml"),
             ...     "gdp_data",
             ...     extra_variables="ignore"
             ... )
+            ```
         """
         from .yaml_metadata import update_metadata_from_yaml
 
@@ -957,9 +1000,11 @@ class Table(pd.DataFrame):
         Returns:
             Self, for method chaining.
 
-        Examples:
-            >>> subset = table[["country", "gdp"]]  # Only 2 columns
-            >>> subset.prune_metadata()  # Remove metadata for dropped columns
+        Example:
+            ```python
+            subset = table[["country", "gdp"]]  # Only 2 columns
+            subset.prune_metadata()  # Remove metadata for dropped columns
+            ```
         """
         self._fields = defaultdict(VariableMeta, {col: self._fields[col] for col in self.all_columns})
         return self
@@ -974,9 +1019,11 @@ class Table(pd.DataFrame):
         Returns:
             A new Table with copied data and metadata.
 
-        Examples:
-            >>> table_copy = table.copy()  # Deep copy
-            >>> table_copy = table.copy(deep=False)  # Shallow copy
+        Example:
+            ```python
+            table_copy = table.copy()  # Deep copy
+            table_copy = table.copy(deep=False)  # Shallow copy
+            ```
         """
         # This could be causing this warning:
         #   Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
@@ -997,9 +1044,11 @@ class Table(pd.DataFrame):
         Returns:
             Self, for method chaining.
 
-        Examples:
-            >>> new_table = Table(transformed_df)
-            >>> new_table.copy_metadata(original_table)
+        Example:
+            ```python
+            new_table = Table(transformed_df)
+            new_table.copy_metadata(original_table)
+            ```
         """
         return copy_metadata(to_table=self, from_table=from_table, deep=deep)
 
@@ -1036,10 +1085,12 @@ class Table(pd.DataFrame):
         Returns:
             Table with new index if inplace=False, None if inplace=True.
 
-        Examples:
-            >>> table = table.set_index("country")
-            >>> table = table.set_index(["country", "year"])
-            >>> table.set_index("country", inplace=True)
+        Example:
+            ```python
+            table = table.set_index("country")
+            table = table.set_index(["country", "year"])
+            table.set_index("country", inplace=True)
+            ```
         """
         if isinstance(keys, str):
             keys = [keys]
@@ -1084,10 +1135,12 @@ class Table(pd.DataFrame):
         Returns:
             Table with reset index if inplace=False, None if inplace=True.
 
-        Examples:
-            >>> new_table = table.reset_index()  # Reset all index levels
-            >>> new_table = table.reset_index(level="country")  # Reset one level
-            >>> table.reset_index(inplace=True)  # Modify in place
+        Example:
+            ```python
+            new_table = table.reset_index()  # Reset all index levels
+            new_table = table.reset_index(level="country")  # Reset one level
+            table.reset_index(inplace=True)  # Modify in place
+            ```
         """
         t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
 
@@ -1116,15 +1169,21 @@ class Table(pd.DataFrame):
         Returns:
             Table with columns cast to specified types.
 
-        Examples:
-            >>> # Cast single column:
-            >>> table = table.astype({"population": int})
+        Example:
+            Cast single column:
+            ```python
+            table = table.astype({"population": int})
+            ```
 
-            >>> # Cast multiple columns:
-            >>> table = table.astype({"year": int, "gdp": float})
+            Cast multiple columns:
+            ```python
+            table = table.astype({"year": int, "gdp": float})
+            ```
 
-            >>> # Cast all columns:
-            >>> table = table.astype(str)
+            Cast all columns:
+            ```python
+            table = table.astype(str)
+            ```
         """
         return super().astype(*args, **kwargs)  # type: ignore
 
@@ -1141,15 +1200,21 @@ class Table(pd.DataFrame):
         Returns:
             Table conformed to new index.
 
-        Examples:
-            >>> # Reindex with new labels:
-            >>> table = table.reindex(["A", "B", "C", "D"])
+        Example:
+            Reindex with new labels:
+            ```python
+            table = table.reindex(["A", "B", "C", "D"])
+            ```
 
-            >>> # Fill missing values:
-            >>> table = table.reindex(new_index, fill_value=0)
+            Fill missing values:
+            ```python
+            table = table.reindex(new_index, fill_value=0)
+            ```
 
-            >>> # Forward fill:
-            >>> table = table.reindex(new_index, method="ffill")
+            Forward fill:
+            ```python
+            table = table.reindex(new_index, method="ffill")
+            ```
         """
         t = super().reindex(*args, **kwargs)
         return cast(Table, t)
@@ -1181,9 +1246,11 @@ class Table(pd.DataFrame):
         Returns:
             Joined table with combined metadata.
 
-        Examples:
-            >>> joined = table1.join(table2, on="country")
-            >>> joined = table1.join(table2, how="outer")
+        Example:
+            ```python
+            joined = table1.join(table2, on="country")
+            joined = table1.join(table2, how="outer")
+            ```
         """
         t = super().join(other, *args, **kwargs)
 
@@ -1219,9 +1286,11 @@ class Table(pd.DataFrame):
         Returns:
             Merged Table with combined metadata.
 
-        Examples:
-            >>> result = table1.merge(table2, on="country")
-            >>> result = table1.merge(table2, left_on="code", right_on="country_code")
+        Example:
+            ```python
+            result = table1.merge(table2, on="country")
+            result = table1.merge(table2, left_on="code", right_on="country_code")
+            ```
         """
         return merge(left=self, right=right, *args, **kwargs)
 
@@ -1254,8 +1323,9 @@ class Table(pd.DataFrame):
         Returns:
             Melted Table in long format with preserved metadata.
 
-        Examples:
-            >>> # Melt all columns except country and year:
+        Example:
+            Melt all columns except country and year:
+            ```python
             >>> long_table = table.melt(id_vars=["country", "year"])
 
             >>> # Melt specific columns:
@@ -1270,6 +1340,7 @@ class Table(pd.DataFrame):
             ...     var_name="indicator",
             ...     value_name="measurement"
             ... )
+            ```
         """
         return melt(
             frame=self,
@@ -1315,7 +1386,8 @@ class Table(pd.DataFrame):
         Returns:
             Pivoted Table in wide format with preserved metadata.
 
-        Examples:
+        Example:
+            ```python
             >>> # Basic pivot:
             >>> wide = table.pivot(
             ...     index="country",
@@ -1330,6 +1402,7 @@ class Table(pd.DataFrame):
             ...     values="population",
             ...     join_column_levels_with="_"
             ... )
+            ```
         """
         return pivot(
             data=self,
@@ -1366,11 +1439,26 @@ class Table(pd.DataFrame):
         Returns:
             Table with underscored names (or None if inplace=True).
 
-        Examples:
-            >>> table = table.underscore()  # Basic underscoring
-            >>> table = table.underscore(camel_to_snake=True)  # Convert camelCase
-            >>> table = table.underscore(collision="rename")  # Handle collisions
-            >>> table.underscore(inplace=True)  # Modify in place
+        Example:
+            Basic underscoring
+            ```python
+            table = table.underscore()
+            ```
+
+            Convert camelCase
+            ```python
+            table = table.underscore(camel_to_snake=True)
+            ```
+
+            Handle collisions
+            ```python
+            table = table.underscore(collision="rename")
+            ```
+
+            Modify in place
+            ```python
+            table.underscore(inplace=True)
+            ```
         """
         t = self
         orig_cols = t.columns
@@ -1435,23 +1523,33 @@ class Table(pd.DataFrame):
             KeyError: If specified keys are not found in table columns.
             ValueError: If verify_integrity=True and index has duplicates.
 
-        Examples:
-            >>> # Basic formatting with default country/year index:
-            >>> table = table.format()
+        Example:
+            Basic formatting with default country/year index:
+            ```python
+            table = table.format()
+            ```
 
-            >>> # Equivalent to:
-            >>> table = table.underscore().set_index(
-            ...     ["country", "year"], verify_integrity=True
-            ... ).sort_index()
+            Equivalent to:
+            ```python
+            table = table.underscore().set_index(
+                ["country", "year"], verify_integrity=True
+            ).sort_index()
+            ```
 
-            >>> # Custom index columns:
-            >>> table = table.format(["country", "year", "sex"])
+            Custom index columns:
+            ```python
+            table = table.format(["country", "year", "sex"])
+            ```
 
-            >>> # Skip underscoring if already formatted:
-            >>> table = table.format(underscore=False, keys=["country", "year"])
+            Skip underscoring if already formatted:
+            ```python
+            table = table.format(underscore=False, keys=["country", "year"])
+            ```
 
-            >>> # Format with custom table name:
-            >>> table = table.format(short_name="population_density")
+            Format with custom table name:
+            ```python
+            table = table.format(short_name="population_density")
+            ```
         """
         t = self
         # Underscore
@@ -1523,15 +1621,21 @@ class Table(pd.DataFrame):
         Returns:
             Table with specified labels dropped.
 
-        Examples:
-            >>> # Drop columns:
-            >>> table = table.drop(columns=["column1", "column2"])
+        Example:
+            Drop columns:
+            ```python
+            table = table.drop(columns=["column1", "column2"])
+            ```
 
-            >>> # Drop rows by index:
-            >>> table = table.drop(index=["row1", "row2"])
+            Drop rows by index:
+            ```python
+            table = table.drop(index=["row1", "row2"])
+            ```
 
-            >>> # Drop columns with axis parameter:
-            >>> table = table.drop(["column1"], axis=1)
+            Drop columns with axis parameter:
+            ```python
+            table = table.drop(["column1"], axis=1)
+            ```
         """
         return cast(Table, super().drop(*args, **kwargs))
 
@@ -1553,15 +1657,21 @@ class Table(pd.DataFrame):
         Returns:
             Filtered Table with only selected labels.
 
-        Examples:
-            >>> # Filter columns by exact names:
-            >>> table = table.filter(items=["country", "year", "gdp"])
+        Example:
+            Filter columns by exact names:
+            ```python
+            table = table.filter(items=["country", "year", "gdp"])
+            ```
 
-            >>> # Filter columns containing pattern:
-            >>> table = table.filter(like="population")
+            Filter columns containing pattern:
+            ```python
+            table = table.filter(like="population")
+            ```
 
-            >>> # Filter columns with regex:
-            >>> table = table.filter(regex="^gdp_.*")
+            Filter columns with regex:
+            ```python
+            table = table.filter(regex="^gdp_.*")
+            ```
         """
         return super().filter(*args, **kwargs)  # type: ignore
 
