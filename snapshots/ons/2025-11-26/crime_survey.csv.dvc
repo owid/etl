@@ -13,8 +13,8 @@ meta:
       Office for National Statistics (ONS), released 23 October 2025, ONS website, statistical bulletin, Crime in England and Wales: year ending June 2025
     attribution_short: ONS
     # Files
-    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwales/yearendingjune2025#theft-offences
-    url_download: https://www.ons.gov.uk/generator?uri=/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwales/yearendingjune2025/a9c6b708&format=csv
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwales/yearendingmarch2025
+    url_download: https://www.ons.gov.uk/generator?uri=/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwales/yearendingmarch2025/fc423867&format=csv
     date_accessed: "2025-11-26"
 
     # License
@@ -22,6 +22,6 @@ meta:
       name: Open Government Licence v3.0,
       url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 outs:
-  - md5: 401a6a0d489127159a698335bb25c338
-    size: 3254
+  - md5: ee47fd72d0821322f384d3a4113e4a21
+    size: 2372
     path: crime_survey.csv
