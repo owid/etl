@@ -28,7 +28,7 @@ This installs both marketplace extensions (Ruff, YAML) and our custom extensions
 After compiling an extension, force-reinstall all extensions with their latest versions:
 
 ```bash
-make vsc-ext-sync
+make vsce-sync
 ```
 
 This command force-reinstalls all custom extensions, ensuring you get the latest compiled versions even if they're already installed.
@@ -150,7 +150,7 @@ Edit code in `vscode_extensions/[extension-name]/src/extension.ts`
 Run the following command from the ETL root directory:
 
 ```bash
-make vsc-ext-compile EXT=extension-name
+make vsce-compile EXT=extension-name
 ```
 
 This compiles the extension and packages it into a `.vsix` file located in `vscode_extensions/[extension-name]/install/`.
@@ -161,7 +161,7 @@ Optionally, you can add `BUMP=patch` (or `minor`/`major`) to increment the versi
 ### Sync extensions
 Install latest versions (including the one you just compiled) of all extensions:
 ```bash
-make vsc-ext-sync
+make vsce-sync
 ```
 
 ### Reload VS Code
@@ -177,10 +177,10 @@ Reload VS Code: cmd+shift+p → "Developer: Reload Window"
 
 **Cause**: This command skips already-installed extensions.
 
-**Solution**: Use `make vsc-ext-sync` to force-reinstall all extensions:
+**Solution**: Use `make vsce-sync` to force-reinstall all extensions:
 
 ```bash
-make vsc-ext-sync
+make vsce-sync
 ```
 
 Then reload VS Code: ++cmd+shift+p++ → "Developer: Reload Window"
@@ -193,11 +193,11 @@ Then reload VS Code: ++cmd+shift+p++ → "Developer: Reload Window"
 
 ```bash
 # Quick method
-make vsc-ext-compile EXT=extension-name INSTALL=1
+make vsce-compile EXT=extension-name INSTALL=1
 
 # Or compile then sync
-make vsc-ext-compile EXT=extension-name
-make vsc-ext-sync
+make vsce-compile EXT=extension-name
+make vsce-sync
 ```
 
 Then reload VS Code: ++cmd+shift+p++ → "Developer: Reload Window"
