@@ -48,6 +48,17 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         message: '`paths.load_dependency` is outdated. Use `paths.load_dataset` or `paths.load_snapshot` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches if __name__ == "__main__" in snapshot files
+        // Common patterns:
+        // - if __name__ == "__main__":
+        // - if __name__=="__main__":
+        // - if "__main__" == __name__:
+        pattern: /if\s+(__name__|["']__main__["'])\s*==\s*(["']__main__["']|__name__)/g,
+        message: '`if __name__ == "__main__"` blocks are outdated in snapshot files. Remove it, as you no longer need it. You can now run snapshots directly with `etls` (or `etl snapshot`) command.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'snapshots/**'
     }
 ];
 

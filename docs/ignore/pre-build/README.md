@@ -10,7 +10,7 @@ Generates the Search API documentation from the OpenAPI specification.
 
 **Source**: Fetched from GitHub at build time
 - **Repository**: `owid/owid-grapher`
-- **File Path**: `functions/search-api.openapi.yaml`
+- **File Path**: `docs/search-api.openapi.yaml`
 - **Branch**: `master`
 
 This ensures the documentation always reflects the current state of the Search API in the grapher repository.

@@ -4,7 +4,7 @@ File lives in GD: https://docs.google.com/spreadsheets/d/1SY7K_hyMtJUhyXDtQQwXAH
 
 Example execution:
 
-    python snapshots/owid/latest/ig_countries.py --path-to-file snapshots/owid/latest/countries.csv
+    etls owid/latest/ig_countries --path-to-file snapshots/owid/latest/countries.csv
     etlr ig_countries --private
 """
 

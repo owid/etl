@@ -13,7 +13,7 @@ To download this files:
         - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Female_2024-2100.csv.gz
         - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Male_2024-2100.csv.gz
     3. Run the snapshot script and wait for it to be ingested into S3:
-        python snapshots/un/2023-10-02/un_wpp_lt.py --path-to-file-all /path/WPP2022_Life_Table_Complete_Medium_Both_1950-2021.zip --path-to-file-f path/WPP2022_Life_Table_Complete_Medium_Female_1950-2021.zip --path-to-file-m path/WPP2022_Life_Table_Complete_Medium_Male_1950-2021.zip
+        etls un/2023-10-02/un_wpp_lt --path-to-file-all /path/WPP2022_Life_Table_Complete_Medium_Both_1950-2021.zip --path-to-file-f path/WPP2022_Life_Table_Complete_Medium_Female_1950-2021.zip --path-to-file-m path/WPP2022_Life_Table_Complete_Medium_Male_1950-2021.zip
 
 """
 

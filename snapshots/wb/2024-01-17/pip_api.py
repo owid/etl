@@ -14,16 +14,16 @@ To run this code from scratch,
     - Delete the files in the cache folder:
         rm -rf .cache/pip*
     - Run the code. You have two options to see the output, in the terminal or in the background:
-        python snapshots/wb/{version}/pip_api.py
-        nohup uv run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
+        etls wb/{version}/pip_api
+        nohup uv run etls wb/{version}/pip_api > output.log 2>&1 &
 
 When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).
     - pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
 
 Copy these files to this folder and run in the terminal:
-    python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
-    python snapshots/wb/{version}/world_bank_pip_percentiles.py --path-to-file snapshots/wb/{version}/pip_percentiles.csv
+    etls wb/{version}/world_bank_pip snapshots/wb/{version}/world_bank_pip.csv
+    etls wb/{version}/world_bank_pip_percentiles --path-to-file snapshots/wb/{version}/pip_percentiles.csv
 
 You can delete the files after this.
 

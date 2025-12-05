@@ -37,6 +37,16 @@ Detects calls to the deprecated dependency loader:
 - Use `paths.load_dataset()` for loading datasets
 - Use `paths.load_snapshot()` for loading snapshots
 
+### 4. `if __name__ == "__main__"` in Snapshots
+Detects outdated main block patterns in snapshot files:
+- `if __name__ == "__main__":`
+- `if __name__=="__main__":`
+- `if "__main__" == __name__:`
+
+**Scope:** Only applies to files in `snapshots/**`
+
+**Recommended action:** Remove this pattern from snapshot files
+
 ## Adding New Patterns
 
 To add new patterns, edit `src/extension.ts` and add entries to the `OUTDATED_PATTERNS` array:
@@ -75,12 +85,46 @@ Each pattern can optionally include a `scope` field to restrict where it applies
   - `etl/**/*.py` - All Python files under `etl/`
   - `apps/*/utils.py` - `utils.py` files in any direct subdirectory of `apps/`
 
-After making changes:
+## Development Workflow
 
-1. Run `npm run compile` to build
-2. Run `npx @vscode/vsce package` to create the VSIX
-3. Move the VSIX file to the `install/` directory
-4. Run `make install-vscode-extensions` from the project root
+After making changes to the extension code:
+
+### Option 1: Compile and Install in One Command (Fastest)
+```bash
+# From project root - compile, package, and install immediately
+make vsce-compile EXT=detect-outdated-practices INSTALL=1
+
+# Or bump version first (patch, minor, major)
+make vsce-compile EXT=detect-outdated-practices BUMP=patch INSTALL=1
+```
+
+### Option 2: Compile Then Sync All Extensions
+```bash
+# Step 1: Compile and package (without version bump)
+make vsce-compile EXT=detect-outdated-practices
+
+# Step 2: Install all custom extensions with latest versions
+make vsce-sync
+```
+
+### Option 3: Manual Method
+```bash
+# From extension directory
+cd vscode_extensions/detect-outdated-practices
+npm run compile
+npx @vscode/vsce package
+mkdir -p install
+mv *.vsix install/
+
+# Then install
+cd ../..
+make vsce-sync
+```
+
+**Notes:**
+- Without `BUMP`, the current version is kept
+- `INSTALL=1` installs immediately after compilation
+- `make vsce-sync` force-reinstalls all custom extensions with their latest versions
 
 ## Pattern Configuration
 
