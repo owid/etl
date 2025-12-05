@@ -101,7 +101,7 @@ class GSheetsApi:
     def worksheet_to_df(self, spreadsheet_id: str, worksheet_id: int) -> pd.DataFrame:
         """Load a Worksheet as a dataframe.
 
-        Args
+        Args:
             spreadsheet_id: ID of the spreadsheet. This is included in the URL of the spreadsheet.
             worksheet_id: ID of the worksheet. This is included in the URL of the spreadsheet. Look for "edit#gid=<worksheet_id>" section.
 

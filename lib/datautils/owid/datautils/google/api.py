@@ -111,10 +111,10 @@ class GoogleApi:
         """List files in a Google Drive folder.
 
         Args:
-        parent_id: Google Drive folder ID.
+            parent_id: Google Drive folder ID.
 
         Returns:
-            List of Files
+            List of files in the folder.
         """
         request = f"'{parent_id}' in parents and trashed=false"
         # Get list of files
