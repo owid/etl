@@ -33,3 +33,11 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+# Add regions
+# Calculate share of global forest area
+# Calculate annual change in forest area as a share of global forest area
+# Calculate annual deforestation as a share of forest area
+# Calculate share of global deforestation
+# Calculate share of annual global forest expansion
