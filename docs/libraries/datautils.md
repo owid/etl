@@ -2,6 +2,12 @@
 
 The `owid-datautils` library provides utility functions for common data processing tasks in ETL workflows.
 
+You can install it via pip:
+
+```bash
+pip install owid-datautils
+```
+
 ::: owid.datautils.dataframes
     options:
       heading_level: 2

@@ -2,6 +2,12 @@
 
 The `owid-catalog` library is the foundation of Our World in Data's data management system. It provides enhanced data structures built on top of pandas that include rich metadata support.
 
+You can install it via pip:
+
+```bash
+pip install owid-catalog
+```
+
 <!-- Catalog -->
 ::: owid.catalog.catalogs.find
     options:
