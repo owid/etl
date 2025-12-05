@@ -49,6 +49,29 @@ SeriesOrVariable = TypeVar("SeriesOrVariable", pd.Series, variables.Variable)
 
 
 class Table(pd.DataFrame):
+    """Enhanced pandas DataFrame with rich metadata support.
+
+    Table extends pandas DataFrame to include metadata at both the table level
+    and individual column level. It's the primary data structure for ETL operations.
+
+    Attributes:
+        metadata: Table-level metadata (title, description, sources, etc).
+        _fields: Dictionary mapping column names to their VariableMeta objects.
+        DEBUG: Set to True to enable metadata validation debugging.
+
+    Examples:
+        Create a table from a DataFrame:
+            >>> df = pd.DataFrame({"country": ["USA", "UK"], "gdp": [20, 3]})
+            >>> table = Table(df, short_name="gdp")
+
+        Create with metadata:
+            >>> meta = TableMeta(short_name="gdp", title="GDP by country")
+            >>> table = Table(df, metadata=meta)
+
+        Copy metadata from another table:
+            >>> new_table = Table(df, like=old_table)
+    """
+
     # metdata about the entire table
     metadata: TableMeta
 
@@ -82,16 +105,25 @@ class Table(pd.DataFrame):
         like: Table | None = None,
         **kwargs: Any,
     ) -> None:
-        """
-        :param metadata: TableMeta to use
-        :param short_name: Use empty TableMeta and fill it with `short_name`. This is a shorter version
-            of `Table(df, metadata=TableMeta(short_name="my_name"))`
-        :param underscore: Underscore table columns and indexes. See `underscore` method for help
-        :param camel_to_snake: Convert camelCase column names to snake_case.
-        :param like: Use metadata from Table given in this argument (including columns). This is a shorter version of
-            new_t = Table(df, metadata=old_t.metadata)
-            for col in new_t.columns:
-                new_t[col].metadata = deepcopy(old_t[col].metadata)
+        """Initialize a Table with data and metadata.
+
+        Args:
+            *args: Positional arguments passed to pandas.DataFrame.__init__.
+            metadata: TableMeta object with table-level metadata. Creates empty
+                metadata if not provided.
+            short_name: Shortcut to set metadata.short_name. Alternative to
+                passing `metadata=TableMeta(short_name="my_name")`.
+            underscore: If True, convert column and index names to snake_case.
+            camel_to_snake: If True, convert camelCase column names to snake_case.
+                Only applies when underscore=True.
+            like: Copy metadata from this Table (including column metadata).
+                Alternative to manually copying metadata for all columns.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.__init__.
+
+        Examples:
+            >>> table = Table(df, short_name="population")
+            >>> table = Table(df, metadata=meta, underscore=True)
+            >>> table = Table(df, like=existing_table)
         """
 
         super().__init__(*args, **kwargs)
@@ -122,16 +154,40 @@ class Table(pd.DataFrame):
 
     @property
     def m(self) -> TableMeta:
-        """Metadata alias to save typing."""
+        """Metadata alias for shorter access (table.m instead of table.metadata)."""
         return self.metadata
 
     @property
     def primary_key(self) -> list[str]:
+        """Get the table's primary key column names.
+
+        Returns the names of index levels, which serve as the table's
+        primary key for identifying unique rows.
+
+        Returns:
+            List of index level names (excluding None values).
+
+        Examples:
+            >>> table = table.set_index(["country", "year"])
+            >>> print(table.primary_key)  # ["country", "year"]
+        """
         return [n for n in self.index.names if n]
 
     def to(self, path: str | Path, repack: bool = True) -> None:
-        """
-        Save this table in one of our SUPPORTED_FORMATS.
+        """Save this table to disk in a supported format.
+
+        The format is automatically detected from the file extension
+        (.csv, .feather, or .parquet).
+
+        Args:
+            path: Output file path. Extension determines format.
+            repack: If True, optimize column dtypes to reduce file size.
+                Set to False for very large tables if optimization fails.
+
+        Examples:
+            >>> table.to("data.feather")  # Save as Feather with optimization
+            >>> table.to("data.csv")  # Save as CSV
+            >>> table.to("data.parquet", repack=False)  # Skip optimization
         """
         # Add entry in the processing log about operation "save".
         self = update_processing_logs_when_saving_table(table=self, path=path)
@@ -154,6 +210,26 @@ class Table(pd.DataFrame):
 
     @classmethod
     def read(cls, path: str | Path, **kwargs) -> Table:
+        """Read a table from disk in any supported format.
+
+        Automatically detects the format from file extension and loads
+        the table with its metadata. Supports .csv, .feather, and .parquet.
+
+        Args:
+            path: Path to the file to read. Extension determines format.
+            **kwargs: Additional arguments passed to format-specific reader.
+
+        Returns:
+            Loaded Table with data and metadata.
+
+        Raises:
+            ValueError: If file extension is not recognized.
+
+        Examples:
+            >>> table = Table.read("data.feather")
+            >>> table = Table.read("data.csv")
+            >>> table = Table.read("data.parquet")
+        """
         if isinstance(path, Path):
             path = path.as_posix()
 
@@ -189,10 +265,22 @@ class Table(pd.DataFrame):
     def to_csv(self, path: Any, **kwargs: Any) -> None: ...
 
     def to_csv(self, path: Any | None = None, **kwargs: Any) -> None | str:
-        """
-        Save this table as a csv file plus accompanying JSON metadata file.
-        If the table is stored at "mytable.csv", the metadata will be at
-        "mytable.meta.json".
+        """Save table as CSV with accompanying metadata file.
+
+        Saves both the data as CSV and metadata as a separate JSON file.
+        For example, "mytable.csv" will have metadata at "mytable.meta.json".
+
+        Args:
+            path: Output CSV path. If None, returns CSV as string.
+            **kwargs: Additional arguments passed to pandas.DataFrame.to_csv.
+                By default, includes index only if table has a primary key.
+
+        Returns:
+            CSV string if path is None, otherwise None.
+
+        Examples:
+            >>> table.to_csv("data.csv")  # Saves data.csv and data.meta.json
+            >>> csv_str = table.to_csv()  # Returns CSV as string
         """
         # return string
         if path is None:
@@ -213,15 +301,22 @@ class Table(pd.DataFrame):
 
     @property
     def codebook(self) -> pd.DataFrame:
-        """
-        Return a codebook for this table.
+        """Generate a human-readable codebook for this table.
 
-        The codebook contains:
-        - column: Column name (including index columns)
-        - title: Title of the indicator
-        - description: Short description
-        - unit: Unit of measurement (with short unit in parentheses)
-        - source: Formatted source attribution with URLs
+        Creates a DataFrame summarizing all variables in the table with their
+        titles, descriptions, units, and source attributions.
+
+        Returns:
+            DataFrame with columns:
+                - column: Column name (including index columns)
+                - title: Title from metadata (title_public > display.name > title)
+                - description: Short description of the indicator
+                - unit: Unit of measurement with short unit in parentheses
+                - source: Formatted source attribution with URLs
+
+        Examples:
+            >>> codebook = table.codebook
+            >>> print(codebook.to_markdown())
         """
         # Initialize lists to store the codebook information.
         columns = []
@@ -302,7 +397,22 @@ class Table(pd.DataFrame):
         metadata_sheet_name="metadata",
         **kwargs: Any,
     ) -> None:
-        # Save data and codebook to an excel file.
+        """Save table to Excel file with optional metadata codebook.
+
+        Exports the table data to an Excel file, optionally including a separate
+        sheet with the codebook metadata.
+
+        Args:
+            excel_writer: File path or ExcelWriter object to save to.
+            with_metadata: If True, include a metadata codebook sheet. Default is True.
+            sheet_name: Name for the data sheet. Default is "data".
+            metadata_sheet_name: Name for the metadata sheet. Default is "metadata".
+            **kwargs: Additional arguments passed to pandas.DataFrame.to_excel.
+
+        Examples:
+            >>> table.to_excel("output.xlsx")  # With metadata
+            >>> table.to_excel("output.xlsx", with_metadata=False)  # Data only
+        """
         if isinstance(excel_writer, pd.ExcelWriter):
             # If excel_writer is already an ExcelWriter instance, use it, to avoid nested contexts.
             super().to_excel(excel_writer, sheet_name=sheet_name, **kwargs)
@@ -322,10 +432,34 @@ class Table(pd.DataFrame):
         compression: Literal["zstd", "lz4", "uncompressed"] = "zstd",
         **kwargs: Any,
     ) -> None:
-        """
-        Save this table as a feather file plus accompanying JSON metadata file.
-        If the table is stored at "mytable.feather", the metadata will be at
+        """Save table as Feather file with accompanying metadata.
+
+        Saves the table in Apache Arrow Feather format with a separate JSON
+        metadata file. For example, "mytable.feather" will have metadata at
         "mytable.meta.json".
+
+        Note:
+            Feather format cannot store indexes, so the index is reset before
+            saving and restored when reading.
+
+        Args:
+            path: Output file path (must end with .feather).
+            repack: If True, optimize column dtypes to reduce file size.
+                Set to False for very large tables if repacking is slow.
+            compression: Compression algorithm to use. Options are:
+                - "zstd" (default): High compression ratio
+                - "lz4": Faster compression
+                - "uncompressed": No compression
+            **kwargs: Additional arguments passed to pandas.DataFrame.to_feather.
+
+        Raises:
+            ValueError: If path doesn't end with .feather or if index names
+                overlap with column names.
+
+        Examples:
+            >>> table.to_feather("data.feather")  # With compression
+            >>> table.to_feather("data.feather", repack=False)  # Skip optimization
+            >>> table.to_feather("data.feather", compression="lz4")  # Fast compression
         """
         if not str(path).endswith(".feather"):
             raise ValueError(f'filename must end in ".feather": {path}')
@@ -357,11 +491,26 @@ class Table(pd.DataFrame):
         return splitext(path)[0] + ".meta.json"
 
     def to_parquet(self, path: Any, repack: bool = True) -> None:  # type: ignore
-        """
-        Save this table as a parquet file with embedded metadata in the table schema.
+        """Save table as Parquet file with metadata sidecar.
 
-        NOTE: we save the metadata for fields in the table scheme, but it might be
-              possible with Parquet to store it in the fields themselves somehow
+        Saves the table in Apache Parquet format with a separate JSON metadata file.
+        Parquet provides efficient columnar storage and compression.
+
+        Note:
+            Metadata is stored in a separate .meta.json file rather than embedded
+            in the Parquet schema to enable efficient partial reading of large files.
+
+        Args:
+            path: Output file path (must end with .parquet).
+            repack: If True, optimize column dtypes to reduce file size.
+                Set to False for very large tables if repacking is slow.
+
+        Raises:
+            ValueError: If path doesn't end with .parquet.
+
+        Examples:
+            >>> table.to_parquet("data.parquet")  # With optimization
+            >>> table.to_parquet("data.parquet", repack=False)  # Skip optimization
         """
         if not str(path).endswith(".parquet"):
             raise ValueError(f'filename must end in ".parquet": {path}')
@@ -415,8 +564,24 @@ class Table(pd.DataFrame):
 
     @classmethod
     def read_csv(cls, path: str | Path, **kwargs) -> Table:
-        """
-        Read the table from csv plus accompanying JSON sidecar.
+        """Read table from CSV file with accompanying metadata.
+
+        Loads a table from a CSV file and its associated .meta.json metadata file.
+        For example, reads both "data.csv" and "data.meta.json".
+
+        Args:
+            path: Path to the CSV file (must end with .csv).
+            **kwargs: Additional arguments passed to the internal metadata loader.
+
+        Returns:
+            Table with data and metadata loaded.
+
+        Raises:
+            ValueError: If path doesn't end with .csv.
+
+        Examples:
+            >>> table = Table.read_csv("data.csv")
+            >>> table = Table.read_csv(Path("data.csv"))
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -430,7 +595,24 @@ class Table(pd.DataFrame):
         return tb
 
     def update_metadata(self, **kwargs) -> Table:
-        """Set Table metadata."""
+        """Update table-level metadata fields.
+
+        Convenience method to update multiple metadata fields at once.
+
+        Args:
+            **kwargs: Metadata field names and values to update.
+                Must be valid TableMeta attributes.
+
+        Returns:
+            Self, for method chaining.
+
+        Raises:
+            AssertionError: If any field name is not a valid TableMeta attribute.
+
+        Examples:
+            >>> table.update_metadata(title="GDP Data", description="GDP by country")
+            >>> table.update_metadata(short_name="gdp_data")
+        """
         for k, v in kwargs.items():
             assert hasattr(self.metadata, k), f"unknown metadata field {k} in TableMeta"
             setattr(self.metadata, k, v)
@@ -457,10 +639,27 @@ class Table(pd.DataFrame):
 
     @classmethod
     def read_feather(cls, path: str | Path, load_data: bool = True, **kwargs) -> Table:
-        """
-        Read the table from feather plus accompanying JSON sidecar.
+        """Read table from Feather file with accompanying metadata.
 
-        The path may be a local file path or a URL.
+        Loads a table from a Feather file and its associated .meta.json metadata file.
+        Supports both local file paths and URLs.
+
+        Args:
+            path: Path or URL to the Feather file (must end with .feather).
+            load_data: If True, load the actual data. If False, only load metadata
+                and column structure (useful for inspecting large files).
+            **kwargs: Additional arguments passed to the internal metadata loader.
+
+        Returns:
+            Table with data and metadata loaded.
+
+        Raises:
+            ValueError: If path doesn't end with .feather.
+
+        Examples:
+            >>> table = Table.read_feather("data.feather")
+            >>> table = Table.read_feather("https://example.com/data.feather")
+            >>> metadata_only = Table.read_feather("data.feather", load_data=False)
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -481,10 +680,24 @@ class Table(pd.DataFrame):
 
     @classmethod
     def read_parquet(cls, path: str | Path, **kwargs) -> Table:
-        """
-        Read the table from a parquet file plus accompanying JSON sidecar.
+        """Read table from Parquet file with accompanying metadata.
 
-        The path may be a local file path or a URL.
+        Loads a table from a Parquet file and its associated .meta.json metadata file.
+        Supports both local file paths and URLs.
+
+        Args:
+            path: Path or URL to the Parquet file (must end with .parquet).
+            **kwargs: Additional arguments passed to the internal metadata loader.
+
+        Returns:
+            Table with data and metadata loaded.
+
+        Raises:
+            ValueError: If path doesn't end with .parquet.
+
+        Examples:
+            >>> table = Table.read_parquet("data.parquet")
+            >>> table = Table.read_parquet("https://example.com/data.parquet")
         """
         if isinstance(path, Path):
             path = path.as_posix()
@@ -543,6 +756,26 @@ class Table(pd.DataFrame):
             self.check_metadata()
 
     def equals_table(self, table: Table) -> bool:
+        """Check if two tables are equal including metadata.
+
+        Compares both data and metadata for equality. This is more
+        comprehensive than pandas equals() which only checks data.
+
+        Args:
+            table: Table to compare with.
+
+        Returns:
+            True if tables have identical data, metadata, and variable
+            metadata. False otherwise.
+
+        Note:
+            NaN values are handled specially to ensure consistent comparison
+            even when NaN values are present.
+
+        Examples:
+            >>> if table1.equals_table(table2):
+            ...     print("Tables are identical")
+        """
         return (
             isinstance(table, Table)
             and self.metadata == table.metadata
@@ -568,7 +801,24 @@ class Table(pd.DataFrame):
     def rename(self, *args: Any, **kwargs: Any) -> Table: ...
 
     def rename(self, *args: Any, **kwargs: Any) -> Table | None:
-        """Rename columns while keeping their metadata."""
+        """Rename columns while preserving their metadata.
+
+        Extends pandas rename to maintain variable metadata when renaming columns
+        or index levels. Metadata follows the renamed columns automatically.
+
+        Args:
+            *args: Positional arguments passed to pandas.DataFrame.rename.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.rename.
+                Supports all pandas rename parameters including mapper, index,
+                columns, and inplace.
+
+        Returns:
+            Renamed table if inplace=False (default), None if inplace=True.
+
+        Examples:
+            >>> new_table = table.rename(columns={"old_name": "new_name"})
+            >>> table.rename(columns={"gdp": "gdp_usd"}, inplace=True)
+        """
         inplace = kwargs.get("inplace")
         old_cols = self.all_columns
         new_table = super().rename(*args, **kwargs)
@@ -610,11 +860,41 @@ class Table(pd.DataFrame):
 
     @property
     def all_columns(self) -> list[str]:
-        "Return names of all columns in the dataset, including the index."
+        """Get names of all columns including index levels.
+
+        Returns both regular columns and index names in a single list,
+        useful for iterating over all variables in the table.
+
+        Returns:
+            List of all column names and index level names.
+
+        Examples:
+            >>> table = table.set_index(["country", "year"])
+            >>> print(table.all_columns)  # ["country", "year", "gdp", "population"]
+        """
         combined: list[str] = filter(None, list(self.index.names) + list(self.columns))  # type: ignore
         return combined
 
     def get_column_or_index(self, name) -> variables.Variable:
+        """Get a variable by name from either columns or index.
+
+        Retrieves a Variable from the table, checking both regular columns
+        and index levels. This is useful when you don't know whether a
+        variable is stored as a column or index.
+
+        Args:
+            name: Name of the variable to retrieve.
+
+        Returns:
+            Variable object with data and metadata.
+
+        Raises:
+            ValueError: If name is not found in either columns or index.
+
+        Examples:
+            >>> var = table.get_column_or_index("country")  # Works for column or index
+            >>> print(var.metadata.title)
+        """
         if name in self.columns:
             return self[name]
         elif name in self.index.names:
@@ -630,9 +910,32 @@ class Table(pd.DataFrame):
         extra_variables: Literal["raise", "ignore"] = "raise",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
-        """Update metadata of table and variables from a YAML file.
-        :param path: Path to YAML file.
-        :param table_name: Name of table, also updates this in the metadata.
+        """Update table and variable metadata from a YAML file.
+
+        Loads metadata definitions from a .meta.yml file and updates both
+        table-level and variable-level metadata. This is the primary way
+        to add rich metadata in the ETL workflow.
+
+        Args:
+            path: Path to the .meta.yml file with metadata definitions.
+            table_name: Name of the table in the YAML file to load metadata from.
+                Also updates the table's short_name to this value.
+            yaml_params: Additional parameters to pass to the YAML loader.
+            extra_variables: How to handle variables in YAML not in table:
+                - "raise" (default): Raise exception
+                - "ignore": Skip extra variables
+            if_origins_exist: How to handle existing origins:
+                - "replace" (default): Replace existing origin with new one
+                - "append": Append new origin to existing origins
+                - "fail": Raise exception if origin already exists
+
+        Examples:
+            >>> table.update_metadata_from_yaml("dataset.meta.yml", "population")
+            >>> table.update_metadata_from_yaml(
+            ...     Path("dataset.meta.yml"),
+            ...     "gdp_data",
+            ...     extra_variables="ignore"
+            ... )
         """
         from .yaml_metadata import update_metadata_from_yaml
 
@@ -646,13 +949,35 @@ class Table(pd.DataFrame):
         )
 
     def prune_metadata(self) -> Table:
-        """Prune metadata for columns that are not in the table. This can happen after slicing
-        the table by columns."""
+        """Remove metadata for columns no longer in the table.
+
+        Cleans up the internal metadata dictionary to remove entries for columns
+        that have been dropped. Useful after column filtering or selection operations.
+
+        Returns:
+            Self, for method chaining.
+
+        Examples:
+            >>> subset = table[["country", "gdp"]]  # Only 2 columns
+            >>> subset.prune_metadata()  # Remove metadata for dropped columns
+        """
         self._fields = defaultdict(VariableMeta, {col: self._fields[col] for col in self.all_columns})
         return self
 
     def copy(self, deep: bool = True) -> Table:
-        """Copy table together with all its metadata."""
+        """Create a copy of the table with all metadata.
+
+        Args:
+            deep: If True (default), make a deep copy of the data and metadata.
+                If False, creates a shallow copy.
+
+        Returns:
+            A new Table with copied data and metadata.
+
+        Examples:
+            >>> table_copy = table.copy()  # Deep copy
+            >>> table_copy = table.copy(deep=False)  # Shallow copy
+        """
         # This could be causing this warning:
         #   Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
         # but I'm not sure how to fix it
@@ -660,7 +985,22 @@ class Table(pd.DataFrame):
         return tab.copy_metadata(self)
 
     def copy_metadata(self, from_table: Table, deep: bool = False) -> Table:
-        """Copy metadata from a different table to self."""
+        """Copy metadata from another table to this table.
+
+        Copies both table-level metadata and variable-level metadata for all
+        matching columns. Useful for preserving metadata after transformations.
+
+        Args:
+            from_table: Source table to copy metadata from.
+            deep: If True, make a deep copy of the metadata. Default is False.
+
+        Returns:
+            Self, for method chaining.
+
+        Examples:
+            >>> new_table = Table(transformed_df)
+            >>> new_table.copy_metadata(original_table)
+        """
         return copy_metadata(to_table=self, from_table=from_table, deep=deep)
 
     @overload
@@ -683,6 +1023,24 @@ class Table(pd.DataFrame):
         keys: str | list[str],
         **kwargs: Any,
     ) -> Table | None:
+        """Set the DataFrame index using specified columns.
+
+        Extends pandas set_index to update table metadata with primary key
+        and dimension information. The index columns become the table's
+        identifying dimensions.
+
+        Args:
+            keys: Column name or list of column names to set as index.
+            **kwargs: Additional arguments passed to pandas.DataFrame.set_index.
+
+        Returns:
+            Table with new index if inplace=False, None if inplace=True.
+
+        Examples:
+            >>> table = table.set_index("country")
+            >>> table = table.set_index(["country", "year"])
+            >>> table.set_index("country", inplace=True)
+        """
         if isinstance(keys, str):
             keys = [keys]
 
@@ -713,7 +1071,24 @@ class Table(pd.DataFrame):
     def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Table: ...
 
     def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Table | None:  # type: ignore
-        """Fix type signature of reset_index."""
+        """Reset the index to default integer index.
+
+        Extends `pandas.reset_index` with proper type signature for Table.
+        Converts index levels to regular columns.
+
+        Args:
+            level: Index level(s) to reset. If None, resets all levels.
+            inplace: If True, modify the table in place. Default is False.
+            **kwargs: Additional arguments passed to pandas.DataFrame.reset_index.
+
+        Returns:
+            Table with reset index if inplace=False, None if inplace=True.
+
+        Examples:
+            >>> new_table = table.reset_index()  # Reset all index levels
+            >>> new_table = table.reset_index(level="country")  # Reset one level
+            >>> table.reset_index(inplace=True)  # Modify in place
+        """
         t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
 
         if inplace:
@@ -729,9 +1104,53 @@ class Table(pd.DataFrame):
             return t  # type: ignore
 
     def astype(self, *args, **kwargs) -> Table:
+        """Cast table columns to specified dtype(s).
+
+        Convert one or more columns to a specified data type. Wrapper
+        around pandas astype that returns a Table.
+
+        Args:
+            *args: Positional arguments passed to pandas.DataFrame.astype.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.astype.
+
+        Returns:
+            Table with columns cast to specified types.
+
+        Examples:
+            >>> # Cast single column:
+            >>> table = table.astype({"population": int})
+
+            >>> # Cast multiple columns:
+            >>> table = table.astype({"year": int, "gdp": float})
+
+            >>> # Cast all columns:
+            >>> table = table.astype(str)
+        """
         return super().astype(*args, **kwargs)  # type: ignore
 
     def reindex(self, *args, **kwargs) -> Table:
+        """Conform table to new index with optional filling logic.
+
+        Create a new Table with changed index. Missing values are filled
+        according to the specified method. Wrapper around pandas reindex.
+
+        Args:
+            *args: Positional arguments passed to pandas.DataFrame.reindex.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.reindex.
+
+        Returns:
+            Table conformed to new index.
+
+        Examples:
+            >>> # Reindex with new labels:
+            >>> table = table.reindex(["A", "B", "C", "D"])
+
+            >>> # Fill missing values:
+            >>> table = table.reindex(new_index, fill_value=0)
+
+            >>> # Forward fill:
+            >>> table = table.reindex(new_index, method="ffill")
+        """
         t = super().reindex(*args, **kwargs)
         return cast(Table, t)
 
@@ -748,7 +1167,24 @@ class Table(pd.DataFrame):
         return super().drop_duplicates(*args, **kwargs)
 
     def join(self, other: pd.DataFrame | Table, *args, **kwargs) -> Table:
-        """Fix type signature of join."""
+        """Join tables while preserving metadata.
+
+        Extends pandas join with proper type signature for Table.
+        Metadata from both tables is preserved in the result.
+
+        Args:
+            other: Table or DataFrame to join with.
+            *args: Positional arguments passed to pandas.DataFrame.join.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.join.
+                Supports all pandas join parameters.
+
+        Returns:
+            Joined table with combined metadata.
+
+        Examples:
+            >>> joined = table1.join(table2, on="country")
+            >>> joined = table1.join(table2, how="outer")
+        """
         t = super().join(other, *args, **kwargs)
 
         t = t.copy_metadata(self)
@@ -770,6 +1206,23 @@ class Table(pd.DataFrame):
         """
 
     def merge(self, right, *args, **kwargs) -> Table:
+        """Merge with another DataFrame or Table.
+
+        Wrapper around pandas merge that preserves Table metadata.
+        See owid.catalog.tables.merge() for full documentation.
+
+        Args:
+            right: DataFrame or Table to merge with.
+            *args: Positional arguments passed to merge().
+            **kwargs: Keyword arguments passed to merge().
+
+        Returns:
+            Merged Table with combined metadata.
+
+        Examples:
+            >>> result = table1.merge(table2, on="country")
+            >>> result = table1.merge(table2, left_on="code", right_on="country_code")
+        """
         return merge(left=self, right=right, *args, **kwargs)
 
     def melt(
@@ -782,6 +1235,42 @@ class Table(pd.DataFrame):
         *args,
         **kwargs,
     ) -> Table:
+        """Unpivot table from wide to long format.
+
+        Converts columns into rows, transforming wide-format data into
+        long-format. Wrapper around pandas melt that preserves metadata.
+        See owid.catalog.tables.melt() for full documentation.
+
+        Args:
+            id_vars: Column(s) to use as identifier variables (not melted).
+            value_vars: Column(s) to unpivot. If None, uses all columns
+                except id_vars.
+            var_name: Name for the variable column. Default is "variable".
+            value_name: Name for the value column. Default is "value".
+            short_name: Optional short name for resulting table metadata.
+            *args: Additional positional arguments passed to melt().
+            **kwargs: Additional keyword arguments passed to melt().
+
+        Returns:
+            Melted Table in long format with preserved metadata.
+
+        Examples:
+            >>> # Melt all columns except country and year:
+            >>> long_table = table.melt(id_vars=["country", "year"])
+
+            >>> # Melt specific columns:
+            >>> long_table = table.melt(
+            ...     id_vars=["country", "year"],
+            ...     value_vars=["gdp", "population"]
+            ... )
+
+            >>> # Custom column names:
+            >>> long_table = table.melt(
+            ...     id_vars="country",
+            ...     var_name="indicator",
+            ...     value_name="measurement"
+            ... )
+        """
         return melt(
             frame=self,
             id_vars=id_vars,
@@ -804,6 +1293,44 @@ class Table(pd.DataFrame):
         fill_dimensions: bool = True,
         **kwargs,
     ) -> Table:
+        """Reshape table from long to wide format.
+
+        Converts rows into columns, transforming long-format data into
+        wide-format. Wrapper around pandas pivot that preserves metadata.
+        See owid.catalog.tables.pivot() for full documentation.
+
+        Args:
+            index: Column(s) to use for the new index. If None, uses
+                existing index.
+            columns: Column(s) whose unique values become new columns.
+            values: Column(s) to aggregate. If None, uses all remaining
+                columns.
+            join_column_levels_with: If pivoting creates multi-level columns,
+                join them with this separator (e.g., "_").
+            short_name: Optional short name for resulting table metadata.
+            fill_dimensions: If True, fill missing dimension values.
+                Default is True.
+            **kwargs: Additional arguments passed to pivot().
+
+        Returns:
+            Pivoted Table in wide format with preserved metadata.
+
+        Examples:
+            >>> # Basic pivot:
+            >>> wide = table.pivot(
+            ...     index="country",
+            ...     columns="year",
+            ...     values="gdp"
+            ... )
+
+            >>> # Flatten multi-level columns:
+            >>> wide = table.pivot(
+            ...     index="country",
+            ...     columns=["year", "sex"],
+            ...     values="population",
+            ...     join_column_levels_with="_"
+            ... )
+        """
         return pivot(
             data=self,
             index=index,
@@ -821,20 +1348,29 @@ class Table(pd.DataFrame):
         inplace: bool = False,
         camel_to_snake: bool = False,
     ) -> Table:
-        """Convert column and index names to underscore. In extremely rare cases
-        two columns might have the same underscored version. Use `collision` param
-        to control whether to raise an error or append numbered suffix.
+        """Convert column and index names to underscore format.
 
-        Parameters
-        ----------
-        t : Table
-            Table to underscore.
-        collision : Literal["raise", "rename", "ignore"], optional
-            How to handle collisions, by default "raise".
-        inplace : bool, optional
-            Whether to modify the table in place, by default False.
-        camel_to_snake : bool, optional
-            Whether to convert strings camelCase to snake_case, by default False.
+        Converts all column names and index names to snake_case format.
+        In rare cases where two columns map to the same underscored name,
+        the collision parameter controls the behavior.
+
+        Args:
+            collision: How to handle naming collisions:
+                - "raise" (default): Raise ValueError if collision occurs
+                - "rename": Append numbered suffix to duplicates
+                - "ignore": Keep first occurrence
+            inplace: If True, modify the table in place. Default is False.
+            camel_to_snake: If True, convert camelCase to snake_case.
+                Default is False (only converts spaces and special chars).
+
+        Returns:
+            Table with underscored names (or None if inplace=True).
+
+        Examples:
+            >>> table = table.underscore()  # Basic underscoring
+            >>> table = table.underscore(camel_to_snake=True)  # Convert camelCase
+            >>> table = table.underscore(collision="rename")  # Handle collisions
+            >>> table.underscore(inplace=True)  # Modify in place
         """
         t = self
         orig_cols = t.columns
@@ -873,38 +1409,49 @@ class Table(pd.DataFrame):
     ) -> Table:
         """Format the table according to OWID standards.
 
-        This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
+        Applies standard OWID formatting: underscores column names, sets index,
+        verifies uniqueness, and sorts data. This is a convenience method that
+        chains multiple operations commonly used in ETL workflows.
 
-        Underscoring is the first step, so make sure to use correct values in `keys` (e.g. use 'country' if original table had 'Country').
+        Note:
+            Underscoring happens first, so use underscored key names in the
+            keys parameter (e.g., use 'country' if original had 'Country').
 
-        ```
-        tb.format(["country", "year"])
-        ```
+        Args:
+            keys: Index column name(s). If None, uses ["country", "year"].
+            verify_integrity: If True (default), raise error if index has
+                duplicate entries.
+            underscore: If True (default), convert column names to snake_case
+                format. Disable if names are already properly formatted.
+            sort_rows: If True (default), sort rows by index in ascending order.
+            sort_columns: If True, sort columns alphabetically. Default is False.
+            short_name: Optional short name to assign to table metadata.
+            **kwargs: Additional arguments passed to the underscore() method.
 
-        is equivalent to
+        Returns:
+            Formatted Table with standardized structure and metadata.
 
-        ```
-        tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-        ```
+        Raises:
+            KeyError: If specified keys are not found in table columns.
+            ValueError: If verify_integrity=True and index has duplicates.
 
-        NOTE: You can use default `tb.format()`, which uses keys = ['country', 'year'].
+        Examples:
+            >>> # Basic formatting with default country/year index:
+            >>> table = table.format()
 
-        Parameters
-        ----------
-        keys : str | list[str] | None, optional
-            Index columns. If none is given, will use ["country", "year"].
-        verify_integrity : bool, optional
-            Verify that there is only one entry per index, by default True.
-        underscore : bool, optional
-            Underscore column names, by default True.
-        sort_rows : bool, optional
-            Sort rows by index (ascending), by default True.
-        sort_columns : bool, optional
-            Sort columns (ascending), by default False.
-        short_name : str | None, optional
-            Short name to assign to the output table.
-        kwargs : Any
-            Passed to `Table.underscore` method.
+            >>> # Equivalent to:
+            >>> table = table.underscore().set_index(
+            ...     ["country", "year"], verify_integrity=True
+            ... ).sort_index()
+
+            >>> # Custom index columns:
+            >>> table = table.format(["country", "year", "sex"])
+
+            >>> # Skip underscoring if already formatted:
+            >>> table = table.format(underscore=False, keys=["country", "year"])
+
+            >>> # Format with custom table name:
+            >>> table = table.format(short_name="population_density")
         """
         t = self
         # Underscore
@@ -964,9 +1511,58 @@ class Table(pd.DataFrame):
         return cast(Table, tb)
 
     def drop(self, *args, **kwargs) -> Table:
+        """Drop specified labels from rows or columns.
+
+        Remove rows or columns by specifying label names and axis.
+        Wrapper around pandas drop that returns a Table.
+
+        Args:
+            *args: Positional arguments passed to pandas.DataFrame.drop.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.drop.
+
+        Returns:
+            Table with specified labels dropped.
+
+        Examples:
+            >>> # Drop columns:
+            >>> table = table.drop(columns=["column1", "column2"])
+
+            >>> # Drop rows by index:
+            >>> table = table.drop(index=["row1", "row2"])
+
+            >>> # Drop columns with axis parameter:
+            >>> table = table.drop(["column1"], axis=1)
+        """
         return cast(Table, super().drop(*args, **kwargs))
 
     def filter(self, *args, **kwargs) -> Table:
+        """Subset rows or columns based on their labels.
+
+        Filter the table to include only specified rows or columns by name.
+        Wrapper around pandas filter that returns a Table.
+
+        Args:
+            *args: Positional arguments passed to pandas.DataFrame.filter.
+            **kwargs: Keyword arguments passed to pandas.DataFrame.filter.
+                Common kwargs include:
+                - items: List of axis labels to select
+                - like: Keep labels matching this string pattern
+                - regex: Keep labels matching this regex pattern
+                - axis: Axis to filter on (0 for rows, 1 for columns)
+
+        Returns:
+            Filtered Table with only selected labels.
+
+        Examples:
+            >>> # Filter columns by exact names:
+            >>> table = table.filter(items=["country", "year", "gdp"])
+
+            >>> # Filter columns containing pattern:
+            >>> table = table.filter(like="population")
+
+            >>> # Filter columns with regex:
+            >>> table = table.filter(regex="^gdp_.*")
+        """
         return super().filter(*args, **kwargs)  # type: ignore
 
     def update_log(
@@ -1143,7 +1739,7 @@ class Table(pd.DataFrame):
                 warnings.warn(f"Variable {column} has no origins.", warnings.NoOriginsWarning)
 
     def rename_index_names(self, renames: dict[str, str]) -> Table:
-        """Rename index."""
+        """Rename index values names."""
         column_idx = list(self.index.names)
         column_idx_new = [renames.get(col, col) for col in column_idx]
         tb = self.reset_index().rename(columns=renames)
@@ -1170,7 +1766,7 @@ class Table(pd.DataFrame):
 
     @classmethod
     def from_records(cls, *args, **kwargs) -> Table:
-        """Calling Table.from_records returns a Table, but does not call __init__ and misses metadata."""
+        """Calling `Table.from_records` returns a Table, but does not call __init__ and misses metadata."""
         df = super().from_records(*args, **kwargs)
         return Table(df)
 
