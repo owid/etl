@@ -2,6 +2,18 @@
 
 The `owid-catalog` library is the foundation of Our World in Data's data management system. It provides enhanced data structures built on top of pandas that include rich metadata support.
 
+::: owid.catalog.catalogs
+    options:
+      heading_level: 2
+      filters: ["!^_"]
+      members_order: alphabetical
+
+::: owid.catalog.processing
+    options:
+      heading_level: 2
+      filters: ["!^_"]
+      members_order: alphabetical
+
 ::: owid.catalog.Dataset
     options:
       heading_level: 2
@@ -14,29 +26,20 @@ The `owid-catalog` library is the foundation of Our World in Data's data managem
       filters: ["!^_"]
       members_order: alphabetical
 
+
 ::: owid.catalog.Variable
     options:
       heading_level: 2
       filters: ["!^_"]
       members_order: alphabetical
 
-::: owid.catalog.meta.DatasetMeta
+
+::: owid.catalog.meta
     options:
       heading_level: 2
       filters: ["!^_"]
       members_order: alphabetical
 
-::: owid.catalog.meta.TableMeta
-    options:
-      heading_level: 2
-      filters: ["!^_"]
-      members_order: alphabetical
-
-::: owid.catalog.meta.VariableMeta
-    options:
-      heading_level: 2
-      filters: ["!^_"]
-      members_order: alphabetical
 
 ::: owid.catalog.utils
     options:
