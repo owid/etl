@@ -2685,23 +2685,14 @@ def read_custom(
     attaching metadata and origin information to the resulting Table. Useful when
     standard read functions (read_csv, read_excel, etc.) don't meet specific needs.
 
-    Parameters
-    ----------
-    read_function : Callable
-        Custom function to read the data. Must accept filepath_or_buffer as first argument
-        and return a DataFrame or Table.
-    filepath_or_buffer : str | Path | IO[AnyStr]
-        Path to the file or file-like object to read.
-    metadata : TableMeta
-        Table metadata.
-    origin : Origin | None, optional
-        Origin of the table data.
-    underscore : bool, optional
-        True to make all column names snake case.
-    *args
-        Additional positional arguments to pass to read_function.
-    **kwargs
-        Additional keyword arguments to pass to read_function.
+    Args:
+        read_function: Custom function to read the data. Must accept filepath_or_buffer as first argument and return a DataFrame or Table.
+        filepath_or_buffer: Path to the file or file-like object to read.
+        metadata: Table metadata.
+        origin: Origin of the table data.
+        underscore: True to make all column names snake case.
+        *args: Additional positional arguments to pass to read_function.
+        **kwargs: Additional keyword arguments to pass to read_function.
 
     Returns
     -------
@@ -2925,15 +2916,11 @@ def multi_merge(tables: list[Table], *args, **kwargs) -> Table:
 
     This is a helper function when merging more than two tables on common columns.
 
-    Parameters
-    ----------
-    tables : list[Table]
-        Tables to merge.
+    Args:
+        tables: Tables to merge.
 
-    Returns
-    -------
-    combined : Table
-        Merged table.
+    Returns:
+        combined: Merged table.
 
     """
     combined = tables[0].copy()
@@ -2958,19 +2945,17 @@ def read_df(
     underscore: bool = False,
 ) -> Table:
     """Create a Table (with metadata and an origin) from a DataFrame.
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    metadata : TableMeta | None, optional
-        Table metadata (with a title and description).
-    origin : Origin | None, optional
-        Origin of the table.
-    underscore : bool, optional
-        True to ensure all column names are snake case.
-    Returns
-    -------
-    Table
+
+    Args:
+        df : pd.DataFrame
+            Input DataFrame.
+        metadata : TableMeta | None, optional
+            Table metadata (with a title and description).
+        origin : Origin | None, optional
+            Origin of the table.
+        underscore : bool, optional
+            True to ensure all column names are snake case.
+    Returns:
         Original data as a Table with metadata and an origin.
     """
     table = Table(df, underscore=underscore)

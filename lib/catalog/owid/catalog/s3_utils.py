@@ -262,19 +262,12 @@ def upload(
 ) -> None:
     """Upload the file at the given local filename to the S3 URL.
 
-    Parameters
-    ----------
-    s3_url : str
-        S3 URL to upload to
-    filename : str | Path
-        Local file to upload
-    public : bool
-        Whether to make the file publicly readable
-    quiet : bool
-        Whether to suppress log messages
-    downloadable : bool
-        If True, force browsers to download the file instead of displaying it inline.
-        Sets Content-Disposition header to 'attachment; filename="..."'
+    Args:
+        s3_url: S3 URL to upload to
+        filename: Local file to upload
+        public: Whether to make the file publicly readable
+        quiet: Whether to suppress log messages
+        downloadable: If True, force browsers to download the file instead of displaying it inline. Sets Content-Disposition header to 'attachment; filename="..."'
     """
     client = connect_r2()
     bucket, key = s3_bucket_key(s3_url)
