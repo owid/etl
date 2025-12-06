@@ -59,3 +59,15 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/forests/2025-08-26/tree_cover_loss_by_driver:
     - data://garden/forests/2025-08-26/tree_cover_loss_by_driver
+
+  #
+  # FAO Forest Resources Assessment (FRA) full dataset
+  #
+  data://meadow/fao/2025-12-05/fra:
+    - snapshot://fao/2025-12-05/fra.zip
+  data://garden/fao/2025-12-05/fra:
+    - data://meadow/fao/2025-12-05/fra
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/fao/2025-12-05/fra:
+    - data://garden/fao/2025-12-05/fra
