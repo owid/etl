@@ -364,6 +364,40 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
+## Performance Profiling and Optimization
+
+### Memory Profiling
+```bash
+etl d profile --mem garden/namespace/version/dataset      # Profile memory
+etl d profile --mem garden/namespace/version/dataset -f func_name  # Profile specific function
+etl d profile --cpu garden/namespace/version/dataset      # Profile CPU
+```
+
+### Common Issues
+
+**1. Object vs Categorical Dtypes** (96-99% memory savings)
+```python
+# Load with categorical preserved
+tb = ds.read("table", safe_types=False)
+assert isinstance(tb["country"].dtype, pd.CategoricalDtype)
+
+# Common causes: np.asarray() on categorical (use .array instead), .apply() operations
+```
+
+**2. Vectorization** (100x+ speedup)
+```python
+# ❌ Bad: tb["result"] = tb.apply(lambda row: func(row), axis=1)
+# ✅ Good: Use np.select() or vectorized functions
+
+conditions = [tb["col1"].notna(), tb["col2"].notna()]
+tb["result"] = np.select(conditions, [tb["col1"], tb["col2"]], default=tb["col3"])
+```
+
+**3. Profile → Optimize → Verify**
+- Run profile, identify large memory spikes (>100 MB)
+- Check if inherent (14K→14M rows expansion) or wasteful (object dtypes)
+- Apply fixes, add assertions, re-profile
+
 ## Database Access
 
 ### MySQL Connection
