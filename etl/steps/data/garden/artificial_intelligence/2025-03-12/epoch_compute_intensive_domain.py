@@ -32,7 +32,6 @@ def run() -> None:
         "organization",
         "parameters",
         "training_compute__flop",
-        "training_dataset_size__datapoints",
     ]
 
     # Aggregate the data by domain
