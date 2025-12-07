@@ -22,32 +22,57 @@ def _has_index(df: pd.DataFrame) -> bool:
 def from_file(
     file_path: Union[str, Path], file_type: Optional[str] = None, **kwargs: Any
 ) -> Union[pd.DataFrame, List[pd.DataFrame]]:
-    """Load a file as a pandas DataFrame.
+    """Load a file as a pandas DataFrame with URL and compression support.
 
-    It uses standard pandas function pandas.read_* but adds the ability to read from a URL in some
-    cases where pandas does not work.
+    Enhanced wrapper around pandas `read_*` functions that adds:
+    - Automatic format detection from file extension
+    - URL download support (via `@enable_file_download` decorator)
+    - Compressed file reading (with explicit `file_type`)
 
-    The function will infer the extension of `file_path` by simply taking what follows the last ".". For example:
-    "file.csv" will be read as a csv file, and "http://my/domain/file.xlsx" will be read as an excel file.
+    The function infers the file type from the extension after the last dot.
+    For example: "file.csv" reads as CSV, "https://example.com/data.xlsx" reads as Excel.
 
-    Reading from compressed files will not work by default, unless you provide a `file_type`.
+    Args:
+        file_path: Local path or URL to the file. Supports local files and HTTP(S) URLs.
+        file_type: Explicit file type when reading compressed files (e.g., "csv", "dta", "json").
+            Only needed for compressed files. Specifies the format of the compressed content,
+            not the compression format itself.
+        **kwargs: Additional arguments passed to the underlying `pandas.read_*` function.
 
-    Parameters
-    ----------
-    filepath : str
-        Path or url to file.
-    file_type : str
-        File type of the data file. By default is None, as it is only required when reading compressed files.
-        This is typically equivalent to the file extension. However, when reading a
-        compressed file, this refers to the actual file that is compressed (not the compressed file extension).
-        Reading from compressed files is supported for "csv", "dta" and "json".
-    kwargs :
-        pandas.read_* arguments.
+    Returns:
+        DataFrame loaded from the file. Some formats (like HTML) may return a list of DataFrames.
 
-    Returns
-    -------
-    pandas.DataFrame:
-        Read dataframe.
+    Raises:
+        ValueError: If file extension is unknown or `file_type` not provided for compressed files.
+        FileNotFoundError: If the file path doesn't exist.
+
+    Example:
+        Load from local file
+        ```python
+        from owid.datautils.io.df import from_file
+
+        # CSV file
+        df = from_file("data.csv")
+
+        # Excel with specific sheet
+        df = from_file("data.xlsx", sheet_name="Sheet1")
+        ```
+
+        Load from URL
+        ```python
+        # HTTP URL (handled automatically by decorator)
+        df = from_file("https://example.com/data.csv")
+        ```
+
+        Load compressed file
+        ```python
+        # Compressed CSV (must specify file_type)
+        df = from_file("data.csv.gz", file_type="csv")
+        ```
+
+    Note:
+        Supported formats: csv, dta, feather, hdf, html, json, parquet, pickle, xlsx, xml.
+        Compression formats: gz, bz2, zip, xz, zst, tar (with explicit `file_type`).
     """
     # Ensure file_path is a Path object.
     file_path = Path(file_path)
@@ -93,28 +118,66 @@ def from_file(
 
 
 def to_file(df: pd.DataFrame, file_path: Union[str, Path], overwrite: bool = True, **kwargs: Any) -> None:
-    """Save dataframe to file.
+    """Save DataFrame to file with automatic format detection and smart defaults.
 
-    This function wraps all pandas df.to_* methods, e.g. df.to_csv() or df.to_parquet(), with the following advantages:
-    * The output file will have the format determined by the extension of file_path. Hence, to_file(df, "data.csv") will
-    create a csv file, and to_file(df, "data.parquet") will create a parquet file.
-    * If file_path is with one or more subfolders that do not exist, the full path will be created.
-    * It can overwrite an existing file (if overwrite is True), or raise an error if the file already exists.
-    * It will avoid creating an index column if the dataframe has a dummy index (which would be equivalent to doing
-    df.to_csv(file_path, index=False)), but it will include the index if the dataframe has one.
-    * Any additional keyword argument that would be passed on to the method to write a file can be safely added. For
-    example, to_file(df, "data.csv", na_rep="TEST") will replace missing data by "TEST" (analogous to
-    df.to_csv("data.csv", na_rep="TEST")).
+    Enhanced wrapper around pandas `to_*` methods that provides:
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Dataframe to be stored in a file.
-    file_path : Union[str, Path]
-        Path to file to be created.
-    overwrite : bool, optional
-        True to overwrite file if it already exists. False to raise an error if file already exists.
+    - Automatic format selection from file extension
+    - Auto-creation of parent directories
+    - Intelligent index handling (omits dummy indices)
+    - Optional overwrite protection
 
+    Format is determined by file extension: "data.csv" creates CSV,
+    "data.parquet" creates Parquet, etc.
+
+    Args:
+        df: DataFrame to save.
+        file_path: Output file path. Parent directories are created if needed.
+        overwrite: If True, overwrite existing files. If False, raise error
+            if file already exists.
+        **kwargs: Additional arguments passed to the underlying `pandas.to_*` method
+            (e.g., `na_rep`, `sep`, `compression`).
+
+    Raises:
+        ValueError: If file extension is not supported.
+        FileExistsError: If file exists and `overwrite=False`.
+
+    Example:
+        Basic usage
+        ```python
+        from owid.datautils.io.df import to_file
+        import pandas as pd
+
+        df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+
+        # Save as CSV
+        to_file(df, "output.csv")
+
+        # Save as Parquet
+        to_file(df, "output.parquet")
+
+        # Save with custom parameters
+        to_file(df, "output.csv", na_rep="N/A", sep=";")
+        ```
+
+        Auto-create directories
+        ```python
+        # Creates nested/path/ if it doesn't exist
+        to_file(df, "nested/path/data.csv")
+        ```
+
+        Overwrite protection
+        ```python
+        # Raises FileExistsError if file exists
+        to_file(df, "existing.csv", overwrite=False)
+        ```
+
+    Note:
+        Supported formats: csv, dta, feather, hdf, html, json, md, parquet,
+        pickle, tex, txt, xlsx, xml.
+
+        Index handling: Automatically omits dummy indices (default integer index)
+        but preserves meaningful indices. Override with `index=True/False` in kwargs.
     """
     # Ensure file_path is a Path object.
     file_path = Path(file_path)

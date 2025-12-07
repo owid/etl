@@ -16,7 +16,31 @@ log = structlog.get_logger()
 
 
 def prune_dict(d: dict) -> dict:
-    """Remove all keys starting with underscore and all empty values from a dictionary."""
+    """Remove private keys and empty values from a dictionary recursively.
+
+    Removes all keys starting with underscore (private fields) and all empty
+    values (None, empty lists, empty dicts) from a dictionary and its nested
+    structures.
+
+    Args:
+        d: Dictionary to prune.
+
+    Returns:
+        New dictionary with private keys and empty values removed.
+
+    Example:
+        ```python
+        d = {
+            "title": "Dataset",
+            "_internal": "hidden",
+            "count": 0,  # Kept (not empty)
+            "empty_list": [],
+            "nested": {"value": 1, "null": None}
+        }
+        result = prune_dict(d)
+        # Returns: {"title": "Dataset", "count": 0, "nested": {"value": 1}}
+        ```
+    """
     out = {}
     for k, v in d.items():
         if not k.startswith("_") and v not in [None, [], {}]:
@@ -30,6 +54,38 @@ def prune_dict(d: dict) -> dict:
 
 
 def pruned_json(cls: T) -> T:
+    """Decorator that modifies a class's to_dict method to prune empty values.
+
+    Wraps a dataclass's `to_dict` method to automatically remove private fields
+    (starting with underscore) and empty values when serializing to JSON.
+
+    Args:
+        cls: Dataclass to decorate.
+
+    Returns:
+        The same class with modified `to_dict` method.
+
+    Example:
+        ```python
+        from dataclasses import dataclass
+        from owid.catalog.utils import pruned_json
+
+        @pruned_json
+        @dataclass
+        class Config:
+            name: str
+            _internal: str = "hidden"
+            optional: str | None = None
+
+        config = Config(name="test", _internal="secret", optional=None)
+        d = config.to_dict()
+        # Returns: {"name": "test"}  (no _internal or optional)
+        ```
+
+    Note:
+        This decorator is commonly used with metadata classes to keep JSON
+        output clean by removing None values and private fields.
+    """
     orig = cls.to_dict  # type: ignore
 
     # only keep non-null public variables
@@ -48,23 +104,43 @@ def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) 
 
 
 def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = False) -> str | None:
-    """Convert arbitrary string to under_score. This was fine tuned on WDI bank column names.
-    This function might evolve in the future, so make sure to have your use cases in tests
-    or rather underscore your columns yourself.
+    """Convert arbitrary string to snake_case format.
 
-    Parameters
-    ----------
-    name : str
-        String to format.
-    validate: bool, optional
-        Whether to validate that the string is under_score. Defaults to True.
-    camel_to_snake: bool, optional
-        Whether to convert camelCase to snake_case. Defaults to False.
+    Transforms strings into valid Python identifiers using snake_case convention.
+    Handles special characters, punctuation, and optionally converts camelCase.
+    Originally fine-tuned for World Bank WDI column names.
 
-    Returns
-    -------
-    str:
-        String using snake_case formatting.
+    Args:
+        name: String to format. Returns None if input is None.
+        validate: If True, validates the result is valid snake_case and raises
+            NameError if not. Defaults to True.
+        camel_to_snake: If True, converts camelCase to snake_case before other
+            transformations. Defaults to False.
+
+    Returns:
+        String in snake_case format, or None if input was None.
+
+    Raises:
+        NameError: If validate is True and the result is not valid snake_case.
+
+    Example:
+        ```python
+        # Basic usage
+        underscore("GDP (constant 2015 US$)")
+        # Returns: "gdp__constant_2015_usdollar__"
+
+        # Handle camelCase
+        underscore("myVariableName", camel_to_snake=True)
+        # Returns: "my_variable_name"
+
+        # Skip validation
+        underscore("123invalid", validate=False)
+        # Returns: "_123invalid"
+        ```
+
+    Warning:
+        This function may evolve in the future. For critical use cases, either
+        add tests or manually underscore your column names.
     """
     if name is None:
         return None
@@ -136,50 +212,116 @@ def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = F
 
 
 def _camel_to_snake(name: str) -> str:
-    """Convert string camelCase to snake_case.
+    """Convert camelCase string to snake_case.
 
-    Reference: https://stackoverflow.com/a/1176023/5056599 CC BY-SA 4.0
+    Args:
+        name: String using camelCase formatting.
+
+    Returns:
+        String converted to snake_case formatting.
 
     Example:
-    >>> _camel_to_snake('camelCase')
-    'camel_case'
+        ```python
+        _camel_to_snake('camelCase')
+        # Returns: 'camel_case'
 
-    Parameters
-    ----------
-    name : str
-        String using camelCase formatting.
+        _camel_to_snake('HTTPResponseCode')
+        # Returns: 'http_response_code'
+        ```
 
-    Returns
-    -------
-    str:
-        String using snake_case formatting.
+    Note:
+        Implementation based on https://stackoverflow.com/a/1176023/5056599 (CC BY-SA 4.0)
     """
     name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
 
 def underscore_table(t, *args, **kwargs):
-    """Convert column and index names to underscore. Only for backwards compatibility.
-    Using table.underscore() method is preferred."""
+    """Convert column and index names to underscore format.
+
+    Warning:
+        **DEPRECATED**: Use `table.underscore()` method instead. This function
+        exists only for backward compatibility.
+
+    Args:
+        t: Table object to underscore.
+        *args: Positional arguments passed to `table.underscore()`.
+        **kwargs: Keyword arguments passed to `table.underscore()`.
+
+    Returns:
+        Table with underscored column and index names.
+
+    Example:
+        Deprecated usage
+        ```python
+        underscored = underscore_table(my_table)
+        ```
+
+        Preferred usage
+        ```python
+        underscored = my_table.underscore()
+        ```
+    """
     return t.underscore(*args, **kwargs)
 
 
 def validate_underscore(name: str | None, object_name: str = "Name") -> None:
-    """Raise error if name is not snake_case."""
+    """Validate that a name follows snake_case convention.
+
+    Args:
+        name: String to validate. If None, validation is skipped.
+        object_name: Name of the object being validated, used in error messages.
+            Defaults to "Name".
+
+    Raises:
+        NameError: If name is not valid snake_case (lowercase letters, digits,
+            and underscores only, must start with letter or underscore).
+
+    Example:
+        Valid names pass silently
+        ```python
+        validate_underscore("my_variable")
+        validate_underscore("_private_var")
+        ```
+
+        Invalid names raise NameError
+        ```python
+        try:
+            validate_underscore("MyVariable", "Variable")
+        except NameError as e:
+            print(e)
+            # Prints: Variable must be snake_case. Change `MyVariable` to `my_variable`
+        ```
+    """
     if name is not None and not re.match("^[a-z_][a-z0-9_]*$", name):
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
 def dynamic_yaml_load(source: Path | str | TextIO, params: dict = {}) -> dict:
-    """
-    Loads a YAML file from a path, string, or StringIO-like object, and updates it with given parameters.
+    """Load YAML file with dynamic parameter substitution.
+
+    Loads a YAML file and updates it with provided parameters for dynamic
+    interpolation. Supports loading from file paths, path strings, or file-like objects.
 
     Args:
-        source (Path | str | TextIO): File path, string, or a file-like object (e.g., StringIO).
-        params (dict): Parameters to update in the loaded YAML.
+        source: File path (Path or str) or file-like object (e.g., StringIO).
+        params: Dictionary of parameters to substitute in the YAML. Defaults to empty dict.
 
     Returns:
-        dict: The parsed YAML data with updated parameters.
+        Parsed YAML data as dictionary with parameters applied.
+
+    Example:
+        ```python
+        from pathlib import Path
+
+        # Load from file path
+        data = dynamic_yaml_load("config.yaml", {"year": 2024})
+
+        # Load from StringIO
+        from io import StringIO
+        yaml_str = StringIO("title: Dataset {{year}}")
+        data = dynamic_yaml_load(yaml_str, {"year": 2024})
+        ```
     """
     if isinstance(source, (str, Path)):
         with open(source) as istream:
@@ -193,8 +335,32 @@ def dynamic_yaml_load(source: Path | str | TextIO, params: dict = {}) -> dict:
 
 
 def dynamic_yaml_to_dict(yd: Any) -> dict:
-    """Convert dynamic yaml to dict. Using dynamic yaml can cause problems when you
-    try to run e.g. Origin(**yd). It's safer to run Origin(**dynamic_yaml_to_dict(yd)) instead."""
+    """Convert dynamic YAML object to plain dictionary.
+
+    Dynamic YAML objects can cause issues when unpacking into dataclass constructors.
+    This function converts them to standard Python dictionaries for safe usage.
+
+    Args:
+        yd: Dynamic YAML object to convert.
+
+    Returns:
+        Plain Python dictionary.
+
+    Example:
+        Problem: Dynamic YAML can cause errors
+        ```python
+        # origin = Origin(**dynamic_yaml_obj)  # May fail
+        ```
+
+        Solution: Convert to dict first
+        ```python
+        origin = Origin(**dynamic_yaml_to_dict(dynamic_yaml_obj))  # Safe
+        ```
+
+    Note:
+        Always use this conversion before unpacking into dataclass constructors
+        to avoid unexpected behavior with dynamic YAML objects.
+    """
     return yaml.safe_load(dynamic_yaml.dump(yd))
 
 
@@ -220,6 +386,7 @@ def hash_any(x: Any) -> int:
         int: A deterministic integer hash value for the object.
 
     Special cases:
+
     - **Dataclasses**: It recursively hashes each field of the dataclass by generating a tuple of (field_name_hash, field_value_hash)
       and then hashes that tuple.
     - **Lists**: It recursively hashes each element in the list, converts the list to a tuple (because tuples are hashable),
@@ -232,14 +399,17 @@ def hash_any(x: Any) -> int:
     - **Other types**: Falls back on Python's built-in `hash()` function for all other types of objects.
 
     Example:
-    >>> @dataclass
-    ... class Person:
-    ...     name: str
-    ...     age: int
-    >>> p1 = Person(name="Alice", age=30)
-    >>> p2 = Person(name="Alice", age=30)
-    >>> hash_any(p1) == hash_any(p2)
-    True
+        ```python
+        >>> @dataclass
+        >>> class Person:
+        ...    name: str
+        ...    age: int
+
+        >>> p1 = Person(name="Alice", age=30)
+        >>> p2 = Person(name="Alice", age=30)
+        >>> hash_any(p1) == hash_any(p2)
+        True
+        ```
     """
 
     if is_dataclass(x):
@@ -332,8 +502,35 @@ def dataclass_from_dict(cls: type[T] | None, d: dict[str, Any]) -> T:
 
 
 def remove_details_on_demand(text: str) -> str:
-    # Remove references to details on demand from a text.
-    # Example: "This is a [description](#dod:something)." -> "This is a description."
+    """Remove details-on-demand references from markdown text.
+
+    Strips out special markdown links that reference details-on-demand content,
+    keeping only the link text. This is useful for generating plain text versions
+    of content that contains interactive elements.
+
+    Args:
+        text: Markdown text containing details-on-demand references.
+
+    Returns:
+        Text with details-on-demand references removed, keeping only link text.
+
+    Example:
+        ```python
+        text = "This is a [description](#dod:something) of the data."
+        result = remove_details_on_demand(text)
+        # Returns: "This is a description of the data."
+        ```
+
+        Multiple references
+        ```python
+        text = "See [mortality](#dod:mort) and [fertility](#dod:fert) data."
+        result = remove_details_on_demand(text)
+        # Returns: "See mortality and fertility data."
+        ```
+
+    Note:
+        The regex pattern matches `[text](#dod:keyword)` and replaces it with just `text`.
+    """
     # The regex matches the entire markdown link syntax [text](#dod:keyword) and replaces it with just the text
     regex = r"\[([^\]]+)\]\(#dod:[^\)]+\)"
     text = re.sub(regex, r"\1", text)
@@ -342,9 +539,39 @@ def remove_details_on_demand(text: str) -> str:
 
 
 def parse_numeric_list(val: list | str) -> list[float | int]:
-    """
-    Parse a string representation of a list of numbers into a Python list.
-    Example: "[10, 20, 30]" -> [10, 20, 30]
+    """Parse a string representation of a numeric list.
+
+    Converts a comma-separated string of numbers (optionally wrapped in brackets)
+    into a Python list of integers and floats.
+
+    Args:
+        val: String representation of a numeric list or an existing list.
+            If already a list, returns it unchanged.
+
+    Returns:
+        List of integers and floats parsed from the input string.
+
+    Example:
+        ```python
+        # String with brackets
+        parse_numeric_list("[10, 20, 30]")
+        # Returns: [10, 20, 30]
+
+        # String without brackets
+        parse_numeric_list("1.5, 2.5, 3.0")
+        # Returns: [1.5, 2.5, 3.0]
+
+        # Mixed integers and floats
+        parse_numeric_list("10, 20.5, 30")
+        # Returns: [10, 20.5, 30]
+
+        # Already a list (no-op)
+        parse_numeric_list([1, 2, 3])
+        # Returns: [1, 2, 3]
+        ```
+
+    Note:
+        Numbers with decimal points are parsed as floats, others as integers.
     """
     if isinstance(val, list):
         return val

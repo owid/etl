@@ -43,8 +43,15 @@ INDEX_FORMATS: list[FileFormat] = ["feather"]
 
 
 class CatalogMixin:
-    """
-    Abstract data catalog API, encapsulates finding and loading data.
+    """Abstract catalog interface for finding and loading data.
+
+    Provides the core API for querying and retrieving data from catalogs.
+    Used as a base class for both LocalCatalog and RemoteCatalog.
+
+    Attributes:
+        channels: Data channels to search (e.g., 'garden', 'meadow', 'grapher').
+        frame: Internal DataFrame containing catalog index.
+        uri: Base URI for the catalog location.
     """
 
     channels: Iterable[CHANNEL]
@@ -59,6 +66,33 @@ class CatalogMixin:
         dataset: str | None = None,
         channel: CHANNEL | None = None,
     ) -> "CatalogFrame":
+        """Search catalog for tables matching specified criteria.
+
+        Search supports partial matching on table names and exact matching on
+        other fields. Multiple criteria can be combined.
+
+        Args:
+            table: Table name pattern to search for (substring match).
+            namespace: Namespace to filter by (e.g., 'un', 'worldbank').
+            version: Version string to filter by (e.g., '2024-01-15').
+            dataset: Dataset name to filter by.
+            channel: Data channel to search (e.g., 'garden', 'grapher').
+
+        Returns:
+            CatalogFrame containing matching tables.
+
+        Raises:
+            ValueError: If specified channel is not loaded in this catalog.
+
+        Example:
+            Search for GDP tables in World Bank namespace
+            ```python
+            from owid.catalog import find
+
+            results = find(table="gdp", namespace="worldbank")
+            print(results)
+            ```
+        """
         criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
 
         if table:
@@ -87,6 +121,30 @@ class CatalogMixin:
         return cast(CatalogFrame, matches)
 
     def find_one(self, *args: str | None, **kwargs: str | None) -> Table:
+        """Find and load a single table matching search criteria.
+
+        Convenience method that combines find() and load(). Requires exactly
+        one matching table.
+
+        Args:
+            *args: Positional arguments passed to find().
+            **kwargs: Keyword arguments passed to find().
+
+        Returns:
+            The loaded Table object.
+
+        Raises:
+            ValueError: If zero or multiple tables match the criteria.
+
+        Example:
+            Load a specific table
+            ```python
+            from owid.catalog import RemoteCatalog
+
+            catalog = RemoteCatalog()
+            table = catalog.find_one(table="population", namespace="un")
+            ```
+        """
         return self.find(*args, **kwargs).load()  # type: ignore
 
     def find_latest(
@@ -94,6 +152,30 @@ class CatalogMixin:
         *args: str | None,
         **kwargs: str | None,
     ) -> Table:
+        """Find and load the latest version of a table.
+
+        Searches for tables matching the criteria and returns the one with
+        the most recent version string (lexicographically sorted).
+
+        Args:
+            *args: Positional arguments passed to find().
+            **kwargs: Keyword arguments passed to find().
+
+        Returns:
+            The loaded Table with the latest version.
+
+        Raises:
+            ValueError: If no tables match the criteria.
+
+        Example:
+            Get latest population data
+            ```python
+            from owid.catalog import find_latest
+
+            table = find_latest(table="population", namespace="un")
+            print(f"Loaded version: {table.metadata.version}")
+            ```
+        """
         frame = self.find(*args, **kwargs)  # type: ignore
         if frame.empty:
             raise ValueError("No matching table found")
@@ -112,10 +194,34 @@ class CatalogMixin:
 
 
 class LocalCatalog(CatalogMixin):
-    """
-    A data catalog that's on disk. On-disk catalogs do not need an index file, since
-    you can simply walk the directory. However, they support a `reindex()` method
-    which can create such an index.
+    """Local filesystem-based data catalog.
+
+    Provides access to datasets stored on disk. Can operate without an index file
+    by walking the directory structure, or use a pre-built index for faster queries.
+
+    The catalog automatically builds an index on first access if one doesn't exist.
+    Use the `reindex()` method to rebuild or update the index.
+
+    Attributes:
+        uri: Path to the catalog directory on disk.
+        channels: Data channels available in this catalog.
+        frame: Indexed catalog contents as a DataFrame.
+
+    Example:
+        Create and use a local catalog
+        ```python
+        from pathlib import Path
+        from owid.catalog import LocalCatalog
+
+        # Initialize catalog
+        catalog = LocalCatalog(Path("./data"), channels=["garden", "meadow"])
+
+        # Search for tables
+        results = catalog.find(table="population")
+
+        # Load specific table
+        table = catalog.find_one(namespace="un", table="population")
+        ```
     """
 
     uri: str
@@ -172,9 +278,29 @@ class LocalCatalog(CatalogMixin):
                     heapq.heappush(to_search, child)
 
     def reindex(self, include: str | None = None) -> None:
-        """
-        Walk the directory tree, generate a channel/namespace/version/dataset/table frame
-        and save it to each of our index formats.
+        """Rebuild the catalog index by scanning the directory tree.
+
+        Walks the directory structure to discover all datasets and tables,
+        then generates and saves a new index file. This can take a while for
+        large catalogs with many datasets.
+
+        Args:
+            include: Optional regex pattern to filter which datasets to include
+                in the index. If specified, only matching datasets are scanned
+                and merged with existing index entries.
+
+        Example:
+            Rebuild entire catalog index
+            ```python
+            catalog = LocalCatalog("./data")
+            catalog.reindex()
+            ```
+
+            Reindex only specific namespace
+            ```python
+            catalog = LocalCatalog("./data")
+            catalog.reindex(include="worldbank")
+            ```
         """
         index = self._scan_for_datasets(include)
 
@@ -249,6 +375,43 @@ class LocalCatalog(CatalogMixin):
 
 
 class RemoteCatalog(CatalogMixin):
+    """Remote HTTP-based data catalog.
+
+    Provides access to datasets hosted on a remote server. The catalog downloads
+    and caches index files on initialization for fast querying. Individual tables
+    are downloaded on-demand when accessed.
+
+    By default, connects to the public Our World in Data catalog at
+    https://catalog.ourworldindata.org/.
+
+    Attributes:
+        uri: Base URI of the remote catalog server.
+        channels: Data channels available in this catalog.
+        frame: Cached catalog index as a DataFrame.
+        metadata: Catalog metadata including format version.
+
+    Example:
+        Use the default remote catalog
+        ```python
+        from owid.catalog import RemoteCatalog
+
+        # Connect to default catalog
+        catalog = RemoteCatalog()
+
+        # Search and load data
+        results = catalog.find(table="gdp")
+        table = results.iloc[0].load()
+        ```
+
+        Connect to custom remote catalog
+        ```python
+        catalog = RemoteCatalog(
+            uri="https://custom-catalog.example.com/",
+            channels=["garden", "meadow"]
+        )
+        ```
+    """
+
     uri: str
 
     def __init__(self, uri: str = OWID_CATALOG_URI, channels: Iterable[CHANNEL] = ("garden",)) -> None:
@@ -287,8 +450,31 @@ class RemoteCatalog(CatalogMixin):
 
 
 class CatalogFrame(pd.DataFrame):
-    """
-    DataFrame helper, meant only for displaying catalog results.
+    """DataFrame of catalog search results.
+
+    Extended pandas DataFrame that represents catalog search results.
+    Each row contains metadata about a table, including namespace, version,
+    and path information. The DataFrame can load tables directly via the
+    `load()` method.
+
+    Attributes:
+        _base_uri: Base URI for loading table data.
+
+    Example:
+        Working with search results
+        ```python
+        from owid.catalog import find
+
+        # Search returns a CatalogFrame
+        results = find(table="population")
+        print(results)
+
+        # Load first matching table
+        table = results.iloc[0].load()
+
+        # Or load if exactly one match
+        table = results.load()
+        ```
     """
 
     _base_uri: str | None = None
@@ -332,9 +518,34 @@ class CatalogFrame(pd.DataFrame):
 
 
 class CatalogSeries(pd.Series):
-    """
-    A row from the catalog representing a single dataset. We subclass Series
-    in order to add a `load()` method onto it that will fetch and return a Table.
+    """Single catalog search result row.
+
+    Extended pandas Series representing one table in the catalog. Contains
+    metadata fields like namespace, version, dataset, and path. Provides a
+    `load()` method to download and load the actual table data.
+
+    Attributes:
+        _base_uri: Base URI for loading table data.
+        namespace: Data provider namespace (e.g., 'un', 'worldbank').
+        version: Dataset version string (e.g., '2024-01-15').
+        dataset: Dataset name.
+        table: Table name within the dataset.
+        path: Relative path to the table file.
+
+    Example:
+        Load table from search result
+        ```python
+        from owid.catalog import find
+
+        results = find(table="population")
+        row = results.iloc[0]
+
+        # Inspect metadata
+        print(f"{row.namespace}/{row.version}/{row.dataset}")
+
+        # Load the table
+        table = row.load()
+        ```
     """
 
     _metadata = ["_base_uri"]
@@ -387,12 +598,70 @@ def find(
     dataset: str | None = None,
     channels: Iterable[CHANNEL] = ("garden",),
 ) -> "CatalogFrame":
+    """Search the remote catalog for tables matching criteria.
+
+    Convenience function that searches the default Our World in Data remote
+    catalog. Automatically initializes and caches the catalog connection.
+
+    Args:
+        table: Table name pattern to search for (substring match).
+        namespace: Namespace to filter by (e.g., 'un', 'worldbank').
+        version: Version string to filter by (e.g., '2024-01-15').
+        dataset: Dataset name to filter by.
+        channels: Data channels to search (default: garden only).
+
+    Returns:
+        CatalogFrame containing matching tables.
+
+    Example:
+        Search for population data
+        ```python
+        from owid.catalog import find
+
+        # Find all population tables
+        results = find(table="population")
+
+        # Filter by namespace
+        results = find(table="population", namespace="un")
+
+        # Search across multiple channels
+        results = find(table="gdp", channels=["garden", "meadow"])
+        ```
+    """
     REMOTE_CATALOG = _load_remote_catalog(channels=channels)
 
     return REMOTE_CATALOG.find(table=table, namespace=namespace, version=version, dataset=dataset)
 
 
 def find_one(*args: str | None, **kwargs: str | None) -> Table:
+    """Find and load a single table from the remote catalog.
+
+    Convenience function that combines find() and load() in one call.
+    Requires exactly one matching table.
+
+    Args:
+        *args: Positional arguments passed to find().
+        **kwargs: Keyword arguments passed to find().
+
+    Returns:
+        The loaded Table object.
+
+    Raises:
+        ValueError: If zero or multiple tables match the criteria.
+
+    Example:
+        Load a specific table
+        ```python
+        from owid.catalog import find_one
+
+        # Load exact match
+        table = find_one(
+            table="population",
+            namespace="un",
+            version="2024-07-11"
+        )
+        ```
+    """
     return find(*args, **kwargs).load()  # type: ignore
 
 
@@ -403,6 +672,44 @@ def find_latest(
     channels: Iterable[CHANNEL] = ("garden",),
     version: str | None = None,
 ) -> Table:
+    """Find and load the latest version of a table from the remote catalog.
+
+    Searches for tables matching the criteria and returns the one with the
+    most recent version string (lexicographically sorted). Useful for always
+    getting the most up-to-date data without specifying an exact version.
+
+    Args:
+        table: Table name pattern to search for (substring match).
+        namespace: Namespace to filter by (e.g., 'un', 'worldbank').
+        dataset: Dataset name to filter by.
+        channels: Data channels to search (default: garden only).
+        version: Optional specific version to load instead of latest.
+
+    Returns:
+        The loaded Table with the latest version.
+
+    Raises:
+        ValueError: If no tables match the criteria.
+
+    Example:
+        Get latest population data
+        ```python
+        from owid.catalog import find_latest
+
+        # Load most recent version
+        table = find_latest(table="population", namespace="un")
+        print(f"Loaded version: {table.m.version}")
+        ```
+
+        Load from multiple channels
+        ```python
+        table = find_latest(
+            table="gdp",
+            namespace="worldbank",
+            channels=["garden", "meadow"]
+        )
+        ```
+    """
     REMOTE_CATALOG = _load_remote_catalog(channels=channels)
 
     # If version is not specified, it will find the latest version given all other specifications.
