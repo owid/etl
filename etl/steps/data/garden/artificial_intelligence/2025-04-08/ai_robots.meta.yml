@@ -43,7 +43,6 @@ tables:
         description_short: |-
           {definitions.description_short_industrial}
         description_key:
-          - The use of robots with AI-based software shows how AI is being applied in the real world.
           - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
           - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
           - Reprogrammable means their functions can be changed through software without altering their physical parts.

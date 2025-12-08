@@ -28,7 +28,7 @@ def google_config_init(client_secrets_file: Union[str, Path], encoding: str = "u
     To obtain `client_secrets_file`, follow the instructions from:
     https://medium.com/analytics-vidhya/how-to-connect-google-drive-to-python-using-pydrive-9681b2a14f20
 
-    IMPORTANT:
+    Note:
         - Additionally, make sure to add yourself in Test users, as noted in:
           https://stackoverflow.com/questions/65980758/pydrive-quickstart-and-error-403-access-denied
         - Select Desktop App instead of Web Application as the application type.
@@ -36,16 +36,11 @@ def google_config_init(client_secrets_file: Union[str, Path], encoding: str = "u
     Method partly sourced from:
     https://github.com/lucasrodes/whatstk/blob/bcb9cf7c256df1c9e270aab810b74ab0f7329436/whatstk/utils/gdrive.py#L38
 
-    Parameters
-    ----------
-    client_secrets_file : str
-        Path to client_secrets file.
-    encoding : str, optional
-        Encoding of the text in `client_secrets` file, by default "utf8"
+    Args:
+        client_secrets_file: Path to client_secrets file.
+        encoding: Encoding of the text in `client_secrets` file, by default "utf8"
 
-    Returns
-    -------
-    GoogleAuth
+    Returns:
         Google authenticator object.
     """
     # Check client_secrets
@@ -83,15 +78,13 @@ def google_config_init(client_secrets_file: Union[str, Path], encoding: str = "u
 def _check_google_config() -> None:
     """Run checks agains Google configuration files.
 
-    Raises
-    ------
-    FileNotFoundError
-        If owid.datautils.google.config.CONFIG_DIR directory does not exist.
-    FileNotFoundError
-        If any of the Google configuration files is missing. These include:
-            - owid.datautils.google.config.CLIENT_SECRETS_PATH
-            - owid.datautils.google.config.SETTINGS_PATH
-            - owid.datautils.google.config.CREDENTIALS_PATH
+    Raises:
+        FileNotFoundError: If owid.datautils.google.config.CONFIG_DIR directory does not exist.
+        FileNotFoundError: If any of the Google configuration files is missing. These include:
+
+                        - owid.datautils.google.config.CLIENT_SECRETS_PATH
+                        - owid.datautils.google.config.SETTINGS_PATH
+                        - owid.datautils.google.config.CREDENTIALS_PATH
     """
     if not os.path.isdir(CONFIG_DIR):
         raise FileNotFoundError(
@@ -105,9 +98,7 @@ def _check_google_config() -> None:
 def is_google_config_init() -> bool:
     """Check if Google configuration files were created.
 
-    Returns
-    -------
-    bool
+    Returns:
         True if Google configuration files were created, False otherwise.
     """
     try:

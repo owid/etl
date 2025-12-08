@@ -62,14 +62,41 @@ NULLABLE_DTYPES = [f"{sign}{typ}{size}" for typ in ("Int", "Float") for sign in 
 
 @dataclass
 class Dataset:
-    """
-    A dataset is a folder full of data tables, with metadata available at `index.json`.
+    """A dataset is a folder containing data tables with metadata.
+
+    A Dataset represents a collection of related data tables stored in a directory.
+    Each dataset has an `index.json` file containing metadata about the dataset
+    and references to its tables.
+
+    Attributes:
+        path: Path to the dataset directory.
+        metadata: Dataset-level metadata (title, description, sources, etc).
+
+    Example:
+        Load an existing dataset:
+
+        ```python
+        >>> ds = Dataset("data://garden/demography/2023-03-31/population")
+        >>> table = ds["population"]
+        ```
+
+        Create a new dataset:
+        ```python
+        >>> ds = Dataset.create_empty("path/to/dataset")
+        >>> ds.add(table)
+        >>> ds.save()
+        ```
     """
 
     path: str
     metadata: "DatasetMeta"
 
     def __init__(self, path: str | Path) -> None:
+        """Initialize a Dataset from a directory path.
+
+        Args:
+            path: Path to the dataset directory. Can be a string or Path object.
+        """
         # for convenience, accept Path objects directly
         if isinstance(path, Path):
             self.path = path.as_posix()
@@ -80,7 +107,7 @@ class Dataset:
 
     @property
     def m(self) -> DatasetMeta:
-        """Metadata alias to save typing."""
+        """Metadata alias for shorter access (ds.m instead of ds.metadata)."""
         return self.metadata
 
     @classmethod
@@ -107,13 +134,29 @@ class Dataset:
         formats: list[FileFormat] = DEFAULT_FORMATS,
         repack: bool = True,
     ) -> None:
-        """
-        Add this table to the dataset by saving it in the dataset's folder. By default we
-        save in multiple formats, but if you need a specific one (e.g. CSV for explorers)
-        you can specify it.
+        """Add a table to this dataset.
 
-        :param repack: if True, try to cast column types to the smallest possible type (e.g. float64 -> float32)
-            to reduce binary file size. Consider using False when your dataframe is large and the repack is failing.
+        Saves the table to the dataset's directory in the specified format(s).
+        By default, saves in multiple formats for compatibility.
+
+        Args:
+            table: The table to add to the dataset.
+            formats: List of file formats to save (feather, parquet, csv).
+                Defaults to DEFAULT_FORMATS (usually ["feather"]).
+            repack: If True, optimize column dtypes to reduce file size
+                (e.g. float64 -> float32). Set to False for very large dataframes
+                if repacking fails or is too slow.
+
+        Raises:
+            PrimaryKeyMissing: If table has no primary key and OWID_STRICT is set.
+            NonUniqueIndex: If table index has duplicates and OWID_STRICT is set.
+
+        Example:
+            ```python
+            >>> ds.add(table)  # Save in default format
+            >>> ds.add(table, formats=["csv"])  # Save only as CSV
+            >>> ds.add(table, repack=False)  # Skip optimization
+            ```
         """
 
         utils.validate_underscore(table.metadata.short_name, "Table's short_name")
@@ -165,19 +208,53 @@ class Dataset:
         reset_metadata: Literal["keep", "keep_origins", "reset"] = "keep",
         load_data: bool = True,
     ) -> tables.Table:
-        """Read dataset's table from disk. Alternative to ds[table_name], but
-        with more options to optimize the reading.
+        """Read a table from the dataset with performance options.
 
-        :param reset_index: If true, don't set primary keys of the table. This can make loading
-            large datasets with multi-indexes much faster.
-        :param safe_types: If true, convert numeric columns to Float64 and Int64 and categorical
-            columns to string[pyarrow]. This can significantly increase memory usage.
-        :param reset_metadata: Controls variable metadata reset behavior.
-            - "keep": Leave metadata unchanged (default).
-            - "keep_origins": Reset variable metadata but retain the 'origins' attribute.
-            - "reset": Reset all variable metadata.
-        :param load_data: If false, only load metadata and not the actual data. This can be useful
-            when you only need to read metadata from a large dataset.
+        This is an alternative to `ds[table_name]` with more control over
+        loading behavior for performance optimization.
+
+        Args:
+            name: Name of the table to read. If None and dataset has only one
+                table, reads that table automatically.
+            reset_index: If True, don't set primary keys. This can make loading
+                large multi-index datasets much faster. Default is True.
+            safe_types: If True, convert numeric columns to nullable types
+                (Float64, Int64) and categorical to string[pyarrow]. This increases
+                memory usage but prevents type issues. Default is True.
+            reset_metadata: Controls variable metadata reset behavior:
+                - "keep": Leave metadata unchanged (default)
+                - "keep_origins": Reset metadata but retain origins attribute
+                - "reset": Reset all variable metadata
+            load_data: If False, only load metadata without actual data. Useful
+                when you only need to inspect metadata. Default is True.
+
+        Returns:
+            The loaded table with data and metadata.
+
+        Raises:
+            ValueError: If name is None but dataset contains multiple tables.
+            KeyError: If the specified table name doesn't exist.
+
+        Example:
+            Read single table with safe defaults
+            ```python
+            table = ds.read()
+            ```
+
+            Keep index
+            ```python
+            >>> table = ds.read("population", reset_index=False)
+            ```
+
+            Faster, less memory
+            ```python
+            >>> table = ds.read("large_table", safe_types=False)
+            ```
+
+            Only metadata
+            ```python
+            >>> meta_only = ds.read(load_data=False)
+            ```
         """
         if name is None:
             if len(self.table_names) == 1:
@@ -253,24 +330,41 @@ class Dataset:
         errors: Literal["ignore", "warn", "raise"] = "raise",
         extra_variables: Literal["raise", "ignore"] = "raise",
     ) -> None:
-        """
-        Load YAML file with metadata from given path and update metadata of dataset and its tables.
+        """Update dataset and table metadata from a YAML file.
 
-        :param metadata_path: Path to *.meta.yml file with metadata. Check out other metadata files
-            for examples, this function doesn't do schema validation
-        :param yaml_params: Additional parameters to pass to the YAML loader
-        :param if_source_exists: What to do if source already exists in metadata. Possible values:
-            - "replace" (default): replace existing source with new one
-            - "append": append new source to existing ones
-            - "fail": raise an exception if source already exists
-        :param if_origins_exist: What to do if origin already exists in metadata. Possible values:
-            - "replace" (default): replace existing origin with new one
-            - "append": append new origin to existing ones
-            - "fail": raise an exception if origin already exists
-        :param errors: How to handle errors encountered during metadata update. Possible values:
-            - "ignore" (default): ignore all errors
-            - "warn": issue a warning if there's an indicator in metadata that doesn't exist in the dataset
-            - "raise": same as "warn" but also raise an exception
+        Loads metadata from a .meta.yml file and updates the dataset's metadata
+        and all referenced tables. This is the primary way to add rich metadata
+        to datasets in the ETL workflow.
+
+        Args:
+            metadata_path: Path to the .meta.yml file with metadata definitions.
+                See existing metadata files for examples of the expected structure.
+            yaml_params: Additional parameters to pass to the YAML loader.
+            if_source_exists: How to handle existing sources:
+                - "replace" (default): Replace existing source with new one
+                - "append": Append new source to existing sources
+                - "fail": Raise exception if source already exists
+            if_origins_exist: How to handle existing origins:
+                - "replace" (default): Replace existing origin with new one
+                - "append": Append new origin to existing origins
+                - "fail": Raise exception if origin already exists
+            errors: How to handle errors during update:
+                - "raise" (default): Raise exception on errors
+                - "warn": Issue warning but continue processing
+                - "ignore": Silently ignore errors
+            extra_variables: How to handle variables in metadata not in dataset:
+                - "raise" (default): Raise exception
+                - "ignore": Skip extra variables
+
+        Example:
+            ```python
+            >>> ds.update_metadata(Path("dataset.meta.yml"))
+            >>> ds.update_metadata(
+            ...     Path("dataset.meta.yml"),
+            ...     if_origins_exist="append",
+            ...     errors="warn"
+            ... )
+            ```
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
@@ -297,8 +391,22 @@ class Dataset:
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:
-        """
-        Return a DataFrame describing the contents of this dataset, one row per table.
+        """Generate an index DataFrame describing all tables in this dataset.
+
+        Creates a summary DataFrame with one row per table, including metadata
+        like namespace, version, checksum, dimensions, and file paths.
+
+        Args:
+            catalog_path: Base path for calculating relative paths. Defaults to "/".
+
+        Returns:
+            DataFrame with columns: namespace, dataset, version, table, checksum, is_public, dimensions, path, and channel.
+
+        Example:
+            ```python
+            >>> index = ds.index()
+            >>> print(index[["table", "dimensions", "checksum"]])
+            ```
         """
         base = {
             "namespace": self.metadata.namespace,
@@ -365,7 +473,20 @@ class Dataset:
         return sorted(glob(join(self.path, "*.meta.json")))
 
     def checksum(self) -> str:
-        "Return a MD5 checksum of all data and metadata in the dataset."
+        """Calculate MD5 checksum of all data and metadata in the dataset.
+
+        Generates a checksum that includes the dataset's index file and all
+        data files. Useful for detecting changes to the dataset.
+
+        Returns:
+            MD5 checksum as a hexadecimal string.
+
+        Example:
+            ```python
+            >>> checksum = ds.checksum()
+            >>> print(f"Dataset checksum: {checksum}")
+            ```
+        """
         _hash = hashlib.md5()
         _hash.update(checksum_file(self._index_file).digest())
 
@@ -386,7 +507,22 @@ for k in DatasetMeta.__dataclass_fields__:
 
 
 def checksum_file(filename: str) -> Any:
-    "Return the MD5 checksum of a given file."
+    """Calculate MD5 checksum of a single file.
+
+    Reads the file in chunks to handle large files efficiently.
+
+    Args:
+        filename: Path to the file to checksum.
+
+    Returns:
+        MD5 hash object (use .hexdigest() to get string representation).
+
+    Example:
+        ```python
+        >>> checksum = checksum_file("data.csv")
+        >>> print(checksum.hexdigest())
+        ```
+    """
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()
     with open(filename, "rb") as istream:
