@@ -28,14 +28,10 @@ def warn_on_list_of_entities(
 ) -> None:
     """Raise a warning with a custom message, and optionally print a list of affected elements.
 
-    Parameters
-    ----------
-    list_of_entities : list or set
-        Elements to optionally print one by one (only relevant if show_list is True).
-    warning_message : str
-        Warning message.
-    show_list : bool
-        True to print a list of affected entities.
+    Args:
+        list_of_entities: Elements to optionally print one by one (only relevant if show_list is True).
+        warning_message: Warning message.
+        show_list: True to print a list of affected entities.
 
     """
     warnings.warn(warning_message)

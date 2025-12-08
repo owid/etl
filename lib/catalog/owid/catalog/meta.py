@@ -38,43 +38,173 @@ T = TypeVar("T")
 
 
 class MetaBase(DataClassJsonMixin):
+    """Base class for all metadata objects in the catalog.
+
+    Provides common functionality for metadata serialization, hashing, comparison,
+    and persistence. All metadata classes (DatasetMeta, TableMeta, VariableMeta, etc.)
+    inherit from this base class.
+
+    Key features:
+
+    - JSON serialization/deserialization
+    - Deterministic hashing for deduplication
+    - Deep copying support
+    - File persistence (save/load)
+    - Dictionary conversion
+
+    Example:
+        ```python
+        from owid.catalog import DatasetMeta
+
+        # Create metadata
+        meta = DatasetMeta(title="GDP Data", short_name="gdp")
+
+        # Save to file
+        meta.save("metadata.json")
+
+        # Load from file
+        loaded = DatasetMeta.load("metadata.json")
+
+        # Convert to dictionary
+        d = meta.to_dict()
+
+        # Create deep copy
+        copy = meta.copy(deep=True)
+        ```
+    """
+
     def __hash__(self):
-        """Hash that uniquely identifies an object (without needing frozen dataclass)."""
+        """Hash that uniquely identifies an object (without needing frozen dataclass).
+
+        Returns:
+            Deterministic hash value for the object.
+        """
         return hash_any(self)
 
     def __eq__(self, other: Self) -> bool:  # type: ignore
+        """Check equality based on hash values.
+
+        Args:
+            other: Object to compare with.
+
+        Returns:
+            True if both objects have the same hash, False otherwise.
+        """
         if not isinstance(other, self.__class__):
             return False
         return self.__hash__() == other.__hash__()
 
     def to_dict(self, encode_json: bool = False) -> dict[str, Any]:  # type: ignore
+        """Convert metadata object to dictionary.
+
+        Args:
+            encode_json: If True, encodes values for JSON serialization.
+
+        Returns:
+            Dictionary representation of the metadata.
+
+        Example:
+            ```python
+            meta = DatasetMeta(title="GDP", short_name="gdp")
+            d = meta.to_dict()
+            print(d["title"])  # "GDP"
+            ```
+        """
         return super().to_dict(encode_json=encode_json)
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> T:  # type: ignore
+        """Create metadata object from dictionary.
+
+        Args:
+            d: Dictionary with metadata fields.
+
+        Returns:
+            New metadata object of the appropriate type.
+
+        Example:
+            ```python
+            d = {"title": "GDP", "short_name": "gdp"}
+            meta = DatasetMeta.from_dict(d)
+            ```
+
+        Note:
+            This uses a custom implementation that's significantly faster than
+            the default dataclasses_json method.
+        """
         # NOTE: this is much faster than using dataclasses_json
         return dataclass_from_dict(cls, d)  # type: ignore
 
     def update(self, **kwargs: dict[str, Any]) -> None:
-        """Update object with new values."""
+        """Update metadata fields with new values.
+
+        Args:
+            **kwargs: Field names and their new values. None values are ignored.
+
+        Example:
+            ```python
+            meta = DatasetMeta(title="GDP")
+            meta.update(title="GDP Data", description="Annual GDP figures")
+            ```
+        """
         for key, value in kwargs.items():
             if value is not None:
                 setattr(self, key, value)
 
     def copy(self, deep=True) -> Self:
-        """Return a copy of the object."""
+        """Create a copy of the metadata object.
+
+        Args:
+            deep: If True, creates a deep copy (copies nested objects).
+                If False, creates a shallow copy.
+
+        Returns:
+            Copy of the metadata object.
+
+        Example:
+            ```python
+            original = DatasetMeta(title="GDP")
+            copy = original.copy(deep=True)
+            copy.title = "Population"  # Doesn't affect original
+            ```
+        """
         if not deep:
             return dataclasses.replace(self)  # type: ignore
         else:
             return _deepcopy_dataclass(self)
 
     def save(self, filename: str | Path) -> None:
+        """Save metadata to a JSON file.
+
+        Args:
+            filename: Path where the metadata should be saved.
+
+        Example:
+            ```python
+            meta = DatasetMeta(title="GDP")
+            meta.save("dataset_meta.json")
+            ```
+        """
         filename = Path(filename).as_posix()
         with open(filename, "w") as ostream:
             json.dump(self.to_dict(), ostream, indent=2, default=str)
 
     @classmethod
     def load(cls, filename: str) -> Self:
+        """Load metadata from a JSON file.
+
+        Args:
+            filename: Path to the JSON file containing metadata.
+
+        Returns:
+            Metadata object loaded from the file.
+
+        Example:
+            ```python
+            meta = DatasetMeta.load("dataset_meta.json")
+            print(meta.title)
+            ```
+        """
         with open(filename) as istream:
             return cls.from_dict(json.load(istream))
 
@@ -82,10 +212,40 @@ class MetaBase(DataClassJsonMixin):
 @pruned_json
 @dataclass(eq=False)
 class License(MetaBase):
+    """License information for data products.
+
+    Stores licensing details for datasets and variables, including the license
+    name and URL to the full license text.
+
+    Attributes:
+        name: License name (e.g., "CC BY 4.0", "MIT", "Public Domain").
+        url: URL to the full license text or information page.
+
+    Example:
+        ```python
+        from owid.catalog import License
+
+        # Creative Commons license
+        license = License(
+            name="CC BY 4.0",
+            url="https://creativecommons.org/licenses/by/4.0/"
+        )
+
+        # Check if license is defined
+        if license:
+            print(f"Licensed under: {license.name}")
+        ```
+    """
+
     name: str | None = None
     url: str | None = None
 
     def __bool__(self):
+        """Check if license has any information defined.
+
+        Returns:
+            True if either name or url is set, False otherwise.
+        """
         return bool(self.name or self.url)
 
 
@@ -93,11 +253,40 @@ class License(MetaBase):
 @pruned_json
 @dataclass(eq=False)
 class Source(MetaBase):
-    """Notes on importing sources to grapher:
-    - Field `source.description` gets mapped to `Internal notes`, but we rather use it for `additional_info`
-    - The most important fields are `published_by` and `additional_info`
-    - In admin for dataset (i.e. /admin/datasets/1234) only the first source of a dataset is shown and
-        can be edited. The other ones are not visible.
+    """Legacy source metadata for datasets.
+
+    Warning:
+        **DEPRECATED**: Use `Origin` instead for new datasets. This class is
+        maintained for backward compatibility only.
+
+    Source contains metadata about the origin of data in legacy format. Modern
+    datasets should use the `Origin` class which provides more comprehensive
+    metadata fields.
+
+    Attributes:
+        name: Source name or identifier.
+        description: Description of the source.
+        url: URL to the source's main page.
+        source_data_url: Direct URL to download the data.
+        owid_data_url: OWID-hosted URL for the data.
+        date_accessed: Date when the source was accessed (ISO format).
+        publication_date: Date when the source was published.
+        publication_year: Year of publication.
+        published_by: Publisher or institution name (used in Grapher).
+
+        Example:
+            ```python
+            # Legacy usage (prefer Origin for new code)
+            source = Source(
+                name="World Bank",
+                published_by="World Bank Group",
+                url="https://data.worldbank.org"
+            )
+            ```
+
+    Note:
+        In Grapher admin, only the first source of a dataset is visible and editable.
+        The most important fields for Grapher are `published_by` and `description`.
     """
 
     name: str | None = None
@@ -117,6 +306,66 @@ class Source(MetaBase):
 @pruned_json
 @dataclass(eq=False)
 class Origin(MetaBase):
+    """Comprehensive metadata about the origin of a data product.
+
+    Origin provides detailed provenance information for datasets, including
+    producer details, citations, URLs, publication dates, and licensing. This is
+    the modern replacement for the legacy `Source` class.
+
+    Attributes:
+        producer: Name of the institution or author(s) that produced the data
+            (e.g., "World Bank", "United Nations").
+        title: Title of the original data product.
+        description: Description of the data product and its methodology.
+        title_snapshot: Title of the specific data subset extracted from the product.
+            Only use if different from `title`.
+        description_snapshot: Description of the snapshot subset. Use when the
+            snapshot differs from the full data product.
+        citation_full: Complete citation for the data product in academic format.
+        attribution: Name to use for attribution (e.g., "V-Dem Institute" instead
+            of individual authors). Defaults to `producer` if not provided.
+        attribution_short: Short form of attribution for space-constrained contexts.
+        version_producer: Version number or identifier from the data producer
+            (e.g., "v12", "2023.1").
+        url_main: Authoritative URL for the dataset's main page.
+        url_download: Direct URL to download the dataset.
+        date_accessed: ISO-format date when the dataset was accessed (YYYY-MM-DD).
+        date_published: Publication date (YYYY-MM-DD), year (YYYY), or "latest"
+            for continuously updated datasets.
+        license: License information for the data product.
+
+    Example:
+        ```python
+        from owid.catalog import Origin, License
+
+        # Comprehensive origin metadata
+        origin = Origin(
+            producer="World Bank",
+            title="World Development Indicators",
+            description="Annual indicators of development",
+            attribution_short="World Bank",
+            version_producer="2024",
+            url_main="https://datatopics.worldbank.org/world-development-indicators/",
+            url_download="https://databank.worldbank.org/data/download/WDI_CSV.zip",
+            date_accessed="2024-01-15",
+            date_published="2024",
+            license=License(
+                name="CC BY 4.0",
+                url="https://creativecommons.org/licenses/by/4.0/"
+            )
+        )
+
+        # Minimal origin (only required fields)
+        origin_minimal = Origin(
+            producer="UN",
+            title="Population Data"
+        )
+        ```
+
+    Raises:
+        ValueError: If `date_published` is not a valid year, date, or "latest".
+    """
+
     # Producer name
     # Name of the institution or the author(s) that produced the data product.
     producer: str
@@ -151,6 +400,11 @@ class Origin(MetaBase):
     license: License | None = None
 
     def __post_init__(self):
+        """Validate and normalize date_published field.
+
+        Raises:
+            ValueError: If date_published is not a valid year, date, or "latest".
+        """
         if self.date_published:
             # convert date or int to string
             if isinstance(self.date_published, (dt.date, int)):
