@@ -12,9 +12,10 @@ from typing import Any, Literal, cast, overload
 
 import pandas as pd
 import structlog
-from owid.grapher import Chart
 from pandas._typing import Scalar
 from pandas.core.series import Series
+
+from owid.grapher import Chart
 
 from . import processing_log as pl
 from . import warnings

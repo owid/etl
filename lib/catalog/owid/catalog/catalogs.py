@@ -772,19 +772,21 @@ def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
             # Fallback if parsing fails
             channel, namespace, version, dataset, table = "", "", "", "", ""
 
-        rows.append({
-            "indicator_title": r.get("title"),
-            "indicator": indicator,
-            "score": r.get("score"),
-            "table": table,
-            "namespace": namespace,
-            "version": version,
-            "dataset": dataset,
-            "channel": channel,
-            "path": path_part,
-            "format": "parquet",
-            "is_public": True,
-        })
+        rows.append(
+            {
+                "indicator_title": r.get("title"),
+                "indicator": indicator,
+                "score": r.get("score"),
+                "table": table,
+                "namespace": namespace,
+                "version": version,
+                "dataset": dataset,
+                "channel": channel,
+                "path": path_part,
+                "format": "parquet",
+                "is_public": True,
+            }
+        )
 
     frame = CatalogFrame(rows)
     frame._base_uri = OWID_CATALOG_URI
