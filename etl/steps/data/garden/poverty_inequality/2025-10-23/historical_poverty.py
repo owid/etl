@@ -1187,7 +1187,7 @@ def prepare_pip_data(tb_pip: Table, tb_thousand_bins: Table) -> Table:
     ]
 
     # As Argentina is only available in PIP as "Argentina (urban)", rename it to "Argentina" to match with thousand_bins
-    tb_pip["country"] = tb_pip["country"].replace({"Argentina (urban)": "Argentina"})
+    tb_pip["country"] = tb_pip["country"].cat.rename_categories({"Argentina (urban)": "Argentina"})
 
     missing_in_thousand_bins, missing_in_pip = compare_countries_available_in_two_tables(
         tb_1=tb_thousand_bins, tb_2=tb_pip, name_tb_1="thousand_bins", name_tb_2="pip"
@@ -2075,7 +2075,9 @@ def interpolate_quantiles_in_thousand_bins(
         tb_expanded["avg"] = safe_log(tb_expanded["avg"])
 
     # Make table wide
-    tb_expanded = tb_expanded.pivot_table(index=["country", "year"], columns="quantile", values="avg").reset_index()
+    tb_expanded = tb_expanded.pivot_table(
+        index=["country", "year"], columns="quantile", values="avg", observed=True
+    ).reset_index()
 
     # Interpolate missing values across quantiles for each country-year
     tb_expanded = interpolate_table(
