@@ -45,58 +45,129 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  historical_poverty:
+  constant_inequality:
     variables:
       headcount_ratio:
-        title: Share below $<<poverty_line>> a day
+        title: Share below $<<poverty_line>> a day (constant inequality)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
       headcount:
-        title: Number below $<<poverty_line>> a day
+        title: Number below $<<poverty_line>> a day (constant inequality)
         unit: "people"
         short_unit: "people"
         display:
           numDecimalPlaces: 0
 
       headcount_ratio_above:
-        title: Share above $<<poverty_line>> a day
+        title: Share above $<<poverty_line>> a day (constant inequality)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
       headcount_above:
-        title: Number above $<<poverty_line>> a day
+        title: Number above $<<poverty_line>> a day (constant inequality)
         unit: "people"
         short_unit: "people"
         display:
           numDecimalPlaces: 0
 
       headcount_ratio_between:
-        title: Share between {definitions.poverty_line_between} a day
+        title: Share between {definitions.poverty_line_between} a day (constant inequality)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
       headcount_between:
-        title: Number between {definitions.poverty_line_between} a day
+        title: Number between {definitions.poverty_line_between} a day (constant inequality)
         unit: "people"
         short_unit: "people"
         display:
           numDecimalPlaces: 0
 
-      headcount_ratio_omm:
-        title: Share below $<<poverty_line>> a day (OMM)
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark) (constant inequality)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark) (constant inequality)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
 
-  population:
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark) (constant inequality)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark) (constant inequality)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark) (constant inequality)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark) (constant inequality)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average) (constant inequality)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average) (constant inequality)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average) (constant inequality)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average) (constant inequality)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average) (constant inequality)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average) (constant inequality)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+  population_constant_inequality:
     variables:
       population:
-        title: Population
+        title: Population (constant inequality)
         unit: "people"
         short_unit: "people"
         display:
@@ -110,15 +181,372 @@ tables:
           numDecimalPlaces: 0
 
       population_diff:
-        title: Population difference
+        title: Population difference (constant inequality)
         unit: "people"
         short_unit: "people"
         display:
           numDecimalPlaces: 0
 
       population_diff_pct:
-        title: Population difference (%)
+        title: Population difference (%) (constant inequality)
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+
+      population_share_of_omm:
+        title: Population as a share of OMM population (constant inequality)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+
+  interpolated_quantiles:
+    variables:
+      headcount_ratio:
+        title: Share below $<<poverty_line>> a day (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount:
+        title: Number below $<<poverty_line>> a day (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above:
+        title: Share above $<<poverty_line>> a day (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above:
+        title: Number above $<<poverty_line>> a day (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between:
+        title: Share between {definitions.poverty_line_between} a day (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between:
+        title: Number between {definitions.poverty_line_between} a day (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark) (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark) (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark) (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average) (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average) (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average) (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+  population_interpolated_quantiles:
+    variables:
+      population:
+        title: Population (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_omm:
+        title: Population (OMM)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff:
+        title: Population difference (interpolated quantiles)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff_pct:
+        title: Population difference (%) (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      population_share_of_omm:
+        title: Population as a share of OMM population (interpolated quantiles)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+
+  interpolated_ginis:
+    variables:
+      headcount_ratio:
+        title: Share below $<<poverty_line>> a day (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount:
+        title: Number below $<<poverty_line>> a day (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above:
+        title: Share above $<<poverty_line>> a day (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above:
+        title: Number above $<<poverty_line>> a day (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between:
+        title: Share between {definitions.poverty_line_between} a day (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between:
+        title: Number between {definitions.poverty_line_between} a day (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark) (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark) (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark) (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average) (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average) (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average) (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+  population_interpolated_ginis:
+    variables:
+      population:
+        title: Population (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_omm:
+        title: Population (OMM)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff:
+        title: Population difference (interpolated Ginis)
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff_pct:
+        title: Population difference (%) (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      population_share_of_omm:
+        title: Population as a share of OMM population (interpolated Ginis)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+
+  comparison:
+    variables:
+      diff_quantiles_vs_constant:
+        title: "Difference in headcount ratio: Quantiles interpolation vs. constant inequality"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      diff_ginis_vs_constant:
+        title: "Difference in headcount ratio: Ginis interpolation vs. constant inequality"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      diff_quantiles_vs_ginis:
+        title: "Difference in headcount ratio: Quantiles interpolation vs. Ginis interpolation"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+  gini_mean:
+    variables:
+      gini:
+        title: Gini coefficient
+        unit: ""
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+      mean:
+        title: Mean
+        unit: "international-$ in 2021 prices"
+        short_unit: "$"
+        display:
+          numDecimalPlaces: 2
