@@ -17,17 +17,14 @@ from etl.snapshot import Snapshot
 log = structlog.get_logger()
 
 
-def check_for_version_ambiguity(dataset_name: str) -> None:
-    """Check if there are multiple versions of the snapshot and fail if so.
-
-    This prevents accidentally overwriting an existing snapshot when multiple
-    versions exist for the same short_name.
+def _normalize_dataset_name(dataset_name: str) -> str:
+    """Normalize dataset name by removing prefixes and extensions.
 
     Args:
-        dataset_name: Dataset path in one of several formats
+        dataset_name: Dataset path in various formats
 
-    Raises:
-        click.ClickException: If multiple versions are found
+    Returns:
+        Normalized dataset name without prefixes or extensions
     """
     # Remove snapshot:// prefix if supplied by user
     dataset_name = dataset_name.removeprefix("snapshot://")
@@ -42,6 +39,23 @@ def check_for_version_ambiguity(dataset_name: str) -> None:
         dot_index = dataset_name.rfind(".")
         if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
             dataset_name = dataset_name[:dot_index]
+
+    return dataset_name
+
+
+def check_for_version_ambiguity(dataset_name: str) -> None:
+    """Check if there are multiple versions of the snapshot and fail if so.
+
+    This prevents accidentally overwriting an existing snapshot when multiple
+    versions exist for the same short_name.
+
+    Args:
+        dataset_name: Dataset path in one of several formats
+
+    Raises:
+        click.ClickException: If multiple versions are found
+    """
+    dataset_name = _normalize_dataset_name(dataset_name)
 
     # Count the number of path separators to determine the type of path
     path_parts = dataset_name.split("/")
@@ -106,7 +120,8 @@ def check_for_version_ambiguity(dataset_name: str) -> None:
 @click.argument("dataset_name", type=str, metavar="DATASET_PATH")
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", type=str, help="Path to local data file (for manual upload scenarios)")
-def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
+@click.option("--dry-run", is_flag=True, help="Preview what would happen without creating/uploading the snapshot")
+def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str], dry_run: bool) -> None:
     """Create snapshot from a snapshot script or .dvc file.
 
     DATASET_PATH can be provided in several formats:
@@ -137,6 +152,9 @@ def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str] = 
 
         etl snapshot dataset_name --skip-upload
         etls dataset_name --skip-upload
+
+        etl snapshot dataset_name --dry-run
+        etls dataset_name --dry-run
     """
     # Check for version ambiguity before proceeding
     check_for_version_ambiguity(dataset_name)
@@ -144,12 +162,71 @@ def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str] = 
     # Find the snapshot script
     script_path = find_snapshot_script(dataset_name)
 
+    if dry_run:
+        # Dry run mode - just show what would happen
+        if script_path and script_path.exists():
+            log.info("DRY RUN: Would execute snapshot script", script_path=script_path.relative_to(paths.SNAPSHOTS_DIR))
+        else:
+            # Find the .dvc file to show what would be created
+            dataset_name_normalized = _normalize_dataset_name(dataset_name)
+            dvc_files = _find_files_by_pattern(dataset_name_normalized, ".*.dvc")
+
+            if len(dvc_files) == 0:
+                raise click.ClickException(f"No .dvc file found for '{dataset_name}'")
+            elif len(dvc_files) > 1:
+                log.info(f"DRY RUN: Multiple .dvc files found matching '{dataset_name}':")
+                for path in sorted(dvc_files):
+                    relative_path = path.relative_to(paths.SNAPSHOTS_DIR)
+                    log.info(f"  {relative_path.with_suffix('')}")
+                raise click.ClickException("Please specify a more specific path to disambiguate.")
+
+            dvc_file = dvc_files[0]
+            log.info("DRY RUN: Would create snapshot from .dvc file", dvc_file=dvc_file.relative_to(paths.SNAPSHOTS_DIR))
+
+        log.info("DRY RUN: Upload enabled" if upload else "DRY RUN: Upload disabled (--skip-upload)")
+        if path_to_file:
+            log.info("DRY RUN: Would use local file", path=path_to_file)
+        return
+
     if script_path and script_path.exists():
         # Run the Python script
         run_snapshot_script(script_path, upload=upload, path_to_file=path_to_file)
     else:
         # Only .dvc file exists, run snap.create_snapshot directly
         run_snapshot_dvc_only(dataset_name, upload=upload, path_to_file=path_to_file)
+
+
+def _find_files_by_pattern(dataset_name: str, extension: str) -> list[Path]:
+    """Find files matching a dataset name pattern with given extension.
+
+    Args:
+        dataset_name: Normalized dataset path (no prefixes/extensions)
+        extension: File extension to search for (e.g., '.py', '.*.dvc')
+
+    Returns:
+        List of matching file paths
+    """
+    path_parts = dataset_name.split("/")
+
+    if len(path_parts) == 3:
+        # Full path: namespace/version/short_name
+        file_path = paths.SNAPSHOTS_DIR / f"{dataset_name}{extension}"
+        return [file_path] if file_path.exists() else []
+
+    elif len(path_parts) == 2:
+        # Partial path: version/short_name
+        version, filename = path_parts
+        pattern = f"*/{version}/{filename}{extension}"
+        return list(paths.SNAPSHOTS_DIR.glob(pattern))
+
+    elif len(path_parts) == 1:
+        # Short name only
+        filename = path_parts[0]
+        pattern = f"**/{filename}{extension}"
+        return list(paths.SNAPSHOTS_DIR.glob(pattern))
+
+    else:
+        raise click.ClickException(f"Invalid dataset path format: {dataset_name}")
 
 
 def find_snapshot_script(dataset_name: str) -> Optional[Path]:
@@ -165,50 +242,13 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
     Returns:
         Path to the .py script file, or None if not found
     """
-    # Remove snapshot:// prefix if supplied by user
-    dataset_name = dataset_name.removeprefix("snapshot://")
-
     # Handle full file path with snapshots/ prefix and .py extension
     if dataset_name.startswith("snapshots/") and dataset_name.endswith(".py"):
         script_path = Path(dataset_name)
-        if script_path.exists():
-            return script_path
-        else:
-            return None
-
-    # Remove snapshots/ prefix if present (for paths like snapshots/namespace/version/name)
-    dataset_name = dataset_name.removeprefix("snapshots/")
-
-    # Remove any file extension if present (e.g., .py, .csv, .xlsx)
-    if "." in dataset_name:
-        # Find the last dot and check if it's likely a file extension
-        dot_index = dataset_name.rfind(".")
-        if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
-            dataset_name = dataset_name[:dot_index]
-
-    # Count the number of path separators to determine the type of path
-    path_parts = dataset_name.split("/")
-
-    if len(path_parts) == 3:
-        # Full path: namespace/version/short_name
-        script_path = paths.SNAPSHOTS_DIR / f"{dataset_name}.py"
         return script_path if script_path.exists() else None
 
-    elif len(path_parts) == 2:
-        # Partial path: version/short_name - search for matching namespace
-        version, filename = path_parts
-        pattern = f"*/{version}/{filename}.py"
-        script_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
-
-    elif len(path_parts) == 1:
-        # Short name only - search in all directories
-        filename = path_parts[0]
-        pattern = f"**/{filename}.py"
-        script_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
-
-    else:
-        # Invalid path format
-        raise click.ClickException(f"Invalid dataset path format: {dataset_name}")
+    dataset_name = _normalize_dataset_name(dataset_name)
+    script_files = _find_files_by_pattern(dataset_name, ".py")
 
     # Handle multiple or no matches for partial paths
     if len(script_files) == 0:
@@ -304,83 +344,24 @@ def _call_snapshot_function(
 
 def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
     """Run snapshot creation when only .dvc file exists."""
-    # Handle full file path with snapshots/ prefix
-    if dataset_name.startswith("snapshots/"):
-        # Remove snapshots/ prefix
-        dataset_name = dataset_name[10:]  # len("snapshots/") = 10
+    dataset_name = _normalize_dataset_name(dataset_name)
+    dvc_files = _find_files_by_pattern(dataset_name, ".*.dvc")
 
-    # Remove any file extension if present (from failed script search)
-    if "." in dataset_name:
-        # Find the last dot and check if it's likely a file extension
-        dot_index = dataset_name.rfind(".")
-        if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
-            dataset_name = dataset_name[:dot_index]
+    if len(dvc_files) == 0:
+        raise click.ClickException(f"No .dvc file found for '{dataset_name}'")
+    elif len(dvc_files) > 1:
+        log.info(f"Multiple .dvc files found matching '{dataset_name}':")
+        for path in sorted(dvc_files):
+            relative_path = path.relative_to(paths.SNAPSHOTS_DIR)
+            log.info(f"  {relative_path.with_suffix('')}")  # Remove .dvc extension
+        raise click.ClickException("Please specify the full filename with extension to disambiguate.")
 
-    # Convert partial path to full URI by finding the .dvc file
-    path_parts = dataset_name.split("/")
+    # Convert to snapshot URI
+    dvc_file = dvc_files[0]
+    relative_path = dvc_file.relative_to(paths.SNAPSHOTS_DIR)
+    snapshot_uri = str(relative_path.with_suffix(""))  # Remove .dvc extension
 
-    if len(path_parts) == 3:
-        # Full path: namespace/version/filename - but need to find the actual .dvc file
-        namespace, version, filename = path_parts
-        pattern = f"{namespace}/{version}/{filename}.*.dvc"
-        dvc_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
-
-        if len(dvc_files) == 0:
-            raise click.ClickException(f"No .dvc file found matching pattern '{filename}.*' in {namespace}/{version}")
-        elif len(dvc_files) > 1:
-            log.info(f"Multiple .dvc files found matching '{dataset_name}':")
-            for path in sorted(dvc_files):
-                relative_path = path.relative_to(paths.SNAPSHOTS_DIR)
-                log.info(f"  {relative_path.with_suffix('')}")  # Remove .dvc extension
-            raise click.ClickException("Please specify the full filename with extension to disambiguate.")
-
-        # Convert to snapshot URI
-        dvc_file = dvc_files[0]
-        relative_path = dvc_file.relative_to(paths.SNAPSHOTS_DIR)
-        snapshot_uri = str(relative_path.with_suffix(""))  # Remove .dvc extension
-    elif len(path_parts) == 2:
-        # Partial path: version/filename - search for matching .dvc file
-        version, filename = path_parts
-        pattern = f"*/{version}/{filename}.*.dvc"
-        dvc_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
-
-        if len(dvc_files) == 0:
-            raise click.ClickException(f"No .dvc file found matching pattern '{filename}.*' in version '{version}'")
-        elif len(dvc_files) > 1:
-            log.info(f"Multiple .dvc files found matching '{dataset_name}':")
-            for path in sorted(dvc_files):
-                relative_path = path.relative_to(paths.SNAPSHOTS_DIR)
-                log.info(f"  {relative_path.with_suffix('')}")  # Remove .dvc extension
-            raise click.ClickException("Please specify a more specific path to disambiguate.")
-
-        # Convert to snapshot URI
-        dvc_file = dvc_files[0]
-        relative_path = dvc_file.relative_to(paths.SNAPSHOTS_DIR)
-        snapshot_uri = str(relative_path.with_suffix(""))  # Remove .dvc extension
-
-    elif len(path_parts) == 1:
-        # Just filename - search in all directories
-        filename = path_parts[0]
-        pattern = f"**/{filename}.*.dvc"
-        dvc_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
-
-        if len(dvc_files) == 0:
-            raise click.ClickException(f"No .dvc file found matching pattern '{filename}.*'")
-        elif len(dvc_files) > 1:
-            log.info(f"Multiple .dvc files found matching '{dataset_name}':")
-            for path in sorted(dvc_files):
-                relative_path = path.relative_to(paths.SNAPSHOTS_DIR)
-                log.info(f"  {relative_path.with_suffix('')}")  # Remove .dvc extension
-            raise click.ClickException("Please specify a more specific path to disambiguate.")
-
-        # Convert to snapshot URI
-        dvc_file = dvc_files[0]
-        relative_path = dvc_file.relative_to(paths.SNAPSHOTS_DIR)
-        snapshot_uri = str(relative_path.with_suffix(""))  # Remove .dvc extension
-    else:
-        raise click.ClickException(f"Invalid dataset path format: {dataset_name}")
-
-    # Create snapshot object - this will find the .dvc file
+    # Create snapshot object
     try:
         snap = Snapshot(snapshot_uri)
     except FileNotFoundError:
