@@ -20,7 +20,7 @@ from typing import Set, Tuple
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Table, warnings
 from scipy import stats
 from structlog import get_logger
 
@@ -230,9 +230,10 @@ def run() -> None:
     tb_thousand_bins_constant_inequality = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     # Calculate poverty measures
-    tb_constant_inequality = calculate_poverty_measures(
-        tb=tb_thousand_bins_constant_inequality, maddison_world_years=maddison_world_years
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_constant_inequality = calculate_poverty_measures(
+            tb=tb_thousand_bins_constant_inequality, maddison_world_years=maddison_world_years
+        )
 
     # Create stacked variables for stacked area/bar charts
     tb_constant_inequality = create_stacked_variables(tb=tb_constant_inequality)
@@ -256,7 +257,8 @@ def run() -> None:
     tb_gini_mean = add_ginis_from_van_zanden(tb_pip=tb_pip, tb_van_zanden=tb_van_zanden)
 
     # Prepare mean and gini data for extrapolation
-    tb_gini_mean = prepare_mean_gini_data(tb=tb_gini_mean, tb_gdp=tb_gdp)
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_gini_mean = prepare_mean_gini_data(tb=tb_gini_mean, tb_gdp=tb_gdp)
 
     ###############################################################################
     # 2.1 INTERPOLATING QUANTILES BETWEEN YEARS WITH GINIS
@@ -272,9 +274,10 @@ def run() -> None:
     )
 
     # Calculate poverty measures
-    tb_interpolated_quantiles = calculate_poverty_measures(
-        tb=tb_thousand_bins_interpolated_quantiles, maddison_world_years=maddison_world_years
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_interpolated_quantiles = calculate_poverty_measures(
+            tb=tb_thousand_bins_interpolated_quantiles, maddison_world_years=maddison_world_years
+        )
 
     # Create stacked variables for stacked area/bar charts
     tb_interpolated_quantiles = create_stacked_variables(tb=tb_interpolated_quantiles)
@@ -303,9 +306,10 @@ def run() -> None:
     )
 
     # Calculate poverty measures
-    tb_interpolated_ginis = calculate_poverty_measures(
-        tb=tb_thousand_bins_interpolated_ginis, maddison_world_years=maddison_world_years
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_interpolated_ginis = calculate_poverty_measures(
+            tb=tb_thousand_bins_interpolated_ginis, maddison_world_years=maddison_world_years
+        )
 
     # Create stacked variables for stacked area/bar charts
     tb_interpolated_ginis = create_stacked_variables(tb=tb_interpolated_ginis)
@@ -1167,7 +1171,6 @@ def prepare_pip_data(tb_pip: Table, tb_thousand_bins: Table) -> Table:
     Prepare World Bank PIP data to use it in extrapolations.
     Here we extract Ginis (survey-based) and means (survey-based and filled) from the latest PIP dataset
     """
-
     tb_pip = tb_pip.copy()
     tb_thousand_bins = tb_thousand_bins.copy()
 
@@ -1436,12 +1439,6 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
     # Generate gini column using priority: survey > filled > van_zanden
     tb_gini_mean[["gini", "gini_origin"]] = tb_gini_mean.apply(select_gini, axis=1)
     tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
-
-    # # Copy metadata from original columns
-    # tb_gini_mean["mean"] = tb_gini_mean["mean"].copy_metadata(tb["mean_filled"] + tb["mean_survey"])
-    # tb_gini_mean["gini"] = tb_gini_mean["gini"].copy_metadata(
-    #     tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]
-    # )
 
     # Keep only relevant columns
     tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
@@ -1910,6 +1907,9 @@ def expand_means_and_ginis_to_thousand_bins(
         on="country",
         how="left",
     )
+
+    # Copy origins from mean and gini columns
+    tb_expanded["avg"].m.origins = (tb_gini_mean[mean_column] + tb_gini_mean[gini_column]).m.origins
 
     # Assert that categorical dtypes are preserved after merge (critical for memory efficiency)
     assert isinstance(
