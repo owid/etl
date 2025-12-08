@@ -26,6 +26,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "typing-extensions>=4.7.1",
     "rdata>=0.11.2",
+    "owid-grapher-py>=0.2.2",
 ]
 classifiers = [
   # How mature is this project? Common values are
@@ -53,12 +54,14 @@ dev-dependencies = [
     "argh>=0.26.2",
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff==0.8.6"
+    "ruff==0.8.6",
+    "ipykernel>=6.29.0",
 ]
 
 [tool.uv.sources]
 owid-datautils = { path = "../datautils", editable = true }
 owid-repack = { path = "../repack", editable = true }
+owid-grapher-py = { path = "../../owid-grapher-py", editable = true }
 
 [tool.ruff]
 extend = "../../pyproject.toml"
