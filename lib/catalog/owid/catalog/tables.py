@@ -1675,7 +1675,7 @@ class Table(pd.DataFrame):
         """
         return super().filter(*args, **kwargs)  # type: ignore
 
-    def plot(
+    def plot_(
         self,
         y: str | None = None,
         x: str | None = None,
@@ -1692,6 +1692,9 @@ class Table(pd.DataFrame):
 
         Smart plotting that auto-detects country/year columns and sets them as index.
         If both x and y are specified, creates a scatter plot by default.
+
+        Note: This method is named `plot_` (with underscore) to avoid conflicting with
+        pandas DataFrame's `.plot` accessor. Use `tb.plot_(...)` instead of `tb.plot(...)`.
 
         Args:
             y: Column name to plot on y-axis. Required if table has multiple data columns.
@@ -1714,17 +1717,17 @@ class Table(pd.DataFrame):
             Auto-detect and plot single data column:
             ```python
             tb = Table({"country": ["USA", "UK"], "year": [2020, 2020], "gdp": [21, 2.8]})
-            tb.plot()  # Auto-detects country/year as index, plots gdp
+            tb.plot_()  # Auto-detects country/year as index, plots gdp
             ```
 
             Specify column to plot:
             ```python
-            tb.plot(y="gdp")
+            tb.plot_(y="gdp")
             ```
 
             Scatter plot with explicit x and y:
             ```python
-            tb.plot(x="gdp", y="population")  # Creates scatter plot
+            tb.plot_(x="gdp", y="population")  # Creates scatter plot
             ```
         """
         # Common entity and time column names
@@ -1784,7 +1787,8 @@ class Table(pd.DataFrame):
             # For scatter, use x as specified or raise error
             if x is None:
                 raise ValueError("Scatter plot requires both x and y columns. Please specify x='column_name'")
-            x_col = x
+            # y is guaranteed to be set by this point (see logic above)
+            assert y is not None
 
             # For scatter plots, we need to handle this differently
             # since both x and y are data columns, not index
@@ -1847,15 +1851,25 @@ class Table(pd.DataFrame):
         Internal method for scatter plot creation.
         """
         if backend == "matplotlib":
-            return self.reset_index().plot.scatter(x=x, y=y, title=title, **kwargs)
+            import matplotlib.pyplot as plt
+
+            df = self.reset_index()
+            ax = kwargs.pop("ax", None)
+            if ax is None:
+                _, ax = plt.subplots()
+            ax.scatter(df[x], df[y], **kwargs)
+            ax.set_xlabel(x)
+            ax.set_ylabel(y)
+            if title:
+                ax.set_title(title)
+            return ax
 
         # OWID backend
         try:
             from owid.grapher import Chart
         except ImportError:
             raise ImportError(
-                "owid-grapher-py is required for interactive plotting. "
-                "Install with: pip install owid-grapher-py"
+                "owid-grapher-py is required for interactive plotting. " "Install with: pip install owid-grapher-py"
             )
 
         # Reset index to get all columns
