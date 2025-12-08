@@ -181,7 +181,9 @@ def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str], d
                 raise click.ClickException("Please specify a more specific path to disambiguate.")
 
             dvc_file = dvc_files[0]
-            log.info("DRY RUN: Would create snapshot from .dvc file", dvc_file=dvc_file.relative_to(paths.SNAPSHOTS_DIR))
+            log.info(
+                "DRY RUN: Would create snapshot from .dvc file", dvc_file=dvc_file.relative_to(paths.SNAPSHOTS_DIR)
+            )
 
         log.info("DRY RUN: Upload enabled" if upload else "DRY RUN: Upload disabled (--skip-upload)")
         if path_to_file:
