@@ -293,6 +293,15 @@ def run() -> None:
         tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
     )
 
+    # Create another 1000 bins table, but this time creating the whole series from the mean and interpolated gini
+    tb_thousand_bins_interpolated_ginis_all_lognormal = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean,
+        tb_thousand_bins=tb_thousand_bins,
+        mean_column="mean",
+        gini_column="gini",
+        keep_original_thousand_bins=False,
+    )
+
     # Calculate poverty measures
     tb_interpolated_ginis = calculate_poverty_measures(
         tb=tb_thousand_bins_interpolated_ginis, maddison_world_years=maddison_world_years
@@ -357,8 +366,17 @@ def run() -> None:
         tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.drop_duplicates(
             subset=["country", "year", "region", "region_old", "quantile"]
         )
+        tb_thousand_bins_interpolated_ginis_all_lognormal = (
+            tb_thousand_bins_interpolated_ginis_all_lognormal.drop_duplicates(
+                subset=["country", "year", "region", "region_old", "quantile"]
+            )
+        )
     tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
         ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
+    )
+    tb_thousand_bins_interpolated_ginis_all_lognormal = tb_thousand_bins_interpolated_ginis_all_lognormal.format(
+        ["country", "year", "region", "region_old", "quantile"],
+        short_name="thousand_bins_interpolated_ginis_all_lognormal",
     )
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
@@ -384,6 +402,7 @@ def run() -> None:
             # tb_thousand_bins_constant_inequality,
             # tb_thousand_bins_interpolated_quantiles,
             tb_thousand_bins_interpolated_ginis,
+            tb_thousand_bins_interpolated_ginis_all_lognormal,
             tb_gini_mean,
         ],
         default_metadata=ds_thousand_bins.metadata,
@@ -1729,7 +1748,11 @@ def select_growth_factor_for_mean(row):
 
 
 def expand_means_and_ginis_to_thousand_bins(
-    tb_gini_mean: Table, tb_thousand_bins: Table, mean_column: str, gini_column: str
+    tb_gini_mean: Table,
+    tb_thousand_bins: Table,
+    mean_column: str,
+    gini_column: str,
+    keep_original_thousand_bins: bool = KEEP_ORIGINAL_THOUSAND_BINS,
 ) -> Table:
     """
     Expand mean and Gini data to a 1000-binned income distribution table.
@@ -1748,7 +1771,7 @@ def expand_means_and_ginis_to_thousand_bins(
     tb_gini_mean["country"] = tb_gini_mean["country"].astype("category")
     tb_gini_mean["region"] = tb_gini_mean["region"].astype("category")
 
-    if KEEP_ORIGINAL_THOUSAND_BINS:
+    if keep_original_thousand_bins:
         # Filter tb_gini_mean to only country-years not in tb_thousand_bins using vectorized merge
         existing = tb_thousand_bins[["country", "year"]].drop_duplicates()
         existing["_exists"] = True
@@ -1904,7 +1927,7 @@ def expand_means_and_ginis_to_thousand_bins(
     tb_expanded = tb_expanded.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
 
     # Concatenate with original thousand_bins
-    if KEEP_ORIGINAL_THOUSAND_BINS:
+    if keep_original_thousand_bins:
         # Only concatenate if we're keeping original data (tb_expanded has only new country-years)
         # Use sort=False since both tables are already sorted - this makes concat much faster
         tb_thousand_bins_from_mean_gini = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True, sort=False)
