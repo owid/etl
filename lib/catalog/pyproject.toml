@@ -42,9 +42,8 @@ dev-dependencies = [
 ]
 
 [tool.uv.sources]
-owid-datautils = { workspace = true }
-owid-repack = { workspace = true }
-owid-grapher-py = {workspace = true}
+owid-datautils = { path = "../datautils", editable = true }
+owid-repack = { path = "../repack", editable = true }
 
 [tool.ruff]
 extend = "../../pyproject.toml"
