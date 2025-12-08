@@ -615,14 +615,14 @@ class Variable(pd.Series):
 
         if entity is None:
             # Look for common entity column names
-            for col in ["country", "entity", "location", "region"]:
+            for col in ["country", "entity", "entities", "location", "region"]:
                 if col in index_names or col in df.columns:
                     entity = col
                     break
 
         if x is None:
             # Look for common time column names
-            for col in ["year", "date", "time"]:
+            for col in ["year", "years", "date", "time"]:
                 if col in index_names or col in df.columns:
                     x = col
                     break
