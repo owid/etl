@@ -10,12 +10,22 @@ status: new
 #   - toc  # Remove this line to show table of contents
 ---
 
+!!! warning "Unofficial Demo - Review with Caution"
+    **This page was generated with assistance from Large Language Models (LLMs) and should be reviewed with caution.** It is not an official resource and was initially drafted as an internal reference to showcase a subset of Zensical's capabilities within our ETL documentation context.
+
+    **For authoritative and up-to-date information, please refer to the official [Zensical documentation](https://zensical.org/docs/get-started/).** The official docs provide comprehensive guidance on all features, best practices, and the latest updates to this modern static site generator.
+
 # Demo Page - Zensical Features Showcase
 
-This page demonstrates the powerful authoring capabilities available in Zensical, built on Material for MkDocs. You'll find examples of rich formatting, interactive elements, and technical documentation features.
+This page demonstrates the powerful authoring capabilities available in Zensical, a modern static site generator. You'll find examples of rich formatting, interactive elements, and technical documentation features.
 
 !!! tip "Navigation Note"
-    This page has the table of contents (TOC) hidden via front matter. Remove `hide: - toc` from the YAML header to restore it.
+    This page has the table of contents (TOC) hidden via front matter. Remove the following line from the YAML header to restore it.
+
+    ```markdown
+    hide:
+      - toc
+    ```
 
 ## Links and References
 
@@ -25,13 +35,13 @@ You can create [internal links](../index.md) to other pages or [external links](
 
 ### Links with Tooltips
 
-Material for MkDocs supports [hoverable tooltips](https://squidfunk.github.io/mkdocs-material/reference/tooltips/ "Click to learn more about tooltips!") using the title attribute.
+Zensical supports [hoverable tooltips](https://zensical.org "Click to learn more about Zensical!") using the title attribute.
 
-You can also use abbreviations for inline tooltips. Hover over ETL below:
+You can also use abbreviations for inline tooltips. Hover over the abbreviation below:
 
-The ETL pipeline processes data through multiple stages.
+The API endpoint processes requests through multiple stages.
 
-*[ETL]: Extract, Transform, Load - Our data processing pipeline
+*[API]: Application Programming Interface - A way for applications to communicate
 
 ### Links with preview
 Check out [our API](../api/index.md){ data-preview }.
@@ -126,71 +136,70 @@ You can create styled buttons for calls to action:
 ### Basic Syntax Highlighting
 
 ```python
-def process_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Process and clean the input dataframe."""
+def process_data(data: list) -> list:
+    """Process and clean the input data."""
     # Remove duplicates
-    df = df.drop_duplicates()
+    data = list(set(data))
 
     # Filter invalid values
-    df = df[df["value"] > 0]
+    data = [x for x in data if x > 0]
 
-    return df
+    return sorted(data)
 ```
 
 ### With Title and Line Numbers
 
-```python title="etl_pipeline.py" linenums="1"
-from etl.helpers import PathFinder
-from etl.data_helpers import geo
+```python title="data_processor.py" linenums="1"
+from typing import Dict, Any
+import json
 
-paths = PathFinder(__file__)
+def load_config(config_path: str) -> Dict[str, Any]:
+    """Load configuration from JSON file."""
+    with open(config_path, 'r') as f:
+        return json.load(f)
 
-def run() -> None:
-    # Load input dataset
-    ds_input = paths.load_dataset("input_dataset")
-    tb = ds_input["table_name"].reset_index()
+def process_records(records: list, config: Dict[str, Any]) -> list:
+    """Process records according to configuration."""
+    # Filter records
+    filtered = [r for r in records if r.get('active', True)]
 
-    # Harmonize country names
-    tb = geo.harmonize_countries(
-        tb,
-        countries_file=paths.country_mapping_path
-    )
+    # Transform according to config
+    transformed = [transform_record(r, config) for r in filtered]
 
-    # Format and save
-    tb = tb.format(short_name=paths.short_name)
-    ds_garden = paths.create_dataset(tables=[tb])
-    ds_garden.save()
+    return transformed
 ```
 
 ### With Highlighted Lines
 
 ```python hl_lines="2 3 5-7" linenums="1"
-import pandas as pd
-from etl.snapshot import Snapshot
-from owid.catalog import Table
+import json
+from pathlib import Path
+from datetime import datetime
 
-# Load snapshot data
-snap = Snapshot("who/latest/health_data.csv")
-df = snap.read_csv()
+# Load data file
+data_path = Path("data/records.json")
+with open(data_path, 'r') as f:
+    records = json.load(f)
 
-# Convert to catalog table
-tb = Table(df)
+# Process records
+processed = [process(r) for r in records]
 ```
 
 ### With Annotations
 
 ```python
-def harmonize_countries(tb: Table) -> Table:
-    """Standardize country names."""
-    tb = geo.harmonize_countries(  # (1)!
-        tb,
-        countries_file=paths.country_mapping_path  # (2)!
-    )
-    return tb
+def validate_config(config: dict) -> bool:
+    """Validate configuration structure."""
+    required_keys = {'name', 'version', 'settings'}  # (1)!
+
+    if not all(key in config for key in required_keys):  # (2)!
+        return False
+
+    return True
 ```
 
-1. The `geo.harmonize_countries()` function standardizes country names to OWID format.
-2. The mapping file contains manual overrides for ambiguous country names.
+1. Define the required configuration keys that must be present.
+2. Check that all required keys exist in the configuration dictionary.
 
 ### Multiple Languages
 
@@ -220,11 +229,11 @@ def harmonize_countries(tb: Table) -> Table:
 === "Bash"
 
     ```bash
-    # Run ETL pipeline
-    .venv/bin/etl run data://garden/who/2024/health_data
+    # Build documentation
+    make docs.build
 
-    # With force flag
-    .venv/bin/etl run --force data://garden/who/2024/health_data
+    # Serve locally
+    make docs.serve
     ```
 
 ## Mermaid Diagrams
@@ -233,10 +242,10 @@ def harmonize_countries(tb: Table) -> Table:
 
 ```mermaid
 graph LR
-    A[Snapshot] -->|Raw Data| B[Meadow]
-    B -->|Cleaned| C[Garden]
-    C -->|Harmonized| D[Grapher]
-    D -->|Published| E[Visualization]
+    A[Input] -->|Raw Data| B[Processing]
+    B -->|Cleaned| C[Transform]
+    C -->|Validated| D[Storage]
+    D -->|Published| E[Output]
 
     style A fill:#f9f,stroke:#333
     style E fill:#9f9,stroke:#333
@@ -247,52 +256,52 @@ graph LR
 ```mermaid
 sequenceDiagram
     participant User
-    participant ETL
+    participant App
     participant Database
     participant API
 
-    User->>ETL: Request dataset update
-    ETL->>Database: Check current version
-    Database-->>ETL: Version info
-    ETL->>ETL: Process new data
-    ETL->>Database: Insert updated dataset
-    Database-->>ETL: Success
-    ETL->>API: Refresh cache
+    User->>App: Request data update
+    App->>Database: Check current version
+    Database-->>App: Version info
+    App->>App: Process new data
+    App->>Database: Store updated data
+    Database-->>App: Success
+    App->>API: Refresh cache
     API-->>User: Updated data available
 ```
 
-### Pipeline Architecture
+### System Architecture
 
 ```mermaid
 graph TB
     subgraph "Data Sources"
-        S1[WHO]
-        S2[World Bank]
-        S3[UN]
+        S1[API Source]
+        S2[File Upload]
+        S3[Database]
     end
 
-    subgraph "ETL Pipeline"
-        Snap[Snapshot Layer]
-        Mead[Meadow Layer]
-        Gard[Garden Layer]
-        Graf[Grapher Layer]
+    subgraph "Processing Pipeline"
+        Ingest[Data Ingestion]
+        Valid[Validation]
+        Trans[Transformation]
+        Store[Storage]
     end
 
-    subgraph "Output"
-        DB[(MySQL Database)]
+    subgraph "Output Layer"
+        DB[(Database)]
         API[REST API]
-        Charts[Interactive Charts]
+        UI[Web Interface]
     end
 
-    S1 --> Snap
-    S2 --> Snap
-    S3 --> Snap
-    Snap --> Mead
-    Mead --> Gard
-    Gard --> Graf
-    Graf --> DB
+    S1 --> Ingest
+    S2 --> Ingest
+    S3 --> Ingest
+    Ingest --> Valid
+    Valid --> Trans
+    Trans --> Store
+    Store --> DB
     DB --> API
-    DB --> Charts
+    DB --> UI
 ```
 
 ## Tabs
@@ -472,7 +481,7 @@ Dataset processing status:
 
 ## Icons
 
-Material for MkDocs includes thousands of icons:
+Zensical includes thousands of icons from multiple [icon sets](https://zensical.org/docs/authoring/icons-emojis/?h=icon). Some examples:
 
 - :material-database: Database operations
 - :material-chart-line: Data visualization
