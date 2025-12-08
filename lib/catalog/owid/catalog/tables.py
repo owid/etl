@@ -1675,6 +1675,225 @@ class Table(pd.DataFrame):
         """
         return super().filter(*args, **kwargs)  # type: ignore
 
+    def plot(
+        self,
+        y: str | None = None,
+        x: str | None = None,
+        kind: Literal["line", "bar", "scatter"] | None = None,
+        backend: Literal["owid", "matplotlib"] = "owid",
+        entity: str | None = None,
+        stacked: bool = False,
+        title: str | None = None,
+        max_entities: int = 10,
+        entities: list[str] | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Plot the table using OWID grapher or matplotlib.
+
+        Smart plotting that auto-detects country/year columns and sets them as index.
+        If both x and y are specified, creates a scatter plot by default.
+
+        Args:
+            y: Column name to plot on y-axis. Required if table has multiple data columns.
+            x: Column name for x-axis. If both x and y are specified, defaults to scatter plot.
+            kind: Type of plot ("line", "bar", "scatter"). If None, auto-detected based on
+                whether both x and y are specified (scatter) or not (line).
+            backend: Plotting backend ("owid" or "matplotlib"). Defaults to "owid".
+            entity: Column name for entity grouping. Auto-detected if not specified.
+            stacked: Whether to stack bars in bar charts. Defaults to False.
+            title: Chart title. Uses variable metadata if not specified.
+            max_entities: Maximum entities to show initially. Defaults to 10.
+            entities: Specific entities to show in the chart.
+            **kwargs: Additional arguments passed to the plotting backend.
+
+        Returns:
+            For OWID backend: owid.grapher.Chart object.
+            For matplotlib backend: matplotlib.axes.Axes object.
+
+        Example:
+            Auto-detect and plot single data column:
+            ```python
+            tb = Table({"country": ["USA", "UK"], "year": [2020, 2020], "gdp": [21, 2.8]})
+            tb.plot()  # Auto-detects country/year as index, plots gdp
+            ```
+
+            Specify column to plot:
+            ```python
+            tb.plot(y="gdp")
+            ```
+
+            Scatter plot with explicit x and y:
+            ```python
+            tb.plot(x="gdp", y="population")  # Creates scatter plot
+            ```
+        """
+        # Common entity and time column names
+        entity_cols = ["country", "entity", "entities", "location", "region"]
+        time_cols = ["year", "years", "date", "time"]
+
+        # Get all column names (including index)
+        all_cols = list(self.index.names) + list(self.columns)
+        all_cols = [c for c in all_cols if c is not None]
+
+        # Auto-detect entity column
+        detected_entity = None
+        for col in entity_cols:
+            if col in all_cols:
+                detected_entity = col
+                break
+
+        # Auto-detect time column
+        detected_time = None
+        for col in time_cols:
+            if col in all_cols:
+                detected_time = col
+                break
+
+        # Determine data columns (columns that are not entity or time)
+        index_like_cols = set()
+        if detected_entity:
+            index_like_cols.add(detected_entity)
+        if detected_time:
+            index_like_cols.add(detected_time)
+
+        data_cols = [c for c in self.columns if c not in index_like_cols]
+
+        # If both x and y are specified, use scatter plot by default
+        if x is not None and y is not None and kind is None:
+            kind = "scatter"
+
+        # Default to line plot
+        if kind is None:
+            kind = "line"
+
+        # Determine which column to plot
+        if y is None:
+            if len(data_cols) == 1:
+                y = data_cols[0]
+            elif len(data_cols) == 0:
+                raise ValueError("No data columns found to plot")
+            else:
+                raise ValueError(
+                    f"Table has multiple data columns: {data_cols}. "
+                    f"Please specify which column to plot using y='column_name'"
+                )
+
+        # For scatter plots, x should be a data column
+        # For line/bar plots, x should be the time column
+        if kind == "scatter":
+            # For scatter, use x as specified or raise error
+            if x is None:
+                raise ValueError("Scatter plot requires both x and y columns. Please specify x='column_name'")
+            x_col = x
+
+            # For scatter plots, we need to handle this differently
+            # since both x and y are data columns, not index
+            return self._plot_scatter(
+                x=x,
+                y=y,
+                backend=backend,
+                entity=entity or detected_entity,
+                title=title,
+                max_entities=max_entities,
+                entities=entities,
+                **kwargs,
+            )
+        else:
+            # For line/bar, x is the time column
+            x_col = x if x is not None else detected_time
+
+        # Prepare the table with proper index
+        tb = self
+
+        # If entity/time columns are not in the index, set them
+        index_names = [n for n in tb.index.names if n is not None]
+        cols_to_index = []
+
+        if detected_entity and detected_entity not in index_names and detected_entity in tb.columns:
+            cols_to_index.append(detected_entity)
+        if detected_time and detected_time not in index_names and detected_time in tb.columns:
+            cols_to_index.append(detected_time)
+
+        if cols_to_index:
+            tb = tb.set_index(cols_to_index, append=len(index_names) > 0)
+
+        # Get the variable and plot it
+        var = tb[y]
+        return var.plot(
+            kind=kind,
+            backend=backend,
+            entity=entity or detected_entity,
+            x=x_col,
+            stacked=stacked,
+            title=title,
+            max_entities=max_entities,
+            entities=entities,
+            **kwargs,
+        )
+
+    def _plot_scatter(
+        self,
+        x: str,
+        y: str,
+        backend: Literal["owid", "matplotlib"] = "owid",
+        entity: str | None = None,
+        title: str | None = None,
+        max_entities: int = 10,
+        entities: list[str] | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Create a scatter plot from two columns.
+
+        Internal method for scatter plot creation.
+        """
+        if backend == "matplotlib":
+            return self.reset_index().plot.scatter(x=x, y=y, title=title, **kwargs)
+
+        # OWID backend
+        try:
+            from owid.grapher import Chart
+        except ImportError:
+            raise ImportError(
+                "owid-grapher-py is required for interactive plotting. "
+                "Install with: pip install owid-grapher-py"
+            )
+
+        # Reset index to get all columns
+        df = self.reset_index()
+
+        # Determine which entities to select
+        selected_entities: list[str] | None = None
+        if entities is not None:
+            selected_entities = entities
+        elif entity and entity in df.columns:
+            unique_entities = df[entity].unique()
+            if len(unique_entities) > max_entities:
+                # For scatter, pick entities with most data points
+                entity_counts = df[entity].value_counts()
+                selected_entities = entity_counts.head(max_entities).index.tolist()
+
+        # Create the chart
+        chart = Chart(df)
+        chart = chart.mark_scatter()
+
+        # Build encode parameters
+        encode_params: dict[str, Any] = {"x": x, "y": y}
+        if entity:
+            encode_params["entity"] = entity
+
+        chart = chart.encode(**encode_params)
+
+        # Select entities if needed
+        if selected_entities is not None:
+            chart = chart.select(entities=selected_entities)
+            chart = chart.interact(entity_control=True)
+
+        # Set title
+        chart_title = title or f"{y} vs {x}"
+        chart = chart.label(title=chart_title)
+
+        return chart
+
     def update_log(
         self,
         operation: str,
