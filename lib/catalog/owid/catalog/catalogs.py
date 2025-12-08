@@ -35,6 +35,9 @@ OWID_CATALOG_URI = "https://catalog.ourworldindata.org/"
 # S3 location for private files
 S3_OWID_URI = "s3://owid-catalog"
 
+# Semantic search API
+OWID_SEARCH_API = "https://search.owid.io/indicators"
+
 # global copy cached after first request
 REMOTE_CATALOG: RemoteCatalog | None = None
 
@@ -421,7 +424,7 @@ class RemoteCatalog(CatalogMixin):
         if self.metadata["format_version"] > OWID_CATALOG_VERSION:
             raise PackageUpdateRequired(
                 f"library supports api version {OWID_CATALOG_VERSION}, "
-                f'but the remote catalog has version {self.metadata["format_version"]} '
+                f"but the remote catalog has version {self.metadata['format_version']} "
                 "-- please update"
             )
 
@@ -714,6 +717,78 @@ def find_latest(
 
     # If version is not specified, it will find the latest version given all other specifications.
     return REMOTE_CATALOG.find_latest(table=table, namespace=namespace, dataset=dataset, version=version)
+
+
+def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
+    """Search for tables by indicator name using semantic search.
+
+    Uses the OWID search API to find indicators matching a natural
+    language query, then returns a CatalogFrame that can load the
+    full tables containing those indicators.
+
+    Args:
+        query: Natural language search query (e.g., "solar power generation").
+        limit: Maximum number of results to return (default: 10).
+
+    Returns:
+        CatalogFrame with columns: indicator_title, indicator, plus standard
+        catalog columns (table, namespace, version, dataset, path, etc.).
+
+    Example:
+        ```python
+        from owid.catalog import find_by_indicator
+
+        # Search for indicators
+        results = find_by_indicator("solar power")
+        print(results[["indicator_title", "indicator", "dataset"]])
+
+        # Load the table containing the top result
+        table = results.iloc[0].load()
+        ```
+    """
+    resp = requests.get(
+        OWID_SEARCH_API,
+        params={"query": query, "limit": limit},
+    )
+    resp.raise_for_status()
+    data = resp.json()
+
+    results = data.get("results", [])
+
+    # Build rows for CatalogFrame
+    rows = []
+    for r in results:
+        catalog_path = r.get("catalog_path", "")
+
+        # Parse catalog_path: "grapher/namespace/version/dataset/table#column"
+        # Example: "grapher/unep/2023-12-12/renewable_energy/investments#solar"
+        path_part, _, indicator = catalog_path.partition("#")
+        parts = path_part.split("/")
+
+        if len(parts) >= 4:
+            channel, namespace, version, dataset = parts[0], parts[1], parts[2], parts[3]
+            table = parts[4] if len(parts) > 4 else dataset
+        else:
+            # Fallback if parsing fails
+            channel, namespace, version, dataset, table = "", "", "", "", ""
+
+        rows.append({
+            "indicator_title": r.get("title"),
+            "indicator": indicator,
+            "score": r.get("score"),
+            "table": table,
+            "namespace": namespace,
+            "version": version,
+            "dataset": dataset,
+            "channel": channel,
+            "path": path_part,
+            "format": "parquet",
+            "is_public": True,
+        })
+
+    frame = CatalogFrame(rows)
+    frame._base_uri = OWID_CATALOG_URI
+    return frame
 
 
 def _download_private_file(uri: str, tmpdir: str) -> str:
