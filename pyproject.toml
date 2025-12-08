@@ -86,7 +86,6 @@ dependencies = [
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
-owid-grapher-py = { path = "../owid-grapher-pyy", editable = true }
 
 [tool.uv]
 dev-dependencies = [
