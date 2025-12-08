@@ -1851,26 +1851,10 @@ class Table(pd.DataFrame):
         Internal method for scatter plot creation.
         """
         if backend == "matplotlib":
-            import matplotlib.pyplot as plt
-
-            df = self.reset_index()
-            ax = kwargs.pop("ax", None)
-            if ax is None:
-                _, ax = plt.subplots()
-            ax.scatter(df[x], df[y], **kwargs)
-            ax.set_xlabel(x)
-            ax.set_ylabel(y)
-            if title:
-                ax.set_title(title)
-            return ax
+            return self.reset_index().plot.scatter(x=x, y=y, title=title, **kwargs)
 
         # OWID backend
-        try:
-            from owid.grapher import Chart
-        except ImportError:
-            raise ImportError(
-                "owid-grapher-py is required for interactive plotting. " "Install with: pip install owid-grapher-py"
-            )
+        from owid.grapher import Chart
 
         # Reset index to get all columns
         df = self.reset_index()
