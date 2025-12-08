@@ -646,7 +646,7 @@ class Variable(pd.Series):
                 selected_entities = last_values.head(max_entities).index.tolist()
 
         # Create the chart
-        chart = Chart(df)
+        chart = Chart(df)  # type: ignore
 
         # Apply the appropriate mark type
         if kind == "line":
