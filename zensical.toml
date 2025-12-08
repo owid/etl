@@ -142,7 +142,7 @@ extra_javascript = [
     "javascripts/tablesort.js",
     "javascripts/cell-toggles.js",
     "javascripts/notebook-copy.js",
-    "javascripts/mermaid.mjs",
+    # Mermaid is handled by the markdown extension (see pymdownx.superfences config below)
 ]
 
 
