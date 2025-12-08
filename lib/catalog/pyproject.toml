@@ -28,23 +28,6 @@ dependencies = [
     "rdata>=0.11.2",
     "owid-grapher-py>=0.2.2",
 ]
-classifiers = [
-  # How mature is this project? Common values are
-  #   3 - Alpha
-  #   4 - Beta
-  #   5 - Production/Stable
-  "Development Status :: 4 - Beta",
-
-  # Indicate who your project is intended for
-  "Intended Audience :: Developers",
-
-  # Specify the Python versions you support here.
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13"
-]
 
 [tool.uv]
 dev-dependencies = [
@@ -59,9 +42,9 @@ dev-dependencies = [
 ]
 
 [tool.uv.sources]
-owid-datautils = { path = "../datautils", editable = true }
-owid-repack = { path = "../repack", editable = true }
-owid-grapher-py = { path = "../../owid-grapher-py", editable = true }
+owid-datautils = { workspace = true }
+owid-repack = { workspace = true }
+owid-grapher-py = {workspace = true}
 
 [tool.ruff]
 extend = "../../pyproject.toml"

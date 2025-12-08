@@ -79,12 +79,17 @@ dependencies = [
     "zensical>=0.0.11",
     "pandas-gbq>=0.29.2",
     "tomli>=2.2.1",
+    "owid-grapher-py>=0.2.2",
 ]
 
 [tool.uv.sources]
-owid-catalog = { path = "lib/catalog", editable = true }
-owid-datautils = { path = "lib/datautils", editable = true }
-owid-repack = { path = "lib/repack", editable = true }
+owid-catalog = { workspace = true }
+owid-datautils = { workspace = true }
+owid-repack = { workspace = true }
+owid-grapher-py = {workspace = true}
+
+[tool.uv.workspace]
+members = ["lib/catalog", "lib/datautils", "lib/repack", "../owid-grapher-py"]
 
 [tool.uv]
 dev-dependencies = [
