@@ -127,12 +127,18 @@ nav = [
 ]
 
 # Extra CSS
-extra_css = ["css/extra.css"]
+extra_css = [
+    "css/extra.css",
+    "https://unpkg.com/katex@0/dist/katex.min.css",
+]
 
 
 # Extra JavaScript
 extra_javascript = [
+    "https://unpkg.com/katex@0/dist/katex.min.js",
+    "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
     "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
+    "javascripts/katex.js",
     "javascripts/tablesort.js",
     "javascripts/cell-toggles.js",
     "javascripts/notebook-copy.js",
@@ -292,6 +298,9 @@ details = {}
 keys = {}
 snippets = {}
 inlinehilite = {}
+
+[project.markdown_extensions.pymdownx.arithmatex]
+generic = true
 
 [project.markdown_extensions.pymdownx.highlight]
 anchor_linenums = true
