@@ -48,7 +48,7 @@ tables:
       temperature_anomaly:
         title: Temperature anomaly
         description_short: |-
-          The difference of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -56,7 +56,7 @@ tables:
       anomaly_below_0:
         title: Anomaly below 0
         description_short: |-
-          The difference of a specific year's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific year's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -65,7 +65,7 @@ tables:
       anomaly_above_0:
         title: Anomaly above 0
         description_short: |-
-          The difference of a specific year's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific year's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -74,7 +74,7 @@ tables:
       temperature_anomaly_decadal:
         title: Decadal temperature anomaly
         description_short: |-
-          The difference of a specific decade's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific decade's average surface temperature from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -82,7 +82,7 @@ tables:
       temperature_2m_decadal:
         title: Decadal average surface temperature
         description_short: |-
-          The temperature of the air measured 2 meters above the ground, encompassing land, sea, and in-land water surfaces. {definitions.desc_update}
+          The temperature of the air measured 2 meters above the ground, encompassing land, sea, and in-land water surfaces.
         description_processing: |-
           {definitions.common_processing}
           - Decadal average temperature is calculated by averaging the annual temperature values for each decade.
