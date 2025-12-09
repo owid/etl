@@ -1,0 +1,54 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Country mentions in The Guardian articles
+    description: |-
+      This dataset tracks mentions of countries in The Guardian newspaper articles from 1999 to present. Data is collected via The Guardian's Open Platform API using comprehensive country-specific search queries.
+
+      **Methodology:**
+
+      An article is counted as mentioning a country if the country name (or recognized variations) appears in the article text, headline, or tags. For each country, we use carefully curated search queries that include:
+
+      - Official country names and common variations (e.g., "Netherlands" and "Holland")
+      - Historical names (e.g., "Burma" for Myanmar, "Ceylon" for Sri Lanka, "Persia" for Iran)
+      - Local language names (e.g., "Deutschland" for Germany, "España" for Spain)
+      - Common abbreviations and acronyms (e.g., "UAE", "UK", "ROK" for South Korea)
+
+      **False Positive Prevention:**
+
+      To improve accuracy, queries include exclusion rules to prevent common false positives:
+
+      - Celebrity names (e.g., excluding "Michael Jordan" when searching for Jordan)
+      - Geographic typos (e.g., excluding "Australia" when searching for Austria)
+      - Common words (e.g., excluding "turkey dinner" when searching for Turkey)
+      - Cross-country confusion (e.g., excluding "South Sudan" when counting Sudan mentions)
+
+      **Limitations:**
+
+      - This is a mentions-based approach, not a content analysis. An article mentioning a country briefly is counted equally to one focusing on that country.
+      - Some ambiguous country names (e.g., Georgia) may still have residual false positives despite exclusion rules.
+      - Historical data may undercount some countries due to name changes or different naming conventions used in older articles.
+
+      **Data Collection:**
+
+      Data is collected through The Guardian's Open Platform API, which provides access to articles published since 1999. The API is queried using boolean search expressions that combine country name variations with exclusion rules.
+    date_published: "2025"
+    # Citation
+    producer: The Guardian
+    citation_full: |-
+      The Guardian, Open Platform
+
+    # Files
+    url_main: https://open-platform.theguardian.com/access/
+    date_accessed: "2025-10-29"
+
+    # License
+    license:
+      name: The Guardian terms of service
+      url: https://www.theguardian.com/help/terms-of-service
+outs:
+  - md5: dafae061601d1cfe77a98e2222b1c013
+    size: 60750
+    path: guardian_mentions.csv

@@ -5,7 +5,7 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize log.
 log = get_logger()
@@ -102,13 +102,13 @@ def correct_historical_regions(data: Table) -> Table:
     return data
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("energy_production_from_fossil_fuels")
-    tb_meadow = ds_meadow["energy_production_from_fossil_fuels"].reset_index()
+    tb_meadow = ds_meadow.read("energy_production_from_fossil_fuels")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
@@ -143,11 +143,11 @@ def run(dest_dir: str) -> None:
     )
 
     # Prepare output data.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(keys=["country", "year"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset (with the same metadata as the meadow version).
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

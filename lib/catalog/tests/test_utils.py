@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
-from owid.catalog.utils import hash_any, underscore
+from owid.catalog.utils import hash_any, remove_details_on_demand, underscore
 
 
 def test_underscore():
@@ -75,11 +75,24 @@ def test_underscore():
         == "poverty_rate__lt_50pct_of_median__lis_key_figures__2018"
     )
     assert underscore("10") == "_10"
+    # Test case from UN SDG data with parentheses and special characters in URLs
+    # The input has unicode characters that unidecode converts, potentially leaving parentheses
+    assert (
+        underscore("14.2.1 - EN_SCP_ECSYBA - Implementation (with parens) - Test https://example.com/#hash(test)")
+        == "_14_2_1__en_scp_ecsyba__implementation__with_parens__test_https__example_com_hash__test"
+    )
     assert (
         underscore(
             "Indicator 1.5.1: Death rate due to exposure to forces of nature (per 100,000 population) *Estimates reported here are based on a 10-year distributed lag for natural disaster mortality. - Past - Scaled"
         )
         == "indicator_1_5_1__death_rate_due_to_exposure_to_forces_of_nature__per_100_000_population__estimates_reported_here_are_based_on_a_10_year_distributed_lag_for_natural_disaster_mortality__past__scaled"
+    )
+    # Test case with exclamation mark from UN SDG data - double-encoded UTF-8 produces ! after unidecode
+    assert (
+        underscore(
+            "14.2.1 - EN_SCP_ECSYBA - Implementation and adaptive management - POMIUAC MALAGA-BUENAVENTURA : Plan de OrdenaciÃ³n y Manejo Integrado de la  Unidad Ambiental Costera del Complejo de MÃ¡laga - Buenaventura, https://www.cvc.gov.co"
+        )
+        == "_14_2_1__en_scp_ecsyba__implementation_and_adaptive_management__pomiuac_malaga_buenaventura__plan_de_ordenacia3n_y_manejo_integrado_de_la__unidad_ambiental_costera_del_complejo_de_ma_laga__buenaventura__https__www_cvc_gov_co"
     )
     assert underscore("a|b") == "a_b"
     assert underscore("$/£ exchange rate") == "dollar_ps_exchange_rate"
@@ -160,3 +173,73 @@ def test_hash_any():
         presentation=VariablePresentationMeta(title_public="Title public"),
     )
     assert hash_any(meta) == 6982634015113220894
+
+
+def test_remove_details_on_demand():
+    # Test with single DoD reference
+    assert remove_details_on_demand("This is a [description](#dod:something).") == "This is a description."
+
+    # Test with multiple DoD references in same text (the original bug case)
+    input_text = (
+        "Measured in [terawatt-hours](#dod:watt-hours). "
+        "Low-carbon sources correspond to renewables and nuclear power, "
+        "that produce significantly less [greenhouse-gas emissions](#dod:ghgemissions) than fossil fuels. "
+        "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal."
+    )
+    expected = (
+        "Measured in terawatt-hours. "
+        "Low-carbon sources correspond to renewables and nuclear power, "
+        "that produce significantly less greenhouse-gas emissions than fossil fuels. "
+        "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal."
+    )
+    assert remove_details_on_demand(input_text) == expected
+
+    # Test with no DoD references - should return unchanged
+    assert remove_details_on_demand("This is plain text.") == "This is plain text."
+
+    # Test with multiple DoDs in same sentence
+    assert (
+        remove_details_on_demand("The [value](#dod:term1) is the [measurement](#dod:term2) of [something](#dod:term3).")
+        == "The value is the measurement of something."
+    )
+
+    # Test with DoD at the beginning
+    assert (
+        remove_details_on_demand("[Temperature](#dod:temp) is measured in celsius.")
+        == "Temperature is measured in celsius."
+    )
+
+    # Test with DoD at the end
+    assert remove_details_on_demand("This measures [energy](#dod:energy)") == "This measures energy"
+
+    # Test that regular markdown links are NOT affected
+    assert (
+        remove_details_on_demand("See [this link](https://example.com) for more info.")
+        == "See [this link](https://example.com) for more info."
+    )
+
+    # Test with DoD containing special characters in the keyword
+    assert (
+        remove_details_on_demand("Measured in [CO₂ emissions](#dod:co2-emissions-detail).")
+        == "Measured in CO₂ emissions."
+    )
+
+    # Test with multiple DoDs and regular markdown links mixed
+    mixed_text = (
+        "The [energy](#dod:energy) consumption is measured in [terawatt-hours](#dod:watt-hours). "
+        "For more information, see [our methodology](https://example.com/methodology)."
+    )
+    expected_mixed = (
+        "The energy consumption is measured in terawatt-hours. "
+        "For more information, see [our methodology](https://example.com/methodology)."
+    )
+    assert remove_details_on_demand(mixed_text) == expected_mixed
+
+    # Test with brackets in the link text
+    assert remove_details_on_demand("This is [data (in brackets)](#dod:something).") == "This is data (in brackets)."
+
+    # Test with empty text
+    assert remove_details_on_demand("") == ""
+
+    # Test with DoD containing hyphens, underscores, and colons in keyword
+    assert remove_details_on_demand("The [indicator](#dod:complex-key_word:123).") == "The indicator."

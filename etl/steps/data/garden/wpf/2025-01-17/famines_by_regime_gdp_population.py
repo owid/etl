@@ -64,7 +64,7 @@ def run() -> None:
     ds_gdp = paths.load_dataset("maddison_project_database")
     tb_gdp = ds_gdp.read("maddison_project_database")
 
-    tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
+    tb_gdp = tb_gdp.loc[:, ["year", "country", "gdp_per_capita"]]
 
     ds_population = paths.load_dataset("population")
 
@@ -124,22 +124,22 @@ def add_regime(tb_famines: Table, ds_regime: Dataset) -> Table:
 
     Parameters:
     tb_famines (Table): Table containing famine data.
-    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem" with a DataFrame value.
+    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem_uni_without_regions" with a DataFrame value.
 
     Returns:
     Table: The updated Table with regime information added.
 
     The function performs the following steps:
-    1. Extracts the "vdem" DataFrame from the ds_regime dictionary and resets its index.
+    1. Extracts the "vdem_uni_without_regions" DataFrame from the ds_regime dictionary and resets its index.
     2. Reduces the regime DataFrame to only include the columns "country", "year", and "regime_redux_row_owid".
     3. Combines autocracies by setting the "regime_redux_row_owid" value to 3 for rows where it is 0 or 1.
     4. Merges the reduced regime DataFrame with the famines DataFrame on "country" and "year".
     5. Applies custom regime rules defined in the CUSTOM_REGIMES dictionary to assign regime values.
     6. Ensures there are no NaN values in the "regime_redux_row_owid" column.
     """
-    tb_regime = ds_regime["vdem"].reset_index()
+    tb_regime = ds_regime.read("vdem_uni_without_regions")
 
-    reduced_regime = tb_regime[["country", "year", "regime_redux_row_owid"]]
+    reduced_regime = tb_regime.loc[:, ["country", "year", "regime_redux_row_owid"]]
 
     # Combine autocracies
     reduced_regime.loc[reduced_regime["regime_redux_row_owid"].isin([0, 1]), "regime_redux_row_owid"] = 3
@@ -178,7 +178,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     Table: The updated Table with GDP information added.
 
     The function performs the following steps:
-    1. Replaces 'Former Sudan' with 'Sudan' in the 'country' column of tb_gdp.
+    1. Replaces 'Sudan (former)' with 'Sudan' in the 'country' column of tb_gdp.
     2. Merges the famine table (tb) with the GDP table (tb_gdp) on 'country' and 'year'.
     3. Defines and applies replacement rules for specific countries and years, using either a reference year or an average GDP over a range of years.
     4. Handles special cases for multiple countries, replacing GDP values for specified years with either a specific year's GDP or an average GDP.
@@ -193,8 +193,8 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     - For China, the GDP values for the years 1876 to 1879 are replaced with the average GDP from 1870 to 1887.
     """
 
-    # Replace 'former Sudan' with 'Sudan' in the 'country' column of tb_gdp
-    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Former Sudan", "Sudan")
+    # Replace 'Sudan (former)' with 'Sudan' in the 'country' column of tb_gdp
+    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Sudan (former)", "Sudan")
 
     tb = pr.merge(tb, tb_gdp, on=["country", "year"], how="left")
 

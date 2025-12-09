@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Bank
+    title: World Development Indicators
+    title_snapshot: World Development Indicators - GDP deflator (linked series)
+    description: |-
+      The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
+    description_snapshot: |-
+      This data includes specifically one indicator from WDI, namely "GDP deflator: linked series (base year varies by country)" (with code NY.GDP.DEFL.ZS.AD).
+    citation_full: |-
+      World Bank national accounts data; OECD; International Monetary Fund. World Development Indicators - World Bank (2025). Indicator [NY.GDP.DEFL.ZS.AD](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD).
+    version_producer: "122"
+    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+    url_download: https://api.worldbank.org/v2/en/indicator/NY.GDP.DEFL.ZS.AD?downloadformat=csv
+    date_accessed: '2025-09-02'
+    date_published: '2025-07-01'
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+outs:
+  - md5: 7b30b341a984d86536c6d2dad92f6415
+    size: 78016
+    path: wdi_gdp_linked.zip

@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title: Levelized Cost of Energy
+    description: |-
+      Lazard's Levelized Cost of Energy+ (LCOE+) is a U.S.-focused annual publication that combines analyses across different reports: Energy (LCOE), Storage, (LCOS) and Hydrogen (LCOH). Lazard first started publishing its comparative analysis of various generation technologies in 2007.
+    date_published: "2025-06-01"
+    producer: Lazard
+    attribution: Lazard - Levelized Cost of Energy+ (2025)
+    citation_full: |-
+      Lazard - Levelized Cost of Energy+ (2025).
+    url_main: https://www.lazard.com/research-insights/levelized-cost-of-energyplus-lcoeplus/
+    url_download: https://www.lazard.com/media/uounhon4/lazards-lcoeplus-june-2025.pdf
+    date_accessed: '2025-09-17'
+    license:
+      name: © Lazard 2025
+      url: https://www.lazard.com/research-insights/levelized-cost-of-energyplus-lcoeplus/
+outs:
+  - md5: 2a8654840e6e55121b9cc71fae09d558
+    size: 1823102
+    path: levelized_cost_of_energy.csv

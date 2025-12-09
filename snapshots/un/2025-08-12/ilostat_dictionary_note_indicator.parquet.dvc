@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "ILOSTAT"
+    description: |-
+      The ILO’s main online database, ILOSTAT, maintained by the Department of Statistics, is the world’s largest repository of labour market statistics. It covers all countries and regions and a wide range of labour-related topics, including employment, unemployment, wages, working time and labour productivity, to name a few. It includes time series going back as far as 1938; annual, quarterly and monthly labour statistics; country-level, regional and global estimates; and even projections of the main labour market indicators.
+    title_snapshot: ILOSTAT - note_indicator dictionary
+    description_snapshot: |-
+      This file the ILOSTAT dictionary that provides additional details for the `note_indicator` column.
+    date_published: "2025-09-16"
+
+    producer: International Labour Organization
+    citation_full: |-
+      International Labour Organization. (2025). ILO modelled estimates database, ILOSTAT [database]. Available from https://ilostat.ilo.org/data/.
+    attribution_short: ILO
+
+    # Files
+    url_main: https://ilostat.ilo.org/
+    date_accessed: '2025-09-17'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.ilo.org/rights-and-permissions#data
+outs:
+  - md5: 789a7ca7ae7a18b6263c2c3fdcf3c0ff
+    size: 19173
+    path: ilostat_dictionary_note_indicator.parquet

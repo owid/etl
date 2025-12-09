@@ -27,7 +27,7 @@ tables:
 
       The data is part of Gapminder effort to build a fact-based worldview by showing the big picture of global development.
       When we find multiple data sources that haven't been combined we combine them into one consistent timeseries. This often
-      results in large data uncertainty, as the underlaying data-sources use different methodologies etc. But we still dare
+      results in large data uncertainty, as the underlying data-sources use different methodologies etc. But we still dare
       to combine data that hasn't been combined, as we find it extremely important to visualize the big picture, which people
       otherwise tend to get absolutely wrong. Before using our data for any other purpose though, please read the documentation
       to make sure you are aware of our levels of doubts in the data.
@@ -64,7 +64,7 @@ tables:
 
               The data is part of Gapminder effort to build a fact-based worldview by showing the big picture of global development.
               When we find multiple data sources that haven't been combined we combine them into one consistent timeseries.
-              This often results in large data uncertainty, as the underlaying data-sources use different methodologies etc.
+              This often results in large data uncertainty, as the underlying data-sources use different methodologies etc.
               But we still dare to combine data that hasn't been combined, as we find it extremely important to visualize
               the big picture, which people otherwise tend to get absolutely wrong. Before using our data for any other purpose
               though, please read the documentation to make sure you are aware of our levels of doubts in the data.

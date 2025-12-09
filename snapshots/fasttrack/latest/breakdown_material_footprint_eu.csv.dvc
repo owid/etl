@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Eurostat (2025)
+    title: breakdown_material_footprint_eu
+    citation_full: Eurostat (2025). Material footprints - details by final use of products.
+    url_main: https://ec.europa.eu/eurostat/databrowser/product/page/ENV_AC_RMEFD
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQToOANb562kFN_ht2TwLbgreWubBFUyZq-YhfAAhqZcQRbBFByAnsTPlmBgZH5fbF2GQpizEgj-tCG/pub?output=csv
+    date_accessed: '2025-08-14'
+  name: Breakdown of material footprint in EU (Eurostat, 2025)
+  description: ''
+  license: {}
+outs:
+  - md5: 454301be68548a7278a20cf6d1183416
+    size: 679
+    path: breakdown_material_footprint_eu.csv

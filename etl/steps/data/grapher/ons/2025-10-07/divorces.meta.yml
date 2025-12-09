@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  divorces:
+    variables:
+      cumulative_percentage:
+        title: Cumulative share of divorces of couples married in << year_of_marriage >> by anniversary year of marriage
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The cumulative percentage of marriages that have ended in divorce by the anniversary year of marriage.
+        description_key:
+          - Data covers divorces legally registered in England and Wales, including marriages that took place abroad if one party had a permanent home in England and Wales.
+          - Divorce statistics do not include married couples who separate but do not divorce.
+          - New divorce legislation came into effect from 6 April 2022. Data from 2022 onwards includes both old and new law cases.
+          - Divorces during 2020 and 2021 may have been affected by disruption to family court activities during the COVID-19 pandemic.
+        description_from_producer: |-
+          Divorce statistics are derived from information recorded by His Majesty's Courts and Tribunals Service (HMCTS) during the divorce process. Data from the old system includes both divorces completed under old law and annulments that took place in England and Wales; annulments are where the marriage was not legally valid in the first place. There is no provision for annulments under the new law and so these cases are processed under old law even if the date of application is after the 6 April 2022.
+
+          Divorce statistics do not include married couples who separate, but do not divorce.
+
+          Divorces where the marriage took place abroad are included provided the marriage was legally recognised in England and Wales and one of the parties had a permanent home in England and Wales.
+
+          Marriages of same-sex couples first took place on 29 March 2014, the first divorces recorded between same-sex couples were in 2015.
+
+          New legislation came into effect from the 6 April 2022, following the Divorce, Dissolution and Separation Act 2020. Key changes include the ability for either a joint or sole application for divorce, civil partnership dissolution or judicial separation, the removal of the Factis (i.e. no grounds for divorce, civil partnership dissolution or separation) and the introduction of a minimum 20 week period between the start of proceedings and application for final order. Data from 2022 will include both old and new law cases, except in tables which specify either old or new law cases only.
+
+          The number and timelines of divorces granted during 2020 and 2021 may have been affected by disruption to family court activities during the Coronavirus (COVID-19) pandemic.
+        processing_level: minor
+        presentation:
+          title_public: Cumulative share of divorces of couples married in << year_of_marriage >> by anniversary year of marriage
+        display:
+          numDecimalPlaces: 1
+          name: << year_of_marriage >>
+

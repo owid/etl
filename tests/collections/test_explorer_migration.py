@@ -1,5 +1,7 @@
-"""
-NOTE: The influenza example contains one dimension (`confirmed_cases_or_symptoms`), which contains only one choice. Hence, when saving the explorer, the dimension is dropped if prune_dimensions is not set to False. That's why we have `test_explorer_legacy_1` and `test_explorer_legacy_2`, so that we account for both cases (dropping dimensions with only one choice and not dropping them).
+"""Tests for CSV explorer migration to new collection format.
+
+The influenza example contains one dimension with only one choice, which gets
+dropped during save unless prune_dimensions=False is set.
 """
 
 import re
@@ -7,7 +9,7 @@ from unittest import mock
 
 import pytest
 
-from etl.collection.explorer_migration import migrate_csv_explorer
+from etl.collection.explorer.migration import migrate_csv_explorer
 from etl.files import yaml_dump
 from etl.helpers import PathFinder
 from etl.paths import STEP_DIR
@@ -36,7 +38,7 @@ influenza_config = {
                     "subtitle": "Acute...",
                     "ySlugs": "reported_ari_cases",
                     "tableSlug": "flu_weekly",
-                    "type": "LineChart",
+                    "type": "LineChart DiscreteBar",
                     "Confirmed cases or Symptoms Radio": "Symptoms",
                     "Metric Dropdown": "Acute respiratory infections",
                     "Interval Radio": "Weekly",
@@ -47,7 +49,7 @@ influenza_config = {
                     "subtitle": "Acute...",
                     "ySlugs": "reported_ari_cases",
                     "tableSlug": "flu_monthly",
-                    "type": "LineChart",
+                    "type": "LineChart DiscreteBar",
                     "Confirmed cases or Symptoms Radio": "Symptoms",
                     "Metric Dropdown": "Acute respiratory infections",
                     "Interval Radio": "Monthly",
@@ -171,7 +173,7 @@ views:
     config:
       title: Weekly reported cases of acute respiratory infections
       subtitle: Acute...
-      type: LineChart
+      type: LineChart DiscreteBar
       timelineMinTime: -4043
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
@@ -194,13 +196,14 @@ views:
     config:
       title: Monthly reported cases of acute respiratory infections
       subtitle: Acute...
-      type: LineChart
+      type: LineChart DiscreteBar
       timelineMinTime: -4043
 """.strip()
 
 
 def test_migrate_csv_explorer():
-    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
+    """Test migration from old CSV explorer config to new YAML format."""
+    with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
         out_yaml = yaml_dump(config)
 
@@ -222,8 +225,8 @@ hasMapTab	true
 pickerColumnSlugs	Country
 graphers
 	yVariableIds	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
-	grapher/who/latest/flu/flu#reported_ari_cases	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
-	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	grapher/who/latest/flu/flu#reported_ari_cases	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
 
 columns
 	catalogPath	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
@@ -246,8 +249,8 @@ hasMapTab	true
 pickerColumnSlugs	Country
 graphers
 	yVariableIds	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
-	grapher/who/latest/flu/flu#reported_ari_cases	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
-	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	grapher/who/latest/flu/flu#reported_ari_cases	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
 
 columns
 	catalogPath	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
@@ -258,9 +261,9 @@ columns
 
 @pytest.mark.integration
 def test_explorer_legacy_1(tmp_path, monkeypatch):
-    """When saving the explorer, the dimension `confirmed_cases_or_symptoms` is dropped because it has only one choice."""
+    """Test legacy explorer save with dimension pruning (dimensions with one choice are dropped)."""
     # Monkeypatch ExplorerLegacy.save() to return its content
-    from etl.collection.explorer_legacy import ExplorerLegacy
+    from etl.collection.explorer.legacy import ExplorerLegacy
 
     d = {}
 
@@ -271,7 +274,7 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     monkeypatch.setattr(ExplorerLegacy, "save", patch_save)
 
     # Dump config to YAML file
-    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
 
     # Make sure explorer can deal with int values
@@ -290,8 +293,9 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection(
         config=config,
+        explorer=True,
     )
 
     # Instead of performing the actual save, get the explorer legacy content
@@ -308,9 +312,9 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
 
 @pytest.mark.integration
 def test_explorer_legacy_2(tmp_path, monkeypatch):
-    """When saving the explorer, the dimension `confirmed_cases_or_symptoms` is not dropped because even if it has only one choice because we set prune_dimensions=False."""
+    """Test legacy explorer save without dimension pruning (all dimensions kept)."""
     # Monkeypatch ExplorerLegacy.save() to return its content
-    from etl.collection.explorer_legacy import ExplorerLegacy
+    from etl.collection.explorer.legacy import ExplorerLegacy
 
     d = {}
 
@@ -321,7 +325,7 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     monkeypatch.setattr(ExplorerLegacy, "save", patch_save)
 
     # Dump config to YAML file
-    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
 
     # Make sure explorer can deal with int values
@@ -340,8 +344,9 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection(
         config=config,
+        explorer=True,
     )
 
     # Instead of performing the actual save, get the explorer legacy content

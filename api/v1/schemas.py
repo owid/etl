@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Extra
+# NOTE: SemanticSearch* schemas moved to api_search/v1/schemas.py
+from pydantic import BaseModel
 
 from .. import utils
 
@@ -12,7 +13,7 @@ class Presentation(BaseModel):
     attributionShort: Optional[str] = None
 
     class Config:
-        extra = Extra.forbid
+        extra = "forbid"
 
     def to_meta_dict(self) -> Dict[str, Any]:
         d = {
@@ -39,7 +40,7 @@ class Indicator(BaseModel):
     updatePeriodDays: Union[int, Literal[""], None] = None
 
     class Config:
-        extra = Extra.forbid
+        extra = "forbid"
 
     def to_meta_dict(self) -> Dict[str, Any]:
         d = {
@@ -70,4 +71,4 @@ class UpdateIndicatorRequest(BaseModel):
     triggerETL: bool = False
 
     class Config:
-        extra = Extra.forbid
+        extra = "forbid"

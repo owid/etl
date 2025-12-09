@@ -2,11 +2,11 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp vsce-compile vsce-sync
 
 include default.mk
 
-SRC = etl snapshots apps api tests docs
+SRC = etl snapshots apps api api_search tests docs owid_mcp
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -16,7 +16,9 @@ help:
 	@echo '  make clean     	Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   	Delete non-reference data and .venv'
 	@echo '  make deploy    	Re-run the full ETL on production'
-	@echo '  make docs      	Serve documentation locally'
+	@echo '  make docs.build    Build documentation'
+	@echo '  make docs.serve    Serve documentation locally'
+	@echo '  make docs.post     Transform non-md files in docs/ after build (e.g. notebooks)'
 	@echo '  make dot       	Build a visual graph of the dependencies'
 	@echo '  make etl       	Fetch data and run all transformations for garden'
 	@echo '  make format    	Format code'
@@ -27,17 +29,45 @@ help:
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
 	@echo '  make api   		Start the ETL API on port 8081'
+	@echo '  make api-search   	Start the Search API on port 8084'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
+	@echo '  make vsce-sync 	Sync all custom VS Code extensions (reinstalling them)'
+# 	@echo '  make vsce-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
 	@echo '  make watch     	Run all tests, watching for changes'
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
-docs: .venv
-	.venv/bin/mkdocs serve
+docs.pre: .venv
+	@echo '==> Fetching external documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_catalog_api.py
+	@echo '==> Generating dynamic documentation files'
+	@.venv/bin/python docs/ignore/pre-build/bake_metadata_reference.py
+	@.venv/bin/python -m docs.ignore.pre-build.bake_search_api
+	@.venv/bin/python -m docs.ignore.pre-build.bake_chart_api
+	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
+	@.venv/bin/python docs/ignore/pre-build/generate_analytics_docs.py
+
+docs.post: .venv
+	@echo '==> Converting Jupyter Notebooks to HTML'
+	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
+
+docs.build: .venv
+	@echo '==> Cleaning previous build'
+	@rm -rf site/ .cache/
+	@mkdir -p .cache
+	@echo '==> Pre-processing documentation files'
+	@$(MAKE) --no-print-directory docs.pre
+	@echo '==> Building documentation with Zensical'
+	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
+	@echo '==> Post-processing documentation files'
+	@$(MAKE) --no-print-directory docs.post
+
+docs.serve: .venv
+	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
@@ -137,7 +167,11 @@ version-tracker: .venv
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
-	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
+	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0 --reload-exclude '.cache/*'
+
+api-search: .venv
+	@echo '==> Starting Search API on http://localhost:8084/indicators'
+	.venv/bin/uvicorn api_search.main:app --reload --port 8084 --host 0.0.0.0 --reload-exclude '.cache/*'
 
 fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'
@@ -154,7 +188,7 @@ install-vscode-extensions:
 	@echo '==> Checking and installing required VS Code extensions'
 	@if command -v code > /dev/null; then \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
 			if ! code --list-extensions | grep -q "$$EXT"; then \
@@ -176,6 +210,77 @@ install-vscode-extensions:
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
 	fi
 
+# Reinstall all custom VS Code extensions (forces update even if already installed)
+vsce-sync:
+	@echo '==> Reinstalling all custom VS Code extensions'
+	@if command -v code > /dev/null; then \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
+		EXTENSIONS_PATH="vscode_extensions"; \
+		for EXT in $$CUSTOM_EXTENSIONS; do \
+			VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+			if [ -n "$$VSIX_FILE" ]; then \
+				echo "Installing owid.$$EXT from $$VSIX_FILE"; \
+				code --install-extension "$$VSIX_FILE" --force; \
+			else \
+				echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
+			fi; \
+		done; \
+	else \
+		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
+	fi
+
 vscode-exclude-archived: .venv
 	@echo '==> Excluding archived steps from VSCode user settings'
 	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
+
+# Compile and package a VS Code extension
+# Usage: make vsce-compile EXT=detect-outdated-practices [BUMP=patch|minor|major] [INSTALL=1]
+vsce-compile:
+	@if [ -z "$(EXT)" ]; then \
+		echo "❌ Error: EXT parameter is required."; \
+		echo "Usage: make vsce-compile EXT=extension-name [BUMP=patch|minor|major] [INSTALL=1]"; \
+		echo ""; \
+		echo "Available extensions:"; \
+		find vscode_extensions -maxdepth 1 -type d ! -name vscode_extensions ! -name '.*' -exec basename {} \; | sed 's/^/  - /'; \
+		exit 1; \
+	fi; \
+	EXT_PATH="vscode_extensions/$(EXT)"; \
+	if [ ! -d "$$EXT_PATH" ]; then \
+		echo "❌ Error: Extension '$(EXT)' not found at $$EXT_PATH"; \
+		exit 1; \
+	fi; \
+	echo "🔧 Building extension: $(EXT)"; \
+	cd "$$EXT_PATH" && \
+	if [ -n "$(BUMP)" ]; then \
+		echo "📦 Bumping version ($(BUMP))..."; \
+		npm version $(BUMP) --no-git-tag-version; \
+	else \
+		CURRENT_VERSION=$$(node -p "require('./package.json').version"); \
+		echo "📦 Using current version ($$CURRENT_VERSION)..."; \
+	fi; \
+	echo "⚙️  Compiling TypeScript..."; \
+	npm run compile && \
+	echo "📦 Packaging VSIX..."; \
+	npx @vscode/vsce package && \
+	mkdir -p install install/archived && \
+	if [ -n "$(BUMP)" ]; then \
+		OLD_VSIX_COUNT=$$(ls -1 install/*.vsix 2>/dev/null | wc -l); \
+		if [ "$$OLD_VSIX_COUNT" -gt 0 ]; then \
+			echo "📦 Archiving $$OLD_VSIX_COUNT old version(s)..."; \
+			mv install/*.vsix install/archived/ 2>/dev/null || true; \
+		fi; \
+	fi; \
+	mv *.vsix install/ && \
+	VSIX_FILE=$$(ls -t install/*.vsix | head -n 1); \
+	VSIX_PATH=$$(pwd)/$$VSIX_FILE; \
+	echo "✅ Extension packaged: $$VSIX_FILE"; \
+	if [ "$(INSTALL)" = "1" ]; then \
+		echo ""; \
+		echo "🔄 Installing extension..."; \
+		cd - > /dev/null && code --install-extension "$$VSIX_PATH" --force; \
+		echo "✅ Extension installed!"; \
+	else \
+		echo ""; \
+		echo "To install, run: make vsce-compile EXT=$(EXT) INSTALL=1"; \
+		echo "Or install directly: code --install-extension $$VSIX_PATH --force"; \
+	fi

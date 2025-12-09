@@ -1,0 +1,36 @@
+name: Documentation
+on:
+    push:
+        branches:
+            - master
+            - main
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+jobs:
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/configure-pages@v5
+            - uses: actions/checkout@v5
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: 3.11
+
+            - name: Submodule init
+              run: git submodule init && git submodule update
+
+            - name: Install dependencies and build docs
+              run: |
+                  pip install -U uv && uv sync --all-extras
+            - name: Build docs
+              run: make docs.build
+
+            - uses: actions/upload-pages-artifact@v4
+              with:
+                  path: site
+            - uses: actions/deploy-pages@v4

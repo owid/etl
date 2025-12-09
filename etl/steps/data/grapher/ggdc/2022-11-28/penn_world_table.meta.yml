@@ -89,6 +89,7 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -96,7 +97,6 @@ tables:
                   - 20000
                   - 50000
                   - 1
-                customNumericMinValue: 0
             selectedEntityNames:
               - Germany
               - United States
@@ -141,6 +141,7 @@ tables:
                 binningStrategy: manual
                 baseColorScheme: PuBu
                 customNumericValues:
+                  - 0
                   - 10000000000
                   - 30000000000
                   - 100000000000

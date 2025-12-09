@@ -292,6 +292,22 @@ class Tag(Base):
         return tags
 
 
+class DoD(Base):
+    __tablename__ = "dods"
+    __table_args__ = (
+        ForeignKeyConstraint(["lastUpdatedUserId"], ["users.id"], ondelete="SET NULL", name="dods_ibfk_1"),
+        Index("lastUpdatedUserId", "lastUpdatedUserId"),
+        Index("name", "name", unique=True),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(512))
+    content: Mapped[str] = mapped_column(VARCHAR(4096))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    lastUpdatedUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (Index("email", "email", unique=True),)
@@ -336,12 +352,12 @@ class ChartRevisions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def get_latest(cls, session: Session, chart_id: int, updatedAt=None) -> "ChartRevisions":
-        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND updatedAt <= '{timestamp}' ORDER BY updatedAt DESC LIMIT 1 if timestamp is given!"""
+    def get_latest(cls, session: Session, chart_id: int, createdAt=None) -> "ChartRevisions":
+        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND createdAt <= '{timestamp}' ORDER BY createdAt DESC LIMIT 1 if timestamp is given!"""
         revision = session.scalars(
             select(cls)
-            .where(and_(cls.chartId == chart_id, cls.updatedAt <= updatedAt) if updatedAt else cls.chartId == chart_id)
-            .order_by(cls.updatedAt.desc())
+            .where(and_(cls.chartId == chart_id, cls.createdAt <= createdAt) if createdAt else cls.chartId == chart_id)
+            .order_by(cls.createdAt.desc())
             .limit(1)
         ).one_or_none()
 
@@ -373,6 +389,7 @@ class ChartConfig(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
 
     chartss: Mapped[List["Chart"]] = relationship("Chart", back_populates="chart_config")
+    explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="chart_config")
 
 
 class Chart(Base):
@@ -402,6 +419,7 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
@@ -423,7 +441,10 @@ class Chart(Base):
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
-        return self.chart_config.full
+        config = self.chart_config.full.copy()
+        # Add isInheritanceEnabled to config so it's included in comparisons
+        config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        return config
 
     @config.expression
     def config(cls):
@@ -925,6 +946,9 @@ class PostsGdocs(Base):
     id: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
     slug: Mapped[str] = mapped_column(VARCHAR(255))
     content: Mapped[dict] = mapped_column(JSON)
+    contentMd5: Mapped[str] = mapped_column(
+        CHAR(24, "utf8mb4_0900_as_cs"), Computed("(to_base64(unhex(md5(`content`))))", persisted=True), nullable=False
+    )
     published: Mapped[int] = mapped_column(TINYINT)
     createdAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     publicationContext: Mapped[str] = mapped_column(ENUM("unlisted", "listed"), server_default=text("'unlisted'"))
@@ -1935,6 +1959,36 @@ class Anomaly(Base):
                 return []
             raise
 
+    def append_anomalies(self, new_df: pd.DataFrame) -> None:
+        """Append new anomalies to existing dfReduced data.
+
+        Combines existing and new anomaly data, removing duplicates by keeping
+        the highest anomaly score for each entity-variable combination.
+
+        Parameters
+        ----------
+        new_df : pd.DataFrame
+            New anomaly data to append with columns: entity_name, variable_id, anomaly_score, etc.
+        """
+        if new_df.empty:
+            return
+
+        if self.dfReduced is not None:
+            # Combine existing and new anomalies
+            df_combined = pd.concat([self.dfReduced, new_df], ignore_index=True)
+
+            # Remove duplicates, keeping the highest anomaly score for each entity-variable combination
+            df_combined = (
+                df_combined.sort_values("anomaly_score", ascending=False)
+                .drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
+                .reset_index(drop=True)
+            )
+
+            self.dfReduced = df_combined
+        else:
+            # No existing data, just use new data
+            self.dfReduced = new_df
+
 
 class Explorer(Base):
     __tablename__ = "explorers"
@@ -1948,6 +2002,7 @@ class Explorer(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
+    explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="explorer")
 
     # isPublished is a virtual column and depends `isPublished\tTrue` string in TSV, it'll be soon treated
     #   as a real column
@@ -1956,6 +2011,9 @@ class Explorer(Base):
     )
     # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
     config: Mapped[dict] = mapped_column(JSON)
+    configMd5: Mapped[str] = mapped_column(
+        CHAR(24, "utf8mb4_0900_as_cs"), Computed("(to_base64(unhex(md5(`config`))))", persisted=True), nullable=False
+    )
 
     @classmethod
     def load_explorer(
@@ -1971,6 +2029,33 @@ class Explorer(Base):
     def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
         execute = session.execute if columns else session.scalars
         return execute(_select_columns(cls, columns)).all()  # type: ignore
+
+
+class ExplorerView(Base):
+    __tablename__ = "explorer_views"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["chartConfigId"], ["chart_configs.id"], ondelete="CASCADE", name="fk_explorer_views_chart_config_id"
+        ),
+        ForeignKeyConstraint(
+            ["explorerSlug"],
+            ["explorers.slug"],
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+            name="fk_explorer_views_explorer_slug",
+        ),
+        Index("fk_explorer_views_chart_config_id", "chartConfigId"),
+        Index("fk_explorer_views_explorer_slug", "explorerSlug"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    explorerSlug: Mapped[str] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
+    explorerView: Mapped[dict] = mapped_column(JSON)
+    chartConfigId: Mapped[Optional[str]] = mapped_column(CHAR(36, "utf8mb4_0900_as_cs"))
+    error: Mapped[Optional[str]] = mapped_column(TEXT(collation="utf8mb4_0900_as_cs"))
+
+    chart_config: Mapped[Optional["ChartConfig"]] = relationship("ChartConfig", back_populates="explorer_viewss")
+    explorer: Mapped["Explorer"] = relationship("Explorer", back_populates="explorer_viewss")
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
@@ -2014,6 +2099,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
     assert values.notnull().all(), "values must not contain nulls"
     assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
     if values.empty:
+        log.warning("_infer_variable_type.mixed_type_detected", reason="empty_values")
         return "mixed"
     try:
         values = pd.to_numeric(values)
@@ -2026,6 +2112,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
             raise NotImplementedError()
     except ValueError:
         if values.map(_is_float).any():
+            log.warning("_infer_variable_type.mixed_type_detected", reason="mixed_numeric_and_string")
             return "mixed"
         else:
             return "string"

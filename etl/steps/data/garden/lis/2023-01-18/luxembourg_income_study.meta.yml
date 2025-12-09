@@ -15,7 +15,7 @@ dataset:
 
     * **Disposable household income**, which is total income minus taxes and social security contributions (available as \`dhi\` in the LIS dataset). Total income comprises income from labor, capital, pensions, public social benefits and private income.
     * **Disposable household cash income**, which is disposable household income minus the total value of goods and services (fringe benefits, home production, in-kind benefits and transfers) (available as \`dhci\` in the LIS dataset).
-    * **Market income**, the sum of factor income (labor plus capital income), private income (private cash transfers and in-kind goods and services, not involving goverment) and private pensions (constructed in LIS as \`hifactor + hiprivate + hi33\`).
+    * **Market income**, the sum of factor income (labor plus capital income), private income (private cash transfers and in-kind goods and services, not involving government) and private pensions (constructed in LIS as \`hifactor + hiprivate + hi33\`).
     * **Total consumption**, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced (available as \`hcexp\` in the LIS dataset).
 
     All households where any of these income/consumption variables is missing are excluded, except when data is not available for this variable in the entire survey (this happens for example with total consumption in several countries).

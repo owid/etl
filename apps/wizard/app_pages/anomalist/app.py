@@ -25,7 +25,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection, load_detector, pretty_print_number
-from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
+from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
     create_tables,
@@ -39,6 +39,7 @@ from apps.wizard.utils.components import (
     grapher_chart,
     st_horizontal,
     st_multiselect_wider,
+    st_title_with_expert,
     tag_in_md,
     url_persist,
 )
@@ -81,7 +82,7 @@ ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
 # GPT
-MODEL_NAME = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 # Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
@@ -166,7 +167,7 @@ def llm_ask(df: pd.DataFrame):
         "AI Summary",
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
-        help=f"Ask GPT {MODEL_NAME} to summarize the anomalies. This is experimental.",
+        help=f"Ask GPT {MODEL_DEFAULT} to summarize the anomalies. This is experimental.",
     )
 
 
@@ -276,24 +277,24 @@ def ask_llm_for_summary(df: pd.DataFrame):
     ]
 
     text_in = "\n".join([m["content"][0]["text"] for m in messages])
-    num_tokens = get_number_tokens(text_in, MODEL_NAME)
+    num_tokens = get_number_tokens(text_in, MODEL_DEFAULT)
 
     # Check if the number of tokens is within limits
     if num_tokens > 128_000:
         st.warning(
-            f"There are too many tokens in the GPT query to model {MODEL_NAME}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
+            f"There are too many tokens in the GPT query to model {MODEL_DEFAULT}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
         )
     else:
         # Ask GPT (stream)
         stream = client.chat.completions.create(
-            model=MODEL_NAME,
+            model=MODEL_DEFAULT,
             messages=messages,  # type: ignore
-            max_tokens=3000,
+            max_completion_tokens=3000,
             stream=True,
         )
         response = cast(str, st.write_stream(stream))
 
-        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_NAME))
+        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_DEFAULT))
         cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
         st.info(cost_msg)
 
@@ -585,8 +586,10 @@ create_tables()
 
 # 1/ PAGE TITLE
 # Show title
-st.title(":material/planner_review: Anomalist")
-
+st_title_with_expert(
+    "Anomalist",
+    icon=":material/planner_review:",
+)
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).
@@ -637,20 +640,24 @@ if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datase
         # Reset flag
         st.session_state.anomalist_anomalies_out_of_date = False
 
-        with st.spinner("Scanning for anomalies... This can take some time.", show_time=True):
-            anomaly_detection(
-                anomaly_types=ANOMALY_TYPES_TO_DETECT,
-                variable_ids=variable_ids,
-                variable_mapping=st.session_state.anomalist_mapping,
-                dry_run=False,
-                reset_db=False,
-            )
+        try:
+            with st.spinner("Scanning for anomalies... This can take some time.", show_time=True):
+                anomaly_detection(
+                    anomaly_types=ANOMALY_TYPES_TO_DETECT,
+                    variable_ids=variable_ids,
+                    variable_mapping=st.session_state.anomalist_mapping,
+                    dry_run=False,
+                    reset_db=False,
+                )
 
-        # Fill list of anomalies...
-        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
+            # Fill list of anomalies...
+            st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
-        # Reset manual trigger
-        st.session_state.anomalist_trigger_detection = False
+            # Reset manual trigger
+            st.session_state.anomalist_trigger_detection = False
+        except FileNotFoundError as e:
+            st.error(f"**Error loading dataset:** {str(e)}")
+            st.stop()
 
     # 3.3/ Anomalies found in DB. If outdated, set FLAG to True, so we can show a warning later on.
     else:
@@ -714,18 +721,68 @@ if st.session_state.anomalist_df is not None:
         col1, col2 = st.columns([10, 4])
         # Indicator
         with col1:
-            options = [
-                indicator for indicator in INDICATORS_AVAILABLE if indicator in st.session_state.anomalist_indicators
-            ]
+            # Show ALL indicators from selected datasets, not just those with anomalies
+            options = list(st.session_state.anomalist_indicators.keys())
+
+            # Track previously selected indicators
+            previous_selection = st.session_state.get("anomalist_filter_indicators_prev", [])
 
             url_persist(st.multiselect)(
                 label="Indicators",
                 options=options,
                 format_func=st.session_state.anomalist_indicators.get,
-                help="Show anomalies affecting only a selection of indicators.",
+                help="Show anomalies affecting only a selection of indicators. Selecting an indicator without anomalies will trigger detection.",
                 placeholder="Select indicators",
                 key="anomalist_filter_indicators",
             )
+
+            # Check if new indicators were selected that don't have anomalies yet
+            current_selection = st.session_state.get("anomalist_filter_indicators", [])
+            new_indicators = set(current_selection) - set(previous_selection)
+
+            if new_indicators:
+                # Check which new indicators don't have anomalies yet
+                indicators_with_anomalies = set(INDICATORS_AVAILABLE)
+                indicators_without_anomalies = new_indicators - indicators_with_anomalies
+
+                if indicators_without_anomalies:
+                    # Update previous selection BEFORE processing to avoid infinite loop
+                    st.session_state.anomalist_filter_indicators_prev = current_selection
+
+                    try:
+                        with st.spinner(
+                            f"Calculating anomalies for {len(indicators_without_anomalies)} new indicator(s)..."
+                        ):
+                            # Run anomaly detection with append for these indicators
+                            anomaly_detection(
+                                anomaly_types=ANOMALY_TYPES_TO_DETECT,
+                                variable_ids=list(indicators_without_anomalies),
+                                variable_mapping=st.session_state.anomalist_mapping,
+                                dry_run=False,
+                                append=True,
+                            )
+
+                            # Reload anomalies from DB
+                            st.session_state.anomalist_anomalies = WizardDB.load_anomalies(
+                                st.session_state.anomalist_datasets_selected
+                            )
+
+                            # Reparse into dataframe
+                            if len(st.session_state.anomalist_anomalies) > 0:
+                                df = get_scores(anomalies=st.session_state.anomalist_anomalies)
+                                st.session_state.anomalist_df = df
+                                # Update INDICATORS_AVAILABLE before rerunning
+                                INDICATORS_AVAILABLE = st.session_state.anomalist_df["indicator_id"].unique()
+                            st.rerun()
+                    except FileNotFoundError as e:
+                        st.error(f"**Error loading dataset:** {str(e)}")
+                        # Don't stop here, just show the error and continue
+                else:
+                    # All new indicators already have anomalies, just update the tracking
+                    st.session_state.anomalist_filter_indicators_prev = current_selection
+            else:
+                # No new indicators, update tracking anyway to stay in sync
+                st.session_state.anomalist_filter_indicators_prev = current_selection
 
         with col2:
             # Entity

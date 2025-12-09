@@ -1,4 +1,7 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create a grapher dataset.
+
+NOTE: If checking for issues with data not being up-to-date, please check the HMD dataset (https://mortality.org/Data/STMF), which is the only one that is still being updated since late 2024.
+"""
 
 from etl.helpers import PathFinder, create_dataset
 

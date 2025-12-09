@@ -8,7 +8,7 @@ from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 from etl.data_helpers.misc import expand_time_column, explode_rows_by_time_range
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -20,13 +20,13 @@ EXPECTED_LAST_YEAR = 2017
 LAST_YEAR = 2023  # Update to extend it further in time
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load gleditsch table
     ds_meadow = paths.load_dataset("gleditsch")
-    tb = ds_meadow["gleditsch"].reset_index()
+    tb = ds_meadow.read("gleditsch")
     # Load population table
     ds_pop = paths.load_dataset("population")
 
@@ -42,17 +42,20 @@ def run(dest_dir: str) -> None:
     ## GW code 260 should be referred to as 'West Germany' until 1990, then as 'Germany'
     tb_formatted.loc[(tb_formatted["id"] == 260) & (tb_formatted["year"] >= 1990), "country"] = "Germany"
 
+    # Get year to extend dataset
+    year_max = ds_pop.read("population")["year"].max()
+
     # Create new table
-    tb_regions = create_table_countries_in_region(tb_formatted, ds_pop)
+    tb_regions = create_table_countries_in_region(tb_formatted, year_max)
 
     # Population table
-    tb_pop = add_population_to_table(tb_formatted, ds_pop)
+    tb_pop = add_population_to_table(tb_formatted, year_max=year_max, ds_pop=ds_pop)
 
     # Combine tables
     tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
     # Get table with id, year, country (whenever that country was present)
-    tb_countries = create_table_country_years(tb_formatted)
+    tb_countries = create_table_country_years(tb_formatted, year_max)
 
     # Add to table list
     tables = [
@@ -65,8 +68,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -94,14 +99,14 @@ def format_table(tb: Table) -> Table:
     return tb
 
 
-def create_table_country_years(tb: Table) -> Table:
+def create_table_country_years(tb: Table, year_max: int) -> Table:
     """Create table with each country present in a year."""
     tb_countries = tb[["id", "year", "country"]].copy()
 
     # define mask for last year
     mask = tb_countries["year"] == EXPECTED_LAST_YEAR
 
-    tb_all_years = Table(pd.RangeIndex(EXPECTED_LAST_YEAR + 1, LAST_YEAR + 1), columns=["year"])
+    tb_all_years = Table(pd.RangeIndex(EXPECTED_LAST_YEAR + 1, year_max + 1), columns=["year"])
     tb_last = tb_countries[mask].drop(columns="year").merge(tb_all_years, how="cross")
 
     tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="gleditsch_countries")
@@ -109,7 +114,7 @@ def create_table_country_years(tb: Table) -> Table:
     return tb
 
 
-def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
+def create_table_countries_in_region(tb: Table, year_max) -> Table:
     """Create table with number of countries in each region per year."""
     # Get number of countries per region per year
     tb_regions = (
@@ -129,7 +134,7 @@ def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
         dimension_col=["region"],
         time_col="year",
         method="none",
-        until_time=LAST_YEAR,
+        until_time=year_max,
         fillna_method="ffill",
     )
     return tb_regions
@@ -202,7 +207,7 @@ def init_table_countries_in_region(
 
 
 def add_population_to_table(
-    tb: Table, ds_pop: Dataset, country_col: str = "country", region_alt: bool = False
+    tb: Table, ds_pop: Dataset, year_max: int, country_col: str = "country", region_alt: bool = False
 ) -> Table:
     """Add population to table.
 
@@ -217,7 +222,7 @@ def add_population_to_table(
     tb_last = tb[tb["year"] == YEAR_MAX].drop(columns=["year"])
 
     # Extend to all years
-    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, LAST_YEAR + 1), columns=["year"])
+    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, year_max + 1), columns=["year"])
     tb_pop = tb_last.merge(tb_all_years, how="cross")
 
     # Add population

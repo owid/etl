@@ -12,6 +12,7 @@ import streamlit as st
 from streamlit_ace import st_ace
 
 from apps.metagpt.cli import MetadataGPTUpdater
+from apps.wizard.utils.components import st_title_with_expert
 from etl.files import yaml_dump
 from etl.paths import SNAPSHOTS_DIR, STEP_DIR
 
@@ -84,7 +85,7 @@ def set_run_gpt_to_false():
 
 
 # Page config
-st.title("Metadata 🌟 **:gray[Upgrader]**")
+st_title_with_expert("Metadata 🌟 **:gray[Upgrader]**")
 st.markdown("Migrate your metadata to the up-to-date standard using GPT.")
 
 

@@ -170,10 +170,15 @@ def add_metadata(tb: Table, metadata_tb: Table):
             meta.title = name
             meta.processing = "minor"
             meta.display = {}
+            meta.presentation = {}
 
-            # Changing the producer name for the variables that come fron the WBL as requested by the source
-            if metadata["source"] == "World Bank: Women, Business and the Law. https://wbl.worldbank.org/":
-                meta.origins[0].producer = "World Bank - Women, Business and the Law"
+            # Change the attribution for the Learning Adjusted Years of Schooling (LAYS) indicators
+            if "HD.HCI.LAYS" in column:
+                meta.presentation["attribution"] = "World Bank based on methodology in Filmer et al. (2018)"
+                meta.presentation["attribution_short"] = "World Bank"
+            # Changing the attribution for the variables that come fron the WBL as requested by the source
+            elif metadata["source"] == "World Bank: Women, Business and the Law. https://wbl.worldbank.org/":
+                meta.presentation["attribution"] = "World Bank - Women, Business and the Law"
 
             # Convert the 'name' variable to lowercase to make text matching easier
             name_lower = tb[column].title.lower()

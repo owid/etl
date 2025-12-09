@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Bank
+    title: World Development Indicators
+    title_snapshot: World Development Indicators - Consumer price index
+    description: |-
+      The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
+    description_snapshot: |-
+      This data includes specifically one indicator from WDI, namely "Consumer price index (2010 = 100)" (with code FP.CPI.TOTL).
+    citation_full: |-
+      International Monetary Fund, International Financial Statistics database. World Development Indicators - World Bank (2025). Indicator [FP.CPI.TOTL](https://data.worldbank.org/indicator/FP.CPI.TOTL).
+    version_producer: "122"
+    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+    url_download: https://api.worldbank.org/v2/en/indicator/FP.CPI.TOTL?downloadformat=csv
+    date_accessed: '2025-08-29'
+    date_published: '2025-07-01'
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+outs:
+  - md5: 73db83104656d5dbb79b451a7347fdd1
+    size: 94910
+    path: wdi_cpi.zip

@@ -34,6 +34,52 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["comments", "geospread_comments"])
     tb = tb.rename(columns={"country_area_territory": "country"})
 
+    # Convert object columns that should be numeric to numeric
+    # Using errors='coerce' converts invalid values to NaN rather than failing.
+    numeric_cols = [
+        "ili_case",
+        "ili_outpatients",
+        "ili_pop_cov",
+        "sari_case",
+        "sari_inpatients",
+        "sari_pop_cov",
+        "sari_deaths",
+        "ari_case",
+        "ari_outpatients",
+        "ari_pop_cov",
+        "pneu_case",
+        "pneu_inpatients",
+        "pneu_pop_cov",
+    ]
+    for col in numeric_cols:
+        if col in tb.columns:
+            # Track non-null values before conversion
+            before_non_null = tb[col].notna().sum()
+            original_values = tb[col].copy()
+
+            # Convert to numeric, coercing errors to NaN
+            tb[col] = pd.to_numeric(tb[col], errors="coerce")
+
+            # Check if any values were coerced to NaN (data quality issues)
+            after_non_null = tb[col].notna().sum()
+            coerced_count = before_non_null - after_non_null
+
+            if coerced_count > 0:
+                # Find the problematic rows
+                coerced_mask = original_values.notna() & tb[col].isna()
+                problematic_rows = tb[coerced_mask]
+
+                log.warning(
+                    f"Data quality issue in column '{col}': {coerced_count} non-numeric values coerced to NaN",
+                    col=col,
+                    coerced_count=coerced_count,
+                    sample_values=original_values[coerced_mask].head(5).tolist(),
+                    sample_countries=problematic_rows["country"].head(5).tolist() if "country" in tb.columns else None,
+                    sample_dates=problematic_rows["iso_weekstartdate"].head(5).tolist()
+                    if "iso_weekstartdate" in tb.columns
+                    else None,
+                )
+
     #
     # Save outputs.
     #

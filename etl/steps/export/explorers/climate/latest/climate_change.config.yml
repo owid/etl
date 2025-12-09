@@ -81,7 +81,7 @@ views:
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: sea_surface_temperature_anomaly
@@ -96,7 +96,7 @@ views:
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: ocean_heat_content__top_700m
@@ -114,7 +114,7 @@ views:
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
       note: |-
         Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
@@ -133,7 +133,7 @@ views:
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
       note: |-
         Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
@@ -150,7 +150,7 @@ views:
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
       hideAnnotationFieldsInTitle: true
   - dimensions:
@@ -168,7 +168,7 @@ views:
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: arctic_sea_ice_extent
@@ -183,7 +183,7 @@ views:
       yScaleToggle: false
       yAxisMin: 0
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: antarctic_sea_ice_extent
@@ -198,7 +198,7 @@ views:
       yScaleToggle: false
       yAxisMin: 0
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: mass_balance_of_ice_sheets
@@ -214,7 +214,7 @@ views:
       yScaleToggle: false
       yAxisMin: -5200
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
       note: Combined measurements are based on more than 20 different studies that have been combined for each region.
   - dimensions:
@@ -230,7 +230,7 @@ views:
       yScaleToggle: false
       yAxisMin: -50
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: snow_cover
@@ -246,7 +246,7 @@ views:
       yScaleToggle: false
       yAxisMin: 0
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: co2_concentrations
@@ -261,7 +261,7 @@ views:
       yScaleToggle: false
       yAxisMin: 320
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: ch4_concentrations
@@ -276,7 +276,7 @@ views:
       yScaleToggle: false
       yAxisMin: 1600
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: n2o_concentrations
@@ -291,7 +291,7 @@ views:
       yScaleToggle: false
       yAxisMin: 300
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: co2_concentrations
@@ -306,7 +306,7 @@ views:
       yScaleToggle: false
       yAxisMin: 150
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: ch4_concentrations
@@ -320,7 +320,7 @@ views:
       yScaleToggle: false
       yAxisMin: 550
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false
   - dimensions:
       metric: n2o_concentrations
@@ -334,5 +334,5 @@ views:
       yScaleToggle: false
       yAxisMin: 250
       baseColorScheme: owid-distinct
-      type: LineChart
+      type: LineChart DiscreteBar
       hasMapTab: false

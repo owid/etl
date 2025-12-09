@@ -6,6 +6,13 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+# x v2mebias
+# x v2smgovdom
+# x v2cagenmob
+# x v2xcl_prpty
+# x v2mecorrpt
+# x v2xnp_client
+# x v2elvotbuy
 COLUMNS_KEEP = [
     # primary keys
     "year",
@@ -20,6 +27,9 @@ COLUMNS_KEEP = [
     "v2caautmob",
     "v2caautmob_codehigh",
     "v2caautmob_codelow",
+    "v2cagenmob",
+    "v2cagenmob_codehigh",
+    "v2cagenmob_codelow",
     "v2cacamps",
     "v2cacamps_codehigh",
     "v2cacamps_codelow",
@@ -67,6 +77,9 @@ COLUMNS_KEEP = [
     "v2elmulpar_osp_codelow",
     "v2eltrnout",
     "v2elvaptrn",
+    "v2elvotbuy",
+    "v2elvotbuy_codehigh",
+    "v2elvotbuy_codelow",
     # What type of election was held on this date?
     "v2eltype_0",  # Legislative; lower, sole, or both chambers, first or only round.
     "v2eltype_1",  # Legislative; lower, sole, or both chambers, second or later round.
@@ -100,9 +113,15 @@ COLUMNS_KEEP = [
     "v2lgcrrpt_codelow",
     "v2lgfemleg",
     # v2m
+    "v2mebias",
+    "v2mebias_codehigh",
+    "v2mebias_codelow",
     "v2mecenefm",
     "v2mecenefm_codehigh",
     "v2mecenefm_codelow",
+    "v2mecorrpt",
+    "v2mecorrpt_codehigh",
+    "v2mecorrpt_codelow",
     "v2meharjrn",
     "v2meharjrn_codehigh",
     "v2meharjrn_codelow",
@@ -114,6 +133,9 @@ COLUMNS_KEEP = [
     "v2pepwrsoc_codehigh",
     "v2pepwrsoc_codelow",
     # v2s
+    "v2smgovdom",
+    "v2smgovdom_codehigh",
+    "v2smgovdom_codelow",
     "v2svdomaut",
     "v2svdomaut_codehigh",
     "v2svdomaut_codelow",
@@ -127,6 +149,9 @@ COLUMNS_KEEP = [
     "v2x_civlib",
     "v2x_civlib_codehigh",
     "v2x_civlib_codelow",
+    "v2xcl_prpty",
+    "v2xcl_prpty_codehigh",
+    "v2xcl_prpty_codelow",
     "v2x_clphy",
     "v2x_clphy_codehigh",
     "v2x_clphy_codelow",
@@ -243,6 +268,9 @@ COLUMNS_KEEP = [
     "v2xlg_legcon",
     "v2xlg_legcon_codehigh",
     "v2xlg_legcon_codelow",
+    "v2xnp_client",
+    "v2xnp_client_codehigh",
+    "v2xnp_client_codelow",
     "v2xnp_pres",
     "v2xnp_pres_codehigh",
     "v2xnp_pres_codelow",
@@ -260,7 +288,9 @@ def run() -> None:
 
     # Load data from snapshot.
     with snap.open_archive():
-        tb = snap.read_from_archive("V-Dem-CY-Full+Others-v15.csv", usecols=COLUMNS_KEEP, dtype={"v2exnamhog": "str"})
+        tb = snap.read_from_archive(
+            "V-Dem-CY-Full+Others-v15.csv", usecols=COLUMNS_KEEP, dtype={"v2exnamhog": "string"}
+        )
     #
     # Process data.
     #

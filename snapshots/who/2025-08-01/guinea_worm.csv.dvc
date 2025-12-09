@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: World Health Organization (2018)
+    description: ""
+    url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+    date_accessed: 2025-08-01
+    publication_year: 2018
+    published_by: "Certification status of dracunculiasis eradication: World Health Organization; 2018. Licence: CC BY-NC-SA 3.0 IGO"
+  name: Certification status of dracunculiasis eradication (WHO, 2018)
+  description: ""
+  license:
+    name: CC BY-NC-SA 3.0 IGO
+    url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 00fe995cf57cead2f8f435f9bab29501
+    size: 186834
+    path: guinea_worm.csv

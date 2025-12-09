@@ -245,6 +245,38 @@ def are_equal(
     return equal, compared
 
 
+def _calculate_weighted_mean(
+    group_data: pd.DataFrame,
+    value_col: str,
+    weight_col: str,
+    num_allowed_nans: int | None = None,
+    frac_allowed_nans: float | None = None,
+    min_num_values: int | None = None,
+) -> float:
+    """Calculate weighted mean for a group, applying NaN handling rules."""
+    values = group_data[value_col]
+    weights = group_data[weight_col]
+
+    # Apply same NaN handling logic as regular aggregations
+    total_count = len(values)
+    mask = ~(pd.isna(values) | pd.isna(weights) | (weights == 0))
+    valid_values = values[mask]
+    valid_weights = weights[mask]
+    valid_count = len(valid_values)
+    nan_count = total_count - valid_count
+
+    # Apply NaN handling rules to follow the same logic as for the non-weighted aggregations (defined in groupby_agg).
+    if (num_allowed_nans is not None) and (nan_count > num_allowed_nans):
+        return np.nan
+    if (frac_allowed_nans is not None) and (total_count > 0) and (nan_count / total_count > frac_allowed_nans):
+        return np.nan
+    if (min_num_values is not None) and (valid_count < min_num_values) and (nan_count > 0):
+        return np.nan
+    if len(valid_values) == 0:
+        return np.nan
+    return float(np.average(valid_values, weights=valid_weights))
+
+
 def groupby_agg(
     df: pd.DataFrame,
     groupby_columns: Union[List[str], str],
@@ -317,8 +349,45 @@ def groupby_agg(
         "observed": True,
     }
 
-    # Group by and aggregate in the usual way.
-    grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # type: ignore
+    # Handle weighted aggregations separately if any are present
+    weighted_aggregations = {
+        k: v for k, v in aggregations.items() if isinstance(v, str) and v.startswith("mean_weighted_by_")
+    }
+
+    if weighted_aggregations:
+        # Split out regular aggregations to handle them normally
+        regular_aggregations = {
+            k: v for k, v in aggregations.items() if not (isinstance(v, str) and v.startswith("mean_weighted_by_"))
+        }
+
+        # Handle regular aggregations first (if any)
+        if regular_aggregations:
+            grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(regular_aggregations)  # type: ignore
+        else:
+            # Create empty DataFrame with proper groupby index for weighted-only case
+            grouped = (
+                df.groupby(groupby_columns, dropna=False, observed=True)
+                .size()
+                .to_frame("_temp")
+                .drop(columns=["_temp"])
+            )
+
+        # Add weighted mean columns
+        for col, agg_func in weighted_aggregations.items():
+            weight_col = agg_func.replace("mean_weighted_by_", "")
+            if weight_col not in df.columns:
+                raise ValueError(f"Weight column '{weight_col}' not found in data")
+
+            weighted_results = df.groupby(groupby_columns, dropna=False, observed=True).apply(
+                lambda group: _calculate_weighted_mean(
+                    group, col, weight_col, num_allowed_nans, frac_allowed_nans, min_num_values
+                ),
+                include_groups=False,
+            )
+            grouped[col] = weighted_results  # type: ignore
+    else:
+        # No weighted aggregations; use standard grouping logic
+        grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # type: ignore
 
     # Calculate a few necessary parameters related to the number of nans and valid elements.
     if (num_allowed_nans is not None) or (frac_allowed_nans is not None) or (min_num_values is not None):

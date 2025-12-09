@@ -94,12 +94,13 @@ tables:
             tab: map
             originUrl: https://ourworldindata.org/co2-and-greenhouse-gas-emissions
             colorScale:
-              binningStrategy: equalInterval
+              binningStrategy: "equalSizeBins-normal"
             map:
               colorScale:
                 baseColorScheme: Reds
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1
                   - 2
                   - 5

@@ -1,0 +1,121 @@
+name: Publish OWID packages to PyPI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'lib/catalog/pyproject.toml'
+      - 'lib/datautils/pyproject.toml'
+      - 'lib/repack/pyproject.toml'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish (catalog, datautils, repack, or all)'
+        required: true
+        default: 'all'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      catalog: ${{ steps.filter.outputs.catalog }}
+      datautils: ${{ steps.filter.outputs.datautils }}
+      repack: ${{ steps.filter.outputs.repack }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Detect which packages changed
+      id: filter
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          PACKAGE="${{ github.event.inputs.package }}"
+          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "catalog" ]; then
+            echo "catalog=true" >> $GITHUB_OUTPUT
+          fi
+          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "datautils" ]; then
+            echo "datautils=true" >> $GITHUB_OUTPUT
+          fi
+          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "repack" ]; then
+            echo "repack=true" >> $GITHUB_OUTPUT
+          fi
+        else
+          git diff --name-only HEAD~1 HEAD | grep -q 'lib/catalog/pyproject.toml' && echo "catalog=true" >> $GITHUB_OUTPUT || echo "catalog=false" >> $GITHUB_OUTPUT
+          git diff --name-only HEAD~1 HEAD | grep -q 'lib/datautils/pyproject.toml' && echo "datautils=true" >> $GITHUB_OUTPUT || echo "datautils=false" >> $GITHUB_OUTPUT
+          git diff --name-only HEAD~1 HEAD | grep -q 'lib/repack/pyproject.toml' && echo "repack=true" >> $GITHUB_OUTPUT || echo "repack=false" >> $GITHUB_OUTPUT
+        fi
+
+  publish:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.catalog == 'true' || needs.detect-changes.outputs.datautils == 'true' || needs.detect-changes.outputs.repack == 'true'
+
+    strategy:
+      matrix:
+        include:
+          - package: catalog
+            name: owid-catalog
+            path: lib/catalog
+            should_run: ${{ needs.detect-changes.outputs.catalog }}
+          - package: datautils
+            name: owid-datautils
+            path: lib/datautils
+            should_run: ${{ needs.detect-changes.outputs.datautils }}
+          - package: repack
+            name: owid-repack
+            path: lib/repack
+            should_run: ${{ needs.detect-changes.outputs.repack }}
+
+    steps:
+    - name: Skip if not needed
+      if: matrix.should_run != 'true'
+      run: |
+        echo "Skipping ${{ matrix.name }} - no changes detected"
+        exit 0
+
+    - name: Checkout code
+      if: matrix.should_run == 'true'
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Check if version was bumped
+      if: matrix.should_run == 'true'
+      run: |
+        CURRENT_VERSION=$(grep '^version = ' ${{ matrix.path }}/pyproject.toml | head -1)
+        PREVIOUS_VERSION=$(git show HEAD~1:${{ matrix.path }}/pyproject.toml | grep '^version = ' | head -1)
+
+        echo "Current version: $CURRENT_VERSION"
+        echo "Previous version: $PREVIOUS_VERSION"
+
+        if [ "$CURRENT_VERSION" = "$PREVIOUS_VERSION" ]; then
+          echo "❌ Version was not bumped in ${{ matrix.path }}/pyproject.toml"
+          echo "Please increment the version before publishing."
+          exit 1
+        fi
+
+        echo "✅ Version was bumped, proceeding with publish"
+
+    - name: Set up Python
+      if: matrix.should_run == 'true'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install UV
+      if: matrix.should_run == 'true'
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Publish ${{ matrix.name }}
+      if: matrix.should_run == 'true'
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+      run: |
+        cd ${{ matrix.path }}
+        rm -rf dist
+        uv build
+        uvx twine upload dist/*

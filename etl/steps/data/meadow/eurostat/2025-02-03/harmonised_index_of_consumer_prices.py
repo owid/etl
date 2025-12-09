@@ -58,7 +58,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb])
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

@@ -2,14 +2,16 @@
 #  catalog.py
 #  owid-catalog-py
 #
+from __future__ import annotations
 
 import heapq
 import json
 import os
 import re
 import tempfile
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union, cast
+from typing import Any, cast
 from urllib.parse import urlparse
 
 import numpy as np
@@ -34,10 +36,10 @@ OWID_CATALOG_URI = "https://catalog.ourworldindata.org/"
 S3_OWID_URI = "s3://owid-catalog"
 
 # global copy cached after first request
-REMOTE_CATALOG: Optional["RemoteCatalog"] = None
+REMOTE_CATALOG: RemoteCatalog | None = None
 
 # what formats should we for our index of available datasets?
-INDEX_FORMATS: List[FileFormat] = ["feather"]
+INDEX_FORMATS: list[FileFormat] = ["feather"]
 
 
 class CatalogMixin:
@@ -51,11 +53,11 @@ class CatalogMixin:
 
     def find(
         self,
-        table: Optional[str] = None,
-        namespace: Optional[str] = None,
-        version: Optional[str] = None,
-        dataset: Optional[str] = None,
-        channel: Optional[CHANNEL] = None,
+        table: str | None = None,
+        namespace: str | None = None,
+        version: str | None = None,
+        dataset: str | None = None,
+        channel: CHANNEL | None = None,
     ) -> "CatalogFrame":
         criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
 
@@ -84,13 +86,13 @@ class CatalogMixin:
 
         return cast(CatalogFrame, matches)
 
-    def find_one(self, *args: Optional[str], **kwargs: Optional[str]) -> Table:
+    def find_one(self, *args: str | None, **kwargs: str | None) -> Table:
         return self.find(*args, **kwargs).load()  # type: ignore
 
     def find_latest(
         self,
-        *args: Optional[str],
-        **kwargs: Optional[str],
+        *args: str | None,
+        **kwargs: str | None,
     ) -> Table:
         frame = self.find(*args, **kwargs)  # type: ignore
         if frame.empty:
@@ -118,7 +120,7 @@ class LocalCatalog(CatalogMixin):
 
     uri: str
 
-    def __init__(self, path: Union[str, Path], channels: Iterable[CHANNEL] = ("garden",)) -> None:
+    def __init__(self, path: str | Path, channels: Iterable[CHANNEL] = ("garden",)) -> None:
         self.uri = str(path)
         self.channels = channels
         if self._catalog_exists(channels):
@@ -152,7 +154,7 @@ class LocalCatalog(CatalogMixin):
         df.dimensions = df.dimensions.map(lambda s: json.loads(s) if isinstance(s, str) else s)
         return df
 
-    def iter_datasets(self, channel: CHANNEL, include: Optional[str] = None) -> Iterator[Dataset]:
+    def iter_datasets(self, channel: CHANNEL, include: str | None = None) -> Iterator[Dataset]:
         to_search = [self.path / channel]
         if not to_search[0].exists():
             return
@@ -169,7 +171,7 @@ class LocalCatalog(CatalogMixin):
                 if child.is_dir():
                     heapq.heappush(to_search, child)
 
-    def reindex(self, include: Optional[str] = None) -> None:
+    def reindex(self, include: str | None = None) -> None:
         """
         Walk the directory tree, generate a channel/namespace/version/dataset/table frame
         and save it to each of our index formats.
@@ -215,7 +217,7 @@ class LocalCatalog(CatalogMixin):
         # add a catalog version number that we can use to tell old clients to update
         self._save_metadata({"format_version": OWID_CATALOG_VERSION})
 
-    def _scan_for_datasets(self, include: Optional[str] = None) -> "CatalogFrame":
+    def _scan_for_datasets(self, include: str | None = None) -> "CatalogFrame":
         """Scan datasets. You can filter by `include` to get better performance."""
         frames = []
         log.info("reindex.start", channels=self.channels, include=include)
@@ -241,7 +243,7 @@ class LocalCatalog(CatalogMixin):
 
         return CatalogFrame(df)
 
-    def _save_metadata(self, contents: Dict[str, Any]) -> None:
+    def _save_metadata(self, contents: dict[str, Any]) -> None:
         with open(self._metadata_file, "w") as ostream:
             json.dump(contents, ostream, indent=2)
 
@@ -268,13 +270,13 @@ class RemoteCatalog(CatalogMixin):
         return self.frame[["namespace", "version", "dataset"]].drop_duplicates()
 
     @staticmethod
-    def _read_metadata(uri: str) -> Dict[str, Any]:
+    def _read_metadata(uri: str) -> dict[str, Any]:
         """
         Read the metadata JSON blob for this repo.
         """
         resp = requests.get(uri)
         resp.raise_for_status()
-        return cast(Dict[str, Any], resp.json())
+        return cast(dict[str, Any], resp.json())
 
     @staticmethod
     def _read_channels(uri: str, channels: Iterable[CHANNEL]) -> pd.DataFrame:
@@ -289,7 +291,7 @@ class CatalogFrame(pd.DataFrame):
     DataFrame helper, meant only for displaying catalog results.
     """
 
-    _base_uri: Optional[str] = None
+    _base_uri: str | None = None
 
     _metadata = ["_base_uri"]
 
@@ -379,10 +381,10 @@ def _load_remote_catalog(channels):
 
 
 def find(
-    table: Optional[str] = None,
-    namespace: Optional[str] = None,
-    version: Optional[str] = None,
-    dataset: Optional[str] = None,
+    table: str | None = None,
+    namespace: str | None = None,
+    version: str | None = None,
+    dataset: str | None = None,
     channels: Iterable[CHANNEL] = ("garden",),
 ) -> "CatalogFrame":
     REMOTE_CATALOG = _load_remote_catalog(channels=channels)
@@ -390,16 +392,16 @@ def find(
     return REMOTE_CATALOG.find(table=table, namespace=namespace, version=version, dataset=dataset)
 
 
-def find_one(*args: Optional[str], **kwargs: Optional[str]) -> Table:
+def find_one(*args: str | None, **kwargs: str | None) -> Table:
     return find(*args, **kwargs).load()  # type: ignore
 
 
 def find_latest(
-    table: Optional[str] = None,
-    namespace: Optional[str] = None,
-    dataset: Optional[str] = None,
+    table: str | None = None,
+    namespace: str | None = None,
+    dataset: str | None = None,
     channels: Iterable[CHANNEL] = ("garden",),
-    version: Optional[str] = None,
+    version: str | None = None,
 ) -> Table:
     REMOTE_CATALOG = _load_remote_catalog(channels=channels)
 
@@ -425,7 +427,7 @@ class PackageUpdateRequired(Exception):
     pass
 
 
-def read_frame(uri: Union[str, Path]) -> pd.DataFrame:
+def read_frame(uri: str | Path) -> pd.DataFrame:
     if isinstance(uri, Path):
         uri = str(uri)
 
@@ -441,7 +443,7 @@ def read_frame(uri: Union[str, Path]) -> pd.DataFrame:
     raise ValueError(f"could not detect format of uri: {uri}")
 
 
-def save_frame(df: pd.DataFrame, path: Union[str, Path]) -> None:
+def save_frame(df: pd.DataFrame, path: str | Path) -> None:
     path = str(path)
     if path.endswith(".feather"):
         df.to_feather(path)

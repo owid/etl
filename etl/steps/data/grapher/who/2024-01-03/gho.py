@@ -3,7 +3,7 @@
 import pandas as pd
 import structlog
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = structlog.get_logger()
 
@@ -47,9 +47,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = paths.create_dataset(tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

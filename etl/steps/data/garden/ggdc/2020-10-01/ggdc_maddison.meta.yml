@@ -44,6 +44,7 @@ tables:
                     binningStrategy: manual
                     binningStrategyBinCount: 9
                     customNumericValues:
+                        - 0
                         - 1000
                         - 2000
                         - 5000

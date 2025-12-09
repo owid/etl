@@ -1,0 +1,28 @@
+# To get the local file, go to
+# https://apps.fas.usda.gov/psdonline/app/index.html#/app/advQuery
+# And select:
+# Commodities: Corn
+# Attributes: Yield
+# Countries: cmd+a (to select all countries)
+# Note that having "All countries" selected doesn't repeat countries; also note that regions are not downloaded, for some reason (it seems to include them we'd need to select them as a separate query)
+# Years: cmd+a (to select all years)
+# Then, below, click on "File format", and click on "Run Query".
+# On the following page, click on "Download" (top right corner) to download the xls file (which seems to actually be an HTML file).
+meta:
+  origin:
+    title: "Corn yields"
+    date_published: "2025-10-01"
+    producer: USDA/FAS
+    citation_full: |-
+      United States Department of Agriculture Foreign Agricultural Service (USDA/FAS) - International corn yields data, extracted from the Production, Supply and Distribution Database.
+      USDA uses official country statistics, reports from agricultural attaches at U.S. embassies, data from international organizations, publications from individual countries, information from traders both inside and outside a country, and other available information.
+    attribution_short: USDA/FAS
+    url_main: https://apps.fas.usda.gov/psdonline/app/index.html#/app/advQuery
+    date_accessed: '2025-10-16'
+    license:
+      name: CC BY 4.0
+      url: https://catalog.data.gov/dataset/production-supply-and-distribution-database
+outs:
+  - md5: 06be29d5b41a0e1b8679efc014b9c3f9
+    size: 305033
+    path: corn_yields.xls

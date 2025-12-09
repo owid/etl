@@ -6,7 +6,6 @@
 #
 
 from dataclasses import dataclass
-from typing import Optional
 
 import pandas as pd
 
@@ -28,7 +27,7 @@ class Chart:
 
     slug: str
 
-    _bundle: Optional[_GrapherBundle] = None
+    _bundle: _GrapherBundle | None = None
 
     @property
     def bundle(self) -> _GrapherBundle:

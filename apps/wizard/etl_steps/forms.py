@@ -11,12 +11,12 @@ import streamlit as st
 from pydantic import BaseModel
 from typing_extensions import Self
 
-from apps.utils.files import generate_step_to_channel
+from apps.utils.files import generate_step, generate_step_to_channel
 from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
 from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
-from etl.paths import DAG_DIR
+from etl.paths import DAG_DIR, STEP_DIR
 
 
 def is_snake(s: str) -> bool:
@@ -413,6 +413,7 @@ class SnapshotForm(StepForm):
     file_extension: str
     is_private: bool
     dataset_manual_import: bool
+    dvc_only: bool = False
 
     # origin
     title: str
@@ -528,3 +529,109 @@ class SnapshotForm(StepForm):
         }
         meta = cast(Dict[str, Any], clean_empty_dict(meta))
         return meta
+
+
+class CollectionForm(StepForm):
+    """express step form."""
+
+    step_name: str = "collection"
+
+    # Common
+    namespace: str
+    short_name: str
+    version: str
+    add_to_dag: bool
+    dag_file: str
+
+    def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
+        """Construct class."""
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
+
+        # st.write(data)
+        super().__init__(**data)  # type: ignore
+
+    def create_files(self) -> List[Dict[str, Any]]:
+        # Generate files
+        COLLECTION_DIR = generate_export_step_to_channel(
+            cookiecutter_path=COOKIE_STEPS[self.step_name], data=self.to_dict()
+        )
+
+        # Add to generated files
+        generated_files = [
+            {
+                "path": COLLECTION_DIR / (self.short_name + ".py"),
+                "language": "python",
+            },
+            {
+                "path": COLLECTION_DIR / (self.short_name + ".config.yml"),
+                "language": "yaml",
+            },
+        ]
+        return generated_files
+
+    @property
+    def dag_path(self) -> Path:
+        """Get DAG path."""
+        return DAG_DIR / self.dag_file
+
+    @property
+    def dag(self) -> Dict[str, Any]:
+        dag = {self.step_uri: [f"data://grapher/{self.base_step_name}"]}
+        return dag
+
+    @property
+    def base_step_name(self) -> str:
+        """namespace/version/short_name"""
+        return f"{self.namespace}/{self.version}/{self.short_name}"
+
+    @property
+    def step_uri(self) -> str:
+        """Get step URI."""
+        return f"export://multidim/{self.base_step_name}"
+
+    def to_dict(self):
+        return {
+            "namespace": self.namespace,
+            "short_name": self.short_name,
+            "version": self.version,
+            "dag_file": self.dag_file,
+            "add_to_dag": self.add_to_dag,
+        }
+
+    def add_steps_to_dag(self) -> str:
+        if self.add_to_dag:
+            # Get dag
+            dag = self.dag
+            # Get comment
+            default_comment = "\n#\n# TODO: add step name (just something recognizable)\n#"
+            comments = {
+                self.step_uri: default_comment,
+            }
+            # Add to DAG
+            write_to_dag_file(dag_file=self.dag_path, dag_part=dag, comments=comments)
+            return ruamel_dump({"steps": dag})
+        else:
+            return ""
+
+    def validate(self: Self) -> None:
+        """Check that fields in form are valid.
+
+        - Add error message for each field (to be displayed in the form).
+        - Return True if all fields are valid, False otherwise.
+        """
+        # Default common checks
+        fields_required = ["namespace", "short_name", "version"]
+        fields_snake = ["namespace", "short_name"]
+        fields_version = ["version"]
+
+        self.check_required(fields_required)
+        self.check_snake(fields_snake)
+        self.check_is_version(fields_version)
+
+
+def generate_export_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
+    assert {"namespace", "version"} <= data.keys()
+
+    target_dir = STEP_DIR / "export" / "multidim"
+    generate_step(cookiecutter_path, data, target_dir)
+    return target_dir / data["namespace"] / data["version"]

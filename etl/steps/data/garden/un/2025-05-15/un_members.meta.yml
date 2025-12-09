@@ -1,0 +1,82 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+    processing_level: major
+    description_short: Membership is defined along current countries and their borders.
+
+  expanded_list: |-
+    The list of current UN members has been expanded with non-member entities we can map but are not included in the original list. Added entities include Taiwan, Palestine and Kosovo, among others.
+
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  un_members:
+    variables:
+      membership_status:
+        title: United Nations membership status
+        unit: ""
+        short_unit: ""
+        description_processing: "{definitions.expanded_list}"
+
+  un_members_in_regions:
+    variables:
+      membership_number:
+        title: Number of UN member states by region
+        unit: ""
+        short_unit: ""
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications.
+        display:
+          name: Number of UN member states
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of UN member states by region
+
+      non_membership_number:
+        title: Number non UN member states by region
+        unit: ""
+        short_unit: ""
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications.
+        display:
+          name: Number non UN member states
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of non UN member states by region
+
+      membership_pop:
+        title: Population of UN member states by region
+        unit: ""
+        short_unit: ""
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data.
+        display:
+          name: Population of UN member states
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Population of UN member states by region
+
+      non_membership_pop:
+        title: Population of non UN member states by region
+        unit: ""
+        short_unit: ""
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data.
+        display:
+          name: Population of non UN member states
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Population of non UN member states by region

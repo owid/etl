@@ -13,11 +13,11 @@ Strategy:
 NOTE: This pipeline assumes that there is a TSV template in owid-content, this should probably be change din the future.
 """
 
-from etl.collection.beta import combine_explorers
-from etl.helpers import PathFinder
+from utils import ExplorerCreator
+from view_edits import ViewEditor
 
-from .utils import ExplorerCreator
-from .view_edits import ViewEditor
+from etl.collection import combine_collections
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -59,7 +59,7 @@ def run() -> None:
     explorer_creator = ExplorerCreator(paths, ds, ds_full)
 
     # Default config: This config contains the default metadata for most explorers. Exceptions are sex_ratio, which needs other names for certain dimension choices, and manual views.
-    config_default = paths.load_explorer_config()
+    config_default = paths.load_collection_config()
 
     # Object used to edit view configs: Some of the views need extra-curation (this includes adding map brackets, renaming titles, etc.)
     view_editor = ViewEditor(map_brackets_yaml=paths.side_file("map_brackets.yml"))
@@ -76,7 +76,7 @@ def run() -> None:
     ########## Population explorer
     explorer_pop = explorer_creator.create(
         table_name="population",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["population", "population_change", "population_density"],
         dimensions={
             "age": ["all", "0", "0-4", "0-14", "0-24"] + AGES_POP_LIST,
@@ -84,7 +84,7 @@ def run() -> None:
             "variant": ["estimates"],
         },
         choice_renames={"age": AGES_POP},
-        explorer_name="population-and-demography",
+        short_name="population-and-demography",
     )
     view_editor.edit_views_pop(explorer_pop)
 
@@ -92,7 +92,7 @@ def run() -> None:
     ########## Dependency ratio explorer
     explorer_dep = explorer_creator.create(
         table_name="dependency_ratio",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["dependency_ratio"],
         dimensions={
             "age": "*",
@@ -105,7 +105,7 @@ def run() -> None:
     ########## Sex ratio explorer
     explorer_sr = explorer_creator.create(
         table_name="sex_ratio",
-        config_yaml=paths.load_explorer_config("un_wpp.sex_ratio.config.yml"),
+        config=paths.load_collection_config("un_wpp.sex_ratio.config.yml"),
         indicator_names=["sex_ratio"],
         dimensions={
             "age": ["all", "0"] + list(AGES_SR.keys()),
@@ -119,7 +119,7 @@ def run() -> None:
     ########## Migration explorer
     explorer_mig = explorer_creator.create(
         table_name="migration",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["net_migration", "net_migration_rate"],
         dimensions={
             "age": "*",
@@ -136,7 +136,7 @@ def run() -> None:
     ########## Deaths explorer
     explorer_deaths = explorer_creator.create(
         table_name="deaths",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["deaths", "death_rate"],
         dimensions={
             "age": ["all", "0", "0-4"] + AGES_DEATHS_LIST,
@@ -150,7 +150,7 @@ def run() -> None:
     ########## Births explorer
     explorer_b = explorer_creator.create(
         table_name="births",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["births", "birth_rate"],
         dimensions={
             "age": "*",
@@ -164,7 +164,7 @@ def run() -> None:
     ########## Median age explorer
     explorer_ma = explorer_creator.create(
         table_name="median_age",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["median_age"],
         dimensions={
             "age": ["all"],
@@ -178,7 +178,7 @@ def run() -> None:
     ########## Life expectancy explorer
     explorer_le = explorer_creator.create(
         table_name="life_expectancy",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["life_expectancy"],
         dimensions={
             "age": "*",
@@ -199,7 +199,7 @@ def run() -> None:
     ########## Fertility rate explorer
     explorer_fr = explorer_creator.create(
         table_name="fertility_rate",
-        config_yaml=config_default,
+        config=config_default,
         indicator_names=["fertility_rate"],
         dimensions={
             "age": "*",
@@ -212,7 +212,7 @@ def run() -> None:
 
     ########## Manual explorer: views with grouped indicators, and others
     explorer_manual = explorer_creator.create_manual(
-        config=paths.load_explorer_config("un_wpp.manual.config.yml"),
+        config=paths.load_collection_config("un_wpp.manual.config.yml"),
     )
     view_editor.edit_views_manual(explorer_manual)
 
@@ -236,14 +236,14 @@ def run() -> None:
     ]
 
     # Combine them into single explorer
-    explorer = combine_explorers(
-        explorers=explorers,
-        explorer_name="population-and-demography",
-        config=explorer_pop.config,
+    c = combine_collections(
+        collections=explorers,
+        collection_name="population-and-demography",
+        config=config_default,
     )
 
     # Sort indicator choices
-    explorer.sort_indicators(
+    c.sort_indicators(
         [
             "population",
             "population_broad",
@@ -271,4 +271,4 @@ def run() -> None:
     )
 
     # # Save explorer (upsert to DB)
-    explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

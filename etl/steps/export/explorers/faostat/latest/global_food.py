@@ -1,4 +1,4 @@
-"""Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer."""
+"""Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer.."""
 
 from copy import deepcopy
 from typing import Any, Callable, Dict, Optional
@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Optional
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.collection.explorer import combine_config_dimensions, expand_config
+from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Initialize log.
@@ -186,7 +186,7 @@ ITEM_CODES_QCL = [
     "00001723",  # From faostat_qcl - 'Sugar crops' (previously 'Sugar crops').
     "00001726",  # From faostat_qcl - 'Pulses' (previously 'Pulses').
     "00000162",  # From faostat_qcl - 'Sugar (raw)' (previously 'Sugar (raw)').
-    "00000667",  # From faostat_qcl - 'Tea leaves' (previously 'Tea').
+    # "00000667",  # From faostat_qcl - 'Tea leaves' (previously 'Tea').
     "00000056",  # From faostat_qcl - 'Maize (corn)' (previously 'Maize').
     "00000257",  # From faostat_qcl - 'Palm oil' (previously 'Palm oil').
     "00000393",  # From faostat_qcl - 'Cauliflowers and broccoli' (previously 'Cauliflowers and broccoli').
@@ -470,7 +470,7 @@ def run():
     tb_fbsc = ds_fbsc.read("faostat_fbsc_flat", load_data=False)
 
     # Load grapher config from YAML.
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     #
     # Process data.
@@ -517,6 +517,7 @@ def run():
             "fat__camels": "Fat, camel",
             "fat__goats": "Fat, goat",
             "fat__cattle": "Fat, cattle",
+            "laying": "Laying birds",
         },
     )
 
@@ -549,7 +550,11 @@ def run():
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_explorer(config=config, explorer_name="global-food")
+    c = paths.create_collection(
+        config=config,
+        short_name="global-food",
+        explorer=True,
+    )
 
     # Save explorer.
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

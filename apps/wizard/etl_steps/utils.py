@@ -169,6 +169,7 @@ COOKIE_STEPS = {
     "meadow": WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow",
     "garden": WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden",
     "grapher": WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher",
+    "collection": WIZARD_DIR / "etl_steps" / "cookiecutter" / "collection",
 }
 # Paths to markdown templates
 MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"

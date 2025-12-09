@@ -86,7 +86,7 @@ def github_app_access_token(max_retries=3) -> str:
     backoff = 2
     for attempt in range(1, max_retries + 1):
         response = requests.post(installation_access_token_url, headers=headers)
-        if response.status_code not in (500, 504):
+        if response.status_code not in (401, 500, 504):
             response.raise_for_status()
             access_token = response.json()["token"]
             return access_token
@@ -231,6 +231,49 @@ class GithubApiRepo:
             # Handle merge conflicts or other errors
             log.error(f"Failed to merge master into {branch_name}: {e}")
             return False
+
+    def merge_with_master_resolve_conflicts(self, branch_name: str) -> None:
+        """Merge master into the specified branch, creating a merge commit even with conflicts."""
+        # Get the current branch and master SHAs
+        branch = self.repo.get_branch(branch_name)
+        master = self.repo.get_branch("master")
+
+        # If branch is already up to date with master, no need to merge
+        if branch.commit.sha == master.commit.sha:
+            log.info(f"Branch {branch_name} is already up to date with master")
+            return
+
+        # Try normal merge first
+        try:
+            self.repo.merge(base=branch_name, head="master", commit_message=f"Merge master into {branch_name}")
+            log.info(f"Successfully merged master into {branch_name}")
+            return
+        except GithubException:
+            # If merge fails due to conflicts, create a merge commit manually
+            log.warning(
+                "Merge conflicts detected, creating merge commit using master's tree (conflicts will be resolved by file commits)"
+            )
+
+            branch_commit = self.repo.get_git_commit(branch.commit.sha)
+            master_commit = self.repo.get_git_commit(master.commit.sha)
+
+            # Use master's tree as the base - this brings in all the master changes
+            # Our subsequent file commits will override any conflicted files
+            master_tree_sha = master_commit.tree.sha
+
+            # Create merge commit with both parents but using master's tree
+            merge_commit = self.repo.create_git_commit(
+                message=f"Merge master into {branch_name} (conflicts to be resolved by file commits)",
+                tree=self.repo.get_git_tree(master_tree_sha),
+                parents=[branch_commit, master_commit],
+            )
+
+            # Update the branch reference
+            self.update_branch_reference(branch_name, merge_commit.sha)
+
+            log.info(
+                f"Created merge commit for {branch_name} using master's tree, conflicts will be resolved by file commits"
+            )
 
     def get_open_prs(self, branch_name: str) -> List[PullRequest]:
         """Get open pull requests for a specific branch.

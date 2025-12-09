@@ -1,3 +1,5 @@
+import pandas as pd
+
 from etl.helpers import PathFinder, create_dataset, get_metadata_path
 from etl.snapshot import Snapshot
 
@@ -10,6 +12,12 @@ def run(dest_dir: str) -> None:
 
     # load data
     tb = snap.read_csv()
+
+    ####################################################################################################################
+    # Fix indicators with mixed types.
+    tb["aviation_freight_milliontonkm"] = tb["aviation_freight_milliontonkm"].str.replace(",", "").astype(int)
+    assert all(pd.api.types.is_numeric_dtype(tb[column]) for column in tb.drop(columns=["country", "year"]).columns)
+    ####################################################################################################################
 
     # add table, update metadata from *.meta.yml and save
     ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)

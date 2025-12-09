@@ -20,31 +20,17 @@ MAX_COLS_PER_ROW = 3
 
 def st_show_home():
     # Page config
-    cols = st.columns([10, 3], vertical_alignment="center")
-    with cols[0]:
+    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
+    with container:
         st.title("Wizard 🪄")
-    with cols[1]:
-        st.caption(f"streamlit {st.__version__}")
-
-    # Relevant links
-    with st.container(border=False):
-        cols = st.columns(2, vertical_alignment="center")
-        with cols[0]:
-            st_wizard_page_link(
-                "expert",
-                label="Questions about ETL or Grapher? Ask the expert!",
-                help="Ask the expert any documentation question!",
-                use_container_width=True,
-                border=True,
-            )
-        with cols[1]:
-            st_wizard_page_link(
-                "analytics",
-                label="OWID Analytics",
-                help="Learn more with the OWID Analytics dashboard. It redirects you to another internal site.",
-                use_container_width=True,
-                border=True,
-            )
+        st_wizard_page_link(
+            "expert",
+            label=":rainbow[**Ask the Expert**]",
+            help="Ask the expert any documentation question!",
+            width="content",
+            border=False,
+        )
+        st.caption(f"streamlit {st.__version__}", width="content")
 
     # Generic tools
     ## Default styling for the cards (Wizard apps are presented as cards)
@@ -103,12 +89,12 @@ def st_show_home():
     steps = WIZARD_CONFIG["etl"]["steps"]
 
     # We present two channels to create an ETL step chain:
-    # 1. Classic: Snapshot -> Meadow -> Garden + Grapher
-    # 2. Fast Track: Fast Track + Grapher
+    # 1. Classic: Snapshot -> Data
+    # 2. Fast Track
 
     # 1/ CLASSIC: Snapshot + Data
     if steps["fasttrack"]["enable"]:
-        col1, col2 = st.columns([1, 3])
+        col1, col2, col3 = st.columns([1, 2, 1])
         with col1:
             create_card(
                 entrypoint=steps["snapshot"]["entrypoint"],
@@ -123,15 +109,24 @@ def st_show_home():
                 image_url=steps["data"]["image_url"],
                 custom_styles={"height": "100px"},
             )
+        with col3:
+            create_card(
+                entrypoint=steps["collection"]["entrypoint"],
+                title=steps["collection"]["title"],
+                image_url=steps["collection"]["image_url"],
+                custom_styles={"height": "100px"},
+            )
 
     # 2/ FAST TRACK
     if steps["fasttrack"]["enable"]:
-        create_card(
-            entrypoint=steps["fasttrack"]["entrypoint"],
-            title=steps["fasttrack"]["title"],
-            image_url=steps["fasttrack"]["image_url"],
-            custom_styles={"height": "50px"},
-        )
+        col1, _ = st.columns([3, 1])
+        with col1:
+            create_card(
+                entrypoint=steps["fasttrack"]["entrypoint"],
+                title=steps["fasttrack"]["title"],
+                image_url=steps["fasttrack"]["image_url"],
+                custom_styles={"height": "50px"},
+            )
 
     #########################
     # Sections
@@ -163,7 +158,7 @@ def st_show_home():
     #########################
     # Legacy
     #########################
-    st.divider()
+    # st.divider()
 
     if "legacy" in WIZARD_CONFIG:
         section_legacy = WIZARD_CONFIG["legacy"]

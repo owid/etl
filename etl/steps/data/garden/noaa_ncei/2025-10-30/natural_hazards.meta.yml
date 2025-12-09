@@ -1,0 +1,62 @@
+definitions:
+  common:
+    unit: ""
+    short_unit: ""
+    processing_level: major
+    description_key:
+      - "A significant eruption must meet at least one of the following criteria: caused fatalities, caused moderate damage (approximately $1 million or more), had a Volcanic Explosivity Index (VEI) of 6 or greater, generated a tsunami, or was associated with a significant earthquake."
+      - "A significant earthquake must meet at least one of the following criteria: caused deaths, caused moderate damage (approximately $1 million or more), had magnitude 7.5 or greater, had a Modified Mercalli Intensity (MMI) X or greater, or generated a tsunami."
+      - Tsunamis are only included if they were classified in the Global Historical Tsunami Database as "probable" or "definite".
+    presentation:
+      attribution_short: NOAA/NCEI
+      topic_tags:
+        - Natural Disasters
+
+dataset:
+  update_period_days: 365
+
+tables:
+  natural_hazards:
+    title: Natural Hazards Data
+    variables:
+      n_events:
+        title: Number of reported natural disasters
+        unit: events
+      deaths:
+        title: Number of reported deaths directly caused by a natural disaster
+        unit: deaths
+      missing:
+        title: Number of reported missing persons directly caused by a natural disaster
+        unit: missing people
+      injuries:
+        title: Number of reported injuries directly caused by a natural disaster
+        unit: injured people
+      damage:
+        title: Economic damage directly caused by a natural disaster
+        unit: current US$
+        short_unit: '$'
+      houses_destroyed:
+        title: Number of houses destroyed directly by a natural disaster
+        unit: houses
+      houses_damaged:
+        title: Number of houses damaged directly by a natural disaster
+        unit: houses
+      deaths_total:
+        title: Total number of deaths caused by a disaster and secondary effects
+        unit: deaths
+      missing_total:
+        title: Total number of missing persons caused by a disaster and secondary effects
+        unit: missing people
+      injuries_total:
+        title: Total number of injuries caused by a disaster and secondary effects
+        unit: injured people
+      damage_total:
+        title: Total economic damage caused by a disaster and secondary effects
+        unit: current US$
+        short_unit: '$'
+      houses_destroyed_total:
+        title: Total number of houses destroyed by a disaster and secondary effects
+        unit: houses
+      houses_damaged_total:
+        title: Total number of houses damaged by a disaster and secondary effects
+        unit: houses

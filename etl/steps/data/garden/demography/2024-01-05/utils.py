@@ -10,7 +10,7 @@ YEAR_WPP_END = 2100
 # sources names
 # this dictionary maps source short names to complete source names
 SOURCES_NAMES = {
-    "unwpp": "United Nations - World Population Prospects (2022) (https://population.un.org/wpp/Download/Standard/Population/)",
+    "unwpp": "United Nations - World Population Prospects (2022) (https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Population)",
     "gapminder": "Gapminder v7 (2022) (https://www.gapminder.org/data/documentation/gd003/)",
     "gapminder_sg": "Gapminder - Systema Globalis (2023) (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
     "hyde": "HYDE v3.3 (2023) (https://public.yoda.uu.nl/geo/UU01/AEZZIT.html)",

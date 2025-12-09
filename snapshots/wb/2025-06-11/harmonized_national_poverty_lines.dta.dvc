@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Harmonized national poverty lines"
+    description: |-
+      Recent improvements in survey methodologies have increased measured consumption in many low- and lower-middle income countries which now collect a more comprehensive measure of household consumption. Faced with such methodological changes, countries have frequently revised up their national poverty lines to make them appropriate for the new measures of consumption. This in turn affects the global poverty lines by the World Bank when they are periodically revised. The international poverty line, which is based on the typical poverty line in low-income countries, increases by around 40% to $3.00 when the more recent national poverty lines as well as the 2021 Purchasing Power Parities are incorporated. The net impact of the changes in international prices, the poverty line and new survey data (including new data for India) is an increase in global extreme poverty by some 125 million people in 2022, and a significant shift away from South Asia and towards Sub-Saharan Africa. The changes at higher poverty lines more relevant to middle-income countries are mixed.
+    date_published: "2025-06-10"
+
+    # Citation
+    producer: Foster et al.
+    citation_full: |-
+      Foster, Elizabeth Mary; Jolliffe, Dean Mitchell; Ibarra, Gabriel Lara; Lakner, Christoph; Baah, Samuel Kofi Tetteh. Global Poverty Revisited Using 2021 PPPs and New Data on Consumption (English). Policy Research Working Paper; Prosperity; RRR Washington, D.C.: World Bank Group. http://documents.worldbank.org/curated/en/099503206032533226
+    attribution_short: World Bank
+
+    # Files
+    url_main: https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099503206032533226
+    date_accessed: '2025-06-11'
+
+    # License
+    license:
+      name: Modified BSD3
+      url: https://reproducibility.worldbank.org/index.php/catalog/285/#project_desc_container1674844764972
+outs:
+  - md5: 8048e01f3f7e0d582c1f0c03f1596322
+    size: 19995
+    path: harmonized_national_poverty_lines.dta

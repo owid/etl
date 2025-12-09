@@ -21,11 +21,11 @@ paths = PathFinder(__file__)
 
 pd.options.mode.chained_assignment = None
 
-# only include tables containing INCLUDE string, this is useful for debugging
-# but should be None before merging to master!!
-# TODO: set this to None before merging to master
-# INCLUDE = "_6_1_1|_6_2_1|_16|_2_4"
-INCLUDE = None
+# only include tables containing SUBSET string, this is useful for debugging
+SUBSET = os.environ.get("SUBSET")
+if SUBSET:
+    # Append additional indicators we need in the step
+    SUBSET += "|_6_1_1|_6_2_1|_16|_2_4|_17"
 
 # for origins
 DATE_ACCESSED = "2024-08-27"
@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     all_tables = []
 
     for var in ds_garden.table_names:
-        if INCLUDE and not re.search(INCLUDE, var):
+        if SUBSET and not re.search(SUBSET, var):
             log.warning("un_sdg.skip", table_name=var)
             continue
 

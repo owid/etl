@@ -17,7 +17,7 @@ import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
-from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
+from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
@@ -26,7 +26,7 @@ from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
 
 # GPT model default
-MODEL_DEFAULT = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -369,6 +369,14 @@ class ChartDiffShow:
         ):
             self._show_metadata_diff_modal()
 
+    def _show_tags_if_changed(self, chart, session):
+        """Show tags as gray badges if there are tag changes."""
+        if "tags" in self.diff.change_types and chart:
+            tags = chart.tags(session)
+            if tags:
+                badges = " ".join([f":gray-badge[{tag['name']}]" for tag in tags])
+                st.markdown(badges)
+
     @st.dialog("Metadata differences", width="large")  # type: ignore
     def _show_metadata_diff_modal(self) -> None:
         """Show metadata diff in a modal page."""
@@ -402,7 +410,7 @@ class ChartDiffShow:
                 target = filter_out_fields_in_metadata_for_checksum(target)
 
                 # Get meta json diff
-                meta_diff = compare_dictionaries(source, target)  # type: ignore
+                meta_diff = compare_dictionaries(source, target, fromfile="source", tofile="target")
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff
 
@@ -440,8 +448,7 @@ class ChartDiffShow:
                 stream = api.chat.completions.create(
                     model=MODEL_DEFAULT,
                     messages=messages,  # type: ignore
-                    temperature=0.15,
-                    max_tokens=1000,
+                    max_completion_tokens=1000,
                     stream=True,
                 )
                 response = cast(str, st.write_stream(stream))
@@ -471,6 +478,7 @@ class ChartDiffShow:
                     )
 
                 if option == "prod":
+                    self._show_tags_if_changed(self.diff.target_chart, self.target_session)
                     assert self.diff.target_chart is not None
                     grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
                 elif option == "last":
@@ -481,6 +489,9 @@ class ChartDiffShow:
                     st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
                 else:
                     st.markdown(self._header_production_chart)
+
+                self._show_tags_if_changed(self.diff.target_chart, self.target_session)
+
                 assert self.diff.target_chart is not None
                 grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
@@ -493,6 +504,9 @@ class ChartDiffShow:
             else:
                 with st.container(height=40, border=False):
                     st.markdown(self._header_staging_chart)
+
+            self._show_tags_if_changed(self.diff.source_chart, self.source_session)
+
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         def _show_charts_comparison_v() -> Tuple[Any, bool]:
@@ -637,7 +651,7 @@ class ChartDiffShow:
         # Copy link
         if self.show_link:
             # with col3:
-            query_params = f"chart_id={self.diff.chart_id}"
+            query_params = f"chart_id={self.diff.chart_id}&show_reviewed="
             # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
             if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                 url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"

@@ -15,14 +15,14 @@ meta:
     attribution_short: UN WPP
 
     # Files
-    url_main: https://population.un.org/wpp/Download/
+    url_main: https://population.un.org/wpp/downloads/
     url_download: https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Fertility_by_Age1.csv.gz
     date_accessed: "2024-07-11"
 
     # License
     license:
       name: CC BY 3.0 IGO
-      url: https://population.un.org/wpp/Download/Standard/MostUsed/
+      url: https://population.un.org/wpp/downloads/
 outs:
   - md5: 373be836c6d64aa2d9c7eccfb7d0305a
     size: 301907467

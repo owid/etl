@@ -1,8 +1,13 @@
 title:
-  title: Data on conflict since 1800
+  title: Data on conflict from 1800 to 2011
   title_variant: "from Project Mars"
 default_selection:
   - World
+
+default_dimensions:
+  indicator: deaths
+  conflict_type: all_stacked
+  estimate: low
 
 dimensions:
   - slug: indicator
@@ -10,37 +15,46 @@ dimensions:
     choices:
       - slug: "deaths"
         name: "Deaths"
+        group: "How deadly are wars?"
         # description: People moving away from country
       - slug: "death_rate"
         name: "Death rate"
-        # description: People moving to country
+        group: "How deadly are wars?"
+        description: Number of deaths divided by the total population
       - slug: "wars_ongoing"
-        name: "Number of ongoing wars"
+        name: "Number of wars"
+        group: "How common are wars?"
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
-        name: "War rate"
-        # description: People moving to country
+        name: "Rate of wars"
+        description: Number of wars divided by the number of countries
+        group: "How common are wars?"
+
   - slug: conflict_type
-    name: "Conflict type"
+    name: "War type"
     choices:
       - slug: "all"
-        name: "All"
+        name: "All wars"
+      - slug: "all_stacked"
+        name: "All, broken down by type"
+        description: "Breakdown between interstate and civil wars"
+      - slug: "others (non-civil)"
+        name: "Interstate wars"
         # description: People moving to country
       - slug: "civil war"
         name: "Civil wars"
         # description: People moving to country
-      - slug: "others (non-civil)"
-        name: "Interstate Wars"
-        # description: People moving to country
+
   - slug: estimate
     name: "Estimate"
     choices:
       - slug: low
-        name: Low estimate
+        name: Low estimate only
       - slug: high
         name: High estimate
       - slug: na
-        name: "-"
+        name: "Not applicable"
+        # description: "Not applicable"
       - slug: low_high
         name: "Low and high estimates"
 

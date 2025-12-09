@@ -5,12 +5,12 @@ import threading
 from functools import lru_cache
 from os import environ as env
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 # import botocore.client.S3 as BaseClient
 import structlog
 from botocore.client import BaseClient
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 log = structlog.get_logger()
@@ -18,7 +18,7 @@ log = structlog.get_logger()
 BOTO3_CLIENT_LOCK = threading.Lock()
 
 
-def s3_bucket_key(url: str) -> Tuple[str, str]:
+def s3_bucket_key(url: str) -> tuple[str, str]:
     """Get bucket and key from either s3:// URL or https:// URL."""
     parsed = urlparse(url)
     bucket = parsed.netloc
@@ -31,7 +31,7 @@ def s3_bucket_key(url: str) -> Tuple[str, str]:
     return bucket, key
 
 
-def list_s3_objects(s3_folder: str, client: Optional[BaseClient] = None) -> List[str]:
+def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[str]:
     client = client or connect_r2()
 
     bucket, key = s3_bucket_key(s3_folder)
@@ -55,7 +55,7 @@ def list_s3_objects(s3_folder: str, client: Optional[BaseClient] = None) -> List
     return keys
 
 
-def download(s3_url: str, filename: str, quiet: bool = False, client: Optional[BaseClient] = None) -> None:
+def download(s3_url: str, filename: str, quiet: bool = False, client: BaseClient | None = None) -> None:
     """Download the file at the S3 URL to the given local filename."""
     client = client or connect_r2()
 
@@ -74,9 +74,9 @@ def download(s3_url: str, filename: str, quiet: bool = False, client: Optional[B
 def download_s3_folder(
     s3_folder: str,
     local_dir: Path,
-    exclude: List[str] = [],
-    include: List[str] = [],
-    client: Optional[BaseClient] = None,
+    exclude: list[str] = [],
+    include: list[str] = [],
+    client: BaseClient | None = None,
     max_workers: int = 20,
     delete: bool = False,
 ) -> None:
@@ -116,29 +116,53 @@ def download_s3_folder(
 
     if delete:
         local_files = set(local_dir.glob("*"))
-        downloaded_files = set(local_dir / Path(s3_key).name for s3_key in s3_keys)
+        downloaded_files = {local_dir / Path(s3_key).name for s3_key in s3_keys}
         files_to_delete = local_files - downloaded_files
         for file in files_to_delete:
             file.unlink()
 
 
-def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False) -> None:
-    """Upload the file at the given local filename to the S3 URL."""
+def upload(
+    s3_url: str, filename: str | Path, public: bool = False, quiet: bool = False, downloadable: bool = False
+) -> None:
+    """Upload the file at the given local filename to the S3 URL.
+
+    Parameters
+    ----------
+    s3_url : str
+        S3 URL to upload to
+    filename : str | Path
+        Local file to upload
+    public : bool
+        Whether to make the file publicly readable
+    quiet : bool
+        Whether to suppress log messages
+    downloadable : bool
+        If True, force browsers to download the file instead of displaying it inline.
+        Sets Content-Disposition header to 'attachment; filename="..."'
+    """
     client = connect_r2()
     bucket, key = s3_bucket_key(s3_url)
     extra_args = {"ACL": "public-read"} if public else {}
+
+    # Add Content-Disposition header to force download with correct filename
+    if downloadable:
+        file_name = Path(filename).name
+        extra_args["ContentDisposition"] = f'attachment; filename="{file_name}"'
+
+    filename_str = str(filename)
     try:
-        client.upload_file(filename, bucket, key, ExtraArgs=extra_args)
+        client.upload_file(filename_str, bucket, key, ExtraArgs=extra_args)
     except ClientError as e:
         log.error(e)
         raise UploadError(e)
 
     if not quiet:
-        log.info(f"UPLOADED: {filename} -> {s3_url}")
+        log.info(f"UPLOADED: {filename_str} -> {s3_url}")
 
 
 # if R2_ACCESS_KEY and R2_SECRET_KEY are null, try using credentials from rclone config
-def _read_owid_rclone_config() -> Dict[str, str]:
+def _read_owid_rclone_config() -> dict[str, str]:
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
@@ -169,12 +193,20 @@ def connect_r2() -> BaseClient:
         except KeyError:
             pass
 
+    cfg = Config(
+        # These are necessary to avoid sending header `content-encoding: gzip,aws-chunked` which breaks Admin
+        # see https://developers.cloudflare.com/r2/examples/aws/boto3/
+        request_checksum_calculation="when_required",
+        response_checksum_validation="when_required",
+    )
+
     client = boto3.client(
         service_name="s3",
         aws_access_key_id=R2_ACCESS_KEY,
         aws_secret_access_key=R2_SECRET_KEY,
         endpoint_url=R2_ENDPOINT or "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com",
         region_name=R2_REGION_NAME or "auto",
+        config=cfg,
     )
 
     return client

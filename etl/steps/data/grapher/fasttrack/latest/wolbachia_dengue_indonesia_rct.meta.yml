@@ -1,0 +1,25 @@
+dataset:
+  title: Wolbachia impact on dengue in Indonesia (Indriani et al. 2020)
+  description: ''
+  licenses:
+    - {}
+tables:
+  wolbachia_dengue_indonesia_rct:
+    variables:
+      areas_with_wolbachia:
+        title: Dengue fever cases in areas with Wolbachia
+        unit: cases per 100,000
+        display:
+          name: With Wolbachia bacteria
+        description: The number of dengue fever cases per 100,000 people within areas that had the Wolbachia method treatment
+      areas_without_wolbachia:
+        title: Dengue fever cases in areas without Wolbachia
+        unit: cases per 100,000
+        display:
+          name: Without Wolbachia
+        description: The number of dengue fever cases per 100,000 people within areas without the Wolbachia method treatment
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

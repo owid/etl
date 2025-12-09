@@ -1033,7 +1033,6 @@ def run() -> None:
     # Create a new garden dataset.
     ds_garden = paths.create_dataset(
         tables=[tb, tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps],
-        check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         yaml_params={"EUROS_YEAR": HICP_BASE_YEAR_NEW, "EUROS_YEAR_ORIGINAL": HICP_BASE_YEAR_ORIGINAL},
     )

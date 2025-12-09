@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 VARIABLE_NAMES = {
     "CUUR0000SEEB01": "college_tuition_fees",
     "CUUR0000SAE1": "education",
-    "CUUR0000SEEB": "tuition_fees_childcare",
+    "CUUR0000SEEB03": "childcare",
     "CUUR0000SAM": "medical_care",
     "CUUR0000SAH21": "household_energy",
     "CUUR0000SAH": "housing",

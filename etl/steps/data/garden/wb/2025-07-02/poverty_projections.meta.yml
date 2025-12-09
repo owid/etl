@@ -1,0 +1,91 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      We obtained regional estimates of the number in poverty by summing the number of people in poverty in each region. For global estimates, we proceeded in a similar way, but summing the regional data. To calculate the share in poverty, we divided these results by the total population in each region or globally, and multiplied by 100 to get a percentage.
+    display: &common-display
+      tolerance: 0
+      entityAnnotationsMap: |-
+        Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia
+    presentation:
+      topic_tags:
+        - Poverty
+      title_variant: Historical estimates with projections
+      attribution_short: World Bank
+
+  ppp_year: 2021
+
+  poverty_line: |-
+    <% if povertyline == 300 %>
+    $3
+    <%- elif povertyline == 420 %>
+    $4.20
+    <%- elif povertyline == 830 %>
+    $8.30
+    <%- endif %>
+
+  description_key_povertyline: |-
+    <% if povertyline == 300 %>
+    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line} per day.
+    <%- elif povertyline == 420 %>
+    A poverty line of {definitions.poverty_line} a day represents definitions of national poverty lines in lower-middle-income countries.
+    <%- elif povertyline == 830 %>
+    A poverty line of {definitions.poverty_line} a day represents definitions of national poverty lines in upper-middle-income countries.
+    <%- endif %>
+
+  description_key_ppp: |-
+    The data is measured in international-$ at {definitions.ppp_year} prices – this adjusts for inflation and for differences in the cost of living between countries.
+
+  description_key_income_consumption: |-
+    Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
+
+  description_key_nonmarket_income: |-
+    Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+
+  description_key_scenarios: |-
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2026-2030 based on GDP per capita growth projections from the World Bank's Macro Poverty Outlook (April 2025) together with IMF's World Economic Outlook (April 2025). For the period 2031-2050, the data is projected using the average annual historical GDP per capita growth over 2014-2023.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Poverty projections by the World Bank
+  update_period_days: 365
+
+
+tables:
+  poverty_projections:
+    variables:
+      headcount_ratio:
+        title: Share of population in poverty ({definitions.poverty_line} a day)
+        unit: "%"
+        short_unit: "%"
+        description_short: "Percentage of population living in households with an income or consumption below {definitions.poverty_line} a day"
+        description_key:
+          - "{definitions.description_key_povertyline}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_nonmarket_income}"
+          - "{definitions.description_key_scenarios}"
+        display:
+          name: Share of population in poverty ({definitions.poverty_line} a day)
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      headcount:
+        title: Number of people in poverty ({definitions.poverty_line} a day)
+        unit: "people"
+        short_unit: ""
+        description_short: "Number of people living in households with an income or consumption below {definitions.poverty_line} a day"
+        description_key:
+          - "{definitions.description_key_povertyline}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_nonmarket_income}"
+          - "{definitions.description_key_scenarios}"
+        display:
+          name: Number of people in poverty ({definitions.poverty_line} a day)
+          numDecimalPlaces: 0
+          <<: *common-display
+

@@ -21,7 +21,13 @@ from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_gra
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import Pagination, st_horizontal, st_wizard_page_link, url_persist
+from apps.wizard.utils.components import (
+    Pagination,
+    st_horizontal,
+    st_title_with_expert,
+    st_wizard_page_link,
+    url_persist,
+)
 from etl.config import FORCE_DATASETTE, OWID_ENV
 from etl.grapher import model as gm
 
@@ -187,8 +193,8 @@ def filter_chart_diffs():
             # keep chart diffs with at least one change type (could be data, metadata or config)
             change_types = st.query_params.get_all("change_type")
         else:
-            # filter to changed config by default
-            change_types = ["new", "config"]
+            # filter to changed config or tags by default
+            change_types = ["new", "config", "tags"]
 
         st.session_state.chart_diffs_filtered = {
             k: v
@@ -285,11 +291,60 @@ def sort_chart_diffs():
 @st.dialog(title="Set all charts to Pending")
 def set_chart_diffs_to_pending(engine: Engine) -> None:
     """Set approval status of all chart diffs to pending."""
-    st.markdown("**Do you want to set all charts-diffs to pending?** this will loose all your progress on reviews.")
+    st.markdown("**Do you want to set all charts-diffs to pending?** this will lose all your progress on reviews.")
+    st.info(
+        "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
+    )
     if st.button("Yes", type="primary"):
         with Session(engine) as session:
             for _, chart_diff in st.session_state.chart_diffs.items():
                 chart_diff.unreview(session)
+        st.rerun()
+
+
+@st.dialog(title="Set all pending charts to Approved")
+def set_chart_diffs_to_approved(engine: Engine) -> None:
+    """Set approval status of all pending chart diffs to approved."""
+    pending_non_conflict_count = len(
+        [chart for chart in st.session_state.chart_diffs.values() if chart.is_pending and not chart.in_conflict]
+    )
+    pending_conflict_count = len(
+        [chart for chart in st.session_state.chart_diffs.values() if chart.is_pending and chart.in_conflict]
+    )
+    st.markdown(
+        f"**Do you want to approve all {pending_non_conflict_count} pending (non-conflicted) chart diffs?** This will approve them for sync to production."
+    )
+    if pending_conflict_count > 0:
+        st.warning(
+            f"⚠️ **Note:** {pending_conflict_count} pending charts with conflicts will be skipped. Consider first using the 'Resolve all conflicts' button, or manually inspect them."
+        )
+    st.info(
+        "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
+    )
+    if st.button("Yes", type="primary"):
+        with Session(engine) as session:
+            for _, chart_diff in st.session_state.chart_diffs.items():
+                if chart_diff.is_pending and not chart_diff.in_conflict:  # Skip conflicted charts
+                    chart_diff.approve(session)
+        st.rerun()
+
+
+@st.dialog(title="Resolve all conflicts (Accept staging changes)")
+def resolve_all_conflicts_accept_staging(engine: Engine) -> None:
+    """Resolve all conflicts by accepting staging changes and approve charts."""
+    conflict_count = len([chart for chart in st.session_state.chart_diffs.values() if chart.in_conflict])
+    st.markdown(
+        f"**Do you want to resolve all {conflict_count} conflicts by accepting staging changes?** This will override any changes made in production when merging this to production."
+    )
+    st.info(
+        "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
+    )
+    if st.button("Yes, accept staging changes", type="primary"):
+        with Session(engine) as session:
+            for _, chart_diff in st.session_state.chart_diffs.items():
+                if chart_diff.in_conflict:
+                    chart_diff.set_conflict_to_resolved(session)
+                    chart_diff.approve(session)
         st.rerun()
 
 
@@ -346,15 +401,15 @@ def _show_options_filters():
     with st.form("chart-diff-filters"):
         default = [change for change in st.query_params.get_all("change_type")]
         if not default:
-            default = ["new", "config"]
+            default = ["new", "config", "tags"]
         st.multiselect(
             label="Chart change types",
-            options=["new", "data", "metadata", "config"],  # type: ignore
+            options=["new", "data", "metadata", "config", "tags"],  # type: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
             key="chart-diff-change-type",
-            help="Show new charts or modified ones with changes in data, metadata, or config.",
-            placeholder="config, data, metadata",
+            help="Show new charts or modified ones with changes in data, metadata, config, or tags.",
+            placeholder="config, data, metadata, tags",
         )
         st.multiselect(
             label="Chart IDs",
@@ -424,7 +479,7 @@ def _show_options_display():
             ],
             key="charts-per-page",
             help="Select the number of charts to display per page.",
-            index=1,
+            index=2,  # Default to 20
         )
 
     with col3:
@@ -446,6 +501,13 @@ def _show_options_misc():
     with st.container(border=True):
         st.markdown("Danger zone ⚠️")
         if st.button(
+            "Resolve all conflicts **(Accept staging changes)**",
+            key="resolve-all-conflicts",
+            help="This will accept all staging changes for charts with conflicts. Use with caution!",
+        ):
+            resolve_all_conflicts_accept_staging(SOURCE_ENGINE)
+
+        if st.button(
             "Set all charts to **Pending**",
             key="unapprove-all-charts",
             # on_click=lambda e=SOURCE_ENGINE: set_chart_diffs_to_pending(e),
@@ -453,11 +515,18 @@ def _show_options_misc():
         ):
             set_chart_diffs_to_pending(SOURCE_ENGINE)
 
+        if st.button(
+            "Set all pending charts to **Approved**",
+            key="approve-all-pending-charts",
+            help="This approves all pending (non-conflicted) chart diffs for sync to production. Charts with conflicts will be skipped.",
+        ):
+            set_chart_diffs_to_approved(SOURCE_ENGINE)
+
 
 def _show_options():
     """Show options pane."""
 
-    with st.popover("⚙️ Options", use_container_width=True):
+    with st.popover("⚙️ Options", width="stretch"):
         # col1, col2, col3 = st.columns(3)
 
         # Filters
@@ -480,7 +549,15 @@ def _show_summary_top(chart_diffs):
     num_charts_approved = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_approved])
     num_charts_rejected = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_rejected])
     num_charts_reviewed = num_charts_approved + num_charts_rejected
+    num_charts_pending = num_charts_total - num_charts_reviewed
     text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed :small[:gray[(:material/thumb_up: {num_charts_approved} :material/thumb_down: {num_charts_rejected})]]"
+
+    # Show CLI tip if there are many pending charts
+    if num_charts_pending > 50:
+        st.info(
+            f"💡 **Tip:** You have {num_charts_pending} charts pending review. "
+            "You can use the CLI command `etl approve --dry-run` to automatically approve charts with identical configs & data."
+        )
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
@@ -559,13 +636,44 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
             st_show(chart_diff, source_session, target_session)
 
 
+def st_docs():
+    # Chart sync documentation
+    # TODO: keep this in sync with `etl chart-sync` CLI docs
+    with st.expander("📋 What gets synced when you merge your PR?", expanded=False):
+        st.markdown("""
+        When you merge your PR to master, the **chart-sync** process automatically runs and syncs approved charts from your staging environment to production. Here's what happens:
+
+        **Charts that get synced:**
+        - ✅ **Approved charts** (new or modified) are synced to production
+        - ✅ **New charts** include their tags when synced
+        - ⚠️ **Pending charts** are NOT synced (and will cause a Slack notification)
+        - ❌ **Rejected charts** are skipped entirely
+
+        **What gets synced for each chart:**
+        - **Chart configuration** (title, subtitle, axis labels, chart type, etc.)
+        - **Variable mappings** (automatically migrated from staging to production IDs)
+        - **Tags** (tags for charts that are not in chart-diff won't be synced)
+        - **Chart metadata** (description, notes, etc.)
+
+        **Additional items synced:**
+        - **DoDs (Data on Demand)** that were created or modified since staging server creation
+
+        **Important considerations:**
+        - The underlying **dataset and indicators** must already exist in production (via ETL pipeline)
+        - Charts modified in production after staging creation will cause **conflicts** and require manual resolution
+        - **Deleted charts** are NOT synced (deletions must be done manually in production)
+        - Charts with **slug conflicts** (new chart with existing slug) will be skipped with an error
+        """)
+
+
 ########################################
 # MAIN
 ########################################
 def main():
     # Title and links
-    st.title(
-        ":material/difference: Chart Diff",
+    st_title_with_expert(
+        title="Chart Diff",
+        icon=":material/difference:",
         help=f"""
 **Chart diff** is a living page that compares all ongoing charts between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 
@@ -574,10 +682,13 @@ It lists all those charts that have been modified in the `{OWID_ENV.name}` envir
 If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `production`, you can approve them by clicking on the toggle button.
 """,
     )
+
     with st_horizontal(vertical_alignment="center"):
         st.markdown("Other links: ")
         st_wizard_page_link("mdim-diff")
         st_wizard_page_link("explorer-diff")
+
+    st_docs()
 
     # Get actual charts
     get_chart_diffs()

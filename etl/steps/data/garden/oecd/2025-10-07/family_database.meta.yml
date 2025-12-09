@@ -1,0 +1,122 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+    display:
+      numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+
+dataset:
+  title: OECD Family Database
+  update_period_days: 365
+
+tables:
+  marriage_divorce_rates:
+    variables:
+      value:
+        title: |-
+          <% if indicator == "marriage_rate" and gender == "Both" %>
+          Crude marriage rate
+          <% elif indicator == "divorce_rate" and gender == "Both" %>
+          Crude divorce rate
+          <% endif %>
+        unit: per 1,000 people
+        description_short: |-
+          <% if indicator == "marriage_rate" %>
+          Number of marriages during a given year per 1,000 people.
+          <% elif indicator == "divorce_rate" %>
+          Number of divorces during a given year per 1,000 people.
+          <% endif %>
+        description_from_producer: |-
+          <% if indicator == "marriage_rate" %>
+          The crude marriage rate is defined as the number of marriages during a given year per 1,000 people.
+          <% elif indicator == "divorce_rate" %>
+          The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
+          <% endif %>
+        description_processing: |-
+            <% if indicator == "marriage_rate" %>
+            Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
+            <% endif %>
+
+  mean_age_first_marriage:
+    variables:
+      value:
+        title: |-
+          <% if indicator == "mean_age_first_marriage" and gender == "Male" %>
+          Mean age of men at first marriage
+          <% elif indicator == "mean_age_first_marriage" and gender == "Female" %>
+          Mean age of women at first marriage
+          <% endif %>
+        unit: years
+        description_short:
+          <% if indicator == "mean_age_first_marriage" and gender == "Female" %>
+           Average age of women who got married for the first time that year.
+          <% elif indicator == "mean_age_first_marriage" and gender == "Male" %>
+          Average age of men who got married for the first time that year.
+          <% endif %>
+        description_from_producer: |-
+          The mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
+
+          For Australia, New Zealand and the United States, median age at first marriage. For Mexico, data refer to all marriages and not only first marriage. For Canada, data include the legal union of two persons of the same sex in some provinces and territories from 2003 onwards, and in all of Canada from 2005 onwards. Data for New Zealand include civil unions. From 2007 onwards, data include those who transferred their civil union to a marriage.
+
+          The statistical data for Israel are supplied by and under the responsibility of the relevant Israeli authorities. The use of such data by the OECD is without prejudice to the status of the Golan Heights, East Jerusalem and Israeli settlements in the West Bank under the terms of international law.
+
+          Footnote for Turkey: the information in this document with reference to « Cyprus » relates to the southern part of the Island. There is no single authority representing both Turkish and Greek Cypriot people on the Island. Turkey recognizes the Turkish Republic of Northern Cyprus (TRNC). Until a lasting and equitable solution is found within the context of United Nations, Turkey shall preserve its position concerning the "Cyprus issue".
+
+          Footnote for all the European Union Member States of the OECD and the European Commission: the Republic of Cyprus is recognized by all members of the United Nations with the exception of Turkey. The information in this document relates to the area under the effective control of the Government of the Republic of Cyprus.
+
+  births_outside_marriage:
+    variables:
+      births_outside_marriage:
+        title: Share of births outside marriage
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of all children born to mothers who were not married at the time of birth.
+        description_from_producer: |-
+          Births to mothers whose legal marital status at the time of the birth is other than married. This includes births to mothers who are single or who are cohabiting with a partner outside of marriage, births to mothers who are divorced or widowed, and births to mothers who are living with a partner in a "common-law" or "de facto" union (unless their legal marital status at the time of birth is also 'married').
+
+          For Australia, Japan, Korea, New Zealand and Canada (1960-1973 only), data refer to ex-nuptial/out-of-wedlock births, that is, where the child's parents are not registered as married to each other (or, for New Zealand, in a civil union with each other) at the time of birth.
+
+          The "share of births outside of marriage" is calculated as the number of births to women whose legal marital status at the time of the birth is other than married [or, for Australia, Japan, Korea, New Zealand and Canada (1960-1973 only), the number of ex-nuptial/out-of-wedlock births], divided by all births in the given year.
+
+  children_in_families:
+    variables:
+      value:
+        title: |-
+          <% if indicator == "Living with two parents" %>
+          Share of children living with two parents
+          <% elif indicator == "Two married parents" %>
+          Share of children living with two married parents
+          <% elif indicator == "Two cohabiting parents" %>
+          Share of children living with two cohabiting parents
+          <% elif indicator == "Living with a single parent" %>
+          Share of children living with a single parent
+          <% elif indicator == "Other" %>
+          Share of children in other family arrangements
+          <% endif %>
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <% if indicator == "Living with two parents" %>
+          The percentage of children aged 0-17 living with two parents.
+          <% elif indicator == "Two married parents" %>
+          The percentage of children aged 0-17 living with two married parents.
+          <% elif indicator == "Two cohabiting parents" %>
+          The percentage of children aged 0-17 living with two cohabiting parents.
+          <% elif indicator == "Living with a single parent" %>
+          The percentage of children aged 0-17 living with a single parent.
+          <% elif indicator == "Other" %>
+          The percentage of children aged 0-17 in other family arrangements.
+          <% endif %>
+        description_from_producer: |-
+          <% if indicator == "Living with two parents" %>
+          The child lives primarily in a household with two adults who are reported as 'parents' of the child, with 'parents' generally referring to both biological parents and step- or adoptive-parents. For European countries and a few non-European OECD countries, data allow for the numbers of children to be further disaggregated into those who live with two married parents – that is, with two adults that are considered parents and who are married to each other – and those who live with two cohabiting parents, that is, with two parents who are not married to each other. For European countries, 'married parents' in principle includes parents in registered partnerships, although actual practice may vary from country to country.
+          <% elif indicator == "Living with a single parent" %>
+          The child lives primarily in a household with only one adult who is reported as a 'parent' of the child. This can be a biological parent or a step- or adoptive-parent. The household may or may not contain other adults – including grandparents and other adult relatives or unrelated adults – but only one adult can be considered as a parent for the household to be classified as a single-parent household.
+          <% endif %>
+

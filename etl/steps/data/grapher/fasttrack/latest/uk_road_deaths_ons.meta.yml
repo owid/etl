@@ -1,0 +1,75 @@
+dataset:
+  title: UK Road Death Statistics (ONS, 2024)
+  description: Road fatality statistics since 1929 in Great Britain from the Office for National Statistics.
+  licenses:
+    - {}
+tables:
+  uk_road_deaths_ons:
+    variables:
+      road_deaths:
+        title: Road deaths
+        unit: deaths
+        display:
+          name: All road deaths
+        description: The number of fatalities from road incidents. This includes drivers, passengers, cyclists and pedestrians.
+      pedestrian_deaths:
+        title: Pedestrian road deaths
+        unit: deaths
+        display:
+          name: Pedestrians
+        description: The number of pedestrians killed in road incidents.
+      cyclists_deaths:
+        title: Cyclist road deaths
+        unit: deaths
+        display:
+          name: Cyclists
+        description: The number of cyclists killed in road incidents.
+      motorcyclists_deaths:
+        title: Motorcyclist road deaths
+        unit: deaths
+        display:
+          name: Motorcyclists
+        description: The number of motorcyclists killed in road incidents.
+      vehicle_driver_occupants_deaths:
+        title: Driver and passenger road deaths
+        unit: deaths
+        display:
+          name: Drivers and passengers
+        description: The number of vehicle drivers and passengers killed in road incidents.
+      licensed_motor_vehicles:
+        title: Number of motor vehicles
+        unit: vehicles
+        display:
+          name: Vehicles
+        description: The number of licensed motor vehicles.
+      traffic_vehicle_miles:
+        title: Vehicle miles driven
+        unit: miles
+        short_unit: miles
+        display:
+          name: Miles driven
+        description: The number of vehicle miles driven.
+      road_deaths_per_billion_miles:
+        title: Number of road deaths per billion miles driven
+        unit: deaths
+        display:
+          name: Deaths per billion miles
+        description: The number of deaths in road incidents per billion miles driven.
+      road_collisions:
+        title: Number of road collisions
+        unit: collisions
+        display:
+          name: All collisions
+        description: The number reported collisions on the roads.
+      drink_drive_road_collisions:
+        title: Number of drink-drive road collisions
+        unit: collisions
+        display:
+          name: Drink-drive collisions
+        description: |-
+          A drink-drive accident is defined as being a reported incident on a public road in which someone is killed or injured, and where at least one of the motor vehicle drivers or riders involved either refuses to give a breath test specimen when requested by the police, or is found to be over the legal limit.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

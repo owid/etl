@@ -1,11 +1,9 @@
 ---
 tags:
   - 👷 Staff
+  - Data Workflow
+icon: lucide/refresh-cw
 ---
-
-!!! warning "This is a work in progress"
-
-    Things might change in the near-future. To stay up-to-date with the latest updates, [join the discussion on GitHub!](https://github.com/owid/etl/issues/3016)
 
 ETL was initially conceived to maintain and publish datasets that are updated once a year. This is still the most common kind of update that we do this days.
 
@@ -14,6 +12,9 @@ However, sometimes we need to update datasets more frequently. This is the case 
 In such cases, the processing code remains the same, but the origin data needs to be updated. Put simply, the ETL process is the same, but with an updated snapshot of the data.
 
 If you want to keep a dataset up-to-date with the latest data, follow the steps below.
+
+!!! tip "Alternative: Automatic updates via metadata"
+    ETL also provides an automatic update system that runs daily and creates pull requests for snapshots that have the `autoupdate` metadata field in their .dvc files. See [Automatic updates via metadata](autoupdate-cli.md) for more details.
 
 ## Create the data pipeline using `latest` version
 
@@ -55,3 +56,7 @@ Simply add a
     command:
     - "sudo su - owid -c 'bash /home/owid/etl/scripts/update-<step>.sh'"
 ```
+
+## See Also
+
+- [Automatic updates via metadata](autoupdate-cli.md) - An alternative approach using metadata in `.dvc` files to enable automatic dataset updates

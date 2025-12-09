@@ -140,7 +140,7 @@ def cli(
         log.info(f"Running ETL for {uri}")
         etl_main(
             dag_path=DAG_FILE,
-            steps=[uri],
+            includes=[uri],
             grapher=False,
         )
 
@@ -264,10 +264,10 @@ def cli(
 
         if run_etl:
             log.info(f"Running ETL for {uri}")
-            config.GRAPHER_FILTER = f"^{col}$"
+            config.SUBSET = f"^{col}$"
             etl_main(
                 dag_path=DAG_FILE,
-                steps=[uri],
+                includes=[uri],
                 grapher=True,
             )
 
@@ -291,7 +291,7 @@ def cli(
             "[green]5.[/green] (Optional) Move YAML from grapher to garden.",
         )
         print(
-            f"[green]6.[/green] Re-run ETL with `STAGING={config.STAGING} GRAPHER_FILTER={col} etl {uri} --grapher`.",
+            f"[green]6.[/green] Re-run ETL with `STAGING={config.STAGING} SUBSET={col} etl {uri} --grapher`.",
         )
 
 

@@ -1343,7 +1343,7 @@ def run() -> None:
 
     # Load dataset about food balances and load its main (long-format) table.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
-    tb_fbsc = ds_fbsc.read("faostat_fbsc")
+    tb_fbsc = ds_fbsc.read("faostat_fbsc", safe_types=False)
 
     # Load dataset about fertilizers by nutrient and load its main (long-format) table.
     ds_rfn = paths.load_dataset("faostat_rfn")

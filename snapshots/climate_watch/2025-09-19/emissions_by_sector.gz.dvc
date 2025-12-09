@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Climate Watch
+    title: Greenhouse gas emissions by sector
+    description: |-
+      Climate Watch Historical Emissions data contains sector-level greenhouse gas (GHG) emissions, including emissions of the six major GHGs from most major sources and sinks. Non-CO₂ emissions are expressed in CO₂ equivalents using 100-year global warming potential values from the Intergovernmental Panel on Climate Change (IPCC) Fifth Assessment Report (AR5).
+
+      More information about their data sources and methodology can be found in their [FAQ page](https://www.climatewatchdata.org/about/faq/ghg). Specifically, the definitions of all Climate Watch data sectors and their methodology are explained in [this document](https://files.wri.org/d8/s3fs-public/2024-05/climate-watch-country-greenhouse-gas-emissions-data-methodology.pdf).
+    citation_full: |-
+      Climate Watch. 2025. Washington, DC: World Resources Institute (WRI). Available online at: https://www.climatewatchdata.org
+
+      Climate Watch data are derived from several sources.
+      - Data on land-Use change and forestry, and agriculture, are sourced from the Food and Agriculture Organization of the United Nations, FAOSTAT Emissions Database.
+      - Data on greenhouse gas emissions from fuel combustion are sourced from the OECD/IEA.
+    attribution_short: Climate Watch
+    url_main: https://www.climatewatchdata.org/data-explorer/historical-emissions
+    date_accessed: '2025-09-19'
+    date_published: '2025-09-01'
+    license:
+      name: CC BY 4.0
+      url: https://www.climatewatchdata.org/about/permissions
+outs:
+  - md5: a8bfa640b99b7df2a8c6bb235ce5838b
+    size: 3867865
+    path: emissions_by_sector.gz

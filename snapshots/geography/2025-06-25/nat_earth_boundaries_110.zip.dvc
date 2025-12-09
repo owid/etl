@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Natural Earth - Large scale data (1:10m Cultural Vectors)"
+    description: |-
+      Natural Earth shows de facto boundaries by default according to who controls the territory, versus de jure. Adjusted to taste which boundaries are shown, hidden, and how they are rendered using the fclass_* properties paired with the POV worldview polygons above.
+
+      Land boundaries and 200-mile nautical limits. Limited attributes in terms of type of boundary: disputed, treaty, and median lines.
+
+      All users of Natural Earth are highly encouraged to read about data sources and manipulation in the [Data Creation section](https://www.naturalearthdata.com/about/data-creation/).
+    date_published: "2022-05-04"
+    version_producer: 5.1.0
+
+    # Citation
+    producer: Natural Earth
+    citation_full: |-
+      Natural Earth. Free vector and raster map data @ naturalearthdata.com
+
+    # Files
+    url_main: https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-boundary-lines/
+    date_accessed: '2025-06-25'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.naturalearthdata.com/about/terms-of-use/
+outs:
+  - md5: 90681f32f65784160e931bf92ba68a9a
+    size: 1036202
+    path: nat_earth_boundaries_110.zip

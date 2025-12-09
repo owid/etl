@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import structlog
 import yaml
 from jsonschema import (
     Draft7Validator,
@@ -9,6 +10,8 @@ from yaml.loader import SafeLoader
 
 from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+
+log = structlog.get_logger()
 
 DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
@@ -38,6 +41,7 @@ def load_yaml_as_string(path):
 
 def test_dataset_schemas():
     validator = Draft7Validator(DATASET_SCHEMA)
+    validation_errors = []
 
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
     for meta_file_path in Path(STEPS_DATA_DIR).glob("**/*.meta.yml"):
@@ -64,11 +68,25 @@ def test_dataset_schemas():
                 if "description" in ind:
                     del ind["description"]
 
+                # Ignore pinned schemas in presentation.grapher_config
+                if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
+                    del ind["presentation"]["grapher_config"]
+
         # Validate the loaded data against the schema
         try:
             validator.validate(data)
         except ValidationError as e:
-            raise ValidationError(f"Validation error in file: {meta_file_path}") from e
+            validation_errors.append((meta_file_path, e))
+
+    # If there are validation errors, log summary and raise the first one
+    if validation_errors:
+        log.error("VALIDATION SUMMARY", error_count=len(validation_errors))
+        for i, (file_path, error) in enumerate(validation_errors, 1):
+            log.error("Validation error", index=i, file=str(file_path), message=error.message)
+
+        # Raise the first error
+        first_file, first_error = validation_errors[0]
+        raise ValidationError(f"Validation error in file: {first_file}") from first_error
 
 
 def test_snapshot_schemas():

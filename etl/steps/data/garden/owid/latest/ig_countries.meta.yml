@@ -4,36 +4,91 @@ definitions:
     presentation:
       topic_tags:
         - Uncategorized
-
-
+  others:
+    window_size: |-
+      <% if time_window == "30d" %>
+      30 days
+      <%- elif time_window == "90d" %>
+      90 days
+      <%- elif time_window == "365d" %>
+      365 days
+      <%- else %>
+      all time
+      <%- endif %>
+    window_size_verbose: |-
+      <% if time_window == "all" %>
+      of all time
+      <%- else %>
+      in the last {definitions.others.window_size}
+      <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
+  title: "Country coverage in OWID Instagram posts"
 
 tables:
   ig_countries:
     variables:
       count:
-        title: Country in post (flag)
-        unit: ""
-      share_post:
-        title: Country in post (share of post)
-        unit: "%"
-        short_unit: "%"
-        description_short: If there are 4 countries in the post, each country will have a share of 25%
-      counts_cum:
-        title: Total count of posts with country
+        title: Number of posts mentioning country ({definitions.others.window_size})
         unit: "posts"
-  summary:
-    variables:
-      proportion:
-        title: Share of posts mentioning a country
+        description_short: |-
+          Number of posts {definitions.others.window_size_verbose} that mention the country.
+        presentation:
+          title_public: |-
+            Number of Instagram posts mentioning a country
+            <%- if time_window != "all" %>
+            in the last {definitions.others.window_size}
+            <%- endif %>
+      share:
+        title: Share of posts mentioning country ({definitions.others.window_size})
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of posts with country
-      proportion_weighed:
-        title: Average mention of a country in a post
+        description_short: |-
+          Share of posts {definitions.others.window_size_verbose} that mention the country.
+        presentation:
+          title_public: |-
+            Share of Instagram posts mentioning a country
+            <%- if time_window != "all" %>
+            in the last {definitions.others.window_size}
+            <%- endif %>
+      share_weighted:
+        title: Weighted share of posts mentioning country ({definitions.others.window_size})
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Weighted share {definitions.others.window_size_verbose}. If a post mentions 4 countries, each gets 25%.
+        presentation:
+          title_public: |-
+            Average mention of a country in an Instagram post
+            <%- if time_window != "all" %>
+            in the last {definitions.others.window_size}
+            <%- endif %>
+
+  mentions:
+    variables:
+      is_mentioned:
+        title: Country is mentioned in post
         unit: ""
-        description_short: If there are two posts, and the first one mentions a country A and another country, this equals to (50% + 0%)/2 = 25%
+      is_mentioned_weighted:
+        title: Country is mentioned in post (share of post)
+        unit: "%"
+        short_unit: "%"
+        description_short: If there are 4 countries in the post, each country will have a share of 25%.
+      is_mentioned_ever:
+        title: Country has ever been mentioned
+        unit: ""
+        description_short: Indicates whether the country has ever been mentioned in any post.
+
+  # summary:
+  #   variables:
+  #     proportion:
+  #       title: Share of posts mentioning a country
+  #       unit: "%"
+  #       short_unit: "%"
+  #       description_short: Proportion of posts with country.
+  #     proportion_weighed:
+  #       title: Average mention of a country in a post
+  #       unit: ""
+  #       description_short: If there are two posts, and the first one mentions a country A and another country, this equals to (50% + 0%)/2 = 25%.

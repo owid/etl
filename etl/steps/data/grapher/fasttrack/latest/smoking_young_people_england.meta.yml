@@ -1,0 +1,28 @@
+dataset:
+  title: Smoking rates among young people in England  (NHS England)
+  description: ''
+  licenses:
+    - {}
+tables:
+  smoking_young_people_england:
+    variables:
+      _15yo_regular_smokers:
+        title: Share of 15 year olds who smoke regularly
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Regular smokers (15 years)
+        description: |-
+          The share of 15-year-olds who are regular smokers of cigarettes. Regular smokers  are defined as usually smoking at least one cigarette per week.
+      pupils_ever_smoked:
+        title: Share of pupils who have ever smoked
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Ever smoked (11-15 years)
+        description: The share of pupils (aged 11 to 15 years) who have ever smoked cigarettes.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

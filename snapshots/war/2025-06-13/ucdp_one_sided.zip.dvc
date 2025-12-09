@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Uppsala Conflict Data Program
+    title: One-sided Violence
+    description: |-
+      An actor-year dataset with information of intentional attacks on civilians by governments and formally organized armed groups.
+
+      You can find more notes at https://ucdp.uu.se/downloads/nsos/ucdp-onesided-251.pdf
+    citation_full: |-
+      Davies, S., Pettersson, T., Sollenberg, M., & Öberg, M. (2025). Organized violence 1989–2024, and the challenges of identifying civilian victims. Journal of Peace Research, 62(4).
+
+      Eck, Kristine & Lisa Hultman (2007) Violence Against Civilians in War. Journal of Peace Research 44(2).
+    attribution_short: UCDP
+    version_producer: version 25.1
+    url_main: https://ucdp.uu.se/downloads/index.html#onesided
+    url_download: https://ucdp.uu.se/downloads/nsos/ucdp-onesided-251-csv.zip
+    date_accessed: "2025-06-13"
+    date_published: "2025"
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 1d668fedd38e893f83d56605fadab92d
+    size: 27664
+    path: ucdp_one_sided.zip

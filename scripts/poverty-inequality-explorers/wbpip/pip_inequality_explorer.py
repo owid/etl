@@ -8,6 +8,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# Define PPP year
+ppp_year = PPP_VERSION_CURRENT_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each relative poverty line or survey type.
 
@@ -20,7 +23,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 povlines_rel = pd.read_csv(url)
 
 # Survey type sheet
-sheet_name = "survey_type"
+sheet_name = f"survey_type_{ppp_year}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
@@ -61,7 +64,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 yAxisMin = Y_AXIS_MIN
@@ -69,6 +71,7 @@ yAxisMin = Y_AXIS_MIN
 additional_description = ADDITIONAL_DESCRIPTION_PIP
 
 notes_title = NOTES_TITLE_PIP
+
 
 processing_description = PROCESSING_DESCRIPTION_PIP
 relative_poverty_description = RELATIVE_POVERTY_DESCRIPTION_PIP
@@ -202,7 +205,6 @@ df_tables["sourceName"] = sourceName
 df_tables["dataPublishedBy"] = dataPublishedBy
 df_tables["sourceLink"] = sourceLink
 df_tables["tolerance"] = tolerance
-df_tables["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 # Make tolerance integer (to not break the parameter in the platform)
 df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
@@ -245,7 +247,6 @@ for i in range(len(df_tables)):
         df_spells.loc[j, "type"] = df_tables.type[i]
         df_spells.loc[j, "colorScaleNumericMinValue"] = df_tables.colorScaleNumericMinValue[i]
         df_spells.loc[j, "colorScaleNumericBins"] = df_tables.colorScaleNumericBins[i]
-        df_spells.loc[j, "colorScaleEqualSizeBins"] = df_tables.colorScaleEqualSizeBins[i]
         df_spells.loc[j, "colorScaleScheme"] = df_tables.colorScaleScheme[i]
         df_spells.loc[j, "survey_type"] = df_tables.survey_type[i]
         j += 1
@@ -264,7 +265,6 @@ for i in range(len(df_tables)):
         df_spells.loc[j, "type"] = df_tables.type[i]
         df_spells.loc[j, "colorScaleNumericMinValue"] = df_tables.colorScaleNumericMinValue[i]
         df_spells.loc[j, "colorScaleNumericBins"] = df_tables.colorScaleNumericBins[i]
-        df_spells.loc[j, "colorScaleEqualSizeBins"] = df_tables.colorScaleEqualSizeBins[i]
         df_spells.loc[j, "colorScaleScheme"] = df_tables.colorScaleScheme[i]
         df_spells.loc[j, "survey_type"] = df_tables.survey_type[i]
         j += 1
@@ -418,7 +418,7 @@ for i in range(len(df_graphers)):
         ]
     )
     df_graphers_spells.loc[j, "note"] = df_graphers["note"][i]
-    df_graphers_spells.loc[j, "type"] = df_graphers["type"][i]
+    df_graphers_spells.loc[j, "type"] = "LineChart"
     df_graphers_spells.loc[j, "yAxisMin"] = df_graphers["yAxisMin"][i]
     df_graphers_spells.loc[j, "selectedFacetStrategy"] = "entity"
     df_graphers_spells.loc[j, "hasMapTab"] = "false"
@@ -478,7 +478,7 @@ df_graphers["subtitle"] = df_graphers["subtitle"].str.replace(
 df_graphers.loc[
     (df_graphers["ySlugs"] == "gini")
     & (df_graphers["Show breaks between less comparable surveys Checkbox"] == "false")
-    & (df_graphers["tableSlug"] == "income_consumption_2017"),
+    & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year}"),
     ["defaultView"],
 ] = "true"
 

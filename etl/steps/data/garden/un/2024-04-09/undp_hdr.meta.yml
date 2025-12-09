@@ -86,6 +86,7 @@ tables:
                 binningStrategy: manual
                 legendDescription: ''
                 customNumericValues:
+                  - 1
                   - 0.4
                   - 0.5
                   - 0.6
@@ -93,7 +94,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-                customNumericMinValue: 1
             selectedEntityNames:
               - United Kingdom
               - United States

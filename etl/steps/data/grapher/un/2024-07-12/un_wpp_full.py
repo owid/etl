@@ -7,10 +7,8 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-TABLES_EXCLUDE = [
-    "fertility_single",
-]
+# Exclude the last three as we want to treat them differently and remove the january rows from them
+TABLES_EXCLUDE = ["fertility_single", "population_january"]
 
 
 def run(dest_dir: str) -> None:
@@ -24,7 +22,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tables = [reshape_table(ds_garden[tb_name]) for tb_name in ds_garden.table_names if tb_name not in TABLES_EXCLUDE]
-
     # Edit title
     ds_garden.metadata.title = cast(str, ds_garden.metadata.title) + " (projections full timeseries)"
 

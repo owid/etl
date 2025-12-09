@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: UK Department for Transport
+    title: uk_road_deaths_ons
+    citation_full: 'UK Department for Transport. Road safety statistics: data tables.'
+    url_main: |-
+      https://www.gov.uk/government/statistical-data-sets/reported-road-accidents-vehicles-and-casualties-tables-for-great-britain
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQz84B5Byv7zeQcLokhCsVdyw0IMicE8iEwnJBE0UxN0znOGwKyoL_hjnz8YE_wltIVtTJ46yJlb6sW/pub?output=csv
+    date_accessed: '2025-07-10'
+  name: UK Road Death Statistics (ONS, 2024)
+  description: Road fatality statistics since 1929 in Great Britain from the Office for National Statistics.
+  license: {}
+outs:
+  - md5: 8af07df08261c355e9c5b5fcdec990f4
+    size: 7385
+    path: uk_road_deaths_ons.csv

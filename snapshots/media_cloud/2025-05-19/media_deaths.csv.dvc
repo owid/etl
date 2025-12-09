@@ -1,0 +1,30 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Media mentions of death"
+    description: |-
+      Media Cloud is an open-source media research project, enabling the study of news and information flow globally. The project is administered as a consortium collaboration between the Media Ecosystems Analysis Group, the University of Massachusetts Amherst, and Northeastern University.
+
+      This dataset contains mentions of the most common causes of death in the US as well as mentions of drug overdose, homicides and terrorism for three major news outlets (New York Times, Washington Post, Fox News). It counts mentions of related terms in the headline and body text of articles and covers the year 2023 (January 1 to December 31).
+
+      This dataset is compiled by Our World in Data, using the Media Cloud News Database and Search API.
+    date_published: "2025"
+
+    # Citation
+    producer: Media Cloud
+    citation_full: |-
+      Roberts, H., Bhargava, R., Valiukas, L., Jen, D., Malik, M. M., Bishop, C. S., Ndulue, E. B., Dave, A., Clark, J., Etling, B., Faris, R., Shah, A., Rubinovitz, J., Hope, A., D’Ignazio, C., Bermejo, F., Benkler, Y., & Zuckerman, E. (2021). Media Cloud: Massive Open Source Collection of Global News on the Open Web. Proceedings of the International AAAI Conference on Web and Social Media, 15(1), 1034-1045. https://doi.org/10.1609/icwsm.v15i1.18127
+    attribution_short: Media Cloud
+
+    # Files
+    url_main: https://www.mediacloud.org/
+    date_accessed: '2025-05-19'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.mediacloud.org/legal/media-cloud-terms-of-use
+outs:
+  - md5: 774c8ae1347f9315bc6b22c23f321ee0
+    size: 2088
+    path: media_deaths.csv

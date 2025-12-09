@@ -1,0 +1,41 @@
+dataset:
+  title: Breakdown of material footprint in EU (Eurostat, 2025)
+  description: ''
+  licenses:
+    - {}
+tables:
+  breakdown_material_footprint_eu:
+    variables:
+      biomass:
+        title: Biomass
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Biomass
+          conversionFactor: 1000
+      non_metallic_minerals:
+        title: Non-metallic minerals
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Non-metallic minerals
+          conversionFactor: 1000
+      metal_ores:
+        title: Metal ores
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Metal ores
+          conversionFactor: 1000
+      fossil_fuels:
+        title: Fossil fuels
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fossil fuels
+          conversionFactor: 1000
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

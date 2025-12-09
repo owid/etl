@@ -6,8 +6,9 @@ import re
 import time
 from functools import cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Literal, Optional, Union
+from typing import Any, Callable, Iterable, Literal, Optional, overload
 
+import deprecated
 import pandas as pd
 import structlog
 from owid import catalog
@@ -24,10 +25,11 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
 from etl import paths
-from etl.collection.explorer import Explorer, create_explorer
-from etl.collection.explorer_legacy import ExplorerLegacy, _create_explorer_legacy
-from etl.collection.multidim import Multidim, MultidimSet, create_mdim, create_mdim_v2
+from etl.collection import Collection, CollectionSet
+from etl.collection.core.create import Listable, create_collection
+from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
+from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -37,7 +39,7 @@ log = structlog.get_logger()
 __all__ = ["grapher_checks"]
 
 
-def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path]) -> catalog.Dataset:
+def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: str | Path) -> catalog.Dataset:
     """Set channel, namespace, version and short_name from the destination directory."""
     pattern = (
         r"\/"
@@ -62,16 +64,16 @@ def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path])
 
 
 def create_dataset(
-    dest_dir: Union[str, Path],
+    dest_dir: str | Path,
     tables: Iterable[catalog.Table],
-    default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
+    default_metadata: SnapshotMeta | catalog.DatasetMeta | None = None,
     underscore_table: bool = True,
     camel_to_snake: bool = False,
-    long_to_wide: Optional[bool] = None,
-    formats: List[FileFormat] = DEFAULT_FORMATS,
+    long_to_wide: bool | None = None,
+    formats: list[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = True,
     run_grapher_checks: bool = True,
-    yaml_params: Optional[Dict[str, Any]] = None,
+    yaml_params: dict[str, Any] | None = None,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     errors: Literal["ignore", "warn", "raise"] = "raise",
     repack: bool = True,
@@ -242,19 +244,27 @@ class PathFinder:
         ds_garden = paths.garden_dataset
     """
 
-    def __init__(self, __file__: str, is_private: Optional[bool] = None):
+    def __init__(self, __file__: str, is_private: bool | None = None):
         self.f = Path(__file__)
 
         # Lazy load dag when needed.
         self._dag = None
 
-        # Current file should be a data step.
-        if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
-            raise CurrentFileMustBeAStep
+        # Check if this is a snapshot file or a regular ETL step
+        self._is_snapshot_file = self.f.as_posix().startswith(paths.SNAPSHOTS_DIR.as_posix())
 
-        # It could be either called from a module with short_name.py or __init__.py inside short_name/ dir.
-        if len(self.f.relative_to(paths.STEP_DIR).parts) == 6:
-            self.f = self.f.parent
+        if self._is_snapshot_file:
+            # For snapshot files, validate they're in the snapshots directory
+            if not self.f.as_posix().startswith(paths.SNAPSHOTS_DIR.as_posix()):
+                raise CurrentFileMustBeAStep
+        else:
+            # Current file should be a data step.
+            if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
+                raise CurrentFileMustBeAStep
+
+            # It could be either called from a module with short_name.py or __init__.py inside short_name/ dir.
+            if len(self.f.relative_to(paths.STEP_DIR).parts) == 6:
+                self.f = self.f.parent
 
         # If is_private is not specified, start by assuming the current step is public.
         # Then, if the step is not found in the dag, but it's found as private, is_private will be set to True.
@@ -276,10 +286,14 @@ class PathFinder:
 
     @property
     def step_type(self) -> str:
+        if self._is_snapshot_file:
+            return "snapshot"
         return self.f.parent.parent.parent.parent.name
 
     @property
     def channel(self) -> CHANNEL:
+        if self._is_snapshot_file:
+            return "snapshot"  # type: ignore
         return self.f.parent.parent.parent.name  # type: ignore
 
     @property
@@ -307,7 +321,7 @@ class PathFinder:
         return self.directory / (self.short_name + ".meta.yml")
 
     @property
-    def mdim_path(self) -> Path:
+    def collection_path(self) -> Path:
         """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
@@ -335,6 +349,33 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
+    def regions(self):
+        """Get Regions helper for the specific use of an ETL step."""
+        if not hasattr(self, "_regions"):
+            try:
+                ds_regions = self.load_dataset("regions")
+            except NoMatchingStepsAmongDependencies:
+                ds_regions = None
+            try:
+                ds_income_groups = self.load_dataset("income_groups")
+            except NoMatchingStepsAmongDependencies:
+                ds_income_groups = None
+            try:
+                ds_population = self.load_dataset("population")
+            except NoMatchingStepsAmongDependencies:
+                ds_population = None
+
+            self._regions = Regions(
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+                ds_population=ds_population,
+                countries_file=self.country_mapping_path,
+                excluded_countries_file=self.excluded_countries_path if self.excluded_countries_path.exists() else None,
+                auto_load_datasets=False,
+            )
+        return self._regions
+
+    @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
@@ -352,10 +393,10 @@ class PathFinder:
     @staticmethod
     def create_step_name(
         short_name: str,
-        channel: Optional[CHANNEL] = None,
-        namespace: Optional[str] = None,
-        version: Optional[Union[int, str]] = None,
-        is_private: Optional[bool] = False,
+        channel: CHANNEL | None = None,
+        namespace: str | None = None,
+        version: int | str | None = None,
+        is_private: bool | None = False,
         step_type: str = "data",
     ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
@@ -398,7 +439,7 @@ class PathFinder:
         )
 
     @staticmethod
-    def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
+    def _get_attributes_from_step_name(step_name: str) -> dict[str, str]:
         """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
         if channel_type.startswith(("snapshot",)):
@@ -444,6 +485,9 @@ class PathFinder:
     def dest_dir(self) -> Path:
         # Local destination folder, where the data generated by this step will be saved.
         # For typical data steps, this folder will be "data/..." (from the base ETL folder).
+        # For snapshots, this should be the snapshots folder.
+        if self._is_snapshot_file:
+            return self.f.parent
         return paths.BASE_DIR / self.f.relative_to(paths.STEP_DIR).with_suffix("")
 
     def side_file(self, filename: str) -> Path:
@@ -461,10 +505,10 @@ class PathFinder:
         self,
         short_name: str,
         step_type: str = "data",
-        channel: Optional[CHANNEL] = None,
-        namespace: Optional[str] = None,
-        version: Optional[Union[str, int]] = None,
-        is_private: Optional[bool] = None,
+        channel: CHANNEL | None = None,
+        namespace: str | None = None,
+        version: str | int | None = None,
+        is_private: bool | None = None,
     ) -> str:
         """Get dependency step name (as it appears in the dag) given its attributes (at least its short name)."""
 
@@ -516,11 +560,11 @@ class PathFinder:
         self,
         short_name: str,
         step_type: str = "data",
-        channel: Optional[CHANNEL] = None,
-        namespace: Optional[str] = None,
-        version: Optional[Union[str, int]] = None,
-        is_private: Optional[bool] = None,
-    ) -> Union[catalog.Dataset, Snapshot, MultidimSet]:
+        channel: CHANNEL | None = None,
+        namespace: str | None = None,
+        version: str | int | None = None,
+        is_private: bool | None = None,
+    ) -> catalog.Dataset | Snapshot | CollectionSet:
         """Load a (dataset or export) dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
@@ -534,10 +578,10 @@ class PathFinder:
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
         elif (step_type == "export") and (dependency["channel"] in "multidim"):
-            mdims_path = (
+            collection_path = (
                 paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )
-            return MultidimSet(mdims_path)
+            return CollectionSet(collection_path)
         else:
             dataset_path = (
                 paths.DATA_DIR
@@ -547,13 +591,13 @@ class PathFinder:
 
         return dataset  # type: ignore[reportReturnType]
 
-    def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
+    def load_snapshot(self, short_name: str | None = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
         snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name, **kwargs)
         assert isinstance(snap, Snapshot)
         return snap
 
-    def read_snap_table(self, short_name: Optional[str] = None, **kwargs) -> Table:
+    def read_snap_table(self, short_name: str | None = None, **kwargs) -> Table:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
         snap = self.load_snapshot(short_name=short_name)
         tb = snap.read(**kwargs)
@@ -561,10 +605,10 @@ class PathFinder:
 
     def load_dataset(
         self,
-        short_name: Optional[str] = None,
-        channel: Optional[CHANNEL] = None,
-        namespace: Optional[str] = None,
-        version: Optional[Union[str, int]] = None,
+        short_name: str | None = None,
+        channel: CHANNEL | None = None,
+        namespace: str | None = None,
+        version: str | int | None = None,
     ) -> catalog.Dataset:
         """Load dataset dependency. short_name defaults to the current step's short_name."""
         dataset = self.load_dependency(
@@ -573,21 +617,55 @@ class PathFinder:
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
-    def load_mdims(
+    def load_collectionset(
         self,
-        short_name: Optional[str] = None,
-        namespace: Optional[str] = None,
-        version: Optional[Union[str, int]] = None,
-    ) -> MultidimSet:
-        mdims = self.load_dependency(
+        short_name: str | None = None,
+        namespace: str | None = None,
+        version: str | int | None = None,
+    ) -> CollectionSet:
+        cs = self.load_dependency(
             step_type="export",
             short_name=short_name or self.short_name,
             channel="multidim",
             namespace=namespace,
             version=version,
         )
-        assert isinstance(mdims, MultidimSet)
-        return mdims
+        assert isinstance(cs, CollectionSet)
+        return cs
+
+    def init_snapshot(self, filename: Optional[str] = None) -> Snapshot:
+        """Create a snapshot using the current step's location to determine namespace, version, and optionally filename.
+
+        Args:
+            filename: Optional filename for the snapshot. If not provided, will look for a .dvc file
+                     that matches the step name (e.g. unwto_gdp.py -> unwto_gdp.*.dvc).
+
+        Returns:
+            Snapshot object ready for use.
+
+        Usage:
+            # Automatically detect filename from matching .dvc file
+            snap = paths.init_snapshot()
+
+            # Or specify filename explicitly
+            snap = paths.init_snapshot("unwto_gdp.xlsx")
+        """
+        if filename is None:
+            # Look for .dvc file that matches the step name
+            dvc_pattern = f"{self.short_name}.*.dvc"
+            dvc_files = list(self.snapshot_dir.glob(dvc_pattern))
+
+            if len(dvc_files) == 0:
+                raise ValueError(f"No .dvc file found matching pattern '{dvc_pattern}' in {self.snapshot_dir}")
+            elif len(dvc_files) > 1:
+                raise ValueError(
+                    f"Multiple .dvc files found matching pattern '{dvc_pattern}' in {self.snapshot_dir}: {[f.name for f in dvc_files]}. Please specify filename explicitly."
+                )
+
+            # Use the basename of the .dvc file (without .dvc extension)
+            filename = dvc_files[0].name[:-4]  # Remove .dvc extension
+
+        return Snapshot(f"{self.namespace}/{self.version}/{filename}")
 
     def load_etag_url(self) -> str:
         """Load etag url dependency and return its URL."""
@@ -595,7 +673,7 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+    def load_config(self, filename: str | None = None, path: str | Path | None = None) -> dict[str, Any]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
@@ -606,27 +684,21 @@ class PathFinder:
             raise AttributeError(f"There was a problem loading config from {path}, please review!. Original error: {e}")
         return config
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+    def load_collection_config(self, filename: str | None = None, path: str | Path | None = None) -> dict[str, Any]:
         """Replace code to use `self.load_config`."""
         return self.load_config(filename, path)
-
-    def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
-        return self.load_config(filename, path)
-        # Check that it can be loaded as an Explorer object.
-        # explorer = Explorer.from_dict(config)
-        # return explorer.to_dict(drop_definitions=False)
 
     def create_dataset(
         self,
         tables: Iterable[catalog.Table],
-        default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
+        default_metadata: SnapshotMeta | catalog.DatasetMeta | None = None,
         underscore_table: bool = True,
         camel_to_snake: bool = False,
-        long_to_wide: Optional[bool] = None,
-        formats: List[FileFormat] = DEFAULT_FORMATS,
+        long_to_wide: bool | None = None,
+        formats: list[FileFormat] = DEFAULT_FORMATS,
         check_variables_metadata: bool = True,
         run_grapher_checks: bool = True,
-        yaml_params: Optional[Dict[str, Any]] = None,
+        yaml_params: dict[str, Any] | None = None,
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
         errors: Literal["ignore", "warn", "raise"] = "raise",
         repack: bool = True,
@@ -647,115 +719,153 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
-        """Create a Multidim object.
-
-        Args:
-        -----
-
-        config: dict
-            MDIM configuration.
-        mdim_name: str
-            Name of the MDIM page. Default is short_name from mdim catalog path.
-        """
-        # Create Multidim
-        mdim = create_mdim(
-            config,
-            self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
-        )
-
-        return mdim
-
-    def create_mdim_v2(
+    @overload
+    def create_collection(
         self,
-        config: Dict[str, Any],
-        mdim_name: Optional[str] = None,
-        tb: Optional[Table] = None,
-        indicator_names: Optional[Union[str, List[str]]] = None,
-        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
-        common_view_config: Optional[Dict[str, Any]] = None,
-        indicators_slug: Optional[str] = None,
+        config: dict[str, Any],
+        short_name: str | None = None,
+        tb: list[Table] | Table | None = None,
+        indicator_names: Listable[list[str] | None] | str = None,
+        dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+        common_view_config: Listable[dict[str, Any] | None] = None,
+        indicators_slug: str | None = None,
         indicator_as_dimension: bool = False,
-        explorer_name: Optional[str] = None,
-        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
+        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
         catalog_path_full: bool = False,
-    ) -> Multidim:
-        """Experimental smarter explorer creation.
+        *,  # Force keyword-only arguments after this
+        explorer: Literal[True],
+    ) -> Explorer: ...
 
-        Args:
+    @overload
+    def create_collection(
+        self,
+        config: dict[str, Any],
+        short_name: str | None = None,
+        tb: list[Table] | Table | None = None,
+        indicator_names: Listable[list[str] | None] | str = None,
+        dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+        common_view_config: Listable[dict[str, Any] | None] = None,
+        indicators_slug: str | None = None,
+        indicator_as_dimension: bool = False,
+        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
+        catalog_path_full: bool = False,
+        *,  # Force keyword-only arguments after this
+        explorer: Literal[False] = False,
+    ) -> Collection: ...
+
+    def create_collection(
+        self,
+        config: dict[str, Any],
+        short_name: str | None = None,
+        tb: list[Table] | Table | None = None,
+        indicator_names: Listable[list[str] | None] | str = None,
+        dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+        common_view_config: Listable[dict[str, Any] | None] = None,
+        indicators_slug: str | None = None,
+        indicator_as_dimension: bool = False,
+        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
+        catalog_path_full: bool = False,
+        explorer: bool = False,
+    ) -> Explorer | Collection:
+        """Create a collection with the given configuration and data.
+
+        This function creates a Collection based on the provided configuration and table data. It supports both single and multiple table inputs with flexible indicator and dimension specification.
+
+        You can create a collection purely based on manually crafted configuration (via YAML) by just using the `config` parameter, or you can provide a table (`tb`) with data to be expanded for the given indicators and dimensions. You can also combine both approaches, where the configuration from `config` will overwrite that automatically generated from the table data.
+
+        A typical strategy is to define the high-level collection configuration and dimension specifications (e.g. dimension names, description, etc.) in the YAML file, and then use the `tb` parameter to automatically expand dimensional indicators.
+
+        Note: You can also expand multiple tables by passing a list of `Table` objects to the `tb` parameter.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            Configuration YAML dictionary for the explorer/collection. Typically loaded from a YAML file with `paths.load_collection_config()`.
+
+        short_name : str | None, default None
+            Short name of the Collection. Defaults to the short name of the step.
+
+        tb : list[Table] | Table | None, default None
+            Table object(s) with dimensional data. It can be a single `Table` or list of `Table`. The function will programmatically generate the collection configuration based on the available indicators in `tb`. To customize which indicators and dimensions to expand, refer to the `indicator_names` and `dimensions` parameters.
+
+        indicator_names : Listable[list[str] | None] | str, default None
+            Specifies which indicators from the table(s) to expand for the collection. Multiple formats supported:
+
+                * `None`: All indicators from `tb` are used (also applies when `tb` is list).
+                * `str`: Only the indicator with given name is used (also applies when `tb` is list).
+                * `list[str]`: Only indicators with the given names are used (also applies when `tb` is list).
+                * `list[list[str] | None]`: List where each element corresponds to a different table in `tb` (element _i_ in list corresponds to table _i_). If an element in the list is None, all indicators are used for that table. List length must match `tb` length.
+
+        dimensions : Listable[list[str] | dict[str, list[str] | str] | None], default None
+            Specifies which dimensions to use and, optionally, which choices. Multiple formats supported:
+                * `None`: All dimensions are used (also applies when `tb` is list). Applies to all tables if `tb` is a list.
+                * `list[str]`: Only dimensions with given names (all must be present). Applies to all tables if `tb` is a list.
+                * `dict[str, list[str] | str]`: Keys are dimension names, values are choices to use. Use "*" as value to include all choices for a given dimension. Must contain all available dimensions as keys. Applies to all tables if `tb` is a list.
+                * `list[list[str] | dict[str, list[str] | str]]`: List where each element corresponds to a different table in `tb` (element _i_ in list corresponds to table _i_). If an element in the list is None, all dimensions are used for that table. List length must match `tb` length.
+
+        common_view_config : Listable[dict[str, Any] | None], default None
+            Common view configuration applied to all views. Applies to all tables if `tb` is a list.
+
+            If given as a list, each element corresponds to a different table in `tb` (element _i_ in list corresponds to table _i_). If an element in the list is None, no common view configuration is applied for that table. List length must match `tb` length.
+
+        indicators_slug : str | None, default None
+            Custom slug for indicators. Uses a default name if not provided.
+
+        indicator_as_dimension : bool, default False
+            If True, the indicator name is treated as a dimension. This means that the indicator will be included in the dimensions of the collection, allowing it to be used as a filter or in views.
+
+        choice_renames : Listable[dict[str, dict[str, str] | Callable] | None], default None
+            Use this to rename the names of the dimension choices. Multiple formats supported:
+                * `None`: No renames are applied (also applies when `tb` is list).
+                * `dict[str, dict[str, str]]`: Key is the dimension slug, value is a mapping
+                    with original choice slug as key and the new choice name as value.
+                * `dict[str, Callable]`: Key is the dimension slug, value is a function that
+                    returns the new name for given slug (returns None to keep original)
+                * For multiple tables: Can be list matching `tb` length with any of the above formats.
+
+        catalog_path_full : bool, default False
+            If True, it uses full catalog path. If False, uses shorter version (e.g., `table#indicator` or `dataset/table#indicator`).
+
+        explorer : bool, default False
+            Use this flag to create an explorer (True).
+
+        Returns
+        -------
+        Explorer | Collection
+            Returns an Explorer or MDIM Collection based on the provided configuration and data.
+
+        Notes
         -----
-        config: dict
-            Configuration YAML for the explorer.
-        mdim_name: str
-            Name of the MDIM page. Default is short_name from mdim catalog path.
-        catalog_path: str
-            Catalog path for the MDIM. This is used to create the MDIM in the database.
-        tb: Table
-            Table object with data. This data will be expanded for the given indicators and dimensions.
-        indicator_names: Optional[Union[str, List[str]]]
-            Name of the indicators to be used. If None, all indicators are used.
-        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]]
-            Dimensions to be used. If None, all dimensions are used. If a list, all dimensions are used with the given names. If a dict, key represent dimensions to use and values choices to use. Note that if a list or dictionary is given, all dimensions must be present.
-        common_view_config: Optional[Dict[str, Any]]
-            Common view configuration to be used for all views.
-        indicators_slug: Optional[str]
-            Slug to be used for the indicators. A default is used.
-        indicator_as_dimension: bool
-            If True, the indicator is treated as a dimension.
-        explorer_name: Optional[str]
-            Name of the explorer. If None, the table name is used.
-        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]]
-            Renames for choices. If a dictionary, the key is the dimension slug and the value is a dictionary with the original slug as key and the new name as value. If a callable, the function should return the new name for the given slug. NOTE: If the callable returns None, the name is not changed.
-        catalog_path_full: bool
-            If True, the full path is used for the catalog. If False, a shorter version is used (e.g. table#indicator` or `dataset/table#indicator`).
+        When `tb` is a list of tables, the parameters `indicator_names`, `dimensions`, `common_view_config`, and `choice_renames` can also be lists where each element corresponds to a table in `tb`. List lengths must match `tb` length. If these parameters are not lists, the same value is applied to all tables.
         """
-        return create_mdim_v2(
+        return create_collection(
             config_yaml=config,
             dependencies=self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
+            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
             tb=tb,
             indicator_names=indicator_names,
             dimensions=dimensions,
             common_view_config=common_view_config,
             indicators_slug=indicators_slug,
             indicator_as_dimension=indicator_as_dimension,
-            explorer_name=explorer_name,
             choice_renames=choice_renames,
             catalog_path_full=catalog_path_full,
+            explorer=explorer,
         )
 
-    def create_explorer(
-        self,
-        config,
-        explorer_name: Optional[str] = None,
-    ) -> Explorer:
-        """Create an Explorer object.
-
-        Args:
-        -----
-        config: Dict[str, Any]
-            Configuration of the explorer.
-        explorer_name: str
-            Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
-        """
-        # Create Explorer object
-        explorer = create_explorer(
-            config=config,
-            dependencies=self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}",
-        )
-
-        return explorer
-
+    @deprecated.deprecated(
+        reason="We should slowly migrate to YAML-based explorers, and use `paths.create_collection` instead."
+    )
     def create_explorer_legacy(
         self,
-        config: Dict[str, Any],
+        config: dict[str, Any],
         df_graphers: pd.DataFrame,
-        df_columns: Optional[pd.DataFrame] = None,
+        df_columns: pd.DataFrame | None = None,
         reset: bool = False,
     ) -> ExplorerLegacy:
-        """This function is used to create an Explorer object using the legacy configuration.
+        """NOTE: We should slowly migrate to YAML-based explorers, and use `paths.create_collection` instead.
+
+        This function is used to create an Explorer object using the legacy configuration.
 
         To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
 
@@ -775,7 +885,7 @@ class PathFinder:
 
         explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
 
-        explorer = _create_explorer_legacy(
+        explorer = create_explorer_legacy(
             catalog_path=explorer_catalog_path,
             config=config,
             df_graphers=df_graphers,

@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/464
-    date_accessed: 2023-08-10 08:42:24.777229
+    url: https://admin.owid.io/admin/datasets/464
+    date_accessed: 2025-09-26 18:06:12.604327
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Historical employment and output by sector – OWID (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ab8b240e0d2bf58f93017f7f7394da7f
-  size: 39962
-  path: 
-    dataset_464_historical_employment_and_output_by_sector__owid__2017_values.feather
+  - md5: 24439f065aae6b1cabcbbc40b158006e
+    size: 41874
+    path: dataset_464_historical_employment_and_output_by_sector__owid__2017_values.feather

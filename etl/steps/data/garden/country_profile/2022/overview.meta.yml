@@ -77,20 +77,20 @@ tables:
           name: Fossil fuels
       share_pop_using_internet:
         title: Share of population using the internet
-        short_unit: '%'
-        unit: '%'
+        short_unit: "%"
+        unit: "%"
       gdp_per_capita:
         title: GDP per capita
         short_unit: $
         unit: constant 2010 US-$
       share_electricity_access:
         title: Electricity access
-        short_unit: '%'
-        unit: '%'
+        short_unit: "%"
+        unit: "%"
       child_mortality__select_gapminder__v10__2017:
         title: Child mortality
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
       electdem_vdem_owid:
         title: Electoral democracy
       electdem_vdem_high_owid:
@@ -129,7 +129,7 @@ tables:
             date_accessed: 2021-10-08
           - name: UN (2022)
             published_by: United Nations - Population Division (2022)
-            url: https://population.un.org/wpp/Download/Standard/Population/
+            url: https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Population
             date_accessed: 2022-09-10
           - name: HYDE (v3.2)
             published_by: HYDE (v3.2)

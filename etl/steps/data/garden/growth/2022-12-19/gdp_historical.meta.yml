@@ -43,7 +43,7 @@ tables:
         title: GDP (constant international-$)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: GDP in the last two millenia estimated by the combination of Maddison Project Database, Maddison Database and World Bank's GDP estimates.
+        description: GDP in the last two millennia estimated by the combination of Maddison Project Database, Maddison Database and World Bank's GDP estimates.
         display:
            name: GDP
            numDecimalPlaces: 1
@@ -51,7 +51,7 @@ tables:
         title: GDP per capita (constant international-$)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: GDP per capita in the last two millenia estimated by the combination of Maddison Project Database, Maddison Database and World Bank's GDP per capita estimates.
+        description: GDP per capita in the last two millennia estimated by the combination of Maddison Project Database, Maddison Database and World Bank's GDP per capita estimates.
         display:
            name: GDP per capita
            numDecimalPlaces: 1

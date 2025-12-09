@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -24,12 +25,53 @@ def run(dest_dir: str) -> None:
     tb = tidy_causes_dimension(tb)
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns="broad_cause_group")
+
+    # Calculate death rates for  combined age groups.
+    # The death rate is per 100,000 population, so we reverse-calculate the population size.
+    tb["estimated_population"] = tb["number"] / tb["death_rate_per_100_000_population"] * 100000
+    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years"], "< 5 years")
+    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years", "5-9 years"], "< 10 years")
+    tb = tb.drop(columns=["estimated_population"])
+
     tb = tb.format(["country", "year", "sex", "age_group", "cause", "icd10_codes"])
     ds_garden = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=False, default_metadata=ds_meadow.metadata
     )
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_age_group_aggregate(tb: Table, age_groups: list[str], label: str) -> Table:
+    """
+    Aggregates death numbers and recalculates death rates for a combined age group.
+
+    Parameters:
+    - tb (Table): Original table with disaggregated age group data.
+    - age_groups (list of str): List of age group labels to combine (e.g., ["less than 1 year", "1-4 years"]).
+    - label (str): New age group label to assign to the aggregated rows (e.g., "< 5 years").
+
+    Returns:
+    - Table: Aggregated rows with updated death rate and age group label merged into the original table.
+    """
+    # Filter relevant age groups
+    tb_filtered = tb[tb["age_group"].isin(age_groups)].copy()
+
+    # Group by relevant dimensions and sum values
+    tb_filtered = tb_filtered.groupby(["country", "year", "sex", "cause", "icd10_codes"], as_index=False).agg(
+        {"number": "sum", "estimated_population": "sum"}
+    )
+
+    # Recalculate the death rate for the new age group
+    tb_filtered["death_rate_per_100_000_population"] = (
+        tb_filtered["number"] / tb_filtered["estimated_population"] * 100000
+    )
+
+    # Assign new age group label
+    tb_filtered["age_group"] = label
+
+    # Drop the helper column
+    tb = pr.concat([tb, tb_filtered])
+    return tb
 
 
 def tidy_causes_dimension(tb: Table) -> Table:

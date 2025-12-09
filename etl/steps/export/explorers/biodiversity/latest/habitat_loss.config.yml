@@ -13,7 +13,6 @@ definitions:
     colorScaleInvert: true
     colorScaleScheme: YlOrRd
     colorScaleNumericBins: -15,;-10,;-5,;0,;5,
-    colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: -20
 
   display_cropland: &display_cropland
@@ -23,7 +22,6 @@ definitions:
     colorScaleInvert: true
     colorScaleScheme: RdYlBu
     colorScaleNumericBins: -100,,;-75,,;-50,,;-25,,;0,,;25,,;50,,;75,,;100,,;250
-    colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: -250
 
 config:
@@ -77,7 +75,7 @@ dimensions:
         name: Birds
       - slug: amphibians
         name: Amphibians
-      - slug: ''
+      - slug: na
         name: ''
     presentation:
       type: radio
@@ -424,7 +422,7 @@ views:
         Projected habitat loss for amphibian species by 2050 under a scenario where crop yield gaps are closed. Yields increase linearly from current yields to 80% of the estimated maximum potential by 2050. Increasing yields above 80% is rarely achieved over large areas.
   - dimensions:
       scenario: business_as_usual
-      species_group: ''
+      species_group: na
       projected_change_by_2050: cropland_area
     indicators:
       y:
@@ -438,7 +436,7 @@ views:
         Projected change in cropland area by 2050 under a business-as-usual scenario. This assumes population growth from UN medium projections; crop yield increases in line with historical rates of improvement; and dietary changes in line with projected rises in income.
   - dimensions:
       scenario: combined_interventions
-      species_group: ''
+      species_group: na
       projected_change_by_2050: cropland_area
     indicators:
       y:
@@ -452,7 +450,7 @@ views:
         Projected change in cropland area by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimisation of agricultural production to avoid the most at-risk locations for habitat loss.
   - dimensions:
       scenario: adoption_of_healthy_diets
-      species_group: ''
+      species_group: na
       projected_change_by_2050: cropland_area
     indicators:
       y:
@@ -466,7 +464,7 @@ views:
         Projected change in cropland area by 2050 under a scenario of global adoption of healthier diets. Diets transition to the EAT-Lancet diet which is in line with healthy calorie and nutritional requirements. For richer countries this would mean a reduction (but not elimination) of meat consumption. For poorer countries, this would mean an increase.
   - dimensions:
       scenario: halve_food_waste
-      species_group: ''
+      species_group: na
       projected_change_by_2050: cropland_area
     indicators:
       y:
@@ -480,7 +478,7 @@ views:
         Projected change in cropland area by 2050 under a scenario where consumer food waste and food losses in supply chains are reduced by 25% by 2030 and 50% by 2050.
   - dimensions:
       scenario: close_yield_gaps
-      species_group: ''
+      species_group: na
       projected_change_by_2050: cropland_area
     indicators:
       y:
@@ -494,7 +492,7 @@ views:
         Projected change in cropland area by 2050 under a scenario where crop yield gaps are closed. Yields increase linearly from current yields to 80% of the estimated maximum potential by 2050. Increasing yields above 80% is rarely achieved over large areas.
   - dimensions:
       scenario: optimise_trade
-      species_group: ''
+      species_group: na
       projected_change_by_2050: cropland_area
     indicators:
       y:

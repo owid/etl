@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Divorces in England and Wales
+    description: |-
+      Annual divorce numbers and rates, by duration of marriage, sex, to whom granted, and reason.
+
+    date_published: '2025-07-02'
+
+    # Citation
+    producer: UK Office for National Statistics
+    citation_full: |-
+      Office for National Statistics (ONS), ONS website, dataset, Divorces in England and Wales, UK. Retrieved 7 October 2025.
+    attribution_short: UK ONS
+
+    # Files
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/divorcesinenglandandwales
+    url_download: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/divorcesinenglandandwales/2023/divorcesworkbook2023final.xlsx
+    date_accessed: '2025-10-07'
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: a2ef49a8e0c002831d2e35be67ab9e39
+    size: 159230
+    path: divorces.xlsx

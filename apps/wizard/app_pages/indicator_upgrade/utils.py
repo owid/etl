@@ -8,10 +8,10 @@ from pymysql import OperationalError
 from rapidfuzz import fuzz
 from structlog import get_logger
 
+from apps.indicator_upgrade.match import find_mapping_suggestions, preliminary_mapping
 from apps.wizard.utils.io import get_steps_df
 from etl.db import get_connection
 from etl.grapher.io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
-from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 
 # Logger
 log = get_logger()
@@ -35,16 +35,17 @@ def get_datasets(archived: bool) -> pd.DataFrame:
 
             # Create a filter to select the new dataset.
             filter_new = steps_df_grapher["id"] == g["new"]["id"]
-            ##  - First options should be those detected by grapher_changes ('old' keyword)
+
+            ##  - First, fuzzy match the step short_names (and names to account for old datasets not in ETL)
+            score_step = steps_df_grapher["step"].apply(lambda x: fuzz.ratio(g["new"]["step"], x))
+            score_name = steps_df_grapher["name"].apply(lambda x: fuzz.ratio(g["new"]["name"], x))
+            steps_df_grapher[col_name] = (score_step + score_name) / 2
+
+            ##  - Then, prioritize those detected by grapher_changes ('old' keyword)
             if "old" in g:
                 steps_df_grapher.loc[steps_df_grapher["id"] == g["old"]["id"], col_name] = 200
                 # This is a new dataset that does have an old counterpart (hence is mappable).
                 steps_df_grapher.loc[filter_new, "new_dataset_mappable"] = True
-
-            ##  - Then, we should just fuzzy match the step short_names (and names to account for old datasets not in ETL)
-            score_step = steps_df_grapher["step"].apply(lambda x: fuzz.ratio(g["new"]["step"], x))
-            score_name = steps_df_grapher["name"].apply(lambda x: fuzz.ratio(g["new"]["name"], x))
-            steps_df_grapher[col_name] = (score_step + score_name) / 2
 
             ## Set own dataset as last
             steps_df_grapher.loc[filter_new, col_name] = -1

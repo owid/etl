@@ -5,7 +5,7 @@ from etl.helpers import PathFinder
 
 log = get_logger()
 
-# naming conventions
+# Naming conventions
 paths = PathFinder(__file__)
 
 

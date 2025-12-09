@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: World Bank
+    title: World Bank
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Eo0s3so3bwAMetFTihDv9rvFTucypL9CifDnIQOui-tTkxr6W46ErYFxDiz66b1A6nNOhlqUiDyF/pub?output=csv
+    date_accessed: '2025-07-17'
+  name: 'DRAFT: Joe''s National poverty lines used for $2.15 and $3 International povety line'
+  description: ''
+  license: {}
+outs:
+  - md5: 4e5d09678e12c08d1f6be5ac2bcfdef2
+    size: 1151
+    path: draft_joe_ipl_data.csv

@@ -8,7 +8,7 @@ import torch
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 
-from etl.config import memory
+from etl.config import DOCS_BUILD, memory
 from etl.paths import CACHE_DIR
 
 # Initialize log.
@@ -21,11 +21,12 @@ def set_device() -> str:
     # Set the default device. We use CPU on our servers, but you can change this to "cuda" if you have a GPU.
     device = os.environ.get("DEVICE", default_device)
 
-    try:
-        torch.set_default_device(device)
-    except RuntimeError:
-        # If was already called, this can happen in streamlit apps
-        pass
+    if DOCS_BUILD:
+        try:
+            torch.set_default_device(device)
+        except RuntimeError:
+            # If was already called, this can happen in streamlit apps
+            pass
 
     return device
 
@@ -54,7 +55,8 @@ def get_embeddings(
     # Get model name
     if model_name is None:
         # NOTE: this is a bit of a hack
-        model_name = model.tokenizer.name_or_path.split("/")[-1]
+        # TODO: fix it when we update to the latest version
+        model_name = model.tokenizer.name_or_path.split("/")[-1]  # type: ignore
 
     cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys.pkl"
     cache_file_tensor = CACHE_DIR / f"embeddings_{model_name}.pt"

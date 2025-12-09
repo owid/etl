@@ -1,5 +1,8 @@
 definitions:
   common:
+    description_processing: |-
+       **Note on current year data:** For the ongoing year (if displayed), annual averages are calculated from available monthly or semi-annual data, providing preliminary CPI values that update throughout the year. Official annual averages from BLS are only available after the year is complete.
+
     presentation:
       topic_tags:
         - Economic Growth
@@ -51,21 +54,25 @@ tables:
         display:
           name: Education
 
-      tuition_fees_childcare:
-        title: US consumer price index for tuition, school fees, childcare
-        description_from_producer: "Tuition, other school fees, and childcare in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB)"
+      childcare:
+        title: US consumer price index for day care and preschool fees
+        description_from_producer: "Day care and preschool in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB)"
         description_key:
           - *cpi_desc
-          - This CPI item is a subcategory of education and tracks out-of-pocket costs for tuition, school fees, and childcare.
-          - It includes college and graduate programs, private elementary and high school tuition, and early childhood education such as daycare and preschool.
-          - It also covers technical and business school fees, and other miscellaneous education-related costs.
-          - The item reflects how the cost of formal education and childcare changes over time.
+          - This CPI item tracks out-of-pocket costs for day care and preschool services.
+          - It includes charges for the care of pre-elementary school children, including pre-kindergarten educational programs.
+          - Individuals whose occupation is to regularly care for pre-elementary school children are included in the pricing.
+          - The item reflects changes over time in the cost of early childhood education and care.
+          - Separate charges for books, uniforms, transportation, or meals are not included.
+          - Short-term or occasional childcare (such as babysitting) and nanny services are excluded.
+          - Camp, kindergarten, and any programs for grade school students (including extended before- and after-school care) are also excluded.
+          - In families with more than three children, only the costs for up to three children are included; additional children are excluded from pricing.
           - *cpi_base_1982_84
         unit: ""
         presentation:
-          title_public: Tuition, school fees, childcare (US consumer price index)
+          title_public: Day care and preschool fees (US consumer price index)
         display:
-          name: Tuition, other school fees, and childcare
+          name: Day care and preschool
 
       medical_care:
         title: US consumer price index for medical care

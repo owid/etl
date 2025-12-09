@@ -25,3 +25,8 @@ tables:
         title: Number of Asian elephants
         unit: ''
         description: The estimated number of Asian elephants.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

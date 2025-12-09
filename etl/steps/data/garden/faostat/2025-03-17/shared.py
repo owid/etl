@@ -148,10 +148,11 @@ REGIONS_TO_ADD = {
         "area_code": "OWID_EUR",
         "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
-    "European Union (27)": {
-        "area_code": "OWID_EU27",
-        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
-    },
+    # There have been multiple cases where "European Union (27)" directly from FAOSTAT was informed, while some of the member countries were not. This caused our aggregate of EU to have spurious jumps. Given that the definition of this region is identical to that of FAOSTAT, there's no need to create our own aggregate.
+    # "European Union (27)": {
+    #     "area_code": "OWID_EU27",
+    #     "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
+    # },
     "Africa": {
         "area_code": "OWID_AFR",
         "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,

@@ -59,8 +59,8 @@ def run(dest_dir: str) -> None:
     tb_wdi = ds_garden_wdi["wdi"]
 
     # Load the UNESCO Education Dataset
-    ds_garden_unesco = paths.load_dataset("enrolment_rates")
-    tb_unesco = ds_garden_unesco["enrolment_rates"]
+    ds_garden_unesco = paths.load_dataset("education_opri")
+    tb_unesco = ds_garden_unesco["education_opri"]
 
     # Extract enrollment rates from the World Bank and UNESCO datasets starting from 2010
     enrolment_recent = extract_recent_data(tb_wdi, tb_unesco)

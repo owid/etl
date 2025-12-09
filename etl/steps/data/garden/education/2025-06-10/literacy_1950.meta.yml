@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+    unit: "%"
+    short_unit: "%"
+    display:
+        numDecimalPlaces: 1
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  literacy_1950:
+    variables:
+      illiteracy_est:
+        title: Illiteracy rate in 1950
+        description_short: Share of the population aged 15 and above who cannot read and write a short, simple statement on their everyday life.
+        description_processing: The source reports illiteracy data as ranges (e.g., 10–20%). These ranges were converted into point estimates by calculating their midpoint. For example, a range of 10–20% was converted to 15%.
+      literacy_est:
+        title: Literacy rate in 1950
+        description_short: Share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
+        description_processing: Literacy rates were not directly reported by the source. Instead, they were derived from illiteracy rates by subtracting the midpoint estimate of illiteracy from 100%. For example, an illiteracy range of 80–90% results in a literacy estimate of 15%.

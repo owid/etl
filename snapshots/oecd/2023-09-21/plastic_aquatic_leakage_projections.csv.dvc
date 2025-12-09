@@ -13,7 +13,7 @@ meta:
         - Accumulated stock of plastics in rivers and lakes
         - Accumulated stock of plastics in oceans
 
-      Plastic leakages to aquatic environments and the subcategory trasport to oceans are estimated by applying the methodology adapted from Lebreton and Andrady (2019), on OECD ENV-Linkages model outputs and plastic leakage from mismanaged and litter. The accumulated stock of plastics leakages in rivers and lakes corresponds to the net cumulative sum of leakages in rivers and lakes from 1951 onwards. The accumulated stock of plastics leakages in oceans corresponds to the net cumulative sum of leakages to oceans from 1951 onwards.
+      Plastic leakages to aquatic environments and the subcategory transport to oceans are estimated by applying the methodology adapted from Lebreton and Andrady (2019), on OECD ENV-Linkages model outputs and plastic leakage from mismanaged and litter. The accumulated stock of plastics leakages in rivers and lakes corresponds to the net cumulative sum of leakages in rivers and lakes from 1951 onwards. The accumulated stock of plastics leakages in oceans corresponds to the net cumulative sum of leakages to oceans from 1951 onwards.
     date_published: 2022-05-05
     description_snapshot: |-
       This dataset offers projections between 2019 and 2060 of plastic leakage to  aquatic environments across 15 global regions.

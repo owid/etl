@@ -1,10 +1,21 @@
 """Load a meadow dataset and create a garden dataset.
 
-This code builds the consolidated Excess Mortality dataset by Our World in Data. To this end, we two datasets: Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD).
-Both sources are updated weekly.
+NOTE: If checking for issues with data not being up-to-date, please check the HMD dataset (https://mortality.org/Data/STMF), which is the only one that is still being updated since late 2024.
 
-This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
 
+This code builds the consolidated Excess Mortality dataset by Our World in Data. To this end, we three datasets:
+
+    - Human Mortality Database (HMD) Short-term Mortality Fluctuations project: https://mortality.org/Data/STMF
+        UPDATE policy: Currently being updated, check URL above for latest updates.
+
+    - World Mortality Dataset (WMD): https://github.com/akarlinsky/world_mortality/
+        UPDATE policy: No more updates from 2024
+            "We will not provide any excess mortality estimates starting from 2024. Our excess mortality calculations are based on linear extrapolation of 2015--2019 trends, and this becomes more and more tenuous as the years go by. We provide and update data for 2015--2024, but excess mortality estimates will only be avilable up to end of 2023."
+
+
+    - Karlinsky and Kobak (2021) dataset: https://github.com/dkobak/excess-mortality
+        UPDATE policy: No more updates from 2024
+            "We will not provide any excess mortality estimates starting from 2024. Our excess mortality calculations are based on linear extrapolation of 2015--2019 trends, and this becomes more and more tenuous as the years go by. The repository will keep being updated together with the World Mortality Dataset but will only show excess until the end of 2023."
 """
 
 from input import build_df
@@ -12,7 +23,7 @@ from owid.catalog import Table
 from process import process_df
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
 
 log = get_logger()
@@ -21,7 +32,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("excess_mortality: start")
 
     #
@@ -59,8 +70,7 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden.format(["entity", "date"])
 
     # Create dataset
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_garden],
         formats=["csv", "feather"],
     )

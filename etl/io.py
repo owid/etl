@@ -50,6 +50,9 @@ def get_all_changed_catalog_paths(files_changed: Dict[str, Dict[str, str]]) -> L
         except ValueError:
             continue
 
+    if not dataset_catalog_paths:
+        return []
+
     # NOTE:
     # This is OK, as it filters down the DAG a little bit. But using VersionTracker.steps_df would be much more precise. You could do:
     # steps_df[(steps_df["step"].isin([...])]["all_active_usages"]

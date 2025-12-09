@@ -20,3 +20,7 @@ steps:
     - data://garden/gapminder/2019-05-25/fertility_rate
   data://garden/gapminder/2019-05-25/fertility_rate:
     - snapshot://gapminder/2019-05-25/fertility_rate.feather
+  data://grapher/papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017: !!set
+    ? data://garden/papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017
+  data://garden/papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017: !!set
+    snapshot://papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017.feather:

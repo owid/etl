@@ -1,8 +1,9 @@
 import difflib
+import fnmatch
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import click
 import structlog
@@ -17,7 +18,7 @@ from etl.dag_helpers import (
 )
 from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
-from etl.steps import to_dependency_order
+from etl.steps import filter_to_subgraph, to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, UpdateState, VersionTracker
 
 log = structlog.get_logger()
@@ -267,7 +268,7 @@ class StepUpdater:
             log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher", "explorers"]:
+        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github"]:
             return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
@@ -275,19 +276,16 @@ class StepUpdater:
 
     def update_steps(
         self,
-        steps: Union[str, List[str], Tuple[str]],
+        steps: List[str],
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         include_dependencies: bool = False,
         include_usages: bool = False,
         step_headers: Optional[Dict[str, str]] = None,
+        direct_only: bool = False,
     ) -> None:
         """Update one or more steps to their new version, if possible."""
-
-        # If a single step is given, convert it to a list.
-        if isinstance(steps, str):
-            steps = [steps]
-        elif isinstance(steps, tuple):
-            steps = list(steps)
+        # Store original steps for direct_only filtering
+        original_steps = steps.copy()
 
         # Gather all steps to be updated.
         for step in steps:
@@ -303,6 +301,10 @@ class StepUpdater:
                 # Add direct usages of current step to the list of steps to update (if not already in the list).
                 usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
                 steps += [usage for usage in usages if usage not in steps]
+
+        # Apply direct_only filtering if requested
+        if direct_only and (include_dependencies or include_usages):
+            steps = _filter_direct_only_steps(original_steps, steps)
 
         # Remove steps that cannot be updated because their version is already equal to the new version.
         # NOTE: One could think that steps with version "latest" should also be skipped. But their dependencies may need
@@ -337,15 +339,15 @@ class StepUpdater:
             # Otherwise, if we updated meadow_c before meadow_a and meadow_b, the new meadow_c would depend on the old
             # meadow_a and meadow_b, and the new meadow_a and meadow_b would not be used.
             # This is the same topological sorting problem we have when deciding the order of steps to execute by etl.
-            # Therefore, we can use the same function to_dependency_order to solve it.
-            steps = to_dependency_order(
-                dag=self.tracker.dag_active,
-                includes=steps,  # type: ignore
+            # Therefore, we can use the same functions filter_to_subgraph and to_dependency_order to solve it.
+            filtered_dag = filter_to_subgraph(
+                graph=self.tracker.dag_active,
+                includes=steps,
                 excludes=[],
-                downstream=False,
                 only=True,
                 exact_match=True,
             )
+            steps = to_dependency_order(filtered_dag)
 
             message = "The following steps will be updated:"
             for step in steps:
@@ -362,12 +364,6 @@ class StepUpdater:
                 if success == 1:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
-
-            # Tell user how to automatically create PR
-            short_name = steps[-1].split("/")[-1].split(".")[0]
-            # cmd = f'etl pro update-{short_name} --title ":bar_chart: Update {short_name}"'
-            cmd = f'etl pr "{short_name}" data'
-            log.info(f"Create the PR automatically with:\n  {cmd}")
 
     def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.
@@ -430,6 +426,10 @@ class StepUpdater:
         # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
         # dependency in the dag).
         for step in steps:
+            if self.steps_df[self.steps_df["step"] == step].empty:
+                log.error(f"Step {step} not found in active dag.")
+                continue
+
             if include_usages:
                 # Add all active usages of current step to the list of steps to update (if not already in the list).
                 usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
@@ -440,13 +440,13 @@ class StepUpdater:
         # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
         # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
         # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
-        steps = to_dependency_order(
-            dag=self.tracker.dag_active,
-            includes=steps,  # type: ignore
+        filtered_dag = filter_to_subgraph(
+            graph=self.tracker.dag_active,
+            includes=steps,
             excludes=[],
-            downstream=False,
             only=True,
         )
+        steps = to_dependency_order(filtered_dag)
 
         if self.interactive:
             message = "The following steps will be archived:"
@@ -475,6 +475,88 @@ def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
         dag_file=DAG_TEMP_FILE,
         dag_part={DAG_TEMP_STEP: temp_dependencies_new},
     )
+
+
+def _extract_step_pattern(step: str) -> tuple[str, str, str]:
+    """Extract namespace, version, and short_name from a step URI."""
+    # Remove channel prefix if present
+    path = step.split("://", 1)[1] if "://" in step else step
+    parts = path.split("/")
+
+    # snapshot://namespace/version/short_name (3 parts)
+    # data://stage/namespace/version/short_name (4 parts)
+    if len(parts) == 3:
+        return parts[0], parts[1], parts[2]
+    elif len(parts) >= 4:
+        return parts[1], parts[2], parts[3]
+    else:
+        raise ValueError(f"Could not parse step URI: {step}")
+
+
+def _filter_direct_only_steps(original_steps: List[str], all_steps: List[str]) -> List[str]:
+    """Filter steps to only include those with the same namespace/version/short_name pattern as original steps.
+
+    Args:
+        original_steps: The initial steps provided by the user
+        all_steps: All steps including dependencies/usages
+
+    Returns:
+        Filtered list containing only direct steps matching the original pattern
+    """
+    # Extract patterns from original steps
+    original_patterns = set()
+    for step in original_steps:
+        namespace, version, short_name = _extract_step_pattern(step)
+        # Remove file extension from short_name for matching
+        short_name_base = short_name.split(".")[0] if "." in short_name else short_name
+        original_patterns.add((namespace, version, short_name_base))
+
+    # Filter all steps to only include those matching original patterns
+    filtered_steps = []
+    for step in all_steps:
+        namespace, version, short_name = _extract_step_pattern(step)
+        short_name_base = short_name.split(".")[0] if "." in short_name else short_name
+
+        if (namespace, version, short_name_base) in original_patterns:
+            filtered_steps.append(step)
+
+    return filtered_steps
+
+
+def _expand_wildcard_patterns(patterns: List[str], active_steps: List[str]) -> List[str]:
+    """Expand wildcard patterns to match actual step names.
+
+    Args:
+        patterns: List of step patterns, potentially containing wildcards (*, ?, [abc])
+        active_steps: List of all available active steps
+
+    Returns:
+        List of expanded step names matching the patterns
+    """
+    expanded_steps = []
+
+    for pattern in patterns:
+        if "*" in pattern or "?" in pattern or "[" in pattern:
+            # This is a wildcard pattern
+            matches = fnmatch.filter(active_steps, pattern)
+            if not matches:
+                log.error(f"No steps found matching pattern: {pattern}")
+                continue
+            log.info(f"Pattern '{pattern}' expanded to {len(matches)} step(s).")
+            expanded_steps.extend(matches)
+        else:
+            # This is a regular step name
+            expanded_steps.append(pattern)
+
+    # Remove duplicates while preserving order
+    seen = set()
+    result = []
+    for step in expanded_steps:
+        if step not in seen:
+            seen.add(step)
+            result.append(step)
+
+    return result
 
 
 def _confirm_choice(multiple_files: List[Any]) -> int:
@@ -527,6 +609,13 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     type=bool,
     help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
 )
+@click.option(
+    "--direct-only",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="When used with --include-usages, only include steps with the same namespace/version/short_name pattern. Default: False.",
+)
 def cli(
     steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -534,6 +623,7 @@ def cli(
     include_usages: bool = False,
     dry_run: bool = False,
     interactive: bool = True,
+    direct_only: bool = False,
 ) -> None:
     """Update one or more steps to their new version, if possible.
 
@@ -550,6 +640,7 @@ def cli(
     * If new snapshots are created that are not used by any steps, they are added to a temporary dag (temp.yml). These steps are then removed from the temporary dag as soon as they are used by an active step.
     * All dependencies of new steps will be assumed to use their latest version possible.
     * Steps whose version is already equal to the new version will be skipped.
+    * Wildcard patterns (*, ?, [abc]) are supported in step names for batch operations.
 
     **Examples:**
 
@@ -573,13 +664,40 @@ def cli(
         ```
 
         Note that the code of the explorers step itself will not be updated (since it has version "latest"), but its dependencies will be updated in the dag.
+
+    * To update all snapshots in a namespace/version directory using wildcards:
+        ```
+        $ etl update "snapshot://climate/2025-07-18/*" --dry-run
+        ```
+
+        This will update all snapshot files matching the pattern in the climate/2025-07-18 directory.
     """
-    # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
-        steps=steps,
+    # If a single step is given, convert it to a list.
+    if isinstance(steps, str):
+        steps = [steps]
+    elif isinstance(steps, tuple):
+        steps = list(steps)
+
+    # Initialize step updater to get access to active steps for wildcard expansion.
+    step_updater = StepUpdater(dry_run=dry_run, interactive=interactive)
+
+    # Get the list of active steps for wildcard expansion.
+    active_steps = sorted(set(step_updater.steps_df["step"]))
+
+    # Expand wildcard patterns in step names.
+    expanded_steps = _expand_wildcard_patterns(steps, active_steps)
+
+    if not expanded_steps:
+        log.error("No valid steps found after expanding patterns.")
+        sys.exit(1)
+
+    # Run update with expanded step list.
+    step_updater.update_steps(
+        steps=expanded_steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
         include_usages=include_usages,
+        direct_only=direct_only,
     )
 
 

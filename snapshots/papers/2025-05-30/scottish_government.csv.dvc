@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Scottish Government
+    title: "Scotland's Forestry Strategy: 2019-2029"
+    citation_full: |-
+      Scottish Government. 2025. Scotland's Forestry Strategy: 2019-2029. Edinburgh: The Scottish Government, https://www.gov.scot/binaries/content/documents/govscot/publications/strategy-plan/2019/02/scotlands-forestry-strategy-20192029/documents/scotlands-forestry-strategy-2019-2029/scotlands-forestry-strategy-2019-2029/govscot%3Adocument/scotlands-forestry-strategy-2019-2029.pdf
+    attribution_short: Scottish Government
+    url_main: |-
+      https://www.gov.scot/binaries/content/documents/govscot/publications/strategy-plan/2019/02/scotlands-forestry-strategy-20192029/documents/scotlands-forestry-strategy-2019-2029/scotlands-forestry-strategy-2019-2029/govscot%3Adocument/scotlands-forestry-strategy-2019-2029.pdf
+    date_accessed: "2025-05-30"
+    date_published: "2019"
+    license:
+      name: Open Government Licence v3.0 except
+      url: https://www.gov.scot/crown-copyright/
+outs:
+  - md5: a7cd3df74266b1a84febaba3ed899f54
+    size: 616
+    path: scottish_government.csv

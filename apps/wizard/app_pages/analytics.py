@@ -1,6 +1,6 @@
 import streamlit as st
 
-external_url = "http://dashboard.owid.io"
+external_url = "http://metabase.owid.io"
 
 redirect_script = f"""
     <meta http-equiv="refresh" content="0; url={external_url}">

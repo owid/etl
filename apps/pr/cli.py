@@ -56,7 +56,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
-from apps.utils.gpt import OpenAIWrapper
+from apps.utils.llms.gpt import OpenAIWrapper
 from etl.config import GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 
@@ -78,6 +78,9 @@ SHELL_FORM_STYLE = questionary.Style(
         # ('disabled', 'fg:#858585 italic')   # disabled choices for select and checkbox prompts
     ]
 )
+
+# LLM
+MODEL_DEFAULT = "gpt-5-mini"
 
 
 @click.command(
@@ -438,5 +441,5 @@ def summarize_title_llm(title) -> str:
     sys_prompt = "You are given a title of a pull request. I need a 2-3 keyword summary, separated by a space. These words will be used to create a branch name."
     api = OpenAIWrapper()
     log.info("Querying GPT!")
-    response = api.query_gpt_fast(title, sys_prompt, model="gpt-4o-mini")
+    response = api.query_gpt_fast(title, sys_prompt, model=MODEL_DEFAULT)
     return response

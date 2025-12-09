@@ -71,7 +71,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
             st.button(
                 label="Next (2/3)",
                 type="primary",
-                use_container_width=True,
+                width="stretch",
                 on_click=set_states_after_submitting,
                 help="Only indicators in this page will be submitted. If you want to map molre indicators at once, make the number of elements per page bigger.",
             )
@@ -90,7 +90,9 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     return indicator_mapping
 
 
-@st.cache_data(ttl=30 * 60)
+# NOTE: we disabled caching because after partial indicator upgrade, refreshing showed all indicators
+#   instead of just those still in charts
+# @st.cache_data(ttl=30 * 60)
 def _get_params_cached(
     dataset_old_id,
     dataset_new_id,

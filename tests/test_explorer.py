@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from etl.collection.explorer import Explorer, extract_explorers_tables
-from etl.collection.model import Dimension
+from etl.collection.explorer.core import Explorer, extract_explorers_tables
+from etl.collection.model.dimension import Dimension
 
 # EXAMPLE explorer. Inspired by Mpox explorer.
 # Summary
@@ -79,7 +79,7 @@ EXPLORER_CONFIG = {
                     }
                 ]
             },
-            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart"},
+            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart DiscreteBar"},
         },
         # VIEW 1
         {
@@ -102,7 +102,7 @@ EXPLORER_CONFIG = {
                     }
                 ]
             },
-            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart"},
+            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart DiscreteBar"},
         },
         # VIEW 2
         {
@@ -125,7 +125,7 @@ EXPLORER_CONFIG = {
                     }
                 ]
             },
-            "config": {"title": "Mpox: Cumulative confirmed cases per million people", "type": "LineChart"},
+            "config": {"title": "Mpox: Cumulative confirmed cases per million people", "type": "LineChart DiscreteBar"},
         },
         # VIEW 3
         {
@@ -164,7 +164,7 @@ EXPLORER_CONFIG = {
             "config": {
                 "title": "Mpox: Cumulative confirmed and suspected cases",
                 "subtitle": "Confirmed cases are those that have been verified through laboratory testing. Suspected cases are those where mpox is likely based on an individual's initial clinical signs and symptoms, but the diagnosis has not yet been confirmed through laboratory testing.",
-                "type": "LineChart",
+                "type": "LineChart DiscreteBar",
                 "selectedFacetStrategy": "entity",
                 "hasMapTab": "false",
                 "minTime": "1433",
@@ -252,7 +252,7 @@ def mock_get_mapping_paths_to_id(paths):
     return {p: i for i, p in enumerate(paths)}
 
 
-@patch("etl.collection.explorer.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
+@patch("etl.collection.explorer.core.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
 def test_explorer_config_legacy(mock_map_func):
     explorer = Explorer.from_dict(EXPLORER_CONFIG)
     assert len(explorer.views) == 7

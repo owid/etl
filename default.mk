@@ -50,7 +50,7 @@ check-default:
 	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git diff --name-only && git ls-files --others --exclude-standard | grep '\.py'); \
 	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}' | grep -v '{}'); \
 	FILE_COUNT=$$(echo "$$CHANGED_PY_FILES" | wc -l); \
-	if [ "$$FILE_COUNT" -le 1 ] && [ "$$FILE_COUNT" -gt 0 ]; then \
+	if [ "$$FILE_COUNT" -le 10 ] && [ "$$FILE_COUNT" -gt 0 ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs pyright; \

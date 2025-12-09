@@ -27,14 +27,14 @@ meta:
         Regressive policies
           1.	Death Penalty for Same-Sex Sexual Acts
           2.	Propaganda Laws
-          3.	Same-Sex Sexual Acts Ilegal
+          3.	Same-Sex Sexual Acts Illegal
           4.	Unequal Age of Consent
           5.	Ban on Marriage Equality
 
       These policies are not measured in a binary (adopted/not-adopted) scheme; the author follows Frank and colleagues (2010, 2017) in considering that similar policies can meaningfully vary in scope, benefits, punishment, etc. So, he determines the robustness of each policy by reviewing five indicators (between parentheses are the scoring schemes):
         1.	Proportion of Population Living Under Law: To acknowledge subnational variations (0-1)
         2.	Scope of Genders Subject to Law: As they can be typically differentiated by gender (0: no law, 0.5: just men or women, 1: both)
-        3.	Maximum Level of Punishment: For regressive policies (0: no law, 0.2: <3 years, 0.4: >3 years and <15 years, 0.6: >15 years and < life, 0.8: live in prison, 1: death penality)
+        3.	Maximum Level of Punishment: For regressive policies (0: no law, 0.2: <3 years, 0.4: >3 years and <15 years, 0.6: >15 years and < life, 0.8: live in prison, 1: death penalty)
         4.	Ease of Access: To benefits the law outlines (0: no law, 0.25: significant barriers, 0.5: moderate barriers, 0.75: little to few barriers, 1: no barriers)
         5.	Evidence of Enforcement: Has been least one case the previous year where this was implemented? (0: no evidence, 1: evidence)
 

@@ -1,3 +1,9 @@
+---
+tags:
+  - Data Workflow
+icon: lucide/forward
+---
+
 # Export steps
 
 Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag:
@@ -97,7 +103,7 @@ def run() -> None:
     config["views"] = multidim.expand_config(
         tb_annual,
         dimensions=["frequency", "source", "unit"],
-        additional_config={"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"},
+        additional_config={"chartTypes": ["LineChart", "DiscreteBar"], "hasMapTab": True, "tab": "map"},
     )
 
     #

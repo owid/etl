@@ -1,7 +1,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
@@ -54,15 +54,15 @@ def combine_tables(tb_fuel_input: Table, tb_supply: Table, tb_efficiency: Table)
     return tb_combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("uk_historical_electricity")
-    tb_fuel_input = ds_meadow["fuel_input"].reset_index()
-    tb_supply = ds_meadow["supply"].reset_index()
-    tb_efficiency = ds_meadow["efficiency"].reset_index()
+    tb_fuel_input = ds_meadow.read("fuel_input")
+    tb_supply = ds_meadow.read("supply")
+    tb_efficiency = ds_meadow.read("efficiency")
 
     #
     # Process data.
@@ -74,5 +74,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create new dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

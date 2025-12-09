@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Working hours (Huberman and Minns, 2005)"
+    description: |-
+      This paper brings a long-term perspective to the debate on the causes of worktime differences among OECD countries. Exploiting new data sets on hours of work per week, days at work per year, and annual work hours between 1870 and 2000, we challenge the conventional view that Europeans began to labor fewer hours than Americans only in the 1980s. Like Australians and Canadians, Americans tended to work longer hours, after controlling for income, beginning around 1900. Labor power and inequality, which are held to be important determinants of worktime after 1970, had comparable effects in the period before 1913. To explain the longstanding predisposition of the New World to give more labor time, we examine the effects of three initial factors in 1870, culture, human capital, and geography on hours of work in 2000. We find that geography – the low population density of the New World that has led to shorter commutes and lower fixed costs of getting to work – has had an enduring impact on supply of labor time.
+    date_published: "2005-10-01"
+
+    # Citation
+    producer: Huberman and Minns
+    citation_full: |-
+      Huberman, M., & Minns, C. (2005). Hours of Work in Old and New Worlds: The Long View, 1870-2000. Tables 1, 2, and 3. The Institute for International Integration Studies Discussion Paper Series iiisdp95, IIIS.
+
+    # Files
+    url_main: https://ideas.repec.org/p/iis/dispap/iiisdp95.html
+    date_accessed: '2025-08-05'
+
+    # License
+    license:
+      name: © 2005 Huberman and Minns
+      url: https://ideas.repec.org/p/iis/dispap/iiisdp95.html
+outs:
+  - md5: fe4761445851e3f490d3985778b77162
+    size: 4915
+    path: huberman_minns.csv

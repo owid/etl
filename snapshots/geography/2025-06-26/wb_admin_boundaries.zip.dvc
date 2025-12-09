@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "World Bank Official Administrative Boundaries"
+    description: |-
+      High resolution, World Bank-approved administrative boundaries. Each download option (shapefile, GeoPackage, or GeoJSON format) includes Admin 0, 1, 2, Non-Determined Legal Status Areas (NDLSA), and an ocean mask. A data dictionary and additional columns of information which can be joined to the Admin 1 and 2 files can be found as separate downloads. 
+
+      Also included are API endpoints for interactive maps. 
+    date_published: "2025-06-17"
+    title_snapshot: World Bank Official Boundaries (Shapefiles)
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      World Bank Group. 2025. World Bank Official Administrative Boundaries (Version 4) [Data set]. World Bank Data Catalog. https://datacatalog.worldbank.org/search/dataset/0038272/World-Bank-Official-Boundaries. Accessed 26 June 2025.
+
+    # Files
+    url_main: https://datacatalog.worldbank.org/search/dataset/0038272/World-Bank-Official-Boundaries
+    date_accessed: '2025-06-26'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses?fragment=cc
+outs:
+  - md5: 4d10fed5c0845e6411ee14efd5b127e5
+    size: 49716572
+    path: wb_admin_boundaries.zip

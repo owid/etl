@@ -43,6 +43,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 5
                   - 10
                   - 15
@@ -76,8 +77,8 @@ tables:
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
-                customNumericMinValue: 100
                 customNumericValues:
+                  - 100
                   - 30
                   - 35
                   - 40

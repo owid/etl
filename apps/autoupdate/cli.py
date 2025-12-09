@@ -1,3 +1,21 @@
+"""Automatically update data snapshots and optionally create a pull request with the changes.
+
+**Main use case**: Run all autoupdate-enabled snapshots, update their data if needed, and create a PR if there are changes.
+
+Examples:
+
+```
+# Run all autoupdate snapshots, update data, and create PRs if needed
+etl autoupdate --create-pr
+
+# Run in dry-run mode (no changes will be made)
+etl autoupdate --dry-run
+
+# Only process snapshots matching a filter
+etl autoupdate --filter "population"
+```
+"""
+
 import datetime as dt
 import subprocess
 from collections import defaultdict
@@ -7,6 +25,7 @@ from pathlib import Path
 import click
 import yaml
 from owid.catalog.utils import underscore
+from rich_click import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
 
@@ -57,23 +76,24 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     if not branch_exists:
         github_repo.create_branch(branch_name, master_sha)
     else:
-        # Always merge with master, regardless of whether there are changes
-        merge_successful = github_repo.merge_with_master(branch_name)
-
-        # If merge unsuccessful, log warning but continue to create PR
-        if not merge_successful:
-            log.warning(f"Failed to merge master into {branch_name}, but will still create PR")
+        # Merge with master, resolving any conflicts in favor of our branch
+        github_repo.merge_with_master_resolve_conflicts(branch_name)
 
     # Prepare parent and base tree SHA
-    parent_sha = master_sha
-    base_tree_sha = master_sha
-
-    # If branch exists, use its latest commit as parent instead of master
     if branch_exists:
-        parent_sha = branch_info["object"]["sha"]
-        base_tree_sha = parent_sha
+        # Get the current branch HEAD (after merge)
+        _, current_branch_info = github_repo.check_branch_exists(branch_name)
+        parent_sha = current_branch_info["object"]["sha"]
+        # Get the tree SHA from the parent commit, not the commit SHA itself
+        parent_commit = github_repo.repo.get_git_commit(parent_sha)
+        base_tree_sha = parent_commit.tree.sha
+    else:
+        parent_sha = master_sha
+        # Get the tree SHA from master commit
+        master_commit = github_repo.repo.get_git_commit(master_sha)
+        base_tree_sha = master_commit.tree.sha
 
-    # Create commit with files
+    # Create commit with files (this will now be on top of the merged state)
     has_changes, _ = github_repo.create_commit_with_files(
         files=files, branch_name=branch_name, commit_message=title, parent_sha=parent_sha, base_tree_sha=base_tree_sha
     )
@@ -102,7 +122,6 @@ def run_updates(
     """Update all snapshots in a group."""
 
     files_to_update = []
-
     identicals = []
 
     for update in group_updates:
@@ -166,11 +185,37 @@ def run_updates(
     if create_pr and not any(identical for identical in identicals):
         create_autoupdate_pr(update_name=update.name, files=files_to_update)  # type: ignore
 
+    # Restore the DVC files to their original state after processing
+    if not dry_run:
+        # Restore all DVC files that were processed
+        all_dvc_files = []
+        for update in group_updates:
+            all_dvc_files.extend([str(f) for f in update.dvc_files])
 
-@click.command()
-@click.option("--dry-run", is_flag=True, help="Run the script in dry-run mode.")
-@click.option("--create-pr", is_flag=True, help="If there's an update, create a PR.")
-@click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
+        if all_dvc_files:
+            subprocess.run(["git", "restore", "--"] + all_dvc_files, check=True, capture_output=True)
+
+
+@click.command(
+    name="autoupdate",
+    cls=RichCommand,
+    help=__doc__,
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Run in dry-run mode. No snapshot scripts will be executed and no files will be changed.",
+)
+@click.option(
+    "--create-pr",
+    is_flag=True,
+    help="If there is an update, create a pull request with the changes.",
+)
+@click.option(
+    "--filter",
+    type=str,
+    help="Process only snapshots whose name includes the given substring.",
+)
 def cli(
     dry_run: bool,
     create_pr: bool,

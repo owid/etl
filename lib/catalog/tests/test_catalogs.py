@@ -3,9 +3,9 @@
 #
 
 import tempfile
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterable, Iterator, Optional
 
 import pytest  # noqa
 
@@ -13,7 +13,7 @@ from owid.catalog import CHANNEL, LocalCatalog, RemoteCatalog, Table, find
 
 from .test_datasets import create_temp_dataset
 
-_catalog: Optional[RemoteCatalog] = None
+_catalog: RemoteCatalog | None = None
 
 
 def load_catalog() -> RemoteCatalog:

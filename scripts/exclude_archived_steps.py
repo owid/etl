@@ -32,13 +32,16 @@ def should_exclude(path: Path) -> bool:
 def snapshots_to_exclude(active_snapshots: Set[str]) -> Set[str]:
     to_exclude = set()
 
+    active_snapshots_folders = {s.rsplit("/", 1)[0] for s in active_snapshots}
+
     for d in SNAPSHOTS_DIR.rglob("*"):
+        # Use folder
         d_rel = d.relative_to(SNAPSHOTS_DIR)
         if len(d_rel.parts) == 2:
             if not should_exclude(d):
                 continue
 
-            if str(d_rel) not in active_snapshots:
+            if str(d_rel) not in active_snapshots_folders:
                 to_exclude.add(f"snapshots/{d_rel}")
 
     return to_exclude

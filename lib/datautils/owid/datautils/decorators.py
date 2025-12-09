@@ -4,12 +4,37 @@ import functools
 import tempfile
 from typing import Any, Callable, Optional
 
-from owid.datautils.s3 import S3
 from owid.datautils.web import download_file_from_url
 
 
 def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any], Any]:
-    """Enable downloading of files from URLs."""
+    """Decorator that allows functions expecting local file paths to accept URLs and S3 paths.
+
+    This decorator automatically downloads remote files to temporary storage before calling
+    the decorated function, making any file-processing function work transparently with:
+    - Local file paths (unchanged behavior)
+    - HTTP/HTTPS URLs (downloaded via web request)
+    - S3 paths (downloaded via S3 client)
+
+    Args:
+        path_arg_name: Name of the parameter containing the file path. If None,
+                      uses the first positional argument.
+
+    Example:
+        @enable_file_download(path_arg_name="file_path")
+        def load_data(file_path):
+            with open(file_path, 'r') as f:
+                return f.read()
+
+        # Now works with all of these:
+        load_data("/local/file.txt")                    # Local file
+        load_data("https://example.com/data.txt")       # HTTP download
+        load_data("s3://bucket/data.txt")               # S3 download
+
+    Warning:
+        Downloads entire files to temporary storage on every call. For large files
+        or frequent access, consider explicit caching or streaming approaches.
+    """
     # Download options, add them as needed (value: str, key: Tuple[str])
     prefixes = {
         "url": (
@@ -43,7 +68,13 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
                         download_file_from_url(path, temp_file.name)  # TODO: Add custom args here
                     # Download file from S3 (need credentials)
                     elif path.startswith(prefixes["s3"]):
-                        S3().download_from_s3(path, temp_file.name, quiet=True)  # TODO: Add custom args here
+                        try:
+                            # Import here to avoid circular dependency
+                            from owid.catalog import s3_utils  # type: ignore
+                        except ImportError as e:
+                            raise ImportError("owid-catalog is required for S3 downloads. ") from e
+
+                        s3_utils.download(path, temp_file.name, quiet=True)  # TODO: Add custom args here
 
                     # Modify args/kwargs
                     if _used_args:

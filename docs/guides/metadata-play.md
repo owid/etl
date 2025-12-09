@@ -1,3 +1,9 @@
+---
+tags:
+  - Metadata
+icon: lucide/info
+---
+
 # Metadata in data pages
 To better understand how the different metadata fields are mapped to the different elements in a data page, we have created a very simple app.
 
@@ -16,13 +22,4 @@ etlwiz metaplay
     ```shell
     ENV_FILE=.env.staging etlwiz metaplay
     ```
-
-
-The previous command will launch the web app.
-
-
-![](../assets/metaplay-short.gif)
-
-
-This app uses a fictional dataset called "dummy", to build the data page for its indicator `dummy_variable`. In the app, you can see and edit the metadata for the origin (in Snapshot) and the metadata for the indicator (in Garden). In the background, this will run the necessary ETL steps to ingest this indicator into Grapher.
 

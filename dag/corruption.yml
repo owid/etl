@@ -1,0 +1,56 @@
+steps:
+
+  #
+  # World Bank Enterprise Surveys
+  #
+  data://meadow/wb/2025-05-12/enterprise_surveys:
+    - snapshot://wb/2025-05-12/enterprise_surveys.xlsx
+  data://garden/wb/2025-05-12/enterprise_surveys:
+    - data://meadow/wb/2025-05-12/enterprise_surveys
+  data://grapher/wb/2025-05-12/enterprise_surveys:
+    - data://garden/wb/2025-05-12/enterprise_surveys
+  export://multidim/corruption/latest/enterprise_surveys:
+    - data://grapher/wb/2025-05-12/enterprise_surveys
+  #
+  # UNODC - Access and Functioning of Justice
+  #
+  data://meadow/unodc/2025-05-12/justice:
+    - snapshot://unodc/2025-05-12/justice.xlsx
+  data://garden/unodc/2025-05-12/justice:
+    - data://meadow/unodc/2025-05-12/justice
+  data://grapher/unodc/2025-05-12/justice:
+    - data://garden/unodc/2025-05-12/justice
+  #
+  # UNODC - Corruption & Economic Crime
+  #
+  data://meadow/unodc/2025-05-12/corruption:
+    - snapshot://unodc/2025-05-12/corruption.xlsx
+  data://garden/unodc/2025-05-12/corruption:
+    - data://meadow/unodc/2025-05-12/corruption
+  data://grapher/unodc/2025-05-12/corruption:
+    - data://garden/unodc/2025-05-12/corruption
+
+  #
+  # Corruption Barometer
+  #
+  data://meadow/corruption/2025-05-12/corruption_barometer:
+    - snapshot://corruption/2025-05-12/corruption_barometer.xlsx
+  data://garden/corruption/2025-05-12/corruption_barometer:
+    - data://meadow/corruption/2025-05-12/corruption_barometer
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/corruption/2025-05-12/corruption_barometer:
+    - data://garden/corruption/2025-05-12/corruption_barometer
+  export://multidim/corruption/latest/corruption_barometer:
+    - data://grapher/corruption/2025-05-12/corruption_barometer
+
+
+  #
+  # Corruption Perceptions Index - Transparency International
+  #
+  data://meadow/corruption/2025-05-13/perception_index:
+    - snapshot://corruption/2025-05-13/perception_index.csv
+  data://garden/corruption/2025-05-13/perception_index:
+    - data://meadow/corruption/2025-05-13/perception_index
+  data://grapher/corruption/2025-05-13/perception_index:
+    - data://garden/corruption/2025-05-13/perception_index

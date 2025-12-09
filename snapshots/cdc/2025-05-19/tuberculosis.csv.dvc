@@ -1,0 +1,25 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Tuberculosis Incidence and Mortality "
+    date_published: "2024-07-17"
+
+    # Citation
+    producer: U.S. Centers for Disease Control and Prevention
+    citation_full: |-
+      Tuberculosis Incidence and Mortality: 1953-2023 (2024). Centers of Disease Control and Prevention
+    attribution_short: CDC
+
+    # Files
+    url_main: https://www.cdc.gov/tb-surveillance-report-2023/tables/table-1.html
+    date_accessed: '2025-05-19'
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 0134ef994ed33f1132f05c89fbac5cf6
+    size: 3690
+    path: tuberculosis.csv

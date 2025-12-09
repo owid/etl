@@ -1,0 +1,41 @@
+dataset:
+  title: Religiosity in the United States (Gallup)
+  description: Trends in religiosity, and participation in public services in the United States.
+  licenses:
+    - {}
+tables:
+  religiosity_united_states_gallup:
+    variables:
+      share_member_church:
+        title: Share who are a member of a church, synagogue, temple or other religious organization
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Members of church
+        description: The share of the population that is a member of a church, synagogue, temple or other religious organization.
+      share_attends_church_every_almost_weekly:
+        title: Share who attend church every or almost every week
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Attends church every or almost every week
+        description: The share of the population that says they attend church every week, or almost every week.
+      share_says_religion_important:
+        title: Share that says religion is important to them
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Religion is important to them
+        description: The share of the population that says religion is important to them.
+      share_identifies_religious:
+        title: Share that identifies with any religion
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Identifies as religious
+        description: The share of the population that says they are religiously affilifated, to any religion.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

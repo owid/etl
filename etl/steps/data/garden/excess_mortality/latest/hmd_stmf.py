@@ -3,7 +3,7 @@
 from datetime import date
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.utils import underscore
 from shared import harmonize_countries
 from structlog import get_logger
@@ -25,7 +25,7 @@ YEAR_MIN = 2010
 YEAR_MAX = 3000  # (No actual limit)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("hmd_stmf: start")
 
     #
@@ -56,13 +56,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
-
-    # Add table of processed data to the new dataset.
-    ds_garden.add(tb_garden)
-
-    # Update dataset and table metadata using the adjacent yaml file.
-    ds_garden.update_metadata(paths.metadata_path)
+    ds_garden = paths.create_dataset(
+        tables=[tb_garden],
+        default_metadata=ds_meadow.metadata,
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -133,10 +130,10 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
 def add_uk(df: pd.DataFrame):
     """Add UK to main dataframe.
 
-    By default, the dataset only contains data for England & Wales, Scotland and Northern Ireland.
+    By default, the dataset only contains data for England and Wales, Scotland and Northern Ireland.
     """
     # Get UK Nations
-    df_uk = df[df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])].copy()
+    df_uk = df[df["entity"].isin(["England and Wales", "Scotland", "Northern Ireland"])].copy()
     # Years to consider (starting from 2015)
     column_years = list(filter(lambda x: x >= 2015, df_uk.filter(regex=r"20\d\d").columns))
     # Sanity check

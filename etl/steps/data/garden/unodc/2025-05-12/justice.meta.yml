@@ -1,0 +1,58 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    description_key:
+      - Justice data is difficult to compare across countries and over time due to differences in legal systems, data collection methods, and reporting practices.
+      - Cases can move slowly through the justice system. Arrests in one year often lead to prosecutions the next, and convictions years later. As a result, arrest and conviction data from the same year reflect different cases, making direct comparisons misleading.
+      - Different agencies — police, prosecutors, and courts — often keep separate records. This creates gaps that make it hard to track individual cases from arrest to final outcome.
+      - Bribery cases are especially complex. They often involve criminal networks and require specialist expertise that many justice systems lack, leading to higher rates of case dismissal compared to other crimes.
+      - Countries use different data collection approaches. Some use the "principal offence rule," counting only the most serious crime when multiple offenses occur together. Adherence to international standards like the [International Classification of Crime for Statistical Purposes (ICCS)](https://www.unodc.org/unodc/en/data-and-analysis/statistics/iccs.html) also varies.
+      - Apparent anomalies — such as prosecution rates that exceed arrest rates — usually reflect differences in data collection, not irregularities in legal procedures.
+      - Arrest, prosecution and conviction rates are shaped by how strongly laws are enforced, how crimes are reported, and what societies consider worth reporting. In places where bribery is normalised, it is often not seen as serious enough to report.
+      - Trends within countries can still be useful, especially when compared with survey data on [bribery prevalence](https://ourworldindata.org/grapher/bribery-prevalence-un). However, these trends may reflect changes in policing or reporting willingness, not just actual crime levels.
+    presentation:
+      topic_tags:
+        - Corruption
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  justice:
+    variables:
+      value:
+        title: << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
+        description_short: |-
+          <% if indicator == "Persons convicted" %>
+          The number of people found guilty of crimes by the courts, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
+          <% elif indicator == "Persons prosecuted" %>
+          The number of people formally charged with crimes, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
+          <% elif indicator == "Persons arrested/cautioned/suspected" %>
+          The number of people arrested, given formal warnings, or identified as suspects, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
+          <%- endif -%>
+        unit: |-
+          <%- if unit_of_measurement.lower() == "counts" %>
+          people
+          <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+          people per 100,000 population
+          <%- endif -%>
+        presentation:
+          title_public: |-
+            <%- if unit_of_measurement.lower() == "counts" %>
+            << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
+            <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+            << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
+            <%- endif -%>
+        display:
+          name:
+            <% if indicator == "Persons convicted" %>
+            Convictions
+            <% elif indicator == "Persons prosecuted" %>
+            Prosecutions
+            <% elif indicator == "Persons arrested/cautioned/suspected" %>
+            Arrests, cautions or suspicions
+            <%- endif -%>

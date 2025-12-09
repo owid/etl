@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: WHO Mortality Database
+    title: WHO Mortality Database
+    title_snapshot: WHO Mortality Database - Deaths from violence
+    citation_full: WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2025)
+    attribution_short: WHO
+    url_main: https://platform.who.int/mortality
+    date_accessed: "2025-08-06"
+    date_published: "2025-02-25"
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 82b0e9ddbb08ae24e93efd5a77eb4209
+    size: 29907380
+    path: who_mort_db.csv

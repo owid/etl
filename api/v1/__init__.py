@@ -22,7 +22,10 @@ from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import SCHEMAS_DIR
 
 from .. import utils
-from .schemas import Indicator, UpdateIndicatorRequest
+from .schemas import (
+    Indicator,
+    UpdateIndicatorRequest,
+)
 
 log = structlog.get_logger()
 
@@ -158,9 +161,9 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
 
 
 def _trigger_etl(db_indicator: gm.Variable, dry_run: bool) -> None:
-    config.GRAPHER_FILTER = f"^{db_indicator.shortName}$"
+    config.SUBSET = f"^{db_indicator.shortName}$"
     etl_main(
-        steps=[str(db_indicator.catalogPath).rsplit("/", 1)[0]],
+        includes=[str(db_indicator.catalogPath).rsplit("/", 1)[0]],
         grapher=True,
         workers=1,
         dry_run=dry_run,

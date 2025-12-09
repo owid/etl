@@ -9,6 +9,7 @@ import streamlit as st
 from owid.catalog import Dataset
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
+from apps.wizard.utils.components import st_title_with_expert
 from etl.config import ENV_IS_REMOTE
 from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
@@ -126,8 +127,13 @@ def ask_for_table(dataset):
         index=None if len(table_names) != 1 else 0,
     )
     if table_name:
-        return dataset[table_name].reset_index()
+        return _get_table_cached(dataset, dataset_uri=dataset.m.uri, table_name=table_name)
     return
+
+
+@st.cache_data
+def _get_table_cached(_dataset, dataset_uri, table_name):
+    return _dataset[table_name].reset_index()
 
 
 def ask_for_indicator(tb):
@@ -188,9 +194,31 @@ def show_manual_mapping(harmonizer, entity, i, border=False):
         st.session_state.entity_mapping[entity] = value_selected
 
 
+@st.fragment
+def show_submit_section(path_export: str):
+    if ENV_IS_REMOTE:
+        # Submit button
+        export_btn = st.button(
+            label="Generate mapping",
+            type="primary",
+        )
+
+    else:
+        path_export = st.text_input(
+            label="Export to...",
+            value=path_export,
+        )
+        # Submit button
+        export_btn = st.button(
+            label="Export mapping",
+            type="primary",
+        )
+    return export_btn
+
+
 def render(step_uri):
     # Page config
-    st.title(":material/music_note: Entity Harmonizer")
+    st_title_with_expert("Entity Harmonizer", icon=":material/music_note:")
 
     # Set states
     st.session_state["show_all"] = st.session_state.get("show_all", False)
@@ -274,23 +302,7 @@ def render(step_uri):
 
                     # 3/ PATH to export & export button
                     path_export = cast(str, harmonizer.output_file)
-                    if ENV_IS_REMOTE:
-                        # Submit button
-                        export_btn = st.button(
-                            label="Generate mapping",
-                            type="primary",
-                        )
-
-                    else:
-                        path_export = st.text_input(
-                            label="Export to...",
-                            value=path_export,
-                        )
-                        # Submit button
-                        export_btn = st.button(
-                            label="Export mapping",
-                            type="primary",
-                        )
+                    export_btn = show_submit_section(path_export)
 
                 ####################################################################################################
                 # EXPORT

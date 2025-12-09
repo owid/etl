@@ -1,0 +1,29 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: UN FAO
+
+tables:
+  faostat_cisp_flat:
+    variables:
+      agriculture__forestry__fishing__general_government__00023131__agriculture_orientation_index_usd__006159:
+        description_short: |
+          A value greater than 1 means the agriculture sector receives a higher share of [general government](#dod:general-government) spending relative to its economic value. A value less than 1 reflects a lower orientation to agriculture.
+        description_key:
+          - The Agriculture Orientation Index (AOI) for government spending is the ratio between the agriculture sector's share of government expenditure and its share of the economy ([GDP](#dod:gdp)).
+          - A value greater than 1 means agriculture receives a larger share of spending relative to its economic size.
+          - The term "agriculture" includes agriculture, forestry, and fishing.
+        display:
+          name: "Agriculture orientation index for government spending"
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agriculture orientation index for government spending
+          grapher_config:
+            note: |
+              The term "agriculture" includes agriculture, forestry, and fishing.

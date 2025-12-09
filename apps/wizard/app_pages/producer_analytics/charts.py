@@ -3,7 +3,6 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from plotly.graph_objects import Scatter
 from st_aggrid import AgGrid, JsCode
 
 from apps.wizard.app_pages.producer_analytics.data_io import get_chart_views_from_bq
@@ -186,25 +185,31 @@ class UIChartProducerAnalytics:
         )
 
         # Update traces to use custom hover text
-        for trace in fig.data:
-            if isinstance(trace, Scatter) and (trace.y is not None):
-                chart_slug = trace.name  # Get the name of the line (Chart slug)
+        for i, trace in enumerate(fig.data):
+            if (
+                hasattr(trace, "type")
+                and hasattr(trace, "y")
+                and getattr(trace, "type") == "scatter"
+                and (getattr(trace, "y") is not None)
+            ):
+                chart_slug = getattr(trace, "name")  # Get the name of the line (Chart slug)
+                trace_y = getattr(trace, "y")
                 if chart_slug == "Total":
-                    trace.update(
+                    fig.data[i].update(
                         # legendgroup="Total",
                         showlegend=True,
                         name="<b>All charts</b>",
                         customdata=[
-                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace_y
                         ],  # Custom hover text for each point
                         hovertemplate="%{customdata}<extra></extra>",
                     )
                 else:
-                    trace.update(
+                    fig.data[i].update(
                         # legendgroup="Charts",
                         showlegend=True,
                         customdata=[
-                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace_y
                         ],  # Custom hover text for each point
                         hovertemplate="%{customdata}<extra></extra>",
                     )
@@ -222,7 +227,7 @@ class UIChartProducerAnalytics:
         )
 
         # Display the chart.
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
 
 @st_cache_data(custom_text="Loading chart data. This can take few seconds...")

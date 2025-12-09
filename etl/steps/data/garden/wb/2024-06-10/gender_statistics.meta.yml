@@ -1,5 +1,16 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
 
+  desc_key_lays: &desc_key_lays
+   - This indicator combines the quantity and quality of education into a single measure.
+   - It shows how many years of schooling in a high-performing system are equivalent to the education a student receives in their country.
+   - The calculation multiplies expected years of schooling by a learning adjustment factor based on international test performance.
+   - Countries are compared against a benchmark for advanced learning; higher-performing countries get higher adjustments, and lower-performing ones get lower adjustments.
+   - It captures both access to schooling and learning effectiveness, showing whether students spend time in school productively.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -78,3 +89,69 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+
+      hd_hci_lays:
+        title: Learning-adjusted years of schooling
+        description_short: "[Learning-adjusted years of schooling](#dod:lays) combine the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes."
+        unit: "years"
+        description_key: *desc_key_lays
+        presentation:
+          title_public: Learning-adjusted years of schooling
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 10
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,2,4,6,8,10,12,1]
+                baseColorScheme: Greens
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+          name: Both genders
+
+      hd_hci_lays_fe:
+        title: Learning-adjusted years of schooling among girls
+        description_short: "[Learning-adjusted years of schooling](#dod:lays) among girls combine the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes."
+        unit: "years"
+        description_key: *desc_key_lays
+        presentation:
+          title_public: Learning-adjusted years of schooling among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 10
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,2,4,6,8,10,12,1]
+                baseColorScheme: Greens
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+          name: Girls
+
+      hd_hci_lays_ma:
+        title: Learning-adjusted years of schooling among boys
+        description_short: "[Learning-adjusted years of schooling](#dod:lays) among boys combine the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes."
+        unit: "years"
+        description_key: *desc_key_lays
+        presentation:
+          title_public: Learning-adjusted years of schooling among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 10
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,2,4,6,8,10,12,1]
+                baseColorScheme: Greens
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+          name: Boys

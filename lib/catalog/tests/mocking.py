@@ -22,15 +22,32 @@ _MOCK_STRINGS = [
 
 
 def is_optional_type(_type: type) -> bool:
-    return (
-        getattr(_type, "__origin__", None) == Union
-        and len(getattr(_type, "__args__", ())) == 2
-        and getattr(_type, "__args__")[1] == type(None)  # noqa
-    )
+    # Handle both old Union[str, None] and new str | None syntax
+    origin = getattr(_type, "__origin__", None)
+    args = getattr(_type, "__args__", ())
+
+    # For the new union syntax (str | None), check if it's a UnionType or has the right structure
+    import types
+
+    # Check if it's the new union type (str | None)
+    if isinstance(_type, types.UnionType):
+        return len(args) == 2 and type(None) in args
+
+    # Check for old Union syntax
+    if origin == Union and len(args) == 2 and type(None) in args:
+        return True
+
+    # Check if it has args but no origin (new union syntax)
+    if origin is None and len(args) == 2 and type(None) in args:
+        return True
+
+    return False
 
 
 def strip_option(_type: type) -> type:
-    return _type.__args__[0]  # type: ignore
+    # Return the non-None type from the union
+    args = getattr(_type, "__args__", ())
+    return next(arg for arg in args if arg is not type(None))
 
 
 def mock(_type: type) -> Any:
@@ -56,17 +73,25 @@ def mock(_type: type) -> Any:
         # some strings in the frictionless standard must be lowercase with no spaces
         return random.choice(_MOCK_STRINGS).lower()
 
-    elif getattr(_type, "_name", None) == "List":
-        if _type.__args__[0].__name__ == "TableDimension":
+    elif getattr(_type, "_name", None) == "List" or getattr(_type, "__origin__", None) is list:
+        args = getattr(_type, "__args__", ())
+        if args and args[0].__name__ == "TableDimension":
             return None
 
-        # e.g. List[int]
-        return [mock(_type.__args__[0]) for i in range(random.randint(1, 4))]  # type: ignore
+        # e.g. List[int] or list[int]
+        if args:
+            return [mock(args[0]) for i in range(random.randint(1, 4))]  # type: ignore
+        else:
+            return []
 
-    elif getattr(_type, "_name", None) == "Dict":
-        # e.g. Dict[str, int]
-        _from, _to = _type.__args__  # type: ignore
-        return {mock(_from): mock(_to) for i in range(random.randint(1, 8))}
+    elif getattr(_type, "_name", None) == "Dict" or getattr(_type, "__origin__", None) is dict:
+        # e.g. Dict[str, int] or dict[str, int]
+        args = getattr(_type, "__args__", ())
+        if len(args) >= 2:
+            _from, _to = args[0], args[1]
+            return {mock(_from): mock(_to) for i in range(random.randint(1, 8))}
+        else:
+            return {}
 
     elif hasattr(_type, "__dataclass_fields__"):
         # all dataclasses

@@ -6,11 +6,13 @@ https://ourworldindata.org/world-region-map-definitions
 """
 
 import json
+from typing import cast
 
-from owid.catalog import Origin, Table
+# import pandas as pd
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -22,11 +24,8 @@ paths = PathFinder(__file__)
 # Note that this year will be ignored in the charts, but it is required by grapher.
 CURRENT_YEAR = int(paths.version.split("-")[0])
 
-# Define a common origin for all columns in the output table.
-COMMON_ORIGIN = Origin(producer="Our World in Data", title="Regions")
 
-
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -79,18 +78,15 @@ def run(dest_dir: str) -> None:
         # Add a column with the region that each country belongs to, according to the current institution.
         tb_regions = tb_regions.merge(_tb_regions, on="country", how="left", validate="one_to_one")
 
-        # Add metadata for the new column.
-        tb_regions[f"{institution}_region"].metadata.origins = [COMMON_ORIGIN]
-        tb_regions[f"{institution}_region"].metadata.title = f"World regions according to {institution.upper()}"
-        tb_regions[f"{institution}_region"].metadata.unit = ""
-
     # Remove unnecessary columns.
     tb_regions = tb_regions.drop(
         columns=["code", "is_historical", "region_type", "defined_by", "members"], errors="raise"
     )
 
     # Add a year column
-    tb_regions["year"] = CURRENT_YEAR
+    tb_regions.loc[:, "year"] = CURRENT_YEAR
+
+    # Downstream
 
     # Update the table's metadata
     # NOTE: It would be better to do this in garden.
@@ -103,5 +99,47 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_regions])
+    ds_grapher = paths.create_dataset(
+        tables=[tb_regions], default_metadata=ds_garden.metadata, check_variables_metadata=True
+    )
     ds_grapher.save()
+
+
+def process_un_definitions(tb) -> Table:
+    """This functions will be deprecated.
+
+    Its tasks were:
+    - [no longer doing] Propagate definitions downstream. (Let's not do it, might be confusing)
+    - [will stop doing soon] Create new definition "un_region" that replaces "Americas" with "Latin America and the Caribbean" and "Northern America".
+    """
+    # Propagate definitions downstream. (Let's not do it, might be confusing)
+    # for i in range(1, 3):
+    #     mask = tb[f"un_m49_{i+1}_region"].isna()
+    #     tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[mask, f"un_m49_{i}_region"]
+
+    # Create new definition
+    ## Get rows where "Americas" should be replaced with "Latin America and the Caribbean" and "Northern America"
+    mask = tb["un_m49_2_region"].str.contains("America", na=False)
+    assert tb.loc[mask, "un_m49_2_region"].nunique() == 2, "There should be only two Americas in UN M49 level 2."
+    ## Create new column
+    tb.loc[:, "un_region2"] = tb.loc[:, "un_m49_1_region"].copy()
+    tb.loc[mask, "un_region2"] = tb.loc[mask, "un_m49_2_region"].copy()
+    return cast(Table, tb)
+
+
+def __util_get_country_codes(text_raw, tb):
+    """Use this function to convert a raw text list of country names into a list of country codes. Unknown codes are left as "UNKNOWN: {country name}".
+
+
+    Example:
+
+    text_raw = "Afghanistan, Albania, Algeria"
+    codes = __util_get_country_codes(text_raw, tb)  # tb here is the regions table
+    print("- " + "\n- ".join(codes))
+
+    This is useful when parsing a raw list of countries into meaningful region member codes. To be used as a manual step.
+    """
+    countries_raw = text_raw.split(", ")
+    mapping = tb.set_index("country").code.to_dict()
+    countries = [mapping.get(c, f"UNKNOWN: {c}") for c in countries_raw]
+    return countries

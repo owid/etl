@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Value of Private Construction Put in Place
+    description: |-
+      Monthly construction spending data for private construction in the United States, broken down by construction type.
+      The dataset includes datacenter construction spending measured as seasonally adjusted annual rate in millions of dollars.
+
+      Data is collected through the Survey of Construction (SOC), which provides national and regional statistics on
+      new privately-owned residential construction. The construction spending estimates are based on reports from builders,
+      owners, and architects, along with information from building permits and Census Bureau surveys.
+    date_published: "2025-11-01"
+
+
+    # Citation
+    producer: United States Census Bureau
+    citation_full: |-
+      U.S. Census Bureau, Value of Construction Put in Place Survey (VIP), Private Construction Spending Time Series
+
+    # Files
+    url_main: https://www.census.gov/construction/c30/historical_data.html
+    url_download: https://www.census.gov/construction/c30/xlsx/privsatime.xlsx
+    date_accessed: '2025-11-17'
+
+    # License
+    license:
+      name: Public Domain
+      url: https://www.census.gov/about/policies/privacy.html
+outs:
+  - md5: 3956897fb15190eda603c8acf807b5eb
+    size: 194582
+    path: datacenter_construction.xlsx

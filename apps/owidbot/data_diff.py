@@ -7,7 +7,7 @@ from rich.ansi import AnsiDecoder
 
 from etl.paths import BASE_DIR
 
-EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet|country_profile|garden/ihme_gbd/2019/gbd_risk"
+EXCLUDE_DATASETS = "excess_mortality|covid|fluid|flunet|country_profile|garden/ihme_gbd/2019/gbd_risk"
 
 
 def run(include: str) -> str:

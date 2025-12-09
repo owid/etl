@@ -46,7 +46,10 @@ def process_df(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_baseline_avg(df: pd.DataFrame) -> pd.DataFrame:
-    """Add field `baseline_avg` to `df`"""
+    """Add field `baseline_avg` to `df`
+
+    It is estimated by averaging deaths from 2015 to 2019.
+    """
     column_new_metric = "baseline_avg"
     # calculate baseline average and standard error -----
     df[column_new_metric] = df[["2015", "2016", "2017", "2018", "2019"]].mean(axis=1)

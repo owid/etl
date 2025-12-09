@@ -39,7 +39,7 @@ definitions:
       - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
       - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
   description_processing_share: &description_processing_share  |-
-    The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the countr.y
+    The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country
 
   average_description_processing_wildfires: &average_description_processing_wildfires |-
     Average weekly wildfires between 2012 and 2023 inclusive.

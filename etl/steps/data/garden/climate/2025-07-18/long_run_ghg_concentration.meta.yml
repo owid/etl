@@ -1,0 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+        - CO2 & Greenhouse Gas Emissions
+    description_processing: |-
+      - Long-run data from ice core studies has been merged with recent measurements of atmospheric concentration of greenhouse gases.
+
+dataset:
+  update_period_days: 0
+
+tables:
+  long_run_ghg_concentration:
+    variables:
+      co2_concentration:
+        title: Long-run CO₂ concentration
+        unit: parts per million volume
+        short_unit: ppmv
+      ch4_concentration:
+        title: Long-run CH₄ concentration
+        unit: parts per billion volume
+        short_unit: ppbv
+      n2o_concentration:
+        title: Long-run N₂O concentration
+        unit: parts per billion volume
+        short_unit: ppbv

@@ -6,7 +6,7 @@ definitions:
   common_views:
     - config:
         tab: map
-        type: LineChart
+        type: LineChart DiscreteBar
         hasMapTab: true
         yScaleToggle: false
 config:

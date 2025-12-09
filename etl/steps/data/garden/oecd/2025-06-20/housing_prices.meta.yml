@@ -1,0 +1,61 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+    processing_level: minor
+
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  housing_prices:
+    variables:
+      nom_house_price_idx:
+        description_short: Index of residential property prices for both new and existing homes. This index is normalized to 2015 prices (=100) and is not adjusted for inflation.
+        description_from_producer: Residential property prices, sales of newly-built and existing dwellings, all types of dwellings.
+      real_house_price_idx:
+        description_short: Index of residential property prices for both new and existing homes. This index is normalized to 2015 prices (=100) and is adjusted for inflation.
+        description_from_producer: Nominal house prices deflated using the private consumption deflator from the national account statistics.
+        description_key:
+          - The real house price index is a measure of the price for which residential properties are sold. It can be used to assess the affordability of housing over time.
+          - The index includes all dwellings sold, so both homes and apartments as well as new and existing properties.
+          - The index is normalized to 2015 prices, meaning that the value of the index in 2015 is set to 100. A year with a value of 120 indicates that the price of residential properties is 20% higher than in 2015.
+          - The data is adjusted for inflation to reflect the real price of housing and allowing for comparisons over time. To achieve this, the nominal house prices are deflated using the private consumption deflator from the national account statistics.
+      rent_prices:
+        description_short: Index for rents prices of residential property. This index is normalized to 2015 prices (=100) and not adjusted for inflation.
+        description_from_producer: Data from the OECD Main Economic Indicators database or from Eurostat, Consumer Price Indices (CPIs) for Actual rentals for housing (COICOP 04.1)
+      price_to_income_ratio:
+        description_short: Ratio of house prices to household disposable income per person, a measure for how affordable buying a home is. It is calculated by dividing nominal house prices by nominal disposable income per head.
+        description_from_producer: Nominal house prices divided by nominal disposable income per head. Net household disposable income is used. The population data come from the OECD national accounts database.
+        description_key:
+          - The price to income ratio is a measure of the affordability of housing, indicating how house prices compare to household income. A higher ratio suggests that housing is less affordable, while a lower ratio indicates that housing is more affordable.
+          - Nominal house prices are divided by nominal disposable income per head and net household disposable income is used. The population data come from the OECD national accounts database.
+          - The index is normalized to 2015 prices, so its 2015 value is set to 100. A year with a value of 120 indicates that the price to income ratio is 20% higher than in 2015.
+      price_to_rent_ratio:
+        description_short: Ratio of house prices to rent prices, used to compare the cost of buying versus renting a home. It is calculated by dividing nominal house prices by nominal rent prices.
+        description_from_producer: Nominal house prices divided by rent price indices.
+        description_key:
+          - The price to rent ratio is a measure of the cost of buying a home compared to renting one. A higher ratio suggests that it is more expensive to buy a home relative to renting, while a lower ratio indicates that buying is more affordable.
+          - Nominal house prices are divided by nominal rent prices. The rent price indices are sourced from the OECD Main Economic Indicators database or from Eurostat, Consumer Price Indices (CPIs) for Actual rentals for housing (COICOP 04.1).
+          - The index is normalized to 2015 prices, so its 2015 value is set to 100. A year with a value of 120 indicates that the price to rent ratio is 20% higher than in 2015.
+      std_price_income_ratio:
+        description_short: Ratio of house prices to income, compared to the long-term average (since 1980). The average is set to 100.
+        description_from_producer: The standardised price-income ratio shows the current price-income ratio relative to its long-term average. The long-term average, which is used as a reference value, is calculated over the whole period available when the indicator begins after 1980 or 1980 if the indicator is available over a longer time period.
+        description_key:
+          - The standardised price-income ratio is a measure of the affordability of housing, showing how house prices compare to household income relative to their long-term average.
+          - To calculate the standardised price-income ratio, first the nominal house prices are divided by nominal disposable income per head. Then, the long-term average of this ratio is calculated for the period from 1980 to now. This average is set to 100, and the current ratio is expressed relative to this average.
+          - A value above 100 indicates that the current price-income ratio is higher than the long-term average, suggesting that housing is less affordable than it has been historically. A value below 100 indicates that the current price-income ratio is lower than the long-term average, suggesting that housing is more affordable than it has been historically.
+      std_price_rent_ratio:
+        description_short: Ratio of house prices to rent, compared to the long-term average (since 1980). The average is set to 100.
+        description_from_producer: The standardised price-rent ratio shows the current price-rent ratio relative to its long-term average. The long-term average, which is used as a reference value, is calculated over the whole period available when the indicator begins after 1980 or 1980 if the indicator is available over a longer time period.
+        description_key:
+          - The standardised price-rent ratio is a measure of the cost of buying a home compared to renting, relative to its long-term average.
+          - To calculate the standardised price-rent ratio, first the nominal house prices are divided by nominal rent prices. Then, the long-term average of this ratio is calculated for the period from 1980 to now. This average is set to 100, and the current ratio is expressed relative to this average.
+          - A value above 100 indicates that the current price-rent ratio is higher than the long-term average, suggesting that it is more expensive to buy a home relative to renting than it has been historically. A value below 100 indicates that the current price-rent ratio is lower than the long-term average, suggesting that it is more affordable to buy a home relative to renting than it has been historically.
+
+
+

@@ -1,3 +1,10 @@
+---
+tags:
+  - Automation
+  - Reference
+icon: lucide/terminal
+---
+
 ::: mkdocs-click
     :module: apps.cli.__init__
     :command: cli

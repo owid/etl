@@ -32,7 +32,7 @@ tables:
         unit: patients
       icu_flow:
         title: ICU admissions
-        unit: admisions
+        unit: admissions
       icu_stock:
         title: Patients in ICU
         unit: patients

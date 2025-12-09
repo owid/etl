@@ -31,10 +31,10 @@ SNAPSHOT_VERSION = pathlib.Path(__file__).parent.name
     help="Upload Snapshot",
 )
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def main(path_to_file: str, upload: bool) -> None:
+def run(path_to_file: str, upload: bool) -> None:
     snap = Snapshot(f"ember/{SNAPSHOT_VERSION}/yearly_electricity.csv")
     snap.create_snapshot(upload=upload, filename=path_to_file)
 
 
 if __name__ == "__main__":
-    main()
+    run()
