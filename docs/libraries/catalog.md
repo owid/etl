@@ -9,29 +9,10 @@ pip install owid-catalog
 ```
 
 <!-- Catalog -->
-::: owid.catalog.catalogs.find
+::: owid.catalog.catalogs
     options:
       heading_level: 2
-
-::: owid.catalog.catalogs.find_one
-    options:
-      heading_level: 2
-
-::: owid.catalog.catalogs.find_latest
-    options:
-      heading_level: 2
-
-::: owid.catalog.catalogs.LocalCatalog
-    options:
-      heading_level: 2
-      filters: ["!^_"]
-      members_order: alphabetical
-
-::: owid.catalog.catalogs.RemoteCatalog
-    options:
-      heading_level: 2
-      filters: ["!^_"]
-      members_order: alphabetical
+      filters: ["!^_", "!^Catalog"]
 
 <!-- Processing -->
 
@@ -42,21 +23,21 @@ pip install owid-catalog
       members_order: alphabetical
 
 <!-- Dataset -->
-::: owid.catalog.Dataset
+::: owid.catalog.datasets
     options:
       heading_level: 2
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Table -->
-::: owid.catalog.Table
+::: owid.catalog.tables
     options:
       heading_level: 2
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Variable -->
-::: owid.catalog.Variable
+::: owid.catalog.variables
     options:
       heading_level: 2
       filters: ["!^_"]
