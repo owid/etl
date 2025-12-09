@@ -5,8 +5,10 @@ from etl.paths import BASE_DIR
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    default_views = make_differences_line("verify-graphs_default-views.log", "commit_default-views.log")
-    all_views = make_differences_line("verify-graphs_all-views.log", "commit_all-views.log")
+    default_views = make_differences_line(
+        "verify-graphs_default-views.log", "commit_default-views.log", "report_default-views.html"
+    )
+    all_views = make_differences_line("verify-graphs_all-views.log", "commit_all-views.log", "report_all-views.html")
 
     body = f"""
 - **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
@@ -36,7 +38,7 @@ Number of differences (all views): {all_views}
     return body
 
 
-def make_differences_line(log_file: str, commit_file: str) -> str:
+def make_differences_line(log_file: str, commit_file: str, report_filename: str) -> str:
     try:
         num_differences = get_num_differences(log_file)
         status_icon = get_status_icon(num_differences)
@@ -46,8 +48,13 @@ def make_differences_line(log_file: str, commit_file: str) -> str:
 
     commit_id = get_commit_id(commit_file)
     commit_link = f"({make_commit_link(commit_id=commit_id)})" if commit_id else ""
+    report_link = (
+        f"[Report]({make_report_url(commit_id=commit_id, report_filename=report_filename)})"
+        if status_icon == "❌" and commit_id
+        else ""
+    )
 
-    return f"{num_differences} {commit_link} {status_icon}"
+    return f"{num_differences} {commit_link} {status_icon} {report_link}".strip()
 
 
 def get_num_differences(log_file: str) -> int:
@@ -76,3 +83,8 @@ def make_commit_link(commit_id: str) -> str:
     commit_hash = commit_id[:6]
     commit_url = f"https://github.com/owid/owid-grapher-svgs/commit/{commit_id}"
     return f"[{commit_hash}]({commit_url})"
+
+
+def make_report_url(commit_id: str, report_filename: str) -> str:
+    # raw.githack.com serves raw files from GitHub with proper HTML content type
+    return f"https://rawcdn.githack.com/owid/owid-grapher-svgs/{commit_id}/{report_filename}"
