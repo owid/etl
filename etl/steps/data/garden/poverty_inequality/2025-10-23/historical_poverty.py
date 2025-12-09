@@ -2484,6 +2484,9 @@ def add_population_with_ireland_patch(
             # Drop Ireland from tb
             tb = tb[tb["country"] != "Ireland"].reset_index(drop=True)
 
+            # Make population_col in tb_ireland NaN for years before 1950
+            tb_ireland.loc[tb_ireland["year"] < 1950, population_col] = pd.NA
+
             # Filter tb_maddison for Ireland
             tb_maddison_ireland = tb_maddison[(tb_maddison["country"] == "Ireland") & (tb_maddison["year"] < 1950)][
                 ["country", "year", "population"]
