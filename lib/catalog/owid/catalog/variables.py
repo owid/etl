@@ -19,6 +19,7 @@ from owid.grapher import Chart
 
 from . import processing_log as pl
 from . import warnings
+from .plotting import create_owid_chart
 from .meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
@@ -511,49 +512,39 @@ class Variable(pd.Series):
             new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
         return new_var
 
-    def plot(
+    def plot_owid(
         self,
         kind: Literal["line", "bar", "scatter"] = "line",
-        backend: Literal["owid", "matplotlib"] = "owid",
         entity: str | None = None,
         x: str | None = None,
         stacked: bool = False,
         title: str | None = None,
         max_entities: int = 10,
         entities: list[str] | None = None,
-        **kwargs: Any,
-    ) -> Any:
-        """Plot the variable using OWID grapher or matplotlib.
+    ) -> Chart:
+        """Plot the variable using OWID grapher.
 
-        Creates interactive visualizations using owid-grapher-py by default, or falls back
-        to pandas/matplotlib plotting. When using the OWID backend, the method automatically
+        Creates interactive visualizations using owid-grapher-py. The method automatically
         detects 'country' and 'year' columns in the index to use as entity and x-axis.
 
         Args:
             kind: Type of plot to create. Options are "line", "bar", or "scatter".
                 Defaults to "line".
-            backend: Plotting backend to use. "owid" uses owid-grapher-py for interactive
-                charts, "matplotlib" uses pandas' built-in plotting. Defaults to "owid".
             entity: Column name to use for entity grouping (e.g., countries). If None,
-                automatically detects 'country' in the index. Only used with OWID backend.
+                automatically detects 'country' in the index.
             x: Column name to use for x-axis. If None, automatically detects 'year' in
-                the index. Only used with OWID backend.
+                the index.
             stacked: Whether to stack bars in bar charts. Only applies when kind="bar".
                 Defaults to False.
             title: Chart title. If None, uses the variable's metadata title or name.
             max_entities: Maximum number of entities to show initially. If there are more
                 entities, the top ones by sum of absolute values are selected, and an
-                entity picker is enabled. Defaults to 10. Only used with OWID backend.
-                Ignored if `entities` is provided.
+                entity picker is enabled. Defaults to 10. Ignored if `entities` is provided.
             entities: List of entity names to show in the chart. If provided, overrides
-                the automatic selection based on `max_entities`. Only used with OWID backend.
-            **kwargs: Additional arguments passed to the plotting backend.
-                For OWID backend: passed to Chart methods.
-                For matplotlib backend: passed to pandas Series.plot().
+                the automatic selection based on `max_entities`.
 
         Returns:
-            For OWID backend: owid.grapher.Chart object (interactive widget in notebooks).
-            For matplotlib backend: matplotlib.axes.Axes object.
+            owid.grapher.Chart object (interactive widget in notebooks).
 
         Example:
             Basic line plot with OWID grapher:
@@ -561,127 +552,30 @@ class Variable(pd.Series):
             ```python
             tb = Table({"country": ["USA", "UK"], "year": [2020, 2020], "gdp": [21, 2.8]})
             tb = tb.set_index(["country", "year"])
-            tb["gdp"].plot()  # Interactive OWID chart
-            ```
-
-            Bar chart with matplotlib:
-
-            ```python
-            tb["gdp"].plot(kind="bar", backend="matplotlib")
+            tb["gdp"].plot_owid()  # Interactive OWID chart
             ```
 
             Plot specific countries:
 
             ```python
-            tb["gdp"].plot(entities=["USA", "China", "Germany"])
+            tb["gdp"].plot_owid(entities=["USA", "China", "Germany"])
             ```
         """
-        if backend == "owid":
-            return self._plot_owid(
-                kind=kind,
-                entity=entity,
-                x=x,
-                stacked=stacked,
-                title=title,
-                max_entities=max_entities,
-                entities=entities,
-            )
-        elif backend == "matplotlib":
-            # Map kind to pandas plot kind (scatter not supported for Series)
-            pandas_kind = kind if kind != "scatter" else "line"
-            return super().plot(kind=pandas_kind, title=title or self.metadata.title or self.name, **kwargs)
-        else:
-            raise ValueError(f"Unknown backend: {backend}. Use 'owid' or 'matplotlib'.")
-
-    def _plot_owid(
-        self,
-        kind: Literal["line", "bar", "scatter"] = "line",
-        entity: str | None = None,
-        x: str | None = None,
-        stacked: bool = False,
-        title: str | None = None,
-        max_entities: int = 10,
-        entities: list[str] | None = None,
-    ) -> Any:
-        """Create an OWID grapher chart from this variable.
-
-        Internal method that handles OWID-specific plotting logic.
-        """
-        # Reset index to get a DataFrame with all columns
-        df = self.reset_index()
-
-        # Auto-detect entity and x columns from common index names
-        index_names = [n for n in self.index.names if n is not None]
-
-        if entity is None:
-            # Look for common entity column names
-            for col in ["country", "entity", "entities", "location", "region"]:
-                if col in index_names or col in df.columns:
-                    entity = col
-                    break
-
-        if x is None:
-            # Look for common time column names
-            for col in ["year", "years", "date", "time"]:
-                if col in index_names or col in df.columns:
-                    x = col
-                    break
-
-        # Get the value column name (the variable name)
-        y = self.name
-        if y is None:
+        if self.name is None:
             raise ValueError("Variable must have a name to plot")
 
-        # Determine which entities to select
-        selected_entities: list[str] | None = None
-        if entities is not None:
-            # User provided explicit list of entities
-            selected_entities = entities
-        elif entity and entity in df.columns:
-            # Auto-select top entities if there are too many
-            unique_entities = df[entity].unique()
-            if len(unique_entities) > max_entities:
-                # Pick top entities by their last value (absolute)
-                last_values = df.groupby(entity)[y].last().abs().sort_values(ascending=False)
-                selected_entities = last_values.head(max_entities).index.tolist()
-
-        # Create the chart
-        chart = Chart(df)  # type: ignore
-
-        # Apply the appropriate mark type
-        if kind == "line":
-            chart = chart.mark_line()
-        elif kind == "bar":
-            chart = chart.mark_bar(stacked=stacked)
-        elif kind == "scatter":
-            chart = chart.mark_scatter()
-        else:
-            raise ValueError(f"Unknown chart kind: {kind}. Use 'line', 'bar', or 'scatter'.")
-
-        # Build encode parameters
-        encode_params: dict[str, Any] = {"y": y}
-        if x:
-            encode_params["x"] = x
-        if entity:
-            encode_params["entity"] = entity
-
-        chart = chart.encode(**encode_params)
-
-        # Select top entities and enable entity picker if there are many
-        if selected_entities is not None:
-            chart = chart.select(entities=selected_entities)
-            chart = chart.interact(entity_control=True)
-
-        # Set title from metadata or parameter
-        chart_title = title or self.metadata.title or self.name
-        if chart_title:
-            chart = chart.label(title=chart_title)
-
-        # Set axis labels from metadata
-        if self.metadata.unit:
-            chart = chart.yaxis(unit=self.metadata.unit)
-
-        return chart
+        return create_owid_chart(
+            df=cast(pd.DataFrame, self.reset_index()),
+            y=self.name,
+            x=x,
+            entity=entity,
+            kind=kind,
+            stacked=stacked,
+            title=title or self.metadata.title or self.name,
+            unit=self.metadata.unit,
+            max_entities=max_entities,
+            entities=entities,
+        )
 
 
 # dynamically add all metadata properties to the class
