@@ -51,12 +51,18 @@ tables:
         title: Share below $<<poverty_line>> a day (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount:
         title: Number below $<<poverty_line>> a day (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -64,12 +70,18 @@ tables:
         title: Share above $<<poverty_line>> a day (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above:
         title: Number above $<<poverty_line>> a day (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -77,12 +89,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between:
         title: Number between {definitions.poverty_line_between} a day (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -90,12 +108,18 @@ tables:
         title: Share below $<<poverty_line>> a day (benchmark) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_benchmark:
         title: Number below $<<poverty_line>> a day (benchmark) (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -103,12 +127,18 @@ tables:
         title: Share above $<<poverty_line>> a day (benchmark) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above_benchmark:
         title: Number above $<<poverty_line>> a day (benchmark) (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -116,12 +146,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (benchmark) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between_benchmark:
         title: Number between {definitions.poverty_line_between} a day (benchmark) (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -129,12 +165,18 @@ tables:
         title: Share below $<<poverty_line>> a day (rolling average) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_rolling_avg:
         title: Number below $<<poverty_line>> a day (rolling average) (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -142,12 +184,18 @@ tables:
         title: Share above $<<poverty_line>> a day (rolling average) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above_rolling_avg:
         title: Number above $<<poverty_line>> a day (rolling average) (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -155,12 +203,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (rolling average) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between_rolling_avg:
         title: Number between {definitions.poverty_line_between} a day (rolling average) (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -170,6 +224,9 @@ tables:
         title: Population (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -177,6 +234,9 @@ tables:
         title: Population (OMM)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -184,6 +244,9 @@ tables:
         title: Population difference (constant inequality)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -191,6 +254,9 @@ tables:
         title: Population difference (%) (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
 
@@ -198,6 +264,9 @@ tables:
         title: Population as a share of OMM population (constant inequality)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 2
 
@@ -207,12 +276,18 @@ tables:
         title: Share below $<<poverty_line>> a day (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount:
         title: Number below $<<poverty_line>> a day (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -220,12 +295,18 @@ tables:
         title: Share above $<<poverty_line>> a day (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above:
         title: Number above $<<poverty_line>> a day (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -233,12 +314,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between:
         title: Number between {definitions.poverty_line_between} a day (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -246,12 +333,18 @@ tables:
         title: Share below $<<poverty_line>> a day (benchmark) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_benchmark:
         title: Number below $<<poverty_line>> a day (benchmark) (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -259,12 +352,18 @@ tables:
         title: Share above $<<poverty_line>> a day (benchmark) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above_benchmark:
         title: Number above $<<poverty_line>> a day (benchmark) (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -272,12 +371,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (benchmark) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between_benchmark:
         title: Number between {definitions.poverty_line_between} a day (benchmark) (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -285,12 +390,18 @@ tables:
         title: Share below $<<poverty_line>> a day (rolling average) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_rolling_avg:
         title: Number below $<<poverty_line>> a day (rolling average) (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -298,12 +409,18 @@ tables:
         title: Share above $<<poverty_line>> a day (rolling average) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above_rolling_avg:
         title: Number above $<<poverty_line>> a day (rolling average) (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -311,12 +428,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (rolling average) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between_rolling_avg:
         title: Number between {definitions.poverty_line_between} a day (rolling average) (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -326,6 +449,9 @@ tables:
         title: Population (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -333,6 +459,9 @@ tables:
         title: Population (OMM)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -340,6 +469,9 @@ tables:
         title: Population difference (interpolated quantiles)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -347,6 +479,9 @@ tables:
         title: Population difference (%) (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
 
@@ -354,6 +489,9 @@ tables:
         title: Population as a share of OMM population (interpolated quantiles)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 2
 
@@ -363,12 +501,18 @@ tables:
         title: Share below $<<poverty_line>> a day (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount:
         title: Number below $<<poverty_line>> a day (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -376,12 +520,18 @@ tables:
         title: Share above $<<poverty_line>> a day (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above:
         title: Number above $<<poverty_line>> a day (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -389,12 +539,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between:
         title: Number between {definitions.poverty_line_between} a day (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -402,12 +558,18 @@ tables:
         title: Share below $<<poverty_line>> a day (benchmark) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_benchmark:
         title: Number below $<<poverty_line>> a day (benchmark) (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -415,12 +577,18 @@ tables:
         title: Share above $<<poverty_line>> a day (benchmark) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above_benchmark:
         title: Number above $<<poverty_line>> a day (benchmark) (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -428,12 +596,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (benchmark) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between_benchmark:
         title: Number between {definitions.poverty_line_between} a day (benchmark) (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -441,12 +615,18 @@ tables:
         title: Share below $<<poverty_line>> a day (rolling average) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_rolling_avg:
         title: Number below $<<poverty_line>> a day (rolling average) (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -454,12 +634,18 @@ tables:
         title: Share above $<<poverty_line>> a day (rolling average) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_above_rolling_avg:
         title: Number above $<<poverty_line>> a day (rolling average) (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -467,12 +653,18 @@ tables:
         title: Share between {definitions.poverty_line_between} a day (rolling average) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
       headcount_between_rolling_avg:
         title: Number between {definitions.poverty_line_between} a day (rolling average) (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -482,6 +674,9 @@ tables:
         title: Population (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -489,6 +684,9 @@ tables:
         title: Population (OMM)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -496,6 +694,9 @@ tables:
         title: Population difference (interpolated Ginis)
         unit: "people"
         short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 0
 
@@ -503,6 +704,9 @@ tables:
         title: Population difference (%) (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
 
@@ -510,6 +714,9 @@ tables:
         title: Population as a share of OMM population (interpolated Ginis)
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 2
 
@@ -519,6 +726,9 @@ tables:
         title: "Difference in headcount ratio: Quantiles interpolation vs. constant inequality"
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
 
@@ -526,6 +736,9 @@ tables:
         title: "Difference in headcount ratio: Ginis interpolation vs. constant inequality"
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
 
@@ -533,6 +746,9 @@ tables:
         title: "Difference in headcount ratio: Quantiles interpolation vs. Ginis interpolation"
         unit: "%"
         short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 1
 
@@ -542,11 +758,26 @@ tables:
         title: Gini coefficient
         unit: ""
         short_unit: ""
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 2
       mean:
         title: Mean
         unit: "international-$ in 2021 prices"
         short_unit: "$"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 2
+      mean_benchmark:
+        title: Mean (benchmark)
+        unit: "international-$ in 2021 prices"
+        short_unit: "$"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
         display:
           numDecimalPlaces: 2
