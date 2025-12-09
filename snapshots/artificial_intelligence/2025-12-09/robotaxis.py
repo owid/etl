@@ -8,7 +8,7 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import List, cast
+from typing import List
 from urllib.parse import urljoin
 
 import pandas as pd
