@@ -100,7 +100,7 @@ def calculate_net_change_in_forest_area(tb: Table) -> Table:
     tb["year_diff"] = tb.groupby("country")["year"].diff()
 
     # Calculate annualized change and shift back one period
-    tb["net_change_forest_area"] = tb["forest_area_diff"].div(tb["year_diff"]).groupby(tb["country"]).shift(-1)
+    tb["net_change_forest_area"] = tb["forest_area_diff"].div(tb["year_diff"]).groupby(tb["country"])
 
     # Clean up temporary columns
     tb = tb.drop(columns=["forest_area_diff", "year_diff"])
