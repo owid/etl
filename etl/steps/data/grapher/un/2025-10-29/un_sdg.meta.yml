@@ -465,6 +465,9 @@ tables:
           - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         presentation:
           grapher_config:
             title: Share of workers in informal employment
