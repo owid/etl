@@ -78,6 +78,9 @@ definitions:
   description_key_labor_income_share: |-
     This indicator is calculated using compensation of employees (wages and salaries in cash and in kind benefits, and social contributions paid by employers) and labor income of the self-employed (the part of the remuneration attributable for work done by self-employed workers).
 
+  description_processing_informal_employment: |-
+    In the case of Chile, we only select informal employment estimates from 2018 onward, given inconsistencies in the official series for previous years.
+
   note_icls_13: |-
     Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
 
@@ -462,6 +465,9 @@ tables:
           - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         presentation:
           grapher_config:
             title: Share of workers in informal employment
@@ -471,7 +477,7 @@ tables:
         display:
           name: Share of workers in informal employment
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__no_breakdown__female:
     variables:
@@ -484,6 +490,9 @@ tables:
           - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         presentation:
           grapher_config:
             title: Share of female workers in informal employment
@@ -493,7 +502,7 @@ tables:
         display:
           name: Share of female workers in informal employment
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__no_breakdown__male:
     variables:
@@ -506,6 +515,9 @@ tables:
           - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         presentation:
           grapher_config:
             title: Share of male workers in informal employment
@@ -515,49 +527,67 @@ tables:
         display:
           name: Share of male workers in informal employment
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__non_agriculture__female:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__female:
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__non_agriculture__male:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__male:
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__female:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__female:
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__male:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__male:
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_informal_employment}
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_5_2__sl_tlf_uem__15_years_old_and_over__both_sexes:
     variables:
