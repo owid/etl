@@ -120,7 +120,10 @@ uv remove package_name
 
 ## Extended Documentation
 
-See `.claude/docs/` for detailed guides on debugging, performance profiling, and advanced patterns.
+See `.claude/docs/` for:
+- `debugging.md` - Data quality debugging approach
+- `performance.md` - Profiling and optimization
+- `pipeline-stages.md` - Pipeline architecture details
 
 ## Individual Preferences
 
