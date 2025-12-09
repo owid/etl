@@ -471,7 +471,7 @@ tables:
         display:
           name: Share of workers in informal employment
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__no_breakdown__female:
     variables:
@@ -493,7 +493,7 @@ tables:
         display:
           name: Share of female workers in informal employment
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__no_breakdown__male:
     variables:
@@ -515,49 +515,49 @@ tables:
         display:
           name: Share of male workers in informal employment
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__non_agriculture__female:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__female:
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__non_agriculture__male:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__male:
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__female:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__female:
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__male:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__male:
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
 
   _8_5_2__sl_tlf_uem__15_years_old_and_over__both_sexes:
     variables:
