@@ -741,7 +741,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
 
             # Calculate and log population impact
             affected_countries = set(unexpected_missing["country"].unique())
-            calculate_population_of_missing_countries(affected_countries)
+            calculate_population_of_a_group_of_countries(affected_countries)
 
             # Raise assertion error
             raise AssertionError(
@@ -859,12 +859,12 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     return tb_poverty
 
 
-def calculate_population_of_missing_countries(missing_countries: Set[str]) -> None:
+def calculate_population_of_a_group_of_countries(countries: Set[str]) -> None:
     """
     Calculate population estimates for countries missing in the main population dataset, and what do they represent as a share of the world population.
     """
     # Create table with column country as missing_countries
-    tb_population_missing = Table(pd.DataFrame(data={"country": list(missing_countries)}))
+    tb_population_missing = Table(pd.DataFrame(data={"country": list(countries)}))
 
     # Assign column year as CURRENT_YEAR
     tb_population_missing["year"] = CURRENT_YEAR
@@ -1366,6 +1366,11 @@ def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
     Add Gini coefficients from Van Zanden et al. (2014) to the PIP data table for historical comparison.
     """
 
+    # Calculate the total population that the countries in tb_van_zanden represent in CURRENT_YEAR
+    if SHOW_WARNINGS:
+        log.info("Calculating population represented by Van Zanden et al. (2014) countries:")
+        calculate_population_of_a_group_of_countries(set(tb_van_zanden["country"].unique()))
+
     # Merge tb_pip with tb_van_zanden on country and year
     tb = pr.merge(
         tb_pip,
@@ -1400,7 +1405,7 @@ def compare_countries_available_in_two_tables(
                 f"The following {len(missing_in_tb_2)} countries are in '{name_tb_1}' but missing in '{name_tb_2}': "
                 f"{sorted_missing}"
             )
-            calculate_population_of_missing_countries(missing_in_tb_2)
+            calculate_population_of_a_group_of_countries(missing_in_tb_2)
 
         if len(missing_in_tb_1) > 0:
             sorted_missing = ", ".join(sorted(missing_in_tb_1))
@@ -1470,7 +1475,7 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
             .min()
             .reset_index()
             .rename(columns={"year": "earliest_year_mean"})
-            .sort_values("earliest_year_mean", ascending=False)
+            .sort_values("earliest_year_mean", ascending=True)
         )
 
         # Create column current_year
@@ -1515,7 +1520,7 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
             .min()
             .reset_index()
             .rename(columns={"year": "earliest_year_gini"})
-            .sort_values("earliest_year_gini", ascending=False)
+            .sort_values("earliest_year_gini", ascending=True)
         )
         # Create column current_year
         earliest_gini["current_year"] = CURRENT_YEAR
