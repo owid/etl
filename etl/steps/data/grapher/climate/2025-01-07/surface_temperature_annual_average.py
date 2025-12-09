@@ -74,7 +74,7 @@ def run() -> None:
         tables=[combined],
         default_metadata=ds_garden.metadata,
         check_variables_metadata=True,
-        yaml_params={"date_accessed": last_date_accessed(combined)},
+        yaml_params={"date_accessed": last_date_accessed(combined), "year": last_date_accessed(combined)[-4:]},
     )
 
     ds_grapher.save()
