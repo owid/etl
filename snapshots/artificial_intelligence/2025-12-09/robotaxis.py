@@ -8,39 +8,55 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import List
+from typing import List, cast
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests
+from bs4 import BeautifulSoup, Tag
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# List of all zip URLs to download and process (find them here https://www.cpuc.ca.gov/regulatory-services/licensing/transportation-licensing-and-analysis-branch/autonomous-vehicle-programs/quarterly-reporting)
-ZIP_URLS = [
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/files/uploadedfiles/cpucwebsite/content/licensing/autovehicle/2022-av-deployment--0301-0531-revised.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/files/uploadedfiles/cpucwebsite/content/licensing/autovehicle/2022-av-deployment--0601-0831-revised.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/files/uploadedfiles/cpucwebsite/content/licensing/autovehicle/2022-av-deployment---0901-1130.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/files/uploadedfiles/cpucwebsite/content/licensing/autovehicle/2023-av-deployment---1201-0228.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/2023-av-deployment---0301-0531/2023-av-deployment---0301-0531.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/2023-av-deployment---0601-0831.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/2023-av-deployment---0901-1130(2).zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/2024-av-deployment---1201-0229(1).zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/2024-av-deployment---0301-0531.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/av-deployment_jun_aug_2024_public.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/waymo-dep-sep-nov-2024-public_2a.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/waymo-dep-dec-2024--public_2.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/waymo-driverless-deployment-2025-q1.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/waymo-deployment-2025q2.zip",
-    "https://www.cpuc.ca.gov/-/media/cpuc-website/divisions/consumer-protection-and-enforcement-division/documents/tlab/av-programs/waymo-deployment-2025q3.zip",
-]
+# CPUC quarterly reporting page URL
+CPUC_URL = "https://www.cpuc.ca.gov/regulatory-services/licensing/transportation-licensing-and-analysis-branch/autonomous-vehicle-programs/quarterly-reporting"
+
+
+def extract_deployment_links() -> List[str]:
+    """Extract all deployment program zip file URLs from CPUC website.
+
+    Returns:
+        List of URLs to deployment program zip files
+    """
+    response = requests.get(CPUC_URL, timeout=30)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.content, "html.parser")
+    base_url = "https://www.cpuc.ca.gov"
+
+    links = []
+    for link in soup.find_all("a", href=True):
+        if not isinstance(link, Tag):
+            continue
+        href = link.get("href")
+        if href:
+            href = str(href)
+            # Filter for deployment program zip files
+            if ("deployment" in href.lower() or "waymo-dep" in href.lower()) and ".zip" in href.lower():
+                full_url = urljoin(base_url, href)
+                if full_url not in links:
+                    links.append(full_url)
+
+    return links
 
 
 def run(upload: bool = True) -> None:
     """Create a new snapshot."""
+    # Extract deployment program URLs dynamically from CPUC website
+    zip_urls = extract_deployment_links()
     # Download and extract CSV files with TotalPMT column
-    dataframes = download_and_extract_csv_files(ZIP_URLS)
+    dataframes = download_and_extract_csv_files(zip_urls)
 
     # Combine all dataframes
     combined_df = pd.concat(dataframes, ignore_index=True)
