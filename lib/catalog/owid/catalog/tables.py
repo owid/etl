@@ -2694,10 +2694,8 @@ def read_custom(
         *args: Additional positional arguments to pass to read_function.
         **kwargs: Additional keyword arguments to pass to read_function.
 
-    Returns
-    -------
-    Table
-        Data read by the custom function as a Table with attached metadata and origin.
+    Returns:
+        Table: Data read by the custom function as a Table with attached metadata and origin.
 
     """
     table = Table(read_function(filepath_or_buffer, *args, **kwargs), underscore=underscore)
@@ -2955,8 +2953,9 @@ def read_df(
             Origin of the table.
         underscore : bool, optional
             True to ensure all column names are snake case.
+
     Returns:
-        Original data as a Table with metadata and an origin.
+        Table: Original data as a Table with metadata and an origin.
     """
     table = Table(df, underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
