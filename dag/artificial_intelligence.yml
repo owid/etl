@@ -188,12 +188,12 @@ steps:
   #
   # Robotaxis dataset
   #
-  data://meadow/artificial_intelligence/2025-08-25/robotaxis:
-    - snapshot://artificial_intelligence/2025-08-25/robotaxis.csv
-  data://garden/artificial_intelligence/2025-08-25/robotaxis:
-    - data://meadow/artificial_intelligence/2025-08-25/robotaxis
-  data://grapher/artificial_intelligence/2025-08-25/robotaxis:
-    - data://garden/artificial_intelligence/2025-08-25/robotaxis
+  data://meadow/artificial_intelligence/2025-12-09/robotaxis:
+    - snapshot://artificial_intelligence/2025-12-09/robotaxis.csv
+  data://garden/artificial_intelligence/2025-12-09/robotaxis:
+    - data://meadow/artificial_intelligence/2025-12-09/robotaxis
+  data://grapher/artificial_intelligence/2025-12-09/robotaxis:
+    - data://garden/artificial_intelligence/2025-12-09/robotaxis
 
   #
   # Ireland Data Centres Metered Electricity Consumption
