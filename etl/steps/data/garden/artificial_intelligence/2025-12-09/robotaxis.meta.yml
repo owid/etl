@@ -44,6 +44,7 @@ tables:
       totalpmt:
         title: Monthly distance traveled by robotaxi passengers
         unit: miles
+        short_unit: miles
         description_short: The total distance that passengers travel each month in California's paid driverless taxi services, calculated by summing, across all trips, the number of passengers multiplied by the miles each one travels.
         description_key:
           - This measures how far people have traveled in paid robotaxi trips that are approved to operate in California.
