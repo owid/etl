@@ -21,6 +21,10 @@ def run() -> None:
     # Extract starting year from year range format (e.g., "2020-2025" -> 2020)
     tb_intervals["year"] = tb_intervals["year"].astype(str).str[:4].astype(int)
 
+    # Check the years in the tables coincide, all the tb_intervals years should be in tb years\
+    assert set(tb_intervals["year"]).issubset(
+        set(tb["year"])
+    ), "Years in intervals table not subset of main table years"
     # merge the two tables
     tb = tb.merge(
         tb_intervals,

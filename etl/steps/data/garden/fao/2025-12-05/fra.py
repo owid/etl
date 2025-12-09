@@ -74,8 +74,10 @@ def run() -> None:
     tb = linearly_interpolate_forest_area(tb)
 
     tb = calculate_share_of_global_forest_area(tb)
-    tb = calculate_annual_change_in_forest_area_as_share_forest_area(tb)
-    tb = calculate_annual_deforestation_as_share_of_forest_area(tb)
+    # Calculate annual change in forest area as share of forest area
+    tb["annual_change_forest_area_share"] = tb["net_change_forest_area"].div(tb["_1a_forestarea"]).mul(100)
+    # Calculate annual deforestation as share of forest area
+    tb["annual_deforestation_share_forest_area"] = tb["_1d_deforestation"].div(tb["_1a_forestarea"]).mul(100)
     tb = calculate_share_of_global_deforestation(tb)
     tb = calculate_share_of_annual_global_forest_expansion(tb)
     # Improve table format.
@@ -110,13 +112,7 @@ def calculate_net_change_in_forest_area(tb: Table) -> Table:
 def linearly_interpolate_forest_area(tb: Table) -> Table:
     # Add rows for missing years and linearly interpolate forest area
     all_years = range(tb["year"].min(), tb["year"].max() + 1)
-    country_all_years = (
-        tb[["country"]]
-        .drop_duplicates()
-        .assign(key=1)
-        .merge(Table.from_dict({"year": all_years}).assign(key=1), on="key")
-        .drop(columns=["key"])
-    )
+    country_all_years = tb[["country"]].drop_duplicates().merge(Table.from_dict({"year": all_years}), how="cross")
     tb = country_all_years.merge(tb, on=["country", "year"], how="left")
 
     tb = tb.sort_values(by=["country", "year"])
@@ -137,16 +133,6 @@ def calculate_share_of_global_forest_area(tb: Table) -> Table:
     assert (
         tb["forestarea_share_global"].max() <= 100
     ), "Error in calculating share of global forest area: values exceed 100%"
-    return tb
-
-
-def calculate_annual_change_in_forest_area_as_share_forest_area(tb: Table) -> Table:
-    tb["annual_change_forest_area_share"] = tb["net_change_forest_area"].div(tb["_1a_forestarea"]).mul(100)
-    return tb
-
-
-def calculate_annual_deforestation_as_share_of_forest_area(tb: Table) -> Table:
-    tb["annual_deforestation_share_forest_area"] = tb["_1d_deforestation"].div(tb["_1a_forestarea"]).mul(100)
     return tb
 
 
