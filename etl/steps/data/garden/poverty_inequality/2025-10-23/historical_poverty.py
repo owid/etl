@@ -613,6 +613,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         ]
     ]
 
+    # Add origins to growth factors columns
+    tb_gdp["growth_factor"].m.origins = tb_maddison["gdp_per_capita"].m.origins
+
     # Check for extreme growth rates
     extreme_growth = tb_gdp[
         (tb_gdp["growth_factor"] > EXTREME_GROWTH_FACTOR_THRESHOLDS[1])
@@ -1709,7 +1712,7 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
         ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation. {remaining_nans[['country', 'year', 'mean', 'gini']]}"
 
     # Copy origins only
-    tb_gini_mean["mean"].m.origins = (tb["mean_filled"] + tb["mean_survey"]).m.origins
+    tb_gini_mean["mean"].m.origins = (tb["mean_filled"] + tb["mean_survey"] + tb_gdp["growth_factor"]).m.origins
     tb_gini_mean["gini"].m.origins = (tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]).m.origins
 
     return tb_gini_mean
@@ -2361,6 +2364,9 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table
 
     # Concatenate all together
     tb_gini_mean = pr.concat([tb_gini_mean, tb_region, tb_world] + tb_country_combinations, ignore_index=True)
+
+    # Preserve mean origins and add population
+    tb_gini_mean["mean"].m.origins = (tb["mean"] + tb_gini_mean["population"]).m.origins
 
     # Keep only relevant columns
     tb_gini_mean = (
