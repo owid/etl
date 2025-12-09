@@ -68,11 +68,10 @@ def run() -> None:
         tb[["_1a_forestarea", "_1d_expansion", "_1d_afforestation", "_1d_nat_exp", "_1d_deforestation"]] * 1000
     )
 
-    # Calculate additional variables
-    tb = calculate_net_change_in_forest_area(tb)
     # Linearly interpolate forest area for missing years
     tb = linearly_interpolate_forest_area(tb)
-
+    # Calculate additional variables
+    tb = calculate_net_change_in_forest_area(tb)
     tb = calculate_share_of_global_forest_area(tb)
     # Calculate annual change in forest area as share of forest area
     tb["annual_change_forest_area_share"] = tb["net_change_forest_area"].div(tb["_1a_forestarea"]).mul(100)
