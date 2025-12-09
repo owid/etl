@@ -55,11 +55,8 @@ tables:
       net_change_forest_area:
         title: Annual change in forest area
         description_short: Net change in forest area measures forest expansion (the sum of afforestation and natural expansion) minus deforestation.
-        unit: hectares per year
-        short_unit: ha/year
-        presentation:
-          grapher_config:
-            note: *footnote_intervals
+        unit: hectares
+        short_unit: ha
         description_processing: Annual forest area values are linearly interpolated for missing years, based on available data points from the FAO Forest Resources Assessment (FRA) reports.
       forestarea_share_global:
         title: Share of global forest area
@@ -72,9 +69,6 @@ tables:
         description_short: Annual net change in forest area measures forest expansion (the sum of afforestation and natural expansion) minus deforestation.
         unit: "%"
         short_unit: "%"
-        presentation:
-          grapher_config:
-            note: *footnote_intervals
         description_processing: Annual forest area values are linearly interpolated for missing years, based on available data points from the FAO Forest Resources Assessment (FRA) reports.
       annual_deforestation_share_forest_area:
         title: Annual deforestation as share of forest area
