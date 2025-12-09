@@ -2368,6 +2368,9 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table
     # Preserve mean origins and add population
     tb_gini_mean["mean"].m.origins = (tb["mean"] + tb_gini_mean["population"]).m.origins
 
+    # Remove attribution for population column
+    tb_gini_mean["mean"].m.presentation.attribution = None
+
     # Keep only relevant columns
     tb_gini_mean = (
         tb_gini_mean[["country", "year", "mean", "gini"]].sort_values(["country", "year"]).reset_index(drop=True)
