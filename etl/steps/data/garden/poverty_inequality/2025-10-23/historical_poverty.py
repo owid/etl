@@ -879,17 +879,17 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
 
 def calculate_population_of_a_group_of_countries(countries: Set[str]) -> None:
     """
-    Calculate population estimates for countries missing in the main population dataset, and what do they represent as a share of the world population.
+    Calculate population estimates for a group of countries in the main population dataset, and what do they represent as a share of the world population.
     """
-    # Create table with column country as missing_countries
-    tb_population_missing = Table(pd.DataFrame(data={"country": list(countries)}))
+    # Create table with column country as list of countries
+    tb_population_countries = Table(pd.DataFrame(data={"country": list(countries)}))
 
     # Assign column year as CURRENT_YEAR
-    tb_population_missing["year"] = CURRENT_YEAR
+    tb_population_countries["year"] = CURRENT_YEAR
 
     # Add population column using paths.regions.add_population
-    tb_population_missing = paths.regions.add_population(
-        tb=tb_population_missing,
+    tb_population_countries = paths.regions.add_population(
+        tb=tb_population_countries,
         population_col="population",
         warn_on_missing_countries=False,
         interpolate_missing_population=True,
@@ -906,17 +906,19 @@ def calculate_population_of_a_group_of_countries(countries: Set[str]) -> None:
     world_population = tb_world_population["world_population"].item()
 
     # Calculate population share of world population
-    tb_population_missing["population_share_of_world"] = tb_population_missing["population"] / world_population * 100
+    tb_population_countries["population_share_of_world"] = (
+        tb_population_countries["population"] / world_population * 100
+    )
 
     # Aggregate population and population_share_of_world
-    tb_population_missing = tb_population_missing.groupby("year").sum().reset_index()
+    tb_population_countries = tb_population_countries.groupby("year").sum().reset_index()
 
-    # Define missing_population
-    missing_population = tb_population_missing["population"].item()
-    missing_population_share = tb_population_missing["population_share_of_world"].item()
+    # Define total_population
+    total_population = tb_population_countries["population"].item()
+    total_population_share = tb_population_countries["population_share_of_world"].item()
 
     log.warning(
-        f"This represents {int(missing_population):,} people in {CURRENT_YEAR} ({missing_population_share:.2f}% of the world population)."
+        f"This represents {int(total_population):,} people in {CURRENT_YEAR} ({total_population_share:.2f}% of the world population)."
     )
 
     return None
