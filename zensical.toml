@@ -130,6 +130,7 @@ nav = [
 extra_css = [
     "css/extra.css",
     "https://unpkg.com/katex@0/dist/katex.min.css",
+    "css/mkdocstrings.css",
 ]
 
 
@@ -343,16 +344,49 @@ paths = ["lib/catalog", "lib/datautils", "lib/repack"]
 
 [project.plugins.mkdocstrings.handlers.python.options]
 docstring_style = "google"
-inherited_members = false
-show_source = false
+inherited_members = true          # false
+merge_init_into_class = true
+parameter_headings = true
 members_order = "source"
-filters = ["!^_"]
-show_root_heading = true
-show_root_toc_entry = false
+filters = ["!^_", "^__"]
 heading_level = 2
-show_signature_annotations = true
 separate_signature = true
 docstring_section_style = "spacy"
+backlinks = "tree"
+show_root_heading = true
+show_root_full_path = true
+show_signature_annotations = true
+show_source = true
+show_symbol_type_heading = true
+show_symbol_type_toc = true
+show_root_toc_entry = false
+signature_crossrefs = true
+summary = true
+unwrap_annotated = true
+
+
+extensions = ["griffe_typingdoc"]
+
+# docstring_options:
+# ignore_init_summary: true
+# docstring_section_style: list
+# extensions:
+# - griffe_typingdoc
+# filters: ["!^_", "^__"]
+# heading_level: 1
+# inherited_members: true
+# merge_init_into_class: true
+# parameter_headings: true
+# separate_signature: true
+# show_root_heading: true
+# show_root_full_path: false
+# show_signature_annotations: true
+# show_source: true
+# show_symbol_type_heading: true
+# show_symbol_type_toc: true
+# signature_crossrefs: true
+# summary: true
+# unwrap_annotated: true
 
 
 ## Others
