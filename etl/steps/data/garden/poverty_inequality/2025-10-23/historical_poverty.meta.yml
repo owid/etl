@@ -550,3 +550,9 @@ tables:
         short_unit: "$"
         display:
           numDecimalPlaces: 2
+      mean_benchmark:
+        title: Mean (benchmark)
+        unit: "international-$ in 2021 prices"
+        short_unit: "$"
+        display:
+          numDecimalPlaces: 2

@@ -98,6 +98,12 @@ PIP_CATEGORIES = {
     },
 }
 
+# Define country combinations for mean in the long-run plot
+COUNTRY_COMBINATIONS_LONG_RUN = {
+    "US and Canada": ["United States", "Canada"],
+    "Australia and New Zealand": ["Australia", "New Zealand"],
+}
+
 # NOTE: See if we want to include these countries not available in Maddison Project Database
 MISSING_COUNTRIES_AND_REGIONS = {
     "American Samoa": "East Asia",
@@ -333,7 +339,7 @@ def run() -> None:
     # EDIT TABLE WITH GINI AND MEAN VALUES
     ###############################################################################
 
-    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb=tb_gini_mean)
+    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb=tb_gini_mean, tb_maddison=tb_maddison)
 
     ###############################################################################
     # FORMAT AND SAVE DATA
@@ -2287,7 +2293,7 @@ def compare_headcount_ratios_across_methods(
     return tb_comparison
 
 
-def prepare_and_aggregate_gini_mean_data(tb: Table) -> Table:
+def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table:
     """
     Prepare historical Gini and mean data to create a long-run mean chart.
     Also, create aggregations at world and region levels.
@@ -2335,42 +2341,71 @@ def prepare_and_aggregate_gini_mean_data(tb: Table) -> Table:
 
     tb_world["mean"] = tb_world["total_income_world"] / tb_world["total_population_world"]
 
-    # Aggregate US and Canada
-    tb_us_can = tb_gini_mean[tb_gini_mean["country"].isin(["United States", "Canada"])].copy()
-    tb_us_can = (
-        tb_us_can.groupby(["year"])
-        .agg(
-            total_income_us_can=("total_income", "sum"),
-            total_population_us_can=("population", "sum"),
+    # Aggregate country combinations from COUNTRY_COMBINATIONS_LONG_RUN
+    tb_country_combinations = []
+    for country_group, countries in COUNTRY_COMBINATIONS_LONG_RUN.items():
+        tb_combination = tb_gini_mean[tb_gini_mean["country"].isin(countries)].copy()
+        tb_combination = (
+            tb_combination.groupby(["year"])
+            .agg(
+                total_income_combination=("total_income", "sum"),
+                total_population_combination=("population", "sum"),
+            )
+            .reset_index()
         )
-        .reset_index()
-    )
-
-    tb_us_can["country"] = "US and Canada"
-
-    tb_us_can["mean"] = tb_us_can["total_income_us_can"] / tb_us_can["total_population_us_can"]
-
-    # Aggregate Australia and New Zealand
-    tb_aus_nz = tb_gini_mean[tb_gini_mean["country"].isin(["Australia", "New Zealand"])].copy()
-    tb_aus_nz = (
-        tb_aus_nz.groupby(["year"])
-        .agg(
-            total_income_aus_nz=("total_income", "sum"),
-            total_population_aus_nz=("population", "sum"),
+        tb_combination["country"] = country_group
+        tb_combination["mean"] = (
+            tb_combination["total_income_combination"] / tb_combination["total_population_combination"]
         )
-        .reset_index()
-    )
-
-    tb_aus_nz["country"] = "Australia and New Zealand"
-
-    tb_aus_nz["mean"] = tb_aus_nz["total_income_aus_nz"] / tb_aus_nz["total_population_aus_nz"]
+        tb_country_combinations.append(tb_combination)
 
     # Concatenate all together
-    tb_gini_mean = pr.concat([tb_gini_mean, tb_region, tb_world, tb_us_can, tb_aus_nz], ignore_index=True)
+    tb_gini_mean = pr.concat([tb_gini_mean, tb_region, tb_world] + tb_country_combinations, ignore_index=True)
 
     # Keep only relevant columns
     tb_gini_mean = (
         tb_gini_mean[["country", "year", "mean", "gini"]].sort_values(["country", "year"]).reset_index(drop=True)
     )
+
+    # Separate tb_gini_mean into two tables: one with data starting from LATEST_YEAR_PIP_FILLED, and one with data before that year
+    tb_after_pip = tb_gini_mean[tb_gini_mean["year"] >= LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+    tb_before_pip = tb_gini_mean[tb_gini_mean["year"] < LATEST_YEAR_PIP_FILLED].reset_index(drop=True)
+
+    # Remove (Maddison) from country column if present
+    tb_maddison["country"] = tb_maddison["country"].str.replace(" (Maddison)", "", regex=False)
+
+    # Merge tb_gini_mean with tb_maddison
+    tb_before_pip = pr.merge(
+        tb_before_pip,
+        tb_maddison[["country", "year", "gdp_per_capita"]],
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Calculate mean_benchmark as mean when there is gdp_per_capita available
+    tb_before_pip["mean_benchmark"] = pd.NA
+    tb_before_pip.loc[tb_before_pip["gdp_per_capita"].notna(), "mean_benchmark"] = tb_before_pip["mean"]
+
+    # For tb_after_pip, set mean_benchmark as mean
+    tb_after_pip["mean_benchmark"] = tb_after_pip["mean"]
+
+    # For US and Canada, and Australia and New Zealand, select the years with data available in both countries in Maddison
+    for country_group, countries in COUNTRY_COMBINATIONS_LONG_RUN.items():
+        tb_group = tb_maddison[tb_maddison["country"].isin(countries)].copy()
+        years_with_data = tb_group.groupby("year").filter(lambda x: len(x) == len(countries))["year"].unique().tolist()
+        tb_before_pip.loc[
+            (tb_before_pip["country"] == country_group) & (tb_before_pip["year"].isin(years_with_data)),
+            "mean_benchmark",
+        ] = tb_before_pip["mean"]
+
+    # Combine tables again
+    tb_gini_mean = pr.concat([tb_before_pip, tb_after_pip], ignore_index=True)
+    tb_gini_mean = tb_gini_mean.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Copy origins for mean_benchmark
+    tb_gini_mean["mean_benchmark"].m.origins = tb_gini_mean["mean"].m.origins
+
+    # Drop unnecessary columns
+    tb_gini_mean = tb_gini_mean.drop(columns=["gdp_per_capita"], errors="raise")
 
     return tb_gini_mean
