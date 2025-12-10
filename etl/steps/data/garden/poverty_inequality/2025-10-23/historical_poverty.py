@@ -237,7 +237,7 @@ def run() -> None:
 
     # Perform backward extrapolation
     tb_thousand_bins_constant_inequality = extrapolate_backwards(
-        tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, tb_maddison=tb_maddison
+        tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, tb_population_patch=tb_maddison
     )
 
     # Calculate poverty measures
@@ -279,7 +279,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_quantiles = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_maddison,
         mean_column="mean",
         gini_column="gini_original",
     )
@@ -287,7 +287,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_quantiles = interpolate_quantiles_in_thousand_bins(
         tb_thousand_bins_interpolated_quantiles=tb_thousand_bins_interpolated_quantiles,
         tb_gini_mean=tb_gini_mean,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_maddison,
     )
 
     # Calculate poverty measures
@@ -312,7 +312,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_ginis = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_maddison,
         mean_column="mean",
         gini_column="gini",
     )
@@ -321,7 +321,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_ginis_all_lognormal = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_maddison,
         mean_column="mean",
         gini_column="gini",
         keep_original_thousand_bins=False,
@@ -355,7 +355,9 @@ def run() -> None:
     # EDIT TABLE WITH GINI AND MEAN VALUES
     ###############################################################################
 
-    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb=tb_gini_mean, tb_maddison=tb_maddison)
+    tb_gini_mean = prepare_and_aggregate_gini_mean_data(
+        tb=tb_gini_mean, tb_maddison=tb_maddison, tb_population_patch=tb_maddison
+    )
 
     ###############################################################################
     # FORMAT AND SAVE DATA
@@ -659,7 +661,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     return tb_gdp
 
 
-def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_maddison: Table) -> Table:
+def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_population_patch: Table) -> Table:
     """
     Extrapolate income distributions backwards from 1990 to 1820, using the cumulative GDP growth factors in the 1000-binned income distribution data.
     """
@@ -710,7 +712,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_maddison: T
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_population_patch,
         patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
@@ -1781,7 +1783,7 @@ def select_growth_factor_for_mean(row):
 def expand_means_and_ginis_to_thousand_bins(
     tb_gini_mean: Table,
     tb_thousand_bins: Table,
-    tb_maddison: Table,
+    tb_population_patch: Table,
     mean_column: str,
     gini_column: str,
     keep_original_thousand_bins: bool = KEEP_ORIGINAL_THOUSAND_BINS,
@@ -1876,7 +1878,7 @@ def expand_means_and_ginis_to_thousand_bins(
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_population_patch,
         patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
@@ -2069,7 +2071,7 @@ def gini_to_sigma(gini_values: np.ndarray) -> np.ndarray:
 
 
 def interpolate_quantiles_in_thousand_bins(
-    tb_thousand_bins_interpolated_quantiles: Table, tb_gini_mean: Table, tb_maddison: Table
+    tb_thousand_bins_interpolated_quantiles: Table, tb_gini_mean: Table, tb_population_patch: Table
 ) -> Table:
     """
     Interpolate missing values in the 1000-binned income distribution table.
@@ -2141,7 +2143,7 @@ def interpolate_quantiles_in_thousand_bins(
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_population_patch,
         patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
@@ -2326,7 +2328,7 @@ def compare_headcount_ratios_across_methods(
     return tb_comparison
 
 
-def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table:
+def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table, tb_population_patch: Table) -> Table:
     """
     Prepare historical Gini and mean data to create a long-run mean chart.
     Also, create aggregations at world and region levels.
@@ -2341,7 +2343,7 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
-        tb_maddison=tb_maddison,
+        tb_population_patch=tb_population_patch,
         patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
@@ -2458,7 +2460,7 @@ def add_population_with_ireland_patch(
     warn_on_missing_countries: bool,
     interpolate_missing_population: bool,
     expected_countries_without_population: list,
-    tb_maddison: Table,
+    tb_population_patch: Table,
     patch_ireland: bool,
 ) -> Table:
     """
@@ -2487,31 +2489,33 @@ def add_population_with_ireland_patch(
             # Make population_col in tb_ireland NaN for years before 1950
             tb_ireland.loc[tb_ireland["year"] < 1950, population_col] = pd.NA
 
-            # Filter tb_maddison for Ireland
-            tb_maddison_ireland = tb_maddison[(tb_maddison["country"] == "Ireland") & (tb_maddison["year"] < 1950)][
-                ["country", "year", "population"]
-            ].copy()
+            # Filter tb_population_patch for Ireland
+            tb_population_patch_ireland = tb_population_patch[
+                (tb_population_patch["country"] == "Ireland") & (tb_population_patch["year"] < 1950)
+            ][["country", "year", "population"]].copy()
 
             # Rename population column to population_col
-            tb_maddison_ireland = tb_maddison_ireland.rename(columns={"population": population_col}, errors="raise")
+            tb_population_patch_ireland = tb_population_patch_ireland.rename(
+                columns={"population": population_col}, errors="raise"
+            )
 
             # Merge population for Ireland into tb
             tb_ireland = pr.merge(
                 tb_ireland,
-                tb_maddison_ireland,
+                tb_population_patch_ireland,
                 on=["country", "year"],
                 how="left",
-                suffixes=("", "_ireland_maddison"),
+                suffixes=("", "_ireland_patch"),
             )
 
             # Where population is NaN and population_maddison is not NaN, fill population with population from Maddison
             tb_ireland.loc[
-                tb_ireland[population_col].isna() & tb_ireland[f"{population_col}_ireland_maddison"].notna(),
+                tb_ireland[population_col].isna() & tb_ireland[f"{population_col}_ireland_patch"].notna(),
                 population_col,
-            ] = tb_ireland[f"{population_col}_ireland_maddison"]
+            ] = tb_ireland[f"{population_col}_ireland_patch"]
 
-            # Drop population_maddison column
-            tb_ireland = tb_ireland.drop(columns=[f"{population_col}_ireland_maddison"], errors="raise")
+            # Drop population_patch column
+            tb_ireland = tb_ireland.drop(columns=[f"{population_col}_ireland_patch"], errors="raise")
 
             # Interpolate Ireland population if still missing
             if tb_ireland[population_col].isna().any():
