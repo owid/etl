@@ -56,6 +56,9 @@ POVERTY_LINES = [3, 10, 30]
 # Define if we want to interpolate the log of GDP per capita/mean or the absolute values
 INTERPOLATE_LOG = True
 
+# Define if we patch population for Ireland before 1950
+PATCH_IRELAND_POPULATION = True
+
 # Earliest year for extrapolation
 EARLIEST_YEAR = 1820
 
@@ -179,6 +182,10 @@ def run() -> None:
     ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
     tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al", safe_types=False)
 
+    # Load Ireland population dataset, and read its main table.
+    ds_population_ireland = paths.load_dataset("population_ireland")
+    tb_population_ireland = ds_population_ireland.read("population_ireland", safe_types=True)
+
     # DEBUG: Filter to subset of countries for profiling
     if PROFILING_MODE:
         tb_thousand_bins = tb_thousand_bins.loc[tb_thousand_bins["country"].isin(PROFILING_COUNTRIES)].reset_index(
@@ -228,12 +235,17 @@ def run() -> None:
         ]["year"].tolist()
     )
 
+    # Prepare population patch
+    tb_population_patch = tb_population_ireland[tb_population_ireland["sex"] == "Both sexes"].reset_index(drop=True)
+
     ###############################################################################
     # 1. KEEPING INEQUALITY CONSTANT
     ###############################################################################
 
     # Perform backward extrapolation
-    tb_thousand_bins_constant_inequality = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
+    tb_thousand_bins_constant_inequality = extrapolate_backwards(
+        tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, tb_population_patch=tb_population_patch
+    )
 
     # Calculate poverty measures
     with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
@@ -272,11 +284,17 @@ def run() -> None:
 
     # Create 1000 bins from inter/extrapolated means and original Ginis, except for years between the earliest year and first year with data
     tb_thousand_bins_interpolated_quantiles = expand_means_and_ginis_to_thousand_bins(
-        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini_original"
+        tb_gini_mean=tb_gini_mean,
+        tb_thousand_bins=tb_thousand_bins,
+        tb_population_patch=tb_population_patch,
+        mean_column="mean",
+        gini_column="gini_original",
     )
 
     tb_thousand_bins_interpolated_quantiles = interpolate_quantiles_in_thousand_bins(
-        tb_thousand_bins_interpolated_quantiles=tb_thousand_bins_interpolated_quantiles, tb_gini_mean=tb_gini_mean
+        tb_thousand_bins_interpolated_quantiles=tb_thousand_bins_interpolated_quantiles,
+        tb_gini_mean=tb_gini_mean,
+        tb_population_patch=tb_population_patch,
     )
 
     # Calculate poverty measures
@@ -299,13 +317,18 @@ def run() -> None:
 
     # Create 1000 bins from mean and gini data
     tb_thousand_bins_interpolated_ginis = expand_means_and_ginis_to_thousand_bins(
-        tb_gini_mean=tb_gini_mean, tb_thousand_bins=tb_thousand_bins, mean_column="mean", gini_column="gini"
+        tb_gini_mean=tb_gini_mean,
+        tb_thousand_bins=tb_thousand_bins,
+        tb_population_patch=tb_population_patch,
+        mean_column="mean",
+        gini_column="gini",
     )
 
     # Create another 1000 bins table, but this time creating the whole series from the mean and interpolated gini
     tb_thousand_bins_interpolated_ginis_all_lognormal = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
+        tb_population_patch=tb_population_patch,
         mean_column="mean",
         gini_column="gini",
         keep_original_thousand_bins=False,
@@ -339,7 +362,9 @@ def run() -> None:
     # EDIT TABLE WITH GINI AND MEAN VALUES
     ###############################################################################
 
-    tb_gini_mean = prepare_and_aggregate_gini_mean_data(tb=tb_gini_mean, tb_maddison=tb_maddison)
+    tb_gini_mean = prepare_and_aggregate_gini_mean_data(
+        tb=tb_gini_mean, tb_maddison=tb_maddison, tb_population_patch=tb_population_patch
+    )
 
     ###############################################################################
     # FORMAT AND SAVE DATA
@@ -643,7 +668,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     return tb_gdp
 
 
-def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
+def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_population_patch: Table) -> Table:
     """
     Extrapolate income distributions backwards from 1990 to 1820, using the cumulative GDP growth factors in the 1000-binned income distribution data.
     """
@@ -688,12 +713,14 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     )
 
     # Add a column with population data
-    tb_thousand_bins_to_extrapolate = paths.regions.add_population(
+    tb_thousand_bins_to_extrapolate = add_population_with_ireland_patch(
         tb=tb_thousand_bins_to_extrapolate,
         population_col="pop",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+        tb_population_patch=tb_population_patch,
+        patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
     # Divide pop into quantiles (1000 quantiles)
@@ -741,7 +768,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
 
             # Calculate and log population impact
             affected_countries = set(unexpected_missing["country"].unique())
-            calculate_population_of_missing_countries(affected_countries)
+            calculate_population_of_a_group_of_countries(affected_countries)
 
             # Raise assertion error
             raise AssertionError(
@@ -859,19 +886,19 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     return tb_poverty
 
 
-def calculate_population_of_missing_countries(missing_countries: Set[str]) -> None:
+def calculate_population_of_a_group_of_countries(countries: Set[str]) -> None:
     """
-    Calculate population estimates for countries missing in the main population dataset, and what do they represent as a share of the world population.
+    Calculate population estimates for a group of countries in the main population dataset, and what do they represent as a share of the world population.
     """
-    # Create table with column country as missing_countries
-    tb_population_missing = Table(pd.DataFrame(data={"country": list(missing_countries)}))
+    # Create table with column country as list of countries
+    tb_population_countries = Table(pd.DataFrame(data={"country": list(countries)}))
 
     # Assign column year as CURRENT_YEAR
-    tb_population_missing["year"] = CURRENT_YEAR
+    tb_population_countries["year"] = CURRENT_YEAR
 
     # Add population column using paths.regions.add_population
-    tb_population_missing = paths.regions.add_population(
-        tb=tb_population_missing,
+    tb_population_countries = paths.regions.add_population(
+        tb=tb_population_countries,
         population_col="population",
         warn_on_missing_countries=False,
         interpolate_missing_population=True,
@@ -888,17 +915,19 @@ def calculate_population_of_missing_countries(missing_countries: Set[str]) -> No
     world_population = tb_world_population["world_population"].item()
 
     # Calculate population share of world population
-    tb_population_missing["population_share_of_world"] = tb_population_missing["population"] / world_population * 100
+    tb_population_countries["population_share_of_world"] = (
+        tb_population_countries["population"] / world_population * 100
+    )
 
     # Aggregate population and population_share_of_world
-    tb_population_missing = tb_population_missing.groupby("year").sum().reset_index()
+    tb_population_countries = tb_population_countries.groupby("year").sum().reset_index()
 
-    # Define missing_population
-    missing_population = tb_population_missing["population"].item()
-    missing_population_share = tb_population_missing["population_share_of_world"].item()
+    # Define total_population
+    total_population = tb_population_countries["population"].item()
+    total_population_share = tb_population_countries["population_share_of_world"].item()
 
     log.warning(
-        f"This represents {int(missing_population):,} people in {CURRENT_YEAR} ({missing_population_share:.2f}% of the world population)."
+        f"This represents {int(total_population):,} people in {CURRENT_YEAR} ({total_population_share:.2f}% of the world population)."
     )
 
     return None
@@ -1366,6 +1395,11 @@ def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
     Add Gini coefficients from Van Zanden et al. (2014) to the PIP data table for historical comparison.
     """
 
+    # Calculate the total population that the countries in tb_van_zanden represent in CURRENT_YEAR
+    if SHOW_WARNINGS:
+        log.info("Calculating population represented by Van Zanden et al. (2014) countries:")
+        calculate_population_of_a_group_of_countries(set(tb_van_zanden["country"].unique()))
+
     # Merge tb_pip with tb_van_zanden on country and year
     tb = pr.merge(
         tb_pip,
@@ -1400,7 +1434,7 @@ def compare_countries_available_in_two_tables(
                 f"The following {len(missing_in_tb_2)} countries are in '{name_tb_1}' but missing in '{name_tb_2}': "
                 f"{sorted_missing}"
             )
-            calculate_population_of_missing_countries(missing_in_tb_2)
+            calculate_population_of_a_group_of_countries(missing_in_tb_2)
 
         if len(missing_in_tb_1) > 0:
             sorted_missing = ", ".join(sorted(missing_in_tb_1))
@@ -1470,7 +1504,7 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
             .min()
             .reset_index()
             .rename(columns={"year": "earliest_year_mean"})
-            .sort_values("earliest_year_mean", ascending=False)
+            .sort_values("earliest_year_mean", ascending=True)
         )
 
         # Create column current_year
@@ -1515,7 +1549,7 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
             .min()
             .reset_index()
             .rename(columns={"year": "earliest_year_gini"})
-            .sort_values("earliest_year_gini", ascending=False)
+            .sort_values("earliest_year_gini", ascending=True)
         )
         # Create column current_year
         earliest_gini["current_year"] = CURRENT_YEAR
@@ -1756,6 +1790,7 @@ def select_growth_factor_for_mean(row):
 def expand_means_and_ginis_to_thousand_bins(
     tb_gini_mean: Table,
     tb_thousand_bins: Table,
+    tb_population_patch: Table,
     mean_column: str,
     gini_column: str,
     keep_original_thousand_bins: bool = KEEP_ORIGINAL_THOUSAND_BINS,
@@ -1844,12 +1879,14 @@ def expand_means_and_ginis_to_thousand_bins(
     tb_expanded["avg"] = tb_expanded["avg"].astype("Float32")
 
     # Add population
-    tb_expanded = paths.regions.add_population(
+    tb_expanded = add_population_with_ireland_patch(
         tb=tb_expanded,
         population_col="pop",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+        tb_population_patch=tb_population_patch,
+        patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
     # Divide population equally among 1000 quantiles and convert to Float32 to save memory
@@ -2041,7 +2078,7 @@ def gini_to_sigma(gini_values: np.ndarray) -> np.ndarray:
 
 
 def interpolate_quantiles_in_thousand_bins(
-    tb_thousand_bins_interpolated_quantiles: Table, tb_gini_mean: Table
+    tb_thousand_bins_interpolated_quantiles: Table, tb_gini_mean: Table, tb_population_patch: Table
 ) -> Table:
     """
     Interpolate missing values in the 1000-binned income distribution table.
@@ -2107,12 +2144,14 @@ def interpolate_quantiles_in_thousand_bins(
         tb_expanded["avg"] = safe_exp(tb_expanded["avg"])
 
     # Add population
-    tb_expanded = paths.regions.add_population(
+    tb_expanded = add_population_with_ireland_patch(
         tb=tb_expanded,
         population_col="pop",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+        tb_population_patch=tb_population_patch,
+        patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
     # Divide population equally among 1000 quantiles
@@ -2296,7 +2335,7 @@ def compare_headcount_ratios_across_methods(
     return tb_comparison
 
 
-def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table:
+def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table, tb_population_patch: Table) -> Table:
     """
     Prepare historical Gini and mean data to create a long-run mean chart.
     Also, create aggregations at world and region levels.
@@ -2305,12 +2344,14 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table
     tb_gini_mean = tb[["country", "year", "region", "mean", "gini"]].copy()
 
     # Add population
-    tb_gini_mean = paths.regions.add_population(
+    tb_gini_mean = add_population_with_ireland_patch(
         tb=tb_gini_mean,
         population_col="population",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+        tb_population_patch=tb_population_patch,
+        patch_ireland=PATCH_IRELAND_POPULATION,
     )
 
     # Calculate total income for each country-year
@@ -2418,3 +2459,113 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table) -> Table
     tb_gini_mean = tb_gini_mean.drop(columns=["gdp_per_capita"], errors="raise")
 
     return tb_gini_mean
+
+
+def add_population_with_ireland_patch(
+    tb: Table,
+    population_col: str,
+    warn_on_missing_countries: bool,
+    interpolate_missing_population: bool,
+    expected_countries_without_population: list,
+    tb_population_patch: Table,
+    patch_ireland: bool,
+) -> Table:
+    """
+    Add population to the table, with a patch for Ireland.
+
+    Ireland's population data is missing for years before 1950, so we manually add it here.
+    """
+
+    tb = paths.regions.add_population(
+        tb=tb,
+        population_col=population_col,
+        warn_on_missing_countries=warn_on_missing_countries,
+        interpolate_missing_population=interpolate_missing_population,
+        expected_countries_without_population=expected_countries_without_population,
+    )
+
+    # See if Ireland is in tb
+    if patch_ireland and "Ireland" in tb["country"].unique():
+        # Filter tb for Ireland
+        tb_ireland = tb[tb["country"] == "Ireland"].copy()
+
+        if tb_ireland["year"].min() < 1950:
+            # Drop Ireland from tb
+            tb = tb[tb["country"] != "Ireland"].reset_index(drop=True)
+
+            # Make population_col in tb_ireland NaN for years before 1950
+            tb_ireland.loc[tb_ireland["year"] < 1950, population_col] = pd.NA
+
+            # Filter tb_population_patch for Ireland
+            tb_population_patch_ireland = tb_population_patch[
+                (tb_population_patch["country"] == "Ireland") & (tb_population_patch["year"] < 1950)
+            ][["country", "year", "population"]].copy()
+
+            # Rename population column to population_col
+            tb_population_patch_ireland = tb_population_patch_ireland.rename(
+                columns={"population": population_col}, errors="raise"
+            )
+
+            # Merge population for Ireland into tb
+            tb_ireland = pr.merge(
+                tb_ireland,
+                tb_population_patch_ireland,
+                on=["country", "year"],
+                how="left",
+                suffixes=("", "_ireland_patch"),
+            )
+
+            # Where population is NaN and population_maddison is not NaN, fill population with population from Maddison
+            tb_ireland.loc[
+                tb_ireland[population_col].isna() & tb_ireland[f"{population_col}_ireland_patch"].notna(),
+                population_col,
+            ] = tb_ireland[f"{population_col}_ireland_patch"]
+
+            # Drop population_patch column
+            tb_ireland = tb_ireland.drop(columns=[f"{population_col}_ireland_patch"], errors="raise")
+
+            # Interpolate Ireland population if still missing
+            if tb_ireland[population_col].isna().any():
+                # Make tb_ireland_to_interpolate, a table with only country, year, and population_col, dropping duplicates
+                tb_ireland_to_interpolate = tb_ireland[["country", "year", population_col]].drop_duplicates().copy()
+
+                # Drop population_col in tb_reland
+                tb_ireland = tb_ireland.drop(columns=[population_col], errors="raise")
+
+                # Interpolate
+                tb_ireland_to_interpolate = interpolate_table(
+                    tb_ireland_to_interpolate,
+                    entity_col="country",
+                    time_col="year",
+                    time_mode="full_range",
+                    method="linear",
+                    limit_direction="both",
+                    limit_area="inside",
+                )
+
+                # Extrapolate up until 1820
+                tb_ireland_to_interpolate = interpolate_table(
+                    tb_ireland_to_interpolate,
+                    entity_col="country",
+                    time_col="year",
+                    time_mode="full_range",
+                    method="linear",
+                    limit_direction="both",
+                    limit_area="outside",
+                )
+
+                # Merge interpolated population back into tb_ireland
+                tb_ireland = pr.merge(
+                    tb_ireland,
+                    tb_ireland_to_interpolate,
+                    on=["country", "year"],
+                    how="left",
+                )
+
+            # Concatenate Ireland back to tb
+            tb = pr.concat([tb, tb_ireland], ignore_index=True)
+
+            # Restore categorical dtype for country column after concat
+            tb["country"] = tb["country"].astype("category")
+
+    return tb
