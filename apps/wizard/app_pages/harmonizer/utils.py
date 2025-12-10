@@ -193,8 +193,6 @@ def show_manual_mapping(harmonizer, entity, i, border=False):
     if not value_ignore:
         st.session_state.entity_mapping[entity] = value_selected
 
-
-@st.fragment
 def show_submit_section(path_export: str):
     if ENV_IS_REMOTE:
         # Submit button
@@ -213,7 +211,8 @@ def show_submit_section(path_export: str):
             label="Export mapping",
             type="primary",
         )
-    return export_btn
+
+    return export_btn, path_export
 
 
 def render(step_uri):
@@ -302,7 +301,7 @@ def render(step_uri):
 
                     # 3/ PATH to export & export button
                     path_export = cast(str, harmonizer.output_file)
-                    export_btn = show_submit_section(path_export)
+                    export_btn, path_export = show_submit_section(path_export)
 
                 ####################################################################################################
                 # EXPORT
