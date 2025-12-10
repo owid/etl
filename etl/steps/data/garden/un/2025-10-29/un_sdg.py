@@ -42,6 +42,8 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    tb = fix_informality_indicators(tb)
+
     tb = duplicate_latin_america_rows(tb)
     # Create a new table with the processed data.
     all_tables = create_tables(tb)
@@ -437,5 +439,18 @@ def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
 
     if not df_lac.empty:
         df = pd.concat([df, df_lac], ignore_index=True)
+
+    return df
+
+
+def fix_informality_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fix data quality issues for informality indicators (8.3.1).
+    This is for now a jump in the series for Chile in 2017 that needs to be fixed.
+    We make the data before 2018 null.
+    """
+
+    mask = (df["indicator"] == "8.3.1") & (df["country"] == "Chile") & (df["year"] < 2018)
+    df.loc[mask, "value"] = pd.NA
 
     return df
