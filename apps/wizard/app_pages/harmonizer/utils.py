@@ -193,6 +193,7 @@ def show_manual_mapping(harmonizer, entity, i, border=False):
     if not value_ignore:
         st.session_state.entity_mapping[entity] = value_selected
 
+
 def show_submit_section(path_export: str):
     if ENV_IS_REMOTE:
         # Submit button
