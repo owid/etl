@@ -7,6 +7,8 @@ definitions:
     processing_level: major
   footnote_intervals: &footnote_intervals |-
     The UN FAO publishes forest data as the annual average on 10- or 5-year timescales. The following year allocation applies: "1990" is the annual average from 1990 to 2000; "2000" for 2000 to 2010; "2010" for 2010 to 2015; "2015" for 2015 to 2020, and "2020" for 2020 to 2025.
+  footnote_average_change: &footnote_average_change |-
+    This data is calculated as the average annual change based on either ten- or five-year changes in forest area. The exact change may differ from year to year over this period.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -58,6 +60,9 @@ tables:
         unit: hectares
         short_unit: ha
         description_processing: Annual forest area values are linearly interpolated for missing years, based on available data points from the FAO Forest Resources Assessment (FRA) reports.
+        presentation:
+          grapher_config:
+            note: *footnote_average_change
       forestarea_share_global:
         title: Share of global forest area
         description_short: Share of global forest area represents the proportion of a country's forest area relative to the total global forest area.
@@ -70,6 +75,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_processing: Annual forest area values are linearly interpolated for missing years, based on available data points from the FAO Forest Resources Assessment (FRA) reports.
+        presentation:
+          grapher_config:
+            note: *footnote_average_change
       annual_deforestation_share_forest_area:
         title: Annual deforestation as share of forest area
         description_short: Annual deforestation as share of forest area represents the yearly percentage of forest area lost due to deforestation relative to the total forest area.
