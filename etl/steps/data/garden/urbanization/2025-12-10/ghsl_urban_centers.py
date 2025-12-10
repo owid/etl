@@ -44,7 +44,6 @@ def run() -> None:
     #
     # Process data.
     #
-
     tb = paths.regions.harmonize_names(tb)
 
     # The meadow step already has capitals and top 100 cities merged.

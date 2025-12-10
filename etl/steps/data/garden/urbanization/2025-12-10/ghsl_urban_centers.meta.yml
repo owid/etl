@@ -210,6 +210,108 @@ definitions:
       Zambia: Lusaka
       Zimbabwe: Harare
 
+  entityAnnotationsMapTop100: &entityAnnotationsMapTop100 |-
+      Abidjan: Côte d'Ivoire
+      Accra: Ghana
+      Addis Ababa: Ethiopia
+      Ahmedabad: India
+      Alexandria: Egypt
+      Amman: Jordan
+      Baghdad: Iraq
+      Bandung: Indonesia
+      Bangkok: Thailand
+      Beijing: China
+      Belo Horizonte: Brazil
+      Bengaluru: India
+      Bogota: Colombia
+      Buenos Aires: Argentina
+      Cairo: Egypt
+      Cape Town: South Africa
+      Casablanca: Morocco
+      Chattogram: Bangladesh
+      Chennai: India
+      Chengdu: China
+      Chaozhou: China
+      Chongqing: China
+      Colombo: Sri Lanka
+      Dar es Salaam: Tanzania
+      Dhaka: Bangladesh
+      Dubai: United Arab Emirates
+      Faisalabad: Pakistan
+      Guangzhou: China
+      Hajipur: India
+      Hangzhou: China
+      Hanoi: Vietnam
+      Harbin: China
+      Hefei: China
+      Ho Chi Minh City: Vietnam
+      Hong Kong: China
+      Hyderabad: India
+      Islamabad: Pakistan
+      Istanbul: Turkey
+      Jakarta: Indonesia
+      Johannesburg: South Africa
+      Kabul: Afghanistan
+      Kampala: Uganda
+      Kano: Nigeria
+      Kanpur: India
+      Karachi: Pakistan
+      Khartoum: Sudan
+      Kinshasa: Democratic Republic of Congo
+      Kochi: India
+      Kolkata: India
+      Kozhikode: India
+      Kuala Lumpur: Malaysia
+      Lagos: Nigeria
+      Lahore: Pakistan
+      Lima: Peru
+      London: United Kingdom
+      Los Angeles: United States
+      Luanda: Angola
+      Lucknow: India
+      Madrid: Spain
+      Manila: Philippines
+      Mashhad: Iran
+      Medan: Indonesia
+      Mexico City: Mexico
+      Moscow: Russia
+      Mumbai: India
+      Nagoya: Japan
+      Nairobi: Kenya
+      Nanjing: China
+      New Delhi: India
+      New York City: United States
+      Onitsha: Nigeria
+      Osaka: Japan
+      Paris: France
+      Pune: India
+      Riyadh: Saudi Arabia
+      Rio de Janeiro: Brazil
+      Saint Petersburg: Russia
+      Santiago: Chile
+      Santo Domingo: Dominican Republic
+      Sao Paulo: Brazil
+      Seoul: South Korea
+      Shanghai: China
+      Shenyang: China
+      Shenzhen: China
+      Singapore: Singapore
+      Surat: India
+      Surabaya: Indonesia
+      Suzhou: China
+      Sydney: Australia
+      Taipei: Taiwan
+      Tehran: Iran
+      Tianjin: China
+      Tokyo: Japan
+      Toronto: Canada
+      Wenzhou: China
+      Wuhan: China
+      Xi'an: China
+      Yangon: Myanmar
+      Yaounde: Cameroon
+      Zhengzhou: China
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -272,6 +374,7 @@ tables:
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
         display:
+          entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
 
      urban_density_top_100_estimates:
@@ -279,15 +382,20 @@ tables:
         unit: 'people/km²'
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
+        display:
+          entityAnnotationsMap: *entityAnnotationsMapTop100
 
      urban_pop_top_100_estimates:
         title: Population of the top 100 most populous cities
         unit: 'people'
         description_short: *desc_short_pop_top_100
+        display:
+          entityAnnotationsMap: *entityAnnotationsMapTop100
 
      urban_pop_top_100_projections:
         title: Population of the top 100 most populous cities (projected)
         unit: 'people'
         description_short: *desc_short_pop_top_100
         display:
+          entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
