@@ -1058,6 +1058,10 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
 
     This function matches on chart IDs to identify truly deleted charts,
     filtering out charts created in target after staging creation time.
+
+    Note: A chart is considered deleted only if its ID doesn't exist at all on staging.
+    Charts that exist on staging but with NULL slug (unpublished) are NOT deleted,
+    even if they have a slug on production (published after staging was created).
     """
     staging_creation_time = get_staging_creation_time(source_session)
 
@@ -1071,12 +1075,11 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
     result = target_session.execute(query, {"staging_creation_time": staging_creation_time}).fetchall()
     target_charts_pre_staging = {row[0]: row[1] for row in result}  # id -> slug mapping
 
-    # Get chart IDs from source
+    # Get ALL chart IDs from source (regardless of slug status)
+    # A chart is only truly deleted if the ID doesn't exist at all on staging
     source_query = text("""
     SELECT c.id
     FROM charts c
-    JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL
     """)
     source_result = source_session.execute(source_query).fetchall()
     source_chart_ids = set(row[0] for row in source_result)
