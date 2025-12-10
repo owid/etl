@@ -63,9 +63,9 @@ tables:
           zeroDay: '1949-01-01'
           yearIsDay: true
 
-      training_dataset_size__gradients:
+      training_dataset_size__datapoints:
         title: Training dataset size
-        unit: 'gradients'
+        unit: 'datapoints'
         description_short: The number of examples provided to train an AI model. Typically, more data results in a more comprehensive understanding by the model.
         description_key:
           - Training data size refers to the volume of data employed to train an artificial intelligence (AI) model effectively. It's a representation of the number of examples that the model learns from during its training process. It is a fundamental measure of the scope of the data used in the model's learning phase.
