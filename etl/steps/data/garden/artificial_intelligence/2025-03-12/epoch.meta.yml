@@ -51,7 +51,7 @@ tables:
       training_dataset_size__gradients:
         title: Training dataset size
         unit: 'unique datapoints'
-        description_short: The total number of distinct data points in the dataset that the model was trained on. Typically, more data results in a more comprehensive understanding by the model.
+        description_short: The number of unique data points used to train the model. Each domain has a specific data point unit; for example, for vision it is images, for language it is words, and for games it is timesteps. This means systems can only be compared directly within the same domain.
         description_key:
          - Training data size measures the volume of unique examples used to train an AI model during its learning phase. It represents the total number of distinct data points the model learns from, counted only once regardless of how many times they're seen during training.
          - To understand this concept, imagine teaching someone to identify different bird species. Each unique bird photo you show them is one piece of training data. If you show 100 different photos, your training data size is 100, even if you review those same photos multiple times.
