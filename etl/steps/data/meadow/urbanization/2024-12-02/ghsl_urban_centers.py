@@ -100,6 +100,7 @@ def run(dest_dir: str) -> None:
 
     for col in ["urban_pop", "urban_density_top_100", "urban_pop_top_100"]:
         tb[col].metadata.origins = tb["country"].metadata.origins
+    print(tb)
 
     tb = tb.format(["country", "year"])
 

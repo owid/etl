@@ -25,7 +25,7 @@ REGIONS = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -44,7 +44,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    tb = tb.reset_index()
     tb = paths.regions.harmonize_names(tb)
 
     # The meadow step already has capitals and top 100 cities merged.

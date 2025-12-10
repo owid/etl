@@ -36,7 +36,7 @@ def run() -> None:
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
     # Read table from meadow dataset.
-    tb = ds_meadow["ghsl_countries"].reset_index()
+    tb = ds_meadow.read("ghsl_countries")
 
     #
     # Process data.
@@ -93,7 +93,6 @@ def run() -> None:
 
     # Drop the original indicator column.
     tb = tb.drop(columns=["indicator"])
-    print(tb["metric"].unique())  # --- IGNORE ---
 
     # Format the table.
     tb = tb.format(["country", "year", "metric", "location_type", "data_type"])
