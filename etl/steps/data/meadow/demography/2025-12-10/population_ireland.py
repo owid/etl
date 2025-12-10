@@ -6,7 +6,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Define columns to keep, and their new names
-COLUMNS_TO_KEEP = {"Sex": "sex", "CensusYear": "year", "VALUE": "population"}
+COLUMNS_TO_KEEP = {"Year": "year", "Total Population": "Both sexes", "Males": "Males", "Females": "Females"}
 
 
 def run() -> None:
@@ -33,6 +33,9 @@ def run() -> None:
 
     # Add country column
     tb["country"] = "Ireland"
+
+    # Make table long
+    tb = tb.melt(id_vars=["country", "year"], var_name="sex", value_name="population")
 
     # Improve tables format.
     tables = [tb.format(["country", "sex", "year"])]
