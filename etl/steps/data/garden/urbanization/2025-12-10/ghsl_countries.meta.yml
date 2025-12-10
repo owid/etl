@@ -154,8 +154,6 @@ tables:
             km²
             <% elif metric == 'share' or metric == 'popshare' %>
             %
-            <% elif metric == 'density' %>
-            people/km²
             <%- endif -%>
           description_processing:
             <% if metric == 'share' or metric == 'popshare' %>
