@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Population in the State of Ireland at each census since 1841"
+    description: |-
+      Population of the Republic of Ireland, combining census data from the Republic of Ireland (1926-2006) and from the United Kingdom of Great Britain and Ireland (1841-1911), only for the counties of the Republic of Ireland. 
+    date_published: "2020-06-01"
+
+    # Citation
+    producer: Central Statistics Office, Ireland
+    citation_full: |-
+      Central Statistics Office, Ireland (2007). Census 2006. Principal Demographic Results. Table 1 - CDR01. Population in the State at each census since 1841 classified by sex. Updated on 01-06-2020.
+
+    # Files
+    url_main: https://www.cso.ie/en/census/census2006reports/census2006principaldemographicresults
+    url_download: https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/CDR01/CSV/1.0/en
+    date_accessed: '2025-12-10'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/
+outs:
+  - md5: 306d25c842601df2fca9fd1a249ee8fa
+    size: 6627
+    path: population_ireland.csv

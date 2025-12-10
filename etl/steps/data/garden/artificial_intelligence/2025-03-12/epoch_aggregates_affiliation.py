@@ -30,7 +30,7 @@ def run() -> None:
     unused_columns = [
         "days_since_1949",
         "parameters",
-        "training_dataset_size__datapoints",
+        "training_dataset_size__gradients",
         "domain",
         "training_computation_petaflop",
     ]
