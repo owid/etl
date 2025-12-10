@@ -28,7 +28,7 @@ def run() -> None:
     # For visualization purposes I am adding the rows with the maximum values of compute, data, and parameters in each year to the table as a separate "model". I don't want to do this in garden as it'd affect other datasets that depend on this one.
     columns = {
         "training_computation_petaflop": "compute",
-        "training_dataset_size__datapoints": "data",
+        "training_dataset_size__gradients": "data",
         "parameters": "parameters",
     }
     # Find maximum values for a given column (compute, data, params) per year, label them, and add summary rows.
