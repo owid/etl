@@ -75,3 +75,25 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2024-12-02/ghsl_urban_centers:
     - data://garden/urbanization/2024-12-02/ghsl_urban_centers
+
+  #
+  # GHSL countries
+  #
+  data://meadow/urbanization/2025-12-10/ghsl_countries:
+    - snapshot://urbanization/2025-12-10/ghsl_countries.xlsx
+  data://garden/urbanization/2025-12-10/ghsl_countries:
+    - data://meadow/urbanization/2025-12-10/ghsl_countries
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/urbanization/2025-12-10/ghsl_countries:
+    - data://garden/urbanization/2025-12-10/ghsl_countries
+
+  # GHSL urban centers
+  data://meadow/urbanization/2025-12-10/ghsl_urban_centers:
+    - snapshot://urbanization/2025-12-10/ghsl_urban_centers.xlsx
+  data://garden/urbanization/2025-12-10/ghsl_urban_centers:
+    - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/urbanization/2025-12-10/ghsl_urban_centers:
+    - data://garden/urbanization/2025-12-10/ghsl_urban_centers
