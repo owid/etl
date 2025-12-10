@@ -255,4 +255,6 @@ steps:
   data://grapher/fasttrack/latest/religiosity_united_states_gallup: !!set
     ? snapshot://fasttrack/latest/religiosity_united_states_gallup.csv
   data-private://grapher/fasttrack/latest/cleaned_traced_news_sentiment: !!set
-    snapshot-private://fasttrack/latest/cleaned_traced_news_sentiment.csv:
+    ? snapshot-private://fasttrack/latest/cleaned_traced_news_sentiment.csv
+  data-private://grapher/fasttrack/latest/end_of_slavery: !!set
+    snapshot-private://fasttrack/latest/end_of_slavery.csv:
