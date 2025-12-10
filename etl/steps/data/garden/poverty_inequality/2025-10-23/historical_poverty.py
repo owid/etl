@@ -244,7 +244,7 @@ def run() -> None:
 
     # Perform backward extrapolation
     tb_thousand_bins_constant_inequality = extrapolate_backwards(
-        tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, tb_population_patch=tb_maddison
+        tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, tb_population_patch=tb_population_patch
     )
 
     # Calculate poverty measures
@@ -286,7 +286,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_quantiles = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
-        tb_population_patch=tb_maddison,
+        tb_population_patch=tb_population_patch,
         mean_column="mean",
         gini_column="gini_original",
     )
@@ -294,7 +294,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_quantiles = interpolate_quantiles_in_thousand_bins(
         tb_thousand_bins_interpolated_quantiles=tb_thousand_bins_interpolated_quantiles,
         tb_gini_mean=tb_gini_mean,
-        tb_population_patch=tb_maddison,
+        tb_population_patch=tb_population_patch,
     )
 
     # Calculate poverty measures
@@ -319,7 +319,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_ginis = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
-        tb_population_patch=tb_maddison,
+        tb_population_patch=tb_population_patch,
         mean_column="mean",
         gini_column="gini",
     )
@@ -328,7 +328,7 @@ def run() -> None:
     tb_thousand_bins_interpolated_ginis_all_lognormal = expand_means_and_ginis_to_thousand_bins(
         tb_gini_mean=tb_gini_mean,
         tb_thousand_bins=tb_thousand_bins,
-        tb_population_patch=tb_maddison,
+        tb_population_patch=tb_population_patch,
         mean_column="mean",
         gini_column="gini",
         keep_original_thousand_bins=False,
@@ -363,7 +363,7 @@ def run() -> None:
     ###############################################################################
 
     tb_gini_mean = prepare_and_aggregate_gini_mean_data(
-        tb=tb_gini_mean, tb_maddison=tb_maddison, tb_population_patch=tb_maddison
+        tb=tb_gini_mean, tb_maddison=tb_maddison, tb_population_patch=tb_population_patch
     )
 
     ###############################################################################
@@ -2523,6 +2523,8 @@ def add_population_with_ireland_patch(
 
             # Drop population_patch column
             tb_ireland = tb_ireland.drop(columns=[f"{population_col}_ireland_patch"], errors="raise")
+
+            print(tb_ireland.head(50))
 
             # Interpolate Ireland population if still missing
             if tb_ireland[population_col].isna().any():
