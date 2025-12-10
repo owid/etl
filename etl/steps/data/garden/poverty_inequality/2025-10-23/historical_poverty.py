@@ -2524,12 +2524,17 @@ def add_population_with_ireland_patch(
             # Drop population_patch column
             tb_ireland = tb_ireland.drop(columns=[f"{population_col}_ireland_patch"], errors="raise")
 
-            print(tb_ireland.head(50))
-
             # Interpolate Ireland population if still missing
             if tb_ireland[population_col].isna().any():
-                tb_ireland = interpolate_table(
-                    tb_ireland,
+                # Make tb_ireland_to_interpolate, a table with only country, year, and population_col, dropping duplicates
+                tb_ireland_to_interpolate = tb_ireland[["country", "year", population_col]].drop_duplicates().copy()
+
+                # Drop population_col in tb_reland
+                tb_ireland = tb_ireland.drop(columns=[population_col], errors="raise")
+
+                # Interpolate
+                tb_ireland_to_interpolate = interpolate_table(
+                    tb_ireland_to_interpolate,
                     entity_col="country",
                     time_col="year",
                     time_mode="full_range",
@@ -2538,7 +2543,29 @@ def add_population_with_ireland_patch(
                     limit_area="inside",
                 )
 
+                # Extrapolate up until 1820
+                tb_ireland_to_interpolate = interpolate_table(
+                    tb_ireland_to_interpolate,
+                    entity_col="country",
+                    time_col="year",
+                    time_mode="full_range",
+                    method="linear",
+                    limit_direction="both",
+                    limit_area="outside",
+                )
+
+                # Merge interpolated population back into tb_ireland
+                tb_ireland = pr.merge(
+                    tb_ireland,
+                    tb_ireland_to_interpolate,
+                    on=["country", "year"],
+                    how="left",
+                )
+
             # Concatenate Ireland back to tb
             tb = pr.concat([tb, tb_ireland], ignore_index=True)
+
+            # Restore categorical dtype for country column after concat
+            tb["country"] = tb["country"].astype("category")
 
     return tb
