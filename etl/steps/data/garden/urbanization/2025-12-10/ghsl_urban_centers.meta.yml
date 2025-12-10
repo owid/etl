@@ -18,19 +18,10 @@ definitions:
     The number of people per km² of land area for the country's capital city.
   desc_short_density_top_100: &desc_short_density_top_100 |-
     The number of people per km² of land area for cities ranked among the top 100 most populous in 2020.
-
   desc_short_pop_capital: &desc_short_pop_capital |-
     The total number of people living in the country's capital city.
   desc_short_pop_top_100: &desc_short_pop_top_100 |-
     The total number of people living in cities ranked among the top 100 most populous in 2020.
-  desc_short_pop_1mil: &desc_short_pop_1mil |-
-    The total number of people living in cities with more than 1 million inhabitants.
-
-  desc_short_1m_total : &desc_short_1m_total |-
-    The percentage of the total population living in cities with more than 1 million inhabitants.
-  desc_short_1m_urb: &desc_short_1m_urb |-
-    The percentage of the urban population living in cities with more than 1 million inhabitants.
-
   desc_processing_density:  &desc_processing_density |-
     Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
 
@@ -130,7 +121,7 @@ definitions:
       Luxembourg: Luxembourg
       Madagascar: Antananarivo
       Malawi: Lilongwe
-      Malaysia: Kuala Lumpur
+      Malaysia: Putrajaya
       Maldives: Malé
       Mali: Bamako
       Malta: Valletta
@@ -146,7 +137,7 @@ definitions:
       Mexico: Mexico City
       Namibia: Windhoek
       Nepal: Kathmandu
-      Netherlands: Amsterdam
+      Netherlands: The Hague
       New Caledonia: Nouméa
       New Zealand: Wellington
       Nicaragua: Managua
@@ -183,7 +174,7 @@ definitions:
       Slovenia: Ljubljana
       Solomon Islands: Honiara
       Somalia: Mogadishu
-      South Africa: Cape Town
+      South Africa: Pretoria
       South Korea: Seoul
       South Sudan: Juba
       Spain: Madrid
@@ -238,6 +229,9 @@ tables:
         display:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
+        presentation:
+          grapher_config:
+            note: Where a country has multiple capital cities, here we show the population of the administrative capital.
 
      urban_density_projections:
         title: Population density of the capital city (projected)
@@ -247,6 +241,9 @@ tables:
         display:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
+        presentation:
+          grapher_config:
+            note: Where a country has multiple capital cities, here we show the population of the administrative capital.
 
      urban_pop_estimates:
         title: Population of the capital city
@@ -254,6 +251,9 @@ tables:
         description_short: *desc_short_pop_capital
         display:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
+        presentation:
+          grapher_config:
+            note: Where a country has multiple capital cities, here we show the population of the administrative capital.
 
      urban_density_estimates:
         title: Population density of the capital city
@@ -262,6 +262,9 @@ tables:
         description_processing: *desc_processing_density
         display:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
+        presentation:
+          grapher_config:
+            note: Where a country has multiple capital cities, here we show the population of the administrative capital.
 
      urban_density_top_100_projections:
         title: Population density of the top 100 most populous cities (projected)
