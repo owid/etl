@@ -22,6 +22,7 @@ REGIONS = [
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "High-income countries",
+    "World",
 ]
 
 
