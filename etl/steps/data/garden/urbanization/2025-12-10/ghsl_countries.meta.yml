@@ -37,6 +37,8 @@ tables:
             Share of land covered by villages
             <% elif location_type == "rural_total" and metric == 'popshare' and data_type == 'estimates' %>
             Share of population living in villages
+            <% elif location_type == "rural_total" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in villages
 
             <% elif location_type == "urban_centre" and metric == 'area' and data_type == 'estimates' %>
             Land covered by cities
@@ -46,6 +48,8 @@ tables:
             Share of land covered by cities
             <% elif location_type == "urban_centre" and metric == 'popshare' and data_type == 'estimates' %>
             Share of population living in cities
+            <% elif location_type == "urban_centre" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in cities
 
             <% elif location_type == "urban_cluster" and metric == 'area' and data_type == 'estimates' %>
             Land covered by towns
@@ -55,6 +59,8 @@ tables:
             Share of land covered by towns
             <% elif location_type == "urban_cluster" and metric == 'popshare' and data_type == 'estimates' %>
             Share of population living in towns
+            <% elif location_type == "urban_cluster" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in towns
 
             <% elif location_type == "urban_total" and metric == 'area' and data_type == 'estimates' %>
             Land covered by urban areas
@@ -64,6 +70,8 @@ tables:
             Share of land covered by urban areas
             <% elif location_type == "urban_total" and metric == 'popshare' and data_type == 'estimates' %>
             Share of population living in urban areas
+            <% elif location_type == "urban_total" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in urban areas
 
             <% elif location_type == "rural_total" and metric == 'area' and data_type == 'projections' %>
             Projected land covered by villages
@@ -73,6 +81,8 @@ tables:
             Projected share of land covered by villages
             <% elif location_type == "rural_total" and metric == 'popshare' and data_type == 'projections' %>
             Projected share of population living in villages
+            <% elif location_type == "rural_total" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in villages
 
             <% elif location_type == "urban_centre" and metric == 'area' and data_type == 'projections' %>
             Projected land covered by cities
@@ -82,6 +92,8 @@ tables:
             Projected share of land covered by cities
             <% elif location_type == "urban_centre" and metric == 'popshare' and data_type == 'projections' %>
             Projected share of population living in cities
+            <% elif location_type == "urban_centre" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in cities
 
             <% elif location_type == "urban_cluster" and metric == 'area' and data_type == 'projections' %>
             Projected land covered by towns
@@ -91,6 +103,8 @@ tables:
             Projected share of land covered by towns
             <% elif location_type == "urban_cluster" and metric == 'popshare' and data_type == 'projections' %>
             Projected share of population living in towns
+            <% elif location_type == "urban_cluster" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in towns
 
             <% elif location_type == "urban_total" and metric == 'area' and data_type == 'projections' %>
             Projected land covered by urban areas
@@ -100,6 +114,8 @@ tables:
             Projected share of land covered by urban areas
             <% elif location_type == "urban_total" and metric == 'popshare' and data_type == 'projections' %>
             Projected share of population living in urban areas
+            <% elif location_type == "urban_total" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in urban areas
 
             <% elif location_type == "urban_centre" and metric == 'density' and data_type == 'estimates' %>
             Population density in cities
