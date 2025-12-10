@@ -182,6 +182,10 @@ def run() -> None:
     ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
     tb_van_zanden = ds_van_zanden.read("historical_inequality_van_zanden_et_al", safe_types=False)
 
+    # Load Ireland population dataset, and read its main table.
+    ds_population_ireland = paths.load_dataset("population_ireland")
+    tb_population_ireland = ds_population_ireland.read("population_ireland", safe_types=True)
+
     # DEBUG: Filter to subset of countries for profiling
     if PROFILING_MODE:
         tb_thousand_bins = tb_thousand_bins.loc[tb_thousand_bins["country"].isin(PROFILING_COUNTRIES)].reset_index(
@@ -230,6 +234,9 @@ def run() -> None:
             & (tb_maddison["year"] < LATEST_YEAR_PIP_FILLED)
         ]["year"].tolist()
     )
+
+    # Prepare population patch
+    tb_population_patch = tb_population_ireland[tb_population_ireland["sex"] == "Both sexes"].reset_index(drop=True)
 
     ###############################################################################
     # 1. KEEPING INEQUALITY CONSTANT
