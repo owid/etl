@@ -85,14 +85,13 @@ Since then, biofuel production [has increased by ~86%](https://ourworldindata.or
 
 ## How much electricity can be produced by solar PV in that area?
 
-### Our estimate based on typical power densities and IRENA's latest capacity factors
+### Our estimate based on various sources
 
 If we were to produce solar energy on biofuel cropland now, we'd install solar panels with modern, utility-scale capacity factors.
 We can find representative capacity factors in [the latest IRENA's Renewable Power Generation Costs report](https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2025/Jul/IRENA_TEC_RPGC_in_2024_2025.pdf).
 In Table 3.2 they show global weighted average capacity factors (AC/DC) for utility-scale solar PV systems by year of commissioning (page 99).
 We can approximately convert the AC/DC factors to AC/AC by multiplying them by an inverter loading ratio (DC/AC) of 1.25.
 The factors reported for 2024 (and their conversions) are as follows:
-
 - 5th percentile: 11.5% (AC/DC) x 1.25 ~ 14% (DC/DC)
 - Weighted average: 17.4% (AC/DC) x 1.25 ~ 22% (DC/DC)
 - 95th percentile: 22.6% (AC/DC) x 1.25 ~ 28% (DC/DC)
@@ -122,7 +121,15 @@ Upper:
 
 32 · 10⁶ ha x ( 0.7 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 28% of 8760 h / 1 year ) = 55 PWh / year
 
-So, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year, which would be as much as the entire world's annual electricity generation.
+Our fiducial value of 1 GWh / year / ha could be considered conservative, given that:
+- A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
+- The hypothetical transition would take place in the coming years, so, it would be reasonable to expect that efficiencies would improve slightly with respect to the present.
+
+So, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year.
+This is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which is 31 PWh in 2024, according to Ember.
+Currently, ~18 PWh of that electricity comes from fossil fuels, and only ~2 PWh from solar.
+
+Compared to [the ~1.42 PWh](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024) of energy actually produced by biofuels, according to [the Energy Institute's Statistical Review of World Energy](https://www.energyinst.org/statistical-review), using solar farms we could produce ~22 times more energy (in electricity) than growing crops for biofuels.
 
 ### Alternative estimate based on Cerulogy
 
@@ -202,8 +209,7 @@ For an average annual generation for solar PV of 1370 kWh / kW, 38 million ha wo
 The land area of the world is 13,003 million ha [OWID (2019)](https://ourworldindata.org/land-use).
 Hence, our current electricity consumption could be supplied by solar PV covering 0.3% of the available land."
 
-I understand these values refer to DC.
-This translates into:
+If these values refer to DC, we can translate them into:
 
 ( 0.51 MWp / ha ) x ( 1370 MWh / MWp / yr ) x ( 1 GWh / 1000 MWh ) = 0.698 GWh / ha / yr
 
@@ -219,47 +225,25 @@ And this would lead to a total production of:
 
 32 · 10⁶ x ( 1 PWh / 10⁶ GWh ) x ( 0.698 GWh / ha / yr ) = 22 PWh
 
-The power density of 0.41 MW / ha is on the conservative side, and the capacity factor of 20% is just a bit below our previous estimates.
 They say that their values are consistent with NREL's Ong et al. (2013).
-That's a 2013 paper about the US, which may not be a representative estimate of today's global average capacity factor.
+The power density of 0.41 MW / ha is on the low side, and the capacity factor of 20% is just a bit below our fiducial value.
+We consider that these dated US estimates may not be a representative of today's achievable global energy density.
 
-So the LBNL estimate (also based in the US, but from 2021) may be a more appropriate estimate.
+### Other alternative estimates
 
-### Other considerations
+[Victoria et al. (2021)](https://www.cell.com/joule/fulltext/S2542-4351%2821%2900100-8) (in [their supplemental information](https://www.cell.com/cms/10.1016/j.joule.2021.03.005/attachment/c2b79392-88f9-4231-833d-faf1a0a2a125/mmc1.pdf)) concluded that we could power all electricity (27 PWh in 2019) with 38 million hectares of solar PV.
 
-We have estimated that, if we replaced the cropland devoted for biofuels with modern solar panels, we could generate ~32 PWh of electricity per year.
-This is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which is 31 PWh in 2024, according to Ember.
-Currently, ~18 PWh of that electricity comes from fossil fuels, and only ~2 PWh from solar.
+[Nøland et al. (2022)](https://www.nature.com/articles/s41598-022-25341-9) (Table 16) estimated an average annual energy density for utility-scale solar PV of 0.087 ± 0.029 TWh / km2 (and a median of 0.080), based on 17 solar farms in different countries.
+The mean value corresponds to 0.87 GWh / ha / year, which is 13% lower than our fiducial value of energy density.
 
-Compared to [the ~1.42 PWh](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024) of energy actually produced by biofuels, according to [the Energy Institute's Statistical Review of World Energy](https://www.energyinst.org/statistical-review), using solar farms we could produce ~22 times more energy (in electricity) than growing crops for biofuels.
-
-Our fiducial value of 1 GWh / year / ha could be considered conservative, given that:
-- A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
-- The hypothetical transition would take place in the coming years, so, it would be reasonable to expect that efficiencies would improve slightly with respect to the present.
-
-Other previous estimates have come to similar conclusions.
-For example, [Victoria et al. (2021)](https://www.cell.com/joule/fulltext/S2542-4351%2821%2900100-8) (in [their supplemental information](https://www.cell.com/cms/10.1016/j.joule.2021.03.005/attachment/c2b79392-88f9-4231-833d-faf1a0a2a125/mmc1.pdf)) have also concluded that we could power all electricity (27 PWh in 2019) with just 38 million hectares of solar PV.
+[Franz and Dumke (2025)](https://link.springer.com/article/10.1186/s13705-024-00504-w) (Table 6) estimate a mean energy density of 93 kWh per m² per year (and a median of 91), based on 107 free-field PV power plants across Europe from 2006 to 2022.
+The mean value corresponds to 0.91 GWh / ha / year, which is 9% lower than our fiducial value.
 
 We could improve our estimates and add values at the country level.
 Some countries would be more efficient at converting biofuels into solar electricity.
 Even within a country, there would be some hotspots where solar farms could be most effective (e.g. cropland close to transmission lines), as shown in [Sturchio et al. (2025)](https://www.pnas.org/doi/10.1073/pnas.2501605122) for the US.
 Additionally, we could also look into the analogous result using wind instead of solar.
 But those improvements fell out of the scope of this analysis.
-
-#### TODO: Additional sources to acknowledge and compare with
-
-Nøland et al. (2022) [estimate around](https://www.nature.com/articles/s41598-022-25341-9) 1 hectare per GWh per year.
-This is from Table 1, which gives a value of 1 TWh per km².
-
-Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022).
-Spatial energy density of large-scale electricity generation from power sources worldwide.
-Scientific Reports, 12(1), 21280.
-
-Franz et al. (2025) [assume](https://link.springer.com/article/10.1186/s13705-024-00504-w) 1.1 hectares per GWh per year.
-
-Franz, M., & Dumke, H. (2025).
-Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
-Energy, Sustainability and Society, 15(1), 12.
 
 ## How much electricity would be needed to power all road transport?
 
@@ -338,6 +322,14 @@ Larger trucks tend to require more electricity per kilometer, and some will have
 However, this will tend to average out across an entire truck fleet.
 
 # Bibliography
+
+Franz, M., & Dumke, H. (2025).
+Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
+Energy, Sustainability and Society, 15(1), 12.
+
+Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022).
+Spatial energy density of large-scale electricity generation from power sources worldwide.
+Scientific Reports, 12(1), 21280.
 
 Popp, J., Kot, S., Lakner, Z., & Oláh, J. (2018).
 Biofuel Use: Peculiarities and Implications.
