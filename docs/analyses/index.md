@@ -25,6 +25,15 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
     [:material-download: Download data (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }
 
+
+!!! note ""
+
+    ## Land use for biofuels vs. solar
+    This document is a technical companion to the article ["***"](***), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic.
+    This technical document serves as a companion to that article, where we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
+
+    [:material-book-open-variant: Methodology](biofuels_land_use/biofuels_land_use.md){ .md-button }
+
 <!-- Keep commented out until the relevant DI is published.
 -->
 <!--

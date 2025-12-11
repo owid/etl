@@ -2,8 +2,10 @@
 
 ## Introduction and summary
 
-This document is a technical companion to the article ["***"](***), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
-In this technical document, we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
+In our article ["***"](***), we explore how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
+
+This technical document serves as a companion to that article.
+Here, we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
 
 In case you are short of time, the main conclusions of this document are as follows:
 
@@ -322,6 +324,8 @@ Larger trucks tend to require more electricity per kilometer, and some will have
 However, this will tend to average out across an entire truck fleet.
 
 # Bibliography
+
+Cerulogy. C. Sandford, C. Malins, J. Phillips (2024). Diverted harvest. Environmental Risk from Growth in International Biofuel Demand.
 
 Franz, M., & Dumke, H. (2025).
 Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
