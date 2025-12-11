@@ -1,5 +1,9 @@
 # Land use for biofuels vs. solar
 
+!!! info ""
+
+    Pablo Rosado, Hannah Ritchie
+
 ## Introduction and summary
 
 In our article ["***"](***), we explore how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
@@ -13,17 +17,17 @@ In case you are short of time, the main conclusions of this document are as foll
 This is similar to [the land area of Cote d'Ivoire](https://ourworldindata.org/grapher/land-area-hectares?country=DEU~CIV~POL), and roughly between Poland's and Germany's.
 With that amount of cropland, biofuels produce 1.42 PWh of energy, according to [the Energy Institute's Statistical Review of World Energy](https://www.energyinst.org/statistical-review).
 
-- If we could hypothetically cover the same area with solar PV panels, under reasonable assumptions on modern solar energy density and capacity factors (from IRENA, LBNL, and other sources), we could produce around 32 PWh of electricity.
+- If we could hypothetically cover the same area with solar PV farms, under reasonable assumptions on modern solar energy density and capacity factors (from IRENA, LBNL, and other sources), we could produce around 32 PWh of electricity.
 This surpasses [the world's total electricity generation in 2024](https://ourworldindata.org/grapher/electricity-prod-source-stacked).
 This also implies that, using the same amount of land, we could produce ~22 times more energy with solar panels than growing crops for biofuels.
 
 - If we replaced vehicles currently powered by biofuels with electric vehicles (under reasonable assumptions on fuel-to-energy ratio for combustion and electric engines), we could power them using just ~2% of that land with solar farms.
 Globally, around 26 PWh of fuel energy is consumed for road transport (e.g. cars and trucks), according to [the IEA's World Energy Outlook](https://www.iea.org/reports/world-energy-outlook-2025).
-If we replaced them with electric vehicles, they'd need less than 10 PWh of electricity, which could be produced with solar panels in just a third of the land currently used for biofuel feedstock.
+If we replaced them with electric vehicles, they'd need less than 10 PWh of electricity, which could be produced with solar panels in less than a third of the land currently used for biofuel feedstock.
 
 ## How much area is globally used for biofuel production?
 
-### Our estimate, based on Cerulogy
+### Our estimate based on Cerulogy
 
 [This report by Cerulogy](https://www.transportenvironment.org/uploads/files/Cerulogy_Diverted-harvest_November_2024.pdf) estimates that there were 61.3 million hectares of feedstock in 2023.
 They then take away a certain percentage of co-products, and estimate an area of 32.0 million hectares of net cropland attributed to biofuel feedstock.
@@ -34,10 +38,8 @@ They do point out this caveat: "Global trade in biofuel feedstocks (rather than 
 
 Note that second generation biofuels (e.g. from municipal solid waste or bagasse) is not included, but in terms of land use it's probably a small fraction compared to first generation.
 
-Their values for feedstock in Table 2 ("Feedstock consumption (Mt) for first-generation biofuels in 2023 for the case study countries") comes from "USDA GAIN reports (Danielson, 2023; Das, 2024; Flach et al., 2023; Florence Mojica-Sevilla, 2024; Hayashi, 2024; Joseph, 2024; Prasertsri, 2024; Rahmanulloh, 2023); EIA data publication (U.S. Energy Information Administration, 2024a); UK RTFO data (UK Department for Transport, 2024c)".
-Those sources are listed in their bibliography, but unfortunately, they are individual PDF reports for different countries, e.g. [India](https://www.fas.usda.gov/data/india-biofuels-annual-9), and [Canada](https://apps.fas.usda.gov/newgainapi/api/Report/DownloadReportByFileName?fileName=Biofuels%20Annual_Ottawa_Canada_CA2023-0030.pdf).
-These reports seem to also rely on some conversion factors, but they are somewhat different for each country.
-
+Their values for feedstock in Table 2 ("Feedstock consumption (Mt) for first-generation biofuels in 2023 for the case study countries") comes from the USDA GAIN reports.
+Those reports are listed in their bibliography; they are individual PDF reports for different countries, e.g. [India](https://www.fas.usda.gov/data/india-biofuels-annual-9), and [Canada](https://apps.fas.usda.gov/newgainapi/api/Report/DownloadReportByFileName?fileName=Biofuels%20Annual_Ottawa_Canada_CA2023-0030.pdf).
 Replicating Cerulogy's estimate would be beyond the scope of this article.
 
 Taking Cerulogy's estimate at face value, globally, first-generation biofuels use 32 million hectares of cropland.
@@ -56,14 +58,14 @@ But this would exclude palm oil and sugar cane area, so that would not be meanin
 So, it's unclear what that area of 1.4 billion hectares refers to exactly.
 
 They don't provide more specific numbers.
-The chart on Page 41 (ironically called "Biofuels take up little space") shows the area of a selection of crops for 2021.
+The chart on Page 41 shows the area of a selection of crops for 2021.
 Adding up the numbers, we get to a total of 84 million hectares devoted to biofuel production, and 740 million hectares for other cropland.
 This implies biofuel area (for those selected crops) accounts for 11% of the land.
 However, the list is incomplete, and it's reasonable to expect that other feedstocks would have smaller shares, which could lead to the 8% they quote on that chart and elsewhere.
 
 The source quoted in the chart is: OECD, USDA, Oil World.
-But the chart says "©AMI 2022"; so I understand the chart was originally made by AMI based on those sources.
-Going to the UFOP document's bibliography, [the AMI data](https://www.ami-informiert.de/ami-shop/shop/detail?ai%5Bd_name%5D=Markt_aktuell_%C3%96lsaaten_und_Bioenergie&ai%5Bd_prodid%5D=110&ai%5Bd_pos%5D=11&ai%5Bcontroller%5D=Catalog&ai%5Baction%5D=detail) seems to not be under a paywall.
+But the chart says "©AMI 2022"; so the chart must have been originally created by AMI based on those sources.
+Going to the UFOP document's bibliography, [the AMI data](https://www.ami-informiert.de/ami-shop/shop/detail?ai%5Bd_name%5D=Markt_aktuell_%C3%96lsaaten_und_Bioenergie&ai%5Bd_prodid%5D=110&ai%5Bd_pos%5D=11&ai%5Bcontroller%5D=Catalog&ai%5Baction%5D=detail) seems to be under a paywall.
 
 Similar values between 7% and 8% have been quoted in different places (e.g. [Oils & Fat International](https://www.ofimagazine.com/news/only-8-of-global-crop-land-used-for-biofuels), [Food Unfolded](https://www.foodunfolded.com/article/biofuels-is-growing-food-for-energy-a-good-idea#ref1), [Biofuels international](https://biofuels-news.com/news/only-7-of-global-crops-is-used-for-biofuels-production-ufop-reveals/) or [Advanced Biofuels USA](https://advancedbiofuelsusa.info/raw-material-for-biofuel-production-is-available-on-7-of-the-cultivated-area)).
 They all cite UFOP, even though the origin of those estimates are unclear.
@@ -72,6 +74,7 @@ Taking the UFOP values at face value, 8% of 1.4 billion hectares would correspon
 And applying that same percentage to the actual global cropland estimated by FAOSTAT, would lead to 126 million hectares.
 
 But their estimates don't seem to adjust for the land use of co-products.
+So we will rely on Cerulogy's estimate instead.
 
 ### Alternative estimate by Popp et al. (2018)
 
@@ -81,7 +84,9 @@ They say:
 > If we include co-products [...] then the land that is needed to grow feedstocks reduces [...] to about 1.5%.
 This would imply around 23 million hectares.
 
-It's unclear which year they are basing their estimates on, but they quote explicitly "At present, around 2% of the 1.515 billion ha which makes up the total global crop area (FAO, 2013)".
+It's unclear which year they are basing their estimates on, but they quote explicitly:
+> At present, around 2% of the 1.515 billion ha which makes up the total global crop area (FAO, 2013).
+
 So, what they refer to as present may be based on 2013 FAO data (which could refer to 2011 or 2012).
 Since then, biofuel production [has increased by ~86%](https://ourworldindata.org/grapher/biofuel-production), so it would be reasonable to expect a significantly larger net area today, closer to Cerulogy's estimate.
 
@@ -94,11 +99,14 @@ We can find representative capacity factors in [the latest IRENA's Renewable Pow
 In Table 3.2 they show global weighted average capacity factors (AC/DC) for utility-scale solar PV systems by year of commissioning (page 99).
 We can approximately convert the AC/DC factors to AC/AC by multiplying them by an inverter loading ratio (DC/AC) of 1.25.
 The factors reported for 2024 (and their conversions) are as follows:
+
 - 5th percentile: 11.5% (AC/DC) x 1.25 ~ 14% (DC/DC)
+
 - Weighted average: 17.4% (AC/DC) x 1.25 ~ 22% (DC/DC)
+
 - 95th percentile: 22.6% (AC/DC) x 1.25 ~ 28% (DC/DC)
 
-After speaking with various people working in the field, it seems that a fiducial value for a typical installation is around 1.5 ha / MWp (in terms of DC power at peak).
+After speaking with various people working in the field, it seems that a reasonable value for a typical installation is around 1.5 ha / MWp (in terms of DC power at peak).
 In terms of AC power, this would correspond to ~0.53 MW(AC) / ha.
 
 We can convert power density to an average energy density using the average DC conversion factor above:
@@ -107,28 +115,22 @@ We can convert power density to an average energy density using the average DC c
 
 We will therefore assume a fiducial value for energy density of 1 GWh / ha / year.
 
-A conservative range of power densities would be somewhere between 0.3 MW(AC) / ha and 0.8 MW(AC) / ha, around a midpoint value of 0.53 MW(AC) / ha chosen before.
+A conservative range of power densities would be somewhere between 0.3 MW(AC) / ha and 0.8 MW(AC) / ha, around the midpoint value of 0.53 MW(AC) / ha chosen before.
 
-Assuming these fiducial ranges of capacity factors and power densities, we can calculate a reasonable lower limit, midpoint and upper limit for the amount of electricity produced in a year in 32 million hectares of land:
+Combining the ranges of capacity factors and power densities, we can calculate a lower limit, a midpoint, and an upper limit for the amount of electricity produced in a year in 32 million hectares of land:
 
-Lower:
+* Lower limit: 32 · 10⁶ ha x ( 0.3 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 14% of 8760 h / 1 year ) = 12 PWh / year
 
-32 · 10⁶ ha x ( 0.3 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 14% of 8760 h / 1 year ) = 12 PWh / year
+* Midpoint: 32 · 10⁶ ha x ( 1 GWh / ha / year ) x ( 1 PWh / 10⁶ GWh ) = 32 PWh / year
 
-Midpoint:
+* Upper: 32 · 10⁶ ha x ( 0.7 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 28% of 8760 h / 1 year ) = 55 PWh / year
 
-32 · 10⁶ ha x ( 1 GWh / ha / year ) x ( 1 PWh / 10⁶ GWh ) = 32 PWh / year
-
-Upper:
-
-32 · 10⁶ ha x ( 0.7 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 28% of 8760 h / 1 year ) = 55 PWh / year
-
-Our fiducial value of 1 GWh / year / ha could be considered conservative, given that:
+Our fiducial value of 1 GWh / ha / year could be considered conservative, given that:
 - A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
 - The hypothetical transition would take place in the coming years, so, it would be reasonable to expect that efficiencies would improve slightly with respect to the present.
 
 So, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year.
-This is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which is 31 PWh in 2024, according to Ember.
+This is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which is 31 PWh in 2024, according to [Ember's Yearly Electricity Data](https://ember-energy.org/data/yearly-electricity-data/).
 Currently, ~18 PWh of that electricity comes from fossil fuels, and only ~2 PWh from solar.
 
 Compared to [the ~1.42 PWh](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024) of energy actually produced by biofuels, according to [the Energy Institute's Statistical Review of World Energy](https://www.energyinst.org/statistical-review), using solar farms we could produce ~22 times more energy (in electricity) than growing crops for biofuels.
@@ -136,9 +138,9 @@ Compared to [the ~1.42 PWh](https://ourworldindata.org/grapher/biofuel-productio
 ### Alternative estimate based on Cerulogy
 
 Cerulogy assumes an average area density of 0.08 kWp / m² for a solar farm, and a farm productivity of 3.9 kWh / kWp / day.
-This leads to:
+This leads to an energy density of:
 
-0.08 kWp x ( 3.9 kWh / kWp / day ) x ( 365 days / 1 year ) x ( 10⁴ m² / 1 ha) x ( 1 GWh / 10⁶ kWh ) =  1.14 GWh / year / ha
+0.08 kWp x ( 3.9 kWh / kWp / day ) x ( 365 days / 1 year ) x ( 10⁴ m² / 1 ha) x ( 1 GWh / 10⁶ kWh ) =  1.14 GWh / ha / year
 
 Therefore, Cerulogy's assumes a capacity factor (DC) of:
 
@@ -169,17 +171,11 @@ Therefore, the minimum, average, and maximum (lifecycle) land used is 12, 19, an
 
 If we used 32 million hectares of land every year for electricity generation from solar PV, how much electricity could be produced?
 
-Minimum:
+- Minimum: 32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 12 m² ) x ( 1 PWh / 10⁹ MWh ) = 27 PWh
 
-32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 12 m² ) x ( 1 PWh / 10⁹ MWh ) = 27 PWh
+- Midpoint: 32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 19 m² ) x ( 1 PWh / 10⁹ MWh ) = 17 PWh
 
-Midpoint:
-
-32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 19 m² ) x ( 1 PWh / 10⁹ MWh ) = 17 PWh
-
-Maximum:
-
-32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 37 m² ) x ( 1 PWh / 10⁹ MWh ) = 8.6 PWh
+- Maximum: 32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 37 m² ) x ( 1 PWh / 10⁹ MWh ) = 8.6 PWh
 
 These lifecycle values are not directly comparable to Cerulogy's cropland estimate, since they do not represent the physical land footprint of solar farms.
 But they can provide a rough lower bound on solar land intensity.
@@ -189,11 +185,11 @@ But they can provide a rough lower bound on solar land intensity.
 [Bolinger & Bolinger (2022)](https://www.energy.gov/sites/default/files/2022-01/lbnl_ieee-land-requirements-for-utility-scale-pv.pdf) (Lawrence Berkeley National Laboratory, LBNL) estimate the following values for power and energy densities in the US:
 
 - Power density:
-  - Fixed-tilt: 0.87 MW(DC) / ha -> 0.69 MW(AC) / ha
-  - Tracking plants: 0.59 MW(DC) / ha -> 0.45 MW(AC) / ha
+    - Fixed-tilt: 0.87 MW(DC) / ha -> 0.69 MW(AC) / ha
+    - Tracking plants: 0.59 MW(DC) / ha -> 0.45 MW(AC) / ha
 - Energy density:
-  - Fixed-tilt: 1.10 GWh / year / ha
-  - Tracking plants: 0.97 GWh / year / ha
+    - Fixed-tilt: 1.10 GWh / ha / year
+    - Tracking plants: 0.97 GWh / ha / year
 
 Assuming tracking plants, which are more commonly used:
 
@@ -206,14 +202,14 @@ This is in very good agreement with our estimate, given that their estimated ene
 An alternative estimate comes from [Victoria et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2542435121001008).
 In their supplementary Note S3, they say:
 
-"[...] Assuming 17% efficiency and that only 30% of the land is covered by solar panels in large-scale installations, the capacity density results in 51 W / m², which is in agreement with values reported in [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
+> [...] Assuming 17% efficiency and that only 30% of the land is covered by solar panels in large-scale installations, the capacity density results in 51 W / m², which is in agreement with values reported in [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
 For an average annual generation for solar PV of 1370 kWh / kW, 38 million ha would be needed.
 The land area of the world is 13,003 million ha [OWID (2019)](https://ourworldindata.org/land-use).
-Hence, our current electricity consumption could be supplied by solar PV covering 0.3% of the available land."
+Hence, our current electricity consumption could be supplied by solar PV covering 0.3% of the available land.
 
 If these values refer to DC, we can translate them into:
 
-( 0.51 MWp / ha ) x ( 1370 MWh / MWp / yr ) x ( 1 GWh / 1000 MWh ) = 0.698 GWh / ha / yr
+( 0.51 MWp / ha ) x ( 1370 MWh / MWp / year ) x ( 1 GWh / 1000 MWh ) = 0.698 GWh / ha / year
 
 The assumed AC power density would be:
 
@@ -221,13 +217,13 @@ The assumed AC power density would be:
 
 And the capacity factor, in AC (again assuming ILR of 1.25) would be:
 
-( 0.51 MWp / ha ) x ( 1370 MWh / MWp / yr ) / ( ( 0.51 MWp / ha ) / 1.25 x ( 8760 h / yr ) ) = 20%
+( 0.51 MWp / ha ) x ( 1370 MWh / MWp / year ) / ( ( 0.51 MWp / ha ) / 1.25 x ( 8760 h / year ) ) = 20%
 
 And this would lead to a total production of:
 
-32 · 10⁶ x ( 1 PWh / 10⁶ GWh ) x ( 0.698 GWh / ha / yr ) = 22 PWh
+32 · 10⁶ x ( 1 PWh / 10⁶ GWh ) x ( 0.698 GWh / ha / year ) = 22 PWh
 
-They say that their values are consistent with NREL's Ong et al. (2013).
+They say that their values are consistent with NREL's [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
 The power density of 0.41 MW / ha is on the low side, and the capacity factor of 20% is just a bit below our fiducial value.
 We consider that these dated US estimates may not be a representative of today's achievable global energy density.
 
@@ -291,10 +287,6 @@ I assume a value of 0.2 kWh per kilometer based on several sources.
 This analysis by [Weiss et al. (2024)](https://www.mdpi.com/2071-1050/16/17/7529) of the European car fleet found certified and average ratings of 19 kWh and 21 kWh per 100 kilometers.
 That's around 0.2 kWh per kilometer.
 
-Weiss, M., Winbush, T., Newman, A., & Helmers, E. (2024).
-Energy consumption of electric vehicles in Europe.
-Sustainability, 16(17), 7529.
-
 You can find the efficiency of different models in [this EV Database](https://ev-database.org/cheatsheet/energy-consumption-electric-car).
 The average across this huge number of models and brands was 0.19 kWh per kilometer.
 
@@ -325,8 +317,6 @@ However, this will tend to average out across an entire truck fleet.
 
 # Bibliography
 
-Cerulogy. C. Sandford, C. Malins, J. Phillips (2024). Diverted harvest. Environmental Risk from Growth in International Biofuel Demand.
-
 Franz, M., & Dumke, H. (2025).
 Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
 Energy, Sustainability and Society, 15(1), 12.
@@ -335,6 +325,10 @@ Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022).
 Spatial energy density of large-scale electricity generation from power sources worldwide.
 Scientific Reports, 12(1), 21280.
 
+Ong, S., Denholm, P., Heath, G., Margolis, R., & Campbell, C. (2013).
+Land-Use Requirements for Solar Power Plants in the United States.
+https://doi.org/10.2172/1086349
+
 Popp, J., Kot, S., Lakner, Z., & Oláh, J. (2018).
 Biofuel Use: Peculiarities and Implications.
 Journal of Security & Sustainability Issues, 7(3).
@@ -342,3 +336,23 @@ Journal of Security & Sustainability Issues, 7(3).
 Popp, J., Harangi-Rákos, M., Gabnai, Z., Balogh, P., Antal, G., & Bai, A. (2016).
 Biofuels and their co-products as livestock feed: global economic and environmental implications.
 Molecules, 21(3), 285.
+
+Sandford, C., Malins, C., Phillips, J. (2024).
+Diverted harvest.
+Environmental Risk from Growth in International Biofuel Demand.
+Cerulogy.
+https://www.cerulogy.com/diverted-harvest/
+
+Sturchio, M. A., Gallaher, A., & Grodsky, S. M. (2025).
+Ecologically informed solar enables a sustainable energy transition in US croplands.
+Proceedings of the National Academy of Sciences, 122(17), e2501605122.
+https://doi.org/10.1073/pnas.2501605122
+
+Victoria, M., Haegel, N., Peters, I. M., Sinton, R., Jäger-Waldau, A., del Cañizo, C., Breyer, C., Stocks, M., Blakers, A., Kaizuka, I., Komoto, K., Smets, A. (2021).
+Solar photovoltaics is ready to power a sustainable future.
+Joule 5, 1041–1056.
+https://doi.org/10.1016/j.joule.2021.03.005
+
+Weiss, M., Winbush, T., Newman, A., & Helmers, E. (2024).
+Energy consumption of electric vehicles in Europe.
+Sustainability, 16(17), 7529.

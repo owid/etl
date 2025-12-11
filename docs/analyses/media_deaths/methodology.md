@@ -1,14 +1,12 @@
----
-icon: lucide/newspaper
----
-
 # Does the news reflect what we die from?
 
 !!! info "This is the methodology for the data analysis used in our article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)"
 
     **Resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code, and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
 
-    **Contact**: [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death).
+    **Author**: Tuna Acisu
+
+    **Contact**: [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death)
 
 
 Our team ran an analysis and published an article ("Does the news reflect what we die from?") comparing what Americans die from, and the relative coverage that these causes of death get in media coverage.
