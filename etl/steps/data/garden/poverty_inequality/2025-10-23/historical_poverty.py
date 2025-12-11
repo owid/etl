@@ -41,7 +41,7 @@ PROFILING_MODE = False
 PROFILING_COUNTRIES = ["United States", "Zimbabwe", "Brazil", "China", "India"]
 ##############################################################################
 # Show warnings and comparisons
-SHOW_WARNINGS = True
+SHOW_WARNINGS = False
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -2410,8 +2410,8 @@ def compare_headcount_ratios_across_methods(
                     f"  Interpolated Ginis vs. constant inequality: Median diff={median_diff_ginis_constant:.2f}pp, Max diff={max_diff_ginis_constant:.2f}pp (in {max_diff_ginis_constant_year})\n"
                     f"  Interpolated quantiles vs. interpolated Ginis: Median diff={median_diff_quantiles_ginis:.2f}pp, Max diff={max_diff_quantiles_ginis:.2f}pp (in {max_diff_quantiles_ginis_year})\n"
                     f"  Randomized Ginis vs. constant inequality: Median diff={median_diff_random_constant:.2f}pp, Max diff={max_diff_random_constant:.2f}pp (in {max_diff_random_constant_year})\n"
-                    f"  Randomized Ginis vs. interpolated Ginis: Median diff={median_diff_random_ginis:.2f}pp, Max diff={max_diff_random_ginis:.2f}pp (in {max_diff_random_ginis_year})\n"
-                    f"  Randomized Ginis vs. interpolated quantiles: Median diff={median_diff_random_quantiles:.2f}pp, Max diff={max_diff_random_quantiles:.2f}pp (in {max_diff_random_quantiles_year})"
+                    f"  Randomized Ginis vs. interpolated quantiles: Median diff={median_diff_random_quantiles:.2f}pp, Max diff={max_diff_random_quantiles:.2f}pp (in {max_diff_random_quantiles_year})\n"
+                    f"  Randomized Ginis vs. interpolated Ginis: Median diff={median_diff_random_ginis:.2f}pp, Max diff={max_diff_random_ginis:.2f}pp (in {max_diff_random_ginis_year})"
                 )
 
         # Export to CSV if enabled
