@@ -34,19 +34,19 @@ steps:
   data://grapher/imf/2025-04-02/public_finances_modern_history:
     - data://garden/imf/2025-04-02/public_finances_modern_history
 
-  # OECD Social Expenditure Database
-  data://meadow/oecd/2025-02-25/social_expenditure:
-    - snapshot://oecd/2025-02-25/social_expenditure.csv
-  data://garden/oecd/2025-02-25/social_expenditure:
-    - data://meadow/oecd/2025-02-25/social_expenditure
-  data://grapher/oecd/2025-02-25/social_expenditure:
-    - data://garden/oecd/2025-02-25/social_expenditure
+    # OECD Social Expenditure Database
+  data://meadow/oecd/2025-12-11/social_expenditure:
+    - snapshot://oecd/2025-12-11/social_expenditure.csv
+  data://garden/oecd/2025-12-11/social_expenditure:
+    - data://meadow/oecd/2025-12-11/social_expenditure
+  data://grapher/oecd/2025-12-11/social_expenditure:
+    - data://garden/oecd/2025-12-11/social_expenditure
 
   #
   # Social expenditure OMM
   #
   data://garden/social_expenditure/2025-03-07/social_expenditure_omm:
-    - data://garden/oecd/2025-02-25/social_expenditure
+    - data://garden/oecd/2025-12-11/social_expenditure
     - data://garden/oecd/2025-03-07/social_expenditure_1985
     - data://garden/social_expenditure/2025-03-07/lindert
   data://grapher/social_expenditure/2025-03-07/social_expenditure_omm:
@@ -139,7 +139,3 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
-  ############################################################
-  # GENERAL
-  ############################################################
-
