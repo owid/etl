@@ -15,6 +15,7 @@ The approach:
 4. Calculate the number and share of people living below different poverty lines, using OWID population data
 """
 
+from multiprocessing import Pool
 from typing import Set, Tuple
 
 import numpy as np
@@ -48,6 +49,9 @@ EXPORT_COMPARISON_CSV = False
 
 # Set number of observations to show in Gini/mean comparison logs
 NUM_OBSERVATIONS_TO_SHOW = 20
+
+# Number of random iterations for randomized gini estimation (0 = disabled, >0 = parallel averaging)
+NUM_RANDOM_ITERATIONS = 0
 ##############################################################################
 
 # Poverty lines (daily income in 2021 PPP$)
@@ -355,23 +359,43 @@ def run() -> None:
     # CALCULATE POVERTY USING RANDOMIZED GINI SERIES
     ###############################################################################
 
-    # Create 1000 bins from mean and gini data
-    tb_thousand_bins_randomized_ginis = expand_means_and_ginis_to_thousand_bins(
-        tb_gini_mean=tb_gini_mean,
-        tb_thousand_bins=tb_thousand_bins,
-        tb_population_patch=tb_population_patch,
-        mean_column="mean",
-        gini_column="gini_random",
-    )
+    if NUM_RANDOM_ITERATIONS > 1:
+        # Parallel execution: run N iterations and average results
+        log.info(f"Running {NUM_RANDOM_ITERATIONS} randomized gini iterations in parallel...")
 
-    # Calculate poverty measures
-    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
-        tb_randomized_ginis = calculate_poverty_measures(
-            tb=tb_thousand_bins_randomized_ginis, maddison_world_years=maddison_world_years
+        # Prepare arguments for parallel execution
+        args_list = [
+            (i, tb_gini_mean, tb_thousand_bins, tb_population_patch, maddison_world_years)
+            for i in range(NUM_RANDOM_ITERATIONS)
+        ]
+
+        # Run iterations in parallel
+        with Pool() as pool:
+            results = pool.map(run_randomized_gini_iteration, args_list)
+
+        # Average results across iterations
+        log.info("Averaging results across iterations...")
+        tb_randomized_ginis = average_randomized_results(results)
+
+    else:
+        # Single iteration (original behavior)
+        # Create 1000 bins from mean and gini data
+        tb_thousand_bins_randomized_ginis = expand_means_and_ginis_to_thousand_bins(
+            tb_gini_mean=tb_gini_mean,
+            tb_thousand_bins=tb_thousand_bins,
+            tb_population_patch=tb_population_patch,
+            mean_column="mean",
+            gini_column="gini_random",
         )
 
-    # Create stacked variables for stacked area/bar charts
-    tb_randomized_ginis = create_stacked_variables(tb=tb_randomized_ginis)
+        # Calculate poverty measures
+        with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+            tb_randomized_ginis = calculate_poverty_measures(
+                tb=tb_thousand_bins_randomized_ginis, maddison_world_years=maddison_world_years
+            )
+
+        # Create stacked variables for stacked area/bar charts
+        tb_randomized_ginis = create_stacked_variables(tb=tb_randomized_ginis)
 
     ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
@@ -1446,7 +1470,6 @@ def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
 def add_randomized_gini_series(tb_gini_mean: Table) -> Table:
     """
     Add a randomized gini column to tb_gini_mean with values between the minimum and maximum of the gini column.
-    Generates 1000 random iterations and computes the average for each row.
     Uses a fixed seed for reproducibility.
     """
     # Get minimum and maximum gini values (excluding NaN)
@@ -1456,20 +1479,105 @@ def add_randomized_gini_series(tb_gini_mean: Table) -> Table:
     # Set seed for reproducibility
     np.random.seed(42)
 
-    # Generate 1000 random gini values between min and max for each row, then average them
+    # Generate random gini values between min and max for each row
     n_rows = len(tb_gini_mean)
-    n_iterations = 1000
-
-    # Generate random values: shape (n_rows, n_iterations)
-    random_values = np.random.uniform(low=gini_min, high=gini_max, size=(n_rows, n_iterations))
-
-    # Compute the mean across the 1000 iterations for each row
-    tb_gini_mean["gini_random"] = random_values.mean(axis=1)
+    tb_gini_mean["gini_random"] = np.random.uniform(low=gini_min, high=gini_max, size=n_rows)
 
     # Copy origins from gini column
     tb_gini_mean["gini_random"].m.origins = tb_gini_mean["gini"].m.origins
 
     return tb_gini_mean
+
+
+def run_randomized_gini_iteration(args: Tuple[int, Table, Table, Table, list]) -> Table:
+    """
+    Run a single iteration of randomized gini poverty estimation with a specific seed.
+    This function is designed to be called in parallel.
+
+    Args:
+        args: Tuple containing:
+            - iteration: Iteration number (used as seed offset)
+            - tb_gini_mean: Table with mean and gini data
+            - tb_thousand_bins: Table with thousand bins data
+            - tb_population_patch: Table with population patch data
+            - maddison_world_years: List of years from Maddison dataset
+
+    Returns:
+        Table with poverty measures for this iteration
+    """
+    iteration, tb_gini_mean, tb_thousand_bins, tb_population_patch, maddison_world_years = args
+
+    # Create a copy to avoid modifying the original
+    tb_gini_mean_iter = tb_gini_mean.copy()
+
+    # Get min/max for random generation
+    gini_min = tb_gini_mean_iter["gini"].min()
+    gini_max = tb_gini_mean_iter["gini"].max()
+
+    # Set seed based on iteration number for reproducibility
+    np.random.seed(42 + iteration)
+
+    # Generate random gini values for this iteration
+    n_rows = len(tb_gini_mean_iter)
+    tb_gini_mean_iter["gini_random"] = np.random.uniform(low=gini_min, high=gini_max, size=n_rows)
+
+    # Copy origins from gini column
+    tb_gini_mean_iter["gini_random"].m.origins = tb_gini_mean_iter["gini"].m.origins
+
+    # Run the pipeline
+    tb_thousand_bins_randomized = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean_iter,
+        tb_thousand_bins=tb_thousand_bins,
+        tb_population_patch=tb_population_patch,
+        mean_column="mean",
+        gini_column="gini_random",
+    )
+
+    # Calculate poverty measures
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_randomized = calculate_poverty_measures(
+            tb=tb_thousand_bins_randomized, maddison_world_years=maddison_world_years
+        )
+
+    # Create stacked variables
+    tb_randomized = create_stacked_variables(tb=tb_randomized)
+
+    return tb_randomized
+
+
+def average_randomized_results(results: list[Table]) -> Table:
+    """
+    Average poverty measures across multiple randomized gini iterations.
+
+    Args:
+        results: List of Tables, each containing poverty measures from one iteration
+
+    Returns:
+        Table with averaged poverty measures
+    """
+    if len(results) == 0:
+        raise ValueError("No results to average")
+
+    if len(results) == 1:
+        return results[0]
+
+    # Use the first result as a template
+    tb_avg = results[0].copy()
+
+    # Get all numeric columns (exclude index columns like country, year, poverty_line)
+    index_cols = ["country", "year", "poverty_line"]
+    numeric_cols = [
+        col for col in tb_avg.columns if col not in index_cols and pd.api.types.is_numeric_dtype(tb_avg[col])
+    ]
+
+    # Average each numeric column across all iterations
+    for col in numeric_cols:
+        # Stack all values for this column
+        col_values = np.stack([result[col].values for result in results])
+        # Average across iterations (axis 0)
+        tb_avg[col] = col_values.mean(axis=0)
+
+    return tb_avg
 
 
 def compare_countries_available_in_two_tables(
