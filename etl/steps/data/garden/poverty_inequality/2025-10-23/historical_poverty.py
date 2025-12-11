@@ -41,7 +41,7 @@ PROFILING_MODE = False
 PROFILING_COUNTRIES = ["United States", "Zimbabwe", "Brazil", "China", "India"]
 ##############################################################################
 # Show warnings and comparisons
-SHOW_WARNINGS = False
+SHOW_WARNINGS = True
 
 # Export comparison files to csv
 EXPORT_COMPARISON_CSV = False
@@ -278,6 +278,9 @@ def run() -> None:
     with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
         tb_gini_mean = prepare_mean_gini_data(tb=tb_gini_mean, tb_gdp=tb_gdp)
 
+    # Add randomized gini series for testing
+    tb_gini_mean = add_randomized_gini_series(tb_gini_mean=tb_gini_mean)
+
     ###############################################################################
     # 2.1 INTERPOLATING QUANTILES BETWEEN YEARS WITH GINIS
     ###############################################################################
@@ -349,6 +352,28 @@ def run() -> None:
     )
 
     ###############################################################################
+    # CALCULATE POVERTY USING RANDOMIZED GINI SERIES
+    ###############################################################################
+
+    # Create 1000 bins from mean and gini data
+    tb_thousand_bins_randomized_ginis = expand_means_and_ginis_to_thousand_bins(
+        tb_gini_mean=tb_gini_mean,
+        tb_thousand_bins=tb_thousand_bins,
+        tb_population_patch=tb_population_patch,
+        mean_column="mean",
+        gini_column="gini_random",
+    )
+
+    # Calculate poverty measures
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_randomized_ginis = calculate_poverty_measures(
+            tb=tb_thousand_bins_randomized_ginis, maddison_world_years=maddison_world_years
+        )
+
+    # Create stacked variables for stacked area/bar charts
+    tb_randomized_ginis = create_stacked_variables(tb=tb_randomized_ginis)
+
+    ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
     ###############################################################################
 
@@ -356,6 +381,7 @@ def run() -> None:
         tb_constant_inequality=tb_constant_inequality,
         tb_interpolated_quantiles=tb_interpolated_quantiles,
         tb_interpolated_ginis=tb_interpolated_ginis,
+        tb_randomized_ginis=tb_randomized_ginis,
     )
 
     ###############################################################################
@@ -416,6 +442,8 @@ def run() -> None:
 
     tb_comparison = tb_comparison.format(["country", "year", "poverty_line"], short_name="comparison")
 
+    tb_randomized_ginis = tb_randomized_ginis.format(["country", "year", "poverty_line"], short_name="randomized_ginis")
+
     # Drop duplicates in profiling mode (filtering causes duplicates in merge logic)
     if PROFILING_MODE:
         tb_gini_mean = tb_gini_mean.drop_duplicates(subset=["country", "year"])
@@ -438,6 +466,7 @@ def run() -> None:
             # tb_thousand_bins_interpolated_quantiles,
             tb_thousand_bins_interpolated_ginis,
             tb_thousand_bins_interpolated_ginis_all_lognormal,
+            tb_randomized_ginis,
             tb_gini_mean,
         ],
         default_metadata=ds_thousand_bins.metadata,
@@ -1414,6 +1443,28 @@ def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
     return tb
 
 
+def add_randomized_gini_series(tb_gini_mean: Table) -> Table:
+    """
+    Add a randomized gini column to tb_gini_mean with values between the minimum and maximum of the gini column.
+    Uses a fixed seed for reproducibility.
+    """
+    # Get minimum and maximum gini values (excluding NaN)
+    gini_min = tb_gini_mean["gini"].min()
+    gini_max = tb_gini_mean["gini"].max()
+
+    # Set seed for reproducibility
+    np.random.seed(42)
+
+    # Generate random gini values between min and max for each row
+    n_rows = len(tb_gini_mean)
+    tb_gini_mean["gini_random"] = np.random.uniform(low=gini_min, high=gini_max, size=n_rows)
+
+    # Copy origins from gini column
+    tb_gini_mean["gini_random"].m.origins = tb_gini_mean["gini"].m.origins
+
+    return tb_gini_mean
+
+
 def compare_countries_available_in_two_tables(
     tb_1: Table, tb_2: Table, name_tb_1: str, name_tb_2: str
 ) -> Tuple[Set[str], Set[str]]:
@@ -1748,6 +1799,14 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
     # Copy origins only
     tb_gini_mean["mean"].m.origins = (tb["mean_filled"] + tb["mean_survey"] + tb_gdp["growth_factor"]).m.origins
     tb_gini_mean["gini"].m.origins = (tb["gini_filled"] + tb["gini_survey"] + tb["gini_van_zanden"]).m.origins
+
+    if SHOW_WARNINGS:
+        # Count number of countries available
+        countries_with_data = set(tb_gini_mean["country"].unique())
+        log.info(
+            f"prepare_mean_gini_data: Prepared mean and Gini data for {len(countries_with_data)} countries from {EARLIEST_YEAR} to {tb_gini_mean['year'].max()}."
+        )
+        calculate_population_of_a_group_of_countries(countries_with_data)
 
     return tb_gini_mean
 
@@ -2227,7 +2286,10 @@ def interpolate_quantiles_in_thousand_bins(
 
 
 def compare_headcount_ratios_across_methods(
-    tb_constant_inequality: Table, tb_interpolated_quantiles: Table, tb_interpolated_ginis: Table
+    tb_constant_inequality: Table,
+    tb_interpolated_quantiles: Table,
+    tb_interpolated_ginis: Table,
+    tb_randomized_ginis: Table,
 ) -> Table:
     """
     Compare headcount_ratio values across three different estimation methods.
@@ -2237,19 +2299,13 @@ def compare_headcount_ratios_across_methods(
     - Constant inequality (baseline)
     - Mean + Gini interpolation/extrapolation
     - Mean only interpolation/extrapolation
-
-    Args:
-        tb_constant_inequality: Table with constant inequality assumption (baseline method)
-        tb_mean_gini: Table with interpolated/extrapolated mean and gini
-        tb_mean_only: Table with interpolated/extrapolated mean only
-
-    Returns:
-        Table with comparison statistics including absolute differences between methods
+    - Randomized Gini
     """
     # Keep only relevant columns for comparison
     tb_constant = tb_constant_inequality[["country", "year", "poverty_line", "headcount_ratio"]].copy()
     tb_ginis = tb_interpolated_ginis[["country", "year", "poverty_line", "headcount_ratio"]].copy()
     tb_quantiles = tb_interpolated_quantiles[["country", "year", "poverty_line", "headcount_ratio"]].copy()
+    tb_random = tb_randomized_ginis[["country", "year", "poverty_line", "headcount_ratio"]].copy()
 
     # Merge all three tables
     tb_comparison = pr.merge(
@@ -2266,9 +2322,18 @@ def compare_headcount_ratios_across_methods(
         on=["country", "year", "poverty_line"],
         how="outer",
     )
-
     # Rename the last headcount_ratio column
     tb_comparison = tb_comparison.rename(columns={"headcount_ratio": "headcount_ratio_quantiles"})
+
+    tb_comparison = pr.merge(
+        tb_comparison,
+        tb_random,
+        on=["country", "year", "poverty_line"],
+        how="outer",
+    )
+
+    # Rename the last headcount_ratio column
+    tb_comparison = tb_comparison.rename(columns={"headcount_ratio": "headcount_ratio_random"})
 
     # Calculate absolute differences
 
@@ -2282,6 +2347,15 @@ def compare_headcount_ratios_across_methods(
 
     tb_comparison["diff_quantiles_vs_ginis"] = (
         tb_comparison["headcount_ratio_quantiles"] - tb_comparison["headcount_ratio_ginis"]
+    ).abs()
+    tb_comparison["diff_random_vs_constant"] = (
+        tb_comparison["headcount_ratio_random"] - tb_comparison["headcount_ratio_constant"]
+    ).abs()
+    tb_comparison["diff_random_vs_ginis"] = (
+        tb_comparison["headcount_ratio_random"] - tb_comparison["headcount_ratio_ginis"]
+    ).abs()
+    tb_comparison["diff_random_vs_quantiles"] = (
+        tb_comparison["headcount_ratio_random"] - tb_comparison["headcount_ratio_quantiles"]
     ).abs()
 
     # Log summary statistics if SHOW_WARNINGS is enabled
@@ -2309,11 +2383,32 @@ def compare_headcount_ratios_across_methods(
                     tb_pl["diff_quantiles_vs_ginis"] == max_diff_quantiles_ginis, "year"
                 ].iloc[0]
 
+                median_diff_random_constant = tb_pl["diff_random_vs_constant"].median()
+                max_diff_random_constant = tb_pl["diff_random_vs_constant"].max()
+                max_diff_random_constant_year = tb_pl.loc[
+                    tb_pl["diff_random_vs_constant"] == max_diff_random_constant, "year"
+                ].iloc[0]
+
+                median_diff_random_ginis = tb_pl["diff_random_vs_ginis"].median()
+                max_diff_random_ginis = tb_pl["diff_random_vs_ginis"].max()
+                max_diff_random_ginis_year = tb_pl.loc[
+                    tb_pl["diff_random_vs_ginis"] == max_diff_random_ginis, "year"
+                ].iloc[0]
+
+                median_diff_random_quantiles = tb_pl["diff_random_vs_quantiles"].median()
+                max_diff_random_quantiles = tb_pl["diff_random_vs_quantiles"].max()
+                max_diff_random_quantiles_year = tb_pl.loc[
+                    tb_pl["diff_random_vs_quantiles"] == max_diff_random_quantiles, "year"
+                ].iloc[0]
+
                 log.info(
                     f"compare_headcount_ratios_across_methods (poverty_line=${poverty_line}):\n"
                     f"  Interpolated quantiles vs. constant inequality: Median diff={median_diff_quantiles_constant:.2f}pp, Max diff={max_diff_quantiles_constant:.2f}pp (in {max_diff_quantiles_constant_year})\n"
                     f"  Interpolated Ginis vs. constant inequality: Median diff={median_diff_ginis_constant:.2f}pp, Max diff={max_diff_ginis_constant:.2f}pp (in {max_diff_ginis_constant_year})\n"
                     f"  Interpolated quantiles vs. interpolated Ginis: Median diff={median_diff_quantiles_ginis:.2f}pp, Max diff={max_diff_quantiles_ginis:.2f}pp (in {max_diff_quantiles_ginis_year})"
+                    f"  Randomized Ginis vs. constant inequality: Median diff={median_diff_random_constant:.2f}pp, Max diff={max_diff_random_constant:.2f}pp (in {max_diff_random_constant_year})\n"
+                    f"  Randomized Ginis vs. interpolated Ginis: Median diff={median_diff_random_ginis:.2f}pp, Max diff={max_diff_random_ginis:.2f}pp (in {max_diff_random_ginis_year})\n"
+                    f"  Randomized Ginis vs. interpolated quantiles: Median diff={median_diff_random_quantiles:.2f}pp, Max diff={max_diff_random_quantiles:.2f}pp (in {max_diff_random_quantiles_year})"
                 )
 
         # Export to CSV if enabled
@@ -2329,6 +2424,9 @@ def compare_headcount_ratios_across_methods(
             "diff_quantiles_vs_constant",
             "diff_ginis_vs_constant",
             "diff_quantiles_vs_ginis",
+            "diff_random_vs_constant",
+            "diff_random_vs_ginis",
+            "diff_random_vs_quantiles",
         ]
     ]
 
@@ -2341,7 +2439,7 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table, tb_popul
     Also, create aggregations at world and region levels.
     """
 
-    tb_gini_mean = tb[["country", "year", "region", "mean", "gini"]].copy()
+    tb_gini_mean = tb[["country", "year", "region", "mean", "gini", "gini_random"]].copy()
 
     # Add population
     tb_gini_mean = add_population_with_ireland_patch(
@@ -2414,7 +2512,9 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table, tb_popul
 
     # Keep only relevant columns
     tb_gini_mean = (
-        tb_gini_mean[["country", "year", "mean", "gini"]].sort_values(["country", "year"]).reset_index(drop=True)
+        tb_gini_mean[["country", "year", "mean", "gini", "gini_random"]]
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
     )
 
     # Separate tb_gini_mean into two tables: one with data starting from LATEST_YEAR_PIP_FILLED, and one with data before that year
