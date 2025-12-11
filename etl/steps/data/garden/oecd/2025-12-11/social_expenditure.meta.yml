@@ -125,7 +125,7 @@ tables:
           - "{definitions.key_spending_type}"
           - "{definitions.key_programme_type}"
         display:
-          name: Social expenditure as a share of GDP
+          name: Social expenditure as a share of GDP - <<programme_type_category>> programs
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -140,7 +140,7 @@ tables:
           - "{definitions.key_spending_type}"
           - "{definitions.key_programme_type}"
         display:
-          name: Social expenditure as a share of government expenditure
+          name: Social expenditure as a share of government expenditure - <<programme_type_category>> programs
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -161,7 +161,7 @@ tables:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
         display:
-          name: Social expenditure per capita
+          name: Social expenditure per capita - <<programme_type_category>> programs
           numDecimalPlaces: 0
           tolerance: 5
 
