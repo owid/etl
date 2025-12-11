@@ -2335,6 +2335,9 @@ def compare_headcount_ratios_across_methods(
     # Rename the last headcount_ratio column
     tb_comparison = tb_comparison.rename(columns={"headcount_ratio": "headcount_ratio_random"})
 
+    # Filter tb_comparison to years before LATEST_YEAR
+    tb_comparison = tb_comparison[tb_comparison["year"] < LATEST_YEAR].reset_index(drop=True)
+
     # Calculate absolute differences
 
     tb_comparison["diff_quantiles_vs_constant"] = (
@@ -2405,7 +2408,7 @@ def compare_headcount_ratios_across_methods(
                     f"compare_headcount_ratios_across_methods (poverty_line=${poverty_line}):\n"
                     f"  Interpolated quantiles vs. constant inequality: Median diff={median_diff_quantiles_constant:.2f}pp, Max diff={max_diff_quantiles_constant:.2f}pp (in {max_diff_quantiles_constant_year})\n"
                     f"  Interpolated Ginis vs. constant inequality: Median diff={median_diff_ginis_constant:.2f}pp, Max diff={max_diff_ginis_constant:.2f}pp (in {max_diff_ginis_constant_year})\n"
-                    f"  Interpolated quantiles vs. interpolated Ginis: Median diff={median_diff_quantiles_ginis:.2f}pp, Max diff={max_diff_quantiles_ginis:.2f}pp (in {max_diff_quantiles_ginis_year})"
+                    f"  Interpolated quantiles vs. interpolated Ginis: Median diff={median_diff_quantiles_ginis:.2f}pp, Max diff={max_diff_quantiles_ginis:.2f}pp (in {max_diff_quantiles_ginis_year})\n"
                     f"  Randomized Ginis vs. constant inequality: Median diff={median_diff_random_constant:.2f}pp, Max diff={max_diff_random_constant:.2f}pp (in {max_diff_random_constant_year})\n"
                     f"  Randomized Ginis vs. interpolated Ginis: Median diff={median_diff_random_ginis:.2f}pp, Max diff={max_diff_random_ginis:.2f}pp (in {max_diff_random_ginis_year})\n"
                     f"  Randomized Ginis vs. interpolated quantiles: Median diff={median_diff_random_quantiles:.2f}pp, Max diff={max_diff_random_quantiles:.2f}pp (in {max_diff_random_quantiles_year})"
