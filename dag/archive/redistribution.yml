@@ -79,4 +79,12 @@ steps:
   data://grapher/oecd/2025-02-25/social_expenditure:
     - data://garden/oecd/2025-02-25/social_expenditure
 
+      # OECD Health Expenditure and Financing Database
+  data://meadow/oecd/2025-07-10/health_expenditure:
+    - snapshot://oecd/2025-07-10/health_expenditure.csv
+  data://garden/oecd/2025-07-10/health_expenditure:
+    - data://meadow/oecd/2025-07-10/health_expenditure
+  data://grapher/oecd/2025-07-10/health_expenditure:
+    - data://garden/oecd/2025-07-10/health_expenditure
+
 
