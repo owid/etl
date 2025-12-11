@@ -1446,6 +1446,7 @@ def add_ginis_from_van_zanden(tb_pip: Table, tb_van_zanden: Table) -> Table:
 def add_randomized_gini_series(tb_gini_mean: Table) -> Table:
     """
     Add a randomized gini column to tb_gini_mean with values between the minimum and maximum of the gini column.
+    Generates 1000 random iterations and computes the average for each row.
     Uses a fixed seed for reproducibility.
     """
     # Get minimum and maximum gini values (excluding NaN)
@@ -1455,9 +1456,15 @@ def add_randomized_gini_series(tb_gini_mean: Table) -> Table:
     # Set seed for reproducibility
     np.random.seed(42)
 
-    # Generate random gini values between min and max for each row
+    # Generate 1000 random gini values between min and max for each row, then average them
     n_rows = len(tb_gini_mean)
-    tb_gini_mean["gini_random"] = np.random.uniform(low=gini_min, high=gini_max, size=n_rows)
+    n_iterations = 1000
+
+    # Generate random values: shape (n_rows, n_iterations)
+    random_values = np.random.uniform(low=gini_min, high=gini_max, size=(n_rows, n_iterations))
+
+    # Compute the mean across the 1000 iterations for each row
+    tb_gini_mean["gini_random"] = random_values.mean(axis=1)
 
     # Copy origins from gini column
     tb_gini_mean["gini_random"].m.origins = tb_gini_mean["gini"].m.origins
