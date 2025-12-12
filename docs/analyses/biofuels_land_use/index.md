@@ -92,63 +92,67 @@ In Table 3.2 they show global weighted average capacity factors (AC/DC) for util
 The AC/DC factors reported for 2024 (converted to AC/AC assuming an inverter loading ratio of 1.25) are:
 
 
-<div class="grid cards" markdown>
--   - 5th percentile: $11.5\% \text{ (AC/DC)} \times 1.25 \approx 14\% \text{ (AC/AC)}$
-    - Weighted average: $17.4\% \text{ (AC/DC)} \times 1.25 \approx 22\% \text{ (AC/AC)}$
-    - 95th percentile: $22.6\% \text{ (AC/DC)} \times 1.25 \approx 28\% \text{ (AC/AC)}$
-</div>
+- 5th percentile:
 
-After speaking with various experts in the field, we concluded that a typical modern installation has a power density of $1 \text{ MWp per } 1.5 \text{ hectares}$ (in terms of DC power at peak).
-In terms of AC power, this would correspond to $\sim 0.53 \text{ MW(AC) / ha}$.
+$$11.5\% \text{ (AC/DC)} \times 1.25 \approx 14\% \text{ (AC/AC)}$$
+
+- Weighted average:
+
+$$17.4\% \text{ (AC/DC)} \times 1.25 \approx 22\% \text{ (AC/AC)}$$
+
+- 95th percentile:
+
+$$22.6\% \text{ (AC/DC)} \times 1.25 \approx 28\% \text{ (AC/AC)}$$
+
+After speaking with various experts in the field, we concluded that a typical modern installation has a power density of 1 MWp per 1.5 hectares (in terms of DC power at peak).
+In terms of AC power, this would correspond to ~0.53 MW(AC) / ha.
 
 We can convert power density to an average energy density using IRENA's average DC conversion factor:
 
 $$\frac{1 \text{ MWp}}{1.5 \text{ ha}} \times \frac{1 \text{ GWh}}{1000 \text{ MWh}} \times \frac{17.4\% \times 8760 \text{ h}}{1 \text{ year}} = 1.02 \text{ GWh / ha / year}$$
 
-We will therefore assume a fiducial value for energy density of $1 \text{ GWh / ha / year}$.
+We will therefore assume a fiducial value for energy density of 1 GWh / ha / year.
 
-A conservative range of power densities would be somewhere between $0.3 \text{ MW(AC) / ha}$ and $0.7 \text{ MW(AC) / ha}$, around the midpoint value of $0.53 \text{ MW(AC) / ha}$ chosen before.
+A conservative range of power densities would be somewhere between 0.3 MW(AC) / ha and 0.7 MW(AC) / ha, around the midpoint value of 0.53 MW(AC) / ha chosen before.
 
 Combining the ranges of capacity factors and power densities, we can calculate a lower limit, a midpoint, and an upper limit for the amount of electricity produced in a year in 32 million hectares of land:
 
-<div class="grid cards" markdown>
--   - **Lower limit:**
+- **Lower limit:**
 
-        $$32 \times 10^6 \text{ ha} \times \frac{0.3 \text{ MW}}{\text{ha}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} \times \frac{14\% \times 8760 \text{ h}}{1 \text{ year}} = 12 \text{ PWh / year}$$
+    $$32 \times 10^6 \text{ ha} \times \frac{0.3 \text{ MW}}{\text{ha}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} \times \frac{14\% \times 8760 \text{ h}}{1 \text{ year}} = 12 \text{ PWh / year}$$
 
-    - **Midpoint:**
+- **Midpoint:**
 
-        $$32 \times 10^6 \text{ ha} \times \frac{1 \text{ GWh}}{\text{ha} \cdot \text{year}} \times \frac{1 \text{ PWh}}{10^6 \text{ GWh}} = 32 \text{ PWh / year}$$
+    $$32 \times 10^6 \text{ ha} \times \frac{1 \text{ GWh}}{\text{ha} \cdot \text{year}} \times \frac{1 \text{ PWh}}{10^6 \text{ GWh}} = 32 \text{ PWh / year}$$
 
-    - **Upper:**
+- **Upper:**
 
-        $$32 \times 10^6 \text{ ha} \times \frac{0.7 \text{ MW}}{\text{ha}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} \times \frac{28\% \times 8760 \text{ h}}{1 \text{ year}} = 55 \text{ PWh / year}$$
-</div>
+    $$32 \times 10^6 \text{ ha} \times \frac{0.7 \text{ MW}}{\text{ha}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} \times \frac{28\% \times 8760 \text{ h}}{1 \text{ year}} = 55 \text{ PWh / year}$$
 
-Our fiducial value of $1 \text{ GWh / ha / year}$ could be considered conservative, given that:
+Our fiducial value of 1 GWh / ha / year could be considered conservative, given that:
 
 - A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
 - The hypothetical transition from biofuel cropland to solar panels would take place in the coming years, so efficiencies would improve slightly with respect to the present.
 
-Therefore, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce $\sim 32 \text{ PWh per year}$.
-This value is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which was $31 \text{ PWh}$ in 2024, according to [Ember's Yearly Electricity Data](https://ember-energy.org/data/yearly-electricity-data/).
-Currently, $\sim 18 \text{ PWh}$ of that electricity comes from fossil fuels, and only $\sim 2 \text{ PWh}$ from solar.
+Therefore, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year.
+This value is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which was 31 PWh in 2024, according to [Ember's Yearly Electricity Data](https://ember-energy.org/data/yearly-electricity-data/).
+Currently, ~18 PWh of that electricity comes from fossil fuels, and only ~2 PWh from solar.
 
 According to [the Energy Institute's Statistical Review of World Energy](https://www.energyinst.org/statistical-review),
-the energy that was actually produced by biofuels in 2024 was [$1.42 \text{ PWh}$](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024).
-Therefore, if we used solar farms, we could produce $\sim 22$ times more energy (in electricity) in the area currently devoted to biofuel crops.
+the energy that was actually produced by biofuels in 2024 was [1.42 PWh](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024).
+Therefore, if we used solar farms, we could produce ~22 times more energy (in electricity) in the area currently devoted to biofuel crops.
 
 ### Alternative estimate based on Cerulogy
 
 Cerulogy assumes an average power density of 0.08 kWp / m² for a solar farm, and a farm productivity of 3.9 kWh / kWp / day.
 This leads to an energy density of:
 
-( 0.08 kWp / m² ) x ( 3.9 kWh / kWp / day ) x ( 365 days / 1 year ) x ( 10⁴ m² / 1 ha) x ( 1 GWh / 10⁶ kWh ) =  1.14 GWh / ha / year
+$$\frac{0.08 \text{ kWp}}{1 \text{ m}^2} \times \frac{3.9 \text{ kWh}}{\text{kWp} \cdot \text{day}} \times \frac{365 \text{ days}}{1 \text{ year}} \times \frac{10^4 \text{ m}^2}{1 \text{ ha}} \times \frac{1 \text{ GWh}}{10^6 \text{ kWh}} = 1.14 \text{ GWh / ha / year}$$
 
 This energy density is 14% larger than the one we assumed.
 Therefore, the estimated amount of electricity that solar PV could produce on 32 million hectares is also larger:
 
-32 · 10⁶ ha x ( 0.64 MW / ha ) x ( 20% of 8760 h / year ) x ( 1 PWh / 10⁹ MWh ) = 36 PWh
+$$32 \times 10^6 \text{ ha} \times \frac{0.64 \text{ MW}}{1 \text{ ha}} \times \frac{20\% \times 8760 \text{ h}}{1 \text{ year}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} = 36 \text{ PWh}$$
 
 Even though we take Cerulogy's estimate of biofuel cropland, we prefer to use our more conservative value of energy density.
 
@@ -165,11 +169,17 @@ Therefore, the minimum, average, and maximum (lifecycle) land used per MWh is 12
 
 If we used 32 million hectares of land for solar electricity, they would generate:
 
-- Minimum: 32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 37 m² ) x ( 1 PWh / 10⁹ MWh ) = 8.6 PWh
+- Minimum:
 
-- Midpoint: 32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 19 m² ) x ( 1 PWh / 10⁹ MWh ) = 17 PWh
+$$32 \times 10^6 \text{ ha} \times \frac{10^4 \text{ m}^2}{1 \text{ ha}} \times \frac{1 \text{ MWh}}{37 \text{ m}^2} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} = 8.6 \text{ PWh}$$
 
-- Maximum: 32 · 10⁶ ha x ( 10⁴ m² / 1 ha ) x ( 1 MWh / 12 m² ) x ( 1 PWh / 10⁹ MWh ) = 27 PWh
+- Midpoint:
+
+$$32 \times 10^6 \text{ ha} \times \frac{10^4 \text{ m}^2}{1 \text{ ha}} \times \frac{1 \text{ MWh}}{19 \text{ m}^2} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} = 17 \text{ PWh}$$
+
+- Maximum:
+
+$$32 \times 10^6 \text{ ha} \times \frac{10^4 \text{ m}^2}{1 \text{ ha}} \times \frac{1 \text{ MWh}}{12 \text{ m}^2} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} = 27 \text{ PWh}$$
 
 Note that these lifecycle values are not directly comparable to Cerulogy's cropland estimate, since they do not represent the physical land footprint of solar farms.
 But these values can provide a rough lower bound on solar land intensity.
@@ -187,7 +197,7 @@ But these values can provide a rough lower bound on solar land intensity.
 
 Assuming tracking plants:
 
-32 · 10⁶ x ( 1 PWh / 10⁶ GWh ) x ( 0.97 GWh / ha / year ) =  31 PWh / year
+$$32 \times 10^6 \text{ ha} \times \frac{0.97 \text{ GWh}}{\text{ha} \cdot \text{year}} \times \frac{1 \text{ PWh}}{10^6 \text{ GWh}} = 31 \text{ PWh / year}$$
 
 This is in very good agreement with our estimate, given that their energy density for tracking plants is very close to our fiducial value of 1 GWh / ha / year.
 
@@ -203,11 +213,11 @@ Hence, our current electricity consumption could be supplied by solar PV coverin
 
 We can translate these values into:
 
-( 51 Wp / m² ) x ( 1 kWp / 10³ Wp ) x ( 10⁴ m² / ha ) x ( 1370 kWh / kWp / year ) x ( 1 GWh / 10⁶ kWh ) = 0.70 GWh / ha / year
+$$\frac{51 \text{ Wp}}{1 \text{ m}^2} \times \frac{1 \text{ kWp}}{10^3 \text{ Wp}} \times \frac{10^4 \text{ m}^2}{1 \text{ ha}} \times \frac{1370 \text{ kWh}}{\text{kWp} \cdot \text{year}} \times \frac{1 \text{ GWh}}{10^6 \text{ kWh}} = 0.70 \text{ GWh / ha / year}$$
 
 This would lead to a total solar production in the current biofuel cropland of:
 
-32 · 10⁶ x ( 1 PWh / 10⁶ GWh ) x ( 0.70 GWh / ha / year ) = 22 PWh
+$$32 \times 10^6 \text{ ha} \times \frac{0.70 \text{ GWh}}{\text{ha} \cdot \text{year}} \times \frac{1 \text{ PWh}}{10^6 \text{ GWh}} = 22 \text{ PWh}$$
 
 They say that their values are consistent with NREL's [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
 The power density of 0.41 MW / ha is on the low side, and the capacity factor of 20% is just a bit below our fiducial value.
@@ -244,13 +254,13 @@ Let's assume, for simplicity, that all this energy goes to power combustion vehi
 Then, if we replaced those vehicles with electric ones, they would require only 0.53 PWh.
 To power all those vehicles with solar farms, assuming our fiducial energy density, we'd need:
 
-( 0.53 PWh / year ) x ( 10⁶ GWh / 1 PWh ) x ( 1 ha x year / 1 GWh ) =  0.53 million ha
+$$\frac{0.53 \text{ PWh}}{1 \text{ year}} \times \frac{10^6 \text{ GWh}}{1 \text{ PWh}} \times \frac{1 \text{ ha} \cdot \text{year}}{1 \text{ GWh}} = 0.53 \text{ million ha}$$
 
 In other words, if instead of growing crops to feed cars with biofuels, which takes 32 million hectares, we produced solar electricity to power electric cars, we'd need less than 2% of the land for the same amount of transport.
 
 Moreover, if all road transport was electric, they could be powered with just 10 million hectares of solar PV, since:
 
-( 9.7 PWh / year ) x ( 10⁶ GWh / 1 PWh ) x ( 1 ha x year / 1 GWh ) = 9.7 million ha
+$$\frac{9.7 \text{ PWh}}{1 \text{ year}} \times \frac{10^6 \text{ GWh}}{1 \text{ PWh}} \times \frac{1 \text{ ha} \cdot \text{year}}{1 \text{ GWh}} = 9.7 \text{ million ha}$$
 
 So, if all road transport was electric, we would be able to power them with just 10 million hectares of solar PV, which is less than a third of the area currently used for biofuel feedstock.
 
@@ -261,14 +271,14 @@ The International Energy Agency [estimates that](https://www.iea.org/data-and-st
 First, we need to convert that to kilometers (or car-kilometers).
 To do that, we can assume that the average car occupancy is 1.5 (so, 1.5 people in a car, on average). Therefore:
 
-25.8 · 10¹² km passenger x ( 1 car / 1.5 passengers ) = 17.2 · 10¹² car km
+$$25.8 \times 10^{12} \text{ passenger km} \times \frac{1 \text{ car}}{1.5 \text{ passengers}} = 17.2 \times 10^{12} \text{ car km}$$
 
 That gives 17.2 trillion kilometers.
 
 We'll assume that the average electric car uses around 0.2 kilowatt-hours to drive one kilometer.
 Covering all those kilometers traveled by car would therefore use:
 
-17.2 · 10¹² car km x ( 0.2 kWh / 1 car km ) x ( 1 PWh / 10¹² kWh ) = 3.44 PWh
+$$17.2 \times 10^{12} \text{ car km} \times \frac{0.2 \text{ kWh}}{1 \text{ car km}} \times \frac{1 \text{ PWh}}{10^{12} \text{ kWh}} = 3.44 \text{ PWh}$$
 
 That means 3.44 PWh of electricity would be needed to power the global car fleet, assuming all cars were electric.
 
@@ -288,12 +298,12 @@ The International Energy Agency [estimates that](https://www.iea.org/data-and-st
 To convert to kilometers, we assume that the average truck load is around 12 tonnes.
 That gives:
 
-35 · 10¹² tonne km x ( 1 truck / 12 tonnes ) = 2.92 · 10¹² truck km
+$$35 \times 10^{12} \text{ tonne km} \times \frac{1 \text{ truck}}{12 \text{ tonnes}} = 2.92 \times 10^{12} \text{ truck km}$$
 
 We assume that a medium heavy-duty truck uses around 1.2 kWh per kilometer driven (if electric).
 Covering 2900 billion kilometers therefore uses:
 
-2.92 · 10¹² truck km x ( 1.2 kWh / 1 truck km ) x ( 1 PWh / 10¹² kWh ) = 3.50 PWh
+$$2.92 \times 10^{12} \text{ truck km} \times \frac{1.2 \text{ kWh}}{1 \text{ truck km}} \times \frac{1 \text{ PWh}}{10^{12} \text{ kWh}} = 3.50 \text{ PWh}$$
 
 That's 3.50 PWh of electricity to power the global truck fleet, assuming they were all electric.
 
@@ -314,51 +324,20 @@ In summary, we estimate that the amount of electricity that would be needed to p
 
 # Bibliography
 
-!!! quote ""
-    Franz, M., & Dumke, H. (2025).
-    Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
-    Energy, Sustainability and Society, 15(1), 12.
+- Franz, M., & Dumke, H. (2025). Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022. *Energy, Sustainability and Society*, 15(1), 12.
 
-!!! quote ""
-    Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022).
-    Spatial energy density of large-scale electricity generation from power sources worldwide.
-    Scientific Reports, 12(1), 21280.
+- Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022). Spatial energy density of large-scale electricity generation from power sources worldwide. *Scientific Reports*, 12(1), 21280.
 
-!!! quote ""
-    Ong, S., Denholm, P., Heath, G., Margolis, R., & Campbell, C. (2013).
-    Land-Use Requirements for Solar Power Plants in the United States.
-    https://doi.org/10.2172/1086349
+- Ong, S., Denholm, P., Heath, G., Margolis, R., & Campbell, C. (2013). Land-Use Requirements for Solar Power Plants in the United States. [https://doi.org/10.2172/1086349](https://doi.org/10.2172/1086349)
 
-!!! quote ""
-    Popp, J., Kot, S., Lakner, Z., & Oláh, J. (2018).
-    Biofuel Use: Peculiarities and Implications.
-    Journal of Security & Sustainability Issues, 7(3).
+- Popp, J., Kot, S., Lakner, Z., & Oláh, J. (2018). Biofuel Use: Peculiarities and Implications. *Journal of Security & Sustainability Issues*, 7(3).
 
-!!! quote ""
-    Popp, J., Harangi-Rákos, M., Gabnai, Z., Balogh, P., Antal, G., & Bai, A. (2016).
-    Biofuels and their co-products as livestock feed: global economic and environmental implications.
-    Molecules, 21(3), 285.
+- Popp, J., Harangi-Rákos, M., Gabnai, Z., Balogh, P., Antal, G., & Bai, A. (2016). Biofuels and their co-products as livestock feed: global economic and environmental implications. *Molecules*, 21(3), 285.
 
-!!! quote ""
-    Sandford, C., Malins, C., Phillips, J. (2024)
-    Diverted harvest.
-    Environmental Risk from Growth in International Biofuel Demand.
-    Cerulogy.
-    https://www.cerulogy.com/diverted-harvest/
+- Sandford, C., Malins, C., Phillips, J. (2024). Diverted harvest. Environmental Risk from Growth in International Biofuel Demand. Cerulogy. [https://www.cerulogy.com/diverted-harvest/](https://www.cerulogy.com/diverted-harvest/)
 
-!!! quote ""
-    Sturchio, M. A., Gallaher, A., & Grodsky, S. M. (2025)
-    Ecologically informed solar enables a sustainable energy transition in US croplands.
-    Proceedings of the National Academy of Sciences, 122(17), e2501605122.
-    https://doi.org/10.1073/pnas.2501605122
+- Sturchio, M. A., Gallaher, A., & Grodsky, S. M. (2025). Ecologically informed solar enables a sustainable energy transition in US croplands. *Proceedings of the National Academy of Sciences*, 122(17), e2501605122. [https://doi.org/10.1073/pnas.2501605122](https://doi.org/10.1073/pnas.2501605122)
 
-!!! quote ""
-    Victoria, M., Haegel, N., Peters, I. M., Sinton, R., Jäger-Waldau, A., del Cañizo, C., Breyer, C., Stocks, M., Blakers, A., Kaizuka, I., Komoto, K., Smets, A. (2021).
-    Solar photovoltaics is ready to power a sustainable future.
-    Joule 5, 1041–1056.
-    https://doi.org/10.1016/j.joule.2021.03.005
+- Victoria, M., Haegel, N., Peters, I. M., Sinton, R., Jäger-Waldau, A., del Cañizo, C., Breyer, C., Stocks, M., Blakers, A., Kaizuka, I., Komoto, K., Smets, A. (2021). Solar photovoltaics is ready to power a sustainable future. *Joule* 5, 1041–1056. [https://doi.org/10.1016/j.joule.2021.03.005](https://doi.org/10.1016/j.joule.2021.03.005)
 
-!!! quote ""
-    Weiss, M., Winbush, T., Newman, A., & Helmers, E. (2024).
-    Energy consumption of electric vehicles in Europe.
-    Sustainability, 16(17), 7529.
+- Weiss, M., Winbush, T., Newman, A., & Helmers, E. (2024). Energy consumption of electric vehicles in Europe. *Sustainability*, 16(17), 7529.
