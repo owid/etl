@@ -105,7 +105,7 @@ We can convert power density to an average energy density using IRENA's average 
 
 We will therefore assume a fiducial value for energy density of 1 GWh / ha / year.
 
-A conservative range of power densities would be somewhere between 0.3 MW(AC) / ha and 0.8 MW(AC) / ha, around the midpoint value of 0.53 MW(AC) / ha chosen before.
+A conservative range of power densities would be somewhere between 0.3 MW(AC) / ha and 0.7 MW(AC) / ha, around the midpoint value of 0.53 MW(AC) / ha chosen before.
 
 Combining the ranges of capacity factors and power densities, we can calculate a lower limit, a midpoint, and an upper limit for the amount of electricity produced in a year in 32 million hectares of land:
 
@@ -233,7 +233,7 @@ Let's assume, for simplicity, that all this energy goes to power combustion vehi
 Then, if we replaced those vehicles with electric ones, they would require only 0.53 PWh.
 To power all those vehicles with solar farms, assuming our fiducial energy density, we'd need:
 
-( 0.53 PWh / year ) x ( 10⁶ GWh / 1 PWh ) x ( 1 ha x year / 1 GWh ) =  0.546 million ha
+( 0.53 PWh / year ) x ( 10⁶ GWh / 1 PWh ) x ( 1 ha x year / 1 GWh ) =  0.53 million ha
 
 In other words, if instead of growing crops to feed cars with biofuels, which takes 32 million hectares, we produced solar electricity to power electric cars, we'd need less than 2% of the land for the same amount of transport.
 
