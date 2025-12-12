@@ -397,11 +397,11 @@ def run() -> None:
                 tb=tb_thousand_bins_randomized_ginis, maddison_world_years=maddison_world_years
             )
 
+        # Keep only relevant columns
+        tb_randomized_ginis = tb_randomized_ginis["country", "year", "poverty_line", "headcount_ratio"]
+
     # Convert poverty_line to string to match other tables (they go through create_stacked_variables which does this)
     tb_randomized_ginis["poverty_line"] = tb_randomized_ginis["poverty_line"].astype(str)
-
-    # Drop population column
-    tb_randomized_ginis = tb_randomized_ginis.drop(columns=["population"], errors="raise")
 
     ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
