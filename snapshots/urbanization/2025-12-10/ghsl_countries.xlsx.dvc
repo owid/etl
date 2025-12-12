@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Human Settlement Layer Dataset
+    description: |-
+      This dataset provides a comprehensive classification of urbanization levels for administrative regions worldwide, using the Global ADMinistrative layer version 4.1 (GADM4.1) as the source of administrative units. The classification is derived from the application of the Degree of Urbanization model's Stage II, which evaluates each unit based on urbanization criteria. It utilizes the Global Human Settlement Layer (GHSL) data, specifically the Settlement Classification (GHS-SMOD_GLOBE_R2023A) that categorizes areas as urban, suburban, or rural, and the Population Grid (GHS-POP_GLOBE_R2023A) that provides detailed population information.
+    date_published: "2025"
+    title_snapshot: Global Human Settlement Layer Dataset - Countries
+
+    # Citation
+    producer: European Commission, Joint Research Centre (JRC)
+    citation_full: |-
+      Schiavina, Marcello; Alessandrini, Alfredo; Melchiorri, Michele; Jacobs-Crisioni, Chris; Dijkstra Lewis, (2025): GHS-WUP-COUNTRY-STATS R2025A – GHS-WUP country statistics by Degree of Urbanisation classes, multitemporal (1950-2100). European Commission, Joint Research Centre (JRC). PID: http://data.europa.eu/89h/ee52f334-aaee-4b9e-aa00-d38ecf6c11a9 , doi: 10.2905/ee52f334-aaee-4b9e-aa00-d38ecf6c11a9
+
+      Jacobs-Crisioni, C., Schiavina, M., Alessandrini, A., Dijkstra, L. (2025) Population by degree of urbanization and by urban agglomeration from 1950 to 2100: Analyses supporting the United Nations World Urbanization Prospects report. Publications Office of the European Union, Luxembourg, 2025, JRC144219
+
+    # Files
+    url_main: https://human-settlement.emergency.copernicus.eu/ghs_wup2025.php
+    url_download: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_WUP_COUNTRY_STATS_GLOBE_R2025A/V1-0/GHS_WUP_COUNTRY_STATS_GLOBE_R2025A_V1_0.zip
+    date_accessed: '2025-12-10'
+
+    # License
+    license:
+      name: European Union, 1995-2025
+      url: https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php
+outs:
+  - md5: 1fd17f4585ca314d1fc763c38da3fe18
+    size: 4285510
+    path: ghsl_countries.xlsx
