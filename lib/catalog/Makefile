@@ -15,8 +15,3 @@ SRC = owid tests
 	else \
 		[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && uv sync --all-extras; \
 	fi
-
-	@if [ -d "../../../owid-grapher-py" ]; then \
-		echo '==> Linking local owid-grapher-py'; \
-		uv pip install -e ../../../owid-grapher-py; \
-	fi
