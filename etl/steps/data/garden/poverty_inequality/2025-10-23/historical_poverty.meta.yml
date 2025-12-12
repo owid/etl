@@ -752,10 +752,222 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      diff_random_vs_constant:
+        title: "Difference in headcount ratio: Randomized Ginis vs. constant inequality"
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+
+      diff_random_vs_quantiles:
+        title: "Difference in headcount ratio: Randomized Ginis vs. quantiles interpolation"
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+
+      diff_random_vs_ginis:
+        title: "Difference in headcount ratio: Randomized Ginis vs. Ginis interpolation"
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+
+  randomized_ginis:
+    variables:
+      headcount_ratio:
+        title: Share below $<<poverty_line>> a day (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount:
+        title: Number below $<<poverty_line>> a day (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above:
+        title: Share above $<<poverty_line>> a day (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_above:
+        title: Number above $<<poverty_line>> a day (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between:
+        title: Share between {definitions.poverty_line_between} a day (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_between:
+        title: Number between {definitions.poverty_line_between} a day (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_benchmark:
+        title: Share below $<<poverty_line>> a day (benchmark) (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_benchmark:
+        title: Number below $<<poverty_line>> a day (benchmark) (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_benchmark:
+        title: Share above $<<poverty_line>> a day (benchmark) (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_above_benchmark:
+        title: Number above $<<poverty_line>> a day (benchmark) (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_benchmark:
+        title: Share between {definitions.poverty_line_between} a day (benchmark) (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_between_benchmark:
+        title: Number between {definitions.poverty_line_between} a day (benchmark) (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_rolling_avg:
+        title: Share below $<<poverty_line>> a day (rolling average) (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_rolling_avg:
+        title: Number below $<<poverty_line>> a day (rolling average) (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_above_rolling_avg:
+        title: Share above $<<poverty_line>> a day (rolling average) (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_above_rolling_avg:
+        title: Number above $<<poverty_line>> a day (rolling average) (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between_rolling_avg:
+        title: Share between {definitions.poverty_line_between} a day (rolling average) (randomized Ginis)
+        unit: "%"
+        short_unit: "%"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 1
+      headcount_between_rolling_avg:
+        title: Number between {definitions.poverty_line_between} a day (rolling average) (randomized Ginis)
+        unit: "people"
+        short_unit: "people"
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 0
+
   gini_mean:
     variables:
       gini:
         title: Gini coefficient
+        unit: ""
+        short_unit: ""
+        description_short: ""
+        description_key: [""]
+        description_processing: ""
+        display:
+          numDecimalPlaces: 2
+      gini_random:
+        title: Gini coefficient (randomized)
         unit: ""
         short_unit: ""
         description_short: ""

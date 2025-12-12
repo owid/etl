@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Human Settlement Layer Dataset
+    description: |-
+      The "Stats in the City Database" offers harmonized data on population and population density for urban centres.
+
+      This data, based on the Global Human Settlement Layer Dataset, uses the Degree of Urbanisation framework to delineate spatial entities and integrates geospatial data from a variety of open-source datasets. It represents one of the most comprehensive resources for understanding urban population patterns and densities worldwide.
+    date_published: "2025"
+    title_snapshot: Global Human Settlement Layer Dataset - Urban centers
+
+    # Citation
+    producer: European Commission, Joint Research Centre (JRC)
+    citation_full: |-
+      Schiavina, Marcello; Alessandrini, Alfredo; Melchiorri, Michele; Dijkstra, Lewis (2025): GHS-WUP-MTUC R2025A – GHS-WUP multitemporal urban centres, obtained from the Degree of Urbanisation grids (GHS-WUP-DEGURBA R2025A) and linked across epochs, multitemporal (1950-2100). European Commission, Joint Research Centre (JRC). PID: http://data.europa.eu/89h/1ea967e5-bedc-4cf3-a0b0-3851742ee7e2 , doi: 10.2905/1ea967e5-bedc-4cf3-a0b0-3851742ee7e2
+
+      Pesaresi, Martino, Marcello Schiavina, Panagiotis Politis, Sergio Freire, Katarzyna Krasnodębska, Johannes H. Uhl, Alessandra Carioli, et al. (2024). Advances on the Global Human Settlement Layer by Joint Assessment of Earth Observation and Population Survey Data. International Journal of Digital Earth 17 (1). doi:10.1080/17538947.2024.2390454
+
+      Jacobs-Crisioni, Chris et al (2025). Population projections by degree of urbanisation for the UN World Urbanization Prospects: introducing the CRISP model, Publications Office of the European Union, Luxembourg, 2025, doi:10.2760/7163875
+
+    url_main: https://human-settlement.emergency.copernicus.eu/ghs_wup_mtuc_r2025a.php
+    url_download: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_WUP_MTUC_GLOBE_R2025A/V1-0/GHS_WUP_MTUC_GLOBE_R2025A_V1_0_statistics.zip
+    date_accessed: '2025-12-10'
+
+    # License
+    license:
+      name: European Union, 1995-2025
+      url: https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php
+outs:
+  - md5: 5417859b69cff1adeb21fb45beb445e1
+    size: 47820670
+    path: ghsl_urban_centers.xlsx
