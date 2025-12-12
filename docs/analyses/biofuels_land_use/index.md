@@ -1,8 +1,9 @@
 # Land use for biofuels vs. solar
 
 !!! info ""
+    :octicons-person-16: **Pablo Rosado, Hannah Ritchie** • :octicons-calendar-16: December 12, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Land%20use%20for%20biofuels%20vs.%20solar)
 
-    Pablo Rosado, Hannah Ritchie
+
 
 ## Introduction and summary
 
@@ -90,42 +91,52 @@ In Table 3.2 they show global weighted average capacity factors (AC/DC) for util
 
 The AC/DC factors reported for 2024 (converted to AC/AC assuming an inverter loading ratio of 1.25) are:
 
-- 5th percentile: 11.5% (AC/DC) x 1.25 ~ 14% (AC/AC)
 
-- Weighted average: 17.4% (AC/DC) x 1.25 ~ 22% (AC/AC)
+<div class="grid cards" markdown>
+-   - 5th percentile: $11.5\% \text{ (AC/DC)} \times 1.25 \approx 14\% \text{ (AC/AC)}$
+    - Weighted average: $17.4\% \text{ (AC/DC)} \times 1.25 \approx 22\% \text{ (AC/AC)}$
+    - 95th percentile: $22.6\% \text{ (AC/DC)} \times 1.25 \approx 28\% \text{ (AC/AC)}$
+</div>
 
-- 95th percentile: 22.6% (AC/DC) x 1.25 ~ 28% (AC/AC)
-
-After speaking with various experts in the field, we concluded that a typical modern installation has a power density of 1 MWp per 1.5 hectares (in terms of DC power at peak).
-In terms of AC power, this would correspond to ~0.53 MW(AC) / ha.
+After speaking with various experts in the field, we concluded that a typical modern installation has a power density of $1 \text{ MWp per } 1.5 \text{ hectares}$ (in terms of DC power at peak).
+In terms of AC power, this would correspond to $\sim 0.53 \text{ MW(AC) / ha}$.
 
 We can convert power density to an average energy density using IRENA's average DC conversion factor:
 
-( 1 MWp / 1.5 ha ) x ( 1 GWh / 1000 MWh ) x ( 17.4% of 8760 h / 1 year ) = 1.02 GWh / ha / year
+$$\frac{1 \text{ MWp}}{1.5 \text{ ha}} \times \frac{1 \text{ GWh}}{1000 \text{ MWh}} \times \frac{17.4\% \times 8760 \text{ h}}{1 \text{ year}} = 1.02 \text{ GWh / ha / year}$$
 
-We will therefore assume a fiducial value for energy density of 1 GWh / ha / year.
+We will therefore assume a fiducial value for energy density of $1 \text{ GWh / ha / year}$.
 
-A conservative range of power densities would be somewhere between 0.3 MW(AC) / ha and 0.7 MW(AC) / ha, around the midpoint value of 0.53 MW(AC) / ha chosen before.
+A conservative range of power densities would be somewhere between $0.3 \text{ MW(AC) / ha}$ and $0.7 \text{ MW(AC) / ha}$, around the midpoint value of $0.53 \text{ MW(AC) / ha}$ chosen before.
 
 Combining the ranges of capacity factors and power densities, we can calculate a lower limit, a midpoint, and an upper limit for the amount of electricity produced in a year in 32 million hectares of land:
 
-- Lower limit: 32 · 10⁶ ha x ( 0.3 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 14% of 8760 h / 1 year ) = 12 PWh / year
+<div class="grid cards" markdown>
+-   - **Lower limit:**
 
-- Midpoint: 32 · 10⁶ ha x ( 1 GWh / ha / year ) x ( 1 PWh / 10⁶ GWh ) = 32 PWh / year
+        $$32 \times 10^6 \text{ ha} \times \frac{0.3 \text{ MW}}{\text{ha}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} \times \frac{14\% \times 8760 \text{ h}}{1 \text{ year}} = 12 \text{ PWh / year}$$
 
-- Upper: 32 · 10⁶ ha x ( 0.7 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 28% of 8760 h / 1 year ) = 55 PWh / year
+    - **Midpoint:**
 
-Our fiducial value of 1 GWh / ha / year could be considered conservative, given that:
+        $$32 \times 10^6 \text{ ha} \times \frac{1 \text{ GWh}}{\text{ha} \cdot \text{year}} \times \frac{1 \text{ PWh}}{10^6 \text{ GWh}} = 32 \text{ PWh / year}$$
+
+    - **Upper:**
+
+        $$32 \times 10^6 \text{ ha} \times \frac{0.7 \text{ MW}}{\text{ha}} \times \frac{1 \text{ PWh}}{10^9 \text{ MWh}} \times \frac{28\% \times 8760 \text{ h}}{1 \text{ year}} = 55 \text{ PWh / year}$$
+</div>
+
+Our fiducial value of $1 \text{ GWh / ha / year}$ could be considered conservative, given that:
+
 - A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
 - The hypothetical transition from biofuel cropland to solar panels would take place in the coming years, so efficiencies would improve slightly with respect to the present.
 
-Therefore, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year.
-This value is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which was 31 PWh in 2024, according to [Ember's Yearly Electricity Data](https://ember-energy.org/data/yearly-electricity-data/).
-Currently, ~18 PWh of that electricity comes from fossil fuels, and only ~2 PWh from solar.
+Therefore, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce $\sim 32 \text{ PWh per year}$.
+This value is just above [the world's total electricity production](https://ourworldindata.org/grapher/electricity-prod-source-stacked), which was $31 \text{ PWh}$ in 2024, according to [Ember's Yearly Electricity Data](https://ember-energy.org/data/yearly-electricity-data/).
+Currently, $\sim 18 \text{ PWh}$ of that electricity comes from fossil fuels, and only $\sim 2 \text{ PWh}$ from solar.
 
 According to [the Energy Institute's Statistical Review of World Energy](https://www.energyinst.org/statistical-review),
-the energy that was actually produced by biofuels in 2024 was [1.42 PWh](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024).
-Therefore, if we used solar farms, we could produce ~22 times more energy (in electricity) in the area currently devoted to biofuel crops.
+the energy that was actually produced by biofuels in 2024 was [$1.42 \text{ PWh}$](https://ourworldindata.org/grapher/biofuel-production?tab=line&time=earliest..2024).
+Therefore, if we used solar farms, we could produce $\sim 22$ times more energy (in electricity) in the area currently devoted to biofuel crops.
 
 ### Alternative estimate based on Cerulogy
 
@@ -226,7 +237,7 @@ We can safely neglect the fraction of vehicles that are currently powered with e
 Let's assume an efficiency of around 30% for combustion cars and 80% for electric cars.
 Then, we can estimate the amount of energy that would be required to power all vehicles, if they were replaced by electric ones:
 
-93 EJ x ( 0.278 PWh / 1 EJ ) x ( 30% / 80% ) = 9.7 PWh
+$$93 \text{ EJ} \times \frac{0.278 \text{ PWh}}{1 \text{ EJ}} \times \frac{30\%}{80\%} = 9.7 \text{ PWh}$$
 
 The amount of energy produced by biofuels in 2024 is, as we saw before, about 1.42 PWh.
 Let's assume, for simplicity, that all this energy goes to power combustion vehicles.
@@ -303,42 +314,51 @@ In summary, we estimate that the amount of electricity that would be needed to p
 
 # Bibliography
 
-Franz, M., & Dumke, H. (2025).
-Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
-Energy, Sustainability and Society, 15(1), 12.
+!!! quote ""
+    Franz, M., & Dumke, H. (2025).
+    Evolution of patterns of specific land use by free-field photovoltaic power plants in Europe from 2006 to 2022.
+    Energy, Sustainability and Society, 15(1), 12.
 
-Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022).
-Spatial energy density of large-scale electricity generation from power sources worldwide.
-Scientific Reports, 12(1), 21280.
+!!! quote ""
+    Nøland, J. K., Auxepaules, J., Rousset, A., Perney, B., & Falletti, G. (2022).
+    Spatial energy density of large-scale electricity generation from power sources worldwide.
+    Scientific Reports, 12(1), 21280.
 
-Ong, S., Denholm, P., Heath, G., Margolis, R., & Campbell, C. (2013).
-Land-Use Requirements for Solar Power Plants in the United States.
-https://doi.org/10.2172/1086349
+!!! quote ""
+    Ong, S., Denholm, P., Heath, G., Margolis, R., & Campbell, C. (2013).
+    Land-Use Requirements for Solar Power Plants in the United States.
+    https://doi.org/10.2172/1086349
 
-Popp, J., Kot, S., Lakner, Z., & Oláh, J. (2018).
-Biofuel Use: Peculiarities and Implications.
-Journal of Security & Sustainability Issues, 7(3).
+!!! quote ""
+    Popp, J., Kot, S., Lakner, Z., & Oláh, J. (2018).
+    Biofuel Use: Peculiarities and Implications.
+    Journal of Security & Sustainability Issues, 7(3).
 
-Popp, J., Harangi-Rákos, M., Gabnai, Z., Balogh, P., Antal, G., & Bai, A. (2016).
-Biofuels and their co-products as livestock feed: global economic and environmental implications.
-Molecules, 21(3), 285.
+!!! quote ""
+    Popp, J., Harangi-Rákos, M., Gabnai, Z., Balogh, P., Antal, G., & Bai, A. (2016).
+    Biofuels and their co-products as livestock feed: global economic and environmental implications.
+    Molecules, 21(3), 285.
 
-Sandford, C., Malins, C., Phillips, J. (2024).
-Diverted harvest.
-Environmental Risk from Growth in International Biofuel Demand.
-Cerulogy.
-https://www.cerulogy.com/diverted-harvest/
+!!! quote ""
+    Sandford, C., Malins, C., Phillips, J. (2024)
+    Diverted harvest.
+    Environmental Risk from Growth in International Biofuel Demand.
+    Cerulogy.
+    https://www.cerulogy.com/diverted-harvest/
 
-Sturchio, M. A., Gallaher, A., & Grodsky, S. M. (2025).
-Ecologically informed solar enables a sustainable energy transition in US croplands.
-Proceedings of the National Academy of Sciences, 122(17), e2501605122.
-https://doi.org/10.1073/pnas.2501605122
+!!! quote ""
+    Sturchio, M. A., Gallaher, A., & Grodsky, S. M. (2025)
+    Ecologically informed solar enables a sustainable energy transition in US croplands.
+    Proceedings of the National Academy of Sciences, 122(17), e2501605122.
+    https://doi.org/10.1073/pnas.2501605122
 
-Victoria, M., Haegel, N., Peters, I. M., Sinton, R., Jäger-Waldau, A., del Cañizo, C., Breyer, C., Stocks, M., Blakers, A., Kaizuka, I., Komoto, K., Smets, A. (2021).
-Solar photovoltaics is ready to power a sustainable future.
-Joule 5, 1041–1056.
-https://doi.org/10.1016/j.joule.2021.03.005
+!!! quote ""
+    Victoria, M., Haegel, N., Peters, I. M., Sinton, R., Jäger-Waldau, A., del Cañizo, C., Breyer, C., Stocks, M., Blakers, A., Kaizuka, I., Komoto, K., Smets, A. (2021).
+    Solar photovoltaics is ready to power a sustainable future.
+    Joule 5, 1041–1056.
+    https://doi.org/10.1016/j.joule.2021.03.005
 
-Weiss, M., Winbush, T., Newman, A., & Helmers, E. (2024).
-Energy consumption of electric vehicles in Europe.
-Sustainability, 16(17), 7529.
+!!! quote ""
+    Weiss, M., Winbush, T., Newman, A., & Helmers, E. (2024).
+    Energy consumption of electric vehicles in Europe.
+    Sustainability, 16(17), 7529.
