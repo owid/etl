@@ -25,6 +25,7 @@ def create_owid_chart(
     unit: str | None = None,
     max_entities: int = 10,
     entities: list[str] | None = None,
+    enable_map: bool = False,
 ) -> Chart:
     """Create an OWID grapher chart from a DataFrame.
 
@@ -41,6 +42,7 @@ def create_owid_chart(
         unit: Unit for y-axis label.
         max_entities: Maximum entities to show initially. Defaults to 10.
         entities: Specific entities to show. Overrides max_entities auto-selection.
+        enable_map: Whether to enable the map tab in the chart. Defaults to False.
 
     Returns:
         owid.grapher.Chart object.
@@ -102,7 +104,9 @@ def create_owid_chart(
     # Select entities and enable picker if needed
     if selected_entities is not None:
         chart = chart.select(entities=selected_entities)
-        chart = chart.interact(entity_control=True)
+        chart = chart.interact(entity_control=True, enable_map=enable_map)
+    elif enable_map:
+        chart = chart.interact(enable_map=True)
 
     # Set title
     if title:

@@ -1680,28 +1680,28 @@ class Table(pd.DataFrame):
         self,
         y: str | None = None,
         x: str | None = None,
-        kind: Literal["line", "bar", "scatter"] | None = None,
+        kind: Literal["line", "bar", "scatter"] = "line",
         entity: str | None = None,
         stacked: bool = False,
         title: str | None = None,
         max_entities: int = 10,
         entities: list[str] | None = None,
+        enable_map: bool = False,
     ) -> Any:
         """Plot the table using OWID grapher.
 
         Smart plotting that auto-detects country/year columns and sets them as index.
-        If both x and y are specified, creates a scatter plot by default.
 
         Args:
             y: Column name to plot on y-axis. Required if table has multiple data columns.
-            x: Column name for x-axis. If both x and y are specified, defaults to scatter plot.
-            kind: Type of plot ("line", "bar", "scatter"). If None, auto-detected based on
-                whether both x and y are specified (scatter) or not (line).
+            x: Column name for x-axis.
+            kind: Type of plot ("line", "bar", "scatter"). Defaults to "line".
             entity: Column name for entity grouping. Auto-detected if not specified.
             stacked: Whether to stack bars in bar charts. Defaults to False.
             title: Chart title. Uses variable metadata if not specified.
             max_entities: Maximum entities to show initially. Defaults to 10.
             entities: Specific entities to show in the chart.
+            enable_map: Whether to enable the map tab in the chart. Defaults to False.
 
         Returns:
             owid.grapher.Chart object.
@@ -1720,7 +1720,7 @@ class Table(pd.DataFrame):
 
             Scatter plot with explicit x and y:
             ```python
-            tb.plot_owid(x="gdp", y="population")  # Creates scatter plot
+            tb.plot_owid(x="gdp", y="population", kind="scatter")
             ```
         """
         # Get all column names (including index)
@@ -1749,14 +1749,6 @@ class Table(pd.DataFrame):
             index_like_cols.add(detected_time)
 
         data_cols = [c for c in self.columns if c not in index_like_cols]
-
-        # If both x and y are specified, use scatter plot by default
-        if x is not None and y is not None and kind is None:
-            kind = "scatter"
-
-        # Default to line plot
-        if kind is None:
-            kind = "line"
 
         # Determine which column to plot
         if y is None:
@@ -1792,6 +1784,7 @@ class Table(pd.DataFrame):
             unit=unit,
             max_entities=max_entities,
             entities=entities,
+            enable_map=enable_map,
         )
 
     def update_log(

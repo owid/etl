@@ -19,7 +19,6 @@ from owid.grapher import Chart
 
 from . import processing_log as pl
 from . import warnings
-from .plotting import create_owid_chart
 from .meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
@@ -30,6 +29,7 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
+from .plotting import create_owid_chart
 from .properties import metadata_property
 
 log = structlog.get_logger()
@@ -521,6 +521,7 @@ class Variable(pd.Series):
         title: str | None = None,
         max_entities: int = 10,
         entities: list[str] | None = None,
+        enable_map: bool = False,
     ) -> Chart:
         """Plot the variable using OWID grapher.
 
@@ -542,6 +543,7 @@ class Variable(pd.Series):
                 entity picker is enabled. Defaults to 10. Ignored if `entities` is provided.
             entities: List of entity names to show in the chart. If provided, overrides
                 the automatic selection based on `max_entities`.
+            enable_map: Whether to enable the map tab in the chart. Defaults to False.
 
         Returns:
             owid.grapher.Chart object (interactive widget in notebooks).
@@ -575,6 +577,7 @@ class Variable(pd.Series):
             unit=self.metadata.unit,
             max_entities=max_entities,
             entities=entities,
+            enable_map=enable_map,
         )
 
 
