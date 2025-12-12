@@ -4,10 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Urbanization
-    display:
-      numDecimalPlaces:
-        0
-
     processing_level: minor
     description_key:
     - |-
@@ -329,6 +325,7 @@ tables:
         unit: people
         description_short: *desc_short_pop_capital
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
         presentation:
@@ -342,6 +339,7 @@ tables:
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
         presentation:
@@ -353,6 +351,7 @@ tables:
         unit: people
         description_short: *desc_short_pop_capital
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
         presentation:
           grapher_config:
@@ -365,6 +364,7 @@ tables:
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
         presentation:
           grapher_config:
@@ -377,6 +377,7 @@ tables:
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
 
@@ -387,6 +388,7 @@ tables:
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
 
      urban_pop_top_100_estimates:
@@ -394,6 +396,7 @@ tables:
         unit: people
         description_short: *desc_short_pop_top_100
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
 
      urban_pop_top_100_projections:
@@ -401,5 +404,6 @@ tables:
         unit: people
         description_short: *desc_short_pop_top_100
         display:
+          numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
