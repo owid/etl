@@ -51,7 +51,7 @@ EXPORT_COMPARISON_CSV = False
 NUM_OBSERVATIONS_TO_SHOW = 20
 
 # Number of random iterations for randomized gini estimation (0 = disabled, >0 = parallel averaging)
-NUM_RANDOM_ITERATIONS = 0
+NUM_RANDOM_ITERATIONS = 2
 ##############################################################################
 
 # Poverty lines (daily income in 2021 PPP$)
@@ -377,6 +377,9 @@ def run() -> None:
         log.info("Averaging results across iterations...")
         tb_randomized_ginis = average_randomized_results(results)
 
+        # Add origins from tb_interpolated_ginis
+        tb_randomized_ginis["headcount_ratio"].m.origins = tb_interpolated_ginis["headcount_ratio"].m.origins
+
     else:
         # Single iteration (original behavior)
         # Create 1000 bins from mean and gini data
@@ -394,8 +397,8 @@ def run() -> None:
                 tb=tb_thousand_bins_randomized_ginis, maddison_world_years=maddison_world_years
             )
 
-        # Create stacked variables for stacked area/bar charts
-        tb_randomized_ginis = create_stacked_variables(tb=tb_randomized_ginis)
+    # Convert poverty_line to string to match other tables (they go through create_stacked_variables which does this)
+    tb_randomized_ginis["poverty_line"] = tb_randomized_ginis["poverty_line"].astype(str)
 
     ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
@@ -1539,9 +1542,6 @@ def run_randomized_gini_iteration(args: Tuple[int, Table, Table, Table, list]) -
             tb=tb_thousand_bins_randomized, maddison_world_years=maddison_world_years
         )
 
-    # Create stacked variables
-    tb_randomized = create_stacked_variables(tb=tb_randomized)
-
     return tb_randomized
 
 
@@ -1564,11 +1564,12 @@ def average_randomized_results(results: list[Table]) -> Table:
     # Use the first result as a template
     tb_avg = results[0].copy()
 
-    # Get all numeric columns (exclude index columns like country, year, poverty_line)
-    index_cols = ["country", "year", "poverty_line"]
-    numeric_cols = [
-        col for col in tb_avg.columns if col not in index_cols and pd.api.types.is_numeric_dtype(tb_avg[col])
-    ]
+    # Define key identifier columns that should never be averaged
+    # These are categorical identifiers, not values to average
+    identifier_cols = ["country", "year", "poverty_line"]
+
+    # Get all columns that should be averaged (numeric columns that are not identifiers)
+    numeric_cols = ["headcount_ratio"]
 
     # Average each numeric column across all iterations
     for col in numeric_cols:
@@ -1576,6 +1577,9 @@ def average_randomized_results(results: list[Table]) -> Table:
         col_values = np.stack([result[col].values for result in results])
         # Average across iterations (axis 0)
         tb_avg[col] = col_values.mean(axis=0)
+
+    # Keep relevant columns only
+    tb_avg = tb_avg[identifier_cols + numeric_cols]
 
     return tb_avg
 
