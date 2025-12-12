@@ -51,7 +51,7 @@ EXPORT_COMPARISON_CSV = False
 NUM_OBSERVATIONS_TO_SHOW = 20
 
 # Number of random iterations for randomized gini estimation (0 = disabled, >0 = parallel averaging)
-NUM_RANDOM_ITERATIONS = 2
+NUM_RANDOM_ITERATIONS = 0
 ##############################################################################
 
 # Poverty lines (daily income in 2021 PPP$)
@@ -399,6 +399,9 @@ def run() -> None:
 
     # Convert poverty_line to string to match other tables (they go through create_stacked_variables which does this)
     tb_randomized_ginis["poverty_line"] = tb_randomized_ginis["poverty_line"].astype(str)
+
+    # Drop population column
+    tb_randomized_ginis = tb_randomized_ginis.drop(columns=["population"], errors="raise")
 
     ###############################################################################
     # COMPARE VALUES BETWEEN DIFFERENT METHODS
