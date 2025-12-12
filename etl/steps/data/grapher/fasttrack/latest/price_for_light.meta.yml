@@ -7,11 +7,13 @@ tables:
   price_for_light:
     variables:
       price_of_lighting:
-        title: price_of_lighting
+        title: Price of lighting
         unit: British Pound per million lumen-hours
         short_unit: £
         display:
           numDecimalPlaces: 2
+        description: |-
+          To allow for comparisons over time, the data is adjusted for inflation and expressed in prices for the year 2000. The data is shown as a five-year moving average.
     dimensions:
       - name: country
         slug: country
