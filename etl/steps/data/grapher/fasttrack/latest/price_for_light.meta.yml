@@ -1,0 +1,19 @@
+dataset:
+  title: Price for Light
+  description: ''
+  licenses:
+    - {}
+tables:
+  price_for_light:
+    variables:
+      price_of_lighting:
+        title: price_of_lighting
+        unit: British Pound per million lumen-hours
+        short_unit: £
+        display:
+          numDecimalPlaces: 2
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
