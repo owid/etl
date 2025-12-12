@@ -398,7 +398,7 @@ def run() -> None:
             )
 
         # Keep only relevant columns
-        tb_randomized_ginis = tb_randomized_ginis["country", "year", "poverty_line", "headcount_ratio"]
+        tb_randomized_ginis = tb_randomized_ginis[["country", "year", "poverty_line", "headcount_ratio"]]
 
     # Convert poverty_line to string to match other tables (they go through create_stacked_variables which does this)
     tb_randomized_ginis["poverty_line"] = tb_randomized_ginis["poverty_line"].astype(str)
