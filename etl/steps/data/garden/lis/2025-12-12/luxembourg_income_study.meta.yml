@@ -14,7 +14,7 @@ dataset:
 
 
 tables:
-  absolute_poverty:
+  poverty:
     variables:
       # testing_variable:
       #   title: Testing variable title
@@ -56,4 +56,10 @@ tables:
       #     numSignificantFigures:
       #
       {}
+  mean_median:
+    variables: {}
+  deciles:
+    variables: {}
+  inequality:
+    variables: {}
 

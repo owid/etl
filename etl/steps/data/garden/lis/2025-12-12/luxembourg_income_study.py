@@ -110,9 +110,16 @@ def run() -> None:
     tb_inequality = process_inequality(tb=tb_inequality)
     tb_mean_median, tb_deciles = process_incomes(tb=tb_incomes)
 
+    # Concatenate poverty tables into one
+    tb_poverty = pr.concat(
+        [tb_absolute_poverty, tb_relative_poverty],
+        ignore_index=True,
+        sort=False,
+    )
+
     # Improve table format.
-    tb_absolute_poverty = tb_absolute_poverty.format(
-        ["country", "year", "poverty_line", "welfare_type", "equivalence_scale"]
+    tb_poverty = tb_poverty.format(
+        ["country", "year", "poverty_line", "welfare_type", "equivalence_scale"], short_name="poverty"
     )
     tb_mean_median = tb_mean_median.format(
         ["country", "year", "welfare_type", "equivalence_scale"], short_name="mean_median"
@@ -121,9 +128,6 @@ def run() -> None:
         ["country", "year", "welfare_type", "equivalence_scale", "decile"], short_name="deciles"
     )
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "equivalence_scale"])
-    tb_relative_poverty = tb_relative_poverty.format(
-        ["country", "year", "poverty_line", "welfare_type", "equivalence_scale"]
-    )
 
     #
     # Save outputs.
@@ -131,8 +135,7 @@ def run() -> None:
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(
         tables=[
-            tb_absolute_poverty,
-            tb_relative_poverty,
+            tb_poverty,
             tb_mean_median,
             tb_deciles,
             tb_inequality,
@@ -150,16 +153,14 @@ def process_poverty(tb: Table, absolute: bool) -> Table:
     Extract poverty lines from indicator names and make the table wide, renaming indicators accordingly.
     """
 
+    # Extract poverty lines from indicator names, as the last number after the last underscore. Make it integer
+    tb["poverty_line"] = tb["indicator"].str.split("_").str[-1].astype(str)
+
     if absolute:
         column_dict = ABSOLUTE_POVERTY_COLUMNS
 
-        # Extract poverty lines from indicator names, as the last number after the last underscore. Make it integer
-        tb["poverty_line"] = tb["indicator"].str.split("_").str[-1].astype(int)
     else:
         column_dict = RELATIVE_POVERTY_COLUMNS
-
-        # Extract poverty lines from indicator names, as the last number after the last underscore. Make it string
-        tb["poverty_line"] = tb["indicator"].str.split("_").str[-1].astype(str)
 
         # Assert that all poverty lines are in RELATIVE_POVERTY_LINES keys
         poverty_lines_expected = set(RELATIVE_POVERTY_LINES.keys())
