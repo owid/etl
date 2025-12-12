@@ -245,16 +245,21 @@ So, if all road transport was electric, we would be able to power them with just
 
 ### Bottom-up estimate
 
-The International Energy Agency [estimates that](https://www.iea.org/data-and-statistics/data-product/world-energy-outlook-2025-free-dataset#tables-for-scenario-projections), globally, passenger cars covered 25800 billion passenger-kilometers in 2024.
+The International Energy Agency [estimates that](https://www.iea.org/data-and-statistics/data-product/world-energy-outlook-2025-free-dataset#tables-for-scenario-projections), globally, passenger cars covered 25.8 trillion passenger-kilometers in 2024.
 
-First, we need to convert that to kilometers.
-To do that, we can assume that the average car occupancy is 1.5 (so, 1.5 people in a car, on average).
-That gives 17200 billion kilometers.
+First, we need to convert that to kilometers (or car-kilometers).
+To do that, we can assume that the average car occupancy is 1.5 (so, 1.5 people in a car, on average). Therefore:
+
+25.8 · 10¹² km passenger x ( 1 car / 1.5 passengers ) = 17.2 · 10¹² car km
+
+That gives 17.2 trillion kilometers.
 
 We'll assume that the average electric car uses around 0.2 kilowatt-hours to drive one kilometer.
-Covering 17200 billion kilometers would therefore use 17200 x 0.2 = 3445 billion kWh.
+Covering all those kilometers traveled by car would therefore use:
 
-That is equivalent to 3445 TWh of electricity to power the global car fleet, assuming all cars were electric.
+17.2 · 10¹² car km x ( 0.2 kWh / 1 car km ) x ( 1 PWh / 10¹² kWh ) = 3.44 PWh
+
+That means 3.44 PWh of electricity would be needed to power the global car fleet, assuming all cars were electric.
 
 The efficiency of electric cars varies based on model, age, size and other factors.
 We can assume a value of 0.2 kWh per kilometer based on several sources.
@@ -270,11 +275,16 @@ They are at an earlier stage of development, so numbers on energy efficiency are
 The International Energy Agency [estimates that](https://www.iea.org/data-and-statistics/data-product/world-energy-outlook-2025-free-dataset#tables-for-scenario-projections) heavy-duty trucks covered 35000 billion tonne-kilometers in 2024.
 
 To convert to kilometers, we assume that the average truck load is around 12 tonnes.
-That gives 35000 billion / 12 = 2900 billion kilometers.
-We have assumed that a medium heavy-duty truck uses around 1.2 kWh per kilometer driven (if electric).
+That gives:
 
-Covering 2900 billion kilometers therefore uses 2900 billion / 1.2 = 3500 billion kWh.
-That's 3500 TWh of electricity to power the global truck fleet, assuming they were all electric.
+35 · 10¹² tonne km x ( 1 truck / 12 tonnes ) = 2.92 · 10¹² truck km
+
+We assume that a medium heavy-duty truck uses around 1.2 kWh per kilometer driven (if electric).
+Covering 2900 billion kilometers therefore uses:
+
+2.92 · 10¹² truck km x ( 1.2 kWh / 1 truck km ) x ( 1 PWh / 10¹² kWh ) = 3.50 PWh
+
+That's 3.50 PWh of electricity to power the global truck fleet, assuming they were all electric.
 
 Again, the efficiency of electric trucks varies based on a range of factors including size, weight, and design.
 We assume an efficiency of 1.2 kWh per km, based on published estimates from a number of sources.
@@ -284,7 +294,7 @@ An independent group [tested the truck](https://www.scania.com/group/en/home/ele
 
 During [an 18-month trial](https://bett.cenex.co.uk/assets/reports/BETT---End-of-trial-report.pdf) of twenty 19-tonne electric trucks, the average efficiency ranged from 0.8 to 1.1 kWh per km, depending on urban or rural driving.
 
-A [recent study](https://theicct.org/wp-content/uploads/2025/08/ID-359-%E2%80%93-EU-goods-transport_report_final.pdf) conducted by the International Council on Clean Transportation found a mean consumption in the range of 1.0 to 1.2 kW per km.
+A [recent study](https://theicct.org/wp-content/uploads/2025/08/ID-359-%E2%80%93-EU-goods-transport_report_final.pdf) conducted by the International Council on Clean Transportation found a mean consumption in the range of 1.0 to 1.2 kWh per km.
 
 Larger trucks tend to require more electricity per kilometer, and some will have an energy consumption higher than 1.2 kWh per km.
 However, this will tend to average out across an entire truck fleet.
