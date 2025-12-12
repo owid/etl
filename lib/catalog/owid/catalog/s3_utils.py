@@ -19,7 +19,30 @@ BOTO3_CLIENT_LOCK = threading.Lock()
 
 
 def s3_bucket_key(url: str) -> tuple[str, str]:
-    """Get bucket and key from either s3:// URL or https:// URL."""
+    """Extract bucket name and key from an S3 URL.
+
+    Parses both `s3://` and `https://` S3 URLs to extract the bucket name
+    and object key.
+
+    Args:
+        url: S3 URL in either format:
+            - `s3://bucket-name/path/to/object`
+            - `https://bucket-name.s3.region.amazonaws.com/path/to/object`
+
+    Returns:
+        Tuple of (bucket_name, object_key).
+
+    Example:
+        ```python
+        # S3 protocol URL
+        bucket, key = s3_bucket_key("s3://my-bucket/data/file.csv")
+        # Returns: ("my-bucket", "data/file.csv")
+
+        # HTTPS URL
+        bucket, key = s3_bucket_key("https://my-bucket.s3.us-east-1.amazonaws.com/data/file.csv")
+        # Returns: ("my-bucket", "data/file.csv")
+        ```
+    """
     parsed = urlparse(url)
     bucket = parsed.netloc
     key = parsed.path.lstrip("/")
@@ -32,6 +55,36 @@ def s3_bucket_key(url: str) -> tuple[str, str]:
 
 
 def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[str]:
+    """List all objects in an S3 folder.
+
+    Recursively lists all objects within an S3 folder, handling pagination
+    automatically. Excludes folder markers (keys ending with '/').
+
+    Args:
+        s3_folder: S3 folder URL (e.g., `s3://bucket/path/to/folder/`).
+        client: Optional boto3 S3 client. If None, connects to R2 automatically.
+
+    Returns:
+        List of object keys (paths) within the folder.
+
+    Example:
+        List all objects in a folder
+        ```python
+        objects = list_s3_objects("s3://my-bucket/data/")
+        print(f"Found {len(objects)} objects")
+        ```
+
+        Use custom client
+        ```python
+        import boto3
+        client = boto3.client('s3')
+        objects = list_s3_objects("s3://my-bucket/data/", client=client)
+        ```
+
+    Note:
+        This function handles pagination automatically for folders with
+        more than 1000 objects.
+    """
     client = client or connect_r2()
 
     bucket, key = s3_bucket_key(s3_folder)
@@ -56,7 +109,28 @@ def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[st
 
 
 def download(s3_url: str, filename: str, quiet: bool = False, client: BaseClient | None = None) -> None:
-    """Download the file at the S3 URL to the given local filename."""
+    """Download a file from S3 to local filesystem.
+
+    Args:
+        s3_url: S3 URL of the file to download (e.g., `s3://bucket/path/file.csv`).
+        filename: Local path where the file should be saved.
+        quiet: If True, suppresses log messages. Defaults to False.
+        client: Optional boto3 S3 client. If None, connects to R2 automatically.
+
+    Raises:
+        UploadError: If the download fails due to S3 client errors.
+
+    Example:
+        Download a file
+        ```python
+        download("s3://my-bucket/data/file.csv", "local_file.csv")
+        ```
+
+        Download quietly (no logs)
+        ```python
+        download("s3://my-bucket/data/file.csv", "file.csv", quiet=True)
+        ```
+    """
     client = client or connect_r2()
 
     bucket, key = s3_bucket_key(s3_url)
@@ -80,7 +154,68 @@ def download_s3_folder(
     max_workers: int = 20,
     delete: bool = False,
 ) -> None:
-    """Download all files in the given S3 folder to the local directory."""
+    """Download all files from an S3 folder to a local directory.
+
+    Downloads all objects from an S3 folder using parallel threads for efficiency.
+    Supports filtering with include/exclude patterns and optional deletion of
+    local files not present in S3.
+
+    Args:
+        s3_folder: S3 folder URL. Must end with a slash (e.g., `s3://bucket/folder/`).
+        local_dir: Local directory path where files will be downloaded.
+        exclude: List of patterns to exclude from download. Files containing any
+            of these patterns will be skipped.
+        include: List of patterns to include in download. If specified, only files
+            containing one of these patterns will be downloaded.
+        client: Optional boto3 S3 client. If None, connects to R2 automatically.
+        max_workers: Maximum number of parallel download threads. Defaults to 20.
+        delete: If True, deletes local files that don't exist in the S3 folder.
+            Defaults to False.
+
+    Raises:
+        AssertionError: If s3_folder doesn't end with a slash.
+        UploadError: If any download fails.
+
+    Example:
+        Download entire folder
+        ```python
+        from pathlib import Path
+        download_s3_folder(
+            "s3://my-bucket/data/",
+            Path("local_data")
+        )
+        ```
+
+        Download only CSV files
+        ```python
+        download_s3_folder(
+            "s3://my-bucket/data/",
+            Path("local_data"),
+            include=[".csv"]
+        )
+        ```
+
+        Download and sync (delete local files not in S3)
+        ```python
+        download_s3_folder(
+            "s3://my-bucket/data/",
+            Path("local_data"),
+            delete=True
+        )
+        ```
+
+        Exclude backup files
+        ```python
+        download_s3_folder(
+            "s3://my-bucket/data/",
+            Path("local_data"),
+            exclude=[".bak", ".tmp"]
+        )
+        ```
+
+    Note:
+        The local_dir is created automatically if it doesn't exist.
+    """
     assert s3_folder.endswith("/"), "s3_folder must end with a slash"
 
     client = client or connect_r2()
@@ -127,19 +262,12 @@ def upload(
 ) -> None:
     """Upload the file at the given local filename to the S3 URL.
 
-    Parameters
-    ----------
-    s3_url : str
-        S3 URL to upload to
-    filename : str | Path
-        Local file to upload
-    public : bool
-        Whether to make the file publicly readable
-    quiet : bool
-        Whether to suppress log messages
-    downloadable : bool
-        If True, force browsers to download the file instead of displaying it inline.
-        Sets Content-Disposition header to 'attachment; filename="..."'
+    Args:
+        s3_url: S3 URL to upload to
+        filename: Local file to upload
+        public: Whether to make the file publicly readable
+        quiet: Whether to suppress log messages
+        downloadable: If True, force browsers to download the file instead of displaying it inline. Sets Content-Disposition header to 'attachment; filename="..."'
     """
     client = connect_r2()
     bucket, key = s3_bucket_key(s3_url)
@@ -173,7 +301,36 @@ def _read_owid_rclone_config() -> dict[str, str]:
 
 
 def connect_r2() -> BaseClient:
-    "Return a connection to Cloudflare's R2."
+    """Create a connection to Cloudflare R2 storage.
+
+    Creates a boto3 S3 client configured for Cloudflare R2. Credentials are loaded
+    from environment variables or rclone configuration file.
+
+    Credential sources (in priority order):
+
+    1. Environment variables: `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_ENDPOINT`, `R2_REGION_NAME`
+    2. rclone config file: `~/.config/rclone/rclone.conf` (section: `owid-r2`)
+
+    Returns:
+        Boto3 S3 client configured for R2.
+
+    Example:
+        ```python
+        # Connect to R2
+        client = connect_r2()
+
+        # Use with boto3 operations
+        client.list_objects_v2(Bucket='my-bucket', Prefix='data/')
+        ```
+
+    Note:
+        For cached connections that reuse the same client across calls, use
+        `connect_r2_cached()` instead. This is more efficient for multiple operations.
+
+    See Also:
+        - `connect_r2_cached()`: Thread-safe cached version
+        - Cloudflare R2 docs: https://developers.cloudflare.com/r2/
+    """
     import boto3
 
     # first, get the R2 credentials from dotenv
@@ -218,16 +375,51 @@ def _connect_r2_cached() -> BaseClient:
 
 
 def connect_r2_cached() -> BaseClient:
-    """Connect to R2, but cache the connection for subsequent calls. This is more efficient than
-    creating a new connection for every request."""
+    """Create a cached, thread-safe connection to Cloudflare R2.
+
+    Returns a cached R2 client that's reused across multiple calls. This is more
+    efficient than creating a new connection for every request. Thread-safe through
+    locking mechanism.
+
+    Returns:
+        Cached boto3 S3 client configured for R2.
+
+    Example:
+        Use cached connection for multiple operations
+        ```python
+        client = connect_r2_cached()
+        client.upload_file('local.csv', 'bucket', 'remote.csv')
+        client.download_file('bucket', 'data.json', 'local.json')
+        # Both use the same underlying connection
+        ```
+
+    Note:
+        The connection is cached indefinitely. If credentials change during runtime,
+        the application needs to be restarted.
+
+    See Also:
+        - `connect_r2()`: Non-cached version for one-time connections
+    """
     # creating a client is not thread safe, lock it
     with BOTO3_CLIENT_LOCK:
         return _connect_r2_cached()
 
 
 class MissingCredentialsError(Exception):
+    """Raised when R2 credentials are not found.
+
+    This exception is raised when neither environment variables nor rclone
+    configuration contain the required R2 credentials.
+    """
+
     pass
 
 
 class UploadError(Exception):
+    """Raised when S3 upload or download operations fail.
+
+    This exception wraps boto3 ClientError exceptions that occur during
+    S3 operations like upload, download, or file listing.
+    """
+
     pass

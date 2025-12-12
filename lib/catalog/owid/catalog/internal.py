@@ -4,14 +4,12 @@
 #  Internal APIs subject to change at any time.
 #
 
-import datetime as dt
+import io
 import json
 from dataclasses import dataclass
-from typing import Literal
 
 import pandas as pd
 import requests
-from dateutil.parser import parse as date_parse
 
 
 class LicenseError(Exception):
@@ -23,141 +21,80 @@ class ChartNotFoundError(Exception):
 
 
 @dataclass
-class _Indicator:
-    data: dict
-    metadata: dict
-
-    def to_dict(self):
-        return {"data": self.data, "metadata": self.metadata}
-
-    def to_frame(self):
-        if self.metadata.get("nonRedistributable"):
-            raise LicenseError(
-                "API download is disallowed for this indicator due to license restrictions from the data provider"
-            )
-
-        # getting a data frame is easy
-        df = pd.DataFrame.from_dict(self.data)
-
-        # turning entity ids into entity names
-        entities = pd.DataFrame.from_records(self.metadata["dimensions"]["entities"]["values"])
-        id_to_name = entities.set_index("id").name.to_dict()
-        df["entities"] = df.entities.apply(id_to_name.__getitem__)
-
-        # make the "values" column more interestingly named
-        short_name = self.metadata.get("shortName", f'_{self.metadata["id"]}')
-        df = df.rename(columns={"values": short_name})
-
-        time_col = self._detect_time_col_type()
-        if time_col == "dates":
-            df["years"] = self._convert_years_to_dates(df["years"])
-
-        # order the columns better
-        cols = ["entities", "years"] + sorted(df.columns.difference(["entities", "years"]))
-        df = df[cols]
-
-        return df
-
-    def _detect_time_col_type(self) -> Literal["dates", "years"]:
-        if self.metadata.get("display", {}).get("yearIsDay"):
-            return "dates"
-
-        return "years"
-
-    def _convert_years_to_dates(self, years):
-        base_date = date_parse(self.metadata["display"]["zeroDay"])
-        return years.apply(lambda y: base_date + dt.timedelta(days=y))
-
-
-@dataclass
 class _GrapherBundle:
+    slug: str
     config: dict
-    dimensions: dict[int, _Indicator]
-    origins: list[dict]
+    metadata: dict
+    _df: pd.DataFrame
 
-    def to_json(self):
-        return json.dumps(
-            {
-                "config": self.config,
-                "dimensions": {k: i.to_dict() for k, i in self.dimensions.items()},
-                "origins": self.origins,
-            }
-        )
+    def to_frame(self) -> pd.DataFrame:
+        df = self._df.copy()
 
-    def size(self):
-        return len(self.to_json())
+        # Rename columns to match expected format
+        df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
 
-    @property
-    def indicators(self) -> list[_Indicator]:
-        return list(self.dimensions.values())
+        # Drop the Code column (not used in the old API)
+        if "Code" in df.columns:
+            df = df.drop(columns=["Code"])
 
-    def to_frame(self):
-        # combine all the indicators into a single data frame and one metadata dict
-        metadata = {}
-        df = None
-        for i in self.indicators:
-            to_merge = i.to_frame()
-            (value_col,) = to_merge.columns.difference(["entities", "years"])
-            metadata[value_col] = i.metadata.copy()
+        # Attach metadata to the DataFrame
+        df.attrs["slug"] = self.slug
+        df.attrs["url"] = f"https://ourworldindata.org/grapher/{self.slug}"
 
-            if df is None:
-                df = to_merge
-            else:
-                df = pd.merge(df, to_merge, how="outer", on=["entities", "years"])
+        # Build per-column metadata from the metadata.json response
+        columns_meta = self.metadata.get("columns", {})
+        df.attrs["metadata"] = {}
+        for col_name, col_meta in columns_meta.items():
+            short_name = col_meta.get("shortName", col_name)
+            if short_name in df.columns:
+                df.attrs["metadata"][short_name] = col_meta
 
-        assert df is not None
+        # If there's only one data column, rename it to the slug-based name
+        value_cols = [c for c in df.columns if c not in ("entities", "years")]
+        if len(value_cols) == 1:
+            old_name = value_cols[0]
+            new_name = self.slug.replace("-", "_")
+            df = df.rename(columns={old_name: new_name})
+            if old_name in df.attrs["metadata"]:
+                df.attrs["metadata"][new_name] = df.attrs["metadata"].pop(old_name)
+            df.attrs["value_col"] = new_name
 
-        # save some useful metadata onto the frame
-        assert self.config
-        slug = self.config["slug"]
-        df.attrs["slug"] = slug
-        df.attrs["url"] = f"https://ourworldindata.org/grapher/{slug}"
-        df.attrs["metadata"] = metadata
-
-        # if there is only one indicator, we can use the slug as the column name
-        if len(df.columns) == 3:
-            assert self.config
-            (value_col,) = df.columns.difference(["entities", "years"])
-            short_name = slug.replace("-", "_")
-            df = df.rename(columns={value_col: short_name})
-            df.attrs["metadata"][short_name] = df.attrs["metadata"].pop(value_col)
-
-            df.attrs["value_col"] = short_name
-
-        # we kept using "years" until now to keep the code paths the same, but they could
-        # be dates
-        if df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
+        # Rename "years" to "dates" if the values are date strings
+        if "years" in df.columns and df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
             df = df.rename(columns={"years": "dates"})
 
         return df
 
     def __repr__(self):
-        return f"GrapherBundle(config={self.config}, dimensions=..., origins=...)"
-
-
-def _fetch_grapher_config(slug):
-    resp = requests.get(f"https://ourworldindata.org/grapher/{slug}")
-    if resp.status_code == 404:
-        raise ChartNotFoundError(f"No such chart found at https://ourworldindata.org/grapher/{slug}")
-
-    resp.raise_for_status()
-    return json.loads(resp.content.decode("utf-8").split("//EMBEDDED_JSON")[1])
-
-
-def _fetch_dimension(id: int) -> _Indicator:
-    data = requests.get(f"https://api.ourworldindata.org/v1/indicators/{id}.data.json").json()
-    metadata = requests.get(f"https://api.ourworldindata.org/v1/indicators/{id}.metadata.json").json()
-    return _Indicator(data, metadata)
+        return f"GrapherBundle(slug={self.slug}, config=..., metadata=...)"
 
 
 def _fetch_bundle(slug: str) -> _GrapherBundle:
-    config = _fetch_grapher_config(slug)
-    indicator_ids = [d["variableId"] for d in config["dimensions"]]
+    base_url = f"https://ourworldindata.org/grapher/{slug}"
 
-    dimensions = {indicator_id: _fetch_dimension(indicator_id) for indicator_id in indicator_ids}
+    # Fetch CSV data
+    csv_resp = requests.get(f"{base_url}.csv?useColumnShortNames=true")
+    if csv_resp.status_code == 404:
+        raise ChartNotFoundError(f"No such chart found at {base_url}")
+    if csv_resp.status_code == 403:
+        # Non-redistributable data
+        try:
+            error_data = csv_resp.json()
+            raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
+        except (json.JSONDecodeError, ValueError):
+            raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
+    csv_resp.raise_for_status()
 
-    origins = []
-    for d in dimensions.values():
-        if d.metadata.get("origins"):
-            origins.append(d.metadata.pop("origins"))
-    return _GrapherBundle(config, dimensions, origins)
+    df = pd.read_csv(io.StringIO(csv_resp.text))
+
+    # Fetch metadata
+    meta_resp = requests.get(f"{base_url}.metadata.json")
+    meta_resp.raise_for_status()
+    metadata = meta_resp.json()
+
+    # Fetch config
+    config_resp = requests.get(f"{base_url}.config.json")
+    config_resp.raise_for_status()
+    config = config_resp.json()
+
+    return _GrapherBundle(slug=slug, config=config, metadata=metadata, _df=df)

@@ -40,7 +40,7 @@ tables:
     variables:
       # OWID
       owid_region:
-        title: World regions according to OWID
+        title: World region according to OWID
         description_short: |-
           Regions defined by Our World in Data, which are used in OWID charts and maps.
         type: ordinal

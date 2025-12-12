@@ -17,11 +17,6 @@ def run() -> None:
     # Load data from snapshot.
     tb = snap.read()
 
-    #
-    # Process data.
-    #
-
-    # Set index
     tb = tb.format(["date", "segment"])
 
     #

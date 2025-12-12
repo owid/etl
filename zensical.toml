@@ -97,12 +97,21 @@ nav = [
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
+    { "Our libraries" = [
+        { "Python" = [
+            "libraries/index.md",
+            { "owid.catalog" = "libraries/catalog.md" },
+            { "owid-grapher-py" = "libraries/grapher-py.md" },
+            { "owid.repack" = "libraries/repack.md" },
+            { "owid.datautils" = "libraries/datautils.md" },
+        ] },
+    ] },
     { "API and catalog" = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
-        { "Catalog API" = "api/catalog-api.md" },
         { "Search API" = "api/search-api.md" },
-        { "Semantic Search API" = "api/semantic-search-api.md" },
+        { "Indicators API" = "api/semantic-search-api.md" },
+        { "Catalog API" = "api/catalog-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
         # { "Content database" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
@@ -118,16 +127,23 @@ nav = [
 ]
 
 # Extra CSS
-extra_css = ["css/extra.css"]
+extra_css = [
+    "css/extra.css",
+    "https://unpkg.com/katex@0/dist/katex.min.css",
+    "css/mkdocstrings.css",
+]
 
 
 # Extra JavaScript
 extra_javascript = [
+    "https://unpkg.com/katex@0/dist/katex.min.js",
+    "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
     "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
+    "javascripts/katex.js",
     "javascripts/tablesort.js",
     "javascripts/cell-toggles.js",
     "javascripts/notebook-copy.js",
-    "javascripts/mermaid.mjs",
+    # Mermaid is handled by the markdown extension (see pymdownx.superfences config below)
 ]
 
 
@@ -284,6 +300,9 @@ keys = {}
 snippets = {}
 inlinehilite = {}
 
+[project.markdown_extensions.pymdownx.arithmatex]
+generic = true
+
 [project.markdown_extensions.pymdownx.highlight]
 anchor_linenums = true
 line_spans = "__span"
@@ -318,6 +337,59 @@ custom_fences = [
 
 
 # PLUGINS
+## MKDOCSTRINGS
+[project.plugins.mkdocstrings.handlers.python]
+inventories = ["https://docs.python.org/3/objects.inv"]
+paths = ["lib/catalog", "lib/datautils", "lib/repack"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+inherited_members = true          # false
+merge_init_into_class = true
+parameter_headings = true
+members_order = "source"
+filters = ["!^_", "^__"]
+heading_level = 2
+separate_signature = true
+docstring_section_style = "spacy"
+backlinks = "tree"
+show_root_heading = true
+show_root_full_path = true
+show_signature_annotations = true
+show_source = true
+show_symbol_type_heading = true
+show_symbol_type_toc = true
+show_root_toc_entry = false
+signature_crossrefs = true
+summary = true
+unwrap_annotated = true
+
+
+extensions = ["griffe_typingdoc"]
+
+# docstring_options:
+# ignore_init_summary: true
+# docstring_section_style: list
+# extensions:
+# - griffe_typingdoc
+# filters: ["!^_", "^__"]
+# heading_level: 1
+# inherited_members: true
+# merge_init_into_class: true
+# parameter_headings: true
+# separate_signature: true
+# show_root_heading: true
+# show_root_full_path: false
+# show_signature_annotations: true
+# show_source: true
+# show_symbol_type_heading: true
+# show_symbol_type_toc: true
+# signature_crossrefs: true
+# summary: true
+# unwrap_annotated: true
+
+
+## Others
 [project.plugins]
 
 [project.plugins."mkdocs-jupyter"]

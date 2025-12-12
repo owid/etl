@@ -51,7 +51,7 @@ def run() -> None:
 def fit_exponential(models, metric):
     """Fit an exponential model to the given metric data. Code provided by Epoch AI team."""
     x = models["frac_year"].values.reshape(-1, 1)
-    y = models[metric]
+    y = pd.to_numeric(models[metric], errors="coerce")
 
     # Filter out non-positive values
     positive_mask = y > 0
@@ -91,7 +91,7 @@ def run_regression(tb):
         f"{DL_ERA_START}–{int(END_DATE)}": np.array([DL_ERA_START, END_DATE]),
     }
 
-    metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__datapoints"]
+    metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__gradients"]
     new_tables = []
 
     for metric in metrics:
