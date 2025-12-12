@@ -1,7 +1,7 @@
 # Land use for biofuels vs. solar
 
 !!! info ""
-    :octicons-person-16: **Pablo Rosado, Hannah Ritchie** • :octicons-calendar-16: December 12, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Land%20use%20for%20biofuels%20vs.%20solar)
+    :octicons-person-16: **Pablo Rosado, Hannah Ritchie** • :octicons-calendar-16: December 12, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Land%20use%20for%20biofuels%20vs.%20solar)
 
 
 

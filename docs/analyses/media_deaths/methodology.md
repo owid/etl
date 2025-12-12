@@ -1,15 +1,13 @@
 # Does the news reflect what we die from?
 
 !!! info ""
-    **:octicons-person-16: Author**: Tuna Acisu
-
-    **:octicons-mail-16: Contact**: [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death)
-
-    **:material-file-document-multiple-outline: Other resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code, and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
+    :octicons-person-16: **Tuna Acisu** • :octicons-calendar-16: November 24, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:tuna.acisu@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Does%20the%20news%20reflect%20what%20we%20die%20from%3F)
 
 
-!!! note
+!!! note "Notes"
     This is the methodology for the data analysis used in our article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)
+
+    **Other resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code, and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
 
 Our team ran an analysis and published an article ("Does the news reflect what we die from?") comparing what Americans die from, and the relative coverage that these causes of death get in media coverage.
 
