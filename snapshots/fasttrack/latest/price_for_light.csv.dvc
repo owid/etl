@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: 'Fouquet and Pearson '
+    producer: 'Fouquet and Pearson (2012)'
     title: |-
       Fouquet and Pearson (2012) – The long run demand for lighting: elasticities and rebound effects in different phases of economic development. Economics of Energy and Environmental Policy, v.1, pp.83-100.
     citation_full: 'The long run demand for lighting: elasticities and rebound effects in different phases of economic development'
@@ -14,6 +14,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: 780aab6c30134f4ec10a1aa19390037a
-    size: 13585
+  - md5: 960ae32448d8563e82edb18dd709ec3c
+    size: 19939
     path: price_for_light.csv
