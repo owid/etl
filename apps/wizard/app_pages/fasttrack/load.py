@@ -88,16 +88,20 @@ def load_data_from_csv(uploaded_file):
     # sep=None autodetects separators
     csv_df = pd.read_csv(uploaded_file, sep=None)  # type: ignore
 
-    # Parse dataframe
-    st.write("Parsing data...")
-    data = parse_data_from_csv(csv_df)
+    try:
+        # Parse dataframe
+        st.write("Parsing data...")
+        data = parse_data_from_csv(csv_df)
 
-    # Obtain dataset and other objects
-    st.write("Parsing metadata...")
-    dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
-        uploaded_file.name,
-        csv_df.columns,
-    )
+        # Obtain dataset and other objects
+        st.write("Parsing metadata...")
+        dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
+            uploaded_file.name,
+            csv_df.columns,
+        )
+    except ValidationError as e:
+        st.exception(e)
+        st.stop()
 
     # Success message
     st.success("Data imported from CSV")
