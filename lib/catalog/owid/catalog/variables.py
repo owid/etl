@@ -15,8 +15,6 @@ import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
-from owid.grapher import Chart
-
 from . import processing_log as pl
 from . import warnings
 from .meta import (
@@ -29,7 +27,6 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from .plotting import create_owid_chart
 from .properties import metadata_property
 
 log = structlog.get_logger()
@@ -511,74 +508,6 @@ class Variable(pd.Series):
             field_names = [n for n in self.index.names + [self.name] if n is not None]
             new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
         return new_var
-
-    def plot_owid(
-        self,
-        kind: Literal["line", "bar", "scatter"] = "line",
-        entity: str | None = None,
-        x: str | None = None,
-        stacked: bool = False,
-        title: str | None = None,
-        max_entities: int = 10,
-        entities: list[str] | None = None,
-        enable_map: bool = False,
-    ) -> Chart:
-        """Plot the variable using OWID grapher.
-
-        Creates interactive visualizations using owid-grapher-py. The method automatically
-        detects 'country' and 'year' columns in the index to use as entity and x-axis.
-
-        Args:
-            kind: Type of plot to create. Options are "line", "bar", or "scatter".
-                Defaults to "line".
-            entity: Column name to use for entity grouping (e.g., countries). If None,
-                automatically detects 'country' in the index.
-            x: Column name to use for x-axis. If None, automatically detects 'year' in
-                the index.
-            stacked: Whether to stack bars in bar charts. Only applies when kind="bar".
-                Defaults to False.
-            title: Chart title. If None, uses the variable's metadata title or name.
-            max_entities: Maximum number of entities to show initially. If there are more
-                entities, the top ones by sum of absolute values are selected, and an
-                entity picker is enabled. Defaults to 10. Ignored if `entities` is provided.
-            entities: List of entity names to show in the chart. If provided, overrides
-                the automatic selection based on `max_entities`.
-            enable_map: Whether to enable the map tab in the chart. Defaults to False.
-
-        Returns:
-            owid.grapher.Chart object (interactive widget in notebooks).
-
-        Example:
-            Basic line plot with OWID grapher:
-
-            ```python
-            tb = Table({"country": ["USA", "UK"], "year": [2020, 2020], "gdp": [21, 2.8]})
-            tb = tb.set_index(["country", "year"])
-            tb["gdp"].plot_owid()  # Interactive OWID chart
-            ```
-
-            Plot specific countries:
-
-            ```python
-            tb["gdp"].plot_owid(entities=["USA", "China", "Germany"])
-            ```
-        """
-        if self.name is None:
-            raise ValueError("Variable must have a name to plot")
-
-        return create_owid_chart(
-            df=cast(pd.DataFrame, self.reset_index()),
-            y=self.name,
-            x=x,
-            entity=entity,
-            kind=kind,
-            stacked=stacked,
-            title=title or self.metadata.title or self.name,
-            unit=self.metadata.unit,
-            max_entities=max_entities,
-            entities=entities,
-            enable_map=enable_map,
-        )
 
 
 # dynamically add all metadata properties to the class

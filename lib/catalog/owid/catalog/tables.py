@@ -35,7 +35,6 @@ from owid.repack import repack_frame
 from . import processing_log as pl
 from . import utils, variables, warnings
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
-from .plotting import ENTITY_COLUMNS, TIME_COLUMNS, create_owid_chart
 
 log = structlog.get_logger()
 
@@ -1675,117 +1674,6 @@ class Table(pd.DataFrame):
             ```
         """
         return super().filter(*args, **kwargs)  # type: ignore
-
-    def plot_owid(
-        self,
-        y: str | None = None,
-        x: str | None = None,
-        kind: Literal["line", "bar", "scatter"] = "line",
-        entity: str | None = None,
-        stacked: bool = False,
-        title: str | None = None,
-        max_entities: int = 10,
-        entities: list[str] | None = None,
-        enable_map: bool = False,
-    ) -> Any:
-        """Plot the table using OWID grapher.
-
-        Smart plotting that auto-detects country/year columns and sets them as index.
-
-        Args:
-            y: Column name to plot on y-axis. Required if table has multiple data columns.
-            x: Column name for x-axis.
-            kind: Type of plot ("line", "bar", "scatter"). Defaults to "line".
-            entity: Column name for entity grouping. Auto-detected if not specified.
-            stacked: Whether to stack bars in bar charts. Defaults to False.
-            title: Chart title. Uses variable metadata if not specified.
-            max_entities: Maximum entities to show initially. Defaults to 10.
-            entities: Specific entities to show in the chart.
-            enable_map: Whether to enable the map tab in the chart. Defaults to False.
-
-        Returns:
-            owid.grapher.Chart object.
-
-        Example:
-            Auto-detect and plot single data column:
-            ```python
-            tb = Table({"country": ["USA", "UK"], "year": [2020, 2020], "gdp": [21, 2.8]})
-            tb.plot_owid()  # Auto-detects country/year as index, plots gdp
-            ```
-
-            Specify column to plot:
-            ```python
-            tb.plot_owid(y="gdp")
-            ```
-
-            Scatter plot with explicit x and y:
-            ```python
-            tb.plot_owid(x="gdp", y="population", kind="scatter")
-            ```
-        """
-        # Get all column names (including index)
-        all_cols = list(self.index.names) + list(self.columns)
-        all_cols = [c for c in all_cols if c is not None]
-
-        # Auto-detect entity column
-        detected_entity = None
-        for col in ENTITY_COLUMNS:
-            if col in all_cols:
-                detected_entity = col
-                break
-
-        # Auto-detect time column
-        detected_time = None
-        for col in TIME_COLUMNS:
-            if col in all_cols:
-                detected_time = col
-                break
-
-        # Determine data columns (columns that are not entity or time)
-        index_like_cols = set()
-        if detected_entity:
-            index_like_cols.add(detected_entity)
-        if detected_time:
-            index_like_cols.add(detected_time)
-
-        data_cols = [c for c in self.columns if c not in index_like_cols]
-
-        # Determine which column to plot
-        if y is None:
-            if len(data_cols) == 1:
-                y = data_cols[0]
-            elif len(data_cols) == 0:
-                raise ValueError("No data columns found to plot")
-            else:
-                raise ValueError(
-                    f"Table has multiple data columns: {data_cols}. "
-                    f"Please specify which column to plot using y='column_name'"
-                )
-
-        # Get metadata for title/unit
-        var_meta = self._fields.get(y) if y else None
-        chart_title = title or (var_meta.title if var_meta else None) or y
-        unit = var_meta.unit if var_meta else None
-
-        # For scatter, x is a data column; for line/bar, x is the time column
-        x_col = x if x is not None else detected_time
-
-        # y is guaranteed to be set by logic above
-        assert y is not None
-
-        return create_owid_chart(
-            df=pd.DataFrame(self.reset_index()),
-            y=y,
-            x=x_col,
-            entity=entity or detected_entity,
-            kind=kind,
-            stacked=stacked,
-            title=chart_title,
-            unit=unit,
-            max_entities=max_entities,
-            entities=entities,
-            enable_map=enable_map,
-        )
 
     def update_log(
         self,
