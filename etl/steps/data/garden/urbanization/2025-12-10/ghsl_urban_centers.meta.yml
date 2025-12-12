@@ -326,7 +326,7 @@ tables:
 
      urban_pop_projections:
         title: Population of the capital city (projected)
-        unit: 'people'
+        unit: people
         description_short: *desc_short_pop_capital
         display:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -337,7 +337,8 @@ tables:
 
      urban_density_projections:
         title: Population density of the capital city (projected)
-        unit: 'people/km²'
+        unit: people per km²
+        short_unit: per km²
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
         display:
@@ -349,7 +350,7 @@ tables:
 
      urban_pop_estimates:
         title: Population of the capital city
-        unit: 'people'
+        unit: people
         description_short: *desc_short_pop_capital
         display:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -359,7 +360,8 @@ tables:
 
      urban_density_estimates:
         title: Population density of the capital city
-        unit: 'people/km²'
+        unit: people per km²
+        short_unit: per km²
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
         display:
@@ -370,7 +372,8 @@ tables:
 
      urban_density_top_100_projections:
         title: Population density of the top 100 most populous cities (projected)
-        unit: 'people/km²'
+        unit: people per km²
+        short_unit: per km²
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
         display:
@@ -379,7 +382,8 @@ tables:
 
      urban_density_top_100_estimates:
         title: Population density of the top 100 most populous cities
-        unit: 'people/km²'
+        unit: people per km²
+        short_unit: per km²
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
         display:
@@ -387,14 +391,14 @@ tables:
 
      urban_pop_top_100_estimates:
         title: Population of the top 100 most populous cities
-        unit: 'people'
+        unit: people
         description_short: *desc_short_pop_top_100
         display:
           entityAnnotationsMap: *entityAnnotationsMapTop100
 
      urban_pop_top_100_projections:
         title: Population of the top 100 most populous cities (projected)
-        unit: 'people'
+        unit: people
         description_short: *desc_short_pop_top_100
         display:
           entityAnnotationsMap: *entityAnnotationsMapTop100

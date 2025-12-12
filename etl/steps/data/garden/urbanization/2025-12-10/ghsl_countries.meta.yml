@@ -146,7 +146,7 @@ tables:
             <% elif metric == 'share' or metric == 'popshare' %>
             %
             <% elif metric == 'density' %>
-            people/km²
+            people per km²
             <%- endif -%>
 
           short_unit:
@@ -154,6 +154,8 @@ tables:
             km²
             <% elif metric == 'share' or metric == 'popshare' %>
             %
+            <% elif metric == 'density' %>
+            per km²
             <%- endif -%>
           description_processing:
             <% if metric == 'share' or metric == 'popshare' %>
