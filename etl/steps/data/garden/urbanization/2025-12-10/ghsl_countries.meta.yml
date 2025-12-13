@@ -13,7 +13,7 @@ definitions:
 
       This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
 
-      To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
+      To predict future urbanization (2025 and 2100), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
 
     description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns](#dod:towns-degurba), and [villages](#dod:villages-degurba) and estimate their respective populations.
 
