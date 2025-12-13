@@ -1,7 +1,7 @@
 __version__ = "0.4.0"
 
 from . import processing, utils
-from .catalogs import CHANNEL, LocalCatalog, RemoteCatalog, find, find_latest, find_one
+from .catalogs import CHANNEL, LocalCatalog, RemoteCatalog, find, find_by_indicator, find_latest, find_one
 from .datasets import Dataset
 from .meta import (
     DatasetMeta,
@@ -21,6 +21,7 @@ __all__ = [
     "LocalCatalog",
     "RemoteCatalog",
     "find",
+    "find_by_indicator",
     "find_latest",
     "find_one",
     "Dataset",
