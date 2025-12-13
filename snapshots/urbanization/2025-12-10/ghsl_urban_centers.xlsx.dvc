@@ -11,9 +11,9 @@ meta:
 
       The long time series consists of three parts:
 
-      From 1950 to 1970, it is based on backcasting by blending data using national definitions of urban and rural areas with data using the Degree of Urbanisation.
-      From 1975 to 2020, it is based on the Global Human Settlement Layer (GHSL), because it has the longest time series and uses a transparent and reproducible method.
-      From 2020 to 2100, it relies on a new model, "Cities and Rural Integrated Spatial Projections" (CRISP).
+      - From 1950 to 1970, it is based on backcasting by blending data using national definitions of urban and rural areas with data using the Degree of Urbanisation.
+      - From 1975 to 2020, it is based on the Global Human Settlement Layer (GHSL), because it has the longest time series and uses a transparent and reproducible method.
+      - From 2020 to 2100, it relies on a new model, "Cities and Rural Integrated Spatial Projections" (CRISP).
 
       The CRISP model estimates population and built-up area change for a global grid of 1 km2 cells in an evidence-based, three-step process. First, the authors estimate population and built-up area change for roughly 1000 functional areas based on past trends and national population projections. Second, they allocate new built-up area to grid cells considering distance to settlements, roads, water, current share of built-up area and other characteristics. Finally, they add population to newly built-up areas and more suitable locations and reduce it in less suitable locations to capture internal migration and natural population decline.
 
