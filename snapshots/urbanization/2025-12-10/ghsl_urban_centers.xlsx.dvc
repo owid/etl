@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Global Human Settlement Layer Dataset
     description: |-
-      Global projections of population by Degree of Urbanisation and for each city for the UN World Urbanization Prospects
+      The dataset includes population projections by degree of urbanisation and at the city level.
 
       For every country and territory in the world, the authors estimated their population from 1950 to 2100 in cities, towns and semi-dense areas, and rural areas. It relies on the UN-endorsed Degree of Urbanisation methodology. As a result, the definitions used in each country are fully harmonised; while national definitions vary considerably.
 
@@ -30,7 +30,7 @@ meta:
 
       Jacobs-Crisioni, Chris et al (2025). Population projections by degree of urbanisation for the UN World Urbanization Prospects: introducing the CRISP model, Publications Office of the European Union, Luxembourg, 2025, doi:10.2760/7163875
 
-    url_main: https://human-settlement.emergency.copernicus.eu/ghs_wup_mtuc_r2025a.php
+    url_main: https://human-settlement.emergency.copernicus.eu/ghs_wup2025.php
     url_download: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_WUP_MTUC_GLOBE_R2025A/V1-0/GHS_WUP_MTUC_GLOBE_R2025A_V1_0_statistics.zip
     date_accessed: '2025-12-10'
 
