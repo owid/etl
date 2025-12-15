@@ -72,13 +72,6 @@ def run() -> None:
         # Clean up metric name
         metric = metric.replace("_", " ").lower()
 
-        # Clean up sub_commodity for display
-        # NOTE: Unit handling - remove "(tonnes)" suffix where it appears
-        if unit.startswith("tonnes"):
-            sub_commodity_display = sub_commodity
-        else:
-            sub_commodity_display = sub_commodity
-
         # Set dimensions on column metadata
         tb[column].m.dimensions = {
             "mineral": underscore(commodity),
