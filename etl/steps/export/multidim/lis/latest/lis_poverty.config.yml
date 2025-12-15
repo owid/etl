@@ -1,0 +1,86 @@
+title:
+  title: "Poverty: Luxembourg Income Study"
+  title_variant: LIS
+topic_tags:
+  - Poverty
+default_selection:
+  - Brazil
+  - Chile
+  - China
+  - France
+  - South Africa
+  - United States
+
+
+default_dimensions:
+  indicator: headcount_ratio
+  poverty_line: "5"
+  welfare_type: "dhi"
+  equivalence_scale: "per capita"
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: headcount_ratio
+        name: Share in poverty
+        description: Share of the population living below the poverty line
+      - slug: headcount
+        name: Number in poverty
+        description: Number of people living below the poverty line
+      - slug: total_shortfall
+        name: Total shortfall from poverty line
+        description: Money theoretically needed to lift the income of all people in poverty up to the poverty line
+      - slug: avg_shortfall
+        name: Average shortfall ($)
+        description: Average amount by which the income of people in poverty falls below the poverty line
+      - slug: income_gap_ratio
+        name: Average shortfall (%)
+        description: Average shortfall as a percentage of the poverty line, also known as income gap ratio
+      - slug: poverty_gap_index
+        name: Poverty gap index
+        description: Share of population in poverty multiplied by the average shortfall as a percentage of the poverty line
+  - name: Poverty line
+    slug: poverty_line
+    choices:
+      - slug: "1"
+        name: "$1 per day"
+      - slug: "2"
+        name: "$2 per day"
+      - slug: "5"
+        name: "$5 per day"
+      - slug: "10"
+        name: "$10 per day"
+      - slug: "20"
+        name: "$20 per day"
+      - slug: "30"
+        name: "$30 per day"
+      - slug: "40"
+        name: "$40 per day"
+      - slug: "multiple_lines"
+        name: "Multiple lines"
+      - slug: "40% of the median"
+        name: "Relative poverty: 40% of median"
+      - slug: "50% of the median"
+        name: "Relative poverty: 50% of median"
+      - slug: "60% of the median"
+        name: "Relative poverty: 60% of median"
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: "dhi"
+        name: "After tax"
+      - slug: "mi"
+        name: "Before tax"
+      - slug: "after_vs_before_tax"
+        name: "After vs. before tax"
+  - name: Equivalized income
+    slug: equivalence_scale
+    description: Adjust for cost sharing within households
+    choices:
+      - slug: "per capita"
+        name: "Per capita"
+      - slug: "square root"
+        name: "Equivalized"
+
+views: []
