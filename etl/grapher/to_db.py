@@ -31,6 +31,7 @@ from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config
+from etl.catalog.utils import CatalogPath
 from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.grapher import helpers as gh
 
@@ -293,7 +294,7 @@ def upsert_table(
         session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable=catalog_path.split("#")[1])
+            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).indicator)
 
 
 def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:

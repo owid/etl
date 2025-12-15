@@ -31,6 +31,7 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from etl import config
+from etl.catalog.utils import CatalogPath
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
 from etl.files import checksum_str
@@ -481,12 +482,10 @@ def variable_data_table_from_catalog(
     to_read = defaultdict(list)
 
     # Group variables by dataset and table
-    # TODO: use CatalogPath object
     for variable in variables:
         assert variable.catalogPath, f"Variable {variable.id} has no catalogPath"
-        path, short_name = variable.catalogPath.split("#")
-        ds_path, table_name = path.rsplit("/", 1)
-        to_read[(ds_path, table_name)].append(variable)
+        p = CatalogPath.from_str(variable.catalogPath)
+        to_read[(p.dataset_path, p.table)].append(variable)
 
     # Read the table and load all its variables
     tbs = []
@@ -950,6 +949,10 @@ def get_variables_data(
     else:
         # Fetch data for all variables.
         df = _get_variables_data_with_filter(db_conn=db_conn)
+
+    # Add parsed catalog_path column if catalogPath exists
+    if "catalogPath" in df.columns and len(df) > 0:
+        df["catalog_path"] = [CatalogPath.from_str(p) if p else None for p in df["catalogPath"]]
 
     return df
 

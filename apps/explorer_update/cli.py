@@ -173,16 +173,14 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
         log.info("No variable ids can be automatically updated.")
         return None
 
-    # Select relevant columns.
-    variables_df = variable_data[["id", "catalogPath", "name"]].copy()
+    # Select relevant columns (catalog_path is pre-parsed CatalogPath objects).
+    variables_df = variable_data[["id", "catalogPath", "catalog_path", "name"]].copy()
 
     # Create a column with the step name of each variable's grapher dataset.
-    variables_df["step"] = [
-        "data://" + "/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in variables_df["catalogPath"]
-    ]
+    variables_df["step"] = [p.step_uri for p in variables_df["catalog_path"]]
 
-    # Create a column with the table name and variable name.
-    variables_df["table_and_variable_short_name"] = [path.split("/")[4] for path in variables_df["catalogPath"]]
+    # Create a column with the table name and indicator name.
+    variables_df["table_and_variable_short_name"] = [f"{p.table}#{p.indicator}" for p in variables_df["catalog_path"]]
 
     # Load dataframe of all steps in ETL.
     steps_df = VersionTracker().steps_df

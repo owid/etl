@@ -75,6 +75,7 @@ from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
 from etl import config, paths
+from etl.catalog.utils import CatalogPath
 from etl.db import read_sql
 
 log = structlog.get_logger()
@@ -1490,15 +1491,19 @@ class Variable(Base):
             raise NotImplementedError()
 
     @property
-    def table_name(self) -> str:
+    def catalog_path(self) -> CatalogPath:
+        """Parsed CatalogPath object for this variable."""
         assert self.catalogPath
-        return self.catalogPath.split("#")[0].rsplit("/", 1)[1]
+        return CatalogPath.from_str(self.catalogPath)
+
+    @property
+    def table_name(self) -> str:
+        return self.catalog_path.table
 
     @property
     def step_path(self) -> Path:
         """Return path to indicator step file."""
-        assert self.catalogPath
-        base_path = paths.STEP_DIR / "data" / self.catalogPath.split("#")[0].rsplit("/", 1)[0]
+        base_path = paths.STEP_DIR / "data" / self.catalog_path.dataset_path
         return base_path.with_suffix(".py")
 
     @property

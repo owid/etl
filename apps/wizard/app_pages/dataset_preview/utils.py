@@ -306,7 +306,7 @@ class IndicatorWithDimensions(IndicatorArray):
             short_name_ = indicator.dimensions["originalShortName"]
             assert isinstance(indicator.catalogPath, str), f"`catalogPath` is empty for variable {indicator.id}"
             # Extract table URI
-            table_ = indicator.catalogPath.split("#")[0]
+            table_ = indicator.catalog_path.table_path
 
             if short_name is None:
                 short_name = short_name_
