@@ -73,13 +73,41 @@ steps:
   data://grapher/minerals/2024-07-15/global_mine_production_by_mineral:
     - data://garden/minerals/2024-07-15/minerals
   #
-  # Minerals - Minerals explorer.
-  #
-  export://explorers/minerals/latest/minerals:
-    - data://grapher/minerals/2024-07-15/minerals
-  #
   # Minerals - Minerals supply and demand prospects.
   #
   export://explorers/minerals/latest/minerals_supply_and_demand_prospects:
     - data://grapher/iea/2024-07-04/critical_minerals_demand_by_technology
     - data://grapher/iea/2024-07-04/critical_minerals_supply_by_country
+  #
+  # USGS - Mineral commodity summaries.
+  #
+  # NOTE: There is no meadow step, as processing and harmonization are tightly coupled.
+  data://garden/usgs/2025-12-15/mineral_commodity_summaries:
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2022.zip
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2023.zip
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
+    - snapshot://usgs/2025-12-15/mineral_commodity_summaries_2025.zip
+  #
+  # Minerals - Minerals.
+  #
+  # Compilation of minerals data from different origins.
+  data://garden/minerals/2025-12-15/minerals:
+    - data://garden/bgs/2024-07-09/world_mineral_statistics
+    - data://garden/usgs/2025-12-15/mineral_commodity_summaries
+    - data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Minerals - Minerals.
+  #
+  data://grapher/minerals/2025-12-15/minerals:
+    - data://garden/minerals/2025-12-15/minerals
+  #
+  # Minerals - Minerals.
+  #
+  data://grapher/minerals/2025-12-15/global_mine_production_by_mineral:
+    - data://garden/minerals/2025-12-15/minerals
+  #
+  # Minerals - Minerals explorer.
+  #
+  export://explorers/minerals/latest/minerals:
+    - data://grapher/minerals/2025-12-15/minerals
