@@ -1,5 +1,4 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# Find data at https://aidsinfo.unaids.org/
 meta:
   origin:
     # Data product / Snapshot
@@ -27,7 +26,7 @@ meta:
     # Files
     url_main: https://kpatlas.unaids.org/
     url_download: https://aidsinfo.unaids.org/documents/KPAtlasDB_2025_en.zip
-    date_accessed: '2025-12-15'
+    date_accessed: "2025-12-15"
 
     # License
     license:
