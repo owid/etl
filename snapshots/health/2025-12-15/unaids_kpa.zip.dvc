@@ -24,7 +24,7 @@ meta:
     attribution_short: UNAIDS
 
     # Files
-    url_main: https://kpatlas.unaids.org/
+    url_main: https://aidsinfo.unaids.org/dataset
     url_download: https://aidsinfo.unaids.org/documents/KPAtlasDB_2025_en.zip
     date_accessed: "2025-12-15"
 

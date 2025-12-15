@@ -20,8 +20,8 @@ meta:
     attribution_short: UNAIDS
 
     # Files
-    url_main: https://aidsinfo.unaids.org/
-    url_download: https://aidsinfo.unaids.org/documents/KPAtlasDB_2025_en.zip
+    url_main: https://aidsinfo.unaids.org/dataset
+    url_download: https://aidsinfo.unaids.org/public/documents/Estimates_2025_en.zip
     date_accessed: "2025-12-15"
 
     # License
@@ -29,6 +29,6 @@ meta:
       name: CC BY 3.0
       url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
 outs:
-  - md5: eb2064273619f99882f0b272a8ea3263
-    size: 878991
+  - md5: 76dfcf2648e661f481f7d20a85038ee0
+    size: 24259656
     path: unaids_epi.zip
