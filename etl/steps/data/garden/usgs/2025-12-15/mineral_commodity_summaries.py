@@ -16,13 +16,13 @@ from owid.catalog import Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 # List years for which snapshots are available.
-YEARS_TO_PROCESS = [2022, 2023, 2024]
+YEARS_TO_PROCESS = [2022, 2023, 2024, 2025]
 
 # List all spurious values that appear in the data (after being stripped of empty spaces) and should be replaced by nan.
 NA_VALUES = ["", "NA", "XX", "Large", 'Categorized as "large"', "Very small", "W", "—"]
@@ -465,7 +465,7 @@ def extract_data_and_metadata_from_compressed_file(zip_file_path: Path):
             for file_path in sorted(temp_path.glob("**/*.csv")):
                 _metadata_path = file_path.with_suffix(".xml").as_posix().replace("_world", "_meta")
                 encoding = "utf-8"
-                ####################################################################################################
+                ########################################################################################################
                 # Handle special cases.
                 if file_path.stem == "mcs2023-zirco-hafni_world":
                     _metadata_path = file_path.with_name("mcs2023-zirco_meta.xml")
@@ -474,13 +474,31 @@ def extract_data_and_metadata_from_compressed_file(zip_file_path: Path):
                 elif file_path.stem == "MCS2024-bismu_world":
                     # This patch is not necessary in case-insensitive file systems, but I'll add it just in case.
                     _metadata_path = file_path.with_name("mcs2024-bismu_meta.xml")
-                ####################################################################################################
+                ########################################################################################################
                 # Read data and metadata.
                 _data = pd.read_csv(file_path, encoding=encoding)
                 _metadata = extract_metadata_from_xml(_metadata_path)
 
-                # Store data and metadata in the common dictionary.
-                data_for_year[_metadata["Commodity"]] = {"data": _data, "metadata": _metadata}
+                if file_path.stem.startswith("MCS2025"):
+                    ####################################################################################################
+                    # In the 2025 release, the data and metadata have a different structure.
+                    # For simplicity, I'll adapt it to match previous years.
+                    _data.columns = [column.capitalize() for column in _data.columns]
+                    _data = _data.rename(columns={"Reserve_notes": "Reserves_notes"}, errors="raise")
+                    _metadata = {field.capitalize(): _metadata[field] for field in _metadata}
+                    for commodity in sorted(set(_data["Commodity"])):
+                        commodity_upper = commodity.upper().rstrip()
+                        _data_for_commodity = (
+                            _data[_data["Commodity"] == commodity]
+                            .drop(columns=["Commodity"], errors="raise")
+                            .reset_index(drop=True)
+                        )
+                        data_for_year[commodity_upper] = {"data": _data_for_commodity, "metadata": _metadata}
+                        data_for_year[commodity_upper]["metadata"]["Commodity"] = commodity_upper
+                    ####################################################################################################
+                else:
+                    # Store data and metadata in the common dictionary.
+                    data_for_year[_metadata["Commodity"]] = {"data": _data, "metadata": _metadata}
 
     return data_for_year
 
@@ -569,12 +587,29 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
         # Production is clearly in kilotonnes. That's what the notes say,
         # and that's also how the data is in the 2022 and 2024 files.
         d = d.rename(columns={"Prod_t_2021": "Prod_kt_2021", "Prod_t_est_2022": "Prod_kt_est_2022"}, errors="raise")
-
+    if (year == 2025) & (mineral == "TITANIUM MINERAL CONCENTRATES"):
+        # There are issues with the units of Titanium mineral concentrates in the 2025 data.
+        # According to the PDF:
+        # https://pubs.usgs.gov/periodicals/mcs2025/mcs2025-titanium-minerals.pdf
+        # "Data in thousand metric tons, titanium dioxide (TiO2) content, unless otherwise specified"
+        # However, the file says "metric tons"; the numbers of the 2024 and 2025 files are similar, so it seems that the units are the same, but the "Unit meas" is wrong: it should be "thousand metric tons" instead of "metric tons".
+        # Additionally, Sierra Leone's Titanium mineral concentrates has no unit.
+        # But looking at the 2024 data, it's clear that the unit should indeed be kt:
+        # The estimated production for 2023 (in the 2024 file) was 110 kt; this coincides with the production of 2023 (in the 2025 file).
+        # Also, the value for reserves in both files coincide, 2900.
+        # So I'll assume that the unit is the one given in the 2024 file (kt).
+        assert set(d["Unit_meas"].dropna()) == {"metric tons"}
+        assert (d[d["Country"] == "Sierra Leone"]["Unit_meas"].isnull()).all()
+        d["Unit_meas"] = "thousand metric tons"
     ############################################################################################################
 
     # Check that all columns are either source, country, type, production, reserves, or capacity.
+    # NOTE: The field "unit_meas" was added in the 2025 release.
     assert all(
-        [column.lower().startswith(("source", "country", "type", "prod_", "reserves_", "cap_")) for column in d.columns]
+        [
+            column.lower().startswith(("source", "country", "type", "prod_", "reserves_", "cap_", "unit_meas"))
+            for column in d.columns
+        ]
     )
     # Sanity checks.
     assert d["Source"].unique().item() == f"MCS{year}"
@@ -635,7 +670,6 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         # I have not found any case with more than one column for reserves.
         assert len(_column_reserves) == 1
         column_reserves = _column_reserves[0]
-        unit_reserves = "_".join(column_reserves.split("_")[1:])
 
         # Get general notes for this column, extracted from the xml metadata.
         notes_reserves = metadata.get(column_reserves)
@@ -646,26 +680,66 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         d[column_reserves] = clean_spurious_values(series=d[column_reserves])
 
         # Fix units.
-        assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
-        if unit_reserves == "mct":
-            d["Reserves_mct"] *= MILLION_CARATS_TO_TONNES
-            d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
-        elif unit_reserves == "kt":
-            d["Reserves_kt"] *= 1e3
-            d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
-        elif unit_reserves == "ore_kt":
-            d["Reserves_ore_kt"] *= 1e3
-            d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
-            # A footnote will mention that reserves refer to ore (see FOOTNOTES).
-        elif unit_reserves in ["Mt", "mt"]:
-            d[f"Reserves_{unit_reserves}"] *= 1e6
-            d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
-        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # type: ignore
-            d["Reserves_mcm"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
-            d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
-        elif unit_reserves == "kg":
-            d["Reserves_kg"] *= 1e-3
-            d = d.rename(columns={"Reserves_kg": "Reserves_t"}, errors="raise")
+        if d["Source"].iloc[0] == "MCS2025":
+            assert len(d["Unit_meas"].unique()) == 1
+            unit_reserves = d["Unit_meas"].unique()[0]
+            assert unit_reserves in [
+                "kilograms",
+                "metric tons",
+                "million carats",
+                "million cubic meters",
+                "million metric tons",
+                "thousand carats",
+                "thousand metric dry tons",
+                "thousand metric tons",
+            ]
+            assert _column_reserves == ["Reserves_2024"]
+            d = d.rename(columns={"Reserves_2024": "Reserves_t"}, errors="raise")
+
+            if unit_reserves == "kilograms":
+                d["Reserves_t"] *= 1e-3
+            elif unit_reserves == "metric tons":
+                pass
+            elif unit_reserves == "million carats":
+                d["Reserves_t"] *= MILLION_CARATS_TO_TONNES
+            elif unit_reserves == "million cubic meters":
+                assert (d["Mineral"] == "Helium").all()
+                d["Reserves_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+            elif unit_reserves == "million metric tons":
+                d["Reserves_t"] *= 1e6
+            elif unit_reserves == "thousand carats":
+                d["Reserves_t"] *= THOUSAND_CARATS_TO_TONNES
+            elif unit_reserves == "thousand metric dry tons":
+                # TODO: Check this.
+                d["Reserves_t"] *= 1e3
+            elif unit_reserves == "thousand metric tons":
+                d["Reserves_t"] *= 1e3
+            else:
+                raise ValueError("Something is wrong in prepare_reserves_data; check unit names when doing conversions")
+
+        else:
+            unit_reserves = "_".join(column_reserves.split("_")[1:])
+            assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
+            if unit_reserves in ["mct", "million carats"]:
+                d["Reserves_mct"] *= MILLION_CARATS_TO_TONNES
+                d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
+            elif unit_reserves == "kt":
+                d["Reserves_kt"] *= 1e3
+                d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
+            elif unit_reserves == "ore_kt":
+                d["Reserves_ore_kt"] *= 1e3
+                d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
+                # A footnote will mention that reserves refer to ore (see FOOTNOTES).
+            elif unit_reserves in ["Mt", "mt"]:
+                # TODO: Double-check that "mt" means million tonnes.
+                d[f"Reserves_{unit_reserves}"] *= 1e6
+                d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
+            elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+                d["Reserves_mcm"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+                d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
+            elif unit_reserves == "kg":
+                d["Reserves_kg"] *= 1e-3
+                d = d.rename(columns={"Reserves_kg": "Reserves_t"}, errors="raise")
 
         # Define the columns for the dataframe of reserves data for the current year and mineral.
         columns = COMMON_COLUMNS + ["Reserves_t"]
@@ -715,23 +789,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
             ]
         )
 
-        # Extract the unit.
-        # NOTE: Often (possibly always) one of the columns has "_est_" (or "_Est_"), I suppose to signal that it is estimated data.
-        _units_production = sorted(
-            set(
-                [
-                    column[:-4].replace("Prod_", "").replace("_est_", "").replace("_Est_", "").rstrip("_")
-                    for column in columns_production
-                ]
-            )
-        )
-        assert len(_units_production) == 1
-        unit_production = _units_production[0]
-
         # Handle special case.
-        if unit_production == "Sponge_t":
-            unit_production = "t"
-            # A footnote will be added to mention that it refers to sponge (see FOOTNOTES).
         if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
@@ -755,19 +813,75 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
             df_production = pd.concat([df_production, _df_for_year], ignore_index=True)
 
         # Fix units.
-        assert unit_production in ["t", "kg", "kt", "Mt", "mmt", "mcm", "kct", "mct"]
-        if unit_production == "kg":
-            df_production["Production_t"] *= 1e-3
-        elif unit_production == "kt":
-            df_production["Production_t"] *= 1e3
-        elif unit_production in ["Mt", "mmt"]:
-            df_production["Production_t"] *= 1e6
-        elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # type: ignore
-            df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
-        elif unit_production == "kct":
-            df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
-        elif unit_production == "mct":
-            df_production["Production_t"] *= MILLION_CARATS_TO_TONNES
+        if d["Source"].iloc[0] == "MCS2025":
+            assert len(d["Unit_meas"].unique()) == 1
+            unit_production = d["Unit_meas"].iloc[0]
+            assert unit_production in [
+                "kilograms",
+                "metric tons",
+                "million carats",
+                "million cubic meters",
+                "million metric tons",
+                "thousand carats",
+                "thousand metric dry tons",
+                "thousand metric tons",
+            ]
+
+            # TODO: Continue handling units for 2025 data.
+            if unit_production == "kilograms":
+                df_production["Production_t"] *= 1e-3
+            elif unit_production == "metric tons":
+                pass
+            elif unit_production == "million carats":
+                df_production["Production_t"] *= MILLION_CARATS_TO_TONNES
+            elif unit_production == "million cubic meters":
+                assert (df_production["Mineral"] == "Helium").all()
+                df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+            elif unit_production == "million metric tons":
+                df_production["Production_t"] *= 1e6
+            elif unit_production == "thousand carats":
+                df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
+            elif unit_production == "thousand metric dry tons":
+                # TODO: confirm this.
+                df_production["Production_t"] *= 1e3
+            elif unit_production == "thousand metric tons":
+                df_production["Production_t"] *= 1e3
+            else:
+                raise ValueError(
+                    "Something is wrong in prepare_production_data; check unit names when doing conversions"
+                )
+
+        else:
+            # NOTE: Often, one of the columns has "_est_" (or "_Est_"), to signal that it is estimated data.
+            _units_production = sorted(
+                set(
+                    [
+                        column[:-4].replace("Prod_", "").replace("_est_", "").replace("_Est_", "").rstrip("_")
+                        for column in columns_production
+                    ]
+                )
+            )
+            assert len(_units_production) == 1
+            unit_production = _units_production[0]
+
+            # Handle special case.
+            if unit_production == "Sponge_t":
+                unit_production = "t"
+                # A footnote will be added to mention that it refers to sponge (see FOOTNOTES).
+
+            assert unit_production in ["t", "kg", "kt", "Mt", "mmt", "mcm", "kct", "mct"]
+            if unit_production == "kg":
+                df_production["Production_t"] *= 1e-3
+            elif unit_production == "kt":
+                df_production["Production_t"] *= 1e3
+            elif unit_production in ["Mt", "mmt"]:
+                df_production["Production_t"] *= 1e6
+            elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+                df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+            elif unit_production == "kct":
+                df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
+            elif unit_production == "mct":
+                df_production["Production_t"] *= MILLION_CARATS_TO_TONNES
 
         # Remove rows without data.
         df_production = df_production.dropna(subset=["Production_t"], how="all").reset_index(drop=True)
@@ -1044,7 +1158,7 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
     return notes_dict
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -1161,5 +1275,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_flat], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb, tb_flat])
     ds_garden.save()
