@@ -103,6 +103,10 @@ def run() -> None:
         if (years.max() - years.min()) < 5:
             sparse_data_min_year[column] = int(years.max())
 
+    # Sanity check: ensure COLUMNS_WITHOUT_MAP_TAB only contains columns that exist in the data.
+    missing_columns = COLUMNS_WITHOUT_MAP_TAB - set(tb.columns)
+    assert not missing_columns, f"COLUMNS_WITHOUT_MAP_TAB contains columns not in data: {missing_columns}"
+
     # Common view configuration
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
