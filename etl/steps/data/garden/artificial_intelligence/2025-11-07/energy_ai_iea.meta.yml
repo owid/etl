@@ -50,7 +50,7 @@ tables:
           - The share has been growing as digital services, cloud computing, and AI applications have expanded globally.
           - Calculated by dividing data center electricity consumption by total electricity demand for each country or region.
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
 
       total_installed_capacity__gw__base:
         title: Projected total installed capacity for data centers
