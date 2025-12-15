@@ -30,9 +30,9 @@ RELATIVE_POVERTY_COLUMNS = {
 
 # Define relative poverty lines
 RELATIVE_POVERTY_LINES = {
-    "0.4": "40% of median",
-    "0.5": "50% of median",
-    "0.6": "60% of median",
+    "0.4": "40% of the median",
+    "0.5": "50% of the median",
+    "0.6": "60% of the median",
 }
 
 # Define inequality indicators and new names
@@ -216,6 +216,9 @@ def process_inequality(tb: Table) -> Table:
         columns="indicator",
         values="value",
     ).reset_index()
+
+    # Calculate share_middle_40 as 100 - share_bottom_50 - share_top_10
+    tb_pivot["share_middle_40"] = 100 - tb_pivot["share_bottom_50"] - tb_pivot["share_top_10"]
 
     # Recover origins from tb
     for col in tb_pivot.columns:

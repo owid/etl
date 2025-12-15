@@ -179,7 +179,9 @@ definitions:
     <%- endif %>
 
   description_key_ppp: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+    <%- endif %>
 
   description_key_welfare_type_base: |-
     Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
