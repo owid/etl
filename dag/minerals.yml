@@ -111,3 +111,8 @@ steps:
   #
   export://explorers/minerals/latest/minerals:
     - data://grapher/minerals/2025-12-15/minerals
+  #
+  # Minerals - Minerals explorer (multidim).
+  #
+  export://multidim/minerals/latest/minerals:
+    - data://grapher/minerals/2025-12-15/minerals
