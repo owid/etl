@@ -15,23 +15,19 @@ paths = PathFinder(__file__)
 # NOTE: This must coincide with the same variable as defined in the garden minerals step.
 SHARE_OF_GLOBAL_PREFIX = "share of global "
 
-# Columns where map tab should be disabled due to sparse data.
+# Columns where map tab should be disabled due to sparse geographic data.
 COLUMNS_WITHOUT_MAP_TAB = {
-    "production_cesium_mine_tonnes",
-    "production_diamond_mine_and_synthetic__industrial_tonnes",
-    "share_of_global_production_diamond_mine_and_synthetic__industrial_tonnes",
-    "reserves_kyanite_mine__kyanite_and_sillimanite_tonnes",
-    "production_soda_ash_synthetic_tonnes",
-    "reserves_zeolites_mine_tonnes",
-    "production_mica_mine__sheet_tonnes",
-    "share_of_global_production_mica_mine__sheet_tonnes",
     "production_bismuth_mine_tonnes",
-    "share_of_global_production_bismuth_mine_tonnes",
     "production_boron_mine_tonnes",
-    "share_of_global_production_boron_mine_tonnes",
+    "production_diamond_mine_and_synthetic__industrial_tonnes",
     "production_gallium_refinery_tonnes",
-    "share_of_global_production_gallium_refinery_tonnes",
+    "production_mica_mine__sheet_tonnes",
     "production_sand_and_gravel_mine__construction_tonnes",
+    "share_of_global_production_bismuth_mine_tonnes",
+    "share_of_global_production_boron_mine_tonnes",
+    "share_of_global_production_diamond_mine_and_synthetic__industrial_tonnes",
+    "share_of_global_production_gallium_refinery_tonnes",
+    "share_of_global_production_mica_mine__sheet_tonnes",
     "share_of_global_production_sand_and_gravel_mine__construction_tonnes",
 }
 
