@@ -15,7 +15,6 @@ import pandas as pd
 from owid.catalog import Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -52,6 +51,7 @@ COMMODITY_MAPPING = {
     ("Aluminum", "smelter production"): ("Aluminum", "Smelter"),
     ("Antimony", "Mine production"): ("Antimony", "Mine"),
     ("Antimony", "Mine production, contained antimony"): ("Antimony", "Mine"),
+    ("Antimony", "Mine production, antimony content"): ("Antimony", "Mine"),
     ("Arsenic", "Plant production, arsenic trioxide or calculated equivalent."): ("Arsenic", "Processing"),
     ("Arsenic", "arsenic trioxide"): ("Arsenic", "Processing"),
     ("Asbestos", "Mine production"): ("Asbestos", "Mine"),
@@ -59,10 +59,9 @@ COMMODITY_MAPPING = {
     ("Barite", "Mine production"): ("Barite", "Mine"),
     ("Barite", "Mine production, barite"): ("Barite", "Mine"),
     ("Barite", "Mine production, excluding U.S."): ("Barite", "Mine"),
-    ("Bauxite and alumina", "Alumina, refinery production - calcined equivalent weights"): (
-        "Alumina",
-        "Refinery",
-    ),
+    ("Barite", "Mine production, barite, estimated"): ("Barite", "Mine"),
+    ("Bauxite and alumina", "Alumina, refinery production - calcined equivalent weights"): ("Alumina", "Refinery"),
+    ("Bauxite", "Refinery production, alumina - calcined equivalent weights"): ("Alumina", "Refinery"),
     ("Bauxite and alumina", "Bauxite, mine production"): ("Bauxite", "Mine"),
     ("Bauxite and alumina", "Mine production, bauxite"): ("Bauxite", "Mine"),
     ("Bauxite and alumina", "Mine production, bauxite, dry tons"): ("Bauxite", "Mine"),
@@ -70,8 +69,10 @@ COMMODITY_MAPPING = {
         "Alumina",
         "Refinery",
     ),
+    ("Bauxite", "Mine production, bauxite, dry tons"): ("Bauxite", "Mine"),
     ("Beryllium", "Mine production"): ("Beryllium", "Mine"),
     ("Beryllium", "Mine production, beryllium"): ("Beryllium", "Mine"),
+    ("Beryllium", "Mine production, beryllium content"): ("Beryllium", "Mine"),
     # NOTE: Bismuth mine production differs significantly from USGS historical data. It may be because USGS current
     #  reports as gross weight and USGS historical as metal content. But for now, simply ignore USGS current.
     ("Bismuth", "Mine production"): None,
@@ -96,11 +97,14 @@ COMMODITY_MAPPING = {
     ("Boron", "datolite ore"): None,
     ("Boron", "refined borates"): None,
     ("Boron", "ulexite"): None,
+    ("Boron", "Boron all types"): None,
     ("Bromine", "Plant production, bromine content"): ("Bromine", "Processing"),
     ("Bromine", "Production, bromine content"): ("Bromine", "Processing"),
     ("Bromine", "Production, bromine content, excluding U.S. production"): ("Bromine", "Processing"),
+    ("Bromine", "Production, bromine content, estimated"): ("Bromine", "Processing"),
     ("Bromine", "Production"): ("Bromine", "Processing"),
     ("Cadmium", "Refinery production"): ("Cadmium", "Refinery"),
+    ("Cadmium", "Refinery production, estimated"): ("Cadmium", "Refinery"),
     ("Cement", "Cement production, estimated"): ("Cement", "Processing"),
     ("Cement", "Clinker capacity, estimated"): None,
     # NOTE: Chromium mine production in USGS historical is different to USGS current
@@ -110,6 +114,7 @@ COMMODITY_MAPPING = {
     ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine, gross weight"),
     ("Chromium", "Mne production, grosss weight, marketable chromite ore"): ("Chromium", "Mine, gross weight"),
     ("Chromium", "Mne production, marketable chromite ore, gross weight"): ("Chromium", "Mine, gross weight"),
+    ("Chromium", "Mine production, grosss weight, marketable chromite ore"): ("Chromium", "Mine, gross weight"),
     # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
     ("Clays", "Bentonite, mine production"): None,
     # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
@@ -124,6 +129,8 @@ COMMODITY_MAPPING = {
     ("Clays", "Mine poduction, Kaolin"): None,
     ("Cobalt", "Mine production, contained cobalt"): ("Cobalt", "Mine"),
     ("Cobalt", "Mine production, metric tons of contained cobalt"): ("Cobalt", "Mine"),
+    ("Cobalt", "Mine production, cobalt content, estimated"): ("Cobalt", "Mine"),
+    ("Cobalt", "Mine production, estimated"): ("Cobalt", "Mine"),
     ("Copper", "Mine production, contained copper"): ("Copper", "Mine"),
     # NOTE: I'm assuming "Mine production, contained copper" is equivalent to "Mine production, recoverable copper content".
     #  The former is used in the 2022 file, and the latter is used in the 2023 and 2024 files.
@@ -134,24 +141,32 @@ COMMODITY_MAPPING = {
     ("Diamond (industrial)", "Mine production, industrial diamond"): ("Diamond", "Mine, industrial"),
     ("Diatomite", "Mine production"): ("Diatomite", "Mine"),
     ("Diatomite", "Mine production, diatomite"): ("Diatomite", "Mine"),
+    ("Diatomite", "Mine production, estimated"): ("Diatomite", "Mine"),
     # NOTE: In 2022, for Feldspar and nepheline syenite, the subcommodity is "Mine production", whereas in 2023 and 2024, it is "Mine production, feldspar".
     #  It seems 2022 also refers to only feldspar (the numbers are in good agreement).
     ("Feldspar and nepheline syenite", "Mine production"): ("Feldspar", "Mine"),
     ("Feldspar and nepheline syenite", "Mine production, feldspar"): ("Feldspar", "Mine"),
+    ("Feldspar", "Mine production, estimated"): ("Feldspar", "Mine"),
     ("Fluorspar", "Mine production"): ("Fluorspar", "Mine"),
     ("Fluorspar", "Mine production, fluorspar"): ("Fluorspar", "Mine"),
+    ("Fluorspar", "Mine production, estimated"): ("Fluorspar", "Mine"),
     ("Gallium", "Primary production"): ("Gallium", "Processing"),
     ("Garnet", "Mine production"): ("Garnet", "Mine"),
+    ("Garnet (industrial)", "Mine production, estimated"): None,
     ("Gemstones", "Mine production, thousand carats of gem diamond"): ("Gemstones", "Mine"),
     ("Gemstones", "Mine production, thousand carats of gem-quality diamond"): ("Gemstones", "Mine"),
     ("Germanium", "Primary and secondary refinery production"): ("Germanium", "Refinery"),
     ("Gold", "Gold - contained content, mine production, metric tons"): ("Gold", "Mine"),
     ("Gold", "Mine production"): ("Gold", "Mine"),
+    ("Gold", "mine production, gold content"): ("Gold", "Mine"),
     ("Graphite (natural)", "Mine production"): ("Graphite", "Mine"),
     ("Graphite (natural)", "Mine production, graphite"): ("Graphite", "Mine"),
+    ("Graphite", "Mine production"): ("Graphite", "Mine"),
     ("Gypsum", "Mine production"): ("Gypsum", "Mine"),
+    ("Gypsum", "Mine production, estimated"): ("Gypsum", "Mine"),
     ("Helium", "Mine production"): ("Helium", "Mine"),
     ("Helium", "Mine production, helium"): ("Helium", "Mine"),
+    ("Helium", "Production, helium gas content"): None,
     ("Indium", "Refinery production"): ("Indium", "Refinery"),
     ("Indium", "Refinery production, indium"): ("Indium", "Refinery"),
     ("Iodine", "Mine production"): ("Iodine", "Mine"),
@@ -167,7 +182,7 @@ COMMODITY_MAPPING = {
     # Looking at the metadata notes, "usable ore" corresponds to "Crude ore".
     ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): ("Iron ore", "Mine, crude ore"),
     ("Iron ore", "Mine production - Iron content"): ("Iron ore", "Mine, iron content"),
-    # TODO: Revisit this mapping:
+    ("Iron ore", "Mine production, iron content"): ("Iron ore", "Mine, iron content"),
     ("Iron ore", "Mine production - Usable ore"): ("Iron ore", "Mine, crude ore"),
     ("Iron ore", "Mine production, usable ore"): ("Iron ore", "Mine, crude ore"),
     ("Iron oxide pigments", "Iron oxide pigments"): None,
@@ -214,6 +229,7 @@ COMMODITY_MAPPING = {
         "Magnesium compounds",
         "Mine",
     ),
+    ("Magnesium compounds", "Mine production, magnesite - gross weight"): ("Magnesium compounds", "Mine"),
     ("Magnesium metal", "Magnesium smelter production"): ("Magnesium metal", "Smelter"),
     ("Magnesium metal", "Smelter production"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Mine production, manganese content"): ("Manganese", "Mine"),
@@ -222,30 +238,39 @@ COMMODITY_MAPPING = {
     ("Mica (natural)", "Mica mine production - scrap and flake"): ("Mica", "Mine, scrap and flake"),
     ("Mica (natural)", "Mica mine production - sheet"): ("Mica", "Mine, sheet"),
     ("Mica (natural)", "Mine production - mica scrap and flake"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural)", "Mine production, mica scrap and flake"): ("Mica", "Mine, scrap and flake"),
     ("Mica (natural)", "Mine production - mica sheet"): ("Mica", "Mine, sheet"),
+    ("Mica (natural)", "Mine production, mica sheet"): ("Mica", "Mine, sheet"),
     ("Molybdenum", "Mine production, contained molybdenum"): ("Molybdenum", "Mine"),
     ("Molybdenum", "Molybdenum mine production, contained molybdenum"): ("Molybdenum", "Mine"),
+    ("Molybdenum", "Mine production, molybdenum content"): ("Molybdenum", "Mine production"),
     ("Nickel", "Mine production"): ("Nickel", "Mine"),
     ("Nickel", "Mine production - nickel, metric tons contained"): ("Nickel", "Mine"),
+    ("Nickel", "Mine production, nickel content"): ("Nickel", "Mine"),
     ("Niobium (columbium)", "Mine production"): ("Niobium", "Mine"),
     ("Niobium (columbium)", "Mine production, niobium content"): ("Niobium", "Mine"),
+    ("Niobium", "Mine production, niobium content"): ("Niobium", "Mine"),
     ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Fixed ammonia"),
     ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): ("Nitrogen", "Fixed ammonia"),
+    ("Nitrogen(fixed) - ammonia", "Plant production, nitrogen content"): ("Nitrogen", "Fixed ammonia"),
     # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
     ("Peat", "Mine production"): None,
     # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
     ("Peat", "Mine production, peat"): None,
     ("Perlite", "Mine production"): ("Perlite", "Mine"),
     ("Perlite", "Mine production, perlite"): ("Perlite", "Mine"),
+    ("Perlite", "Mine production, estimated"): ("Perlite", "Mine"),
     ("Phosphate rock", "Mine production"): ("Phosphate rock", "Mine"),
     ("Phosphate rock", "Mine production, phosphate rock ore"): ("Phosphate rock", "Mine"),
-    ("Platinum-group metals", "Mine production: Palladium"): ("Platinum group metals", "Mine, palladium"),
+    ("Phosphate rock", "Mine production, marketable phosphate rock"): None,
     ("Platinum-group metals", "Mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
-    ("Platinum-group metals", "World mine production: Palladium"): ("Platinum group metals", "Mine, palladium"),
     ("Platinum-group metals", "World mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
+    ("Platinum-group metals", "Mine production, Platinum content"): ("Platinum group metals", "Mine, platinum"),
+    ("Platinum-group metals", "Mine production: Palladium"): ("Platinum group metals", "Mine, palladium"),
+    ("Platinum-group metals", "World mine production: Palladium"): ("Platinum group metals", "Mine, palladium"),
+    ("Platinum-group metals", "Mine production, Palladium content"): ("Platinum group metals", "Mine, palladium"),
     ("Potash", "Mine production"): ("Potash", "Mine"),
     ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine"),
-    # TODO: Reconsider mapping:
     ("Potash", "Reserves, recoverable ore"): None,
     # NOTE: The following could be mapped to ("Pumice and pumicite", "Mine").
     # However, the resulting World aggregate is significantly larger than from USGS historical.
@@ -253,6 +278,7 @@ COMMODITY_MAPPING = {
     ("Pumice and pumicite", "Mine production"): None,
     ("Pumice and pumicite", "Mine production, puice and pumicite"): None,
     ("Pumice and pumicite", "Mine production, pumice and pumicite"): None,
+    ("Pumice & pumicite", "Mine production, estimated"): None,
     ("Rare earths", "Mine production, metric tons of rare-earth-oxide (REO) equivalent"): (
         "Rare earths",
         "Mine",
@@ -261,9 +287,12 @@ COMMODITY_MAPPING = {
         "Rare earths",
         "Mine",
     ),
+    ("Rare earths", "Mine production, rare-earth-oxide equivalent"): ("Rare earths", "Mine"),
     ("Rhenium", "Mine production"): ("Rhenium", "Mine"),
     ("Rhenium", "Mine production, contained rhenium"): ("Rhenium", "Mine"),
+    ("Rhenium", "Mine production, rhenium content"): ("Rhenium", "Mine"),
     ("Salt", "Mine production"): ("Salt", "Mine"),
+    ("Salt", "Mine production, estimated"): ("Salt", "Mine"),
     ("Sand and gravel (industrial)", "Mine production"): (
         "Sand and gravel",
         "Mine, industrial",
@@ -272,14 +301,17 @@ COMMODITY_MAPPING = {
         "Sand and gravel",
         "Mine, industrial",
     ),
+    ("Sand and gravel (industrial)", "Mine production, estimated"): ("Sand and gravel", "Mine, industrial"),
     ("Selenium", "Refinery production"): ("Selenium", "Refinery"),
     ("Selenium", "Refinery production, contained selenium"): ("Selenium", "Refinery"),
+    ("Selenium", "Refinery production, selenium content"): ("Selenium", "Refinery"),
     ("Silicon", "Plant production, silicon content of combined totals for ferrosilicon and silicon metal production"): (
         "Silicon",
         "Processing",
     ),
     ("Silicon", "Plant production, silicon content of ferrosilicon"): None,
     ("Silicon", "Plant production, silicon content of ferrosilicon production"): None,
+    ("Silicon", "Plant production, Ferosilicon, silicon content"): None,
     ("Silicon", "Plant production, silicon metal"): None,
     ("Silicon", "silicon content of combined totals for ferrosilicon and silicon metal production"): (
         "Silicon",
@@ -289,9 +321,12 @@ COMMODITY_MAPPING = {
     ("Silver", "Mine production"): ("Silver", "Mine"),
     ("Silver", "Silver - mine production, contained silver - metric tons"): ("Silver", "Mine"),
     ("Silver", "mine production, silver content"): ("Silver", "Mine"),
+    ("Silver", "Mine production, silver content"): ("Silver", "Mine"),
     ("Soda ash", "Mine production (natural soda ash)"): ("Soda ash", "Natural"),
+    ("Soda ash", "Mine production, natural"): ("Soda ash", "Natural"),
     ("Soda ash", "Soda ash, natural, mine production"): ("Soda ash", "Natural"),
     ("Soda ash", "Soda ash, synthetic"): ("Soda ash", "Synthetic"),
+    ("Soda ash", "Production, Synthetic"): ("Soda ash", "Synthetic"),
     ("Soda ash", "Soda ash, total natural and synthetic"): ("Soda ash", "Natural and synthetic"),
     ("Soda ash", "World total mine production, natural soda ash (rounded)"): ("Soda ash", "Natural"),
     ("Soda ash", "World total production, natural and synthetic soda ash (rounded)"): (
@@ -303,7 +338,9 @@ COMMODITY_MAPPING = {
     ("Stone (dimension)", "Mine production, dimension stone"): None,
     ("Strontium", "Mine production"): ("Strontium", "Mine"),
     ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine"),
+    ("Strontium", "Mine production, strontium content"): ("Strontium", "Mine"),
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
+    ("Sulfur", "Production, all forms, sulfur content"): ("Sulfur", "Processing"),
     ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Processing"),
     ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): None,
     # NOTE: Talc production is larger than crude talk production.
@@ -315,6 +352,7 @@ COMMODITY_MAPPING = {
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): ("Talc and pyrophyllite", "Mine"),
     ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
     ("Talc and pyrophyllite", "Mine production, estimated"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc, crude", "Mine production, estimated"): None,
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
     # NOTE: The following could be mapped to ("Tellurium", "Mine"). However, we decided to discard Tellurium.
@@ -328,6 +366,7 @@ COMMODITY_MAPPING = {
         "Titanium and titanium dioxide",
         "Sponge Metal Production and Sponge and Pigment Yearend Operating Capacity",
     ): None,
+    ("Titanium & titanium dioxide", "Sponge Metal Production"): None,
     ("Titanium mineral concentrates", "Mine production: Ilmenite"): ("Titanium", "Mine, ilmenite"),
     ("Titanium mineral concentrates", "Mine production: Ilmenite (rounded)"): ("Titanium", "Mine, ilmenite"),
     ("Titanium mineral concentrates", "Mine production: Ilmenite and rutile"): None,
@@ -348,6 +387,10 @@ COMMODITY_MAPPING = {
         "Titanium",
         "Mine, ilmenite",
     ),
+    ("Titanium mineral concentrates", "Mine production, ilmentite, titanium dioxide (TiO2) content"): (
+        "Titanium",
+        "Mine, ilmenite",
+    ),
     ("Titanium mineral concentrates", "World total mine production: ilmentite and rutile (rounded)"): None,
     (
         "Titanium mineral concentrates",
@@ -361,6 +404,10 @@ COMMODITY_MAPPING = {
         "Titanium mineral concentrates",
         "World total mine production: rutile (rounded), titanium dioxide (TiO2) content.",
     ): ("Titanium", "Mine, rutile"),
+    ("Titanium mineral concentrates", "Mine production, rutile, titanium dioxide (TiO2) content"): (
+        "Titanium",
+        "Mine, rutile",
+    ),
     ("Tungsten", "Mine production, contained tungsten"): ("Tungsten", "Mine"),
     ("Tungsten", "Mine production, tungsten content"): ("Tungsten", "Mine"),
     ("Vanadium", "Mine production"): ("Vanadium", "Mine"),
@@ -379,6 +426,7 @@ COMMODITY_MAPPING = {
         "Zinc",
         "Mine",
     ),
+    ("Zinc", "Mine production, zinc content"): ("Zinc", "Mine"),
     ("Zirconium and hafnium", "Mine production, zirconium ores and zircon concentrates"): (
         "Zirconium and hafnium",
         "Mine",
@@ -387,62 +435,8 @@ COMMODITY_MAPPING = {
         "Zirconium and hafnium",
         "Zirconium ores and zircon concentrates, mine production, thousand metric tons, gross weight",
     ): ("Zirconium and hafnium", "Mine"),
+    ("Zirconium and hafnium", "Mine production, zirconium, gross weight"): ("Zirconium and hafnium", "Mine"),
 }
-
-# TODO: Fix missing mappings:
-MISSING_MAPPINGS = {
-    ("Rare earths", "Mine production, rare-earth-oxide equivalent"): None,
-    ("Garnet (industrial)", "Mine production, estimated"): None,
-    ("Fluorspar", "Mine production, estimated"): None,
-    ("Molybdenum", "Mine production, molybdenum content"): None,
-    ("Iron ore", "Mine production, iron content"): None,
-    ("Rhenium", "Mine production, rhenium content"): None,
-    ("Cobalt", "Mine production, cobalt content, estimated"): None,
-    ("Boron", "Boron all types"): None,
-    ("Feldspar", "Mine production, estimated"): None,
-    ("Talc, crude", "Mine production, estimated"): None,
-    ("Helium", "Production, helium gas content"): None,
-    ("Magnesium compounds", "Mine production, magnesite - gross weight"): None,
-    ("Platinum-group metals", "Mine production, Palladium content"): None,
-    ("Niobium", "Mine production, niobium content"): None,
-    ("Silver", "Mine production, silver content"): None,
-    ("Cobalt", "Mine production, estimated"): None,
-    ("Antimony", "Mine production, antimony content"): None,
-    ("Diatomite", "Mine production, estimated"): None,
-    ("Bauxite", "Mine production, bauxite, dry tons"): None,
-    ("Gypsum", "Mine production, estimated"): None,
-    ("Zirconium and hafnium", "Mine production, zirconium, gross weight"): None,
-    ("Phosphate rock", "Mine production, marketable phosphate rock"): None,
-    ("Soda ash", "Mine production, natural"): None,
-    ("Mica (natural)", "Mine production, mica scrap and flake"): None,
-    ("Nickel", "Mine production, nickel content"): None,
-    ("Selenium", "Refinery production, selenium content"): None,
-    ("Mica (natural)", "Mine production, mica sheet"): None,
-    ("Graphite", "Mine production"): None,
-    ("Zinc", "Mine production, zinc content"): None,
-    ("Gold", "mine production, gold content"): None,
-    ("Strontium", "Mine production, strontium content"): None,
-    ("Barite", "Mine production, barite, estimated"): None,
-    ("Titanium mineral concentrates", "Mine production, ilmentite, titanium dioxide (TiO2) content"): None,
-    ("Perlite", "Mine production, estimated"): None,
-    ("Bromine", "Production, bromine content, estimated"): None,
-    ("Titanium mineral concentrates", "Mine production, rutile, titanium dioxide (TiO2) content"): None,
-    ("Chromium", "Mine production, grosss weight, marketable chromite ore"): None,
-    # Mappings missing in reserves 2025 data:
-    ("Sand and gravel (industrial)", "Mine production, estimated"): None,
-    ("Titanium & titanium dioxide", "Sponge Metal Production"): None,
-    ("Cadmium", "Refinery production, estimated"): None,
-    ("Beryllium", "Mine production, beryllium content"): None,
-    ("Soda ash", "Production, Synthetic"): None,
-    ("Sulfur", "Production, all forms, sulfur content"): None,
-    ("Salt", "Mine production, estimated"): None,
-    ("Silicon", "Plant production, Ferosilicon, silicon content"): None,
-    ("Pumice & pumicite", "Mine production, estimated"): None,
-    ("Platinum-group metals", "Mine production, Platinum content"): None,
-    ("Nitrogen(fixed) - ammonia", "Plant production, nitrogen content"): None,
-    ("Bauxite", "Refinery production, alumina - calcined equivalent weights"): None,
-}
-COMMODITY_MAPPING = COMMODITY_MAPPING | MISSING_MAPPINGS
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
@@ -887,8 +881,6 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
                 "thousand metric dry tons",
                 "thousand metric tons",
             ]
-
-            # TODO: Continue handling units for 2025 data.
             if unit_production == "kilograms":
                 df_production["Production_t"] *= 1e-3
             elif unit_production == "metric tons":
@@ -992,13 +984,7 @@ def harmonize(df):
     # NOTE: For some reason, sometimes "World" excludes the US.
     # For now, we excluded those aggregates from the data.
     # If needed, we can construct proper aggregates in the future.
-    df = geo.harmonize_countries(
-        df=df,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        country_col="Country",
-        warn_on_unused_countries=False,
-    )
+    df = paths.regions.harmonize_names(tb=df, country_col="Country", warn_on_unused_countries=False)
 
     return df
 
