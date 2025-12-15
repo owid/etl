@@ -167,7 +167,9 @@ COMMODITY_MAPPING = {
     # Looking at the metadata notes, "usable ore" corresponds to "Crude ore".
     ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): ("Iron ore", "Mine, crude ore"),
     ("Iron ore", "Mine production - Iron content"): ("Iron ore", "Mine, iron content"),
+    # TODO: Revisit this mapping:
     ("Iron ore", "Mine production - Usable ore"): ("Iron ore", "Mine, crude ore"),
+    ("Iron ore", "Mine production, usable ore"): ("Iron ore", "Mine, crude ore"),
     ("Iron oxide pigments", "Iron oxide pigments"): None,
     ("Iron oxide pigments", "Mine production"): None,
     ("Iron oxide pigments", "Mine production, iron oxide pigments"): None,
@@ -188,6 +190,7 @@ COMMODITY_MAPPING = {
     ("Kyanite", "kyanite"): None,
     # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.
     ("Kyanite", "kyanite and sillimanite"): None,
+    ("Kyanite and related minerals", "Mine production"): None,
     ("Lead", "Mine production"): ("Lead", "Mine"),
     ("Lead", "Mine production, lead content"): ("Lead", "Mine"),
     ("Lime", "Plant production"): ("Lime", "Processing"),
@@ -242,6 +245,8 @@ COMMODITY_MAPPING = {
     ("Platinum-group metals", "World mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
     ("Potash", "Mine production"): ("Potash", "Mine"),
     ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine"),
+    # TODO: Reconsider mapping:
+    ("Potash", "Reserves, recoverable ore"): None,
     # NOTE: The following could be mapped to ("Pumice and pumicite", "Mine").
     # However, the resulting World aggregate is significantly larger than from USGS historical.
     # This is possibly caused by a sudden increase in production in Turkey in 2022 and 2023, found in the 2024 file.
@@ -309,6 +314,7 @@ COMMODITY_MAPPING = {
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): None,
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): ("Talc and pyrophyllite", "Mine"),
     ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
+    ("Talc and pyrophyllite", "Mine production, estimated"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
     # NOTE: The following could be mapped to ("Tellurium", "Mine"). However, we decided to discard Tellurium.
@@ -382,6 +388,61 @@ COMMODITY_MAPPING = {
         "Zirconium ores and zircon concentrates, mine production, thousand metric tons, gross weight",
     ): ("Zirconium and hafnium", "Mine"),
 }
+
+# TODO: Fix missing mappings:
+MISSING_MAPPINGS = {
+    ("Rare earths", "Mine production, rare-earth-oxide equivalent"): None,
+    ("Garnet (industrial)", "Mine production, estimated"): None,
+    ("Fluorspar", "Mine production, estimated"): None,
+    ("Molybdenum", "Mine production, molybdenum content"): None,
+    ("Iron ore", "Mine production, iron content"): None,
+    ("Rhenium", "Mine production, rhenium content"): None,
+    ("Cobalt", "Mine production, cobalt content, estimated"): None,
+    ("Boron", "Boron all types"): None,
+    ("Feldspar", "Mine production, estimated"): None,
+    ("Talc, crude", "Mine production, estimated"): None,
+    ("Helium", "Production, helium gas content"): None,
+    ("Magnesium compounds", "Mine production, magnesite - gross weight"): None,
+    ("Platinum-group metals", "Mine production, Palladium content"): None,
+    ("Niobium", "Mine production, niobium content"): None,
+    ("Silver", "Mine production, silver content"): None,
+    ("Cobalt", "Mine production, estimated"): None,
+    ("Antimony", "Mine production, antimony content"): None,
+    ("Diatomite", "Mine production, estimated"): None,
+    ("Bauxite", "Mine production, bauxite, dry tons"): None,
+    ("Gypsum", "Mine production, estimated"): None,
+    ("Zirconium and hafnium", "Mine production, zirconium, gross weight"): None,
+    ("Phosphate rock", "Mine production, marketable phosphate rock"): None,
+    ("Soda ash", "Mine production, natural"): None,
+    ("Mica (natural)", "Mine production, mica scrap and flake"): None,
+    ("Nickel", "Mine production, nickel content"): None,
+    ("Selenium", "Refinery production, selenium content"): None,
+    ("Mica (natural)", "Mine production, mica sheet"): None,
+    ("Graphite", "Mine production"): None,
+    ("Zinc", "Mine production, zinc content"): None,
+    ("Gold", "mine production, gold content"): None,
+    ("Strontium", "Mine production, strontium content"): None,
+    ("Barite", "Mine production, barite, estimated"): None,
+    ("Titanium mineral concentrates", "Mine production, ilmentite, titanium dioxide (TiO2) content"): None,
+    ("Perlite", "Mine production, estimated"): None,
+    ("Bromine", "Production, bromine content, estimated"): None,
+    ("Titanium mineral concentrates", "Mine production, rutile, titanium dioxide (TiO2) content"): None,
+    ("Chromium", "Mine production, grosss weight, marketable chromite ore"): None,
+    # Mappings missing in reserves 2025 data:
+    ("Sand and gravel (industrial)", "Mine production, estimated"): None,
+    ("Titanium & titanium dioxide", "Sponge Metal Production"): None,
+    ("Cadmium", "Refinery production, estimated"): None,
+    ("Beryllium", "Mine production, beryllium content"): None,
+    ("Soda ash", "Production, Synthetic"): None,
+    ("Sulfur", "Production, all forms, sulfur content"): None,
+    ("Salt", "Mine production, estimated"): None,
+    ("Silicon", "Plant production, Ferosilicon, silicon content"): None,
+    ("Pumice & pumicite", "Mine production, estimated"): None,
+    ("Platinum-group metals", "Mine production, Platinum content"): None,
+    ("Nitrogen(fixed) - ammonia", "Plant production, nitrogen content"): None,
+    ("Bauxite", "Refinery production, alumina - calcined equivalent weights"): None,
+}
+COMMODITY_MAPPING = COMMODITY_MAPPING | MISSING_MAPPINGS
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
