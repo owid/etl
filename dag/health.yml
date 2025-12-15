@@ -171,15 +171,15 @@ steps:
     - data://garden/health/2025-01-22/unaids
 
   # UNAIDS 2025
-  data://meadow/abs/2025-12-15/unaids:
+  data://meadow/health/2025-12-15/unaids:
     - snapshot://health/2025-12-15/unaids_epi.zip
     - snapshot://health/2025-12-15/unaids_gam.zip
     - snapshot://health/2025-12-15/unaids_kpa.zip
     - snapshot://health/2025-12-15/unaids_ncpi.zip
-  data://garden/abs/2025-12-15/unaids:
-    - data://meadow/abs/2025-12-15/unaids
-  data://grapher/abs/2025-12-15/unaids:
-    - data://garden/abs/2025-12-15/unaids
+  data://garden/health/2025-12-15/unaids:
+    - data://meadow/health/2025-12-15/unaids
+  data://grapher/health/2025-12-15/unaids:
+    - data://garden/health/2025-12-15/unaids
 
   # OECD Road accidents & passenger travel
   data://meadow/oecd/2024-07-01/road_accidents:
