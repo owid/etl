@@ -731,8 +731,9 @@ def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
         limit: Maximum number of results to return (default: 10).
 
     Returns:
-        CatalogFrame with columns: indicator_title, indicator, plus standard
-        catalog columns (table, namespace, version, dataset, path, etc.).
+        CatalogFrame with columns: indicator_title, indicator, score, then standard
+        catalog columns (table, dataset, version, namespace, channel, is_public,
+        dimensions, path, format).
 
     Example:
         ```python
@@ -769,27 +770,47 @@ def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
             channel, namespace, version, dataset = parts[0], parts[1], parts[2], parts[3]
             table = parts[4] if len(parts) > 4 else dataset
         else:
-            # Fallback if parsing fails
-            channel, namespace, version, dataset, table = "", "", "", "", ""
+            # Fallback if parsing fails - use pd.NA for missing values
+            channel, namespace, version, dataset, table = pd.NA, pd.NA, pd.NA, pd.NA, pd.NA
+            path_part = pd.NA
+            indicator = indicator if indicator else pd.NA
 
         rows.append(
             {
+                # Indicator-specific columns first
                 "indicator_title": r.get("title"),
-                "indicator": indicator,
+                "indicator": indicator if indicator else pd.NA,
                 "score": r.get("score"),
+                # Standard catalog columns in consistent order
                 "table": table,
-                "namespace": namespace,
-                "version": version,
                 "dataset": dataset,
+                "version": version,
+                "namespace": namespace,
                 "channel": channel,
+                "is_public": True,
                 "path": path_part,
                 "format": "parquet",
-                "is_public": True,
             }
         )
 
     frame = CatalogFrame(rows)
     frame._base_uri = OWID_CATALOG_URI
+
+    # Enrich with dimensions from the remote catalog
+    if not frame.empty:
+        catalog = _load_remote_catalog(channels=["grapher"])
+        # Merge on path to get dimensions
+        frame = frame.merge(
+            catalog.frame[["path", "dimensions"]],
+            on="path",
+            how="left",
+        )
+        # Reorder columns to put dimensions in the right place
+        cols = [c for c in frame.columns if c != "dimensions"]
+        cols.insert(cols.index("is_public") + 1, "dimensions")
+        frame = CatalogFrame(frame[cols])
+        frame._base_uri = OWID_CATALOG_URI
+
     return frame
 
 
