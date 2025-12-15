@@ -720,6 +720,14 @@ steps:
     - data://garden/un/2025-10-29/un_sdg
 
   #
+  # England and Wales Crime Survey
+  #
+  data://meadow/ons/2025-11-26/crime_survey:
+    - snapshot://ons/2025-11-26/crime_survey.csv
+  data://garden/ons/2025-11-26/crime_survey:
+    - data://meadow/ons/2025-11-26/crime_survey
+  data://grapher/ons/2025-11-26/crime_survey:
+    - data://garden/ons/2025-11-26/crime_survey
   # FBI crime data - Summary Reporting System Estimates
   #
   data://meadow/fbi/2025-11-21/summary_reporting_system_estimates:

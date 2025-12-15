@@ -1,9 +1,7 @@
----
-icon: material/virus
----
 # COVID-19
 
-This page is a compact summary of our COVID-19 work, with all the relevant links to download our COVID-19 datasets.
+!!! info "This page is a compact summary of our COVID-19 work, with all the relevant links to download our COVID-19 datasets."
+    **Maintained by**: Lucas Rodés-Guirao
 
 !!! tip "I just want [the data](#download-data)!"
 
