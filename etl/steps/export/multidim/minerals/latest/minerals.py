@@ -63,6 +63,10 @@ def run() -> None:
     # Only store minTime for columns with sparse data (<5 years range).
     sparse_data_min_year = {}
 
+    # Track choice renames for mineral and type dimensions (slug -> display name).
+    mineral_names: dict[str, str] = {}
+    type_names: dict[str, str] = {}
+
     for column in tb.drop(columns=["country", "year"]).columns:
         # Check if column has data
         years = tb["year"][tb[column].notnull()]
@@ -82,11 +86,19 @@ def run() -> None:
         # Clean up metric name
         metric = metric.replace("_", " ").lower()
 
+        # Create slugs for dimensions
+        mineral_slug = underscore(commodity)
+        type_slug = underscore(sub_commodity)
+
+        # Track original names for display (slug -> proper display name)
+        mineral_names[mineral_slug] = commodity
+        type_names[type_slug] = sub_commodity
+
         # Set dimensions on column metadata
         tb[column].m.dimensions = {
-            "mineral": underscore(commodity),
+            "mineral": mineral_slug,
             "metric": underscore(metric),
-            "type": underscore(sub_commodity),
+            "type": type_slug,
             "measure": measure,
         }
         tb[column].m.original_short_name = "value"
@@ -110,6 +122,10 @@ def run() -> None:
         indicator_names=["value"],
         dimensions=["mineral", "metric", "type", "measure"],
         common_view_config=common_view_config,
+        choice_renames={
+            "mineral": mineral_names,
+            "type": type_names,
+        },
     )
 
     # Helper function to determine if map tab should be shown
