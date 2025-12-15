@@ -174,11 +174,6 @@ class CatalogPath:
         return self.dataset
 
     @property
-    def indicator(self) -> Optional[str]:
-        """Alias for variable (preferred terminology)."""
-        return self.variable
-
-    @property
     def dataset_path(self) -> str:
         """Path to dataset: channel/namespace/version/dataset."""
         return f"{self.channel}/{self.namespace}/{self.version}/{self.dataset}"
@@ -194,6 +189,15 @@ class CatalogPath:
     def step_uri(self) -> str:
         """ETL step URI: data://channel/namespace/version/dataset."""
         return f"data://{self.dataset_path}"
+
+    @property
+    def table_variable(self) -> Optional[str]:
+        """Table and variable slug: table#variable (or just table if no variable)."""
+        if self.table is None:
+            return None
+        if self.variable is None:
+            return self.table
+        return f"{self.table}#{self.variable}"
 
     def with_channel(self, channel: CHANNEL) -> CatalogPath:
         """Return new path with different channel."""
@@ -223,17 +227,9 @@ class CatalogPath:
             raise ValueError("Cannot set variable without table")
         return replace(self, variable=variable)
 
-    def with_indicator(self, indicator: str) -> CatalogPath:
-        """Alias for with_variable (preferred terminology)."""
-        return self.with_variable(indicator)
-
     def without_variable(self) -> CatalogPath:
         """Return path without variable component."""
         return replace(self, variable=None)
-
-    def without_indicator(self) -> CatalogPath:
-        """Alias for without_variable (preferred terminology)."""
-        return self.without_variable()
 
     def without_table(self) -> CatalogPath:
         """Return path without table and variable components."""

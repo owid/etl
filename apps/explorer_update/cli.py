@@ -6,6 +6,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
 
+from etl.catalog.utils import CatalogPath
 from etl.grapher.io import get_variables_data
 from etl.paths import EXPLORERS_DIR
 from etl.version_tracker import VersionTracker
@@ -180,7 +181,7 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
     variables_df["step"] = [p.step_uri for p in variables_df["catalog_path"]]
 
     # Create a column with the table name and indicator name.
-    variables_df["table_and_variable_short_name"] = [f"{p.table}#{p.indicator}" for p in variables_df["catalog_path"]]
+    variables_df["table_and_variable_short_name"] = [f"{p.table}#{p.variable}" for p in variables_df["catalog_path"]]
 
     # Load dataframe of all steps in ETL.
     steps_df = VersionTracker().steps_df
@@ -217,7 +218,7 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
     ]
 
     # Create a column for the new version of the latest steps.
-    updateable["version_new"] = [variable["catalogPath_new"].split("/")[2] for _, variable in updateable.iterrows()]
+    updateable["version_new"] = [CatalogPath.from_str(variable["catalogPath_new"]).version for _, variable in updateable.iterrows()]
 
     if len(updateable) == 0:
         log.info("No variables to update.")

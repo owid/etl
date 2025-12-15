@@ -126,6 +126,21 @@ class TestProperties:
         p = CatalogPath.from_str("grapher/who/2024/gho/table#var")
         assert p.step_uri == "data://grapher/who/2024/gho"
 
+    def test_table_variable(self) -> None:
+        """table_variable returns table#variable slug."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/life_expectancy#value")
+        assert p.table_variable == "life_expectancy#value"
+
+    def test_table_variable_without_variable(self) -> None:
+        """table_variable returns just table when no variable."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/life_expectancy")
+        assert p.table_variable == "life_expectancy"
+
+    def test_table_variable_none_when_no_table(self) -> None:
+        """table_variable is None when no table."""
+        p = CatalogPath.from_str("grapher/who/2024/gho")
+        assert p.table_variable is None
+
 
 class TestWithMethods:
     """Tests for with_* builder methods."""
