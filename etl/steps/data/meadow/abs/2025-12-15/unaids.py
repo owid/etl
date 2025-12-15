@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
+import numpy as np
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -12,8 +14,6 @@ def run() -> None:
     #
     # Load inputs.
     #
-    snap = paths.load_snapshot("unaids_epi.zip")
-
     short_names = [
         "epi",
         "gam",
@@ -21,12 +21,13 @@ def run() -> None:
         "ncpi",
     ]
     tables = []
-    for short_name in short_names:
+    for name in short_names:
         # Retrieve snapshot.
-        snap = paths.load_snapshot(f"unaids_{short_name}.zip")
+        short_name = f"unaids_{name}.zip"
+        snap = paths.load_snapshot(short_name)
 
         # Load data from snapshot.
-        tb = snap.read()
+        tb = snap.read_csv()
 
         #
         # Process data.
@@ -59,7 +60,7 @@ def clean_table(tb):
         "Subgroup": "dimension",
         "Area": "country",
         # "Area ID" : "",
-        "Time period": "year",
+        "Time Period": "year",
         "Source": "source",
         "Data value": "value_raw",
         "Formatted": "value",
@@ -72,7 +73,7 @@ def clean_table(tb):
     tb = tb.drop_duplicates(subset=["country", "year", "indicator", "dimension"], keep="first")
 
     # Handle NaNs
-    tb["value"] = tb["value"].replace("...", np.nan)
+    tb.loc[:, "value"] = tb["value"].replace("...", np.nan)
     tb = tb.dropna(subset=["value"])
 
     return tb
