@@ -43,7 +43,7 @@ definitions:
     display: &common_display
       tolerance: 5
 
-  ppp_prices: 2021
+  ppp_version: 2021
 
   poverty_line_a_day: |-
     <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -121,11 +121,18 @@ definitions:
     Inequality is measured here in terms of income before taxes and benefits.
     <%- endif %>
 
+  subtitle_welfare_type: |-
+    <% if welfare_type == "dhi" %>
+    Income here is measured here after taxes and benefits.
+    <%- elif welfare_type == "mi" %>
+    Income here is measured here before taxes and benefits.
+    <%- endif %>
+
   ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
 
-  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices.
+  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices.
 
-  ppp_adjustment_note_longer: This data is measured in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices to adjust for inflation and differences in living costs between countries.
+  ppp_adjustment_note_longer: This data is measured in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices to adjust for inflation and differences in living costs between countries.
 
   relative_poverty_percentage: |-
     <% if poverty_line == "40% of the median" %>
@@ -135,6 +142,364 @@ definitions:
     <%- elif poverty_line == "60% of the median" %>
     60%
     <%- endif %>
+
+  title_welfare_type: |-
+    <% if welfare_type == "dhi" %>
+    after tax
+    <%- elif welfare_type == "mi" %>
+    before tax
+    <%- endif %>
+
+  # For Grapher configuration
+
+  headcount_ratio_title: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Share of population living in extreme poverty ({definitions.title_welfare_type})
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Relative poverty: Share of population below <<poverty_line>> ({definitions.title_welfare_type})
+    <%- else %>
+    Poverty: Share of population living on less than {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    <%- endif %>
+
+  headcount_title: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Number of people living in extreme poverty ({definitions.title_welfare_type})
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Relative poverty: Number of people below <<poverty_line>> ({definitions.title_welfare_type})
+    <%- else %>
+    Poverty: Number of people living on less than {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    <%- endif %>
+
+  total_shortfall_title: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Total shortfall from extreme poverty ({definitions.title_welfare_type})
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Total shortfall from a poverty line of <<poverty_line>> income ({definitions.title_welfare_type})
+    <%- else %>
+    Total shortfall from a poverty line of {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    <%- endif %>
+
+  avg_shortfall_title: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Average shortfall from extreme poverty ({definitions.title_welfare_type})
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Average shortfall from a poverty line of <<poverty_line>> income ({definitions.title_welfare_type})
+    <%- else %>
+    Average shortfall from a poverty line of {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    <%- endif %>
+
+  income_gap_ratio_title: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Average shortfall from extreme poverty (as a share of the poverty line) ({definitions.title_welfare_type})
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Average shortfall from a poverty line of <<poverty_line>> income ({definitions.title_welfare_type}) (as a share of the poverty line)
+    <%- else %>
+    Average shortfall from a poverty line of {definitions.poverty_line_a_day} (as a share of the poverty line) ({definitions.title_welfare_type})
+    <%- endif %>
+
+  poverty_gap_index_title: |-
+    <% if poverty_line in ['40% of the median', '50% of the median', '60% of the median'] %>
+    Poverty gap index at <<poverty_line>> income ({definitions.title_welfare_type})
+    <%- else %>
+    Poverty gap index at {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    <%- endif %>
+
+  threshold_title: |-
+    {macros}
+    <% if decile == 5 %>
+    Threshold income per day marking the <<percentiles_thr(decile) | lower>> (median) ({definitions.title_welfare_type})
+    <%- else %>
+    Threshold income per day marking the <<percentiles_thr(decile) | lower>> ({definitions.title_welfare_type})
+    <%- endif %>
+
+  poverty_line_subtitle: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Extreme poverty is defined as living below the [International Poverty Line](#dod:international-poverty-line) of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
+    <%- elif poverty_line in poverty_line_lmic %>
+    The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_umic %>
+    The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at {definitions.relative_poverty_percentage} of the median income. {definitions.subtitle_welfare_type}
+    <%- else %>
+    {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- endif %>
+
+  total_shortfall_subtitle: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the [International Poverty Line](#dod:international-poverty-line) of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_lmic %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_umic %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> income. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- else %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- endif %>
+
+  avg_shortfall_subtitle: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the [International Poverty Line](#dod:international-poverty-line) of {definitions.poverty_line_per_day}, averaged across the population in poverty. {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_lmic %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty. {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_umic %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty. {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> income, averaged across the population in poverty. {definitions.subtitle_welfare_type}
+    <%- else %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty. {definitions.subtitle_welfare_type}
+    <%- endif %>
+
+  income_gap_ratio_subtitle_base: |-
+    This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_.
+
+  income_gap_ratio_subtitle: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the [International Poverty Line](#dod:international-poverty-line) ({definitions.poverty_line_per_day}). {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_lmic %>
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the lower-middle income poverty line ({definitions.poverty_line_per_day}). {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in poverty_line_umic %>
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the upper-middle income poverty line ({definitions.poverty_line_per_day}). {definitions.subtitle_welfare_type}
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than <<poverty_line>> income. {definitions.subtitle_welfare_type}
+    <%- else %>
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than {definitions.poverty_line_per_day}. {definitions.subtitle_welfare_type}
+    <%- endif %>
+
+  poverty_gap_index_subtitle: |-
+    The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line). {definitions.subtitle_welfare_type}
+
+  note_for_absolute_or_relative_poverty: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
+    {definitions.ppp_adjustment_note}
+    <%- endif %>
+
+  note_total_shortfall: |-
+    {definitions.ppp_adjustment_note} This shortfall does not take into account costs and inefficiencies from making the necessary transfers.
+
+  headcount_ratio_color_scheme: |-
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    YlOrBr
+    <%- else %>
+    OrRd
+    <%- endif %>
+
+  headcount_color_scheme: |-
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    YlOrBr
+    <%- else %>
+    Reds
+    <%- endif %>
+
+  total_shortfall_color_scheme: |-
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    YlOrBr
+    <%- else %>
+    Oranges
+    <%- endif %>
+
+  avg_shortfall_color_scheme: |-
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    YlOrBr
+    <%- else %>
+    Purples
+    <%- endif %>
+
+  map_brackets_headcount_ratio: &map_brackets_headcount_ratio |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    [0, 3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    <%- elif poverty_line in ["40% of the median"] %>
+    [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
+    <%- elif poverty_line in ["50% of the median"] %>
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
+    <%- elif poverty_line in ["60% of the median"] %>
+    [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- else %>
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    <%- endif %>
+
+  map_brackets_headcount: &map_brackets_headcount <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
+    <%- else %>
+    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
+    <%- endif %>
+
+  map_brackets_total_shortfall: &map_brackets_total_shortfall |-
+    {macros}
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
+    <%- elif poverty_line in ["100"] %>
+    [0, 1000000,3000000,10000000,30000000,100000000,300000000,1]
+    <%- elif poverty_line in poverty_line_ipl %>
+    [0, 1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1]
+    <%- elif poverty_line in poverty_line_lmic %>
+    [0, 10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1]
+    <%- elif poverty_line in poverty_line_umic %>
+    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1]
+    <%- elif poverty_line in ["1000"] %>
+    [0, 1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1]
+    <%- elif poverty_line in ["2000"] %>
+    [0, 10000000000,30000000000,100000000000,300000000000,1]
+    <%- elif poverty_line in ["3000"] %>
+    [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,1]
+    <%- elif poverty_line in ["4000"] %>
+    [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
+    <%- endif %>
+
+  map_brackets_avg_shortfall: &map_brackets_avg_shortfall |-
+    {macros}
+    <% if poverty_line in ["40% of the median"] %>
+    [0, 1, 2, 3, 4, 5, 6, 1]
+    <%- elif poverty_line in ["50% of the median"] %>
+    [0, 1, 2, 3, 4, 5, 6, 7, 1]
+    <%- elif poverty_line in ["60% of the median"] %>
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+    <%- elif poverty_line in ["100"] %>
+    [0, 0.2, 0.4, 0.6, 0.8, 1]
+    <%- elif poverty_line in poverty_line_ipl %>
+    [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, <<poverty_line|float/100>>]
+    <%- elif poverty_line in poverty_line_lmic %>
+    [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, <<poverty_line|float/100>>]
+    <%- elif poverty_line in poverty_line_umic %>
+    [0, 1, 2, 3, 4, 5, 6, 7, <<poverty_line|float/100>>]
+    <%- elif poverty_line in ["500"] %>
+    [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+    <%- elif poverty_line in ["700"] %>
+    [0, 1, 2, 3, 4, 5, 6, 7]
+    <%- elif poverty_line in ["1000"] %>
+    [0, 2, 4 ,6, 8, 10]
+    <%- elif poverty_line in ["2000"] %>
+    [0, 2, 4 ,6, 8, 10, 12, 14, 16, 18, 20]
+    <%- elif poverty_line in ["3000"] %>
+    [0, 5, 10 , 15, 20, 25, 30]
+    <%- elif poverty_line in ["4000"] %>
+    [0, 5, 10 , 15, 20, 25, 30, 35, 40]
+    <%- endif %>
+
+  map_brackets_income_gap_ratio: &map_brackets_income_gap_ratio <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    [5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
+    <%- else %>
+    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    <%- endif %>
+
+  map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index |-
+    {macros}
+    <% if poverty_line in ["40% of the median"] %>
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
+    <%- elif poverty_line in ["50% of the median"] %>
+    [0, 2, 4, 6, 8, 10, 1]
+    <%- elif poverty_line in ["60% of the median"] %>
+    [0, 2, 4, 6, 8, 10, 12, 1]
+    <%- elif poverty_line in ["100"] %>
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+    <%- elif poverty_line in poverty_line_ipl %>
+    [0, 5, 10, 15, 20, 25, 30, 35, 1]
+    <%- elif poverty_line in poverty_line_lmic %>
+    [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
+    <%- elif poverty_line in poverty_line_umic %>
+    [0, 10, 20, 30, 40, 50, 60, 70, 1]
+    <%- elif poverty_line in ["1000"] %>
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 1]
+    <%- else %>
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    <%- endif %>
+
+  map_brackets_avg: &map_brackets_avg <% if decile in [1, 2, 3, 4] %>
+    [0, 1, 2, 5, 10, 20, 1]
+    <%- elif decile in [5, 6, 7, 8] %>
+    [0, 1, 2, 5, 10, 20, 50, 1]
+    <%- elif decile in [9] %>
+    [0, 1, 2, 5, 10, 20, 50, 100, 1]
+    <%- elif decile in [10] %>
+    [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
+    <%- endif %>
+
+  map_brackets_share: &map_brackets_share <% if decile in [1] %>
+    [0, 1, 2, 3, 4, 1]
+    <%- elif decile in [2] %>
+    [0, 1, 2, 3, 4, 5, 1]
+    <%- elif decile in [3] %>
+    [100, 2, 3, 4, 5, 6, 1]
+    <%- elif decile in [4] %>
+    [100, 2, 3, 4, 5, 6, 7, 1]
+    <%- elif decile in [5] %>
+    [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+    <%- elif decile in [6] %>
+    [100, 4, 5, 6, 7, 8, 9, 1]
+    <%- elif decile in [7] %>
+    [100, 6, 7, 8, 9, 10, 11, 1]
+    <%- elif decile in [8] %>
+    [100, 8, 9, 10, 11, 12, 13, 1]
+    <%- elif decile in [9] %>
+    [100, 8, 10, 12, 14, 16, 1]
+    <%- elif decile in [10] %>
+    [100, 20, 25, 30, 35, 40, 45, 1]
+    <%- endif %>
+
+  map_brackets_thr: &map_brackets_thr <% if decile in [1, 2, 3] %>
+    [0, 1, 2, 5, 10, 20, 1]
+    <% elif decile in [4, 5, 6, 7] %>
+    [0, 1, 2, 5, 10, 20, 50, 1]
+    <% elif decile in [8, 9] %>
+    [0, 1, 2, 5, 10, 20, 50, 100, 1]
+    <%- endif %>
+
+  entity_names_poverty: &entity_names_poverty
+    - Mozambique
+    - Zambia
+    - Kenya
+    - Nigeria
+    - Bangladesh
+    - Bolivia
+    - Romania
+    - Indonesia
+
+  entity_names_inequality: &entity_names_inequality
+    - Chile
+    - Brazil
+    - South Africa
+    - United States
+    - France
+    - China
+
+  entity_names_incomes_across_distribution: &entity_names_incomes_across_distribution
+    - World
+    - United States
+    - South Korea
+    - Spain
+    - China
+    - Mauritania
+    - Ghana
+    - India
+    - Ethiopia
+    - Democratic Republic of Congo
+
+  entity_names_prosperity_gap: &entity_names_prosperity_gap
+    - Norway
+    - United Kingdom
+    - Russia
+    - China
+    - Brazil
+    - India
+    - Mali
+    - Philippines
+    - Democratic Republic of Congo
+    - Mozambique
+    - United States
+
+  # This is the ID of the Google Doc that contains the FAQs
+  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
 
 # Learn more about the available fields:
@@ -162,6 +527,21 @@ tables:
           name: Share of population in poverty ({definitions.poverty_line_a_day})
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.headcount_ratio_title}"
+            subtitle: "{definitions.poverty_line_subtitle}"
+            note: "{definitions.note_for_absolute_or_relative_poverty}"
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "{definitions.headcount_ratio_color_scheme}"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_headcount_ratio
+            selectedEntityNames: *entity_names_poverty
 
       headcount:
         title: Number of people in poverty ({definitions.poverty_line_a_day}, {definitions.welfare_type}, {definitions.equivalence_scale})
@@ -181,10 +561,25 @@ tables:
           numSignificantFigures: 3
           roundingMode: significantFigures
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.headcount_title}"
+            subtitle: "{definitions.poverty_line_subtitle}"
+            note: "{definitions.note_for_absolute_or_relative_poverty}"
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "{definitions.headcount_color_scheme}"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_headcount
+            selectedEntityNames: *entity_names_poverty
 
       total_shortfall:
         title: Total shortfall ({definitions.poverty_line_a_day}, {definitions.welfare_type}, {definitions.equivalence_scale})
-        unit: international-$ in {definitions.ppp_prices} prices
+        unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           This is the amount of money that would be theoretically needed to lift the income of all people in poverty up to {definitions.poverty_line_per_day}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
@@ -198,10 +593,27 @@ tables:
           name: Total shortfall ({definitions.poverty_line_a_day})
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.total_shortfall_title}"
+            subtitle: "{definitions.total_shortfall_subtitle}"
+            note: "{definitions.note_total_shortfall}"
+            hasMapTab: true
+            tab: chart
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "{definitions.total_shortfall_color_scheme}"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_total_shortfall
+            selectedEntityNames: *entity_names_poverty
 
       avg_shortfall:
         title: Average shortfall ($) ({definitions.poverty_line_a_day}, {definitions.welfare_type}, {definitions.equivalence_scale})
-        unit: international-$ in {definitions.ppp_prices} prices
+        unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           This is the amount of money that would be theoretically needed to lift the income of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty.
@@ -215,6 +627,21 @@ tables:
           name: Average shortfall ($) ({definitions.poverty_line_a_day})
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.avg_shortfall_title}"
+            subtitle: "{definitions.avg_shortfall_subtitle}"
+            note: "{definitions.ppp_adjustment_note_longer}"
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "{definitions.avg_shortfall_color_scheme}"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_avg_shortfall
+            selectedEntityNames: *entity_names_poverty
 
       income_gap_ratio:
         title: Average shortfall (%) ({definitions.poverty_line_a_day}, {definitions.welfare_type}, {definitions.equivalence_scale})
@@ -232,6 +659,21 @@ tables:
           name: Average shortfall (%) ({definitions.poverty_line_a_day})
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.income_gap_ratio_title}"
+            subtitle: "{definitions.income_gap_ratio_subtitle}"
+            note: "{definitions.ppp_adjustment_note_longer}"
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrRd"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_income_gap_ratio
+            selectedEntityNames: *entity_names_poverty
 
       poverty_gap_index:
         title: Poverty gap index ({definitions.poverty_line_a_day}, {definitions.welfare_type}, {definitions.equivalence_scale})
@@ -249,12 +691,27 @@ tables:
           name: Poverty gap index ({definitions.poverty_line_a_day})
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.poverty_gap_index_title}"
+            subtitle: "{definitions.poverty_gap_index_subtitle}"
+            note: "{definitions.ppp_adjustment_note_longer}"
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "RdPu"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_poverty_gap_index
+            selectedEntityNames: *entity_names_poverty
 
   mean_median:
     variables:
       mean:
         title: Mean income ({definitions.welfare_type}, {definitions.equivalence_scale})
-        unit: international-$ in {definitions.ppp_prices} prices
+        unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           Average income of the population.
@@ -266,10 +723,27 @@ tables:
           name: Mean income
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Mean income ({definitions.title_welfare_type})
+            subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
+            note: "{definitions.ppp_adjustment_note}"
+            hasMapTab: true
+            tab: chart
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "BuGn"
+                binningStrategy: "manual"
+                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
         title: Median income ({definitions.welfare_type}, {definitions.equivalence_scale})
-        unit: international-$ in {definitions.ppp_prices} prices
+        unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           Value of income below which 50% of the population live.
@@ -281,6 +755,23 @@ tables:
           name: Median income
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Median income ({definitions.title_welfare_type})
+            subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
+            note: "{definitions.ppp_adjustment_note}"
+            hasMapTab: true
+            tab: chart
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "Blues"
+                binningStrategy: "manual"
+                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
   deciles:
     variables:
@@ -288,7 +779,7 @@ tables:
         title: |-
           {macros}
           Average (<<percentiles_avg_share(decile)>>, {definitions.welfare_type}, {definitions.equivalence_scale})
-        unit: international-$ in {definitions.ppp_prices} prices
+        unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           {macros}
@@ -303,6 +794,27 @@ tables:
             Average (<<percentiles_avg_share(decile)>>)
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: |-
+              {macros}
+              Mean income within the <<percentiles_avg_share(decile) | lower>> ({definitions.title_welfare_type})
+            subtitle: |-
+              {macros}
+              The mean income within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+            note: "{definitions.ppp_adjustment_note}"
+            hasMapTab: true
+            tab: chart
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "Greens"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_avg
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
       share:
         title: |-
@@ -322,12 +834,31 @@ tables:
             Share (<<percentiles_avg_share(decile)>>)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: |-
+              {macros}
+              Income share of the <<percentiles_avg_share(decile) | lower>> ({definitions.title_welfare_type})
+            subtitle: |-
+              {macros}
+              The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.subtitle_welfare_type}
+            note: ""
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_share
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
       thr:
         title: |-
           {macros}
           Threshold (<<percentiles_thr(decile)>>, {definitions.welfare_type}, {definitions.equivalence_scale})
-        unit: international-$ in {definitions.ppp_prices} prices
+        unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           {macros}
@@ -342,6 +873,23 @@ tables:
             Threshold (<<percentiles_thr(decile)>>)
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.threshold_title}"
+            subtitle: The level of income per person below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+            note: "{definitions.ppp_adjustment_note}"
+            hasMapTab: true
+            tab: chart
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "Purples"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_thr
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
   inequality:
     variables:
@@ -358,6 +906,21 @@ tables:
           name: Gini coefficient
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Gini coefficient ({definitions.title_welfare_type})"
+            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type}
+            note: ""
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Oranges"
+                binningStrategy: "manual"
+                customNumericValues: [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.1]
+            selectedEntityNames: *entity_names_inequality
 
       palma_ratio:
         title: Palma ratio ({definitions.welfare_type}, {definitions.equivalence_scale})
@@ -372,6 +935,22 @@ tables:
           name: Palma ratio
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Palma ratio ({definitions.title_welfare_type})"
+            subtitle: |-
+              The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type}
+            note: ""
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
+                customNumericValues: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 1]
+            selectedEntityNames: *entity_names_inequality
 
       p50_p10_ratio:
         title: P50/P10 ratio ({definitions.welfare_type}, {definitions.equivalence_scale})
@@ -428,6 +1007,21 @@ tables:
           name: Share (bottom 50%)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Income share of the poorest 50% ({definitions.title_welfare_type})"
+            subtitle: "The share of income received by the poorest 50% of the population. {definitions.subtitle_welfare_type}"
+            note: ""
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Blues"
+                binningStrategy: "manual"
+                customNumericValues: [1000, 10, 15, 20, 25, 30, 1]
+            selectedEntityNames: *entity_names_inequality
 
       share_top_10:
         title: Share (top 10%, {definitions.welfare_type}, {definitions.equivalence_scale})
@@ -442,6 +1036,21 @@ tables:
           name: Share (top 10%)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Income share of the richest 10% ({definitions.title_welfare_type})"
+            subtitle: "The share of income received by the richest 10% of the population. {definitions.subtitle_welfare_type}"
+            note: ""
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: [1000, 20, 25, 30, 35, 40, 1]
+            selectedEntityNames: *entity_names_inequality
 
       share_middle_40:
         title: Share (middle 40%, {definitions.welfare_type}, {definitions.equivalence_scale})
@@ -470,4 +1079,19 @@ tables:
           name: Share of population in relative poverty
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Share of population in relative poverty ({definitions.title_welfare_type})"
+            subtitle: "The share of the population with income below 50% of the median. Relative poverty reflects the extent of inequality within the bottom of the distribution. {definitions.description_short_welfare_type}"
+            note: ""
+            hasMapTab: true
+            tab: chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
+                customNumericValues: [0, 5, 10, 15, 20, 25, 1]
+            selectedEntityNames: *entity_names_inequality
 
