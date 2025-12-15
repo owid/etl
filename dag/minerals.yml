@@ -73,9 +73,14 @@ steps:
   data://grapher/minerals/2024-07-15/global_mine_production_by_mineral:
     - data://garden/minerals/2024-07-15/minerals
   #
-  # Minerals - Minerals explorer.
+  # Minerals - Minerals explorer (legacy).
   #
   export://explorers/minerals/latest/minerals:
+    - data://grapher/minerals/2024-07-15/minerals
+  #
+  # Minerals - Minerals explorer (multidim).
+  #
+  export://multidim/minerals/latest/minerals:
     - data://grapher/minerals/2024-07-15/minerals
   #
   # Minerals - Minerals supply and demand prospects.
