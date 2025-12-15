@@ -34,7 +34,7 @@ def run() -> None:
         #
         tb = clean_table(tb)
         # Format table
-        tb = tb.format(column_index, short_name=short_name)
+        tb = tb.format(column_index, short_name=name)
 
         # Append current table to list of tables.
         tables.append(tb)
@@ -62,8 +62,8 @@ def clean_table(tb):
         # "Area ID" : "",
         "Time Period": "year",
         "Source": "source",
-        "Data value": "value_raw",
-        "Formatted": "value",
+        "Data value": "value",
+        "Formatted": "value_rounded",
         "Data_Denominator": "data_denominator",
         "Footnote": "footnote",
     }
@@ -73,7 +73,7 @@ def clean_table(tb):
     tb = tb.drop_duplicates(subset=["country", "year", "indicator", "dimension"], keep="first")
 
     # Handle NaNs
-    tb.loc[:, "value"] = tb["value"].replace("...", np.nan)
+    # tb.loc[:, "value"] = tb["value"].replace("...", np.nan)
     tb = tb.dropna(subset=["value"])
 
     return tb
