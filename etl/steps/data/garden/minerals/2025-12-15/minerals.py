@@ -24,12 +24,11 @@ from typing import List, Optional, Tuple
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
-from owid.catalog import Dataset, Table, VariablePresentationMeta
+from owid.catalog import Table, VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -482,13 +481,13 @@ def add_share_of_global_columns(tb: Table) -> Table:
     return tb
 
 
-def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
+def _raise_error_on_large_deviations(tb: Table) -> None:
     world_usgs_label = "World (USGS)"
     world_agg_label = "World (aggregated)"
     # The following should coincide with the one defined in combine_data.
     world_bgs_label = "World (BGS)"
     # Add up the contribution from all countries and compare it to USGS' original "World".
-    tb = _add_global_data_for_comparison(tb=tb, ds_regions=ds_regions)
+    tb = _add_global_data_for_comparison(tb=tb)
     tb["country"] = tb["country"].replace("World", world_agg_label).replace("World (original)", world_usgs_label)
     for entity_to_compare in [world_agg_label, world_bgs_label]:
         _tb = tb[(tb["country"].isin([world_usgs_label, entity_to_compare]))].reset_index(drop=True)
@@ -531,7 +530,6 @@ def combine_data(
     tb_usgs_flat: Table,
     tb_usgs_historical_flat: Table,
     tb_bgs_flat: Table,
-    ds_regions: Dataset,
     columns_to_plot: Optional[List[str]] = None,
 ) -> Table:
     # Compare the data from different origins where they overlap.
@@ -616,7 +614,7 @@ def combine_data(
 
     # Sanity check: Raise an error if the aggregate of all data is significantly larger than the original "World" given
     # by USGS.
-    _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
+    _raise_error_on_large_deviations(tb=tb)
 
     # It would be useful to have a global total for certain cases, like Coal and Petroleum, and some critical minerals,
     # which come from BGS and are quite complete.
@@ -643,7 +641,7 @@ def combine_data(
     return tb
 
 
-def _add_global_data_for_comparison(tb: Table, ds_regions: Dataset) -> Table:
+def _add_global_data_for_comparison(tb: Table) -> Table:
     _tb = tb.copy()
     # We want to create a "World" aggregate, just for sanity checks:
     # * We will ensure there are no overlaps between historical and successor regions.
@@ -670,14 +668,16 @@ def _add_global_data_for_comparison(tb: Table, ds_regions: Dataset) -> Table:
         "South America": {},
         "World": {"additional_members": ["Other"]},
     }
-    _tb = geo.add_regions_to_table(
+    # Create a world aggregate, but keep the original as "World (original)".
+    _tb_original_world = _tb[_tb["country"] == "World"].reset_index(drop=True).assign(**{"country": "World (original)"})
+    _tb = paths.regions.add_aggregates(
         tb=_tb[_tb["country"] != "World (BGS)"],
         regions=regions,
-        ds_regions=ds_regions,
         min_num_values_per_year=1,
         accepted_overlaps=accepted_overlaps,
-        keep_original_region_with_suffix=" (original)",
     )
+    _tb = pr.concat([_tb, _tb_original_world], ignore_index=True)
+
     # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
     regions_to_remove = [region for region in regions if region not in ["World", "World (original)"]]
     _tb = _tb.loc[~_tb["country"].isin(regions_to_remove)].reset_index(drop=True)
@@ -697,7 +697,7 @@ def run_sanity_checks(tb: Table) -> None:
             log.warning(f"{column} maximum: {tb[column].max():.0f}%")
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -710,10 +710,6 @@ def run(dest_dir: str) -> None:
     tb_usgs_historical_flat = ds_usgs_historical.read("historical_statistics_for_mineral_and_material_commodities_flat")
     tb_usgs_flat = ds_usgs.read("mineral_commodity_summaries_flat")
     tb_bgs_flat = ds_bgs.read("world_mineral_statistics_flat")
-
-    # Load regions dataset.
-    # NOTE: It will only be used for sanity checks.
-    ds_regions = paths.load_dataset("regions")
 
     #
     # Process data.
@@ -738,7 +734,6 @@ def run(dest_dir: str) -> None:
         tb_usgs_flat=tb_usgs_flat,
         tb_usgs_historical_flat=tb_usgs_historical_flat,
         tb_bgs_flat=tb_bgs_flat,
-        ds_regions=ds_regions,
         columns_to_plot=PLOT_TO_COMPARE_DATA_SOURCES,
     )
 
@@ -768,5 +763,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
