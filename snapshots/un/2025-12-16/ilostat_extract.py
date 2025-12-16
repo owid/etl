@@ -36,32 +36,32 @@ When the code finishes, you will have the following files in this folder:
     - ilostat_table_of_contents_country.parquet
 
 Now you can run
-    etls ilostat --path-to-file snapshots/un/2025-08-12/ilostat.parquet
-    etls ilostat_dictionary_classif1 --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_classif1.parquet
-    etls ilostat_dictionary_classif2 --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_classif2.parquet
-    etls ilostat_dictionary_indicator --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_indicator.parquet
-    etls ilostat_dictionary_note_classif --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_note_classif.parquet
-    etls ilostat_dictionary_note_indicator --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_note_indicator.parquet
-    etls ilostat_dictionary_note_source --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_note_source.parquet
-    etls ilostat_dictionary_obs_status --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_obs_status.parquet
-    etls ilostat_dictionary_ref_area --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_ref_area.parquet
-    etls ilostat_dictionary_sex --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_sex.parquet
-    etls ilostat_dictionary_source --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_source.parquet
-    etls ilostat_table_of_contents_country --path-to-file snapshots/un/2025-08-12/ilostat_table_of_contents_country.parquet
+    etls un/2025-12-16/ilostat.parquet --path-to-file snapshots/un/2025-12-16/ilostat.parquet
+    etls un/2025-12-16/ilostat_dictionary_classif1 --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_classif1.parquet
+    etls un/2025-12-16/ilostat_dictionary_classif2 --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_classif2.parquet
+    etls un/2025-12-16/ilostat_dictionary_indicator --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_indicator.parquet
+    etls un/2025-12-16/ilostat_dictionary_note_classif --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_classif.parquet
+    etls un/2025-12-16/ilostat_dictionary_note_indicator --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_indicator.parquet
+    etls un/2025-12-16/ilostat_dictionary_note_source --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_source.parquet
+    etls un/2025-12-16/ilostat_dictionary_obs_status --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_obs_status.parquet
+    etls un/2025-12-16/ilostat_dictionary_ref_area --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_ref_area.parquet
+    etls un/2025-12-16/ilostat_dictionary_sex --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_sex.parquet
+    etls un/2025-12-16/ilostat_dictionary_source --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_source.parquet
+    etls un/2025-12-16/ilostat_table_of_contents_country --path-to-file snapshots/un/2025-12-16/ilostat_table_of_contents_country.parquet
 
 You can delete the file after this.
-    rm -rf snapshots/un/2025-08-12/ilostat.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_classif1.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_classif2.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_indicator.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_note_classif.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_note_indicator.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_note_source.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_obs_status.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_ref_area.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_sex.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_source.parquet
-    rm -rf snapshots/un/2025-08-12/ilostat_table_of_contents_country.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_classif1.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_classif2.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_indicator.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_note_classif.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_note_indicator.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_note_source.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_obs_status.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_ref_area.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_sex.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_dictionary_source.parquet
+    rm -rf snapshots/un/2025-12-16/ilostat_table_of_contents_country.parquet
 
 """
 
