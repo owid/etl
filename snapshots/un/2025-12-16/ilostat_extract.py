@@ -37,17 +37,17 @@ When the code finishes, you will have the following files in this folder:
 
 Now you can run
     etls un/2025-12-16/ilostat.parquet --path-to-file snapshots/un/2025-12-16/ilostat.parquet
-    etls un/2025-12-16/ilostat_dictionary_classif1 --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_classif1.parquet
-    etls un/2025-12-16/ilostat_dictionary_classif2 --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_classif2.parquet
-    etls un/2025-12-16/ilostat_dictionary_indicator --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_indicator.parquet
-    etls un/2025-12-16/ilostat_dictionary_note_classif --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_classif.parquet
-    etls un/2025-12-16/ilostat_dictionary_note_indicator --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_indicator.parquet
-    etls un/2025-12-16/ilostat_dictionary_note_source --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_source.parquet
-    etls un/2025-12-16/ilostat_dictionary_obs_status --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_obs_status.parquet
-    etls un/2025-12-16/ilostat_dictionary_ref_area --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_ref_area.parquet
-    etls un/2025-12-16/ilostat_dictionary_sex --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_sex.parquet
-    etls un/2025-12-16/ilostat_dictionary_source --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_source.parquet
-    etls un/2025-12-16/ilostat_table_of_contents_country --path-to-file snapshots/un/2025-12-16/ilostat_table_of_contents_country.parquet
+    etls un/2025-12-16/ilostat_dictionary_classif1.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_classif1.parquet
+    etls un/2025-12-16/ilostat_dictionary_classif2.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_classif2.parquet
+    etls un/2025-12-16/ilostat_dictionary_indicator.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_indicator.parquet
+    etls un/2025-12-16/ilostat_dictionary_note_classif.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_classif.parquet
+    etls un/2025-12-16/ilostat_dictionary_note_indicator.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_indicator.parquet
+    etls un/2025-12-16/ilostat_dictionary_note_source.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_note_source.parquet
+    etls un/2025-12-16/ilostat_dictionary_obs_status.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_obs_status.parquet
+    etls un/2025-12-16/ilostat_dictionary_ref_area.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_ref_area.parquet
+    etls un/2025-12-16/ilostat_dictionary_sex.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_sex.parquet
+    etls un/2025-12-16/ilostat_dictionary_source.parquet --path-to-file snapshots/un/2025-12-16/ilostat_dictionary_source.parquet
+    etls un/2025-12-16/ilostat_table_of_contents_country.parquet --path-to-file snapshots/un/2025-12-16/ilostat_table_of_contents_country.parquet
 
 You can delete the file after this.
     rm -rf snapshots/un/2025-12-16/ilostat.parquet
