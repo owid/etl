@@ -63,10 +63,10 @@ COLUMN_CATEGORIES = {
         "Gender wage gap by occupation (%)": "gender_wage_gap_by_occupation",
         "Share of children in child labour by sex and age (%)": "share_of_children_in_child_labour_by_sex_and_age",
         "Female share of low pay earners (%)": "female_share_of_low_pay_earners",
-        "Labour force by sex and age -- ILO modelled estimates, Nov. 2024 (thousands)": "labour_force_by_sex_and_age",
-        "Labour force participation rate by sex and age -- ILO modelled estimates, Nov. 2024 (%)": "labour_force_participation_rate_by_sex_and_age",
-        "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2024 (thousands)": "employment_by_sex_and_status_in_employment",
-        "Unemployment rate by sex and age -- ILO modelled estimates, Nov. 2024 (%)": "unemployment_rate_by_sex_and_age",
+        "Labour force by sex and age -- ILO modelled estimates, Nov. 2025 (thousands)": "labour_force_by_sex_and_age",
+        "Labour force participation rate by sex and age -- ILO modelled estimates, Nov. 2025 (%)": "labour_force_participation_rate_by_sex_and_age",
+        "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2025 (thousands)": "employment_by_sex_and_status_in_employment",
+        "Unemployment rate by sex and age -- ILO modelled estimates, Nov. 2025 (%)": "unemployment_rate_by_sex_and_age",
         "Informal employment rate by sex -- ILO modelled estimates, Nov. 2024 (%)": "informal_employment_rate_by_sex",
     },
     "sex": {
@@ -221,15 +221,15 @@ def run() -> None:
     tb_regions = format_ilo_regions(tb_regions=tb_regions)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
+    tb = paths.regions.harmonize_names(
+        tb=tb,
         warn_on_unused_countries=False,
         warn_on_unknown_excluded_countries=False,
     )
-    tb_regions = geo.harmonize_countries(
-        df=tb_regions, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    tb_regions = paths.regions.harmonize_names(
+        tb=tb_regions,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
     )
 
     # Remove outliers in specific indicators
