@@ -122,6 +122,9 @@ def run() -> None:
     # description_from_producer = "\n".join(["\n    ".join(description.split("\n")) for description in _description_from_producer if description])
 
     # Melt table to create a long table with mineral as "country" column.
+    for column in tb.columns:
+        # Remove dimensions from metadata to avoid spurious warnings.
+        tb[column].metadata.dimensions = None
     tb_long = tb.melt(id_vars=["year"], var_name="country", value_name="mine_production")
 
     # Drop empty rows.
