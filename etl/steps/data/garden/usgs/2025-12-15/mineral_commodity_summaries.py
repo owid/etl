@@ -1145,15 +1145,23 @@ def gather_and_process_data(data) -> pd.DataFrame:
         == 2
     )
 
-    # For each year, there is production data for two years.
-    # So, there are multiple values of production data for the same year.
-    # Assume that the latest is the most accurate (usually, the previous value was an estimate).
+    # In each file there is production data for a given year, and an estimate of the following year.
+    # Therefore, for each year, there is production data for two years.
+    # We could simply drop duplicates of country, mineral, type, year, keeping last.
+    # However, it can happen that a country is informed in the estimated production of a file, but not in the actual production of the following file.
+    # This happens e.g. to Tantalum: in the 2024 file there is estimated data (for 2023) for "Other"; however, in the 2025 file there is no "Other".
+    # If I simply drop duplicates, keeping the last instance of a country-mineral-type-year, then the estimated "Other" leaks into the actual production data, creating a mismatch in aggregates.
     df_production = df_production.sort_values(
         ["Source", "Country", "Mineral", "Type", "Year"], ascending=True
     ).reset_index(drop=True)
-    df_production = df_production.drop_duplicates(
-        subset=["Country", "Mineral", "Type", "Year"], keep="last"
-    ).reset_index(drop=True)
+    # df_production = df_production.drop_duplicates(
+    #     subset=["Country", "Mineral", "Type", "Year"], keep="last"
+    # ).reset_index(drop=True)
+    # So, the alternative is to find the latest source of a given mineral-type-year.
+    df_production = df_production[
+        df_production["Source"]
+        == df_production.groupby(["Mineral", "Type", "Year"], as_index=False)["Source"].transform("last")
+    ]
 
     # Combine reserves and production data.
     # NOTE: Here, do not merge on "Source". It can happen that we have reserves for one year in one source, but not in the other.
