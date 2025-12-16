@@ -15,3 +15,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
+outs:
+  - md5: b9575494e0088b7153d07700a2f4a392
+    size: 16838
+    path: ilostat_dictionary_note_classif.parquet

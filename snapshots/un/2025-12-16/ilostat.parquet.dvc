@@ -13,3 +13,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
+outs:
+  - md5: df6a9c2a12bd8baa5ac53db6f3be7374
+    size: 5248101
+    path: ilostat.parquet
