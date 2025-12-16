@@ -1,7 +1,10 @@
 """Script to create a snapshot with all data from BGS' World Mineral Statistics.
 
+The BGS now uses the OGC API-Features standard for serving data.
+This script fetches all records from the new API endpoint.
+
 It may take about 20 minutes to fetch all data.
-The result will be a zip folder containing a big json file, adapted to the limitations of the BGS' system.
+The result will be a zip folder containing a big json file.
 
 """
 
@@ -9,11 +12,9 @@ import json
 import time
 import zipfile
 from pathlib import Path
-from typing import Dict, List
 
 import click
 import requests
-from bs4 import BeautifulSoup
 from structlog import get_logger
 from tqdm.auto import tqdm
 
@@ -25,90 +26,102 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# Base url for data queries.
-URL_BASE = "https://www2.bgs.ac.uk/mineralsuk/statistics/wms.cfc"
+# Base url for the OGC API-Features endpoint.
+API_BASE_URL = "https://ogcapi.bgs.ac.uk/collections/world-mineral-statistics/items"
+
+# Maximum number of items to request per page (API limit).
+# Testing shows the API can handle larger requests
+PAGE_LIMIT = 20000
 
 # Seconds to wait between consecutive queries.
+# Reduced to speed up fetching while still being respectful
 TIME_BETWEEN_QUERIES = 0.1
 
 
-def fetch_raw_data(data_types: List[str], years: List[int], commodity_to_id: Dict[str, int]):
-    # To load data for all countries we can set "country=" in the query.
-    # Queries need to be in groups of maximum 10 years.
-    # Example query:
-    # https://www2.bgs.ac.uk/mineralsUK/statistics/wms.cfc?method=listResults&dataType=Imports&commodity=29&dateFrom=1970&dateTo=1979&country=&agreeToTsAndCs=agreed
+def fetch_all_data():
+    """
+    Fetch all World Mineral Statistics data from the BGS OGC API.
 
-    # Split years in groups of 9 years.
-    years_start = [years[0]]
-    for year in years[1:]:
-        if year > years_start[-1] + 9:
-            years_start.append(year)
+    Returns:
+        List of all feature records from the API.
+    """
+    all_features = []
+    offset = 0
 
-    # Calculate the total number of queries required.
-    # n_queries = len(years_start) * len(commodity_to_id) * len(data_types)
+    # First request to get the total number of records
+    log.info("Fetching initial data to determine total records (may take a few minutes)...")
+    params = {"f": "json", "limit": PAGE_LIMIT, "offset": offset}
 
-    # Fetch raw data in as many queries as required.
-    data = {}
-    for data_type in tqdm(data_types, desc="Data type"):
-        data[data_type] = {}
-        for commodity in tqdm(commodity_to_id, desc="Commodity"):
-            data[data_type][commodity] = {}
-            commodity_id = commodity_to_id[commodity]
-            for year_start in years_start:
-                year_end = year_start + 9
+    response = requests.get(API_BASE_URL, params=params)
+    response.raise_for_status()
+    data = response.json()
 
-                # Construct the url for the query.
-                query_url = (
-                    URL_BASE
-                    + f"?method=listResults&dataType={data_type}&commodity={commodity_id}&dateFrom={year_start}&dateTo={year_end}&country=&agreeToTsAndCs=agreed"
-                )
+    total_records = data.get("numberMatched", 0)
+    log.info(f"Total records to fetch: {total_records:,}")
 
-                # Get response.
-                response = requests.get(query_url)
+    # Add first batch of features
+    all_features.extend(data.get("features", []))
+    offset += len(data.get("features", []))
 
-                # Store content.
-                data[data_type][commodity][year_start] = response.content.decode("utf-8")
+    # Fetch remaining pages with progress bar
+    with tqdm(total=total_records, initial=offset, desc="Fetching records") as pbar:
+        while offset < total_records:
+            params = {"f": "json", "limit": PAGE_LIMIT, "offset": offset}
 
-                # Wait before sending next query.
-                time.sleep(TIME_BETWEEN_QUERIES)
+            response = requests.get(API_BASE_URL, params=params)
+            response.raise_for_status()
+            data = response.json()
 
-    return data
+            features = data.get("features", [])
+            if not features:
+                break
+
+            all_features.extend(features)
+            offset += len(features)
+            pbar.update(len(features))
+
+            # Wait before sending next query to be respectful to the server
+            time.sleep(TIME_BETWEEN_QUERIES)
+
+    log.info(f"Successfully fetched {len(all_features):,} records")
+    return all_features
 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
+    """
+    Main function to fetch BGS World Mineral Statistics and create a snapshot.
+    """
     # Create a new snapshot.
     snap = Snapshot(f"bgs/{SNAPSHOT_VERSION}/world_mineral_statistics.zip")
 
-    # Load the download data page, to be able to extract the mappings of the different elements.
-    page_map = requests.get(URL_BASE + "?method=searchWMS")
-    soup = BeautifulSoup(page_map.text, "html.parser")
+    # Fetch all data from the new OGC API
+    log.info("Starting data fetch from BGS OGC API-Features endpoint...")
+    all_features = fetch_all_data()
 
-    # Map mineral names (commodities) to ids.
-    soup_commodity = soup.find("select", id="commodity").find_all("option")  # type: ignore
-    commodity_to_id = {option.text.strip(): int(option["value"]) for option in soup_commodity if option["value"]}
-
-    # Data type options are simply "Imports", "Exports" and "Production".
-    data_types = ["Imports", "Exports", "Production"]
-
-    # Get the list of available years.
-    soup_years = soup.find("select", id="dateFrom").find_all("option")  # type: ignore
-    years = [int(option.text.strip()) for option in soup_years if option["value"]]
-
-    # First fetch all necessary data, without processing it.
-    data = fetch_raw_data(data_types=data_types, years=years, commodity_to_id=commodity_to_id)
-
-    # Convert the dictionary to a JSON.
-    json_data = json.dumps(data)
+    # Convert the feature collection to a JSON structure
+    # This maintains the GeoJSON FeatureCollection format
+    json_data = json.dumps(
+        {
+            "type": "FeatureCollection",
+            "features": all_features,
+            "numberMatched": len(all_features),
+            "numberReturned": len(all_features),
+        },
+        indent=2,
+    )
 
     # Ensure output snapshot folder exists, otherwise create it.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
 
     # Create a zip file and add the JSON data to it
+    log.info(f"Creating zip file at {snap.path}...")
     with zipfile.ZipFile(snap.path, "w", zipfile.ZIP_DEFLATED) as zipf:
         # Add the JSON data to the zip file.
         zipf.writestr(f"{snap.metadata.short_name}.json", json_data)
+
+    log.info(f"Zip file created successfully with {len(all_features):,} records")
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload, filename=snap.path)

@@ -5,12 +5,11 @@ from typing import Dict, List
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table, VariablePresentationMeta
+from owid.catalog import Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
-from etl.data_helpers import geo
 from etl.files import ruamel_load
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -975,13 +974,13 @@ def gather_notes(
     return notes_str_dict
 
 
-def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
+def add_global_data(tb: Table) -> Table:
     # We want to create a "World" aggregate.
     # This is useful to later inspect how BGS global data compares to USGS.
     # For now other regions are not important (since the data is very sparse, and
     # therefore aggregtes will not be representative of the region).
     # We could simply add up all countries, but we need to be aware of possible region overlaps.
-    # Therefore, I will use geo.add_regions_to_table to create all regions.
+    # Therefore, I will use paths.regions.add_aggregates to create all regions.
     # It will also create an aggregate for "World" (which will be created by aggregating newly created continent
     # aggregates).
     # Then I will remove all other region aggregates.
@@ -994,10 +993,9 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
         "South America": {},
         "World": {},
     }
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb=tb,
         regions=regions,
-        ds_regions=ds_regions,
         min_num_values_per_year=1,
         index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
         accepted_overlaps=ACCEPTED_OVERLAPS,
@@ -1008,7 +1006,7 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
 
     # # We noticed that imports/exports data have:
     # # * Only data for European countries (and Turkey) from 2003 onwards. Check this:
-    # regions = ds_regions["regions"]
+    # regions = paths.regions.tb_regions
     # europe = regions.loc[json.loads(regions[regions["name"] == "Europe"]["members"].item())]["name"].unique().tolist()
     # error = "Expected only European countries (including Turkey) imports/exports data after 2002."
     # assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
@@ -1126,16 +1124,13 @@ def aggregate_coal(tb: Table) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("world_mineral_statistics")
     tb = ds_meadow.read("world_mineral_statistics", safe_types=False)
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
 
     # Load adjacent file containing the original BGS notes and footnotes for each data column.
     # NOTE: This file is loaded as a sanity check, in case in a later update notes change.
@@ -1148,9 +1143,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # We decided to discard imports and exports data, since (as mentioned in other comments) it includes data for
     # non-european countries only until 2002, and it causes many issues.
@@ -1229,7 +1222,7 @@ def run(dest_dir: str) -> None:
         tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
 
     # Add global data.
-    tb = add_global_data(tb=tb, ds_regions=ds_regions)
+    tb = add_global_data(tb=tb)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
     for category in ["production"]:
@@ -1283,7 +1276,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_flat], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb, tb_flat])
 
     # Save changes in the new garden dataset.
     ds_garden.save()
