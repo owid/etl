@@ -104,6 +104,7 @@ ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
     ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
     ("World (BGS)", "production|Mercury|Mine|tonnes", [2022]),
+    ("World (aggregated)", "production|Magnesium compounds|Mine|tonnes", [2021]),
 ]
 
 # BGS does not provide any global data. But we created an aggregated World (which we will later on call "World (BGS)").
@@ -482,22 +483,63 @@ def add_share_of_global_columns(tb: Table) -> Table:
 
 
 def _raise_error_on_large_deviations(tb: Table) -> None:
+    _tb = tb.copy()
     world_usgs_label = "World (USGS)"
     world_agg_label = "World (aggregated)"
     # The following should coincide with the one defined in combine_data.
     world_bgs_label = "World (BGS)"
     # Add up the contribution from all countries and compare it to USGS' original "World".
-    tb = _add_global_data_for_comparison(tb=tb)
-    tb["country"] = tb["country"].replace("World", world_agg_label).replace("World (original)", world_usgs_label)
+    # We want to create a "World" aggregate, just for sanity checks:
+    # * We will ensure there are no overlaps between historical and successor regions.
+    # * We will ensure that the given "World" agrees with the sum of all countries (within a certain error).
+    # NOTE: This "World aggregate" will be ignored after sanity checks (and we will keep the original USGS' "World").
+
+    # Known overlaps between historical and successor regions (only on years when the historical region dissolved).
+    accepted_overlaps = [
+        # {1991: {"USSR", "Russia"}},
+        {1992: {"Czechia", "Czechoslovakia"}},
+        {1992: {"Slovakia", "Czechoslovakia"}},
+        # {1990: {"Germany", "East Germany"}},
+        # {1990: {"Germany", "West Germany"}},
+        # {1990: {"Yemen", "Yemen People's Republic"}},
+    ]
+    # Regions to create.
+    # NOTE: We only need "World", but we need other regions to construct it.
+    regions = {
+        "Africa": {},
+        "Asia": {},
+        "Europe": {},
+        "North America": {},
+        "Oceania": {},
+        "South America": {},
+        "World": {"additional_members": ["Other"]},
+    }
+    # Just to clarify, currently tb has "World" (which is the combination of historical and current USGS data) and "World (BGS)" (which comes from BGS).
+    assert set(tb[tb["country"].str.contains("World")]["country"]) == {"World", world_bgs_label}
+    # Rename to have only "World (BGS)" and "World (USGS)".
+    _tb["country"] = _tb["country"].replace("World", world_usgs_label)
+    # Create a world aggregate.
+    _tb = paths.regions.add_aggregates(
+        tb=_tb,
+        regions=regions,
+        min_num_values_per_year=1,
+        accepted_overlaps=accepted_overlaps,
+    )
+    _tb["country"] = _tb["country"].replace("World", world_agg_label)
+    # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
+    regions_to_remove = [region for region in regions if region != "World"]
+    _tb = _tb.loc[~_tb["country"].isin(regions_to_remove)].reset_index(drop=True)
+
+    # Compare World according to USGS with the aggregated world, and then with the BGS world.
     for entity_to_compare in [world_agg_label, world_bgs_label]:
-        _tb = tb[(tb["country"].isin([world_usgs_label, entity_to_compare]))].reset_index(drop=True)
-        _tb_pivot = _tb.pivot(
+        _tb_comparison = _tb[(_tb["country"].isin([world_usgs_label, entity_to_compare]))].reset_index(drop=True)
+        _tb_pivot = _tb_comparison.pivot(
             index=["year"],
             columns="country",
-            values=_tb.drop(columns=["country", "year"]).columns,
+            values=_tb_comparison.drop(columns=["country", "year"]).columns,
             join_column_levels_with="_",
         )
-        for column in [column for column in _tb.columns if column.startswith("production")]:
+        for column in [column for column in _tb_comparison.columns if column.startswith("production")]:
             original_column = f"{column}_{world_usgs_label}"
             aggregated_column = f"{column}_{entity_to_compare}"
             # We accept that the aggregated global data often does not add up to 100%, since we lack data for all countries.
@@ -523,7 +565,7 @@ def _raise_error_on_large_deviations(tb: Table) -> None:
             ):
                 message = f"{column}: {entity_to_compare} exceeds {world_usgs_label} by up to {deviation_max:.0f}% (MAPE: {mape:.0f}%)"
                 log.error(message + f" on {years_with_deviation}")
-                px.line(_tb, x="year", y=column, color="country", markers=True, title=message).show()
+                px.line(_tb_comparison, x="year", y=column, color="country", markers=True, title=message).show()
 
 
 def combine_data(
@@ -606,7 +648,8 @@ def combine_data(
         "production|Cobalt|Refinery|tonnes",
     ] = None
     tb.loc[
-        (tb["country"] != "World") & (tb["year"].isin([1977, 1978, 1979, 1983])),
+        (tb["country"] != "World")
+        & (tb["year"].isin([1969, 1970, 1971, 1972, 1973, 1974, 1977, 1978, 1979, 1983, 2021])),
         "production|Iodine|Mine|tonnes",
     ] = None
 
@@ -639,53 +682,6 @@ def combine_data(
     # Indeed, the aggregated global coal and petroleum production obtained from BGS data is reasonable agreement with the Statistical Review.
 
     return tb
-
-
-def _add_global_data_for_comparison(tb: Table) -> Table:
-    _tb = tb.copy()
-    # We want to create a "World" aggregate, just for sanity checks:
-    # * We will ensure there are no overlaps between historical and successor regions.
-    # * We will ensure that the given "World" agrees with the sum of all countries (within a certain error).
-    # NOTE: This "World aggregate" will be ignored after sanity checks (and we will keep the original USGS' "World").
-
-    # Known overlaps between historical and successor regions (only on years when the historical region dissolved).
-    accepted_overlaps = [
-        # {1991: {"USSR", "Russia"}},
-        {1992: {"Czechia", "Czechoslovakia"}},
-        {1992: {"Slovakia", "Czechoslovakia"}},
-        # {1990: {"Germany", "East Germany"}},
-        # {1990: {"Germany", "West Germany"}},
-        # {1990: {"Yemen", "Yemen People's Republic"}},
-    ]
-    # Regions to create.
-    # NOTE: We only need "World", but we need other regions to construct it.
-    regions = {
-        "Africa": {},
-        "Asia": {},
-        "Europe": {},
-        "North America": {},
-        "Oceania": {},
-        "South America": {},
-        "World": {"additional_members": ["Other"]},
-    }
-    # Create a world aggregate, but keep the original as "World (original)".
-    _tb_original_world = _tb[_tb["country"] == "World"].reset_index(drop=True).assign(**{"country": "World (original)"})
-    _tb = paths.regions.add_aggregates(
-        tb=_tb[_tb["country"] != "World (BGS)"],
-        regions=regions,
-        min_num_values_per_year=1,
-        accepted_overlaps=accepted_overlaps,
-    )
-    _tb = pr.concat([_tb, _tb_original_world], ignore_index=True)
-
-    # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
-    regions_to_remove = [region for region in regions if region not in ["World", "World (original)"]]
-    _tb = _tb.loc[~_tb["country"].isin(regions_to_remove)].reset_index(drop=True)
-
-    # Include the original "World (BGS)" for comparison.
-    _tb = pr.concat([_tb, tb[tb["country"] == "World (BGS)"]], ignore_index=True)
-
-    return _tb
 
 
 def run_sanity_checks(tb: Table) -> None:
