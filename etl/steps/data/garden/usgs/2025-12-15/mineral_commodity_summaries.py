@@ -656,6 +656,16 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
         assert set(d["Unit_meas"].dropna()) == {"metric tons"}
         assert (d[d["Country"] == "Sierra Leone"]["Unit_meas"].isnull()).all()
         d["Unit_meas"] = "thousand metric tons"
+
+        # There is a row for World (ilmenite and rutile), which happens to be the sum of global ilmenite and global rutile.
+        # This row is unnecessary (since we have them separately), and it's misleading (since the Type mentions only ilmenite).
+        # So I'll remove it.
+        d = d.drop(
+            d[
+                (d["Country"] == "World total (ilmenite and rutile, rounded)")
+                & (d["Type"] == "Mine production, ilmentite, titanium dioxide (TiO2) content")
+            ].index
+        ).reset_index(drop=True)
     ############################################################################################################
 
     # Check that all columns are either source, country, type, production, reserves, or capacity.
@@ -989,10 +999,11 @@ def harmonize(df):
     return df
 
 
-def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def fix_duplicates(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # After harmonization, some countries that appeared with an annotation become the same.
-    # However, there is only one case where this creates ambiguity within the same country-year-mineral-type.
-    # That's Helium. Check that this is the case, and remove this commodity.
+    # This happens to Helium production and reserves, where the US appears as:
+    # "United States (from Cliffside Field)" and "United States (extracted from natural gas)".
+    # We can simply sum them together.
     counts = df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()
     assert set(counts[counts["Reserves_t"] > 1]["Mineral"]) == set(["Helium"])
     counts = df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()
@@ -1043,8 +1054,6 @@ def harmonize_commodity_subcommodity_pairs(df: pd.DataFrame) -> pd.DataFrame:
             df = df.drop(index_to_drop).reset_index(drop=True)
             continue
 
-        # Get the new commodity-subcommodity names.
-        commodity_new, subcommodity_new = pair_new
         # Rename the commodity-subcommodity pair.
         df.loc[(df["Mineral"] == commodity_old) & (df["Type"] == subcommodity_old), ["Mineral", "Type"]] = pair_new
 
@@ -1113,7 +1122,7 @@ def gather_and_process_data(data) -> pd.DataFrame:
     df_production = harmonize(df_production)
 
     # Fix Helium issue (see function for an explanation).
-    df_reserves, df_production = fix_helium_issue(df_reserves=df_reserves, df_production=df_production)
+    df_reserves, df_production = fix_duplicates(df_reserves=df_reserves, df_production=df_production)
 
     # Check that the issue is solved.
     assert (
