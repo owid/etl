@@ -222,10 +222,9 @@ def show_table_explorers(df):
 def load_dataset_from_etl(dataset_uri: str) -> catalog.Dataset | None:
     """Get dataset."""
     p = CatalogPath.from_str(dataset_uri)
-    dataset_path = DATA_DIR / p.dataset_path
     dataset = None
     try:
-        dataset = catalog.Dataset(dataset_path)
+        dataset = catalog.Dataset(DATA_DIR / p)
     except Exception:
         st.warning(f"Dataset not found. You may want to run `etl {p.step_uri}` first")
     return dataset

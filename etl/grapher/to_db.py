@@ -294,7 +294,7 @@ def upsert_table(
         session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).indicator)
+            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).variable)
 
 
 def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:

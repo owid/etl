@@ -449,11 +449,12 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
         catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
     """
     p = CatalogPath.from_str(catalog_path)
+    assert p.variable
 
     parquet_url = f"{CATALOG_BASE}/{p.table_path}.parquet"
-    sql_tpl = f"SELECT country, year, {p.indicator} FROM '{parquet_url}' WHERE country = '??' LIMIT 100"
+    sql_tpl = f"SELECT country, year, {p.variable} FROM '{parquet_url}' WHERE country = '??' LIMIT 100"
     return {
         "parquet_url": parquet_url,
         "run_sql_template": sql_tpl,
-        "column": p.indicator,
+        "column": p.variable,
     }

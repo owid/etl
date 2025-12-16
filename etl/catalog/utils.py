@@ -235,6 +235,65 @@ class CatalogPath:
         """Return path without table and variable components."""
         return replace(self, table=None, variable=None)
 
+    @property
+    def parent(self) -> CatalogPath:
+        """Return parent path (like pathlib.Path.parent).
+
+        - If has variable, returns path without variable
+        - If has table (no variable), returns path without table
+        - If dataset-only, returns self (dataset is the root)
+        """
+        if self.variable is not None:
+            return replace(self, variable=None)
+        if self.table is not None:
+            return replace(self, table=None)
+        return self
+
+    def __truediv__(self, other: str) -> CatalogPath:
+        """Join path components using / operator (like pathlib.Path).
+
+        Examples:
+            >>> p = CatalogPath.from_str("grapher/who/2024/gho")
+            >>> p / "table"
+            CatalogPath('grapher/who/2024/gho/table')
+            >>> p / "table#var"
+            CatalogPath('grapher/who/2024/gho/table#var')
+        """
+        if self.table is not None:
+            raise ValueError("Cannot append to path that already has a table")
+
+        if "#" in other:
+            table, variable = other.split("#", 1)
+            return replace(self, table=table, variable=variable)
+        return replace(self, table=other)
+
+    def __eq__(self, other: object) -> bool:
+        """Compare with another CatalogPath or string."""
+        if isinstance(other, str):
+            return str(self) == other
+        if isinstance(other, CatalogPath):
+            return (
+                self.channel == other.channel
+                and self.namespace == other.namespace
+                and self.version == other.version
+                and self.dataset == other.dataset
+                and self.table == other.table
+                and self.variable == other.variable
+            )
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        """Hash for use in sets and dicts."""
+        return hash((self.channel, self.namespace, self.version, self.dataset, self.table, self.variable))
+
+    def __fspath__(self) -> str:
+        """Return path string for os.fspath() compatibility.
+
+        This allows using CatalogPath directly with pathlib.Path:
+            >>> DATA_DIR / catalog_path  # works!
+        """
+        return self.dataset_path
+
     def __str__(self) -> str:
         """Full catalog path string."""
         result = self.dataset_path

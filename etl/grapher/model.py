@@ -1498,6 +1498,7 @@ class Variable(Base):
 
     @property
     def table_name(self) -> str:
+        assert self.catalog_path.table is not None
         return self.catalog_path.table
 
     @property

@@ -218,7 +218,9 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
     ]
 
     # Create a column for the new version of the latest steps.
-    updateable["version_new"] = [CatalogPath.from_str(variable["catalogPath_new"]).version for _, variable in updateable.iterrows()]
+    updateable["version_new"] = [
+        CatalogPath.from_str(variable["catalogPath_new"]).version for _, variable in updateable.iterrows()
+    ]
 
     if len(updateable) == 0:
         log.info("No variables to update.")

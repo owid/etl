@@ -162,6 +162,7 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
 
 
 def _trigger_etl(db_indicator: gm.Variable, dry_run: bool) -> None:
+    assert db_indicator.catalogPath is not None
     config.SUBSET = f"^{db_indicator.shortName}$"
     etl_main(
         includes=[CatalogPath.from_str(db_indicator.catalogPath).dataset_path],

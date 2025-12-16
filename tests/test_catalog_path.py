@@ -259,3 +259,90 @@ class TestHashingAndEquality:
         p2 = CatalogPath.from_str("grapher/who/2024/gho/table#var")
         s = {p1, p2}
         assert len(s) == 1
+
+    def test_equality_with_string(self) -> None:
+        """Can compare with string directly."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/table#var")
+        assert p == "grapher/who/2024/gho/table#var"
+        assert p != "grapher/who/2024/gho/table#other"
+
+    def test_equality_string_both_directions(self) -> None:
+        """String comparison works in both directions."""
+        p = CatalogPath.from_str("grapher/who/2024/gho")
+        assert p == "grapher/who/2024/gho"
+        # Note: "string" == CatalogPath won't work (string's __eq__ is called)
+        # but CatalogPath == "string" works
+
+
+class TestParentProperty:
+    """Tests for parent property."""
+
+    def test_parent_removes_variable(self) -> None:
+        """Parent of path with variable removes variable."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/table#var")
+        assert p.parent == "grapher/who/2024/gho/table"
+        assert p.parent.variable is None
+        assert p.parent.table == "table"
+
+    def test_parent_removes_table(self) -> None:
+        """Parent of path with table (no variable) removes table."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/table")
+        assert p.parent == "grapher/who/2024/gho"
+        assert p.parent.table is None
+
+    def test_parent_of_dataset_is_self(self) -> None:
+        """Parent of dataset-only path is itself (same object)."""
+        p = CatalogPath.from_str("grapher/who/2024/gho")
+        assert p.parent == p
+        assert p.parent is p  # Same object returned
+
+    def test_parent_chain(self) -> None:
+        """Can chain parent calls."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/table#var")
+        assert p.parent.parent == "grapher/who/2024/gho"
+
+
+class TestTruedivOperator:
+    """Tests for / operator (path joining)."""
+
+    def test_append_table(self) -> None:
+        """Can append table with / operator."""
+        p = CatalogPath.from_str("grapher/who/2024/gho")
+        p2 = p / "life_expectancy"
+        assert p2 == "grapher/who/2024/gho/life_expectancy"
+        assert p2.table == "life_expectancy"
+        assert p2.variable is None
+
+    def test_append_table_and_variable(self) -> None:
+        """Can append table#variable with / operator."""
+        p = CatalogPath.from_str("grapher/who/2024/gho")
+        p2 = p / "life_expectancy#value"
+        assert p2 == "grapher/who/2024/gho/life_expectancy#value"
+        assert p2.table == "life_expectancy"
+        assert p2.variable == "value"
+
+    def test_append_to_table_raises(self) -> None:
+        """Cannot append to path that already has table."""
+        p = CatalogPath.from_str("grapher/who/2024/gho/table")
+        with pytest.raises(ValueError, match="Cannot append"):
+            _ = p / "another"
+
+
+class TestFspathProtocol:
+    """Tests for os.fspath() compatibility."""
+
+    def test_fspath_returns_dataset_path(self) -> None:
+        """__fspath__ returns dataset_path for use with Path."""
+        import os
+
+        p = CatalogPath.from_str("grapher/who/2024/gho/table#var")
+        assert os.fspath(p) == "grapher/who/2024/gho"
+
+    def test_works_with_pathlib(self) -> None:
+        """Can use with pathlib.Path / operator."""
+        from pathlib import Path
+
+        base = Path("/data")
+        p = CatalogPath.from_str("grapher/who/2024/gho/table#var")
+        result = base / p
+        assert result == Path("/data/grapher/who/2024/gho")
