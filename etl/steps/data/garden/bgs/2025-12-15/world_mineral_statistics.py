@@ -329,6 +329,8 @@ COMMODITY_MAPPING = {
     ("Lithium minerals", "Petalite"): None,
     ("Lithium minerals", "Spodumene"): None,
     ("Lithium minerals", "Unknown"): None,
+    ("Lithium minerals", "Lepidolite (Li content)"): None,
+    ("Lithium minerals", "Spodumene (Li content)"): None,
     # NOTE: It's unclear what "Unknown" is.
     ("Magnesite", "Unknown"): None,
     ("Magnesite and magnesia", "Magnesia"): ("Magnesium compounds", "Magnesia"),
@@ -662,6 +664,8 @@ COMMODITY_MAPPING = {
     # NOTE: Only imports/exports data prior to 2003.
     ("Zirconium", "Zirconium sand"): None,
     ("Zirconium minerals", "Unknown"): ("Zirconium and hafnium", "Mine"),
+    # In the latest update (2025-12-15) a NaN commodity was introduced; we'll simply ignore it.
+    ("nan", "Igneous rock (f) (g)"): None,
 }
 
 # Mapping from original unit names to tonnes.
@@ -764,8 +768,6 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
             tb = tb.drop(index_to_drop).reset_index(drop=True)
             continue
 
-        # Get the new commodity-subcommodity names.
-        commodity_new, subcommodity_new = pair_new
         # Rename the commodity-subcommodity pair.
         tb.loc[
             (tb["commodity"] == commodity_old) & (tb["sub_commodity"] == subcommodity_old),
