@@ -1,0 +1,4 @@
+steps:
+  data://meadow/example/2024-01-01/cherry_blossom:
+  data://garden/example/2024-01-01/cherry_blossom:
+    - data://meadow/example/2024-01-01/cherry_blossom

@@ -59,6 +59,7 @@ dependencies = [
     "owid-catalog",
     "owid-datautils",
     "owid-repack",
+    "owid-etl",
     "deprecated>=1.2.14",
     "scikit-learn>=1.5.2",
     "geopy>=2.4.1",
@@ -85,6 +86,7 @@ dependencies = [
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
+owid-etl = { path = "lib/etl", editable = true }
 
 [tool.uv]
 dev-dependencies = [
@@ -179,8 +181,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pyright]
+extraPaths = ["lib/etl"]
 exclude = [
-    "lib/",
+    "lib/catalog",
+    "lib/datautils",
+    "lib/repack",
     "apps/wizard/etl_steps/cookiecutter/",
     "apps/wizard/etl_steps/cookiecutter/snapshot/**",
     "**/node_modules",

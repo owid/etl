@@ -1395,6 +1395,7 @@ dependencies = [
     { name = "openpyxl" },
     { name = "owid-catalog" },
     { name = "owid-datautils" },
+    { name = "owid-etl" },
     { name = "owid-repack" },
     { name = "pandas" },
     { name = "pandas-gbq" },
@@ -1544,6 +1545,7 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.0.9" },
     { name = "owid-catalog", editable = "lib/catalog" },
     { name = "owid-datautils", editable = "lib/datautils" },
+    { name = "owid-etl", editable = "lib/etl" },
     { name = "owid-repack", editable = "lib/repack" },
     { name = "pandas", specifier = "==2.2.3" },
     { name = "pandas-gbq", specifier = ">=0.29.2" },
@@ -5203,6 +5205,34 @@ dev = [
     { name = "pytest-cov", specifier = ">=2.12.1" },
     { name = "ruff", specifier = "==0.8.6" },
     { name = "sphinx", specifier = "==4.5.0" },
+    { name = "watchdog", specifier = ">=2.1.5" },
+]
+
+[[package]]
+name = "owid-etl"
+version = "0.1.0"
+source = { editable = "lib/etl" }
+dependencies = [
+    { name = "click" },
+    { name = "owid-catalog" },
+    { name = "pyyaml" },
+    { name = "structlog" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "click", specifier = ">=8.0" },
+    { name = "owid-catalog", editable = "lib/catalog" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "structlog", specifier = ">=21.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyright", specifier = "==1.1.373" },
+    { name = "pytest", specifier = ">=6.2.5" },
+    { name = "pytest-cov", specifier = ">=2.12.1" },
+    { name = "ruff", specifier = "==0.8.6" },
     { name = "watchdog", specifier = ">=2.1.5" },
 ]
 

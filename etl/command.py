@@ -7,7 +7,6 @@ import difflib
 import itertools
 import json
 import re
-import resource
 import sys
 import time
 from collections.abc import MutableMapping
@@ -23,6 +22,12 @@ from typing import Any, Callable, Dict, Iterator, List, Optional
 import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
+
+# Import generic execution utilities from owid.etl
+from owid.etl.execution import (
+    timed_run,
+    update_open_file_limit,
+)
 
 from etl import config, files, paths
 from etl.dag_helpers import load_dag
@@ -43,9 +48,6 @@ config.enable_sentry()
 #   it all at once.
 # Use string[pyarrow] by default, this will become True in pandas 3.0
 # pd.options.future.infer_string = True
-
-# if the number of open files allowed is less than this, increase it
-LIMIT_NOFILE = 4096
 
 log = structlog.get_logger()
 
@@ -208,7 +210,7 @@ def main_cli(
     $ etl run mars prio --dry-run
     ```
     """
-    _update_open_file_limit()
+    update_open_file_limit()
 
     # make everything single threaded, useful for debugging
     if not use_threads:
@@ -742,12 +744,6 @@ def strictness_level(strict: bool) -> Iterator[None]:
     # no need to clean up
 
 
-def timed_run(f: Callable[[], Any]) -> float:
-    start_time = time.time()
-    f()
-    return time.time() - start_time
-
-
 def _validate_private_steps(steps: list[Step]) -> None:
     """Make sure there are no public steps that have private steps as dependency."""
     for step in steps:
@@ -769,13 +765,6 @@ def _grapher_steps(dag: DAG, private: bool) -> DAG:
             new_dag[re.sub(r"^(data|data-private)://", "grapher://", step)] = {step}
 
     return new_dag
-
-
-def _update_open_file_limit() -> None:
-    # avoid errors due to not enough allowed open files
-    soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
-    if soft_limit < LIMIT_NOFILE:
-        resource.setrlimit(resource.RLIMIT_NOFILE, (min(LIMIT_NOFILE, hard_limit), hard_limit))
 
 
 def _always_clean() -> bool:
