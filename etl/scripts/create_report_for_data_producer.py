@@ -64,6 +64,8 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
     # Get charts using data from the current data producer.
     df_producer_charts = get_visualizations_using_data_by_producer(producers=[producer])
 
+    assert not df_producer_charts.empty, f"No charts found for producer: {producer}"
+
     # Remove duplicate rows.
     # NOTE: This happens, for example, when a chart uses multiple snapshots of the same producer (so they are different origins for the same producer), e.g. chart 488 has two origins with producer "Global Carbon Project".
     df_producer_charts = df_producer_charts.drop_duplicates(subset=["chart_id"]).reset_index(drop=True)
@@ -459,7 +461,7 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
 @click.option(
     "--overwrite-pdf/--no-overwrite-pdf",
     default=False,
-    help="Overwrite existing PDF if report already exists.",
+    help="Overwrite existing PDF if report already exists. Use this to generate a new PDF after manual changes have been made to the GDoc. To clarify, this flag does not regenerate the PDF from scratch.",
 )
 @click.option(
     "--grant-permissions/--no-grant-permissions",
