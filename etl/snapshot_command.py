@@ -212,8 +212,9 @@ def _find_files_by_pattern(dataset_name: str, extension: str) -> list[Path]:
 
     if len(path_parts) == 3:
         # Full path: namespace/version/short_name
-        file_path = paths.SNAPSHOTS_DIR / f"{dataset_name}{extension}"
-        return [file_path] if file_path.exists() else []
+        # Use glob to support wildcard patterns in extension (e.g., '.*.dvc')
+        pattern = f"{dataset_name}{extension}"
+        return list(paths.SNAPSHOTS_DIR.glob(pattern))
 
     elif len(path_parts) == 2:
         # Partial path: version/short_name
