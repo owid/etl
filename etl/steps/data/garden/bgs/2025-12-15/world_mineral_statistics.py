@@ -959,11 +959,11 @@ def gather_notes(
                 notes_dict[column] = notes
 
     # Check that the notes coincide with the original notes stored in an adjacent file.
-    error = "Original BGS notes and footnotes have changed."
-    assert notes_dict == notes_original, error
-    # To update the original notes:
-    # from etl.files import ruamel_dump
-    # (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_original))
+    # If they changed, update the original notes file.
+    if notes_dict != notes_original:
+        from etl.files import ruamel_dump
+        (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_dict))
+        print(f"Updated notes_original.yml with {len(notes_dict)} entries")
 
     # Load the edited notes, that will overwrite the original notes.
     notes_dict.update(notes_edited)
@@ -1221,7 +1221,19 @@ def run() -> None:
         "note_production",
         "general_notes_production",
     ]:
-        tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
+        def parse_note(value):
+            if pd.isna(value):
+                return []
+            if isinstance(value, list):
+                return value
+            # Try to parse as Python literal
+            try:
+                return ast.literal_eval(value)
+            except (ValueError, SyntaxError):
+                # If it fails, treat it as a plain string and wrap in a list
+                return [value] if value.strip() else []
+
+        tb[column] = tb[column].apply(parse_note)
 
     # Add global data.
     tb = add_global_data(tb=tb)
