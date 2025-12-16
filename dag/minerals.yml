@@ -88,11 +88,22 @@ steps:
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
     - snapshot://usgs/2025-12-15/mineral_commodity_summaries_2025.zip
   #
+  # BGS - World Mineral Statistics.
+  #
+  data://meadow/bgs/2025-12-15/world_mineral_statistics:
+    - snapshot://bgs/2025-12-15/world_mineral_statistics.zip
+  #
+  # BGS - World Mineral Statistics.
+  #
+  data://garden/bgs/2025-12-15/world_mineral_statistics:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/bgs/2025-12-15/world_mineral_statistics
+  #
   # Minerals - Minerals.
   #
   # Compilation of minerals data from different origins.
   data://garden/minerals/2025-12-15/minerals:
-    - data://garden/bgs/2024-07-09/world_mineral_statistics
+    - data://garden/bgs/2025-12-15/world_mineral_statistics
     - data://garden/usgs/2025-12-15/mineral_commodity_summaries
     - data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
     - data://garden/regions/2023-01-01/regions
@@ -116,14 +127,3 @@ steps:
   #
   export://multidim/minerals/latest/minerals:
     - data://grapher/minerals/2025-12-15/minerals
-  #
-  # BGS - World Mineral Statistics.
-  #
-  data://meadow/bgs/2025-12-15/world_mineral_statistics:
-    - snapshot://bgs/2025-12-15/world_mineral_statistics.zip
-  #
-  # BGS - World Mineral Statistics.
-  #
-  data://garden/bgs/2025-12-15/world_mineral_statistics:
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/bgs/2025-12-15/world_mineral_statistics
