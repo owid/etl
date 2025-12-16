@@ -103,7 +103,8 @@ ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Tungsten|Mine|tonnes", [2020, 2021, 2022]),
     ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
     ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
-    ("World (BGS)", "production|Mercury|Mine|tonnes", [2022]),
+    ("World (BGS)", "production|Mercury|Mine|tonnes", [2022, 2023]),
+    ("World (BGS)", "production|Barite|Mine|tonnes", [2021]),
     ("World (aggregated)", "production|Magnesium compounds|Mine|tonnes", [2021]),
 ]
 
