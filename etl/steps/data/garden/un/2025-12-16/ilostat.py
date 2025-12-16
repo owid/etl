@@ -419,7 +419,20 @@ def remove_outliers_in_data(tb: Table) -> Table:
 
         # Replace out-of-range values with missing (pd.NA)
         mask = (tb[indicator] < thresholds[0]) | (tb[indicator] > thresholds[1])
-        tb.loc[mask, indicator] = pd.NA
+
+        # Create outliers table
+        tb_outliers = (
+            tb[mask][["country", "year", "sex", indicator]].sort_values(by=[indicator], ascending=False).copy()
+        )
+
+        # Check if there are any values in mask
+        if mask.any():
+            log.info(
+                f"Removing {mask.sum()} outlier(s) in indicator {indicator} outside range {thresholds}.\n"
+                f"Examples of outliers: {tb_outliers.head(5)}"
+            )
+            # tb_outliers.to_csv("outliers_ilostat.csv", index=False)
+            tb.loc[mask, indicator] = pd.NA
 
     return tb
 
