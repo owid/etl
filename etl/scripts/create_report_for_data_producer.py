@@ -161,7 +161,9 @@ class Report:
         self.producer = producer
         self.period = period
         self.year = year
-        self.title = f"{year}-{period} Our World in Data analytics report for {producer}"
+        # For annual reports (period "Y"), use just the year. For other periods, include the period code.
+        period_prefix = f"{year}" if period == "Y" else f"{year}-{period}"
+        self.title = f"{period_prefix} Our World in Data analytics report for {producer}"
         self.min_date = f"{year}-{PERIODS[period]['min_date']}"
         self.max_date = f"{year}-{PERIODS[period]['max_date']}"
 
