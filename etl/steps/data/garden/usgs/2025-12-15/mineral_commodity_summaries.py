@@ -666,6 +666,13 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
                 & (d["Type"] == "Mine production, ilmentite, titanium dioxide (TiO2) content")
             ].index
         ).reset_index(drop=True)
+    if (year == 2025) & (mineral == "SAND AND GRAVEL (INDUSTRIAL)"):
+        # The unit in the file is "metric tons", however, the pdf says thousand metric tons:
+        # https://pubs.usgs.gov/periodicals/mcs2025/mcs2025-sand-industrial.pdf
+        # The global value in the pdf is is of 400,000 thousand metric tons, which is similar to the estimated amount in the 2024 release.
+        # So I will fix the unit.
+        assert (d["Unit_meas"] == "metric tons").all()
+        d["Unit_meas"] = "thousand metric tons"
     ############################################################################################################
 
     # Check that all columns are either source, country, type, production, reserves, or capacity.
