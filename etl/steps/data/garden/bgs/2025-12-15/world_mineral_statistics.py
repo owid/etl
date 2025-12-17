@@ -5,11 +5,14 @@ from typing import Dict, List
 
 import owid.catalog.processing as pr
 import pandas as pd
+import structlog
 from owid.catalog import Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
 from etl.files import ruamel_load
 from etl.helpers import PathFinder
+
+log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -922,11 +925,15 @@ def clean_notes(notes):
             if "ms excel" in note.lower():
                 # Skip unnecessary notes about how to download the data.
                 continue
-            # Ensure each note starts with a capital letter, and ends in a single period.
-            # NOTE: Using capitalize() would make all characters lower case except the first.
-            note = note[0].upper() + (note[1:].replace("\xa0", " ") + ".").replace("..", ".")
-            if note not in notes_clean:
-                notes_clean.append(note)
+            # Split notes that contain "|" separator into individual notes.
+            sub_notes = [n.strip() for n in note.split("|")]
+            for sub_note in sub_notes:
+                if len(sub_note) > 1:
+                    # Ensure each note starts with a capital letter, and ends in a single period.
+                    # NOTE: Using capitalize() would make all characters lower case except the first.
+                    sub_note = sub_note[0].upper() + (sub_note[1:].replace("\xa0", " ") + ".").replace("..", ".")
+                    if sub_note not in notes_clean:
+                        notes_clean.append(sub_note)
 
     return notes_clean
 
@@ -952,19 +959,25 @@ def gather_notes(
         if len(_notes) > 0:
             # Gather all notes for this column.
             notes = sum(_notes, [])
+            # Split notes that contain "|" into separate notes.
+            notes_split = []
+            for note in notes:
+                if "|" in note:
+                    notes_split.extend([n.strip() for n in note.split("|")])
+                else:
+                    notes_split.append(note)
             # Get unique notes keeping the order.
-            notes = pd.unique(pd.Series(notes)).tolist()
+            notes = pd.unique(pd.Series(notes_split)).tolist()
             # Join notes.
             if len(notes) > 0:
                 notes_dict[column] = notes
 
-    # Check that the notes coincide with the original notes stored in an adjacent file.
-    # If they changed, update the original notes file.
+    # Sanity check: Warn if notes have changed from the stored original notes.
     if notes_dict != notes_original:
-        from etl.files import ruamel_dump
-
-        (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_dict))
-        print(f"Updated notes_original.yml with {len(notes_dict)} entries")
+        log.warning(
+            "Notes have changed from notes_original.yml",
+            action="To update the file, uncomment the update_notes_original_file() call in the run() function.",
+        )
 
     # Load the edited notes, that will overwrite the original notes.
     notes_dict.update(notes_edited)
@@ -1030,6 +1043,52 @@ def add_global_data(tb: Table) -> Table:
     # tb.loc[(tb["year"] > 2002) & (tb["country"] == "World"), ["imports", "exports"]] = None
 
     return tb
+
+
+def update_notes_original_file(tb: Table) -> None:
+    """
+    Update the notes_original.yml file with the latest notes from the raw data.
+
+    This function should be called ONLY when running for the first time after a data update.
+    After running once, comment out the call to this function to prevent the file from being
+    rewritten on every run.
+    """
+    from etl.files import ruamel_dump
+
+    # Create a flattened table with notes.
+    tb_flat_notes = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=["notes_production"],
+        join_column_levels_with="|",
+    )
+    tb_flat_notes = tb_flat_notes.rename(
+        columns={column: column.replace("notes_", "") for column in tb_flat_notes.columns}
+    )
+
+    # Gather all notes for each column.
+    notes_dict = {}
+    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns, disable=True):
+        _notes = tb_flat_notes[column].dropna().tolist()
+        if len(_notes) > 0:
+            # Gather all notes for this column.
+            notes = sum(_notes, [])
+            # Split notes that contain "|" into separate notes.
+            notes_split = []
+            for note in notes:
+                if "|" in note:
+                    notes_split.extend([n.strip() for n in note.split("|")])
+                else:
+                    notes_split.append(note)
+            # Get unique notes keeping the order.
+            notes = pd.unique(pd.Series(notes_split)).tolist()
+            # Add to dictionary if not empty.
+            if len(notes) > 0:
+                notes_dict[column] = notes
+
+    # Write the notes to the file.
+    (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_dict))
+    log.info("Updated notes_original.yml", n_entries=len(notes_dict))
 
 
 def aggregate_coal(tb: Table) -> Table:
@@ -1263,6 +1322,13 @@ def run() -> None:
     notes = gather_notes(
         tb, notes_columns=["notes_production"], notes_original=notes_original, notes_edited=notes_edited
     )
+
+    ####################################################################################################################
+    # Uncomment the following line ONLY when running for the first time after a data update.
+    # This will regenerate notes_original.yml with the latest notes from the raw data.
+    # After running once, comment it out again to prevent the file from being rewritten on every run.
+    # update_notes_original_file(tb)
+    ####################################################################################################################
 
     # Create a wide table.
     tb_flat = tb.pivot(
