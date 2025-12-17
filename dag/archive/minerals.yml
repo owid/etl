@@ -37,7 +37,6 @@ steps:
   #
   data://grapher/minerals/2024-07-15/global_mine_production_by_mineral:
     - data://garden/minerals/2024-07-15/minerals
-    - data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
   #
   # Minerals - Minerals supply and demand prospects.
   #
