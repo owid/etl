@@ -980,12 +980,16 @@ def gather_notes(
         )
 
     # Load the edited notes, that will overwrite the original notes.
-    notes_dict.update(notes_edited)
+    # Filter out None values (which occur when all notes for a column are commented out in the YAML).
+    notes_edited_filtered = {k: v for k, v in notes_edited.items() if v is not None}
+    notes_dict.update(notes_edited_filtered)
 
     # Join all notes into one string, separated by line breaks.
     notes_str_dict = {}
     for column, notes in notes_dict.items():
-        notes_str_dict[column] = "- " + "\n- ".join(notes)
+        # Ensure notes is a list before joining
+        if isinstance(notes, list) and len(notes) > 0:
+            notes_str_dict[column] = "- " + "\n- ".join(notes)
 
     return notes_str_dict
 
