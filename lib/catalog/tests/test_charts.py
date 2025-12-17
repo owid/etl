@@ -1,7 +1,6 @@
 import pytest
 
 from owid.catalog import charts
-from owid.catalog.internal import LicenseError
 
 # NOTE: the tests below make multiple network requests per check, we could consider
 #       mocking them out if they cause problems
@@ -33,7 +32,7 @@ def test_fetch_non_redistributable_chart():
     # a chart where nonRedistributable is true in the indicator's metadata; see also
     # the dataset at https://admin.owid.io/admin/datasets/6457
     chart = charts.Chart("test-scores-ai-capabilities-relative-human-performance")
-    with pytest.raises(LicenseError):
+    with pytest.raises(charts.LicenseError):
         chart.get_data()
 
 
