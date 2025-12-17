@@ -1,0 +1,368 @@
+#
+#  owid.catalog.client.datasets
+#
+#  Datasets API for querying and loading from the OWID catalog.
+#
+from __future__ import annotations
+
+import os
+import tempfile
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
+from urllib.parse import urlparse
+
+import numpy as np
+import numpy.typing as npt
+
+from .models import DatasetResult, ResultSet
+
+if TYPE_CHECKING:
+    from ..catalogs import CatalogFrame, RemoteCatalog
+    from ..tables import Table
+    from . import Client
+
+
+# Default format preference
+PREFERRED_FORMAT = "feather"
+SUPPORTED_FORMATS = ["feather", "parquet", "csv"]
+
+
+class DatasetsAPI:
+    """API for querying and loading datasets from the OWID catalog.
+
+    Provides methods to search for datasets by various criteria and
+    load tables directly from the catalog.
+
+    Example:
+        ```python
+        from owid.catalog.client import Client
+
+        client = Client()
+
+        # Search for datasets
+        results = client.datasets.find(table="population", namespace="un")
+
+        # Load the first result
+        table = results[0].load()
+
+        # Or load directly with find_one
+        table = client.datasets.find_one(table="gdp", namespace="worldbank")
+
+        # Get latest version
+        table = client.datasets.find_latest(table="co2", namespace="owid")
+
+        # Direct path access
+        table = client.datasets["garden/un/2024-07-11/population/population"]
+        ```
+    """
+
+    CATALOG_URI = "https://catalog.ourworldindata.org/"
+    S3_URI = "s3://owid-catalog"
+
+    def __init__(self, client: Client) -> None:
+        self._client = client
+        self._catalog: RemoteCatalog | None = None
+        self._channels: set[str] = {"garden"}
+
+    def _get_catalog(self, channels: Iterable[str] = ("garden",)) -> RemoteCatalog:
+        """Get or create the remote catalog, adding channels as needed."""
+        from ..catalogs import RemoteCatalog as RC
+
+        # Add new channels if needed
+        new_channels = set(channels) - self._channels
+        if new_channels or self._catalog is None:
+            self._channels = self._channels | set(channels)
+            # Cast to the expected channel type
+            channel_list: list = list(self._channels)  # type: ignore
+            self._catalog = RC(channels=channel_list)
+
+        return self._catalog
+
+    def find(
+        self,
+        table: str | None = None,
+        namespace: str | None = None,
+        version: str | None = None,
+        dataset: str | None = None,
+        channel: str | None = None,
+        channels: Iterable[str] = ("garden",),
+    ) -> ResultSet[DatasetResult]:
+        """Search the catalog for datasets matching criteria.
+
+        Args:
+            table: Table name pattern (substring match).
+            namespace: Data provider namespace (e.g., "un", "worldbank").
+            version: Version string (e.g., "2024-01-15").
+            dataset: Dataset name.
+            channel: Single channel to search.
+            channels: List of channels to search (default: garden only).
+
+        Returns:
+            SearchResults containing DatasetResult objects.
+
+        Example:
+            ```python
+            # Search by table name
+            results = client.datasets.find(table="population")
+
+            # Filter by namespace and version
+            results = client.datasets.find(
+                table="gdp",
+                namespace="worldbank",
+                version="2024-01-15"
+            )
+
+            # Search multiple channels
+            results = client.datasets.find(
+                table="co2",
+                channels=["garden", "meadow"]
+            )
+            ```
+        """
+        catalog = self._get_catalog(channels)
+        frame = catalog.frame
+
+        # Build filter criteria
+        criteria: npt.ArrayLike = np.ones(len(frame), dtype=bool)
+
+        if table:
+            criteria &= frame.table.str.contains(table)
+        if namespace:
+            criteria &= frame.namespace == namespace
+        if version:
+            criteria &= frame.version == version
+        if dataset:
+            criteria &= frame.dataset == dataset
+        if channel:
+            criteria &= frame.channel == channel
+
+        matches = frame[criteria]
+
+        # Convert to DatasetResult objects
+        results = []
+        for _, row in matches.iterrows():
+            dimensions = row.get("dimensions", [])
+            if isinstance(dimensions, str):
+                import json
+
+                dimensions = json.loads(dimensions)
+
+            # Handle formats - could be list, numpy array, or None
+            formats_raw = row.get("formats", None)
+            if formats_raw is None or (hasattr(formats_raw, "__len__") and len(formats_raw) == 0):
+                # Fallback to single format field
+                format_single = row.get("format", None)
+                formats = [format_single] if format_single else []
+            else:
+                formats = list(formats_raw) if hasattr(formats_raw, "__iter__") else []
+
+            results.append(
+                DatasetResult(
+                    table=row["table"],
+                    dataset=row["dataset"],
+                    version=str(row["version"]),
+                    namespace=row["namespace"],
+                    channel=row["channel"],
+                    path=row["path"],
+                    is_public=row.get("is_public", True),
+                    dimensions=list(dimensions) if dimensions is not None else [],
+                    formats=formats,
+                )
+            )
+
+        return ResultSet(
+            results=results,
+            query=table or "",
+            total=len(results),
+        )
+
+    def find_one(
+        self,
+        table: str | None = None,
+        namespace: str | None = None,
+        version: str | None = None,
+        dataset: str | None = None,
+        channel: str | None = None,
+        channels: Iterable[str] = ("garden",),
+    ) -> "Table":
+        """Find and load a single table from the catalog.
+
+        Convenience method that combines find() and load().
+        Requires exactly one matching table.
+
+        Args:
+            table: Table name pattern (substring match).
+            namespace: Data provider namespace.
+            version: Version string.
+            dataset: Dataset name.
+            channel: Single channel to search.
+            channels: List of channels to search.
+
+        Returns:
+            The loaded Table object.
+
+        Raises:
+            ValueError: If zero or multiple tables match.
+
+        Example:
+            ```python
+            table = client.datasets.find_one(
+                table="population",
+                namespace="un",
+                version="2024-07-11"
+            )
+            ```
+        """
+        results = self.find(
+            table=table,
+            namespace=namespace,
+            version=version,
+            dataset=dataset,
+            channel=channel,
+            channels=channels,
+        )
+
+        if len(results) == 0:
+            raise ValueError("No matching table found")
+        elif len(results) > 1:
+            tables = [r.table for r in results]
+            raise ValueError(f"Multiple tables found: {', '.join(tables)}")
+
+        return results[0].load()
+
+    def find_latest(
+        self,
+        table: str | None = None,
+        namespace: str | None = None,
+        dataset: str | None = None,
+        channels: Iterable[str] = ("garden",),
+    ) -> "Table":
+        """Find and load the latest version of a table.
+
+        Searches for tables matching the criteria and returns the one
+        with the most recent version string (lexicographically sorted).
+
+        Args:
+            table: Table name pattern (substring match).
+            namespace: Data provider namespace.
+            dataset: Dataset name.
+            channels: List of channels to search.
+
+        Returns:
+            The loaded Table with the latest version.
+
+        Raises:
+            ValueError: If no tables match.
+
+        Example:
+            ```python
+            # Always get the latest population data
+            table = client.datasets.find_latest(
+                table="population",
+                namespace="un"
+            )
+            print(f"Version: {table.metadata.version}")
+            ```
+        """
+        results = self.find(
+            table=table,
+            namespace=namespace,
+            dataset=dataset,
+            channels=channels,
+        )
+
+        if len(results) == 0:
+            raise ValueError("No matching table found")
+
+        # Sort by version and get latest
+        sorted_results = sorted(results.results, key=lambda r: r.version)
+        return sorted_results[-1].load()
+
+    def __getitem__(self, path: str) -> "Table":
+        """Load a table by its catalog path.
+
+        Args:
+            path: Full catalog path (e.g., "garden/un/2024/population/population").
+
+        Returns:
+            The loaded Table object.
+
+        Raises:
+            KeyError: If no table found at the path.
+
+        Example:
+            ```python
+            table = client.datasets["garden/un/2024-07-11/population/population"]
+            ```
+        """
+        return self._load_table(path)
+
+    @staticmethod
+    def _load_table(
+        path: str,
+        formats: list[str] | None = None,
+        is_public: bool = True,
+    ) -> "Table":
+        """Load a table from the catalog by path.
+
+        Internal method used by DatasetResult.load() and __getitem__.
+        """
+        from ..tables import Table
+
+        base_uri = DatasetsAPI.CATALOG_URI
+        uri = "/".join([base_uri.rstrip("/"), path])
+
+        # Determine format preference
+        if formats:
+            formats_to_try = formats
+        else:
+            formats_to_try = SUPPORTED_FORMATS
+
+        # Prefer feather if available
+        if PREFERRED_FORMAT in formats_to_try:
+            formats_to_try = [PREFERRED_FORMAT] + [f for f in formats_to_try if f != PREFERRED_FORMAT]
+
+        for fmt in formats_to_try:
+            try:
+                table_uri = f"{uri}.{fmt}"
+
+                # Handle private files
+                if not is_public:
+                    table_uri = DatasetsAPI._download_private_file(table_uri)
+
+                return Table.read(table_uri)
+            except Exception:
+                continue
+
+        raise KeyError(f"No matching table found at: {path}")
+
+    @staticmethod
+    def _download_private_file(uri: str) -> str:
+        """Download a private file from S3 to a temp location."""
+        from .. import s3_utils
+
+        tmpdir = tempfile.mkdtemp()
+        parsed = urlparse(uri)
+        base, ext = os.path.splitext(parsed.path)
+
+        s3_utils.download(
+            DatasetsAPI.S3_URI + base + ".meta.json",
+            tmpdir + "/data.meta.json",
+        )
+        s3_utils.download(
+            DatasetsAPI.S3_URI + base + ext,
+            tmpdir + "/data" + ext,
+        )
+
+        return tmpdir + "/data" + ext
+
+    def to_catalog_frame(self, results: ResultSet[DatasetResult]) -> CatalogFrame:
+        """Convert ResultSet to CatalogFrame for backwards compatibility.
+
+        Args:
+            results: ResultSet from find() method.
+
+        Returns:
+            CatalogFrame that can use legacy .load() method.
+        """
+        return results.to_catalog_frame()
