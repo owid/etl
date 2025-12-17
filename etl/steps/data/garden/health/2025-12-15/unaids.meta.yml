@@ -922,7 +922,7 @@ tables:
           Count of the number of male and female condoms that left the central or regional warehouses for onward distribution in the previous calendar year. Data should include condoms distributed for free (public providers), condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) and condoms sold through the commercial sector (private sector providers). There should be no double-counting of condoms in case of overlap. If condoms from public sector warehouses are given to nongovernmental organizations or community workers for distribution, condoms should be accounted for in the public sector.
         description_key:
           - |-
-            Measures the total quantity of condoms distributed to {definitions.people_gender_term} from central/regional warehouses during the previous year, regardless of distribution channel or price point.
+            Measures the total quantity of condoms distributed from central/regional warehouses during the previous year, regardless of distribution channel or price point.
           - |-
             Tracks three distinct distribution channels: free condoms through public providers, subsidized condoms via social marketing/NGOs, and commercial sales through private sector.
           - |-
