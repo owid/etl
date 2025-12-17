@@ -4,6 +4,14 @@ definitions:
 
   people_dimension: |-
     <<sex+' ' if sex != 'total' else ''>>people<<' aged ' + age if age != 'total' else ''>>
+  people_gender_term: |-
+    <% if sex == 'total' %>
+    people
+    <%- elif sex == 'male' %>
+    males
+    <%- else %>
+    females
+    <%- endif %>
   people_term: |-
     <% if age == 'total' %>
     People
@@ -901,6 +909,29 @@ tables:
         presentation:
           title_public: "Tuberculosis patients who tested positive for HIV"
 
+      condoms_distributed_per_100k:
+        title: Condoms distributed per 100,000 population
+        unit: "condoms per 100,000 people"
+        description_short: |-
+          Number of condoms distributed through public and private channels per 100,000 population during the reporting period.
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          Condoms have been shown to be one of the most effective methods in preventing the sexual transmission of HIV, other sexually transmitted infections (STIs) and unintended pregnancy, with effectiveness that increases with consistent and correct use. The World Health Organization (WHO) and UNAIDS recommendations emphasize that condom distribution and promotion is an efficacious intervention and a critical component of combination HIV prevention.
+
+          Count of the number of male and female condoms that left the central or regional warehouses for onward distribution in the previous calendar year. Data should include condoms distributed for free (public providers), condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) and condoms sold through the commercial sector (private sector providers). There should be no double-counting of condoms in case of overlap. If condoms from public sector warehouses are given to nongovernmental organizations or community workers for distribution, condoms should be accounted for in the public sector.
+        description_key:
+          - |-
+            Measures the total quantity of condoms distributed to {definitions.people_gender_term} from central/regional warehouses during the previous year, regardless of distribution channel or price point.
+          - |-
+            Tracks three distinct distribution channels: free condoms through public providers, subsidized condoms via social marketing/NGOs, and commercial sales through private sector.
+          - |-
+            Requires careful accounting to avoid double-counting when condoms move between distribution channels (e.g., from public sector to NGOs).
+          - |-
+            For condoms provided to NGOs or community workers from public sector warehouses, attribution should remain with the public sector to maintain accurate tracking.
+        presentation:
+          title_public: "Condoms distributed per 100,000 population"
+
   gam_sex:
     variables:
       knowledge_in_young_people:
@@ -1265,7 +1296,7 @@ tables:
             timeTolerance: 3
     variables:
       condoms_distributed:
-        title: "Annual number of <<sex>> condoms distributed - Provider: <<group>>"
+        title: "Annual number of condoms distributed - Provider: <<group>> - Sex: <<sex>>"
         unit: condoms
         description_short: |-
           <% if group == "total" %>
@@ -1284,7 +1315,7 @@ tables:
         description_key:
           - |-
             <% if group == "total" %>
-            Measures the total quantity of <<sex>> condoms distributed from central/regional warehouses during the previous year, regardless of distribution channel or price point.
+            Measures the total quantity of <<sex+' ' if sex != 'total' else ''>>condoms distributed to {definitions.people_gender_term} from central/regional warehouses during the previous year, regardless of distribution channel or price point.
             <%- endif %>
           - |-
             <% if group == "total" %>
@@ -1299,10 +1330,10 @@ tables:
             For condoms provided to NGOs or community workers from public sector warehouses, attribution should remain with the public sector to maintain accurate tracking.
             <%- endif %>
         presentation:
-          title_public: Annual number of <<sex>> condoms distributed
+          title_public: Annual number of condoms distributed
           title_variant: <<"by " + group + " providers" if group != "total" else "">>
           grapher_config:
-            title: Annual number of <<sex>> condoms distributed<<" by " + group + " providers" if group != "total" else "">>
+            title: Annual number of <<sex+' ' if sex != 'total' else ''>>condoms distributed<<" by " + group + " providers" if group != "total" else "">>
         display:
           numDecimalPlaces: 0
 

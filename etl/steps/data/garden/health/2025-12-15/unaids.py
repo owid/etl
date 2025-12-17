@@ -127,7 +127,8 @@ def run() -> None:
     tb = handle_countries_gam(tb)
 
     # Drop non-relevant (or non-supported) indicators
-    tb = tb.loc[~((tb["indicator"] == "population") & (tb["dimension"] == "Total"))]
+    mask = (tb["indicator"] == "population") & (tb["dimension"] == "Total")
+    tb = tb.loc[~mask]
 
     # Handle dimensions: Expand raw dimensions, group indicators, etc.
     tb = handle_dimensions_clean_gam(
@@ -181,6 +182,9 @@ def run() -> None:
     ]
 
     tb, tb_sex_group = extract_tbs(tb)
+
+    # Condoms per capita
+    tb_no_dim = add_condoms_per_100k(tb_no_dim, tb_sex_group)
 
     # RESHAPE (and check)
     paths.log.info("GAM: Format (and check)")
@@ -758,6 +762,14 @@ def extract_sex_group_table_gam(tb):
     # Drop columns
     tb_new = tb_new.drop(columns=["age"])
 
+    # Add condoms distributed, total
+    assert tb_new["indicator"].nunique() == 1
+    tb_new_total = tb_new.groupby(["country", "year", "indicator", "group"], as_index=False)[["value"]].sum()
+    tb_new_total["sex"] = "total"
+    tb_new_total["unit"] = "Number"
+    tb_new_total["source"] = "UNAIDS_GAM_"
+    tb_new = pr.concat([tb_new, tb_new_total], ignore_index=True)
+
     return tb_new, mask
 
 
@@ -821,6 +833,24 @@ def extract_tbs(tb):
     tb = tb.loc[~mask_no_age]
 
     return tb, tb_sex_group
+
+
+def add_condoms_per_100k(tb_no_dim, tb_sex_group):
+    tb_ = tb_sex_group.loc[
+        (tb_sex_group["indicator"] == "condoms_distributed")
+        & (tb_sex_group["sex"] == "total")
+        & (tb_sex_group["group"] == "total")
+    ]
+    assert not tb_.empty, "Empty datafame!"
+    tb_ = paths.regions.add_population(tb_)
+    tb_["value"] = 100_000 * tb_["value"] / tb_["population"]
+    tb_["indicator"] = "condoms_distributed_per_100k"
+    tb_["sex"] = np.nan
+    tb_["group"] = np.nan
+    tb_ = tb_.drop(columns=["population"])
+
+    tb_no_dim = pr.concat([tb_no_dim, tb_], ignore_index=True)
+    return tb_no_dim
 
 
 def pivot_and_format(tb, columns, short_name, regions_agg=True):
