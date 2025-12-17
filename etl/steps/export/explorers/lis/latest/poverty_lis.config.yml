@@ -1,15 +1,16 @@
-title:
-  title: "Poverty: Luxembourg Income Study"
-  title_variant: LIS
-topic_tags:
-  - Poverty
-default_selection:
-  - Brazil
-  - Chile
-  - China
-  - France
-  - South Africa
-  - United States
+config:
+  explorerTitle: "Poverty - Luxembourg Income Study"
+  explorerSubtitle: "Explore Luxembourg Income Study data on poverty."
+  selection:
+    - Brazil
+    - Chile
+    - China
+    - France
+    - South Africa
+    - United States
+  wpBlockId: 57755
+  isPublished: true
+  # pickerColumnSlugs:
 
 
 default_dimensions:

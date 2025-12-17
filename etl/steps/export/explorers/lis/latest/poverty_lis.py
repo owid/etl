@@ -53,6 +53,7 @@ def run() -> None:
         tb=tb,
         indicator_names=INDICATOR_NAMES,
         # dimensions=DIMENSIONS_CONFIG,
+        explorer=True,
     )
 
     #
