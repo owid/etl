@@ -105,12 +105,14 @@ def process_regional_data(snap) -> pd.DataFrame:
             value = row[VALUE_START_COL + i]
             if pd.notna(value) and value != 0:
                 scenario = "base" if year == PROJECTION_YEAR else "historical"
-                data_rows.append({
-                    "year": year,
-                    "country": country,
-                    "metric": current_metric,
-                    "value": value,
-                    "scenario": scenario,
-                })
+                data_rows.append(
+                    {
+                        "year": year,
+                        "country": country,
+                        "metric": current_metric,
+                        "value": value,
+                        "scenario": scenario,
+                    }
+                )
 
     return pd.DataFrame(data_rows)
