@@ -962,6 +962,7 @@ def gather_notes(
     # If they changed, update the original notes file.
     if notes_dict != notes_original:
         from etl.files import ruamel_dump
+
         (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_dict))
         print(f"Updated notes_original.yml with {len(notes_dict)} entries")
 
@@ -1126,6 +1127,32 @@ def aggregate_coal(tb: Table) -> Table:
     return tb
 
 
+def prepare_notes_format(tb: Table) -> Table:
+    tb = tb.copy()
+
+    # Parse notes as lists of strings.
+    for column in [
+        "note_production",
+        "general_notes_production",
+    ]:
+
+        def parse_note(value):
+            if pd.isna(value):
+                return []
+            if isinstance(value, list):
+                return value
+            # Try to parse as Python literal
+            try:
+                return ast.literal_eval(value)
+            except (ValueError, SyntaxError):
+                # If it fails, treat it as a plain string and wrap in a list
+                return [value] if value.strip() else []
+
+        tb[column] = tb[column].apply(parse_note)
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -1165,10 +1192,10 @@ def run() -> None:
 
     ####################################################################################################################
     # Fix some known issues in the data.
-    # Molybdenum, mine for the US between 1970 and 1976 is significantly larger than in USGS.
-    # And BGS notes on 1977 say "Break in series". So I will remove those points prior to 1977.
-    # A similar thing happens for Turkey and the USSR.
-    # Even after removing these, BGS data is larger than USGS' World. So, simply remove all points prior to 1977.
+    # Molybdenum production data from BGS (prior to 1977) is significantly larger than USGS data (from 1977 onwards).
+    # So I will remove those points prior to 1977.
+    # import plotly.express as px
+    # px.line(tb[(tb["commodity"] == "Molybdenum") & (tb["category"] == "Production")], x="year", y="value", color="country", markers=True)
     tb.loc[
         (tb["commodity"] == "Molybdenum")
         # & (tb["country"].isin(["United States", "Turkey", "USSR"]))
@@ -1177,7 +1204,8 @@ def run() -> None:
         "value",
     ] = None
 
-    # A similar issue happens with tugsten.
+    # A similar issue happens with Tungsten.
+    # px.line(tb[(tb["commodity"] == "Tungsten") & (tb["category"] == "Production")], x="year", y="value", color="country", markers=True)
     tb.loc[
         (tb["commodity"] == "Tungsten") & (tb["year"] < 1977) & (tb["category"] == "Production"),
         "value",
@@ -1188,6 +1216,7 @@ def run() -> None:
     # https://www.bgs.ac.uk/mineralsuk/statistics/world-mineral-statistics/world-mineral-statistics-archive/
     # It seems that the zero may be spurious (not found in any of those PDFs) and all values are estimated.
     # I'll remove them.
+    # px.line(tb[(tb["commodity"] == "Chromium") & (tb["sub_commodity"] == "Mine, gross weight") & (tb["category"] == "Production") & (tb["country"] == "Colombia")], x="year", y="value", color="country", markers=True)
     tb.loc[
         (tb["commodity"] == "Chromium")
         & (tb["sub_commodity"] == "Mine, gross weight")
@@ -1216,24 +1245,8 @@ def run() -> None:
     # Set an appropriate format for value columns.
     tb = tb.astype({column: "Float64" for column in ["production"]})
 
-    # Parse notes as lists of strings.
-    for column in [
-        "note_production",
-        "general_notes_production",
-    ]:
-        def parse_note(value):
-            if pd.isna(value):
-                return []
-            if isinstance(value, list):
-                return value
-            # Try to parse as Python literal
-            try:
-                return ast.literal_eval(value)
-            except (ValueError, SyntaxError):
-                # If it fails, treat it as a plain string and wrap in a list
-                return [value] if value.strip() else []
-
-        tb[column] = tb[column].apply(parse_note)
+    # Prepare format of note columns.
+    tb = prepare_notes_format(tb=tb)
 
     # Add global data.
     tb = add_global_data(tb=tb)
