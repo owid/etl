@@ -768,10 +768,19 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
             assert _column_reserves == ["Reserves_2024"]
             d = d.rename(columns={"Reserves_2024": "Reserves_t"}, errors="raise")
 
-            # Handle special case of Iron ore: Unit_meas says thousand tonnes, but the reserve_notes column indicates that it's in million metric tons.
-            # After checking with previous releases, it seems that production is in thousand metric tons and reserves in million tons.
+            # Handle special cases where UNIT_MEAS doesn't match RESERVE_NOTES:
+            # Iron ore: UNIT_MEAS says thousand metric tons but RESERVE_NOTES says million metric tons.
+            # After checking 2024 data: production is in thousand tons, reserves are in million tons.
             if (d["Mineral"].iloc[0] == "Iron ore") and (unit_reserves == "thousand metric tons"):
                 unit_reserves = "million metric tons"
+            # Molybdenum: UNIT_MEAS says metric tons but RESERVE_NOTES says thousand metric tons.
+            # After checking 2024 data: production is in t, reserves are in kt.
+            elif (d["Mineral"].iloc[0] == "Molybdenum") and (unit_reserves == "metric tons"):
+                unit_reserves = "thousand metric tons"
+            # Vanadium: UNIT_MEAS says metric tons but RESERVE_NOTES says thousand metric tons.
+            # After checking 2024 data: production is in t, reserves are in kt.
+            elif (d["Mineral"].iloc[0] == "Vanadium") and (unit_reserves == "metric tons"):
+                unit_reserves = "thousand metric tons"
 
             if unit_reserves == "kilograms":
                 d["Reserves_t"] *= 1e-3
