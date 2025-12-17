@@ -32,6 +32,9 @@ def run(dest_dir: str) -> None:
     tb = Table(df, short_name=paths.short_name, underscore=True)
     # Dropping out these columns as they are awkward types and we don't need to use them
     tb = tb.drop(columns=["comments", "geospread_comments"])
+
+    # Convert trend column to string - it has mixed types (numeric codes and occasional date strings)
+    tb["trend"] = tb["trend"].astype(str)
     tb = tb.rename(columns={"country_area_territory": "country"})
 
     # Convert object columns that should be numeric to numeric

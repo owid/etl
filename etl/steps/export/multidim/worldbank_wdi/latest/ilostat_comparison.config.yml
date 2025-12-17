@@ -1,5 +1,5 @@
 title:
-  title: "Comparison of labor estimates: national vs. modeled data"
+  title: "Comparison of labor estimates: modeled vs. national data"
   title_variant: ILO
 topic_tags:
   - Work & Employment
@@ -76,7 +76,7 @@ views:
           display:
             name: Unemployment rate, modeled
     config:
-      title: "Unemployment rate estimates: national vs. modeled data"
+      title: "Unemployment rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_unemployment_rate} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
@@ -104,7 +104,7 @@ views:
           display:
             name: Labor force participation rate, modeled
     config:
-      title: "Labor force participation rate estimates: national vs. modeled data"
+      title: "Labor force participation rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_labor_force_participation_rate} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
@@ -133,7 +133,7 @@ views:
           display:
             name: Employment-to-population ratio, modeled
     config:
-      title: "Employment-to-population ratio estimates: national vs. modeled data"
+      title: "Employment-to-population ratios: modeled vs. national estimates"
       subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
