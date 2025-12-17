@@ -1288,6 +1288,17 @@ def run() -> None:
         "value",
     ] = None
 
+    # Mica production in Brazil shows an implausible spike in 2014, compared to surrounding years.
+    # I'll remove this point.
+    # px.line(tb[(tb["commodity"] == "Mica") & (tb["country"] == "Brazil") & (tb["category"] == "Production")], x="year", y="value", markers=True)
+    tb.loc[
+        (tb["commodity"] == "Mica")
+        & (tb["country"] == "Brazil")
+        & (tb["year"] == 2014)
+        & (tb["category"] == "Production"),
+        "value",
+    ] = None
+
     ####################################################################################################################
 
     # Combine all subcommodities of coal production, and fix some issues.
