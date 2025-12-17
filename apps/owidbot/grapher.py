@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from etl.config import get_container_name
 from etl.paths import BASE_DIR
 
@@ -5,10 +7,8 @@ from etl.paths import BASE_DIR
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    default_views = make_differences_line(
-        "verify-graphs_default-views.log", "commit_default-views.log", "report_default-views.html"
-    )
-    all_views = make_differences_line("verify-graphs_all-views.log", "commit_all-views.log", "report_all-views.html")
+    default_views = make_differences_line("graphers")
+    all_views = make_differences_line("grapher-views")
 
     body = f"""
 - **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
@@ -38,7 +38,11 @@ Number of differences (all views): {all_views}
     return body
 
 
-def make_differences_line(log_file: str, commit_file: str, report_filename: str) -> str:
+def make_differences_line(dir: str) -> str:
+    log_file = BASE_DIR.parent / "owid-grapher-svgs" / dir / "verify-graphs.log"
+    commit_file = BASE_DIR.parent / "owid-grapher-svgs" / dir / "commit.log"
+    report_filename = f"{dir}/differences.html"
+
     try:
         num_differences = get_num_differences(log_file)
         status_icon = get_status_icon(num_differences)
@@ -57,8 +61,7 @@ def make_differences_line(log_file: str, commit_file: str, report_filename: str)
     return f"{num_differences} {commit_link} {status_icon} {report_link}".strip()
 
 
-def get_num_differences(log_file: str) -> int:
-    path = BASE_DIR.parent / "owid-grapher-svgs" / log_file
+def get_num_differences(path: Path) -> int:
     with open(path) as f:
         return len(f.readlines())
 
@@ -70,8 +73,7 @@ def get_status_icon(num_differences: int) -> str:
         return "✅"
 
 
-def get_commit_id(commit_file: str) -> str:
-    path = BASE_DIR.parent / "owid-grapher-svgs" / commit_file
+def get_commit_id(path: Path) -> str:
     try:
         with open(path) as f:
             return f.readline().strip()
