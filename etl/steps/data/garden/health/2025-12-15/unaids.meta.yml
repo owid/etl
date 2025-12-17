@@ -147,7 +147,7 @@ tables:
       art_none_preg_child_inf_preg:
         title: "Number of children infected with HIV during pregnancy, when mother did not receive ART during pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during pregnancy when their HIV-positive mother did not receive antiretroviral therapy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -160,7 +160,7 @@ tables:
       art_drop_preg_child_inf:
         title: Number of children infected with HIV during pregnancy, when mother dropped off ART during pregnancy
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during pregnancy when their HIV-positive mother discontinued antiretroviral therapy during pregnancy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -173,7 +173,7 @@ tables:
       art_start_late_preg_child_inf_preg:
         title: "Number of children infected with HIV during pregnancy, when mother started ART late in pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during pregnancy when their HIV-positive mother started antiretroviral therapy late in pregnancy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -186,7 +186,7 @@ tables:
       art_start_child_inf_during_preg:
         title: "Number of children infected with HIV during pregnancy, when mother started ART during in pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during pregnancy when their HIV-positive mother started antiretroviral therapy during pregnancy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -199,7 +199,7 @@ tables:
       art_start_before_preg_child_inf_preg:
         title: "Number of children infected with HIV during pregnancy, when mother started ART before the pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during pregnancy when their HIV-positive mother had already started antiretroviral therapy before becoming pregnant."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -212,7 +212,7 @@ tables:
       mother_child_inf_preg:
         title: Number of children infected with HIV during pregnancy, along with their mothers
         unit: "infections"
-        description_short: ""
+        description_short: "Number of mother-child pairs where both became infected with HIV during pregnancy (mother acquired HIV while pregnant and transmitted it to the child)."
         display:
           numDecimalPlaces: 0
         presentation:
@@ -223,7 +223,7 @@ tables:
       art_none_bf:
         title: "Number of children infected with HIV during breastfeeding, when mother did not receive ART during breastfeeding"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during breastfeeding when their HIV-positive mother did not receive antiretroviral therapy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -236,7 +236,7 @@ tables:
       art_drop_bf_child_inf:
         title: Number of children infected with HIV during breastfeeding, when mother dropped off ART during breastfeeding
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during breastfeeding when their HIV-positive mother discontinued antiretroviral therapy during breastfeeding."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -249,7 +249,7 @@ tables:
       art_start_late_preg_child_inf_bf:
         title: "Number of children infected with HIV during breastfeeding, when mother started ART late in pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during breastfeeding when their HIV-positive mother started antiretroviral therapy late in pregnancy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -262,7 +262,7 @@ tables:
       art_start_during_preg_child_inf_bf:
         title: "Number of children infected with HIV during breastfeeding, when mother started ART during in pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during breastfeeding when their HIV-positive mother started antiretroviral therapy during pregnancy."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -275,7 +275,7 @@ tables:
       art_start_before_preg_child_inf_bf:
         title: "Number of children infected with HIV during breastfeeding, when mother started ART before the pregnancy"
         unit: "children"
-        description_short: ""
+        description_short: "Number of children infected with HIV during breastfeeding when their HIV-positive mother had already started antiretroviral therapy before becoming pregnant."
         description_key:
           - "{definitions.art_description}"
         display:
@@ -288,7 +288,7 @@ tables:
       mother_child_inf_bf:
         title: Number of children infected with HIV during breastfeeding, along with their mothers
         unit: "infections"
-        description_short: ""
+        description_short: "Number of mother-child pairs where both became infected with HIV during breastfeeding (mother acquired HIV while breastfeeding and transmitted it to the child)."
         display:
           numDecimalPlaces: 0
         presentation:
@@ -633,38 +633,37 @@ tables:
       hiv_care:
         title: People newly enrolled in HIV treatment
         unit: people
-        description_short: ""
+        description_short: "Number of people who started HIV treatment during the reporting period."
         display:
           numDecimalPlaces: 0
       hiv_tb_diagnosis:
         title: People newly enrolled in HIV treatment diagnosed as having TB during the reporting period
         unit: people
-        description_short: ""
+        description_short: "Number of people newly enrolled in HIV treatment who were diagnosed with tuberculosis during the reporting period."
         display:
           numDecimalPlaces: 0
       hiv_tb_patients_under_ipt:
         title: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
         unit: people
-        description_short: ""
+        description_short: "Number of people newly enrolled in HIV treatment who started isoniazid preventive therapy to prevent tuberculosis."
         display:
           numDecimalPlaces: 0
       newly_enrolled_care:
         title: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
         unit: people
-        description_short: ""
+        description_short: "Total number of adults and children newly enrolled in HIV treatment during the year."
         display:
           numDecimalPlaces: 0
       plhiv_in_care_with_active_tb:
         title: Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease
         unit: people
-        description_short: |-
-          https://indicatorregistry.unaids.org/indicator/proportion-people-living-hiv-newly-enrolled-hiv-care-active-tb-disease
+        description_short: "Number of people living with HIV newly enrolled in HIV treatment who have active tuberculosis disease."
         display:
           numDecimalPlaces: 0
       plhiv_receiving_tb_preventive_therapy:
         title: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
         unit: people
-        description_short: ""
+        description_short: "Number of people living with HIV newly enrolled in HIV treatment who started tuberculosis preventive therapy."
         display:
           numDecimalPlaces: 0
 
@@ -672,18 +671,18 @@ tables:
       plhiv_current_enrolled:
         title: People currently enrolled in HIV treatment
         unit: people
-        description_short: ""
+        description_short: "Number of people currently receiving ongoing HIV treatment."
         display:
           numDecimalPlaces: 0
       plhiv_current_tb_preventative:
         title: Proportion of people living with HIV currently enrolled in HIV treatment receiving TB preventive therapy
         unit: "%"
-        description_short: ""
+        description_short: "Share of people currently in HIV treatment who are also receiving tuberculosis preventive therapy."
         description_from_producer: ""
       plhiv_current_treatment_tb:
         title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
         unit: people
-        description_short: ""
+        description_short: "Number of people currently in HIV treatment who started treatment for latent tuberculosis infection during the reporting period."
         display:
           numDecimalPlaces: 0
 
@@ -698,38 +697,38 @@ tables:
       hiv_tb_patients_receiving_art:
         title: TB patients living with HIV receiving ART
         unit: patients
-        description_short: ""
+        description_short: "Number of tuberculosis patients who are living with HIV and receiving antiretroviral therapy."
         display:
           numDecimalPlaces: 0
       share_hiv_tb_patients_receiving_art:
         title: Share of TB patients living with HIV receiving ART
         unit: "%"
-        description_short: ""
+        description_short: "Share of tuberculosis patients living with HIV who are receiving antiretroviral therapy."
         description_from_producer: ""
       hiv_tb_patients_receiving_cpt:
         title: TB patients living with HIV receiving CPT
         unit: patients
-        description_short: ""
+        description_short: "Number of tuberculosis patients living with HIV who are receiving co-trimoxazole preventive therapy (CPT)."
         display:
           numDecimalPlaces: 0
       share_hiv_tb_patients_receiving_cpt:
         title: Share of TB patients living with HIV receiving CPT
         unit: "%"
-        description_short: ""
+        description_short: "Share of tuberculosis patients living with HIV who are receiving co-trimoxazole preventive therapy (CPT)."
         display:
           numDecimalPlaces: 0
 
       new_relapse_tb_cases:
         title: Total new and relapse TB cases
         unit: cases
-        description_short: ""
+        description_short: "Total number of new tuberculosis cases and cases that relapsed after previous treatment."
         display:
           numDecimalPlaces: 0
 
       notified_tb_cases:
         title: Total notified TB cases
         unit: cases
-        description_short: ""
+        description_short: "Total number of tuberculosis cases officially reported to health authorities."
         display:
           numDecimalPlaces: 0
 
@@ -737,42 +736,42 @@ tables:
       people_art_elig_tpt:
         title: People on ART who were eligible for TB preventive treatment (TPT)
         unit: people
-        description_short: ""
+        description_short: "Number of people receiving antiretroviral therapy who were eligible for tuberculosis preventive treatment."
         display:
           numDecimalPlaces: 0
       people_art_elig_tpt_strt:
         title: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: people
-        description_short: ""
+        description_short: "Number of people on antiretroviral therapy who were eligible for tuberculosis preventive treatment and started it."
         display:
           numDecimalPlaces: 0
       people_new_art_elig_tpt_strt:
         title: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: people
-        description_short: ""
+        description_short: "Number of people newly on antiretroviral therapy who were eligible for tuberculosis preventive treatment and started it."
         display:
           numDecimalPlaces: 0
       num_art_complt_tpt:
         title: People on ART who completed TPT among those who initiated any course of TPT during the previous year
         unit: people
-        description_short: ""
+        description_short: "Number of people on antiretroviral therapy who completed tuberculosis preventive treatment among those who started it in the previous year."
         display:
           numDecimalPlaces: 0
       num_art_init_tpt:
         title: People on ART who initiated any course of TPT during the previous year
         unit: people
-        description_short: ""
+        description_short: "Number of people on antiretroviral therapy who started any course of tuberculosis preventive treatment during the previous year."
         display:
           numDecimalPlaces: 0
       prop_art_tpt_start:
         title: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: "%"
-        description_short: ""
+        description_short: "Share of people on antiretroviral therapy who were eligible for tuberculosis preventive treatment and started it."
         description_from_producer: ""
       prop_new_art_tpt_strt:
         title: Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: "%"
-        description_short: ""
+        description_short: "Share of people newly on antiretroviral therapy who were eligible for tuberculosis preventive treatment and started it."
         description_from_producer: ""
 
       # Others
@@ -813,7 +812,7 @@ tables:
       prisoners_tb:
         title: Tuberculosis (TB) infection among prisoners
         unit: people
-        description_short: ""
+        description_short: "Number of prisoners diagnosed with tuberculosis infection."
         display:
           numDecimalPlaces: 0
 
@@ -1450,7 +1449,7 @@ tables:
       hiv_pos_rate:
         title: "HIV positivity rate - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
-        description_short: ""
+        description_short: "Percentage of HIV tests that return positive results among tested individuals."
         description_from_producer: ""
         presentation:
           title_public: HIV positivity rate
@@ -1736,7 +1735,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: |-
-              Share of people using a condom at last high-risk sex
+              Discriminatory attitudes towards people living with HIV
               <%- if sex not in ["other", "total"] %>
               , <<sex>>s
               <%- endif %>
