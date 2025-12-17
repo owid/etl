@@ -88,6 +88,11 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     return results
 
 
+def is_ready() -> bool:
+    """Check if the semantic search model is ready to handle requests."""
+    return _initialization_complete and _embeddings_model is not None and _initialization_error is None
+
+
 def get_model_info() -> Dict[str, Any]:
     """Get information about the loaded model and indicators."""
     return {
@@ -95,5 +100,5 @@ def get_model_info() -> Dict[str, Any]:
         "model_loaded": _embeddings_model is not None,
         "initialization_complete": _initialization_complete,
         "initialization_error": _initialization_error,
-        "ready": _initialization_complete and _embeddings_model is not None and _indicators is not None,
+        "ready": is_ready(),
     }

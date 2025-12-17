@@ -197,6 +197,8 @@ definitions:
     Employment in senior and middle management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to major group 1 of ISCO-08 or ISCO-88, excluding sub-major groups 14 in ISCO-08 and 13 in ISCO-88.
   description_key_disability_status: |-
     Disability, as defined in the [International Classification of Functioning, Disability and Health (ICF)](https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health), is used as an umbrella term, covering impairments, activity limitations, and participation restrictions. For measurement purposes, a person with disability is defined as a person who is limited in the kind or amount of activities that he or she can do because of ongoing difficulties due to a long-term physical condition, mental condition or health problem.
+  description_key_neet: |-
+    This indicator, also known as the NEET rate, reflects how well young people are integrating into education and the labor market. High NEET rates indicate that many young people are missing opportunities to build skills, gain work experience, and earn income, with potentially long-term consequences for their employment prospects, earnings, and well-being.
   description_key_occupational_injury: |-
     An occupational injury is defined as any personal injury, disease or death resulting from an occupational accident. An occupational accident is an unexpected and unplanned occurrence, including acts of violence, arising out of or in connection with work which results in one or more workers incurring a personal injury, disease or death.
   description_key_fatal_occupational_injury: |-
@@ -223,6 +225,9 @@ definitions:
 
   description_processing_obs_status: |-
     We modified the observation status (`obs_status`) variable to show the data is modeled whenever the original observation status was missing and there is a non-missing value for the corresponding ILO Modelled Estimates indicator.
+
+  note_national_estimates: |-
+    Figures refer to [national estimates](#dod:ilo-national-estimates) and may not be fully comparable across countries.
 
   # Common sort values for ordinal obs_status variables
   sort_obs_status: &sort_obs_status
@@ -570,7 +575,11 @@ tables:
         title: SDG 8.6.1 Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
         unit: "%"
         short_unit: "%"
-        description_short: Number of young persons not in education, employment or training as a percentage of the total youth population
+        description_short: Percentage of people aged 15–24 who are not in education (formal education or short courses), employment (worked in paid work or self-employment), or training (non-academic skill-building activities). {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_neet}"
+          - "{definitions.description_key_ilo_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:

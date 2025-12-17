@@ -1,0 +1,157 @@
+gam:
+  - name: hiv_prevalence
+    long_name: HIV prevalence
+    indicators_origin:
+      tg_hiv_prevalence:
+        dimension: transgender
+      msm_hiv_prevalence:
+        dimension: men who have sex with men
+      sex_workers_hiv_prevalence:
+        dimension: sex workers
+      pwid_hiv_prevalence:
+        dimension: people who inject drugs
+      prisoners_hiv_prevalence:
+        dimension: prisoners
+
+  - name: syphilis_prevalence
+    long_name: Syphilis prevalence
+    indicators_origin:
+      sw_syphilis:
+        dimension: sex workers
+      msm_syphilis:
+        dimension: men who have sex with men
+      tg_syphilis:
+        dimension: transgender
+
+  - name: viral_hepatitis
+    long_name: Viral hepatitis
+    indicators_origin:
+      tg_hepatitis:
+        dimension: transgender
+      msm_hepatitis:
+        dimension: men who have sex with men
+      sw_hepatitis:
+        dimension: sex workers
+      pwid_hepatitis:
+        dimension: people who inject drugs
+
+  - name: population
+    long_name: Population size
+    indicators_origin:
+      population:
+        dimension:
+      sex_workers_population_size:
+        dimension: sex workers
+      tg_population_size:
+        dimension: transgender
+      pwid_population_size:
+        dimension: people who inject drugs
+      prisoners_population_size:
+        dimension: prisoners
+      msm_population_size:
+        dimension: men who have sex with men
+
+  - name: condoms_distributed_pp
+    long_name: Condoms distributed per person
+    indicators_origin:
+      sw_condoms_distributed:
+        dimension: sex workers
+      msm_condoms_distributed:
+        dimension: men who have sex with men
+
+  - name: art_coverage
+    long_name: Antiretroviral therapy coverage
+    indicators_origin:
+      sex_workers_art_coverage:
+        dimension: sex workers
+      msm_art_coverage:
+        dimension: men who have sex with men
+      pwid_art_coverage:
+        dimension: people who inject drugs
+      tg_art_coverage:
+        dimension: transgender
+      prisoners_art_coverage:
+        dimension: prisoners
+
+  - name: condom_use
+    long_name: Condom use
+    indicators_origin:
+      condom_use:
+        dimension: high-risk sex
+      sex_workers_condom_use:
+        dimension: sex workers
+      tg_condom_use:
+        dimension: transgender
+      pwid_condom_use:
+        dimension: people who inject drugs
+      msm_condom_use:
+        dimension: men who have sex with men
+
+  - name: hiv_programmes_coverage
+    long_name: Coverage of HIV prevention programmes
+    indicators_origin:
+      tg_programmes:
+        dimension: transgender
+      sw_programmes:
+        dimension: sex workers
+      pwid_programmes:
+        dimension: people who inject drugs
+      msm_programmes:
+        dimension: men who have sex with men
+
+  - name: hiv_status_awareness
+    long_name: HIV testing and status awareness
+    indicators_origin:
+      tg_hiv_status:
+        dimension: transgender
+      sw_hiv_status:
+        dimension: sex workers
+      pwid_hiv_status:
+        dimension: people who inject drugs
+      msm_hiv_status:
+        dimension: men who have sex with men
+
+  - name: avoidance_care
+    # AVOIDANCE OF CARE BC OF STIGMA (4)
+    long_name: Avoidance of health care because of stigma and discrimination
+    indicators_origin:
+      sw_avoidance_care:
+        dimension: sex workers
+      pwid_avoidance_care:
+        dimension: people who inject drugs
+      tg_avoided_healthcare_facility:
+        dimension: transgender
+      msm_afraid_to_seek_health_services:
+        dimension: men who have sex with men
+
+  - name: experience_stigma
+    long_name: Experience of stigma and discrimination
+    indicators_origin:
+      sw_kp_report_exp_sd:
+        dimension: sex workers
+      tg_kp_report_exp_sd:
+        dimension: transgender
+      idu_kp_report_exp_sd:
+        dimension: people who inject drugs
+      msm_kp_report_exp_sd:
+        dimension: men who have sex with men
+
+  - name: experience_violence
+    long_name: Experience of sexual and/or physical violence
+    indicators_origin:
+      sw_exp_phys_sv:
+        dimension: sex workers
+      idu_exp_phys_sv:
+        dimension: people who inject drugs
+      msm_exp_phys_sv:
+        dimension: men who have sex with men
+      tg_exp_phys_sv:
+        dimension: transgender
+
+  - name: hiv_tests
+    long_name: HIV testing
+    indicators_origin:
+      hiv_tests_vol:
+        dimension:
+      hiv_testing_tb_patients:
+        dimension: TB-patients

@@ -15,6 +15,8 @@ This file provides guidance to automation agents working with code in this repos
 - **ALWAYS** provide full error tracebacks - don't truncate diagnostic information
 - **If unsure, ASK THE USER** - don't guess or mask issues
 - **Never** push or commit unless explicitly told to do so
+- Use `gh` CLI to interact with GitHub issues (e.g. `gh issue view <url>`) instead of browser.
+- If not told otherwise, save outputs to `ai/` directory.
 
 ## Architecture Overview
 
