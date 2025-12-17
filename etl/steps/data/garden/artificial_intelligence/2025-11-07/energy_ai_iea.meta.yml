@@ -5,13 +5,18 @@ definitions:
       topic_tags:
         - Artificial Intelligence
         - Energy
+  base_case: &base_case
+    - The Base Case looks at how electricity use in data centres is expected to change if today’s regulations stay the same and the industry develops as currently projected.
+    - In the short term, the main factor shaping this outlook is industry forecasts for server shipments up to 2028, with similar trends assumed to continue beyond that point.
+    - Improvements in energy efficiency are expected to play a key role in keeping electricity use from rising too quickly, even as demand for digital services continues to grow.
+  data_centers_description: &data_centers_description
+    - Data centers house the servers and computing infrastructure that power internet services, cloud computing, and artificial intelligence applications.
+    - This metric includes electricity consumption for all data center operations, encompassing both conventional servers and accelerated servers used for AI and machine learning workloads.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Energy and AI
-
 
 tables:
   energy_ai_iea:
@@ -20,11 +25,8 @@ tables:
         title: Total electricity consumption by data centers
         unit: terawatt-hours
         short_unit: TWh
-        description_short: Electricity consumption by data centers, including both traditional and AI workloads.
-        description_key:
-          - Data centers house the servers and computing infrastructure that power internet services, cloud computing, and artificial intelligence applications.
-          - This metric includes electricity consumption for all data center operations, encompassing both conventional servers and accelerated servers used for AI and machine learning workloads.
-          - Data reflects actual recorded energy consumption from 2020 to 2024.
+        description_short: Electricity consumption by data centers, measured in [terawatt-hours](#dod:watt-hours). Data centres run the full spectrum of internet services from shopping to streaming, not solely AI. The exact split between AI and other uses is not available.
+        description_key: *data_centers_description
         display:
           numDecimalPlaces: 0
 
@@ -33,10 +35,7 @@ tables:
         unit: gigawatts
         short_unit: GW
         description_short: Total installed power capacity of data centers worldwide and by region.
-        description_key:
-          - Installed capacity represents the maximum power that data center infrastructure can draw from the electrical grid.
-          - This includes capacity for servers, cooling systems, and supporting infrastructure required to operate data centers.
-          - Data covers the period from 2020 to 2024.
+        description_key: *data_centers_description
         display:
           numDecimalPlaces: 1
 
@@ -47,8 +46,8 @@ tables:
         description_short: Data center electricity consumption as a percentage of total global or regional electricity demand.
         description_key:
           - This metric shows the proportion of total electricity demand that is consumed by data centers.
-          - The share has been growing as digital services, cloud computing, and AI applications have expanded globally.
-          - Calculated by dividing data center electricity consumption by total electricity demand for each country or region.
+          - *data_centers_description
+        description_processing: We calculated this share by dividing data centre electricity consumption by total electricity demand for each country or region.
         display:
           numDecimalPlaces: 1
 
@@ -56,11 +55,10 @@ tables:
         title: Projected total installed capacity for data centers
         unit: gigawatts
         short_unit: GW
-        description_short: Projected total installed power capacity of data centers in 2030 under the IEA's base scenario.
+        description_short: Projected total installed power capacity of data centers in 2030 under the IEA's base scenario, measured in [gigawatts](#dod:watt).
         description_key:
-          - The base scenario represents the IEA's central projection for data center capacity growth to 2030, accounting for expected AI adoption and digital service expansion.
-          - This scenario assumes data center electricity consumption grows by approximately 15% annually from 2024 to 2030, more than four times faster than growth in other sectors.
-          - Projections account for improvements in energy efficiency while anticipating rapid growth in AI-related computing demand, particularly in accelerated servers.
+          - *data_centers_description
+          - *base_case
         display:
           numDecimalPlaces: 1
           isProjection: True
@@ -69,12 +67,10 @@ tables:
         title: Projected total electricity consumption by data centers
         unit: terawatt-hours
         short_unit: TWh
-        description_short: Projected electricity consumption by data centers in 2030 under the IEA's base scenario.
+        description_short: Projected electricity consumption by data centers in 2030 under the IEA's base scenario, measured in [terawatt-hours](#dod:watt-hours).
         description_key:
-          - The base scenario projects global data center electricity consumption will reach approximately 945 TWh by 2030, nearly double the 2024 level.
-          - This growth is primarily driven by AI adoption, with accelerated server consumption growing at 30% annually compared to 9% for conventional servers.
-          - By 2030, data centers are projected to account for just under 3% of total global electricity consumption in this scenario.
-          - China and the United States are expected to drive nearly 80% of global growth, with consumption increasing by around 240 TWh in the US and 175 TWh in China from 2024 to 2030.
+          - *data_centers_description
+          - *base_case
         display:
           numDecimalPlaces: 0
           isProjection: True
