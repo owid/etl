@@ -27,23 +27,6 @@ dependencies = [
     "typing-extensions>=4.7.1",
     "rdata>=0.11.2",
 ]
-classifiers = [
-  # How mature is this project? Common values are
-  #   3 - Alpha
-  #   4 - Beta
-  #   5 - Production/Stable
-  "Development Status :: 4 - Beta",
-
-  # Indicate who your project is intended for
-  "Intended Audience :: Developers",
-
-  # Specify the Python versions you support here.
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13"
-]
 
 [tool.uv]
 dev-dependencies = [
@@ -53,7 +36,8 @@ dev-dependencies = [
     "argh>=0.26.2",
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff==0.8.6"
+    "ruff==0.8.6",
+    "ipykernel>=6.29.0",
 ]
 
 [tool.uv.sources]

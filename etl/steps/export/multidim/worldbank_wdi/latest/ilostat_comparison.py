@@ -18,7 +18,7 @@ def run() -> None:
     #
     c = paths.create_collection(
         config=config,
-        short_name="ilostat_national_vs_modeled",
+        short_name="ilostat_comparison",
     )
 
     #
