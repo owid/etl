@@ -178,6 +178,9 @@ steps:
     - snapshot://health/2025-12-15/unaids_ncpi.zip
   data://garden/health/2025-12-15/unaids:
     - data://meadow/health/2025-12-15/unaids
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/health/2025-12-15/unaids:
     - data://garden/health/2025-12-15/unaids
 

@@ -14,13 +14,25 @@ def run() -> None:
     ds_garden = paths.load_dataset("unaids")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("unaids", reset_index=False)
+    tables = [
+        ds_garden["epi"],
+        ds_garden["gam"],
+        ds_garden["gam_sex"],
+        ds_garden["gam_age"],
+        ds_garden["gam_group"],
+        ds_garden["gam_estimates"],
+        ds_garden["gam_hepatitis"],
+        ds_garden["gam_age_group"],
+        ds_garden["gam_sex_group"],
+        ds_garden["gam_age_sex"],
+        ds_garden["gam_age_sex_group"],
+    ]
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=tables, default_metadata=ds_garden.metadata)
 
     # Save grapher dataset.
     ds_grapher.save()

@@ -115,11 +115,10 @@ def run() -> None:
     ###############################
     # GAM data
     ###############################
-    tb_gam = ds_meadow.read("gam")  ## 124,570 rows
+    tb = ds_meadow.read("gam")  ## 124,570 rows
     ################
     # SANITY CHECKS
     ################
-    tb = tb_gam.copy()
     tb = clean_indicator_names(tb, "gam")
     # Sanity check dimensions
     _check_dimensions(tb, dimensions, "gam")
@@ -246,6 +245,10 @@ def run() -> None:
         tb_sex_group,
         tb_no_dim,
     ]
+    # for tb in tables_gam:
+    #     cols = tb.columns
+    #     for col in cols:
+    #         print(col, tb[col].m.origins)
 
     #
     # Save outputs.
@@ -827,7 +830,7 @@ def pivot_and_format(tb, columns, short_name, regions_agg=True):
     assert not tb_units[["indicator"]].duplicated().any(), "Multiple units for a single indicator!"
 
     # 1.5/ Ensure value column is numeric (not string)
-    tb["value"] = pd.to_numeric(tb["value"], errors="coerce")
+    tb["value"] = pr.to_numeric(tb["value"], errors="coerce")
 
     # 2/ Pivot
     tb = tb.pivot(index=columns, columns="indicator", values="value").reset_index()

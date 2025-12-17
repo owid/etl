@@ -47,6 +47,9 @@ definitions:
       topic_tags:
         - HIV/AIDS
 
+dataset:
+  title: "Global AIDS Update"
+
 tables:
   epi:
     common:
@@ -300,7 +303,7 @@ tables:
           title_public: "Lives saved due to ART"
 
       people_receiving_art:
-        title: "People living with HIV receiving ART - Age: <<age>> - Sex: <<sex>>"
+        title: "People living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "people"
         description_short: |-
           Number of {definitions.people_dimension} living with HIV on antiretroviral therapy. This is the <<estimate.lower() >> estimate.
