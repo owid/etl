@@ -457,7 +457,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the << estimate >> estimate.
+          Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the <<estimate.lower()>> estimate.
         description_key:
           - Known as "HIV prevalence", it is estimated by dividing the number of people in a given group who tested positive for HIV by all the people that were tested.
         presentation:
@@ -1183,13 +1183,13 @@ tables:
       hiv_new_tb_cases:
         title: Estimated HIV in new TB cases - <<estimate.title()>> estimate
         unit: "%"
-        description_short: "<<estimate.title()>> estimate."
+        description_short: "Estimated percentage of new tuberculosis cases that also have HIV infection. This is the <<estimate.lower()>> estimate."
         presentation:
           title_public: Estimated HIV in new TB cases
       incident_tb_cases:
         title: Incident TB cases in people living with HIV - <<estimate.title()>> estimate
         unit: cases
-        description_short: "<<estimate.title()>> estimate."
+        description_short: "Estimated number of new tuberculosis cases occurring among people living with HIV. This is the <<estimate.lower()>> estimate."
         display:
           numDecimalPlaces: 0
         presentation:
@@ -1250,7 +1250,7 @@ tables:
       prevalence_male_circumcision:
         title: "Prevalence of male circumcision - Age: <<age>> - Procedure: <<group>>"
         description_short: |-
-          Percentage of men <<"15-49" if age == "total" else age>> that are circumcised.
+          Percentage of men aged <<'15-49' if age == 'total' else age>> who are circumcised.
         unit: "%"
         description_from_producer: |-
           Three randomized controlled trials have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics to reduce the risk of heterosexually acquired HIV infection. Voluntary medical male circumcision services should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
