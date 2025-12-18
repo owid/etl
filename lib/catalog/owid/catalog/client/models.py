@@ -1,14 +1,14 @@
 #
 #  owid.catalog.client.models
 #
-#  Dataclass definitions for API responses.
+#  Pydantic model definitions for API responses.
 #
 from __future__ import annotations
 
-from dataclasses import dataclass, field, fields
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Iterator, TypeVar
 
 import pandas as pd
+from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
     from ..catalogs import CatalogFrame
@@ -17,8 +17,7 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-@dataclass
-class ChartResult:
+class ChartResult(BaseModel):
     """Metadata about an OWID chart.
 
     Attributes:
@@ -29,11 +28,15 @@ class ChartResult:
         metadata: Chart metadata dict including column info.
     """
 
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
     slug: str
     title: str
     url: str
-    config: dict = field(default_factory=dict, repr=False)
-    metadata: dict = field(default_factory=dict, repr=False)
+    config: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     def get_data(self) -> pd.DataFrame:
         """Fetch the data for this chart.
@@ -47,8 +50,7 @@ class ChartResult:
         return ChartsAPI._fetch_data(self.slug)
 
 
-@dataclass
-class ChartSearchResult:
+class ChartSearchResult(BaseModel):
     """A chart found via search.
 
     Attributes:
@@ -64,7 +66,7 @@ class ChartSearchResult:
     title: str
     url: str
     subtitle: str = ""
-    available_entities: list[str] = field(default_factory=list)
+    available_entities: list[str] = Field(default_factory=list)
     num_related_articles: int = 0
 
     def get_data(self) -> pd.DataFrame:
@@ -74,8 +76,7 @@ class ChartSearchResult:
         return ChartsAPI._fetch_data(self.slug)
 
 
-@dataclass
-class PageSearchResult:
+class PageSearchResult(BaseModel):
     """An article/page found via search.
 
     Attributes:
@@ -92,13 +93,12 @@ class PageSearchResult:
     title: str
     url: str
     excerpt: str = ""
-    authors: list[str] = field(default_factory=list)
+    authors: list[str] = Field(default_factory=list)
     published_at: str = ""
     thumbnail_url: str = ""
 
 
-@dataclass
-class IndicatorResult:
+class IndicatorResult(BaseModel):
     """An indicator found via semantic search.
 
     Attributes:
@@ -111,6 +111,10 @@ class IndicatorResult:
         unit: Unit of measurement.
         n_charts: Number of charts using this indicator.
     """
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
 
     indicator_id: int
     title: str
@@ -134,8 +138,7 @@ class IndicatorResult:
         return DatasetsAPI._load_table(path_part)
 
 
-@dataclass
-class DatasetResult:
+class DatasetResult(BaseModel):
     """A dataset found in the catalog.
 
     Attributes:
@@ -147,7 +150,12 @@ class DatasetResult:
         path: Full path to the table.
         is_public: Whether the data is publicly accessible.
         dimensions: List of dimension columns.
+        formats: List of available formats.
     """
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
 
     table: str
     dataset: str
@@ -156,8 +164,8 @@ class DatasetResult:
     channel: str
     path: str
     is_public: bool = True
-    dimensions: list[str] = field(default_factory=list)
-    formats: list[str] = field(default_factory=list)
+    dimensions: list[str] = Field(default_factory=list)
+    formats: list[str] = Field(default_factory=list)
 
     def load(self) -> "Table":
         """Load this table from the catalog.
@@ -170,8 +178,7 @@ class DatasetResult:
         return DatasetsAPI._load_table(self.path, formats=self.formats, is_public=self.is_public)
 
 
-@dataclass
-class ResultSet(Generic[T]):
+class ResultSet(BaseModel, Generic[T]):
     """Generic container for API results.
 
     Provides iteration, indexing, and conversion to CatalogFrame
@@ -183,15 +190,21 @@ class ResultSet(Generic[T]):
         total: Total number of results (may be more than len(results)).
     """
 
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
     results: list[T]
     query: str = ""
     total: int = 0
 
-    def __post_init__(self) -> None:
+    def model_post_init(self, __context: Any) -> None:
+        """Set total to length of results if not provided."""
         if self.total == 0:
             self.total = len(self.results)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[T]:  # type: ignore[override]
+        """Iterate over results, not model fields."""
         return iter(self.results)
 
     def __len__(self) -> int:
@@ -212,18 +225,11 @@ class ResultSet(Generic[T]):
         if not self.results:
             return pd.DataFrame()
 
-        # Convert dataclass instances to dicts
-        rows = []
-        for r in self.results:
-            row: dict[str, Any] = {}
-            # Use fields() function to iterate over dataclass fields
-            for f in fields(r):  # type: ignore
-                row[f.name] = getattr(r, f.name)
-            rows.append(row)
-
+        # Convert Pydantic models to dicts
+        rows = [r.model_dump() if isinstance(r, BaseModel) else r for r in self.results]  # type: ignore
         return pd.DataFrame(rows)
 
-    def to_catalog_frame(self) -> CatalogFrame:
+    def to_catalog_frame(self) -> "CatalogFrame":
         """Convert to CatalogFrame for backwards compatibility.
 
         Only works for DatasetResult and IndicatorResult types.
