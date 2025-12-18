@@ -17,7 +17,7 @@ import numpy.typing as npt
 from .models import DatasetResult, ResultSet
 
 if TYPE_CHECKING:
-    from ..catalogs import CatalogFrame, RemoteCatalog
+    from ..catalogs import RemoteCatalog
     from ..tables import Table
     from . import Client
 
@@ -250,14 +250,3 @@ class DatasetsAPI:
         )
 
         return tmpdir + "/data" + ext
-
-    def to_catalog_frame(self, results: ResultSet[DatasetResult]) -> CatalogFrame:
-        """Convert ResultSet to CatalogFrame for backwards compatibility.
-
-        Args:
-            results: ResultSet from find() method.
-
-        Returns:
-            CatalogFrame that can use legacy .load() method.
-        """
-        return results.to_catalog_frame()
