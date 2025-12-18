@@ -1735,7 +1735,7 @@ class Regions:
             self._tb_population = self.ds_population.read("population")  # type: ignore
         return self._tb_population
 
-    def get_region(self, name: str) -> dict:
+    def get_region(self, name: str, **kwargs) -> dict:
         """Get region members and other information.
 
         Parameters
@@ -1782,6 +1782,7 @@ class Regions:
                     include_historical_regions_in_income_groups=True,
                     subregion_type=subregion_type,
                     unpack_subregions=True,
+                    **kwargs,
                 )
 
             self._region_cache[name] = region_dict
