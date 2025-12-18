@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 import requests
 
-from .models import ChartResult
+from .models import ChartResult, ChartSearchResult, ResultSet
 
 if TYPE_CHECKING:
     from . import Client
@@ -34,7 +34,8 @@ class ChartsAPI:
     """API for accessing OWID chart data and metadata.
 
     Provides methods to fetch data, metadata, and configuration from
-    published charts on ourworldindata.org.
+    published charts on ourworldindata.org. Also includes search
+    functionality to find charts by keywords.
 
     Example:
         ```python
@@ -42,14 +43,18 @@ class ChartsAPI:
 
         client = Client()
 
+        # Search for charts
+        results = client.charts.search("gdp per capita")
+        df = results[0].get_data()
+
         # Get chart data as DataFrame
-        df = client.charts.get("life-expectancy")
+        df = client.charts.get_data("life-expectancy")
 
         # Get chart metadata
         meta = client.charts.metadata("life-expectancy")
 
         # Get full chart info as ChartResult
-        chart = client.charts.info("life-expectancy")
+        chart = client.charts.fetch("life-expectancy")
         df = chart.get_data()
         ```
     """
@@ -143,6 +148,57 @@ class ChartsAPI:
             url=f"{self.BASE_URL}/{slug}",
             config=config,
             metadata=metadata,
+        )
+
+    def search(
+        self,
+        query: str,
+        *,
+        countries: list[str] | None = None,
+        topics: list[str] | None = None,
+        require_all_countries: bool = False,
+        limit: int = 20,
+        page: int = 0,
+    ) -> ResultSet[ChartSearchResult]:
+        """Search for charts matching a query.
+
+        Args:
+            query: Search query string.
+            countries: Optional list of country names to filter by.
+            topics: Optional list of topic names to filter by.
+            require_all_countries: If True, only return charts with ALL
+                specified countries. Default False (any country matches).
+            limit: Maximum results to return (1-100). Default 20.
+            page: Page number for pagination (0-indexed). Default 0.
+
+        Returns:
+            ResultSet containing ChartSearchResult objects.
+
+        Example:
+            ```python
+            # Basic search
+            results = client.charts.search("life expectancy")
+            for chart in results:
+                print(chart.title)
+
+            # Filter by countries
+            results = client.charts.search(
+                "gdp",
+                countries=["France", "Germany"],
+                require_all_countries=True
+            )
+
+            # Get data from search results
+            df = results[0].get_data()
+            ```
+        """
+        return self._client._site_search.charts(
+            query=query,
+            countries=countries,
+            topics=topics,
+            require_all_countries=require_all_countries,
+            limit=limit,
+            page=page,
         )
 
     @staticmethod

@@ -22,7 +22,7 @@ class TestClient:
     def test_client_has_all_apis(self):
         client = Client()
         assert hasattr(client, "charts")
-        assert hasattr(client, "search")
+        assert hasattr(client, "_site_search")
         assert hasattr(client, "indicators")
         assert hasattr(client, "datasets")
 
@@ -90,12 +90,13 @@ class TestChartsAPI:
             client.charts.get_data("https://example.com/not-a-grapher-url")
 
 
-class TestSearchAPI:
-    """Test the Search API."""
+class TestChartsAPISearch:
+    """Test the Charts API search functionality."""
 
-    def test_search_charts(self):
+    def test_charts_search(self):
+        """Test searching for charts via ChartsAPI."""
         client = Client()
-        results = client.search.charts("life expectancy")
+        results = client.charts.search("life expectancy")
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
@@ -103,16 +104,32 @@ class TestSearchAPI:
         assert results[0].slug
         assert results[0].title
 
-    def test_search_charts_with_countries(self):
+    def test_charts_search_with_countries(self):
+        """Test searching with country filters."""
         client = Client()
-        results = client.search.charts("gdp", countries=["France"])
+        results = client.charts.search("gdp", countries=["France"])
 
         assert isinstance(results, ResultSet)
         # Results should be filtered by country
 
-    def test_search_pages(self):
+    def test_search_results_to_frame(self):
+        """Test converting search results to DataFrame."""
         client = Client()
-        results = client.search.pages("climate change")
+        results = client.charts.search("population")
+
+        df = results.to_frame()
+        assert "slug" in df.columns
+        assert "title" in df.columns
+        assert len(df) == len(results)
+
+
+class TestSiteSearchAPI:
+    """Test the internal SiteSearchAPI (advanced usage)."""
+
+    def test_site_search_pages(self):
+        """Test searching for pages via _site_search."""
+        client = Client()
+        results = client._site_search.pages("climate change")
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
@@ -120,14 +137,13 @@ class TestSearchAPI:
         assert results[0].slug
         assert results[0].title
 
-    def test_search_results_to_frame(self):
+    def test_site_search_charts(self):
+        """Test accessing charts via _site_search (should work but not recommended)."""
         client = Client()
-        results = client.search.charts("population")
+        results = client._site_search.charts("gdp")
 
-        df = results.to_frame()
-        assert "slug" in df.columns
-        assert "title" in df.columns
-        assert len(df) == len(results)
+        assert isinstance(results, ResultSet)
+        assert len(results) > 0
 
 
 class TestIndicatorsAPI:

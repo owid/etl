@@ -12,13 +12,10 @@ Example:
 
     client = Client()
 
-    # Charts API - fetch data from published charts
+    # Charts API - fetch and search for published charts
     df = client.charts.get_data("life-expectancy")
     chart = client.charts.fetch("life-expectancy")  # Full chart object
-
-    # Search API - find charts and pages
-    charts = client.search.charts("gdp per capita")
-    pages = client.search.pages("climate change")
+    results = client.charts.search("gdp per capita")  # Search for charts
 
     # Indicators API - semantic search for indicators
     indicators = client.indicators.search("renewable energy")
@@ -28,6 +25,9 @@ Example:
     results = client.datasets.find(table="population", namespace="un")
     table = client.datasets.find_one(table="gdp", namespace="worldbank")
     table = client.datasets["garden/un/2024/population/population"]
+
+    # Advanced: Search pages/articles
+    pages = client._site_search.pages("climate change")
     ```
 """
 
@@ -44,21 +44,21 @@ from .models import (
     PageSearchResult,
     ResultSet,
 )
-from .search import SearchAPI
+from .search import SiteSearchAPI
 
 
 class Client:
     """Unified client for all OWID data APIs.
 
     Provides access to four main APIs:
-    - charts: Fetch data and metadata from published charts
-    - search: Find charts and pages via Algolia search
+
+    - charts: Fetch and search for published charts
     - indicators: Semantic search for data indicators
     - datasets: Query and load from the data catalog
+    - _site_search: Internal site search (prefer using charts.search() or indicators.search())
 
     Attributes:
-        charts: ChartsAPI instance for chart operations.
-        search: SearchAPI instance for content search.
+        charts: ChartsAPI instance for chart operations and search.
         indicators: IndicatorsAPI instance for indicator search.
         datasets: DatasetsAPI instance for catalog operations.
 
@@ -70,40 +70,40 @@ class Client:
         client = Client()
 
         # Access different APIs
-        df = client.charts.get("life-expectancy")
-        results = client.search.charts("gdp")
+        df = client.charts.get_data("life-expectancy")
+        results = client.charts.search("gdp")  # Search for charts
         indicators = client.indicators.search("solar energy")
         table = client.datasets.find_one(table="population")
         ```
     """
 
+    charts: ChartsAPI
+    indicators: IndicatorsAPI
+    datasets: DatasetsAPI
+    _site_search: SiteSearchAPI
+
     def __init__(self) -> None:
         """Initialize the client with all API interfaces."""
         self.charts = ChartsAPI(self)
-        self.search = SearchAPI(self)
         self.indicators = IndicatorsAPI(self)
         self.datasets = DatasetsAPI(self)
+        self._site_search = SiteSearchAPI(self)
 
     def __repr__(self) -> str:
-        return "Client(charts=..., search=..., indicators=..., datasets=...)"
+        return "Client(charts=..., indicators=..., datasets=...)"
 
 
 __all__ = [
     # Main client
     "Client",
-    # API classes
-    "ChartsAPI",
-    "SearchAPI",
-    "IndicatorsAPI",
-    "DatasetsAPI",
-    # Result types
+    # Result types for type hints
     "ChartResult",
     "ChartSearchResult",
     "PageSearchResult",
     "IndicatorResult",
     "DatasetResult",
     "ResultSet",
-    # Exceptions
+    # Exceptions for error handling
     "ChartNotFoundError",
     "LicenseError",
 ]

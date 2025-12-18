@@ -1,7 +1,7 @@
 #
 #  owid.catalog.client.search
 #
-#  Search API for finding charts and pages via Algolia.
+#  Site search API for finding charts and pages via Algolia.
 #
 from __future__ import annotations
 
@@ -15,11 +15,15 @@ if TYPE_CHECKING:
     from . import Client
 
 
-class SearchAPI:
-    """API for searching OWID charts and pages.
+class SiteSearchAPI:
+    """API for searching the OWID website (charts and pages).
 
     Uses the Algolia-powered search endpoint to find content
     on ourworldindata.org.
+
+    Note:
+        For searching charts specifically, prefer using `client.charts.search()`.
+        This API is intended for advanced usage or when you need to search pages.
 
     Example:
         ```python
@@ -27,15 +31,12 @@ class SearchAPI:
 
         client = Client()
 
-        # Search for charts
-        results = client.search.charts("gdp per capita")
-        for chart in results:
-            print(chart.title)
-
         # Search for pages/articles
-        results = client.search.pages("climate change")
+        results = client._site_search.pages("climate change")
         for page in results:
             print(page.title)
+
+        # For charts, prefer: client.charts.search("gdp")
         ```
     """
 
@@ -68,21 +69,16 @@ class SearchAPI:
         Returns:
             SearchResults containing ChartSearchResult objects.
 
+        Note:
+            Prefer using `client.charts.search()` for a simpler API.
+
         Example:
             ```python
-            # Basic search
-            results = client.search.charts("life expectancy")
+            # Recommended: use client.charts.search()
+            results = client.charts.search("life expectancy")
 
-            # Filter by countries
-            results = client.search.charts(
-                "gdp",
-                countries=["France", "Germany"],
-                require_all_countries=True
-            )
-
-            # Paginate results
-            page1 = client.search.charts("population", limit=10, page=0)
-            page2 = client.search.charts("population", limit=10, page=1)
+            # Advanced: use site search directly
+            results = client._site_search.charts("gdp", countries=["France"])
             ```
         """
         params: dict = {
@@ -142,7 +138,7 @@ class SearchAPI:
 
         Example:
             ```python
-            results = client.search.pages("climate change")
+            results = client._site_search.pages("climate change")
             for page in results:
                 print(f"{page.title}: {page.url}")
             ```
