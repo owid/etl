@@ -177,17 +177,17 @@ class TestIndicatorsAPI:
 class TestDatasetsAPI:
     """Test the Datasets API."""
 
-    def test_find_datasets(self):
+    def test_search_datasets(self):
         client = Client()
-        results = client.datasets.find(table="population")
+        results = client.datasets.search(table="population")
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
         assert all(isinstance(r, DatasetResult) for r in results)
 
-    def test_find_datasets_by_namespace(self):
+    def test_search_datasets_by_namespace(self):
         client = Client()
-        results = client.datasets.find(table="population", namespace="un")
+        results = client.datasets.search(table="population", namespace="un")
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
@@ -195,7 +195,7 @@ class TestDatasetsAPI:
 
     def test_dataset_results_to_catalog_frame(self):
         client = Client()
-        results = client.datasets.find(table="population", namespace="un")
+        results = client.datasets.search(table="population", namespace="un")
 
         frame = results.to_catalog_frame()
         assert "table" in frame.columns
@@ -204,14 +204,6 @@ class TestDatasetsAPI:
 
         # Should be loadable
         assert hasattr(frame, "load")
-
-    def test_find_latest(self):
-        # This test may be slow as it loads actual data
-        # Uncomment to test:
-        # client = Client()
-        # table = client.datasets.find_latest(table="population", namespace="un")
-        # assert table is not None
-        pass
 
     def test_direct_path_access(self):
         # This test may be slow as it loads actual data

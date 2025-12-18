@@ -40,16 +40,10 @@ class DatasetsAPI:
         client = Client()
 
         # Search for datasets
-        results = client.datasets.find(table="population", namespace="un")
+        results = client.datasets.search(table="population", namespace="un")
 
         # Load the first result
         table = results[0].load()
-
-        # Or load directly with find_one
-        table = client.datasets.find_one(table="gdp", namespace="worldbank")
-
-        # Get latest version
-        table = client.datasets.find_latest(table="co2", namespace="owid")
 
         # Direct path access
         table = client.datasets["garden/un/2024-07-11/population/population"]
@@ -78,7 +72,7 @@ class DatasetsAPI:
 
         return self._catalog
 
-    def find(
+    def search(
         self,
         table: str | None = None,
         namespace: str | None = None,
@@ -103,20 +97,23 @@ class DatasetsAPI:
         Example:
             ```python
             # Search by table name
-            results = client.datasets.find(table="population")
+            results = client.datasets.search(table="population")
 
             # Filter by namespace and version
-            results = client.datasets.find(
+            results = client.datasets.search(
                 table="gdp",
                 namespace="worldbank",
                 version="2024-01-15"
             )
 
             # Search multiple channels
-            results = client.datasets.find(
+            results = client.datasets.search(
                 table="co2",
                 channels=["garden", "meadow"]
             )
+
+            # Load a specific result
+            table = results[0].load()
             ```
         """
         catalog = self._get_catalog(channels)
@@ -175,108 +172,6 @@ class DatasetsAPI:
             query=table or "",
             total=len(results),
         )
-
-    def find_one(
-        self,
-        table: str | None = None,
-        namespace: str | None = None,
-        version: str | None = None,
-        dataset: str | None = None,
-        channel: str | None = None,
-        channels: Iterable[str] = ("garden",),
-    ) -> "Table":
-        """Find and load a single table from the catalog.
-
-        Convenience method that combines find() and load().
-        Requires exactly one matching table.
-
-        Args:
-            table: Table name pattern (substring match).
-            namespace: Data provider namespace.
-            version: Version string.
-            dataset: Dataset name.
-            channel: Single channel to search.
-            channels: List of channels to search.
-
-        Returns:
-            The loaded Table object.
-
-        Raises:
-            ValueError: If zero or multiple tables match.
-
-        Example:
-            ```python
-            table = client.datasets.find_one(
-                table="population",
-                namespace="un",
-                version="2024-07-11"
-            )
-            ```
-        """
-        results = self.find(
-            table=table,
-            namespace=namespace,
-            version=version,
-            dataset=dataset,
-            channel=channel,
-            channels=channels,
-        )
-
-        if len(results) == 0:
-            raise ValueError("No matching table found")
-        elif len(results) > 1:
-            tables = [r.table for r in results]
-            raise ValueError(f"Multiple tables found: {', '.join(tables)}")
-
-        return results[0].load()
-
-    def find_latest(
-        self,
-        table: str | None = None,
-        namespace: str | None = None,
-        dataset: str | None = None,
-        channels: Iterable[str] = ("garden",),
-    ) -> "Table":
-        """Find and load the latest version of a table.
-
-        Searches for tables matching the criteria and returns the one
-        with the most recent version string (lexicographically sorted).
-
-        Args:
-            table: Table name pattern (substring match).
-            namespace: Data provider namespace.
-            dataset: Dataset name.
-            channels: List of channels to search.
-
-        Returns:
-            The loaded Table with the latest version.
-
-        Raises:
-            ValueError: If no tables match.
-
-        Example:
-            ```python
-            # Always get the latest population data
-            table = client.datasets.find_latest(
-                table="population",
-                namespace="un"
-            )
-            print(f"Version: {table.metadata.version}")
-            ```
-        """
-        results = self.find(
-            table=table,
-            namespace=namespace,
-            dataset=dataset,
-            channels=channels,
-        )
-
-        if len(results) == 0:
-            raise ValueError("No matching table found")
-
-        # Sort by version and get latest
-        sorted_results = sorted(results.results, key=lambda r: r.version)
-        return sorted_results[-1].load()
 
     def __getitem__(self, path: str) -> "Table":
         """Load a table by its catalog path.

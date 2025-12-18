@@ -22,8 +22,8 @@ Example:
     table = indicators[0].load()
 
     # Datasets API - query and load from catalog
-    results = client.datasets.find(table="population", namespace="un")
-    table = client.datasets.find_one(table="gdp", namespace="worldbank")
+    results = client.datasets.search(table="population", namespace="un")
+    table = results[0].load()
     table = client.datasets["garden/un/2024/population/population"]
 
     # Advanced: Search pages/articles
