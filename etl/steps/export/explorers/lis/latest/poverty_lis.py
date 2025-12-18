@@ -60,14 +60,16 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
+        # Set default view
         if (
-            view.dimensions["indicator"] == "heacount_ratio"
+            view.dimensions["indicator"] == "headcount_ratio"
             and view.dimensions["poverty_line"] == "5"
             and view.dimensions["welfare_type"] == "dhi"
             and view.dimensions["equivalence_scale"] == "per capita"
         ):
-            view.config["defaultView"] = "true"
-        pass
+            if view.config is None:
+                view.config = {}
+            view.config["defaultView"] = True
 
     #
     # Save garden dataset.
