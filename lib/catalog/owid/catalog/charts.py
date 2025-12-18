@@ -15,18 +15,24 @@
 from dataclasses import dataclass
 
 import pandas as pd
+from deprecated import deprecated
 
 from .client import ChartNotFoundError, Client, LicenseError  # noqa
 
 
+@deprecated(
+    version="0.4.0",
+    reason="Use owid.catalog.Client instead: client = Client(); df = client.charts.get_data('chart-slug')",
+)
 @dataclass
 class Chart:
-    """
-    A chart published on Our World in Data, for example:
+    """A chart published on Our World in Data.
 
-    https://ourworldindata.org/grapher/life-expectancy
+    Example:
+        https://ourworldindata.org/grapher/life-expectancy
 
-    DEPRECATED: Use owid.catalog.client.Client instead.
+    Deprecated:
+        Use :class:`owid.catalog.Client` instead.
     """
 
     slug: str
@@ -48,9 +54,13 @@ class Chart:
 
     @property
     def bundle(self):
-        """
-        DEPRECATED: For backwards compatibility only.
-        Raises ChartNotFoundError if the chart does not exist.
+        """For backwards compatibility only.
+
+        Raises:
+            ChartNotFoundError: If the chart does not exist.
+
+        Deprecated:
+            Use :class:`owid.catalog.Client` instead.
         """
         # This property exists only to trigger the fetch and raise an error if the chart doesn't exist
         self._fetch_chart()
@@ -58,16 +68,25 @@ class Chart:
 
     @property
     def config(self) -> dict:
-        """Get chart configuration."""
+        """Get chart configuration.
+
+        Deprecated:
+            Use :class:`owid.catalog.Client` instead.
+        """
         self._fetch_chart()
         return self._chart_result.config  # type: ignore
 
     def get_data(self) -> pd.DataFrame:
-        """
-        Fetch chart data as a DataFrame.
+        """Fetch chart data as a DataFrame.
 
         This method maintains backwards compatibility with the old API,
         including special column renaming for single-value charts.
+
+        Returns:
+            DataFrame with chart data and metadata in attrs.
+
+        Deprecated:
+            Use :class:`owid.catalog.Client` instead.
         """
         # Fetch using the new client
         df = self._get_client().charts.get_data(self.slug)
@@ -88,16 +107,32 @@ class Chart:
         return isinstance(value, Chart) and value.slug == self.slug
 
 
+@deprecated(
+    version="0.4.0",
+    reason="Use owid.catalog.Client instead: client = Client(); df = client.charts.get_data('chart-slug')",
+)
 def get_data(slug_or_url: str) -> pd.DataFrame:
-    """
-    Fetch the data for a chart by its slug or by the URL of the chart.
+    """Fetch the data for a chart by its slug or by the URL of the chart.
 
     Additional metadata about the chart is available in the DataFrame's `attrs` attribute.
 
-    DEPRECATED: Use owid.catalog.client.Client instead:
-        from owid.catalog import Client
-        client = Client()
-        df = client.charts.get_data("life-expectancy")
+    Args:
+        slug_or_url: Chart slug (e.g., "life-expectancy") or full URL.
+
+    Returns:
+        DataFrame with chart data.
+
+    Raises:
+        ValueError: If URL is not a valid Grapher URL.
+        ChartNotFoundError: If the chart does not exist.
+        LicenseError: If the data cannot be downloaded due to licensing.
+
+    Deprecated:
+        Use :class:`owid.catalog.Client` instead::
+
+            from owid.catalog import Client
+            client = Client()
+            df = client.charts.get_data("life-expectancy")
     """
     # Parse the slug from URL if needed
     if slug_or_url.startswith("https://ourworldindata.org/grapher/"):
@@ -111,12 +146,19 @@ def get_data(slug_or_url: str) -> pd.DataFrame:
 
 
 def _apply_legacy_transforms(df: pd.DataFrame, slug: str, metadata: dict) -> pd.DataFrame:
-    """
-    Apply legacy transformations to maintain backwards compatibility with old API.
+    """Apply legacy transformations to maintain backwards compatibility with old API.
 
     The old API had special behavior:
     - Single value columns were renamed to the slug (with underscores)
     - Metadata was stored differently in attrs
+
+    Args:
+        df: DataFrame from the new client.
+        slug: Chart slug.
+        metadata: Metadata from the metadata endpoint.
+
+    Returns:
+        DataFrame with legacy transformations applied.
     """
     # Build per-column metadata from the metadata.json response
     columns_meta = metadata.get("columns", {})
