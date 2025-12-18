@@ -19,6 +19,7 @@ import numpy.typing as npt
 import pandas as pd
 import requests
 import structlog
+from rapidfuzz import fuzz
 
 from . import s3_utils
 from .datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, Dataset, FileFormat
@@ -115,30 +116,17 @@ class CatalogMixin:
             results = find(dataset="wrld bank", fuzzy=True, threshold=60)
             ```
         """
-        criteria: npt.NDArray[np.bool_] = np.ones(len(self.frame), dtype=bool)
-        fuzzy_scores: npt.NDArray[np.float64] | None = None
+        if table and dataset:
+            raise ValueError("Cannot specify both 'table' and 'dataset' arguments")
 
-        if table:
-            if fuzzy:
-                scores = self._fuzzy_scores(self.frame.table, table, case)
-                criteria &= scores >= threshold
-                fuzzy_scores = scores if fuzzy_scores is None else fuzzy_scores + scores
-            else:
-                criteria &= self.frame.table.str.contains(table, case=case, regex=regex)
+        # Step 1: Apply exact match filters (namespace, version, channel)
+        criteria: npt.NDArray[np.bool_] = np.ones(len(self.frame), dtype=bool)
 
         if namespace:
             criteria &= self.frame.namespace == namespace
 
         if version:
             criteria &= self.frame.version == version
-
-        if dataset:
-            if fuzzy:
-                scores = self._fuzzy_scores(self.frame.dataset, dataset, case)
-                criteria &= scores >= threshold
-                fuzzy_scores = scores if fuzzy_scores is None else fuzzy_scores + scores
-            else:
-                criteria &= self.frame.dataset.str.contains(dataset, case=case, regex=regex)
 
         if channel:
             if channel not in self.channels:
@@ -147,38 +135,26 @@ class CatalogMixin:
                 )
             criteria &= self.frame.channel == channel
 
+        # Step 2: Apply text field filter (table or dataset)
+        scores: npt.NDArray[np.float64] | None = None
+        if table:
+            scores = _match_score(self.frame.table, table, fuzzy, case, regex)
+            criteria &= scores >= threshold
+        elif dataset:
+            scores = _match_score(self.frame.dataset, dataset, fuzzy, case, regex)
+            criteria &= scores >= threshold
+
+        # Step 3: Build result
         matches = self.frame[criteria]
         if "checksum" in matches.columns:
             matches = matches.drop(columns=["checksum"])
 
-        # Sort by fuzzy score (descending) when fuzzy matching is used
-        if fuzzy and fuzzy_scores is not None:
-            sort_order = np.argsort(-fuzzy_scores[criteria])
+        # Sort by score (descending) when fuzzy matching is used
+        if fuzzy and scores is not None:
+            sort_order = np.argsort(-scores[criteria])
             matches = matches.iloc[sort_order]
 
         return cast(CatalogFrame, matches)
-
-    @staticmethod
-    def _fuzzy_scores(series: pd.Series, query: str, case: bool) -> npt.NDArray[np.float64]:
-        """Compute fuzzy match scores for a pandas Series.
-
-        Uses rapidfuzz's WRatio (Weighted Ratio) which intelligently combines
-        multiple matching strategies for best results across different scenarios.
-
-        Args:
-            series: The pandas Series to search.
-            query: The search query string.
-            case: If True, matching is case-sensitive.
-
-        Returns:
-            Array of match scores (0-100).
-        """
-        from rapidfuzz import fuzz
-
-        if not case:
-            query = query.lower()
-            series = series.str.lower()
-        return np.array([fuzz.WRatio(query, x) for x in series], dtype=np.float64)
 
     def find_one(self, *args: str | None, **kwargs: str | None) -> Table:
         """Find and load a single table matching search criteria.
@@ -945,3 +921,28 @@ def save_frame(df: pd.DataFrame, path: str | Path) -> None:
 
     else:
         raise ValueError(f"could not detect what format to write to: {path}")
+
+
+def _match_score(
+    series: pd.Series, query: str, fuzzy: bool, case: bool, regex: bool
+) -> npt.NDArray[np.float64]:
+    """Calculate match scores for a text column.
+
+    Args:
+        series: The pandas Series to search.
+        query: The search query string.
+        fuzzy: If True, use fuzzy matching (0-100 scores).
+        case: If True, matching is case-sensitive.
+        regex: If True, treat query as regex (ignored when fuzzy=True).
+
+    Returns:
+        Array of match scores: 0-100 for fuzzy, 0 or 100 for regex/literal.
+    """
+    if fuzzy:
+        if not case:
+            query = query.lower()
+            series = series.str.lower()
+        return np.array([fuzz.WRatio(query, x) for x in series], dtype=np.float64)
+    else:
+        matches = series.str.contains(query, case=case, regex=regex)
+        return np.where(matches, 100.0, 0.0)
