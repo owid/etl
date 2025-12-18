@@ -121,35 +121,6 @@ definitions:
     Inequality is measured here in terms of income before taxes and benefits.
     <%- endif %>
 
-  subtitle_welfare_type: |-
-    <% if welfare_type == "dhi" %>
-    Income here is measured here after taxes and benefits.
-    <%- elif welfare_type == "mi" %>
-    Income here is measured here before taxes and benefits.
-    <%- endif %>
-
-  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
-
-  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices.
-
-  ppp_adjustment_note_longer: This data is measured in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices to adjust for inflation and differences in living costs between countries.
-
-  relative_poverty_percentage: |-
-    <% if poverty_line == "40% of the median" %>
-    40%
-    <%- elif poverty_line == "50% of the median" %>
-    50%
-    <%- elif poverty_line == "60% of the median" %>
-    60%
-    <%- endif %>
-
-  title_welfare_type: |-
-    <% if welfare_type == "dhi" %>
-    after tax
-    <%- elif welfare_type == "mi" %>
-    before tax
-    <%- endif %>
-
   # For Grapher configuration
 
   headcount_ratio_title: |-
@@ -217,6 +188,13 @@ definitions:
     Threshold income per day marking the <<percentiles_thr(decile) | lower>> ({definitions.title_welfare_type})
     <%- endif %>
 
+  title_welfare_type: |-
+    <% if welfare_type == "dhi" %>
+    after tax
+    <%- elif welfare_type == "mi" %>
+    before tax
+    <%- endif %>
+
   poverty_line_subtitle: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
@@ -226,9 +204,16 @@ definitions:
     <%- elif poverty_line in poverty_line_umic %>
     The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at {definitions.relative_poverty_percentage} of the median income. {definitions.subtitle_welfare_type}
+    Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at <<poverty_line>> income. {definitions.subtitle_welfare_type}
     <%- else %>
     {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+    <%- endif %>
+
+  subtitle_welfare_type: |-
+    <% if welfare_type == "dhi" %>
+    Income here is measured here after taxes and benefits.
+    <%- elif welfare_type == "mi" %>
+    Income here is measured here before taxes and benefits.
     <%- endif %>
 
   total_shortfall_subtitle: |-
@@ -279,13 +264,54 @@ definitions:
   poverty_gap_index_subtitle: |-
     The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line). {definitions.subtitle_welfare_type}
 
-  note_for_absolute_or_relative_poverty: |-
-    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
+  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
+
+  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices.
+
+  ppp_adjustment_note_longer: This data is measured in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices to adjust for inflation and differences in living costs between countries.
+
+  note_ppp_equivalence_scale: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] and equivalence_scale == "square root" %>
+    {definitions.ppp_adjustment_note} {definitions.note_equivalized}
+    <%- elif poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.ppp_adjustment_note}
+    <%- elif equivalence_scale == "square root" %>
+    {definitions.note_equivalized}
+    <%- endif %>
+
+  note_ppp_equivalence_scale_longer: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] and equivalence_scale == "square root" %>
+    {definitions.ppp_adjustment_note_longer} {definitions.note_equivalized}
+    <%- elif poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
+    {definitions.ppp_adjustment_note_longer}
+    <%- elif equivalence_scale == "square root" %>
+    {definitions.note_equivalized}
+    <%- endif %>
+
+  note_for_absolute_or_relative_poverty: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] and equivalence_scale == "square root" %>
+    {definitions.ppp_adjustment_note} {definitions.note_equivalized}
+    <%- elif poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
+    {definitions.ppp_adjustment_note}
+    <%- elif equivalence_scale == "square root" %>
+    {definitions.note_equivalized}
     <%- endif %>
 
   note_total_shortfall: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] and equivalence_scale == "square root" %>
+    {definitions.ppp_adjustment_note} This shortfall does not take into account costs and inefficiencies from making the necessary transfers. {definitions.note_equivalized}
+    <%- elif poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.ppp_adjustment_note} This shortfall does not take into account costs and inefficiencies from making the necessary transfers.
+    <%- elif equivalence_scale == "square root" %>
+    This shortfall does not take into account costs and inefficiencies from making the necessary transfers. {definitions.note_equivalized}
+    <%- endif %>
+
+  note_equivalized: Income has been [equivalized](#dod:equivalization).
+
+  note_equivalence_scale: |-
+    <% if equivalence_scale == "square root" %>
+    {definitions.note_equivalized}
+    <%- endif %>
 
   headcount_ratio_color_scheme: |-
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -631,7 +657,7 @@ tables:
           grapher_config:
             title: "{definitions.avg_shortfall_title}"
             subtitle: "{definitions.avg_shortfall_subtitle}"
-            note: "{definitions.ppp_adjustment_note_longer}"
+            note: "{definitions.note_ppp_equivalence_scale_longer}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -663,7 +689,7 @@ tables:
           grapher_config:
             title: "{definitions.income_gap_ratio_title}"
             subtitle: "{definitions.income_gap_ratio_subtitle}"
-            note: "{definitions.ppp_adjustment_note_longer}"
+            note: "{definitions.note_ppp_equivalence_scale_longer}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -695,7 +721,7 @@ tables:
           grapher_config:
             title: "{definitions.poverty_gap_index_title}"
             subtitle: "{definitions.poverty_gap_index_subtitle}"
-            note: "{definitions.ppp_adjustment_note_longer}"
+            note: "{definitions.note_ppp_equivalence_scale_longer}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -727,7 +753,9 @@ tables:
           grapher_config:
             title: Mean income ({definitions.title_welfare_type})
             subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
-            note: "{definitions.ppp_adjustment_note}"
+            note: |-
+              <% set poverty_line = "" %>
+              {definitions.note_ppp_equivalence_scale}
             hasMapTab: true
             tab: chart
             hideRelativeToggle: false
@@ -759,7 +787,9 @@ tables:
           grapher_config:
             title: Median income ({definitions.title_welfare_type})
             subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
-            note: "{definitions.ppp_adjustment_note}"
+            note: |-
+              <% set poverty_line = "" %>
+              {definitions.note_ppp_equivalence_scale}
             hasMapTab: true
             tab: chart
             hideRelativeToggle: false
@@ -802,7 +832,9 @@ tables:
             subtitle: |-
               {macros}
               The mean income within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
-            note: "{definitions.ppp_adjustment_note}"
+            note: |-
+              <% set poverty_line = "" %>
+              {definitions.note_ppp_equivalence_scale}
             hasMapTab: true
             tab: chart
             hideRelativeToggle: false
@@ -842,7 +874,7 @@ tables:
             subtitle: |-
               {macros}
               The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.subtitle_welfare_type}
-            note: ""
+            note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -877,7 +909,9 @@ tables:
           grapher_config:
             title: "{definitions.threshold_title}"
             subtitle: The level of income per person below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
-            note: "{definitions.ppp_adjustment_note}"
+            note: |-
+              <% set poverty_line = "" %>
+              {definitions.note_ppp_equivalence_scale}
             hasMapTab: true
             tab: chart
             hideRelativeToggle: false
@@ -910,7 +944,7 @@ tables:
           grapher_config:
             title: "Gini coefficient ({definitions.title_welfare_type})"
             subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type}
-            note: ""
+            note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -940,7 +974,7 @@ tables:
             title: "Palma ratio ({definitions.title_welfare_type})"
             subtitle: |-
               The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type}
-            note: ""
+            note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -1011,7 +1045,7 @@ tables:
           grapher_config:
             title: "Income share of the poorest 50% ({definitions.title_welfare_type})"
             subtitle: "The share of income received by the poorest 50% of the population. {definitions.subtitle_welfare_type}"
-            note: ""
+            note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -1040,7 +1074,7 @@ tables:
           grapher_config:
             title: "Income share of the richest 10% ({definitions.title_welfare_type})"
             subtitle: "The share of income received by the richest 10% of the population. {definitions.subtitle_welfare_type}"
-            note: ""
+            note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
             yAxis:
@@ -1083,7 +1117,7 @@ tables:
           grapher_config:
             title: "Share of population in relative poverty ({definitions.title_welfare_type})"
             subtitle: "The share of the population with income below 50% of the median. Relative poverty reflects the extent of inequality within the bottom of the distribution. {definitions.description_short_welfare_type}"
-            note: ""
+            note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
             yAxis:
