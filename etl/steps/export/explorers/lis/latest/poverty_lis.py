@@ -60,8 +60,13 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        # if view.dimension["sex"] == "male":
-        #     view.config["title"] = "Something else"
+        if (
+            view.dimension["indicator"] == "heacount_ratio"
+            and view.dimension["poverty_line"] == "5"
+            and view.dimension["welfare_type"] == "dhi"
+            and view.dimension["equivalence_scale"] == "per capita"
+        ):
+            view.config["defaultView"] = "true"
         pass
 
     #
