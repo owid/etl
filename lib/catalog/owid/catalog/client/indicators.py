@@ -12,7 +12,6 @@ import requests
 from .models import IndicatorResult, ResultSet
 
 if TYPE_CHECKING:
-    from ..tables import Table
     from . import Client
 
 
@@ -106,39 +105,3 @@ class IndicatorsAPI:
             query=query,
             total=data.get("total_results", len(results)),
         )
-
-    def get(self, indicator_id: int) -> "Table":
-        """Get an indicator by its ID.
-
-        Fetches the table containing the indicator from the catalog.
-
-        Args:
-            indicator_id: The indicator's unique ID.
-
-        Returns:
-            Table containing the indicator data.
-
-        Note:
-            This method requires knowing the indicator ID. To discover
-            indicators, use the search() method first.
-        """
-        # First search to find the catalog path
-        # This is a workaround since we don't have a direct ID lookup endpoint
-        params = {
-            "query": str(indicator_id),
-            "limit": 100,
-        }
-
-        resp = requests.get(self.BASE_URL, params=params)
-        resp.raise_for_status()
-        data = resp.json()
-
-        for r in data.get("results", []):
-            if r.get("indicator_id") == indicator_id:
-                path_part, _, _ = r.get("catalog_path", "").partition("#")
-                if path_part:
-                    from .datasets import DatasetsAPI
-
-                    return DatasetsAPI._load_table(path_part)
-
-        raise ValueError(f"Indicator with ID {indicator_id} not found")
