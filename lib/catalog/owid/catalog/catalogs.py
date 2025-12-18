@@ -923,9 +923,7 @@ def save_frame(df: pd.DataFrame, path: str | Path) -> None:
         raise ValueError(f"could not detect what format to write to: {path}")
 
 
-def _match_score(
-    series: pd.Series, query: str, fuzzy: bool, case: bool, regex: bool
-) -> npt.NDArray[np.float64]:
+def _match_score(series: pd.Series, query: str, fuzzy: bool, case: bool, regex: bool) -> npt.NDArray[np.float64]:
     """Calculate match scores for a text column.
 
     Args:
