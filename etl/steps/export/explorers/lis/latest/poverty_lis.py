@@ -56,10 +56,66 @@ def run() -> None:
         explorer=True,
     )
 
+    # Add After tax vs. Before tax dimension
+    c.group_views(
+        groups=[
+            {
+                "dimension": "welfare_type",
+                "choice_new_slug": "after_vs_before_tax",
+                "view_config": {
+                    "hideRelativeToggle": "false",
+                    "selectedFacetStrategy": "entity",
+                },
+            },
+            {
+                "dimension": "poverty_line",
+                "choices": ["1", "2", "5", "10", "20", "30", "40"],
+                "choice_new_slug": "multiple_lines",
+                "view_config": {"hideRelativeToggle": "false", "selectedFacetStrategy": "entity"},
+            },
+        ]
+    )
+
     #
     # (optional) Edit views
     #
     for view in c.views:
+        if view.dimensions["welfare_type"] == "after_vs_before_tax":
+            # Initialize config if it's None
+            if view.config is None:
+                view.config = {}
+
+            # Generate title from first indicator's display name (which already excludes tax info)
+            # Get the catalog path of the first indicator
+            if view.indicators.y:
+                first_indicator_path = view.indicators.y[0].catalogPath
+                # Extract the column name from the catalog path
+                indicator_col = first_indicator_path.split("#")[-1]
+
+                # Get the title from the table metadata
+                if indicator_col in tb.columns:
+                    col_meta = tb[indicator_col].metadata
+                    if col_meta.presentation and col_meta.presentation.grapher_config:
+                        # Set title
+                        if col_meta.presentation.grapher_config.get("title"):
+                            view.config["title"] = col_meta.presentation.grapher_config["title"]
+
+                            # Remove (before tax) or (after tax) from title if present
+                            view.config["title"] = (
+                                view.config["title"]
+                                .replace(" (before tax)", " (after vs. before tax)")
+                                .replace(" (after tax)", " (after vs. before tax)")
+                            )
+                        if col_meta.presentation.grapher_config.get("subtitle"):
+                            view.config["subtitle"] = col_meta.presentation.grapher_config["subtitle"]
+
+                            # Remove welfare type info from subtitle
+                            view.config["subtitle"] = (
+                                view.config["subtitle"]
+                                .replace(" Income here is measured after taxes and benefits.", "")
+                                .replace(" Income here is measured before taxes and benefits.", "")
+                            )
+
         # Set default view
         if (
             view.dimensions["indicator"] == "headcount_ratio"

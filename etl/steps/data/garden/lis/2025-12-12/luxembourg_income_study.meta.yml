@@ -211,9 +211,9 @@ definitions:
 
   subtitle_welfare_type: |-
     <% if welfare_type == "dhi" %>
-    Income here is measured here after taxes and benefits.
+    Income here is measured after taxes and benefits.
     <%- elif welfare_type == "mi" %>
-    Income here is measured here before taxes and benefits.
+    Income here is measured before taxes and benefits.
     <%- endif %>
 
   total_shortfall_subtitle: |-
