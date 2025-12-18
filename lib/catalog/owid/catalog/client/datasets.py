@@ -45,7 +45,12 @@ class DatasetsAPI:
         # Load the first result
         table = results[0].load()
 
-        # Direct path access
+        # Fetch metadata by path (without loading data)
+        dataset = client.datasets.fetch("garden/un/2024/population/population")
+        print(f"Dataset: {dataset.dataset}, Version: {dataset.version}")
+        table = dataset.load()  # Load when needed
+
+        # Direct path access (loads data immediately)
         table = client.datasets["garden/un/2024-07-11/population/population"]
         ```
     """
@@ -172,6 +177,54 @@ class DatasetsAPI:
             query=table or "",
             total=len(results),
         )
+
+    def fetch(self, path: str) -> DatasetResult:
+        """Fetch dataset metadata by catalog path (without loading data).
+
+        Returns metadata about the dataset. Use .load() on the result to
+        actually load the table data.
+
+        Args:
+            path: Full catalog path (e.g., "garden/un/2024/population/population").
+
+        Returns:
+            DatasetResult with metadata. Call .load() to get the table.
+
+        Raises:
+            ValueError: If dataset not found.
+
+        Example:
+            ```python
+            # Get metadata without loading data
+            result = client.datasets.fetch("garden/un/2024/population/population")
+            print(f"Dataset: {result.dataset}, Version: {result.version}")
+
+            # Load data when needed
+            table = result.load()
+            ```
+        """
+        # Parse path: channel/namespace/version/dataset/table
+        parts = path.split("/")
+        if len(parts) < 5:
+            raise ValueError(f"Invalid path format: {path}. Expected format: channel/namespace/version/dataset/table")
+
+        channel, namespace, version, dataset = parts[0:4]
+        table = parts[4]
+
+        # Search to get full metadata from catalog
+        results = self.search(
+            table=table,
+            namespace=namespace,
+            version=version,
+            dataset=dataset,
+            channel=channel,
+        )
+
+        if len(results) == 0:
+            raise ValueError(f"Dataset not found: {path}")
+
+        # Return first match (should be exact)
+        return results[0]
 
     def __getitem__(self, path: str) -> "Table":
         """Load a table by its catalog path.

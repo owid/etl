@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 import requests
 
-from .models import ChartResult, ChartSearchResult, ResultSet
+from .models import ChartResult, ResultSet
 
 if TYPE_CHECKING:
     from . import Client
@@ -159,7 +159,7 @@ class ChartsAPI:
         require_all_countries: bool = False,
         limit: int = 20,
         page: int = 0,
-    ) -> ResultSet[ChartSearchResult]:
+    ) -> ResultSet[ChartResult]:
         """Search for charts matching a query.
 
         Args:
@@ -172,7 +172,7 @@ class ChartsAPI:
             page: Page number for pagination (0-indexed). Default 0.
 
         Returns:
-            ResultSet containing ChartSearchResult objects.
+            ResultSet containing ChartResult objects.
 
         Example:
             ```python

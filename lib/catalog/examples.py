@@ -37,14 +37,14 @@ def example_client_search():
 
     client = Client()
 
-    # Search for charts
-    charts = client.search.charts("gdp per capita", limit=3)
+    # Search for charts (recommended way)
+    charts = client.charts.search("gdp per capita", limit=3)
     print(f"Found {charts.total} charts, showing first {len(charts)}:")
     for chart in charts:
         print(f"  - {chart.title} ({chart.slug})")
 
-    # Search for pages/articles
-    pages = client.search.pages("climate change", limit=3)
+    # Search for pages/articles (advanced - use internal API)
+    pages = client._site_search.pages("climate change", limit=3)
     print(f"\nFound {pages.total} pages, showing first {len(pages)}:")
     for page in pages:
         print(f"  - {page.title}")
@@ -70,6 +70,11 @@ def example_client_indicators():
         table = indicators[0].load()
         print(f"Table shape: {table.shape}")
 
+        # Fetch specific indicator by ID
+        indicator_id = indicators[0].indicator_id
+        indicator = client.indicators.fetch(indicator_id)
+        print(f"\nFetched indicator {indicator_id}: {indicator.title}")
+
 
 def example_client_datasets():
     """Example: Querying and loading datasets from catalog."""
@@ -77,8 +82,8 @@ def example_client_datasets():
 
     client = Client()
 
-    # Find datasets by criteria
-    results = client.datasets.find(table="population", namespace="un")
+    # Search for datasets by criteria
+    results = client.datasets.search(table="population", namespace="un")
     print(f"Found {len(results)} datasets matching criteria:")
     for result in results[:3]:
         print(f"  - {result.path}")
@@ -89,9 +94,11 @@ def example_client_datasets():
         print(f"\nLoaded table shape: {table.shape}")
         print(f"Columns: {list(table.columns)}")
 
-    # Find and load the latest version
-    latest = client.datasets.find_latest(table="population", namespace="un")
-    print(f"\nLatest population table: {latest.metadata.short_name}")
+        # Fetch dataset metadata by path (without loading data)
+        path = results[0].path
+        dataset = client.datasets.fetch(path)
+        print(f"\nFetched metadata: {dataset.dataset} v{dataset.version}")
+        print(f"Dimensions: {dataset.dimensions}")
 
 
 def example_tables_and_metadata():

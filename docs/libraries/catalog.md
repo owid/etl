@@ -8,6 +8,58 @@ You can install it via pip:
 pip install owid-catalog
 ```
 
+## Client API
+
+The unified client for accessing OWID data through various APIs.
+
+::: owid.catalog.client.Client
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+::: owid.catalog.client.charts.ChartsAPI
+    options:
+      heading_level: 4
+      show_root_heading: true
+
+
+::: owid.catalog.client.indicators.IndicatorsAPI
+    options:
+      heading_level: 4
+      show_root_heading: true
+
+
+::: owid.catalog.client.datasets.DatasetsAPI
+    options:
+      heading_level: 4
+      show_root_heading: true
+
+::: owid.catalog.client.models.ChartResult
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+::: owid.catalog.client.models.IndicatorResult
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+::: owid.catalog.client.models.DatasetResult
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+::: owid.catalog.client.models.PageSearchResult
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+::: owid.catalog.client.models.ResultSet
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+<!-- LEGACY BELOW  -->
 <!-- Catalog -->
 ::: owid.catalog.catalogs
     options:

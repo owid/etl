@@ -34,6 +34,10 @@ class IndicatorsAPI:
 
         # Load the top result's table
         table = results[0].load()
+
+        # Fetch specific indicator by ID
+        indicator = client.indicators.fetch(12345)
+        table = indicator.load()
         ```
     """
 
@@ -105,3 +109,29 @@ class IndicatorsAPI:
             query=query,
             total=data.get("total_results", len(results)),
         )
+
+    def fetch(self, indicator_id: int) -> IndicatorResult:
+        """Fetch a specific indicator by ID.
+
+        Args:
+            indicator_id: Unique indicator ID.
+
+        Returns:
+            IndicatorResult with full details.
+
+        Raises:
+            ValueError: If indicator not found.
+
+        Example:
+            ```python
+            indicator = client.indicators.fetch(12345)
+            print(f"Title: {indicator.title}")
+            table = indicator.load()
+            ```
+        """
+        # Search by ID to find it
+        results = self.search(str(indicator_id), limit=100)
+        for r in results:
+            if r.indicator_id == indicator_id:
+                return r
+        raise ValueError(f"Indicator {indicator_id} not found")

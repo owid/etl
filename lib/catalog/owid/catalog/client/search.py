@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from .models import ChartSearchResult, PageSearchResult, ResultSet
+from .models import ChartResult, PageSearchResult, ResultSet
 
 if TYPE_CHECKING:
     from . import Client
@@ -54,7 +54,7 @@ class SiteSearchAPI:
         require_all_countries: bool = False,
         limit: int = 20,
         page: int = 0,
-    ) -> ResultSet[ChartSearchResult]:
+    ) -> ResultSet[ChartResult]:
         """Search for charts matching a query.
 
         Args:
@@ -67,7 +67,7 @@ class SiteSearchAPI:
             page: Page number for pagination (0-indexed). Default 0.
 
         Returns:
-            SearchResults containing ChartSearchResult objects.
+            SearchResults containing ChartResult objects.
 
         Note:
             Prefer using `client.charts.search()` for a simpler API.
@@ -103,7 +103,7 @@ class SiteSearchAPI:
         for hit in data.get("results", []):
             slug = hit.get("slug", "")
             results.append(
-                ChartSearchResult(
+                ChartResult(
                     slug=slug,
                     title=hit.get("title", ""),
                     url=f"https://ourworldindata.org/grapher/{slug}",

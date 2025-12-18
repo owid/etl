@@ -14,17 +14,19 @@ Example:
 
     # Charts API - fetch and search for published charts
     df = client.charts.get_data("life-expectancy")
-    chart = client.charts.fetch("life-expectancy")  # Full chart object
+    chart = client.charts.fetch("life-expectancy")  # Fetch specific chart
     results = client.charts.search("gdp per capita")  # Search for charts
 
     # Indicators API - semantic search for indicators
     indicators = client.indicators.search("renewable energy")
+    indicator = client.indicators.fetch(12345)  # Fetch by ID
     table = indicators[0].load()
 
     # Datasets API - query and load from catalog
     results = client.datasets.search(table="population", namespace="un")
+    dataset = client.datasets.fetch("garden/un/2024/pop/pop")  # Fetch metadata
     table = results[0].load()
-    table = client.datasets["garden/un/2024/population/population"]
+    table = client.datasets["garden/un/2024/population/population"]  # Direct access
 
     # Advanced: Search pages/articles
     pages = client._site_search.pages("climate change")
@@ -38,7 +40,6 @@ from .datasets import DatasetsAPI
 from .indicators import IndicatorsAPI
 from .models import (
     ChartResult,
-    ChartSearchResult,
     DatasetResult,
     IndicatorResult,
     PageSearchResult,
@@ -69,11 +70,19 @@ class Client:
         # Create client (recommended: reuse for multiple operations)
         client = Client()
 
-        # Access different APIs
+        # Charts API
         df = client.charts.get_data("life-expectancy")
-        results = client.charts.search("gdp")  # Search for charts
+        chart = client.charts.fetch("gdp")  # Fetch specific chart
+        results = client.charts.search("population")  # Search for charts
+
+        # Indicators API
         indicators = client.indicators.search("solar energy")
-        table = client.datasets.find_one(table="population")
+        indicator = client.indicators.fetch(12345)  # Fetch by ID
+
+        # Datasets API
+        results = client.datasets.search(table="population", namespace="un")
+        dataset = client.datasets.fetch("garden/un/2024/pop/pop")  # Fetch metadata
+        table = results[0].load()  # Load data
         ```
     """
 
@@ -98,7 +107,6 @@ __all__ = [
     "Client",
     # Result types for type hints
     "ChartResult",
-    "ChartSearchResult",
     "PageSearchResult",
     "IndicatorResult",
     "DatasetResult",

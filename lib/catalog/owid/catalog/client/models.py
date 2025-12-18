@@ -18,25 +18,42 @@ T = TypeVar("T")
 
 
 class ChartResult(BaseModel):
-    """Metadata about an OWID chart.
+    """An OWID chart (from fetch or search).
+
+    Fields populated depend on the source:
+    - fetch(): Provides config and metadata
+    - search(): Provides subtitle, available_entities, and num_related_articles
+
+    Core fields (slug, title, url) are always populated.
 
     Attributes:
         slug: Chart URL identifier (e.g., "life-expectancy").
         title: Chart title.
         url: Full URL to the interactive chart.
-        config: Raw grapher configuration dict.
-        metadata: Chart metadata dict including column info.
+        config: Raw grapher configuration dict (from fetch).
+        metadata: Chart metadata dict including column info (from fetch).
+        subtitle: Chart subtitle/description (from search).
+        available_entities: List of entities/countries in the chart (from search).
+        num_related_articles: Number of related articles (from search).
     """
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
 
+    # Core fields (always present)
     slug: str
     title: str
     url: str
+
+    # From fetch() - full chart details
     config: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+    # From search() - search-specific metadata
+    subtitle: str = ""
+    available_entities: list[str] = Field(default_factory=list)
+    num_related_articles: int = 0
 
     def get_data(self) -> pd.DataFrame:
         """Fetch the data for this chart.
@@ -45,32 +62,6 @@ class ChartResult(BaseModel):
             DataFrame with chart data. Metadata is available in df.attrs.
         """
         # Import here to avoid circular imports
-        from .charts import ChartsAPI
-
-        return ChartsAPI._fetch_data(self.slug)
-
-
-class ChartSearchResult(BaseModel):
-    """A chart found via search.
-
-    Attributes:
-        slug: Chart URL identifier.
-        title: Chart title.
-        url: Full URL to the interactive chart.
-        subtitle: Chart subtitle/description.
-        available_entities: List of entities (countries) in the chart.
-        num_related_articles: Number of related articles.
-    """
-
-    slug: str
-    title: str
-    url: str
-    subtitle: str = ""
-    available_entities: list[str] = Field(default_factory=list)
-    num_related_articles: int = 0
-
-    def get_data(self) -> pd.DataFrame:
-        """Fetch the data for this chart."""
         from .charts import ChartsAPI
 
         return ChartsAPI._fetch_data(self.slug)

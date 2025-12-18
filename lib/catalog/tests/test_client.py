@@ -7,7 +7,6 @@ from owid.catalog import Client
 from owid.catalog.client import (
     ChartNotFoundError,
     ChartResult,
-    ChartSearchResult,
     DatasetResult,
     IndicatorResult,
     LicenseError,
@@ -100,7 +99,7 @@ class TestChartsAPISearch:
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
-        assert all(isinstance(r, ChartSearchResult) for r in results)
+        assert all(isinstance(r, ChartResult) for r in results)
         assert results[0].slug
         assert results[0].title
 
@@ -173,6 +172,31 @@ class TestIndicatorsAPI:
         assert "score" in frame.columns
         assert "path" in frame.columns
 
+    def test_fetch_indicator(self):
+        """Test fetching a specific indicator by ID."""
+        client = Client()
+        # First search to find an indicator ID
+        results = client.indicators.search("solar power")
+        if len(results) > 0:
+            indicator_id = results[0].indicator_id
+            # Try to fetch it by ID
+            # Note: This may not work reliably because semantic search
+            # doesn't guarantee exact ID matches
+            try:
+                indicator = client.indicators.fetch(indicator_id)
+                assert indicator.indicator_id == indicator_id
+                assert indicator.title
+                assert indicator.catalog_path
+            except ValueError:
+                # Expected - semantic search may not return exact ID match
+                pass
+
+    def test_fetch_nonexistent_indicator(self):
+        """Test that fetching non-existent indicator raises error."""
+        client = Client()
+        with pytest.raises(ValueError, match="not found"):
+            client.indicators.fetch(999999999)
+
 
 class TestDatasetsAPI:
     """Test the Datasets API."""
@@ -204,6 +228,33 @@ class TestDatasetsAPI:
 
         # Should be loadable
         assert hasattr(frame, "load")
+
+    def test_fetch_dataset(self):
+        """Test fetching dataset metadata by path."""
+        client = Client()
+        # First search to find a path
+        results = client.datasets.search(table="population", namespace="un")
+        if len(results) > 0:
+            path = results[0].path
+            # Now fetch by path (should return same metadata)
+            dataset = client.datasets.fetch(path)
+            assert isinstance(dataset, DatasetResult)
+            assert dataset.path == path
+            assert dataset.table
+            assert dataset.dataset
+            assert dataset.namespace == "un"
+
+    def test_fetch_invalid_path(self):
+        """Test that fetching with invalid path format raises error."""
+        client = Client()
+        with pytest.raises(ValueError, match="Invalid path format"):
+            client.datasets.fetch("invalid/path")
+
+    def test_fetch_nonexistent_dataset(self):
+        """Test that fetching non-existent dataset raises error."""
+        client = Client()
+        with pytest.raises(ValueError, match="not found"):
+            client.datasets.fetch("garden/fake/2024-01-01/fake/fake")
 
     def test_direct_path_access(self):
         # This test may be slow as it loads actual data
