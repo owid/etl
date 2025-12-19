@@ -9,25 +9,76 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 30
-  title: TSMC Historical Operating Data
+  title: TSMC Operating Data
+  update_period_days: 365
 
 tables:
   operating_data:
     variables:
       value:
-        title: << category >> << metric >>
-        unit: ""
-        description_short: Value of the metric. Units vary by metric type.
+        title: |-
+          <% if category == "capacity" %>
+          Annual production capacity
+          <% elif category == "shipments" %>
+          Quarterly wafer shipments
+          <% elif category == "technology" %>
+          Revenue share from << metric >> chips
+          <% elif category == "platform" %>
+          Revenue share from << metric >>
+          <% elif category == "geography" %>
+          Revenue share from << metric >>
+          <% endif %>
+        unit: |-
+          <% if category == "capacity" %>
+          thousands of 12-inch equivalent wafers
+          <% elif category == "shipments" %>
+          thousands of 12-inch equivalent wafers
+          <% else %>
+          % of revenue
+          <% endif %>
+        short_unit: |-
+          <% if category in ["capacity", "shipments"] %><% else %>%<% endif %>
+        description_short: |-
+          <% if category == "capacity" %>
+          Annual production capacity in thousands of 12-inch equivalent wafers.
+          <% elif category == "shipments" %>
+          Quarterly wafer shipments in thousands of 12-inch equivalent wafers.
+          <% elif category == "technology" %>
+          Percentage of wafer revenue from << metric >> process node technology.
+          <% elif category == "platform" %>
+          Percentage of net revenue from << metric >> applications.
+          <% elif category == "geography" %>
+          Percentage of net revenue from << metric >>.
+          <% endif %>
         description_key:
           - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
-          - This dataset contains comprehensive quarterly operating metrics including capacity, wafer shipments, and revenue breakdowns.
-          - For Annual Capacity and Quarterly Wafer Shipments, values are in thousands of 12-inch equivalent wafers.
-          - For revenue breakdown metrics (by technology, platform, geography), values represent percentages of total revenue.
-          - Revenue breakdown by technology shows the percentage of wafer revenue from different process nodes (3nm, 5nm, 7nm, etc.).
-          - Revenue breakdown by platform shows percentage of net revenue from High Performance Computing, Smartphone, IoT, Automotive, etc.
-          - Revenue breakdown by geography shows percentage of net revenue by region (North America, China, Asia Pacific, Japan, EMEA).
-          - Data coverage begins in 1994 with varying levels of detail across different time periods.
+          - |-
+            <% if category == "capacity" %>
+            Annual production capacity measured in thousands of 12-inch equivalent wafers. Represents TSMC's total manufacturing capability across all fabrication facilities.
+            <% elif category == "shipments" %>
+            Quarterly wafer shipments measured in thousands of 12-inch equivalent wafers. Represents actual production output delivered to customers each quarter and is a key indicator of TSMC's production utilization.
+            <% elif category == "technology" %>
+            Percentage of wafer revenue from this process node technology. Smaller nanometer values represent more advanced, cutting-edge manufacturing processes. Advanced nodes (3nm, 5nm, 7nm) command higher prices and are used in high-performance applications, while mature nodes (28nm and above) serve specialized applications and legacy products.
+            <% elif category == "platform" %>
+            Percentage of net revenue from this application platform. Shows TSMC's revenue distribution across different end-use markets. High Performance Computing includes AI accelerators, data center processors, and graphics cards.
+            <% elif category == "geography" %>
+            Percentage of net revenue from this geographic region. Reflects customer location and regional demand patterns. North America includes major customers like Apple, Nvidia, and AMD.
+            <% endif %>
+        presentation:
+          title_public: |-
+            <% if category == "capacity" %>
+            TSMC annual production capacity
+            <% elif category == "shipments" %>
+            TSMC quarterly wafer shipments
+            <% elif category == "technology" %>
+            TSMC revenue from << metric >> chips
+            <% elif category == "platform" %>
+            TSMC revenue from << metric.replace("High Performance Computing", "HPC").replace("Internet of Things", "IoT").replace("Digital Consumer Electronics", "Consumer Electronics") >>
+            <% elif category == "geography" %>
+            TSMC revenue from << metric.replace("EMEA", "Europe, Middle East & Africa") >>
+            <% endif %>
         display:
-          numDecimalPlaces: 2
-          name: << metric >>
+          numDecimalPlaces: |-
+            <% if category in ["capacity", "shipments"] %>0<% else %>1<% endif %>
+          name: |-
+            <% if category == "capacity" %>Annual capacity<% elif category == "shipments" %>Quarterly shipments<% else %><< metric >><% endif %>
