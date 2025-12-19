@@ -61,9 +61,9 @@ definitions:
 
   welfare_type: |-
     <% if welfare_type == "dhi" %>
-    post-tax
+    after tax
     <%- elif welfare_type == "mi" %>
-    pre-tax
+    before tax
     <%- endif %>
 
   equivalence_scale: |-
@@ -126,73 +126,66 @@ definitions:
   headcount_ratio_title: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Share of population living in extreme poverty ({definitions.title_welfare_type})
+    Share of population living in extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty: Share of population below <<poverty_line>> ({definitions.title_welfare_type})
+    Relative poverty: Share of population below <<poverty_line>> ({definitions.welfare_type})
     <%- else %>
-    Poverty: Share of population living on less than {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    Poverty: Share of population living on less than {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
 
   headcount_title: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Number of people living in extreme poverty ({definitions.title_welfare_type})
+    Number of people living in extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty: Number of people below <<poverty_line>> ({definitions.title_welfare_type})
+    Relative poverty: Number of people below <<poverty_line>> ({definitions.welfare_type})
     <%- else %>
-    Poverty: Number of people living on less than {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    Poverty: Number of people living on less than {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
 
   total_shortfall_title: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Total shortfall from extreme poverty ({definitions.title_welfare_type})
+    Total shortfall from extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Total shortfall from a poverty line of <<poverty_line>> income ({definitions.title_welfare_type})
+    Total shortfall from a poverty line of <<poverty_line>> income ({definitions.welfare_type})
     <%- else %>
-    Total shortfall from a poverty line of {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    Total shortfall from a poverty line of {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
 
   avg_shortfall_title: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Average shortfall from extreme poverty ({definitions.title_welfare_type})
+    Average shortfall from extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Average shortfall from a poverty line of <<poverty_line>> income ({definitions.title_welfare_type})
+    Average shortfall from a poverty line of <<poverty_line>> income ({definitions.welfare_type})
     <%- else %>
-    Average shortfall from a poverty line of {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    Average shortfall from a poverty line of {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
 
   income_gap_ratio_title: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Average shortfall from extreme poverty (as a share of the poverty line) ({definitions.title_welfare_type})
+    Average shortfall from extreme poverty (as a share of the poverty line) ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Average shortfall from a poverty line of <<poverty_line>> income ({definitions.title_welfare_type}) (as a share of the poverty line)
+    Average shortfall from a poverty line of <<poverty_line>> income ({definitions.welfare_type}) (as a share of the poverty line)
     <%- else %>
-    Average shortfall from a poverty line of {definitions.poverty_line_a_day} (as a share of the poverty line) ({definitions.title_welfare_type})
+    Average shortfall from a poverty line of {definitions.poverty_line_a_day} (as a share of the poverty line) ({definitions.welfare_type})
     <%- endif %>
 
   poverty_gap_index_title: |-
     <% if poverty_line in ['40% of the median', '50% of the median', '60% of the median'] %>
-    Poverty gap index at <<poverty_line>> income ({definitions.title_welfare_type})
+    Poverty gap index at <<poverty_line>> income ({definitions.welfare_type})
     <%- else %>
-    Poverty gap index at {definitions.poverty_line_a_day} ({definitions.title_welfare_type})
+    Poverty gap index at {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
 
   threshold_title: |-
     {macros}
     <% if decile == 5 %>
-    Threshold income per day marking the <<percentiles_thr(decile) | lower>> (median) ({definitions.title_welfare_type})
+    Threshold income per day marking the <<percentiles_thr(decile) | lower>> (median) ({definitions.welfare_type})
     <%- else %>
-    Threshold income per day marking the <<percentiles_thr(decile) | lower>> ({definitions.title_welfare_type})
-    <%- endif %>
-
-  title_welfare_type: |-
-    <% if welfare_type == "dhi" %>
-    after tax
-    <%- elif welfare_type == "mi" %>
-    before tax
+    Threshold income per day marking the <<percentiles_thr(decile) | lower>> ({definitions.welfare_type})
     <%- endif %>
 
   poverty_line_subtitle: |-
@@ -550,7 +543,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Share of population in poverty ({definitions.poverty_line_a_day})
+          name: Share below {definitions.poverty_line_a_day} ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -582,7 +575,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Number of people in poverty ({definitions.poverty_line_a_day})
+          name: Number below {definitions.poverty_line_a_day} ({definitions.welfare_type})
           numDecimalPlaces: 0
           numSignificantFigures: 3
           roundingMode: significantFigures
@@ -616,7 +609,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Total shortfall ({definitions.poverty_line_a_day})
+          name: Total shortfall - {definitions.poverty_line_a_day} ({definitions.welfare_type})
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
@@ -650,7 +643,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Average shortfall ($) ({definitions.poverty_line_a_day})
+          name: Average shortfall ($) - {definitions.poverty_line_a_day} ({definitions.welfare_type})
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
@@ -682,7 +675,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Average shortfall (%) ({definitions.poverty_line_a_day})
+          name: Average shortfall (%) - {definitions.poverty_line_a_day} ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -714,7 +707,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Poverty gap index ({definitions.poverty_line_a_day})
+          name: Poverty gap index - {definitions.poverty_line_a_day} ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -746,12 +739,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Mean income
+          name: Mean income ({definitions.welfare_type})
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
           grapher_config:
-            title: Mean income ({definitions.title_welfare_type})
+            title: Mean income ({definitions.welfare_type})
             subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
             note: |-
               <% set poverty_line = "" %>
@@ -780,12 +773,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Median income
+          name: Median income ({definitions.welfare_type})
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
           grapher_config:
-            title: Median income ({definitions.title_welfare_type})
+            title: Median income ({definitions.welfare_type})
             subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
             note: |-
               <% set poverty_line = "" %>
@@ -821,14 +814,14 @@ tables:
         display:
           name: |-
             {macros}
-            Average (<<percentiles_avg_share(decile)>>)
+            Average (<<percentiles_avg_share(decile)>>) ({definitions.welfare_type})
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
           grapher_config:
             title: |-
               {macros}
-              Mean income within the <<percentiles_avg_share(decile) | lower>> ({definitions.title_welfare_type})
+              Mean income within the <<percentiles_avg_share(decile) | lower>> ({definitions.welfare_type})
             subtitle: |-
               {macros}
               The mean income within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
@@ -863,14 +856,14 @@ tables:
         display:
           name: |-
             {macros}
-            Share (<<percentiles_avg_share(decile)>>)
+            Share (<<percentiles_avg_share(decile)>>) ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
           grapher_config:
             title: |-
               {macros}
-              Income share of the <<percentiles_avg_share(decile) | lower>> ({definitions.title_welfare_type})
+              Income share of the <<percentiles_avg_share(decile) | lower>> ({definitions.welfare_type})
             subtitle: |-
               {macros}
               The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.subtitle_welfare_type}
@@ -902,7 +895,7 @@ tables:
         display:
           name: |-
             {macros}
-            Threshold (<<percentiles_thr(decile)>>)
+            Threshold (<<percentiles_thr(decile)>>) ({definitions.welfare_type})
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
@@ -937,12 +930,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Gini coefficient
+          name: Gini coefficient ({definitions.welfare_type})
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Gini coefficient ({definitions.title_welfare_type})"
+            title: "Gini coefficient ({definitions.welfare_type})"
             subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type}
             note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
@@ -966,12 +959,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Palma ratio
+          name: Palma ratio ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Palma ratio ({definitions.title_welfare_type})"
+            title: "Palma ratio ({definitions.welfare_type})"
             subtitle: |-
               The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type}
             note: "{definitions.note_equivalence_scale}"
@@ -996,7 +989,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: P50/P10 ratio
+          name: P50/P10 ratio ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1010,7 +1003,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: P90/P10 ratio
+          name: P90/P10 ratio ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1024,7 +1017,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: P90/P50 ratio
+          name: P90/P50 ratio ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1038,12 +1031,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Share (bottom 50%)
+          name: Share (bottom 50%) ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Income share of the poorest 50% ({definitions.title_welfare_type})"
+            title: "Income share of the poorest 50% ({definitions.welfare_type})"
             subtitle: "The share of income received by the poorest 50% of the population. {definitions.subtitle_welfare_type}"
             note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
@@ -1067,12 +1060,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Share (top 10%)
+          name: Share (top 10%) ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Income share of the richest 10% ({definitions.title_welfare_type})"
+            title: "Income share of the richest 10% ({definitions.welfare_type})"
             subtitle: "The share of income received by the richest 10% of the population. {definitions.subtitle_welfare_type}"
             note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
@@ -1096,7 +1089,7 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Share (middle 40%)
+          name: Share (middle 40%) ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1110,12 +1103,12 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_equivalence_scale}"
         display:
-          name: Share of population in relative poverty
+          name: Share of population in relative poverty ({definitions.welfare_type})
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Share of population in relative poverty ({definitions.title_welfare_type})"
+            title: "Share of population in relative poverty ({definitions.welfare_type})"
             subtitle: "The share of the population with income below 50% of the median. Relative poverty reflects the extent of inequality within the bottom of the distribution. {definitions.description_short_welfare_type}"
             note: "{definitions.note_equivalence_scale}"
             hasMapTab: true

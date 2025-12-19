@@ -65,13 +65,20 @@ def run() -> None:
                 "view_config": {
                     "hideRelativeToggle": "false",
                     "selectedFacetStrategy": "entity",
+                    "hasMapTab": "false",
+                    "type": "LineChart",
                 },
             },
             {
                 "dimension": "poverty_line",
                 "choices": ["1", "2", "5", "10", "20", "30", "40"],
                 "choice_new_slug": "multiple_lines",
-                "view_config": {"hideRelativeToggle": "false", "selectedFacetStrategy": "entity"},
+                "view_config": {
+                    "hideRelativeToggle": "false",
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": "false",
+                    "type": "LineChart",
+                },
             },
         ]
     )
@@ -106,6 +113,7 @@ def run() -> None:
                                 .replace(" (before tax)", " (after vs. before tax)")
                                 .replace(" (after tax)", " (after vs. before tax)")
                             )
+
                         if col_meta.presentation.grapher_config.get("subtitle"):
                             view.config["subtitle"] = col_meta.presentation.grapher_config["subtitle"]
 
