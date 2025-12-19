@@ -1,7 +1,7 @@
 #
-#  owid.catalog.client.datasets
+#  owid.catalog.client.tables
 #
-#  Datasets API for querying and loading from the OWID catalog.
+#  Tables API for querying and loading tables from the OWID catalog.
 #
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 import numpy as np
 import numpy.typing as npt
 
-from .models import DatasetResult, ResultSet
+from .models import ResultSet, TableResult
 
 if TYPE_CHECKING:
     from ..catalogs import RemoteCatalog
@@ -27,11 +27,11 @@ PREFERRED_FORMAT = "feather"
 SUPPORTED_FORMATS = ["feather", "parquet", "csv"]
 
 
-class DatasetsAPI:
-    """API for querying and loading datasets from the OWID catalog.
+class TablesAPI:
+    """API for querying and loading tables from the OWID catalog.
 
-    Provides methods to search for datasets by various criteria and
-    load tables directly from the catalog.
+    Provides methods to search for tables by various criteria and
+    load table data directly from the catalog.
 
     Example:
         ```python
@@ -39,19 +39,19 @@ class DatasetsAPI:
 
         client = Client()
 
-        # Search for datasets
-        results = client.datasets.search(table="population", namespace="un")
+        # Search for tables
+        results = client.tables.search(table="population", namespace="un")
 
         # Load the first result
-        table = results[0].load()
+        table = results[0].data
 
         # Fetch metadata by path (without loading data)
-        dataset = client.datasets.fetch("garden/un/2024/population/population")
-        print(f"Dataset: {dataset.dataset}, Version: {dataset.version}")
-        table = dataset.load()  # Load when needed
+        table_result = client.tables.fetch("garden/un/2024/population/population")
+        print(f"Dataset: {table_result.dataset}, Version: {table_result.version}")
+        table = table_result.data  # Lazy-load when needed
 
         # Direct path access (loads data immediately)
-        table = client.datasets["garden/un/2024-07-11/population/population"]
+        table = client.tables["garden/un/2024-07-11/population/population"]
         ```
     """
 
@@ -85,8 +85,8 @@ class DatasetsAPI:
         dataset: str | None = None,
         channel: str | None = None,
         channels: Iterable[str] = ("garden",),
-    ) -> ResultSet[DatasetResult]:
-        """Search the catalog for datasets matching criteria.
+    ) -> ResultSet[TableResult]:
+        """Search the catalog for tables matching criteria.
 
         Args:
             table: Table name pattern (substring match).
@@ -97,28 +97,28 @@ class DatasetsAPI:
             channels: List of channels to search (default: garden only).
 
         Returns:
-            SearchResults containing DatasetResult objects.
+            SearchResults containing TableResult objects.
 
         Example:
             ```python
             # Search by table name
-            results = client.datasets.search(table="population")
+            results = client.tables.search(table="population")
 
             # Filter by namespace and version
-            results = client.datasets.search(
+            results = client.tables.search(
                 table="gdp",
                 namespace="worldbank",
                 version="2024-01-15"
             )
 
             # Search multiple channels
-            results = client.datasets.search(
+            results = client.tables.search(
                 table="co2",
                 channels=["garden", "meadow"]
             )
 
             # Load a specific result
-            table = results[0].load()
+            table = results[0].data
             ```
         """
         catalog = self._get_catalog(channels)
@@ -140,7 +140,7 @@ class DatasetsAPI:
 
         matches = frame[criteria]
 
-        # Convert to DatasetResult objects
+        # Convert to TableResult objects
         results = []
         for _, row in matches.iterrows():
             dimensions = row.get("dimensions", [])
@@ -159,7 +159,7 @@ class DatasetsAPI:
                 formats = list(formats_raw) if hasattr(formats_raw, "__iter__") else []
 
             results.append(
-                DatasetResult(
+                TableResult(
                     table=row["table"],
                     dataset=row["dataset"],
                     version=str(row["version"]),
@@ -178,29 +178,35 @@ class DatasetsAPI:
             total=len(results),
         )
 
-    def fetch(self, path: str) -> DatasetResult:
-        """Fetch dataset metadata by catalog path (without loading data).
+    def fetch(self, path: str, *, load_data: bool = False) -> TableResult:
+        """Fetch table metadata by catalog path (without loading data).
 
-        Returns metadata about the dataset. Use .load() on the result to
-        actually load the table data.
+        Returns metadata about the table. Access .data property on the result to
+        lazy-load the table data.
 
         Args:
             path: Full catalog path (e.g., "garden/un/2024/population/population").
+            load_data: If True, preload table data immediately.
+                       If False (default), data is loaded lazily when accessed via .data property.
 
         Returns:
-            DatasetResult with metadata. Call .load() to get the table.
+            TableResult with metadata. Access .data to get the table.
 
         Raises:
-            ValueError: If dataset not found.
+            ValueError: If table not found.
 
         Example:
             ```python
             # Get metadata without loading data
-            result = client.datasets.fetch("garden/un/2024/population/population")
+            result = client.tables.fetch("garden/un/2024/population/population")
             print(f"Dataset: {result.dataset}, Version: {result.version}")
 
             # Load data when needed
-            table = result.load()
+            table = result.data
+
+            # Or preload data immediately
+            result = client.tables.fetch(path, load_data=True)
+            table = result.data  # Already loaded
             ```
         """
         # Parse path: channel/namespace/version/dataset/table
@@ -221,10 +227,16 @@ class DatasetsAPI:
         )
 
         if len(results) == 0:
-            raise ValueError(f"Dataset not found: {path}")
+            raise ValueError(f"Table not found: {path}")
 
-        # Return first match (should be exact)
-        return results[0]
+        # Get first match (should be exact)
+        result = results[0]
+
+        # Preload data if requested
+        if load_data:
+            _ = result.data  # Access property to trigger loading
+
+        return result
 
     def __getitem__(self, path: str) -> "Table":
         """Load a table by its catalog path.
@@ -240,7 +252,7 @@ class DatasetsAPI:
 
         Example:
             ```python
-            table = client.datasets["garden/un/2024-07-11/population/population"]
+            table = client.tables["garden/un/2024-07-11/population/population"]
             ```
         """
         return self._load_table(path)
@@ -253,11 +265,11 @@ class DatasetsAPI:
     ) -> "Table":
         """Load a table from the catalog by path.
 
-        Internal method used by DatasetResult.load() and __getitem__.
+        Internal method used by TableResult._load() and __getitem__.
         """
         from ..tables import Table
 
-        base_uri = DatasetsAPI.CATALOG_URI
+        base_uri = TablesAPI.CATALOG_URI
         uri = "/".join([base_uri.rstrip("/"), path])
 
         # Determine format preference
@@ -276,7 +288,7 @@ class DatasetsAPI:
 
                 # Handle private files
                 if not is_public:
-                    table_uri = DatasetsAPI._download_private_file(table_uri)
+                    table_uri = TablesAPI._download_private_file(table_uri)
 
                 return Table.read(table_uri)
             except Exception:
@@ -294,11 +306,11 @@ class DatasetsAPI:
         base, ext = os.path.splitext(parsed.path)
 
         s3_utils.download(
-            DatasetsAPI.S3_URI + base + ".meta.json",
+            TablesAPI.S3_URI + base + ".meta.json",
             tmpdir + "/data.meta.json",
         )
         s3_utils.download(
-            DatasetsAPI.S3_URI + base + ext,
+            TablesAPI.S3_URI + base + ext,
             tmpdir + "/data" + ext,
         )
 

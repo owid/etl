@@ -110,14 +110,16 @@ class IndicatorsAPI:
             total=data.get("total_results", len(results)),
         )
 
-    def fetch(self, indicator_id: int) -> IndicatorResult:
+    def fetch(self, indicator_id: int, *, load_data: bool = False) -> IndicatorResult:
         """Fetch a specific indicator by ID.
 
         Args:
             indicator_id: Unique indicator ID.
+            load_data: If True, preload indicator data immediately.
+                       If False (default), data is loaded lazily when accessed via .data property.
 
         Returns:
-            IndicatorResult with full details.
+            IndicatorResult with full details. Access .data to get the variable.
 
         Raises:
             ValueError: If indicator not found.
@@ -126,12 +128,19 @@ class IndicatorsAPI:
             ```python
             indicator = client.indicators.fetch(12345)
             print(f"Title: {indicator.title}")
-            table = indicator.load()
+            variable = indicator.data  # Lazy-loaded Variable
+
+            # Or preload data immediately
+            indicator = client.indicators.fetch(12345, load_data=True)
+            variable = indicator.data  # Already loaded
             ```
         """
         # Search by ID to find it
         results = self.search(str(indicator_id), limit=100)
         for r in results:
             if r.indicator_id == indicator_id:
+                # Preload data if requested
+                if load_data:
+                    _ = r.data  # Access property to trigger loading
                 return r
         raise ValueError(f"Indicator {indicator_id} not found")

@@ -15,18 +15,23 @@ Example:
     # Charts API - fetch and search for published charts
     df = client.charts.get_data("life-expectancy")
     chart = client.charts.fetch("life-expectancy")  # Fetch specific chart
+    df = chart.data  # Lazy-load data via property
     results = client.charts.search("gdp per capita")  # Search for charts
 
     # Indicators API - semantic search for indicators
     indicators = client.indicators.search("renewable energy")
     indicator = client.indicators.fetch(12345)  # Fetch by ID
-    table = indicators[0].load()
+    variable = indicator.data  # Returns Variable (Series), not Table
+    table = indicator.table  # Access full table if needed
 
-    # Datasets API - query and load from catalog
-    results = client.datasets.search(table="population", namespace="un")
-    dataset = client.datasets.fetch("garden/un/2024/pop/pop")  # Fetch metadata
-    table = results[0].load()
-    table = client.datasets["garden/un/2024/population/population"]  # Direct access
+    # Tables API - query and load from catalog
+    results = client.tables.search(table="population", namespace="un")
+    table_result = client.tables.fetch("garden/un/2024/pop/pop")  # Fetch metadata
+    table = table_result.data  # Lazy-load table data
+    table = client.tables["garden/un/2024/population/population"]  # Direct access
+
+    # Backwards compatibility: client.datasets still works (deprecated)
+    results = client.datasets.search(table="population")  # Works, but use .tables instead
 
     # Advanced: Search pages/articles
     pages = client._site_search.pages("climate change")
@@ -36,16 +41,20 @@ Example:
 from __future__ import annotations
 
 from .charts import ChartNotFoundError, ChartsAPI, LicenseError
-from .datasets import DatasetsAPI
 from .indicators import IndicatorsAPI
 from .models import (
     ChartResult,
-    DatasetResult,
     IndicatorResult,
     PageSearchResult,
     ResultSet,
+    TableResult,
 )
 from .search import SiteSearchAPI
+from .tables import TablesAPI
+
+# Backwards compatibility aliases
+DatasetResult = TableResult
+DatasetsAPI = TablesAPI
 
 
 class Client:
@@ -55,12 +64,13 @@ class Client:
 
     - ChartsAPI: Fetch and search for published charts
     - IndicatorsAPI: Semantic search for data indicators
-    - DatasetsAPI: Query and load from the data catalog
+    - TablesAPI: Query and load tables from the data catalog
 
     Attributes:
         charts: ChartsAPI instance for chart operations and search.
         indicators: IndicatorsAPI instance for indicator search.
-        datasets: DatasetsAPI instance for catalog operations.
+        tables: TablesAPI instance for catalog operations.
+        datasets: Deprecated alias for tables (backwards compatibility).
 
     Example: test
         ```python
@@ -78,38 +88,47 @@ class Client:
         indicators = client.indicators.search("solar energy")
         indicator = client.indicators.fetch(12345)  # Fetch by ID
 
-        # Datasets API
-        results = client.datasets.search(table="population", namespace="un")
-        dataset = client.datasets.fetch("garden/un/2024/pop/pop")  # Fetch metadata
-        table = results[0].load()  # Load data
+        # Tables API
+        results = client.tables.search(table="population", namespace="un")
+        table_result = client.tables.fetch("garden/un/2024/pop/pop")  # Fetch metadata
+        table = results[0].data  # Lazy-load data
         ```
     """
 
     charts: ChartsAPI
     indicators: IndicatorsAPI
-    datasets: DatasetsAPI
+    tables: TablesAPI
+    datasets: TablesAPI  # Backwards compatibility alias
     _site_search: SiteSearchAPI
 
     def __init__(self) -> None:
         """Initialize the client with all API interfaces."""
         self.charts = ChartsAPI(self)
         self.indicators = IndicatorsAPI(self)
-        self.datasets = DatasetsAPI(self)
+        self.tables = TablesAPI(self)
+        self.datasets = self.tables  # Backwards compatibility alias
         self._site_search = SiteSearchAPI(self)
 
     def __repr__(self) -> str:
-        return "Client(charts=..., indicators=..., datasets=...)"
+        return "Client(charts=..., indicators=..., tables=...)"
 
 
 __all__ = [
     # Main client
     "Client",
+    # API classes
+    "TablesAPI",
+    "ChartsAPI",
+    "IndicatorsAPI",
     # Result types for type hints
     "ChartResult",
     "PageSearchResult",
     "IndicatorResult",
-    "DatasetResult",
+    "TableResult",
     "ResultSet",
+    # Backwards compatibility aliases (deprecated)
+    "DatasetResult",  # Alias for TableResult
+    "DatasetsAPI",  # Alias for TablesAPI
     # Exceptions for error handling
     "ChartNotFoundError",
     "LicenseError",

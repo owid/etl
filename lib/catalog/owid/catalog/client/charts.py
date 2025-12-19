@@ -110,33 +110,45 @@ class ChartsAPI:
         slug = self._parse_slug(slug_or_url)
         return self._fetch_config(slug)
 
-    def fetch(self, slug_or_url: str) -> ChartResult:
+    def fetch(self, slug_or_url: str, *, load_data: bool = False) -> ChartResult:
         """Fetch a chart with all its metadata and config.
 
         Args:
             slug_or_url: Chart slug or full URL.
+            load_data: If True, preload chart data immediately.
+                       If False (default), data is loaded lazily when accessed via .data property.
 
         Returns:
-            ChartResult with metadata, config, and get_data() method.
+            ChartResult with metadata, config, and data loading capability.
 
         Example:
             ```python
             chart = client.charts.fetch("life-expectancy")
             print(chart.title)
-            df = chart.get_data()
+            df = chart.data  # Lazy-loaded via property
+
+            # Or preload data immediately
+            chart = client.charts.fetch("life-expectancy", load_data=True)
+            df = chart.data  # Already loaded
             ```
         """
         slug = self._parse_slug(slug_or_url)
         config = self._fetch_config(slug)
         metadata = self._fetch_metadata(slug)
 
-        return ChartResult(
+        result = ChartResult(
             slug=slug,
             title=config.get("title", ""),
             url=f"{self.BASE_URL}/{slug}",
             config=config,
             metadata=metadata,
         )
+
+        # Preload data if requested
+        if load_data:
+            _ = result.data  # Access property to trigger loading
+
+        return result
 
     def search(
         self,

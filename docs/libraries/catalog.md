@@ -29,7 +29,7 @@ The unified client for accessing OWID data through various APIs.
       show_root_heading: true
 
 
-::: owid.catalog.client.datasets
+::: owid.catalog.client.tables
     options:
       heading_level: 3
       show_root_heading: true
@@ -44,7 +44,7 @@ The unified client for accessing OWID data through various APIs.
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.models.DatasetResult
+::: owid.catalog.client.models.TableResult
     options:
       heading_level: 3
       show_root_heading: true
@@ -58,6 +58,9 @@ The unified client for accessing OWID data through various APIs.
     options:
       heading_level: 3
       show_root_heading: true -->
+
+<!-- Note: The old DatasetsAPI has been renamed to TablesAPI for better clarity.
+For backwards compatibility, client.datasets still works as an alias to client.tables. -->
 
 ## Legacy API
 <!-- LEGACY BELOW  -->

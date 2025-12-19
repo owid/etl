@@ -7,11 +7,12 @@ from owid.catalog import Client
 from owid.catalog.client import (
     ChartNotFoundError,
     ChartResult,
-    DatasetResult,
+    DatasetResult,  # Backwards compatibility alias
     IndicatorResult,
     LicenseError,
     PageSearchResult,
     ResultSet,
+    TableResult,
 )
 
 
@@ -23,7 +24,8 @@ class TestClient:
         assert hasattr(client, "charts")
         assert hasattr(client, "_site_search")
         assert hasattr(client, "indicators")
-        assert hasattr(client, "datasets")
+        assert hasattr(client, "tables")
+        assert hasattr(client, "datasets")  # Backwards compatibility
 
     def test_client_repr(self):
         client = Client()
@@ -198,28 +200,28 @@ class TestIndicatorsAPI:
             client.indicators.fetch(999999999)
 
 
-class TestDatasetsAPI:
-    """Test the Datasets API."""
+class TestTablesAPI:
+    """Test the Tables API."""
 
-    def test_search_datasets(self):
+    def test_search_tables(self):
         client = Client()
-        results = client.datasets.search(table="population")
+        results = client.tables.search(table="population")
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
-        assert all(isinstance(r, DatasetResult) for r in results)
+        assert all(isinstance(r, TableResult) for r in results)
 
-    def test_search_datasets_by_namespace(self):
+    def test_search_tables_by_namespace(self):
         client = Client()
-        results = client.datasets.search(table="population", namespace="un")
+        results = client.tables.search(table="population", namespace="un")
 
         assert isinstance(results, ResultSet)
         assert len(results) > 0
         assert all(r.namespace == "un" for r in results)
 
-    def test_dataset_results_to_catalog_frame(self):
+    def test_table_results_to_catalog_frame(self):
         client = Client()
-        results = client.datasets.search(table="population", namespace="un")
+        results = client.tables.search(table="population", namespace="un")
 
         frame = results.to_catalog_frame()
         assert "table" in frame.columns
@@ -229,40 +231,54 @@ class TestDatasetsAPI:
         # Should be loadable
         assert hasattr(frame, "load")
 
-    def test_fetch_dataset(self):
-        """Test fetching dataset metadata by path."""
+    def test_fetch_table(self):
+        """Test fetching table metadata by path."""
         client = Client()
         # First search to find a path
-        results = client.datasets.search(table="population", namespace="un")
+        results = client.tables.search(table="population", namespace="un")
         if len(results) > 0:
             path = results[0].path
             # Now fetch by path (should return same metadata)
-            dataset = client.datasets.fetch(path)
-            assert isinstance(dataset, DatasetResult)
-            assert dataset.path == path
-            assert dataset.table
-            assert dataset.dataset
-            assert dataset.namespace == "un"
+            table_result = client.tables.fetch(path)
+            assert isinstance(table_result, TableResult)
+            assert table_result.path == path
+            assert table_result.table
+            assert table_result.dataset
+            assert table_result.namespace == "un"
 
     def test_fetch_invalid_path(self):
         """Test that fetching with invalid path format raises error."""
         client = Client()
         with pytest.raises(ValueError, match="Invalid path format"):
-            client.datasets.fetch("invalid/path")
+            client.tables.fetch("invalid/path")
 
-    def test_fetch_nonexistent_dataset(self):
-        """Test that fetching non-existent dataset raises error."""
+    def test_fetch_nonexistent_table(self):
+        """Test that fetching non-existent table raises error."""
         client = Client()
         with pytest.raises(ValueError, match="not found"):
-            client.datasets.fetch("garden/fake/2024-01-01/fake/fake")
+            client.tables.fetch("garden/fake/2024-01-01/fake/fake")
 
     def test_direct_path_access(self):
         # This test may be slow as it loads actual data
         # Uncomment to test:
         # client = Client()
-        # table = client.datasets["garden/un/2024-07-11/un_wpp/population"]
+        # table = client.tables["garden/un/2024-07-11/un_wpp/population"]
         # assert table is not None
         pass
+
+    def test_backwards_compatibility_datasets(self):
+        """Test that client.datasets still works (backwards compatibility)."""
+        client = Client()
+
+        # Should work via datasets attribute
+        results = client.datasets.search(table="population")
+        assert len(results) > 0
+
+        # Verify it's the same as tables
+        assert client.datasets is client.tables
+
+        # DatasetResult should work as alias
+        assert DatasetResult is TableResult
 
 
 class TestResultSet:
@@ -318,8 +334,8 @@ class TestDataclassModels:
         assert result.indicator_id == 123
         assert result.score == 0.95
 
-    def test_dataset_result(self):
-        result = DatasetResult(
+    def test_table_result(self):
+        result = TableResult(
             table="population",
             dataset="un_wpp",
             version="2024-07-11",
@@ -330,3 +346,17 @@ class TestDataclassModels:
 
         assert result.table == "population"
         assert result.namespace == "un"
+
+    def test_dataset_result_alias(self):
+        """Test that DatasetResult is an alias for TableResult."""
+        result = DatasetResult(
+            table="population",
+            dataset="un_wpp",
+            version="2024-07-11",
+            namespace="un",
+            channel="garden",
+            path="garden/un/2024-07-11/un_wpp/population",
+        )
+
+        assert isinstance(result, TableResult)
+        assert result.table == "population"

@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Generic, Iterator, TypeVar
 
 import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 if TYPE_CHECKING:
     from ..catalogs import CatalogFrame
@@ -54,6 +54,20 @@ class ChartResult(BaseModel):
     subtitle: str = ""
     available_entities: list[str] = Field(default_factory=list)
     num_related_articles: int = 0
+
+    # Private cached data field
+    _data: pd.DataFrame | None = PrivateAttr(default=None)
+
+    @property
+    def data(self) -> pd.DataFrame:
+        """Lazy-load chart data. Data is cached after first access.
+
+        Returns:
+            DataFrame with chart data. Metadata is available in df.attrs.
+        """
+        if self._data is None:
+            self._data = self.get_data()
+        return self._data
 
     def get_data(self) -> pd.DataFrame:
         """Fetch the data for this chart.
@@ -115,22 +129,44 @@ class IndicatorResult(BaseModel):
     column_name: str = ""
     unit: str = ""
     n_charts: int = 0
+    _table: "Table | None" = PrivateAttr(default=None)
 
-    def load(self) -> "Table":
-        """Load the table containing this indicator.
+    @property
+    def data(self) -> "Variable":
+        """Lazy-load indicator data as a Variable (Series). Data is cached after first access.
 
         Returns:
-            Table object with the indicator data.
+            Variable object (pandas Series subclass) with the indicator data.
         """
-        from .datasets import DatasetsAPI
+        from ..variables import Variable
+
+        if self._table is None:
+            self._table = self._load()
+        # Extract the specific column/variable
+        return self._table[self.column_name]  # type: ignore
+
+    @property
+    def table(self) -> "Table":
+        """Lazy-load the full table containing this indicator.
+
+        Returns:
+            Table object with all columns including this indicator.
+        """
+        if self._table is None:
+            self._table = self._load()
+        return self._table
+
+    def _load(self) -> "Table":
+        """Internal method to load the table containing this indicator."""
+        from .tables import TablesAPI
 
         # Parse catalog_path: "grapher/namespace/version/dataset/table#column"
         path_part, _, _ = self.catalog_path.partition("#")
-        return DatasetsAPI._load_table(path_part)
+        return TablesAPI._load_table(path_part)
 
 
-class DatasetResult(BaseModel):
-    """A dataset found in the catalog.
+class TableResult(BaseModel):
+    """A table found in the catalog.
 
     Attributes:
         table: Table name.
@@ -157,16 +193,24 @@ class DatasetResult(BaseModel):
     is_public: bool = True
     dimensions: list[str] = Field(default_factory=list)
     formats: list[str] = Field(default_factory=list)
+    _data: "Table | None" = PrivateAttr(default=None)
 
-    def load(self) -> "Table":
-        """Load this table from the catalog.
+    @property
+    def data(self) -> "Table":
+        """Lazy-load table data. Data is cached after first access.
 
         Returns:
             Table object with data and metadata.
         """
-        from .datasets import DatasetsAPI
+        if self._data is None:
+            self._data = self._load()
+        return self._data
 
-        return DatasetsAPI._load_table(self.path, formats=self.formats, is_public=self.is_public)
+    def _load(self) -> "Table":
+        """Internal method to load table data."""
+        from .tables import TablesAPI
+
+        return TablesAPI._load_table(self.path, formats=self.formats, is_public=self.is_public)
 
 
 class ResultSet(BaseModel, Generic[T]):
@@ -223,7 +267,7 @@ class ResultSet(BaseModel, Generic[T]):
     def to_catalog_frame(self) -> "CatalogFrame":
         """Convert to CatalogFrame for backwards compatibility.
 
-        Only works for DatasetResult and IndicatorResult types.
+        Only works for TableResult and IndicatorResult types.
 
         Returns:
             CatalogFrame that can use .load() method.
@@ -236,7 +280,7 @@ class ResultSet(BaseModel, Generic[T]):
 
         # Check result type
         first = self.results[0]
-        if isinstance(first, DatasetResult):
+        if isinstance(first, TableResult):
             rows = []
             for r in self.results:
                 rows.append(
