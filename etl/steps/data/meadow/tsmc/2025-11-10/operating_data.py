@@ -3,7 +3,7 @@
 import pandas as pd
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -41,7 +41,7 @@ def extract_section(df: pd.DataFrame, start_row: int, end_row: int, quarters: li
     return pd.DataFrame(results)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """Load snapshot and create meadow dataset."""
     # Load inputs.
     snap = paths.load_snapshot("operating_data.xlsx")
@@ -127,5 +127,5 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["date", "year", "category", "metric"])
 
     # Save outputs.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True)
     ds_meadow.save()

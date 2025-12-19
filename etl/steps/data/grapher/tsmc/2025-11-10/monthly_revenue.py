@@ -1,12 +1,12 @@
 """Load garden dataset and create grapher views."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """Create grapher dataset."""
     # Load garden dataset.
     ds_garden = paths.load_dataset("monthly_revenue")
@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     tb_yearly = tb_yearly.set_index(["country", "year"])
 
     # Save outputs.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[tb_monthly, tb_yearly], check_variables_metadata=True, default_metadata=ds_garden.metadata
+    ds_grapher = paths.create_dataset(
+        tables=[tb_monthly, tb_yearly], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
     ds_grapher.save()

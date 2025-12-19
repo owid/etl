@@ -1,12 +1,12 @@
 """Load meadow dataset and create garden dataset with enhanced indicators."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """Create garden dataset with additional calculated indicators."""
     # Load inputs.
     ds_meadow = paths.load_dataset("monthly_revenue")
@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     tb_yearly = ds_meadow.read("tsmc_yearly_revenue", reset_index=False)
 
     # Save outputs.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_monthly, tb_yearly], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=[tb_monthly, tb_yearly], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
     ds_garden.save()
