@@ -116,9 +116,6 @@ class CatalogMixin:
             results = find(dataset="wrld bank", fuzzy=True, threshold=60)
             ```
         """
-        if table and dataset:
-            raise ValueError("Cannot specify both 'table' and 'dataset' arguments")
-
         # Step 1: Apply exact match filters (namespace, version, channel)
         criteria: npt.NDArray[np.bool_] = np.ones(len(self.frame), dtype=bool)
 
@@ -135,14 +132,17 @@ class CatalogMixin:
                 )
             criteria &= self.frame.channel == channel
 
-        # Step 2: Apply text field filter (table or dataset)
+        # Step 2: Apply text field filters (table and/or dataset)
         scores: npt.NDArray[np.float64] | None = None
         if table:
-            scores = _match_score(self.frame.table, table, fuzzy, case, regex)
-            criteria &= scores >= threshold
-        elif dataset:
-            scores = _match_score(self.frame.dataset, dataset, fuzzy, case, regex)
-            criteria &= scores >= threshold
+            table_scores = _match_score(self.frame.table, table, fuzzy, case, regex)
+            criteria &= table_scores >= threshold
+            scores = table_scores
+        if dataset:
+            dataset_scores = _match_score(self.frame.dataset, dataset, fuzzy, case, regex)
+            criteria &= dataset_scores >= threshold
+            # Average scores if both table and dataset are specified
+            scores = dataset_scores if scores is None else (scores + dataset_scores) / 2
 
         # Step 3: Build result
         matches = self.frame[criteria]
