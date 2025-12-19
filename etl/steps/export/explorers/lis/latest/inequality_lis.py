@@ -8,12 +8,11 @@ paths = PathFinder(__file__)
 
 # Define indicators to use
 INDICATOR_NAMES = [
-    "headcount_ratio",
-    "headcount",
-    "total_shortfall",
-    "avg_shortfall",
-    "income_gap_ratio",
-    "poverty_gap_index",
+    "gini",
+    "share_top_10",
+    "share_bottom_50",
+    "palma_ratio",
+    "share_below_50pct_median",
 ]
 
 # Define texts to modify
@@ -22,6 +21,8 @@ AFTER_TAX_TITLE = "(after tax)"
 AFTER_VS_BEFORE_TAX_TITLE = "(after vs. before tax)"
 BEFORE_TAX_SUBTITLE = "Income here is measured before taxes and benefits."
 AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
+BEFORE_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income before taxes and benefits."
+AFTER_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income after taxes and benefits."
 
 EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
@@ -36,14 +37,14 @@ def run() -> None:
 
     # Load grapher dataset.
     ds = paths.load_dataset("luxembourg_income_study")
-    tb = ds.read("poverty", load_data=False)
+    tb = ds.read("inequality", load_data=False)
 
     #
     # Create collection object
     #
     c = paths.create_collection(
         config=config,
-        short_name="poverty-lis",
+        short_name="inequality-lis",
         tb=tb,
         indicator_names=INDICATOR_NAMES,
         # dimensions=DIMENSIONS_CONFIG,
@@ -61,17 +62,6 @@ def run() -> None:
             {
                 "dimension": "welfare_type",
                 "choice_new_slug": "after_vs_before_tax",
-                "view_config": {
-                    "hideRelativeToggle": "false",
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": "false",
-                    "type": "LineChart",
-                },
-            },
-            {
-                "dimension": "poverty_line",
-                "choices": ["1", "2", "5", "10", "20", "30", "40"],
-                "choice_new_slug": "multiple_lines",
                 "view_config": {
                     "hideRelativeToggle": "false",
                     "selectedFacetStrategy": "entity",
@@ -125,6 +115,8 @@ def run() -> None:
                                 view.config["subtitle"]
                                 .replace(f" {AFTER_TAX_SUBTITLE}", "")
                                 .replace(f" {BEFORE_TAX_SUBTITLE}", "")
+                                .replace(f" {BEFORE_TAX_INEQUALITY_SUBTITLE}", "")
+                                .replace(f" {AFTER_TAX_INEQUALITY_SUBTITLE}", "")
                             )
 
         # Add equivalence scale subtitle when equivalence_scale is "square root"
@@ -168,8 +160,7 @@ def run() -> None:
 
         # Set default view
         if (
-            view.dimensions["indicator"] == "headcount_ratio"
-            and view.dimensions["poverty_line"] == "30"
+            view.dimensions["indicator"] == "gini"
             and view.dimensions["welfare_type"] == "dhi"
             and view.dimensions["equivalence_scale"] == "per capita"
         ):
