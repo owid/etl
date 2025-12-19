@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.collection.model.dimension import DimensionPresentation
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -56,6 +57,11 @@ def run() -> None:
         explorer=True,
     )
 
+    # Make the equivalence_scale dimension a checkbox
+    for dimension in c.dimensions:
+        if dimension.slug == "equivalence_scale":
+            dimension.presentation = DimensionPresentation(type="checkbox", choice_slug_true="square root")
+
     # Add After tax vs. Before tax dimension
     c.group_views(
         groups=[
@@ -87,12 +93,16 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        if view.dimensions["welfare_type"] == "after_vs_before_tax":
-            # Initialize config if it's None
-            if view.config is None:
-                view.config = {}
+        # Initialize config if it's None
+        if view.config is None:
+            view.config = {}
 
-            # Generate title from first indicator's display name (which already excludes tax info)
+        if view.dimensions["welfare_type"] in ["dhi", "mi"]:
+            # Set tab as map
+            view.config["tab"] = "map"
+
+        if view.dimensions["welfare_type"] == "after_vs_before_tax":
+            # Generate title from first indicator's display name
             # Get the catalog path of the first indicator
             if view.indicators.y:
                 first_indicator_path = view.indicators.y[0].catalogPath
@@ -127,12 +137,10 @@ def run() -> None:
         # Set default view
         if (
             view.dimensions["indicator"] == "headcount_ratio"
-            and view.dimensions["poverty_line"] == "5"
+            and view.dimensions["poverty_line"] == "30"
             and view.dimensions["welfare_type"] == "dhi"
             and view.dimensions["equivalence_scale"] == "per capita"
         ):
-            if view.config is None:
-                view.config = {}
             view.config["defaultView"] = True
 
     #

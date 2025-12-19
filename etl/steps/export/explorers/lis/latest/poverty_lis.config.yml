@@ -75,9 +75,8 @@ dimensions:
         name: "Before tax"
       - slug: "after_vs_before_tax"
         name: "After vs. before tax"
-  - name: Equivalized income
+  - name: Adjust for cost sharing within households (equivalized income)
     slug: equivalence_scale
-    description: Adjust for cost sharing within households
     choices:
       - slug: "per capita"
         name: "Per capita"
