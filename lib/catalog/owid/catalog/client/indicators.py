@@ -32,7 +32,7 @@ class IndicatorsAPI:
         for ind in results:
             print(f"{ind.title} (score: {ind.score:.2f})")
 
-        # Load the top result's table
+        # Load the table that contains the indicator of interest
         table = results[0].load()
 
         # Fetch specific indicator by ID
