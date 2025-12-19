@@ -16,16 +16,41 @@ dimensions:
   - name: Indicator
     slug: indicator
     choices:
-      - slug: gini
-        name: Gini coefficient
-      - slug: share_top_10
-        name: Share of the richest 10%
-      - slug: share_bottom_50
-        name: Share of the poorest 50%
-      - slug: palma_ratio
-        name: Palma ratio
-      - slug: share_below_50pct_median
-        name: Share in relative poverty
+      - slug: mean
+        name: Mean income
+      - slug: median
+        name: Median income
+      - slug: avg
+        name: Mean income, by decile
+      - slug: thr
+        name: Decile thresholds
+      - slug: share
+        name: Decile shares
+  - name: Decile
+    slug: decile
+    choices:
+      - slug: "1"
+        name: "1 (poorest)"
+      - slug: "2"
+        name: "2"
+      - slug: "3"
+        name: "3"
+      - slug: "4"
+        name: "4"
+      - slug: "5"
+        name: "5"
+      - slug: "6"
+        name: "6"
+      - slug: "7"
+        name: "7"
+      - slug: "8"
+        name: "8"
+      - slug: "9"
+        name: "9"
+      - slug: "10"
+        name: "10"
+      - slug: all
+        name: All deciles
   - name: Income measure
     slug: welfare_type
     choices:

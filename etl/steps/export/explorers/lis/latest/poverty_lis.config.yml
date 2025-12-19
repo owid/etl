@@ -12,13 +12,6 @@ config:
   isPublished: true
   # pickerColumnSlugs:
 
-
-default_dimensions:
-  indicator: headcount_ratio
-  poverty_line: "5"
-  welfare_type: "dhi"
-  equivalence_scale: "per capita"
-
 dimensions:
   - name: Indicator
     slug: indicator

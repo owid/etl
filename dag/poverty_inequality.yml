@@ -63,6 +63,8 @@ steps:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
   export://explorers/lis/latest/inequality_lis:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://explorers/lis/latest/incomes_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
 
     # Luxembourg Income Study (legacy)
   data://meadow/lis/2025-07-23/luxembourg_income_study:
