@@ -271,7 +271,7 @@ commands_subgroups = {
     ]
     for alias, subgroup in SUBGROUPS.items()
 }
-click.rich_click.COMMAND_GROUPS = {
+click.rich_click.COMMAND_GROUPS = {  # type: ignore[assignment]
     "etl": GROUPS,
     **commands_subgroups,
 }
