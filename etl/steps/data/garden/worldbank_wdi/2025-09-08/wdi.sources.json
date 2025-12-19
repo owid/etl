@@ -2593,5 +2593,50 @@
     "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
     "name": "ICP, Eurostat PPP Programme, and OECD PPP Programme, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "FAO electronic files and website, Food and Agriculture Organization of the United Nations (FAO), publisher: Food and Agriculture Organization of the United Nations (FAO)",
+    "name": "Food and Agriculture Organization of the United Nations (FAO), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "FAO electronic files and web site, Food and Agriculture Organization of the United Nations (FAO), uri: https://www.fao.org/faostat/en/#data/QCL, publisher: Food and Agriculture Organization of the United Nations (FAO)",
+    "name": "Food and Agriculture Organization of the United Nations (FAO), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "SIPRI Military Expenditure Database, Stockholm International Peace Research Institute (SIPRI), uri: https://www.sipri.org/databases",
+    "name": "Stockholm International Peace Research Institute (SIPRI), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Tracking SDG 7: The Energy Progress Report, International Energy Agency (IEA), International Renewable Energy Agency (IRENA), United Nations Statistical Division (UNSD), World Bank, World Health Organization (WHO), uri: https://trackingsdg7.esmap.org/, note: License: Creative Commons Attribution—NonCommercial 3.0 IGO (CC BY-NC 3.0 IGO), publisher: International Energy Agency (IEA), International Renewable Energy Agency (IRENA), United Nations Statistical Division (UNSD), World Bank, World Health Organization (WHO), date published: 2025-06;\nInternational Renewable Energy Agency (IRENA), note: Tracking SDG 7: The Energy Progress Report;\nUnited Nations (UN), note: Tracking SDG 7: The Energy Progress Report, publisher: UN Statistics Division;\nWorld Bank (WB), note: Tracking SDG 7: The Energy Progress Report;\nWorld Health Organization (WHO), note: Tracking SDG 7: The Energy Progress Report",
+    "name": "Tracking SDG 7: The Energy Progress Report, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Comtrade database, United Nations (UN), uri: comtrade.un.org, publisher: UN Statistics Division;\nWorld Integrated Trade Solution system (WITS), World Bank (WB), uri: https://wits.worldbank.org/",
+    "name": "United Nations Comtrade database and World Integrated Trade Solution (WITS), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Food and Agriculture Organization., Food and Agriculture Organization of the United Nations (FAO), publisher: Food and Agriculture Organization of the United Nations (FAO)",
+    "name": "Food and Agriculture Organization of the United Nations (FAO), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "FAO electronic files and web site, Food and Agriculture Organization of the United Nations (FAO), uri: https://www.fao.org/faostat/en/#data/QCL, note: Item code F1717, publisher: Food and Agriculture Organization of the United Nations (FAO)",
+    "name": "Food and Agriculture Organization of the United Nations (FAO), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene, World Health Organization (WHO), uri: washdata.org, publisher: WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene (washdata.org), date accessed: 2025-09-30, date published: 2025-08-25;\nUN Children's Fund (UNICEF), uri: washdata.org, note: WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene",
+    "name": "WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "The Changing Wealth of Nations, World Bank (WB), uri: https://www.worldbank.org/en/publication/changing-wealth-of-nations/data, note: World Bank staff estimates based on sources and methods described in the World Bank's The Changing Wealth of Nations., publisher: World Bank (WB);\nStaff estimates, World Bank (WB), note: World Bank staff estimates based on sources and methods described in the World Bank's The Changing Wealth of Nations.",
+    "name": "The Changing Wealth of Nations, World Bank staff estimates, via World Bank",
+    "dataPublisherSource": ""
   }
 ]
