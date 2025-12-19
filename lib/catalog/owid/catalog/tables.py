@@ -1151,7 +1151,7 @@ class Table(pd.DataFrame):
             return None
         else:
             # preserve metadata in _fields, calling reset_index() on a table drops it
-            t._fields = self._fields
+            t._fields = self._fields  # type: ignore
             # drop dimensions
             t.metadata.dimensions = None
             return t  # type: ignore
