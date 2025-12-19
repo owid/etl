@@ -338,26 +338,32 @@ definitions:
     {macros}
     <% if poverty_line in poverty_line_ipl %>
     [0, 3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    <%- elif poverty_line in ["40% of the median"] %>
+    <%- elif poverty_line in ["40% of the median"] and welfare_type == "dhi" %>
     [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
-    <%- elif poverty_line in ["50% of the median"] %>
+    <%- elif poverty_line in ["50% of the median"] and welfare_type == "dhi" %>
     [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
-    <%- elif poverty_line in ["60% of the median"] %>
+    <%- elif poverty_line in ["60% of the median"] and welfare_type == "dhi" %>
     [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- elif poverty_line in ["40% of the median"] and welfare_type == "mi" %>
+    [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- elif poverty_line in ["50% of the median"] and welfare_type == "mi" %>
+    [1000, 20, 25, 30, 35, 1]
+    <%- elif poverty_line in ["60% of the median"] and welfare_type == "mi" %>
+    [1000, 20, 25, 30, 35, 40, 1]
     <%- else %>
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
   map_brackets_headcount: &map_brackets_headcount <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
+    [0, 100_000, 300_000, 1_000_000, 3_000_000, 10_000_000, 30_000_000, 100_000_000, 1]
     <%- else %>
-    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
+    [0, 100_000, 300_000, 1_000_000, 3_000_000, 10_000_000, 30_000_000, 100_000_000, 300_000_000, 1]
     <%- endif %>
 
   map_brackets_total_shortfall: &map_brackets_total_shortfall |-
     {macros}
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
+    [0, 1_000_000_000, 3_000_000_000, 10_000_000_000, 30_000_000_000, 100_000_000_000, 1]
     <%- elif poverty_line in ["100"] %>
     [0, 1000000,3000000,10000000,30000000,100000000,300000000,1]
     <%- elif poverty_line in poverty_line_ipl %>
@@ -379,12 +385,12 @@ definitions:
   map_brackets_avg_shortfall: &map_brackets_avg_shortfall |-
     {macros}
     <% if poverty_line in ["40% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 1]
+    [0, 1, 2, 5, 10, 20, 1]
     <%- elif poverty_line in ["50% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 1]
+    [0, 1, 2, 5, 10, 20, 1]
     <%- elif poverty_line in ["60% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif poverty_line in ["100"] %>
+    [0, 1, 2, 5, 10, 20, 1]
+    <%- elif poverty_line in ["1"] %>
     [0, 0.2, 0.4, 0.6, 0.8, 1]
     <%- elif poverty_line in poverty_line_ipl %>
     [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, <<poverty_line|float/100>>]
@@ -392,17 +398,17 @@ definitions:
     [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, <<poverty_line|float/100>>]
     <%- elif poverty_line in poverty_line_umic %>
     [0, 1, 2, 3, 4, 5, 6, 7, <<poverty_line|float/100>>]
-    <%- elif poverty_line in ["500"] %>
+    <%- elif poverty_line in ["2"] %>
+    [0, 0.8, 0.8, 1.2, 1.6, 2]
+    <%- elif poverty_line in ["5"] %>
     [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
-    <%- elif poverty_line in ["700"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7]
-    <%- elif poverty_line in ["1000"] %>
+    <%- elif poverty_line in ["10"] %>
     [0, 2, 4 ,6, 8, 10]
-    <%- elif poverty_line in ["2000"] %>
+    <%- elif poverty_line in ["20"] %>
     [0, 2, 4 ,6, 8, 10, 12, 14, 16, 18, 20]
-    <%- elif poverty_line in ["3000"] %>
+    <%- elif poverty_line in ["30"] %>
     [0, 5, 10 , 15, 20, 25, 30]
-    <%- elif poverty_line in ["4000"] %>
+    <%- elif poverty_line in ["40"] %>
     [0, 5, 10 , 15, 20, 25, 30, 35, 40]
     <%- endif %>
 
@@ -644,7 +650,7 @@ tables:
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Average shortfall ($) - {definitions.poverty_line_a_day} ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: 2
           <<: *common_display
         presentation:
           grapher_config:
