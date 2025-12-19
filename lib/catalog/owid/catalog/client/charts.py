@@ -18,18 +18,6 @@ if TYPE_CHECKING:
     from . import Client
 
 
-class ChartNotFoundError(Exception):
-    """Raised when a chart does not exist."""
-
-    pass
-
-
-class LicenseError(Exception):
-    """Raised when chart data cannot be downloaded due to licensing."""
-
-    pass
-
-
 class ChartsAPI:
     """API for accessing OWID chart data and metadata.
 
@@ -270,3 +258,15 @@ class ChartsAPI:
 
         resp.raise_for_status()
         return resp.json()
+
+
+class ChartNotFoundError(Exception):
+    """Raised when a chart does not exist."""
+
+    pass
+
+
+class LicenseError(Exception):
+    """Raised when chart data cannot be downloaded due to licensing."""
+
+    pass

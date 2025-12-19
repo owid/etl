@@ -51,19 +51,18 @@ from .search import SiteSearchAPI
 class Client:
     """Unified client for all OWID data APIs.
 
-    Provides access to four main APIs:
+    Provides access to our main APIs:
 
-    - charts: Fetch and search for published charts
-    - indicators: Semantic search for data indicators
-    - datasets: Query and load from the data catalog
-    - _site_search: Internal site search (prefer using charts.search() or indicators.search())
+    - ChartsAPI: Fetch and search for published charts
+    - IndicatorsAPI: Semantic search for data indicators
+    - DatasetsAPI: Query and load from the data catalog
 
     Attributes:
         charts: ChartsAPI instance for chart operations and search.
         indicators: IndicatorsAPI instance for indicator search.
         datasets: DatasetsAPI instance for catalog operations.
 
-    Example:
+    Example: test
         ```python
         from owid.catalog.client import Client
 
@@ -71,8 +70,8 @@ class Client:
         client = Client()
 
         # Charts API
-        df = client.charts.get_data("life-expectancy")
         chart = client.charts.fetch("gdp")  # Fetch specific chart
+        df = client.charts.get_data("life-expectancy")
         results = client.charts.search("population")  # Search for charts
 
         # Indicators API

@@ -9,7 +9,6 @@ pip install owid-catalog
 ```
 
 ## Client API
-
 The unified client for accessing OWID data through various APIs.
 
 ::: owid.catalog.client.Client
@@ -17,29 +16,29 @@ The unified client for accessing OWID data through various APIs.
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.charts.ChartsAPI
-    options:
-      heading_level: 4
-      show_root_heading: true
-
-
-::: owid.catalog.client.indicators.IndicatorsAPI
-    options:
-      heading_level: 4
-      show_root_heading: true
-
-
-::: owid.catalog.client.datasets.DatasetsAPI
-    options:
-      heading_level: 4
-      show_root_heading: true
-
-::: owid.catalog.client.models.ChartResult
+::: owid.catalog.client.charts
     options:
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.models.IndicatorResult
+
+::: owid.catalog.client.indicators
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+
+::: owid.catalog.client.datasets
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+::: owid.catalog.client.models
+    options:
+      heading_level: 3
+      show_root_heading: true
+
+<!-- ::: owid.catalog.client.models.IndicatorResult
     options:
       heading_level: 3
       show_root_heading: true
@@ -57,60 +56,62 @@ The unified client for accessing OWID data through various APIs.
 ::: owid.catalog.client.models.ResultSet
     options:
       heading_level: 3
-      show_root_heading: true
+      show_root_heading: true -->
 
+## Legacy API
 <!-- LEGACY BELOW  -->
 <!-- Catalog -->
 ::: owid.catalog.catalogs
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_", "!^Catalog"]
 
+## Data processing
 <!-- Processing -->
 
 ::: owid.catalog.processing
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Dataset -->
 ::: owid.catalog.datasets
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Table -->
 ::: owid.catalog.tables
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Variable -->
 ::: owid.catalog.variables
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Metadata -->
 ::: owid.catalog.meta
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 <!-- Utils -->
 ::: owid.catalog.utils
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 ::: owid.catalog.s3_utils
     options:
-      heading_level: 2
+      heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
