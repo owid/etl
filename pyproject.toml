@@ -115,7 +115,7 @@ dev-dependencies = [
     "memory-profiler>=0.61.0",
     "line-profiler>=4.1.3",
     # unpinning those would introduce tons of type errors
-    "pyright==1.1.373",
+    "ty>=0.0.4",
     "pandas-stubs==1.2.0.62",
     "ruff==0.8.6",
     "ipdb>=0.13.13",
@@ -178,9 +178,9 @@ extend-exclude = [".ipynb_checkpoints", "*cookiecutter", "*.ipynb"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.pyright]
+[tool.ty.src]
 exclude = [
-    "lib/",
+    # "lib/",
     "apps/wizard/etl_steps/cookiecutter/",
     "apps/wizard/etl_steps/cookiecutter/snapshot/**",
     "**/node_modules",
@@ -191,9 +191,15 @@ exclude = [
     "playground/",
     ".cachedir/",
     ".cache/",
-    "etl/steps",
-    "snapshots/",
 ]
+
+[tool.ty.rules]
+invalid-method-override = "ignore"
+parameter-already-assigned = "ignore"
+redundant-cast = "ignore"
+possibly-missing-attribute = "ignore"
+no-matching-overload = "ignore"
+invalid-argument-type = "ignore"
 
 [tool.pytest.ini_options]
 markers = [

@@ -428,8 +428,8 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
             .where(gm.Dataset.id == dataset_id)  # type: ignore
             .values(
                 sourceChecksum=checksum,
-                dataEditedAt=datetime.datetime.utcnow(),
-                metadataEditedAt=datetime.datetime.utcnow(),
+                dataEditedAt=datetime.datetime.now(datetime.timezone.utc),
+                metadataEditedAt=datetime.datetime.now(datetime.timezone.utc),
             )
         )
         session.execute(q)
