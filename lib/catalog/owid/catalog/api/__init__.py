@@ -1,5 +1,5 @@
 #
-#  owid.catalog.client
+#  owid.catalog.api
 #
 #  Unified client for all OWID data APIs.
 #
@@ -8,7 +8,7 @@ Unified client for accessing Our World in Data APIs.
 
 Example:
     ```python
-    from owid.catalog.client import Client
+    from owid.catalog import Client
 
     client = Client()
 
@@ -72,9 +72,9 @@ class Client:
         tables: TablesAPI instance for catalog operations.
         datasets: Deprecated alias for tables (backwards compatibility).
 
-    Example: test
+    Example:
         ```python
-        from owid.catalog.client import Client
+        from owid.catalog import Client
 
         # Create client (recommended: reuse for multiple operations)
         client = Client()

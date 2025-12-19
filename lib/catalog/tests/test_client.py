@@ -1,10 +1,10 @@
 #
-#  Tests for owid.catalog.client module
+#  Tests for owid.catalog.api module
 #
 import pytest
 
 from owid.catalog import Client
-from owid.catalog.client import (
+from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
     DatasetResult,  # Backwards compatibility alias

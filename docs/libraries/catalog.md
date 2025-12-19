@@ -11,56 +11,58 @@ pip install owid-catalog
 ## Client API
 The unified client for accessing OWID data through various APIs.
 
-::: owid.catalog.client.Client
+::: owid.catalog.api.Client
     options:
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.charts
+::: owid.catalog.api.charts
     options:
       heading_level: 3
       show_root_heading: true
       members_order: source
 
 
-::: owid.catalog.client.indicators
+::: owid.catalog.api.indicators
     options:
       heading_level: 3
       show_root_heading: true
 
 
-::: owid.catalog.client.tables
+::: owid.catalog.api.tables
     options:
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.models
+::: owid.catalog.api.models
     options:
       heading_level: 3
       show_root_heading: true
 
-<!-- ::: owid.catalog.client.models.IndicatorResult
+<!-- ::: owid.catalog.api.models.IndicatorResult
     options:
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.models.TableResult
+::: owid.catalog.api.models.TableResult
     options:
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.models.PageSearchResult
+::: owid.catalog.api.models.PageSearchResult
     options:
       heading_level: 3
       show_root_heading: true
 
-::: owid.catalog.client.models.ResultSet
+::: owid.catalog.api.models.ResultSet
     options:
       heading_level: 3
       show_root_heading: true -->
 
 <!-- Note: The old DatasetsAPI has been renamed to TablesAPI for better clarity.
-For backwards compatibility, client.datasets still works as an alias to client.tables. -->
+For backwards compatibility, client.datasets still works as an alias to client.tables.
+The client/ directory has been renamed to api/ for clarity, though owid.catalog.client
+imports still work via backwards compatibility. -->
 
 ## Legacy API
 <!-- LEGACY BELOW  -->

@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 if TYPE_CHECKING:
     from ..catalogs import CatalogFrame
     from ..tables import Table
+    from ..variables import Variable
 
 T = TypeVar("T")
 
@@ -138,7 +139,6 @@ class IndicatorResult(BaseModel):
         Returns:
             Variable object (pandas Series subclass) with the indicator data.
         """
-        from ..variables import Variable
 
         if self._table is None:
             self._table = self._load()

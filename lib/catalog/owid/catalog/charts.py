@@ -17,7 +17,7 @@ from dataclasses import dataclass
 import pandas as pd
 from deprecated import deprecated
 
-from .client import ChartNotFoundError, Client, LicenseError  # noqa
+from .api import ChartNotFoundError, Client, LicenseError  # noqa
 
 
 @deprecated(

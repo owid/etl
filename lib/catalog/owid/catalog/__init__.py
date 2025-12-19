@@ -1,8 +1,8 @@
 __version__ = "0.4.0"
 
-from . import client, processing, utils
+from . import api, processing, utils
+from .api import Client
 from .catalogs import CHANNEL, LocalCatalog, RemoteCatalog, find, find_by_indicator, find_latest, find_one
-from .client import Client
 from .datasets import Dataset
 from .meta import (
     DatasetMeta,
@@ -18,10 +18,14 @@ from .processing_log import LogEntry, ProcessingLog
 from .tables import Table
 from .variables import Variable
 
+# Backwards compatibility alias
+client = api
+
 __all__ = [
     # New unified client API
     "Client",
-    "client",
+    "api",
+    "client",  # Backwards compatibility alias
     # Legacy catalog access (still supported)
     "LocalCatalog",
     "RemoteCatalog",

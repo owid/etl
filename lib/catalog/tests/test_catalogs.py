@@ -3,6 +3,7 @@
 #
 
 import tempfile
+import warnings
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -12,6 +13,16 @@ import pytest  # noqa
 from owid.catalog import CHANNEL, LocalCatalog, RemoteCatalog, Table, find
 
 from .test_datasets import create_temp_dataset
+
+
+# Context manager to suppress deprecation warnings for legacy API tests
+@contextmanager
+def suppress_deprecation_warnings():
+    """Suppress DeprecationWarning for testing legacy catalog functions."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        yield
+
 
 _catalog: RemoteCatalog | None = None
 
@@ -78,15 +89,16 @@ def test_local_default_channel():
 
 
 def test_calling_find_adds_channels():
-    find("abc")
-    from owid.catalog.catalogs import REMOTE_CATALOG
+    with suppress_deprecation_warnings():
+        find("abc")
+        from owid.catalog.catalogs import REMOTE_CATALOG
 
-    assert REMOTE_CATALOG.channels == ("garden",)  # type: ignore
+        assert REMOTE_CATALOG.channels == ("garden",)  # type: ignore
 
-    find("abc", channels=("garden", "meadow"))
-    from owid.catalog.catalogs import REMOTE_CATALOG
+        find("abc", channels=("garden", "meadow"))
+        from owid.catalog.catalogs import REMOTE_CATALOG
 
-    assert set(REMOTE_CATALOG.channels) == {"garden", "meadow"}  # type: ignore
+        assert set(REMOTE_CATALOG.channels) == {"garden", "meadow"}  # type: ignore
 
 
 def test_reindex_with_include():
