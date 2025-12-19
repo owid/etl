@@ -19,6 +19,7 @@ import numpy.typing as npt
 import pandas as pd
 import requests
 import structlog
+from rapidfuzz import fuzz
 
 from . import s3_utils
 from .datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, Dataset, FileFormat
@@ -68,18 +69,30 @@ class CatalogMixin:
         version: str | None = None,
         dataset: str | None = None,
         channel: CHANNEL | None = None,
+        case: bool = False,
+        regex: bool = True,
+        fuzzy: bool = False,
+        threshold: int = 70,
     ) -> "CatalogFrame":
         """Search catalog for tables matching specified criteria.
 
-        Search supports partial matching on table names and exact matching on
-        other fields. Multiple criteria can be combined.
+        Search supports pattern matching on table and dataset names (case-insensitive
+        regex by default) and exact matching on other fields. Multiple criteria can
+        be combined.
 
         Args:
-            table: Table name pattern to search for (substring match).
+            table: Table name pattern to search for (regex by default).
             namespace: Namespace to filter by (e.g., 'un', 'worldbank').
             version: Version string to filter by (e.g., '2024-01-15').
-            dataset: Dataset name to filter by.
+            dataset: Dataset name pattern to filter by (regex by default).
             channel: Data channel to search (e.g., 'garden', 'grapher').
+            case: If True, search is case-sensitive. Default False.
+            regex: If True, treat table/dataset as regex patterns. Default True.
+                Ignored when fuzzy=True.
+            fuzzy: If True, use fuzzy matching for table/dataset. Default False.
+                When enabled, matches strings that are similar but not exact.
+            threshold: Minimum fuzzy match score (0-100). Default 70.
+                Only used when fuzzy=True. Higher values require closer matches.
 
         Returns:
             CatalogFrame containing matching tables.
@@ -92,23 +105,28 @@ class CatalogMixin:
             ```python
             from owid.catalog import find
 
-            results = find(table="gdp", namespace="worldbank")
-            print(results)
+            # Case-insensitive regex search (default)
+            results = find(table="gdp.*capita", namespace="worldbank")
+
+            # Case-sensitive literal search
+            results = find(table="GDP", case=True, regex=False)
+
+            # Fuzzy search - matches similar strings
+            results = find(table="gdp per capita", fuzzy=True)
+            results = find(dataset="wrld bank", fuzzy=True, threshold=60)
             ```
         """
-        criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
+        if table and dataset:
+            raise ValueError("Cannot specify both 'table' and 'dataset' arguments")
 
-        if table:
-            criteria &= self.frame.table.str.contains(table)
+        # Step 1: Apply exact match filters (namespace, version, channel)
+        criteria: npt.NDArray[np.bool_] = np.ones(len(self.frame), dtype=bool)
 
         if namespace:
             criteria &= self.frame.namespace == namespace
 
         if version:
             criteria &= self.frame.version == version
-
-        if dataset:
-            criteria &= self.frame.dataset == dataset
 
         if channel:
             if channel not in self.channels:
@@ -117,9 +135,24 @@ class CatalogMixin:
                 )
             criteria &= self.frame.channel == channel
 
+        # Step 2: Apply text field filter (table or dataset)
+        scores: npt.NDArray[np.float64] | None = None
+        if table:
+            scores = _match_score(self.frame.table, table, fuzzy, case, regex)
+            criteria &= scores >= threshold
+        elif dataset:
+            scores = _match_score(self.frame.dataset, dataset, fuzzy, case, regex)
+            criteria &= scores >= threshold
+
+        # Step 3: Build result
         matches = self.frame[criteria]
         if "checksum" in matches.columns:
             matches = matches.drop(columns=["checksum"])
+
+        # Sort by score (descending) when fuzzy matching is used
+        if fuzzy and scores is not None:
+            sort_order = np.argsort(-scores[criteria])
+            matches = matches.iloc[sort_order]
 
         return cast(CatalogFrame, matches)
 
@@ -600,6 +633,10 @@ def find(
     version: str | None = None,
     dataset: str | None = None,
     channels: Iterable[CHANNEL] = ("garden",),
+    case: bool = False,
+    regex: bool = True,
+    fuzzy: bool = False,
+    threshold: int = 70,
 ) -> "CatalogFrame":
     """Search the remote catalog for tables matching criteria.
 
@@ -607,11 +644,18 @@ def find(
     catalog. Automatically initializes and caches the catalog connection.
 
     Args:
-        table: Table name pattern to search for (substring match).
+        table: Table name pattern to search for (regex by default).
         namespace: Namespace to filter by (e.g., 'un', 'worldbank').
         version: Version string to filter by (e.g., '2024-01-15').
-        dataset: Dataset name to filter by.
+        dataset: Dataset name pattern to filter by (regex by default).
         channels: Data channels to search (default: garden only).
+        case: If True, search is case-sensitive. Default False.
+        regex: If True, treat table/dataset as regex patterns. Default True.
+            Ignored when fuzzy=True.
+        fuzzy: If True, use fuzzy matching for table/dataset. Default False.
+            When enabled, matches strings that are similar but not exact.
+        threshold: Minimum fuzzy match score (0-100). Default 70.
+            Only used when fuzzy=True. Higher values require closer matches.
 
     Returns:
         CatalogFrame containing matching tables.
@@ -621,7 +665,7 @@ def find(
         ```python
         from owid.catalog import find
 
-        # Find all population tables
+        # Find all population tables (case-insensitive regex)
         results = find(table="population")
 
         # Filter by namespace
@@ -629,11 +673,27 @@ def find(
 
         # Search across multiple channels
         results = find(table="gdp", channels=["garden", "meadow"])
+
+        # Case-sensitive literal search
+        results = find(table="GDP", case=True, regex=False)
+
+        # Fuzzy search - matches similar strings
+        results = find(table="gdp per capita", fuzzy=True)
+        results = find(dataset="wrld bank", fuzzy=True, threshold=60)
         ```
     """
     REMOTE_CATALOG = _load_remote_catalog(channels=channels)
 
-    return REMOTE_CATALOG.find(table=table, namespace=namespace, version=version, dataset=dataset)
+    return REMOTE_CATALOG.find(
+        table=table,
+        namespace=namespace,
+        version=version,
+        dataset=dataset,
+        case=case,
+        regex=regex,
+        fuzzy=fuzzy,
+        threshold=threshold,
+    )
 
 
 def find_one(*args: str | None, **kwargs: str | None) -> Table:
@@ -861,3 +921,26 @@ def save_frame(df: pd.DataFrame, path: str | Path) -> None:
 
     else:
         raise ValueError(f"could not detect what format to write to: {path}")
+
+
+def _match_score(series: pd.Series, query: str, fuzzy: bool, case: bool, regex: bool) -> npt.NDArray[np.float64]:
+    """Calculate match scores for a text column.
+
+    Args:
+        series: The pandas Series to search.
+        query: The search query string.
+        fuzzy: If True, use fuzzy matching (0-100 scores).
+        case: If True, matching is case-sensitive.
+        regex: If True, treat query as regex (ignored when fuzzy=True).
+
+    Returns:
+        Array of match scores: 0-100 for fuzzy, 0 or 100 for regex/literal.
+    """
+    if fuzzy:
+        if not case:
+            query = query.lower()
+            series = series.str.lower()
+        return np.array([fuzz.WRatio(query, x) for x in series], dtype=np.float64)
+    else:
+        matches = series.str.contains(query, case=case, regex=regex)
+        return np.where(matches, 100.0, 0.0)

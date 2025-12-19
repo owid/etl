@@ -60,6 +60,13 @@ catalog.find('covid')
 
 # load Covid-19 data from the Our World in Data namespace as a data frame
 df = catalog.find('covid', namespace='owid').load()
+
+# search is case-insensitive and supports regex by default
+catalog.find(table='gdp.*capita')
+
+# use fuzzy search for typo-tolerant matching (sorted by relevance)
+catalog.find(table='forest area', fuzzy=True)
+catalog.find(dataset='wrld bank', fuzzy=True, threshold=60)
 ```
 
 There many be multiple versions of the same dataset in a catalog, each will have a unique path. To easily load the same dataset again, you should record its path and load it this way:
@@ -90,6 +97,13 @@ make watch
 <details>
 <summary>Click to expand changelog</summary>
 
+- `v0.4.4`
+    - Enhanced `find()` with better search capabilities:
+      - Case-insensitive search by default (use `case=True` for case-sensitive)
+      - Regex support enabled by default for `table` and `dataset` parameters
+      - New fuzzy search with `fuzzy=True` - typo-tolerant matching sorted by relevance
+      - Configurable fuzzy threshold (0-100) to control match strictness
+    - New dependency: `rapidfuzz` for fuzzy string matching
 - `v0.4.3`
     - Fixed minor bugs
 - `v0.4.0`
