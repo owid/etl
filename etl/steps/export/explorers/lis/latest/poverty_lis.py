@@ -141,10 +141,11 @@ def run() -> None:
                         existing_subtitle = col_meta.presentation.grapher_config.get("subtitle", "")
                         existing_note = col_meta.presentation.grapher_config.get("note", "")
 
+                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
                         # Remove EQUIVALENCE_SCALE_NOTE if present
-                        new_note = existing_note.replace(f" {EQUIVALENCE_SCALE_NOTE}", "")
+                        new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
 
-                        # Define new note
+                        # Set note in view config
                         view.config["note"] = new_note
 
                         # Add EQUIVALENCE_SCALE_SUBTITLE at the end
