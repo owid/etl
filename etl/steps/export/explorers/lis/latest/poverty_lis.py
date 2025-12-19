@@ -16,22 +16,15 @@ INDICATOR_NAMES = [
     "poverty_gap_index",
 ]
 
-DIMENSIONS_CONFIG = {
-    "poverty_line": [
-        "1",
-        "2",
-        "5",
-        "10",
-        "20",
-        "30",
-        "40",
-        "40% of the median",
-        "50% of the median",
-        "60% of the median",
-    ],
-    "welfare_type": ["dhi", "mi"],
-    "equivalence_scale": ["per capita", "square root"],
-}
+# Define texts to modify
+BEFORE_TAX_TITLE = "(before tax)"
+AFTER_TAX_TITLE = "(after tax)"
+AFTER_VS_BEFORE_TAX_TITLE = "(after vs. before tax)"
+BEFORE_TAX_SUBTITLE = "Income here is measured before taxes and benefits."
+AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
+
+EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
+EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
 
 def run() -> None:
@@ -120,8 +113,8 @@ def run() -> None:
                             # Remove (before tax) or (after tax) from title if present
                             view.config["title"] = (
                                 view.config["title"]
-                                .replace(" (before tax)", " (after vs. before tax)")
-                                .replace(" (after tax)", " (after vs. before tax)")
+                                .replace(f" {BEFORE_TAX_TITLE}", f" {AFTER_VS_BEFORE_TAX_TITLE}")
+                                .replace(f" {AFTER_TAX_TITLE}", f" {AFTER_VS_BEFORE_TAX_TITLE}")
                             )
 
                         if col_meta.presentation.grapher_config.get("subtitle"):
@@ -130,9 +123,35 @@ def run() -> None:
                             # Remove welfare type info from subtitle
                             view.config["subtitle"] = (
                                 view.config["subtitle"]
-                                .replace(" Income here is measured after taxes and benefits.", "")
-                                .replace(" Income here is measured before taxes and benefits.", "")
+                                .replace(f" {AFTER_TAX_SUBTITLE}", "")
+                                .replace(f" {BEFORE_TAX_SUBTITLE}", "")
                             )
+
+        # Add equivalence scale subtitle when equivalence_scale is "square root"
+        if view.dimensions.get("equivalence_scale") == "square root":
+            # Get the catalog path of the first indicator to access metadata
+            if view.indicators.y:
+                first_indicator_path = view.indicators.y[0].catalogPath
+                indicator_col = first_indicator_path.split("#")[-1]
+
+                if indicator_col in tb.columns:
+                    col_meta = tb[indicator_col].metadata
+                    if col_meta.presentation and col_meta.presentation.grapher_config:
+                        # Get existing subtitle and note or empty string
+                        existing_subtitle = col_meta.presentation.grapher_config.get("subtitle", "")
+                        existing_note = col_meta.presentation.grapher_config.get("note", "")
+
+                        # Remove EQUIVALENCE_SCALE_NOTE if present
+                        new_note = existing_note.replace(f" {EQUIVALENCE_SCALE_NOTE}", "")
+
+                        # Define new note
+                        view.config["note"] = new_note
+
+                        # Add EQUIVALENCE_SCALE_SUBTITLE at the end
+                        if existing_subtitle:
+                            view.config["subtitle"] = f"{existing_subtitle} {EQUIVALENCE_SCALE_SUBTITLE}"
+                        else:
+                            view.config["subtitle"] = EQUIVALENCE_SCALE_SUBTITLE
 
         # Set default view
         if (
