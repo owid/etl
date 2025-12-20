@@ -6,19 +6,14 @@ from typing import Any, Dict, Optional
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-import requests
 import structlog
-from joblib import Memory
 from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
-
-memory = Memory(CACHE_DIR, verbose=0)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -531,31 +526,6 @@ def mk_custom_entities(df: Table) -> pd.DataFrame:
     return df_cust
 
 
-@memory.cache
-def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
-    indicator_code = indicator_code.replace("_", ".").upper()
-    api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
-    log.info("wdi.fetch_metadata", indicator_code=indicator_code)
-    js = requests.get(api_url).json()
-
-    # Metadata not available for indicators such as PER.SI.ALLSI.COV.Q3.TOT
-    if len(js) < 2:
-        raise ValueError(f"Metadata not available for indicator {indicator_code}")
-
-    d = js[1]
-    assert len(d) == 1
-    d = d[0]
-
-    # There might be more fields, but we don't use them
-    return {
-        "indicator_code": indicator_code,
-        "indicator_name": d.pop("name"),
-        "unit": d.pop("unit"),
-        "source": d.pop("sourceOrganization"),
-        "topic": d.pop("topics")[0].get("value"),
-    }
-
-
 def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.DataFrame:
     # Exclude metadata not in indicator_codes
     df_vars = df_vars[df_vars["series_code"].isin(indicator_codes)].copy()
@@ -570,26 +540,7 @@ def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.Dat
 
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
 
-    # Fetch missing indicator metadata
-    indicators_without_meta = set(indicator_codes) - set(df_vars["indicator_code"])
-
-    # Add indicators without sources
-    indicators_without_meta |= set(df_vars.loc[df_vars.source.isnull(), "indicator_code"])
-
-    # Add indicators without names
-    indicators_without_meta |= set(df_vars.loc[df_vars.indicator_name.isnull(), "indicator_code"])
-
-    # Fetch metadata for missing indicators
-    # NOTE: this should be ideally in the snapshot, but there are only a few indicators like this so it's
-    #   not worth it
-    log.info("wdi.missing_metadata", n_indicators=len(indicators_without_meta))
-    if indicators_without_meta:
-        df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
-        # Merge missing metadata
-        df_vars = pd.concat([df_vars[~df_vars.indicator_code.isin(df_missing.indicator_code)], df_missing])
-    # If no missing indicators, no need to merge anything
-
-    # Final checks
+    # Check for missing metadata
     missing_indicator_codes = set(indicator_codes) - set(df_vars["indicator_code"])
     if missing_indicator_codes:
         raise ValueError(f"Missing metadata in WDISeries.csv for the following indicators: {missing_indicator_codes}")
