@@ -1,0 +1,10 @@
+{
+  "channel": "garden",
+  "namespace": "example",
+  "short_name": "cherry_blossom",
+  "title": "Cherry Blossom Bloom Dates (Processed)",
+  "is_public": true,
+  "version": "2024-01-01",
+  "non_redistributable": false,
+  "source_checksum": "7100a1007be6b9d13fd8addd34652fc2"
+}

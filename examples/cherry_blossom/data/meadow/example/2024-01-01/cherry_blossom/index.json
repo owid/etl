@@ -1,0 +1,10 @@
+{
+  "channel": "meadow",
+  "namespace": "example",
+  "short_name": "cherry_blossom",
+  "title": "Cherry Blossom Bloom Dates",
+  "is_public": true,
+  "version": "2024-01-01",
+  "non_redistributable": false,
+  "source_checksum": "af0104dbd463bff70ca3ad099977dd28"
+}

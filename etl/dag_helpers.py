@@ -2,12 +2,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Union
 
 import yaml
+
+# Re-export Graph type from owid.etl for backwards compatibility
+from owid.etl import Graph
 from structlog import get_logger
 
 from etl import paths
 
 log = get_logger()
-Graph = Dict[str, Set[str]]
 
 
 def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
