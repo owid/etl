@@ -1391,7 +1391,7 @@
   },
   {
     "rawName": "World Urbanization Prospects, United Nations (UN), uri: https://population.un.org/wup/, note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects, publisher: UN Population Division;\nStaff estimates, World Bank (WB), note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects",
-    "name": "World Bank staff estimates based on the UN Population Division's World Urbanization Prospects",
+    "name": "World Bank based on data from the UN Population Division",
     "dataPublisherSource": ""
   },
   {
@@ -2506,7 +2506,7 @@
   },
   {
     "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, note: This information is for ICP’s PPPs utilized in WDI, publisher: International Comparison Program (ICP), date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-explorer.oecd.org/, publisher: OECD;\nStaff estimates, World Bank (WB);\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD);\nWorld Economic Outlook database, International Monetary Fund (IMF)",
-    "name": "ICP data and PPP data (World Bank, Eurostat, OECD, IMF), via World Bank",
+    "name": "Eurostat, OECD, IMF, and World Bank",
     "dataPublisherSource": ""
   },
   {
@@ -2671,7 +2671,7 @@
   },
   {
     "rawName": "World Urbanization Prospects, United Nations (UN), uri: https://population.un.org/wup/, note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects, National definitions, publisher: UN Population Division;\nStaff estimates, World Bank (WB), note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects, National definitions",
-    "name": "World Bank staff estimates based on the UN Population Division's World Urbanization Prospects",
+    "name": "World Bank based on data from the UN Population Division",
     "dataPublisherSource": ""
   },
   {
