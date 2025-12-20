@@ -36,7 +36,7 @@ def test_remote_find_returns_all():
 
 def test_remote_find_one():
     c = load_catalog()
-    t = c.find_one("population_density", namespace="owid")
+    t = c.find_one("population_density", dataset="key_indicators", namespace="owid")
     assert isinstance(t, Table)
 
 

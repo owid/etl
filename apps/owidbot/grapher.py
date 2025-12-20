@@ -7,8 +7,9 @@ from etl.paths import BASE_DIR
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    default_views = make_differences_line("graphers")
-    all_views = make_differences_line("grapher-views")
+    svg_tester_graphers = make_differences_line("graphers")
+    svg_tester_grapher_views = make_differences_line("grapher-views")
+    svg_tester_mdims = make_differences_line("mdims")
 
     body = f"""
 - **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
@@ -29,8 +30,9 @@ def run(branch: str) -> str:
 <details open>
 <summary><b>SVG tester:</b> </summary>
 
-Number of differences (default views): {default_views}
-Number of differences (all views): {all_views}
+Number of differences (graphers): {svg_tester_graphers}
+Number of differences (grapher views): {svg_tester_grapher_views}
+Number of differences (mdims): {svg_tester_mdims}
 
 </details>
     """.strip()
@@ -43,12 +45,15 @@ def make_differences_line(dir: str) -> str:
     commit_file = BASE_DIR.parent / "owid-grapher-svgs" / dir / "commit.log"
     report_filename = f"{dir}/differences.html"
 
+    # Handle missing log files based on the test suite type:
+    # - 'graphers' is the core test suite that always runs: missing file indicates an error
+    # - Other test suites are optional: missing file likely means skipped
     try:
         num_differences = get_num_differences(log_file)
         status_icon = get_status_icon(num_differences)
     except FileNotFoundError:
-        num_differences = "error"
-        status_icon = "❓"
+        num_differences = "error" if dir == "graphers" else "_skipped_"
+        status_icon = "❓" if dir == "graphers" else ""
 
     commit_id = get_commit_id(commit_file)
     commit_link = f"({make_commit_link(commit_id=commit_id)})" if commit_id else ""
