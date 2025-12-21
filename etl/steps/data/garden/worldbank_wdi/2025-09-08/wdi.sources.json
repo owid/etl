@@ -1391,7 +1391,7 @@
   },
   {
     "rawName": "World Urbanization Prospects, United Nations (UN), uri: https://population.un.org/wup/, note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects, publisher: UN Population Division;\nStaff estimates, World Bank (WB), note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects",
-    "name": "World Bank staff estimates based on the UN Population Division's World Urbanization Prospects",
+    "name": "World Bank based on data from the UN Population Division",
     "dataPublisherSource": ""
   },
   {
@@ -2506,7 +2506,7 @@
   },
   {
     "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, note: This information is for ICP’s PPPs utilized in WDI, publisher: International Comparison Program (ICP), date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-explorer.oecd.org/, publisher: OECD;\nStaff estimates, World Bank (WB);\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD);\nWorld Economic Outlook database, International Monetary Fund (IMF)",
-    "name": "ICP data and PPP data (World Bank, Eurostat, OECD, IMF), via World Bank",
+    "name": "Eurostat, OECD, IMF, and World Bank",
     "dataPublisherSource": ""
   },
   {
@@ -2637,6 +2637,146 @@
   {
     "rawName": "The Changing Wealth of Nations, World Bank (WB), uri: https://www.worldbank.org/en/publication/changing-wealth-of-nations/data, note: World Bank staff estimates based on sources and methods described in the World Bank's The Changing Wealth of Nations., publisher: World Bank (WB);\nStaff estimates, World Bank (WB), note: World Bank staff estimates based on sources and methods described in the World Bank's The Changing Wealth of Nations.",
     "name": "The Changing Wealth of Nations, World Bank staff estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, note: This information is for ICP’s PPPs utilized in WDI, publisher: International Comparison Program (ICP), date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, date accessed: Periodical update;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD, date accessed: Periodical update;\nStaff estimates, World Bank (WB);\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD);\nWorld Economic Outlook database, International Monetary Fund (IMF)",
+    "name": "International Comparison Program (ICP), Eurostat, OECD, IMF, and World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Urbanization Prospects, United Nations (UN), uri: https://population.un.org/wup/, note: United Nations Population Division's World Urbanization Prospects, National definitions, publisher: UN Population Division",
+    "name": "World Urbanization Prospects - UN Population Division, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "DHS API, DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: HC_HHHD_H_FEM; \tIndicator name from the original source: Female-headed households, publisher: DHS Program (ICF), type: API, date accessed: 2024-06-14",
+    "name": "DHS Program (ICF) (DHS API), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "UNODC Research - Data Portal – Intentional Homicide, UN Office on Drugs and Crime (UNODC)",
+    "name": "UN Office on Drugs and Crime (UNODC), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_NEG; \tIndicator name from the original source: Wife beating justified if she neglects the children [Women], publisher: The DHS Program (ICF), type: API, date accessed: 2023-02-10",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "UNICEF DATA, UN Children's Fund (UNICEF), uri: https://sdmx.data.unicef.org/overview.html, note: Indicator code from the original source: PT_F_15-49_FGM; \tIndicator name from the original source: Percentage of girls and women (aged 15-49 years) who have undergone female genital mutilation (FGM), type: API, date accessed: 2023-12-07;\nDemographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS) and other surverys, DHS Program (ICF), uri: https://sdmx.data.unicef.org/overview.html, note: Indicator code from the original source: PT_F_15-49_FGM; \tIndicator name from the original source: Percentage of girls and women (aged 15-49 years) who have undergone female genital mutilation (FGM), publisher: The DHS Program (ICF), type: API, date accessed: 2023-12-07;\nDHS API, DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: PT_F_15-49_FGM; \tIndicator name from the original source: Percentage of girls and women (aged 15-49 years) who have undergone female genital mutilation (FGM), date accessed: 2023-12-07",
+    "name": "UNICEF, Demographic and Health Surveys (DHS), and Multiple Indicator Cluster Surveys (MICS), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Urbanization Prospects, United Nations (UN), uri: https://population.un.org/wup/, note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects, National definitions, publisher: UN Population Division;\nStaff estimates, World Bank (WB), note: World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects, National definitions",
+    "name": "World Bank based on data from the UN Population Division",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, Joint Research Centre (JRC) - European Commission, uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024;\nInternational Energy Agency (IEA), uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: International Energy Agency (IEA), date published: 2024",
+    "name": "Joint Research Centre (European Commission) and International Energy Agency (IEA), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 07, 2025",
+    "name": "International Labour Organization, ILO Modelled Estimates (ILOEST) / ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Enterprise Surveys, World Bank (WB), uri: https://www.enterprisesurveys.org/en/data, note: All surveys were administered using the Enterprise Surveys methodology as outlined in the Methodology page which can be found from www.enterprisesurveys.org.",
+    "name": "Enterprise Surveys - World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_AGR; \tIndicator name from the original source: Wife beating justified for at least one specific reason [Women], publisher: The DHS Program (ICF), type: API, date accessed: 2023-02-10",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_BFD; \tIndicator name from the original source: Wife beating justified if she burns the food [Women], publisher: The DHS Program (ICF), type: API, date accessed: 2023-02-10",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, Joint Research Centre (JRC) - European Commission, uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024;\nEDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, International Energy Agency (IEA), uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024",
+    "name": "Joint Research Centre (European Commission) and International Energy Agency (IEA), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_OUT; \tIndicator name from the original source: Wife beating justified if she goes out without telling him [Women], publisher: The DHS Program (ICF), type: API, date accessed: 2023-02-10",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, Joint Research Centre (JRC) - European Commission, uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024;\nInternational Energy Agency (IEA), uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024",
+    "name": "Joint Research Centre (European Commission) and International Energy Agency (IEA), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, Joint Research Centre (JRC) - European Commission, uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024;\nEuropean Forest Observatory, uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024",
+    "name": "Joint Research Centre (European Commission) and European Forest Observatory, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "UCDP Battle-related Deaths Dataset , Uppsala Conflict Data Program (UCDP), uri: https://ucdp.uu.se/downloads/, publisher: Uppsala University",
+    "name": "Uppsala Conflict Data Program (UCDP), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_REF; \tIndicator name from the original source: Wife beating justified if she refuses to have sex with him [Women], publisher: The DHS Program (ICF), type: API, date accessed: 2023-02-10",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_ARG; \tIndicator name from the original source: Wife beating justified if she argues with him [Women], publisher: The DHS Program (ICF), type: API, date accessed: 2023-02-10",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Alkire, S., Mishra, R., Selden, L. and Suppa, N. (2025). ‘The global Multidimensional Poverty Index (MPI) 2025: Country results and methodological note’, OPHI MPI Methodological Note 61, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford.url: <https://ophi.org.uk/publications/MN-61>",
+    "name": "Oxford Poverty and Human Development Initiative (OPHI), University of Oxford, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Labour Force Statistics database (LFS), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: September 25, 2025",
+    "name": "International Labour Organization, ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Education and Mismatch Indicators database (EMI), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: September 25, 2025",
+    "name": "International Labour Organization (EMI) / ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 07, 2025.",
+    "name": "International Labour Organization, ILO Modelled Estimates (ILOEST) / ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Labour Market-related SDG Indicators database (ILOSDG), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: September 25, 2025",
+    "name": "International Labour Organization, ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene, World Health Organization (WHO), uri: washdata.org, note: Aggregate data by groups are computed based on the groupings for the World Bank fiscal year in which the data was released by the WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene., publisher: WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene (washdata.org), date accessed: 2025-09-30, date published: 2025-08-25;\nUN Children's Fund (UNICEF), uri: washdata.org, note: WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene",
+    "name": "WHO/UNICEF Joint Monitoring Programme (JMP) for WASH and UNICEF, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Wages and Working Time Statistics database (COND), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: September 25, 2025",
+    "name": "International Labour Organization, ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), DHS Program (ICF), uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_DMAK_W_3DC; \tIndicator name from the original source: Final say in all of the decisions [Women], publisher: The DHS program (ICF), type: API, date accessed: 2023-08-18",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Maternal Mortality Estimation Inter-Agency Group (MMEIG), World Health Organization (WHO), note: The country data compiled, adjusted and used in the estimation model by the Maternal Mortality Estimation Inter-Agency Group (MMEIG). The country data were compiled from the following sources:  civil registration and vital statistics; specialized studies on maternal mortality; population based surveys and censuses; other available data sources including data from surveillance sites.;\nUN Children's Fund (UNICEF), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nUN Population Fund (UNFPA), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nWorld Bank Group (WBG), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nUnited Nations (UN), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nPAHO, note: Core Indicators Portal;\nICF, note: The DHS Program, Demographic and Health Surveys",
+    "name": "UN Maternal Mortality Estimation Inter-Agency Group (MMEIG), via World Bank",
     "dataPublisherSource": ""
   }
 ]
