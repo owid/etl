@@ -1,6 +1,6 @@
 [project]
 name = "owid-catalog"
-version = "0.4.3"
+version = "0.4.4"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [
@@ -26,6 +26,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "typing-extensions>=4.7.1",
     "rdata>=0.11.2",
+    "rapidfuzz>=3.14.3",
 ]
 
 [tool.uv]
