@@ -4,6 +4,12 @@ The Data API provides unified access to OWID's published data through a simple c
 
 !!! tip "[Jump to the reference :octicons-arrow-down-16:](#api-reference)"
 
+!!! warning "This library is under active development"
+
+    This documentation reflects the latest version, v1.0.0rc1, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc1`.
+
+    We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon.
+
 ## Quick Reference
 
 ```python
