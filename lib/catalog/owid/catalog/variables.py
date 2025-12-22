@@ -15,9 +15,9 @@ import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
-from . import processing_log as pl
-from . import warnings
-from .meta import (
+from owid.catalog import processing_log as pl
+from owid.catalog import warnings
+from owid.catalog.meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
     License,
@@ -27,7 +27,7 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from .properties import metadata_property
+from owid.catalog.properties import metadata_property
 
 log = structlog.get_logger()
 
@@ -235,7 +235,7 @@ class Variable(pd.Series):
     @property
     def _constructor_expanddim(self) -> type:
         # XXX lazy circular import
-        from . import tables
+        from owid.catalog import tables
 
         return tables.Table
 

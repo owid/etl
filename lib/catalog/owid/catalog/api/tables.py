@@ -14,6 +14,7 @@ from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+    from owid.catalog.tables import Table
 
 
 class TablesAPI:
@@ -34,14 +35,13 @@ class TablesAPI:
         # Load the first result
         table = results[0].data
 
-        # Fetch metadata by path (without loading data)
+        # Get table data directly by path
+        table = client.tables.get_data("garden/un/2024/population/population")
+
+        # Or fetch metadata first
         table_result = client.tables.fetch("garden/un/2024/population/population")
         print(f"Dataset: {table_result.dataset}, Version: {table_result.version}")
         table = table_result.data  # Lazy-load when needed
-
-        # Or preload data immediately
-        table_result = client.tables.fetch("garden/un/2024/population/population", load_data=True)
-        table = table_result.data  # Already loaded
         ```
     """
 
@@ -230,6 +230,29 @@ class TablesAPI:
             query=query,
             total=len(results),
         )
+
+    def get_data(self, path: str) -> "Table":
+        """Fetch table data directly.
+
+        Convenience method equivalent to fetch(path).data
+
+        Args:
+            path: Full catalog path (e.g., "garden/un/2024/population/population").
+
+        Returns:
+            Table (pandas DataFrame with metadata).
+
+        Raises:
+            ValueError: If table not found.
+
+        Example:
+            ```python
+            table = client.tables.get_data("garden/un/2024/population/population")
+            print(table.head())
+            print(table.metadata.title)
+            ```
+        """
+        return self.fetch(path).data
 
     def fetch(self, path: str, *, load_data: bool = False) -> TableResult:
         """Fetch table metadata by catalog path (without loading data).

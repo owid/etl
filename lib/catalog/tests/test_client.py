@@ -194,7 +194,7 @@ class TestIndicatorsAPI:
 
         # Check result fields
         first = results[0]
-        assert first.indicator_id > 0
+        assert first.indicator_id is not None and first.indicator_id > 0
         assert first.title
         assert 0 <= first.score <= 1
         assert first.catalog_path
@@ -245,6 +245,20 @@ class TestIndicatorsAPI:
             # Try to fetch with a non-existent column
             with pytest.raises(ValueError, match="Column 'nonexistent_column_12345' not found"):
                 client.indicators.fetch(f"{table_path}#nonexistent_column_12345")
+
+    def test_get_data(self):
+        """Test get_data convenience method."""
+        client = Client()
+        # Search to get an indicator path
+        results = client.indicators.search("solar power")
+        if len(results) > 0:
+            path = results[0].catalog_path
+            # Use get_data - should return Variable directly
+            variable = client.indicators.get_data(path)
+            assert variable is not None
+            # Should be equivalent to fetch().data
+            variable2 = client.indicators.fetch(path).data
+            assert variable.name == variable2.name
 
 
 class TestTablesAPI:
@@ -304,6 +318,21 @@ class TestTablesAPI:
         client = Client()
         with pytest.raises(ValueError, match="not found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
+
+    def test_get_data(self):
+        """Test get_data convenience method."""
+        client = Client()
+        # Search to get a table path
+        results = client.tables.search(table="population", namespace="un")
+        if len(results) > 0:
+            path = results[0].path
+            # Use get_data - should return Table directly
+            table = client.tables.get_data(path)
+            assert table is not None
+            assert len(table) > 0
+            # Should be equivalent to fetch().data
+            table2 = client.tables.fetch(path).data
+            assert table.m.short_name == table2.m.short_name
 
     def test_backwards_compatibility_datasets(self):
         """Test that client.datasets still works (backwards compatibility)."""

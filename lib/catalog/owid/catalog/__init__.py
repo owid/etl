@@ -1,10 +1,10 @@
 __version__ = "0.4.0"
 
-from . import api, processing, utils
-from .api import Client
-from .catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
-from .datasets import Dataset
-from .meta import (
+from owid.catalog import api, processing, utils
+from owid.catalog.api import Client
+from owid.catalog.catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
+from owid.catalog.datasets import Dataset
+from owid.catalog.meta import (
     DatasetMeta,
     FaqLink,
     License,
@@ -14,9 +14,9 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from .processing_log import LogEntry, ProcessingLog
-from .tables import Table
-from .variables import Variable
+from owid.catalog.processing_log import LogEntry, ProcessingLog
+from owid.catalog.tables import Table
+from owid.catalog.variables import Variable
 
 __all__ = [
     # New unified client API

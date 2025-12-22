@@ -23,9 +23,9 @@ import mistune
 import pandas as pd
 from dataclasses_json import DataClassJsonMixin
 
-from . import jinja
-from .processing_log import ProcessingLog
-from .utils import dataclass_from_dict, hash_any, parse_numeric_list, pruned_json
+from owid.catalog import jinja
+from owid.catalog.processing_log import ProcessingLog
+from owid.catalog.utils import dataclass_from_dict, hash_any, parse_numeric_list, pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 

@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING
 from deprecated import deprecated
 
 # Re-export classes and functions for backwards compatibility
-from .api.utils import (
+from owid.catalog.api.utils import (
     INDEX_FORMATS,
     OWID_CATALOG_URI,
     S3_OWID_URI,
@@ -47,10 +47,10 @@ from .api.utils import (
 )
 
 # Re-export constants
-from .datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat
+from owid.catalog.datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat
 
 if TYPE_CHECKING:
-    from .api import Client
+    from owid.catalog.api import Client
 
 # Global cache for backwards compatibility
 REMOTE_CATALOG: ETLCatalog | None = None
@@ -72,7 +72,7 @@ def _get_client() -> "Client":
     """Get or create the global Client instance."""
     global _CLIENT_INSTANCE
     if _CLIENT_INSTANCE is None:
-        from .api import Client
+        from owid.catalog.api import Client
 
         _CLIENT_INSTANCE = Client()
     return _CLIENT_INSTANCE
