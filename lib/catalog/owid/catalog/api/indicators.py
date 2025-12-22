@@ -15,6 +15,9 @@ if TYPE_CHECKING:
     from owid.catalog.api import Client
 
 
+OWID_SEARCH_API = "https://search.owid.io/indicators"
+
+
 class IndicatorsAPI:
     """API for semantic search of OWID indicators.
 
@@ -33,17 +36,22 @@ class IndicatorsAPI:
             print(f"{ind.title} (score: {ind.score:.2f})")
 
         # Load the table that contains the indicator of interest
-        table = results[0].load()
+        table = results[0].table
 
-        # Fetch specific indicator by ID
-        indicator = client.indicators.fetch(12345)
-        table = indicator.load()
+        # Fetch specific indicator by URI
+        indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total")
+        variable = indicator.data
         ```
     """
 
-    BASE_URL = "https://search.owid.io/indicators"
+    BASE_URL = OWID_SEARCH_API
 
     def __init__(self, client: "Client") -> None:
+        """Initialize the IndicatorsAPI.
+
+        Args:
+            client: The Client instance.
+        """
         self._client = client
 
     def search(
@@ -110,11 +118,12 @@ class IndicatorsAPI:
             total=data.get("total_results", len(results)),
         )
 
-    def fetch(self, indicator_id: int, *, load_data: bool = False) -> IndicatorResult:
-        """Fetch a specific indicator by ID.
+    def fetch(self, path: str, *, load_data: bool = False) -> IndicatorResult:
+        """Fetch a specific indicator by catalog path.
 
         Args:
-            indicator_id: Unique indicator ID.
+            path: Catalog path in format "channel/namespace/version/dataset/table#column"
+                  (e.g., "grapher/un/2024/pop/population#population_total")
             load_data: If True, preload indicator data immediately.
                        If False (default), data is loaded lazily when accessed via .data property.
 
@@ -122,25 +131,79 @@ class IndicatorsAPI:
             IndicatorResult with full details. Access .data to get the variable.
 
         Raises:
-            ValueError: If indicator not found.
+            ValueError: If path format is invalid, table not found, or column doesn't exist.
 
         Example:
             ```python
-            indicator = client.indicators.fetch(12345)
+            # Fetch indicator by URI
+            indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total")
             print(f"Title: {indicator.title}")
             variable = indicator.data  # Lazy-loaded Variable
 
             # Or preload data immediately
-            indicator = client.indicators.fetch(12345, load_data=True)
+            indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total", load_data=True)
             variable = indicator.data  # Already loaded
             ```
+
+        TODO:
+            - This method currently uses TablesAPI to load the table. In the future, we should get the indicator data directly without loading the full table.
+            - Currently, no indicator_id is assigned when fetching by URI. We should provide one.
+            - For the above points, we probably need to infer the indicator ID form the indicator path.
         """
-        # Search by ID to find it
-        results = self.search(str(indicator_id), limit=100)
-        for r in results:
-            if r.indicator_id == indicator_id:
-                # Preload data if requested
-                if load_data:
-                    _ = r.data  # Access property to trigger loading
-                return r
-        raise ValueError(f"Indicator {indicator_id} not found")
+        # Parse path to extract table_path and column_name
+        if "#" not in path:
+            raise ValueError(
+                f"Invalid indicator path format: '{path}'. "
+                "Expected format: 'channel/namespace/version/dataset/table#column'"
+            )
+
+        table_path, _, column_name = path.partition("#")
+
+        if not table_path or not column_name:
+            raise ValueError(
+                f"Invalid indicator path format: '{path}'. "
+                "Both table path and column name (separated by #) are required."
+            )
+
+        # Fetch table header (structure only, no rows) to validate column and extract metadata
+        try:
+            table_result = self._client.tables.fetch(table_path)
+            # Load only the header (columns and metadata, no data rows)
+            table = table_result.data_header
+        except Exception as e:
+            raise ValueError(f"Failed to load table at path: '{table_path}'. Error: {e}") from e
+
+        # Verify column exists in table
+        if column_name not in table.columns:
+            available_cols = ", ".join(f"'{col}'" for col in sorted(table.columns)[:10])
+            total_cols = len(table.columns)
+            cols_display = f"{available_cols}{'...' if total_cols > 10 else ''}"
+
+            raise ValueError(
+                f"Column '{column_name}' not found in table '{table_path}'. "
+                f"Available columns ({total_cols}): {cols_display}"
+            )
+
+        # Extract metadata from the Variable object
+        metadata = table[column_name].metadata
+
+        # Create IndicatorResult
+        indicator = IndicatorResult(
+            indicator_id=None,  # TODO: No ID when fetching by URI. We should provide one.
+            title=metadata.title or column_name,
+            score=1.0,  # Direct fetch - perfect match
+            catalog_path=path,
+            description=metadata.description or "",
+            column_name=column_name,
+            unit=metadata.unit or "",
+            n_charts=None,  # TODO: Not available when fetched by URI.
+        )
+
+        # Don't store the table - let it be loaded lazily when indicator.data is accessed
+        # The table will be loaded fresh via indicator._load_table() when needed
+
+        # Preload data if requested
+        if load_data:
+            _ = indicator.data
+
+        return indicator
