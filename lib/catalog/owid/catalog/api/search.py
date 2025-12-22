@@ -5,6 +5,7 @@
 #
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 import requests
@@ -45,6 +46,37 @@ class SiteSearchAPI:
     def __init__(self, client: "Client") -> None:
         self._client = client
 
+    def _search(
+        self,
+        query: str,
+        type_: str,
+        limit: int,
+        page: int,
+        extra_params: dict | None = None,
+    ) -> dict:
+        """Internal method to perform search request with common logic."""
+        # Warn if limit exceeds maximum
+        if limit > 100:
+            warnings.warn(
+                "Max allowed of result items is 100. Using limit=100 instead.",
+                UserWarning,
+                stacklevel=3,  # stacklevel=3 to point to the public method caller
+            )
+
+        params: dict = {
+            "q": query,
+            "type": type_,
+            "hitsPerPage": min(max(1, limit), 100),
+            "page": page,
+        }
+
+        if extra_params:
+            params.update(extra_params)
+
+        resp = requests.get(self.BASE_URL, params=params)
+        resp.raise_for_status()
+        return resp.json()
+
     def charts(
         self,
         query: str,
@@ -81,24 +113,19 @@ class SiteSearchAPI:
             results = client._site_search.charts("gdp", countries=["France"])
             ```
         """
-        params: dict = {
-            "q": query,
-            "type": "charts",
-            "hitsPerPage": min(max(1, limit), 100),
-            "page": page,
-        }
-
+        # Build extra parameters for chart-specific filters
+        extra_params: dict = {}
         if countries:
-            params["countries"] = "~".join(countries)
+            extra_params["countries"] = "~".join(countries)
         if topics:
-            params["topics"] = "~".join(topics)
+            extra_params["topics"] = "~".join(topics)
         if require_all_countries:
-            params["requireAllCountries"] = "true"
+            extra_params["requireAllCountries"] = "true"
 
-        resp = requests.get(self.BASE_URL, params=params)
-        resp.raise_for_status()
-        data = resp.json()
+        # Perform search
+        data = self._search(query, "charts", limit, page, extra_params)
 
+        # Parse results
         results = []
         for hit in data.get("results", []):
             slug = hit.get("slug", "")
@@ -143,17 +170,10 @@ class SiteSearchAPI:
                 print(f"{page.title}: {page.url}")
             ```
         """
-        params: dict = {
-            "q": query,
-            "type": "pages",
-            "hitsPerPage": min(max(1, limit), 100),
-            "page": page,
-        }
+        # Perform search
+        data = self._search(query, "pages", limit, page)
 
-        resp = requests.get(self.BASE_URL, params=params)
-        resp.raise_for_status()
-        data = resp.json()
-
+        # Parse results
         results = []
         for hit in data.get("results", []):
             slug = hit.get("slug", "")
