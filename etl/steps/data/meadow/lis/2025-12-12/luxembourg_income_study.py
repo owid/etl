@@ -34,9 +34,6 @@ def run() -> None:
         #
         # Process data.
         #
-        # If value21 column exists, rename it to value
-        if "value21" in tb.columns:
-            tb = tb.rename(columns={"value21": "value"}, errors="raise")
 
         # Keep only relevant columns and rename them.
         tb = tb[list(COLUMNS_TO_KEEP.keys())].rename(columns=COLUMNS_TO_KEEP, errors="raise")
