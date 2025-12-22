@@ -104,7 +104,7 @@ definitions:
     <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
       Employers are defined as workers in self-employment jobs who have engaged one or more persons to work for them as employees. {definitions.icse_93_short}
     <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
-      Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. {definitions.icse_93_short}
+      Independent own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. {definitions.icse_93_short}
     <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
       Contributing family workers are defined as workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93_short}
     <%- endif %>
