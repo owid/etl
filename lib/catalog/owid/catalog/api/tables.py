@@ -75,6 +75,45 @@ class TablesAPI:
 
         return self._catalog
 
+    def _build_query(
+        self,
+        table: str | None = None,
+        namespace: str | None = None,
+        version: str | None = None,
+        dataset: str | None = None,
+        channel: str | None = None,
+        channels: Iterable[str] = ("garden",),
+    ) -> str:
+        """Build a descriptive query string from search parameters.
+
+        Args:
+            table: Table name pattern
+            namespace: Namespace filter
+            version: Version filter
+            dataset: Dataset name pattern
+            channel: Channel filter
+            channels: List of channels to search
+
+        Returns:
+            Human-readable query string describing the search parameters.
+        """
+        query_parts = []
+        if table:
+            query_parts.append(f"table={table!r}")
+        if namespace:
+            query_parts.append(f"namespace={namespace!r}")
+        if version:
+            query_parts.append(f"version={version!r}")
+        if dataset:
+            query_parts.append(f"dataset={dataset!r}")
+        if channel:
+            query_parts.append(f"channel={channel!r}")
+        elif len(list(channels)) > 1 or list(channels)[0] != "garden":
+            # Only show channels if non-default
+            query_parts.append(f"channels={list(channels)!r}")
+
+        return " ".join(query_parts) if query_parts else "all tables"
+
     def search(
         self,
         table: str | None = None,
@@ -184,9 +223,19 @@ class TablesAPI:
                 )
             )
 
+        # Build descriptive query from search parameters
+        query = self._build_query(
+            table=table,
+            namespace=namespace,
+            version=version,
+            dataset=dataset,
+            channel=channel,
+            channels=channels,
+        )
+
         return ResultSet(
             results=results,
-            query=table or "",
+            query=query,
             total=len(results),
         )
 
