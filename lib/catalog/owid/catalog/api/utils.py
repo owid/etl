@@ -20,9 +20,10 @@ import numpy.typing as npt
 import pandas as pd
 import requests
 import structlog
+from rapidfuzz import fuzz
 
-from .. import s3_utils
-from ..datasets import CHANNEL, Dataset, FileFormat
+from owid.catalog import s3_utils
+from owid.catalog.datasets import CHANNEL, Dataset, FileFormat
 
 if TYPE_CHECKING:
     from ..tables import Table
@@ -81,6 +82,35 @@ def save_frame(df: pd.DataFrame, path: str | Path) -> None:
         raise ValueError(f"could not detect what format to write to: {path}")
 
 
+def _match_score(
+    series: pd.Series,
+    query: str,
+    fuzzy: bool,
+    case: bool,
+    regex: bool,
+) -> npt.NDArray[np.float64]:
+    """Calculate match scores for a text column.
+
+    Args:
+        series: Text column to search
+        query: Search pattern
+        fuzzy: Use fuzzy matching (rapidfuzz)
+        case: Case-sensitive matching
+        regex: Enable regex patterns
+
+    Returns:
+        Array of match scores: 0-100 for fuzzy, 0 or 100 for regex/literal.
+    """
+    if fuzzy:
+        if not case:
+            query = query.lower()
+            series = series.str.lower()
+        return np.array([fuzz.WRatio(query, x) for x in series], dtype=np.float64)
+    else:
+        matches = series.str.contains(query, case=case, regex=regex)
+        return np.where(matches, 100.0, 0.0)
+
+
 class CatalogMixin:
     """Abstract catalog interface for finding and loading data."""
 
@@ -95,28 +125,70 @@ class CatalogMixin:
         version: str | None = None,
         dataset: str | None = None,
         channel: CHANNEL | None = None,
+        case: bool = False,
+        regex: bool = True,
+        fuzzy: bool = False,
+        threshold: int = 70,
     ) -> "CatalogFrame":
-        """Search catalog for tables matching specified criteria."""
-        criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
+        """Search catalog for tables matching specified criteria.
 
+        Args:
+            table: Table name pattern
+            namespace: Namespace filter
+            version: Version filter
+            dataset: Dataset name pattern
+            channel: Channel filter
+            case: Case-sensitive search (default: False)
+            regex: Enable regex patterns (default: True)
+            fuzzy: Use fuzzy matching (default: False)
+            threshold: Minimum fuzzy match score 0-100 (default: 70)
+
+        Returns:
+            CatalogFrame with matching tables, sorted by relevance if fuzzy=True.
+        """
+        criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
+        scores: npt.NDArray[np.float64] | None = None
+
+        # Table matching with scoring
         if table:
-            criteria &= self.frame.table.str.contains(table)
+            table_scores = _match_score(self.frame.table, table, fuzzy, case, regex)
+            if fuzzy:
+                criteria &= table_scores >= threshold
+                scores = table_scores
+            else:
+                criteria &= table_scores > 0
+
+        # Dataset matching with scoring
+        if dataset:
+            dataset_scores = _match_score(self.frame.dataset, dataset, fuzzy, case, regex)
+            if fuzzy:
+                criteria &= dataset_scores >= threshold
+                # Average scores if both table and dataset specified
+                scores = dataset_scores if scores is None else (scores + dataset_scores) / 2
+            else:
+                criteria &= dataset_scores > 0
+
+        # Exact match filters (no fuzzy)
         if namespace:
             criteria &= self.frame.namespace == namespace
         if version:
             criteria &= self.frame.version == version
-        if dataset:
-            criteria &= self.frame.dataset == dataset
         if channel:
             if channel not in self.channels:
                 raise ValueError(
-                    f"You need to add `{channel}` to channels in Catalog init (only `{self.channels}` are loaded now)"
+                    f"You need to add `{channel}` to channels in Catalog init "
+                    f"(only `{self.channels}` are loaded now)"
                 )
             criteria &= self.frame.channel == channel
 
         matches = self.frame[criteria]
         if "checksum" in matches.columns:
             matches = matches.drop(columns=["checksum"])
+
+        # Sort by relevance if fuzzy matching was used
+        if fuzzy and scores is not None:
+            sort_order = np.argsort(-scores[criteria])
+            matches = matches.iloc[sort_order]
 
         return cast(CatalogFrame, matches)
 
@@ -267,8 +339,8 @@ class LocalCatalog(CatalogMixin):
             json.dump(contents, ostream, indent=2)
 
 
-class RemoteCatalog(CatalogMixin):
-    """Remote HTTP catalog."""
+class ETLCatalog(CatalogMixin):
+    """Remote HTTP catalog for ETL data."""
 
     uri: str
 

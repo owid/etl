@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from .models import ChartResult, PageSearchResult, ResultSet
+from owid.catalog.api.models import ChartResult, PageSearchResult, ResultSet
 
 if TYPE_CHECKING:
-    from . import Client
+    from owid.catalog.api import Client
 
 
 class SiteSearchAPI:

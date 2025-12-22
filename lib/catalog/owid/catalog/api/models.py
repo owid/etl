@@ -11,9 +11,9 @@ import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 if TYPE_CHECKING:
-    from ..catalogs import CatalogFrame
-    from ..tables import Table
-    from ..variables import Variable
+    from owid.catalog.catalogs import CatalogFrame
+    from owid.catalog.tables import Table
+    from owid.catalog.variables import Variable
 
 T = TypeVar("T")
 

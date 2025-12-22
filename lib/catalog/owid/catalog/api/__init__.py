@@ -40,17 +40,17 @@ Example:
 
 from __future__ import annotations
 
-from .charts import ChartNotFoundError, ChartsAPI, LicenseError
-from .indicators import IndicatorsAPI
-from .models import (
+from owid.catalog.api.charts import ChartNotFoundError, ChartsAPI, LicenseError
+from owid.catalog.api.indicators import IndicatorsAPI
+from owid.catalog.api.models import (
     ChartResult,
     IndicatorResult,
     PageSearchResult,
     ResultSet,
     TableResult,
 )
-from .search import SiteSearchAPI
-from .tables import TablesAPI
+from owid.catalog.api.search import SiteSearchAPI
+from owid.catalog.api.tables import TablesAPI
 
 # Backwards compatibility aliases
 DatasetResult = TableResult

@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from .models import IndicatorResult, ResultSet
+from owid.catalog.api.models import IndicatorResult, ResultSet
 
 if TYPE_CHECKING:
-    from . import Client
+    from owid.catalog.api import Client
 
 
 class IndicatorsAPI:

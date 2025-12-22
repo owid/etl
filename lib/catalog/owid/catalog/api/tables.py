@@ -7,24 +7,22 @@ from __future__ import annotations
 
 import tempfile
 from collections.abc import Iterable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
-import numpy as np
-import numpy.typing as npt
-
-from .models import ResultSet, TableResult
-from .utils import (
+from owid.catalog.api.models import ResultSet, TableResult
+from owid.catalog.api.utils import (
     OWID_CATALOG_URI,
     PREFERRED_FORMAT,
     S3_OWID_URI,
     SUPPORTED_FORMATS,
-    RemoteCatalog,
+    ETLCatalog,
     download_private_file_s3,
 )
+from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
-    from ..tables import Table
-    from . import Client
+    from owid.catalog.api import Client
+    from owid.catalog.tables import Table
 
 
 class TablesAPI:
@@ -60,12 +58,12 @@ class TablesAPI:
 
     def __init__(self, client: Client) -> None:
         self._client = client
-        self._catalog: RemoteCatalog | None = None
+        self._catalog: ETLCatalog | None = None
         self._channels: set[str] = {"garden"}
 
-    def _get_catalog(self, channels: Iterable[str] = ("garden",)) -> RemoteCatalog:
+    def _get_catalog(self, channels: Iterable[str] = ("garden",)) -> ETLCatalog:
         """Get or create the remote catalog, adding channels as needed."""
-        # Use RemoteCatalog from utils
+        # Use ETLCatalog from utils
 
         # Add new channels if needed
         new_channels = set(channels) - self._channels
@@ -73,7 +71,7 @@ class TablesAPI:
             self._channels = self._channels | set(channels)
             # Cast to the expected channel type
             channel_list: list = list(self._channels)  # type: ignore
-            self._catalog = RemoteCatalog(channels=channel_list)
+            self._catalog = ETLCatalog(channels=channel_list)
 
         return self._catalog
 
@@ -85,24 +83,42 @@ class TablesAPI:
         dataset: str | None = None,
         channel: str | None = None,
         channels: Iterable[str] = ("garden",),
+        case: bool = False,
+        regex: bool = True,
+        fuzzy: bool = False,
+        threshold: int = 70,
     ) -> ResultSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
         Args:
-            table: Table name pattern (substring match).
-            namespace: Data provider namespace (e.g., "un", "worldbank").
-            version: Version string (e.g., "2024-01-15").
-            dataset: Dataset name.
-            channel: Single channel to search.
-            channels: List of channels to search (default: garden only).
+            table: Table name pattern to search for
+            namespace: Filter by namespace (exact match)
+            version: Filter by version (exact match)
+            dataset: Dataset name pattern to search for
+            channel: Filter by channel (exact match)
+            channels: List of channels to search (default: garden only)
+            case: Case-sensitive search (default: False)
+            regex: Enable regex patterns in table/dataset (default: True)
+            fuzzy: Use fuzzy string matching (default: False)
+            threshold: Minimum fuzzy match score 0-100 (default: 70)
 
         Returns:
-            SearchResults containing TableResult objects.
+            ResultSet containing matching TableResult objects.
+            If fuzzy=True, results are sorted by relevance score.
 
-        Example:
+        Examples:
             ```python
-            # Search by table name
-            results = client.tables.search(table="population")
+            # Exact match
+            results = client.tables.search(table="population", regex=False)
+
+            # Regex search (default)
+            results = client.tables.search(table="population.*density")
+
+            # Fuzzy search sorted by relevance
+            results = client.tables.search(table="populaton", fuzzy=True)
+
+            # Case-sensitive fuzzy search
+            results = client.tables.search(table="GDP", fuzzy=True, case=True)
 
             # Filter by namespace and version
             results = client.tables.search(
@@ -122,23 +138,19 @@ class TablesAPI:
             ```
         """
         catalog = self._get_catalog(channels)
-        frame = catalog.frame
 
-        # Build filter criteria
-        criteria: npt.ArrayLike = np.ones(len(frame), dtype=bool)
-
-        if table:
-            criteria &= frame.table.str.contains(table)
-        if namespace:
-            criteria &= frame.namespace == namespace
-        if version:
-            criteria &= frame.version == version
-        if dataset:
-            criteria &= frame.dataset == dataset
-        if channel:
-            criteria &= frame.channel == channel
-
-        matches = frame[criteria]
+        # Use catalog.find() which now supports fuzzy matching
+        matches = catalog.find(
+            table=table,
+            namespace=namespace,
+            version=version,
+            dataset=dataset,
+            channel=cast(CHANNEL, channel) if channel else None,
+            case=case,
+            regex=regex,
+            fuzzy=fuzzy,
+            threshold=threshold,
+        )
 
         # Convert to TableResult objects
         results = []
