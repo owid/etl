@@ -14,7 +14,7 @@ import rich
 import rich_click as click
 import structlog
 from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, VariableMeta, find
-from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
+from owid.catalog.api.utils import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
