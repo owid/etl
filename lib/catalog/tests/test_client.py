@@ -146,6 +146,40 @@ class TestSiteSearchAPI:
         assert isinstance(results, ResultSet)
         assert len(results) > 0
 
+    def test_site_search_charts_limit_warning(self):
+        """Test that warning is raised when limit > 100 for charts."""
+        import warnings
+
+        client = Client()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            results = client._site_search.charts("gdp", limit=150)
+
+            # Check warning was raised
+            assert len(w) == 1
+            assert issubclass(w[0].category, UserWarning)
+            assert "Max allowed of result items is 100" in str(w[0].message)
+
+            # Check that limit was clamped to 100
+            assert isinstance(results, ResultSet)
+
+    def test_site_search_pages_limit_warning(self):
+        """Test that warning is raised when limit > 100 for pages."""
+        import warnings
+
+        client = Client()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            results = client._site_search.pages("climate", limit=200)
+
+            # Check warning was raised
+            assert len(w) == 1
+            assert issubclass(w[0].category, UserWarning)
+            assert "Max allowed of result items is 100" in str(w[0].message)
+
+            # Check that limit was clamped to 100
+            assert isinstance(results, ResultSet)
+
 
 class TestIndicatorsAPI:
     """Test the Indicators API."""
@@ -175,29 +209,42 @@ class TestIndicatorsAPI:
         assert "path" in frame.columns
 
     def test_fetch_indicator(self):
-        """Test fetching a specific indicator by ID."""
+        """Test fetching a specific indicator by URI."""
         client = Client()
-        # First search to find an indicator ID
+        # First search to find an indicator URI
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            indicator_id = results[0].indicator_id
-            # Try to fetch it by ID
-            # Note: This may not work reliably because semantic search
-            # doesn't guarantee exact ID matches
-            try:
-                indicator = client.indicators.fetch(indicator_id)
-                assert indicator.indicator_id == indicator_id
-                assert indicator.title
-                assert indicator.catalog_path
-            except ValueError:
-                # Expected - semantic search may not return exact ID match
-                pass
+            # Fetch by URI (catalog_path)
+            indicator = client.indicators.fetch(results[0].catalog_path)
+            assert indicator.column_name
+            assert indicator.title
+            assert indicator.catalog_path == results[0].catalog_path
+            # Test lazy loading - table should not be loaded yet
+            assert indicator._table is None
+            # Test data access - this triggers lazy loading
+            variable = indicator.data
+            assert variable is not None
+            # After accessing data, table should be cached
+            assert indicator._table is not None
 
-    def test_fetch_nonexistent_indicator(self):
-        """Test that fetching non-existent indicator raises error."""
+    def test_fetch_indicator_invalid_format(self):
+        """Test that invalid path format raises error."""
         client = Client()
-        with pytest.raises(ValueError, match="not found"):
-            client.indicators.fetch(999999999)
+        with pytest.raises(ValueError, match="Invalid indicator path format"):
+            # Missing # separator
+            client.indicators.fetch("grapher/un/2024/pop/population")
+
+    def test_fetch_indicator_missing_column(self):
+        """Test that fetching non-existent column raises error."""
+        client = Client()
+        # Search to get a valid table path
+        results = client.indicators.search("solar power")
+        if len(results) > 0:
+            # Get table path from catalog_path
+            table_path = results[0].catalog_path.partition("#")[0]
+            # Try to fetch with a non-existent column
+            with pytest.raises(ValueError, match="Column 'nonexistent_column_12345' not found"):
+                client.indicators.fetch(f"{table_path}#nonexistent_column_12345")
 
 
 class TestTablesAPI:
