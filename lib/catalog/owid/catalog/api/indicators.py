@@ -122,30 +122,6 @@ class IndicatorsAPI:
             total=data.get("total_results", len(results)),
         )
 
-    def get_data(self, path: str) -> "Variable":
-        """Fetch indicator data as a Variable.
-
-        Convenience method equivalent to fetch(path).data
-
-        Args:
-            path: Catalog path in format "channel/namespace/version/dataset/table#column"
-                  (e.g., "grapher/un/2024/pop/population#population_total")
-
-        Returns:
-            Variable (pandas Series with metadata).
-
-        Raises:
-            ValueError: If path format is invalid, table not found, or column doesn't exist.
-
-        Example:
-            ```python
-            variable = client.indicators.get_data("grapher/un/2024/pop/population#population_total")
-            print(variable.head())
-            print(variable.metadata.unit)
-            ```
-        """
-        return self.fetch(path).data
-
     def fetch(self, path: str, *, load_data: bool = False) -> IndicatorResult:
         """Fetch a specific indicator by catalog path.
 
@@ -236,3 +212,27 @@ class IndicatorsAPI:
             _ = indicator.data
 
         return indicator
+
+    def get_data(self, path: str) -> "Variable":
+        """Fetch indicator data as a Variable.
+
+        Convenience method equivalent to fetch(path).data
+
+        Args:
+            path: Catalog path in format "channel/namespace/version/dataset/table#column"
+                  (e.g., "grapher/un/2024/pop/population#population_total")
+
+        Returns:
+            Variable (pandas Series with metadata).
+
+        Raises:
+            ValueError: If path format is invalid, table not found, or column doesn't exist.
+
+        Example:
+            ```python
+            variable = client.indicators.get_data("grapher/un/2024/pop/population#population_total")
+            print(variable.head())
+            print(variable.metadata.unit)
+            ```
+        """
+        return self.fetch(path).data

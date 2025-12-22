@@ -231,29 +231,6 @@ class TablesAPI:
             total=len(results),
         )
 
-    def get_data(self, path: str) -> "Table":
-        """Fetch table data directly.
-
-        Convenience method equivalent to fetch(path).data
-
-        Args:
-            path: Full catalog path (e.g., "garden/un/2024/population/population").
-
-        Returns:
-            Table (pandas DataFrame with metadata).
-
-        Raises:
-            ValueError: If table not found.
-
-        Example:
-            ```python
-            table = client.tables.get_data("garden/un/2024/population/population")
-            print(table.head())
-            print(table.metadata.title)
-            ```
-        """
-        return self.fetch(path).data
-
     def fetch(self, path: str, *, load_data: bool = False) -> TableResult:
         """Fetch table metadata by catalog path (without loading data).
 
@@ -314,3 +291,26 @@ class TablesAPI:
             _ = result.data  # Access property to trigger loading
 
         return result
+
+    def get_data(self, path: str) -> "Table":
+        """Fetch table data directly.
+
+        Convenience method equivalent to fetch(path).data
+
+        Args:
+            path: Full catalog path (e.g., "garden/un/2024/population/population").
+
+        Returns:
+            Table (pandas DataFrame with metadata).
+
+        Raises:
+            ValueError: If table not found.
+
+        Example:
+            ```python
+            table = client.tables.get_data("garden/un/2024/population/population")
+            print(table.head())
+            print(table.metadata.title)
+            ```
+        """
+        return self.fetch(path).data
