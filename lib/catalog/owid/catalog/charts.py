@@ -93,7 +93,7 @@ class Chart:
 
         # Fetch metadata separately to add to attrs
         if self._metadata is None:
-            self._metadata = self._get_client().charts.metadata(self.slug)
+            self._metadata = self._get_client().charts.get_metadata(self.slug)
 
         # Apply old API transformations for backwards compatibility
         df = _apply_legacy_transforms(df, self.slug, self._metadata)
