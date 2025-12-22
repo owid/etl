@@ -39,9 +39,9 @@ from .api.utils import (
     S3_OWID_URI,
     CatalogFrame,
     CatalogSeries,
+    ETLCatalog,
     LocalCatalog,
     PackageUpdateRequired,
-    RemoteCatalog,
     read_frame,
     save_frame,
 )
@@ -57,7 +57,7 @@ if TYPE_CHECKING:
 OWID_SEARCH_API = "https://search.owid.io/indicators"
 
 # Global cache for backwards compatibility
-REMOTE_CATALOG: RemoteCatalog | None = None
+REMOTE_CATALOG: ETLCatalog | None = None
 _CLIENT_INSTANCE: "Client | None" = None
 
 
@@ -151,133 +151,15 @@ def find(
     return results.to_catalog_frame()
 
 
-@deprecated(
-    version="0.4.0",
-    reason="Use Client().tables.search()[0].data instead. See: https://docs.owid.io/catalog-api-migration",
-)
-def find_one(*args: str | None, **kwargs: str | None) -> Table:
-    """Find and load single table (DEPRECATED).
-
-    **DEPRECATED**: Use Client().tables.search()[0].data instead.
-
-    Convenience function that combines find() and load() in one call.
-    Requires exactly one matching table.
-
-    Args:
-        *args: Positional arguments passed to find().
-        **kwargs: Keyword arguments passed to find().
-
-    Returns:
-        The loaded Table object.
-
-    Raises:
-        ValueError: If zero or multiple tables match the criteria.
-
-    Example:
-        ```python
-        # DEPRECATED:
-        from owid.catalog import find_one
-        table = find_one(table="population", namespace="un")
-
-        # RECOMMENDED:
-        from owid.catalog import Client
-        client = Client()
-        results = client.tables.search(table="population", namespace="un")
-        table = results[0].data
-        ```
-    """
-    _warn_deprecated("find_one", "Client().tables.search()[0].data")
-
-    # Use Client API internally
-    client = _get_client()
-    results = client.tables.search(*args, **kwargs)  # type: ignore
-
-    if len(results) == 0:
-        raise ValueError("no tables found")
-    elif len(results) > 1:
-        raise ValueError(
-            f"only one table can be loaded at once (tables found: {', '.join([r.table for r in results])})"
-        )
-
-    return results[0].data
-
-
-@deprecated(
-    version="0.4.0",
-    reason="Use Client().tables.search()[-1].data instead. See: https://docs.owid.io/catalog-api-migration",
-)
-def find_latest(
-    table: str | None = None,
-    namespace: str | None = None,
-    dataset: str | None = None,
-    channels: Iterable[CHANNEL] = ("garden",),
-    version: str | None = None,
-) -> Table:
-    """Find latest version (DEPRECATED).
-
-    **DEPRECATED**: Use Client().tables.search()[-1].data instead.
-
-    Searches for tables matching the criteria and returns the one with the
-    most recent version string (lexicographically sorted). Useful for always
-    getting the most up-to-date data without specifying an exact version.
-
-    Args:
-        table: Table name pattern to search for (substring match).
-        namespace: Namespace to filter by (e.g., 'un', 'worldbank').
-        dataset: Dataset name to filter by.
-        channels: Data channels to search (default: garden only).
-        version: Optional specific version to load instead of latest.
-
-    Returns:
-        The loaded Table with the latest version.
-
-    Raises:
-        ValueError: If no tables match the criteria.
-
-    Example:
-        ```python
-        # DEPRECATED:
-        from owid.catalog import find_latest
-        table = find_latest(table="population", namespace="un")
-
-        # RECOMMENDED:
-        from owid.catalog import Client
-        client = Client()
-        results = client.tables.search(table="population", namespace="un")
-        table = results[-1].data  # Latest version
-        ```
-    """
-    _warn_deprecated("find_latest", "Client().tables.search()[-1].data")
-
-    # Use Client API internally
-    client = _get_client()
-    results = client.tables.search(
-        table=table,
-        namespace=namespace,
-        version=version,
-        dataset=dataset,
-        channels=channels,
-    )
-
-    if len(results) == 0:
-        raise ValueError("No matching table found")
-
-    # Sort by version and get the latest
-    sorted_results = sorted(results, key=lambda r: r.version)
-    return sorted_results[-1].data
-
-
 __all__ = [
     # Classes (backwards compatibility)
     "LocalCatalog",
-    "RemoteCatalog",
+    "ETLCatalog",
     "CatalogFrame",
     "CatalogSeries",
     "PackageUpdateRequired",
     # Functions (deprecated)
     "find",
-    "find_one",
-    "find_latest",
     # Constants
     "CHANNEL",
     "OWID_CATALOG_URI",

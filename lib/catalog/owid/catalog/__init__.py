@@ -2,7 +2,7 @@ __version__ = "0.4.0"
 
 from . import api, processing, utils
 from .api import Client
-from .catalogs import CHANNEL, LocalCatalog, RemoteCatalog, find, find_by_indicator, find_latest, find_one
+from .catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
 from .datasets import Dataset
 from .meta import (
     DatasetMeta,
@@ -28,11 +28,8 @@ __all__ = [
     "client",  # Backwards compatibility alias
     # Legacy catalog access (still supported)
     "LocalCatalog",
-    "RemoteCatalog",
+    "ETLCatalog",
     "find",
-    "find_by_indicator",
-    "find_latest",
-    "find_one",
     # Core data structures
     "Dataset",
     "Table",
