@@ -105,6 +105,22 @@ make watch
 <details>
 <summary>Click to expand changelog</summary>
 
+- `v1.0.0-rc` (Release Candidate)
+    - **Highlights**
+      - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
+      - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
+      - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
+      - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
+      - **Breaking changes**: `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+    - **Others**
+      - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
+      - Documentation restructure: Split into intro, API reference, and data structures guides
+      - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
+      - Enhanced type checking with pydantic `BaseModel` for all result types
+      - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
+      - `ResultSet` container with iteration, indexing, and DataFrame conversion
+      - Loading indicators for long-running API requests
+      - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
 - `v0.4.5`
     - Allow both `table` and `dataset` parameters in `find()` (they can now be used together)
     - Migrate from pyright to ty type checker for improved type checking
