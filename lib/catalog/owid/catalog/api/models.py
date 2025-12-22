@@ -272,8 +272,8 @@ class ResultSet(BaseModel, Generic[T]):
         Returns:
             CatalogFrame that can use .load() method.
         """
-        from ..catalogs import OWID_CATALOG_URI
-        from ..catalogs import CatalogFrame as CF
+        from .utils import OWID_CATALOG_URI
+        from .utils import CatalogFrame as CF
 
         if not self.results:
             return CF.create_empty()
