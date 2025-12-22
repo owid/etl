@@ -241,6 +241,7 @@ def run() -> None:
             view.dimensions["indicator"] == "thr"
             and view.dimensions["decile"] == "9.0"
             and view.dimensions["welfare_type"] == "dhi"
+            and view.dimensions["period"] == "year"
             and view.dimensions["equivalence_scale"] == "per capita"
         ):
             view.config["defaultView"] = True
