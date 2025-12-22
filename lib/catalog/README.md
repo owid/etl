@@ -33,16 +33,18 @@ Install with `pip install owid-catalog`. Then you can get data in two different 
 This API attempts to give you exactly the data you in a chart on our site.
 
 ```python
-from owid.catalog import charts
+from owid.catalog import Client
+
+client = Client()
 
 # get the data for one chart by URL
-df = charts.get_data('https://ourworldindata.org/grapher/life-expectancy')
+df = client.charts.get_data('https://ourworldindata.org/grapher/life-expectancy')
 ```
 
 Notice that the last part of the URL is the chart's slug, its identifier, in this case `life-expectancy`. Using the slug alone also works.
 
 ```python
-df = charts.get_data('life-expectancy')
+df = client.charts.get_data('life-expectancy')
 ```
 
 
@@ -53,31 +55,37 @@ We also curate much more data than is available on our site. To access that in e
 This API is designed for use in Jupyter notebooks.
 
 ```python
-from owid import catalog
+from owid.catalog import Client
 
-# look for Covid-19 data, return a data frame of matches
-catalog.find('covid')
+client = Client()
 
-# load Covid-19 data from the Our World in Data namespace as a data frame
-df = catalog.find('covid', namespace='owid').load()
+# Search for tables
+results = client.tables.search(table='covid')
 
-# search is case-insensitive and supports regex by default
-catalog.find(table='gdp.*capita')
+# Load data from first result
+df = results[0].data
 
-# use fuzzy search for typo-tolerant matching (sorted by relevance)
-catalog.find(table='forest area', fuzzy=True)
-catalog.find(dataset='wrld bank', fuzzy=True, threshold=60)
+# Search with namespace filter
+results = client.tables.search(table='covid', namespace='owid')
+df = results[0].data
+
+# Search is case-insensitive and supports regex by default
+client.tables.search(table='gdp.*capita')
+
+# Use fuzzy search for typo-tolerant matching (sorted by relevance)
+client.tables.search(table='forest area', fuzzy=True)
+client.tables.search(dataset='wrld bank', fuzzy=True, threshold=60)
 ```
 
-There many be multiple versions of the same dataset in a catalog, each will have a unique path. To easily load the same dataset again, you should record its path and load it this way:
+There may be multiple versions of the same dataset in a catalog, each will have a unique path. To easily load the same dataset again, you should record its path and load it this way:
 
 ```python
-from owid import catalog
+from owid.catalog import Client
+
+client = Client()
 
 path = 'garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate/gbd_mental_health_prevalence_rate'
-
-rc = catalog.ETLCatalog()
-df = rc[path]
+df = client.tables.get_data(path)
 ```
 
 ## Development
@@ -97,6 +105,9 @@ make watch
 <details>
 <summary>Click to expand changelog</summary>
 
+- `v0.4.5`
+    - Allow both `table` and `dataset` parameters in `find()` (they can now be used together)
+    - Migrate from pyright to ty type checker for improved type checking
 - `v0.4.4`
     - Enhanced `find()` with better search capabilities:
       - Case-insensitive search by default (use `case=True` for case-sensitive)
