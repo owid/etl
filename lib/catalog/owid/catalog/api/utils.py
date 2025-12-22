@@ -12,7 +12,7 @@ import re
 import tempfile
 from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 from urllib.parse import urlparse
 
 import numpy as np
@@ -24,9 +24,7 @@ from rapidfuzz import fuzz
 
 from owid.catalog import s3_utils
 from owid.catalog.datasets import CHANNEL, Dataset, FileFormat
-
-if TYPE_CHECKING:
-    from ..tables import Table
+from owid.catalog.tables import Table
 
 log = structlog.get_logger()
 
@@ -206,17 +204,13 @@ class CatalogMixin:
         if frame.empty:
             raise ValueError("No matching table found")
         else:
-            from ..tables import Table as T
-
-            return cast(T, frame.sort_values("version").iloc[-1].load())
+            return cast(Table, frame.sort_values("version").iloc[-1].load())
 
     def __getitem__(self, path: str) -> Table:
-        from ..tables import Table as T
-
         uri = "/".join([self.uri.rstrip("/"), path])
         for _format in SUPPORTED_FORMATS:
             try:
-                return T.read(f"{uri}.{_format}")
+                return Table.read(f"{uri}.{_format}")
             except Exception:
                 continue
 
@@ -426,8 +420,6 @@ class CatalogSeries(pd.Series):
         return CatalogSeries
 
     def load(self) -> Table:
-        from ..tables import Table as T
-
         format = None
         if hasattr(self, "format"):
             format = self.format
@@ -441,7 +433,7 @@ class CatalogSeries(pd.Series):
                 if not getattr(self, "is_public", True):
                     uri = download_private_file_s3(uri, tmpdir)
 
-                return T.read(uri)
+                return Table.read(uri)
 
         raise ValueError("series is not a table spec")
 

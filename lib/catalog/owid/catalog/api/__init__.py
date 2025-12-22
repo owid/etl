@@ -39,11 +39,13 @@ Example:
 
 from __future__ import annotations
 
-from owid.catalog.api.charts import ChartNotFoundError, ChartsAPI, LicenseError
+from owid.catalog.api.charts import ChartsAPI
 from owid.catalog.api.indicators import IndicatorsAPI
 from owid.catalog.api.models import (
+    ChartNotFoundError,
     ChartResult,
     IndicatorResult,
+    LicenseError,
     PageSearchResult,
     ResultSet,
     TableResult,

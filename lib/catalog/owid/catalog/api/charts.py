@@ -5,17 +5,15 @@
 #
 from __future__ import annotations
 
-import io
-import json
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import requests
 
-from owid.catalog.api.models import ChartResult, ResultSet
+from owid.catalog.api.models import ChartNotFoundError, ChartResult, LicenseError, ResultSet
 
 if TYPE_CHECKING:
-    from . import Client
+    from owid.catalog.api import Client
 
 
 class ChartsAPI:
@@ -31,19 +29,19 @@ class ChartsAPI:
 
         client = Client()
 
+        # Get chart data directly
+        df = client.charts.get_data("life-expectancy")
+
+        # Or fetch chart and access data via property
+        chart = client.charts.fetch("life-expectancy")
+        df = chart.data  # Lazy-loaded via property
+
         # Search for charts
         results = client.charts.search("gdp per capita")
-        df = results[0].get_data()
-
-        # Get chart data as DataFrame
-        df = client.charts.get_data("life-expectancy")
+        df = results[0].data  # Access data via property
 
         # Get chart metadata
         meta = client.charts.metadata("life-expectancy")
-
-        # Get full chart info as ChartResult
-        chart = client.charts.fetch("life-expectancy")
-        df = chart.get_data()
         ```
     """
 
@@ -71,8 +69,8 @@ class ChartsAPI:
             print(df.head())
             ```
         """
-        slug = self._parse_slug(slug_or_url)
-        return self._fetch_data(slug)
+        # Use fetch() to get ChartResult, then access .data property
+        return self.fetch(slug_or_url).data
 
     def metadata(self, slug_or_url: str) -> dict[str, Any]:
         """Fetch chart metadata.
@@ -213,41 +211,6 @@ class ChartsAPI:
         return slug_or_url
 
     @staticmethod
-    def _fetch_data(slug: str) -> pd.DataFrame:
-        """Fetch CSV data from a chart."""
-        url = f"{ChartsAPI.BASE_URL}/{slug}.csv?useColumnShortNames=true"
-        resp = requests.get(url)
-
-        if resp.status_code == 404:
-            raise ChartNotFoundError(f"No such chart found: {slug}")
-
-        if resp.status_code == 403:
-            try:
-                error_data = resp.json()
-                raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
-            except (json.JSONDecodeError, ValueError):
-                raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
-
-        resp.raise_for_status()
-
-        df = pd.read_csv(io.StringIO(resp.text))
-
-        # Normalize column names
-        df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
-        if "Code" in df.columns:
-            df = df.drop(columns=["Code"])
-
-        # Attach metadata
-        df.attrs["slug"] = slug
-        df.attrs["url"] = f"{ChartsAPI.BASE_URL}/{slug}"
-
-        # Rename "years" to "dates" if values are date strings
-        if "years" in df.columns and df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
-            df = df.rename(columns={"years": "dates"})
-
-        return df
-
-    @staticmethod
     def _fetch_metadata(slug: str) -> dict[str, Any]:
         """Fetch metadata JSON from a chart."""
         url = f"{ChartsAPI.BASE_URL}/{slug}.metadata.json"
@@ -270,15 +233,3 @@ class ChartsAPI:
 
         resp.raise_for_status()
         return resp.json()
-
-
-class ChartNotFoundError(Exception):
-    """Raised when a chart does not exist."""
-
-    pass
-
-
-class LicenseError(Exception):
-    """Raised when chart data cannot be downloaded due to licensing."""
-
-    pass

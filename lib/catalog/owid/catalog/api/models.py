@@ -5,17 +5,91 @@
 #
 from __future__ import annotations
 
+import io
+import json
 from typing import TYPE_CHECKING, Any, Generic, Iterator, TypeVar
 
 import pandas as pd
+import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+
+from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.catalogs import CatalogFrame
-    from owid.catalog.tables import Table
     from owid.catalog.variables import Variable
 
 T = TypeVar("T")
+
+
+class ChartNotFoundError(Exception):
+    """Raised when a chart does not exist."""
+
+    pass
+
+
+class LicenseError(Exception):
+    """Raised when chart data cannot be downloaded due to licensing."""
+
+    pass
+
+
+def _load_table_data(
+    path: str,
+    formats: list[str] | None = None,
+    is_public: bool = True,
+) -> "Table":
+    """Load a table from the catalog by path.
+
+    Helper function for loading table data. Used by TableResult and IndicatorResult.
+
+    Args:
+        path: Table path in catalog (e.g., "grapher/namespace/version/dataset/table")
+        formats: List of formats to try. If None, tries all supported formats.
+        is_public: Whether the table is publicly accessible.
+
+    Returns:
+        Table object with data and metadata.
+
+    Raises:
+        KeyError: If no table found at the specified path.
+    """
+    import tempfile
+
+    from owid.catalog.api.utils import (
+        OWID_CATALOG_URI,
+        PREFERRED_FORMAT,
+        SUPPORTED_FORMATS,
+        download_private_file_s3,
+    )
+
+    base_uri = OWID_CATALOG_URI
+    uri = "/".join([base_uri.rstrip("/"), path])
+
+    # Determine format preference
+    if formats:
+        formats_to_try = formats
+    else:
+        formats_to_try = SUPPORTED_FORMATS
+
+    # Prefer feather if available
+    if PREFERRED_FORMAT in formats_to_try:
+        formats_to_try = [PREFERRED_FORMAT] + [f for f in formats_to_try if f != PREFERRED_FORMAT]
+
+    for fmt in formats_to_try:
+        try:
+            table_uri = f"{uri}.{fmt}"
+
+            # Handle private files
+            if not is_public:
+                tmpdir = tempfile.mkdtemp()
+                table_uri = download_private_file_s3(table_uri, tmpdir)
+
+            return Table.read(table_uri)
+        except Exception:
+            continue
+
+    raise KeyError(f"No matching table found at: {path}")
 
 
 class ChartResult(BaseModel):
@@ -67,19 +141,43 @@ class ChartResult(BaseModel):
             DataFrame with chart data. Metadata is available in df.attrs.
         """
         if self._data is None:
-            self._data = self.get_data()
+            self._data = self._load_data()
         return self._data
 
-    def get_data(self) -> pd.DataFrame:
-        """Fetch the data for this chart.
+    def _load_data(self) -> pd.DataFrame:
+        """Internal method to fetch chart data."""
+        # Fetch CSV data from the chart
+        url = f"https://ourworldindata.org/grapher/{self.slug}.csv?useColumnShortNames=true"
+        resp = requests.get(url)
 
-        Returns:
-            DataFrame with chart data. Metadata is available in df.attrs.
-        """
-        # Import here to avoid circular imports
-        from .charts import ChartsAPI
+        if resp.status_code == 404:
+            raise ChartNotFoundError(f"No such chart found: {self.slug}")
 
-        return ChartsAPI._fetch_data(self.slug)
+        if resp.status_code == 403:
+            try:
+                error_data = resp.json()
+                raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
+            except (json.JSONDecodeError, ValueError):
+                raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
+
+        resp.raise_for_status()
+
+        df = pd.read_csv(io.StringIO(resp.text))
+
+        # Normalize column names
+        df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
+        if "Code" in df.columns:
+            df = df.drop(columns=["Code"])
+
+        # Attach metadata
+        df.attrs["slug"] = self.slug
+        df.attrs["url"] = self.url
+
+        # Rename "years" to "dates" if values are date strings
+        if "years" in df.columns and df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
+            df = df.rename(columns={"years": "dates"})
+
+        return df
 
 
 class PageSearchResult(BaseModel):
@@ -141,7 +239,7 @@ class IndicatorResult(BaseModel):
         """
 
         if self._table is None:
-            self._table = self._load()
+            self._table = self._load_table()
         # Extract the specific column/variable
         return self._table[self.column_name]  # type: ignore
 
@@ -153,16 +251,14 @@ class IndicatorResult(BaseModel):
             Table object with all columns including this indicator.
         """
         if self._table is None:
-            self._table = self._load()
+            self._table = self._load_table()
         return self._table
 
-    def _load(self) -> "Table":
+    def _load_table(self) -> "Table":
         """Internal method to load the table containing this indicator."""
-        from .tables import TablesAPI
-
         # Parse catalog_path: "grapher/namespace/version/dataset/table#column"
         path_part, _, _ = self.catalog_path.partition("#")
-        return TablesAPI._load_table(path_part)
+        return _load_table_data(path_part)
 
 
 class TableResult(BaseModel):
@@ -208,9 +304,7 @@ class TableResult(BaseModel):
 
     def _load(self) -> "Table":
         """Internal method to load table data."""
-        from .tables import TablesAPI
-
-        return TablesAPI._load_table(self.path, formats=self.formats, is_public=self.is_public)
+        return _load_table_data(self.path, formats=self.formats, is_public=self.is_public)
 
 
 class ResultSet(BaseModel, Generic[T]):
@@ -269,7 +363,7 @@ class ResultSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"ResultSet\n  • query={self.query!r}\n  • total={self.total}\n  • .results:\n    {indented_df}"
+        header = f"ResultSet\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
         return header
 
     def __str__(self) -> str:
@@ -291,9 +385,9 @@ class ResultSet(BaseModel, Generic[T]):
         html = f"""<div>
   <p><strong>ResultSet</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
-    <li>• <strong>query</strong>: {self.query!r}</li>
-    <li>• <strong>total</strong>: {self.total}</li>
-    <li>• <strong>.results</strong>:
+    <li><strong>.query</strong>: {self.query!r}</li>
+    <li><strong>.total</strong>: {self.total}</li>
+    <li><strong>.results</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
       </div>
@@ -342,8 +436,8 @@ class ResultSet(BaseModel, Generic[T]):
         Returns:
             CatalogFrame that can use .load() method.
         """
-        from .utils import OWID_CATALOG_URI
-        from .utils import CatalogFrame as CF
+        from owid.catalog.api.utils import OWID_CATALOG_URI
+        from owid.catalog.api.utils import CatalogFrame as CF
 
         if not self.results:
             return CF.create_empty()

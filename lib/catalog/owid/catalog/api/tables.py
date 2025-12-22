@@ -5,24 +5,15 @@
 #
 from __future__ import annotations
 
-import tempfile
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, cast
 
 from owid.catalog.api.models import ResultSet, TableResult
-from owid.catalog.api.utils import (
-    OWID_CATALOG_URI,
-    PREFERRED_FORMAT,
-    S3_OWID_URI,
-    SUPPORTED_FORMATS,
-    ETLCatalog,
-    download_private_file_s3,
-)
+from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI, ETLCatalog
 from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
-    from owid.catalog.tables import Table
 
 
 class TablesAPI:
@@ -299,43 +290,3 @@ class TablesAPI:
             _ = result.data  # Access property to trigger loading
 
         return result
-
-    @staticmethod
-    def _load_table(
-        path: str,
-        formats: list[str] | None = None,
-        is_public: bool = True,
-    ) -> "Table":
-        """Load a table from the catalog by path.
-
-        Internal method used by TableResult._load().
-        """
-        from ..tables import Table
-
-        base_uri = TablesAPI.CATALOG_URI
-        uri = "/".join([base_uri.rstrip("/"), path])
-
-        # Determine format preference
-        if formats:
-            formats_to_try = formats
-        else:
-            formats_to_try = SUPPORTED_FORMATS
-
-        # Prefer feather if available
-        if PREFERRED_FORMAT in formats_to_try:
-            formats_to_try = [PREFERRED_FORMAT] + [f for f in formats_to_try if f != PREFERRED_FORMAT]
-
-        for fmt in formats_to_try:
-            try:
-                table_uri = f"{uri}.{fmt}"
-
-                # Handle private files
-                if not is_public:
-                    tmpdir = tempfile.mkdtemp()
-                    table_uri = download_private_file_s3(table_uri, tmpdir)
-
-                return Table.read(table_uri)
-            except Exception:
-                continue
-
-        raise KeyError(f"No matching table found at: {path}")
