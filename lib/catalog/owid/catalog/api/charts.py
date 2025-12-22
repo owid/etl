@@ -25,7 +25,7 @@ class ChartsAPI:
 
     Example:
         ```python
-        from owid.catalog.client import Client
+        from owid.catalog import Client
 
         client = Client()
 
@@ -187,7 +187,7 @@ class ChartsAPI:
             )
 
             # Get data from search results
-            df = results[0].get_data()
+            df = results[0].data
             ```
         """
         return self._client._site_search.charts(

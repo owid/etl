@@ -28,7 +28,7 @@ class SiteSearchAPI:
 
     Example:
         ```python
-        from owid.catalog.client import Client
+        from owid.catalog import Client
 
         client = Client()
 
@@ -99,7 +99,7 @@ class SiteSearchAPI:
             page: Page number for pagination (0-indexed). Default 0.
 
         Returns:
-            SearchResults containing ChartResult objects.
+            ResultSet containing ChartResult objects.
 
         Note:
             Prefer using `client.charts.search()` for a simpler API.
@@ -161,7 +161,7 @@ class SiteSearchAPI:
             page: Page number for pagination (0-indexed). Default 0.
 
         Returns:
-            SearchResults containing PageSearchResult objects.
+            ResultSet containing PageSearchResult objects.
 
         Example:
             ```python

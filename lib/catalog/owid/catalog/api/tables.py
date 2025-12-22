@@ -25,7 +25,7 @@ class TablesAPI:
 
     Example:
         ```python
-        from owid.catalog.client import Client
+        from owid.catalog import Client
 
         client = Client()
 

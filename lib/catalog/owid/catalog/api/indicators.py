@@ -27,7 +27,7 @@ class IndicatorsAPI:
 
     Example:
         ```python
-        from owid.catalog.client import Client
+        from owid.catalog import Client
 
         client = Client()
 
@@ -89,7 +89,7 @@ class IndicatorsAPI:
                 print(f"  Path: {ind.catalog_path}")
 
             # Load data from top result
-            table = results[0].load()
+            indicator = results[0].data
             ```
         """
         params = {
@@ -173,10 +173,11 @@ class IndicatorsAPI:
             variable = indicator.data  # Already loaded
             ```
 
-        TODO:
-            - This method currently uses TablesAPI to load the table. In the future, we should get the indicator data directly without loading the full table.
-            - Currently, no indicator_id is assigned when fetching by URI. We should provide one.
-            - For the above points, we probably need to infer the indicator ID form the indicator path.
+        Note:
+            Known limitations of this method:
+            - Uses TablesAPI internally, loading the full table to access a single column
+            - No indicator_id is assigned when fetching by URI (returns None)
+            - Future optimization may allow direct indicator access without full table loading
         """
         # Parse path to extract table_path and column_name
         if "#" not in path:

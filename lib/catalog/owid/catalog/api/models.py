@@ -111,10 +111,10 @@ def _load_table(
         path: Table path in catalog (e.g., "grapher/namespace/version/dataset/table")
         formats: List of formats to try. If None, tries all supported formats.
         is_public: Whether the table is publicly accessible.
-        load_data: If True, load only table structure (columns and metadata) without rows.
+        load_data: If True, load full data. If False, load only table structure (columns and metadata) without rows.
 
     Returns:
-        Table object with data and metadata (or just metadata if load_data=True).
+        Table object with data and metadata (or just metadata if load_data=False).
 
     Raises:
         KeyError: If no table found at the specified path.
