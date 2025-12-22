@@ -1007,7 +1007,7 @@ wheels = [
 
 [[package]]
 name = "owid-catalog"
-version = "0.4.4"
+version = "0.4.5"
 source = { editable = "." }
 dependencies = [
     { name = "dataclasses-json" },
@@ -1078,7 +1078,7 @@ dev = [
 
 [[package]]
 name = "owid-datautils"
-version = "0.6.1"
+version = "0.6.2"
 source = { editable = "../datautils" }
 dependencies = [
     { name = "boto3" },
@@ -1128,7 +1128,7 @@ dev = [
 
 [[package]]
 name = "owid-repack"
-version = "0.1.6"
+version = "0.1.7"
 source = { editable = "../repack" }
 dependencies = [
     { name = "numpy" },
