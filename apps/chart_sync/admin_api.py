@@ -205,7 +205,7 @@ class AdminAPI(object):
     def get_narrative_chart(self, narrative_chart_id: int) -> dict:
         """Get a narrative chart by ID."""
         resp = requests.get(
-            f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}",
+            f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
             cookies={"sessionid": self.session_id},
         )
         js = self._json_from_response(resp)
