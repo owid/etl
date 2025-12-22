@@ -84,7 +84,7 @@ class RequestLoggingMiddleware(Middleware):
         # Put every MCP call inside a Logfire span so it shows up as a trace
         msg = str(context.method)
         if attrs.get("name"):
-            msg += " - " + attrs["name"]
+            msg += " - " + str(attrs["name"])
         with logfire.span(msg, **attrs):
             # Log incoming request
             sentry_logger.info(
