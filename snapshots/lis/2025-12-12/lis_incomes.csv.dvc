@@ -21,13 +21,13 @@ meta:
 
     # Files
     url_main: https://www.lisdatacenter.org/our-data/lis-database/
-    date_accessed: '2025-12-12'
+    date_accessed: '2025-12-22'
 
     # License
     license:
       name: LIS Privacy Policy
       url: https://www.lisdatacenter.org/about-lis/terms-of-use/
 outs:
-  - md5: 14101f663c614b8bbf1d31f194f04902
-    size: 8296649
+  - md5: 4e2987fba25066c9549723344ea993e1
+    size: 6815991
     path: lis_incomes.csv

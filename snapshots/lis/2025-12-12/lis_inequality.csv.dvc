@@ -21,13 +21,13 @@ meta:
 
     # Files
     url_main: https://www.lisdatacenter.org/our-data/lis-database/
-    date_accessed: '2025-12-12'
+    date_accessed: '2025-12-22'
 
     # License
     license:
       name: LIS Privacy Policy
       url: https://www.lisdatacenter.org/about-lis/terms-of-use/
 outs:
-  - md5: cfee5903f551fbb6de86e79feda6da06
-    size: 1669620
+  - md5: 772d36f2d33e457b1a7c37340ff2fe1d
+    size: 1733737
     path: lis_inequality.csv

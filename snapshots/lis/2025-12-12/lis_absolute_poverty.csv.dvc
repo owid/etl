@@ -21,13 +21,13 @@ meta:
 
     # Files
     url_main: https://www.lisdatacenter.org/our-data/lis-database/
-    date_accessed: '2025-12-12'
+    date_accessed: '2025-12-22'
 
     # License
     license:
       name: LIS Privacy Policy
       url: https://www.lisdatacenter.org/about-lis/terms-of-use/
 outs:
-  - md5: 6c0a615895b9550d1bfe8402bac9cfa1
-    size: 12111351
+  - md5: 719950b601419ee2366ebc77ed406598
+    size: 14853360
     path: lis_absolute_poverty.csv
