@@ -258,14 +258,6 @@ class TestTablesAPI:
         with pytest.raises(ValueError, match="not found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
 
-    def test_direct_path_access(self):
-        # This test may be slow as it loads actual data
-        # Uncomment to test:
-        # client = Client()
-        # table = client.tables["garden/un/2024-07-11/un_wpp/population"]
-        # assert table is not None
-        pass
-
     def test_backwards_compatibility_datasets(self):
         """Test that client.datasets still works (backwards compatibility)."""
         client = Client()

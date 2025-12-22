@@ -28,7 +28,6 @@ Example:
     results = client.tables.search(table="population", namespace="un")
     table_result = client.tables.fetch("garden/un/2024/pop/pop")  # Fetch metadata
     table = table_result.data  # Lazy-load table data
-    table = client.tables["garden/un/2024/population/population"]  # Direct access
 
     # Backwards compatibility: client.datasets still works (deprecated)
     results = client.datasets.search(table="population")  # Works, but use .tables instead

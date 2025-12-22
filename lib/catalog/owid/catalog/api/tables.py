@@ -48,8 +48,9 @@ class TablesAPI:
         print(f"Dataset: {table_result.dataset}, Version: {table_result.version}")
         table = table_result.data  # Lazy-load when needed
 
-        # Direct path access (loads data immediately)
-        table = client.tables["garden/un/2024-07-11/population/population"]
+        # Or preload data immediately
+        table_result = client.tables.fetch("garden/un/2024/population/population", load_data=True)
+        table = table_result.data  # Already loaded
         ```
     """
 
@@ -299,25 +300,6 @@ class TablesAPI:
 
         return result
 
-    def __getitem__(self, path: str) -> "Table":
-        """Load a table by its catalog path.
-
-        Args:
-            path: Full catalog path (e.g., "garden/un/2024/population/population").
-
-        Returns:
-            The loaded Table object.
-
-        Raises:
-            KeyError: If no table found at the path.
-
-        Example:
-            ```python
-            table = client.tables["garden/un/2024-07-11/population/population"]
-            ```
-        """
-        return self._load_table(path)
-
     @staticmethod
     def _load_table(
         path: str,
@@ -326,7 +308,7 @@ class TablesAPI:
     ) -> "Table":
         """Load a table from the catalog by path.
 
-        Internal method used by TableResult._load() and __getitem__.
+        Internal method used by TableResult._load().
         """
         from ..tables import Table
 
