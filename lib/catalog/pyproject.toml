@@ -5,7 +5,7 @@ description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
 license = "MIT"
-requires-python = ">=3.10, <4.0"
+requires-python = ">=3.10, <3.15"
 dependencies = [
     "pandas>=2.2.3",
     "jsonschema>=3.2.0",

@@ -1,6 +1,6 @@
 [![Build status](https://badge.buildkite.com/66cc67fc572120ca97b9ffff288d5d73cb33e019dd70323053.svg)](https://buildkite.com/our-world-in-data/owid-catalog-unit-tests)
 [![PyPI version](https://badge.fury.io/py/owid-catalog.svg)](https://badge.fury.io/py/owid-catalog)
-![](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)
+![](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)
 
 # owid-catalog
 
@@ -112,6 +112,7 @@ make watch
       - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
       - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
       - **Breaking changes**: `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+      - **Python 3.14 support**: Added support for Python 3.14
     - **Others**
       - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
       - Documentation restructure: Split into intro, API reference, and data structures guides
