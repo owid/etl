@@ -17,11 +17,11 @@ from dataclasses import dataclass
 import pandas as pd
 from deprecated import deprecated
 
-from .api import ChartNotFoundError, Client, LicenseError  # noqa
+from owid.catalog.api import ChartNotFoundError, Client, LicenseError  # noqa
 
 
 @deprecated(
-    version="0.4.0",
+    version="0.4.X",
     reason="Use owid.catalog.Client instead: client = Client(); df = client.charts.get_data('chart-slug')",
 )
 @dataclass
@@ -108,7 +108,7 @@ class Chart:
 
 
 @deprecated(
-    version="0.4.0",
+    version="0.4.X",
     reason="Use owid.catalog.Client instead: client = Client(); df = client.charts.get_data('chart-slug')",
 )
 def get_data(slug_or_url: str) -> pd.DataFrame:

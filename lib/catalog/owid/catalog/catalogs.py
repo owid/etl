@@ -22,7 +22,6 @@ Migration example:
     table = results[0].data
     ```
 
-See migration guide: https://docs.owid.io/catalog-api-migration
 """
 
 from __future__ import annotations
@@ -30,6 +29,8 @@ from __future__ import annotations
 import warnings
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
+
+from deprecated import deprecated
 
 # Re-export classes and functions for backwards compatibility
 from .api.utils import (
@@ -81,6 +82,10 @@ def _get_client() -> "Client":
     return _CLIENT_INSTANCE
 
 
+@deprecated(
+    version="0.4.0",
+    reason="Use Client().tables.search() instead. See: https://docs.owid.io/catalog-api-migration",
+)
 def find(
     table: str | None = None,
     namespace: str | None = None,
@@ -133,6 +138,10 @@ def find(
     return results.to_catalog_frame()
 
 
+@deprecated(
+    version="0.4.0",
+    reason="Use Client().tables.search()[0].data instead. See: https://docs.owid.io/catalog-api-migration",
+)
 def find_one(*args: str | None, **kwargs: str | None) -> Table:
     """Find and load single table (DEPRECATED).
 
@@ -180,6 +189,10 @@ def find_one(*args: str | None, **kwargs: str | None) -> Table:
     return results[0].data
 
 
+@deprecated(
+    version="0.4.0",
+    reason="Use Client().tables.search()[-1].data instead. See: https://docs.owid.io/catalog-api-migration",
+)
 def find_latest(
     table: str | None = None,
     namespace: str | None = None,
@@ -241,6 +254,10 @@ def find_latest(
     return sorted_results[-1].data
 
 
+@deprecated(
+    version="0.4.0",
+    reason="Use Client().indicators.search() instead. See: https://docs.owid.io/catalog-api-migration",
+)
 def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
     """Search by indicator (DEPRECATED).
 
