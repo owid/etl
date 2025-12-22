@@ -37,6 +37,7 @@ from pyarrow import feather
 from sqlalchemy import (
     CHAR,
     BigInteger,
+    CheckConstraint,
     Computed,
     Date,
     DateTime,
@@ -2062,6 +2063,80 @@ class ExplorerView(Base):
 
     chart_config: Mapped[Optional["ChartConfig"]] = relationship("ChartConfig", back_populates="explorer_viewss")
     explorer: Mapped["Explorer"] = relationship("Explorer", back_populates="explorer_viewss")
+
+
+class NarrativeChart(Base):
+    __tablename__ = "narrative_charts"
+    __table_args__ = (
+        CheckConstraint(
+            "((`parentChartId` is null) xor (`parentMultiDimXChartConfigId` is null))",
+            name="check_narrative_charts_single_parent",
+        ),
+        ForeignKeyConstraint(
+            ["chartConfigId"],
+            ["chart_configs.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="narrative_charts_ibfk_1",
+        ),
+        ForeignKeyConstraint(
+            ["lastEditedByUserId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="narrative_charts_ibfk_3",
+        ),
+        ForeignKeyConstraint(
+            ["parentChartId"], ["charts.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="narrative_charts_ibfk_2"
+        ),
+        ForeignKeyConstraint(
+            ["parentMultiDimXChartConfigId"],
+            ["multi_dim_x_chart_configs.id"],
+            name="fk_narrative_charts_parent_multi_dim_x_chart_config_id",
+        ),
+        Index("chartConfigId", "chartConfigId"),
+        Index("fk_narrative_charts_parent_multi_dim_x_chart_config_id", "parentMultiDimXChartConfigId"),
+        Index("lastEditedByUserId", "lastEditedByUserId"),
+        Index("name", "name", unique=True),
+        Index("parentChartId", "parentChartId"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
+    chartConfigId: Mapped[str] = mapped_column(CHAR(36), nullable=False)
+    queryParamsForParentChart: Mapped[dict] = mapped_column(JSON, nullable=False)
+    queryParamsForParentChartMd5: Mapped[str] = mapped_column(
+        CHAR(24), Computed("(to_base64(unhex(md5(`queryParamsForParentChart`))))", persisted=True), nullable=False
+    )
+    lastEditedByUserId: Mapped[int] = mapped_column(Integer, nullable=False)
+    parentChartId: Mapped[Optional[int]] = mapped_column(Integer)
+    parentMultiDimXChartConfigId: Mapped[Optional[int]] = mapped_column(Integer)
+    createdAt: Mapped[Optional[datetime]] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+
+    @classmethod
+    def load_narrative_charts_by_parent_chart_ids(
+        cls, session: Session, parent_chart_ids: Set[int]
+    ) -> List["NarrativeChart"]:
+        """Load narrative charts that have the given parent chart IDs."""
+        if not parent_chart_ids:
+            return []
+        return list(session.scalars(select(cls).where(cls.parentChartId.in_(parent_chart_ids))).all())
+
+    def load_config(self, session: Session) -> Dict[str, Any]:
+        """Load the patch config from chart_configs table."""
+        result = session.execute(
+            text("SELECT patch FROM chart_configs WHERE id = :config_id"),
+            {"config_id": self.chartConfigId},
+        ).fetchone()
+        if result is None:
+            return {}
+        config = result[0]
+        if isinstance(config, str):
+            return json.loads(config)
+        return config
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
