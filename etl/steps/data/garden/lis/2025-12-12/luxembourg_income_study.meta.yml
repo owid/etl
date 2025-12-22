@@ -579,6 +579,13 @@ definitions:
     [100, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 1]
     <%- endif %>
 
+  map_brackets_relative_poverty: &map_brackets_relative_poverty |-
+    <% if welfare_type == "dhi" %>
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
+    <%- elif welfare_type == "mi" %>
+    [1000, 20, 25, 30, 35, 1]
+    <%- endif %>
+
   entity_names_poverty: &entity_names_poverty
     - Mozambique
     - Zambia
@@ -1209,6 +1216,6 @@ tables:
               colorScale:
                 baseColorScheme: "YlOrBr"
                 binningStrategy: "manual"
-                customNumericValues: [0, 5, 10, 15, 20, 25, 1]
+                customNumericValues: *map_brackets_relative_poverty
             selectedEntityNames: *entity_names_inequality
 
