@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 macros: |-
   <# Poverty lines levels #>
-  <% set poverty_line_ipl = ["3.00"] %>
+  <% set poverty_line_ipl = ["3"] %>
   <% set poverty_line_lmic = ["4.20"] %>
   <% set poverty_line_umic = ["8.30"] %>
 

@@ -70,7 +70,7 @@ def run() -> None:
             },
             {
                 "dimension": "poverty_line",
-                "choices": ["1", "2", "5", "10", "20", "30", "40"],
+                "choices": ["1", "3", "4.20", "8.30", "10", "20", "30", "40"],
                 "choice_new_slug": "multiple_lines",
                 "view_config": {
                     "hideRelativeToggle": "false",
