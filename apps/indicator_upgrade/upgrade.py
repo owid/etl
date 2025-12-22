@@ -5,6 +5,7 @@ from typing import Dict, List
 
 import click
 import pandas as pd
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher.model as gm
@@ -12,8 +13,13 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
+from etl.db import get_engine
 from etl.files import get_schema_from_url
-from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
+from etl.indicator_upgrade.indicator_update import (
+    find_charts_from_variable_ids,
+    update_chart_config,
+    update_narrative_chart_config,
+)
 
 # Default number of parallel workers
 DEFAULT_MAX_WORKERS = 5
@@ -49,6 +55,60 @@ def _update_single_chart(chart: gm.Chart, indicator_mapping: Dict[int, int], api
     # Push new chart to DB
     api.update_chart(chart_id=chart_id, chart_config=config_new)
     return chart_id
+
+
+def get_affected_narrative_charts_cli(charts: List[gm.Chart]) -> List[gm.NarrativeChart]:
+    """Get affected narrative charts for CLI (without Streamlit dependencies).
+
+    Finds narrative charts by looking up which ones have the affected charts as parents.
+    """
+    log.info("Finding affected narrative charts...")
+    parent_chart_ids = {chart.id for chart in charts if chart.id}
+    with Session(get_engine()) as session:
+        narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(session, parent_chart_ids)
+    log.info(f"Found {len(narrative_charts)} affected narrative charts")
+    return narrative_charts
+
+
+def push_new_narrative_charts_cli(
+    narrative_charts: List[gm.NarrativeChart],
+    indicator_mapping: Dict[int, int],
+    dry_run: bool = False,
+) -> None:
+    """Update narrative charts in the database (CLI version)."""
+    if not narrative_charts:
+        log.warning("No narrative charts to update")
+        return
+
+    if dry_run:
+        log.info(
+            f"DRY RUN: Would update {len(narrative_charts)} narrative charts with indicator mapping: {indicator_mapping}"
+        )
+        for nc in narrative_charts:
+            log.info(f"DRY RUN: Would update narrative chart {nc.id} - {nc.name}")
+        return
+
+    log.info(f"Updating {len(narrative_charts)} narrative charts...")
+
+    grapher_user_id = get_grapher_user().id
+
+    # API to interact with the admin tool
+    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
+
+    # Update narrative charts sequentially
+    with Session(get_engine()) as session:
+        for nc in narrative_charts:
+            # Load the config from DB
+            config = nc.load_config(session)
+
+            # Update narrative chart config
+            config_new = update_narrative_chart_config(config, indicator_mapping)
+
+            # Push new config to DB
+            api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new)
+            log.info(f"Successfully updated narrative chart {nc.id}")
+
+    log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
 
 
 def push_new_charts_cli(
@@ -122,8 +182,19 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
         chart_url = OWID_ENV.chart_site(chart.slug) if chart.slug else f"Chart {chart.id}"
         log.info(f"  - Chart {chart.id}: {chart_url}")
 
-    # 4. Update charts
+    # 4. Get affected narrative charts (children of affected charts)
+    narrative_charts = get_affected_narrative_charts_cli(charts)
+
+    if narrative_charts:
+        log.info("Affected narrative charts:")
+        for nc in narrative_charts:
+            log.info(f"  - Narrative chart {nc.id}: {nc.name}")
+
+    # 5. Update charts
     push_new_charts_cli(charts, indicator_mapping, dry_run=dry_run, max_workers=max_workers)
+
+    # 6. Update narrative charts
+    push_new_narrative_charts_cli(narrative_charts, indicator_mapping, dry_run=dry_run)
 
     if not dry_run:
         log.info("Indicator upgrade completed successfully!")
