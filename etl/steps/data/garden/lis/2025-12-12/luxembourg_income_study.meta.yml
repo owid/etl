@@ -455,10 +455,12 @@ definitions:
     [0, 5, 10 , 15, 20, 25, 30, 35, 40]
     <%- endif %>
 
-  map_brackets_income_gap_ratio: &map_brackets_income_gap_ratio <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
+  map_brackets_income_gap_ratio: &map_brackets_income_gap_ratio <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] and welfare_type == "dhi" %>
+    [1000, 20, 25, 30, 35, 40, 45, 1]
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] and welfare_type == "mi" %>
+    [1000, 55, 60, 65, 70, 75, 80, 1]
     <%- else %>
-    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
   map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index |-
