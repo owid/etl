@@ -76,7 +76,7 @@ from owid import catalog
 
 path = 'garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate/gbd_mental_health_prevalence_rate'
 
-rc = catalog.RemoteCatalog()
+rc = catalog.ETLCatalog()
 df = rc[path]
 ```
 

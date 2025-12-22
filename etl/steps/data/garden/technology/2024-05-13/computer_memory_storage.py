@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid import catalog
+from owid.catalog.api.utils import ETLCatalog
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    us_cpi = catalog.find_latest(dataset="us_consumer_prices").reset_index()[["year", "all_items"]]
+    us_cpi = ETLCatalog().find_latest(dataset="us_consumer_prices").reset_index()[["year", "all_items"]]
 
     # Left-merge and validate 1:1
     tb = tb.merge(us_cpi, on="year", how="left", validate="1:1")

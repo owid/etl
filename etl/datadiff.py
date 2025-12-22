@@ -13,7 +13,7 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, VariableMeta, find
+from owid.catalog import Dataset, DatasetMeta, ETLCatalog, LocalCatalog, Table, VariableMeta, find
 from owid.catalog.api.utils import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 from rich.panel import Panel
@@ -104,12 +104,12 @@ class DatasetDiff:
         def _snippet_dataset(ds: Dataset, table_name: str) -> str:
             m = ds.metadata
             if isinstance(ds, RemoteDataset):
-                return f'RemoteCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
+                return f'ETLCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
             else:
                 return f'Dataset(DATA_DIR / "{m.uri}")["{table_name}"]'
 
         code = f"""
-from owid.catalog import RemoteCatalog, Dataset
+from owid.catalog import ETLCatalog, Dataset
 from etl.paths import DATA_DIR
 
 ta = {_snippet_dataset(ds_a, table_name)}
@@ -896,7 +896,7 @@ def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
 
 def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: Optional[str]) -> Dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of remote catalog."""
-    rc = RemoteCatalog(channels=channels)
+    rc = ETLCatalog(channels=channels)
     frame = rc.frame
 
     frame["ds_paths"] = frame["path"].map(os.path.dirname)

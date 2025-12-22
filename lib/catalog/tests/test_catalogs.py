@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest  # noqa
 
-from owid.catalog import CHANNEL, LocalCatalog, RemoteCatalog, Table, find
+from owid.catalog import CHANNEL, ETLCatalog, LocalCatalog, Table, find
 
 from .test_datasets import create_temp_dataset
 
@@ -24,14 +24,14 @@ def suppress_deprecation_warnings():
         yield
 
 
-_catalog: RemoteCatalog | None = None
+_catalog: ETLCatalog | None = None
 
 
-def load_catalog() -> RemoteCatalog:
+def load_catalog() -> ETLCatalog:
     global _catalog
 
     if _catalog is None:
-        _catalog = RemoteCatalog()
+        _catalog = ETLCatalog()
 
     return _catalog
 
