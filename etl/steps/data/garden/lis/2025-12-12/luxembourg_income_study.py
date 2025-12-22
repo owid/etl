@@ -108,7 +108,7 @@ def run() -> None:
     tb_absolute_poverty = process_poverty(tb=tb_absolute_poverty, absolute=True)
     tb_relative_poverty = process_poverty(tb=tb_relative_poverty, absolute=False)
     tb_inequality = process_inequality(tb=tb_inequality)
-    tb_mean_median, tb_deciles = process_incomes(tb=tb_incomes)
+    tb_incomes = process_incomes(tb=tb_incomes)
 
     # Concatenate poverty tables into one
     tb_poverty = pr.concat(
@@ -121,11 +121,8 @@ def run() -> None:
     tb_poverty = tb_poverty.format(
         ["country", "year", "poverty_line", "welfare_type", "equivalence_scale"], short_name="poverty"
     )
-    tb_mean_median = tb_mean_median.format(
-        ["country", "year", "welfare_type", "equivalence_scale"], short_name="mean_median"
-    )
-    tb_deciles = tb_deciles.format(
-        ["country", "year", "welfare_type", "equivalence_scale", "decile"], short_name="deciles"
+    tb_incomes = tb_incomes.format(
+        ["country", "year", "welfare_type", "equivalence_scale", "decile"], short_name="incomes"
     )
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "equivalence_scale"])
 
@@ -136,8 +133,7 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[
             tb_poverty,
-            tb_mean_median,
-            tb_deciles,
+            tb_incomes,
             tb_inequality,
         ],
         default_metadata=ds_meadow.metadata,
@@ -269,4 +265,7 @@ def process_incomes(tb: Table) -> Table:
     for col in tb_deciles_pivot.columns:
         tb_deciles_pivot[col].m.origins = tb["value"].m.origins
 
-    return tb_mean_median_pivot, tb_deciles_pivot
+    # Concatenate both tables
+    tb_incomes = pr.concat([tb_deciles_pivot, tb_mean_median_pivot], ignore_index=True, sort=False)
+
+    return tb_incomes

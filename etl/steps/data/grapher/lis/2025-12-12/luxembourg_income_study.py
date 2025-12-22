@@ -15,8 +15,7 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb_poverty = ds_garden.read("poverty", reset_index=False)
-    tb_mean_median = ds_garden.read("mean_median", reset_index=False)
-    tb_deciles = ds_garden.read("deciles", reset_index=False)
+    tb_incomes = ds_garden.read("incomes", reset_index=False)
     tb_inequality = ds_garden.read("inequality", reset_index=False)
 
     #
@@ -26,8 +25,7 @@ def run() -> None:
     ds_grapher = paths.create_dataset(
         tables=[
             tb_poverty,
-            tb_mean_median,
-            tb_deciles,
+            tb_incomes,
             tb_inequality,
         ],
         default_metadata=ds_garden.metadata,

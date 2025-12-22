@@ -8,6 +8,8 @@ paths = PathFinder(__file__)
 
 # Define indicators to use
 INDICATOR_NAMES = [
+    "mean",
+    "median",
     "avg",
     "thr",
     "share",
@@ -35,7 +37,7 @@ def run() -> None:
 
     # Load grapher dataset.
     ds = paths.load_dataset("luxembourg_income_study")
-    tb = ds.read("deciles", load_data=False)
+    tb = ds.read("incomes", load_data=False)
 
     #
     # Create collection object
@@ -70,6 +72,7 @@ def run() -> None:
             {
                 "dimension": "decile",
                 "choice_new_slug": "all",
+                "choices": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
                 "view_config": {
                     "hideRelativeToggle": "false",
                     "selectedFacetStrategy": "entity",

@@ -51,6 +51,8 @@ dimensions:
         name: "10"
       - slug: all
         name: All deciles
+      - slug: nan
+        name: "-"
   - name: Income measure
     slug: welfare_type
     choices:

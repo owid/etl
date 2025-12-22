@@ -736,7 +736,7 @@ tables:
                 customNumericValues: *map_brackets_poverty_gap_index
             selectedEntityNames: *entity_names_poverty
 
-  mean_median:
+  incomes:
     variables:
       mean:
         title: Mean income ({definitions.welfare_type}, {definitions.equivalence_scale})
@@ -806,8 +806,6 @@ tables:
                 customNumericValues: [1, 2, 5, 10, 20, 50, 1]
             selectedEntityNames: *entity_names_incomes_across_distribution
 
-  deciles:
-    variables:
       avg:
         title: |-
           {macros}
