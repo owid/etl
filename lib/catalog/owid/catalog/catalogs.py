@@ -129,6 +129,17 @@ def find(
     """
     _warn_deprecated("find", "Client().tables.search()")
 
+    # Maintain backwards compatibility by populating REMOTE_CATALOG
+    global REMOTE_CATALOG
+    if REMOTE_CATALOG is None:
+        REMOTE_CATALOG = ETLCatalog(channels=channels)
+    else:
+        # Add new channels if needed
+        current_channels = set(REMOTE_CATALOG.channels)
+        new_channels = set(channels) - current_channels
+        if new_channels:
+            REMOTE_CATALOG = ETLCatalog(channels=tuple(current_channels | set(channels)))
+
     # Use Client API internally
     client = _get_client()
     results = client.tables.search(
