@@ -267,9 +267,6 @@ def process_incomes(tb: Table) -> Table:
     for col in tb_deciles_pivot.columns:
         tb_deciles_pivot[col].m.origins = tb["value"].m.origins
 
-    # Add decile column with NaN to mean_median table (will be handled by pandas during concat)
-    # Don't add the column - let concat handle it
-
     # Concatenate both tables
     tb_incomes = pr.concat([tb_deciles_pivot, tb_mean_median_pivot], ignore_index=True, sort=False)
 
