@@ -249,7 +249,58 @@ class ResultSet(BaseModel, Generic[T]):
         return self.results[index]
 
     def __repr__(self) -> str:
-        return f"ResultSet(query={self.query!r}, total={self.total}, results={self.results})"
+        """Display results as a formatted table for better readability."""
+        if not self.results:
+            return f"ResultSet(query={self.query!r}, total=0, results=[])"
+
+        # Convert to DataFrame for nice tabular display
+        df = self.to_frame()
+
+        # Limit display to first 10 rows for readability
+        if len(df) == 0:
+            return f"ResultSet(query={self.query!r}, total={self.total}, results=[])"
+        elif len(df) <= 10:
+            df_str = str(df)
+        else:
+            df_str = str(df.head(10))
+
+        # Format as bullet points to show attributes at same level
+        # Indent DataFrame lines to align with bullet points
+        df_lines = df_str.split("\n")
+        indented_df = "\n    ".join(df_lines)
+
+        header = f"ResultSet\n  • query={self.query!r}\n  • total={self.total}\n  • .results:\n    {indented_df}"
+        return header
+
+    def __str__(self) -> str:
+        """Use the same representation for str() and repr()."""
+        return self.__repr__()
+
+    def _repr_html_(self) -> str:
+        """Display as HTML table in Jupyter notebooks."""
+        if not self.results:
+            return f"<p>ResultSet(query={self.query!r}, total=0, results=[])</p>"
+
+        df = self.to_frame()
+        if len(df) <= 10:
+            df_html = df._repr_html_()
+        else:
+            df_html = df.head(10)._repr_html_()
+
+        # Format as bullet points to show attributes at same level
+        html = f"""<div>
+  <p><strong>ResultSet</strong></p>
+  <ul style="list-style-type: none; padding-left: 1em;">
+    <li>• <strong>query</strong>: {self.query!r}</li>
+    <li>• <strong>total</strong>: {self.total}</li>
+    <li>• <strong>.results</strong>:
+      <div style="margin-left: 1.5em; margin-top: 0.5em;">
+        {df_html}
+      </div>
+    </li>
+  </ul>
+</div>"""
+        return html
 
     def to_frame(self) -> pd.DataFrame:
         """Convert results to a DataFrame.
@@ -261,7 +312,26 @@ class ResultSet(BaseModel, Generic[T]):
             return pd.DataFrame()
 
         # Convert Pydantic models to dicts
-        rows = [r.model_dump() if isinstance(r, BaseModel) else r for r in self.results]  # type: ignore
+        rows = []
+        for r in self.results:
+            if isinstance(r, BaseModel):
+                # For ChartResult, exclude large dict fields for better display
+                if isinstance(r, ChartResult):
+                    row = {
+                        "slug": r.slug,
+                        "title": r.title,
+                        "subtitle": r.subtitle,
+                        "url": r.url,
+                        "num_related_articles": r.num_related_articles,
+                        # Only show count of entities, not full list
+                        "num_entities": len(r.available_entities),
+                    }
+                else:
+                    row = r.model_dump()
+                rows.append(row)
+            else:
+                rows.append(r)
+
         return pd.DataFrame(rows)
 
     def to_catalog_frame(self) -> "CatalogFrame":
