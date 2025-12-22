@@ -1,6 +1,6 @@
 config:
-  explorerTitle: "Inequality - Luxembourg Income Study"
-  explorerSubtitle: "Explore Luxembourg Income Study data on inequality."
+  explorerTitle: "Incomes Across the Distribution - Luxembourg Income Study"
+  explorerSubtitle: "Explore Luxembourg Income Study data on the distribution of incomes."
   selection:
     - Brazil
     - Chile
