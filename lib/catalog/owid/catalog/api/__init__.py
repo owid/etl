@@ -20,10 +20,6 @@ from owid.catalog.api.models import (
 from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
 
-# Backwards compatibility aliases
-DatasetResult = TableResult
-DatasetsAPI = TablesAPI
-
 
 class Client:
     """Unified client for all OWID data APIs.
@@ -95,9 +91,6 @@ __all__ = [
     "IndicatorResult",
     "TableResult",
     "ResultSet",
-    # Backwards compatibility aliases (deprecated)
-    "DatasetResult",  # Alias for TableResult
-    "DatasetsAPI",  # Alias for TablesAPI
     # Exceptions for error handling
     "ChartNotFoundError",
     "LicenseError",
