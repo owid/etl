@@ -110,6 +110,8 @@ def run() -> None:
     tb_inequality = process_inequality(tb=tb_inequality)
     tb_incomes = process_incomes(tb=tb_incomes)
 
+    tb_incomes = add_period_dimension(tb=tb_incomes)
+
     # Concatenate poverty tables into one
     tb_poverty = pr.concat(
         [tb_absolute_poverty, tb_relative_poverty],
@@ -122,7 +124,7 @@ def run() -> None:
         ["country", "year", "poverty_line", "welfare_type", "equivalence_scale"], short_name="poverty"
     )
     tb_incomes = tb_incomes.format(
-        ["country", "year", "welfare_type", "equivalence_scale", "decile"], short_name="incomes"
+        ["country", "year", "welfare_type", "equivalence_scale", "decile", "period"], short_name="incomes"
     )
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "equivalence_scale"])
 
@@ -265,7 +267,41 @@ def process_incomes(tb: Table) -> Table:
     for col in tb_deciles_pivot.columns:
         tb_deciles_pivot[col].m.origins = tb["value"].m.origins
 
+    # Add decile column with NaN to mean_median table (will be handled by pandas during concat)
+    # Don't add the column - let concat handle it
+
     # Concatenate both tables
     tb_incomes = pr.concat([tb_deciles_pivot, tb_mean_median_pivot], ignore_index=True, sort=False)
 
     return tb_incomes
+
+
+def add_period_dimension(tb: Table) -> Table:
+    """
+    Add period dimension to incomes table (day, month, year).
+    """
+
+    # Separate table between "non-periodicable" and "periodable" indicators
+    tb_period = tb[
+        ["country", "year", "welfare_type", "equivalence_scale", "decile", "mean", "median", "avg", "thr"]
+    ].copy()
+    tb_non_period = tb[["country", "year", "welfare_type", "equivalence_scale", "decile", "share"]].copy()
+
+    # Create two copues of tb_period, one for "day" and another for "month"
+    tb_day = tb_period.copy()
+    tb_month = tb_period.copy()
+
+    for col in ["mean", "median", "avg", "thr"]:
+        tb_day[col] = tb_day[col] / 365
+        tb_month[col] = tb_month[col] / 12
+
+        tb_day["period"] = "day"
+        tb_month["period"] = "month"
+
+    # Define the column 'period' with value 'year' in tb_period
+    tb_period["period"] = "year"
+
+    # Concatenate all the tables
+    tb = pr.concat([tb_period, tb_day, tb_month, tb_non_period], ignore_index=True, sort=False)
+
+    return tb

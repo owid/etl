@@ -59,6 +59,11 @@ definitions:
     <<poverty_line>>
     <%- endif %>
 
+  per_period: |-
+    <% if period in ["day", "month", "year"] %>
+    per <<period>>
+    <%- endif %>
+
   welfare_type: |-
     <% if welfare_type == "dhi" %>
     after tax
@@ -183,9 +188,9 @@ definitions:
   threshold_title: |-
     {macros}
     <% if decile == 5 %>
-    Threshold income per day marking the <<percentiles_thr(decile) | lower>> (median) ({definitions.welfare_type})
+    Threshold income {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> (median) ({definitions.welfare_type})
     <%- else %>
-    Threshold income per day marking the <<percentiles_thr(decile) | lower>> ({definitions.welfare_type})
+    Threshold income {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> ({definitions.welfare_type})
     <%- endif %>
 
   poverty_line_subtitle: |-
@@ -739,11 +744,11 @@ tables:
   incomes:
     variables:
       mean:
-        title: Mean income ({definitions.welfare_type}, {definitions.equivalence_scale})
+        title: Mean income ({definitions.per_period}, {definitions.welfare_type}, {definitions.equivalence_scale})
         unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
-          Average income of the population.
+          Average income {definitions.per_period} of the population.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -754,7 +759,7 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: Mean income ({definitions.welfare_type})
+            title: Mean income {definitions.per_period} ({definitions.welfare_type})
             subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
             note: |-
               <% set poverty_line = "" %>
@@ -773,11 +778,11 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
-        title: Median income ({definitions.welfare_type}, {definitions.equivalence_scale})
+        title: Median income ({definitions.per_period}, {definitions.welfare_type}, {definitions.equivalence_scale})
         unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
-          Value of income below which 50% of the population live.
+          Value of income {definitions.per_period} below which 50% of the population live.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -788,7 +793,7 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: Median income ({definitions.welfare_type})
+            title: Median income {definitions.per_period} ({definitions.welfare_type})
             subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}"
             note: |-
               <% set poverty_line = "" %>
@@ -809,12 +814,12 @@ tables:
       avg:
         title: |-
           {macros}
-          Average (<<percentiles_avg_share(decile)>>, {definitions.welfare_type}, {definitions.equivalence_scale})
+          Average ({definitions.per_period}, <<percentiles_avg_share(decile)>>, {definitions.welfare_type}, {definitions.equivalence_scale})
         unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean income within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean income {definitions.per_period} within the <<percentiles_avg_share(decile)>> (tenth of the population).
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -829,10 +834,10 @@ tables:
           grapher_config:
             title: |-
               {macros}
-              Mean income within the <<percentiles_avg_share(decile) | lower>> ({definitions.welfare_type})
+              Mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> ({definitions.welfare_type})
             subtitle: |-
               {macros}
-              The mean income within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+              The mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
             note: |-
               <% set poverty_line = "" %>
               {definitions.note_ppp_equivalence_scale}
@@ -890,12 +895,12 @@ tables:
       thr:
         title: |-
           {macros}
-          Threshold (<<percentiles_thr(decile)>>, {definitions.welfare_type}, {definitions.equivalence_scale})
+          Threshold ({definitions.per_period}, <<percentiles_thr(decile)>>, {definitions.welfare_type}, {definitions.equivalence_scale})
         unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
           {macros}
-          The level of income below which <<decile>>0% of the population falls.
+          The level of income {definitions.per_period} below which <<decile>>0% of the population falls.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -909,7 +914,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.threshold_title}"
-            subtitle: The level of income per person below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+            subtitle: The level of income {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
             note: |-
               <% set poverty_line = "" %>
               {definitions.note_ppp_equivalence_scale}

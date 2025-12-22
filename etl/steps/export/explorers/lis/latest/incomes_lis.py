@@ -56,6 +56,9 @@ def run() -> None:
         if dimension.slug == "equivalence_scale":
             dimension.presentation = DimensionPresentation(type="checkbox", choice_slug_true="square root")
 
+        if dimension.slug == "period":
+            dimension.presentation = DimensionPresentation(type="radio")
+
     # Add After tax vs. Before tax dimension
     c.group_views(
         groups=[
@@ -72,7 +75,7 @@ def run() -> None:
             {
                 "dimension": "decile",
                 "choice_new_slug": "all",
-                "choices": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+                "choices": ["1.0", "2.0", "3.0", "4.0", "5.0", "6.0", "7.0", "8.0", "9.0", "10.0"],
                 "view_config": {
                     "hideRelativeToggle": "false",
                     "selectedFacetStrategy": "entity",
@@ -236,7 +239,7 @@ def run() -> None:
         # Set default view
         if (
             view.dimensions["indicator"] == "thr"
-            and view.dimensions["decile"] == "9"
+            and view.dimensions["decile"] == "9.0"
             and view.dimensions["welfare_type"] == "dhi"
             and view.dimensions["equivalence_scale"] == "per capita"
         ):
