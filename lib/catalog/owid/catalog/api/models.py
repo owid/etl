@@ -7,16 +7,13 @@ from __future__ import annotations
 
 import io
 import json
-import sys
-import threading
-import time
-from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Iterator, TypeVar
 
 import pandas as pd
 import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
+from owid.catalog.api.utils import _loading_data_from_api
 from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
@@ -24,65 +21,6 @@ if TYPE_CHECKING:
     from owid.catalog.variables import Variable
 
 T = TypeVar("T")
-
-
-@contextmanager
-def _loading_data_from_api(message: str = "Loading data"):
-    """Context manager that shows a loading indicator while data is being fetched.
-
-    Displays animated dots in terminal or Jupyter notebook to indicate progress.
-
-    Args:
-        message: Message to display (default: "Loading data")
-
-    Example:
-        ```python
-        with _loading_data_from_api("Fetching chart"):
-            data = expensive_operation()
-        ```
-    """
-    # Check if we're in a Jupyter notebook
-    try:
-        get_ipython  # type: ignore
-        in_notebook = True
-    except NameError:
-        in_notebook = False
-
-    # Check if output is to a terminal (not redirected)
-    is_tty = sys.stdout.isatty()
-
-    # Only show indicator in interactive environments
-    if not (in_notebook or is_tty):
-        yield
-        return
-
-    # Animation state
-    stop_event = threading.Event()
-    animation_chars = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
-
-    def animate():
-        """Animate the loading indicator."""
-        idx = 0
-        while not stop_event.is_set():
-            char = animation_chars[idx % len(animation_chars)]
-            # Use carriage return to overwrite the line
-            print(f"\r{char} {message}...", end="", flush=True)
-            idx += 1
-            time.sleep(0.1)
-
-    # Start animation thread
-    animation_thread = threading.Thread(target=animate, daemon=True)
-    animation_thread.start()
-
-    try:
-        yield
-    finally:
-        # Stop animation
-        stop_event.set()
-        animation_thread.join(timeout=0.5)
-        # Clear the line completely using ANSI escape code
-        # \r moves to start of line, \033[K clears from cursor to end of line
-        print("\r\033[K", end="", flush=True)
 
 
 class ChartNotFoundError(Exception):
@@ -444,8 +382,6 @@ class ResultSet(BaseModel, Generic[T]):
             return f"ResultSet(query={self.query!r}, total={self.total}, results=[])"
         else:
             df_str = str(df)
-        # else:
-        #     df_str = str(df.head(10))
 
         # Format as bullet points to show attributes at same level
         # Indent DataFrame lines to align with bullet points
