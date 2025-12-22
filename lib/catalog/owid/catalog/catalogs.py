@@ -51,7 +51,6 @@ from .datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat
 
 if TYPE_CHECKING:
     from .api import Client
-    from .tables import Table
 
 # Public constants
 OWID_SEARCH_API = "https://search.owid.io/indicators"
