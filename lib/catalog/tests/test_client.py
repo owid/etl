@@ -53,7 +53,7 @@ class TestChartsAPI:
 
     def test_get_chart_metadata(self):
         client = Client()
-        meta = client.charts.metadata("life-expectancy")
+        meta = client.charts.get_metadata("life-expectancy")
 
         assert meta is not None
         assert isinstance(meta, dict)
@@ -61,7 +61,7 @@ class TestChartsAPI:
 
     def test_get_chart_config(self):
         client = Client()
-        config = client.charts.config("life-expectancy")
+        config = client.charts.get_config("life-expectancy")
 
         assert config is not None
         assert isinstance(config, dict)
