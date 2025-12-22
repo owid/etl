@@ -277,6 +277,7 @@ class TablesAPI:
             version=version,
             dataset=dataset,
             channel=channel,
+            channels=[channel],  # Ensure the catalog loads this channel
         )
 
         if len(results) == 0:
