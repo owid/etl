@@ -757,7 +757,7 @@ def combine_variables_processing_logs(variables: list[Variable]) -> ProcessingLo
         [],
     )
 
-    return ProcessingLog(processing_log)
+    return ProcessingLog(processing_log)  # type: ignore
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:

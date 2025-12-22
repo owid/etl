@@ -146,7 +146,7 @@ class GPTResponse(ChatCompletion):
     def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Initialize OpenAI API wrapper."""
         if chat_completion_instance:
-            super().__init__(**chat_completion_instance.dict())
+            super().__init__(**chat_completion_instance.dict())  # type: ignore
         else:
             super().__init__(**kwargs)
 

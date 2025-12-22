@@ -1,6 +1,6 @@
 [project]
 name = "owid-catalog"
-version = "0.4.4"
+version = "0.4.5"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [
@@ -35,7 +35,7 @@ dev-dependencies = [
     "pytest-cov>=2.12.1",
     "watchdog>=2.1.5",
     "argh>=0.26.2",
-    "pyright==1.1.373",
+    "ty>=0.0.4",
     "pandas-stubs==1.2.0.62",
     "ruff==0.8.6",
     "ipykernel>=6.29.0",
@@ -48,9 +48,12 @@ owid-repack = { path = "../repack", editable = true }
 [tool.ruff]
 extend = "../../pyproject.toml"
 
-[tool.pyright]
-reportIncompatibleMethodOverride = "none"
-reportOverlappingOverload = "none"
+[tool.ty.rules]
+invalid-method-override = "ignore"
+parameter-already-assigned = "ignore"
+redundant-cast = "ignore"
+possibly-missing-attribute = "ignore"
+no-matching-overload = "ignore"
 
 [build-system]
 requires = ["hatchling"]

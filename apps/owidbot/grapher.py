@@ -7,13 +7,36 @@ from etl.paths import BASE_DIR
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    svg_tester_graphers = make_differences_line("graphers")
-    svg_tester_grapher_views = make_differences_line("grapher-views")
-    svg_tester_mdims = make_differences_line("mdims")
+    svg_tester_dirs = ("graphers", "grapher-views", "mdims")
+    svg_tester_has_run = any(
+        (BASE_DIR.parent / "owid-grapher-svgs" / dir_name / "verify-graphs.log").exists()
+        for dir_name in svg_tester_dirs
+    )
+    svg_tester_graphers = make_differences_line("graphers") if svg_tester_has_run else ""
+    svg_tester_grapher_views = make_differences_line("grapher-views") if svg_tester_has_run else ""
+    svg_tester_mdims = make_differences_line("mdims") if svg_tester_has_run else ""
+
+    svg_tester_line = (
+        f"- **SVG tester:** https://github.com/owid/owid-grapher-svgs/compare/{branch}" if svg_tester_has_run else ""
+    )
+    svg_tester_block = (
+        f"""
+<details open>
+<summary><b>SVG tester:</b> </summary>
+
+Number of differences (graphers): {svg_tester_graphers}
+Number of differences (grapher views): {svg_tester_grapher_views}
+Number of differences (mdims): {svg_tester_mdims}
+
+</details>
+""".strip()
+        if svg_tester_has_run
+        else ""
+    )
 
     body = f"""
 - **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
-- **SVG tester:** https://github.com/owid/owid-grapher-svgs/compare/{branch}
+{svg_tester_line}
 
 <details open>
 <summary><b>Archive:</b> </summary>
@@ -27,14 +50,7 @@ def run(branch: str) -> str:
 - [Archived article](http://{container_name}:8789/latest/vaping-vs-smoking-health-risks.html)
 </details>
 
-<details open>
-<summary><b>SVG tester:</b> </summary>
-
-Number of differences (graphers): {svg_tester_graphers}
-Number of differences (grapher views): {svg_tester_grapher_views}
-Number of differences (mdims): {svg_tester_mdims}
-
-</details>
+{svg_tester_block}
     """.strip()
 
     return body

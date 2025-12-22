@@ -1128,7 +1128,7 @@ def sanity_check_grouped_view(view: View) -> None:
     metadata_dict = (
         view.metadata
         if isinstance(view.metadata, dict)
-        else view.metadata.to_dict()
+        else view.metadata.to_dict()  # type: ignore[union-attr]
         if hasattr(view.metadata, "to_dict")
         else {}
     )
