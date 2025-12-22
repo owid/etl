@@ -499,26 +499,51 @@ definitions:
     [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
     <%- endif %>
 
-  map_brackets_share: &map_brackets_share <% if decile in [1] %>
-    [0, 1, 2, 3, 4, 1]
-    <%- elif decile in [2] %>
-    [0, 1, 2, 3, 4, 5, 1]
-    <%- elif decile in [3] %>
-    [100, 2, 3, 4, 5, 6, 1]
-    <%- elif decile in [4] %>
-    [100, 2, 3, 4, 5, 6, 7, 1]
-    <%- elif decile in [5] %>
-    [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif decile in [6] %>
-    [100, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif decile in [7] %>
-    [100, 6, 7, 8, 9, 10, 11, 1]
-    <%- elif decile in [8] %>
-    [100, 8, 9, 10, 11, 12, 13, 1]
-    <%- elif decile in [9] %>
-    [100, 8, 10, 12, 14, 16, 1]
-    <%- elif decile in [10] %>
-    [100, 20, 25, 30, 35, 40, 45, 1]
+  map_brackets_share: &map_brackets_share |-
+    <% if welfare_type == "dhi" %>
+      <% if decile in [1] %>
+      [0, 1, 2, 3, 4, 1]
+      <%- elif decile in [2] %>
+      [0, 1, 2, 3, 4, 5, 1]
+      <%- elif decile in [3] %>
+      [100, 2, 3, 4, 5, 6, 1]
+      <%- elif decile in [4] %>
+      [100, 2, 3, 4, 5, 6, 7, 1]
+      <%- elif decile in [5] %>
+      [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif decile in [6] %>
+      [100, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif decile in [7] %>
+      [100, 6, 7, 8, 9, 10, 11, 1]
+      <%- elif decile in [8] %>
+      [100, 8, 9, 10, 11, 12, 13, 1]
+      <%- elif decile in [9] %>
+      [100, 8, 10, 12, 14, 16, 1]
+      <%- elif decile in [10] %>
+      [100, 20, 25, 30, 35, 40, 45, 1]
+      <%- endif %>
+    <% elif welfare_type == "mi" %>
+      <% if decile in [1] %>
+      [0, 1, 2, 3, 4, 1]
+      <%- elif decile in [2] %>
+      [0, 1, 2, 3, 4, 5, 1]
+      <%- elif decile in [3] %>
+      [100, 2, 3, 4, 5, 6, 1]
+      <%- elif decile in [4] %>
+      [100, 2, 3, 4, 5, 6, 7, 1]
+      <%- elif decile in [5] %>
+      [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif decile in [6] %>
+      [100, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif decile in [7] %>
+      [100, 6, 7, 8, 9, 10, 11, 1]
+      <%- elif decile in [8] %>
+      [100, 8, 9, 10, 11, 12, 13, 1]
+      <%- elif decile in [9] %>
+      [100, 8, 10, 12, 14, 16, 1]
+      <%- elif decile in [10] %>
+      [100, 20, 25, 30, 35, 40, 45, 1]
+      <%- endif %>
     <%- endif %>
 
   map_brackets_thr: &map_brackets_thr <% if decile in [1, 2, 3] %>
@@ -527,6 +552,31 @@ definitions:
     [0, 1, 2, 5, 10, 20, 50, 1]
     <% elif decile in [8, 9] %>
     [0, 1, 2, 5, 10, 20, 50, 100, 1]
+    <%- endif %>
+
+  map_brackets_gini: &map_brackets_gini
+    <% if welfare_type == "dhi" %>
+    [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.1]
+    <%- elif welfare_type == "mi" %>
+    [1, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.1]
+    <%- endif %>
+
+  map_brackets_share_top_10: &map_brackets_share_top_10 <% if welfare_type == "dhi" %>
+    [100, 20, 25, 30, 35, 40, 45, 1]
+    <%- elif welfare_type == "mi" %>
+    [100, 25, 30, 35, 40, 45, 1]
+    <%- endif %>
+
+  map_brackets_share_bottom_50: &map_brackets_share_bottom_50 <% if welfare_type == "dhi" %>
+    [100, 10, 15, 20, 25, 30, 1]
+    <%- elif welfare_type == "mi" %>
+    [100, 5, 10, 15, 20, 25, 1]
+    <%- endif %>
+
+  map_brackets_palma_ratio: &map_brackets_palma_ratio <% if welfare_type == "dhi" %>
+    [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 1]
+    <%- elif welfare_type == "mi" %>
+    [100, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 1]
     <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
@@ -986,7 +1036,7 @@ tables:
               colorScale:
                 baseColorScheme: "Oranges"
                 binningStrategy: "manual"
-                customNumericValues: [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.1]
+                customNumericValues: *map_brackets_gini
             selectedEntityNames: *entity_names_inequality
 
       palma_ratio:
@@ -1016,7 +1066,7 @@ tables:
               colorScale:
                 baseColorScheme: "YlOrBr"
                 binningStrategy: "manual"
-                customNumericValues: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 1]
+                customNumericValues: *map_brackets_palma_ratio
             selectedEntityNames: *entity_names_inequality
 
       p50_p10_ratio:
@@ -1087,7 +1137,7 @@ tables:
               colorScale:
                 baseColorScheme: "Blues"
                 binningStrategy: "manual"
-                customNumericValues: [1000, 10, 15, 20, 25, 30, 1]
+                customNumericValues: *map_brackets_share_bottom_50
             selectedEntityNames: *entity_names_inequality
 
       share_top_10:
@@ -1116,7 +1166,7 @@ tables:
               colorScale:
                 baseColorScheme: "OrRd"
                 binningStrategy: "manual"
-                customNumericValues: [1000, 20, 25, 30, 35, 40, 1]
+                customNumericValues: *map_brackets_share_top_10
             selectedEntityNames: *entity_names_inequality
 
       share_middle_40:
