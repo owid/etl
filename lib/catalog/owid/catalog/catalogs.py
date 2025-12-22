@@ -52,9 +52,6 @@ from .datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat
 if TYPE_CHECKING:
     from .api import Client
 
-# Public constants
-OWID_SEARCH_API = "https://search.owid.io/indicators"
-
 # Global cache for backwards compatibility
 REMOTE_CATALOG: ETLCatalog | None = None
 _CLIENT_INSTANCE: "Client | None" = None
@@ -163,7 +160,6 @@ __all__ = [
     "CHANNEL",
     "OWID_CATALOG_URI",
     "S3_OWID_URI",
-    "OWID_SEARCH_API",
     "INDEX_FORMATS",
     "PREFERRED_FORMAT",
     "SUPPORTED_FORMATS",

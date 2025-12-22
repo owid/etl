@@ -18,14 +18,10 @@ from .processing_log import LogEntry, ProcessingLog
 from .tables import Table
 from .variables import Variable
 
-# Backwards compatibility alias
-client = api
-
 __all__ = [
     # New unified client API
     "Client",
     "api",
-    "client",  # Backwards compatibility alias
     # Legacy catalog access (still supported)
     "LocalCatalog",
     "ETLCatalog",
