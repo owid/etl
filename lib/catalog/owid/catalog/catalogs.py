@@ -31,47 +31,33 @@ import warnings
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
-import pandas as pd
-import requests
-
-# Re-export internal classes for backwards compatibility
-from .api.tables import (
-    _CatalogFrame as CatalogFrame,
-)
-from .api.tables import (
-    _CatalogSeries as CatalogSeries,
-)
-from .api.tables import (
-    _LocalCatalog as LocalCatalog,
-)
-from .api.tables import (
-    _PackageUpdateRequired as PackageUpdateRequired,
-)
-from .api.tables import (
-    _read_frame as read_frame,
-)
-from .api.tables import (
-    _RemoteCatalog as RemoteCatalog,
-)
-from .api.tables import (
-    _save_frame as save_frame,
+# Re-export classes and functions for backwards compatibility
+from .api.utils import (
+    INDEX_FORMATS,
+    OWID_CATALOG_URI,
+    S3_OWID_URI,
+    CatalogFrame,
+    CatalogSeries,
+    LocalCatalog,
+    PackageUpdateRequired,
+    RemoteCatalog,
+    read_frame,
+    save_frame,
 )
 
 # Re-export constants
 from .datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat
 
 if TYPE_CHECKING:
+    from .api import Client
     from .tables import Table
 
 # Public constants
-OWID_CATALOG_VERSION = 3
-OWID_CATALOG_URI = "https://catalog.ourworldindata.org/"
-S3_OWID_URI = "s3://owid-catalog"
 OWID_SEARCH_API = "https://search.owid.io/indicators"
-INDEX_FORMATS: list[FileFormat] = ["feather"]
 
-# Global cache
+# Global cache for backwards compatibility
 REMOTE_CATALOG: RemoteCatalog | None = None
+_CLIENT_INSTANCE: "Client | None" = None
 
 
 def _warn_deprecated(func_name: str, alternative: str) -> None:
@@ -85,17 +71,14 @@ def _warn_deprecated(func_name: str, alternative: str) -> None:
     )
 
 
-def _load_remote_catalog(channels: Iterable[CHANNEL]) -> RemoteCatalog:
-    """Internal helper to load remote catalog."""
-    global REMOTE_CATALOG
+def _get_client() -> "Client":
+    """Get or create the global Client instance."""
+    global _CLIENT_INSTANCE
+    if _CLIENT_INSTANCE is None:
+        from .api import Client
 
-    if REMOTE_CATALOG and not (set(channels) <= set(REMOTE_CATALOG.channels)):
-        REMOTE_CATALOG = RemoteCatalog(channels=list(set(REMOTE_CATALOG.channels) | set(channels)))
-
-    if not REMOTE_CATALOG:
-        REMOTE_CATALOG = RemoteCatalog(channels=channels)
-
-    return REMOTE_CATALOG
+        _CLIENT_INSTANCE = Client()
+    return _CLIENT_INSTANCE
 
 
 def find(
@@ -135,8 +118,19 @@ def find(
         ```
     """
     _warn_deprecated("find", "Client().tables.search()")
-    catalog = _load_remote_catalog(channels=channels)
-    return catalog.find(table=table, namespace=namespace, version=version, dataset=dataset)
+
+    # Use Client API internally
+    client = _get_client()
+    results = client.tables.search(
+        table=table,
+        namespace=namespace,
+        version=version,
+        dataset=dataset,
+        channels=channels,
+    )
+
+    # Convert ResultSet to CatalogFrame for backwards compatibility
+    return results.to_catalog_frame()
 
 
 def find_one(*args: str | None, **kwargs: str | None) -> Table:
@@ -171,7 +165,19 @@ def find_one(*args: str | None, **kwargs: str | None) -> Table:
         ```
     """
     _warn_deprecated("find_one", "Client().tables.search()[0].data")
-    return find(*args, **kwargs).load()  # type: ignore
+
+    # Use Client API internally
+    client = _get_client()
+    results = client.tables.search(*args, **kwargs)  # type: ignore
+
+    if len(results) == 0:
+        raise ValueError("no tables found")
+    elif len(results) > 1:
+        raise ValueError(
+            f"only one table can be loaded at once (tables found: {', '.join([r.table for r in results])})"
+        )
+
+    return results[0].data
 
 
 def find_latest(
@@ -216,8 +222,23 @@ def find_latest(
         ```
     """
     _warn_deprecated("find_latest", "Client().tables.search()[-1].data")
-    catalog = _load_remote_catalog(channels=channels)
-    return catalog.find_latest(table=table, namespace=namespace, dataset=dataset, version=version)
+
+    # Use Client API internally
+    client = _get_client()
+    results = client.tables.search(
+        table=table,
+        namespace=namespace,
+        version=version,
+        dataset=dataset,
+        channels=channels,
+    )
+
+    if len(results) == 0:
+        raise ValueError("No matching table found")
+
+    # Sort by version and get the latest
+    sorted_results = sorted(results, key=lambda r: r.version)
+    return sorted_results[-1].data
 
 
 def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
@@ -252,57 +273,12 @@ def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
     """
     _warn_deprecated("find_by_indicator", "Client().indicators.search()")
 
-    # Keep original implementation
-    resp = requests.get(
-        OWID_SEARCH_API,
-        params={"query": query, "limit": limit},
-    )
-    resp.raise_for_status()
-    data = resp.json()
-    results = data.get("results", [])
+    # Use Client API internally
+    client = _get_client()
+    results = client.indicators.search(query, limit=limit)
 
-    rows = []
-    for r in results:
-        catalog_path = r.get("catalog_path", "")
-        path_part, _, indicator = catalog_path.partition("#")
-        parts = path_part.split("/")
-
-        if len(parts) >= 4:
-            channel, namespace, version, dataset = parts[0], parts[1], parts[2], parts[3]
-            table = parts[4] if len(parts) > 4 else dataset
-        else:
-            channel, namespace, version, dataset, table = pd.NA, pd.NA, pd.NA, pd.NA, pd.NA
-            path_part = pd.NA
-            indicator = indicator if indicator else pd.NA
-
-        rows.append(
-            {
-                "indicator_title": r.get("title"),
-                "indicator": indicator if indicator else pd.NA,
-                "score": r.get("score"),
-                "table": table,
-                "dataset": dataset,
-                "version": version,
-                "namespace": namespace,
-                "channel": channel,
-                "is_public": True,
-                "path": path_part,
-                "format": "parquet",
-            }
-        )
-
-    frame = CatalogFrame(rows)
-    frame._base_uri = OWID_CATALOG_URI
-
-    if not frame.empty:
-        catalog = _load_remote_catalog(channels=["grapher"])
-        frame = frame.merge(catalog.frame[["path", "dimensions"]], on="path", how="left")
-        cols = [c for c in frame.columns if c != "dimensions"]
-        cols.insert(cols.index("is_public") + 1, "dimensions")
-        frame = CatalogFrame(frame[cols])
-        frame._base_uri = OWID_CATALOG_URI
-
-    return frame
+    # Convert ResultSet to CatalogFrame for backwards compatibility
+    return results.to_catalog_frame()
 
 
 __all__ = [
@@ -320,7 +296,6 @@ __all__ = [
     # Constants
     "CHANNEL",
     "OWID_CATALOG_URI",
-    "OWID_CATALOG_VERSION",
     "S3_OWID_URI",
     "OWID_SEARCH_API",
     "INDEX_FORMATS",
