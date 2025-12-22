@@ -7,6 +7,10 @@ from __future__ import annotations
 
 import io
 import json
+import sys
+import threading
+import time
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Iterator, TypeVar
 
 import pandas as pd
@@ -22,6 +26,65 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
+@contextmanager
+def _loading_data_from_api(message: str = "Loading data"):
+    """Context manager that shows a loading indicator while data is being fetched.
+
+    Displays animated dots in terminal or Jupyter notebook to indicate progress.
+
+    Args:
+        message: Message to display (default: "Loading data")
+
+    Example:
+        ```python
+        with _loading_data_from_api("Fetching chart"):
+            data = expensive_operation()
+        ```
+    """
+    # Check if we're in a Jupyter notebook
+    try:
+        get_ipython  # type: ignore
+        in_notebook = True
+    except NameError:
+        in_notebook = False
+
+    # Check if output is to a terminal (not redirected)
+    is_tty = sys.stdout.isatty()
+
+    # Only show indicator in interactive environments
+    if not (in_notebook or is_tty):
+        yield
+        return
+
+    # Animation state
+    stop_event = threading.Event()
+    animation_chars = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+    def animate():
+        """Animate the loading indicator."""
+        idx = 0
+        while not stop_event.is_set():
+            char = animation_chars[idx % len(animation_chars)]
+            # Use carriage return to overwrite the line
+            print(f"\r{char} {message}...", end="", flush=True)
+            idx += 1
+            time.sleep(0.1)
+
+    # Start animation thread
+    animation_thread = threading.Thread(target=animate, daemon=True)
+    animation_thread.start()
+
+    try:
+        yield
+    finally:
+        # Stop animation
+        stop_event.set()
+        animation_thread.join(timeout=0.5)
+        # Clear the line completely using ANSI escape code
+        # \r moves to start of line, \033[K clears from cursor to end of line
+        print("\r\033[K", end="", flush=True)
+
+
 class ChartNotFoundError(Exception):
     """Raised when a chart does not exist."""
 
@@ -34,10 +97,11 @@ class LicenseError(Exception):
     pass
 
 
-def _load_table_data(
+def _load_table(
     path: str,
     formats: list[str] | None = None,
     is_public: bool = True,
+    load_data: bool = True,
 ) -> "Table":
     """Load a table from the catalog by path.
 
@@ -47,9 +111,10 @@ def _load_table_data(
         path: Table path in catalog (e.g., "grapher/namespace/version/dataset/table")
         formats: List of formats to try. If None, tries all supported formats.
         is_public: Whether the table is publicly accessible.
+        load_data: If True, load only table structure (columns and metadata) without rows.
 
     Returns:
-        Table object with data and metadata.
+        Table object with data and metadata (or just metadata if load_data=True).
 
     Raises:
         KeyError: If no table found at the specified path.
@@ -63,33 +128,45 @@ def _load_table_data(
         download_private_file_s3,
     )
 
-    base_uri = OWID_CATALOG_URI
-    uri = "/".join([base_uri.rstrip("/"), path])
+    # Extract table name for display
+    table_name = path.split("/")[-1] if "/" in path else path
+    message = f"Loading table '{table_name}'"
 
-    # Determine format preference
-    if formats:
-        formats_to_try = formats
+    def fct():
+        base_uri = OWID_CATALOG_URI
+        uri = "/".join([base_uri.rstrip("/"), path])
+
+        # Determine format preference
+        if formats:
+            formats_to_try = formats
+        else:
+            formats_to_try = SUPPORTED_FORMATS
+
+        # Prefer feather if available
+        if PREFERRED_FORMAT in formats_to_try:
+            formats_to_try = [PREFERRED_FORMAT] + [f for f in formats_to_try if f != PREFERRED_FORMAT]
+
+        for fmt in formats_to_try:
+            try:
+                table_uri = f"{uri}.{fmt}"
+
+                # Handle private files
+                if not is_public:
+                    tmpdir = tempfile.mkdtemp()
+                    table_uri = download_private_file_s3(table_uri, tmpdir)
+
+                # If header_only, return empty table with same structure
+                return Table.read(table_uri, load_data=load_data)
+            except Exception:
+                continue
+
+        raise KeyError(f"No matching table found at: {path}")
+
+    if load_data:
+        with _loading_data_from_api(message):
+            return fct()
     else:
-        formats_to_try = SUPPORTED_FORMATS
-
-    # Prefer feather if available
-    if PREFERRED_FORMAT in formats_to_try:
-        formats_to_try = [PREFERRED_FORMAT] + [f for f in formats_to_try if f != PREFERRED_FORMAT]
-
-    for fmt in formats_to_try:
-        try:
-            table_uri = f"{uri}.{fmt}"
-
-            # Handle private files
-            if not is_public:
-                tmpdir = tempfile.mkdtemp()
-                table_uri = download_private_file_s3(table_uri, tmpdir)
-
-            return Table.read(table_uri)
-        except Exception:
-            continue
-
-    raise KeyError(f"No matching table found at: {path}")
+        return fct()
 
 
 class ChartResult(BaseModel):
@@ -146,38 +223,39 @@ class ChartResult(BaseModel):
 
     def _load_data(self) -> pd.DataFrame:
         """Internal method to fetch chart data."""
-        # Fetch CSV data from the chart
-        url = f"https://ourworldindata.org/grapher/{self.slug}.csv?useColumnShortNames=true"
-        resp = requests.get(url)
+        with _loading_data_from_api(f"Fetching chart '{self.slug}'"):
+            # Fetch CSV data from the chart
+            url = f"https://ourworldindata.org/grapher/{self.slug}.csv?useColumnShortNames=true"
+            resp = requests.get(url)
 
-        if resp.status_code == 404:
-            raise ChartNotFoundError(f"No such chart found: {self.slug}")
+            if resp.status_code == 404:
+                raise ChartNotFoundError(f"No such chart found: {self.slug}")
 
-        if resp.status_code == 403:
-            try:
-                error_data = resp.json()
-                raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
-            except (json.JSONDecodeError, ValueError):
-                raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
+            if resp.status_code == 403:
+                try:
+                    error_data = resp.json()
+                    raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
+                except (json.JSONDecodeError, ValueError):
+                    raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
 
-        resp.raise_for_status()
+            resp.raise_for_status()
 
-        df = pd.read_csv(io.StringIO(resp.text))
+            df = pd.read_csv(io.StringIO(resp.text))
 
-        # Normalize column names
-        df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
-        if "Code" in df.columns:
-            df = df.drop(columns=["Code"])
+            # Normalize column names
+            df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
+            if "Code" in df.columns:
+                df = df.drop(columns=["Code"])
 
-        # Attach metadata
-        df.attrs["slug"] = self.slug
-        df.attrs["url"] = self.url
+            # Attach metadata
+            df.attrs["slug"] = self.slug
+            df.attrs["url"] = self.url
 
-        # Rename "years" to "dates" if values are date strings
-        if "years" in df.columns and df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
-            df = df.rename(columns={"years": "dates"})
+            # Rename "years" to "dates" if values are date strings
+            if "years" in df.columns and df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
+                df = df.rename(columns={"years": "dates"})
 
-        return df
+            return df
 
 
 class PageSearchResult(BaseModel):
@@ -220,14 +298,14 @@ class IndicatorResult(BaseModel):
         arbitrary_types_allowed=True,
     )
 
-    indicator_id: int
+    indicator_id: int | None
     title: str
     score: float
     catalog_path: str
     description: str = ""
     column_name: str = ""
     unit: str = ""
-    n_charts: int = 0
+    n_charts: int | None = None
     _table: "Table | None" = PrivateAttr(default=None)
 
     @property
@@ -258,7 +336,7 @@ class IndicatorResult(BaseModel):
         """Internal method to load the table containing this indicator."""
         # Parse catalog_path: "grapher/namespace/version/dataset/table#column"
         path_part, _, _ = self.catalog_path.partition("#")
-        return _load_table_data(path_part)
+        return _load_table(path_part)
 
 
 class TableResult(BaseModel):
@@ -302,9 +380,20 @@ class TableResult(BaseModel):
             self._data = self._load()
         return self._data
 
+    @property
+    def data_header(self) -> "Table":
+        """Load only the table structure (columns and metadata) without rows.
+
+        This is useful for quickly accessing metadata without loading potentially large datasets.
+
+        Returns:
+            Empty Table object with columns and metadata but no data rows.
+        """
+        return _load_table(self.path, formats=self.formats, is_public=self.is_public, load_data=False)
+
     def _load(self) -> "Table":
         """Internal method to load table data."""
-        return _load_table_data(self.path, formats=self.formats, is_public=self.is_public)
+        return _load_table(self.path, formats=self.formats, is_public=self.is_public)
 
 
 class ResultSet(BaseModel, Generic[T]):
@@ -353,10 +442,10 @@ class ResultSet(BaseModel, Generic[T]):
         # Limit display to first 10 rows for readability
         if len(df) == 0:
             return f"ResultSet(query={self.query!r}, total={self.total}, results=[])"
-        elif len(df) <= 10:
-            df_str = str(df)
         else:
-            df_str = str(df.head(10))
+            df_str = str(df)
+        # else:
+        #     df_str = str(df.head(10))
 
         # Format as bullet points to show attributes at same level
         # Indent DataFrame lines to align with bullet points
@@ -376,10 +465,7 @@ class ResultSet(BaseModel, Generic[T]):
             return f"<p>ResultSet(query={self.query!r}, total=0, results=[])</p>"
 
         df = self.to_frame()
-        if len(df) <= 10:
-            df_html = df._repr_html_()
-        else:
-            df_html = df.head(10)._repr_html_()
+        df_html = df._repr_html_()
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
