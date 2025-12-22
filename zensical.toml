@@ -97,10 +97,14 @@ nav = [
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
-    { "Our libraries" = [
+    { "Libraries" = [
         { "Python" = [
             "libraries/index.md",
-            { "owid.catalog" = "libraries/catalog.md" },
+            { "owid.catalog" = [
+                "libraries/catalog/index.md",
+                { "Data APIs" = "libraries/catalog/api.md" },
+                { "Processing" = "libraries/catalog/structures.md" },
+            ] },
             { "owid-grapher-py" = "libraries/grapher-py.md" },
             { "owid.repack" = "libraries/repack.md" },
             { "owid.datautils" = "libraries/datautils.md" },
