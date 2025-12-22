@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 import requests
 
-from owid.catalog.api.models import ChartNotFoundError, ChartResult, LicenseError, ResultSet
+from owid.catalog.api.models import ChartNotFoundError, ChartResult, ResultSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -41,7 +41,7 @@ class ChartsAPI:
         df = results[0].data  # Access data via property
 
         # Get chart metadata
-        meta = client.charts.metadata("life-expectancy")
+        meta = client.charts.get_metadata("life-expectancy")
         ```
     """
 
@@ -49,104 +49,6 @@ class ChartsAPI:
 
     def __init__(self, client: "Client") -> None:
         self._client = client
-
-    def get_data(self, slug_or_url: str) -> pd.DataFrame:
-        """Fetch chart data as a DataFrame.
-
-        Args:
-            slug_or_url: Chart slug (e.g., "life-expectancy") or full URL.
-
-        Returns:
-            DataFrame with chart data. Additional metadata in df.attrs.
-
-        Raises:
-            ChartNotFoundError: If the chart does not exist.
-            LicenseError: If the data cannot be downloaded due to licensing.
-
-        Example:
-            ```python
-            df = client.charts.get_data("life-expectancy")
-            print(df.head())
-            ```
-        """
-        # Use fetch() to get ChartResult, then access .data property
-        return self.fetch(slug_or_url).data
-
-    def metadata(self, slug_or_url: str) -> dict[str, Any]:
-        """Fetch chart metadata.
-
-        Args:
-            slug_or_url: Chart slug or full URL.
-
-        Returns:
-            Dict containing chart metadata including column information.
-
-        Example:
-            ```python
-            meta = client.charts.metadata("life-expectancy")
-            print(meta["columns"].keys())
-            ```
-        """
-        slug = self._parse_slug(slug_or_url)
-        return self._fetch_metadata(slug)
-
-    def config(self, slug_or_url: str) -> dict[str, Any]:
-        """Fetch raw grapher configuration.
-
-        Args:
-            slug_or_url: Chart slug or full URL.
-
-        Returns:
-            Dict containing the grapher configuration.
-
-        Example:
-            ```python
-            config = client.charts.config("life-expectancy")
-            print(config["title"])
-            ```
-        """
-        slug = self._parse_slug(slug_or_url)
-        return self._fetch_config(slug)
-
-    def fetch(self, slug_or_url: str, *, load_data: bool = False) -> ChartResult:
-        """Fetch a chart with all its metadata and config.
-
-        Args:
-            slug_or_url: Chart slug or full URL.
-            load_data: If True, preload chart data immediately.
-                       If False (default), data is loaded lazily when accessed via .data property.
-
-        Returns:
-            ChartResult with metadata, config, and data loading capability.
-
-        Example:
-            ```python
-            chart = client.charts.fetch("life-expectancy")
-            print(chart.title)
-            df = chart.data  # Lazy-loaded via property
-
-            # Or preload data immediately
-            chart = client.charts.fetch("life-expectancy", load_data=True)
-            df = chart.data  # Already loaded
-            ```
-        """
-        slug = self._parse_slug(slug_or_url)
-        config = self._fetch_config(slug)
-        metadata = self._fetch_metadata(slug)
-
-        result = ChartResult(
-            slug=slug,
-            title=config.get("title", ""),
-            url=f"{self.BASE_URL}/{slug}",
-            config=config,
-            metadata=metadata,
-        )
-
-        # Preload data if requested
-        if load_data:
-            _ = result.data  # Access property to trigger loading
-
-        return result
 
     def search(
         self,
@@ -198,6 +100,104 @@ class ChartsAPI:
             limit=limit,
             page=page,
         )
+
+    def fetch(self, slug_or_url: str, *, load_data: bool = False) -> ChartResult:
+        """Fetch a chart with all its metadata and config.
+
+        Args:
+            slug_or_url: Chart slug or full URL.
+            load_data: If True, preload chart data immediately.
+                       If False (default), data is loaded lazily when accessed via .data property.
+
+        Returns:
+            ChartResult with metadata, config, and data loading capability.
+
+        Example:
+            ```python
+            chart = client.charts.fetch("life-expectancy")
+            print(chart.title)
+            df = chart.data  # Lazy-loaded via property
+
+            # Or preload data immediately
+            chart = client.charts.fetch("life-expectancy", load_data=True)
+            df = chart.data  # Already loaded
+            ```
+        """
+        slug = self._parse_slug(slug_or_url)
+        config = self._fetch_config(slug)
+        metadata = self._fetch_metadata(slug)
+
+        result = ChartResult(
+            slug=slug,
+            title=config.get("title", ""),
+            url=f"{self.BASE_URL}/{slug}",
+            config=config,
+            metadata=metadata,
+        )
+
+        # Preload data if requested
+        if load_data:
+            _ = result.data  # Access property to trigger loading
+
+        return result
+
+    def get_data(self, slug_or_url: str) -> pd.DataFrame:
+        """Fetch chart data as a DataFrame.
+
+        Args:
+            slug_or_url: Chart slug (e.g., "life-expectancy") or full URL.
+
+        Returns:
+            DataFrame with chart data. Additional metadata in df.attrs.
+
+        Raises:
+            ChartNotFoundError: If the chart does not exist.
+            LicenseError: If the data cannot be downloaded due to licensing.
+
+        Example:
+            ```python
+            df = client.charts.get_data("life-expectancy")
+            print(df.head())
+            ```
+        """
+        # Use fetch() to get ChartResult, then access .data property
+        return self.fetch(slug_or_url).data
+
+    def get_metadata(self, slug_or_url: str) -> dict[str, Any]:
+        """Fetch chart metadata.
+
+        Args:
+            slug_or_url: Chart slug or full URL.
+
+        Returns:
+            Dict containing chart metadata including column information.
+
+        Example:
+            ```python
+            meta = client.charts.get_metadata("life-expectancy")
+            print(meta["columns"].keys())
+            ```
+        """
+        slug = self._parse_slug(slug_or_url)
+        return self._fetch_metadata(slug)
+
+    def get_config(self, slug_or_url: str) -> dict[str, Any]:
+        """Fetch raw grapher configuration.
+
+        Args:
+            slug_or_url: Chart slug or full URL.
+
+        Returns:
+            Dict containing the grapher configuration.
+
+        Example:
+            ```python
+            config = client.charts.get_config("life-expectancy")
+            print(config["title"])
+            ```
+        """
+        slug = self._parse_slug(slug_or_url)
+        return self._fetch_config(slug)
 
     @staticmethod
     def _parse_slug(slug_or_url: str) -> str:
