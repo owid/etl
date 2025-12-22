@@ -103,7 +103,7 @@ def interpolate_table(
 
     if time_mode != "none":
         # Expand time
-        df = expand_time_column(
+        df = expand_time_column(  # type: ignore[assignment]
             df,
             dimension_col=entity_col,
             time_col=time_col,
@@ -114,7 +114,7 @@ def interpolate_table(
     df = cast(TableOrDataFrame, df.set_index(index).sort_index())
 
     # Interpolate
-    df = (
+    df = (  # type: ignore[assignment]
         df.groupby(entity_col)
         .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area))  # type: ignore
         .reset_index()
@@ -255,7 +255,7 @@ def expand_time_column(
         )
 
         # Reindex
-        df = (
+        df = (  # type: ignore[assignment]
             df.set_index(index)
             .reindex(pd.MultiIndex.from_product(iterables, names=names))  # type: ignore
             .sort_index()
