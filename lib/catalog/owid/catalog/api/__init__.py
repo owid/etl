@@ -3,39 +3,6 @@
 #
 #  Unified client for all OWID data APIs.
 #
-"""
-Unified client for accessing Our World in Data APIs.
-
-Example:
-    ```python
-    from owid.catalog import Client
-
-    client = Client()
-
-    # Charts API - fetch and search for published charts
-    df = client.charts.get_data("life-expectancy")
-    chart = client.charts.fetch("life-expectancy")  # Fetch specific chart
-    df = chart.data  # Lazy-load data via property
-    results = client.charts.search("gdp per capita")  # Search for charts
-
-    # Indicators API - semantic search for indicators
-    indicators = client.indicators.search("renewable energy")
-    indicator = client.indicators.fetch(12345)  # Fetch by ID
-    variable = indicator.data  # Returns Variable (Series), not Table
-    table = indicator.table  # Access full table if needed
-
-    # Tables API - query and load from catalog
-    results = client.tables.search(table="population", namespace="un")
-    table_result = client.tables.fetch("garden/un/2024/pop/pop")  # Fetch metadata
-    table = table_result.data  # Lazy-load table data
-
-    # Backwards compatibility: client.datasets still works (deprecated)
-    results = client.datasets.search(table="population")  # Works, but use .tables instead
-
-    # Advanced: Search pages/articles
-    pages = client._site_search.pages("climate change")
-    ```
-"""
 
 from __future__ import annotations
 
@@ -77,22 +44,23 @@ class Client:
         ```python
         from owid.catalog import Client
 
-        # Create client (recommended: reuse for multiple operations)
         client = Client()
 
-        # Charts API
-        chart = client.charts.fetch("gdp")  # Fetch specific chart
-        df = client.charts.get_data("life-expectancy")
-        results = client.charts.search("population")  # Search for charts
+        # Charts: Published visualizations
+        results = client.charts.search("climate change")
+        chart = client.charts.fetch("life-expectancy")
+        df = client.charts.get_data("animals-slaughtered-for-meat")
 
-        # Indicators API
-        indicators = client.indicators.search("solar energy")
-        indicator = client.indicators.fetch(12345)  # Fetch by ID
-
-        # Tables API
+        # Tables: Catalog datasets
         results = client.tables.search(table="population", namespace="un")
-        table_result = client.tables.fetch("garden/un/2024/pop/pop")  # Fetch metadata
-        table = results[0].data  # Lazy-load data
+        table = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+        tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
+
+        # Indicators: Semantic search for data series
+        results = client.indicators.search("renewable energy")
+        variable = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
+        data = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
+
         ```
     """
 

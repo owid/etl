@@ -40,10 +40,10 @@ class IndicatorsAPI:
         table = results[0].table
 
         # Get indicator data directly by URI
-        variable = client.indicators.get_data("grapher/un/2024/pop/population#population_total")
+        variable = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
 
         # Or fetch indicator metadata first
-        indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total")
+        indicator = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
         variable = indicator.data
         ```
     """
@@ -110,7 +110,7 @@ class IndicatorsAPI:
                     score=r.get("score", 0.0),
                     catalog_path=r.get("catalog_path", ""),
                     description=r.get("description", ""),
-                    column_name=r.get("metadata", {}).get("column_name", ""),
+                    column_name=r.get("metadata", {}).get("column", ""),
                     unit=r.get("metadata", {}).get("unit", ""),
                     n_charts=r.get("n_charts", 0),
                 )
@@ -142,11 +142,7 @@ class IndicatorsAPI:
             # Fetch indicator by URI
             indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total")
             print(f"Title: {indicator.title}")
-            variable = indicator.data  # Lazy-loaded Variable
-
-            # Or preload data immediately
-            indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total", load_data=True)
-            variable = indicator.data  # Already loaded
+            variable = indicator.data
             ```
 
         Note:
@@ -230,7 +226,7 @@ class IndicatorsAPI:
 
         Example:
             ```python
-            variable = client.indicators.get_data("grapher/un/2024/pop/population#population_total")
+            variable = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
             print(variable.head())
             print(variable.metadata.unit)
             ```

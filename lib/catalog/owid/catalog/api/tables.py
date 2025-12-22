@@ -36,10 +36,10 @@ class TablesAPI:
         table = results[0].data
 
         # Get table data directly by path
-        table = client.tables.get_data("garden/un/2024/population/population")
+        table = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
 
         # Or fetch metadata first
-        table_result = client.tables.fetch("garden/un/2024/population/population")
+        table_result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
         print(f"Dataset: {table_result.dataset}, Version: {table_result.version}")
         table = table_result.data  # Lazy-load when needed
         ```
@@ -137,7 +137,7 @@ class TablesAPI:
             ResultSet containing matching TableResult objects.
             If fuzzy=True, results are sorted by relevance score.
 
-        Examples:
+        Example:
             ```python
             # Exact match
             results = client.tables.search(table="population", regex=False)
@@ -238,7 +238,7 @@ class TablesAPI:
         lazy-load the table data.
 
         Args:
-            path: Full catalog path (e.g., "garden/un/2024/population/population").
+            path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
             load_data: If True, preload table data immediately.
                        If False (default), data is loaded lazily when accessed via .data property.
 
@@ -251,15 +251,11 @@ class TablesAPI:
         Example:
             ```python
             # Get metadata without loading data
-            result = client.tables.fetch("garden/un/2024/population/population")
+            result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
             print(f"Dataset: {result.dataset}, Version: {result.version}")
 
             # Load data when needed
             table = result.data
-
-            # Or preload data immediately
-            result = client.tables.fetch(path, load_data=True)
-            table = result.data  # Already loaded
             ```
         """
         # Parse path: channel/namespace/version/dataset/table
@@ -298,7 +294,7 @@ class TablesAPI:
         Convenience method equivalent to fetch(path).data
 
         Args:
-            path: Full catalog path (e.g., "garden/un/2024/population/population").
+            path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
 
         Returns:
             Table (pandas DataFrame with metadata).
@@ -308,7 +304,7 @@ class TablesAPI:
 
         Example:
             ```python
-            table = client.tables.get_data("garden/un/2024/population/population")
+            table = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
             print(table.head())
             print(table.metadata.title)
             ```

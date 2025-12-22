@@ -257,7 +257,7 @@ class IndicatorResult(BaseModel):
         if self._table is None:
             self._table = self._load_table()
         # Extract the specific column/variable
-        return self._table[self.column_name]  # type: ignore
+        return self._table[self.column_name].dropna()  # type: ignore
 
     @property
     def table(self) -> "Table":

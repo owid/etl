@@ -116,11 +116,7 @@ class ChartsAPI:
             ```python
             chart = client.charts.fetch("life-expectancy")
             print(chart.title)
-            df = chart.data  # Lazy-loaded via property
-
-            # Or preload data immediately
-            chart = client.charts.fetch("life-expectancy", load_data=True)
-            df = chart.data  # Already loaded
+            df = chart.data
             ```
         """
         slug = self._parse_slug(slug_or_url)
