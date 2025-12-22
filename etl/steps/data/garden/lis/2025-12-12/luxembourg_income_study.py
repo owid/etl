@@ -28,6 +28,13 @@ RELATIVE_POVERTY_COLUMNS = {
     "total_shortfall_relative": "total_shortfall",
 }
 
+# Define World Bank poverty lines (to show price in the right format)
+WORLD_BANK_POVERTY_LINES = {
+    "3": "3",
+    "4.2": "4.20",
+    "8.3": "8.30",
+}
+
 # Define relative poverty lines
 RELATIVE_POVERTY_LINES = {
     "0.4": "40% of the median",
@@ -156,6 +163,16 @@ def process_poverty(tb: Table, absolute: bool) -> Table:
 
     if absolute:
         column_dict = ABSOLUTE_POVERTY_COLUMNS
+
+        # Assert the lines in WORLD_BANK_POVERTY_LINES keys are all in tb['poverty_line']
+        tb_lines_expected = set(WORLD_BANK_POVERTY_LINES.keys())
+        tb_lines_actual = set(tb["poverty_line"].unique())
+        assert tb_lines_expected.issubset(
+            tb_lines_actual
+        ), f"Missing poverty lines: {tb_lines_expected - tb_lines_actual}"
+
+        # Rename poverty lines
+        tb["poverty_line"] = tb["poverty_line"].replace(WORLD_BANK_POVERTY_LINES)
 
     else:
         column_dict = RELATIVE_POVERTY_COLUMNS
