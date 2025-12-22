@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 import requests
 
-from .models import ChartResult, ResultSet
+from owid.catalog.api.models import ChartResult, ResultSet
 
 if TYPE_CHECKING:
     from . import Client

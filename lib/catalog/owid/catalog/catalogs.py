@@ -92,6 +92,10 @@ def find(
     version: str | None = None,
     dataset: str | None = None,
     channels: Iterable[CHANNEL] = ("garden",),
+    case: bool = False,
+    regex: bool = True,
+    fuzzy: bool = False,
+    threshold: int = 70,
 ) -> CatalogFrame:
     """Search remote catalog (DEPRECATED).
 
@@ -101,20 +105,25 @@ def find(
     catalog. Automatically initializes and caches the catalog connection.
 
     Args:
-        table: Table name pattern to search for (substring match).
-        namespace: Namespace to filter by (e.g., 'un', 'worldbank').
-        version: Version string to filter by (e.g., '2024-01-15').
-        dataset: Dataset name to filter by.
-        channels: Data channels to search (default: garden only).
+        table: Table name pattern to search for
+        namespace: Filter by namespace (exact match)
+        version: Filter by version (exact match)
+        dataset: Dataset name pattern to search for
+        channels: Data channels to search (default: garden only)
+        case: Case-sensitive search (default: False)
+        regex: Enable regex patterns in table/dataset (default: True)
+        fuzzy: Use fuzzy string matching (default: False)
+        threshold: Minimum fuzzy match score 0-100 (default: 70)
 
     Returns:
-        CatalogFrame containing matching tables.
+        CatalogFrame containing matching tables, sorted by relevance if fuzzy=True.
 
     Example:
         ```python
         # DEPRECATED - use Client API instead
         from owid.catalog import find
         results = find(table="population")
+        results = find(table="populaton", fuzzy=True)  # Fuzzy search
 
         # RECOMMENDED:
         from owid.catalog import Client
@@ -132,6 +141,10 @@ def find(
         version=version,
         dataset=dataset,
         channels=channels,
+        case=case,
+        regex=regex,
+        fuzzy=fuzzy,
+        threshold=threshold,
     )
 
     # Convert ResultSet to CatalogFrame for backwards compatibility
@@ -254,50 +267,6 @@ def find_latest(
     return sorted_results[-1].data
 
 
-@deprecated(
-    version="0.4.0",
-    reason="Use Client().indicators.search() instead. See: https://docs.owid.io/catalog-api-migration",
-)
-def find_by_indicator(query: str, limit: int = 10) -> CatalogFrame:
-    """Search by indicator (DEPRECATED).
-
-    **DEPRECATED**: Use Client().indicators.search() instead.
-
-    Uses the OWID search API to find indicators matching a natural
-    language query, then returns a CatalogFrame that can load the
-    full tables containing those indicators.
-
-    Args:
-        query: Natural language search query (e.g., "solar power generation").
-        limit: Maximum number of results to return (default: 10).
-
-    Returns:
-        CatalogFrame with columns: indicator_title, indicator, score, then standard
-        catalog columns (table, dataset, version, namespace, channel, is_public,
-        dimensions, path, format).
-
-    Example:
-        ```python
-        # DEPRECATED:
-        from owid.catalog import find_by_indicator
-        results = find_by_indicator("solar power")
-
-        # RECOMMENDED:
-        from owid.catalog import Client
-        client = Client()
-        results = client.indicators.search("solar power")
-        ```
-    """
-    _warn_deprecated("find_by_indicator", "Client().indicators.search()")
-
-    # Use Client API internally
-    client = _get_client()
-    results = client.indicators.search(query, limit=limit)
-
-    # Convert ResultSet to CatalogFrame for backwards compatibility
-    return results.to_catalog_frame()
-
-
 __all__ = [
     # Classes (backwards compatibility)
     "LocalCatalog",
@@ -309,7 +278,6 @@ __all__ = [
     "find",
     "find_one",
     "find_latest",
-    "find_by_indicator",
     # Constants
     "CHANNEL",
     "OWID_CATALOG_URI",

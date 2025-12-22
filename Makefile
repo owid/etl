@@ -97,6 +97,10 @@ unittest: .venv
 
 test: check-formatting check-linting check-typing unittest version-tracker
 
+check-typing: .venv
+	@echo '==> Checking types'
+	.venv/bin/ty check $(SRC) --exclude "etl/steps/**" --exclude "snapshots/**"
+
 test-integration: .venv
 	@echo '==> Running integration tests'
 	.venv/bin/pytest -m integration tests

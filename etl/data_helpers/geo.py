@@ -717,14 +717,14 @@ def interpolate_table(
         else:
             years_in_data = df[time_col].unique()
         # Reindex
-        df = (
+        df = (  # type: ignore[assignment]
             df.set_index([country_col, time_col])
             .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
             .sort_index()
         )
 
     # Interpolate
-    df = (
+    df = (  # type: ignore[assignment]
         df.groupby(country_col)
         .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # type: ignore
         .reset_index()

@@ -15,7 +15,7 @@ import os
 import warnings
 from dataclasses import dataclass
 from threading import Lock
-from typing import Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
 import structlog
@@ -206,13 +206,13 @@ def _check_upserted_variable(variable: Variable) -> None:
     assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
 
 
-def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[str, dict]:
+def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[int | str, Any]:
     q = """
     select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
     """
     return (
         read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")
-    )  # type: ignore
+    )
 
 
 def upsert_table(
@@ -428,8 +428,8 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
             .where(gm.Dataset.id == dataset_id)  # type: ignore
             .values(
                 sourceChecksum=checksum,
-                dataEditedAt=datetime.datetime.utcnow(),
-                metadataEditedAt=datetime.datetime.utcnow(),
+                dataEditedAt=datetime.datetime.now(datetime.timezone.utc),
+                metadataEditedAt=datetime.datetime.now(datetime.timezone.utc),
             )
         )
         session.execute(q)
