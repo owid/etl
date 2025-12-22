@@ -1,3 +1,7 @@
+---
+status:
+    - new
+---
 # Catalog Library
 
 The `owid-catalog` library is the foundation of Our World in Data's data management system. It serves two main purposes:
