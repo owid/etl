@@ -7,7 +7,6 @@ from owid.catalog import Client
 from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
-    DatasetResult,  # Backwards compatibility alias
     IndicatorResult,
     LicenseError,
     PageSearchResult,
@@ -25,7 +24,6 @@ class TestClient:
         assert hasattr(client, "_site_search")
         assert hasattr(client, "indicators")
         assert hasattr(client, "tables")
-        assert hasattr(client, "datasets")  # Backwards compatibility
 
     def test_client_repr(self):
         client = Client()
@@ -345,9 +343,6 @@ class TestTablesAPI:
         # Verify it's the same as tables
         assert client.datasets is client.tables
 
-        # DatasetResult should work as alias
-        assert DatasetResult is TableResult
-
 
 class TestResultSet:
     """Test the ResultSet container."""
@@ -414,17 +409,3 @@ class TestDataclassModels:
 
         assert result.table == "population"
         assert result.namespace == "un"
-
-    def test_dataset_result_alias(self):
-        """Test that DatasetResult is an alias for TableResult."""
-        result = DatasetResult(
-            table="population",
-            dataset="un_wpp",
-            version="2024-07-11",
-            namespace="un",
-            channel="garden",
-            path="garden/un/2024-07-11/un_wpp/population",
-        )
-
-        assert isinstance(result, TableResult)
-        assert result.table == "population"
