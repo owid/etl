@@ -58,6 +58,8 @@ Different APIs use different path conventions:
       heading_level: 3
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"
 
 
 ::: owid.catalog.api.charts.ChartsAPI
@@ -65,18 +67,24 @@ Different APIs use different path conventions:
       heading_level: 3
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"
 
 ::: owid.catalog.api.tables.TablesAPI
     options:
       heading_level: 3
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"
 
 ::: owid.catalog.api.indicators.IndicatorsAPI
     options:
       heading_level: 3
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"
 
 
 ### API result types
@@ -87,21 +95,29 @@ Result objects returned by `fetch()` and `search()` methods.
     options:
       heading_level: 4
       show_root_heading: true
+      filters:
+        - "!^_"
 
 ::: owid.catalog.api.models.ChartResult
     options:
       heading_level: 4
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"
 
 ::: owid.catalog.api.models.IndicatorResult
     options:
       heading_level: 4
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"
 
 ::: owid.catalog.api.models.TableResult
     options:
       heading_level: 4
       show_root_heading: true
       members_order: source
+      filters:
+        - "!^_"

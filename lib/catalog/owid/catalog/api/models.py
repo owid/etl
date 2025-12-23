@@ -739,14 +739,16 @@ class ResponseSet(BaseModel, Generic[T]):
             New ResponseSet with filtered results.
 
         Example:
+            ```py
             >>> # Filter results by version
             >>> results.filter(lambda r: r.version > '2024')
-            >>>
+
             >>> # Filter by namespace
             >>> results.filter(lambda r: r.namespace == "worldbank")
-            >>>
+
             >>> # Chain multiple filters
             >>> results.filter(lambda r: r.version > '2024').filter(lambda r: r.namespace == "un")
+            ```
         """
         filtered_results = [item for item in self.results if predicate(item)]
         return ResponseSet(
@@ -768,17 +770,19 @@ class ResponseSet(BaseModel, Generic[T]):
             New ResponseSet with sorted results.
 
         Example:
+            ```py
             >>> # Sort by version (ascending)
             >>> results.sort_by('version')
-            >>>
+
             >>> # Sort by version (descending - latest first)
             >>> results.sort_by('version', reverse=True)
-            >>>
+
             >>> # Sort by custom function (e.g., by score)
             >>> results.sort_by(lambda r: r.score, reverse=True)
-            >>>
+
             >>> # Chain sorting and filtering
             >>> results.filter(lambda r: r.version > '2024').sort_by('version', reverse=True)
+            ```
         """
         if isinstance(key, str):
             # Sort by attribute name
@@ -810,18 +814,20 @@ class ResponseSet(BaseModel, Generic[T]):
             AttributeError: If the specified attribute doesn't exist on the results.
 
         Example:
+            ```py
             >>> # For TableResult - use version (default)
             >>> latest_table = results.latest()
             >>> tb = latest_table.data
-            >>>
+
             >>> # For IndicatorResult - use version (parsed from catalog_path)
             >>> latest_indicator = results.latest()
-            >>>
+
             >>> # For PageSearchResult - use published_at
             >>> latest_article = results.latest(by='published_at')
-            >>>
+
             >>> # For IndicatorResult - sort by relevance score
             >>> best_match = results.latest(by='score')
+            ```
         """
         if not self.results:
             raise ValueError("No results available to get latest from")
@@ -849,15 +855,17 @@ class ResponseSet(BaseModel, Generic[T]):
             If n>1, returns a new ResponseSet with the first n results.
 
         Example:
+            ```python
             >>> # Get first result
             >>> first_result = results.first()
             >>> tb = first_result.data
-            >>>
+
             >>> # Get first 5 results
             >>> top_five = results.first(5)
-            >>>
+
             >>> # Combine with sorting
             >>> latest_five = results.sort_by('version', reverse=True).first(5)
+            ```
         """
         if n == 1:
             return self.results[0] if self.results else None  # type: ignore
