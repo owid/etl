@@ -52,7 +52,6 @@ Different APIs use different path conventions:
 
 ## API Reference
 
-
 ::: owid.catalog.api.Client
     options:
       heading_level: 3
@@ -115,6 +114,15 @@ Result objects returned by `fetch()` and `search()` methods.
         - "!^_"
 
 ::: owid.catalog.api.models.TableResult
+    options:
+      heading_level: 4
+      show_root_heading: true
+      members_order: source
+      filters:
+        - "!^_"
+
+### Experimental
+::: owid.catalog.api.experimental
     options:
       heading_level: 4
       show_root_heading: true

@@ -55,18 +55,20 @@ def show(
     Args:
         name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy")
         kind: What to search for (default: "table"):
-            - "table": Search catalog tables
-            - "indicator": Search indicators (variables in tables)
-            - "chart": Search published charts
+
+                - "table": Search catalog tables
+                - "indicator": Search indicators (variables in tables)
+                - "chart": Search published charts
         namespace: Filter by namespace (e.g., "un", "worldbank")
         version: Filter by specific version (e.g., "2024-01-15")
         dataset: Filter by dataset name
         channel: Filter by channel (e.g., "garden", "grapher")
         match: Matching mode (default: "fuzzy" for typo-tolerance)
-            - "exact": Exact string match
-            - "contains": Substring match
-            - "regex": Regular expression
-            - "fuzzy": Typo-tolerant similarity matching
+
+                - "exact": Exact string match
+                - "contains": Substring match
+                - "regex": Regular expression
+                - "fuzzy": Typo-tolerant similarity matching
         fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70)
         case: Case-sensitive search (default: False)
         limit: Maximum number of results to show (default: 10)
@@ -128,19 +130,20 @@ def get(path: str) -> "Table" | pd.DataFrame:
     """Get data directly by path (auto-detects tables, indicators, or charts).
 
     This function auto-detects what you're trying to access based on the path format:
+
     - Regular catalog path → Table
     - Path with #fragment → Table (single-column indicator data)
     - Path starting with "chart:" → DataFrame (chart data)
 
     Args:
         path: Path to the data resource:
+
             - Table: "channel/namespace/version/dataset/table"
             - Indicator: "channel/namespace/version/dataset/table#variable"
             - Chart: "chart:slug" (e.g., "chart:life-expectancy")
 
     Returns:
-        - Table object if path points to a table
-        - Table object if path contains # fragment (single-column indicator)
+        - Table object if path points to a table or indicator (single-column indicator)
         - DataFrame if path starts with "chart:" prefix
 
     Raises:

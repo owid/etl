@@ -8,10 +8,12 @@ functions in this namespace. Experimental features that prove stable will be gra
 to the main API by removing the experimental_ prefix.
 
 Data Discovery and Retrieval:
-    show() - Browse available data without downloading (discovery/exploration)
-    get() - Direct download by catalog path (precise retrieval)
+
+    - show(): Browse available data without downloading (discovery/exploration)
+    - get(): Direct download by catalog path (precise retrieval)
 
 The API separates discovery from download for better cost awareness:
+
 - Use show() to explore and find what you need (lightweight, no downloads)
 - Use get() to download specific data by path (explicit, knows what you're getting)
 
@@ -40,7 +42,7 @@ Example:
 # - bulk: bulk download functions for multiple paths at once
 
 # Version marker for experimental features
-__version__ = "0.2.0-experimental"
+__version__ = "0.1.0-experimental"
 
 # Import experimental functions
 from .quick import get, show
