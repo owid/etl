@@ -224,46 +224,56 @@ class IndicatorResult(BaseModel):
     """An indicator found via semantic search.
 
     Attributes:
-        indicator_id: Unique indicator ID.
         title: Indicator title/name.
-        score: Semantic similarity score (0-1).
-        catalog_path: Path in the catalog (e.g., "grapher/un/2024/pop/pop#population").
-        description: Full indicator description.
+        indicator_id: Unique indicator ID.
+        path: Path in the catalog (e.g., "grapher/un/2024-07-12/un_wpp/population#population").
+        channel: Data channel (parsed from path).
+        namespace: Data provider namespace (parsed from path).
+        version: Version string (parsed from path).
+        dataset: Dataset name (parsed from path).
         column_name: Column name in the table.
+        description: Full indicator description.
         unit: Unit of measurement.
+        score: Semantic similarity score (0-1).
         n_charts: Number of charts using this indicator.
-        dataset: Dataset name (parsed from catalog_path).
-        version: Version string (parsed from catalog_path).
-        namespace: Data provider namespace (parsed from catalog_path).
-        channel: Data channel (parsed from catalog_path).
     """
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
 
-    indicator_id: int | None
+    # Identification
     title: str
-    score: float
-    catalog_path: str | None
-    description: str = ""
-    column_name: str = ""
-    unit: str = ""
-    n_charts: int | None = None
-    dataset: str | None = None
-    version: str | None = None
-    namespace: str | None = None
+    indicator_id: int | None
+
+    # Location
+    path: str | None
+
+    # Structural metadata
     channel: str | None = None
+    namespace: str | None = None
+    version: str | None = None
+    dataset: str | None = None
+
+    # Content metadata
+    column_name: str = ""
+    description: str = ""
+    unit: str = ""
+
+    # Usage metadata
+    score: float
+    n_charts: int | None = None
+
     _table: "Table | None" = PrivateAttr(default=None)
     _legacy: bool = PrivateAttr(default=False)
 
     def model_post_init(self, __context: Any) -> None:
-        """Parse dataset, version, namespace, channel from catalog_path."""
-        if self.catalog_path and not self.dataset:
+        """Parse dataset, version, namespace, channel from path."""
+        if self.path and not self.dataset:
             # Parse using CatalogPath
             try:
                 # CatalogPath.from_str() handles the "#" automatically
-                parsed = CatalogPath.from_str(self.catalog_path)
+                parsed = CatalogPath.from_str(self.path)
                 # Set parsed fields
                 object.__setattr__(self, "dataset", parsed.dataset)
                 object.__setattr__(self, "version", parsed.version)
@@ -299,16 +309,14 @@ class IndicatorResult(BaseModel):
 
     def _load_table(self) -> "Table":
         """Internal method to load the table containing this indicator."""
-        # Check catalog_path is not None
-        if self.catalog_path is None:
-            raise ValueError(
-                "Cannot load table: catalog_path is None. Likely because this is a legacy (pre-ETL) table."
-            )
-        # Parse catalog_path using CatalogPath
-        parsed = CatalogPath.from_str(self.catalog_path)
+        # Check path is not None
+        if self.path is None:
+            raise ValueError("Cannot load table: path is None. Likely because this is a legacy (pre-ETL) table.")
+        # Parse path using CatalogPath
+        parsed = CatalogPath.from_str(self.path)
         # Use table_path property (without variable)
         if parsed.table_path is None:
-            raise ValueError(f"Invalid catalog path: {self.catalog_path}")
+            raise ValueError(f"Invalid catalog path: {self.path}")
         return _load_table(parsed.table_path)
 
 
@@ -317,13 +325,13 @@ class TableResult(BaseModel):
 
     Attributes:
         table: Table name.
-        dataset: Dataset name.
-        version: Version string.
-        namespace: Data provider namespace.
-        channel: Data channel (garden, meadow, etc.).
         path: Full path to the table.
-        is_public: Whether the data is publicly accessible.
+        channel: Data channel (garden, meadow, etc.).
+        namespace: Data provider namespace.
+        version: Version string.
+        dataset: Dataset name.
         dimensions: List of dimension columns.
+        is_public: Whether the data is publicly accessible.
         formats: List of available formats.
     """
 
@@ -331,15 +339,25 @@ class TableResult(BaseModel):
         arbitrary_types_allowed=True,
     )
 
+    # Identification
     table: str
-    dataset: str
-    version: str
-    namespace: str
-    channel: str
+
+    # Location
     path: str
-    is_public: bool = True
+
+    # Structural metadata
+    channel: str
+    namespace: str
+    version: str
+    dataset: str
+
+    # Content metadata
     dimensions: list[str] = Field(default_factory=list)
+
+    # Technical metadata
+    is_public: bool = True
     formats: list[str] = Field(default_factory=list)
+
     _data: "Table | None" = PrivateAttr(default=None)
 
     @property
@@ -367,153 +385,6 @@ class TableResult(BaseModel):
     def _load(self) -> "Table":
         """Internal method to load table data."""
         return _load_table(self.path, formats=self.formats, is_public=self.is_public)
-
-    def experimental_preview(self, n: int = 10) -> "Table":
-        """Preview first N rows without loading full dataset (experimental feature).
-
-        This is useful for quickly inspecting large tables without loading all data into memory.
-        Note: This is an experimental feature and may change in future versions.
-
-        Args:
-            n: Number of rows to preview (default: 10).
-
-        Returns:
-            Table with first N rows and full metadata.
-
-        Example:
-            ```python
-            >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-            >>> preview = result.experimental_preview(n=5)
-            >>> print(preview.shape)
-            (5, 3)  # Only 5 rows loaded
-            ```
-        """
-        # Load the full table (unfortunately, we need to load all data to get first N rows
-        # as the underlying storage format doesn't support partial reads efficiently)
-        # TODO: Optimize this by adding support for row-limited reads in Table.read()
-        table = self.data
-        preview = table.head(n)
-        # Ensure we return a Table, not DataFrame/Series
-        from owid.catalog.tables import Table as TableClass
-
-        if not isinstance(preview, TableClass):
-            preview = TableClass(preview)
-        return preview
-
-    def experimental_summary(self) -> str:
-        """Get summary statistics without loading full dataset (experimental feature).
-
-        Returns metadata and structure information (shape, dtypes, memory usage) without
-        loading actual data rows. This is much faster than loading the full table.
-
-        Note: This is an experimental feature and may change in future versions.
-
-        Returns:
-            Formatted string with table summary (shape, dtypes, null counts, memory estimate).
-
-        Example:
-            ```python
-            >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-            >>> print(result.experimental_summary())
-            Table: population
-            Dataset: un_wpp (garden/un/2024-07-12)
-            Dimensions: ['country', 'year']
-            Columns: 3
-            Dtypes: int64(2), float64(1)
-            Memory: ~45.8 MB (estimated)
-            ```
-        """
-        # Use data_header to get structure without loading rows
-        header = self.data_header
-
-        # Build summary string
-        lines = [
-            f"Table: {self.table}",
-            f"Dataset: {self.dataset} ({self.channel}/{self.namespace}/{self.version})",
-        ]
-
-        if self.dimensions:
-            lines.append(f"Dimensions: {self.dimensions}")
-
-        lines.append(f"Columns: {len(header.columns)}")
-
-        # Get dtype counts
-        dtype_counts: dict[str, int] = {}
-        for dtype in header.dtypes:
-            dtype_str = str(dtype)
-            dtype_counts[dtype_str] = dtype_counts.get(dtype_str, 0) + 1
-
-        dtype_summary = ", ".join([f"{dtype}({count})" for dtype, count in sorted(dtype_counts.items())])
-        lines.append(f"Dtypes: {dtype_summary}")
-
-        # Note: Can't get actual memory without loading data, but can estimate
-        lines.append("Memory: Unknown (call .data to load and measure)")
-
-        return "\n".join(lines)
-
-    def experimental_describe_metadata(self) -> str:
-        """Pretty-print table metadata (experimental feature).
-
-        Returns a formatted string with the table's metadata including title, description,
-        sources, and other relevant information.
-
-        Note: This is an experimental feature and may change in future versions.
-
-        Returns:
-            Formatted string with metadata details.
-
-        Example:
-            ```python
-            >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-            >>> print(result.experimental_describe_metadata())
-            === Table Metadata ===
-            Title: Population by country and year
-            Description: Total population by country...
-            Sources: UN World Population Prospects (2024)
-            ...
-            ```
-        """
-        # Load header to get metadata
-        header = self.data_header
-        metadata = header.metadata
-
-        lines = ["=== Table Metadata ==="]
-
-        if metadata.title:
-            lines.append(f"Title: {metadata.title}")
-
-        if metadata.description:
-            # Truncate long descriptions
-            desc = metadata.description
-            if len(desc) > 200:
-                desc = desc[:200] + "..."
-            lines.append(f"Description: {desc}")
-
-        # Sources and licenses are on the dataset, not the table
-        if metadata.dataset:
-            if metadata.dataset.sources:
-                source_names = [s.name for s in metadata.dataset.sources if s.name]
-                if source_names:
-                    lines.append(f"Sources: {', '.join(source_names)}")
-
-            if metadata.dataset.licenses:
-                license_names = [lic.name for lic in metadata.dataset.licenses if lic.name]
-                if license_names:
-                    lines.append(f"Licenses: {', '.join(license_names)}")
-
-        # Add column information
-        lines.append(f"\nColumns ({len(header.columns)}):")
-        for col_name in header.columns:
-            col = header[col_name]
-            col_info = f"  - {col_name}"
-            if hasattr(col, "metadata") and col.metadata:
-                if col.metadata.unit:
-                    col_info += f" ({col.metadata.unit})"
-                if col.metadata.title and col.metadata.title != col_name:
-                    col_info += f": {col.metadata.title}"
-            lines.append(col_info)
-
-        return "\n".join(lines)
 
 
 class ResponseSet(BaseModel, Generic[T]):
@@ -690,7 +561,7 @@ class ResponseSet(BaseModel, Generic[T]):
             for r in self.results:
                 # Parse catalog path using CatalogPath
                 try:
-                    parsed = CatalogPath.from_str(r.catalog_path)  # type: ignore
+                    parsed = CatalogPath.from_str(r.path)  # type: ignore
                     indicator = parsed.variable or ""
                     channel = parsed.channel
                     namespace = parsed.namespace
@@ -702,7 +573,7 @@ class ResponseSet(BaseModel, Generic[T]):
                 except Exception:
                     # Fallback if parsing fails
                     indicator = channel = namespace = version = dataset = table = ""
-                    path_part = r.catalog_path.split("#")[0] if "#" in r.catalog_path else r.catalog_path  # type: ignore
+                    path_part = r.path.split("#")[0] if "#" in r.path else r.path  # type: ignore
 
                 rows.append(
                     {
