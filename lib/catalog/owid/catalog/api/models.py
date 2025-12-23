@@ -245,16 +245,17 @@ class IndicatorResult(BaseModel):
     indicator_id: int | None
     title: str
     score: float
-    catalog_path: str
+    catalog_path: str | None
     description: str = ""
     column_name: str = ""
     unit: str = ""
     n_charts: int | None = None
-    dataset: str = ""
-    version: str = ""
-    namespace: str = ""
-    channel: str = ""
+    dataset: str | None = None
+    version: str | None = None
+    namespace: str | None = None
+    channel: str | None = None
     _table: "Table | None" = PrivateAttr(default=None)
+    _legacy: bool = PrivateAttr(default=False)
 
     def model_post_init(self, __context: Any) -> None:
         """Parse dataset, version, namespace, channel from catalog_path."""
@@ -270,7 +271,7 @@ class IndicatorResult(BaseModel):
                 object.__setattr__(self, "channel", parsed.channel)
             except Exception:
                 # If parsing fails, leave fields empty
-                pass
+                object.__setattr__(self, "_legacy", True)
 
     @property
     def data(self) -> "Variable":
@@ -383,6 +384,16 @@ class ResponseSet(BaseModel, Generic[T]):
     query: str = ""
     total: int = 0
 
+    def _get_type_display(self) -> str:
+        """Get display name for ResponseSet with generic type."""
+        if not self.results:
+            return "ResponseSet"
+
+        # Get the type of the first result
+        first_result = self.results[0]
+        type_name = type(first_result).__name__
+        return f"ResponseSet[{type_name}]"
+
     def model_post_init(self, __context: Any) -> None:
         """Set total to length of results if not provided."""
         if self.total == 0:
@@ -400,15 +411,17 @@ class ResponseSet(BaseModel, Generic[T]):
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
+        type_display = self._get_type_display()
+
         if not self.results:
-            return f"ResponseSet(query={self.query!r}, total=0, results=[])"
+            return f"{type_display}(query={self.query!r}, total=0, results=[])"
 
         # Convert to DataFrame for nice tabular display
         df = self.to_frame()
 
         # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"ResponseSet(query={self.query!r}, total={self.total}, results=[])"
+            return f"{type_display}(query={self.query!r}, total={self.total}, results=[])"
         else:
             df_str = str(df)
 
@@ -417,7 +430,7 @@ class ResponseSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"ResponseSet\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
+        header = f"{type_display}\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
 
         # Add helper tip at the end
         tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
@@ -429,15 +442,17 @@ class ResponseSet(BaseModel, Generic[T]):
 
     def _repr_html_(self) -> str:
         """Display as HTML table in Jupyter notebooks."""
+        type_display = self._get_type_display()
+
         if not self.results:
-            return f"<p>ResponseSet(query={self.query!r}, total=0, results=[])</p>"
+            return f"<p>{type_display}(query={self.query!r}, total=0, results=[])</p>"
 
         df = self.to_frame()
         df_html = df._repr_html_()
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
-  <p><strong>ResponseSet</strong></p>
+  <p><strong>{type_display}</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
     <li><strong>.total</strong>: {self.total}</li>
