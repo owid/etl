@@ -323,7 +323,7 @@ class LocalCatalog(CatalogMixin):
         for channel in self.channels:
             channel_frame = frame.loc[frame.channel == channel].reset_index(drop=True)
             for format in INDEX_FORMATS:
-                filename = self._catalog_channel_file(channel, format)
+                filename = self._catalog_channel_file(channel, cast(FileFormat, format))
                 save_frame(channel_frame, filename)
 
         self._save_metadata({"format_version": OWID_CATALOG_VERSION})
