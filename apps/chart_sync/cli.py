@@ -1,7 +1,7 @@
 import copy
 import datetime as dt
 import re
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, Optional, Set
 
 import click
 import pandas as pd
