@@ -12,7 +12,7 @@ import re
 import tempfile
 from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 from urllib.parse import urlparse
 
 import numpy as np
