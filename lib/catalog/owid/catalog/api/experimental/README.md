@@ -13,35 +13,61 @@ All features in this module are marked as **experimental** and follow these rule
 
 ## Features
 
-### 1. Quick Access Functions
+### 1. Data Discovery and Retrieval
 
-#### `quick(name, kind="table", **filters)` - Smart search and download
+The experimental API separates discovery (browsing) from download (retrieval) for better cost awareness:
 
-One-liner to search and download data with fuzzy matching:
+- **`show()`** - Browse available data without downloading (lightweight exploration)
+- **`get()`** - Download specific data by path (explicit retrieval)
+
+This design ensures you know exactly what you're downloading before spending bandwidth on large datasets.
+
+#### `show(name, kind="table", **filters)` - Browse available data
+
+Display what's available in the catalog without downloading:
 
 ```python
-from owid.catalog.api.experimental import quick
+from owid.catalog.api.experimental import show
 
-# Tables (default) - returns Table
-table = quick("population")
-table = quick("gdp", namespace="worldbank", latest=True)
+# Tables (default) - shows matching paths
+show("population")
 
-# Indicators - returns single-column Table
-indicator = quick("population", kind="indicator")
+# With filters
+show("wdi", namespace="worldbank_wdi")
 
-# Charts - returns DataFrame
-chart_data = quick("life-expectancy", kind="chart")
+# Indicators - semantic search
+show("gdp", kind="indicator")
+
+# Charts - search published charts
+show("life-expectancy", kind="chart")
+
+# Exact match (no fuzzy tolerance)
+show("population", match="exact")
 ```
 
 **Features:**
+- Display-only (no data download)
 - Fuzzy matching by default (typo-tolerant)
-- Automatically returns latest version
-- Supports all three APIs (tables, indicators, charts)
-- Consistent return types (Tables everywhere except charts)
+- Supports tables, indicators, and charts via `kind=` parameter
+- Shows full catalog paths for use with `get()`
+- Helpful error messages and tips
 
-#### `get(path)` - Direct access with auto-detection
+**Output example:**
+```
+Showing tables matching 'population' (fuzzy):
+Found 15 results.
 
-Direct path access that auto-detects what you're requesting:
+garden/un/2024-07-12/un_wpp/population
+garden/un/2023-05-15/un_wpp/population
+garden/worldbank/2024-01-10/wdi/population_total
+...
+
+Tip: Copy a path and use get(path) to download
+```
+
+#### `get(path)` - Download data by path
+
+Direct download with auto-detection of data type:
 
 ```python
 from owid.catalog.api.experimental import get
@@ -61,6 +87,16 @@ chart_data = get("chart:life-expectancy")
 - Validates prefixes (only `chart:` is allowed)
 - Indicators return single-column Tables (not Variables)
 - Clean error messages for invalid paths
+
+**Typical workflow:**
+```python
+# 1. Browse to find what you need
+show("population")
+
+# 2. Copy a path from the results
+# 3. Download it
+table = get("garden/un/2024-07-12/un_wpp/population")
+```
 
 ### 2. Preview Methods on TableResult
 
@@ -98,36 +134,6 @@ print(result.experimental_describe_metadata())
 
 **Note:** `experimental_preview()` currently loads the full table then returns first N rows. Future optimization may add true partial loading.
 
-### 3. Bulk Download on ResponseSet
-
-Download multiple tables in parallel:
-
-```python
-from owid.catalog import Client
-
-client = Client()
-results = client.tables.search("worldbank/wdi", match="contains")
-
-# Download all results in parallel with progress bar
-tables = results.experimental_download_all(
-    parallel=True,
-    max_workers=4,
-    show_progress=True
-)
-
-# Check results
-successful = {k: v for k, v in tables.items() if not isinstance(v, Exception)}
-failed = {k: v for k, v in tables.items() if isinstance(v, Exception)}
-
-print(f"Downloaded {len(successful)} tables, {len(failed)} failed")
-```
-
-**Features:**
-- Parallel downloads using ThreadPoolExecutor
-- Progress bars (requires `tqdm`)
-- Graceful error handling (returns exceptions, doesn't fail entire batch)
-- Returns `dict[str, Table | Exception]`
-
 ## Installation
 
 The experimental module is included with `owid-catalog`:
@@ -136,28 +142,43 @@ The experimental module is included with `owid-catalog`:
 uv add owid-catalog
 ```
 
-For progress bars in bulk downloads:
-
-```bash
-uv add tqdm
-```
-
 ## Usage Patterns
 
-### Pattern 1: Quick data exploration
+### Pattern 1: Data discovery workflow
 
 ```python
-from owid.catalog.api.experimental import quick
+from owid.catalog.api.experimental import show, get
 
-# Get latest population data quickly
-table = quick("population")
+# Browse available data (no download)
+show("population")
+
+# Copy a path from the results and download
+table = get("garden/un/2024-07-12/un_wpp/population")
 print(table.head())
 
-# Fuzzy search with filters
-table = quick("populaton", namespace="un", match="fuzzy")  # Typo-tolerant!
+# Fuzzy search with filters (typo-tolerant!)
+show("populaton", namespace="un", match="fuzzy")
 ```
 
-### Pattern 2: Preview before loading
+### Pattern 2: Indicators and charts
+
+```python
+from owid.catalog.api.experimental import show, get
+
+# Browse indicators using semantic search
+show("gdp per capita", kind="indicator")
+
+# Download specific indicator
+indicator_table = get("garden/un/2024-07-12/un_wpp/population#population")
+
+# Browse charts
+show("life-expectancy", kind="chart")
+
+# Download chart data
+chart_data = get("chart:life-expectancy")
+```
+
+### Pattern 3: Preview before downloading
 
 ```python
 from owid.catalog import Client
@@ -173,43 +194,48 @@ for result in results[:5]:
 table = results[0].data
 ```
 
-### Pattern 3: Bulk processing
+### Pattern 4: Precise filtering
 
 ```python
-from owid.catalog import Client
+from owid.catalog.api.experimental import show, get
 
-client = Client()
-results = client.tables.search("worldbank", match="contains")
+# Use filters to narrow results
+show("wdi", namespace="worldbank_wdi", version="2024-01-10")
 
-# Download top 10 in parallel
-top_10 = results.first(10)
-tables = top_10.experimental_download_all(parallel=True, max_workers=4)
+# Exact match (no fuzzy tolerance)
+show("population", match="exact")
 
-# Process all successful downloads
-for name, table in tables.items():
-    if not isinstance(table, Exception):
-        print(f"Processing {name}: {table.shape}")
-```
-
-### Pattern 4: Charts and indicators
-
-```python
-from owid.catalog.api.experimental import quick, get
-
-# Quick chart access
-chart = quick("life-expectancy", kind="chart")  # Returns DataFrame
-
-# Or with explicit path
-chart = get("chart:life-expectancy")
-
-# Indicators return single-column Tables
-indicator = quick("gdp", kind="indicator")  # Table with one column
-indicator = get("garden/.../dataset/table#variable")  # Also a Table
+# Then download the specific version you need
+table = get("garden/worldbank/2024-01-10/wdi/population_total")
 ```
 
 ## Migration Path
 
-When experimental features graduate to stable API:
+### Breaking Changes in v0.2.0
+
+**⚠️ `quick()` has been removed** and replaced with `show()` + `get()` workflow.
+
+**Old code (v0.1.0):**
+```python
+from owid.catalog.api.experimental import quick
+table = quick("population")  # One-liner search + download
+```
+
+**New code (v0.2.0):**
+```python
+from owid.catalog.api.experimental import show, get
+
+# Two-step workflow: browse then download
+show("population")  # Display available data
+table = get("garden/un/2024-07-12/un_wpp/population")  # Explicit download
+```
+
+**Why the change?**
+- Clearer separation between discovery (lightweight) and download (expensive)
+- Users explicitly choose what to download after seeing options
+- Better cost awareness for large datasets
+
+### When experimental features graduate to stable API
 
 1. **Prefix removal**: `experimental_preview()` → `preview()`
 2. **Import path change**: May move from `experimental` to main module
@@ -220,18 +246,20 @@ When experimental features graduate to stable API:
 
 ```python
 # Current experimental usage
-from owid.catalog.api.experimental import quick
-table = quick("population")
+from owid.catalog.api.experimental import show, get
+show("population")
+table = get("garden/un/2024-07-12/un_wpp/population")
 
 # When graduated (hypothetical future)
-from owid.catalog.api import quick  # Main import
-table = quick("population")  # Same API
+from owid.catalog.api import show, get  # Main import
+show("population")
+table = get("garden/un/2024-07-12/un_wpp/population")  # Same API
 
 # Or stay on main API to avoid changes
 from owid.catalog import Client
 client = Client()
 results = client.tables.search("population", match="fuzzy")
-table = results.latest().data  # Explicit but stable
+table = results[0].data  # Explicit but stable
 ```
 
 ## Feedback
@@ -244,14 +272,25 @@ Experimental features are shaped by user feedback! Please:
 
 ## Changelog
 
+### v0.2.0-experimental (2024)
+
+- 🔥 **BREAKING**: Removed `quick()` function
+- ✨ Added `show()` function for data discovery without downloading
+- 💡 Separated discovery (show) from download (get) for better cost awareness
+- 📝 Updated all documentation and examples
+- 🎯 Kept `get()` unchanged for precise downloads
+
+**Migration from v0.1.0:**
+- Replace `quick("name")` with `show("name")` followed by `get(path)`
+- See Migration Path section for details
+
 ### v0.1.0-experimental (2024)
 
 - ✨ Initial release with `quick()` and `get()` functions
 - ✨ Added `experimental_preview()`, `experimental_summary()`, `experimental_describe_metadata()` to TableResult
-- ✨ Added `experimental_download_all()` to ResponseSet
+- ✨ Removed `experimental_download_all()` from ResponseSet (had type issues)
 - 🎯 Unified API across tables, indicators, and charts
 - 🔧 Auto-detection in `get()` using CatalogPath
-- ⚡ Parallel bulk downloads with progress bars
 
 ## Technical Notes
 
@@ -271,17 +310,9 @@ This design ensures you work with rich metadata wherever possible (Tables have `
 2. **Fragment check**: If path contains `#`, it's an indicator (parse with CatalogPath)
 3. **Default**: Regular catalog table path
 
-### Parallel Download Safety
-
-`experimental_download_all()` uses ThreadPoolExecutor (not multiprocessing):
-- ✅ Safe for I/O-bound downloads
-- ✅ Respects GIL (Global Interpreter Lock)
-- ✅ Works across platforms
-- ⚠️  Limited by network bandwidth, not CPU
-
 ### Performance Expectations
 
-- **Quick access**: +0-100ms overhead vs. direct API calls
-- **Bulk downloads**: 3-4x speedup with 4 workers (network-dependent)
+- **show()**: ~100-500ms for catalog search (no data download)
+- **get()**: Variable depending on dataset size (downloads full table/indicator)
 - **Preview**: Currently loads full table (no speedup), future optimization planned
 - **Summary**: ~10-50ms (only loads metadata, no data rows)

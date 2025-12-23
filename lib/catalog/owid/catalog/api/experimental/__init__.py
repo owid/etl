@@ -7,9 +7,13 @@ Features are organized into experimental_* methods on existing classes and stand
 functions in this namespace. Experimental features that prove stable will be graduated
 to the main API by removing the experimental_ prefix.
 
-Quick Access Functions:
-    quick() - Smart search and download with fuzzy matching
-    get() - Direct download by catalog path
+Data Discovery and Retrieval:
+    show() - Browse available data without downloading (discovery/exploration)
+    get() - Direct download by catalog path (precise retrieval)
+
+The API separates discovery from download for better cost awareness:
+- Use show() to explore and find what you need (lightweight, no downloads)
+- Use get() to download specific data by path (explicit, knows what you're getting)
 
 Caching:
     cached_client() - Create a client with automatic caching
@@ -23,8 +27,17 @@ API stability for core features.
 
 Example:
     ```python
-    from owid.catalog.api.experimental import quick
-    table = quick("population")  # Search and download with fuzzy matching
+    from owid.catalog.api.experimental import show, get
+
+    # Browse available data (no download)
+    show("population")  # Shows matching paths
+
+    # Download specific data by path
+    table = get("garden/un/2024-07-12/un_wpp/population")
+
+    # Or browse indicators
+    show("gdp", kind="indicator")
+    ind_table = get("garden/un/2024-07-12/un_wpp/population#population")
 
     from owid.catalog.api.experimental import cached_client
     client = cached_client(ttl="7d")  # Enable caching with 7-day TTL
@@ -35,10 +48,10 @@ Example:
 """
 
 # Version marker for experimental features
-__version__ = "0.1.0-experimental"
+__version__ = "0.2.0-experimental"
 
 # Import experimental functions
-from .quick import get, quick
+from .quick import get, show
 
 # Commented out until implemented:
 # from .cache import cached_client
@@ -46,7 +59,7 @@ from .quick import get, quick
 
 # Exported functions
 __all__ = [
-    "quick",
+    "show",
     "get",
     # "cached_client",
     # "bulk",

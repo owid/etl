@@ -1,21 +1,18 @@
-"""Quick access functions for common data retrieval patterns.
+"""Quick access functions for data discovery and retrieval.
 
-This module provides convenience functions for quickly accessing OWID catalog data
-without the ceremony of creating a client and navigating search results.
+This module provides convenience functions for discovering and accessing OWID catalog data.
+The API separates discovery (browsing) from download (retrieval) for better cost awareness.
 
 Functions:
-    quick() - Smart search with fuzzy matching for tables, indicators, or charts
-    get() - Direct access by path (auto-detects tables, indicators, or charts)
+    show() - Display available data without downloading (discovery/browsing)
+    get() - Direct access by path (downloads data)
 
 Examples:
-    >>> # Quick fuzzy search - returns latest version's data
-    >>> from owid.catalog.api.experimental import quick
-    >>> tb = quick("population")  # Finds and loads latest table
+    >>> # Browse available data (no download)
+    >>> from owid.catalog.api.experimental import show
+    >>> show("population")  # Displays matching paths
 
-    >>> # Search for indicators (returns single-column Table)
-    >>> tb_ind = quick("population", kind="indicator")
-
-    >>> # Direct path access (auto-detects type using CatalogPath)
+    >>> # Download specific data by path
     >>> from owid.catalog.api.experimental import get
     >>> tb = get("garden/un/2024-07-12/un_wpp/population")
     >>> tb_ind = get("garden/un/2024-07-12/un_wpp/population#population")
@@ -35,7 +32,7 @@ if TYPE_CHECKING:
     from owid.catalog.tables import Table
 
 
-def quick(
+def show(
     name: str,
     *,
     kind: Literal["table", "indicator", "chart"] = "table",
@@ -43,21 +40,15 @@ def quick(
     version: str | None = None,
     dataset: str | None = None,
     channel: str | None = None,
-    latest: bool = True,
     match: Literal["exact", "contains", "regex", "fuzzy"] = "fuzzy",
     fuzzy_threshold: int = 70,
     case: bool = False,
-) -> "Table" | pd.DataFrame:
-    """Quick search and download with sensible defaults.
+    limit: int = 10,
+) -> None:
+    """Display available data without downloading (for browsing/discovery).
 
-    TODO: quick("population", kind="chart")
-
-    This is a convenience function that wraps the appropriate API search method
-    with smart defaults for common use cases:
-
-    - Uses fuzzy matching by default (typo-tolerant)
-    - Automatically returns the latest version if latest=True
-    - Loads data immediately (no lazy loading)
+    This function shows what data is available in the catalog without downloading it.
+    Use this to explore and find the exact path, then use get() to download the data.
 
     Args:
         name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy")
@@ -69,7 +60,6 @@ def quick(
         version: Filter by specific version (e.g., "2024-01-15")
         dataset: Filter by dataset name
         channel: Filter by channel (e.g., "garden", "grapher")
-        latest: If True, return latest version automatically (default: True)
         match: Matching mode (default: "fuzzy" for typo-tolerance)
             - "exact": Exact string match
             - "contains": Substring match
@@ -77,59 +67,53 @@ def quick(
             - "fuzzy": Typo-tolerant similarity matching
         fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70)
         case: Case-sensitive search (default: False)
+        limit: Maximum number of results to show (default: 10)
 
     Returns:
-        - Table object if kind="table"
-        - Table object if kind="indicator" (single-column with metadata)
-        - DataFrame if kind="chart"
-
-    Raises:
-        ValueError: If no results found or multiple results found with latest=False
+        None - prints results to console
 
     Example:
         ```python
-        # Simplest case - fuzzy search for table
-        tb = quick("population")
+        # Browse tables (fuzzy search by default)
+        show("population")
 
-        # Search for indicator (variable)
-        tb_ind = quick("population", kind="indicator")
+        # Browse indicators
+        show("gdp", kind="indicator")
 
-        # Search for chart
-        df = quick("life-expectancy", kind="chart")
+        # Browse charts
+        show("life-expectancy", kind="chart")
 
-        # With namespace filter
-        quick("wdi", namespace="worldbank_wdi")
+        # Exact match
+        show("population", match="exact")
 
-        # Exact match (no fuzzy tolerance)
-        tb = quick("population", match="exact")
+        # With filters
+        show("wdi", namespace="worldbank_wdi")
 
-        # Get specific version (not latest)
-        tb = quick("population", version="2024-12-01", latest=False)
-
-        # Search in specific channel
-        tb = quick("co2", channel="grapher")
+        # Then download what you need:
+        from owid.catalog.api.experimental import get
+        tb = get("garden/un/2024-07-12/un_wpp/population")
         ```
 
-    Future improvements:
-        - Better communicate the ID/path of the returned resource
+    Tip:
+        Copy a path from the results and use get(path) to download the data.
     """
     # Route to appropriate helper function based on kind
     if kind == "table":
-        return _quick_table(
+        _show_tables(
             name=name,
             namespace=namespace,
             version=version,
             dataset=dataset,
             channel=channel,
-            latest=latest,
             match=match,
             fuzzy_threshold=fuzzy_threshold,
             case=case,
+            limit=limit,
         )
     elif kind == "indicator":
-        return _quick_indicator(name=name, latest=latest)
+        _show_indicators(name=name, limit=limit)
     elif kind == "chart":
-        return _quick_chart(name=name)
+        _show_charts(name=name, limit=limit)
     else:
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")
 
@@ -207,19 +191,19 @@ def get(path: str) -> "Table" | pd.DataFrame:
         raise e
 
 
-def _quick_table(
+def _show_tables(
     name: str,
     *,
     namespace: str | None = None,
     version: str | None = None,
     dataset: str | None = None,
     channel: str | None = None,
-    latest: bool = True,
     match: Literal["exact", "contains", "regex", "fuzzy"] = "fuzzy",
     fuzzy_threshold: int = 70,
     case: bool = False,
-) -> "Table":
-    """Helper function to search and retrieve table data."""
+    limit: int = 10,
+) -> None:
+    """Helper function to display tables matching search criteria."""
     client = Client()
 
     # Search tables
@@ -236,61 +220,91 @@ def _quick_table(
 
     # Handle no results
     if len(results) == 0:
-        error_msg = f"No tables found matching name='{name}'"
-        if namespace:
-            error_msg += f", namespace='{namespace}'"
-        if version:
-            error_msg += f", version='{version}'"
-        raise ValueError(error_msg)
+        print(f"No tables found matching '{name}'.")
+        print("\nTry:")
+        print("  - Broader search terms")
+        print("  - match='contains' instead of 'fuzzy'")
+        print("  - Check spelling")
+        return
 
-    # Get latest version if requested
-    if latest:
-        result = results.latest(by="version")
+    # Build header message
+    total = len(results)
+    match_desc = match if match != "fuzzy" else f"fuzzy (threshold={fuzzy_threshold})"
+    filters = []
+    if namespace:
+        filters.append(f"namespace='{namespace}'")
+    if version:
+        filters.append(f"version='{version}'")
+    if dataset:
+        filters.append(f"dataset='{dataset}'")
+    if channel:
+        filters.append(f"channel='{channel}'")
+
+    filter_str = ", ".join(filters)
+    if filter_str:
+        print(f"Showing tables matching '{name}' ({match_desc}, {filter_str}):")
     else:
-        # Without latest=True, require exactly one result
-        if len(results) > 1:
-            raise ValueError(
-                f"Multiple tables found ({len(results)} results). "
-                f"Either set latest=True to get the most recent version, "
-                f"or add more filters (namespace, version, dataset) to narrow results."
-            )
-        result = results[0]
+        print(f"Showing tables matching '{name}' ({match_desc}):")
 
-    # Load and return table data
-    return result.data
+    if total > limit:
+        print(f"Displaying {limit} of {total} results.\n")
+    else:
+        print(f"Found {total} result{'s' if total != 1 else ''}.\n")
+
+    # Display paths (limited)
+    for i, result in enumerate(list(results)[:limit]):
+        # Build full path from result
+        path = f"{result.channel}/{result.namespace}/{result.version}/{result.dataset}/{result.table}"
+        print(path)
+
+    # Show tip for too many results
+    if total > limit:
+        print(f"\n... and {total - limit} more results.")
+        print("\nRefine your search with:")
+        print("  - namespace='un'")
+        print("  - version='2024-07-12'")
+        print("  - dataset='un_wpp'")
+        print("  - match='exact' for precise matching")
+
+    # Always show usage tip
+    print("\nTip: Copy a path and use get(path) to download")
 
 
-def _quick_indicator(name: str, *, latest: bool = True) -> "Table":
-    """Helper function to search and retrieve indicator data as a Table."""
+def _show_indicators(name: str, *, limit: int = 10) -> None:
+    """Helper function to display indicators matching search criteria."""
     client = Client()
 
     # Search indicators
-    results = client.indicators.search(name)
+    results = client.indicators.search(name, limit=limit)
 
     # Handle no results
     if len(results) == 0:
-        raise ValueError(f"No indicators found matching name='{name}'")
+        print(f"No indicators found matching '{name}'.")
+        print("\nTry:")
+        print("  - Broader search terms")
+        print("  - Check spelling")
+        return
 
-    # Get best match (indicators are sorted by relevance)
-    if latest:
-        # For indicators, get first result (best match by relevance)
-        result = results[0]
+    # Build header message
+    total = len(results)
+    print(f"Showing indicators matching '{name}' (semantic search):")
+
+    if total > limit:
+        print(f"Displaying {limit} of {total} results.\n")
     else:
-        # Without latest=True, require exactly one result
-        if len(results) > 1:
-            raise ValueError(
-                f"Multiple indicators found ({len(results)} results). "
-                f"Set latest=True to get the best match by relevance."
-            )
-        result = results[0]
+        print(f"Found {total} result{'s' if total != 1 else ''}.\n")
 
-    # Load variable data and convert to Table
-    variable = result.data
-    return variable.to_frame()
+    # Display paths with # fragment (limited)
+    for i, result in enumerate(list(results)[:limit]):
+        if result.catalog_path:
+            print(result.catalog_path)
+
+    # Always show usage tip
+    print("\nTip: Copy a path and use get(path) to download")
 
 
-def _quick_chart(name: str) -> pd.DataFrame:
-    """Helper function to search and retrieve chart data."""
+def _show_charts(name: str, *, limit: int = 10) -> None:
+    """Helper function to display charts matching search criteria."""
     client = Client()
 
     # Search charts
@@ -298,10 +312,24 @@ def _quick_chart(name: str) -> pd.DataFrame:
 
     # Handle no results
     if len(results) == 0:
-        raise ValueError(f"No charts found matching name='{name}'")
+        print(f"No charts found matching '{name}'.")
+        print("\nTry:")
+        print("  - Broader search terms")
+        print("  - Check spelling")
+        return
 
-    # Get first match
-    result = results[0]
+    # Build header message
+    total = len(results)
+    print(f"Showing charts matching '{name}':")
 
-    # Load and return chart data as DataFrame
-    return client.charts.get_data(result.slug)
+    if total > limit:
+        print(f"Displaying {limit} of {total} results.\n")
+    else:
+        print(f"Found {total} result{'s' if total != 1 else ''}.\n")
+
+    # Display chart slugs with chart: prefix (limited)
+    for i, result in enumerate(list(results)[:limit]):
+        print(f"chart:{result.slug}")
+
+    # Always show usage tip
+    print("\nTip: Copy a path and use get(path) to download")
