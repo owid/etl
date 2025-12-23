@@ -51,12 +51,16 @@ import datetime as dt
 import json
 import tempfile
 import zipfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import click
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
+from etl.config import memory
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
@@ -67,6 +71,12 @@ URL_METADATA = "https://ddh-openapi.worldbank.org/dataset/download?dataset_uniqu
 
 API_BASE_URL = "https://ddh-openapi.worldbank.org/indicators"
 DATASET_ID = "0037712"
+
+# Legacy API for individual indicator metadata (used by garden step)
+LEGACY_API_BASE_URL = "https://api.worldbank.org/v2/indicator"
+
+# Number of parallel workers for fetching legacy metadata
+MAX_WORKERS = 20
 
 
 @click.command()
@@ -93,6 +103,10 @@ def main(upload: bool) -> None:
     # Add JSON metadata from API to the zip file
     # NOTE: Ideally, we'd get all metadata from wdi.zip, but it contains outdated metadata.
     add_json_metadata_to_zip(snap.path)
+
+    # Add legacy metadata from individual indicator API calls
+    # This provides the exact format needed by the garden step (indicator_name, source, unit, topic)
+    add_legacy_metadata_to_zip(snap.path)
 
     # Create the snapshot and upload the data.
     snap.dvc_add(upload=upload)
@@ -158,6 +172,102 @@ def add_json_metadata_to_zip(zip_path: Path) -> None:
             zf.write(temp_json_path, "WDIMetadata.json")
     finally:
         # Clean up temporary file
+        Path(temp_json_path).unlink()
+
+
+@memory.cache
+def fetch_single_indicator_metadata(indicator_code: str) -> dict | None:
+    """Fetch metadata for a single indicator from the legacy World Bank API.
+
+    Args:
+        indicator_code: Indicator code in WDI format (e.g., "NY.GDP.MKTP.CD")
+
+    Returns:
+        Dictionary with indicator metadata or None if not available
+    """
+    api_url = f"{LEGACY_API_BASE_URL}/{indicator_code}?format=json"
+
+    response = requests.get(api_url, timeout=30)
+    response.raise_for_status()
+    js = response.json()
+
+    # API returns [pagination_info, [indicator_data]] or just [error_info]
+    if len(js) < 2 or not js[1]:
+        return None
+
+    d = js[1][0]
+    return {
+        "indicator_code": indicator_code,
+        "indicator_name": d.get("name"),
+        "unit": d.get("unit"),
+        "source": d.get("sourceOrganization"),
+        "topic": d["topics"][0].get("value") if d.get("topics") else None,
+    }
+
+
+def fetch_legacy_metadata_parallel(indicator_codes: list[str], max_workers: int = MAX_WORKERS) -> list[dict]:
+    """Fetch metadata for all indicators from legacy API using parallel requests.
+
+    Args:
+        indicator_codes: List of indicator codes in WDI format (e.g., ["NY.GDP.MKTP.CD", ...])
+        max_workers: Maximum number of parallel workers
+
+    Returns:
+        List of metadata dictionaries (None values filtered out for indicators without metadata)
+    """
+    results = []
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_code = {executor.submit(fetch_single_indicator_metadata, code): code for code in indicator_codes}
+
+        for future in tqdm(as_completed(future_to_code), total=len(indicator_codes), desc="Fetching legacy metadata"):
+            result = future.result()
+            if result:
+                results.append(result)
+
+    return results
+
+
+def extract_indicator_codes_from_zip(zip_path: Path) -> list[str]:
+    """Extract unique indicator codes from WDICSV.csv in the ZIP file.
+
+    Args:
+        zip_path: Path to the WDI ZIP file
+
+    Returns:
+        List of indicator codes in WDI format (e.g., ["NY.GDP.MKTP.CD", ...])
+    """
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        df = pd.read_csv(zf.open("WDICSV.csv"), usecols=["Indicator Code"])
+        return df["Indicator Code"].dropna().unique().tolist()
+
+
+def add_legacy_metadata_to_zip(zip_path: Path) -> None:
+    """Fetch legacy metadata for all indicators and add to ZIP as WDIMetadataLegacy.json."""
+    # Extract indicator codes from the data file
+    indicator_codes = extract_indicator_codes_from_zip(zip_path)
+    print(f"Found {len(indicator_codes)} unique indicators in WDICSV.csv")
+
+    # Fetch metadata in parallel
+    metadata_list = fetch_legacy_metadata_parallel(indicator_codes)
+    print(f"Successfully fetched metadata for {len(metadata_list)} indicators")
+
+    # Create JSON structure
+    legacy_metadata = {
+        "data": metadata_list,
+        "count": len(metadata_list),
+        "fetched_at": dt.datetime.now().isoformat(),
+    }
+
+    # Write to temporary file and add to ZIP
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+        json.dump(legacy_metadata, temp_file, indent=2)
+        temp_json_path = temp_file.name
+
+    try:
+        with zipfile.ZipFile(zip_path, "a") as zf:
+            zf.write(temp_json_path, "WDIMetadataLegacy.json")
+    finally:
         Path(temp_json_path).unlink()
 
 

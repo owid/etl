@@ -49,7 +49,7 @@ ANOMALY_DETECTORS = {
 
 def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
     """Load detector."""
-    return ANOMALY_DETECTORS[anomaly_type]
+    return ANOMALY_DETECTORS[anomaly_type]  # type: ignore[return-value]
 
 
 def get_variables_views_in_charts(

@@ -568,7 +568,7 @@ class VariableMeta(MetaBase):
     def copy(self, deep=True) -> Self:
         m = super().copy(deep)
         m._name = getattr(self, "_name", None)  # type: ignore
-        return m
+        return m  # type: ignore
 
 
 @pruned_json
