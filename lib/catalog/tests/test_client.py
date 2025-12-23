@@ -195,7 +195,7 @@ class TestIndicatorsAPI:
         assert first.indicator_id is not None and first.indicator_id > 0
         assert first.title
         assert 0 <= first.score <= 1
-        assert first.catalog_path
+        assert first.path
 
     def test_indicator_results_to_catalog_frame(self):
         client = Client()
@@ -212,12 +212,12 @@ class TestIndicatorsAPI:
         # First search to find an indicator URI
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            # Fetch by URI (catalog_path)
-            assert results[0].catalog_path
-            indicator = client.indicators.fetch(results[0].catalog_path)
+            # Fetch by URI (path)
+            assert results[0].path
+            indicator = client.indicators.fetch(results[0].path)
             assert indicator.column_name
             assert indicator.title
-            assert indicator.catalog_path == results[0].catalog_path
+            assert indicator.path == results[0].path
             # Test lazy loading - table should not be loaded yet
             assert indicator._table is None
             # Test data access - this triggers lazy loading
@@ -239,9 +239,9 @@ class TestIndicatorsAPI:
         # Search to get a valid table path
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            # Get table path from catalog_path
-            assert results[0].catalog_path
-            table_path = results[0].catalog_path.partition("#")[0]
+            # Get table path from path
+            assert results[0].path
+            table_path = results[0].path.partition("#")[0]
             # Try to fetch with a non-existent column
             with pytest.raises(ValueError, match="Column 'nonexistent_column_12345' not found"):
                 client.indicators.fetch(f"{table_path}#nonexistent_column_12345")
@@ -252,7 +252,7 @@ class TestIndicatorsAPI:
         # Search to get an indicator path
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            path = results[0].catalog_path
+            path = results[0].path
             assert path is not None
             # Use get_data - should return Variable directly
             variable = client.indicators.get_data(path)
@@ -592,7 +592,7 @@ class TestDataclassModels:
             indicator_id=123,
             title="Test Indicator",
             score=0.95,
-            catalog_path="grapher/test/2024/dataset/table#column",
+            path="grapher/test/2024/dataset/table#column",
         )
 
         assert result.indicator_id == 123

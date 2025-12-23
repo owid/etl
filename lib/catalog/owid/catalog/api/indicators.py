@@ -89,7 +89,7 @@ class IndicatorsAPI:
             for ind in results:
                 print(f"{ind.title}")
                 print(f"  Score: {ind.score:.3f}")
-                print(f"  Path: {ind.catalog_path}")
+                print(f"  Path: {ind.path}")
 
             # Load data from top result
             indicator = results[0].data
@@ -106,20 +106,20 @@ class IndicatorsAPI:
 
         results = []
         for r in data.get("results", []):
-            catalog_path = r.get("catalog_path", "")
+            path = r.get("catalog_path", "")
 
             # If legacy indicator, keep only if asked to
-            if "/NULL/" in catalog_path:
+            if "/NULL/" in path:
                 if not show_legacy:
                     # Skip legacy indicators unless requested
                     continue
-                catalog_path = None
+                path = None
             results.append(
                 IndicatorResult(
                     indicator_id=r.get("indicator_id", 0),
                     title=r.get("title", ""),
                     score=r.get("score", 0.0),
-                    catalog_path=catalog_path,
+                    path=path,
                     description=r.get("description", ""),
                     column_name=r.get("metadata", {}).get("column", ""),
                     unit=r.get("metadata", {}).get("unit", ""),
@@ -208,7 +208,7 @@ class IndicatorsAPI:
             indicator_id=None,  # TODO: No ID when fetching by URI. We should provide one.
             title=metadata.title or column_name,
             score=1.0,  # Direct fetch - perfect match
-            catalog_path=path,
+            path=path,
             description=metadata.description or "",
             column_name=column_name,
             unit=metadata.unit or "",
