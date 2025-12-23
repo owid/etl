@@ -213,6 +213,7 @@ class TestIndicatorsAPI:
         results = client.indicators.search("solar power")
         if len(results) > 0:
             # Fetch by URI (catalog_path)
+            assert results[0].catalog_path
             indicator = client.indicators.fetch(results[0].catalog_path)
             assert indicator.column_name
             assert indicator.title
@@ -239,6 +240,7 @@ class TestIndicatorsAPI:
         results = client.indicators.search("solar power")
         if len(results) > 0:
             # Get table path from catalog_path
+            assert results[0].catalog_path
             table_path = results[0].catalog_path.partition("#")[0]
             # Try to fetch with a non-existent column
             with pytest.raises(ValueError, match="Column 'nonexistent_column_12345' not found"):
@@ -251,6 +253,7 @@ class TestIndicatorsAPI:
         results = client.indicators.search("solar power")
         if len(results) > 0:
             path = results[0].catalog_path
+            assert path is not None
             # Use get_data - should return Variable directly
             variable = client.indicators.get_data(path)
             assert variable is not None
