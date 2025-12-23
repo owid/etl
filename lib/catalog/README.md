@@ -113,6 +113,7 @@ make watch
       - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
       - **Breaking changes**:
         - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+        - `catalog.charts` module has been removed in favor of `Client().charts` API
       - **Python 3.14 support**: Added support for Python 3.14
     - **Others**
       - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
