@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 import requests
 
 from owid.catalog.api.models import IndicatorResult, ResponseSet
+from owid.catalog.core import CatalogPath
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -151,19 +152,23 @@ class IndicatorsAPI:
             - No indicator_id is assigned when fetching by URI (returns None)
             - Future optimization may allow direct indicator access without full table loading
         """
-        # Parse path to extract table_path and column_name
-        if "#" not in path:
+        # Parse path using CatalogPath
+        catalog_path = CatalogPath.from_str(path)
+
+        if not catalog_path.variable:
+            raise ValueError(
+                f"Invalid indicator path format: '{path}'. "
+                "Expected format: 'channel/namespace/version/dataset/table#column' (missing #column)"
+            )
+
+        # Build table path (without variable)
+        table_path = catalog_path.table_path
+        column_name = catalog_path.variable
+
+        if table_path is None:
             raise ValueError(
                 f"Invalid indicator path format: '{path}'. "
                 "Expected format: 'channel/namespace/version/dataset/table#column'"
-            )
-
-        table_path, _, column_name = path.partition("#")
-
-        if not table_path or not column_name:
-            raise ValueError(
-                f"Invalid indicator path format: '{path}'. "
-                "Both table path and column name (separated by #) are required."
             )
 
         # Fetch table header (structure only, no rows) to validate column and extract metadata

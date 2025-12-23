@@ -14,6 +14,7 @@ import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.utils import _loading_data_from_api
+from owid.catalog.core import CatalogPath
 from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
@@ -67,7 +68,8 @@ def _load_table(
     )
 
     # Extract table name for display
-    table_name = path.split("/")[-1] if "/" in path else path
+    catalog_path = CatalogPath.from_str(path)
+    table_name = catalog_path.table or path
     message = f"Loading table '{table_name}'"
 
     def fct():
@@ -258,11 +260,9 @@ class IndicatorResult(BaseModel):
         """Parse dataset, version, namespace, channel from catalog_path."""
         if self.catalog_path and not self.dataset:
             # Parse using CatalogPath
-            from owid.catalog.core import CatalogPath
-
             try:
-                path_part = self.catalog_path.split("#")[0]  # Remove variable part
-                parsed = CatalogPath.from_str(path_part)
+                # CatalogPath.from_str() handles the "#" automatically
+                parsed = CatalogPath.from_str(self.catalog_path)
                 # Set parsed fields
                 object.__setattr__(self, "dataset", parsed.dataset)
                 object.__setattr__(self, "version", parsed.version)
@@ -298,9 +298,12 @@ class IndicatorResult(BaseModel):
 
     def _load_table(self) -> "Table":
         """Internal method to load the table containing this indicator."""
-        # Parse catalog_path: "grapher/namespace/version/dataset/table#column"
-        path_part, _, _ = self.catalog_path.partition("#")
-        return _load_table(path_part)
+        # Parse catalog_path using CatalogPath
+        parsed = CatalogPath.from_str(self.catalog_path)
+        # Use table_path property (without variable)
+        if parsed.table_path is None:
+            raise ValueError(f"Invalid catalog path: {self.catalog_path}")
+        return _load_table(parsed.table_path)
 
 
 class TableResult(BaseModel):
@@ -518,14 +521,21 @@ class ResponseSet(BaseModel, Generic[T]):
         elif isinstance(first, IndicatorResult):
             rows = []
             for r in self.results:
-                path_part, _, indicator = r.catalog_path.partition("#")  # type: ignore
-                parts = path_part.split("/")
-
-                if len(parts) >= 4:
-                    channel, namespace, version, dataset = parts[0], parts[1], parts[2], parts[3]
-                    table = parts[4] if len(parts) > 4 else dataset
-                else:
-                    channel = namespace = version = dataset = table = ""
+                # Parse catalog path using CatalogPath
+                try:
+                    parsed = CatalogPath.from_str(r.catalog_path)  # type: ignore
+                    indicator = parsed.variable or ""
+                    channel = parsed.channel
+                    namespace = parsed.namespace
+                    version = parsed.version
+                    dataset = parsed.dataset
+                    table = parsed.table or dataset
+                    # Use table_path property (without variable)
+                    path_part = parsed.table_path or parsed.dataset_path
+                except Exception:
+                    # Fallback if parsing fails
+                    indicator = channel = namespace = version = dataset = table = ""
+                    path_part = r.catalog_path.split("#")[0] if "#" in r.catalog_path else r.catalog_path  # type: ignore
 
                 rows.append(
                     {
