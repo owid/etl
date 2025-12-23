@@ -8,12 +8,15 @@ import json
 import os
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Literal, cast, overload
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 import pandas as pd
 import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
+
+if TYPE_CHECKING:
+    from owid.catalog.tables import Table
 
 from owid.catalog import processing_log as pl
 from owid.catalog import warnings
@@ -478,6 +481,16 @@ class Variable(pd.Series):
             ```
         """
         return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
+
+    def to_frame(self, name: str | None = None) -> Table:
+        """Convert Variable to a Table (single-column table)."""
+        # The parent to_frame() already returns a Table via _constructor_expanddim
+        # This override just provides proper type hints
+        # Don't pass name=None explicitly, as that would make pandas use None as column name
+        if name is None:
+            return super().to_frame()  # type: ignore[return-value]
+        else:
+            return super().to_frame(name=name)  # type: ignore[return-value]
 
     def copy_metadata(self, from_variable: Variable, inplace: bool = False) -> Variable | None:
         """Copy metadata from another variable.
