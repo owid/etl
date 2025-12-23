@@ -24,7 +24,7 @@ Examples:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Literal, Union
+from typing import TYPE_CHECKING, Iterable, Literal, Union, cast
 
 import pandas as pd
 
@@ -116,7 +116,7 @@ def _quick_indicator(name: str, *, latest: bool = True) -> "Table":
 
     # Load variable data and convert to Table
     variable = result.data
-    return variable.to_frame()
+    return cast(Table, variable.to_frame())
 
 
 def _quick_chart(name: str) -> pd.DataFrame:
@@ -152,6 +152,8 @@ def quick(
     case: bool = False,
 ) -> Union["Table", pd.DataFrame]:
     """Quick search and download with sensible defaults.
+
+    TODO: quick("population", kind="chart")
 
     This is a convenience function that wraps the appropriate API search method
     with smart defaults for common use cases:
@@ -300,4 +302,4 @@ def get(path: str) -> Union["Table", pd.DataFrame]:
 
     except ValueError as e:
         # Re-raise with more context
-        raise ValueError(f"Invalid catalog path '{path}': {e}") from e
+        raise e
