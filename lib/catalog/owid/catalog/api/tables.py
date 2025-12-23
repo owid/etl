@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 from owid.catalog.api.catalogs import ETLCatalog
 from owid.catalog.api.models import ResultSet, TableResult
@@ -116,9 +116,8 @@ class TablesAPI:
         channel: str | None = None,
         channels: Iterable[str] = ("garden",),
         case: bool = False,
-        regex: bool = True,
-        fuzzy: bool = False,
-        threshold: int = 70,
+        match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
+        fuzzy_threshold: int = 70,
     ) -> ResultSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
@@ -130,27 +129,33 @@ class TablesAPI:
             channel: Filter by channel (exact match)
             channels: List of channels to search (default: garden only)
             case: Case-sensitive search (default: False)
-            regex: Enable regex patterns in table/dataset (default: True)
-            fuzzy: Use fuzzy string matching (default: False)
-            threshold: Minimum fuzzy match score 0-100 (default: 70)
+            match: How to match table/dataset names (default: "exact"):
+                - "exact": Exact string match
+                - "contains": Substring match
+                - "regex": Regular expression pattern
+                - "fuzzy": Typo-tolerant similarity matching
+            fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
+                Only used when match="fuzzy". (default: 70)
 
         Returns:
-            ResultSet containing matching TableResult objects.
-            If fuzzy=True, results are sorted by relevance score.
+            ResultSet containing matching TableResult objects. If match="fuzzy", results are sorted by relevance score.
 
         Example:
             ```python
-            # Exact match
-            results = client.tables.search(table="population", regex=False)
+            # Exact match (default)
+            results = client.tables.search(table="population")
 
-            # Regex search (default)
-            results = client.tables.search(table="population.*density")
+            # Substring match
+            results = client.tables.search(table="pop", match="contains")
+
+            # Regex search
+            results = client.tables.search(table="population.*density", match="regex")
 
             # Fuzzy search sorted by relevance
-            results = client.tables.search(table="populaton", fuzzy=True)
+            results = client.tables.search(table="populaton", match="fuzzy")
 
-            # Case-sensitive fuzzy search
-            results = client.tables.search(table="GDP", fuzzy=True, case=True)
+            # Case-sensitive fuzzy search with custom threshold
+            results = client.tables.search(table="GDP", match="fuzzy", case=True, fuzzy_threshold=85)
 
             # Filter by namespace and version
             results = client.tables.search(
@@ -171,7 +176,7 @@ class TablesAPI:
         """
         catalog = self._get_catalog(channels)
 
-        # Use catalog.find() which now supports fuzzy matching
+        # Use catalog.find() with the new match parameter
         matches = catalog.find(
             table=table,
             namespace=namespace,
@@ -179,9 +184,8 @@ class TablesAPI:
             dataset=dataset,
             channel=cast(CHANNEL, channel) if channel else None,
             case=case,
-            regex=regex,
-            fuzzy=fuzzy,
-            threshold=threshold,
+            match=match,
+            fuzzy_threshold=fuzzy_threshold,
         )
 
         # Convert to TableResult objects

@@ -140,7 +140,15 @@ def find(
         if new_channels:
             REMOTE_CATALOG = ETLCatalog(channels=tuple(current_channels | set(channels)))
 
-    # Use Client API internally
+    # Convert old parameters to new match parameter for backwards compatibility
+    if fuzzy:
+        match = "fuzzy"
+    elif regex:
+        match = "regex"
+    else:
+        match = "contains"
+
+    # Use Client API internally with new parameters
     client = _get_client()
     results = client.tables.search(
         table=table,
@@ -149,9 +157,8 @@ def find(
         dataset=dataset,
         channels=channels,
         case=case,
-        regex=regex,
-        fuzzy=fuzzy,
-        threshold=threshold,
+        match=match,
+        fuzzy_threshold=threshold,
     )
 
     # Convert ResultSet to CatalogFrame for backwards compatibility

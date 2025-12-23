@@ -12,7 +12,7 @@ import re
 import tempfile
 from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 from urllib.parse import urlparse
 
 import numpy as np
@@ -83,29 +83,42 @@ def save_frame(df: pd.DataFrame, path: str | Path) -> None:
 def _match_score(
     series: pd.Series,
     query: str,
-    fuzzy: bool,
+    mode: Literal["exact", "contains", "regex", "fuzzy"],
     case: bool,
-    regex: bool,
+    threshold: int = 70,
 ) -> npt.NDArray[np.float64]:
-    """Calculate match scores for a text column.
+    """Calculate match scores for a text column based on search mode.
 
     Args:
         series: Text column to search
         query: Search pattern
-        fuzzy: Use fuzzy matching (rapidfuzz)
+        mode: Matching mode - "exact", "contains", "regex", or "fuzzy"
         case: Case-sensitive matching
-        regex: Enable regex patterns
+        threshold: Score cutoff for fuzzy matching (only used when mode="fuzzy")
 
     Returns:
-        Array of match scores: 0-100 for fuzzy, 0 or 100 for regex/literal.
+        Array of match scores: 0-100 for fuzzy, 0 or 100 for other modes.
     """
-    if fuzzy:
+    if mode == "fuzzy":
+        # Fuzzy matching with similarity scoring (0-100)
         if not case:
             query = query.lower()
             series = series.str.lower()
-        return np.array([fuzz.WRatio(query, x) for x in series], dtype=np.float64)
-    else:
-        matches = series.str.contains(query, case=case, regex=regex)
+        return np.array([fuzz.WRatio(query, x, score_cutoff=threshold) for x in series], dtype=np.float64)
+    elif mode == "regex":
+        # Regex pattern matching (0 or 100)
+        matches = series.str.contains(query, regex=True, case=case, na=False)
+        return np.where(matches, 100.0, 0.0)
+    elif mode == "contains":
+        # Substring matching (0 or 100)
+        matches = series.str.contains(query, regex=False, case=case, na=False)
+        return np.where(matches, 100.0, 0.0)
+    else:  # mode == "exact"
+        # Exact string matching (0 or 100)
+        if case:
+            matches = series == query
+        else:
+            matches = series.str.lower() == query.lower()
         return np.where(matches, 100.0, 0.0)
 
 
@@ -124,49 +137,62 @@ class CatalogMixin:
         dataset: str | None = None,
         channel: CHANNEL | None = None,
         case: bool = False,
-        regex: bool = True,
-        fuzzy: bool = False,
-        threshold: int = 70,
+        match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
+        fuzzy_threshold: int = 70,
     ) -> "CatalogFrame":
         """Search catalog for tables matching specified criteria.
 
         Args:
             table: Table name pattern
-            namespace: Namespace filter
-            version: Version filter
+            namespace: Namespace filter (exact match only)
+            version: Version filter (exact match only)
             dataset: Dataset name pattern
-            channel: Channel filter
+            channel: Channel filter (exact match only)
             case: Case-sensitive search (default: False)
-            regex: Enable regex patterns (default: True)
-            fuzzy: Use fuzzy matching (default: False)
-            threshold: Minimum fuzzy match score 0-100 (default: 70)
+            match: How to match table/dataset names (default: "exact"):
+                - "exact": Exact string match
+                - "contains": Substring match
+                - "regex": Regular expression pattern
+                - "fuzzy": Typo-tolerant similarity matching
+            fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
+                Only used when match="fuzzy". (default: 70)
 
         Returns:
-            CatalogFrame with matching tables, sorted by relevance if fuzzy=True.
+            CatalogFrame with matching tables, sorted by relevance if match="fuzzy".
+
+        Examples:
+            >>> # Exact match (default)
+            >>> catalog.find(table="population")
+            >>> # Substring search
+            >>> catalog.find(table="pop", match="contains")
+            >>> # Regex pattern
+            >>> catalog.find(table="pop.*density", match="regex")
+            >>> # Fuzzy typo-tolerant search
+            >>> catalog.find(table="populaton", match="fuzzy", fuzzy_threshold=80)
         """
         criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
         scores: npt.NDArray[np.float64] | None = None
 
         # Table matching with scoring
         if table:
-            table_scores = _match_score(self.frame.table, table, fuzzy, case, regex)
-            if fuzzy:
-                criteria &= table_scores >= threshold
+            table_scores = _match_score(self.frame.table, table, match, case, fuzzy_threshold)
+            if match == "fuzzy":
+                criteria &= table_scores >= fuzzy_threshold
                 scores = table_scores
             else:
                 criteria &= table_scores > 0
 
         # Dataset matching with scoring
         if dataset:
-            dataset_scores = _match_score(self.frame.dataset, dataset, fuzzy, case, regex)
-            if fuzzy:
-                criteria &= dataset_scores >= threshold
+            dataset_scores = _match_score(self.frame.dataset, dataset, match, case, fuzzy_threshold)
+            if match == "fuzzy":
+                criteria &= dataset_scores >= fuzzy_threshold
                 # Average scores if both table and dataset specified
                 scores = dataset_scores if scores is None else (scores + dataset_scores) / 2
             else:
                 criteria &= dataset_scores > 0
 
-        # Exact match filters (no fuzzy)
+        # Exact match filters
         if namespace:
             criteria &= self.frame.namespace == namespace
         if version:
@@ -184,7 +210,7 @@ class CatalogMixin:
             matches = matches.drop(columns=["checksum"])
 
         # Sort by relevance if fuzzy matching was used
-        if fuzzy and scores is not None:
+        if match == "fuzzy" and scores is not None:
             sort_order = np.argsort(-scores[criteria])
             matches = matches.iloc[sort_order]
 

@@ -126,13 +126,13 @@ def test_reindex_with_include():
 def test_find_case_insensitive():
     """Test that find() is case-insensitive by default."""
     with mock_catalog(3) as catalog:
-        # Should match "dataset0" with uppercase search
-        matches = catalog.find(dataset="DATASET0")
+        # Should match "dataset0" with uppercase search (exact match, case-insensitive)
+        matches = catalog.find(dataset="DATASET0", match="exact")
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset0"}
 
         # Should also match with mixed case
-        matches = catalog.find(dataset="DaTaSeT1")
+        matches = catalog.find(dataset="DaTaSeT1", match="exact")
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset1"}
 
@@ -141,38 +141,40 @@ def test_find_case_sensitive():
     """Test that find() can be made case-sensitive."""
     with mock_catalog(3) as catalog:
         # Should NOT match with case=True
-        matches = catalog.find(dataset="DATASET0", case=True)
+        matches = catalog.find(dataset="DATASET0", match="exact", case=True)
         assert len(matches) == 0
 
         # Should match exact case
-        matches = catalog.find(dataset="dataset0", case=True)
+        matches = catalog.find(dataset="dataset0", match="exact", case=True)
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset0"}
 
 
 def test_find_regex():
-    """Test that find() supports regex patterns by default."""
+    """Test that find() supports regex patterns with match='regex'."""
     with mock_catalog(3) as catalog:
         # Match multiple datasets with regex
-        matches = catalog.find(dataset="dataset[01]")
+        matches = catalog.find(dataset="dataset[01]", match="regex")
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset0", "dataset1"}
 
         # Match with wildcard
-        matches = catalog.find(dataset="data.*2")
+        matches = catalog.find(dataset="data.*2", match="regex")
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset2"}
 
 
-def test_find_regex_disabled():
-    """Test that regex can be disabled for literal matching."""
+def test_find_contains():
+    """Test substring matching with match='contains'."""
     with mock_catalog(3) as catalog:
-        # With regex=False, special chars are treated literally
-        matches = catalog.find(dataset="dataset[01]", regex=False)
-        assert len(matches) == 0
+        # With match="contains", substring match works
+        matches = catalog.find(dataset="dataset", match="contains")
+        assert len(matches) > 0
+        # Should match all three datasets (with their tables)
+        assert set(matches.dataset) == {"dataset0", "dataset1", "dataset2"}
 
-        # Literal match still works
-        matches = catalog.find(dataset="dataset0", regex=False)
+        # Partial match
+        matches = catalog.find(dataset="set0", match="contains")
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset0"}
 
@@ -182,12 +184,12 @@ def test_find_fuzzy():
     with mock_catalog(3) as catalog:
         # Fuzzy match with typo - "datset0" should match "dataset0"
         # Use high threshold to only match the specific one
-        matches = catalog.find(dataset="datset0", fuzzy=True, threshold=80)
+        matches = catalog.find(dataset="datset0", match="fuzzy", fuzzy_threshold=80)
         assert len(matches) > 0
         assert "dataset0" in set(matches.dataset)
 
-        # Exact match should also work with fuzzy=True
-        matches = catalog.find(dataset="dataset1", fuzzy=True, threshold=100)
+        # Exact match should also work with match="fuzzy"
+        matches = catalog.find(dataset="dataset1", match="fuzzy", fuzzy_threshold=100)
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset1"}
 
@@ -196,10 +198,10 @@ def test_find_fuzzy_threshold():
     """Test that fuzzy threshold controls match strictness."""
     with mock_catalog(3) as catalog:
         # High threshold - only very close matches
-        matches_strict = catalog.find(dataset="datset", fuzzy=True, threshold=90)
+        matches_strict = catalog.find(dataset="datset", match="fuzzy", fuzzy_threshold=90)
 
         # Low threshold - more permissive
-        matches_permissive = catalog.find(dataset="datset", fuzzy=True, threshold=50)
+        matches_permissive = catalog.find(dataset="datset", match="fuzzy", fuzzy_threshold=50)
 
         # Permissive should match at least as many as strict
         assert len(matches_permissive) >= len(matches_strict)
@@ -209,12 +211,12 @@ def test_find_fuzzy_case_insensitive():
     """Test that fuzzy matching respects case parameter."""
     with mock_catalog(3) as catalog:
         # Case-insensitive (default) - exact match with different case
-        matches = catalog.find(dataset="DATASET0", fuzzy=True, threshold=100)
+        matches = catalog.find(dataset="DATASET0", match="fuzzy", fuzzy_threshold=100)
         assert len(matches) > 0
         assert set(matches.dataset) == {"dataset0"}
 
         # Case-sensitive - should not match uppercase against lowercase
-        matches = catalog.find(dataset="DATASET0", fuzzy=True, case=True, threshold=100)
+        matches = catalog.find(dataset="DATASET0", match="fuzzy", case=True, fuzzy_threshold=100)
         assert len(matches) == 0
 
 
@@ -222,7 +224,7 @@ def test_find_fuzzy_sorted_by_score():
     """Test that fuzzy results are sorted by match score (best first)."""
     with mock_catalog(3) as catalog:
         # Search with low threshold to get multiple matches
-        matches = catalog.find(dataset="dataset0", fuzzy=True, threshold=50)
+        matches = catalog.find(dataset="dataset0", match="fuzzy", fuzzy_threshold=50)
         assert len(matches) > 0
 
         # First result should be the exact match (dataset0)
