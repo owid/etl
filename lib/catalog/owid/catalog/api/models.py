@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import io
 import json
-from typing import TYPE_CHECKING, Any, Generic, Iterator, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
 
 import pandas as pd
 import requests
@@ -230,6 +230,10 @@ class IndicatorResult(BaseModel):
         column_name: Column name in the table.
         unit: Unit of measurement.
         n_charts: Number of charts using this indicator.
+        dataset: Dataset name (parsed from catalog_path).
+        version: Version string (parsed from catalog_path).
+        namespace: Data provider namespace (parsed from catalog_path).
+        channel: Data channel (parsed from catalog_path).
     """
 
     model_config = ConfigDict(
@@ -244,7 +248,29 @@ class IndicatorResult(BaseModel):
     column_name: str = ""
     unit: str = ""
     n_charts: int | None = None
+    dataset: str = ""
+    version: str = ""
+    namespace: str = ""
+    channel: str = ""
     _table: "Table | None" = PrivateAttr(default=None)
+
+    def model_post_init(self, __context: Any) -> None:
+        """Parse dataset, version, namespace, channel from catalog_path."""
+        if self.catalog_path and not self.dataset:
+            # Parse using CatalogPath
+            from owid.catalog.core import CatalogPath
+
+            try:
+                path_part = self.catalog_path.split("#")[0]  # Remove variable part
+                parsed = CatalogPath.from_str(path_part)
+                # Set parsed fields
+                object.__setattr__(self, "dataset", parsed.dataset)
+                object.__setattr__(self, "version", parsed.version)
+                object.__setattr__(self, "namespace", parsed.namespace)
+                object.__setattr__(self, "channel", parsed.channel)
+            except Exception:
+                # If parsing fails, leave fields empty
+                pass
 
     @property
     def data(self) -> "Variable":
@@ -334,52 +360,52 @@ class TableResult(BaseModel):
         return _load_table(self.path, formats=self.formats, is_public=self.is_public)
 
 
-class ResultSet(BaseModel, Generic[T]):
-    """Generic container for API results.
+class ResponseSet(BaseModel, Generic[T]):
+    """Generic container for API responses.
 
     Provides iteration, indexing, and conversion to CatalogFrame
     for backwards compatibility.
 
     Attributes:
-        items: List of result objects.
+        results: List of result objects.
         query: The query that produced these results.
-        total: Total number of results (may be more than len(items)).
+        total: Total number of results (may be more than len(results)).
     """
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
 
-    items: list[T]
+    results: list[T]
     query: str = ""
     total: int = 0
 
     def model_post_init(self, __context: Any) -> None:
-        """Set total to length of items if not provided."""
+        """Set total to length of results if not provided."""
         if self.total == 0:
-            self.total = len(self.items)
+            self.total = len(self.results)
 
     def __iter__(self) -> Iterator[T]:  # type: ignore[override]
-        """Iterate over items, not model fields."""
-        return iter(self.items)
+        """Iterate over results, not model fields."""
+        return iter(self.results)
 
     def __len__(self) -> int:
-        return len(self.items)
+        return len(self.results)
 
     def __getitem__(self, index: int) -> T:
-        return self.items[index]
+        return self.results[index]
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
-        if not self.items:
-            return f"ResultSet(query={self.query!r}, total=0, items=[])"
+        if not self.results:
+            return f"ResponseSet(query={self.query!r}, total=0, results=[])"
 
         # Convert to DataFrame for nice tabular display
         df = self.to_frame()
 
         # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"ResultSet(query={self.query!r}, total={self.total}, items=[])"
+            return f"ResponseSet(query={self.query!r}, total={self.total}, results=[])"
         else:
             df_str = str(df)
 
@@ -388,8 +414,11 @@ class ResultSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"ResultSet\n.query={self.query!r}\n.total={self.total}\n.items:\n    {indented_df}"
-        return header
+        header = f"ResponseSet\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
+
+        # Add helper tip at the end
+        tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
+        return header + tip
 
     def __str__(self) -> str:
         """Use the same representation for str() and repr()."""
@@ -397,19 +426,19 @@ class ResultSet(BaseModel, Generic[T]):
 
     def _repr_html_(self) -> str:
         """Display as HTML table in Jupyter notebooks."""
-        if not self.items:
-            return f"<p>ResultSet(query={self.query!r}, total=0, items=[])</p>"
+        if not self.results:
+            return f"<p>ResponseSet(query={self.query!r}, total=0, results=[])</p>"
 
         df = self.to_frame()
         df_html = df._repr_html_()
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
-  <p><strong>ResultSet</strong></p>
+  <p><strong>ResponseSet</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
     <li><strong>.total</strong>: {self.total}</li>
-    <li><strong>.items</strong>:
+    <li><strong>.results</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
       </div>
@@ -419,17 +448,17 @@ class ResultSet(BaseModel, Generic[T]):
         return html
 
     def to_frame(self) -> pd.DataFrame:
-        """Convert items to a DataFrame.
+        """Convert results to a DataFrame.
 
         Returns:
-            DataFrame with one row per item.
+            DataFrame with one row per result.
         """
-        if not self.items:
+        if not self.results:
             return pd.DataFrame()
 
         # Convert Pydantic models to dicts
         rows = []
-        for r in self.items:
+        for r in self.results:
             if isinstance(r, BaseModel):
                 # For ChartResult, exclude large dict fields for better display
                 if isinstance(r, ChartResult):
@@ -461,14 +490,14 @@ class ResultSet(BaseModel, Generic[T]):
         from owid.catalog.api.catalogs import CatalogFrame as CF
         from owid.catalog.api.utils import OWID_CATALOG_URI
 
-        if not self.items:
+        if not self.results:
             return CF.create_empty()
 
         # Check result type
-        first = self.items[0]
+        first = self.results[0]
         if isinstance(first, TableResult):
             rows = []
-            for r in self.items:
+            for r in self.results:
                 rows.append(
                     {
                         "table": r.table,  # type: ignore
@@ -488,7 +517,7 @@ class ResultSet(BaseModel, Generic[T]):
 
         elif isinstance(first, IndicatorResult):
             rows = []
-            for r in self.items:
+            for r in self.results:
                 path_part, _, indicator = r.catalog_path.partition("#")  # type: ignore
                 parts = path_part.split("/")
 
@@ -519,3 +548,145 @@ class ResultSet(BaseModel, Generic[T]):
 
         else:
             raise TypeError(f"Cannot convert {type(first).__name__} results to CatalogFrame")
+
+    def filter(self, predicate: Callable[[T], bool]) -> "ResponseSet[T]":
+        """Filter results by predicate function.
+
+        Returns a new ResponseSet with only items that match the predicate.
+        The predicate should return True for items to keep.
+
+        Args:
+            predicate: Function that takes an item and returns True/False.
+
+        Returns:
+            New ResponseSet with filtered results.
+
+        Example:
+            >>> # Filter results by version
+            >>> results.filter(lambda r: r.version > '2024')
+            >>>
+            >>> # Filter by namespace
+            >>> results.filter(lambda r: r.namespace == "worldbank")
+            >>>
+            >>> # Chain multiple filters
+            >>> results.filter(lambda r: r.version > '2024').filter(lambda r: r.namespace == "un")
+        """
+        filtered_results = [item for item in self.results if predicate(item)]
+        return ResponseSet(
+            results=filtered_results,
+            query=self.query,
+            total=len(filtered_results),
+        )
+
+    def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
+        """Sort results by attribute name or key function.
+
+        Returns a new ResponseSet with items sorted by the specified key.
+
+        Args:
+            key: Either an attribute name (string) or a function that extracts a comparison key from each item.
+            reverse: If True, sort in descending order (default: False).
+
+        Returns:
+            New ResponseSet with sorted results.
+
+        Example:
+            >>> # Sort by version (ascending)
+            >>> results.sort_by('version')
+            >>>
+            >>> # Sort by version (descending - latest first)
+            >>> results.sort_by('version', reverse=True)
+            >>>
+            >>> # Sort by custom function (e.g., by score)
+            >>> results.sort_by(lambda r: r.score, reverse=True)
+            >>>
+            >>> # Chain sorting and filtering
+            >>> results.filter(lambda r: r.version > '2024').sort_by('version', reverse=True)
+        """
+        if isinstance(key, str):
+            # Sort by attribute name
+            sorted_results = sorted(self.results, key=lambda item: getattr(item, key), reverse=reverse)
+        else:
+            # Sort by key function
+            sorted_results = sorted(self.results, key=key, reverse=reverse)
+
+        return ResponseSet(
+            results=sorted_results,
+            query=self.query,
+            total=self.total,
+        )
+
+    def latest(self, by: str = "version") -> T:
+        """Get the most recent result by a specific field.
+
+        Returns the single item with the highest value for the specified field.
+
+        Args:
+            by: Attribute name to sort by (default: 'version').
+                Common values: 'version', 'published_at', 'score'.
+
+        Returns:
+            Single item with the highest value for the specified field.
+
+        Raises:
+            ValueError: If no results are available.
+            AttributeError: If the specified attribute doesn't exist on the results.
+
+        Example:
+            >>> # For TableResult - use version (default)
+            >>> latest_table = results.latest()
+            >>> table = latest_table.data
+            >>>
+            >>> # For IndicatorResult - use version (parsed from catalog_path)
+            >>> latest_indicator = results.latest()
+            >>>
+            >>> # For PageSearchResult - use published_at
+            >>> latest_article = results.latest(by='published_at')
+            >>>
+            >>> # For IndicatorResult - sort by relevance score
+            >>> best_match = results.latest(by='score')
+        """
+        if not self.results:
+            raise ValueError("No results available to get latest from")
+
+        # Check if attribute exists on first item
+        if not hasattr(self.results[0], by):
+            # Get available attributes (exclude private ones)
+            available = [
+                k for k in dir(self.results[0]) if not k.startswith("_") and not callable(getattr(self.results[0], k))
+            ]
+            raise AttributeError(
+                f"Results don't have '{by}' attribute. " f"Available attributes: {', '.join(sorted(available))}"
+            )
+
+        return max(self.results, key=lambda item: getattr(item, by))
+
+    def first(self, n: int = 1) -> T | "ResponseSet[T]":
+        """Get the first n results.
+
+        Args:
+            n: Number of results to return (default: 1).
+
+        Returns:
+            If n=1, returns a single item (or None if no results).
+            If n>1, returns a new ResponseSet with the first n results.
+
+        Example:
+            >>> # Get first result
+            >>> first_result = results.first()
+            >>> table = first_result.data
+            >>>
+            >>> # Get first 5 results
+            >>> top_five = results.first(5)
+            >>>
+            >>> # Combine with sorting
+            >>> latest_five = results.sort_by('version', reverse=True).first(5)
+        """
+        if n == 1:
+            return self.results[0] if self.results else None  # type: ignore
+        else:
+            return ResponseSet(
+                results=self.results[:n],
+                query=self.query,
+                total=self.total,
+            )
