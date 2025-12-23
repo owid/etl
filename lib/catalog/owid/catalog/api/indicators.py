@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 import requests
 
 from owid.catalog.api.models import IndicatorResult, ResponseSet
+from owid.catalog.core import CatalogPath
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -63,6 +64,7 @@ class IndicatorsAPI:
         query: str,
         *,
         limit: int = 10,
+        show_legacy: bool = False,
     ) -> ResponseSet[IndicatorResult]:
         """Search for indicators using natural language.
 
@@ -73,6 +75,7 @@ class IndicatorsAPI:
             query: Natural language search query
                 (e.g., "renewable energy capacity", "child mortality rate").
             limit: Maximum number of results to return. Default 10.
+            show_legacy: If True, show pre-ETL indicators only. Default False.
 
         Returns:
             SearchResults containing IndicatorResult objects.
@@ -103,18 +106,22 @@ class IndicatorsAPI:
 
         results = []
         for r in data.get("results", []):
-            results.append(
-                IndicatorResult(
-                    indicator_id=r.get("indicator_id", 0),
-                    title=r.get("title", ""),
-                    score=r.get("score", 0.0),
-                    catalog_path=r.get("catalog_path", ""),
-                    description=r.get("description", ""),
-                    column_name=r.get("metadata", {}).get("column", ""),
-                    unit=r.get("metadata", {}).get("unit", ""),
-                    n_charts=r.get("n_charts", 0),
+            if "NULL" in r.get("catalog_path", ""):
+                if not show_legacy:
+                    # Skip legacy indicators unless requested
+                    continue
+                results.append(
+                    IndicatorResult(
+                        indicator_id=r.get("indicator_id", 0),
+                        title=r.get("title", ""),
+                        score=r.get("score", 0.0),
+                        catalog_path=None,
+                        description=r.get("description", ""),
+                        column_name=r.get("metadata", {}).get("column", ""),
+                        unit=r.get("metadata", {}).get("unit", ""),
+                        n_charts=r.get("n_charts", 0),
+                    )
                 )
-            )
 
         return ResponseSet(
             results=results,
@@ -151,19 +158,23 @@ class IndicatorsAPI:
             - No indicator_id is assigned when fetching by URI (returns None)
             - Future optimization may allow direct indicator access without full table loading
         """
-        # Parse path to extract table_path and column_name
-        if "#" not in path:
+        # Parse path using CatalogPath
+        catalog_path = CatalogPath.from_str(path)
+
+        if not catalog_path.variable:
+            raise ValueError(
+                f"Invalid indicator path format: '{path}'. "
+                "Expected format: 'channel/namespace/version/dataset/table#column' (missing #column)"
+            )
+
+        # Build table path (without variable)
+        table_path = catalog_path.table_path
+        column_name = catalog_path.variable
+
+        if table_path is None:
             raise ValueError(
                 f"Invalid indicator path format: '{path}'. "
                 "Expected format: 'channel/namespace/version/dataset/table#column'"
-            )
-
-        table_path, _, column_name = path.partition("#")
-
-        if not table_path or not column_name:
-            raise ValueError(
-                f"Invalid indicator path format: '{path}'. "
-                "Both table path and column name (separated by #) are required."
             )
 
         # Fetch table header (structure only, no rows) to validate column and extract metadata

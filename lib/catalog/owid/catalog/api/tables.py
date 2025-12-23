@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Literal, cast
 from owid.catalog.api.catalogs import ETLCatalog
 from owid.catalog.api.models import ResponseSet, TableResult
 from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI
+from owid.catalog.core import CatalogPath
 from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
@@ -263,22 +264,20 @@ class TablesAPI:
             table = result.data
             ```
         """
-        # Parse path: channel/namespace/version/dataset/table
-        parts = path.split("/")
-        if len(parts) < 5:
-            raise ValueError(f"Invalid path format: {path}. Expected format: channel/namespace/version/dataset/table")
+        # Parse path using CatalogPath
+        catalog_path = CatalogPath.from_str(path)
 
-        channel, namespace, version, dataset = parts[0:4]
-        table = parts[4]
+        if not catalog_path.table:
+            raise ValueError(f"Invalid path format: {path}. Expected format: channel/namespace/version/dataset/table")
 
         # Search to get full metadata from catalog
         results = self.search(
-            table=table,
-            namespace=namespace,
-            version=version,
-            dataset=dataset,
-            channel=channel,
-            channels=[channel],  # Ensure the catalog loads this channel
+            table=catalog_path.table,
+            namespace=catalog_path.namespace,
+            version=catalog_path.version,
+            dataset=catalog_path.dataset,
+            channel=catalog_path.channel,
+            channels=[catalog_path.channel],  # Ensure the catalog loads this channel
         )
 
         if len(results) == 0:

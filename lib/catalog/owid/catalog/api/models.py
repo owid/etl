@@ -15,6 +15,7 @@ import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.utils import _loading_data_from_api
+from owid.catalog.core import CatalogPath
 from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
@@ -68,7 +69,8 @@ def _load_table(
     )
 
     # Extract table name for display
-    table_name = path.split("/")[-1] if "/" in path else path
+    catalog_path = CatalogPath.from_str(path)
+    table_name = catalog_path.table or path
     message = f"Loading table '{table_name}'"
 
     def fct():
@@ -244,26 +246,25 @@ class IndicatorResult(BaseModel):
     indicator_id: int | None
     title: str
     score: float
-    catalog_path: str
+    catalog_path: str | None
     description: str = ""
     column_name: str = ""
     unit: str = ""
     n_charts: int | None = None
-    dataset: str = ""
-    version: str = ""
-    namespace: str = ""
-    channel: str = ""
+    dataset: str | None = None
+    version: str | None = None
+    namespace: str | None = None
+    channel: str | None = None
     _table: "Table | None" = PrivateAttr(default=None)
+    _legacy: bool = PrivateAttr(default=False)
 
     def model_post_init(self, __context: Any) -> None:
         """Parse dataset, version, namespace, channel from catalog_path."""
         if self.catalog_path and not self.dataset:
             # Parse using CatalogPath
-            from owid.catalog.core import CatalogPath
-
             try:
-                path_part = self.catalog_path.split("#")[0]  # Remove variable part
-                parsed = CatalogPath.from_str(path_part)
+                # CatalogPath.from_str() handles the "#" automatically
+                parsed = CatalogPath.from_str(self.catalog_path)
                 # Set parsed fields
                 object.__setattr__(self, "dataset", parsed.dataset)
                 object.__setattr__(self, "version", parsed.version)
@@ -271,7 +272,7 @@ class IndicatorResult(BaseModel):
                 object.__setattr__(self, "channel", parsed.channel)
             except Exception:
                 # If parsing fails, leave fields empty
-                pass
+                object.__setattr__(self, "_legacy", True)
 
     @property
     def data(self) -> "Variable":
@@ -299,9 +300,12 @@ class IndicatorResult(BaseModel):
 
     def _load_table(self) -> "Table":
         """Internal method to load the table containing this indicator."""
-        # Parse catalog_path: "grapher/namespace/version/dataset/table#column"
-        path_part, _, _ = self.catalog_path.partition("#")
-        return _load_table(path_part)
+        # Parse catalog_path using CatalogPath
+        parsed = CatalogPath.from_str(self.catalog_path)
+        # Use table_path property (without variable)
+        if parsed.table_path is None:
+            raise ValueError(f"Invalid catalog path: {self.catalog_path}")
+        return _load_table(parsed.table_path)
 
 
 class TableResult(BaseModel):
@@ -522,6 +526,16 @@ class ResponseSet(BaseModel, Generic[T]):
     query: str = ""
     total: int = 0
 
+    def _get_type_display(self) -> str:
+        """Get display name for ResponseSet with generic type."""
+        if not self.results:
+            return "ResponseSet"
+
+        # Get the type of the first result
+        first_result = self.results[0]
+        type_name = type(first_result).__name__
+        return f"ResponseSet[{type_name}]"
+
     def model_post_init(self, __context: Any) -> None:
         """Set total to length of results if not provided."""
         if self.total == 0:
@@ -539,15 +553,17 @@ class ResponseSet(BaseModel, Generic[T]):
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
+        type_display = self._get_type_display()
+
         if not self.results:
-            return f"ResponseSet(query={self.query!r}, total=0, results=[])"
+            return f"{type_display}(query={self.query!r}, total=0, results=[])"
 
         # Convert to DataFrame for nice tabular display
         df = self.to_frame()
 
         # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"ResponseSet(query={self.query!r}, total={self.total}, results=[])"
+            return f"{type_display}(query={self.query!r}, total={self.total}, results=[])"
         else:
             df_str = str(df)
 
@@ -556,7 +572,7 @@ class ResponseSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"ResponseSet\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
+        header = f"{type_display}\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
 
         # Add helper tip at the end
         tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
@@ -568,15 +584,17 @@ class ResponseSet(BaseModel, Generic[T]):
 
     def _repr_html_(self) -> str:
         """Display as HTML table in Jupyter notebooks."""
+        type_display = self._get_type_display()
+
         if not self.results:
-            return f"<p>ResponseSet(query={self.query!r}, total=0, results=[])</p>"
+            return f"<p>{type_display}(query={self.query!r}, total=0, results=[])</p>"
 
         df = self.to_frame()
         df_html = df._repr_html_()
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
-  <p><strong>ResponseSet</strong></p>
+  <p><strong>{type_display}</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
     <li><strong>.total</strong>: {self.total}</li>
@@ -660,14 +678,21 @@ class ResponseSet(BaseModel, Generic[T]):
         elif isinstance(first, IndicatorResult):
             rows = []
             for r in self.results:
-                path_part, _, indicator = r.catalog_path.partition("#")  # type: ignore
-                parts = path_part.split("/")
-
-                if len(parts) >= 4:
-                    channel, namespace, version, dataset = parts[0], parts[1], parts[2], parts[3]
-                    table = parts[4] if len(parts) > 4 else dataset
-                else:
-                    channel = namespace = version = dataset = table = ""
+                # Parse catalog path using CatalogPath
+                try:
+                    parsed = CatalogPath.from_str(r.catalog_path)  # type: ignore
+                    indicator = parsed.variable or ""
+                    channel = parsed.channel
+                    namespace = parsed.namespace
+                    version = parsed.version
+                    dataset = parsed.dataset
+                    table = parsed.table or dataset
+                    # Use table_path property (without variable)
+                    path_part = parsed.table_path or parsed.dataset_path
+                except Exception:
+                    # Fallback if parsing fails
+                    indicator = channel = namespace = version = dataset = table = ""
+                    path_part = r.catalog_path.split("#")[0] if "#" in r.catalog_path else r.catalog_path  # type: ignore
 
                 rows.append(
                     {
