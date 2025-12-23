@@ -17,7 +17,7 @@ from owid.catalog.api.utils import _loading_data_from_api
 from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
-    from owid.catalog.catalogs import CatalogFrame
+    from owid.catalog.api.catalogs import CatalogFrame
     from owid.catalog.variables import Variable
 
 T = TypeVar("T")
@@ -59,11 +59,11 @@ def _load_table(
     """
     import tempfile
 
+    from owid.catalog.api.catalogs import download_private_file_s3
     from owid.catalog.api.utils import (
         OWID_CATALOG_URI,
         PREFERRED_FORMAT,
         SUPPORTED_FORMATS,
-        download_private_file_s3,
     )
 
     # Extract table name for display
@@ -458,8 +458,8 @@ class ResultSet(BaseModel, Generic[T]):
         Returns:
             CatalogFrame that can use .load() method.
         """
+        from owid.catalog.api.catalogs import CatalogFrame as CF
         from owid.catalog.api.utils import OWID_CATALOG_URI
-        from owid.catalog.api.utils import CatalogFrame as CF
 
         if not self.items:
             return CF.create_empty()

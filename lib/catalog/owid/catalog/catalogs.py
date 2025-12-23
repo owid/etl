@@ -32,11 +32,8 @@ from typing import TYPE_CHECKING
 
 from deprecated import deprecated
 
-# Re-export classes and functions for backwards compatibility
-from owid.catalog.api.utils import (
-    INDEX_FORMATS,
-    OWID_CATALOG_URI,
-    S3_OWID_URI,
+# Re-export catalog classes for backwards compatibility
+from owid.catalog.api.catalogs import (
     CatalogFrame,
     CatalogSeries,
     ETLCatalog,
@@ -45,6 +42,9 @@ from owid.catalog.api.utils import (
     read_frame,
     save_frame,
 )
+
+# Re-export constants from utils
+from owid.catalog.api.utils import INDEX_FORMATS, OWID_CATALOG_URI, S3_OWID_URI
 
 # Re-export constants
 from owid.catalog.datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat

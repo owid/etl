@@ -8,8 +8,9 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, cast
 
+from owid.catalog.api.catalogs import ETLCatalog
 from owid.catalog.api.models import ResultSet, TableResult
-from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI, ETLCatalog
+from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI
 from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
