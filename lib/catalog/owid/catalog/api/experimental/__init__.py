@@ -15,12 +15,6 @@ The API separates discovery from download for better cost awareness:
 - Use show() to explore and find what you need (lightweight, no downloads)
 - Use get() to download specific data by path (explicit, knows what you're getting)
 
-Caching:
-    cached_client() - Create a client with automatic caching
-
-Bulk Operations:
-    bulk.download() - Parallel download of multiple tables
-
 The experimental namespace follows the streamlit convention: experimental features
 are clearly marked and easy to find, allowing rapid iteration while maintaining
 API stability for core features.
@@ -38,14 +32,12 @@ Example:
     # Or browse indicators
     show("gdp", kind="indicator")
     ind_table = get("garden/un/2024-07-12/un_wpp/population#population")
-
-    from owid.catalog.api.experimental import cached_client
-    client = cached_client(ttl="7d")  # Enable caching with 7-day TTL
-
-    from owid.catalog.api.experimental import bulk
-    tables = bulk.download(["un/un_wpp/population", "worldbank/wdi/gdp"])
     ```
 """
+
+# TODOs:
+# - cache: cached_client() for reusing Client with caching
+# - bulk: bulk download functions for multiple paths at once
 
 # Version marker for experimental features
 __version__ = "0.2.0-experimental"

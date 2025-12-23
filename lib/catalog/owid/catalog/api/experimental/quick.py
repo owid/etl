@@ -7,7 +7,8 @@ Functions:
     show() - Display available data without downloading (discovery/browsing)
     get() - Direct access by path (downloads data)
 
-Examples:
+Example:
+    ```python
     >>> # Browse available data (no download)
     >>> from owid.catalog.api.experimental import show
     >>> show("population")  # Displays matching paths
@@ -17,6 +18,7 @@ Examples:
     >>> tb = get("garden/un/2024-07-12/un_wpp/population")
     >>> tb_ind = get("garden/un/2024-07-12/un_wpp/population#population")
     >>> df_chart = get("chart:life-expectancy")
+    ```
 """
 
 from __future__ import annotations
@@ -44,7 +46,7 @@ def show(
     fuzzy_threshold: int = 70,
     case: bool = False,
     limit: int = 10,
-) -> None:
+) -> list[str]:
     """Display available data without downloading (for browsing/discovery).
 
     This function shows what data is available in the catalog without downloading it.
@@ -70,7 +72,7 @@ def show(
         limit: Maximum number of results to show (default: 10)
 
     Returns:
-        None - prints results to console
+        List of matching paths, sorted alphabetically
 
     Example:
         ```python
@@ -99,7 +101,7 @@ def show(
     """
     # Route to appropriate helper function based on kind
     if kind == "table":
-        _show_tables(
+        return _show_tables(
             name=name,
             namespace=namespace,
             version=version,
@@ -111,9 +113,9 @@ def show(
             limit=limit,
         )
     elif kind == "indicator":
-        _show_indicators(name=name, limit=limit)
+        return _show_indicators(name=name, limit=limit)
     elif kind == "chart":
-        _show_charts(name=name, limit=limit)
+        return _show_charts(name=name, limit=limit)
     else:
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")
 
@@ -146,10 +148,10 @@ def get(path: str) -> "Table" | pd.DataFrame:
         tb = get("garden/un/2024-07-12/un_wpp/population")
 
         # Get indicator as single-column Table
-        tb = get("garden/un/2024-07-12/un_wpp/population#population")
+        tb_ind = get("garden/un/2024-07-12/un_wpp/population#population")
 
         # Get chart data
-        chart_data = get("chart:life-expectancy")
+        df_chart = get("chart:life-expectancy")
 
         # Grapher channel table
         tb = get("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
@@ -202,7 +204,7 @@ def _show_tables(
     fuzzy_threshold: int = 70,
     case: bool = False,
     limit: int = 10,
-) -> None:
+) -> list[str]:
     """Helper function to display tables matching search criteria."""
     client = Client()
 
@@ -225,52 +227,18 @@ def _show_tables(
         print("  - Broader search terms")
         print("  - match='contains' instead of 'fuzzy'")
         print("  - Check spelling")
-        return
+        return []
 
-    # Build header message
-    total = len(results)
-    match_desc = match if match != "fuzzy" else f"fuzzy (threshold={fuzzy_threshold})"
-    filters = []
-    if namespace:
-        filters.append(f"namespace='{namespace}'")
-    if version:
-        filters.append(f"version='{version}'")
-    if dataset:
-        filters.append(f"dataset='{dataset}'")
-    if channel:
-        filters.append(f"channel='{channel}'")
+    # Build full paths from results
+    all_paths = [result.path for result in results]
 
-    filter_str = ", ".join(filters)
-    if filter_str:
-        print(f"Showing tables matching '{name}' ({match_desc}, {filter_str}):")
-    else:
-        print(f"Showing tables matching '{name}' ({match_desc}):")
+    # Sort paths alphabetically
+    all_paths.sort()
 
-    if total > limit:
-        print(f"Displaying {limit} of {total} results.\n")
-    else:
-        print(f"Found {total} result{'s' if total != 1 else ''}.\n")
-
-    # Display paths (limited)
-    for i, result in enumerate(list(results)[:limit]):
-        # Build full path from result
-        path = f"{result.channel}/{result.namespace}/{result.version}/{result.dataset}/{result.table}"
-        print(path)
-
-    # Show tip for too many results
-    if total > limit:
-        print(f"\n... and {total - limit} more results.")
-        print("\nRefine your search with:")
-        print("  - namespace='un'")
-        print("  - version='2024-07-12'")
-        print("  - dataset='un_wpp'")
-        print("  - match='exact' for precise matching")
-
-    # Always show usage tip
-    print("\nTip: Copy a path and use get(path) to download")
+    return all_paths
 
 
-def _show_indicators(name: str, *, limit: int = 10) -> None:
+def _show_indicators(name: str, *, limit: int = 10) -> list[str]:
     """Helper function to display indicators matching search criteria."""
     client = Client()
 
@@ -283,27 +251,18 @@ def _show_indicators(name: str, *, limit: int = 10) -> None:
         print("\nTry:")
         print("  - Broader search terms")
         print("  - Check spelling")
-        return
+        return []
 
-    # Build header message
-    total = len(results)
-    print(f"Showing indicators matching '{name}' (semantic search):")
+    # Build full paths from results
+    all_paths = [result.catalog_path for result in results if result.catalog_path]
 
-    if total > limit:
-        print(f"Displaying {limit} of {total} results.\n")
-    else:
-        print(f"Found {total} result{'s' if total != 1 else ''}.\n")
+    # Sort paths alphabetically
+    all_paths.sort()
 
-    # Display paths with # fragment (limited)
-    for i, result in enumerate(list(results)[:limit]):
-        if result.catalog_path:
-            print(result.catalog_path)
-
-    # Always show usage tip
-    print("\nTip: Copy a path and use get(path) to download")
+    return all_paths
 
 
-def _show_charts(name: str, *, limit: int = 10) -> None:
+def _show_charts(name: str, *, limit: int = 10) -> list[str]:
     """Helper function to display charts matching search criteria."""
     client = Client()
 
@@ -316,20 +275,12 @@ def _show_charts(name: str, *, limit: int = 10) -> None:
         print("\nTry:")
         print("  - Broader search terms")
         print("  - Check spelling")
-        return
+        return []
 
-    # Build header message
-    total = len(results)
-    print(f"Showing charts matching '{name}':")
+    # Build full paths from results
+    all_paths = [f"chart:{result.slug}" for result in results]
 
-    if total > limit:
-        print(f"Displaying {limit} of {total} results.\n")
-    else:
-        print(f"Found {total} result{'s' if total != 1 else ''}.\n")
+    # Sort paths alphabetically
+    all_paths.sort()
 
-    # Display chart slugs with chart: prefix (limited)
-    for i, result in enumerate(list(results)[:limit]):
-        print(f"chart:{result.slug}")
-
-    # Always show usage tip
-    print("\nTip: Copy a path and use get(path) to download")
+    return all_paths
