@@ -1830,7 +1830,6 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: *processing_level_by_sector
         description_processing: "{definitions.processing_oda_by_sector}"
-        presentation:
         display:
           name: ODA by donor and sector (<<sector>>)
           numDecimalPlaces: 0
@@ -1854,7 +1853,6 @@ tables:
           {definitions.processing_per_capita_2}
 
           {definitions.processing_oda_by_sector}
-        presentation:
         display:
           name: ODA per capita by donor and sector (<<sector>>)
           numDecimalPlaces: 2
