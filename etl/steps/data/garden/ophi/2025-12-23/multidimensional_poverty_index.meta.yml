@@ -1,0 +1,332 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    display: &common_display
+      tolerance: 12
+    presentation:
+      topic_tags:
+        - Poverty
+      faqs:
+        - fragment_id: mpi-definition
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-sources
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-indicators-unavailable
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-comparability
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-other-sources
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
+    # Description from producer
+    description_from_producer: >-
+      The global MPI is a measure of acute poverty covering over 100 countries in the developing
+      regions of the world. This measure is based on the dual-cutoff counting approach to poverty
+      developed by Alkire and Foster (2011). The global MPI was developed in 2010 by Alkire and
+      Santos (2014, 2010) in collaboration with the UNDP’s Human Development Report Office
+      (HDRO). Since its inception, the global MPI has used information from 10 indicators, which are
+      grouped into three equally weighted dimensions: health, education, and living standards.
+      These dimensions are the same as those used in the UNDP’s Human Development Index.
+
+
+      In 2018, the first major revision of the global MPI was undertaken, considering improvements in
+      survey microdata and better align to the 2030 development agenda insofar as possible (Alkire and
+      Jahan, 2018; OPHI, 2018). The revision consisted of adjustments in the definition of five out of
+      the ten indicators, namely child mortality, nutrition, years of schooling, housing and assets. Alkire,
+      Kanagaratnam, Nogales and Suppa (2022) provide a comprehensive analysis of the consequences
+      of the 2018 revision. The normative and empirical decisions that underlie the revision of the global
+      MPI, and adjustments related to the child mortality, nutrition, years of schooling and housing
+      indicators are discussed in Alkire and Kanagaratnam (2021). The revision of assets indicator is
+      detailed in Vollmer and Alkire (2022).
+
+
+      The global MPI begins by establishing a deprivation profile for each person, showing which of the
+      10 indicators they are deprived in. Each person is identified as deprived or non-deprived in each
+      indicator based on a deprivation cutoff. In the case of health and education, each
+      household member may be identified as deprived or not deprived according to available
+      information for other household members. For example, if any household member for whom data
+      exist is undernourished, each person in that household is considered deprived in nutrition. Taking
+      this approach – which was required by the data – does not reveal intrahousehold disparities, but
+      is intuitive and assumes shared positive (or negative) effects of achieving (or not achieving) certain
+      outcomes. Next, looking across indicators, each person’s deprivation score is constructed by
+      adding up the weights of the indicators in which they are deprived. The indicators use a nested
+      weight structure: equal weights across dimensions and an equal weight for each indicator within a
+      dimension. The normalised indicator weight structure of the global MPI means that the living
+      standard indicators receive lower weight than health and education related indicators because from
+      a policy perspective, each of the three dimensions is of roughly equal normative importance.
+
+
+      In the global MPI, a person is identified as multidimensionally poor or MPI poor if they are
+      deprived in at least one-third of the weighted MPI indicators. In other words, a person is MPI
+      poor if the person’s deprivation score is equal to or higher than the poverty cutoff of 33.33 percent.
+      After the poverty identification step, we aggregate across individuals to obtain the incidence of
+      poverty or headcount ratio (H) which represents the percentage of poor people in the population.
+      We then compute the intensity of poverty (A), representing the average percentage of weighted
+      deprivations experienced by the poor. We then compute the adjusted poverty headcount ratio (M0)
+      or MPI by combining H and A in a multiplicative form (MPI = H x A).
+
+
+      Both the incidence and the intensity of these deprivations are highly relevant pieces of information
+      for poverty measurement. The incidence of poverty is intuitive and understandable by anyone.
+      People always want to know how many poor people there are in a society as a proportion of the
+      whole population. Media tend to pick up on the incidence of poverty easily. Yet, the proportion
+      of poor people as the headline figure is not enough (Alkire, Oldiges and Kanagaratnam, 2021).
+
+
+      A headcount ratio is also estimated using two other poverty cutoffs. The global MPI identifies
+      individuals as vulnerable to poverty if they are close to the one-third threshold, that is, if they are
+      deprived in 20 to 33.32 percent of weighted indicators. The tables also apply a higher poverty
+      cutoff to identify those in severe poverty, meaning those deprived in 50 percent or more of the
+      dimensions.
+
+
+      The AF methodology has a property that makes the global MPI even more useful—dimensional
+      breakdown. This property makes it possible to consistently compute the percentage of the
+      population who are multidimensionally poor and simultaneously deprived in each indicator. This
+      is known as the censored headcount ratio of an indicator. The weighted sum of censored
+      headcount ratios of all MPI indicators is equal to the MPI value.
+
+
+      The censored headcount ratio shows the extent of deprivations among the poor but does not
+      reflect the weights or relative values of the indicators. Two indicators may have the same censored
+      headcount ratios but different contributions to overall poverty, because the contribution depends
+      both on the censored headcount ratio and on the weight assigned to each indicator. As such, a
+      complementary analysis to the censored headcount ratio is the percentage contribution of each
+      indicator to overall multidimensional poverty.
+
+  # For description_short
+  description_short_multidimensional_poverty: Multidimensional poverty is defined as being deprived in a range of health, education and living standards indicators.
+  description_short_mpi: The Multidimensional Poverty Index (MPI) is a measure that combines the prevalence and the intensity of multidimensional poverty on a scale from 0 to 1. Higher values indicate higher poverty.
+  description_short_headcount_ratio: This is the share of the population that is multidimensionally poor.
+  description_short_intensity: The intensity is the share of indicators in which people in multidimensional poverty are deprived on average.
+  description_short_vulnerable: This is the share of the population that is close to being in multidimensional poverty.
+  description_short_severe: This is the share of the population that is in severe multidimensional poverty.
+  description_short_censored_headcount_ratio: This is the share of the multidimensionally poor population deprived in the indicator _<<indicator.lower()>>_.
+  description_short_uncensored_headcount_ratio: This is the share of the population deprived in the indicator _<<indicator.lower()>>_.
+  description_short_area: |-
+    <% if area == "Urban" %>
+     This indicator is calculated for urban areas.
+    <% elif area == "Rural" %>
+     This indicator is calculated for rural areas.
+    <% elif area == "Camp" %>
+     This indicator is calculated for populations within refugee camps (available only for Palestine).
+    <%- endif -%>
+
+  # For description_key
+  description_key_multidimensional_poverty_complement: |-
+    grouped into three dimensions of well-being: **health** (using two indicators: nutrition, child mortality), **education** (using two indicators: years of schooling, school attendance), and **living standards** (using six indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets).
+  description_key_multidimensional_poverty: |-
+    Being in multidimensional poverty means that a person lives in a household deprived in a third or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+  description_key_vulnerable: |-
+    Being _vulnerable_ to multidimensional poverty means that a person lives in a household deprived in 20-33.3% of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+  description_key_severe: |-
+    Being in _severe_ multidimensional poverty means that a person lives in a household deprived in 50% or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+  description_key_assessments: |-
+    Each household is assessed against specific thresholds for these indicators. For example, a household is considered deprived in the _electricity_ indicator if it does not have access to it. [This article](https://ourworldindata.org/multidimensional-poverty-index) discusses specific thresholds in more detail.
+  description_key_weights: |-
+    Each indicator contributes to one of the three dimensions of well-being.  Health and education indicators are weighted more (1/6 each) than living standards indicators (1/18 each) so that all three dimensions contribute equally to the overall measure.
+  description_key_mpi: |-
+    The Multidimensional Poverty Index (MPI) is calculated by multiplying two values: the [share of people who are multidimensionally poor](https://ourworldindata.org/grapher/share-multi-poverty) and the [intensity of their poverty](https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-national).
+  description_key_intensity: |-
+    The intensity of multidimensional poverty is calculated as the average share of indicators in which those counted as MPI poor are deprived.
+  description_key_flavor_cme: |-
+    This indicator is a current margin estimate (CME), meaning that it relies on the most recent survey data available for each country.
+  description_key_flavor_hot: |-
+    This indicator is a harmonized over time (HOT) estimate. This harmonization seeks to make two or more MPI estimates comparable by aligning the indicator definitions in each survey.
+  description_key_flavor: |-
+    <% if flavor == "Current margin estimate" %>
+    {definitions.description_key_flavor_cme}{definitions.description_key_flavor_link}
+    <% elif flavor == "Harmonized over time" %>
+    {definitions.description_key_flavor_hot}{definitions.description_key_flavor_link}
+    <%- endif -%>
+  description_key_flavor_link: |-
+    <% if flavor == "Current margin estimate" and area == "National" %>
+     Look for the [harmonized over time (HOT) estimate](<<hot_link>>) to see trends over time.
+    <% elif flavor == "Harmonized over time" and area == "National" %>
+     Look for the [current margin estimate (CME)](<<cme_link>>) to see the most recent survey data.
+    <%- endif -%>
+  description_key_flavor_no_links_for_national: |-
+    <% if flavor == "Current margin estimate" %>
+    {definitions.description_key_flavor_cme}
+    <% elif flavor == "Harmonized over time" %>
+    {definitions.description_key_flavor_hot}
+    <%- endif -%>
+  description_key_indicator_start: |-
+    A person in a household is deprived in the indicator _<<indicator.lower()>>_ if
+  description_key_indicator_end: |-
+    <% if indicator == "Nutrition" %>
+    any person under 70 years of age for whom there is nutritional information is undernourished. This indicator is part of the _health_ dimension.
+    <% elif indicator == "Child mortality" %>
+    a child under 18 has died in the household in the five-year period preceding the survey. This indicator is part of the _health_ dimension.
+    <% elif indicator == "Years of schooling" %>
+    no eligible household member has completed six years of schooling. This indicator is part of the _education_ dimension.
+    <% elif indicator == "School attendance" %>
+    any school-aged child is not attending school up to the age at which he/she would complete class 8. This indicator is part of the _education_ dimension.
+    <% elif indicator == "Cooking fuel" %>
+    a household cooks using solid fuel, such as dung, agricultural crop, shrubs, wood, charcoal, or coal. This indicator is part of the _living standards_ dimension.
+    <% elif indicator == "Sanitation" %>
+    the household has unimproved or no sanitation facility or it is improved but shared with other households. This indicator is part of the _living standards_ dimension.
+    <% elif indicator == "Drinking water" %>
+    the household’s source of drinking water is not safe or safe drinking water is a 30-minute or longer walk from home, roundtrip. This indicator is part of the _living standards_ dimension.
+    <% elif indicator == "Electricity" %>
+    the household has no electricity. This indicator is part of the _living standards_ dimension.
+    <% elif indicator == "Housing" %>
+    the household has inadequate housing materials in any of the three components: floor, roof, or walls. This indicator is part of the _living standards_ dimension.
+    <% elif indicator == "Assets" %>
+    the household does not own more than one of these assets: radio, TV, telephone, computer, animal cart, bicycle, motorbike, or refrigerator, and does not own a car or truck. This indicator is part of the _living standards_ dimension.
+    <%- endif -%>
+  description_key_indicator: |-
+    {definitions.description_key_indicator_start} {definitions.description_key_indicator_end}
+
+  # For title_variant
+  title_variant_area: |-
+    <% if area == "Urban" %>
+    , Urban area
+    <% elif area == "Rural" %>
+    , Rural area
+    <% elif area == "Camp" %>
+    , Refugee camps
+    <%- endif -%>
+
+  title_variant_flavor: |-
+    <% if flavor == "Current margin estimate" %>
+    Most recent year
+    <% elif flavor == "Harmonized over time" %>
+    Harmonized over time
+    <%- endif -%>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  multidimensional_poverty_index:
+    variables:
+      mpi:
+        title: Multidimensional Poverty Index (MPI) (<<area>>) - <<flavor>>
+        unit: ""
+        short_unit: ""
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_mpi}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_mpi}"
+          - "{definitions.description_key_multidimensional_poverty}"
+          - "{definitions.description_key_assessments}"
+          - "{definitions.description_key_weights}"
+          - "{definitions.description_key_intensity}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi" %> <% set hot_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi-hot" %>{definitions.description_key_flavor}
+        presentation:
+          title_public: Multidimensional Poverty Index (MPI)
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Multidimensional Poverty Index (MPI)
+          numDecimalPlaces: 3
+          <<: *common_display
+
+      headcount_ratio:
+        title: Share of population living in multidimensional poverty (<<area>>) - <<flavor>>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_headcount_ratio}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_multidimensional_poverty}"
+          - "{definitions.description_key_assessments}"
+          - "{definitions.description_key_weights}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/share-multi-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/share-of-population-multidimensionally-poor-hot" %>{definitions.description_key_flavor}
+        presentation:
+          title_public: Share of population living in multidimensional poverty
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Share of population living in multidimensional poverty
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      intensity:
+        title: Intensity of multidimensional poverty (<<area>>) - <<flavor>>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_intensity}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_multidimensional_poverty}"
+          - "{definitions.description_key_assessments}"
+          - "{definitions.description_key_intensity}"
+          - "{definitions.description_key_weights}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-hot" %>{definitions.description_key_flavor}
+        presentation:
+          title_public: Intensity of multidimensional poverty
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Intensity of multidimensional poverty
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      vulnerable:
+        title: Share of population vulnerable to multidimensional poverty (<<area>>) - <<flavor>>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_vulnerable}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_vulnerable}"
+          - "{definitions.description_key_assessments}"
+          - "{definitions.description_key_weights}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
+        presentation:
+          title_public: Share of population vulnerable to multidimensional poverty
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Share of population vulnerable to multidimensional poverty
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      severe:
+        title: Share of population living in severe multidimensional poverty (<<area>>) - <<flavor>>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_severe}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_severe}"
+          - "{definitions.description_key_assessments}"
+          - "{definitions.description_key_weights}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
+        presentation:
+          title_public: Share of population living in severe multidimensional poverty
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Share of population living in severe multidimensional poverty
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      censored_headcount_ratio:
+        title: Share of population in multidimensional poverty deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_censored_headcount_ratio}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_multidimensional_poverty}"
+          - "{definitions.description_key_indicator}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
+        presentation:
+          title_public: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      uncensored_headcount_ratio:
+        title: Share of population deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_uncensored_headcount_ratio}{definitions.description_short_area}"
+        description_key:
+          - "{definitions.description_key_multidimensional_poverty}"
+          - "{definitions.description_key_indicator}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
+        presentation:
+          title_public: Share of population deprived in the indicator <<indicator>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+        display:
+          name: Share of population deprived in the indicator <<indicator>>
+          numDecimalPlaces: 1
+          <<: *common_display

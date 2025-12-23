@@ -220,3 +220,12 @@ steps:
     - data://meadow/wb/2025-07-02/poverty_projections
   data://grapher/wb/2025-07-02/poverty_projections:
     - data://garden/wb/2025-07-02/poverty_projections
+
+  # Global Multidimensional Poverty Index
+  data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
+    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_cme.csv
+    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_hot.csv
+  data://garden/ophi/2024-10-28/multidimensional_poverty_index:
+    - data://meadow/ophi/2024-10-28/multidimensional_poverty_index
+  data://grapher/ophi/2024-10-28/multidimensional_poverty_index:
+    - data://garden/ophi/2024-10-28/multidimensional_poverty_index
