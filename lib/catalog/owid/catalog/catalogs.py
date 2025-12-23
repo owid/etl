@@ -155,7 +155,6 @@ def find(
         namespace=namespace,
         version=version,
         dataset=dataset,
-        channels=channels,
         case=case,
         match=match,
         fuzzy_threshold=threshold,
