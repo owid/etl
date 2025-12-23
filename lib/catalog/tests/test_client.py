@@ -308,7 +308,7 @@ class TestTablesAPI:
     def test_fetch_invalid_path(self):
         """Test that fetching with invalid path format raises error."""
         client = Client()
-        with pytest.raises(ValueError, match="Invalid path format"):
+        with pytest.raises(ValueError, match="Invalid catalog path"):
             client.tables.fetch("invalid/path")
 
     def test_fetch_nonexistent_table(self):
