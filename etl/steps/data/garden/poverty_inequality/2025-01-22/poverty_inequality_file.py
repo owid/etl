@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 # NOTE: Change this in case of new PPP versions in the future
 # TODO: Change to 2021 prices
 PPP_YEAR_PIP = 2021
-PPP_YEAR_LIS = 2017
+PPP_YEAR_LIS = 2021
 PPP_YEAR_WID = 2023
 
 
@@ -22,41 +22,32 @@ def run() -> None:
     #
     # Load garden datasets
     ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_lis = paths.load_dataset("luxembourg_income_study")
     ds_wid = paths.load_dataset("world_inequality_database")
     ds_wdi = paths.load_dataset("wdi")
 
     # Read tables from garden datasets.
     tb_pip = ds_pip[f"income_consumption_{PPP_YEAR_PIP}_unsmoothed"].reset_index()
-    tb_lis = ds_lis["luxembourg_income_study"].reset_index()
     tb_wid = ds_wid["world_inequality_database"].reset_index()
-    tb_lis_adults = ds_lis["luxembourg_income_study_adults"].reset_index()
 
     tb_pip_percentiles = ds_pip[f"percentiles_income_consumption_{PPP_YEAR_PIP}"].reset_index()
-    tb_lis_percentiles = ds_lis["lis_percentiles"].reset_index()
     tb_wid_percentiles = ds_wid["world_inequality_database_distribution"].reset_index()
-    tb_lis_percentiles_adults = ds_lis["lis_percentiles_adults"].reset_index()
     tb_wdi = ds_wdi["wdi"].reset_index()
 
     #
     # Process data.
     #
     tb_pip_keyvars = create_keyvars_file_pip(tb_pip)
-    tb_lis_keyvars = create_keyvars_file_lis(tb_lis, adults=False)
-    tb_lis_keyvars_adults = create_keyvars_file_lis(tb_lis_adults, adults=True)
     tb_wid_keyvars = create_keyvars_file_wid(tb_wid, extrapolated=False)
     tb_wid_keyvars_extrapolated = create_keyvars_file_wid(tb_wid, extrapolated=True)
 
     tb_pip_percentiles = create_percentiles_file_pip(tb_pip_percentiles)
-    tb_lis_percentiles = create_percentiles_file_lis(tb_lis_percentiles, adults=False)
-    tb_lis_percentiles_adults = create_percentiles_file_lis(tb_lis_percentiles_adults, adults=True)
     tb_wid_percentiles, tb_wid_percentiles_extrapolated = create_percentiles_file_wid(tb_wid_percentiles)
 
     tb_wdi = extract_gdp_from_wdi(tb_wdi)
 
     # Concatenate all the tables
     tb = pr.concat(
-        [tb_pip_keyvars, tb_lis_keyvars, tb_lis_keyvars_adults, tb_wid_keyvars, tb_wid_keyvars_extrapolated],
+        [tb_pip_keyvars, tb_wid_keyvars, tb_wid_keyvars_extrapolated],
         ignore_index=True,
         short_name="keyvars",
     )
@@ -64,8 +55,6 @@ def run() -> None:
     tb_percentiles = pr.concat(
         [
             tb_pip_percentiles,
-            tb_lis_percentiles,
-            tb_lis_percentiles_adults,
             tb_wid_percentiles,
             tb_wid_percentiles_extrapolated,
         ],
@@ -149,7 +138,7 @@ def run() -> None:
     # Create explorer dataset
     ds_explorer = paths.create_dataset(
         tables=[tb, tb_percentiles, tb_wdi],
-        default_metadata=ds_lis.metadata,
+        default_metadata=ds_pip.metadata,
     )
     ds_explorer.save()
 

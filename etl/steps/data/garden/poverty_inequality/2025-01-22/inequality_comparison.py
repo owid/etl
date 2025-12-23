@@ -74,14 +74,12 @@ def run() -> None:
     # ds_regions = paths.load_dataset("regions")
     ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_wid = paths.load_dataset("world_inequality_database")
-    ds_lis = paths.load_dataset("luxembourg_income_study")
 
     tb = ds_pov_ineq.read("keyvars")
 
     # Load tables from PIP, WID, and LIS datasets (for metadata)
     tb_pip = ds_pip.read(f"income_consumption_{PPP_YEAR_PIP}_unsmoothed")
     tb_wid = ds_wid.read("world_inequality_database")
-    tb_lis = ds_lis.read("luxembourg_income_study")
 
     # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -120,7 +118,10 @@ def run() -> None:
 
     # Add metadata from original tables
     tb = add_metadata_from_original_tables(
-        tb=tb, indicator_match=INDICATORS_FOR_ANALYSIS, tb_pip=tb_pip, tb_wid=tb_wid, tb_lis=tb_lis
+        tb=tb,
+        indicator_match=INDICATORS_FOR_ANALYSIS,
+        tb_pip=tb_pip,
+        tb_wid=tb_wid,
     )
 
     # Create analysis and grapher tables
@@ -448,7 +449,10 @@ def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
 
 
 def add_metadata_from_original_tables(
-    tb: Table, indicator_match: Dict[str, str], tb_pip: Table, tb_wid: Table, tb_lis: Table
+    tb: Table,
+    indicator_match: Dict[str, str],
+    tb_pip: Table,
+    tb_wid: Table,
 ) -> Table:
     """
     Add the original metadata we have in the garden steps of the main metadata.
@@ -464,10 +468,6 @@ def add_metadata_from_original_tables(
         elif "wid" in col:
             # Get the metadata from the WID table
             tb[col] = tb[col].copy_metadata(tb_wid[match])
-        # If col contains "lis"
-        elif "lis" in col:
-            # Get the metadata from the LIS table
-            tb[col] = tb[col].copy_metadata(tb_lis[match])
 
     return tb
 
