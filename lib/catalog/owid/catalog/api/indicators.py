@@ -151,7 +151,7 @@ class IndicatorsAPI:
         Example:
             ```python
             # Fetch indicator by URI
-            indicator = client.indicators.fetch("grapher/un/2024/pop/population#population_total")
+            indicator = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
             print(f"Title: {indicator.title}")
             variable = indicator.data
             ```
