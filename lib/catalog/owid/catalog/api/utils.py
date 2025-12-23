@@ -9,14 +9,18 @@ import sys
 import threading
 import time
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from owid.catalog.datasets import FileFormat
 
 # Constants
 OWID_CATALOG_VERSION = 3
 OWID_CATALOG_URI = "https://catalog.ourworldindata.org/"
 S3_OWID_URI = "s3://owid-catalog"
-PREFERRED_FORMAT = "feather"
-SUPPORTED_FORMATS = ["feather", "parquet", "csv"]
-INDEX_FORMATS = ["feather"]
+PREFERRED_FORMAT: FileFormat = "feather"
+SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
+INDEX_FORMATS: list[FileFormat] = ["feather"]
 
 
 @contextmanager
