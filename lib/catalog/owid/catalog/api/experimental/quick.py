@@ -88,26 +88,26 @@ def quick(
 
     Example:
         ```python
-        >>> # Simplest case - fuzzy search for table
-        >>> tb = quick("population")
+        # Simplest case - fuzzy search for table
+        tb = quick("population")
 
-        >>> # Search for indicator (variable)
-        >>> tb_ind = quick("population", kind="indicator")
+        # Search for indicator (variable)
+        tb_ind = quick("population", kind="indicator")
 
-        >>> # Search for chart
-        >>> df = quick("life-expectancy", kind="chart")
+        # Search for chart
+        df = quick("life-expectancy", kind="chart")
 
-        >>> # With namespace filter
-        >>> quick("wdi", namespace="worldbank_wdi")
+        # With namespace filter
+        quick("wdi", namespace="worldbank_wdi")
 
-        >>> # Exact match (no fuzzy tolerance)
-        >>> tb = quick("population", match="exact")
+        # Exact match (no fuzzy tolerance)
+        tb = quick("population", match="exact")
 
-        >>> # Get specific version (not latest)
-        >>> tb = quick("population", version="2024-12-01", latest=False)
+        # Get specific version (not latest)
+        tb = quick("population", version="2024-12-01", latest=False)
 
-        >>> # Search in specific channel
-        >>> tb = quick("co2", channel="grapher")
+        # Search in specific channel
+        tb = quick("co2", channel="grapher")
         ```
 
     Future improvements:

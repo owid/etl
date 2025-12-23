@@ -377,10 +377,12 @@ class TableResult(BaseModel):
             Table with first N rows and full metadata.
 
         Example:
+            ```python
             >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
             >>> preview = result.experimental_preview(n=5)
             >>> print(preview.shape)
             (5, 3)  # Only 5 rows loaded
+            ```
         """
         # Load the full table (unfortunately, we need to load all data to get first N rows
         # as the underlying storage format doesn't support partial reads efficiently)
@@ -406,6 +408,7 @@ class TableResult(BaseModel):
             Formatted string with table summary (shape, dtypes, null counts, memory estimate).
 
         Example:
+            ```python
             >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
             >>> print(result.experimental_summary())
             Table: population
@@ -414,6 +417,7 @@ class TableResult(BaseModel):
             Columns: 3
             Dtypes: int64(2), float64(1)
             Memory: ~45.8 MB (estimated)
+            ```
         """
         # Use data_header to get structure without loading rows
         header = self.data_header
@@ -455,6 +459,7 @@ class TableResult(BaseModel):
             Formatted string with metadata details.
 
         Example:
+            ```python
             >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
             >>> print(result.experimental_describe_metadata())
             === Table Metadata ===
@@ -462,6 +467,7 @@ class TableResult(BaseModel):
             Description: Total population by country...
             Sources: UN World Population Prospects (2024)
             ...
+            ```
         """
         # Load header to get metadata
         header = self.data_header
