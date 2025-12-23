@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import io
 import json
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
 
 import pandas as pd
@@ -300,6 +299,11 @@ class IndicatorResult(BaseModel):
 
     def _load_table(self) -> "Table":
         """Internal method to load the table containing this indicator."""
+        # Check catalog_path is not None
+        if self.catalog_path is None:
+            raise ValueError(
+                "Cannot load table: catalog_path is None. Likely because this is a legacy (pre-ETL) table."
+            )
         # Parse catalog_path using CatalogPath
         parsed = CatalogPath.from_str(self.catalog_path)
         # Use table_path property (without variable)
@@ -863,87 +867,3 @@ class ResponseSet(BaseModel, Generic[T]):
                 query=self.query,
                 limit=self.limit,
             )
-
-    def experimental_download_all(
-        self, *, parallel: bool = True, max_workers: int = 4, show_progress: bool = True
-    ) -> dict[str, Table | Exception]:
-        """Download data for all results in parallel (experimental feature).
-
-        This is useful for bulk downloading multiple tables efficiently.
-        Note: This is an experimental feature and may change in future versions.
-
-        Args:
-            parallel: If True, download in parallel using ThreadPoolExecutor (default: True).
-            max_workers: Maximum number of concurrent downloads (default: 4).
-            show_progress: If True, show progress bar (default: True).
-
-        Returns:
-            Dictionary mapping table names to loaded Table objects or Exception if download failed.
-
-        Example:
-            >>> results = client.tables.search("worldbank/wdi")
-            >>> tbs = results.experimental_download_all(parallel=True, max_workers=4)
-            >>> # Check which downloads succeeded
-            >>> successful = {k: v for k, v in tables.items() if not isinstance(v, Exception)}
-            >>> failed = {k: v for k, v in tables.items() if isinstance(v, Exception)}
-        """
-        # Only works for TableResult types
-        if not self.results:
-            return {}
-
-        # Check if this is a TableResult ResponseSet
-        if not isinstance(self.results[0], TableResult):
-            raise ValueError("experimental_download_all() only works with TableResult objects")
-
-        output: dict[str, Table | Exception] = {}
-
-        def download_one(result: TableResult) -> tuple[str, Table | Exception]:
-            """Download a single table, returning name and data or exception."""
-            try:
-                data = result.data
-                return (result.table, data)
-            except Exception as e:
-                return (result.table, e)
-
-        if parallel:
-            # Parallel download using ThreadPoolExecutor
-            try:
-                from tqdm import tqdm
-
-                has_tqdm = True
-            except ImportError:
-                has_tqdm = False
-                if show_progress:
-                    print("Install tqdm for progress bars: uv add tqdm")
-
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                # Submit all download tasks
-                futures = {executor.submit(download_one, result): result for result in self.results}
-
-                # Collect results with optional progress bar
-                if show_progress and has_tqdm:
-                    with tqdm(total=len(futures), desc="Downloading tables") as pbar:
-                        for future in as_completed(futures):
-                            name, data = future.result()
-                            output[name] = data
-                            pbar.update(1)
-                else:
-                    for future in as_completed(futures):
-                        name, data = future.result()
-                        output[name] = data
-        else:
-            # Sequential download
-            try:
-                from tqdm import tqdm
-
-                has_tqdm = True
-            except ImportError:
-                has_tqdm = False
-
-            iterator = tqdm(self.results, desc="Downloading tables") if show_progress and has_tqdm else self.results
-
-            for result in iterator:
-                name, data = download_one(result)
-                output[name] = data
-
-        return output
