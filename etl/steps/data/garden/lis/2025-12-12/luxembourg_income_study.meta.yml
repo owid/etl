@@ -731,14 +731,12 @@ definitions:
     <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
-    - Mozambique
-    - Zambia
-    - Kenya
-    - Nigeria
-    - Bangladesh
-    - Bolivia
-    - Romania
-    - Indonesia
+    - Chile
+    - Brazil
+    - South Africa
+    - United States
+    - France
+    - China
 
   entity_names_inequality: &entity_names_inequality
     - Chile
@@ -749,16 +747,15 @@ definitions:
     - China
 
   entity_names_incomes_across_distribution: &entity_names_incomes_across_distribution
-    - World
     - United States
-    - South Korea
-    - Spain
-    - China
-    - Mauritania
-    - Ghana
-    - India
-    - Ethiopia
-    - Democratic Republic of Congo
+    - Canada
+    - Australia
+    - Germany
+    - Sweden
+    - France
+    - Mexico
+    - Russia
+    - Israel
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
