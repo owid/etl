@@ -270,7 +270,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_oda_net_disbursements}"
         presentation:
-          title_public: Foreign aid given
           title_variant: Net disbursements
         display:
           name: Official development assistance (ODA) and private grants by donor - Net disbursements
@@ -289,7 +288,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_oda_net_disbursements}"
         presentation:
-          title_public: Foreign aid given
           title_variant: Net disbursements
         display:
           name: Official development assistance (ODA) by donor - Net disbursements
@@ -307,7 +305,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_oof}"
         presentation:
-          title_public: Other official flows (OOF) by donor
           title_variant: Net disbursements
         display:
           name: Other official flows (OOF) by donor - Net disbursements
@@ -327,7 +324,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_officially_supported_export_credits}"
         presentation:
-          title_public: Officially supported export credits by donor
           title_variant: Net disbursements
         display:
           name: Officially supported export credits by donor - Net disbursements
@@ -346,7 +342,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_private_flows_market_terms}"
         presentation:
-          title_public: Private flows at market terms by donor
           title_variant: Net disbursements
         display:
           name: Private flows at market terms by donor - Net disbursements
@@ -362,7 +357,6 @@ tables:
         description_key: *description_key_private_grants
         description_from_producer: "{definitions.producer_net_private_grants}"
         presentation:
-          title_public: Net private grants by donor
           title_variant: Net disbursements
         display:
           name: Net private grants by donor - Net disbursements
@@ -387,7 +381,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_share_gni}"
         presentation:
-          title_public: Foreign aid given as a share of national income
           title_variant: Net disbursements
         display:
           name: ODA by donor (% of GNI) - Net disbursements
@@ -412,7 +405,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_share_gni}"
         presentation:
-          title_public: Foreign aid given as a share of national income
           title_variant: Grant equivalents
         display:
           name: ODA by donor (% of GNI) - Grant equivalents
@@ -436,7 +428,6 @@ tables:
           - "{definitions.key_oda_target}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Foreign aid given as a share of national income
           title_variant: Official estimate
         display:
           name: ODA by donor (% of GNI) - Official estimate
@@ -459,7 +450,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Bilateral ODA by donor
           title_variant: Grant equivalents
         display:
           name: Bilateral ODA by donor - Grant equivalents
@@ -481,7 +471,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Multilateral ODA by donor
           title_variant: Grant equivalents
         display:
           name: Multilateral ODA by donor - Grant equivalents
@@ -504,7 +493,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Bilateral ODA by donor
           title_variant: Net disbursements
         display:
           name: Bilateral ODA by donor - Net disbursements
@@ -526,7 +514,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Multilateral ODA by donor
           title_variant: Net disbursements
         display:
           name: Multilateral ODA by donor - Net disbursements
@@ -548,7 +535,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Foreign aid given
           title_variant: Grant equivalents
         display:
           name: Official development assistance (ODA) by donor - Grant equivalents
@@ -567,7 +553,6 @@ tables:
           - "{definitions.key_net_disbursements}"
         description_from_producer: "{definitions.producer_net_flows}"
         presentation:
-          title_public: Official and private flows by donor (% of GNI)
           title_variant: Net disbursements
         display:
           name: Official and private flows by donor (% of GNI) - Net disbursements
@@ -586,7 +571,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_net_flows}"
         presentation:
-          title_public: Official and private flows by donor
           title_variant: Net disbursements
         display:
           name: Official and private flows by donor - Net disbursements
@@ -605,7 +589,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
         description_from_producer: "{definitions.producer_net_flows}"
         presentation:
-          title_public: Official and private flows by donor (% of GNI)
           title_variant: Grant equivalents
         display:
           name: Official and private flows by donor (% of GNI) - Grant equivalents
@@ -629,7 +612,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita}"
         presentation:
-          title_public: Foreign aid given per capita
           title_variant: Net disbursements
         display:
           name: ODA per capita by donor - Net disbursements
@@ -653,7 +635,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita}"
         presentation:
-          title_public: Foreign aid given per capita
           title_variant: Grant equivalents
         display:
           name: ODA per capita by donor - Grant equivalents
@@ -672,7 +653,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Budget support
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Budget support
@@ -690,7 +670,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Bilateral core contributions & pooled programmes & funds
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Bilateral core contributions & pooled programmes & funds
@@ -708,7 +687,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Project-type interventions
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Project-type interventions
@@ -726,7 +704,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Experts and other technical assistance
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Experts and other technical assistance
@@ -744,7 +721,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Scholarships and student costs in donor countries
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Scholarships and student costs in donor countries
@@ -762,7 +738,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Debt relief
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Debt relief
@@ -780,7 +755,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Administrative costs not included elsewhere
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Administrative costs not included elsewhere
@@ -798,7 +772,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Other in-donor expenditures
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Other in-donor expenditures
@@ -816,7 +789,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Development awareness
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Development awareness
@@ -834,7 +806,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Refugees in donor countries
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Refugees in donor countries
@@ -852,7 +823,6 @@ tables:
       #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
-      #     title_public: ODA by donor - Support to refugees and asylum seekers in other provider countries
       #     title_variant: Grant equivalents
       #   display:
       #     name: ODA by donor - Support to refugees and asylum seekers in other provider countries
@@ -870,7 +840,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
           title_variant: Grant equivalents
         display:
           name: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
@@ -888,7 +857,6 @@ tables:
       #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
-      #     title_public: "ODA by donor - Other loans repayments"
       #     title_variant: Grant equivalents
       #   display:
       #     name: "ODA by donor - Other loans repayments"
@@ -906,7 +874,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: "ODA by donor - Private sector instruments"
           title_variant: Grant equivalents
         display:
           name: "ODA by donor - Private sector instruments"
@@ -924,7 +891,6 @@ tables:
       #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
-      #     title_public: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
       #     title_variant: Grant equivalents
       #   display:
       #     name: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
@@ -944,7 +910,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_processing: "{definitions.processing_indonor}"
         presentation:
-          title_public: ODA by donor - In-donor aid
           title_variant: Grant equivalents
         display:
           name: ODA by donor - In-donor aid
@@ -964,7 +929,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_processing: "{definitions.processing_overseas}"
         presentation:
-          title_public: ODA by donor - Overseas aid
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Overseas aid
@@ -982,7 +946,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Budget support
           title_variant: Net disbursements
         display:
           name: ODA by donor - Budget support
@@ -1000,7 +963,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Bilateral core contributions & pooled programmes & funds
           title_variant: Net disbursements
         display:
           name: ODA by donor - Bilateral core contributions & pooled programmes & funds
@@ -1018,7 +980,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Project-type interventions
           title_variant: Net disbursements
         display:
           name: ODA by donor - Project-type interventions
@@ -1036,7 +997,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Experts and other technical assistance
           title_variant: Net disbursements
         display:
           name: ODA by donor - Experts and other technical assistance
@@ -1054,7 +1014,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Scholarships and student costs in donor countries
           title_variant: Net disbursements
         display:
           name: ODA by donor - Scholarships and student costs in donor countries
@@ -1072,7 +1031,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Debt relief
           title_variant: Net disbursements
         display:
           name: ODA by donor - Debt relief
@@ -1090,7 +1048,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Administrative costs not included elsewhere
           title_variant: Net disbursements
         display:
           name: ODA by donor - Administrative costs not included elsewhere
@@ -1108,7 +1065,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Other in-donor expenditures
           title_variant: Net disbursements
         display:
           name: ODA by donor - Other in-donor expenditures
@@ -1126,7 +1082,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Development awareness
           title_variant: Net disbursements
         display:
           name: ODA by donor - Development awareness
@@ -1144,7 +1099,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Refugees in donor countries
           title_variant: Net disbursements
         display:
           name: ODA by donor - Refugees in donor countries
@@ -1162,7 +1116,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: ODA by donor - Support to refugees and asylum seekers in other provider countries
           title_variant: Net disbursements
         display:
           name: ODA by donor - Support to refugees and asylum seekers in other provider countries
@@ -1180,7 +1133,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
           title_variant: Net disbursements
         display:
           name: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
@@ -1198,7 +1150,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: "ODA by donor - Other loans repayments"
           title_variant: Net disbursements
         display:
           name: "ODA by donor - Other loans repayments"
@@ -1216,7 +1167,6 @@ tables:
       #     - "{definitions.key_net_disbursements}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
-      #     title_public: "ODA by donor - Private sector instruments"
       #     title_variant: Net disbursements
       #   display:
       #     name: "ODA by donor - Private sector instruments"
@@ -1234,7 +1184,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
           title_variant: Net disbursements
         display:
           name: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
@@ -1254,7 +1203,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_processing: "{definitions.processing_indonor}"
         presentation:
-          title_public: ODA by donor - In-donor aid
           title_variant: Net disbursements
         display:
           name: ODA by donor - In-donor aid
@@ -1274,7 +1222,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_processing: "{definitions.processing_overseas}"
         presentation:
-          title_public: ODA by donor - Overseas aid
           title_variant: Net disbursements
         display:
           name: ODA by donor - Overseas aid
@@ -1292,7 +1239,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
         description_processing: "{definitions.processing_share_oda}"
         presentation:
-          title_public: ODA by donor - Scholarships and student costs in donor countries (% of ODA)
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Scholarships and student costs in donor countries (% of ODA)
@@ -1310,7 +1256,6 @@ tables:
             - "{definitions.key_grant_equivalents}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Administrative costs not included elsewhere (% of ODA)
             title_variant: Grant equivalents
           display:
             name: ODA by donor - Administrative costs not included elsewhere (% of ODA)
@@ -1328,7 +1273,6 @@ tables:
             - "{definitions.key_grant_equivalents}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Development awareness (% of ODA)
             title_variant: Grant equivalents
           display:
             name: ODA by donor - Development awareness (% of ODA)
@@ -1346,7 +1290,6 @@ tables:
             - "{definitions.key_grant_equivalents}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Refugees in donor countries (% of ODA)
             title_variant: Grant equivalents
           display:
             name: ODA by donor - Refugees in donor countries (% of ODA)
@@ -1365,7 +1308,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
         description_processing: "{definitions.processing_indonor}"
         presentation:
-          title_public: ODA by donor - In-donor aid (% of ODA)
           title_variant: Grant equivalents
         display:
           name: ODA by donor - In-donor aid (% of ODA)
@@ -1384,7 +1326,6 @@ tables:
           - "{definitions.key_grant_equivalents}"
         description_processing: "{definitions.processing_overseas}"
         presentation:
-          title_public: ODA by donor - Overseas aid (% of ODA)
           title_variant: Grant equivalents
         display:
           name: ODA by donor - Overseas aid (% of ODA)
@@ -1402,7 +1343,6 @@ tables:
             - "{definitions.key_net_disbursements}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Scholarships and student costs in donor countries (% of ODA)
             title_variant: Net disbursements
           display:
             name: ODA by donor - Scholarships and student costs in donor countries (% of ODA)
@@ -1420,7 +1360,6 @@ tables:
             - "{definitions.key_net_disbursements}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Administrative costs not included elsewhere (% of ODA)
             title_variant: Net disbursements
           display:
             name: ODA by donor - Administrative costs not included elsewhere (% of ODA)
@@ -1438,7 +1377,6 @@ tables:
             - "{definitions.key_net_disbursements}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Development awareness (% of ODA)
             title_variant: Net disbursements
           display:
             name: ODA by donor - Development awareness (% of ODA)
@@ -1456,7 +1394,6 @@ tables:
             - "{definitions.key_net_disbursements}"
           description_processing: "{definitions.processing_share_oda}"
           presentation:
-            title_public: ODA by donor - Refugees in donor countries (% of ODA)
             title_variant: Net disbursements
           display:
             name: ODA by donor - Refugees in donor countries (% of ODA)
@@ -1475,7 +1412,6 @@ tables:
           - "{definitions.key_net_disbursements}"
         description_processing: "{definitions.processing_indonor}"
         presentation:
-          title_public: ODA by donor - In-donor aid (% of ODA)
           title_variant: Net disbursements
         display:
           name: ODA by donor - In-donor aid (% of ODA)
@@ -1494,7 +1430,6 @@ tables:
           - "{definitions.key_net_disbursements}"
         description_processing: "{definitions.processing_overseas}"
         presentation:
-          title_public: ODA by donor - Overseas aid (% of ODA)
           title_variant: Net disbursements
         display:
           name: ODA by donor - Overseas aid (% of ODA)
@@ -1515,7 +1450,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Grants by donor
           title_variant: Net disbursements
         display:
           name: Grants by donor
@@ -1535,7 +1469,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Loans by donor
           title_variant: Net disbursements
         display:
           name: Loans by donor
@@ -1556,7 +1489,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Capital subscriptions (deposits) by donor
           title_variant: Net disbursements
         display:
           name: Capital subscriptions (deposits) by donor
@@ -1576,7 +1508,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Recoveries on grants by donor
           title_variant: Net disbursements
         display:
           name: Recoveries on grants by donor
@@ -1592,7 +1523,6 @@ tables:
         description_key: *description_key_by_donor
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Foreign aid received
           title_variant: <<donor>>
         display:
           name: Official development assistance (ODA) by recipient
@@ -1613,7 +1543,6 @@ tables:
           - "{definitions.key_gni}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
-          title_public: Foreign aid received as a share of national income
           title_variant: <<donor>>
         display:
           name: ODA by recipient (% of GNI)
@@ -1633,7 +1562,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Grants by recipient
           title_variant: <<donor>>
         display:
           name: Grants by recipient
@@ -1653,7 +1581,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Loans by recipient
           title_variant: <<donor>>
         display:
           name: Loans by recipient
@@ -1674,7 +1601,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Capital subscriptions (deposits) by recipient
           title_variant: <<donor>>
         display:
           name: Capital subscriptions (deposits) by recipient
@@ -1694,7 +1620,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Recoveries on grants by recipient
           title_variant: <<donor>>
         display:
           name: Recoveries on grants by recipient
@@ -1714,7 +1639,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Humanitarian aid by recipient
           title_variant: <<donor>>
         display:
           name: Humanitarian aid by recipient
@@ -1736,7 +1660,6 @@ tables:
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_food_aid}"
         presentation:
-          title_public: Development food aid by recipient
           title_variant: <<donor>>
         display:
           name: Development food aid by recipient
@@ -1756,7 +1679,6 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
-          title_public: Technical cooperation by recipient
           title_variant: <<donor>>
         display:
           name: Technical cooperation by recipient
@@ -1779,7 +1701,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
         presentation:
-          title_public: Foreign aid received per capita
           title_variant: <<donor>>
         display:
           name: ODA per capita by recipient
@@ -1801,7 +1722,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
         presentation:
-          title_public: Grants per capita by recipient
           title_variant: <<donor>>
         display:
           name: Grants per capita by recipient
@@ -1823,7 +1743,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
         presentation:
-          title_public: Loans per capita by recipient
           title_variant: <<donor>>
         display:
           name: Loans per capita by recipient
@@ -1845,7 +1764,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
         presentation:
-          title_public: Humanitarian aid per capita by recipient
           title_variant: <<donor>>
         display:
           name: Humanitarian aid per capita by recipient
@@ -1869,7 +1787,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
         presentation:
-          title_public: Development food aid per capita by recipient
           title_variant: <<donor>>
         display:
           name: Development food aid per capita by recipient
@@ -1891,7 +1808,6 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
         presentation:
-          title_public: Technical cooperation per capita by recipient
           title_variant: <<donor>>
         display:
           name: Technical cooperation per capita by recipient
@@ -1915,7 +1831,6 @@ tables:
         processing_level: *processing_level_by_sector
         description_processing: "{definitions.processing_oda_by_sector}"
         presentation:
-          title_public: ODA by donor and sector (<<sector>>)
         display:
           name: ODA by donor and sector (<<sector>>)
           numDecimalPlaces: 0
@@ -1940,7 +1855,6 @@ tables:
 
           {definitions.processing_oda_by_sector}
         presentation:
-          title_public: ODA per capita by donor and sector (<<sector>>)
         display:
           name: ODA per capita by donor and sector (<<sector>>)
           numDecimalPlaces: 2
