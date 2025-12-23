@@ -106,22 +106,26 @@ class IndicatorsAPI:
 
         results = []
         for r in data.get("results", []):
-            if "NULL" in r.get("catalog_path", ""):
+            catalog_path = r.get("catalog_path", "")
+
+            # If legacy indicator, keep only if asked to
+            if "/NULL/" in catalog_path:
                 if not show_legacy:
                     # Skip legacy indicators unless requested
                     continue
-                results.append(
-                    IndicatorResult(
-                        indicator_id=r.get("indicator_id", 0),
-                        title=r.get("title", ""),
-                        score=r.get("score", 0.0),
-                        catalog_path=None,
-                        description=r.get("description", ""),
-                        column_name=r.get("metadata", {}).get("column", ""),
-                        unit=r.get("metadata", {}).get("unit", ""),
-                        n_charts=r.get("n_charts", 0),
-                    )
+                catalog_path = None
+            results.append(
+                IndicatorResult(
+                    indicator_id=r.get("indicator_id", 0),
+                    title=r.get("title", ""),
+                    score=r.get("score", 0.0),
+                    catalog_path=catalog_path,
+                    description=r.get("description", ""),
+                    column_name=r.get("metadata", {}).get("column", ""),
+                    unit=r.get("metadata", {}).get("unit", ""),
+                    n_charts=r.get("n_charts", 0),
                 )
+            )
 
         return ResponseSet(
             results=results,
