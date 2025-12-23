@@ -3,7 +3,6 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
