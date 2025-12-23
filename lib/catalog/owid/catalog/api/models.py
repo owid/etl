@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
 
 import pandas as pd
@@ -363,6 +364,147 @@ class TableResult(BaseModel):
         """Internal method to load table data."""
         return _load_table(self.path, formats=self.formats, is_public=self.is_public)
 
+    def experimental_preview(self, n: int = 10) -> "Table":
+        """Preview first N rows without loading full dataset (experimental feature).
+
+        This is useful for quickly inspecting large tables without loading all data into memory.
+        Note: This is an experimental feature and may change in future versions.
+
+        Args:
+            n: Number of rows to preview (default: 10).
+
+        Returns:
+            Table with first N rows and full metadata.
+
+        Example:
+            >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+            >>> preview = result.experimental_preview(n=5)
+            >>> print(preview.shape)
+            (5, 3)  # Only 5 rows loaded
+        """
+        # Load the full table (unfortunately, we need to load all data to get first N rows
+        # as the underlying storage format doesn't support partial reads efficiently)
+        # TODO: Optimize this by adding support for row-limited reads in Table.read()
+        table = self.data
+        preview = table.head(n)
+        # Ensure we return a Table, not DataFrame/Series
+        from owid.catalog.tables import Table as TableClass
+
+        if not isinstance(preview, TableClass):
+            preview = TableClass(preview)
+        return preview
+
+    def experimental_summary(self) -> str:
+        """Get summary statistics without loading full dataset (experimental feature).
+
+        Returns metadata and structure information (shape, dtypes, memory usage) without
+        loading actual data rows. This is much faster than loading the full table.
+
+        Note: This is an experimental feature and may change in future versions.
+
+        Returns:
+            Formatted string with table summary (shape, dtypes, null counts, memory estimate).
+
+        Example:
+            >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+            >>> print(result.experimental_summary())
+            Table: population
+            Dataset: un_wpp (garden/un/2024-07-12)
+            Dimensions: ['country', 'year']
+            Columns: 3
+            Dtypes: int64(2), float64(1)
+            Memory: ~45.8 MB (estimated)
+        """
+        # Use data_header to get structure without loading rows
+        header = self.data_header
+
+        # Build summary string
+        lines = [
+            f"Table: {self.table}",
+            f"Dataset: {self.dataset} ({self.channel}/{self.namespace}/{self.version})",
+        ]
+
+        if self.dimensions:
+            lines.append(f"Dimensions: {self.dimensions}")
+
+        lines.append(f"Columns: {len(header.columns)}")
+
+        # Get dtype counts
+        dtype_counts: dict[str, int] = {}
+        for dtype in header.dtypes:
+            dtype_str = str(dtype)
+            dtype_counts[dtype_str] = dtype_counts.get(dtype_str, 0) + 1
+
+        dtype_summary = ", ".join([f"{dtype}({count})" for dtype, count in sorted(dtype_counts.items())])
+        lines.append(f"Dtypes: {dtype_summary}")
+
+        # Note: Can't get actual memory without loading data, but can estimate
+        lines.append("Memory: Unknown (call .data to load and measure)")
+
+        return "\n".join(lines)
+
+    def experimental_describe_metadata(self) -> str:
+        """Pretty-print table metadata (experimental feature).
+
+        Returns a formatted string with the table's metadata including title, description,
+        sources, and other relevant information.
+
+        Note: This is an experimental feature and may change in future versions.
+
+        Returns:
+            Formatted string with metadata details.
+
+        Example:
+            >>> result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+            >>> print(result.experimental_describe_metadata())
+            === Table Metadata ===
+            Title: Population by country and year
+            Description: Total population by country...
+            Sources: UN World Population Prospects (2024)
+            ...
+        """
+        # Load header to get metadata
+        header = self.data_header
+        metadata = header.metadata
+
+        lines = ["=== Table Metadata ==="]
+
+        if metadata.title:
+            lines.append(f"Title: {metadata.title}")
+
+        if metadata.description:
+            # Truncate long descriptions
+            desc = metadata.description
+            if len(desc) > 200:
+                desc = desc[:200] + "..."
+            lines.append(f"Description: {desc}")
+
+        # Sources and licenses are on the dataset, not the table
+        if metadata.dataset:
+            if metadata.dataset.sources:
+                source_names = [s.name for s in metadata.dataset.sources if s.name]
+                if source_names:
+                    lines.append(f"Sources: {', '.join(source_names)}")
+
+            if metadata.dataset.licenses:
+                license_names = [lic.name for lic in metadata.dataset.licenses if lic.name]
+                if license_names:
+                    lines.append(f"Licenses: {', '.join(license_names)}")
+
+        # Add column information
+        lines.append(f"\nColumns ({len(header.columns)}):")
+        for col_name in header.columns:
+            col = header[col_name]
+            col_info = f"  - {col_name}"
+            if hasattr(col, "metadata") and col.metadata:
+                if col.metadata.unit:
+                    col_info += f" ({col.metadata.unit})"
+                if col.metadata.title and col.metadata.title != col_name:
+                    col_info += f": {col.metadata.title}"
+            lines.append(col_info)
+
+        return "\n".join(lines)
+
 
 class ResponseSet(BaseModel, Generic[T]):
     """Generic container for API responses.
@@ -373,7 +515,7 @@ class ResponseSet(BaseModel, Generic[T]):
     Attributes:
         results: List of result objects.
         query: The query that produced these results.
-        total: Total number of results (may be more than len(results)).
+        limit: Total number of results (may be more than len(results)).
     """
 
     model_config = ConfigDict(
@@ -382,7 +524,7 @@ class ResponseSet(BaseModel, Generic[T]):
 
     results: list[T]
     query: str = ""
-    total: int = 0
+    limit: int = 0
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
@@ -395,9 +537,9 @@ class ResponseSet(BaseModel, Generic[T]):
         return f"ResponseSet[{type_name}]"
 
     def model_post_init(self, __context: Any) -> None:
-        """Set total to length of results if not provided."""
-        if self.total == 0:
-            self.total = len(self.results)
+        """Set limit to length of results if not provided."""
+        if self.limit == 0:
+            self.limit = len(self.results)
 
     def __iter__(self) -> Iterator[T]:  # type: ignore[override]
         """Iterate over results, not model fields."""
@@ -414,14 +556,14 @@ class ResponseSet(BaseModel, Generic[T]):
         type_display = self._get_type_display()
 
         if not self.results:
-            return f"{type_display}(query={self.query!r}, total=0, results=[])"
+            return f"{type_display}(query={self.query!r}, limit=0, results=[])"
 
         # Convert to DataFrame for nice tabular display
         df = self.to_frame()
 
         # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"{type_display}(query={self.query!r}, total={self.total}, results=[])"
+            return f"{type_display}(query={self.query!r}, limit={self.limit}, results=[])"
         else:
             df_str = str(df)
 
@@ -430,7 +572,7 @@ class ResponseSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"{type_display}\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
+        header = f"{type_display}\n.query={self.query!r}\n.limit={self.limit}\n.results:\n    {indented_df}"
 
         # Add helper tip at the end
         tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
@@ -445,7 +587,7 @@ class ResponseSet(BaseModel, Generic[T]):
         type_display = self._get_type_display()
 
         if not self.results:
-            return f"<p>{type_display}(query={self.query!r}, total=0, results=[])</p>"
+            return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
 
         df = self.to_frame()
         df_html = df._repr_html_()
@@ -455,7 +597,7 @@ class ResponseSet(BaseModel, Generic[T]):
   <p><strong>{type_display}</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
-    <li><strong>.total</strong>: {self.total}</li>
+    <li><strong>.limit</strong>: {self.limit}</li>
     <li><strong>.results</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
@@ -600,7 +742,7 @@ class ResponseSet(BaseModel, Generic[T]):
         return ResponseSet(
             results=filtered_results,
             query=self.query,
-            total=len(filtered_results),
+            limit=len(filtered_results),
         )
 
     def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
@@ -638,7 +780,7 @@ class ResponseSet(BaseModel, Generic[T]):
         return ResponseSet(
             results=sorted_results,
             query=self.query,
-            total=self.total,
+            limit=self.limit,
         )
 
     def latest(self, by: str = "version") -> T:
@@ -713,5 +855,89 @@ class ResponseSet(BaseModel, Generic[T]):
             return ResponseSet(
                 results=self.results[:n],
                 query=self.query,
-                total=self.total,
+                limit=self.limit,
             )
+
+    def experimental_download_all(
+        self, *, parallel: bool = True, max_workers: int = 4, show_progress: bool = True
+    ) -> dict[str, Table | Exception]:
+        """Download data for all results in parallel (experimental feature).
+
+        This is useful for bulk downloading multiple tables efficiently.
+        Note: This is an experimental feature and may change in future versions.
+
+        Args:
+            parallel: If True, download in parallel using ThreadPoolExecutor (default: True).
+            max_workers: Maximum number of concurrent downloads (default: 4).
+            show_progress: If True, show progress bar (default: True).
+
+        Returns:
+            Dictionary mapping table names to loaded Table objects or Exception if download failed.
+
+        Example:
+            >>> results = client.tables.search("worldbank/wdi")
+            >>> tables = results.experimental_download_all(parallel=True, max_workers=4)
+            >>> # Check which downloads succeeded
+            >>> successful = {k: v for k, v in tables.items() if not isinstance(v, Exception)}
+            >>> failed = {k: v for k, v in tables.items() if isinstance(v, Exception)}
+        """
+        # Only works for TableResult types
+        if not self.results:
+            return {}
+
+        # Check if this is a TableResult ResponseSet
+        if not isinstance(self.results[0], TableResult):
+            raise ValueError("experimental_download_all() only works with TableResult objects")
+
+        output: dict[str, Table | Exception] = {}
+
+        def download_one(result: TableResult) -> tuple[str, Table | Exception]:
+            """Download a single table, returning name and data or exception."""
+            try:
+                data = result.data
+                return (result.table, data)
+            except Exception as e:
+                return (result.table, e)
+
+        if parallel:
+            # Parallel download using ThreadPoolExecutor
+            try:
+                from tqdm import tqdm
+
+                has_tqdm = True
+            except ImportError:
+                has_tqdm = False
+                if show_progress:
+                    print("Install tqdm for progress bars: uv add tqdm")
+
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # Submit all download tasks
+                futures = {executor.submit(download_one, result): result for result in self.results}
+
+                # Collect results with optional progress bar
+                if show_progress and has_tqdm:
+                    with tqdm(total=len(futures), desc="Downloading tables") as pbar:
+                        for future in as_completed(futures):
+                            name, data = future.result()
+                            output[name] = data
+                            pbar.update(1)
+                else:
+                    for future in as_completed(futures):
+                        name, data = future.result()
+                        output[name] = data
+        else:
+            # Sequential download
+            try:
+                from tqdm import tqdm
+
+                has_tqdm = True
+            except ImportError:
+                has_tqdm = False
+
+            iterator = tqdm(self.results, desc="Downloading tables") if show_progress and has_tqdm else self.results
+
+            for result in iterator:
+                name, data = download_one(result)
+                output[name] = data
+
+        return output

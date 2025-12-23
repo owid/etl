@@ -234,7 +234,7 @@ class TablesAPI:
         return ResponseSet(
             results=results,
             query=query,
-            total=len(results),
+            limit=len(results),
         )
 
     def fetch(self, path: str, *, load_data: bool = False) -> TableResult:
