@@ -1,92 +1,76 @@
 [![Build status](https://badge.buildkite.com/66cc67fc572120ca97b9ffff288d5d73cb33e019dd70323053.svg)](https://buildkite.com/our-world-in-data/owid-catalog-unit-tests)
 [![PyPI version](https://badge.fury.io/py/owid-catalog.svg)](https://badge.fury.io/py/owid-catalog)
-![](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)
+![](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)
 
 # owid-catalog
 
-_A Pythonic API for working with OWID's data catalog._
+_A Pythonic library for working with OWID data._
 
-Status: experimental, APIs likely to change
+The `owid-catalog` library is the foundation of Our World in Data's data management system. It provides:
 
-## Overview
+1. **Data APIs**: Access OWID's published data through unified client interfaces
+2. **Data Structures**: Enhanced pandas DataFrames with rich metadata support
 
-Our World in Data is building a new data catalog, with the goal of our datasets being reproducible and transparent to the general public. That project is our [etl](https://github.com/owid/etl), which going forward will contain the recipes for all the datasets we republish.
+## Installation
 
-This library allows you to query our data catalog programmatically, and get back data in the form of Pandas data frames, perfect for data pipelines or Jupyter notebook explorations.
+```bash
+pip install owid-catalog
+```
+
+> **Note**: The library is currently in Release Candidate stage (v1.0.0-rc1). Install with: `pip install owid-catalog==1.0.0rc1`
+
+## Quick Examples
+
+### Accessing OWID Data
+
+```python
+from owid.catalog import Client
+
+client = Client()
+
+# Get data from charts
+df = client.charts.get_data("life-expectancy")
+
+# Search for indicators
+results = client.indicators.search("renewable energy")
+df = results[0].data
+
+# Query catalog tables
+tables = client.tables.search(table="population", namespace="un")
+df = tables[0].data
+```
+
+### Working with Data Structures
+
+```python
+from owid.catalog import Table
+from owid.catalog import processing as pr
+
+# Tables are pandas DataFrames with metadata
+tb = Table(df, metadata={"short_name": "population"})
+
+# Metadata propagates through operations
+tb_filtered = tb[tb["year"] > 2000]  # Keeps metadata
+tb_merged = pr.merge(tb1, tb2, on="country")  # Merges metadata
+```
+
+## Documentation
+
+For detailed documentation, see:
+- **[API Reference](https://docs.owid.io/projects/etl/en/latest/api/catalog/api/)**: ChartsAPI, IndicatorsAPI, TablesAPI
+- **[Data Structures](https://docs.owid.io/projects/etl/en/latest/api/catalog/structures/)**: Dataset, Table, Variable, metadata handling
+- **[Full Documentation](https://docs.owid.io/projects/etl/en/latest/api/catalog/)**: Complete library documentation
+
+## Architecture
 
 ```mermaid
 graph TB
-
 etl -->|reads| snapshot[upstream datasets]
 etl -->|generates| s3[data catalog]
 catalog[owid-catalog] -->|queries| s3
 ```
 
-We would love feedback on how we can make this library and overall data catalog better. Feel free to send us an email at info@ourworldindata.org, or start a [discussion](https://github.com/owid/etl/discussions) on Github.
-
-## Quickstart
-
-Install with `pip install owid-catalog`. Then you can get data in two different ways.
-
-### Charts catalog
-
-This API attempts to give you exactly the data you in a chart on our site.
-
-```python
-from owid.catalog import Client
-
-client = Client()
-
-# get the data for one chart by URL
-df = client.charts.get_data('https://ourworldindata.org/grapher/life-expectancy')
-```
-
-Notice that the last part of the URL is the chart's slug, its identifier, in this case `life-expectancy`. Using the slug alone also works.
-
-```python
-df = client.charts.get_data('life-expectancy')
-```
-
-
-### Data science API
-
-We also curate much more data than is available on our site. To access that in efficient binary (Feather) format, use our data science API.
-
-This API is designed for use in Jupyter notebooks.
-
-```python
-from owid.catalog import Client
-
-client = Client()
-
-# Search for tables
-results = client.tables.search(table='covid')
-
-# Load data from first result
-df = results[0].data
-
-# Search with namespace filter
-results = client.tables.search(table='covid', namespace='owid')
-df = results[0].data
-
-# Search is case-insensitive and supports regex by default
-client.tables.search(table='gdp.*capita')
-
-# Use fuzzy search for typo-tolerant matching (sorted by relevance)
-client.tables.search(table='forest area', fuzzy=True)
-client.tables.search(dataset='wrld bank', fuzzy=True, threshold=60)
-```
-
-There may be multiple versions of the same dataset in a catalog, each will have a unique path. To easily load the same dataset again, you should record its path and load it this way:
-
-```python
-from owid.catalog import Client
-
-client = Client()
-
-path = 'garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate/gbd_mental_health_prevalence_rate'
-df = client.tables.get_data(path)
-```
+This library is part of OWID's [ETL project](https://github.com/owid/etl), which contains recipes for all datasets we publish.
 
 ## Development
 
@@ -102,128 +86,157 @@ make watch
 
 ## Changelog
 
-<details>
-<summary>Click to expand changelog</summary>
+### `v1.0.0-rc` (Release Candidate)
+  - **Highlights**
+    - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
+    - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
+    - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
+    - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
+    - **Breaking changes**:
+      - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+      - `catalog.charts` module has been removed in favor of `Client().cha  - **Others**
+    - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
+    - Documentation restructure: Split into intro, API reference, and data structures guides
+    - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
+    - Enhanced type checking with pydantic `BaseModel` for all result types
+    - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
+    - `ResponseSet` container with iteration, indexing, and DataFrame conversion
+    - Loading indicators for long-running API requests
+    - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
 
-- `v1.0.0-rc` (Release Candidate)
-    - **Highlights**
-      - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
-      - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
-      - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
-      - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
-      - **Breaking changes**:
-        - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
-        - `catalog.charts` module has been removed in favor of `Client().charts` API
-      - **Python 3.14 support**: Added support for Python 3.14
-    - **Others**
-      - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
-      - Documentation restructure: Split into intro, API reference, and data structures guides
-      - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
-      - Enhanced type checking with pydantic `BaseModel` for all result types
-      - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
-      - `ResponseSet` container with iteration, indexing, and DataFrame conversion
-      - Loading indicators for long-running API requests
-      - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
-- `v0.4.5`
-    - Allow both `table` and `dataset` parameters in `find()` (they can now be used together)
-    - Migrate from pyright to ty type checker for improved type checking
-- `v0.4.4`
-    - Enhanced `find()` with better search capabilities:
-      - Case-insensitive search by default (use `case=True` for case-sensitive)
-      - Regex support enabled by default for `table` and `dataset` parameters
-      - New fuzzy search with `fuzzy=True` - typo-tolerant matching sorted by relevance
-      - Configurable fuzzy threshold (0-100) to control match strictness
-    - New dependency: `rapidfuzz` for fuzzy string matching
-- `v0.4.3`
-    - Fixed minor bugs
-- `v0.4.0`
-    - **Highlights**
-      - Support for Python 3.10-3.13 (was 3.11-3.13)
-      - Drop support for Python 3.9 (breaking change)
-    - **Others**
-      - Deprecate Walden.
-      - Dependencies: Change `rdata` for `pyreadr`.
-      - Support: indicator dimensions.
-      - Support: MDIMs.
-      - Switched from Poetry to UV package manager.
-      - New decorator `@keep_metadata` to propagate metadata in pandas functions.
-    - Fixes: `Table.apply`, `groupby.apply`, metadata propagation, type hinting, etc.
-- `v0.3.11`
-    - Add support for Python 3.12 in `pypackage.toml`
-- `v0.3.10`
-    - Add experimental chart data API in `owid.catalog.charts`
-- `v0.3.9`
-    - Switch from isort & black & fake8 to ruff
-- `v0.3.8`
-    - Pin dataclasses-json==0.5.8 to fix error with python3.9
-- `v0.3.7`
-    - Fix bugs.
-    - Improve metadata propagation.
-    - Improve metadata YAML file handling, to have common definitions.
-    - Remove `DatasetMeta.origins`.
-- `v0.3.6`
-    - Fixed tons of bugs
-    - `processing.py` module with pandas-like functions that propagate metadata
-    - Support for Dynamic YAML files
-    - Support for R2 alongside S3
-- `v0.3.5`
-    - Remove `catalog.frames`; use `owid-repack` package instead
-    - Relax dependency constraints
-    - Add optional `channel` argument to `DatasetMeta`
-    - Stop supporting metadata in Parquet format, load JSON sidecar instead
-    - Fix errors when creating new Table columns
-- `v0.3.4`
-    - Bump `pyarrow` dependency to enable Python 3.11 support
-- `v0.3.3`
-    - Add more arguments to `Table.__init__` that are often used in ETL
-    - Add `Dataset.update_metadata` function for updating metadata from YAML file
-    - Python 3.11 support via update of `pyarrow` dependency
-- `v0.3.2`
-    - Fix a bug in `Catalog.__getitem__()`
-    - Replace `mypy` type checker by `pyright`
-- `v0.3.1`
-    - Sort imports with `isort`
-    - Change black line length to 120
-    - Add `grapher` channel
-    - Support path-based indexing into catalogs
-- `v0.3.0`
-    - Update `OWID_CATALOG_VERSION` to 3
-    - Support multiple formats per table
-    - Support reading and writing `parquet` files with embedded metadata
-    - Optional `repack` argument when adding tables to dataset
-    - Underscore `|`
-    - Get `version` field from `DatasetMeta` init
-    - Resolve collisions of `underscore_table` function
-    - Convert `version` to `str` and load json `dimensions`
-- `v0.2.9`
-    - Allow multiple channels in `catalog.find` function
-- `v0.2.8`
-    - Update `OWID_CATALOG_VERSION` to 2
-- `v0.2.7`
-    - Split datasets into channels (`garden`, `meadow`, `open_numbers`, ...) and make garden default one
-    - Add `.find_latest` method to Catalog
-- `v0.2.6`
-    - Add flag `is_public` for public/private datasets
-    - Enforce snake_case for table, dataset and variable short names
-    - Add fields `published_by` and `published_at` to Source
+
+<details>
+<summary>See previous versions</summary>
+
+
+#### `v0.4.5`
+- Allow both `table` and `dataset` parameters in `find()` (they can now be used together)
+- Migrate from pyright to ty type checker for improved type checking
+
+#### `v0.4.4`
+- Enhanced `find()` with better search capabilities:
+  - Case-insensitive search by default (use `case=True` for case-sensitive)
+  - Regex support enabled by default for `table` and `dataset` parameters
+  - New fuzzy search with `fuzzy=True` - typo-tolerant matching sorted by relevance
+  - Configurable fuzzy threshold (0-100) to control match strictness
+- New dependency: `rapidfuzz` for fuzzy string matching
+
+#### `v0.4.3`
+- Fixed minor bugs
+
+#### `v0.4.0`
+- **Highlights**
+  - Support for Python 3.10-3.13 (was 3.11-3.13)
+  - Drop support for Python 3.9 (breaking change)
+- **Others**
+  - Deprecate Walden.
+  - Dependencies: Change `rdata` for `pyreadr`.
+  - Support: indicator dimensions.
+  - Support: MDIMs.
+  - Switched from Poetry to UV package manager.
+  - New decorator `@keep_metadata` to propagate metadata in pandas functions.
+- Fixes: `Table.apply`, `groupby.apply`, metadata propagation, type hinting, etc.
+
+#### `v0.3.11`
+- Add support for Python 3.12 in `pypackage.toml`
+
+#### `v0.3.10`
+- Add experimental chart data API in `owid.catalog.charts`
+
+#### `v0.3.9`
+- Switch from isort & black & fake8 to ruff
+
+#### `v0.3.8`
+- Pin dataclasses-json==0.5.8 to fix error with python3.9
+
+#### `v0.3.7`
+- Fix bugs.
+- Improve metadata propagation.
+- Improve metadata YAML file handling, to have common definitions.
+- Remove `DatasetMeta.origins`.
+
+#### `v0.3.6`
+- Fixed tons of bugs
+- `processing.py` module with pandas-like functions that propagate metadata
+- Support for Dynamic YAML files
+- Support for R2 alongside S3
+
+#### `v0.3.5`
+- Remove `catalog.frames`; use `owid-repack` package instead
+- Relax dependency constraints
+- Add optional `channel` argument to `DatasetMeta`
+- Stop supporting metadata in Parquet format, load JSON sidecar instead
+- Fix errors when creating new Table columns
+
+#### `v0.3.4`
+- Bump `pyarrow` dependency to enable Python 3.11 support
+
+#### `v0.3.3`
+- Add more arguments to `Table.__init__` that are often used in ETL
+- Add `Dataset.update_metadata` function for updating metadata from YAML file
+- Python 3.11 support via update of `pyarrow` dependency
+
+#### `v0.3.2`
+- Fix a bug in `Catalog.__getitem__()`
+- Replace `mypy` type checker by `pyright`
+
+#### `v0.3.1`
+- Sort imports with `isort`
+- Change black line length to 120
+- Add `grapher` channel
+- Support path-based indexing into catalogs
+
+#### `v0.3.0`
+  - Update `OWID_CATALOG_VERSION` to 3
+  - Support multiple formats per table
+  - Support reading and writing `parquet` files with embedded metadata
+  - Optional `repack` argument when adding tables to dataset
+  - Underscore `|`
+  - Get `version` field from `DatasetMeta` init
+  - Resolve collisions of `underscore_table` function
+  - Convert `version` to `str` and load json `dimensions`
+
+#### `v0.2.9`
+- Allow multiple channels in `catalog.find` function
+
+#### `v0.2.8`
+- Update `OWID_CATALOG_VERSION` to 2
+
+#### `v0.2.7`
+- Split datasets into channels (`garden`, `meadow`, `open_numbers`, ...) and make garden default one
+- Add `.find_latest` method to Catalog
+
+#### `v0.2.6`
+- Add flag `is_public` for public/private datasets
+- Enforce snake_case for table, dataset and variable short names
+- Add fields `published_by` and `published_at` to Source
     - Added a list of supported and unsupported operations on columns
     - Updated `pyarrow`
-- `v0.2.5`
-    - Fix ability to load remote CSV tables
-- `v0.2.4`
-    - Update the default catalog URL to use a CDN
-- `v0.2.3`
-    - Fix methods for finding and loading data from a `LocalCatalog`
-- `v0.2.2`
-    - Repack frames to compact dtypes on `Table.to_feather()`
-- `v0.2.1`
-    - Fix key typo used in version check
-- `v0.2.0`
-    - Copy dataset metadata into tables, to make tables more traceable
-    - Add API versioning, and a requirement to update if your version of this library is too old
-- `v0.1.1`
-    - Add support for Python 3.8
-- `v0.1.0`
-    - Initial release, including searching and fetching data from a remote catalog
+
+#### `v0.2.5`
+- Fix ability to load remote CSV tables
+
+#### `v0.2.4`
+- Update the default catalog URL to use a CDN
+
+#### `v0.2.3`
+- Fix methods for finding and loading data from a `LocalCatalog`
+
+#### `v0.2.2`
+- Repack frames to compact dtypes on `Table.to_feather()`
+
+#### `v0.2.1`
+- Fix key typo used in version check
+
+#### `v0.2.0`
+- Copy dataset metadata into tables, to make tables more traceable
+- Add API versioning, and a requirement to update if your version of this library is too old
+
+#### `v0.1.1`
+- Add support for Python 3.8
+
+#### `v0.1.0`
+
+- Initial release, including searching and fetching data from a remote catalog
 
 </details>
