@@ -101,7 +101,7 @@ def show(
     """
     # Route to appropriate helper function based on kind
     if kind == "table":
-        return _show_tables(
+        res = _show_tables(
             name=name,
             namespace=namespace,
             version=version,
@@ -113,11 +113,15 @@ def show(
             limit=limit,
         )
     elif kind == "indicator":
-        return _show_indicators(name=name, limit=limit)
+        res = _show_indicators(name=name, limit=limit)
     elif kind == "chart":
-        return _show_charts(name=name, limit=limit)
+        res = _show_charts(name=name, limit=limit)
     else:
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")
+
+    # TODO: sort res based on relevance, or alphabetically, etc. Maybe we need an argument for this.
+
+    return res
 
 
 def get(path: str) -> "Table" | pd.DataFrame:
@@ -232,9 +236,6 @@ def _show_tables(
     # Build full paths from results
     all_paths = [result.path for result in results]
 
-    # Sort paths alphabetically
-    all_paths.sort()
-
     return all_paths
 
 
@@ -254,10 +255,7 @@ def _show_indicators(name: str, *, limit: int = 10) -> list[str]:
         return []
 
     # Build full paths from results
-    all_paths = [result.catalog_path for result in results if result.catalog_path]
-
-    # Sort paths alphabetically
-    all_paths.sort()
+    all_paths = [result.path for result in results if result.path]
 
     return all_paths
 
@@ -279,8 +277,5 @@ def _show_charts(name: str, *, limit: int = 10) -> list[str]:
 
     # Build full paths from results
     all_paths = [f"chart:{result.slug}" for result in results]
-
-    # Sort paths alphabetically
-    all_paths.sort()
 
     return all_paths
