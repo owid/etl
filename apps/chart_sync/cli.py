@@ -1,7 +1,7 @@
 import copy
 import datetime as dt
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import click
 import pandas as pd
@@ -122,7 +122,8 @@ def cli(
         source = repo.get_git_branch_from_commit_sha(source)
         log.info("chart_sync.use_branch", branch=source)
 
-    source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
+    source_env = OWIDEnv.from_staging_or_env_file(source)
+    source_engine = source_env.get_engine()
     target_env = OWIDEnv.from_staging_or_env_file(target)
     target_engine = target_env.get_engine()
 
@@ -135,7 +136,9 @@ def cli(
 
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
-    target_api: AdminAPI = AdminAPI(target_env) if not dry_run else None  # type: ignore
+    # We need source_api to fetch narrative chart merged configs, and target_api to update
+    source_api = AdminAPI(source_env)
+    target_api = AdminAPI(target_env)
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
@@ -163,6 +166,8 @@ def cli(
 
             charts_synced = 0
             dods_synced = 0
+            narrative_charts_synced = 0
+            synced_chart_ids: Set[int] = set()  # Track synced chart IDs for narrative chart sync
 
             # Iterate over all chart diffs
             for diff in chart_diffs:
@@ -222,6 +227,7 @@ def cli(
                     if diff.is_approved:
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
+                        synced_chart_ids.add(chart_id)
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
                             target_api.set_tags(chart_id, source_tags, user_id=user_id)
@@ -249,6 +255,7 @@ def cli(
                     # New chart has been approved
                     if diff.is_approved:
                         charts_synced += 1
+                        synced_chart_ids.add(chart_id)
                         if not dry_run:
                             resp = target_api.create_chart(migrated_config, user_id=user_id)
                             target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
@@ -276,6 +283,11 @@ def cli(
                     else:
                         raise ValueError("Invalid chart diff state")
 
+            # Sync narrative charts for the synced parent charts
+            narrative_charts_synced = _sync_narrative_charts(
+                synced_chart_ids, source_session, target_session, source_api, target_api, dry_run
+            )
+
             # Sync DoDs
             dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
 
@@ -289,10 +301,12 @@ def cli(
 
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
+    if narrative_charts_synced > 0:
+        print(f"[bold green]Narrative charts synced: {narrative_charts_synced}[/bold green]")
     if dods_synced > 0:
         print(f"[bold green]DoDs synced: {dods_synced}[/bold green]")
-    if charts_synced == 0 and dods_synced == 0:
-        print("\n[bold green]No charts or DoDs need to be synced[/bold green]")
+    if charts_synced == 0 and narrative_charts_synced == 0 and dods_synced == 0:
+        print("\n[bold green]No charts, narrative charts, or DoDs need to be synced[/bold green]")
 
 
 def _is_commit_sha(source: str) -> bool:
@@ -412,6 +426,93 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
+
+
+def _sync_narrative_charts(
+    synced_chart_ids: Set[int],
+    source_session: Session,
+    target_session: Session,
+    source_api: AdminAPI,
+    target_api: AdminAPI,
+    dry_run: bool,
+) -> int:
+    """Sync narrative charts for the given synced parent chart IDs.
+
+    When a chart is synced, we also sync all its child narrative charts.
+    Narrative charts are matched by ID between environments.
+
+    The sync process:
+    1. Fetch the merged config from source via Admin API
+    2. Remap variable IDs from source to target using catalog paths
+    3. PUT the migrated merged config to target - backend recalculates the patch
+    """
+    if not synced_chart_ids:
+        return 0
+
+    narrative_charts_synced = 0
+
+    # Get all narrative charts that have the synced charts as parents
+    source_narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
+        source_session, synced_chart_ids
+    )
+
+    if not source_narrative_charts:
+        return 0
+
+    log.info(
+        "narrative_chart_sync.start",
+        n=len(source_narrative_charts),
+        narrative_chart_ids=[nc.id for nc in source_narrative_charts],
+    )
+
+    for source_nc in source_narrative_charts:
+        # Check if narrative chart exists in target by ID
+        target_nc = target_session.get(gm.NarrativeChart, source_nc.id)
+
+        if not target_nc:
+            # Narrative chart doesn't exist in target - this is expected if it's new
+            # We cannot create narrative charts via API currently, just log a warning
+            log.warning(
+                "narrative_chart_sync.new_chart_skipped",
+                name=source_nc.name,
+                narrative_chart_id=source_nc.id,
+                reason="creating new narrative charts not supported yet",
+            )
+            continue
+
+        # Fetch merged config from source API (full config = parent + patch merged)
+        source_merged_config = source_api.get_narrative_chart(source_nc.id)
+
+        # Migrate the merged config (remap variable IDs from source to target)
+        migrated_config = source_nc.migrate_merged_config(source_merged_config, source_session, target_session)
+
+        # For comparison, get target's merged config via API
+        target_merged_config = target_api.get_narrative_chart(target_nc.id)
+
+        if migrated_config == target_merged_config:
+            log.info(
+                "narrative_chart_sync.skip",
+                name=source_nc.name,
+                reason="identical config already exists",
+            )
+            continue
+
+        log.info(
+            "narrative_chart_sync.update",
+            name=source_nc.name,
+            narrative_chart_id=source_nc.id,
+        )
+        narrative_charts_synced += 1
+
+        if not dry_run:
+            # PUT the full migrated config - backend will recalculate the patch
+            target_api.update_narrative_chart(
+                target_nc.id,
+                migrated_config,
+                user_id=source_nc.lastEditedByUserId,
+            )
+
+    return narrative_charts_synced
 
 
 def _sync_dods(
