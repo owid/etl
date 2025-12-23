@@ -104,7 +104,8 @@ def push_new_narrative_charts_cli(
     # Update narrative charts sequentially
     for nc in narrative_charts:
         # Get merged config via API (full config = parent + patch merged)
-        merged_config = api.get_narrative_chart(nc.id)
+        response = api.get_narrative_chart(nc.id)
+        merged_config = response["mergedConfig"]
 
         # Update variable IDs in the merged config
         config_new = update_narrative_chart_config(merged_config, indicator_mapping)
