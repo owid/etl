@@ -53,19 +53,23 @@ class TablesAPI:
     def __init__(self, client: Client) -> None:
         self._client = client
         self._catalog: ETLCatalog | None = None
-        self._channels: set[str] = {"garden"}
 
-    def _get_catalog(self, channels: Iterable[str] = ("garden",)) -> ETLCatalog:
-        """Get or create the remote catalog, adding channels as needed."""
-        # Use ETLCatalog from utils
-
-        # Add new channels if needed
-        new_channels = set(channels) - self._channels
-        if new_channels or self._catalog is None:
-            self._channels = self._channels | set(channels)
-            # Cast to the expected channel type
-            channel_list: list = list(self._channels)  # type: ignore
-            self._catalog = ETLCatalog(channels=channel_list)
+    def _get_catalog(self) -> ETLCatalog:
+        """Get or create the remote catalog with all channels loaded."""
+        if self._catalog is None:
+            # Load all available channels
+            all_channels: list[CHANNEL] = [
+                "snapshot",
+                "garden",
+                "meadow",
+                "grapher",
+                "open_numbers",
+                "examples",
+                "explorers",
+                "external",
+                "multidim",
+            ]
+            self._catalog = ETLCatalog(channels=all_channels)
 
         return self._catalog
 
@@ -76,7 +80,6 @@ class TablesAPI:
         version: str | None = None,
         dataset: str | None = None,
         channel: str | None = None,
-        channels: Iterable[str] = ("garden",),
     ) -> str:
         """Build a descriptive query string from search parameters.
 
@@ -85,8 +88,7 @@ class TablesAPI:
             namespace: Namespace filter
             version: Version filter
             dataset: Dataset name pattern
-            channel: Channel filter
-            channels: List of channels to search
+            channel: Channel filter (defaults to 'garden' if not specified)
 
         Returns:
             Human-readable query string describing the search parameters.
@@ -102,9 +104,9 @@ class TablesAPI:
             query_parts.append(f"dataset={dataset!r}")
         if channel:
             query_parts.append(f"channel={channel!r}")
-        elif len(list(channels)) > 1 or list(channels)[0] != "garden":
-            # Only show channels if non-default
-            query_parts.append(f"channels={list(channels)!r}")
+        else:
+            # Default to garden channel
+            query_parts.append("channel='garden'")
 
         return " ".join(query_parts) if query_parts else "all tables"
 
@@ -115,7 +117,6 @@ class TablesAPI:
         version: str | None = None,
         dataset: str | None = None,
         channel: str | None = None,
-        channels: Iterable[str] = ("garden",),
         case: bool = False,
         match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
         fuzzy_threshold: int = 70,
@@ -127,8 +128,7 @@ class TablesAPI:
             namespace: Filter by namespace (exact match)
             version: Filter by version (exact match)
             dataset: Dataset name pattern to search for
-            channel: Filter by channel (exact match)
-            channels: List of channels to search (default: garden only)
+            channel: Filter by channel (exact match). Defaults to 'garden' if not specified.
             case: Case-sensitive search (default: False)
             match: How to match table/dataset names (default: "exact"):
                 - "exact": Exact string match
@@ -143,7 +143,7 @@ class TablesAPI:
 
         Example:
             ```python
-            # Exact match (default)
+            # Exact match (default) - searches garden channel by default
             results = client.tables.search(table="population")
 
             # Substring match
@@ -160,22 +160,28 @@ class TablesAPI:
 
             # Filter by namespace and version
             results = client.tables.search(
-                table="gdp",
-                namespace="worldbank",
-                version="2024-01-15"
+                table="wdi",
+                namespace="worldbank_wdi",
+                version="2025-09-08",
             )
 
-            # Search multiple channels
+            # Search in a specific channel
             results = client.tables.search(
-                table="co2",
-                channels=["garden", "meadow"]
+                table="wdi",
+                namespace="worldbank_wdi",
+                version="2025-09-08",
+                channel="meadow",
             )
 
             # Load a specific result
-            table = results[0].data
+            tb = results[0].data
             ```
         """
-        catalog = self._get_catalog(channels)
+        # Default to garden channel if not specified
+        if channel is None:
+            channel = "garden"
+
+        catalog = self._get_catalog()
 
         # Use catalog.find() with the new match parameter
         matches = catalog.find(
@@ -228,7 +234,6 @@ class TablesAPI:
             version=version,
             dataset=dataset,
             channel=channel,
-            channels=channels,
         )
 
         return ResponseSet(
@@ -261,7 +266,7 @@ class TablesAPI:
             print(f"Dataset: {result.dataset}, Version: {result.version}")
 
             # Load data when needed
-            table = result.data
+            tb = result.data
             ```
         """
         # Parse path using CatalogPath
@@ -277,7 +282,6 @@ class TablesAPI:
             version=catalog_path.version,
             dataset=catalog_path.dataset,
             channel=catalog_path.channel,
-            channels=[catalog_path.channel],  # Ensure the catalog loads this channel
         )
 
         if len(results) == 0:
@@ -308,7 +312,7 @@ class TablesAPI:
 
         Example:
             ```python
-            table = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
+            tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
             print(table.head())
             print(table.metadata.title)
             ```
