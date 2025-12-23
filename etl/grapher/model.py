@@ -2138,6 +2138,70 @@ class NarrativeChart(Base):
             return json.loads(config)
         return config
 
+    def migrate_merged_config(
+        self, merged_config: Dict[str, Any], source_session: Session, target_session: Session
+    ) -> Dict[str, Any]:
+        """Remap variable ids in merged config from source to target session.
+
+        The merged config is the full chart config (parent + patch merged).
+        We remap variable IDs and return the full config - the backend will
+        recalculate the patch automatically when we PUT this config.
+        """
+        # Extract variable IDs from the merged config
+        source_var_ids: Set[int] = set()
+        if "dimensions" in merged_config:
+            for dim in merged_config["dimensions"]:
+                if "variableId" in dim:
+                    source_var_ids.add(int(dim["variableId"]))
+        if "map" in merged_config and "columnSlug" in merged_config["map"]:
+            try:
+                source_var_ids.add(int(merged_config["map"]["columnSlug"]))
+            except (ValueError, TypeError):
+                pass
+        if merged_config.get("sortBy") == "column" and "sortColumnSlug" in merged_config:
+            try:
+                source_var_ids.add(int(merged_config["sortColumnSlug"]))
+            except (ValueError, TypeError):
+                pass
+
+        if not source_var_ids:
+            # No variable IDs to remap
+            return merged_config
+
+        # Build remap_ids mapping using catalog paths
+        remap_ids: Dict[int, int] = {}
+        for source_var_id in source_var_ids:
+            source_var = source_session.get(Variable, source_var_id)
+            if not source_var:
+                log.warning(f"Variable {source_var_id} not found in source for narrative chart {self.id}")
+                continue
+
+            if source_var.catalogPath:
+                try:
+                    target_var = Variable.from_catalog_path(target_session, source_var.catalogPath)
+                    remap_ids[source_var_id] = target_var.id
+                except NoResultFound:
+                    log.warning(f"Variable catalogPath not found in target: {source_var.catalogPath}")
+            else:
+                # Old style variable, match on name and datasetId
+                try:
+                    target_var = target_session.scalars(
+                        select(Variable).where(
+                            Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
+                        )
+                    ).one()
+                    remap_ids[source_var_id] = target_var.id
+                except NoResultFound:
+                    log.warning(
+                        f"Variable with name `{source_var.name}` and datasetId `{source_var.datasetId}` not found in target"
+                    )
+
+        if not remap_ids:
+            return merged_config
+
+        # Apply the remapping
+        return _remap_variable_ids(copy.deepcopy(merged_config), remap_ids)
+
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
     """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
