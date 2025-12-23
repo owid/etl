@@ -14,7 +14,7 @@ from owid.catalog.api.models import (
     IndicatorResult,
     LicenseError,
     PageSearchResult,
-    ResultSet,
+    ResponseSet,
     TableResult,
 )
 from owid.catalog.api.search import SiteSearchAPI
@@ -90,7 +90,7 @@ __all__ = [
     "PageSearchResult",
     "IndicatorResult",
     "TableResult",
-    "ResultSet",
+    "ResponseSet",
     # Exceptions for error handling
     "ChartNotFoundError",
     "LicenseError",

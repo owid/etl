@@ -83,7 +83,7 @@ Different APIs use different path conventions:
 
 Result objects returned by `fetch()` and `search()` methods.
 
-::: owid.catalog.api.models.ResultSet
+::: owid.catalog.api.models.ResponseSet
     options:
       heading_level: 4
       show_root_heading: true

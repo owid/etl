@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from owid.catalog.api.models import IndicatorResult, ResultSet
+from owid.catalog.api.models import IndicatorResult, ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -63,7 +63,7 @@ class IndicatorsAPI:
         query: str,
         *,
         limit: int = 10,
-    ) -> ResultSet[IndicatorResult]:
+    ) -> ResponseSet[IndicatorResult]:
         """Search for indicators using natural language.
 
         Uses semantic search to find indicators that match the
@@ -116,8 +116,8 @@ class IndicatorsAPI:
                 )
             )
 
-        return ResultSet(
-            items=results,
+        return ResponseSet(
+            results=results,
             query=query,
             total=data.get("total_results", len(results)),
         )

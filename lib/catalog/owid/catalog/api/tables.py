@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from typing import TYPE_CHECKING, Literal, cast
 
 from owid.catalog.api.catalogs import ETLCatalog
-from owid.catalog.api.models import ResultSet, TableResult
+from owid.catalog.api.models import ResponseSet, TableResult
 from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI
 from owid.catalog.datasets import CHANNEL
 
@@ -118,7 +118,7 @@ class TablesAPI:
         case: bool = False,
         match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
         fuzzy_threshold: int = 70,
-    ) -> ResultSet[TableResult]:
+    ) -> ResponseSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
         Args:
@@ -138,7 +138,7 @@ class TablesAPI:
                 Only used when match="fuzzy". (default: 70)
 
         Returns:
-            ResultSet containing matching TableResult objects. If match="fuzzy", results are sorted by relevance score.
+            ResponseSet containing matching TableResult objects. If match="fuzzy", results are sorted by relevance score.
 
         Example:
             ```python
@@ -230,8 +230,8 @@ class TablesAPI:
             channels=channels,
         )
 
-        return ResultSet(
-            items=results,
+        return ResponseSet(
+            results=results,
             query=query,
             total=len(results),
         )

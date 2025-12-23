@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from owid.catalog.api.models import ChartResult, PageSearchResult, ResultSet
+from owid.catalog.api.models import ChartResult, PageSearchResult, ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -86,7 +86,7 @@ class SiteSearchAPI:
         require_all_countries: bool = False,
         limit: int = 20,
         page: int = 0,
-    ) -> ResultSet[ChartResult]:
+    ) -> ResponseSet[ChartResult]:
         """Search for charts matching a query.
 
         Args:
@@ -99,7 +99,7 @@ class SiteSearchAPI:
             page: Page number for pagination (0-indexed). Default 0.
 
         Returns:
-            ResultSet containing ChartResult objects.
+            ResponseSet containing ChartResult objects.
 
         Note:
             Prefer using `client.charts.search()` for a simpler API.
@@ -140,8 +140,8 @@ class SiteSearchAPI:
                 )
             )
 
-        return ResultSet(
-            items=results,
+        return ResponseSet(
+            results=results,
             query=query,
             total=data.get("totalCount", len(results)),
         )
@@ -152,7 +152,7 @@ class SiteSearchAPI:
         *,
         limit: int = 20,
         page: int = 0,
-    ) -> ResultSet[PageSearchResult]:
+    ) -> ResponseSet[PageSearchResult]:
         """Search for pages/articles matching a query.
 
         Args:
@@ -161,7 +161,7 @@ class SiteSearchAPI:
             page: Page number for pagination (0-indexed). Default 0.
 
         Returns:
-            ResultSet containing PageSearchResult objects.
+            ResponseSet containing PageSearchResult objects.
 
         Example:
             ```python
@@ -189,8 +189,8 @@ class SiteSearchAPI:
                 )
             )
 
-        return ResultSet(
-            items=results,
+        return ResponseSet(
+            results=results,
             query=query,
             total=data.get("totalCount", len(results)),
         )

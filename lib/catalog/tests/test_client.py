@@ -10,7 +10,7 @@ from owid.catalog.api import (
     IndicatorResult,
     LicenseError,
     PageSearchResult,
-    ResultSet,
+    ResponseSet,
     TableResult,
 )
 
@@ -97,7 +97,7 @@ class TestChartsAPISearch:
         client = Client()
         results = client.charts.search("life expectancy")
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         assert len(results) > 0
         assert all(isinstance(r, ChartResult) for r in results)
         assert results[0].slug
@@ -108,7 +108,7 @@ class TestChartsAPISearch:
         client = Client()
         results = client.charts.search("gdp", countries=["France"])
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         # Results should be filtered by country
 
     def test_search_results_to_frame(self):
@@ -130,7 +130,7 @@ class TestSiteSearchAPI:
         client = Client()
         results = client._site_search.pages("climate change")
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         assert len(results) > 0
         assert all(isinstance(r, PageSearchResult) for r in results)
         assert results[0].slug
@@ -141,7 +141,7 @@ class TestSiteSearchAPI:
         client = Client()
         results = client._site_search.charts("gdp")
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         assert len(results) > 0
 
     def test_site_search_charts_limit_warning(self):
@@ -159,7 +159,7 @@ class TestSiteSearchAPI:
             assert "Max allowed of result items is 100" in str(w[0].message)
 
             # Check that limit was clamped to 100
-            assert isinstance(results, ResultSet)
+            assert isinstance(results, ResponseSet)
 
     def test_site_search_pages_limit_warning(self):
         """Test that warning is raised when limit > 100 for pages."""
@@ -176,7 +176,7 @@ class TestSiteSearchAPI:
             assert "Max allowed of result items is 100" in str(w[0].message)
 
             # Check that limit was clamped to 100
-            assert isinstance(results, ResultSet)
+            assert isinstance(results, ResponseSet)
 
 
 class TestIndicatorsAPI:
@@ -186,7 +186,7 @@ class TestIndicatorsAPI:
         client = Client()
         results = client.indicators.search("solar power generation")
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         assert len(results) > 0
         assert all(isinstance(r, IndicatorResult) for r in results)
 
@@ -266,7 +266,7 @@ class TestTablesAPI:
         client = Client()
         results = client.tables.search(table="population")
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         assert len(results) > 0
         assert all(isinstance(r, TableResult) for r in results)
 
@@ -274,7 +274,7 @@ class TestTablesAPI:
         client = Client()
         results = client.tables.search(table="population", namespace="un")
 
-        assert isinstance(results, ResultSet)
+        assert isinstance(results, ResponseSet)
         assert len(results) > 0
         assert all(r.namespace == "un" for r in results)
 
@@ -344,33 +344,231 @@ class TestTablesAPI:
         assert client.datasets is client.tables
 
 
-class TestResultSet:
-    """Test the ResultSet container."""
+class TestResponseSet:
+    """Test the ResponseSet container."""
 
     def test_iteration(self):
-        results = ResultSet(items=[1, 2, 3], query="test")
+        results = ResponseSet(results=[1, 2, 3], query="test")
 
         items = list(results)
         assert items == [1, 2, 3]
 
     def test_indexing(self):
-        results = ResultSet(items=["a", "b", "c"], query="test")
+        results = ResponseSet(results=["a", "b", "c"], query="test")
 
         assert results[0] == "a"
         assert results[1] == "b"
         assert results[2] == "c"
 
     def test_len(self):
-        results = ResultSet(items=[1, 2, 3, 4, 5], query="test")
+        results = ResponseSet(results=[1, 2, 3, 4, 5], query="test")
         assert len(results) == 5
 
     def test_total_auto_set(self):
-        results = ResultSet(items=[1, 2, 3], query="test")
+        results = ResponseSet(results=[1, 2, 3], query="test")
         assert results.total == 3
 
     def test_total_explicit(self):
-        results = ResultSet(items=[1, 2, 3], query="test", total=100)
+        results = ResponseSet(results=[1, 2, 3], query="test", total=100)
         assert results.total == 100
+
+    def test_filter(self):
+        """Test filtering results with a predicate."""
+        # Create mock result objects with version attribute
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            version: str
+            name: str
+
+        items = [
+            MockResult(version="2024-01-01", name="a"),
+            MockResult(version="2024-06-01", name="b"),
+            MockResult(version="2023-12-01", name="c"),
+            MockResult(version="2024-03-01", name="d"),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Filter by version (>= "2024-03-01" matches 2024-03-01 and 2024-06-01)
+        filtered = results.filter(lambda r: r.version >= "2024-03-01")
+        assert len(filtered) == 2
+        assert all(r.version >= "2024-03-01" for r in filtered)
+        assert {r.name for r in filtered} == {"b", "d"}
+
+        # Filter by name
+        filtered = results.filter(lambda r: r.name in ["a", "c"])
+        assert len(filtered) == 2
+        assert {r.name for r in filtered} == {"a", "c"}
+
+        # Chain filters
+        filtered = results.filter(lambda r: r.version >= "2024-01-01").filter(lambda r: r.name != "d")
+        assert len(filtered) == 2
+
+    def test_sort_by_string(self):
+        """Test sorting by attribute name."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            version: str
+            score: float
+
+        items = [
+            MockResult(version="2024-03-01", score=0.8),
+            MockResult(version="2024-01-01", score=0.9),
+            MockResult(version="2024-06-01", score=0.7),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Sort by version ascending
+        sorted_results = results.sort_by("version")
+        versions = [r.version for r in sorted_results]
+        assert versions == ["2024-01-01", "2024-03-01", "2024-06-01"]
+
+        # Sort by version descending
+        sorted_results = results.sort_by("version", reverse=True)
+        versions = [r.version for r in sorted_results]
+        assert versions == ["2024-06-01", "2024-03-01", "2024-01-01"]
+
+        # Sort by score
+        sorted_results = results.sort_by("score", reverse=True)
+        scores = [r.score for r in sorted_results]
+        assert scores == [0.9, 0.8, 0.7]
+
+    def test_sort_by_function(self):
+        """Test sorting by key function."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            name: str
+            value: int
+
+        items = [
+            MockResult(name="c", value=3),
+            MockResult(name="a", value=1),
+            MockResult(name="b", value=2),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Sort by value using lambda
+        sorted_results = results.sort_by(lambda r: r.value)
+        values = [r.value for r in sorted_results]
+        assert values == [1, 2, 3]
+
+        # Sort by name using lambda
+        sorted_results = results.sort_by(lambda r: r.name)
+        names = [r.name for r in sorted_results]
+        assert names == ["a", "b", "c"]
+
+    def test_latest(self):
+        """Test getting the latest result."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            version: str
+            published_at: str
+            score: float
+
+        items = [
+            MockResult(version="2024-01-01", published_at="2024-01-15", score=0.8),
+            MockResult(version="2024-06-01", published_at="2024-06-15", score=0.9),
+            MockResult(version="2024-03-01", published_at="2024-03-15", score=0.7),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Get latest by version
+        latest = results.latest(by="version")
+        assert latest.version == "2024-06-01"
+
+        # Get latest by published_at
+        latest = results.latest(by="published_at")
+        assert latest.published_at == "2024-06-15"
+
+        # Get latest by score
+        latest = results.latest(by="score")
+        assert latest.score == 0.9
+
+    def test_latest_empty_results(self):
+        """Test that latest() raises ValueError on empty results."""
+        results = ResponseSet(results=[], query="test")
+
+        with pytest.raises(ValueError, match="No results available"):
+            results.latest(by="version")
+
+    def test_first_single(self):
+        """Test getting first single result."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            name: str
+
+        items = [
+            MockResult(name="a"),
+            MockResult(name="b"),
+            MockResult(name="c"),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Get first item
+        first = results.first()
+        assert first.name == "a"
+
+        # First of empty results
+        empty_results = ResponseSet(results=[], query="test")
+        assert empty_results.first() is None
+
+    def test_first_multiple(self):
+        """Test getting first n results."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            name: str
+
+        items = [
+            MockResult(name="a"),
+            MockResult(name="b"),
+            MockResult(name="c"),
+            MockResult(name="d"),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Get first 2
+        first_two = results.first(2)
+        assert isinstance(first_two, ResponseSet)
+        assert len(first_two) == 2
+        assert [r.name for r in first_two] == ["a", "b"]
+
+        # Get first 10 (more than available)
+        first_ten = results.first(10)
+        assert isinstance(first_ten, ResponseSet)
+        assert len(first_ten) == 4
+
+    def test_chaining(self):
+        """Test chaining multiple convenience methods."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            version: str
+            namespace: str
+            score: float
+
+        items = [
+            MockResult(version="2024-01-01", namespace="un", score=0.8),
+            MockResult(version="2024-06-01", namespace="worldbank", score=0.9),
+            MockResult(version="2024-03-01", namespace="un", score=0.7),
+            MockResult(version="2024-02-01", namespace="worldbank", score=0.6),
+        ]
+        results = ResponseSet(results=items, query="test")
+
+        # Chain filter -> sort -> first
+        filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True).first(1)
+        assert filtered.version == "2024-03-01"
+        assert filtered.namespace == "un"
+
+        # Chain filter -> sort -> first multiple
+        top_two = results.filter(lambda r: r.score > 0.6).sort_by("score", reverse=True).first(2)
+        assert isinstance(top_two, ResponseSet)
+        assert len(top_two) == 2
+        assert [r.score for r in top_two] == [0.9, 0.8]
 
 
 class TestDataclassModels:

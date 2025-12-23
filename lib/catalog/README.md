@@ -120,7 +120,7 @@ make watch
       - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
       - Enhanced type checking with pydantic `BaseModel` for all result types
       - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
-      - `ResultSet` container with iteration, indexing, and DataFrame conversion
+      - `ResponseSet` container with iteration, indexing, and DataFrame conversion
       - Loading indicators for long-running API requests
       - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
 - `v0.4.5`

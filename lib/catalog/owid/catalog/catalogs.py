@@ -161,7 +161,7 @@ def find(
         fuzzy_threshold=threshold,
     )
 
-    # Convert ResultSet to CatalogFrame for backwards compatibility
+    # Convert ResponseSet to CatalogFrame for backwards compatibility
     return results.to_catalog_frame()
 
 
