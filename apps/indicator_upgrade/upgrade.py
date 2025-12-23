@@ -75,7 +75,13 @@ def push_new_narrative_charts_cli(
     indicator_mapping: Dict[int, int],
     dry_run: bool = False,
 ) -> None:
-    """Update narrative charts in the database (CLI version)."""
+    """Update narrative charts in the database (CLI version).
+
+    Uses AdminAPI to:
+    1. GET merged config (full config = parent + patch merged)
+    2. Update variable IDs in the merged config
+    3. PUT the updated merged config - backend recalculates the patch
+    """
     if not narrative_charts:
         log.warning("No narrative charts to update")
         return
@@ -96,17 +102,16 @@ def push_new_narrative_charts_cli(
     api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
 
     # Update narrative charts sequentially
-    with Session(get_engine()) as session:
-        for nc in narrative_charts:
-            # Load the config from DB
-            config = nc.load_config(session)
+    for nc in narrative_charts:
+        # Get merged config via API (full config = parent + patch merged)
+        merged_config = api.get_narrative_chart(nc.id)
 
-            # Update narrative chart config
-            config_new = update_narrative_chart_config(config, indicator_mapping)
+        # Update variable IDs in the merged config
+        config_new = update_narrative_chart_config(merged_config, indicator_mapping)
 
-            # Push new config to DB
-            api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new)
-            log.info(f"Successfully updated narrative chart {nc.id}")
+        # PUT the updated merged config - backend will recalculate the patch
+        api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new)
+        log.info(f"Successfully updated narrative chart {nc.id}")
 
     log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
 
