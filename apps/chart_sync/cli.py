@@ -481,13 +481,15 @@ def _sync_narrative_charts(
             continue
 
         # Fetch merged config from source API (full config = parent + patch merged)
-        source_merged_config = source_api.get_narrative_chart(source_nc.id)
+        source_response = source_api.get_narrative_chart(source_nc.id)
+        source_merged_config = source_response["mergedConfig"]
 
         # Migrate the merged config (remap variable IDs from source to target)
         migrated_config = source_nc.migrate_merged_config(source_merged_config, source_session, target_session)
 
         # For comparison, get target's merged config via API
-        target_merged_config = target_api.get_narrative_chart(target_nc.id)
+        target_response = target_api.get_narrative_chart(target_nc.id)
+        target_merged_config = target_response["mergedConfig"]
 
         if migrated_config == target_merged_config:
             log.info(
