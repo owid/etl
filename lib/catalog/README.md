@@ -19,7 +19,7 @@ graph TB
 
 etl -->|reads| snapshot[upstream datasets]
 etl -->|generates| s3[data catalog]
-catalog[owid-catalog-py] -->|queries| s3
+catalog[owid-catalog] -->|queries| s3
 ```
 
 We would love feedback on how we can make this library and overall data catalog better. Feel free to send us an email at info@ourworldindata.org, or start a [discussion](https://github.com/owid/etl/discussions) on Github.
