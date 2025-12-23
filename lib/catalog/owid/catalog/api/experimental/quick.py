@@ -24,7 +24,7 @@ Examples:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Literal, cast
+from typing import TYPE_CHECKING, Iterable, Literal
 
 import pandas as pd
 
@@ -287,7 +287,7 @@ def _quick_indicator(name: str, *, latest: bool = True) -> "Table":
 
     # Load variable data and convert to Table
     variable = result.data
-    return cast(Table, variable.to_frame())
+    return variable.to_frame()
 
 
 def _quick_chart(name: str) -> pd.DataFrame:
