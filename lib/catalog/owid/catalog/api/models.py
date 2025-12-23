@@ -341,45 +341,45 @@ class ResultSet(BaseModel, Generic[T]):
     for backwards compatibility.
 
     Attributes:
-        results: List of result objects.
+        items: List of result objects.
         query: The query that produced these results.
-        total: Total number of results (may be more than len(results)).
+        total: Total number of results (may be more than len(items)).
     """
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
 
-    results: list[T]
+    items: list[T]
     query: str = ""
     total: int = 0
 
     def model_post_init(self, __context: Any) -> None:
-        """Set total to length of results if not provided."""
+        """Set total to length of items if not provided."""
         if self.total == 0:
-            self.total = len(self.results)
+            self.total = len(self.items)
 
     def __iter__(self) -> Iterator[T]:  # type: ignore[override]
-        """Iterate over results, not model fields."""
-        return iter(self.results)
+        """Iterate over items, not model fields."""
+        return iter(self.items)
 
     def __len__(self) -> int:
-        return len(self.results)
+        return len(self.items)
 
     def __getitem__(self, index: int) -> T:
-        return self.results[index]
+        return self.items[index]
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
-        if not self.results:
-            return f"ResultSet(query={self.query!r}, total=0, results=[])"
+        if not self.items:
+            return f"ResultSet(query={self.query!r}, total=0, items=[])"
 
         # Convert to DataFrame for nice tabular display
         df = self.to_frame()
 
         # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"ResultSet(query={self.query!r}, total={self.total}, results=[])"
+            return f"ResultSet(query={self.query!r}, total={self.total}, items=[])"
         else:
             df_str = str(df)
 
@@ -388,7 +388,7 @@ class ResultSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"ResultSet\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
+        header = f"ResultSet\n.query={self.query!r}\n.total={self.total}\n.items:\n    {indented_df}"
         return header
 
     def __str__(self) -> str:
@@ -397,8 +397,8 @@ class ResultSet(BaseModel, Generic[T]):
 
     def _repr_html_(self) -> str:
         """Display as HTML table in Jupyter notebooks."""
-        if not self.results:
-            return f"<p>ResultSet(query={self.query!r}, total=0, results=[])</p>"
+        if not self.items:
+            return f"<p>ResultSet(query={self.query!r}, total=0, items=[])</p>"
 
         df = self.to_frame()
         df_html = df._repr_html_()
@@ -409,7 +409,7 @@ class ResultSet(BaseModel, Generic[T]):
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
     <li><strong>.total</strong>: {self.total}</li>
-    <li><strong>.results</strong>:
+    <li><strong>.items</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
       </div>
@@ -419,17 +419,17 @@ class ResultSet(BaseModel, Generic[T]):
         return html
 
     def to_frame(self) -> pd.DataFrame:
-        """Convert results to a DataFrame.
+        """Convert items to a DataFrame.
 
         Returns:
-            DataFrame with one row per result.
+            DataFrame with one row per item.
         """
-        if not self.results:
+        if not self.items:
             return pd.DataFrame()
 
         # Convert Pydantic models to dicts
         rows = []
-        for r in self.results:
+        for r in self.items:
             if isinstance(r, BaseModel):
                 # For ChartResult, exclude large dict fields for better display
                 if isinstance(r, ChartResult):
@@ -461,14 +461,14 @@ class ResultSet(BaseModel, Generic[T]):
         from owid.catalog.api.utils import OWID_CATALOG_URI
         from owid.catalog.api.utils import CatalogFrame as CF
 
-        if not self.results:
+        if not self.items:
             return CF.create_empty()
 
         # Check result type
-        first = self.results[0]
+        first = self.items[0]
         if isinstance(first, TableResult):
             rows = []
-            for r in self.results:
+            for r in self.items:
                 rows.append(
                     {
                         "table": r.table,  # type: ignore
@@ -488,7 +488,7 @@ class ResultSet(BaseModel, Generic[T]):
 
         elif isinstance(first, IndicatorResult):
             rows = []
-            for r in self.results:
+            for r in self.items:
                 path_part, _, indicator = r.catalog_path.partition("#")  # type: ignore
                 parts = path_part.split("/")
 

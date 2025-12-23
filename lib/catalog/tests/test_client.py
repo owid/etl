@@ -348,28 +348,28 @@ class TestResultSet:
     """Test the ResultSet container."""
 
     def test_iteration(self):
-        results = ResultSet(results=[1, 2, 3], query="test")
+        results = ResultSet(items=[1, 2, 3], query="test")
 
         items = list(results)
         assert items == [1, 2, 3]
 
     def test_indexing(self):
-        results = ResultSet(results=["a", "b", "c"], query="test")
+        results = ResultSet(items=["a", "b", "c"], query="test")
 
         assert results[0] == "a"
         assert results[1] == "b"
         assert results[2] == "c"
 
     def test_len(self):
-        results = ResultSet(results=[1, 2, 3, 4, 5], query="test")
+        results = ResultSet(items=[1, 2, 3, 4, 5], query="test")
         assert len(results) == 5
 
     def test_total_auto_set(self):
-        results = ResultSet(results=[1, 2, 3], query="test")
+        results = ResultSet(items=[1, 2, 3], query="test")
         assert results.total == 3
 
     def test_total_explicit(self):
-        results = ResultSet(results=[1, 2, 3], query="test", total=100)
+        results = ResultSet(items=[1, 2, 3], query="test", total=100)
         assert results.total == 100
 
 

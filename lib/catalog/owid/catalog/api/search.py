@@ -141,7 +141,7 @@ class SiteSearchAPI:
             )
 
         return ResultSet(
-            results=results,
+            items=results,
             query=query,
             total=data.get("totalCount", len(results)),
         )
@@ -190,7 +190,7 @@ class SiteSearchAPI:
             )
 
         return ResultSet(
-            results=results,
+            items=results,
             query=query,
             total=data.get("totalCount", len(results)),
         )

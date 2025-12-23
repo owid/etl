@@ -111,7 +111,9 @@ make watch
       - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
       - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
       - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
-      - **Breaking changes**: `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+      - **Breaking changes**:
+        - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+        - `ResultSet.results` renamed to `ResultSet.items` for clarity
       - **Python 3.14 support**: Added support for Python 3.14
     - **Others**
       - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings

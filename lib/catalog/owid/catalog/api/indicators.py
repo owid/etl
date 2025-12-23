@@ -117,7 +117,7 @@ class IndicatorsAPI:
             )
 
         return ResultSet(
-            results=results,
+            items=results,
             query=query,
             total=data.get("total_results", len(results)),
         )

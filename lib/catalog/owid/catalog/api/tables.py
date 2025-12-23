@@ -226,7 +226,7 @@ class TablesAPI:
         )
 
         return ResultSet(
-            results=results,
+            items=results,
             query=query,
             total=len(results),
         )
