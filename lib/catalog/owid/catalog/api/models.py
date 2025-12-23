@@ -515,7 +515,7 @@ class ResponseSet(BaseModel, Generic[T]):
     Attributes:
         results: List of result objects.
         query: The query that produced these results.
-        total: Total number of results (may be more than len(results)).
+        limit: Total number of results (may be more than len(results)).
     """
 
     model_config = ConfigDict(
@@ -524,7 +524,7 @@ class ResponseSet(BaseModel, Generic[T]):
 
     results: list[T]
     query: str = ""
-    total: int = 0
+    limit: int = 0
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
@@ -537,9 +537,9 @@ class ResponseSet(BaseModel, Generic[T]):
         return f"ResponseSet[{type_name}]"
 
     def model_post_init(self, __context: Any) -> None:
-        """Set total to length of results if not provided."""
-        if self.total == 0:
-            self.total = len(self.results)
+        """Set limit to length of results if not provided."""
+        if self.limit == 0:
+            self.limit = len(self.results)
 
     def __iter__(self) -> Iterator[T]:  # type: ignore[override]
         """Iterate over results, not model fields."""
@@ -556,14 +556,14 @@ class ResponseSet(BaseModel, Generic[T]):
         type_display = self._get_type_display()
 
         if not self.results:
-            return f"{type_display}(query={self.query!r}, total=0, results=[])"
+            return f"{type_display}(query={self.query!r}, limit=0, results=[])"
 
         # Convert to DataFrame for nice tabular display
         df = self.to_frame()
 
         # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"{type_display}(query={self.query!r}, total={self.total}, results=[])"
+            return f"{type_display}(query={self.query!r}, limit={self.limit}, results=[])"
         else:
             df_str = str(df)
 
@@ -572,7 +572,7 @@ class ResponseSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"{type_display}\n.query={self.query!r}\n.total={self.total}\n.results:\n    {indented_df}"
+        header = f"{type_display}\n.query={self.query!r}\n.limit={self.limit}\n.results:\n    {indented_df}"
 
         # Add helper tip at the end
         tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
@@ -587,7 +587,7 @@ class ResponseSet(BaseModel, Generic[T]):
         type_display = self._get_type_display()
 
         if not self.results:
-            return f"<p>{type_display}(query={self.query!r}, total=0, results=[])</p>"
+            return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
 
         df = self.to_frame()
         df_html = df._repr_html_()
@@ -597,7 +597,7 @@ class ResponseSet(BaseModel, Generic[T]):
   <p><strong>{type_display}</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
-    <li><strong>.total</strong>: {self.total}</li>
+    <li><strong>.limit</strong>: {self.limit}</li>
     <li><strong>.results</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
@@ -742,7 +742,7 @@ class ResponseSet(BaseModel, Generic[T]):
         return ResponseSet(
             results=filtered_results,
             query=self.query,
-            total=len(filtered_results),
+            limit=len(filtered_results),
         )
 
     def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
@@ -780,7 +780,7 @@ class ResponseSet(BaseModel, Generic[T]):
         return ResponseSet(
             results=sorted_results,
             query=self.query,
-            total=self.total,
+            limit=self.limit,
         )
 
     def latest(self, by: str = "version") -> T:
@@ -855,7 +855,7 @@ class ResponseSet(BaseModel, Generic[T]):
             return ResponseSet(
                 results=self.results[:n],
                 query=self.query,
-                total=self.total,
+                limit=self.limit,
             )
 
     def experimental_download_all(

@@ -130,7 +130,7 @@ class IndicatorsAPI:
         return ResponseSet(
             results=results,
             query=query,
-            total=data.get("total_results", len(results)),
+            limit=data.get("total_results", len(results)),
         )
 
     def fetch(self, path: str, *, load_data: bool = False) -> IndicatorResult:

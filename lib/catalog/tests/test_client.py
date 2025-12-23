@@ -364,13 +364,13 @@ class TestResponseSet:
         results = ResponseSet(results=[1, 2, 3, 4, 5], query="test")
         assert len(results) == 5
 
-    def test_total_auto_set(self):
+    def test_limit_auto_set(self):
         results = ResponseSet(results=[1, 2, 3], query="test")
-        assert results.total == 3
+        assert results.limit == 3
 
-    def test_total_explicit(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", total=100)
-        assert results.total == 100
+    def test_limit_explicit(self):
+        results = ResponseSet(results=[1, 2, 3], query="test", limit=100)
+        assert results.limit == 100
 
     def test_filter(self):
         """Test filtering results with a predicate."""
