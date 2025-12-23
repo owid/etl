@@ -802,7 +802,7 @@ class ResponseSet(BaseModel, Generic[T]):
         Example:
             >>> # For TableResult - use version (default)
             >>> latest_table = results.latest()
-            >>> table = latest_table.data
+            >>> tb = latest_table.data
             >>>
             >>> # For IndicatorResult - use version (parsed from catalog_path)
             >>> latest_indicator = results.latest()
@@ -841,7 +841,7 @@ class ResponseSet(BaseModel, Generic[T]):
         Example:
             >>> # Get first result
             >>> first_result = results.first()
-            >>> table = first_result.data
+            >>> tb = first_result.data
             >>>
             >>> # Get first 5 results
             >>> top_five = results.first(5)
@@ -876,7 +876,7 @@ class ResponseSet(BaseModel, Generic[T]):
 
         Example:
             >>> results = client.tables.search("worldbank/wdi")
-            >>> tables = results.experimental_download_all(parallel=True, max_workers=4)
+            >>> tbs = results.experimental_download_all(parallel=True, max_workers=4)
             >>> # Check which downloads succeeded
             >>> successful = {k: v for k, v in tables.items() if not isinstance(v, Exception)}
             >>> failed = {k: v for k, v in tables.items() if isinstance(v, Exception)}

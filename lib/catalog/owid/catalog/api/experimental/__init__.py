@@ -21,15 +21,17 @@ The experimental namespace follows the streamlit convention: experimental featur
 are clearly marked and easy to find, allowing rapid iteration while maintaining
 API stability for core features.
 
-Examples:
-    >>> from owid.catalog.api.experimental import quick
-    >>> table = quick("population")  # Search and download with fuzzy matching
+Example:
+    ```python
+    from owid.catalog.api.experimental import quick
+    table = quick("population")  # Search and download with fuzzy matching
 
-    >>> from owid.catalog.api.experimental import cached_client
-    >>> client = cached_client(ttl="7d")  # Enable caching with 7-day TTL
+    from owid.catalog.api.experimental import cached_client
+    client = cached_client(ttl="7d")  # Enable caching with 7-day TTL
 
-    >>> from owid.catalog.api.experimental import bulk
-    >>> tables = bulk.download(["un/un_wpp/population", "worldbank/wdi/gdp"])
+    from owid.catalog.api.experimental import bulk
+    tables = bulk.download(["un/un_wpp/population", "worldbank/wdi/gdp"])
+    ```
 """
 
 # Version marker for experimental features

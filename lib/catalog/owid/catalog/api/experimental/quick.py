@@ -10,21 +10,21 @@ Functions:
 Examples:
     >>> # Quick fuzzy search - returns latest version's data
     >>> from owid.catalog.api.experimental import quick
-    >>> table = quick("population")  # Finds and loads latest table
+    >>> tb = quick("population")  # Finds and loads latest table
 
     >>> # Search for indicators (returns single-column Table)
-    >>> indicator_table = quick("population", kind="indicator")
+    >>> tb_ind = quick("population", kind="indicator")
 
     >>> # Direct path access (auto-detects type using CatalogPath)
     >>> from owid.catalog.api.experimental import get
-    >>> table = get("garden/un/2024-07-12/un_wpp/population")
-    >>> indicator_table = get("garden/un/2024-07-12/un_wpp/population#population")
-    >>> chart_data = get("chart:life-expectancy")
+    >>> tb = get("garden/un/2024-07-12/un_wpp/population")
+    >>> tb_ind = get("garden/un/2024-07-12/un_wpp/population#population")
+    >>> df_chart = get("chart:life-expectancy")
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Literal
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 
@@ -43,7 +43,6 @@ def quick(
     version: str | None = None,
     dataset: str | None = None,
     channel: str | None = None,
-    channels: Iterable[str] = ("garden",),
     latest: bool = True,
     match: Literal["exact", "contains", "regex", "fuzzy"] = "fuzzy",
     fuzzy_threshold: int = 70,
@@ -70,7 +69,6 @@ def quick(
         version: Filter by specific version (e.g., "2024-01-15")
         dataset: Filter by dataset name
         channel: Filter by channel (e.g., "garden", "grapher")
-        channels: Channels to search (default: garden only)
         latest: If True, return latest version automatically (default: True)
         match: Matching mode (default: "fuzzy" for typo-tolerance)
             - "exact": Exact string match
@@ -88,27 +86,29 @@ def quick(
     Raises:
         ValueError: If no results found or multiple results found with latest=False
 
-    Examples:
+    Example:
+        ```python
         >>> # Simplest case - fuzzy search for table
         >>> tb = quick("population")
 
         >>> # Search for indicator (variable)
-        >>> variable = quick("population", kind="indicator")
+        >>> tb_ind = quick("population", kind="indicator")
 
         >>> # Search for chart
         >>> df = quick("life-expectancy", kind="chart")
 
         >>> # With namespace filter
-        >>> table = quick("gdp", namespace="worldbank")
+        >>> quick("wdi", namespace="worldbank_wdi")
 
         >>> # Exact match (no fuzzy tolerance)
-        >>> table = quick("population", match="exact")
+        >>> tb = quick("population", match="exact")
 
         >>> # Get specific version (not latest)
-        >>> table = quick("population", version="2024-12-01", latest=False)
+        >>> tb = quick("population", version="2024-12-01", latest=False)
 
-        >>> # Search multiple channels
-        >>> table = quick("co2", channels=["garden", "grapher"])
+        >>> # Search in specific channel
+        >>> tb = quick("co2", channel="grapher")
+        ```
 
     Future improvements:
         - Better communicate the ID/path of the returned resource
@@ -121,7 +121,6 @@ def quick(
             version=version,
             dataset=dataset,
             channel=channel,
-            channels=channels,
             latest=latest,
             match=match,
             fuzzy_threshold=fuzzy_threshold,
@@ -157,18 +156,20 @@ def get(path: str) -> "Table" | pd.DataFrame:
     Raises:
         ValueError: If path is invalid, uses unexpected prefix, or resource not found
 
-    Examples:
-        >>> # Get table
-        >>> table = get("garden/un/2024-07-12/un_wpp/population")
+    Example:
+        ```python
+        # Get table
+        tb = get("garden/un/2024-07-12/un_wpp/population")
 
-        >>> # Get indicator as single-column Table
-        >>> table = get("garden/un/2024-07-12/un_wpp/population#population")
+        # Get indicator as single-column Table
+        tb = get("garden/un/2024-07-12/un_wpp/population#population")
 
-        >>> # Get chart data
-        >>> chart_data = get("chart:life-expectancy")
+        # Get chart data
+        chart_data = get("chart:life-expectancy")
 
-        >>> # Grapher channel table
-        >>> table = get("grapher/who/2024-01-15/gho/life_expectancy")
+        # Grapher channel table
+        tb = get("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
+        ```
     """
     # Create client (reuses singleton internally)
     client = Client()
@@ -213,7 +214,6 @@ def _quick_table(
     version: str | None = None,
     dataset: str | None = None,
     channel: str | None = None,
-    channels: Iterable[str] = ("garden",),
     latest: bool = True,
     match: Literal["exact", "contains", "regex", "fuzzy"] = "fuzzy",
     fuzzy_threshold: int = 70,
@@ -229,7 +229,6 @@ def _quick_table(
         version=version,
         dataset=dataset,
         channel=channel,
-        channels=channels,
         case=case,
         match=match,
         fuzzy_threshold=fuzzy_threshold,

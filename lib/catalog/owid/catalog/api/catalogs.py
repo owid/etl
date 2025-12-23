@@ -160,15 +160,20 @@ class CatalogMixin:
         Returns:
             CatalogFrame with matching tables, sorted by relevance if match="fuzzy".
 
-        Examples:
-            >>> # Exact match (default)
-            >>> catalog.find(table="population")
-            >>> # Substring search
-            >>> catalog.find(table="pop", match="contains")
-            >>> # Regex pattern
-            >>> catalog.find(table="pop.*density", match="regex")
-            >>> # Fuzzy typo-tolerant search
-            >>> catalog.find(table="populaton", match="fuzzy", fuzzy_threshold=80)
+        Example:
+            ```python
+            # Exact match (default)
+            catalog.find(table="population")
+
+            # Substring search
+            catalog.find(table="pop", match="contains")
+
+            # Regex pattern
+            catalog.find(table="pop.*density", match="regex")
+
+            # Fuzzy typo-tolerant search
+            catalog.find(table="populaton", match="fuzzy", fuzzy_threshold=80)
+            ```
         """
         criteria: npt.ArrayLike = np.ones(len(self.frame), dtype=bool)
         scores: npt.NDArray[np.float64] | None = None
