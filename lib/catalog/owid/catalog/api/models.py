@@ -835,15 +835,12 @@ class ResponseSet(BaseModel, Generic[T]):
             >>> latest_table = results.latest()
             >>> tb = latest_table.data
 
-            >>> # For IndicatorResult - use version (parsed from catalog_path)
+            >>> # For IndicatorResult - use version (default)
             >>> latest_indicator = results.latest()
-
-            >>> # For PageSearchResult - use published_at
-            >>> latest_article = results.latest(by='published_at')
-
-            >>> # For IndicatorResult - sort by relevance score
-            >>> best_match = results.latest(by='score')
             ```
+
+        Note:
+            Support for charts is coming soon.
         """
         if not self.results:
             raise ValueError("No results available to get latest from")
