@@ -221,6 +221,42 @@ steps:
   data://grapher/wb/2025-07-02/poverty_projections:
     - data://garden/wb/2025-07-02/poverty_projections
 
+      # Luxembourg Income Study (legacy)
+  data://meadow/lis/2025-07-23/luxembourg_income_study:
+    - snapshot://lis/2025-07-23/lis_keyvars.csv
+    - snapshot://lis/2025-07-23/lis_abs_poverty.csv
+    - snapshot://lis/2025-07-23/lis_distribution.csv
+    - snapshot://lis/2025-07-23/lis_keyvars_adults.csv
+    - snapshot://lis/2025-07-23/lis_abs_poverty_adults.csv
+    - snapshot://lis/2025-07-23/lis_distribution_adults.csv
+    - snapshot://lis/2024-06-13/lis_percentiles.csv
+    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/lis/2025-07-23/luxembourg_income_study:
+    - data://meadow/lis/2025-07-23/luxembourg_income_study
+  data://grapher/lis/2025-07-23/luxembourg_income_study:
+    - data://garden/lis/2025-07-23/luxembourg_income_study
+  data://explorers/lis/latest/luxembourg_income_study:
+    - data://garden/lis/2025-07-23/luxembourg_income_study
+
+      # Luxembourg Income Study (legacy)
+  data://meadow/lis/2025-07-23/luxembourg_income_study:
+    - snapshot://lis/2025-07-23/lis_keyvars.csv
+    - snapshot://lis/2025-07-23/lis_abs_poverty.csv
+    - snapshot://lis/2025-07-23/lis_distribution.csv
+    - snapshot://lis/2025-07-23/lis_keyvars_adults.csv
+    - snapshot://lis/2025-07-23/lis_abs_poverty_adults.csv
+    - snapshot://lis/2025-07-23/lis_distribution_adults.csv
+    - snapshot://lis/2024-06-13/lis_percentiles.csv
+    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/lis/2025-07-23/luxembourg_income_study:
+    - data://meadow/lis/2025-07-23/luxembourg_income_study
+  data://grapher/lis/2025-07-23/luxembourg_income_study:
+    - data://garden/lis/2025-07-23/luxembourg_income_study
+  data://explorers/lis/latest/luxembourg_income_study:
+    - data://garden/lis/2025-07-23/luxembourg_income_study
+
   # Global Multidimensional Poverty Index
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
     - snapshot://ophi/2024-10-28/multidimensional_poverty_index_cme.csv
