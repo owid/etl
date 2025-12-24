@@ -17,14 +17,8 @@ def run() -> None:
     # Ensure date column is datetime
     tb["date"] = tb["date"].astype("datetime64[ns]")
 
-    # Ensure exchange_rate is float
-    tb["exchange_rate"] = tb["exchange_rate"].astype(float)
-
-    # Add metadata origins
-    tb["exchange_rate"].metadata.origins = [snap.metadata.origin]
-
     # Format table with proper index and short name
-    tb = tb.format(["date"], short_name="twd_usd_exchange_rate")
+    tb = tb.format(["date"])
 
     # Save outputs.
     ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True)
