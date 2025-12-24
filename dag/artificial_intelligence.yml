@@ -222,3 +222,13 @@ steps:
     - data://meadow/us_census_bureau/2025-11-17/datacenter_construction
   data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
     - data://garden/us_census_bureau/2025-11-17/datacenter_construction
+
+
+  # IEA Energy Consumption by AI dataset
+  data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea:
+    - snapshot://artificial_intelligence/2025-11-07/energy_ai_iea.xlsx
+  data://garden/artificial_intelligence/2025-11-07/energy_ai_iea:
+    - data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea
+    - data://garden/energy/2025-06-27/electricity_mix
+  data://grapher/artificial_intelligence/2025-11-07/energy_ai_iea:
+    - data://garden/artificial_intelligence/2025-11-07/energy_ai_iea
