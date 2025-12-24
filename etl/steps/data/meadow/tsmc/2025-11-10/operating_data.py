@@ -9,11 +9,16 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def parse_quarters_from_row(df: pd.DataFrame, row_idx: int) -> list:
+def parse_quarters_from_row(tb: Table, row_idx: int) -> list:
     """Parse quarter columns from header row."""
+    # Assert first column is empty (NaN) for the quarters row
+    assert pd.isna(
+        tb.iloc[row_idx, 0]
+    ), f"Expected first column to be empty in quarters row, got: {tb.iloc[row_idx, 0]}"
+
     quarters = []
-    for col in df.columns[1:]:  # Skip first column
-        val = df.iloc[row_idx, col]
+    for col in tb.columns[1:]:  # Skip first column
+        val = tb.iloc[row_idx, col]
         if pd.notna(val) and isinstance(val, str) and "Q" in val:
             quarters.append(val)
     return quarters

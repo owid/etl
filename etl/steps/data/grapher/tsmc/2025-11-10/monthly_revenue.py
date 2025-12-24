@@ -18,8 +18,8 @@ def run() -> None:
     tb_monthly["country"] = "Taiwan"
     tb_yearly["country"] = "Taiwan"
 
-    tb_monthly = tb_monthly.set_index(["country", "date"])
-    tb_yearly = tb_yearly.set_index(["country", "year"])
+    tb_monthly = tb_monthly.format(["country", "date"])
+    tb_yearly = tb_yearly.format(["country", "year"])
 
     # Save outputs.
     ds_grapher = paths.create_dataset(

@@ -41,7 +41,7 @@ YEAR_URLS = {
 }
 
 
-def scrape_exchange_rate_data(url: str) -> pd.DataFrame:
+def scrape_exchange_rate_data(url: str) -> list:
     """Scrape exchange rate data from a CBC Taiwan webpage.
 
     Parameters
@@ -51,8 +51,8 @@ def scrape_exchange_rate_data(url: str) -> pd.DataFrame:
 
     Returns
     -------
-    pd.DataFrame
-        DataFrame with columns: date, exchange_rate
+    list
+        List of dicts with keys: date, exchange_rate
     """
     import requests
 
@@ -86,7 +86,7 @@ def scrape_exchange_rate_data(url: str) -> pd.DataFrame:
                 except (ValueError, AttributeError):
                     continue
 
-    return pd.DataFrame(rows)
+    return rows
 
 
 @click.command()
@@ -106,10 +106,10 @@ def main(upload: bool) -> None:
     for year, url in sorted(YEAR_URLS.items()):
         print(f"Scraping data for {year}...")
         try:
-            df = scrape_exchange_rate_data(url)
-            if not df.empty:
-                all_data.append(df)
-                print(f"  Found {len(df)} records for {year}")
+            rows = scrape_exchange_rate_data(url)
+            if rows:
+                all_data.extend(rows)
+                print(f"  Found {len(rows)} records for {year}")
             else:
                 print(f"  No data found for {year}")
         except Exception as e:
@@ -120,7 +120,7 @@ def main(upload: bool) -> None:
     if not all_data:
         raise ValueError("No exchange rate data could be scraped")
 
-    df_combined = pd.concat(all_data, ignore_index=True)
+    df_combined = pd.DataFrame(all_data)
     df_combined = df_combined.sort_values("date").reset_index(drop=True)
 
     print(f"\nTotal records scraped: {len(df_combined)}")
