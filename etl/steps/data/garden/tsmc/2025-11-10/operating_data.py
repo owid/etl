@@ -18,9 +18,10 @@ def run() -> None:
     mask = ~tb["category"].isin(["shipments", "capacity"])
     tb.loc[mask, "value"] = tb.loc[mask, "value"] * 100
 
+    tb["metric"] = tb["metric"].replace({"Smartphone": "Smartphones"})
+
     # Add country column for OWID's grapher
     tb["country"] = "Taiwan"
-
     # Set index with country
     tb = tb.format(["country", "date", "category", "metric"])
 
