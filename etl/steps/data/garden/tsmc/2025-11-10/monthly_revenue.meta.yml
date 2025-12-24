@@ -20,21 +20,21 @@ tables:
   tsmc_monthly_revenue:
     variables:
       revenue_usd:
-        title: TSMC monthly revenue
+        title: TSMC's monthly revenue
         unit: US dollars
         short_unit: $
-        description_short: Taiwan Semiconductor Manufacturing Company’s consolidated monthly revenue in US dollars, including its subsidiaries. TSMC designs and manufactures advanced computer chips for other companies, acting as the world’s leading dedicated semiconductor foundry and producing the cutting-edge processors used across AI, smartphones, computers, and many other modern technologies.
-        description_processing: We converted values from New Taiwan dollars to United States dollars using monthly average exchange rates from the Central Bank of the Republic of China (Taiwan).
+        description_short: Taiwan Semiconductor Manufacturing Company’s (TSMC) consolidated monthly revenue in US dollars, including its subsidiaries. TSMC designs and manufactures advanced computer chips for other companies, acting as the world’s leading dedicated semiconductor foundry and producing the cutting-edge processors used across AI, smartphones, computers, and many other modern technologies.
+        description_processing: We converted values from New Taiwan dollars to US dollars using monthly average exchange rates from the Central Bank of the Republic of China (Taiwan).
         display:
           numDecimalPlaces: 0
 
   tsmc_yearly_revenue:
     variables:
       revenue_usd:
-        title: TSMC annual revenue
+        title: TSMC's annual revenue
         unit: US dollars
         short_unit: $
-        description_short: Taiwan Semiconductor Manufacturing Company’s consolidated annual revenue in US dollars, including its subsidiaries. TSMC designs and manufactures advanced computer chips for other companies, acting as the world’s leading dedicated semiconductor foundry and producing the cutting-edge processors used across AI, smartphones, computers, and many other modern technologies.
-        description_processing: We converted values from New Taiwan dollars to United States dollars using annual average exchange rates from the Central Bank of the Republic of China (Taiwan).
+        description_short: Taiwan Semiconductor Manufacturing Company’s (TSMC) consolidated annual revenue in US dollars, including its subsidiaries. TSMC designs and manufactures advanced computer chips for other companies, acting as the world’s leading dedicated semiconductor foundry and producing the cutting-edge processors used across AI, smartphones, computers, and many other modern technologies.
+        description_processing: We converted values from New Taiwan dollars to US dollars using annual average exchange rates from the Central Bank of the Republic of China (Taiwan).
         display:
           numDecimalPlaces: 0
