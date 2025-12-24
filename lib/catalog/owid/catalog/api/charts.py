@@ -104,9 +104,7 @@ class ChartsAPI:
             timeout=timeout or self._client.timeout,
         )
 
-    def fetch(
-        self, slug_or_url: str, *, load_data: bool = False, timeout: int | None = None
-    ) -> ChartResult:
+    def fetch(self, slug_or_url: str, *, load_data: bool = False, timeout: int | None = None) -> ChartResult:
         """Fetch a chart with all its metadata and config.
 
         Args:

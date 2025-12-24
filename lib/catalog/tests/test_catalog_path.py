@@ -434,7 +434,17 @@ class TestAdditionalCoverage:
 
     def test_all_channels_valid(self) -> None:
         """All defined channels are accepted."""
-        channels = ["snapshot", "garden", "meadow", "grapher", "open_numbers", "examples", "explorers", "external", "multidim"]
+        channels = [
+            "snapshot",
+            "garden",
+            "meadow",
+            "grapher",
+            "open_numbers",
+            "examples",
+            "explorers",
+            "external",
+            "multidim",
+        ]
         for channel in channels:
             p = CatalogPath.from_str(f"{channel}/ns/2024/ds")
             assert p.channel == channel
