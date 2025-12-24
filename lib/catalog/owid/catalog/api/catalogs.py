@@ -368,11 +368,15 @@ class ETLCatalog(CatalogMixin):
     """Remote HTTP catalog for ETL data."""
 
     uri: str
+    timeout: int
 
-    def __init__(self, uri: str = OWID_CATALOG_URI, channels: Iterable[CHANNEL] = ("garden",)) -> None:
+    def __init__(
+        self, uri: str = OWID_CATALOG_URI, channels: Iterable[CHANNEL] = ("garden",), timeout: int = 30
+    ) -> None:
         self.uri = uri
         self.channels = channels
-        self.metadata = self._read_metadata(self.uri + "catalog.meta.json")
+        self.timeout = timeout
+        self.metadata = self._read_metadata(self.uri + "catalog.meta.json", timeout=timeout)
         if self.metadata["format_version"] > OWID_CATALOG_VERSION:
             raise PackageUpdateRequired(
                 f"library supports api version {OWID_CATALOG_VERSION}, "
@@ -388,9 +392,9 @@ class ETLCatalog(CatalogMixin):
         return self.frame[["namespace", "version", "dataset"]].drop_duplicates()
 
     @staticmethod
-    def _read_metadata(uri: str) -> dict[str, Any]:
+    def _read_metadata(uri: str, timeout: int = 30) -> dict[str, Any]:
         """Read the metadata JSON blob for this repo."""
-        resp = requests.get(uri)
+        resp = requests.get(uri, timeout=timeout)
         resp.raise_for_status()
         return cast(dict[str, Any], resp.json())
 
