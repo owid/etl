@@ -3,7 +3,7 @@ definitions:
   common:
     processing_level: minor
     display: &common_display
-      tolerance: 12
+      tolerance: 10
     presentation:
       topic_tags:
         - Poverty
