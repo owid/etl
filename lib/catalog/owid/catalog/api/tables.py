@@ -5,12 +5,14 @@
 #
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Literal, cast
 
 from owid.catalog.api.catalogs import ETLCatalog
 from owid.catalog.api.models import ResponseSet, TableResult
 from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI
 from owid.catalog.core import CatalogPath
+from owid.catalog.core.paths import VALID_CHANNELS
 from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
@@ -57,18 +59,7 @@ class TablesAPI:
         """Get or create the remote catalog with all channels loaded."""
         if self._catalog is None:
             # Load all available channels
-            all_channels: list[CHANNEL] = [
-                "snapshot",
-                "garden",
-                "meadow",
-                "grapher",
-                "open_numbers",
-                "examples",
-                "explorers",
-                "external",
-                "multidim",
-            ]
-            self._catalog = ETLCatalog(channels=all_channels)
+            self._catalog = ETLCatalog(channels=VALID_CHANNELS)
 
         return self._catalog
 
@@ -199,8 +190,6 @@ class TablesAPI:
         for _, row in matches.iterrows():
             dimensions = row.get("dimensions", [])
             if isinstance(dimensions, str):
-                import json
-
                 dimensions = json.loads(dimensions)
 
             # Handle formats - could be list, numpy array, or None
@@ -312,8 +301,8 @@ class TablesAPI:
         Example:
             ```python
             tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
-            print(table.head())
-            print(table.metadata.title)
+            print(tb.head())
+            print(tb.metadata.title)
             ```
         """
         return self.fetch(path).data
