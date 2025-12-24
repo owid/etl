@@ -1,4 +1,4 @@
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0rc0"
 
 from owid.catalog import api, processing, utils
 from owid.catalog.api import Client

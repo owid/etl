@@ -86,7 +86,7 @@ make watch
 
 ## Changelog
 
-### `v1.0.0rc1` (Release Candidate)
+### `v1.0.0rc0` (Release Candidate)
   - **Highlights**
     - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
     - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
