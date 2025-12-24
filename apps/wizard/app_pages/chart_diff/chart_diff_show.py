@@ -620,11 +620,8 @@ class ChartDiffShow:
         for nc in narrative_charts:
             with st.container(border=True):
                 # Get merged configs from both environments via API
-                try:
-                    source_nc = source_api.get_narrative_chart(nc.id)
-                    source_config = source_nc.get("mergedConfig", {})
-                except Exception:
-                    source_config = None
+                source_nc = source_api.get_narrative_chart(nc.id)
+                source_config = source_nc.get("mergedConfig", {})
 
                 try:
                     target_nc = target_api.get_narrative_chart(nc.id)
