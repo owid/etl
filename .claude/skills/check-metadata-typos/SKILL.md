@@ -1,17 +1,20 @@
 ---
-description: Check .meta.yml and snapshot .dvc files for spelling typos using codespell
+name: check-metadata-typos
+description: Check .meta.yml and snapshot .dvc files for spelling typos using codespell. Use when user mentions typos, spelling errors, metadata quality, or wants to check metadata files for mistakes.
 ---
+
+# Check Metadata Typos
 
 Check metadata files for spelling typos using comprehensive spell checking.
 
-**First, ask the user which scope they want to check:**
+## Scope Options
+
+Ask the user which scope they want to check:
 
 1. **Current step only** - Ask the user to specify the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
 2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/{garden,meadow,grapher}/` (automatically excludes ~3,570 archived steps)
 3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/` (~7,915 files)
 4. **All metadata** - Check both ETL steps and snapshot metadata files
-
-Once the user specifies the scope, proceed with the typo check using the codespell-based approach.
 
 **Note:** Archived steps and snapshots (defined in `dag/archive/*.yml`) are automatically excluded from checking as they are no longer actively maintained.
 

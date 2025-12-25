@@ -1,22 +1,16 @@
 ---
-argument-hint: <namespace>/<old_version>/<name> [branch]
-description: End-to-end dataset update workflow using project subagents with progress tracking and a mandatory checkpoint after every step. New version is set to today's date automatically.
+name: update-dataset
+description: End-to-end dataset update workflow with PR creation, snapshot, meadow, garden, and grapher steps. Use when user wants to update a dataset, refresh data, run ETL update, or mentions updating dataset versions.
 ---
 
-# Update dataset (PR → snapshot → steps → grapher)
+# Update Dataset (PR → snapshot → steps → grapher)
 
-Use this command to run a complete dataset update with Claude Code subagents, keep a live progress checklist, and pause for approval at a checkpoint **after every numbered workflow step** before continuing.
-
-## Context probes
-
-- Current branch: !`git branch --show-current`
+Use this skill to run a complete dataset update with Claude Code subagents, keep a live progress checklist, and pause for approval at a checkpoint **after every numbered workflow step** before continuing.
 
 ## Inputs
 
 - `<namespace>/<old_version>/<name>`
 - Get `<new_version>` as today's date by running `date -u +"%Y-%m-%d"`
-
-
 
 Optional trailing args:
 - branch: The working branch name (defaults to current branch)
@@ -98,7 +92,7 @@ You MUST:
 
 ## Guardrails and tips
 
-- ⚠️ Never return empty tables or comment out logic as a workaround — fix the parsing/transformations instead.
+- Never return empty tables or comment out logic as a workaround — fix the parsing/transformations instead.
 - Column name changes: update garden processing code and metadata YAMLs (garden/grapher) to match schema changes.
 - Indexing: avoid leaking index columns from `reset_index()`; format tables with `tb.format(["country", "year"])` as appropriate.
 - Metadata validation errors are guidance — update YAML to add/remove variables as indicated.
@@ -114,13 +108,13 @@ You MUST:
 ## Example usage
 
 - Minimal catalog URI with explicit old version:
-  - `/update-dataset data://snapshot/irena/2024-11-15/renewable_power_generation_costs 2023-11-15 update-irena-costs`
+  - `update-dataset data://snapshot/irena/2024-11-15/renewable_power_generation_costs 2023-11-15 update-irena-costs`
 
 ---
 
 ### Common issues when data structure changes
 
-- ⚠️ SILENT FAILURES WARNING: Never return empty tables or comment code as workarounds!
+- SILENT FAILURES WARNING: Never return empty tables or comment code as workarounds!
 - Column name changes: If columns are renamed/split (e.g., single cost → local currency + PPP), update:
   - Python code references in the garden step
   - Garden metadata YAML (e.g., `food_prices_for_nutrition.meta.yml`)
