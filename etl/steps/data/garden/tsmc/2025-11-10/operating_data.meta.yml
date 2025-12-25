@@ -43,48 +43,8 @@ tables:
           TSMC's annual production capacity.
           <% elif category == "shipments" %>
           TSMC's quarterly wafer shipments.
-          <% elif category == "technology" and metric == "3nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in cutting-edge AI processors and flagship smartphones.
-          <% elif category == "technology" and metric == "5nm" %>
-          The share of TSMC's revenue from << metric >> chips, widely used in flagship smartphones and AI accelerators.
-          <% elif category == "technology" and metric == "7nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in high-performance CPUs, GPUs, and mobile processors.
-          <% elif category == "technology" and metric == "10nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in mid-range mobile processors.
-          <% elif category == "technology" and metric == "16nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in GPUs, networking, and automotive applications.
-          <% elif category == "technology" and metric == "20nm" %>
-          The share of TSMC's revenue from legacy << metric >> chips.
-          <% elif category == "technology" and metric == "28nm" %>
-          The share of TSMC's revenue from << metric >> chips, widely used in automotive, IoT, and industrial applications.
-          <% elif category == "technology" and metric == "40/45nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in automotive and industrial applications.
-          <% elif category == "technology" and metric == "65nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in automotive and industrial applications.
-          <% elif category == "technology" and metric == "90nm" %>
-          The share of TSMC's revenue from << metric >> chips, used in power management and display drivers.
-          <% elif category == "technology" and metric == "0.11/0.13um" %>
-          The share of TSMC's revenue from << metric >> chips, used in long-lifecycle industrial and automotive products.
-          <% elif category == "technology" and metric == "0.15um" %>
-          The share of TSMC's revenue from << metric >> chips, used in specialized industrial and analog applications.
-          <% elif category == "technology" and metric == "0.18um" %>
-          The share of TSMC's revenue from << metric >> chips, used in power management and analog circuits.
-          <% elif category == "technology" and metric == "0.25um+" %>
-          The share of TSMC's revenue from << metric >> chips, used in specialized analog and industrial applications.
-          <% elif category == "platform" and metric == "High Performance Computing" %>
-          The share of TSMC's revenue from << metric.lower() >>, including AI accelerators and data center processors.
-          <% elif category == "platform" and metric == "Smartphones" %>
-          The share of TSMC's revenue from << metric.lower() >> processors and mobile chipsets.
-          <% elif category == "platform" and metric == "Internet of Things" %>
-          The share of TSMC's revenue from << metric.lower() >> applications, including smart home devices and wearables.
-          <% elif category == "platform" and metric == "Automotive" %>
-          The share of TSMC's revenue from << metric.lower() >> applications, including ADAS and infotainment systems.
-          <% elif category == "platform" and metric == "Digital Consumer Electronics" %>
-          The share of TSMC's revenue from << metric.lower() >> like TVs and gaming consoles.
-          <% elif category == "platform" and metric == "Others" %>
-          The share of TSMC's revenue from << metric.lower() >> not classified in major platform categories.
-          <% elif category == "geography" %>
-          The share of TSMC's revenue from << metric >>.
+          <% elif category in ["technology", "platform", "geography"] %>
+          The share of TSMC's revenue from<%- if category == "technology" and metric == "3nm" %> << metric >> chips, used in cutting-edge AI processors and flagship smartphones<%- elif category == "technology" and metric == "5nm" %> << metric >> chips, widely used in flagship smartphones and AI accelerators<%- elif category == "technology" and metric == "7nm" %> << metric >> chips, used in high-performance CPUs, GPUs, and mobile processors<%- elif category == "technology" and metric == "10nm" %> << metric >> chips, used in mid-range mobile processors<%- elif category == "technology" and metric == "16nm" %> << metric >> chips, used in GPUs, networking, and automotive applications<%- elif category == "technology" and metric == "20nm" %> legacy << metric >> chips<%- elif category == "technology" and metric == "28nm" %> << metric >> chips, widely used in automotive, IoT, and industrial applications<%- elif category == "technology" and metric == "40/45nm" %> << metric >> chips, used in automotive and industrial applications<%- elif category == "technology" and metric == "65nm" %> << metric >> chips, used in automotive and industrial applications<%- elif category == "technology" and metric == "90nm" %> << metric >> chips, used in power management and display drivers<%- elif category == "technology" and metric == "0.11/0.13um" %> << metric >> chips, used in long-lifecycle industrial and automotive products<%- elif category == "technology" and metric == "0.15um" %> << metric >> chips, used in specialized industrial and analog applications<%- elif category == "technology" and metric == "0.18um" %> << metric >> chips, used in power management and analog circuits<%- elif category == "technology" and metric == "0.25um+" %> << metric >> chips, used in specialized analog and industrial applications<%- elif category == "platform" and metric == "High Performance Computing" %> << metric.lower() >>, including AI accelerators and data center processors<%- elif category == "platform" and metric == "Smartphones" %> << metric.lower() >> processors and mobile chipsets<%- elif category == "platform" and metric == "Internet of Things" %> << metric.lower() >> applications, including smart home devices and wearables<%- elif category == "platform" and metric == "Automotive" %> << metric.lower() >> applications, including ADAS and infotainment systems<%- elif category == "platform" and metric == "Digital Consumer Electronics" %> << metric.lower() >> like TVs and gaming consoles<%- elif category == "platform" and metric == "Others" %> << metric.lower() >> not classified in major platform categories<%- elif category == "geography" %> << metric >><% endif %>.
           <% endif %>
         description_key:
           - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
@@ -93,46 +53,10 @@ tables:
             Annual production capacity measured in thousands of 12-inch equivalent wafers. Represents TSMC's total manufacturing capability across all fabrication facilities.
             <% elif category == "shipments" %>
             Quarterly wafer shipments measured in thousands of 12-inch equivalent wafers. Represents actual production output delivered to customers each quarter and is a key indicator of TSMC's production utilization.
-            <% elif category == "technology" and metric == "3nm" %>
-            Percentage of wafer revenue from << metric >> process technology. TSMC's most advanced manufacturing node, used for cutting-edge AI processors, flagship smartphone chips, and high-performance computing applications. Commands premium pricing due to extreme technical complexity.
-            <% elif category == "technology" and metric == "5nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Leading-edge node widely used in flagship smartphones, AI accelerators, and advanced server processors. Offers excellent performance and power efficiency.
-            <% elif category == "technology" and metric == "7nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Mature advanced node used in high-performance CPUs, GPUs, and mobile processors. Provides strong balance of performance, power efficiency, and manufacturing yield.
-            <% elif category == "technology" and metric == "10nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Used in mid-range mobile processors and some networking chips. Transitional node between 7nm and older technologies.
-            <% elif category == "technology" and metric == "16nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Established node used in a wide range of applications including GPUs, FPGAs, networking chips, and automotive processors.
-            <% elif category == "technology" and metric == "20nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Legacy advanced node still used in some mobile and consumer applications. Largely superseded by more advanced nodes.
-            <% elif category == "technology" and metric == "28nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Popular mature node with excellent economics. Widely used in automotive, IoT, networking, and industrial applications requiring proven reliability.
-            <% elif category == "technology" and metric == "40/45nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Established specialty node used in automotive, industrial, power management, and display driver ICs. Known for reliability and cost-effectiveness.
-            <% elif category == "technology" and metric == "65nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Mature specialty node used in automotive, industrial, microcontrollers, and power management applications.
-            <% elif category == "technology" and metric == "90nm" %>
-            Percentage of wafer revenue from << metric >> process technology. Legacy node used in specialized applications including power management, display drivers, and some automotive components.
-            <% elif category == "technology" and metric == "0.11/0.13um" %>
-            Percentage of wafer revenue from << metric >> process technology. Legacy node used in long-lifecycle products including industrial, automotive, and power management applications.
-            <% elif category == "technology" and metric == "0.15um" %>
-            Percentage of wafer revenue from << metric >> process technology. Very mature node used in specialized industrial, automotive, and analog applications requiring proven long-term reliability.
-            <% elif category == "technology" and metric == "0.18um" %>
-            Percentage of wafer revenue from << metric >> process technology. Well-established legacy node used in power management, analog circuits, sensors, and industrial applications.
-            <% elif category == "technology" and metric == "0.25um+" %>
-            Percentage of wafer revenue from << metric >> process technology. Oldest nodes used in specialized analog, power, and long-lifecycle industrial applications.
-            <% elif category == "platform" and metric == "High Performance Computing" %>
-            Percentage of net revenue from << metric.lower() >> applications. Includes AI accelerators, data center processors, graphics cards (GPUs), and workstation processors used for computationally intensive tasks.
-            <% elif category == "platform" and metric == "Smartphones" %>
-            Percentage of net revenue from << metric.lower() >> applications. Includes application processors, modems, and system-on-chip (SoC) designs for mobile devices.
-            <% elif category == "platform" and metric == "Internet of Things" %>
-            Percentage of net revenue from << metric.lower() >> applications. Includes chips for smart home devices, wearables, industrial sensors, and connected embedded systems.
-            <% elif category == "platform" and metric == "Automotive" %>
-            Percentage of net revenue from << metric.lower() >> applications. Includes chips for advanced driver-assistance systems (ADAS), infotainment, powertrain control, and autonomous driving technologies.
-            <% elif category == "platform" and metric == "Digital Consumer Electronics" %>
-            Percentage of net revenue from << metric.lower() >> applications. Includes chips for televisions, gaming consoles, digital cameras, home appliances, and other consumer devices.
-            <% elif category == "platform" and metric == "Others" %>
-            Percentage of net revenue from << metric.lower() >> applications. Includes specialized industrial, medical, and legacy product segments.
+            <% elif category == "technology" %>
+            Percentage of wafer revenue from << metric >> process technology.<%- if metric == "3nm" %> TSMC's most advanced manufacturing node, used for cutting-edge AI processors, flagship smartphone chips, and high-performance computing applications. Commands premium pricing due to extreme technical complexity<%- elif metric == "5nm" %> Leading-edge node widely used in flagship smartphones, AI accelerators, and advanced server processors. Offers excellent performance and power efficiency<%- elif metric == "7nm" %> Mature advanced node used in high-performance CPUs, GPUs, and mobile processors. Provides strong balance of performance, power efficiency, and manufacturing yield<%- elif metric == "10nm" %> Used in mid-range mobile processors and some networking chips. Transitional node between 7nm and older technologies<%- elif metric == "16nm" %> Established node used in a wide range of applications including GPUs, FPGAs, networking chips, and automotive processors<%- elif metric == "20nm" %> Legacy advanced node still used in some mobile and consumer applications. Largely superseded by more advanced nodes<%- elif metric == "28nm" %> Popular mature node with excellent economics. Widely used in automotive, IoT, networking, and industrial applications requiring proven reliability<%- elif metric == "40/45nm" %> Established specialty node used in automotive, industrial, power management, and display driver ICs. Known for reliability and cost-effectiveness<%- elif metric == "65nm" %> Mature specialty node used in automotive, industrial, microcontrollers, and power management applications<%- elif metric == "90nm" %> Legacy node used in specialized applications including power management, display drivers, and some automotive components<%- elif metric == "0.11/0.13um" %> Legacy node used in long-lifecycle products including industrial, automotive, and power management applications<%- elif metric == "0.15um" %> Very mature node used in specialized industrial, automotive, and analog applications requiring proven long-term reliability<%- elif metric == "0.18um" %> Well-established legacy node used in power management, analog circuits, sensors, and industrial applications<%- elif metric == "0.25um+" %> Oldest nodes used in specialized analog, power, and long-lifecycle industrial applications<% endif %>.
+            <% elif category == "platform" %>
+            Percentage of net revenue from << metric.lower() >> applications.<%- if metric == "High Performance Computing" %> Includes AI accelerators, data center processors, graphics cards (GPUs), and workstation processors used for computationally intensive tasks<%- elif metric == "Smartphones" %> Includes application processors, modems, and system-on-chip (SoC) designs for mobile devices<%- elif metric == "Internet of Things" %> Includes chips for smart home devices, wearables, industrial sensors, and connected embedded systems<%- elif metric == "Automotive" %> Includes chips for advanced driver-assistance systems (ADAS), infotainment, powertrain control, and autonomous driving technologies<%- elif metric == "Digital Consumer Electronics" %> Includes chips for televisions, gaming consoles, digital cameras, home appliances, and other consumer devices<%- elif metric == "Others" %> Includes specialized industrial, medical, and legacy product segments<% endif %>.
             <% elif category == "geography" %>
             Percentage of net revenue from this geographic region. Reflects customer location and regional demand patterns. North America includes major customers like Apple, Nvidia, and AMD.
             <% endif %>
@@ -142,12 +66,8 @@ tables:
             TSMC annual production capacity
             <% elif category == "shipments" %>
             TSMC quarterly wafer shipments
-            <% elif category == "technology" %>
-            TSMC revenue from << metric >> chips
-            <% elif category == "platform" %>
-            TSMC revenue from << metric.lower() >>
-            <% elif category == "geography" %>
-            TSMC revenue from << metric >>
+            <% elif category in ["technology", "platform", "geography"] %>
+            TSMC revenue from<%- if category == "technology" %> << metric >> chips<%- elif category == "platform" %> << metric.lower() >><%- else %> << metric >><% endif %>
             <% endif %>
         display:
           numDecimalPlaces: |-
