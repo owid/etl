@@ -10,6 +10,8 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Never push/commit** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
+- If not told otherwise, save outputs to `ai/` directory.
+
 
 ## Pipeline Overview
 
@@ -92,6 +94,16 @@ snap = Snapshot("namespace/version/file.csv")
 tb = snap.read_csv()
 ```
 
+### Catalog System
+
+Built on **owid.catalog** library:
+- **Dataset**: Container for multiple tables with shared metadata
+- **Table**: pandas.DataFrame subclass with rich metadata per column
+- **Variable**: pandas.Series subclass with variable-specific metadata
+- Content-based checksums for change detection
+- Multiple formats (feather, parquet, csv) with automatic schema validation
+
+
 ### YAML Editing (preserve comments)
 ```python
 from etl.files import ruamel_load, ruamel_dump
@@ -101,14 +113,9 @@ with open(file_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
 
-## Make Commands
+## Additional Tools
 
-```bash
-make check         # Format, lint, typecheck (run before commits)
-make etl           # Run garden steps
-make wizard        # Start Wizard UI (port 8053)
-make sync.catalog  # Download catalog (~10GB)
-```
+Get `--help` for details on any command.
 
 ## Package Management
 
