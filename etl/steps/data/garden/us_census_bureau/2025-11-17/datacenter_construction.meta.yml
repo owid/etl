@@ -4,7 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
-
+desc_key: &desc_key
+  - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
+  - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only part of total data center investment, since IT hardware represents a significant additional cost.
+  - The values shown are not seasonally adjusted, meaning they reflect actual monthly spending including typical seasonal patterns such as slower winter construction or busier summer periods.
 dataset:
   update_period_days: 30
 
@@ -15,11 +18,17 @@ tables:
         title: Construction spending on data center buildings in the United States
         unit: US dollars
         short_unit: $
-        description_short: Monthly private construction spending on data center buildings in the United States, covering materials, labor, and contractor costs for work done at construction sites. This excludes equipment like servers and IT hardware. The data is not adjusted for inflation.
+        description_short: Monthly private construction spending on data center buildings in the United States, covering materials, labor, and contractor costs for work done at construction sites. This excludes equipment like servers and IT hardware. The data is not adjusted for inflation or seasonality.
         description_key:
-          - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
-          - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only part of total data center investment, since IT hardware represents a significant additional cost.
-          - The values shown are monthly spending figures that have been seasonally adjusted to remove typical seasonal patterns. This adjustment makes it easier to compare different months throughout the year by accounting for regular variations like slower winter construction or busier summer periods.
-          - The Census Bureau adjusts this data for seasonal patterns, holidays, and trading-day effects using statistical methods. These adjustments are updated each month as new information becomes available, which means recent months' figures may be revised.
+          - *desc_key
+
+      datacenter_construction_spending_real:
+        title: Inflation-adjusted construction spending on data center buildings in the United States
+        unit: 2025 US dollars
+        short_unit: $
+        description_short: Monthly private construction spending on data center buildings in the United States, adjusted for inflation using the Producer Price Index (PPI) for new office construction. This provides a measure of real spending in constant 2025 US dollars, accounting for changes in construction costs over time.
+        description_key:
+          - *desc_key
+          - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office construction, allowing for comparison of real spending over time in constant 2025 US dollars.
         display:
           numDecimalPlaces: 0

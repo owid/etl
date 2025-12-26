@@ -33,10 +33,7 @@ def run() -> None:
 
     # Create date column for monthly data
     tb["date"] = pd.to_datetime(
-        tb.apply(
-            lambda row: f"{row['year']}-{row['month']:02d}-01" if pd.notna(row["month"]) else f"{row['year']}-01-01",
-            axis=1,
-        )
+        tb["year"].astype(str) + "-" + tb["month"].fillna(1).astype(int).astype(str).str.zfill(2) + "-01"
     )
 
     # Drop unnecessary columns

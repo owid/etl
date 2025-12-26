@@ -25,6 +25,6 @@ meta:
       url: https://www.bls.gov/opub/copyright-information.htm
 
 outs:
-  - md5: 9bb5d0184a41000e4119eb5cffcfb2a0
-    size: 397
+  - md5: 4e5727ca6ef921ad78061cb0695306df
+    size: 9196
     path: us_ppi_construction.csv
