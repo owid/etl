@@ -220,6 +220,7 @@ steps:
     - snapshot://us_census_bureau/2025-11-17/datacenter_construction.xlsx
   data://garden/us_census_bureau/2025-11-17/datacenter_construction:
     - data://meadow/us_census_bureau/2025-11-17/datacenter_construction
+    - data://garden/bls/2025-12-24/us_ppi_construction
   data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
     - data://garden/us_census_bureau/2025-11-17/datacenter_construction
 
