@@ -35,7 +35,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"bls/{SNAPSHOT_VERSION}/us_ppi_construction.csv")
 
-    start_year = 1900
+    start_year = 2009
     end_year = datetime.date.today().year
 
     all_series_data = []
