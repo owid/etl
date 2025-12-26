@@ -4,10 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
-desc_key: &desc_key
-  - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
-  - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only part of total data center investment, since IT hardware represents a significant additional cost.
-  - The values shown are not seasonally adjusted, meaning they reflect actual monthly spending including typical seasonal patterns such as slower winter construction or busier summer periods.
+  desc_key: &desc_key
+    - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
+    - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only part of total data center investment, since IT hardware represents a significant additional cost.
+    - The values shown are not seasonally adjusted, meaning they reflect actual monthly spending including typical seasonal patterns such as slower winter construction or busier summer periods.
 dataset:
   update_period_days: 30
 
