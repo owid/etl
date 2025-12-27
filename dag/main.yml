@@ -87,6 +87,10 @@ steps:
   data://grapher/bls/2025-04-12/us_consumer_prices:
     - data://garden/bls/2025-04-12/us_consumer_prices
 
+  # USA PPI New Office Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2025-12-24/us_ppi_construction:
+    - snapshot://bls/2025-12-24/us_ppi_construction.csv
+
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
     - snapshot://technology/2023-03-16/hcctad.txt
