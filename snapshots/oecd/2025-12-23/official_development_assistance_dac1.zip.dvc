@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: OECD
+    title: 'OECD Official Development Assistance (ODA) - DAC1: Flows by provider (ODA+OOF+Private)'
+    description: |-
+      This dataset provides main aggregates of DAC members' and other provider countries' official development assistance (ODA) flows and grant equivalents, as well as other resource flows to developing countries.
+    citation_full: 'OECD (2025). OECD Official Development Assistance (ODA) - DAC1: Flows by provider (ODA+OOF+Private). OECD Data Explorer.'
+    url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
+    url_download: https://stats.oecd.org/wbos/fileview2.aspx?IDFile=570b240e-df9c-4586-b53d-99946fac437d
+    date_accessed: '2025-12-23'
+    date_published: '2025-12-18'
+    license:
+      name: OECD Terms & conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: c81b7ba6368fc45711fe3987d75245e0
+    size: 18364024
+    path: official_development_assistance_dac1.zip
