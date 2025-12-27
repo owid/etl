@@ -1,13 +1,11 @@
 [project]
 name = "owid-catalog"
-version = "0.4.5"
+version = "1.0.0rc1"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
-authors = [
-    {name = "Our World in Data", email = "tech@ourworldindata.org"},
-]
+authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
 license = "MIT"
-requires-python = ">=3.10, <4.0"
+requires-python = ">=3.10, <3.15"
 dependencies = [
     "pandas>=2.2.3",
     "jsonschema>=3.2.0",
@@ -26,6 +24,8 @@ dependencies = [
     "jinja2>=3.1.6",
     "typing-extensions>=4.7.1",
     "rdata>=0.11.2",
+    "pydantic>=2.0.0",
+    "Deprecated>=1.2.14",
     "rapidfuzz>=3.14.3",
 ]
 
@@ -65,4 +65,3 @@ packages = ["owid"]
 [project.urls]
 Homepage = "https://github.com/owid/etl/tree/master/lib/catalog"
 Repository = "https://github.com/etl/etl.git"
-

@@ -146,7 +146,7 @@ and run the following code:
 ```python
 from owid import catalog
 
-rc = catalog.RemoteCatalog()
+rc = catalog.ETLCatalog()
 uri = "..."
 df = rc[uri]
 ```

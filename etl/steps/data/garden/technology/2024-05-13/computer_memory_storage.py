@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid import catalog
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,6 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("computer_memory_storage")
+    ds_cpi = paths.load_dataset("us_consumer_prices")
 
     # Read table from meadow dataset.
     tb = ds_meadow["computer_memory_storage"].reset_index()
@@ -21,7 +20,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    us_cpi = catalog.find_latest(dataset="us_consumer_prices").reset_index()[["year", "all_items"]]
+    us_cpi = ds_cpi.read("us_consumer_prices")[["year", "all_items"]]
 
     # Left-merge and validate 1:1
     tb = tb.merge(us_cpi, on="year", how="left", validate="1:1")
