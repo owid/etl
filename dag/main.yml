@@ -256,6 +256,7 @@ steps:
     - snapshot://technology/2024-05-13/computer_memory_storage.xlsx
   data://garden/technology/2024-05-13/computer_memory_storage:
     - data://meadow/technology/2024-05-13/computer_memory_storage
+    - data://garden/bls/2025-04-12/us_consumer_prices
   data://grapher/technology/2024-05-13/computer_memory_storage:
     - data://garden/technology/2024-05-13/computer_memory_storage
 

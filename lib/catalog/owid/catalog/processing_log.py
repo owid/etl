@@ -10,7 +10,7 @@ from typing import Any, Literal
 
 from dataclasses_json import dataclass_json
 
-from .utils import pruned_json
+from owid.catalog.utils import pruned_json
 
 
 def enabled() -> bool:
