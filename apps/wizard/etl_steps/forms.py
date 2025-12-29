@@ -79,7 +79,7 @@ class StepForm(BaseModel):
         schema_full = jsonref.replace_refs(schema)
         # Process each error
         errors = sorted(validator.iter_errors(self.metadata), key=str)  # get all validation errors
-        for error in errors:
+        for error in cast(list[jsonschema.ValidationError], errors):
             # Get error type
             error_type = error.validator
             if error_type not in {"required", "type", "pattern"}:

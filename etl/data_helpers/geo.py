@@ -717,14 +717,14 @@ def interpolate_table(
         else:
             years_in_data = df[time_col].unique()
         # Reindex
-        df = (
+        df = (  # type: ignore[assignment]
             df.set_index([country_col, time_col])
             .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
             .sort_index()
         )
 
     # Interpolate
-    df = (
+    df = (  # type: ignore[assignment]
         df.groupby(country_col)
         .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # type: ignore
         .reset_index()
@@ -1735,7 +1735,7 @@ class Regions:
             self._tb_population = self.ds_population.read("population")  # type: ignore
         return self._tb_population
 
-    def get_region(self, name: str) -> dict:
+    def get_region(self, name: str, **kwargs) -> dict:
         """Get region members and other information.
 
         Parameters
@@ -1782,6 +1782,7 @@ class Regions:
                     include_historical_regions_in_income_groups=True,
                     subregion_type=subregion_type,
                     unpack_subregions=True,
+                    **kwargs,
                 )
 
             self._region_cache[name] = region_dict

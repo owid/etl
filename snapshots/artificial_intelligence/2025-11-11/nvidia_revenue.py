@@ -232,7 +232,7 @@ def extract_nvidia_revenue() -> pd.DataFrame:
 
     # Map fiscal quarter to calendar month (start of quarter)
     # FY Q1 -> Feb (month 2), Q2 -> May (month 5), Q3 -> Aug (month 8), Q4 -> Nov (month 11)
-    quarter_to_month = {1: 2, 2: 5, 3: 8, 4: 11}
+    quarter_to_month = {1: 1, 2: 4, 3: 7, 4: 10}
     months = fiscal_quarters.map(quarter_to_month)
 
     # For Q1-Q3, the calendar year is fiscal_year - 1
