@@ -81,3 +81,11 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data-private://garden/ihme_gbd/2024-05-20/gbd_risk
+
+  #
+  # A millennium of macroeconomic data (Bank of England)
+  #
+  data://meadow/abs/2025-12-29/millennium_macroeconomic_data:
+    - snapshot://bank_of_england/2025-12-29/millennium_macroeconomic_data.xlsx
+  data://garden/abs/2025-12-29/millennium_macroeconomic_data:
+    - data://meadow/abs/2025-12-29/millennium_macroeconomic_data

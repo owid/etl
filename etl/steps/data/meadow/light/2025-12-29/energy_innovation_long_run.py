@@ -38,7 +38,6 @@ def run() -> None:
         skiprows=2,
         header=0,
         usecols="A:H,N:T",
-        na_values=[" - "],
     )
 
     #
