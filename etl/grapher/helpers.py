@@ -634,7 +634,7 @@ class IntRange:
 
     @staticmethod
     def from_values(xs: List[int]) -> "IntRange":
-        return IntRange(min(xs), max(xs))
+        return IntRange(min(xs), max(xs))  # type: ignore[unknown-argument]
 
     def to_values(self) -> list[int]:
         return [self.min, self.max]

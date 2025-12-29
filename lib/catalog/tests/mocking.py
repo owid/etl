@@ -88,7 +88,7 @@ def mock(_type: type) -> Any:
         # e.g. Dict[str, int] or dict[str, int]
         args = getattr(_type, "__args__", ())
         if len(args) >= 2:
-            _from, _to = args[0], args[1]
+            _from, _to = args[0], args[1]  # type: ignore
             return {mock(_from): mock(_to) for i in range(random.randint(1, 8))}
         else:
             return {}
@@ -110,7 +110,7 @@ def mock(_type: type) -> Any:
         return random.choice(_type.__args__)  # type: ignore
 
     elif getattr(_type, "__origin__", None) == Union:
-        return mock(random.choice(_type.__args__))
+        return mock(random.choice(_type.__args__))  # type: ignore
 
     elif _type is type(None):
         return None

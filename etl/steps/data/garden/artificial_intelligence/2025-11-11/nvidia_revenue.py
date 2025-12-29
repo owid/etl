@@ -28,9 +28,9 @@ def run() -> None:
         "Professional Visualization": "Professional visualization",
         "Gaming": "Gaming",
         "TOTAL": "Total",
-        "Auto": "Auto",
+        "Auto": "Automotive",
         "OEM & Other": "Original equipment manufacturing and other",
-        "Data Center": "Data centers",
+        "Data Center": "Data centers and AI",
     }
 
     # Replace values in the column

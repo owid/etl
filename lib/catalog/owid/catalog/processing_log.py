@@ -50,10 +50,10 @@ class LogEntry:
     parents: tuple[str, ...] = field(default_factory=tuple)
     comment: str | None = None
 
-    def to_dict(self) -> dict[str, Any]: ...
+    def to_dict(self) -> dict[str, Any]: ...  # type: ignore
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "LogEntry": ...
+    def from_dict(d: dict[str, Any]) -> "LogEntry": ...  # type: ignore
 
     def clone(self, **kwargs):
         """Clone the log entry, optionally overriding some attributes."""

@@ -670,3 +670,4 @@ include:
   - dag/archive/forests.yml
   - dag/archive/families.yml
   - dag/archive/natural_disasters.yml
+  - dag/archive/minerals.yml
