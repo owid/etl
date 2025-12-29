@@ -12,7 +12,9 @@ steps:
   data://garden/forests/2025-05-08/forest_share:
     - snapshot://papers/2025-05-30/scottish_government.csv
     - snapshot://defra/2025-05-06/forest_share.csv
+    - snapshot://fao/2025-05-07/forest_share.csv
     - data://garden/fao/2025-12-05/fra
+    - data://garden/worldbank_wdi/2025-09-08/wdi
     - snapshot://forest_research/2025-05-06/forest_share.csv
     - snapshot://papers/2025-05-07/france_forest_share.csv
     - snapshot://papers/2025-05-07/japan_forest_share.csv

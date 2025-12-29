@@ -19,7 +19,7 @@ def run() -> None:
     # Defra data for England and Scotland
     snap_meadow_defra = paths.load_snapshot("forest_share", namespace="defra")
     # FAO data for England and Scotland
-    snap_meadow_fao = paths.load_dataset("fra", namespace="fao")
+    snap_meadow_fao = paths.load_snapshot("forest_share", namespace="fao")
     # Forest cover data for  Scotland
     snap_meadow_forest_research = paths.load_snapshot("forest_share", namespace="forest_research")
     # Forest cover data for France
@@ -43,6 +43,8 @@ def run() -> None:
 
     # FAO Forest Resource Assessment (FRA) 2025 data
     ds_garden_fra = paths.load_dataset("fra")
+    # WDI data to get land area for each country
+    ds_garden_wdi = paths.load_dataset("wdi")
     # Read table from meadow dataset.
     tb_defra = snap_meadow_defra.read()
     tb_fao = snap_meadow_fao.read()
@@ -58,6 +60,8 @@ def run() -> None:
     tb_sg = snap_meadow_sg.read()
     tb_fra = ds_garden_fra["fra"].reset_index()
     tb_fra["source"] = "Forest Resource Assessment (FRA) 2025"
+    tb_wdi = ds_garden_wdi['wdi'].reset_index()
+    tb_fra = calculate_fra_forest_share(tb_fra = tb_fra, tb_wdi = tb_wdi)
     # Concatenate tables.
     tb = pr.concat(
         [
@@ -93,6 +97,28 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def calculate_fra_forest_share(tb_fra: Table, tb_wdi: Table) -> Table:
+    """
+    Combine the forest area variable (hectares) from FRA (2025) with the land area
+    data (sq. km) from WDI to calculate the share of land covered in forest for each country.
+
+    Return just country, year, forest share and source
+    """
+    tb_fra = tb_fra[['country', 'year', '_1a_forestarea', 'source']]
+    tb_wdi = tb_wdi[['country','year','ag_lnd_totl_k2']]
+    # Strangely this land area value changes in 1991 and 2011, with the dissolution of the soviet union and creation of south sudan
+    tb_wdi = tb_wdi.dropna()
+    tb_wdi = tb_wdi[tb_wdi['year'] == max(tb_wdi['year'])]
+    tb_wdi = tb_wdi.drop(columns = 'year')
+    # convert from square km to hectares
+    tb_wdi['ag_lnd_totl_k2'] *=100
+    tb = pr.merge(tb_fra, tb_wdi, on = ['country'])
+    tb['forest_share'] = (tb['_1a_forestarea']/tb['ag_lnd_totl_k2']) * 100
+    tb = tb[['country', 'year', 'forest_share', 'source']]
+
+    return tb
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:
