@@ -25,8 +25,6 @@ def run() -> None:
     # Process lighting prices table to make it long with dimensions.
     tb_lighting_prices = process_lighting_prices(tb_lighting_prices=tb_lighting_prices)
 
-    print(tb_lighting_prices)
-
     # Improve table format.
     tb_lighting_prices = tb_lighting_prices.format(["country", "year", "lighting_source", "price_year"])
 
