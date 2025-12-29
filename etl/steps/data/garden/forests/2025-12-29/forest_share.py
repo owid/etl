@@ -2,7 +2,6 @@
 
 from typing import List
 
-import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -42,9 +41,10 @@ def run() -> None:
     # More recent forest data for England and Scotland - from the Scottish Government
     snap_meadow_sg = paths.load_snapshot("scottish_government", namespace="papers")
 
-    # FAO Forest Resource Assessment (FRA) 2020 data
-    ds_meadow_fra = paths.load_dataset("fra_forest_extent")
-
+    # FAO Forest Resource Assessment (FRA) 2025 data
+    ds_garden_fra = paths.load_dataset("fra")
+    # WDI data to get land area for each country
+    ds_garden_wdi = paths.load_dataset("wdi")
     # Read table from meadow dataset.
     tb_defra = snap_meadow_defra.read()
     tb_fao = snap_meadow_fao.read()
@@ -58,10 +58,10 @@ def run() -> None:
     tb_usa = snap_meadow_usa.read()
     tb_china = snap_meadow_china.read()
     tb_sg = snap_meadow_sg.read()
-    tb_fra = ds_meadow_fra["fra_forest_area"].reset_index()
-    # Interpolate the 5-yearly FRA data to fill in missing years.
-    tb_fra = interpolate_fra(tb_fra)
-    tb_fra["source"] = "Forest Resource Assessment (FRA) 2020"
+    tb_fra = ds_garden_fra["fra"].reset_index()
+    tb_fra["source"] = "Forest Resource Assessment (FRA) 2025"
+    tb_wdi = ds_garden_wdi["wdi"].reset_index()
+    tb_fra = calculate_fra_forest_share(tb_fra=tb_fra, tb_wdi=tb_wdi)
     # Concatenate tables.
     tb = pr.concat(
         [
@@ -81,7 +81,7 @@ def run() -> None:
     )
 
     tb_com = combine_datasets(
-        tb_a=tb, tb_b=tb_fra, table_name="forest_share", preferred_source="Forest Resource Assessment (FRA) 2020"
+        tb_a=tb, tb_b=tb_fra, table_name="forest_share", preferred_source="Forest Resource Assessment (FRA) 2025"
     )
     tb_com = tb_com.drop(columns=["source"])
     #
@@ -99,27 +99,26 @@ def run() -> None:
     ds_garden.save()
 
 
-def interpolate_fra(tb_fra: Table) -> Table:
+def calculate_fra_forest_share(tb_fra: Table, tb_wdi: Table) -> Table:
     """
-    Interpolate FRA data to fill in missing years for countries.
-    The data from FRA is based on annual average changes in forest area, so we can interpolate
-    the forest share for each country across the years.
-    """
-    tb_fra = tb_fra.copy(deep=True)
+    Combine the forest area variable (hectares) from FRA (2025) with the land area
+    data (sq. km) from WDI to calculate the share of land covered in forest for each country.
 
-    years = [tb_fra["year"].min(), tb_fra["year"].max()]
-    range_years = list(range(years[0], years[1] + 1))
-    # Ensure all years are present for each country
-    tb_fra = (
-        tb_fra.set_index(["country", "year"])
-        .reindex(pd.MultiIndex.from_product([tb_fra["country"].unique(), range_years], names=["country", "year"]))
-        .reset_index()
-    )
-    # Interpolate missing values
-    tb_fra["forest_share"] = tb_fra.groupby("country")["forest_share"].transform(
-        lambda x: x.interpolate(method="linear", limit_direction="both")
-    )
-    return tb_fra
+    Return just country, year, forest share and source
+    """
+    tb_fra = tb_fra[["country", "year", "_1a_forestarea", "source"]]
+    tb_wdi = tb_wdi[["country", "year", "ag_lnd_totl_k2"]]
+    # Strangely this land area value changes in 1991 and 2011, with the dissolution of the soviet union and creation of south sudan
+    tb_wdi = tb_wdi.dropna()
+    tb_wdi = tb_wdi[tb_wdi["year"] == max(tb_wdi["year"])]
+    tb_wdi = tb_wdi.drop(columns="year")
+    # convert from square km to hectares
+    tb_wdi["ag_lnd_totl_k2"] *= 100
+    tb = pr.merge(tb_fra, tb_wdi, on=["country"])
+    tb["forest_share"] = (tb["_1a_forestarea"] / tb["ag_lnd_totl_k2"]) * 100
+    tb = tb[["country", "year", "forest_share", "source"]]
+
+    return tb
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:

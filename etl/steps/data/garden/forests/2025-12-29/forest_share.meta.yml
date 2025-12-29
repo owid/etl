@@ -8,7 +8,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 1830
   title: Historic forest cover estimates from combined sources
   description: |-
     This dataset provides estimates of forest cover from various sources, including FAO, USDA Forest Service, DEFRA, Forest Research and others. The details for the historical estimates are provided below:
