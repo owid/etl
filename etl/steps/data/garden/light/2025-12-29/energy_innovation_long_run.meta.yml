@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Light at Night
+        - Energy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  lighting_prices:
+    variables:
+      lighting_price:
+        title: Price of lighting (<<lighting_source>>, <<price_year>> prices)
+        unit: constant <<price_year>> US$ per million lumen-hours
+        short_unit: £
+        description_short: "The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1700 lumen. This data is expressed in British pounds, adjusted for inflation."
+        # description_key: List of key points about the indicator.
+        display:
+          name: Price of lighting (<<lighting_source>>)
+          numDecimalPlaces: 2
+          tolerance: 0
+
+
