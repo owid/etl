@@ -1,5 +1,7 @@
 definitions:
   common:
+    display:
+      numDecimalPlaces: 0
     presentation:
       topic_tags:
         - Artificial Intelligence
@@ -14,7 +16,7 @@ tables:
   datacenter_construction:
     variables:
       datacenter_construction_spending:
-        title: Construction spending on data center buildings in the United States
+        title: Investment in the physical construction of US data centre buildings
         unit: US dollars
         short_unit: $
         description_short: This includes only the work done on site to construct data centre buildings each month, including materials and construction labour. It excludes the IT hardware inside the buildings, like servers and storage, which account for a large share of total investment. Expressed in nominal US dollars.
@@ -23,7 +25,7 @@ tables:
         processing_level: minor
 
       datacenter_construction_spending_real:
-        title: Construction spending on data center buildings in the United States (inflation-adjusted)
+        title: Investment in the physical construction of US data centre buildings (inflation-adjusted)
         unit: constant 2014 US$
         short_unit: $
         description_short: This includes only the work done on site to construct data centre buildings each month, including materials and construction labour. It excludes the IT hardware inside the buildings, like servers and storage, which account for a large share of total investment. Expressed in US dollars, adjusted for inflation.
@@ -32,9 +34,8 @@ tables:
           - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office building construction. Following guidance from the [Bureau of Economic Analysis (BEA)](https://www.bea.gov/), we assume data centre construction costs are similar to office-type buildings because both use comparable structural components, such as foundations, walls, and HVAC systems.
         description_processing: We used the Producer Price Index (PPI) for new office building construction to adjust for inflation, following guidance from the [Bureau of Economic Analysis (BEA)](https://www.bea.gov/) that suggests data center construction costs are similar to office buildings due to their comparable structural components.
         presentation:
-          title_public: Construction spending on data center buildings in the United States
+          title_public: Investment in the physical construction of US data centre buildings
           grapher_config:
             note: Data is expressed in constant 2014 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction.
         processing_level: major
-        display:
-          numDecimalPlaces: 0
+
