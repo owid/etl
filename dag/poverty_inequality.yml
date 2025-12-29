@@ -81,14 +81,14 @@ steps:
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
     - data://garden/poverty_inequality/2025-01-22/inequality_comparison
 
-  # Global Multidimensional Poverty Index
-  data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
-    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_cme.csv
-    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_hot.csv
-  data://garden/ophi/2024-10-28/multidimensional_poverty_index:
-    - data://meadow/ophi/2024-10-28/multidimensional_poverty_index
-  data://grapher/ophi/2024-10-28/multidimensional_poverty_index:
-    - data://garden/ophi/2024-10-28/multidimensional_poverty_index
+    # Global Multidimensional Poverty Index
+  data://meadow/ophi/2025-12-23/multidimensional_poverty_index:
+    - snapshot://ophi/2025-12-23/multidimensional_poverty_index_hot.csv
+    - snapshot://ophi/2025-12-23/multidimensional_poverty_index_cme.csv
+  data://garden/ophi/2025-12-23/multidimensional_poverty_index:
+    - data://meadow/ophi/2025-12-23/multidimensional_poverty_index
+  data://grapher/ophi/2025-12-23/multidimensional_poverty_index:
+    - data://garden/ophi/2025-12-23/multidimensional_poverty_index
 
   # # OECD Income Distribution Database
   data://meadow/oecd/2025-04-16/income_distribution_database:
