@@ -2,7 +2,6 @@
 
 from typing import List
 
-import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -94,7 +93,6 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
-
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:
