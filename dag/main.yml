@@ -459,20 +459,6 @@ steps:
   export://multidim/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries
 
-  # OECD Official Development Assistance (ODA)
-  data://meadow/oecd/2025-02-19/official_development_assistance:
-    - snapshot://oecd/2025-02-19/official_development_assistance_crs.zip
-    - snapshot://oecd/2025-02-19/official_development_assistance_dac5.zip
-    - snapshot://oecd/2025-02-19/official_development_assistance_dac1.zip
-    - snapshot://oecd/2025-02-19/official_development_assistance_dac2a.zip
-
-  data://garden/oecd/2025-02-19/official_development_assistance:
-    - data://garden/demography/2024-07-15/population
-    - data://meadow/oecd/2025-02-19/official_development_assistance
-
-  data://grapher/oecd/2025-02-19/official_development_assistance:
-    - data://garden/oecd/2025-02-19/official_development_assistance
-
   # ATUS - American Time Use Survey
   data://meadow/atus/2024-12-10/atus_0323:
     - snapshot://atus/2024-12-10/atus_who.zip
@@ -737,6 +723,21 @@ steps:
     - data://meadow/fbi/2025-11-21/summary_reporting_system_estimates
   data://grapher/fbi/2025-11-21/summary_reporting_system_estimates:
     - data://garden/fbi/2025-11-21/summary_reporting_system_estimates
+
+  # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2025-12-23/official_development_assistance:
+    - snapshot://oecd/2025-12-23/official_development_assistance_dac5.zip
+    - snapshot://oecd/2025-12-23/official_development_assistance_dac2a.zip
+    - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
+
+  data://garden/oecd/2025-12-23/official_development_assistance:
+    - data://meadow/oecd/2025-12-23/official_development_assistance
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+
+  data://grapher/oecd/2025-12-23/official_development_assistance:
+    - data://garden/oecd/2025-12-23/official_development_assistance
 
 include:
   - dag/open_numbers.yml
