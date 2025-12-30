@@ -17,18 +17,22 @@ Example:
     >>> from owid.catalog.api.experimental import get
     >>> tb = get("garden/un/2024-07-12/un_wpp/population")
     >>> tb_ind = get("garden/un/2024-07-12/un_wpp/population#population")
-    >>> df_chart = get("chart:life-expectancy")
+    >>> df_chart = get("life-expectancy")  # Chart slug auto-detected
     ```
 """
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 
 from owid.catalog.api import Client
 from owid.catalog.core.paths import CatalogPath
+
+# Pattern for chart slugs: alphanumeric with dashes and underscores only
+_CHART_SLUG_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 
 if TYPE_CHECKING:
     from owid.catalog.tables import Table
@@ -129,25 +133,21 @@ def show(
 def get(path: str) -> "Table" | pd.DataFrame:
     """Get data directly by path (auto-detects tables, indicators, or charts).
 
-    This function auto-detects what you're trying to access based on the path format:
-
-    - Regular catalog path → Table
-    - Path with #fragment → Table (single-column indicator data)
-    - Path starting with "chart:" → DataFrame (chart data)
+    This function load the data associated to `path`. It auto-detects what you're trying to access (table, indicator or chart data) based on its format.
 
     Args:
         path: Path to the data resource:
 
             - Table: "channel/namespace/version/dataset/table"
             - Indicator: "channel/namespace/version/dataset/table#variable"
-            - Chart: "chart:slug" (e.g., "chart:life-expectancy")
+            - Chart: "life-expectancy" (e.g. no use of '/' or '#')
 
     Returns:
-        - Table object if path points to a table or indicator (single-column indicator)
-        - DataFrame if path starts with "chart:" prefix
+        - Table object if path points to a table or indicator
+        - DataFrame if path is a chart slug
 
     Raises:
-        ValueError: If path is invalid, uses unexpected prefix, or resource not found
+        ValueError: If path is invalid or resource not found
 
     Example:
         ```python
@@ -157,8 +157,8 @@ def get(path: str) -> "Table" | pd.DataFrame:
         # Get indicator as single-column Table
         tb_ind = get("garden/un/2024-07-12/un_wpp/population#population")
 
-        # Get chart data
-        df_chart = get("chart:life-expectancy")
+        # Get chart data (slug auto-detected)
+        df_chart = get("life-expectancy")
 
         # Grapher channel table
         tb = get("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
@@ -167,37 +167,39 @@ def get(path: str) -> "Table" | pd.DataFrame:
     # Create client (reuses singleton internally)
     client = Client()
 
-    # Check for prefix (colon before first slash)
-    if ":" in path and (path.index(":") < path.index("/") if "/" in path else True):
-        prefix, rest = path.split(":", 1)
+    # Detect path type based on structure:
+    # - Contains "/" → catalog path (table or indicator)
+    # - Contains "#" → indicator path
+    # - Matches slug pattern (alphanumeric + dashes/underscores) → chart slug
 
-        # Validate prefix
-        if prefix != "chart":
-            raise ValueError(
-                f"Invalid path prefix '{prefix}:'. "
-                f"Only 'chart:' prefix is supported for referencing charts. "
-                f"For catalog paths, omit the prefix."
-            )
+    if "/" in path or "#" in path:
+        # Catalog path (table or indicator)
+        try:
+            catalog_path = CatalogPath.from_str(path)
 
-        # Chart slug with prefix
-        return client.charts.get_data(rest)
+            if catalog_path.variable is not None:
+                # Indicator path (table path with #variable fragment)
+                # Get variable and convert to Table
+                variable = client.indicators.get_data(path)
+                return variable.to_frame()
+            else:
+                # Regular table path
+                return client.tables.get_data(path)
 
-    # Use CatalogPath to detect if this is an indicator (has #fragment)
-    try:
-        catalog_path = CatalogPath.from_str(path)
+        except ValueError as e:
+            # Re-raise with more context
+            raise e
 
-        if catalog_path.variable is not None:
-            # Indicator path (table path with #variable fragment)
-            # Get variable and convert to Table
-            variable = client.indicators.get_data(path)
-            return variable.to_frame()
-        else:
-            # Regular table path
-            return client.tables.get_data(path)
+    elif _CHART_SLUG_PATTERN.match(path):
+        # Chart slug (alphanumeric with dashes/underscores)
+        return client.charts.get_data(path)
 
-    except ValueError as e:
-        # Re-raise with more context
-        raise e
+    else:
+        raise ValueError(
+            f"Invalid path format: '{path}'. "
+            f"Expected a catalog path (with '/'), indicator path (with '#'), "
+            f"or chart slug (alphanumeric with dashes/underscores)."
+        )
 
 
 def _show_tables(
@@ -278,7 +280,7 @@ def _show_charts(name: str, *, limit: int = 10) -> list[str]:
         print("  - Check spelling")
         return []
 
-    # Build full paths from results
-    all_paths = [f"chart:{result.slug}" for result in results]
+    # Build paths from results (just the slug, auto-detected by get())
+    all_paths = [result.slug for result in results]
 
     return all_paths
