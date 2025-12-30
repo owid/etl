@@ -149,6 +149,7 @@ class ChartResult(BaseModel):
 
     # Private cached data field
     _data: pd.DataFrame | None = PrivateAttr(default=None)
+    _timeout: int = PrivateAttr(default=30)
 
     @property
     def data(self) -> pd.DataFrame:
@@ -166,7 +167,7 @@ class ChartResult(BaseModel):
         with _loading_data_from_api(f"Fetching chart '{self.slug}'"):
             # Fetch CSV data from the chart
             url = f"https://ourworldindata.org/grapher/{self.slug}.csv?useColumnShortNames=true"
-            resp = requests.get(url)
+            resp = requests.get(url, timeout=self._timeout)
 
             if resp.status_code == 404:
                 raise ChartNotFoundError(f"No such chart found: {self.slug}")

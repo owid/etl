@@ -59,6 +59,7 @@ class ChartsAPI:
         require_all_countries: bool = False,
         limit: int = 20,
         page: int = 0,
+        timeout: int | None = None,
     ) -> ResponseSet[ChartResult]:
         """Search for charts matching a query.
 
@@ -70,6 +71,7 @@ class ChartsAPI:
                 specified countries. Default False (any country matches).
             limit: Maximum results to return (1-100). Default 20.
             page: Page number for pagination (0-indexed). Default 0.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             ResponseSet containing ChartResult objects.
@@ -99,15 +101,17 @@ class ChartsAPI:
             require_all_countries=require_all_countries,
             limit=limit,
             page=page,
+            timeout=timeout or self._client.timeout,
         )
 
-    def fetch(self, slug_or_url: str, *, load_data: bool = False) -> ChartResult:
+    def fetch(self, slug_or_url: str, *, load_data: bool = False, timeout: int | None = None) -> ChartResult:
         """Fetch a chart with all its metadata and config.
 
         Args:
             slug_or_url: Chart slug or full URL.
             load_data: If True, preload chart data immediately.
                        If False (default), data is loaded lazily when accessed via .data property.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             ChartResult with metadata, config, and data loading capability.
@@ -119,9 +123,10 @@ class ChartsAPI:
             df = chart.data
             ```
         """
+        effective_timeout = timeout or self._client.timeout
         slug = self._parse_slug(slug_or_url)
-        config = self._fetch_config(slug)
-        metadata = self._fetch_metadata(slug)
+        config = self._fetch_config(slug, timeout=effective_timeout)
+        metadata = self._fetch_metadata(slug, timeout=effective_timeout)
 
         result = ChartResult(
             slug=slug,
@@ -130,6 +135,7 @@ class ChartsAPI:
             config=config,
             metadata=metadata,
         )
+        result._timeout = effective_timeout
 
         # Preload data if requested
         if load_data:
@@ -137,11 +143,12 @@ class ChartsAPI:
 
         return result
 
-    def get_data(self, slug_or_url: str) -> pd.DataFrame:
+    def get_data(self, slug_or_url: str, *, timeout: int | None = None) -> pd.DataFrame:
         """Fetch chart data as a DataFrame.
 
         Args:
             slug_or_url: Chart slug (e.g., "life-expectancy") or full URL.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             DataFrame with chart data. Additional metadata in df.attrs.
@@ -157,13 +164,14 @@ class ChartsAPI:
             ```
         """
         # Use fetch() to get ChartResult, then access .data property
-        return self.fetch(slug_or_url).data
+        return self.fetch(slug_or_url, timeout=timeout).data
 
-    def get_metadata(self, slug_or_url: str) -> dict[str, Any]:
+    def get_metadata(self, slug_or_url: str, *, timeout: int | None = None) -> dict[str, Any]:
         """Fetch chart metadata.
 
         Args:
             slug_or_url: Chart slug or full URL.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             Dict containing chart metadata including column information.
@@ -175,13 +183,14 @@ class ChartsAPI:
             ```
         """
         slug = self._parse_slug(slug_or_url)
-        return self._fetch_metadata(slug)
+        return self._fetch_metadata(slug, timeout=timeout or self._client.timeout)
 
-    def get_config(self, slug_or_url: str) -> dict[str, Any]:
+    def get_config(self, slug_or_url: str, *, timeout: int | None = None) -> dict[str, Any]:
         """Fetch raw grapher configuration.
 
         Args:
             slug_or_url: Chart slug or full URL.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             Dict containing the grapher configuration.
@@ -193,7 +202,7 @@ class ChartsAPI:
             ```
         """
         slug = self._parse_slug(slug_or_url)
-        return self._fetch_config(slug)
+        return self._fetch_config(slug, timeout=timeout or self._client.timeout)
 
     @staticmethod
     def _parse_slug(slug_or_url: str) -> str:
@@ -206,11 +215,10 @@ class ChartsAPI:
             raise ValueError("URL must be a Grapher URL, e.g. https://ourworldindata.org/grapher/life-expectancy")
         return slug_or_url
 
-    @staticmethod
-    def _fetch_metadata(slug: str) -> dict[str, Any]:
+    def _fetch_metadata(self, slug: str, *, timeout: int) -> dict[str, Any]:
         """Fetch metadata JSON from a chart."""
-        url = f"{ChartsAPI.BASE_URL}/{slug}.metadata.json"
-        resp = requests.get(url)
+        url = f"{self.BASE_URL}/{slug}.metadata.json"
+        resp = requests.get(url, timeout=timeout)
 
         if resp.status_code == 404:
             raise ChartNotFoundError(f"No such chart found: {slug}")
@@ -218,11 +226,10 @@ class ChartsAPI:
         resp.raise_for_status()
         return resp.json()
 
-    @staticmethod
-    def _fetch_config(slug: str) -> dict[str, Any]:
+    def _fetch_config(self, slug: str, *, timeout: int) -> dict[str, Any]:
         """Fetch config JSON from a chart."""
-        url = f"{ChartsAPI.BASE_URL}/{slug}.config.json"
-        resp = requests.get(url)
+        url = f"{self.BASE_URL}/{slug}.config.json"
+        resp = requests.get(url, timeout=timeout)
 
         if resp.status_code == 404:
             raise ChartNotFoundError(f"No such chart found: {slug}")

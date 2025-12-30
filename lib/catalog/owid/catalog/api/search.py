@@ -53,6 +53,8 @@ class SiteSearchAPI:
         limit: int,
         page: int,
         extra_params: dict | None = None,
+        *,
+        timeout: int | None = None,
     ) -> dict:
         """Internal method to perform search request with common logic."""
         # Warn if limit exceeds maximum
@@ -73,7 +75,7 @@ class SiteSearchAPI:
         if extra_params:
             params.update(extra_params)
 
-        resp = requests.get(self.BASE_URL, params=params)
+        resp = requests.get(self.BASE_URL, params=params, timeout=timeout or self._client.timeout)
         resp.raise_for_status()
         return resp.json()
 
@@ -86,6 +88,7 @@ class SiteSearchAPI:
         require_all_countries: bool = False,
         limit: int = 20,
         page: int = 0,
+        timeout: int | None = None,
     ) -> ResponseSet[ChartResult]:
         """Search for charts matching a query.
 
@@ -97,6 +100,7 @@ class SiteSearchAPI:
                 specified countries. Default False (any country matches).
             limit: Maximum results to return (1-100). Default 20.
             page: Page number for pagination (0-indexed). Default 0.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             ResponseSet containing ChartResult objects.
@@ -113,6 +117,8 @@ class SiteSearchAPI:
             results = client._site_search.charts("gdp", countries=["France"])
             ```
         """
+        effective_timeout = timeout or self._client.timeout
+
         # Build extra parameters for chart-specific filters
         extra_params: dict = {}
         if countries:
@@ -123,22 +129,22 @@ class SiteSearchAPI:
             extra_params["requireAllCountries"] = "true"
 
         # Perform search
-        data = self._search(query, "charts", limit, page, extra_params)
+        data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
         # Parse results
         results = []
         for hit in data.get("results", []):
             slug = hit.get("slug", "")
-            results.append(
-                ChartResult(
-                    slug=slug,
-                    title=hit.get("title", ""),
-                    url=f"https://ourworldindata.org/grapher/{slug}",
-                    subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
-                    available_entities=hit.get("availableEntities", []),
-                    num_related_articles=hit.get("numRelatedArticles", 0),
-                )
+            chart = ChartResult(
+                slug=slug,
+                title=hit.get("title", ""),
+                url=f"https://ourworldindata.org/grapher/{slug}",
+                subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
+                available_entities=hit.get("availableEntities", []),
+                num_related_articles=hit.get("numRelatedArticles", 0),
             )
+            chart._timeout = effective_timeout
+            results.append(chart)
 
         return ResponseSet(
             results=results,
@@ -152,6 +158,7 @@ class SiteSearchAPI:
         *,
         limit: int = 20,
         page: int = 0,
+        timeout: int | None = None,
     ) -> ResponseSet[PageSearchResult]:
         """Search for pages/articles matching a query.
 
@@ -159,6 +166,7 @@ class SiteSearchAPI:
             query: Search query string.
             limit: Maximum results to return (1-100). Default 20.
             page: Page number for pagination (0-indexed). Default 0.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             ResponseSet containing PageSearchResult objects.
@@ -171,7 +179,7 @@ class SiteSearchAPI:
             ```
         """
         # Perform search
-        data = self._search(query, "pages", limit, page)
+        data = self._search(query, "pages", limit, page, timeout=timeout)
 
         # Parse results
         results = []

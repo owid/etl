@@ -86,7 +86,7 @@ make watch
 
 ## Changelog
 
-### `v1.0.0-rc` (Release Candidate)
+### `v1.0.0rc0` (Release Candidate)
   - **Highlights**
     - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
     - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
@@ -94,7 +94,7 @@ make watch
     - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
     - **Breaking changes**:
       - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
-      - `catalog.charts` module has been removed in favor of `Client().cha  - **Others**
+      - `catalog.charts` module has been removed in favor of `Client().chart`  - **Others**
     - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
     - Documentation restructure: Split into intro, API reference, and data structures guides
     - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency

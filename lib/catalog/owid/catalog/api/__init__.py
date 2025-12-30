@@ -64,10 +64,16 @@ class Client:
     indicators: IndicatorsAPI
     tables: TablesAPI
     datasets: TablesAPI  # Backwards compatibility alias
+    timeout: int
     _site_search: SiteSearchAPI
 
-    def __init__(self) -> None:
-        """Initialize the client with all API interfaces."""
+    def __init__(self, timeout: int = 30) -> None:
+        """Initialize the client with all API interfaces.
+
+        Args:
+            timeout: HTTP request timeout in seconds. Default 30.
+        """
+        self.timeout = timeout
         self.charts = ChartsAPI(self)
         self.indicators = IndicatorsAPI(self)
         self.tables = TablesAPI(self)

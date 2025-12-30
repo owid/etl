@@ -65,6 +65,7 @@ class IndicatorsAPI:
         *,
         limit: int = 10,
         show_legacy: bool = False,
+        timeout: int | None = None,
     ) -> ResponseSet[IndicatorResult]:
         """Search for indicators using natural language.
 
@@ -76,6 +77,7 @@ class IndicatorsAPI:
                 (e.g., "renewable energy capacity", "child mortality rate").
             limit: Maximum number of results to return. Default 10.
             show_legacy: If True, show pre-ETL indicators only. Default False.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             SearchResults containing IndicatorResult objects.
@@ -100,7 +102,7 @@ class IndicatorsAPI:
             "limit": limit,
         }
 
-        resp = requests.get(self.BASE_URL, params=params)
+        resp = requests.get(self.BASE_URL, params=params, timeout=timeout or self._client.timeout)
         resp.raise_for_status()
         data = resp.json()
 
@@ -133,7 +135,7 @@ class IndicatorsAPI:
             limit=data.get("total_results", len(results)),
         )
 
-    def fetch(self, path: str, *, load_data: bool = False) -> IndicatorResult:
+    def fetch(self, path: str, *, load_data: bool = False, timeout: int | None = None) -> IndicatorResult:
         """Fetch a specific indicator by catalog path.
 
         Args:
@@ -141,6 +143,7 @@ class IndicatorsAPI:
                   (e.g., "grapher/un/2024/pop/population#population_total")
             load_data: If True, preload indicator data immediately.
                        If False (default), data is loaded lazily when accessed via .data property.
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             IndicatorResult with full details. Access .data to get the variable.
@@ -162,6 +165,8 @@ class IndicatorsAPI:
             - No indicator_id is assigned when fetching by URI (returns None)
             - Future optimization may allow direct indicator access without full table loading
         """
+        effective_timeout = timeout or self._client.timeout
+
         # Parse path using CatalogPath
         catalog_path = CatalogPath.from_str(path)
 
@@ -183,7 +188,7 @@ class IndicatorsAPI:
 
         # Fetch table header (structure only, no rows) to validate column and extract metadata
         try:
-            table_result = self._client.tables.fetch(table_path)
+            table_result = self._client.tables.fetch(table_path, timeout=effective_timeout)
             # Load only the header (columns and metadata, no data rows)
             table = table_result.data_header
         except Exception as e:
@@ -224,7 +229,7 @@ class IndicatorsAPI:
 
         return indicator
 
-    def get_data(self, path: str) -> "Variable":
+    def get_data(self, path: str, *, timeout: int | None = None) -> "Variable":
         """Fetch indicator data as a Variable.
 
         Convenience method equivalent to fetch(path).data
@@ -232,6 +237,7 @@ class IndicatorsAPI:
         Args:
             path: Catalog path in format "channel/namespace/version/dataset/table#column"
                   (e.g., "grapher/un/2024/pop/population#population_total")
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
             Variable (pandas Series with metadata).
@@ -246,4 +252,4 @@ class IndicatorsAPI:
             print(variable.metadata.unit)
             ```
         """
-        return self.fetch(path).data
+        return self.fetch(path, timeout=timeout).data

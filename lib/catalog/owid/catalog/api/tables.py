@@ -5,12 +5,15 @@
 #
 from __future__ import annotations
 
+import json
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Literal, cast
 
 from owid.catalog.api.catalogs import ETLCatalog
 from owid.catalog.api.models import ResponseSet, TableResult
 from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI
 from owid.catalog.core import CatalogPath
+from owid.catalog.core.paths import VALID_CHANNELS
 from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
@@ -53,22 +56,18 @@ class TablesAPI:
         self._client = client
         self._catalog: ETLCatalog | None = None
 
-    def _get_catalog(self) -> ETLCatalog:
-        """Get or create the remote catalog with all channels loaded."""
+    def _get_catalog(self, timeout: int | None = None) -> ETLCatalog:
+        """Get or create the remote catalog with all channels loaded.
+
+        Args:
+            timeout: HTTP request timeout in seconds. Defaults to client timeout.
+                     Only used during initial catalog loading.
+        """
         if self._catalog is None:
             # Load all available channels
-            all_channels: list[CHANNEL] = [
-                "snapshot",
-                "garden",
-                "meadow",
-                "grapher",
-                "open_numbers",
-                "examples",
-                "explorers",
-                "external",
-                "multidim",
-            ]
-            self._catalog = ETLCatalog(channels=all_channels)
+            self._catalog = ETLCatalog(
+                channels=cast(Iterable[CHANNEL], VALID_CHANNELS), timeout=timeout or self._client.timeout
+            )
 
         return self._catalog
 
@@ -119,6 +118,7 @@ class TablesAPI:
         case: bool = False,
         match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
         fuzzy_threshold: int = 70,
+        timeout: int | None = None,
     ) -> ResponseSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
@@ -136,6 +136,7 @@ class TablesAPI:
                 - "fuzzy": Typo-tolerant similarity matching
             fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
                 Only used when match="fuzzy". (default: 70)
+            timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
 
         Returns:
             ResponseSet containing matching TableResult objects. If match="fuzzy", results are sorted by relevance score.
@@ -180,7 +181,7 @@ class TablesAPI:
         if channel is None:
             channel = "garden"
 
-        catalog = self._get_catalog()
+        catalog = self._get_catalog(timeout=timeout)
 
         # Use catalog.find() with the new match parameter
         matches = catalog.find(
@@ -199,8 +200,6 @@ class TablesAPI:
         for _, row in matches.iterrows():
             dimensions = row.get("dimensions", [])
             if isinstance(dimensions, str):
-                import json
-
                 dimensions = json.loads(dimensions)
 
             # Handle formats - could be list, numpy array, or None
@@ -241,7 +240,7 @@ class TablesAPI:
             limit=len(results),
         )
 
-    def fetch(self, path: str, *, load_data: bool = False) -> TableResult:
+    def fetch(self, path: str, *, load_data: bool = False, timeout: int | None = None) -> TableResult:
         """Fetch table metadata by catalog path (without loading data).
 
         Returns metadata about the table. Access .data property on the result to
@@ -251,6 +250,7 @@ class TablesAPI:
             path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
             load_data: If True, preload table data immediately.
                        If False (default), data is loaded lazily when accessed via .data property.
+            timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
 
         Returns:
             TableResult with metadata. Access .data to get the table.
@@ -281,6 +281,7 @@ class TablesAPI:
             version=catalog_path.version,
             dataset=catalog_path.dataset,
             channel=catalog_path.channel,
+            timeout=timeout,
         )
 
         if len(results) == 0:
@@ -295,13 +296,14 @@ class TablesAPI:
 
         return result
 
-    def get_data(self, path: str) -> "Table":
+    def get_data(self, path: str, *, timeout: int | None = None) -> "Table":
         """Fetch table data directly.
 
         Convenience method equivalent to fetch(path).data
 
         Args:
             path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
+            timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
 
         Returns:
             Table (pandas DataFrame with metadata).
@@ -312,8 +314,8 @@ class TablesAPI:
         Example:
             ```python
             tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
-            print(table.head())
-            print(table.metadata.title)
+            print(tb.head())
+            print(tb.metadata.title)
             ```
         """
-        return self.fetch(path).data
+        return self.fetch(path, timeout=timeout).data
