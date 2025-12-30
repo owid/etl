@@ -612,3 +612,63 @@ def test_truediv_zero_division() -> None:
     assert result.isnull()[0]  # Check that 0/0 results in pandas NaN
     assert not result.isnull()[1]  # Check that 1/1 does not result in NaN
     assert not result.isnull()[2]  # Check that 2/2 does not result in NaN
+
+
+def test_variable_to_frame() -> None:
+    """Test that Variable.to_frame() returns a Table with preserved metadata."""
+    from owid.catalog.tables import Table
+
+    # Create a variable with metadata
+    v = Variable([1, 2, 3], name="gdp")
+    v.metadata.title = "GDP"
+    v.metadata.unit = "USD"
+    v.metadata.description = "Gross Domestic Product"
+
+    # Convert to frame (should return Table, not DataFrame)
+    table = v.to_frame()
+
+    # Check that result is a Table
+    assert isinstance(table, Table)
+
+    # Check that it has one column
+    assert len(table.columns) == 1
+    assert table.columns[0] == "gdp"
+
+    # Check that data is preserved
+    assert list(table["gdp"]) == [1, 2, 3]
+
+    # Check that metadata is preserved
+    assert table["gdp"].metadata.title == "GDP"
+    assert table["gdp"].metadata.unit == "USD"
+    assert table["gdp"].metadata.description == "Gross Domestic Product"
+
+
+def test_variable_to_frame_with_custom_name() -> None:
+    """Test that Variable.to_frame() respects custom column name.
+
+    Note: When a custom name is provided, pandas creates a new column with that name.
+    Metadata is not automatically copied to the renamed column (consistent with pandas behavior).
+    """
+    from owid.catalog.tables import Table
+
+    # Create a variable with metadata
+    v = Variable([10, 20, 30], name="original_name")
+    v.metadata.title = "My Variable"
+    v.metadata.unit = "kg"
+
+    # Convert to frame with custom name
+    table = v.to_frame(name="custom_name")
+
+    # Check that result is a Table
+    assert isinstance(table, Table)
+
+    # Check that column has the custom name
+    assert len(table.columns) == 1
+    assert table.columns[0] == "custom_name"
+
+    # Check that data is preserved
+    assert list(table["custom_name"]) == [10, 20, 30]
+
+    # Note: Metadata is not automatically copied when renaming via name parameter
+    # This is consistent with pandas Series.to_frame() behavior
+    # If you need to preserve metadata when renaming, copy it manually after conversion

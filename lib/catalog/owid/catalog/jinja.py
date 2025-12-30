@@ -5,7 +5,7 @@ from typing import Any
 import jinja2
 import structlog
 
-from .utils import remove_details_on_demand
+from owid.catalog.utils import remove_details_on_demand
 
 log = structlog.get_logger()
 
