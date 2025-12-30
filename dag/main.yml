@@ -730,8 +730,10 @@ steps:
     - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
 
   data://garden/oecd/2025-12-23/official_development_assistance:
-    - data://garden/demography/2024-07-15/population
     - data://meadow/oecd/2025-12-23/official_development_assistance
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
 
   data://grapher/oecd/2025-12-23/official_development_assistance:
     - data://garden/oecd/2025-12-23/official_development_assistance

@@ -4,9 +4,8 @@
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -14,6 +13,14 @@ paths = PathFinder(__file__)
 
 # Define conversions for columns.
 TO_MILLION = 1e6
+
+# Define region aggregates
+REGIONS = [
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+]
 
 # categories to keep
 CATEGORIES = {
@@ -166,7 +173,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("official_development_assistance")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb_dac1 = ds_meadow["dac1"].reset_index()
@@ -176,37 +182,29 @@ def run() -> None:
     #
     # Process data.
     #
-    tb_dac1 = geo.harmonize_countries(
-        df=tb_dac1,
+    tb_dac1 = paths.regions.harmonize_names(
+        tb=tb_dac1,
         country_col="donor",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
         warn_on_unused_countries=False,
         warn_on_unknown_excluded_countries=False,
     )
-    tb_dac2a = geo.harmonize_countries(
-        df=tb_dac2a,
+    tb_dac2a = paths.regions.harmonize_names(
+        tb=tb_dac2a,
         country_col="recipient",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
         warn_on_unused_countries=False,
         warn_on_unknown_excluded_countries=False,
     )
-    tb_dac5 = geo.harmonize_countries(
-        df=tb_dac5,
+    tb_dac5 = paths.regions.harmonize_names(
+        tb=tb_dac5,
         country_col="donor",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
         warn_on_unused_countries=False,
         warn_on_unknown_excluded_countries=False,
     )
 
     # Harmonize names of donors in tb_dac2a
-    tb_dac2a = geo.harmonize_countries(
-        df=tb_dac2a,
+    tb_dac2a = paths.regions.harmonize_names(
+        tb=tb_dac2a,
         country_col="donor",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
         warn_on_unused_countries=False,
         warn_on_unknown_excluded_countries=False,
     )
@@ -271,7 +269,6 @@ def run() -> None:
             "humanitarian_aid_recipient",
             "oda_by_sector",
         ],
-        ds_population=ds_population,
     )
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
@@ -491,7 +488,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str]) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.
@@ -500,13 +497,28 @@ def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List
 
     tb = tb.copy()
 
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    # Define index columns
+    index_columns = ["country", "year", "donor", "sector"]
 
-    for indicator in indicator_list:
-        tb[f"{indicator}_per_capita"] = tb[indicator] / tb["population"]
+    tb = paths.regions.add_per_capita(
+        tb=tb,
+        index_columns=index_columns,
+        columns=indicator_list,
+        warn_on_missing_countries=False,
+    )
 
-    # Drop population column
-    tb = tb.drop(columns="population")
+    # Create a dictionary of the indicator_list indicators with the suffix _per_capita and with values mean_weighted_by_population
+    indicator_aggregations = {f"{indicator}_per_capita": "mean_weighted_by_population" for indicator in indicator_list}
+
+    # Calculate aggregates for income groups
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        index_columns=index_columns,
+        regions=REGIONS,
+        aggregations=indicator_aggregations,
+        frac_allowed_nans_per_year=0.2,
+        check_for_region_overlaps=False,
+    )
 
     return tb
 
