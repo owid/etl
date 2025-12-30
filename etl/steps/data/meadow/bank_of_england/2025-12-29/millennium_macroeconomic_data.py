@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -9,6 +11,13 @@ paths = PathFinder(__file__)
 COLUMNS_WAGES = {
     "Unnamed: 0": "year",
     "£": "average_weekly_earnings",
+    "Spliced index 2015=100": "cpi",
+}
+
+# Define columns for earnings table and new names
+COLUMNS_EARNINGS = {
+    "Unnamed: 0": "year",
+    "Unnamed: 1": "real_consumption_earnings",
 }
 
 
@@ -23,20 +32,35 @@ def run() -> None:
     tb_wages = snap.read(
         sheet_name="A47. Wages and prices",
         skiprows=5,
-        usecols="A:B",
+        usecols="A:B,D",
     )
 
-    # Rename columns
-    tb_wages = tb_wages.rename(columns=COLUMNS_WAGES, errors="raise")
-
-    # Add country column
-    tb_wages["country"] = "United Kingdom"
+    tb_earnings = snap.read(
+        sheet_name="A48. Real Earnings ",
+        skiprows=4,
+        usecols="A:B",
+    )
 
     #
     # Process data.
     #
+    # Rename columns
+    tb_wages = tb_wages.rename(columns=COLUMNS_WAGES, errors="raise")
+    tb_earnings = tb_earnings.rename(columns=COLUMNS_EARNINGS, errors="raise")
+
+    # Merge tables
+    tb = pr.merge(
+        tb_wages,
+        tb_earnings,
+        on="year",
+        how="outer",
+    )
+
+    # Add country column
+    tb["country"] = "United Kingdom"
+
     # Improve tables format.
-    tables = [tb_wages.format(["country", "year"])]
+    tables = [tb.format(["country", "year"])]
 
     #
     # Save outputs.

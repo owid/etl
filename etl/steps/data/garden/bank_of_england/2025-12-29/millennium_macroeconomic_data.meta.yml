@@ -15,44 +15,57 @@ dataset:
 tables:
   millennium_macroeconomic_data:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      average_weekly_earnings:
+        title: Average weekly earnings
+        unit: current British pounds
+        short_unit: £
+        description_short: ""
+        description_key:
+          - This series is a combination of data representing England and Great Britain.
+        description_from_producer: |-
+          _Composite Average Weekly Earnings series_
+
+          **Coverage:** England/GB
+
+          **Source:** NB based on English daily wage rates prior to 1750.  See real earnings sheet for measures which adjust for days worked per week over this period.
+        display:
+          name: Average weekly earnings
+          numDecimalPlaces: 2
+          tolerance: 0
+
+      cpi:
+        title: Consumer price index
+        unit: ""
+        short_unit: ""
+        description_short: ""
+        description_key:
+          - This series is a combination of data representing Great Britain and the United Kingdom on their current administrative boundaries.
+        description_from_producer: |-
+          _Consumer Price Index (CPI) -  preferred measure_
+
+          **Coverage:** GB/UK(GB+NI)
+
+          **Source:** 1661-1750, Schumpeter-Gilboy index from Mitchell(1988), 1750-1770 from Crafts and Mills (1991), 1770-1882, Feinstein (1998), 1882-1914 Feinstein (1991),1914-1949 from ONS (O'Donoghue et al (2004)), 1949-2014 CPI (ONS)
+        display:
+          name: Consumer price index
+          numDecimalPlaces: 1
+          tolerance: 0
+
+      real_consumption_earnings:
+        title: Real consumption earnings index (1900=100)
+        unit: ""
+        short_unit: ""
+        description_short: ""
+        description_key:
+          - This series is a combination of data representing Great Britain.
+        description_from_producer: |-
+          _Real Consumption Earnings_
+
+          **Coverage:** GB
+
+          **Source:** Using preferred full employment earnings and CPI series. Traditional measure based on daily wage rates in England before 1750, Index 1900=100
+        display:
+          name: Real consumption earnings index
+          numDecimalPlaces: 2
+          tolerance: 0
 
