@@ -5,6 +5,12 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define columns for wages table and new names
+COLUMNS_WAGES = {
+    "Unnamed: 0": "year",
+    "£": "average_weekly_earnings",
+}
+
 
 def run() -> None:
     #
@@ -20,13 +26,17 @@ def run() -> None:
         usecols="A:B",
     )
 
-    print(tb_wages)
+    # Rename columns
+    tb_wages = tb_wages.rename(columns=COLUMNS_WAGES, errors="raise")
+
+    # Add country column
+    tb_wages["country"] = "United Kingdom"
 
     #
     # Process data.
     #
     # Improve tables format.
-    tables = [tb.format(["country", "year"])]
+    tables = [tb_wages.format(["country", "year"])]
 
     #
     # Save outputs.

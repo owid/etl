@@ -19,8 +19,6 @@ def run() -> None:
     #
     # Process data.
     #
-    # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb=tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
