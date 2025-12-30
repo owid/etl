@@ -724,7 +724,7 @@ for survey in range(len(survey_type)):
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Share in poverty"
     df_graphers.loc[j, "International-$ Dropdown"] = f"Compare {ppp_year_current} and {ppp_year_old} prices"
-    df_graphers.loc[j, "Poverty line Dropdown"] = f"Relative poverty: 60% of median"
+    df_graphers.loc[j, "Poverty line Dropdown"] = "Relative poverty: 60% of median"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
     df_graphers.loc[j, "subtitle"] = (
@@ -748,7 +748,7 @@ for survey in range(len(survey_type)):
     df_graphers.loc[j, "ySlugs"] = f"headcount_60_median_ppp{ppp_year_old} headcount_60_median_ppp{ppp_year_current}"
     df_graphers.loc[j, "Indicator Dropdown"] = "Number in poverty"
     df_graphers.loc[j, "International-$ Dropdown"] = f"Compare {ppp_year_current} and {ppp_year_old} prices"
-    df_graphers.loc[j, "Poverty line Dropdown"] = f"Relative poverty: 60% of median"
+    df_graphers.loc[j, "Poverty line Dropdown"] = "Relative poverty: 60% of median"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
     df_graphers.loc[j, "subtitle"] = (
