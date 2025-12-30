@@ -85,7 +85,7 @@ steps:
   #
   # A millennium of macroeconomic data (Bank of England)
   #
-  data://meadow/abs/2025-12-29/millennium_macroeconomic_data:
+  data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data:
     - snapshot://bank_of_england/2025-12-29/millennium_macroeconomic_data.xlsx
-  data://garden/abs/2025-12-29/millennium_macroeconomic_data:
-    - data://meadow/abs/2025-12-29/millennium_macroeconomic_data
+  data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data:
+    - data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data
