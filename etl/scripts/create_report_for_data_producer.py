@@ -382,8 +382,12 @@ class Report:
 
         if len(df) == 1:
             emails_raw = df["Emails for analytics reports"].item()
-            email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-            emails = re.findall(email_pattern, emails_raw)
+            # Handle empty cells (None or NaN)
+            if pd.notna(emails_raw) and emails_raw:
+                email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                emails = re.findall(email_pattern, emails_raw)
+            else:
+                emails = []
         else:
             emails = []
 
