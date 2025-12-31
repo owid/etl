@@ -15,12 +15,13 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("lighting_prices", reset_index=False)
+    tb_weeks_of_earnings = ds_garden.read("weeks_of_earnings_needed_for_reading", reset_index=False)
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb, tb_weeks_of_earnings], default_metadata=ds_garden.metadata)
 
     # Save grapher dataset.
     ds_grapher.save()

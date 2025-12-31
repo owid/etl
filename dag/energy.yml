@@ -397,5 +397,6 @@ steps:
     - snapshot://light/2025-12-29/energy_innovation_long_run.xlsx
   data://garden/light/2025-12-29/energy_innovation_long_run:
     - data://meadow/light/2025-12-29/energy_innovation_long_run
+    - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
   data://grapher/light/2025-12-29/energy_innovation_long_run:
     - data://garden/light/2025-12-29/energy_innovation_long_run

@@ -12,8 +12,8 @@ meta:
     # Citation
     producer: Thomas and Dimsdale
     citation_full: |-
-      Thomas, R. and Dimsdale, N. (2017). "A Millennium of UK Data", Bank of England OBRA dataset, http://www.bankofengland.co.uk/research/Pages/onebank/threecenturies.aspx
-    attribution: Thomas and Dimsdale - A millennium of macroeconomic data 3.1 (2017)
+      Thomas, R. and Dimsdale, N. (2017). "A Millennium of UK Data". Bank of England.
+    attribution: Thomas and Dimsdale - A millennium of macroeconomic data (2017)
     attribution_short: Bank of England
 
     # Files
