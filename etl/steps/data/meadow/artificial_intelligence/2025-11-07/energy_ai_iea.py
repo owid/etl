@@ -9,6 +9,30 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+# Constants
+YEAR_ROW = 3
+YEAR_COLS = slice(2, 7)
+DATA_START_ROW = 4
+VALUE_COL = 1
+VALUE_START_COL = 2
+PROJECTION_YEAR = 2030
+
+METRIC_HEADERS = {
+    "Total installed capacity (GW)",
+    "Total electricity consumption (TWh)",
+}
+
+# All possible metric headers in the sheet (to detect when we enter a new section)
+ALL_METRIC_HEADERS = {
+    "Total installed capacity (GW)",
+    "IT installed capacity (GW)",
+    "Power usage effectiveness",
+    "Load factor (%)",
+    "Total electricity consumption (TWh)",
+    "IT electricity consumption (TWh)",
+}
+
+
 def run() -> None:
     """Load IEA Energy and AI snapshot and create a meadow dataset."""
     paths.log.info("energy_ai_iea.start")
@@ -19,16 +43,14 @@ def run() -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("energy_ai_iea.xlsx")
 
-    # Process Regional Data sheet
-    df_regional = process_regional_data(snap)
+    #
+    # Process data.
+    #
+    # Read and process regional data.
+    tb = read_and_process_regional_data(snap=snap)
 
-    tb = Table(pd.DataFrame(df_regional), short_name="energy_ai_iea")
-
-    # Set index - year, country, and metric form the primary key
-    tb = tb.format(["country", "year", "metric", "scenario"])
-    # Add metadata
-    for col in tb.columns:
-        tb[col].metadata.origins = [snap.metadata.origin]
+    # Improve table format.
+    tb = tb.format(["country", "year", "metric", "scenario"], short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -42,42 +64,19 @@ def run() -> None:
     paths.log.info("energy_ai_iea.end")
 
 
-def process_regional_data(snap) -> pd.DataFrame:
+def read_and_process_regional_data(snap) -> Table:
     """Process Regional Data sheet into long format."""
-    # Constants
-    YEAR_ROW = 3
-    YEAR_COLS = slice(2, 7)
-    DATA_START_ROW = 4
-    VALUE_COL = 1
-    VALUE_START_COL = 2
-    PROJECTION_YEAR = 2030
-
-    METRIC_HEADERS = {
-        "Total installed capacity (GW)",
-        "Total electricity consumption (TWh)",
-    }
-
-    # All possible metric headers in the sheet (to detect when we enter a new section)
-    ALL_METRIC_HEADERS = {
-        "Total installed capacity (GW)",
-        "IT installed capacity (GW)",
-        "Power usage effectiveness",
-        "Load factor (%)",
-        "Total electricity consumption (TWh)",
-        "IT electricity consumption (TWh)",
-    }
-
-    df = snap.read(sheet_name="Regional Data", header=None, safe_types=False)
+    tb_raw = snap.read(sheet_name="Regional Data", header=None, safe_types=False)
 
     # Extract year headers (row 3: 2020, 2023, 2024, 2030)
-    years = df.iloc[YEAR_ROW, YEAR_COLS].values
+    years = tb_raw.iloc[YEAR_ROW, YEAR_COLS].values
     years = [int(y) if pd.notna(y) and y != 0 else None for y in years]
 
     data_rows = []
     current_metric = None
 
-    for idx in range(DATA_START_ROW, len(df)):
-        row = df.iloc[idx]
+    for idx in range(DATA_START_ROW, len(tb_raw)):
+        row = tb_raw.iloc[idx]
         cell_value = row[VALUE_COL]
 
         if pd.isna(cell_value):
@@ -115,4 +114,7 @@ def process_regional_data(snap) -> pd.DataFrame:
                     }
                 )
 
-    return pd.DataFrame(data_rows)
+    # Create a table with metadata.
+    tb = snap.read_from_df(data_rows)
+
+    return tb
