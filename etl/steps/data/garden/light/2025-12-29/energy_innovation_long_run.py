@@ -115,15 +115,14 @@ def calculate_weeks_of_earnings_needed_for_reading(
 
     # In tb_earnings, create cpi_base, with the value of cpi for the year 2000 (for each country)
 
-    tb_earnings["cpi_base"] = tb_earnings.groupby("country")["cpi"].transform(
+    tb_earnings["cpi_base_year"] = tb_earnings.groupby("country")["cpi"].transform(
         lambda x: x.loc[tb_earnings["year"] == 2000].values[0]
     )
 
-    # Calculate cpi_rebased, as cpi / cpi_base
-    tb_earnings["cpi_rebased"] = tb_earnings["cpi"] / tb_earnings["cpi_base"]
-
-    # Calculate real_average_weekly_earnings
-    tb_earnings["real_average_weekly_earnings"] = tb_earnings["average_weekly_earnings"] / tb_earnings["cpi_rebased"]
+    # Calculate real_average_weekly_earnings as average_weekly_earnings * cpi_base/cpi
+    tb_earnings["real_average_weekly_earnings"] = tb_earnings["average_weekly_earnings"] * (
+        tb_earnings["cpi_base_year"] / tb_earnings["cpi"]
+    )
 
     if EXPAND_EARNING_SERIES:
         tb_earnings = prepare_earnings_extended(tb_earnings_new=tb_earnings_new, tb_cpi=tb_cpi, tb_earnings=tb_earnings)
@@ -166,16 +165,18 @@ def prepare_earnings_extended(tb_earnings_new: Table, tb_cpi: Table, tb_earnings
     )
 
     # Calculate cpi_base for year 2000
-    tb_earnings_new["cpi_base"] = tb_earnings_new.groupby("country")["cpi"].transform(
+    tb_earnings_new["cpi_base_new"] = tb_earnings_new.groupby("country")["cpi"].transform(
         lambda x: x.loc[tb_earnings_new["year"] == 2000].values[0]
     )
 
-    # Calculate cpi_rebased
-    tb_earnings_new["cpi_rebased"] = tb_earnings_new["cpi"] / tb_earnings_new["cpi_base"]
+    # Calculate cpi_base for year 2015
+    tb_earnings_new["cpi_base_old"] = tb_earnings_new.groupby("country")["cpi"].transform(
+        lambda x: x.loc[tb_earnings_new["year"] == 2015].values[0]
+    )
 
-    # Calculate real_average_weekly_earnings
-    tb_earnings_new["real_average_weekly_earnings"] = (
-        tb_earnings_new["average_weekly_earnings"] * tb_earnings_new["cpi_rebased"]
+    # Calculate real_average_weekly_earnings as the real value in 2015 prices multiplied by the ratio of cpi_base_new to cpi_base_old
+    tb_earnings_new["real_average_weekly_earnings"] = tb_earnings_new["average_weekly_earnings"] * (
+        tb_earnings_new["cpi_base_new"] / tb_earnings_new["cpi_base_old"]
     )
 
     # Calculate the maximum year in tb_earnings
