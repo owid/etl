@@ -33,6 +33,9 @@ def run() -> None:
     ds_electricity = paths.load_dataset("electricity_mix")
     tb_electricity = ds_electricity.read("electricity_mix")
 
+    #
+    # Process data.
+    #
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb)
 
@@ -45,15 +48,6 @@ def run() -> None:
     # Calculate share of total electricity demand
     tb_share = calculate_share_of_total_demand(tb, tb_electricity)
 
-    ####################################################################################################################
-    # TODO: Alternative method. Uncomment if agreed.
-    # Add custom regions (e.g. "World excl. US and China").
-    # tb = add_custom_regions(tb=tb)
-
-    # Add rows for electricity consumption (from IEA) as a share of electricity demand (from Ember).
-    # tb_share = create_share_of_electricity_demand(tb=tb, tb_electricity=tb_electricity)
-    ####################################################################################################################
-
     # Combine original data with share data
     tb_combined = pr.concat([tb, tb_share], ignore_index=True)
 
@@ -63,8 +57,32 @@ def run() -> None:
     # Pivot to wide format: each metric-scenario combination becomes a column
     tb_wide = tb_combined.pivot(index=["country", "year"], columns="column_name", values="value").reset_index()
 
+    ####################################################################################################################
+    # # TODO: Alternative method. Uncomment if agreed.
+    # # Add custom regions (e.g. "World excl. US and China").
+    # tb = add_custom_regions(tb=tb)
+
+    # # Add rows for electricity consumption (from IEA) as a share of electricity demand (from Ember).
+    # tb_share = create_share_of_electricity_demand(tb=tb, tb_electricity=tb_electricity)
+
+    # # Create column names from metric and scenario combinations
+    # tb["column_name"] = tb["metric"] + " - " + tb["scenario"]
+
+    # # Pivot to wide format: each metric-scenario combination becomes a column
+    # tb_wide = tb.pivot(index=["country", "year"], columns="column_name", values="value", join_column_levels_with="")
+
+    # # Combine table of total values with table of share values.
+    # tb_wide = tb_wide.merge(
+    #     tb_share[["country", "year", "value"]].rename(columns={"value": f"{SHARE_METRIC} - {HISTORICAL_SCENARIO}"}),
+    #     on=["country", "year"],
+    #     how="outer",
+    # )
+
+    ####################################################################################################################
+
     # Format
     tb_wide = tb_wide.format(["country", "year"])
+
     #
     # Save outputs.
     #
