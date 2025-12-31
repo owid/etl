@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -95,6 +96,9 @@ def process_lighting_prices(tb_lighting_prices: Table) -> Table:
 
     # Replace underscore with space in lighting_source
     tb_lighting_prices["lighting_source"] = tb_lighting_prices["lighting_source"].str.replace("_", " ")
+
+    # For lighting_price, make all zero values NaN
+    tb_lighting_prices["lighting_price"] = tb_lighting_prices["lighting_price"].replace(0, pd.NA)
 
     return tb_lighting_prices
 
