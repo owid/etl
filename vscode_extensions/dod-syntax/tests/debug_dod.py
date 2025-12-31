@@ -2,10 +2,11 @@
 """
 Debug script to test DoD pattern matching
 """
+
 import re
 
 # Test the same regex pattern as used in the extension
-dod_regex = r'\[([^\]]+)\]\(#dod:([^)]+)\)'
+dod_regex = r"\[([^\]]+)\]\(#dod:([^)]+)\)"
 
 test_content = """
 title: "Test DoD Hover"
