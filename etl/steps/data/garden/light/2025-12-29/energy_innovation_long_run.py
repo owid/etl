@@ -11,6 +11,9 @@ paths = PathFinder(__file__)
 # Define lumens suitable fore reading
 LUMENS_FOR_READING = 800
 
+# Set if we expand earnings series or not
+EXPAND_EARNING_SERIES = True
+
 
 def run() -> None:
     #
@@ -26,6 +29,14 @@ def run() -> None:
     ds_earnings = paths.load_dataset("millennium_macroeconomic_data")
     tb_earnings = ds_earnings.read("millennium_macroeconomic_data")
 
+    # Load CPI UK
+    ds_cpi = paths.load_dataset("cpi_uk")
+    tb_cpi = ds_cpi.read("cpi_uk")
+
+    # Load modern UK earnings series
+    ds_earnings_new = paths.load_dataset("average_weekly_earnings_uk")
+    tb_earnings_new = ds_earnings_new.read("average_weekly_earnings_uk")
+
     #
     # Process data.
     #
@@ -35,7 +46,10 @@ def run() -> None:
 
     # Calculate weeks of earnings needed for reading
     tb_weeks_of_earnings = calculate_weeks_of_earnings_needed_for_reading(
-        tb_lighting_prices=tb_lighting_prices, tb_earnings=tb_earnings
+        tb_lighting_prices=tb_lighting_prices,
+        tb_earnings=tb_earnings,
+        tb_earnings_new=tb_earnings_new,
+        tb_cpi=tb_cpi,
     )
 
     # Improve table format.
@@ -85,7 +99,9 @@ def process_lighting_prices(tb_lighting_prices: Table) -> Table:
     return tb_lighting_prices
 
 
-def calculate_weeks_of_earnings_needed_for_reading(tb_lighting_prices: Table, tb_earnings: Table) -> Table:
+def calculate_weeks_of_earnings_needed_for_reading(
+    tb_lighting_prices: Table, tb_earnings: Table, tb_earnings_new: Table, tb_cpi: Table
+) -> Table:
     """
     Calculate the number of weeks needed to afford lighting for reading based on earnings.
     """
@@ -104,6 +120,9 @@ def calculate_weeks_of_earnings_needed_for_reading(tb_lighting_prices: Table, tb
 
     # Calculate real_average_weekly_earnings
     tb_earnings["real_average_weekly_earnings"] = tb_earnings["average_weekly_earnings"] / tb_earnings["cpi_rebased"]
+
+    if EXPAND_EARNING_SERIES:
+        tb_earnings = prepare_earnings_extended(tb_earnings_new=tb_earnings_new, tb_cpi=tb_cpi, tb_earnings=tb_earnings)
 
     # For lighting prices, select lighting source "average" and price_year 2000
     tb_lighting_prices_avg_2000 = tb_lighting_prices[
@@ -128,3 +147,42 @@ def calculate_weeks_of_earnings_needed_for_reading(tb_lighting_prices: Table, tb
     tb = tb[["country", "year", "weeks_of_earnings_needed_for_reading", "days_of_earnings_needed_for_reading"]]
 
     return tb
+
+
+def prepare_earnings_extended(tb_earnings_new: Table, tb_cpi: Table, tb_earnings: Table) -> Table:
+    """
+    Prepare extended earnings series by rebasing new series and appending to original long-run earnings table.
+    """
+    # Merge tb_earning_new with tb_cpi to rebase earnings
+    tb_earnings_new = pr.merge(
+        tb_earnings_new,
+        tb_cpi,
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Calculate cpi_base for year 2000
+    tb_earnings_new["cpi_base"] = tb_earnings_new.groupby("country")["cpi"].transform(
+        lambda x: x.loc[tb_earnings_new["year"] == 2000].values[0]
+    )
+
+    # Calculate cpi_rebased
+    tb_earnings_new["cpi_rebased"] = tb_earnings_new["cpi"] / tb_earnings_new["cpi_base"]
+
+    # Calculate real_average_weekly_earnings
+    tb_earnings_new["real_average_weekly_earnings"] = (
+        tb_earnings_new["average_weekly_earnings"] * tb_earnings_new["cpi_rebased"]
+    )
+
+    # Calculate the maximum year in tb_earnings
+    max_year_earnings = tb_earnings["year"].max()
+
+    # Filter tb_earnings_new for years greater than max_year_earnings
+    tb_earnings_new_filtered = tb_earnings_new[tb_earnings_new["year"] > max_year_earnings][
+        ["country", "year", "real_average_weekly_earnings"]
+    ]
+
+    # Append the filtered new earnings to the original earnings table
+    tb_earnings = pr.concat([tb_earnings, tb_earnings_new_filtered], ignore_index=True)
+
+    return tb_earnings
