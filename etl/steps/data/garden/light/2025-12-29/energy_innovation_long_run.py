@@ -15,6 +15,9 @@ LUMENS_FOR_READING = 800
 # Set if we expand earnings series or not
 EXPAND_EARNING_SERIES = True
 
+# Set debug mode
+DEBUG = False
+
 
 def run() -> None:
     #
@@ -186,6 +189,30 @@ def prepare_earnings_extended(tb_earnings_new: Table, tb_cpi: Table, tb_earnings
     tb_earnings_new_filtered = tb_earnings_new[tb_earnings_new["year"] > max_year_earnings][
         ["country", "year", "real_average_weekly_earnings"]
     ]
+
+    if DEBUG:
+        # Combine tb_earnings with tb_earnings_new
+        tb_earnings_debug = pr.merge(
+            tb_earnings[["country", "year", "real_average_weekly_earnings"]],
+            tb_earnings_new[["country", "year", "real_average_weekly_earnings"]],
+            on=["country", "year"],
+            how="inner",
+            validate="1:1",
+            suffixes=("_old", "_new"),
+        )
+        tb_earnings_debug.to_csv("debug_earnings_overlap.csv", index=False)
+
+        # Calculate absolute and relative differences between old and new earnings
+        tb_earnings_debug["absolute_difference"] = (
+            tb_earnings_debug["real_average_weekly_earnings_new"]
+            - tb_earnings_debug["real_average_weekly_earnings_old"]
+        ).abs()
+        tb_earnings_debug["relative_difference"] = (
+            tb_earnings_debug["absolute_difference"] / tb_earnings_debug["real_average_weekly_earnings_old"]
+        )
+
+        print("Earnings overlap debug info:")
+        print(tb_earnings_debug.describe())
 
     # Append the filtered new earnings to the original earnings table
     tb_earnings = pr.concat([tb_earnings, tb_earnings_new_filtered], ignore_index=True)
