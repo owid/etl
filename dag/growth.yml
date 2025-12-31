@@ -89,3 +89,10 @@ steps:
     - snapshot://bank_of_england/2025-12-29/millennium_macroeconomic_data.xlsx
   data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data:
     - data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data
+  #
+  # CPI UK (ONS)
+  #
+  data://meadow/ons/2025-12-31/cpi_uk:
+    - snapshot://ons/2025-12-31/cpi_uk.csv
+  data://garden/ons/2025-12-31/cpi_uk:
+    - data://meadow/ons/2025-12-31/cpi_uk
