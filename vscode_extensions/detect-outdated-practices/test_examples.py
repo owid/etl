@@ -7,29 +7,37 @@ Open this file in VS Code to see the warnings.
 # PATTERN 1: dest_dir usage
 # ========================================
 
+
 # Example 1: Function parameter with comma
 def create_dataset(dest_dir, table_name):
     pass
+
 
 # Example 2: Function parameter with closing parenthesis
 def save_data(dest_dir):
     pass
 
+
 # Example 3: Type annotation
 def process_files(dest_dir: str):
     pass
 
+
 # Example 4: Multiple parameters
 def complex_function(source_file, dest_dir, output_format):
     pass
+
 
 # Example 5: String literal (should also be detected)
 config = {"path": "dest_dir"}
 
 # Example 6: Type annotation with Path
 from pathlib import Path
+
+
 def handle_path(dest_dir: Path):
     pass
+
 
 # Example 7: Variable usage with comma
 my_var = dest_dir, other_var
@@ -53,17 +61,14 @@ tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
 geo.harmonize_countries(df, countries_file="mapping.json")
 
 # Example 3: With excluded countries
-result = geo.harmonize_countries(
-    tb,
-    countries_file=paths.country_mapping_path,
-    excluded_countries=["World"]
-)
+result = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path, excluded_countries=["World"])
 
 # ========================================
 # PATTERN 3: paths.load_dependency
 # ========================================
 
 from etl.helpers import PathFinder
+
 paths = PathFinder(__file__)
 
 # Example 1: Loading a dataset

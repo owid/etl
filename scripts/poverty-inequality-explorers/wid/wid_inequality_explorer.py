@@ -327,12 +327,12 @@ for tab in range(len(tables)):
 
     # BEFORE VS. AFTER TAX
     # Gini coefficient
-    df_graphers.loc[j, "title"] = f"Gini coefficient (after tax vs. before tax)"
-    df_graphers.loc[j, "ySlugs"] = f"p0p100_gini_pretax p0p100_gini_posttax_nat"
+    df_graphers.loc[j, "title"] = "Gini coefficient (after tax vs. before tax)"
+    df_graphers.loc[j, "ySlugs"] = "p0p100_gini_pretax p0p100_gini_posttax_nat"
     df_graphers.loc[j, "Indicator Dropdown"] = "Gini coefficient"
     df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
     df_graphers.loc[j, "subtitle"] = (
-        f"The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality."
+        "The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality."
     )
     df_graphers.loc[j, "note"] = ""
     df_graphers.loc[j, "type"] = np.nan
@@ -342,11 +342,11 @@ for tab in range(len(tables)):
     j += 1
 
     # Share of the top 10%
-    df_graphers.loc[j, "title"] = f"Income share of the richest 10% (after tax vs. before tax)"
-    df_graphers.loc[j, "ySlugs"] = f"p90p100_share_pretax p90p100_share_posttax_nat"
+    df_graphers.loc[j, "title"] = "Income share of the richest 10% (after tax vs. before tax)"
+    df_graphers.loc[j, "ySlugs"] = "p90p100_share_pretax p90p100_share_posttax_nat"
     df_graphers.loc[j, "Indicator Dropdown"] = "Share of the richest 10%"
     df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
-    df_graphers.loc[j, "subtitle"] = f"The share of income received by the richest 10% of the population."
+    df_graphers.loc[j, "subtitle"] = "The share of income received by the richest 10% of the population."
     df_graphers.loc[j, "note"] = ""
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
@@ -355,11 +355,11 @@ for tab in range(len(tables)):
     j += 1
 
     # Share of the top 1%
-    df_graphers.loc[j, "title"] = f"Income share of the richest 1% (after tax vs. before tax)"
-    df_graphers.loc[j, "ySlugs"] = f"p99p100_share_pretax p99p100_share_posttax_nat"
+    df_graphers.loc[j, "title"] = "Income share of the richest 1% (after tax vs. before tax)"
+    df_graphers.loc[j, "ySlugs"] = "p99p100_share_pretax p99p100_share_posttax_nat"
     df_graphers.loc[j, "Indicator Dropdown"] = "Share of the richest 1%"
     df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
-    df_graphers.loc[j, "subtitle"] = f"The share of income received by the richest 1% of the population."
+    df_graphers.loc[j, "subtitle"] = "The share of income received by the richest 1% of the population."
     df_graphers.loc[j, "note"] = ""
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
@@ -368,11 +368,11 @@ for tab in range(len(tables)):
     j += 1
 
     # Share of the top 0.1%
-    df_graphers.loc[j, "title"] = f"Income share of the richest 0.1% (after tax vs. before tax)"
-    df_graphers.loc[j, "ySlugs"] = f"p99_9p100_share_pretax p99_9p100_share_posttax_nat"
+    df_graphers.loc[j, "title"] = "Income share of the richest 0.1% (after tax vs. before tax)"
+    df_graphers.loc[j, "ySlugs"] = "p99_9p100_share_pretax p99_9p100_share_posttax_nat"
     df_graphers.loc[j, "Indicator Dropdown"] = "Share of the richest 0.1%"
     df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
-    df_graphers.loc[j, "subtitle"] = f"The share of income received by the richest 0.1% of the population."
+    df_graphers.loc[j, "subtitle"] = "The share of income received by the richest 0.1% of the population."
     df_graphers.loc[j, "note"] = ""
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
@@ -381,11 +381,11 @@ for tab in range(len(tables)):
     j += 1
 
     # Share of the bottom 50%
-    df_graphers.loc[j, "title"] = f"Income share of the poorest 50% (after tax vs. before tax)"
-    df_graphers.loc[j, "ySlugs"] = f"p0p50_share_pretax p0p50_share_posttax_nat"
+    df_graphers.loc[j, "title"] = "Income share of the poorest 50% (after tax vs. before tax)"
+    df_graphers.loc[j, "ySlugs"] = "p0p50_share_pretax p0p50_share_posttax_nat"
     df_graphers.loc[j, "Indicator Dropdown"] = "Share of the poorest 50%"
     df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
-    df_graphers.loc[j, "subtitle"] = f"The share of income received by the poorest 50% of the population."
+    df_graphers.loc[j, "subtitle"] = "The share of income received by the poorest 50% of the population."
     df_graphers.loc[j, "note"] = ""
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
@@ -394,12 +394,12 @@ for tab in range(len(tables)):
     j += 1
 
     # # Palma ratio
-    df_graphers.loc[j, "title"] = f"Palma ratio (after tax vs. before tax)"
-    df_graphers.loc[j, "ySlugs"] = f"palma_ratio_pretax palma_ratio_posttax_nat"
+    df_graphers.loc[j, "title"] = "Palma ratio (after tax vs. before tax)"
+    df_graphers.loc[j, "ySlugs"] = "palma_ratio_pretax palma_ratio_posttax_nat"
     df_graphers.loc[j, "Indicator Dropdown"] = "Palma ratio"
     df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
     df_graphers.loc[j, "subtitle"] = (
-        f"The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality."
+        "The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality."
     )
     df_graphers.loc[j, "note"] = ""
     df_graphers.loc[j, "type"] = np.nan

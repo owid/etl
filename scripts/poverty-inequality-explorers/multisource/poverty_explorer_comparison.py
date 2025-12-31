@@ -967,7 +967,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Indicator Dropdown"] = "Poverty gap index"
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_abs['povline_dropdown'][p]}"
             df_graphers.loc[j, "subtitle"] = (
-                f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
+                "The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
             )
             df_graphers.loc[j, "note"] = (
                 f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
@@ -1066,7 +1066,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Indicator Dropdown"] = "Poverty gap index"
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_rel['dropdown'][pct]}"
             df_graphers.loc[j, "subtitle"] = (
-                f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
+                "The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
             )
             df_graphers.loc[j, "note"] = (
                 f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."

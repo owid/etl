@@ -176,7 +176,7 @@ class TypedDictGenerator:
         if description:
             lines.append(f'    """{description}"""')
         else:
-            lines.append(f'    """Generated from JSON schema."""')
+            lines.append('    """Generated from JSON schema."""')
 
         if not properties:
             lines.append("    pass")
