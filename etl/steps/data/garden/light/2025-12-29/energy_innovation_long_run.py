@@ -212,7 +212,7 @@ def prepare_earnings_extended(tb_earnings_new: Table, tb_cpi: Table, tb_earnings
         )
 
         print("Earnings overlap debug info:")
-        print(tb_earnings_debug.describe())
+        print(tb_earnings_debug[["absolute_difference", "relative_difference"]].describe())
 
     # Append the filtered new earnings to the original earnings table
     tb_earnings = pr.concat([tb_earnings, tb_earnings_new_filtered], ignore_index=True)
