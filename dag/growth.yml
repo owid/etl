@@ -96,3 +96,11 @@ steps:
     - snapshot://ons/2025-12-31/cpi_uk.csv
   data://garden/ons/2025-12-31/cpi_uk:
     - data://meadow/ons/2025-12-31/cpi_uk
+
+  #
+  # Real average weekly earnings UK (ONS)
+  #
+  data://meadow/ons/2025-12-31/average_weekly_earnings_uk:
+    - snapshot://ons/2025-12-31/average_weekly_earnings_uk.xlsx
+  data://garden/ons/2025-12-31/average_weekly_earnings_uk:
+    - data://meadow/ons/2025-12-31/average_weekly_earnings_uk
