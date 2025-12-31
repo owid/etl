@@ -45,6 +45,15 @@ def run() -> None:
     # Calculate share of total electricity demand
     tb_share = calculate_share_of_total_demand(tb, tb_electricity)
 
+    ####################################################################################################################
+    # TODO: Alternative method. Uncomment if agreed.
+    # Add custom regions (e.g. "World excl. US and China").
+    # tb = add_custom_regions(tb=tb)
+
+    # Add rows for electricity consumption (from IEA) as a share of electricity demand (from Ember).
+    # tb_share = create_share_of_electricity_demand(tb=tb, tb_electricity=tb_electricity)
+    ####################################################################################################################
+
     # Combine original data with share data
     tb_combined = pr.concat([tb, tb_share], ignore_index=True)
 
@@ -237,3 +246,105 @@ def calculate_share_of_total_demand(tb: Table, tb_electricity: Table) -> Table:
     tb_share = tb_merged[["country", "year", "metric", "scenario", "value"]]
 
     return Table(tb_share)
+
+
+def add_custom_regions(tb):
+    """
+    Add custom regions:
+    - North America (IEA) excl. United States = North America (IEA) - United States
+    - Asia Pacific (IEA) excl. China = Asia Pacific (IEA) - China
+    - World excl. United States and China = World - United States - China
+    """
+    tb = tb.copy()
+
+    # Create a temporary table for US with negative values (to be subtracted later when creating aggregates).
+    tb_us_subtracted = (
+        tb[tb["country"] == "United States"].reset_index(drop=True).assign(**{"country": "United States subtracted"})
+    )
+    tb_us_subtracted["value"] *= -1
+
+    # Idem for China.
+    tb_china_subtracted = tb[tb["country"] == "China"].reset_index(drop=True).assign(**{"country": "China subtracted"})
+    tb_china_subtracted["value"] *= -1
+
+    # Combine original table with temporary ones.
+    tb = pr.concat([tb, tb_us_subtracted, tb_china_subtracted], ignore_index=True)
+
+    # Create a custom aggregate region for World excluding United States and China.
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        index_columns=["country", "year", "metric", "scenario"],
+        regions={
+            "World excl. United States and China": {
+                "custom_members": ["World", "United States subtracted", "China subtracted"]
+            }
+        },
+    )
+
+    # Create a custom aggregate region for Asia excluding China.
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        index_columns=["country", "year", "metric", "scenario"],
+        regions={"Asia Pacific (IEA) excl. China": {"custom_members": ["Asia Pacific (IEA)", "China subtracted"]}},
+    )
+
+    # Create a custom aggregate region for North America excluding United States.
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        index_columns=["country", "year", "metric", "scenario"],
+        regions={
+            "North America (IEA) excl. United States": {
+                "custom_members": ["North America (IEA)", "United States subtracted"]
+            }
+        },
+    )
+
+    # Remove temporary rows.
+    tb = tb[~tb["country"].str.contains("subtracted")].reset_index(drop=True)
+
+    return tb
+
+
+def create_share_of_electricity_demand(tb, tb_electricity):
+    # Create a table of electricity demand (defined by Ember as electricity generation minus net imports) for selected countries.
+    tb_demand = (
+        tb_electricity[tb_electricity["country"].isin(["World", "United States", "China"])][
+            ["country", "year", "total_demand__twh"]
+        ]
+        .dropna()
+        .reset_index(drop=True)
+    )
+
+    # Create a temporary table for the demand of China and US.
+    tb_demand_us_china = (
+        tb_demand[tb_demand["country"].isin(["United States", "China"])]
+        .groupby(["year"], as_index=False)
+        .agg({"total_demand__twh": "sum"})
+    )
+
+    # Create a temporary table for the demand of all countries except China and US.
+    tb_demand_rest = (
+        tb_demand[tb_demand["country"] == "World"]
+        .drop(columns=["country"])
+        .merge(tb_demand_us_china, on="year", how="inner", suffixes=("_world", "_us_china"))
+    )
+    tb_demand_rest["total_demand__twh"] = (
+        tb_demand_rest["total_demand__twh_world"] - tb_demand_rest["total_demand__twh_us_china"]
+    )
+    tb_demand_rest["country"] = "World excl. United States and China"
+
+    # Combine the original demand table with the one that includes World excl. US and China.
+    tb_demand = pr.concat([tb_demand, tb_demand_rest[["country", "year", "total_demand__twh"]]], ignore_index=True)
+
+    # Create a new table with the electricity consumption of China, US, World, and rest of the world, as a percentage of their total electricity demand.
+    tb_share = tb[
+        (tb["metric"] == TOTAL_ELEC_CONSUMPTION_METRIC)
+        & (tb["scenario"] == HISTORICAL_SCENARIO)
+        & (tb["country"].isin(["World", "China", "United States", "World excl. United States and China"]))
+    ].reset_index(drop=True)
+    tb_share = tb_share.merge(tb_demand, on=["country", "year"], how="left")
+    tb_share["value"] = 100 * tb_share["value"] / tb_share["total_demand__twh"]
+    tb_share["metric"] = SHARE_METRIC
+    tb_share = tb_share.drop(columns=["total_demand__twh"])
+
+    return tb_share

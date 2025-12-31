@@ -229,6 +229,7 @@ steps:
   data://garden/artificial_intelligence/2025-11-07/energy_ai_iea:
     - data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea
     - data://garden/energy/2025-06-27/electricity_mix
+    - data://garden/regions/2023-01-01/regions
   data://grapher/artificial_intelligence/2025-11-07/energy_ai_iea:
     - data://garden/artificial_intelligence/2025-11-07/energy_ai_iea
 
