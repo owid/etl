@@ -65,7 +65,7 @@ definitions:
   description_short_employment_to_population_ratio: |-
     Share of the << sex >>working-age population << age >>who are employed.
   description_short_vulnerable_employment: |-
-    Share of employed population who are working as own-account workers (self-employed without staff), or contributing family workers (self-employed in a household business or farm).
+    Share of employed population who are working as independent own-account workers (self-employed without staff), or contributing family workers (self-employed in a household business or farm).
   description_short_labor_force_female: |-
     Share of the working-age population economically active (employed or unemployed) who are female.
   description_short_employment_agriculture: |-
@@ -105,11 +105,11 @@ definitions:
     When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO’s guidelines define it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
 
   description_key_vulnerable_employment_1: |-
-    This indicator shows the share of employed people in vulnerable employment – those working as own-account workers or as contributing family members. These groups are more likely to lack formal arrangements and social protection, and to have variable income.
+    This indicator shows the share of employed people in vulnerable employment – those working as independent own-account workers or as contributing family members. These groups are more likely to lack formal arrangements and social protection, and to have variable income.
   description_key_vulnerable_employment_2: |-
-    Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. Contributing family members are workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. These groups are defined according to the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93).
+    Independent own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. Contributing family members are workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. These groups are defined according to the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93).
   description_key_vulnerable_employment_3: |-
-    A higher share indicates greater labor market vulnerability, which is more common in lower-income countries. Over time, the share tends to fall as countries get richer and more workers move into wage and salaried employment. It’s important to note that this is a broad measure: even within this category, people’s work circumstances can vary widely. For example, some own-account workers in rich countries are highly paid professionals or freelancers, and would not usually be considered “vulnerable”.
+    A higher share indicates greater labor market vulnerability, which is more common in lower-income countries. Over time, the share tends to fall as countries get richer and more workers move into wage and salaried employment. It’s important to note that this is a broad measure: even within this category, people’s work circumstances can vary widely. For example, some independent own-account workers in rich countries are highly paid professionals or freelancers, and would not usually be considered “vulnerable”.
   description_key_employment_agriculture: |-
     The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
   description_key_employment_industry: |-

@@ -262,7 +262,7 @@ def main_cli(
 
     for _ in runs:
         if ipdb:
-            config.IPDB_ENABLED = True
+            config.IPDB_ENABLED = True  # type: ignore[assignment]
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
             kwargs["workers"] = 1
@@ -787,10 +787,10 @@ def _set_dependencies_to_nondirty(step: Step) -> None:
     """Set all dependencies of a step to non-dirty."""
     if isinstance(step, DataStep):
         for step_dep in step.dependencies:
-            step_dep.is_dirty = _always_clean
+            step_dep.is_dirty = _always_clean  # type: ignore[method-assign]
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
-            step.data_step.is_dirty = _always_clean
+            step.data_step.is_dirty = _always_clean  # type: ignore[method-assign]
 
 
 def _check_public_private_steps(dag: DAG) -> None:

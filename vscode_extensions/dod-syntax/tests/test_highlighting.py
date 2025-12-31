@@ -2,7 +2,7 @@
 
 # These should be highlighted (in strings):
 desc1 = "This has a [test DOD](#dod:test) reference."
-desc2 = 'Another [DOD reference](#dod:another) in single quotes.'
+desc2 = "Another [DOD reference](#dod:another) in single quotes."
 desc3 = """
 Multiline string with [DOD](#dod:multiline) reference.
 """

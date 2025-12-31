@@ -179,7 +179,9 @@ definitions:
     <%- endif %>
 
   description_key_ppp: |-
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+    <%- endif %>
 
   description_key_welfare_type_base: |-
     Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
@@ -579,9 +581,9 @@ definitions:
     <%- endif %>
 
   map_brackets_income_gap_ratio: &map_brackets_income_gap_ratio <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
+    [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
     <%- else %>
-    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
   map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index |-

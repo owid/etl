@@ -439,7 +439,7 @@ class PathFinder:
         )
 
     @staticmethod
-    def _get_attributes_from_step_name(step_name: str) -> dict[str, str]:
+    def _get_attributes_from_step_name(step_name: str) -> dict[str, str | bool]:
         """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
         if channel_type.startswith(("snapshot",)):
@@ -577,7 +577,7 @@ class PathFinder:
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
-        elif (step_type == "export") and (dependency["channel"] in "multidim"):
+        elif (step_type == "export") and (dependency["channel"] == "multidim"):
             collection_path = (
                 paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )

@@ -20,7 +20,7 @@ def test_dict_mixin():
         name: str | None = None
         age: int | None = None
 
-        def to_dict(self) -> dict[str, Any]: ...
+        def to_dict(self) -> dict[str, Any]: ...  # type: ignore
 
     assert Dog(name="fred").to_dict() == {"name": "fred"}
     assert Dog(age=10).to_dict() == {"age": 10}
@@ -42,7 +42,7 @@ def test_dict_mixin_nested():
         age: int | None = None
         cat: Cat | None = None
 
-        def to_dict(self) -> dict[str, Any]: ...
+        def to_dict(self) -> dict[str, Any]: ...  # type: ignore
 
     assert Dog(name="fred", cat=Cat(name="cred")).to_dict() == {"name": "fred", "cat": {"name": "cred"}}
 

@@ -223,7 +223,6 @@ steps:
   data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
     - data://garden/us_census_bureau/2025-11-17/datacenter_construction
 
-
   # IEA Energy Consumption by AI dataset
   data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea:
     - snapshot://artificial_intelligence/2025-11-07/energy_ai_iea.xlsx
@@ -232,3 +231,26 @@ steps:
     - data://garden/energy/2025-06-27/electricity_mix
   data://grapher/artificial_intelligence/2025-11-07/energy_ai_iea:
     - data://garden/artificial_intelligence/2025-11-07/energy_ai_iea
+
+  # TSMC operating data
+  data://meadow/tsmc/2025-11-10/operating_data:
+    - snapshot://tsmc/2025-11-10/operating_data.xlsx
+  data://garden/tsmc/2025-11-10/operating_data:
+    - data://meadow/tsmc/2025-11-10/operating_data
+  data://grapher/tsmc/2025-11-10/operating_data:
+    - data://garden/tsmc/2025-11-10/operating_data
+
+  # TWD/USD exchange rates from Central Bank of Taiwan
+  data://meadow/cbc_taiwan/2025-12-22/twd_usd_exchange_rate:
+    - snapshot://cbc_taiwan/2025-12-22/twd_usd_exchange_rate.csv
+  data://garden/cbc_taiwan/2025-12-22/twd_usd_exchange_rate:
+    - data://meadow/cbc_taiwan/2025-12-22/twd_usd_exchange_rate
+
+  # TSMC monthly revenue
+  data://meadow/tsmc/2025-11-10/monthly_revenue:
+    - snapshot://tsmc/2025-11-10/monthly_revenue.xlsx
+  data://garden/tsmc/2025-11-10/monthly_revenue:
+    - data://meadow/tsmc/2025-11-10/monthly_revenue
+    - data://garden/cbc_taiwan/2025-12-22/twd_usd_exchange_rate
+  data://grapher/tsmc/2025-11-10/monthly_revenue:
+    - data://garden/tsmc/2025-11-10/monthly_revenue

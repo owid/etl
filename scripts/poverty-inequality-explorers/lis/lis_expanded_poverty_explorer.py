@@ -796,7 +796,7 @@ for tab in range(len(tables)):
                 f"poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_100 poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_200 poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_500 poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_1000 poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_2000 poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_3000 poverty_gap_index_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}_4000"
             )
             df_graphers.loc[j, "Indicator Dropdown"] = "Poverty gap index"
-            df_graphers.loc[j, "Poverty line Dropdown"] = f"Multiple lines"
+            df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
             df_graphers.loc[j, "Income measure Dropdown"] = f"{welfare['dropdown_option'][wel]}"
             df_graphers.loc[
                 j,
