@@ -346,6 +346,11 @@ def generate_subtitle_by_dimensions(view):
                 f"{gender_term.title()} of official age for each level of education not enrolled at that level of education, "
                 f"expressed as a percentage of the total population of {gender_term} in that age group."
             )
+        elif view.matches(sex="sex_side_by_side"):
+            return (
+                f"Share of girls and boys {age_range} not enrolled in {scope} education, "
+                f"expressed as a percentage of the total population of girls and boys in that age group."
+            )
         else:
             return (
                 f"{gender_term.title()} {age_range} not enrolled in {scope} education, "
@@ -356,6 +361,8 @@ def generate_subtitle_by_dimensions(view):
     else:
         if view.matches(level="level_side_by_side"):
             return f"{gender_term.title()} of official age for each level of education not enrolled in that level of education or higher."
+        elif view.matches(sex="sex_side_by_side"):
+            return f"Number of girls and boys {age_range} not enrolled in {scope} education or higher."
         else:
             return f"{gender_term.title()} {age_range} not enrolled in {scope} education or higher."
 
