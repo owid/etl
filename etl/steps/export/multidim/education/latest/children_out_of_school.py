@@ -297,6 +297,8 @@ def generate_title_by_dimensions(view):
     else:
         if view.matches(level="level_side_by_side"):
             return f"Number of {gender_term} of official age for each level of education who are not in school"
+        elif view.matches(sex="sex_side_by_side"):
+            return f"Number of girls and boys who are not in {title_term} school"
         else:
             return f"Number of {gender_term} who are not in {title_term} school"
 
