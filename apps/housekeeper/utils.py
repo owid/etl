@@ -1,6 +1,8 @@
-from datetime import date, datetime
+from datetime import date
+from pathlib import Path
 from typing import List
 
+import yaml
 from sqlalchemy.orm import Session
 
 from apps.utils.llms.gpt import GPTQuery, GPTResponse, OpenAIWrapper
@@ -8,40 +10,18 @@ from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher import model as gm
 
-# System prompt to summarize chart information
-MODEL_DEFAULT = "gpt-5"
-SYSTEM_PROMPT = f"""We are reviewing a chart that was created some time ago. We want to understand if we can unpublish it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance), keep it as-is, improve it and keep it etc.
-
-Your job is to briefly summarize what the chart is about, and to provide some context about the variables used in the chart. You can also check the chart's history to see if it has been edited recently, and the number of views in the last year that it gets (consider that the median of the chart views in last year is ~1300 views; i.e. half of the charts get less than 1300 views). Fewer-than median doesn't imply that we should unpublish, but together with other indicators can help us to decide. Note that some charts may have few visits because they were published very recently, so you should also consider the date of publication. Also, if it has been edited often and recently, it is a good indicator that the chart is still relevant and useful.
-
-In your response, consider today's date {date.today().strftime("%Y-%m-%d")}, and provide three blocks:
-
-(i) Chart Description: To this end, look at the information given by the chart configuration parameters, and the different variables used in it. Don't get lost into the details. This should be at most ~3 sentences or so.
-(ii) General comment: Based on the information you have, provide a comment on the quality of the chart and its edit activity. You can measure the quality of the chart by checking if there are typos, inconsistencies, and, most importantly, outdated information. Remember that you can compare the views of the chart to the median value. When looking at the activity, focus on whether there have been recent and regular edits. First sentence of your comment should be short and provide the recommended action (e.g. 'Recommended action: Keep the chart', 'Recommended action: Unpublish the chart', 'No action recommended'). Then, follow your recommendation with 2-3 bullet points (use symbol '•') with the reasons. Don't be too verbose, and try to keep your comment concise, short and to the point.
-(iii) Edits timeline: Summarize the various edits that the chart has had over time. We are interested in knowing who might be the owner of the chart, so look at the most recent major edits. Provide the list of *all* the edits, with the name of the person who made the edit, and the date (no need to add the hour) of the edit. Sort the list in descending order of the date. Structure each item in the list as follows: "YYYY-MM-DD: Edit by 'Name of the person who made the edit'".
-
-Each block should be formatted with a title in bold (just use one '*'), and a brief text. You can use the following template:
-
-*→ Chart Description*
-This chart shows the evolution of the number of COVID-19 cases in the world, by continent. It uses data from the COVID-19 dataset.
-
-*→ General comment*
-Recommended action: ...
-• Reason 1
-• Reason 2
-...
-
-*→ Edits timeline*
-This chart has been mostly edited by 'Max Roser' and 'Esteban Ortiz-Ospina'. The last edit was done on 2021-01-01 by 'Max Roser'.
-
-2021-01-01: Edit by 'Max Roser'
-2020-12-01: Edit by 'Esteban Ortiz-Ospina'
-...
-"""
-
 # Today and one year ago
-TODAY = datetime.today()
+TODAY = date.today()
 YEAR_AGO = TODAY.replace(year=TODAY.year - 1)
+
+# Load LLM configuration
+CURRENT_DIR = Path(__file__).parent
+with open(CURRENT_DIR / "config.yaml", "r") as f:
+    CONFIG = yaml.safe_load(f)
+
+# System prompt to summarize chart information
+MODEL_DEFAULT = CONFIG["charts"]["llm"]["model_name"]
+SYSTEM_PROMPT = CONFIG["charts"]["llm"]["system_prompt"].format(TODAY=TODAY.strftime("%Y-%m-%d"))
 
 
 def get_reviews_id(object_type: str):
