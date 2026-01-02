@@ -1,6 +1,6 @@
 charts:
   llm:
-    model_name: gpt-5
+    model_name: openai:gpt-5.2
     system_prompt: |-
       We are reviewing a chart that was created some time ago. We want to understand if we can unpublish it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance), keep it as-is, improve it and keep it etc.
 

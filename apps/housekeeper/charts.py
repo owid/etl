@@ -3,9 +3,9 @@ from structlog import get_logger
 from apps.chart_sync.admin_api import AdminAPI
 from apps.housekeeper.utils import (
     TODAY,
-    add_reviews,
     get_chart_summary,
-    get_reviews_id,
+    owidb_get_reviews_id,
+    owidb_submit_review_id,
 )
 from etl.analytics.metabase import get_question_data
 from etl.config import OWID_ENV, SLACK_API_TOKEN
@@ -30,10 +30,6 @@ def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: 
     log.info("Select chart...")
     chart = df.iloc[0]
 
-    # DEBUGGING:
-    # 2582 (wordpress link), 1609 (no references), 5689 (explorer, no post), 4288 (explorer, wp post), 2093 (no explorer, post), 3475 (explorer, post), (explorer, post + wp)
-    # chart = df[df.chart_id == 3475].iloc[0]
-    # chart = df.iloc[0]
     log.info(f"Selected chart: {chart['chart_id']}, {chart['slug']}")
 
     # Get references
@@ -66,7 +62,7 @@ def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: 
         send_extra_messages(chart, refs, **kwargs)
 
         # 3/ Add chart to reviewed charts
-        add_reviews(object_type="chart", object_id=chart["chart_id"])
+        owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
 
 
 def get_charts_to_review():
@@ -80,7 +76,7 @@ def get_charts_to_review():
         prod=True,
     )
     # Skip those that have been already reviewed
-    reviews_id = get_reviews_id(object_type="chart")
+    reviews_id = owidb_get_reviews_id(object_type="chart")
     df = df.loc[~df["chart_id"].isin(reviews_id)]
 
     # Only return published charts
@@ -90,7 +86,11 @@ def get_charts_to_review():
 
 
 def get_references(chart_id: int):
-    """Get references to a chart (explorers, posts)."""
+    """Get references to a chart (explorers, posts).
+
+    For debugging purposes:
+    2582 (wordpress link), 1609 (no references), 5689 (explorer, no post), 4288 (explorer, wp post), 2093 (no explorer, post), 3475 (explorer, post), (explorer, post + wp)
+    """
     api = AdminAPI(OWID_ENV)
     refs = api.get_chart_references(chart_id)
     refs = refs["references"]
@@ -103,8 +103,7 @@ def build_main_message(chart, refs):
     message_usage = _get_main_message_usage(chart, refs)
     DATE = TODAY.strftime("%d %b, %Y")
     message = (
-        f"{DATE}: *Daily chart:* "
-        f"<{OWID_ENV.chart_site(chart['slug'])}|{chart['title']}>\n"
+        f"{DATE} <{OWID_ENV.chart_site(chart['slug'])}|daily chart>\n"
         f"{message_usage}\n"
         f"Go to <{OWID_ENV.chart_admin_site(chart['chart_id'])}|edit :writing_hand:>\n"
     )
@@ -138,9 +137,7 @@ def _get_main_message_usage(chart, refs):
 def send_extra_messages(chart, refs, **kwargs):
     """Provide more context in the thread"""
     ## 1/ Similar charts
-    similar_messages = (
-        f"🕵️ <{OWID_ENV.wizard_url}similar_charts?chart_search_text={chart['slug']}| → Explore similar charts>"
-    )
+    similar_messages = f"🕵️ <{OWID_ENV.wizard_url}related_charts?slug={chart['slug']}| → Explore related charts>"
 
     ## 2/ AI: Chart description, chart edit timeline, suggestion
     log.info("Getting AI summary...")
