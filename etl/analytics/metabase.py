@@ -24,10 +24,12 @@ COLLECTION_EXPERT_ID = 61  # Expert collection
 DATABASE_ID = 2  # Semantic Layer database
 
 
-def mb_cli(key: str | None = None):
+def mb_cli(domain: str | None = None, key: str | None = None):
+    if domain is None:
+        domain = METABASE_URL_LOCAL
     if key is None:
         key = METABASE_API_KEY
-    return Metabase_API(METABASE_URL_LOCAL, api_key=key)
+    return Metabase_API(domain, api_key=key)
 
 
 def read_metabase(sql: str) -> pd.DataFrame:
@@ -163,9 +165,19 @@ def create_question(
     return question
 
 
-def list_questions():
+def _get_domain(prod: bool = False) -> str:
+    if prod:
+        domain = METABASE_URL
+    else:
+        domain = METABASE_URL_LOCAL
+    return domain
+
+
+def list_questions(prod: bool = False) -> list[dict]:
+    domain = _get_domain(prod=prod)
+
     # Init API client
-    mb = mb_cli()
+    mb = mb_cli(domain=domain)
 
     # Get cards
     cards = mb.get("/api/card/")
@@ -180,9 +192,11 @@ def list_questions():
     return questions
 
 
-def get_question_info(question_id: int) -> dict:
+def get_question_info(question_id: int, prod: bool = False) -> dict:
+    domain = _get_domain(prod=prod)
+
     # Init API client
-    mb = mb_cli()
+    mb = mb_cli(domain=domain)
 
     # Get question
     question = mb.get_item_info(item_id=question_id, item_type="card")
@@ -192,9 +206,11 @@ def get_question_info(question_id: int) -> dict:
     return question
 
 
-def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
+def get_question_data(card_id: int, data_format: str = "csv", prod: bool = False) -> pd.DataFrame:
+    domain = _get_domain(prod=prod)
+
     # Init API client
-    mb = mb_cli()
+    mb = mb_cli(domain=domain)
 
     # Get card data
     data_str = mb.get_card_data(
@@ -210,9 +226,10 @@ def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
     return df
 
 
-def get_metabase_analytics():
+def get_metabase_analytics(prod: bool = False):
     """Get views on Metabase questions."""
-    mb = mb_cli(key=METABASE_API_KEY_ADMIN)
+    domain = _get_domain(prod=prod)
+    mb = mb_cli(key=METABASE_API_KEY_ADMIN, domain=domain)
 
     #########################
     # View counts

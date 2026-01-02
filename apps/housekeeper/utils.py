@@ -25,6 +25,10 @@ SYSTEM_PROMPT = CONFIG["charts"]["llm"]["system_prompt"].format(TODAY=TODAY.strf
 
 
 def get_reviews_id(object_type: str):
+    """Get IDs of objects (e.g. charts) that have been suggested for review by Housekeeper.
+
+    This is based on querying the HousekeeperReview table in MySQL.
+    """
     with Session(OWID_ENV.engine) as session:
         return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type)
 
