@@ -1,3 +1,6 @@
+from genai_prices import Usage, calc_price
+from pydantic_ai.usage import UsageBase
+
 from apps.utils.llms.models import LLM_MODELS
 
 # Get costs
@@ -6,12 +9,18 @@ LLM_MODELS_COST: dict[str, dict[str, float | dict[str, list[float]]]] = {
 }
 
 
-def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) -> float:
+def estimate_llm_cost(
+    model_name: str,
+    usage: Usage | UsageBase | None = None,
+    input_tokens: int | None = None,
+    output_tokens: int | None = None,
+) -> float:
     """Estimate the cost of an LLM interaction.
 
     Args:
         model_name: Name of the model (e.g., "openai:gpt-5-mini")
-        input_tokens: Number of input tokens used
+        usage: Usage of tokens. This is a typical pydantic-ai object (result.usage())
+        input_tokens: Number of input tokens used. If given, together with output_tokens, it overrides `usage`.
         output_tokens: Number of output tokens generated
 
     Returns:
@@ -21,21 +30,42 @@ def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) ->
         KeyError: If model_name is not found in MODELS_COST
         ValueError: If token counts are negative
     """
-    if input_tokens < 0 or output_tokens < 0:
+    # Check `usage` or `input_tokens`/`output_tokens`
+    if (input_tokens is not None) and (output_tokens is not None):
+        usage = Usage(
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+    if usage is None:
+        raise ValueError("Either `usage` or both `input_tokens` and `output_tokens` must be provided")
+
+    # Sanity checks
+    if usage.input_tokens is None or usage.output_tokens is None:
+        raise ValueError("Usage must have both input_tokens and output_tokens defined")
+
+    if usage.input_tokens < 0 or usage.output_tokens < 0:
         raise ValueError("Token counts must be non-negative")
 
-    if model_name not in LLM_MODELS_COST:
-        raise KeyError(f"Model '{model_name}' not found in MODELS_COST")
+    # Get provider id
+    if ":" in model_name:
+        model_name_list = model_name.split(":")
+        assert len(model_name_list) == 2, "Model name must be in 'provider:model' format"
+        provider_id = model_name_list[0]
+        model_name = model_name_list[1]
+    else:
+        provider_id = None
 
-    cost_config = LLM_MODELS_COST[model_name]
+    # Use genai_prices to calculate cost
+    price_data = calc_price(
+        usage,
+        model_ref=model_name,
+        provider_id=provider_id,
+    )
 
-    # Calculate input cost
-    input_cost = _calculate_tiered_cost(cost_config["in"], input_tokens)
+    # Convert to float
+    total_cost = float(price_data.total_price)
 
-    # Calculate output cost
-    output_cost = _calculate_tiered_cost(cost_config["out"], output_tokens)
-
-    return input_cost + output_cost
+    return total_cost
 
 
 def _calculate_tiered_cost(cost_config, tokens: int) -> float:
