@@ -2,6 +2,7 @@
 
 from typing import List
 
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -107,11 +108,14 @@ def calculate_fra_forest_share(tb_fra: Table, tb_wdi: Table) -> Table:
     Return just country, year, forest share and source
     """
     tb_fra = tb_fra[["country", "year", "_1a_forestarea", "source"]]
+    # Select out the total land area variable: ag_lnd_totl_k2
     tb_wdi = tb_wdi[["country", "year", "ag_lnd_totl_k2"]]
     # Strangely this land area value changes in 1991 and 2011, with the dissolution of the soviet union and creation of south sudan
     tb_wdi = tb_wdi.dropna()
     tb_wdi = tb_wdi[tb_wdi["year"] == max(tb_wdi["year"])]
     tb_wdi = tb_wdi.drop(columns="year")
+    # Manually add in French Guiana and Western Sahara, the value for France (547557 km2) already seems to exclude french guiana, so no need to change that
+    tb_wdi.append(pd.DataFrame({"country": ["French Guiana", "Western Sahara"], "ag_lnd_totl_k2": [83534, 272000]}))
     # convert from square km to hectares
     tb_wdi["ag_lnd_totl_k2"] *= 100
     tb = pr.merge(tb_fra, tb_wdi, on=["country"])
