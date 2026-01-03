@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import structlog
@@ -28,13 +28,19 @@ SYSTEM_PROMPT = CONFIG["charts"]["llm"]["system_prompt"].format(TODAY=TODAY.strf
 #####################################
 # Get / Submit Housekeeper reviews  #
 #####################################
-def owidb_get_reviews_id(object_type: str):
+def owidb_get_reviews_id(object_type: str, since_year_ago: bool = True) -> list[int]:
     """Get IDs of objects (e.g. charts) that have been suggested for review by Housekeeper.
 
-    This is based on querying the HousekeeperReview table in MySQL.
+    Args:
+        object_type: Type of object (e.g., 'chart')
+        since_year_ago: If True, only return reviews from the last year (allows re-review after 1 year)
+
+    Returns:
+        List of object IDs that have been reviewed
     """
+    since = datetime.combine(YEAR_AGO, datetime.min.time()) if since_year_ago else None
     with Session(OWID_ENV.engine) as session:
-        return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type)
+        return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type, since=since)
 
 
 def owidb_submit_review_id(object_type: str, object_id: int):
@@ -148,7 +154,7 @@ def ask_llm(user_prompt: str, system_prompt: str | None = None, model: str | Non
 
     # Create agent with system prompt
     agent = Agent(
-        model=f"openai:{model}",
+        model=model,
         instructions=system_prompt,
         retries=2,
     )
