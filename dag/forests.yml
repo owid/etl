@@ -71,3 +71,22 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/fao/2025-12-05/fra:
     - data://garden/fao/2025-12-05/fra
+
+  # Forest Share combined sources
+  data://garden/forests/2025-12-29/forest_share:
+    - snapshot://papers/2025-05-30/scottish_government.csv
+    - snapshot://defra/2025-05-06/forest_share.csv
+    - snapshot://fao/2025-05-07/forest_share.csv
+    - data://garden/fao/2025-12-05/fra
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+    - snapshot://forest_research/2025-05-06/forest_share.csv
+    - snapshot://papers/2025-05-07/france_forest_share.csv
+    - snapshot://papers/2025-05-07/japan_forest_share.csv
+    - snapshot://papers/2025-05-07/taiwan_forest_share.csv
+    - snapshot://papers/2025-05-08/mather_2004.csv
+    - snapshot://papers/2025-05-13/kleinn_2000.csv
+    - snapshot://papers/2025-05-23/he_2025.csv
+    - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
+    - snapshot://usda_fs/2025-05-07/forest_share.csv
+  data://grapher/forests/2025-12-29/forest_share:
+    - data://garden/forests/2025-12-29/forest_share
