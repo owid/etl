@@ -249,3 +249,12 @@ steps:
   #
   data://grapher/emissions/2024-11-21/national_contributions:
     - data://garden/emissions/2024-11-21/national_contributions
+  #
+  # IPCC - Emission Factor Database (2023-10-24).
+  #
+  data://meadow/emissions/2023-10-24/emission_factors:
+    - snapshot://emissions/2023-10-24/emission_factors.xlsx
+  data://garden/emissions/2023-10-24/emission_factors:
+    - data://meadow/emissions/2023-10-24/emission_factors
+  data://grapher/emissions/2023-10-24/emission_factors:
+    - data://garden/emissions/2023-10-24/emission_factors

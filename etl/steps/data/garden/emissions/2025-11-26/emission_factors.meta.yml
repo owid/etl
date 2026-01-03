@@ -1,0 +1,31 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
+    processing_level: minor
+    unit: grams of CO₂ per kilowatt-hour
+    short_unit: gCO₂/kWh
+
+dataset:
+  update_period_days: 365
+
+tables:
+  energy_emission_factors:
+    variables:
+      emission_factor:
+        title: CO₂ energy emission factor
+        description_short: |-
+          Amount of carbon dioxide emissions produced per unit of a specific energy source.
+        description_processing: |-
+          Data has been converted from kilograms per terajoule (kg/TJ) to grams per kilowatt-hour (g/kWh) using a conversion factor of 0.0036.
+  electricity_emission_factors:
+    variables:
+      median_direct_combustion_emission_factor:
+        title: Electricity direct combustion emission factor - median value
+        description_short: |-
+          Amount of carbon dioxide emissions produced per unit of electricity generated from a specific source.
+      min_direct_combustion_emission_factor:
+        title: Electricity direct combustion emission factor - minimum value
+      max_direct_combustion_emission_factor:
+        title: Electricity direct combustion emission factor - maximum value
