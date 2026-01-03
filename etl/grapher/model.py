@@ -163,8 +163,20 @@ class HousekeeperReview(Base):
             return list(vars)
 
     @classmethod
-    def load_reviews_object_id(cls, session: Session, object_type: str) -> list[int]:
-        vars = session.scalars(select(cls.objectId).where(cls.objectType == object_type)).all()
+    def load_reviews_object_id(
+        cls, session: Session, object_type: str, since: datetime | None = None
+    ) -> list[int]:
+        """Load object IDs that have been reviewed.
+
+        Args:
+            session: Database session
+            object_type: Type of object (e.g., 'chart')
+            since: If provided, only return reviews after this date
+        """
+        query = select(cls.objectId).where(cls.objectType == object_type)
+        if since is not None:
+            query = query.where(cls.suggestedAt >= since)
+        vars = session.scalars(query).all()
         return list(vars)
 
     @classmethod
