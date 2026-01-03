@@ -359,6 +359,10 @@ class Snapshot:
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
 
+    def read_from_df(self, *args, **kwargs) -> Table:
+        """Read data from a dataframe into a Table and populate it with metadata."""
+        return pr.read_from_df(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
         """Read data file using a custom reader function, and return a Table with metadata.
 
