@@ -15,8 +15,6 @@ REVIEW_TYPES = [
 # Config
 CHANNEL_NAME = "#chart-reviews"
 # CHANNEL_NAME = "#lucas-playground"
-SLACK_USERNAME = "housekeeper"
-ICON_EMOJI = "sus-blue"
 
 
 @click.command("housekeeper", help=__doc__)
@@ -38,7 +36,5 @@ def main(review_type: str, channel: Optional[str] = None):
     if review_type == "chart":
         send_slack_chart_reviews(
             channel_name=channel_name,
-            slack_username=SLACK_USERNAME,
-            icon_emoji=ICON_EMOJI,
-            include_draft=False,
+            include_draft=True,
         )

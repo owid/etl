@@ -1,8 +1,9 @@
 """WIP: Currently integrating Draft charts into pipeline
 
 NEXT STEPS:
-    - Draft charts sent daily, with minimal text.
-    - Charts suggested more than a year ago might be re-suggested. When this happens, we should link to the previous slack revision. For this use `etl.slack_helpers.get_messages` and suggestedAt field in HousekeeperReview.
+    - QA #lucas-playground with Ed. Daily frequency is fine?
+    - We currently allow for re-suggestions if suggested more than 1 year ago. Check with Ed.
+    - We should detect when a chart is being "re-suggested", and include the thread that last-suggested it.
 """
 
 from structlog import get_logger
@@ -26,8 +27,6 @@ log = get_logger()
 ####################################
 def send_slack_chart_reviews(
     channel_name: str,
-    slack_username: str,
-    icon_emoji: str,
     include_published: bool = True,
     include_draft: bool = True,
 ):
@@ -37,27 +36,29 @@ def send_slack_chart_reviews(
 
     Args:
         channel_name: Name of the Slack channel to send the message to.
-        slack_username: Username to use when sending the message.
-        icon_emoji: Emoji to use as icon when sending the message.
         include_published: Whether to send a published chart review.
         include_draft: Whether to send a draft chart review.
     """
     log.info("Getting all charts to review")
     df_published, df_draft = get_all_charts_to_review()
 
-    slack_kwargs = {
-        "channel_name": channel_name,
-        "slack_username": slack_username,
-        "icon_emoji": icon_emoji,
-    }
-
     if include_published and not df_published.empty:
-        _send_published_chart_review(df_published.iloc[0], **slack_kwargs)
+        _send_published_chart_review(
+            df_published.iloc[0],
+            channel_name=channel_name,
+            slack_username="daily chart",
+            icon_emoji="sus-blue",
+        )
     elif include_published:
         log.info("No published charts to review")
 
     if include_draft and not df_draft.empty:
-        _send_draft_chart_review(df_draft.iloc[0], **slack_kwargs)
+        _send_draft_chart_review(
+            df_draft.iloc[0],
+            channel_name=channel_name,
+            slack_username="daily draft chart",
+            icon_emoji="sus-white",
+        )
     elif include_draft:
         log.info("No draft charts to review")
 
@@ -76,6 +77,14 @@ def get_all_charts_to_review():
     """
     # Fetch all charts from Metabase (question 812)
     df = get_question_data(812, prod=True)
+
+    # Dtypes
+    df = df.astype(
+        {
+            "last_edited_at": "datetime64[ns]",
+            "created_at": "datetime64[ns]",
+        }
+    )
 
     # Skip charts reviewed in the last year (both published and drafts use same object_type)
     reviews_id = owidb_get_reviews_id(object_type="chart")
@@ -127,7 +136,7 @@ def _send_published_chart_review(chart, channel_name: str, slack_username: str, 
             "username": slack_username,
             "thread_ts": response["ts"],
         }
-        _send_published_extra_messages(chart, refs, **kwargs)
+        # _send_published_extra_messages(chart, refs, **kwargs)
 
         # Add chart to reviewed
         owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
@@ -138,9 +147,9 @@ def build_published_message(chart, refs):
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"{date_str} <{OWID_ENV.chart_site(chart['slug'])}|daily chart>\n"
+        f"*{date_str}* "
+        f"(<{OWID_ENV.chart_site(chart['slug'])}|live>, <{OWID_ENV.chart_admin_site(chart['chart_id'])}|admin>)\n"
         f"{message_usage}\n"
-        f"Go to <{OWID_ENV.chart_admin_site(chart['chart_id'])}|edit :writing_hand:>\n"
     )
     return message
 
@@ -160,7 +169,7 @@ def _get_published_message_usage(chart, refs):
         ]
         references = " and ".join(filter(None, references))
         msg_references = f"referenced in {references}" if references else "no references"
-    return f"({msg_chart_views}; {msg_references})"
+    return f"{msg_chart_views}; {msg_references}"
 
 
 def _send_published_extra_messages(chart, refs, **kwargs):
@@ -218,6 +227,11 @@ def _send_draft_chart_review(chart, channel_name: str, slack_username: str, icon
 def build_draft_message(chart):
     """Build simple message for draft chart review."""
     last_edited = chart["last_edited_at"]
+    today_str = TODAY.strftime("%d %b, %Y")
+
+    # Get chart title
+    api = AdminAPI(OWID_ENV)
+    config = api.get_chart_config(chart["chart_id"])
 
     # Calculate time ago
     days_ago = (TODAY - last_edited.date()).days
@@ -233,9 +247,9 @@ def build_draft_message(chart):
     date_str = last_edited.strftime("%d %b %Y")
 
     message = (
-        f"📝 *Daily draft review*\n"
-        f"Last edited: *{date_str}* ({time_ago})\n"
-        f"<{OWID_ENV.chart_admin_site(chart['chart_id'])}|→ View in admin>"
+        f"*{today_str}*\n"
+        f"<{OWID_ENV.chart_admin_site(chart['chart_id'])}|*{config.get('title', '')}*>\n"
+        f"last edited: *{date_str}* ({time_ago}), by {chart['last_edited_by']}"
     )
     return message
 
