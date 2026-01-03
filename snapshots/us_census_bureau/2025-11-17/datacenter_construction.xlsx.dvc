@@ -6,7 +6,7 @@ meta:
     title: Value of Private Construction Put in Place
     description: |-
       Monthly construction spending data for private construction in the United States, broken down by construction type.
-      The dataset includes datacenter construction spending measured as seasonally adjusted annual rate in millions of dollars.
+      The dataset includes datacenter construction spending measured as not seasonally adjusted monthly values in millions of dollars.
 
       Data is collected through the Survey of Construction (SOC), which provides national and regional statistics on
       new privately-owned residential construction. The construction spending estimates are based on reports from builders,
@@ -21,7 +21,7 @@ meta:
 
     # Files
     url_main: https://www.census.gov/construction/c30/historical_data.html
-    url_download: https://www.census.gov/construction/c30/xlsx/privsatime.xlsx
+    url_download: https://www.census.gov/construction/c30/xlsx/privtime.xlsx
     date_accessed: '2025-11-17'
 
     # License
@@ -29,6 +29,6 @@ meta:
       name: Public Domain
       url: https://www.census.gov/about/policies/privacy.html
 outs:
-  - md5: 3956897fb15190eda603c8acf807b5eb
-    size: 194582
+  - md5: 0cd294e19fc942e64eafe2dc3c66a6a3
+    size: 173188
     path: datacenter_construction.xlsx
