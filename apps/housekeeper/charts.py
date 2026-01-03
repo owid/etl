@@ -3,7 +3,12 @@
 NEXT STEPS:
     - QA #lucas-playground with Ed. Daily frequency is fine?
     - We currently allow for re-suggestions if suggested more than 1 year ago. Check with Ed.
-    - We should detect when a chart is being "re-suggested", and include the thread that last-suggested it.
+    - We should detect when a chart is being "re-suggested", and include the thread that last-suggested it. For this we need more permissions for our bot
+        1. Go to https://api.slack.com/apps
+        2. Select your app
+        3. Go to OAuth & Permissions → Scopes → Bot Token Scopes
+        4. Add channels:history (and groups:history for private channels)
+        5. Reinstall the app to your workspace (required after adding scopes)
 """
 
 from structlog import get_logger
@@ -136,7 +141,7 @@ def _send_published_chart_review(chart, channel_name: str, slack_username: str, 
             "username": slack_username,
             "thread_ts": response["ts"],
         }
-        # _send_published_extra_messages(chart, refs, **kwargs)
+        _send_published_extra_messages(chart, refs, **kwargs)
 
         # Add chart to reviewed
         owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
