@@ -163,9 +163,7 @@ class HousekeeperReview(Base):
             return list(vars)
 
     @classmethod
-    def load_reviews_object_id(
-        cls, session: Session, object_type: str, since: datetime | None = None
-    ) -> list[int]:
+    def load_reviews_object_id(cls, session: Session, object_type: str, since: datetime | None = None) -> list[int]:
         """Load object IDs that have been reviewed.
 
         Args:

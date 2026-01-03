@@ -231,11 +231,13 @@ def get_messages(
         for msg in response.get("messages", []):
             # Skip thread replies and bot messages if needed
             if "subtype" not in msg:  # Regular user messages
-                messages.append({
-                    "text": msg.get("text", ""),
-                    "ts": msg.get("ts"),
-                    "user": msg.get("user"),
-                })
+                messages.append(
+                    {
+                        "text": msg.get("text", ""),
+                        "ts": msg.get("ts"),
+                        "user": msg.get("user"),
+                    }
+                )
 
         # Check for pagination
         if response.get("has_more") and response.get("response_metadata", {}).get("next_cursor"):
