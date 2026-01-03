@@ -1,61 +1,50 @@
 from datetime import date, datetime
-from typing import List
+from pathlib import Path
 
+import structlog
+import yaml
+from pydantic_ai import Agent
 from sqlalchemy.orm import Session
 
-from apps.utils.llms.gpt import GPTQuery, GPTResponse, OpenAIWrapper
+from apps.utils.llms import estimate_llm_cost
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher import model as gm
 
-# System prompt to summarize chart information
-MODEL_DEFAULT = "gpt-5"
-SYSTEM_PROMPT = f"""We are reviewing a chart that was created some time ago. We want to understand if we can unpublish it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance), keep it as-is, improve it and keep it etc.
-
-Your job is to briefly summarize what the chart is about, and to provide some context about the variables used in the chart. You can also check the chart's history to see if it has been edited recently, and the number of views in the last year that it gets (consider that the median of the chart views in last year is ~1300 views; i.e. half of the charts get less than 1300 views). Fewer-than median doesn't imply that we should unpublish, but together with other indicators can help us to decide. Note that some charts may have few visits because they were published very recently, so you should also consider the date of publication. Also, if it has been edited often and recently, it is a good indicator that the chart is still relevant and useful.
-
-In your response, consider today's date {date.today().strftime("%Y-%m-%d")}, and provide three blocks:
-
-(i) Chart Description: To this end, look at the information given by the chart configuration parameters, and the different variables used in it. Don't get lost into the details. This should be at most ~3 sentences or so.
-(ii) General comment: Based on the information you have, provide a comment on the quality of the chart and its edit activity. You can measure the quality of the chart by checking if there are typos, inconsistencies, and, most importantly, outdated information. Remember that you can compare the views of the chart to the median value. When looking at the activity, focus on whether there have been recent and regular edits. First sentence of your comment should be short and provide the recommended action (e.g. 'Recommended action: Keep the chart', 'Recommended action: Unpublish the chart', 'No action recommended'). Then, follow your recommendation with 2-3 bullet points (use symbol '•') with the reasons. Don't be too verbose, and try to keep your comment concise, short and to the point.
-(iii) Edits timeline: Summarize the various edits that the chart has had over time. We are interested in knowing who might be the owner of the chart, so look at the most recent major edits. Provide the list of *all* the edits, with the name of the person who made the edit, and the date (no need to add the hour) of the edit. Sort the list in descending order of the date. Structure each item in the list as follows: "YYYY-MM-DD: Edit by 'Name of the person who made the edit'".
-
-Each block should be formatted with a title in bold (just use one '*'), and a brief text. You can use the following template:
-
-*→ Chart Description*
-This chart shows the evolution of the number of COVID-19 cases in the world, by continent. It uses data from the COVID-19 dataset.
-
-*→ General comment*
-Recommended action: ...
-• Reason 1
-• Reason 2
-...
-
-*→ Edits timeline*
-This chart has been mostly edited by 'Max Roser' and 'Esteban Ortiz-Ospina'. The last edit was done on 2021-01-01 by 'Max Roser'.
-
-2021-01-01: Edit by 'Max Roser'
-2020-12-01: Edit by 'Esteban Ortiz-Ospina'
-...
-"""
-
 # Today and one year ago
-TODAY = datetime.today()
+TODAY = date.today()
 YEAR_AGO = TODAY.replace(year=TODAY.year - 1)
 
+# Load LLM configuration
+CURRENT_DIR = Path(__file__).parent
+with open(CURRENT_DIR / "config.yaml", "r") as f:
+    CONFIG = yaml.safe_load(f)
 
-def get_reviews_id(object_type: str):
+# System prompt to summarize chart information
+MODEL_DEFAULT = CONFIG["charts"]["llm"]["model_name"]
+SYSTEM_PROMPT = CONFIG["charts"]["llm"]["system_prompt"].format(TODAY=TODAY.strftime("%Y-%m-%d"))
+
+
+#####################################
+# Get / Submit Housekeeper reviews  #
+#####################################
+def owidb_get_reviews_id(object_type: str, since_year_ago: bool = True) -> list[int]:
+    """Get IDs of objects (e.g. charts) that have been suggested for review by Housekeeper.
+
+    Args:
+        object_type: Type of object (e.g., 'chart')
+        since_year_ago: If True, only return reviews from the last year (allows re-review after 1 year)
+
+    Returns:
+        List of object IDs that have been reviewed
+    """
+    since = datetime.combine(YEAR_AGO, datetime.min.time()) if since_year_ago else None
     with Session(OWID_ENV.engine) as session:
-        return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type)
+        return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type, since=since)
 
 
-def get_charts_with_slug_rename_last_year():
-    query = f"""SELECT chart_id FROM chart_slug_redirects WHERE createdAt >= '{YEAR_AGO.strftime('%Y-%m-%d')}'"""
-    df = OWID_ENV.read_sql(query)
-    return df["chart_id"].tolist()
-
-
-def add_reviews(object_type: str, object_id: int):
+def owidb_submit_review_id(object_type: str, object_id: int):
+    """Submit a review suggestion to HousekeeperReview table in MySQL."""
     with Session(OWID_ENV.engine) as session:
         gm.HousekeeperReview.add_review(
             session=session,
@@ -64,26 +53,17 @@ def add_reviews(object_type: str, object_id: int):
         )
 
 
-def get_indicators_in_chart(chart_id) -> List[gm.Variable]:
-    with Session(OWID_ENV.engine) as session:
-        variables = gm.Variable.load_variables_in_chart(session, chart_id)
-        return variables
-
-
-def get_chart_revisions(chart_id):
-    query = f"""
-    SELECT u.fullName, c.config, c.createdAt FROM chart_revisions c
-    LEFT JOIN users u ON u.id = c.userId
-    WHERE c.chartId={chart_id};
-    """
-    df = read_sql(query)
-    return df
-
-
+#####################################
+# LLM                               #
+#####################################
 def get_chart_summary(chart):
+    """Summarize chart details with LLM.
+
+    Generates a message to be shared on Slack.
+    """
     # Get variables used in chart
     variables = get_indicators_in_chart(chart["chart_id"])
-    variable_description = _get_summary_variables(variables)
+    variable_description = _get_summary_indicators(variables)
 
     # Get last chart configuration
     df = get_chart_revisions(chart["chart_id"])
@@ -99,35 +79,40 @@ def get_chart_summary(chart):
     num_chart_views = chart["views_365d"]
 
     # Prepare user prompt
-    user_prompt = f"1) Chart config:\n{config}\n{'='*20}\n2) {variable_description}\n{'='*20}\n3) Timeline edits:\n{edit_summary}\n4) Chart views: {num_chart_views}"
+    user_prompt = f"1) Chart config:\n{config}\n{'='*20}\n2) {variable_description}\n{'='*20}\n3) Timeline edits:\n{edit_summary}\n4) Total views in the last 365 days: {num_chart_views}"
 
     # Query GPT
-    gpt_response = ask_gpt(user_prompt)
+    result = ask_llm(user_prompt)
 
-    # Response with cost
-    if gpt_response is not None:
-        if gpt_response.cost is not None:
-            cost = round(gpt_response.cost, 4)
-        else:
-            cost = "unknown"
-        return f"*🤖 Summary* (AI-generated with {MODEL_DEFAULT})\n{gpt_response.message_content}\n\n(Cost: {cost} $)"
+    if result is not None:
+        usage = result.usage()
+        cost = estimate_llm_cost(
+            MODEL_DEFAULT,
+            usage=usage,
+        )
 
+        message = f"*🤖 Summary* ({MODEL_DEFAULT})\n{result.output}\n\n(Cost: {cost} $)"
 
-def ask_gpt(user_prompt) -> GPTResponse | None:
-    """Get AI summary of a chart based on user prompt."""
-    api = OpenAIWrapper()
-    query = GPTQuery(
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0,
-    )
-    gpt_response = api.query_gpt(query=query, model=MODEL_DEFAULT)
-    return gpt_response
+        return message
 
 
-def _get_summary_variable(variable):
+def get_indicators_in_chart(chart_id) -> list[gm.Variable]:
+    with Session(OWID_ENV.engine) as session:
+        variables = gm.Variable.load_variables_in_chart(session, chart_id)
+        return variables
+
+
+def _get_summary_indicators(variables):
+    """String description of all variables."""
+    s = "Summary of the variables, by variableId:\n"
+    for variable in variables:
+        s += "---------------\n"
+        s += _get_summary_indicator(variable)
+
+    return s
+
+
+def _get_summary_indicator(variable):
     """String description of a variable."""
     s = f"""VariableId: {variable.id}
 name: {variable.name}
@@ -136,11 +121,47 @@ description: {variable.descriptionShort if variable.descriptionShort is not None
     return s
 
 
-def _get_summary_variables(variables):
-    """String description of all variables."""
-    s = "Summary of the variables, by variableId:\n"
-    for variable in variables:
-        s += "---------------\n"
-        s += _get_summary_variable(variable)
+def get_chart_revisions(chart_id):
+    query = f"""
+    SELECT u.fullName, c.config, c.createdAt FROM chart_revisions c
+    LEFT JOIN users u ON u.id = c.userId
+    WHERE c.chartId={chart_id};
+    """
+    df = read_sql(query)
+    return df
 
-    return s
+
+def ask_llm(user_prompt: str, system_prompt: str | None = None, model: str | None = None):
+    """Get AI summary using pydantic-ai instead of OpenAI library.
+
+    Args:
+        user_prompt: The user's prompt/question
+        system_prompt: Optional system prompt. Defaults to SYSTEM_PROMPT if not provided
+        model: Optional model name. Defaults to MODEL_DEFAULT if not provided
+
+    Returns:
+        SimpleNamespace with:
+            - message_content: The AI response text
+            - cost: Cost in USD (None if unavailable)
+    """
+    log = structlog.get_logger()
+
+    # Use defaults if not provided
+    if system_prompt is None:
+        system_prompt = SYSTEM_PROMPT
+    if model is None:
+        model = MODEL_DEFAULT
+
+    # Create agent with system prompt
+    agent = Agent(
+        model=model,
+        instructions=system_prompt,
+        retries=2,
+    )
+
+    try:
+        # Run the agent synchronously
+        return agent.run_sync(user_prompt)
+    except Exception as e:
+        log.error(f"Error querying pydantic-ai: {e}")
+        return None
