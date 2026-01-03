@@ -4,7 +4,7 @@ from typing import Optional
 
 import rich_click as click
 
-from apps.housekeeper.charts import send_slack_chart_review
+from apps.housekeeper.charts import send_slack_chart_reviews
 
 # TODO: Add more review types
 REVIEW_TYPES = [
@@ -36,8 +36,9 @@ def main(review_type: str, channel: Optional[str] = None):
     channel_name = CHANNEL_NAME if channel is None else channel
     # Review charts
     if review_type == "chart":
-        send_slack_chart_review(
+        send_slack_chart_reviews(
             channel_name=channel_name,
             slack_username=SLACK_USERNAME,
             icon_emoji=ICON_EMOJI,
+            include_draft=False,
         )
