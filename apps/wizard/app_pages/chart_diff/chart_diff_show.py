@@ -621,11 +621,11 @@ class ChartDiffShow:
             with st.container(border=True):
                 # Get full configs from both environments via API
                 source_nc = source_api.get_narrative_chart(nc.id)
-                source_config = source_nc.get("fullConfig", {})
+                source_config = source_nc.get("configFull", {})
 
                 try:
                     target_nc = target_api.get_narrative_chart(nc.id)
-                    target_config = target_nc.get("fullConfig", {})
+                    target_config = target_nc.get("configFull", {})
                 except Exception:
                     target_config = None
 
