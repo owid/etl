@@ -110,10 +110,14 @@ Key environment variables and settings are defined in `config.py`:
 
 The ETL includes an optional MCP (Model Context Protocol) server that provides Claude Code with tools to search OWID indicators, fetch chart data, and query the database directly.
 
-To enable it, copy the example configuration:
+To enable it, add the OWID MCP server to your local Claude Code configuration:
 
 ```bash
-cp .mcp.json.example .mcp.json
+# Production server (hosted)
+claude mcp add owid --transport http https://mcp.owid.io/mcp
+
+# Development server (local, requires running the server first)
+claude mcp add owid-dev --transport http http://0.0.0.0:8080/mcp/
 ```
 
 This adds the following tools to Claude Code:
