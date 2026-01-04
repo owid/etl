@@ -480,18 +480,18 @@ def _sync_narrative_charts(
             )
             continue
 
-        # Fetch merged config from source API (full config = parent + patch merged)
+        # Fetch full config from source API (full config = parent + patch merged)
         source_response = source_api.get_narrative_chart(source_nc.id)
-        source_merged_config = source_response["mergedConfig"]
+        source_full_config = source_response["fullConfig"]
 
-        # Migrate the merged config (remap variable IDs from source to target)
-        migrated_config = source_nc.migrate_merged_config(source_merged_config, source_session, target_session)
+        # Migrate the full config (remap variable IDs from source to target)
+        migrated_config = source_nc.migrate_merged_config(source_full_config, source_session, target_session)
 
-        # For comparison, get target's merged config via API
+        # For comparison, get target's full config via API
         target_response = target_api.get_narrative_chart(target_nc.id)
-        target_merged_config = target_response["mergedConfig"]
+        target_full_config = target_response["fullConfig"]
 
-        if migrated_config == target_merged_config:
+        if migrated_config == target_full_config:
             log.info(
                 "narrative_chart_sync.skip",
                 name=source_nc.name,
