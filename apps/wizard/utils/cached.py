@@ -61,10 +61,9 @@ def load_variables_display_in_dataset(
     )
 
     def _display_slug(o) -> str:
-        p = o.catalogPath
         if only_slug:
-            return p.rsplit("/", 1)[-1] if isinstance(p, str) else ""
-        return p
+            return o.catalog_path.table_variable or ""
+        return o.catalogPath or ""
 
     indicators_display = {i.id: _display_slug(i) for i in indicators}
 
@@ -73,10 +72,9 @@ def load_variables_display_in_dataset(
 
 @st.cache_data
 def get_variable_uris(indicators: List[Variable], only_slug: Optional[bool] = False) -> List[str]:
-    options = [o.catalogPath for o in indicators]
     if only_slug:
-        options = [o.rsplit("/", 1)[-1] if isinstance(o, str) else "" for o in options]
-    return options  # type: ignore
+        return [o.catalog_path.table_variable or "" for o in indicators]
+    return [o.catalogPath or "" for o in indicators]
 
 
 @st.cache_data

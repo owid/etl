@@ -21,6 +21,7 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
+from owid.catalog.core import CatalogPath
 from owid.catalog.meta import update_variable_metadata
 from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
@@ -293,7 +294,7 @@ def upsert_table(
         session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable=catalog_path.split("#")[1])
+            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).variable)
 
 
 def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:
