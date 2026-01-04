@@ -29,12 +29,11 @@ import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 
+from owid.catalog import processing_log as pl
+from owid.catalog import utils, variables, warnings
+from owid.catalog.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
 from owid.datautils import dataframes
 from owid.repack import repack_frame
-
-from . import processing_log as pl
-from . import utils, variables, warnings
-from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -980,7 +979,7 @@ class Table(pd.DataFrame):
             ... )
             ```
         """
-        from .yaml_metadata import update_metadata_from_yaml
+        from owid.catalog.yaml_metadata import update_metadata_from_yaml
 
         return update_metadata_from_yaml(
             tb=self,
@@ -1151,7 +1150,7 @@ class Table(pd.DataFrame):
             return None
         else:
             # preserve metadata in _fields, calling reset_index() on a table drops it
-            t._fields = self._fields
+            t._fields = self._fields  # type: ignore
             # drop dimensions
             t.metadata.dimensions = None
             return t  # type: ignore

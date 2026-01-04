@@ -8,16 +8,19 @@ import json
 import os
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Literal, cast, overload
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 import pandas as pd
 import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
-from . import processing_log as pl
-from . import warnings
-from .meta import (
+if TYPE_CHECKING:
+    from owid.catalog.tables import Table
+
+from owid.catalog import processing_log as pl
+from owid.catalog import warnings
+from owid.catalog.meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
     License,
@@ -27,7 +30,7 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from .properties import metadata_property
+from owid.catalog.properties import metadata_property
 
 log = structlog.get_logger()
 
@@ -235,7 +238,7 @@ class Variable(pd.Series):
     @property
     def _constructor_expanddim(self) -> type:
         # XXX lazy circular import
-        from . import tables
+        from owid.catalog import tables
 
         return tables.Table
 
@@ -478,6 +481,16 @@ class Variable(pd.Series):
             ```
         """
         return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
+
+    def to_frame(self, name: str | None = None) -> Table:
+        """Convert Variable to a Table (single-column table)."""
+        # The parent to_frame() already returns a Table via _constructor_expanddim
+        # This override just provides proper type hints
+        # Don't pass name=None explicitly, as that would make pandas use None as column name
+        if name is None:
+            return super().to_frame()  # type: ignore[return-value]
+        else:
+            return super().to_frame(name=name)  # type: ignore[return-value]
 
     def copy_metadata(self, from_variable: Variable, inplace: bool = False) -> Variable | None:
         """Copy metadata from another variable.
@@ -757,7 +770,7 @@ def combine_variables_processing_logs(variables: list[Variable]) -> ProcessingLo
         [],
     )
 
-    return ProcessingLog(processing_log)
+    return ProcessingLog(processing_log)  # type: ignore
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:

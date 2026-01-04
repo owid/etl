@@ -4,11 +4,9 @@ from typing import Any, Literal
 
 import yaml
 
-from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
-
-from .meta import DatasetMeta, TableMeta, VariableMeta
-from .tables import Table
-from .utils import dynamic_yaml_load, dynamic_yaml_to_dict
+from owid.catalog.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
+from owid.catalog.tables import Table
+from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
 
 def update_metadata_from_yaml(

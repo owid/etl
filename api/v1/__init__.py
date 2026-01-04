@@ -207,7 +207,7 @@ def _update_indicator_in_r2(db_indicator: gm.Variable, indicator: Indicator) -> 
     # download JSON file and update it
     indicator_dict = requests.get(db_indicator.s3_metadata_path(typ="http")).json()
 
-    _deep_update(indicator_dict, indicator.dict(exclude_none=True))
+    _deep_update(indicator_dict, indicator.dict(exclude_none=True))  # type: ignore
 
     indicator_dict = utils.prune_none(indicator_dict)
 

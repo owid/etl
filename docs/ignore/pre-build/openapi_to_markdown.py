@@ -11,6 +11,55 @@ import textwrap
 from typing import Any, Dict, List
 
 
+def format_description_for_table(description: str) -> str:
+    """Format a description for use in a markdown table cell.
+
+    Converts multi-line descriptions with bullet lists to HTML that renders
+    correctly in markdown table cells.
+    """
+    if not description:
+        return ""
+
+    lines = description.strip().split("\n")
+    result_parts = []
+    current_list_items: List[str] = []
+    in_list = False
+
+    def flush_list():
+        """Flush accumulated list items to result."""
+        nonlocal current_list_items, in_list
+        if current_list_items:
+            list_html = "<ul>" + "".join(f"<li>{item}</li>" for item in current_list_items) + "</ul>"
+            result_parts.append(list_html)
+            current_list_items = []
+        in_list = False
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Check if this is a bullet list item (starts with - or *)
+        if stripped.startswith("- ") or stripped.startswith("* "):
+            in_list = True
+            # Extract the list item content (remove the bullet)
+            item_content = stripped[2:].strip()
+            current_list_items.append(item_content)
+        else:
+            # Not a list item
+            if in_list:
+                flush_list()
+
+            # Skip empty lines but add spacing
+            if stripped:
+                result_parts.append(stripped)
+
+    # Flush any remaining list items
+    if in_list:
+        flush_list()
+
+    # Join parts with <br/> for line breaks between non-list elements
+    return "<br/>".join(result_parts)
+
+
 def format_type(schema: Dict[str, Any]) -> str:
     """Format schema type information."""
     if not schema:
@@ -71,7 +120,7 @@ def render_parameter_table(parameters: List[Dict[str, Any]]) -> str:
         schema = param.get("schema", {})
         param_type = format_type(schema)
         required = "✓" if param.get("required", False) else ""
-        description = param.get("description", "").replace("\n", " ")
+        description = format_description_for_table(param.get("description", ""))
 
         # Add constraints to description
         constraints = format_constraints(schema)
@@ -229,7 +278,7 @@ def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any])
             prop_type = f"[{ref_name}](#{ref_name.lower()})"
 
         required = "✓" if prop_name in required_fields else ""
-        description = prop_schema.get("description", "").replace("\n", " ")
+        description = format_description_for_table(prop_schema.get("description", ""))
 
         # Add example if available
         if "example" in prop_schema:

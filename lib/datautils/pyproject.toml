@@ -1,6 +1,6 @@
 [project]
 name = "owid-datautils"
-version = "0.6.1"
+version = "0.6.2"
 description = "Data utils library by the Data Team at Our World in Data"
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
@@ -40,7 +40,7 @@ dev-dependencies = [
     "ipykernel>=6.13.0",
     "openpyxl>=3.0.10",
     "lxml>=4.9.1",
-    "pyright==1.1.373",
+    "ty>=0.0.4",
     "ruff==0.8.6"
 ]
 
@@ -54,4 +54,3 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["owid"]
 
-[tool.pyright]

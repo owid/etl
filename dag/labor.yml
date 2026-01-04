@@ -24,5 +24,5 @@ steps:
   #
   # ILOSTAT national vs. modeled comparison (from WDI)
   #
-  export://multidim/worldbank_wdi/latest/wdi:
+  export://multidim/worldbank_wdi/latest/ilostat_comparison:
     - data://grapher/worldbank_wdi/2025-09-08/wdi

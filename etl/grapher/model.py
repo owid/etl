@@ -723,9 +723,9 @@ class Dataset(Base):
             ds.nonRedistributable = self.nonRedistributable
             ds.catalogPath = self.catalogPath
             ds.tables = self.tables
-            ds.updatedAt = datetime.utcnow()
-            ds.metadataEditedAt = datetime.utcnow()
-            ds.dataEditedAt = datetime.utcnow()
+            ds.updatedAt = datetime.now(timezone.utc)
+            ds.metadataEditedAt = datetime.now(timezone.utc)
+            ds.dataEditedAt = datetime.now(timezone.utc)
 
         # null checksum to label it as undone
         ds.sourceChecksum = None
@@ -857,7 +857,7 @@ class Source(Base):
         if not ds:
             ds = self
         else:
-            ds.updatedAt = datetime.utcnow()
+            ds.updatedAt = datetime.now(timezone.utc)
             ds.description = self.description
 
         session.add(ds)
@@ -1220,7 +1220,7 @@ class Variable(Base):
             ds.licenses = self.licenses
             ds.license = self.license
             ds.type = self.type
-            ds.updatedAt = datetime.utcnow()
+            ds.updatedAt = datetime.now(timezone.utc)
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
                 ds.columnOrder = self.columnOrder

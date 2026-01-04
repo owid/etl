@@ -14,11 +14,12 @@ from pathlib import Path
 import click
 import pandas as pd
 import requests
-from owid.catalog import find
+from owid.catalog import Dataset
 from owid.datautils.io import df_to_file
 from structlog import get_logger
 from tqdm import tqdm
 
+from etl.paths import LATEST_REGIONS_DATASET_PATH
 from etl.snapshot import Snapshot
 
 # Initialize logger.
@@ -36,7 +37,7 @@ START_YEAR = 2024  # Define the starting year
 YEARS = list(range(START_YEAR, CURRENT_YEAR + 1))
 
 
-TB_REGIONS = find(table="regions", dataset="regions").iloc[0].load().reset_index()
+TB_REGIONS = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"].reset_index()
 TB_REGIONS = TB_REGIONS[TB_REGIONS.defined_by == "owid"]
 COUNTRIES = {code: name for code, name in zip(TB_REGIONS["code"], TB_REGIONS["name"])}
 
