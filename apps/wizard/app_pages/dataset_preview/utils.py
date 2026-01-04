@@ -4,10 +4,10 @@ from typing import Any, Dict
 import pandas as pd
 import streamlit as st
 from owid import catalog
+from owid.catalog.core import CatalogPath
 
 from apps.wizard.utils import TTL_DEFAULT
 from apps.wizard.utils.components import st_cache_data
-from etl.catalog.utils import CatalogPath
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.model import Dataset

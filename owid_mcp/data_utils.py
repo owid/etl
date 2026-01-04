@@ -15,8 +15,8 @@ from typing import Any, Dict, List, Optional
 import httpx
 import structlog
 import yaml
+from owid.catalog.core import CatalogPath
 
-from etl.catalog.utils import CatalogPath
 from owid_mcp.config import (
     ALGOLIA_API_KEY,
     ALGOLIA_APP_ID,

@@ -1,8 +1,7 @@
 """Tests for CatalogPath class."""
 
 import pytest
-
-from etl.catalog.utils import CatalogPath
+from owid.catalog.core import CatalogPath
 
 
 class TestFromStr:

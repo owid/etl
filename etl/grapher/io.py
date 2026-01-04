@@ -23,6 +23,7 @@ import structlog
 import validators
 from deprecated import deprecated
 from owid.catalog import Dataset, Table
+from owid.catalog.core import CatalogPath
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tenacity import Retrying
@@ -31,7 +32,6 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from etl import config
-from etl.catalog.utils import CatalogPath
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
 from etl.files import checksum_str

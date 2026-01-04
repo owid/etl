@@ -31,6 +31,7 @@ import requests
 import structlog
 from deprecated import deprecated
 from owid import catalog
+from owid.catalog.core import CatalogPath
 from owid.catalog.meta import VARIABLE_TYPE
 from pyarrow import feather
 from sqlalchemy import (
@@ -75,7 +76,6 @@ from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
 from etl import config, paths
-from etl.catalog.utils import CatalogPath
 from etl.db import read_sql
 
 log = structlog.get_logger()

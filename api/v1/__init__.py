@@ -9,12 +9,12 @@ from git import PushInfo
 from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from owid.catalog.core import CatalogPath
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
-from etl.catalog.utils import CatalogPath
 from etl.command import main as etl_main
 from etl.db import get_engine
 from etl.files import read_json_schema, yaml_dump

@@ -21,6 +21,7 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
+from owid.catalog.core import CatalogPath
 from owid.catalog.meta import update_variable_metadata
 from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
@@ -31,7 +32,6 @@ from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config
-from etl.catalog.utils import CatalogPath
 from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.grapher import helpers as gh
 
