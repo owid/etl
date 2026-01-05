@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: International Union for Conservation of Nature Red List of Threatened Species
+    title: IUCN Red List Summary Statistics - Total, threatened and extinct invertebrate species in each country
+    description: |-
+      Total number of endemic, threatened endemic and extinct invertebrate species recorded for each country for comprehensively assessed groups only.
+    citation_full: |-
+      International Union for Conservation of Nature. 2025. The IUCN Red List of Threatened Species. Version 2025-1. https://www.iucnredlist.org. Accessed on [27 March 2025]
+    attribution_short: IUCN
+    url_main: https://nc.iucnredlist.org/redlist/content/attachment_files/2025-2_RL_Table8c.pdf
+    date_accessed: "2026-01-05"
+    date_published: "2025-03-27"
+    license:
+      name: © International Union for Conservation of Nature and Natural Resources
+      url: https://www.iucnredlist.org/terms/terms-of-use
+outs:
+  - md5: 5e6439a93ad73fa85b70c2c328a58742
+    size: 10495
+    path: endemic_invertebrates.csv
