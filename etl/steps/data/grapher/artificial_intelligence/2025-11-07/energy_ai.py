@@ -12,10 +12,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("energy_ai_iea")
+    ds_garden = paths.load_dataset("energy_ai")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("energy_ai_iea", reset_index=False)
+    tb = ds_garden.read("energy_ai", reset_index=False)
 
     #
     # Save outputs.

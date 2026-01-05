@@ -35,13 +35,13 @@ ALL_METRIC_HEADERS = {
 
 def run() -> None:
     """Load IEA Energy and AI snapshot and create a meadow dataset."""
-    paths.log.info("energy_ai_iea.start")
+    paths.log.info("energy_ai.start")
 
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("energy_ai_iea.xlsx")
+    snap = paths.load_snapshot("energy_ai.xlsx")
 
     #
     # Process data.
@@ -61,7 +61,7 @@ def run() -> None:
     # Save changes in the new meadow dataset.
     ds_meadow.save()
 
-    paths.log.info("energy_ai_iea.end")
+    paths.log.info("energy_ai.end")
 
 
 def read_and_process_regional_data(snap) -> Table:

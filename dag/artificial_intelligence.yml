@@ -223,15 +223,15 @@ steps:
   data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
     - data://garden/us_census_bureau/2025-11-17/datacenter_construction
 
-  # IEA Energy Consumption by AI dataset
-  data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea:
-    - snapshot://artificial_intelligence/2025-11-07/energy_ai_iea.xlsx
-  data://garden/artificial_intelligence/2025-11-07/energy_ai_iea:
-    - data://meadow/artificial_intelligence/2025-11-07/energy_ai_iea
+  # IEA Energy and AI dataset
+  data://meadow/artificial_intelligence/2025-11-07/energy_ai:
+    - snapshot://artificial_intelligence/2025-11-07/energy_ai.xlsx
+  data://garden/artificial_intelligence/2025-11-07/energy_ai:
+    - data://meadow/artificial_intelligence/2025-11-07/energy_ai
     - data://garden/energy/2025-06-27/electricity_mix
     - data://garden/regions/2023-01-01/regions
-  data://grapher/artificial_intelligence/2025-11-07/energy_ai_iea:
-    - data://garden/artificial_intelligence/2025-11-07/energy_ai_iea
+  data://grapher/artificial_intelligence/2025-11-07/energy_ai:
+    - data://garden/artificial_intelligence/2025-11-07/energy_ai
 
   # TSMC operating data
   data://meadow/tsmc/2025-11-10/operating_data:

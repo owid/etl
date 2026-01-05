@@ -16,16 +16,16 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     """Load IEA Energy and AI meadow dataset and create a garden dataset."""
-    paths.log.info("energy_ai_iea.start")
+    paths.log.info("energy_ai.start")
 
     #
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("energy_ai_iea")
+    ds_meadow = paths.load_dataset("energy_ai")
 
     # Read the combined table from meadow
-    tb = ds_meadow.read("energy_ai_iea")
+    tb = ds_meadow.read("energy_ai")
 
     # Load electricity mix dataset for total demand data
     ds_electricity = paths.load_dataset("electricity_mix")
@@ -71,7 +71,7 @@ def run() -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    paths.log.info("energy_ai_iea.end")
+    paths.log.info("energy_ai.end")
 
 
 def duplicate_latest_historical_year_for_scenarios(tb: Table) -> Table:

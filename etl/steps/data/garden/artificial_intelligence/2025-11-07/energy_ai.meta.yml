@@ -19,7 +19,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  energy_ai_iea:
+  energy_ai:
     variables:
       total_electricity_consumption__twh__historical:
         title: Total electricity consumption by data centers
