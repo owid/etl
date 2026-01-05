@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 import streamlit as st
 import structlog
-from owid.catalog import find
+from owid.catalog import Client
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
@@ -181,16 +181,14 @@ def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, An
 
 @st.cache_data(show_spinner=False)
 def load_latest_population():
-    # NOTE: The "channels" parameter of the find function is not working well.
-    candidates = find("population", channels=("grapher",), dataset="population", namespace="demography").sort_values(
-        "version", ascending=False
+    candidates = Client().tables.search(table="population", namespace="demography", dataset="population")
+
+    # Pick highest version available
+    population = candidates.latest(by="version").data
+
+    population = population.reset_index()[["country", "year", "population"]].rename(
+        columns={"country": "entity_name"}, errors="raise"
     )
-    population = (
-        candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
-        .iloc[0]
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    ).rename(columns={"country": "entity_name"}, errors="raise")
 
     return population
 
