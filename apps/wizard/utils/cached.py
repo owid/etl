@@ -186,6 +186,13 @@ def load_latest_population():
         "version", ascending=False
     )
     filtered = candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
+
+    if filtered.empty:
+        raise ValueError(
+            "No population table found in grapher channel. "
+            f"Available candidates:\n{candidates[['channel', 'table', 'version']].to_string()}"
+        )
+
     population = (filtered.iloc[0].load().reset_index()[["country", "year", "population"]]).rename(
         columns={"country": "entity_name"}, errors="raise"
     )
