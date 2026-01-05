@@ -519,28 +519,14 @@ def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List
         check_for_region_overlaps=False,
     )
 
-    # Drop the population column
-    if "population" in tb.columns:
-        tb = tb.drop(columns="population")
-
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
-
-    for indicator in indicator_list:
-        tb[f"{indicator}_per_capita"] = tb[indicator] / tb["population"]
-
-    # Drop population column
-    tb = tb.drop(columns="population")
-
-    # tb = paths.regions.add_per_capita(
-    #     tb=tb,
-    #     index_columns=index_columns,
-    #     # regions=REGIONS,
-    #     # aggregations=indicator_aggregations,
-    #     columns=indicator_list,
-    #     warn_on_missing_countries=False,
-    #     only_informed_countries_in_regions=True,
-    #     drop_population=True,
-    # )
+    tb = paths.regions.add_per_capita(
+        tb=tb,
+        index_columns=index_columns,
+        columns=indicator_list,
+        warn_on_missing_countries=False,
+        only_informed_countries_in_regions=False,
+        drop_population=True,
+    )
 
     return tb
 
