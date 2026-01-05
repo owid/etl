@@ -186,11 +186,9 @@ def load_latest_population():
         "version", ascending=False
     )
     filtered = candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
-    population = (
-        filtered.iloc[0]
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    ).rename(columns={"country": "entity_name"}, errors="raise")
+    population = (filtered.iloc[0].load().reset_index()[["country", "year", "population"]]).rename(
+        columns={"country": "entity_name"}, errors="raise"
+    )
 
     return population
 
