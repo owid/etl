@@ -10,11 +10,12 @@ from collections.abc import Iterable
 from typing import TYPE_CHECKING, Literal, cast
 
 from owid.catalog.api.catalogs import ETLCatalog
-from owid.catalog.api.models import ResponseSet, TableResult
+from owid.catalog.api.models import ResponseSet, TableResult, _load_table
 from owid.catalog.api.utils import OWID_CATALOG_URI, S3_OWID_URI
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
 from owid.catalog.datasets import CHANNEL
+from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -38,10 +39,9 @@ class TablesAPI:
         # Load the first result
         table = results[0].data
 
-        # Fetch metadata first, then load data
-        table_result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-        print(f"Dataset: {table_result.dataset}, Version: {table_result.version}")
-        table = table_result.data  # Lazy-load when needed
+        # Fetch table directly by path
+        tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+        print(tb.head())
         ```
     """
 
@@ -236,58 +236,39 @@ class TablesAPI:
             limit=len(results),
         )
 
-    def fetch(self, path: str, *, load_data: bool = False, timeout: int | None = None) -> TableResult:
-        """Fetch table metadata by catalog path (without loading data).
+    def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:
+        """Fetch a table by catalog path.
 
-        Returns metadata about the table. Access .data property on the result to
-        lazy-load the table data.
+        Loads the table directly from the catalog.
 
         Args:
             path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
-            load_data: If True, preload table data immediately.
-                       If False (default), data is loaded lazily when accessed via .data property.
-            timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
+            load_data: If True (default), load full table data.
+                       If False, load only table structure (columns and metadata) without rows.
+            timeout: HTTP request timeout in seconds (currently unused, reserved for future).
 
         Returns:
-            TableResult with metadata. Access .data to get the table.
+            Table with data and metadata (or just metadata if load_data=False).
 
         Raises:
-            ValueError: If table not found.
+            ValueError: If path format is invalid.
+            KeyError: If table not found at path.
 
         Example:
             ```python
-            # Get metadata without loading data
-            result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-            print(f"Dataset: {result.dataset}, Version: {result.version}")
+            # Load table with data
+            tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+            print(tb.head())
 
-            # Load data when needed
-            tb = result.data
+            # Load only metadata (no data rows)
+            tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population", load_data=False)
+            print(tb.columns)
             ```
         """
-        # Parse path using CatalogPath
+        # Validate path format
         catalog_path = CatalogPath.from_str(path)
 
         if not catalog_path.table:
             raise ValueError(f"Invalid path format: {path}. Expected format: channel/namespace/version/dataset/table")
 
-        # Search to get full metadata from catalog
-        results = self.search(
-            table=catalog_path.table,
-            namespace=catalog_path.namespace,
-            version=catalog_path.version,
-            dataset=catalog_path.dataset,
-            channel=catalog_path.channel,
-            timeout=timeout,
-        )
-
-        if len(results) == 0:
-            raise ValueError(f"Table not found: {path}")
-
-        # Get first match (should be exact)
-        result = results[0]
-
-        # Preload data if requested
-        if load_data:
-            _ = result.data  # Access property to trigger loading
-
-        return result
+        return _load_table(path, load_data=load_data)

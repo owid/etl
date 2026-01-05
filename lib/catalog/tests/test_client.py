@@ -3,7 +3,7 @@
 #
 import pytest
 
-from owid.catalog import Client
+from owid.catalog import Client, Table
 from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
@@ -205,24 +205,22 @@ class TestIndicatorsAPI:
         assert "path" in frame.columns
 
     def test_fetch_indicator(self):
-        """Test fetching a specific indicator by URI."""
+        """Test fetching a specific indicator by path returns Table directly."""
         client = Client()
-        # First search to find an indicator URI
+        # First search to find an indicator path
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            # Fetch by URI (path)
+            # Fetch by path - returns Table with single column
             assert results[0].path
-            indicator = client.indicators.fetch(results[0].path)
-            assert indicator.column_name
-            assert indicator.title
-            assert indicator.path == results[0].path
-            # Test lazy loading - table should not be loaded yet
-            assert indicator._table is None
-            # Test data access - this triggers lazy loading
-            variable = indicator.data
-            assert variable is not None
-            # After accessing data, table should be cached
-            assert indicator._table is not None
+            tb = client.indicators.fetch(results[0].path)
+            assert isinstance(tb, Table)
+            # Table has data (since load_data=True by default)
+            assert len(tb) > 0
+            # Should have exactly one column (the indicator)
+            assert len(tb.columns) == 1
+            # Metadata is accessible on the column
+            col_name = tb.columns[0]
+            assert tb[col_name].metadata is not None
 
     def test_fetch_indicator_invalid_format(self):
         """Test that invalid path format raises error."""
@@ -277,19 +275,19 @@ class TestTablesAPI:
         assert hasattr(frame, "load")
 
     def test_fetch_table(self):
-        """Test fetching table metadata by path."""
+        """Test fetching table by path returns Table directly."""
         client = Client()
         # First search to find a path
         results = client.tables.search(table="population", namespace="un")
         if len(results) > 0:
             path = results[0].path
-            # Now fetch by path (should return same metadata)
-            table_result = client.tables.fetch(path)
-            assert isinstance(table_result, TableResult)
-            assert table_result.path == path
-            assert table_result.table
-            assert table_result.dataset
-            assert table_result.namespace == "un"
+            # Fetch table directly by path
+            tb = client.tables.fetch(path)
+            assert isinstance(tb, Table)
+            # Table has data (since load_data=True by default)
+            assert len(tb) > 0
+            # Metadata is accessible
+            assert tb.metadata is not None
 
     def test_fetch_invalid_path(self):
         """Test that fetching with invalid path format raises error."""
@@ -300,7 +298,7 @@ class TestTablesAPI:
     def test_fetch_nonexistent_table(self):
         """Test that fetching non-existent table raises error."""
         client = Client()
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(KeyError, match="No matching table found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
 
     def test_backwards_compatibility_datasets(self):

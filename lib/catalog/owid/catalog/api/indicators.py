@@ -11,6 +11,7 @@ import requests
 
 from owid.catalog.api.models import IndicatorResult, ResponseSet
 from owid.catalog.core import CatalogPath
+from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -131,35 +132,29 @@ class IndicatorsAPI:
             limit=data.get("total_results", len(results)),
         )
 
-    def fetch(self, path: str, *, load_data: bool = False, timeout: int | None = None) -> IndicatorResult:
+    def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:
         """Fetch a specific indicator by catalog path.
 
         Args:
             path: Catalog path in format "channel/namespace/version/dataset/table#column"
-                  (e.g., "grapher/un/2024/pop/population#population_total")
-            load_data: If True, preload indicator data immediately.
-                       If False (default), data is loaded lazily when accessed via .data property.
+                  (e.g., "garden/un/2024/pop/population#population_total")
+            load_data: If True (default), load full indicator data.
+                       If False, load only structure (columns and metadata) without rows.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            IndicatorResult with full details. Access .data to get the variable.
+            Table with a single indicator column (plus index). Metadata is preserved.
 
         Raises:
             ValueError: If path format is invalid, table not found, or column doesn't exist.
 
         Example:
             ```python
-            # Fetch indicator by URI
-            indicator = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
-            print(f"Title: {indicator.title}")
-            variable = indicator.data
+            # Fetch indicator by path
+            tb = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
+            print(tb.head())
+            print(tb["population"].metadata.unit)
             ```
-
-        Note:
-            Known limitations of this method:
-            - Uses TablesAPI internally, loading the full table to access a single column
-            - No indicator_id is assigned when fetching by URI (returns None)
-            - Future optimization may allow direct indicator access without full table loading
         """
         effective_timeout = timeout or self._client.timeout
 
@@ -182,11 +177,9 @@ class IndicatorsAPI:
                 "Expected format: 'channel/namespace/version/dataset/table#column'"
             )
 
-        # Fetch table header (structure only, no rows) to validate column and extract metadata
+        # Fetch full table
         try:
-            table_result = self._client.tables.fetch(table_path, timeout=effective_timeout)
-            # Load only the header (columns and metadata, no data rows)
-            table = table_result.data_header
+            table = self._client.tables.fetch(table_path, load_data=load_data, timeout=effective_timeout)
         except Exception as e:
             raise ValueError(f"Failed to load table at path: '{table_path}'. Error: {e}") from e
 
@@ -201,26 +194,6 @@ class IndicatorsAPI:
                 f"Available columns ({total_cols}): {cols_display}"
             )
 
-        # Extract metadata from the Variable object
-        metadata = table[column_name].metadata
-
-        # Create IndicatorResult
-        indicator = IndicatorResult(
-            indicator_id=None,  # TODO: No ID when fetching by URI. We should provide one.
-            title=metadata.title or column_name,
-            score=1.0,  # Direct fetch - perfect match
-            path=path,
-            description=metadata.description or "",
-            column_name=column_name,
-            unit=metadata.unit or "",
-            n_charts=None,  # TODO: Not available when fetched by URI.
-        )
-
-        # Don't store the table - let it be loaded lazily when indicator.data is accessed
-        # The table will be loaded fresh via indicator._load_table() when needed
-
-        # Preload data if requested
-        if load_data:
-            _ = indicator.data
-
-        return indicator
+        # Extract just this indicator column as a single-column Table
+        # This preserves the index and column metadata
+        return table.loc[:, [column_name]]
