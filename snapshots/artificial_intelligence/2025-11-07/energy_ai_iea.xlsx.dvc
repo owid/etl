@@ -20,13 +20,18 @@ meta:
 
     # Files
     url_main: https://www.iea.org/data-and-statistics/data-product/energy-and-ai
-    url_download: https://www.iea.org/product/download/020879-000396-020495
     date_accessed: '2025-11-07'
+
+    # Manual download instructions:
+    # 1. Visit: https://www.iea.org/data-and-statistics/data-product/energy-and-ai
+    # 2. Create an IEA account or log in if you already have one
+    # 3. Download the Excel file
+    # 4. Run: etls artificial_intelligence/2025-11-07/energy_ai_iea --path-to-file <path_to_downloaded_file>
 
     # License
     license:
-      name: Public domain
-      url: https://www.eia.gov/about/copyrights_reuse.php
+      name: © OECD/IEA 2024
+      url: https://www.iea.org/terms
 outs:
   - md5: 9fc209c5a9b8a724b9d21b4a6acc9436
     size: 24210

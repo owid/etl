@@ -43,7 +43,8 @@ tables:
         title: Share of total electricity demand consumed by data centers
         unit: "%"
         short_unit: "%"
-        description_short: Data center electricity consumption as a percentage of total global or regional electricity demand.
+        processing_level: major
+        description_short: Data center electricity consumption as a percentage of total electricity demand of the country or region.
         description_key:
           - This metric shows the proportion of total electricity demand that is consumed by data centers.
           - *data_centers_description
