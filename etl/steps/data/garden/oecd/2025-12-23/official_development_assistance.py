@@ -4,8 +4,9 @@
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -173,6 +174,7 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("official_development_assistance")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb_dac1 = ds_meadow["dac1"].reset_index()
@@ -269,7 +271,11 @@ def run() -> None:
             "humanitarian_aid_recipient",
             "oda_by_sector",
         ],
+        ds_population=ds_population,
     )
+
+    # Replace inf values with None (can occur when dividing by zero or very small populations)
+    tb = tb.replace([float("inf"), float("-inf")], None)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -488,7 +494,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str]) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.
@@ -500,15 +506,8 @@ def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List
     # Define index columns
     index_columns = ["country", "year", "donor", "sector"]
 
-    tb = paths.regions.add_per_capita(
-        tb=tb,
-        index_columns=index_columns,
-        columns=indicator_list,
-        warn_on_missing_countries=False,
-    )
-
-    # Create a dictionary of the indicator_list indicators with the suffix _per_capita and with values mean_weighted_by_population
-    indicator_aggregations = {f"{indicator}_per_capita": "mean_weighted_by_population" for indicator in indicator_list}
+    # Create a dictionary of the indicator_list indicators with sum aggregation
+    indicator_aggregations = {f"{indicator}": "sum" for indicator in indicator_list}
 
     # Calculate aggregates for income groups
     tb = paths.regions.add_aggregates(
@@ -519,6 +518,29 @@ def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List
         frac_allowed_nans_per_year=0.2,
         check_for_region_overlaps=False,
     )
+
+    # Drop the population column
+    if "population" in tb.columns:
+        tb = tb.drop(columns="population")
+
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+
+    for indicator in indicator_list:
+        tb[f"{indicator}_per_capita"] = tb[indicator] / tb["population"]
+
+    # Drop population column
+    tb = tb.drop(columns="population")
+
+    # tb = paths.regions.add_per_capita(
+    #     tb=tb,
+    #     index_columns=index_columns,
+    #     # regions=REGIONS,
+    #     # aggregations=indicator_aggregations,
+    #     columns=indicator_list,
+    #     warn_on_missing_countries=False,
+    #     only_informed_countries_in_regions=True,
+    #     drop_population=True,
+    # )
 
     return tb
 
