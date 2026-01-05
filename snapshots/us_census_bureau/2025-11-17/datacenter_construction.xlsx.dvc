@@ -27,7 +27,6 @@ meta:
     # License
     license:
       name: Public Domain
-      url: https://www.census.gov/about/policies/privacy.html
 outs:
   - md5: 0cd294e19fc942e64eafe2dc3c66a6a3
     size: 173188

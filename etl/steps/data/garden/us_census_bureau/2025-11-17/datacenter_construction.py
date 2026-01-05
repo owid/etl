@@ -34,11 +34,11 @@ def run() -> None:
     # Merge with PPI data using pr.merge to preserve metadata
     tb = pr.merge(tb, tb_ppi[["date", "ppi_new_office_construction"]], on=["date"], how="left")
 
-    # Rebase PPI to January 2014 = 100
-    ppi_jan_2014 = tb_ppi[tb_ppi["date"] == "2014-01-01"]["ppi_new_office_construction"].values[0]
-    tb["ppi_rebased"] = (tb["ppi_new_office_construction"] / ppi_jan_2014) * 100
+    # Rebase PPI to January 2021 = 100
+    ppi_jan_2021 = tb_ppi[tb_ppi["date"] == "2021-01-01"]["ppi_new_office_construction"].values[0]
+    tb["ppi_rebased"] = (tb["ppi_new_office_construction"] / ppi_jan_2021) * 100
 
-    # Adjust for inflation using PPI (base year January 2014=100)
+    # Adjust for inflation using PPI (base year January 2021=100)
     tb["datacenter_construction_spending_real"] = tb["datacenter_construction_spending"] * (100 / tb["ppi_rebased"])
 
     # Drop the PPI columns as they're not needed in output

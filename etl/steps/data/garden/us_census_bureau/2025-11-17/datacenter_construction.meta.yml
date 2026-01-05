@@ -27,16 +27,16 @@ tables:
 
       datacenter_construction_spending_real:
         title: Investment in the physical construction of US data centre buildings (inflation-adjusted)
-        unit: constant 2014 US$
+        unit: constant 2021 US$
         short_unit: $
         description_short: This includes only the work done on site to construct data centre buildings each month, including materials and construction labour. It excludes the IT hardware inside the buildings, like servers and storage, which account for a large share of total investment. Expressed in US dollars, adjusted for inflation.
         description_key:
           - *desc_key
-          - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office building construction. Following guidance from the [Bureau of Economic Analysis (BEA)](https://www.bea.gov/), we assume data centre construction costs are similar to office-type buildings because both use comparable structural components, such as foundations, walls, and HVAC systems.
-        description_processing: We used the Producer Price Index (PPI) for new office building construction to adjust for inflation, following guidance from the [Bureau of Economic Analysis (BEA)](https://www.bea.gov/) that suggests data center construction costs are similar to office buildings due to their comparable structural components.
+          - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office building construction. Following guidance from the [Bureau of Economic Analysis (BEA)](https://www.census.gov/construction/c30/definitions.html), we assume data centre construction costs are similar to office-type buildings because both use comparable structural components, such as foundations, walls, and HVAC systems.
+        description_processing: We used the Producer Price Index (PPI) for new office building construction to adjust for inflation, following guidance from the [Bureau of Economic Analysis (BEA)](https://www.census.gov/construction/c30/definitions.html) that suggests data center construction costs are similar to office buildings due to their comparable structural components.
         presentation:
           title_public: Investment in the physical construction of US data centre buildings
           grapher_config:
-            note: Data is expressed in constant 2014 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction.
+            note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction.
         processing_level: major
 
