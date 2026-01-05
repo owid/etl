@@ -14,7 +14,6 @@ from owid.catalog.core import CatalogPath
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
-    from owid.catalog.variables import Variable
 
 
 OWID_SEARCH_API = "https://search.owid.io/indicators"
@@ -40,10 +39,7 @@ class IndicatorsAPI:
         # Load the table that contains the indicator of interest
         table = results[0].table
 
-        # Get indicator data directly by URI
-        variable = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
-
-        # Or fetch indicator metadata first
+        # Fetch indicator metadata first, then access data
         indicator = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
         variable = indicator.data
         ```
@@ -228,28 +224,3 @@ class IndicatorsAPI:
             _ = indicator.data
 
         return indicator
-
-    def get_data(self, path: str, *, timeout: int | None = None) -> "Variable":
-        """Fetch indicator data as a Variable.
-
-        Convenience method equivalent to fetch(path).data
-
-        Args:
-            path: Catalog path in format "channel/namespace/version/dataset/table#column"
-                  (e.g., "grapher/un/2024/pop/population#population_total")
-            timeout: HTTP request timeout in seconds. Defaults to client timeout.
-
-        Returns:
-            Variable (pandas Series with metadata).
-
-        Raises:
-            ValueError: If path format is invalid, table not found, or column doesn't exist.
-
-        Example:
-            ```python
-            variable = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
-            print(variable.head())
-            print(variable.metadata.unit)
-            ```
-        """
-        return self.fetch(path, timeout=timeout).data

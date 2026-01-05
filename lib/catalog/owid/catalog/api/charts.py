@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import pandas as pd
 import requests
 
 from owid.catalog.api.models import ChartNotFoundError, ChartResult, ResponseSet
@@ -19,9 +18,9 @@ if TYPE_CHECKING:
 class ChartsAPI:
     """API for accessing OWID chart data and metadata.
 
-    Provides methods to fetch data, metadata, and configuration from
-    published charts on ourworldindata.org. Also includes search
-    functionality to find charts by keywords.
+    Provides methods to fetch data and metadata from published charts
+    on ourworldindata.org. Also includes search functionality to find
+    charts by keywords.
 
     Example:
         ```python
@@ -29,19 +28,15 @@ class ChartsAPI:
 
         client = Client()
 
-        # Get chart data directly
-        df = client.charts.get_data("life-expectancy")
-
-        # Or fetch chart and access data via property
+        # Fetch chart and access data via property
         chart = client.charts.fetch("life-expectancy")
         df = chart.data  # Lazy-loaded via property
+        meta = chart.metadata
+        config = chart.config
 
         # Search for charts
         results = client.charts.search("gdp per capita")
         df = results[0].data  # Access data via property
-
-        # Get chart metadata
-        meta = client.charts.get_metadata("life-expectancy")
         ```
     """
 
@@ -142,67 +137,6 @@ class ChartsAPI:
             _ = result.data  # Access property to trigger loading
 
         return result
-
-    def get_data(self, slug_or_url: str, *, timeout: int | None = None) -> pd.DataFrame:
-        """Fetch chart data as a DataFrame.
-
-        Args:
-            slug_or_url: Chart slug (e.g., "life-expectancy") or full URL.
-            timeout: HTTP request timeout in seconds. Defaults to client timeout.
-
-        Returns:
-            DataFrame with chart data. Additional metadata in df.attrs.
-
-        Raises:
-            ChartNotFoundError: If the chart does not exist.
-            LicenseError: If the data cannot be downloaded due to licensing.
-
-        Example:
-            ```python
-            df = client.charts.get_data("life-expectancy")
-            print(df.head())
-            ```
-        """
-        # Use fetch() to get ChartResult, then access .data property
-        return self.fetch(slug_or_url, timeout=timeout).data
-
-    def get_metadata(self, slug_or_url: str, *, timeout: int | None = None) -> dict[str, Any]:
-        """Fetch chart metadata.
-
-        Args:
-            slug_or_url: Chart slug or full URL.
-            timeout: HTTP request timeout in seconds. Defaults to client timeout.
-
-        Returns:
-            Dict containing chart metadata including column information.
-
-        Example:
-            ```python
-            meta = client.charts.get_metadata("life-expectancy")
-            print(meta["columns"].keys())
-            ```
-        """
-        slug = self._parse_slug(slug_or_url)
-        return self._fetch_metadata(slug, timeout=timeout or self._client.timeout)
-
-    def get_config(self, slug_or_url: str, *, timeout: int | None = None) -> dict[str, Any]:
-        """Fetch raw grapher configuration.
-
-        Args:
-            slug_or_url: Chart slug or full URL.
-            timeout: HTTP request timeout in seconds. Defaults to client timeout.
-
-        Returns:
-            Dict containing the grapher configuration.
-
-        Example:
-            ```python
-            config = client.charts.get_config("life-expectancy")
-            print(config["title"])
-            ```
-        """
-        slug = self._parse_slug(slug_or_url)
-        return self._fetch_config(slug, timeout=timeout or self._client.timeout)
 
     @staticmethod
     def _parse_slug(slug_or_url: str) -> str:
