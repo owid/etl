@@ -9,11 +9,11 @@ meta:
     attribution_short: IUCN
     url_main: https://nc.iucnredlist.org/redlist/content/attachment_files/2025-2_RL_Table8c.pdf
     date_accessed: "2026-01-05"
-    date_published: "2025-03-27"
+    date_published: "2025-10-10"
     license:
       name: © International Union for Conservation of Nature and Natural Resources
       url: https://www.iucnredlist.org/terms/terms-of-use
 outs:
-  - md5: 5e6439a93ad73fa85b70c2c328a58742
-    size: 10495
+  - md5: 4d2b7b7f105f30939c2087ca828f31e5
+    size: 11807
     path: endemic_invertebrates.csv
