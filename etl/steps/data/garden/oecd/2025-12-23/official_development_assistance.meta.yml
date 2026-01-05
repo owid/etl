@@ -176,7 +176,10 @@ definitions:
   processing_per_capita_2: |-
     We calculated this indicator by dividing by the population of each country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
-    We also calculated per capita aggregates for [World Bank income groups](https://ourworldindata.org/world-bank-income-groups-explained) (low-income, lower-middle-income, upper-middle-income, and high-income countries), dividing the total sum of the indicator by the total population of these income groups.
+    We also calculated per-capita aggregates for the [World Bank income groups](https://ourworldindata.org/world-bank-income-groups-explained). To do this, we summed the indicator across all countries in each income group and divided by the total population of that group.
+
+  processing_income_aggregations: |-
+    We calculated aggregates for the [World Bank income groups](https://ourworldindata.org/world-bank-income-groups-explained) by summing the indicator across all countries in each income group.
 
   processing_share_gni: |-
     We calculated this indicator by dividing by the gross national income (GNI) of the donor country regional aggregation. The GNI estimate is available in the OECD dataset.
@@ -1524,6 +1527,8 @@ tables:
         description_short: *description_short_by_donor
         description_key: *description_key_by_donor
         description_from_producer: "{definitions.producer_oda}"
+        processing_level: major
+        description_processing: "{definitions.processing_income_aggregations}"
         presentation:
           title_variant: <<donor>>
         display:
@@ -1563,6 +1568,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_income_aggregations}"
         presentation:
           title_variant: <<donor>>
         display:
@@ -1582,6 +1589,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_income_aggregations}"
         presentation:
           title_variant: <<donor>>
         display:
@@ -1640,6 +1649,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_income_aggregations}"
         presentation:
           title_variant: <<donor>>
         display:
@@ -1660,7 +1671,11 @@ tables:
           - "{definitions.key_food_aid}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-        description_from_producer: "{definitions.producer_food_aid}"
+        processing_level: major
+        description_from_producer: |-
+          {definitions.producer_food_aid}
+
+          {definitions.processing_income_aggregations}
         presentation:
           title_variant: <<donor>>
         display:
@@ -1680,6 +1695,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_income_aggregations}"
         presentation:
           title_variant: <<donor>>
         display:
@@ -1830,8 +1847,11 @@ tables:
           - "{definitions.key_sector}"
           - "{definitions.key_commitments_sectors}"
           - "{definitions.key_constant_usd}"
-        processing_level: *processing_level_by_sector
-        description_processing: "{definitions.processing_oda_by_sector}"
+        processing_level: major
+        description_processing: |-
+          {definitions.processing_oda_by_sector}
+
+          {definitions.processing_income_aggregations}
         display:
           name: ODA by donor and sector (<<sector>>)
           numDecimalPlaces: 0
