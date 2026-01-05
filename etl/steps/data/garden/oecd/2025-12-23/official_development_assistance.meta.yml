@@ -176,7 +176,7 @@ definitions:
   processing_per_capita_2: |-
     We calculated this indicator by dividing by the population of each country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
-    We also calculated per capita aggregates for the [latest World Bank income groups](https://ourworldindata.org/world-bank-income-groups-explained) (low-income, lower-middle-income, upper-middle-income, and high-income countries), dividing the total sum of the indicator by the total population of these income groups.
+    We also calculated per capita aggregates for the [latest World Bank income groups classification](https://ourworldindata.org/world-bank-income-groups-explained) (low-income, lower-middle-income, upper-middle-income, and high-income countries), dividing the total sum of the indicator by the total population of these income groups.
 
   processing_share_gni: |-
     We calculated this indicator by dividing by the gross national income (GNI) of the donor country regional aggregation. The GNI estimate is available in the OECD dataset.
