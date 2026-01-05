@@ -185,9 +185,9 @@ def load_latest_population():
     candidates = find("population", channels=("grapher",), dataset="population", namespace="demography").sort_values(
         "version", ascending=False
     )
+    filtered = candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
     population = (
-        candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
-        .iloc[0]
+        filtered.iloc[0]
         .load()
         .reset_index()[["country", "year", "population"]]
     ).rename(columns={"country": "entity_name"}, errors="raise")
