@@ -632,6 +632,8 @@ def _expand_nav_for_page(template: str, page_path: str, relative_root: str) -> s
     if not nav_link:
         # Try matching just the filename in case paths differ
         for link in soup.find_all("a", class_="md-nav__link"):
+            if not isinstance(link, Tag):
+                continue
             href = link.get("href", "")
             if href.endswith(page_filename):
                 nav_link = link
@@ -650,11 +652,11 @@ def _expand_nav_for_page(template: str, page_path: str, relative_root: str) -> s
             if level != "0":
                 # Find the associated checkbox input
                 label = parent.find_previous_sibling("label")
-                if label and label.get("for"):
+                if isinstance(label, Tag) and label.get("for"):
                     parent_nav_ids.append(label.get("for"))
                 else:
                     input_elem = parent.find_previous_sibling("input", class_="md-nav__toggle")
-                    if input_elem and input_elem.get("id"):
+                    if isinstance(input_elem, Tag) and input_elem.get("id"):
                         parent_nav_ids.append(input_elem.get("id"))
         parent = parent.parent
 
