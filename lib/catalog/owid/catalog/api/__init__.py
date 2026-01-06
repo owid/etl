@@ -45,17 +45,14 @@ class Client:
         # Charts: Published visualizations
         results = client.charts.search("climate change")
         chart = client.charts.fetch("life-expectancy")
-        df = client.charts.get_data("animals-slaughtered-for-meat")
 
         # Tables: Catalog datasets
         results = client.tables.search(table="population", namespace="un")
         table = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-        tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
 
         # Indicators: Semantic search for data series
         results = client.indicators.search("renewable energy")
         variable = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
-        data = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
 
         ```
     """
