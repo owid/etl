@@ -233,7 +233,9 @@ class AdminAPI(object):
         return js
 
 
-@cache
+# NOTE: turned this off because I have a suspicion sessions are short-lived. We should switch to tokens for auth
+# as soon as possible
+# @cache
 def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
     engine = owid_env.get_engine()
     with Session(engine) as session:
