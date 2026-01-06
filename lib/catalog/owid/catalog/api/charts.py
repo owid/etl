@@ -8,6 +8,7 @@ from __future__ import annotations
 import io
 from typing import TYPE_CHECKING, Any
 
+import pandas as pd
 import requests
 
 from owid.catalog.api.models import ChartNotFoundError, ChartResult, LicenseError, ResponseSet
