@@ -129,7 +129,7 @@ class IndicatorsAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("total_results", len(results)),
+            total_count=data.get("total_results", len(results)),
         )
 
     def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:

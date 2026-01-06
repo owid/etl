@@ -149,7 +149,7 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
         )
 
     def pages(
@@ -200,5 +200,5 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
         )
