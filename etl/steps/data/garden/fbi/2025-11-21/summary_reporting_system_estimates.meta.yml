@@ -145,3 +145,23 @@ tables:
           - *description_key_hierarchy
           - *motor_vehicle_theft_desc_key
         unit: motor vehicle thefts per 100,000 population
+      rape_legacy:
+        title: Estimated number of rapes according to the legacy definition
+        unit: rapes
+        description_key:
+          - *description_key_hierarchy
+      rape_revised:
+        title: Estimated number of rapes according to the revised definition
+        unit: rapes
+        description_key:
+          - *description_key_hierarchy
+      rape_legacy_per_100k:
+        title: Estimated number of rapes according to the legacy definition per 100,000 population
+        unit: rapes per 100,000 population
+        description_key:
+          - *description_key_hierarchy
+      rape_revised_per_100k:
+        title: Estimated number of rapes according to the revised definition per 100,000 population
+        unit: rapes per 100,000 population
+        description_key:
+          - *description_key_hierarchy
