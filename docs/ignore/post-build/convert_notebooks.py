@@ -601,9 +601,23 @@ def _expand_nav_for_page(template: str, page_path: str, relative_root: str) -> s
     str
         Template with expanded nav sections
     """
-    # Step 1: Remove ALL existing md-nav__link--active classes from the template
+    # Step 1: Remove ALL existing active classes from the template
     # This removes the "Home" active state that comes from index.html template
     template = re.sub(r"md-nav__link--active\s*", "", template)
+    template = re.sub(r"md-tabs__item--active\s*", "", template)
+
+    # Step 1b: Add active class to the correct top navigation tab
+    # The page_path is like "analyses/food_supply.../file.html"
+    # We need to find the tab with href pointing to the top-level section
+    top_section = page_path.split("/")[0] + "/"  # e.g., "analyses/"
+    tab_href = f"{relative_root}{top_section}"  # e.g., "../../analyses/"
+
+    # Add md-tabs__item--active to the tab containing this href
+    def add_tab_active(match):
+        return match.group(0).replace("md-tabs__item", "md-tabs__item md-tabs__item--active", 1)
+
+    pattern = rf'<li class="md-tabs__item">\s*<a href="{re.escape(tab_href)}"'
+    template = re.sub(pattern, add_tab_active, template)
 
     # Step 2: Find the parent nav IDs using BeautifulSoup (read-only)
     # We need to know which __nav_X checkboxes to mark as checked
