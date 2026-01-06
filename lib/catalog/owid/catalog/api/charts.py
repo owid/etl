@@ -5,11 +5,15 @@
 #
 from __future__ import annotations
 
+import io
 from typing import TYPE_CHECKING, Any
 
+import pandas as pd
 import requests
 
-from owid.catalog.api.models import ChartNotFoundError, ChartResult, ResponseSet
+from owid.catalog.api.models import ChartNotFoundError, ChartResult, LicenseError, ResponseSet
+from owid.catalog.core.charts import ChartTable, ChartTableMeta
+from owid.catalog.meta import Origin, VariableMeta
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -28,15 +32,15 @@ class ChartsAPI:
 
         client = Client()
 
-        # Fetch chart and access data via property
-        chart = client.charts.fetch("life-expectancy")
-        df = chart.data  # Lazy-loaded via property
-        meta = chart.metadata
-        config = chart.config
+        # Fetch chart data as ChartTable
+        tb = client.charts.fetch("life-expectancy")
+        print(tb.head())
+        print(tb["life_expectancy_0"].metadata.unit)
+        print(tb.chart_config.get("title"))  # Access chart config
 
         # Search for charts
         results = client.charts.search("gdp per capita")
-        df = results[0].data  # Access data via property
+        df = results[0].data  # Access data via property on ChartResult
         ```
     """
 
@@ -99,44 +103,148 @@ class ChartsAPI:
             timeout=timeout or self._client.timeout,
         )
 
-    def fetch(self, slug_or_url: str, *, load_data: bool = False, timeout: int | None = None) -> ChartResult:
-        """Fetch a chart with all its metadata and config.
+    def fetch(self, slug_or_url: str, *, load_data: bool = True, timeout: int | None = None) -> ChartTable:
+        """Fetch chart data as a ChartTable with rich metadata.
 
         Args:
             slug_or_url: Chart slug or full URL.
-            load_data: If True, preload chart data immediately.
-                       If False (default), data is loaded lazily when accessed via .data property.
+            load_data: If True (default), load full chart data.
+                       If False, load only structure (columns and metadata) without rows.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            ChartResult with metadata, config, and data loading capability.
+            ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
+            is populated from the chart's metadata.json. Chart config is accessible via .chart_config.
 
         Example:
             ```python
-            chart = client.charts.fetch("life-expectancy")
-            print(chart.title)
-            df = chart.data
+            tb = client.charts.fetch("life-expectancy")
+            print(tb.head())
+            print(tb["life_expectancy_0"].metadata.unit)
+            print(tb.chart_config.get("title"))
             ```
         """
         effective_timeout = timeout or self._client.timeout
         slug = self._parse_slug(slug_or_url)
-        config = self._fetch_config(slug, timeout=effective_timeout)
+
+        # Fetch metadata (contains column info)
         metadata = self._fetch_metadata(slug, timeout=effective_timeout)
 
-        result = ChartResult(
-            slug=slug,
-            title=config.get("title", ""),
-            url=f"{self.BASE_URL}/{slug}",
-            config=config,
-            metadata=metadata,
+        # Build lookup from shortName to column metadata
+        columns_meta = metadata.get("columns", {})
+        short_name_lookup = {col_info.get("shortName"): col_info for col_info in columns_meta.values()}
+
+        # Fetch config
+        config = self._fetch_config(slug, timeout=effective_timeout)
+
+        # Load data from CSV as ChartTable
+        tb = self._fetch_data_as_chart_table(slug, chart_config=config, timeout=effective_timeout, load_data=load_data)
+
+        # Apply column metadata to data columns
+        for col in tb.columns:
+            if col in ("entities", "years", "dates"):
+                continue
+            col_info = short_name_lookup.get(col, {})
+            if col_info:
+                tb[col].metadata = self._build_variable_meta(col_info)
+
+        # Set table metadata using ChartTableMeta
+        tb.metadata = ChartTableMeta(
+            short_name=slug,
+            title=config.get("title"),
+            description=config.get("subtitle"),
         )
-        result._timeout = effective_timeout
 
-        # Preload data if requested
+        # Set index columns (entities + years/dates)
+        index_cols = []
+        if "entities" in tb.columns:
+            index_cols.append("entities")
+        if "years" in tb.columns:
+            index_cols.append("years")
+        elif "dates" in tb.columns:
+            index_cols.append("dates")
+        if index_cols:
+            # Preserve chart_config and metadata before set_index
+            chart_config = tb.chart_config
+            col_metadata = {col: tb[col].metadata for col in tb.columns if col not in index_cols}
+
+            # set_index returns Table, reconstruct ChartTable
+            indexed = tb.set_index(index_cols)
+            tb = ChartTable(indexed, chart_config=chart_config)
+            tb.metadata = indexed.metadata
+
+            # Restore column metadata
+            for col, meta in col_metadata.items():
+                if col in tb.columns:
+                    tb[col].metadata = meta
+
+        return tb
+
+    def _fetch_data_as_chart_table(
+        self, slug: str, *, chart_config: dict[str, Any], timeout: int, load_data: bool = True
+    ) -> ChartTable:
+        """Fetch chart data as a ChartTable."""
+        url = f"{self.BASE_URL}/{slug}.csv?useColumnShortNames=true"
+        resp = requests.get(url, timeout=timeout)
+
+        if resp.status_code == 404:
+            raise ChartNotFoundError(f"No such chart found: {slug}")
+
+        if resp.status_code == 403:
+            try:
+                error_data = resp.json()
+                raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
+            except (ValueError, requests.exceptions.JSONDecodeError):
+                raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
+
+        resp.raise_for_status()
+
         if load_data:
-            _ = result.data  # Access property to trigger loading
+            df = pd.read_csv(io.StringIO(resp.text))
+        else:
+            # Load only header (first row)
+            df = pd.read_csv(io.StringIO(resp.text), nrows=0)
 
-        return result
+        # Normalize column names
+        df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
+        if "Code" in df.columns:
+            df = df.drop(columns=["Code"])
+
+        # Rename "years" to "dates" if values are date strings
+        if load_data and "years" in df.columns and len(df) > 0:
+            if df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
+                df = df.rename(columns={"years": "dates"})
+
+        return ChartTable(df, chart_config=chart_config)
+
+    @staticmethod
+    def _build_variable_meta(col_info: dict[str, Any]) -> VariableMeta:
+        """Build VariableMeta from chart column metadata."""
+        # Build Origin with citation info
+        origins = []
+        citation_full = col_info.get("citationLong")
+        if citation_full:
+            # Extract producer from citationShort (format: "Producer – Year")
+            citation_short = col_info.get("citationShort", "")
+            producer = citation_short.split(" – ")[0] if citation_short else ""
+
+            origin = Origin(
+                producer=producer,
+                title=col_info.get("titleLong") or "",
+                citation_full=citation_full,
+                date_published=col_info.get("lastUpdated"),
+            )
+            origins.append(origin)
+
+        return VariableMeta(
+            title=col_info.get("titleShort"),
+            description_short=col_info.get("descriptionShort"),
+            description_key=col_info.get("descriptionKey", []),
+            description_processing=col_info.get("descriptionProcessing"),
+            unit=col_info.get("unit"),
+            short_unit=col_info.get("shortUnit"),
+            origins=origins,
+        )
 
     @staticmethod
     def _parse_slug(slug_or_url: str) -> str:

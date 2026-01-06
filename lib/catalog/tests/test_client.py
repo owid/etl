@@ -13,6 +13,7 @@ from owid.catalog.api import (
     ResponseSet,
     TableResult,
 )
+from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
 
 class TestClient:
@@ -34,41 +35,63 @@ class TestChartsAPI:
     """Test the Charts API."""
 
     def test_fetch_chart(self):
+        """Test fetching chart returns ChartTable directly."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
+        tb = client.charts.fetch("life-expectancy")
 
-        assert isinstance(chart, ChartResult)
-        assert chart.slug == "life-expectancy"
-        assert chart.title
-        assert chart.url == "https://ourworldindata.org/grapher/life-expectancy"
+        assert isinstance(tb, ChartTable)
+        # Table has data (load_data=True by default)
+        assert len(tb) > 0
+        # Chart slug stored in metadata.short_name
+        assert tb.metadata.short_name == "life-expectancy"
 
     def test_fetch_chart_by_url(self):
+        """Test fetching chart by URL returns ChartTable."""
         client = Client()
-        chart = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
+        tb = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
 
-        assert isinstance(chart, ChartResult)
-        assert chart.slug == "life-expectancy"
+        assert isinstance(tb, ChartTable)
+        assert tb.metadata.short_name == "life-expectancy"
 
     def test_fetch_chart_data(self):
+        """Test that fetched chart Table has expected index and columns."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
-        df = chart.data
+        tb = client.charts.fetch("life-expectancy")
 
-        assert df is not None
-        assert len(df) > 0
-        assert "entities" in df.columns
-        assert "years" in df.columns
+        assert len(tb) > 0
+        # entities and years are now index columns
+        assert "entities" in tb.index.names
+        assert "years" in tb.index.names or "dates" in tb.index.names
 
     def test_fetch_chart_metadata_and_config(self):
+        """Test that table metadata, column metadata and chart config are accessible."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
+        tb = client.charts.fetch("life-expectancy")
 
-        assert chart.metadata is not None
-        assert isinstance(chart.metadata, dict)
-        assert "columns" in chart.metadata
+        # Table metadata should be ChartTableMeta
+        assert tb.metadata is not None
+        assert isinstance(tb.metadata, ChartTableMeta)
+        assert tb.metadata.short_name == "life-expectancy"
+        assert tb.metadata.title is not None
+        # ChartTableMeta.uri returns chart URL
+        assert tb.metadata.uri == "https://ourworldindata.org/grapher/life-expectancy"
+        # ChartTableMeta.dataset returns None (charts don't have datasets)
+        assert tb.metadata.dataset is None
 
-        assert chart.config is not None
-        assert isinstance(chart.config, dict)
+        # Column metadata should be populated (columns are data columns only, index has entities/years)
+        assert len(tb.columns) > 0
+        col = tb.columns[0]
+        assert tb[col].metadata.unit is not None
+
+        # Origin with citation should be populated
+        assert len(tb[col].metadata.origins) > 0
+        origin = tb[col].metadata.origins[0]
+        assert origin.citation_full is not None
+
+        # Chart config should be accessible via .chart_config property
+        assert tb.chart_config is not None
+        assert isinstance(tb.chart_config, dict)
+        assert "title" in tb.chart_config
 
     def test_chart_not_found(self):
         client = Client()
@@ -76,10 +99,11 @@ class TestChartsAPI:
             client.charts.fetch("this-chart-does-not-exist")
 
     def test_non_redistributable_chart(self):
+        """Test that non-redistributable charts raise LicenseError."""
         client = Client()
         with pytest.raises(LicenseError):
-            chart = client.charts.fetch("test-scores-ai-capabilities-relative-human-performance")
-            _ = chart.data  # Access data to trigger LicenseError
+            # LicenseError is raised immediately since load_data=True by default
+            client.charts.fetch("test-scores-ai-capabilities-relative-human-performance")
 
     def test_invalid_url(self):
         client = Client()
