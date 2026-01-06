@@ -124,11 +124,11 @@ def cli(
 
         assert variable.catalogPath, f"Variable {var_id} does not come from ETL. Migrate it there first."
 
-        # extract dataset URI and columns
-        uri, cols = variable.catalogPath.split("#")
-        cols = f"^{cols}$"
-        uri = uri.split("/", 1)[1]
-        uri, table_name = uri.rsplit("/", 1)
+        # extract dataset URI and columns using parsed catalog_path
+        p = variable.catalog_path
+        cols = f"^{p.indicator}$"
+        uri = f"{p.namespace}/{p.version}/{p.dataset}"
+        table_name = p.table
     else:
         grapher_config = None
 

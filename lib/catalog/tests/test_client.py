@@ -33,37 +33,6 @@ class TestClient:
 class TestChartsAPI:
     """Test the Charts API."""
 
-    def test_get_chart_data(self):
-        client = Client()
-        df = client.charts.get_data("life-expectancy")
-
-        assert df is not None
-        assert len(df) > 0
-        assert "entities" in df.columns
-        assert "years" in df.columns
-
-    def test_get_chart_data_by_url(self):
-        client = Client()
-        df = client.charts.get_data("https://ourworldindata.org/grapher/life-expectancy")
-
-        assert df is not None
-        assert len(df) > 0
-
-    def test_get_chart_metadata(self):
-        client = Client()
-        meta = client.charts.get_metadata("life-expectancy")
-
-        assert meta is not None
-        assert isinstance(meta, dict)
-        assert "columns" in meta
-
-    def test_get_chart_config(self):
-        client = Client()
-        config = client.charts.get_config("life-expectancy")
-
-        assert config is not None
-        assert isinstance(config, dict)
-
     def test_fetch_chart(self):
         client = Client()
         chart = client.charts.fetch("life-expectancy")
@@ -73,20 +42,49 @@ class TestChartsAPI:
         assert chart.title
         assert chart.url == "https://ourworldindata.org/grapher/life-expectancy"
 
+    def test_fetch_chart_by_url(self):
+        client = Client()
+        chart = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
+
+        assert isinstance(chart, ChartResult)
+        assert chart.slug == "life-expectancy"
+
+    def test_fetch_chart_data(self):
+        client = Client()
+        chart = client.charts.fetch("life-expectancy")
+        df = chart.data
+
+        assert df is not None
+        assert len(df) > 0
+        assert "entities" in df.columns
+        assert "years" in df.columns
+
+    def test_fetch_chart_metadata_and_config(self):
+        client = Client()
+        chart = client.charts.fetch("life-expectancy")
+
+        assert chart.metadata is not None
+        assert isinstance(chart.metadata, dict)
+        assert "columns" in chart.metadata
+
+        assert chart.config is not None
+        assert isinstance(chart.config, dict)
+
     def test_chart_not_found(self):
         client = Client()
         with pytest.raises(ChartNotFoundError):
-            client.charts.get_data("this-chart-does-not-exist")
+            client.charts.fetch("this-chart-does-not-exist")
 
     def test_non_redistributable_chart(self):
         client = Client()
         with pytest.raises(LicenseError):
-            client.charts.get_data("test-scores-ai-capabilities-relative-human-performance")
+            chart = client.charts.fetch("test-scores-ai-capabilities-relative-human-performance")
+            _ = chart.data  # Access data to trigger LicenseError
 
     def test_invalid_url(self):
         client = Client()
         with pytest.raises(ValueError):
-            client.charts.get_data("https://example.com/not-a-grapher-url")
+            client.charts.fetch("https://example.com/not-a-grapher-url")
 
 
 class TestChartsAPISearch:
@@ -246,21 +244,6 @@ class TestIndicatorsAPI:
             with pytest.raises(ValueError, match="Column 'nonexistent_column_12345' not found"):
                 client.indicators.fetch(f"{table_path}#nonexistent_column_12345")
 
-    def test_get_data(self):
-        """Test get_data convenience method."""
-        client = Client()
-        # Search to get an indicator path
-        results = client.indicators.search("solar power")
-        if len(results) > 0:
-            path = results[0].path
-            assert path is not None
-            # Use get_data - should return Variable directly
-            variable = client.indicators.get_data(path)
-            assert variable is not None
-            # Should be equivalent to fetch().data
-            variable2 = client.indicators.fetch(path).data
-            assert variable.name == variable2.name
-
 
 class TestTablesAPI:
     """Test the Tables API."""
@@ -319,21 +302,6 @@ class TestTablesAPI:
         client = Client()
         with pytest.raises(ValueError, match="not found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
-
-    def test_get_data(self):
-        """Test get_data convenience method."""
-        client = Client()
-        # Search to get a table path
-        results = client.tables.search(table="population", namespace="un")
-        if len(results) > 0:
-            path = results[0].path
-            # Use get_data - should return Table directly
-            table = client.tables.get_data(path)
-            assert table is not None
-            assert len(table) > 0
-            # Should be equivalent to fetch().data
-            table2 = client.tables.fetch(path).data
-            assert table.m.short_name == table2.m.short_name
 
     def test_backwards_compatibility_datasets(self):
         """Test that client.datasets still works (backwards compatibility)."""
