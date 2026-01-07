@@ -27,6 +27,7 @@ def get_cloudflare_subdomain(branch_name: str) -> str:
     # Truncate to Cloudflare's limit and remove trailing hyphens
     return subdomain[:CLOUDFLARE_SUBDOMAIN_LIMIT].rstrip("-")
 
+
 log = structlog.get_logger()
 
 REPOS = Literal["etl", "owid-grapher"]
