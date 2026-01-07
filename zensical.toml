@@ -97,10 +97,14 @@ nav = [
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
-    { "Our libraries" = [
+    { "Libraries" = [
         { "Python" = [
             "libraries/index.md",
-            { "owid.catalog" = "libraries/catalog.md" },
+            { "owid.catalog" = [
+                "libraries/catalog/index.md",
+                { "Data APIs" = "libraries/catalog/api.md" },
+                { "Processing" = "libraries/catalog/structures.md" },
+            ] },
             { "owid-grapher-py" = "libraries/grapher-py.md" },
             { "owid.repack" = "libraries/repack.md" },
             { "owid.datautils" = "libraries/datautils.md" },
@@ -120,10 +124,9 @@ nav = [
     { "Technical publications" = [
         "analyses/index.md",
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
-        # { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
-        # { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
-        # { "Our COVID work" = "api/covid.md" },
+        { "Food supply of world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         { "Our COVID work" = "api/covid.md" },
+        # { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
     ] },
 ]
 
@@ -347,7 +350,7 @@ paths = ["lib/catalog", "lib/datautils", "lib/repack"]
 docstring_style = "google"
 inherited_members = true          # false
 merge_init_into_class = true
-parameter_headings = true
+parameter_headings = false
 members_order = "source"
 filters = ["!^_", "^__"]
 heading_level = 2

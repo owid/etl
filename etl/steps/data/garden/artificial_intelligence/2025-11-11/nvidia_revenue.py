@@ -23,18 +23,22 @@ def run() -> None:
     # Add a 'country' column for NVIDIA (worldwide data)
     tb = tb.drop(columns=["quarter"])
     tb["revenue_millions"] = tb["revenue_millions"] * 1_000_000  # Convert millions to actual dollars
-    # Mapping of old values to 'niner ones'
+
+    # Group Professional Visualization, Auto, and OEM & Other into "Other"
     rename_map = {
-        "Professional Visualization": "Professional visualization",
+        "Professional Visualization": "Other",
         "Gaming": "Gaming",
         "TOTAL": "Total",
-        "Auto": "Automotive",
-        "OEM & Other": "Original equipment manufacturing and other",
+        "Auto": "Other",
+        "OEM & Other": "Other",
         "Data Center": "Data centers and AI",
     }
 
     # Replace values in the column
     tb["segment"] = tb["segment"].replace(rename_map)
+
+    # Group by date and segment to combine the "Other" categories
+    tb = tb.groupby(["date", "segment"], as_index=False, observed=True)["revenue_millions"].sum()
 
     # Set appropriate format and metadata
     tb = tb.format(["date", "segment"])

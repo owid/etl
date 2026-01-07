@@ -555,7 +555,7 @@ for tab in range(len(tables)):
                 "Adjust for cost sharing within households (equivalized income) Checkbox",
             ] = equivalence_scales["checkbox"][eq]
             df_graphers.loc[j, "subtitle"] = (
-                f"This data is adjusted for inflation and for differences in living costs between countries."
+                "This data is adjusted for inflation and for differences in living costs between countries."
             )
             df_graphers.loc[j, "note"] = (
                 f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. {equivalence_scales['note'][eq]}"
@@ -582,7 +582,7 @@ for tab in range(len(tables)):
                 "Adjust for cost sharing within households (equivalized income) Checkbox",
             ] = equivalence_scales["checkbox"][eq]
             df_graphers.loc[j, "subtitle"] = (
-                f"This data is adjusted for inflation and for differences in living costs between countries."
+                "This data is adjusted for inflation and for differences in living costs between countries."
             )
             df_graphers.loc[j, "note"] = (
                 f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. {equivalence_scales['note'][eq]}"

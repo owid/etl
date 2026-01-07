@@ -17,14 +17,6 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-download: Download data (ZIP)](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip){ .md-button }
 
 
-!!! note ""
-
-    ## COVID-19 work
-    Summary of our data work during COVID-19 pandemic, with all the relevant links to data and research. For a less technical, but more narrative summary, refer to our [COVID-19 history article](https://ourworldindata.org/owid-covid-history).
-
-    [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
-    [:material-download: Download data (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }
-
 <!-- Keep commented out until the article is published.
 -->
 <!--
@@ -37,15 +29,20 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-book-open-variant: Methodology](biofuels_land_use/index.md){ .md-button }
 -->
 
-<!-- Keep commented out until the relevant DI is published.
--->
-<!--
 !!! note ""
 
     ## Food supply of world regions
     Analysis of food supply and agricultural land data of world regions.
 
     [:material-notebook: View notebook](food_supply_of_world_regions/food_supply_of_world_regions.html){ .md-button }
-    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/docs-technical-publication-agriculturalindicators/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
--->
+
+
+!!! note ""
+
+    ## COVID-19 work
+    Summary of our data work during COVID-19 pandemic, with all the relevant links to data and research. For a less technical, but more narrative summary, refer to our [COVID-19 history article](https://ourworldindata.org/owid-covid-history).
+
+    [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
+    [:material-download: Download data (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }

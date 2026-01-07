@@ -23,7 +23,7 @@ tables:
         title: TSMC's monthly revenue
         unit: US dollars
         short_unit: $
-        description_short: Taiwan Semiconductor Manufacturing Company’s (TSMC) consolidated monthly revenue in US dollars, including its subsidiaries. TSMC designs and manufactures advanced computer chips for other companies, acting as the world’s leading dedicated semiconductor foundry and producing the cutting-edge processors used across AI, smartphones, computers, and many other modern technologies.
+        description_short: Monthly revenue of Taiwan Semiconductor Manufacturing Company (TSMC), in US dollars. TSMC is a semiconductor foundry that manufactures advanced chips for other companies, including processors used in AI, smartphones, computers, and other technologies. This data is not adjusted for inflation.
         description_processing: We converted values from New Taiwan dollars to US dollars using monthly average exchange rates from the Central Bank of the Republic of China (Taiwan).
         display:
           numDecimalPlaces: 0
@@ -34,7 +34,7 @@ tables:
         title: TSMC's annual revenue
         unit: US dollars
         short_unit: $
-        description_short: Taiwan Semiconductor Manufacturing Company’s (TSMC) consolidated annual revenue in US dollars, including its subsidiaries. TSMC designs and manufactures advanced computer chips for other companies, acting as the world’s leading dedicated semiconductor foundry and producing the cutting-edge processors used across AI, smartphones, computers, and many other modern technologies.
+        description_short: Annual revenue of Taiwan Semiconductor Manufacturing Company (TSMC), in US dollars. TSMC is a semiconductor foundry that manufactures advanced chips for other companies, including processors used in AI, smartphones, computers, and other technologies. This data is not adjusted for inflation.
         description_processing: We converted values from New Taiwan dollars to US dollars using annual average exchange rates from the Central Bank of the Republic of China (Taiwan).
         display:
           numDecimalPlaces: 0
