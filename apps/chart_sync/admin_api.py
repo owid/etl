@@ -3,7 +3,6 @@ import datetime as dt
 import json
 import random
 import string
-from functools import cache
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
@@ -202,8 +201,40 @@ class AdminAPI(object):
         #     raise AdminAPIError({"error": js["error"], "dod_data": data})
         return js
 
+    def get_narrative_chart(self, narrative_chart_id: int) -> dict:
+        """Get a narrative chart by ID."""
+        resp = requests.get(
+            f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
+            cookies={"sessionid": self.session_id},
+        )
+        js = self._json_from_response(resp)
+        return js
 
-@cache
+    def update_narrative_chart(self, narrative_chart_id: int, config: dict, user_id: Optional[int] = None) -> dict:
+        """Update a narrative chart's config.
+
+        Args:
+            narrative_chart_id: The ID of the narrative chart to update
+            config: The updated patch config for the narrative chart
+            user_id: Optional user ID for the session
+
+        Returns:
+            Response dict from the API
+        """
+        resp = requests.put(
+            f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}",
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json={"config": config},
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):  # Some endpoints don't return success
+            raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
+        return js
+
+
+# NOTE: turned this off because I have a suspicion sessions are short-lived. We should switch to tokens for auth
+# as soon as possible
+# @cache
 def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
     engine = owid_env.get_engine()
     with Session(engine) as session:

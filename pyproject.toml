@@ -87,8 +87,8 @@ owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.3.2",
     "watchdog>=4.0.1",
     "pyyaml>=6.0.2",

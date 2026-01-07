@@ -18,14 +18,13 @@ from owid.catalog.datasets import CHANNEL
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
-    from owid.catalog.tables import Table
 
 
 class TablesAPI:
     """API for querying and loading tables from the OWID catalog.
 
     Provides methods to search for tables by various criteria and
-    load table data directly from the catalog.
+    load table data from the catalog.
 
     Example:
         ```python
@@ -39,10 +38,7 @@ class TablesAPI:
         # Load the first result
         table = results[0].data
 
-        # Get table data directly by path
-        table = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
-
-        # Or fetch metadata first
+        # Fetch metadata first, then load data
         table_result = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
         print(f"Dataset: {table_result.dataset}, Version: {table_result.version}")
         table = table_result.data  # Lazy-load when needed
@@ -295,27 +291,3 @@ class TablesAPI:
             _ = result.data  # Access property to trigger loading
 
         return result
-
-    def get_data(self, path: str, *, timeout: int | None = None) -> "Table":
-        """Fetch table data directly.
-
-        Convenience method equivalent to fetch(path).data
-
-        Args:
-            path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
-            timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
-
-        Returns:
-            Table (pandas DataFrame with metadata).
-
-        Raises:
-            ValueError: If table not found.
-
-        Example:
-            ```python
-            tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
-            print(tb.head())
-            print(tb.metadata.title)
-            ```
-        """
-        return self.fetch(path, timeout=timeout).data

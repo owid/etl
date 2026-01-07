@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 import click
+from owid.catalog.core import CatalogPath
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
@@ -173,16 +174,14 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
         log.info("No variable ids can be automatically updated.")
         return None
 
-    # Select relevant columns.
-    variables_df = variable_data[["id", "catalogPath", "name"]].copy()
+    # Select relevant columns (catalog_path is pre-parsed CatalogPath objects).
+    variables_df = variable_data[["id", "catalogPath", "catalog_path", "name"]].copy()
 
     # Create a column with the step name of each variable's grapher dataset.
-    variables_df["step"] = [
-        "data://" + "/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in variables_df["catalogPath"]
-    ]
+    variables_df["step"] = [p.step_uri for p in variables_df["catalog_path"]]
 
-    # Create a column with the table name and variable name.
-    variables_df["table_and_variable_short_name"] = [path.split("/")[4] for path in variables_df["catalogPath"]]
+    # Create a column with the table name and indicator name.
+    variables_df["table_and_variable_short_name"] = [f"{p.table}#{p.variable}" for p in variables_df["catalog_path"]]
 
     # Load dataframe of all steps in ETL.
     steps_df = VersionTracker().steps_df
@@ -219,7 +218,9 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
     ]
 
     # Create a column for the new version of the latest steps.
-    updateable["version_new"] = [variable["catalogPath_new"].split("/")[2] for _, variable in updateable.iterrows()]
+    updateable["version_new"] = [
+        CatalogPath.from_str(variable["catalogPath_new"]).version for _, variable in updateable.iterrows()
+    ]
 
     if len(updateable) == 0:
         log.info("No variables to update.")
