@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP)"
+    description: |-
+      The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990. The JMP maintains an extensive global database and has become the leading source of comparable estimates of progress at national, regional and global levels.
+    date_published: "2025-08-01"
+    version_producer: 2000-2024 report
+    title_snapshot: Definitions
+    description_snapshot: |-
+      Definitions of variables included in the WHO/UNICEF JMP WASH household data.
+    # Citation
+    producer: World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
+    citation_full: |-
+      World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (2024). Estimates for drinking water, sanitation and hygiene services by country (2000-2024), https://washdata.org/data
+    attribution_short: WHO/UNICEF JMP
+
+    # Files
+    url_main: https://washdata.org/data/downloads#WLD
+    date_accessed: '2025-12-08'
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://data.unicef.org/resources/jmp-report-2025/
+
+outs:
+  - md5: 9ad3971eb4fc9261fc40bd30eea44c6d
+    size: 60718
+    path: definitions.xlsx
