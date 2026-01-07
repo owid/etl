@@ -4,7 +4,6 @@
 #  Tables API for querying and loading tables from the OWID catalog.
 #
 from __future__ import annotations
-from docx.oxml.table import CT_TblGrid
 
 import json
 import tempfile
