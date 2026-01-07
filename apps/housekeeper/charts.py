@@ -51,7 +51,7 @@ def send_slack_chart_reviews(
         _send_published_chart_review(
             df_published.iloc[0],
             channel_name=channel_name,
-            slack_username="daily chart",
+            slack_username="Daily chart",
             icon_emoji="sus-blue",
         )
     elif include_published:
@@ -61,7 +61,7 @@ def send_slack_chart_reviews(
         _send_draft_chart_review(
             df_draft.iloc[0],
             channel_name=channel_name,
-            slack_username="daily draft chart",
+            slack_username="Daily draft chart",
             icon_emoji="sus-white",
         )
     elif include_draft:
@@ -152,9 +152,8 @@ def build_published_message(chart, refs):
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"*{date_str}* "
-        f"(<{OWID_ENV.chart_site(chart['slug'])}|live>, <{OWID_ENV.chart_admin_site(chart['chart_id'])}|admin>)\n"
-        f"{message_usage}\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online*\n"
+        f"_{message_usage}_\n"
     )
     return message
 
@@ -251,10 +250,11 @@ def build_draft_message(chart):
 
     date_str = last_edited.strftime("%d %b %Y")
 
+    # <{OWID_ENV.chart_admin_site(chart['chart_id'])}|*{config.get('title', '')}*>
     message = (
-        f"*{today_str}*\n"
-        f"<{OWID_ENV.chart_admin_site(chart['chart_id'])}|*{config.get('title', '')}*>\n"
-        f"last edited: *{date_str}* ({time_ago}), by {chart['last_edited_by']}"
+        f"[{today_str}] *Delete <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this draft> if it's no longer needed* @responsible\n"
+        f"title: {config.get('title', '')}\n"
+        f"_last edited: {date_str} ({time_ago}), by {chart['last_edited_by']}_"
     )
     return message
 
