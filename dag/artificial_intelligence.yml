@@ -163,16 +163,6 @@ steps:
     - data://garden/artificial_intelligence/2025-04-08/ai_incidents
     - data://garden/artificial_intelligence/2025-04-08/ai_robots
     - data://garden/artificial_intelligence/2025-04-08/ai_investment
-
-  # AI Index Report grapher step (test version for narrative charts)
-  data://grapher/artificial_intelligence/2025-12-22/ai_index:
-    - data://garden/artificial_intelligence/2025-04-08/ai_adoption
-    - data://garden/artificial_intelligence/2025-04-08/ai_conferences
-    - data://garden/artificial_intelligence/2025-04-08/ai_jobs
-    - data://garden/artificial_intelligence/2025-04-08/ai_bills
-    - data://garden/artificial_intelligence/2025-04-08/ai_incidents
-    - data://garden/artificial_intelligence/2025-04-08/ai_robots
-    - data://garden/artificial_intelligence/2025-04-08/ai_investment
   #
   # CSET datasets
   #

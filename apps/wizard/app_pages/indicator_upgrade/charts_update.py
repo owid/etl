@@ -105,9 +105,8 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     return charts
 
 
-def push_new_charts(charts: List[gm.Chart]) -> None:
+def push_new_charts() -> None:
     """Updating charts and narrative charts in the database."""
-    del charts  # Not used - cli_upgrade_indicators loads charts from the mapping in DB
     with st.spinner("Updating charts and narrative charts..."):
         try:
             # Use the CLI function which handles both charts and narrative charts
@@ -150,7 +149,7 @@ def undo_indicator_upgrade(indicator_mapping):
         # TODO: instead of pushing new charts, we should revert the changes!
         # To do this, we should have kept a copy or reference to the original revision.
         # Idea: when 'push_new_charts' is called, store in a table the original revision of the chart.
-        push_new_charts(charts)
+        push_new_charts()
 
         # Undo narrative chart upgrades
         if narrative_charts:
