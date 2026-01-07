@@ -30,11 +30,11 @@ definitions:
   safely_managed_sanitation_desc: &safely_managed_sanitation_desc |
     Safely managed sanitation services are defined as improved sanitation facilities that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
   drinking_water_rationale: &drinking_water_rationale |
-    Easy and reliable access drinking water is fundamental to human health and well-being. Improved drinking water sources reduce the risk of contamination and the spread waterborne diseases.
+    Easy and reliable access to drinking water is fundamental to human health and well-being. Improved drinking water sources reduce the risk of contamination and the spread of waterborne diseases.
   water_not_on_premises_desc: &water_not_on_premises_desc |
     Having to collect water from sources outside the home can be time-consuming and physically demanding. Spending hours each day collecting water can limit opportunities for education, employment, and community participation.
   water_on_premises_desc: &water_on_premises_desc |
-    Having access to water on premises and when needed  reduces the time and effort spent collecting water, which frees up time for education, work and participation in community life.
+    Having access to water on premises and when needed reduces the time and effort spent collecting water, which frees up time for education, work and participation in community life.
   basic_drinking_water_desc: &basic_drinking_water_desc |
     Basic drinking water services are defined as an [improved drinking water source](#dod:improved-water-source), provided collection time is not more than 30 minutes for a roundtrip including queuing.
   limited_drinking_water_desc: &limited_drinking_water_desc |
@@ -91,7 +91,6 @@ tables:
           - *water_on_premises_desc
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
-          - *safely_managed_water_desc
         unit: percent
         short_unit: "%"
       wat_imp:
@@ -322,7 +321,7 @@ tables:
         short_unit: "%"
       hyg_lim:
         title: Share of {definitions.residence} population with limited handwashing facilities
-        description_short: Proportion of people with access to a handwashing facility at home, which lacks soap and / or water.
+        description_short: Proportion of people with access to a handwashing facility at home, which lacks soap or water.
         description_from_producer: Availability of a handwashing facility lacking water and/or soap.
         unit: percent
         short_unit: "%"
@@ -892,7 +891,7 @@ tables:
           numDecimalPlaces: 0
       wat_sm_without:
         title: Share of {definitions.residence} population without access to safely managed drinking water
-        description_short: People without access to safely managed drinking water either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contaminatation.
+        description_short: People without access to safely managed drinking water either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contamination.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
@@ -902,7 +901,7 @@ tables:
       wat_sm_pop_without:
         title: |-
           {definitions.residence_pop} population without access to safely managed drinking water
-        description_short: People without access to safely managed drinking water either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contaminatation.
+        description_short: People without access to safely managed drinking water either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contamination.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
