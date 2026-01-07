@@ -68,6 +68,7 @@ definitions:
   desc_uncertainty: &desc_uncertainty |-
       The source notes that in some cases it may be unclear whether an incident meets all inclusion criteria. In these ambiguous cases, terrorism is considered likely but not certain. These incidents are included in the dataset.
 dataset:
+  title: Global Terrorism Database
   update_period_days: 365
 
 tables:
