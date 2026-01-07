@@ -79,7 +79,11 @@ def calculate_population_all_indicators(tb):
         tb[f"{col}_pop"] = (tb[col] / 100) * tb["pop"]
         # add metadata to new column
         title_col = tb[col].metadata.title if tb[col].metadata.title else col
-        tb[f"{col}_pop"].metadata.title = f'{title_col.split("Proportion of ")[0].capitalize()}'
+        if "Proportion of " in title_col:
+            new_title = title_col.split("Proportion of ", 1)[1].capitalize()
+        else:
+            new_title = title_col
+        tb[f"{col}_pop"].metadata.title = new_title
         tb[f"{col}_pop"].metadata.description_from_producer = tb[col].metadata.description_from_producer
         tb[f"{col}_pop"].metadata.unit = "people"
         tb[f"{col}_pop"].metadata.short_unit = ""
