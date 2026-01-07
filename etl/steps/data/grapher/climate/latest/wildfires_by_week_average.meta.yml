@@ -38,28 +38,28 @@ definitions:
   description_ke_pm2_5: &description_ke_pm2_5
       - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
       - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
-  description_processing_share: &description_processing_share  |-
+  description_processing_share: |-
     The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country
 
   average_description_processing_wildfires: &average_description_processing_wildfires |-
-    Average weekly wildfires between 2012 and 2023 inclusive.
+    Average weekly wildfires between 2012 and {max_year} inclusive.
   upper_bound_description_processing_wildfires: &upper_bound_description_processing_wildfires |-
-    The year with the highest cumulative area burned at the end of the year, between 2012 and 2023 inclusive.
+    The year with the highest cumulative area burned at the end of the year, between 2012 and {max_year} inclusive.
   lower_bound_description_processing_wildfires: &lower_bound_description_processing_wildfires |-
-    The year with the lowest cumulative area burned at the end of the year, between 2012 and 2023 inclusive.
+    The year with the lowest cumulative area burned at the end of the year, between 2012 and {max_year} inclusive.
   average_description_processing_emisssions: &average_description_processing_emisssions |-
-    Average weekly emissions between 2003 and 2023 inclusive.
+    Average weekly emissions between 2003 and {max_year} inclusive.
   upper_bound_description_processing_emisssions: &upper_bound_description_processing_emisssions |-
-    The year with the highest cumulative emissions at the end of the year, between 2003 and 2023 inclusive.
+    The year with the highest cumulative emissions at the end of the year, between 2003 and {max_year} inclusive.
   lower_bound_description_processing_emisssions: &lower_bound_description_processing_emisssions |-
-    The year with the lowest cumulative emissions at the end of the year, between 2003 and 2023 inclusive.
+    The year with the lowest cumulative emissions at the end of the year, between 2003 and {max_year} inclusive.
 
-  average_description_processing_share_wildfires: &average_description_processing_share_wildfires |-
-    Average weekly share of the total land area burnt by wildfires between 2012 and 2023 inclusive.
-  upper_bound_description_processing_share_wildfires: &upper_bound_description_processing_share_wildfires |-
-    The year with the highest cumulative share of the total land area burnt at the end of the year, between 2012 and 2023 inclusive.
-  lower_bound_description_processing_share_wildfires: &lower_bound_description_processing_share_wildfires |-
-    The year with the lowest cumulative share of the total land area burnt at the end of the year, between 2012 and 2023 inclusive.
+  average_description_processing_share_wildfires: |-
+    Average weekly share of the total land area burnt by wildfires between 2012 and {max_year} inclusive.
+  upper_bound_description_processing_share_wildfires: |-
+    The year with the highest cumulative share of the total land area burnt at the end of the year, between 2012 and {max_year} inclusive.
+  lower_bound_description_processing_share_wildfires:  |-
+    The year with the lowest cumulative share of the total land area burnt at the end of the year, between 2012 and {max_year} inclusive.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -74,8 +74,8 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
 
-        avg_area_ha_cumulative_until_2024:
-          title: Average cumulative area burnt by wildfires between 2012 and 2023
+        avg_area_ha_cumulative_until_current_year_minus_2:
+          title: Average cumulative area burnt by wildfires between 2012 and {max_year}
           unit: *unit_wildfires
           short_unit: *short_unit_wildfires
           description_short: *description_short_wildires_cumulative
@@ -83,7 +83,7 @@ tables:
           description_processing: *average_description_processing_wildfires
 
         upper_bound_area_ha_cumulative:
-          title: Maximum cumulative area burnt by wildfires between 2012 and 2023
+          title: Maximum cumulative area burnt by wildfires between 2012 and {max_year}
           unit: *unit_wildfires
           short_unit: *short_unit_wildfires
           description_short: *description_short_wildires_cumulative
@@ -91,15 +91,15 @@ tables:
           description_processing: *upper_bound_description_processing_wildfires
 
         lower_bound_area_ha_cumulative:
-          title: Minimum cumulative area burnt by wildfires between 2012 and 2023
+          title: Minimum cumulative area burnt by wildfires between 2012 and {max_year}
           unit: *unit_wildfires
           short_unit: *short_unit_wildfires
           description_short: *description_short_wildires_cumulative
           description_key: *desc_wildfires
           description_processing: *lower_bound_description_processing_wildfires
 
-        avg_share_cumulative_area_until_2024:
-          title: Average cumulative share of the total land area burnt by wildfires between 2012 and 2023
+        avg_share_cumulative_area_until_current_year_minus_2:
+          title: Average cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
           unit: *unit_share
           short_unit: *short_unit_share
           description_short: *description_short_share_wildfires_cumulative
@@ -108,7 +108,7 @@ tables:
               - {definitions.average_description_processing_share_wildfires}
 
         upper_bound_share_cumulative_area:
-          title: Maximum cumulative share of the total land area burnt by wildfires between 2012 and 2023
+          title: Maximum cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
           unit: *unit_share
           short_unit: *short_unit_share
           description_short: *description_short_share_wildfires_cumulative
@@ -117,7 +117,7 @@ tables:
               - {definitions.upper_bound_description_processing_share_wildfires}
 
         lower_bound_share_cumulative_area:
-          title: Minimum cumulative share of the total land area burnt by wildfires between 2012 and 2023
+          title: Minimum cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
           unit: *unit_share
           short_unit: *short_unit_share
           description_short: *description_short_share_wildfires_cumulative
@@ -125,8 +125,8 @@ tables:
               - {definitions.description_processing_share}
               - {definitions.lower_bound_description_processing_share_wildfires}
 
-        avg_co2_cumulative_until_2024:
-          title: Average weekly cumulative carbon dioxide emissions from wildfires between 2003 and 2023
+        avg_co2_cumulative_until_current_year_minus_2:
+          title: Average weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
           description_short: *description_short_co2_cumulative
@@ -134,7 +134,7 @@ tables:
           description_processing: *average_description_processing_emisssions
 
         upper_bound_co2_cumulative:
-          title: Maximum weekly cumulative carbon dioxide emissions from wildfires between 2003 and 2023
+          title: Maximum weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
           description_short: *description_short_co2_cumulative
@@ -142,15 +142,15 @@ tables:
           description_processing: *upper_bound_description_processing_emisssions
 
         lower_bound_co2_cumulative:
-          title: Minimum weekly cumulative carbon dioxide emissions from wildfires between 2003 and 2023
+          title: Minimum weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
           description_short: *description_short_co2_cumulative
           description_key: *description_key_co2
           description_processing: *lower_bound_description_processing_emisssions
 
-        avg_pm2_5_cumulative_until_2024:
-          title: Average weekly cumulative PM2.5 emissions from wildfires between 2003 and 2023
+        avg_pm2_5_cumulative_until_current_year_minus_2:
+          title: Average weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
           description_short: *description_short_pm2_5_cumulative
@@ -158,7 +158,7 @@ tables:
           description_processing: *average_description_processing_emisssions
 
         upper_bound_pm2_5_cumulative:
-          title: Maximum weekly cumulative PM2.5 emissions from wildfires between 2003 and 2023
+          title: Maximum weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
           description_short: *description_short_pm2_5_cumulative
@@ -166,7 +166,7 @@ tables:
           description_processing: *upper_bound_description_processing_emisssions
 
         lower_bound_pm2_5_cumulative:
-          title: Minimum weekly cumulative PM2.5 emissions from wildfires between 2003 and 2023
+          title: Minimum weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
           description_short: *description_short_pm2_5_cumulative
