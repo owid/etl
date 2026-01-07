@@ -1371,3 +1371,13 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/oecd/2026-01-07/body_weight:
+    - snapshot://oecd/2026-01-07/body_weight.csv
+  data://garden/oecd/2026-01-07/body_weight:
+    - data://meadow/oecd/2026-01-07/body_weight
+  data://grapher/oecd/2026-01-07/body_weight:
+    - data://garden/oecd/2026-01-07/body_weight
