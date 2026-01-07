@@ -3,7 +3,6 @@ import datetime as dt
 import json
 import random
 import string
-from functools import cache
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
