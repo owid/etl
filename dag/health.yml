@@ -1381,3 +1381,13 @@ steps:
     - data://meadow/oecd/2026-01-07/body_weight
   data://grapher/oecd/2026-01-07/body_weight:
     - data://garden/oecd/2026-01-07/body_weight
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/eurostat/2026-01-07/bmi:
+    - snapshot://eurostat/2026-01-07/bmi.csv
+  data://garden/eurostat/2026-01-07/bmi:
+    - data://meadow/eurostat/2026-01-07/bmi
+  data://grapher/eurostat/2026-01-07/bmi:
+    - data://garden/eurostat/2026-01-07/bmi
