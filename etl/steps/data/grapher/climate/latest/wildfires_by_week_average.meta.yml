@@ -81,6 +81,11 @@ tables:
           description_short: *description_short_wildires_cumulative
           description_key: *desc_wildfires
           description_processing: *average_description_processing_wildfires
+          presentation:
+            title_public: Average cumulative area burnt by wildfires (2012-{max_year})
+          display:
+            name: Average
+            numDecimalPlaces: 0
 
         upper_bound_area_ha_cumulative:
           title: Maximum cumulative area burnt by wildfires between 2012 and {max_year}
@@ -89,6 +94,11 @@ tables:
           description_short: *description_short_wildires_cumulative
           description_key: *desc_wildfires
           description_processing: *upper_bound_description_processing_wildfires
+          presentation:
+            title_public: Maximum cumulative area burnt by wildfires (2012-{max_year})
+          display:
+            name: Maximum
+            numDecimalPlaces: 0
 
         lower_bound_area_ha_cumulative:
           title: Minimum cumulative area burnt by wildfires between 2012 and {max_year}
@@ -97,6 +107,11 @@ tables:
           description_short: *description_short_wildires_cumulative
           description_key: *desc_wildfires
           description_processing: *lower_bound_description_processing_wildfires
+          presentation:
+            title_public: Minimum cumulative area burnt by wildfires (2012-{max_year})
+          display:
+            name: Minimum
+            numDecimalPlaces: 0
 
         avg_share_cumulative_area_until_current_year_minus_2:
           title: Average cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
@@ -106,6 +121,11 @@ tables:
           description_processing: |-
               - {definitions.description_processing_share}
               - {definitions.average_description_processing_share_wildfires}
+          presentation:
+            title_public: Average cumulative share of the total land area burnt by wildfires (2012-{max_year})
+          display:
+            name: Average
+            numDecimalPlaces: 2
 
         upper_bound_share_cumulative_area:
           title: Maximum cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
@@ -115,6 +135,11 @@ tables:
           description_processing: |-
               - {definitions.description_processing_share}
               - {definitions.upper_bound_description_processing_share_wildfires}
+          presentation:
+            title_public: Maximum cumulative share of the total land area burnt by wildfires (2012-{max_year})
+          display:
+            name: Maximum
+            numDecimalPlaces: 2
 
         lower_bound_share_cumulative_area:
           title: Minimum cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
@@ -124,6 +149,11 @@ tables:
           description_processing: |-
               - {definitions.description_processing_share}
               - {definitions.lower_bound_description_processing_share_wildfires}
+          presentation:
+            title_public: Minimum cumulative share of the total land area burnt by wildfires (2012-{max_year})
+          display:
+            name: Minimum
+            numDecimalPlaces: 2
 
         avg_co2_cumulative_until_current_year_minus_2:
           title: Average weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
@@ -132,6 +162,11 @@ tables:
           description_short: *description_short_co2_cumulative
           description_key: *description_key_co2
           description_processing: *average_description_processing_emisssions
+          presentation:
+            title_public: Average weekly cumulative carbon dioxide emissions from wildfires (2003-{max_year})
+          display:
+            name: Average
+            numDecimalPlaces: 0
 
         upper_bound_co2_cumulative:
           title: Maximum weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
@@ -140,6 +175,11 @@ tables:
           description_short: *description_short_co2_cumulative
           description_key: *description_key_co2
           description_processing: *upper_bound_description_processing_emisssions
+          presentation:
+            title_public: Maximum weekly cumulative carbon dioxide emissions from wildfires (2003-{max_year})
+          display:
+            name: Maximum
+            numDecimalPlaces: 0
 
         lower_bound_co2_cumulative:
           title: Minimum weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
@@ -148,6 +188,11 @@ tables:
           description_short: *description_short_co2_cumulative
           description_key: *description_key_co2
           description_processing: *lower_bound_description_processing_emisssions
+          presentation:
+            title_public: Minimum weekly cumulative carbon dioxide emissions from wildfires (2003-{max_year})
+          display:
+            name: Minimum
+            numDecimalPlaces: 0
 
         avg_pm2_5_cumulative_until_current_year_minus_2:
           title: Average weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
@@ -156,6 +201,11 @@ tables:
           description_short: *description_short_pm2_5_cumulative
           description_key: *description_ke_pm2_5
           description_processing: *average_description_processing_emisssions
+          presentation:
+            title_public: Average weekly cumulative PM2.5 emissions from wildfires (2003-{max_year})
+          display:
+            name: Average
+            numDecimalPlaces: 0
 
         upper_bound_pm2_5_cumulative:
           title: Maximum weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
@@ -164,6 +214,11 @@ tables:
           description_short: *description_short_pm2_5_cumulative
           description_key: *description_ke_pm2_5
           description_processing: *upper_bound_description_processing_emisssions
+          presentation:
+            title_public: Maximum weekly cumulative PM2.5 emissions from wildfires (2003-{max_year})
+          display:
+            name: Maximum
+            numDecimalPlaces: 0
 
         lower_bound_pm2_5_cumulative:
           title: Minimum weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
@@ -172,3 +227,8 @@ tables:
           description_short: *description_short_pm2_5_cumulative
           description_key: *description_ke_pm2_5
           description_processing: *lower_bound_description_processing_emisssions
+          presentation:
+            title_public: Minimum weekly cumulative PM2.5 emissions from wildfires (2003-{max_year})
+          display:
+            name: Minimum
+            numDecimalPlaces: 0
