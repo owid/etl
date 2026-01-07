@@ -12,6 +12,21 @@ from apps.owidbot import anomalist, chart_diff, data_diff, grapher
 from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
 from etl.git_api_helpers import GithubApiRepo
 
+# Cloudflare Pages subdomain limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
+CLOUDFLARE_SUBDOMAIN_LIMIT = 28
+
+
+def get_cloudflare_subdomain(branch_name: str) -> str:
+    """Get the Cloudflare Pages subdomain for a branch.
+
+    Cloudflare normalizes branch names by replacing special characters with dashes
+    and truncating to 28 characters.
+    """
+    # Replace special characters with dashes (same as _normalise_branch in etl/config.py)
+    subdomain = re.sub(r"[\/\._]", "-", branch_name)
+    # Truncate to Cloudflare's limit and remove trailing hyphens
+    return subdomain[:CLOUDFLARE_SUBDOMAIN_LIMIT].rstrip("-")
+
 log = structlog.get_logger()
 
 REPOS = Literal["etl", "owid-grapher"]
@@ -135,10 +150,11 @@ def services_from_comment(comment: Any) -> Dict[str, str]:
 
 def create_comment_body(branch: str, services: Dict[str, str], start_time: float):
     container_name = get_container_name(branch) if branch else "dry-run"
+    cloudflare_subdomain = get_cloudflare_subdomain(branch) if branch else "dry-run"
 
     body = f"""
 <b>Quick links (staging server)</b>:
-[Site Dev](http://{container_name}/) | [Site Preview](https://{branch}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
+[Site Dev](http://{container_name}/) | [Site Preview](https://{cloudflare_subdomain}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
 |--------------------------------|----------------------------------|---|---|---|
 
 **Login**: `ssh owid@{container_name}`
