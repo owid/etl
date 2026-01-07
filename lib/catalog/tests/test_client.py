@@ -93,34 +93,6 @@ class TestChartsAPI:
         assert isinstance(tb.chart_config, dict)
         assert "title" in tb.chart_config
 
-    def test_fetch_chart_by_url(self):
-        client = Client()
-        chart = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
-
-        assert isinstance(chart, ChartResult)
-        assert chart.slug == "life-expectancy"
-
-    def test_fetch_chart_data(self):
-        client = Client()
-        chart = client.charts.fetch("life-expectancy")
-        df = chart.data
-
-        assert df is not None
-        assert len(df) > 0
-        assert "entities" in df.columns
-        assert "years" in df.columns
-
-    def test_fetch_chart_metadata_and_config(self):
-        client = Client()
-        chart = client.charts.fetch("life-expectancy")
-
-        assert chart.metadata is not None
-        assert isinstance(chart.metadata, dict)
-        assert "columns" in chart.metadata
-
-        assert chart.config is not None
-        assert isinstance(chart.config, dict)
-
     def test_chart_not_found(self):
         client = Client()
         with pytest.raises(ChartNotFoundError):

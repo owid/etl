@@ -5,11 +5,13 @@
 #
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import requests
+from pydantic import BaseModel, ConfigDict, PrivateAttr
 
-from owid.catalog.api.models import IndicatorResult, ResponseSet
+from owid.catalog.api.models import ResponseSet
+from owid.catalog.api.tables import _load_table
 from owid.catalog.core import CatalogPath
 from owid.catalog.tables import Table
 
@@ -18,6 +20,203 @@ if TYPE_CHECKING:
 
 
 OWID_SEARCH_API = "https://search.owid.io/indicators"
+
+
+# =============================================================================
+# Indicator Loading Functions
+# =============================================================================
+
+
+def _load_indicator(path: str, *, load_data: bool = True) -> Table:
+    """Load indicator data by catalog path.
+
+    Shared logic for IndicatorResult.fetch() and IndicatorsAPI.fetch().
+
+    Args:
+        path: Catalog path in format "channel/namespace/version/dataset/table#column"
+        load_data: If True, load full data. If False, load only structure.
+
+    Returns:
+        Table with a single indicator column (plus index).
+
+    Raises:
+        ValueError: If path format is invalid or column doesn't exist.
+    """
+    # Parse path
+    catalog_path = CatalogPath.from_str(path)
+
+    if not catalog_path.variable:
+        raise ValueError(
+            f"Invalid indicator path format: '{path}'. "
+            "Expected format: 'channel/namespace/version/dataset/table#column' (missing #column)"
+        )
+
+    table_path = catalog_path.table_path
+    column_name = catalog_path.variable
+
+    if table_path is None:
+        raise ValueError(
+            f"Invalid indicator path format: '{path}'. "
+            "Expected format: 'channel/namespace/version/dataset/table#column'"
+        )
+
+    # Load table
+    table = _load_table(table_path, load_data=load_data)
+
+    # Validate column exists
+    if column_name not in table.columns:
+        available_cols = ", ".join(f"'{col}'" for col in sorted(table.columns)[:10])
+        total_cols = len(table.columns)
+        cols_display = f"{available_cols}{'...' if total_cols > 10 else ''}"
+        raise ValueError(
+            f"Column '{column_name}' not found in table '{table_path}'. "
+            f"Available columns ({total_cols}): {cols_display}"
+        )
+
+    return table.loc[:, [column_name]]
+
+
+# =============================================================================
+# IndicatorResult Model
+# =============================================================================
+
+
+class IndicatorResult(BaseModel):
+    """An indicator found via semantic search.
+
+    Attributes:
+        title: Indicator title/name.
+        indicator_id: Unique indicator ID.
+        path: Path in the catalog (e.g., "grapher/un/2024-07-12/un_wpp/population#population").
+        channel: Data channel (parsed from path).
+        namespace: Data provider namespace (parsed from path).
+        version: Version string (parsed from path).
+        dataset: Dataset name (parsed from path).
+        column_name: Column name in the table.
+        description: Full indicator description.
+        unit: Unit of measurement.
+        score: Semantic similarity score (0-1).
+        n_charts: Number of charts using this indicator.
+    """
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
+    # Identification
+    title: str
+    indicator_id: int | None
+
+    # Location
+    path: str | None
+
+    # Structural metadata
+    channel: str | None = None
+    namespace: str | None = None
+    version: str | None = None
+    dataset: str | None = None
+
+    # Content metadata
+    column_name: str = ""
+    description: str = ""
+    unit: str = ""
+
+    # Usage metadata
+    score: float
+    n_charts: int | None = None
+
+    _cached_table: Table | None = PrivateAttr(default=None)
+    _legacy: bool = PrivateAttr(default=False)
+
+    def model_post_init(self, __context: Any) -> None:
+        """Parse dataset, version, namespace, channel from path."""
+        if self.path and not self.dataset:
+            # Parse using CatalogPath
+            try:
+                # CatalogPath.from_str() handles the "#" automatically
+                parsed = CatalogPath.from_str(self.path)
+                # Set parsed fields
+                object.__setattr__(self, "dataset", parsed.dataset)
+                object.__setattr__(self, "version", parsed.version)
+                object.__setattr__(self, "namespace", parsed.namespace)
+                object.__setattr__(self, "channel", parsed.channel)
+            except Exception:
+                # If parsing fails, leave fields empty
+                object.__setattr__(self, "_legacy", True)
+
+    def fetch(self, *, load_data: bool = True) -> Table:
+        """Fetch indicator data as a single-column Table.
+
+        Args:
+            load_data: If True (default), load full indicator data.
+                       If False, load only structure (columns and metadata) without rows.
+
+        Returns:
+            Table with the indicator column (plus index). Metadata is preserved.
+
+        Example:
+            ```python
+            result = client.indicators.search("population")[0]
+            tb = result.fetch()
+            print(tb.head())
+            print(tb[tb.columns[0]].metadata.unit)
+            ```
+        """
+        if self.path is None:
+            raise ValueError("Cannot fetch: path is None. Likely a legacy (pre-ETL) indicator.")
+
+        # Return cached if available and requesting full data
+        if load_data and self._cached_table is not None:
+            return self._cached_table
+
+        tb = _load_indicator(self.path, load_data=load_data)
+
+        # Cache only if loading full data
+        if load_data:
+            self._cached_table = tb
+
+        return tb
+
+    def fetch_table(self, *, load_data: bool = True) -> Table:
+        """Fetch the full table containing this indicator.
+
+        Args:
+            load_data: If True (default), load full table data.
+                       If False, load only structure (columns and metadata) without rows.
+
+        Returns:
+            Table with all columns including this indicator.
+
+        Example:
+            ```python
+            result = client.indicators.search("population")[0]
+            tb = result.fetch_table()
+            print(tb.columns)
+            ```
+        """
+        # Return cached if available and requesting full data
+        if load_data and self._cached_table is not None:
+            return self._cached_table
+
+        result = self._load_full_table(load_data=load_data)
+
+        # Cache only if loading full data
+        if load_data:
+            self._cached_table = result
+
+        return result
+
+    def _load_full_table(self, *, load_data: bool = True) -> Table:
+        """Internal method to load the table containing this indicator."""
+        # Check path is not None
+        if self.path is None:
+            raise ValueError("Cannot load table: path is None. Likely because this is a legacy (pre-ETL) table.")
+        # Parse path using CatalogPath
+        parsed = CatalogPath.from_str(self.path)
+        # Use table_path property (without variable)
+        if parsed.table_path is None:
+            raise ValueError(f"Invalid catalog path: {self.path}")
+        return _load_table(parsed.table_path, load_data=load_data)
 
 
 class IndicatorsAPI:
@@ -37,12 +236,11 @@ class IndicatorsAPI:
         for ind in results:
             print(f"{ind.title} (score: {ind.score:.2f})")
 
-        # Load the table that contains the indicator of interest
-        table = results[0].table
+        # Fetch the indicator data as a single-column Table
+        tb = results[0].fetch()
 
-        # Fetch indicator metadata first, then access data
-        indicator = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
-        variable = indicator.data
+        # Or fetch the full table containing the indicator
+        full_table = results[0].fetch_table()
         ```
     """
 
@@ -91,7 +289,7 @@ class IndicatorsAPI:
                 print(f"  Path: {ind.path}")
 
             # Load data from top result
-            indicator = results[0].data
+            tb = results[0].fetch()
             ```
         """
         params = {
@@ -140,7 +338,7 @@ class IndicatorsAPI:
                   (e.g., "garden/un/2024/pop/population#population_total")
             load_data: If True (default), load full indicator data.
                        If False, load only structure (columns and metadata) without rows.
-            timeout: HTTP request timeout in seconds. Defaults to client timeout.
+            timeout: HTTP request timeout in seconds (reserved for future use).
 
         Returns:
             Table with a single indicator column (plus index). Metadata is preserved.
@@ -156,44 +354,5 @@ class IndicatorsAPI:
             print(tb["population"].metadata.unit)
             ```
         """
-        effective_timeout = timeout or self._client.timeout
-
-        # Parse path using CatalogPath
-        catalog_path = CatalogPath.from_str(path)
-
-        if not catalog_path.variable:
-            raise ValueError(
-                f"Invalid indicator path format: '{path}'. "
-                "Expected format: 'channel/namespace/version/dataset/table#column' (missing #column)"
-            )
-
-        # Build table path (without variable)
-        table_path = catalog_path.table_path
-        column_name = catalog_path.variable
-
-        if table_path is None:
-            raise ValueError(
-                f"Invalid indicator path format: '{path}'. "
-                "Expected format: 'channel/namespace/version/dataset/table#column'"
-            )
-
-        # Fetch full table
-        try:
-            table = self._client.tables.fetch(table_path, load_data=load_data, timeout=effective_timeout)
-        except Exception as e:
-            raise ValueError(f"Failed to load table at path: '{table_path}'. Error: {e}") from e
-
-        # Verify column exists in table
-        if column_name not in table.columns:
-            available_cols = ", ".join(f"'{col}'" for col in sorted(table.columns)[:10])
-            total_cols = len(table.columns)
-            cols_display = f"{available_cols}{'...' if total_cols > 10 else ''}"
-
-            raise ValueError(
-                f"Column '{column_name}' not found in table '{table_path}'. "
-                f"Available columns ({total_cols}): {cols_display}"
-            )
-
-        # Extract just this indicator column as a single-column Table
-        # This preserves the index and column metadata
-        return table.loc[:, [column_name]]
+        _ = timeout  # Reserved for future use
+        return _load_indicator(path, load_data=load_data)

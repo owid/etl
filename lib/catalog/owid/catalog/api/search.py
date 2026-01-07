@@ -10,7 +10,8 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from owid.catalog.api.models import ChartResult, PageSearchResult, ResponseSet
+from owid.catalog.api.charts import ChartResult
+from owid.catalog.api.models import PageSearchResult, ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
