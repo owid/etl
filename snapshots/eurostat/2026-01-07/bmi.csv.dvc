@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Obesity rate by body mass index (BMI)"
+    description: |-
+      This indicator is derived from the body mass index (BMI), which is defined as the weight in kilograms divided by the square of the height in metres. People aged 18 years or over are considered obese if their BMI is equal to or greater than 30. The category ‘pre-obese’ refers to people with a BMI between 25 and less than 30. The category ‘overweight’ (BMI equal or greater than 25) combines the two categories pre-obese and obese. The data presented in this section stem from the European Health Interview Survey (EHIS) and the EU Statistics on Income and Living Conditions (EU-SILC).
+    date_published: "2025-10-20"
+
+    # Citation
+    producer: Eurostat
+    citation_full: |-
+      Obesity rate by body mass index (BMI), Eurostat.
+
+    attribution_short: Eurostat
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/sdg_02_10/default/table?lang=en
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/3.0/data/dataflow/ESTAT/sdg_02_10/1.0?compress=false&format=csvdata&formatVersion=2.0&lang=en&labels=name
+    date_accessed: '2026-01-07'
+
+    # License
+    license:
+      name: © European Union, 1995-2026
+      url: https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Copyright/licence_policy
+outs:
+  - md5: bb3ae631f49939538152d44db426ccf9
+    size: 65060
+    path: bmi.csv
