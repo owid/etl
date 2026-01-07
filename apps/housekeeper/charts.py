@@ -26,6 +26,16 @@ from etl.slack_helpers import send_slack_message
 
 log = get_logger()
 
+# Default reviewers for daily chart reviews
+DAILY_CHART_REVIEWER_DEFAULT = "fiona"
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "fiona"
+
+# Mapping from chart revision usernames (fullName) to Slack usernames
+# Edit this dictionary to add/update mappings
+SLACK_NAMES: dict[str, str] = {
+    # "Full Name": "slack_username",  # Example: "Lucas Rodriguez": "lucas"
+}
+
 
 ####################################
 # Main entry point
@@ -152,7 +162,7 @@ def build_published_message(chart, refs):
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online*\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
         f"_{message_usage}_\n"
     )
     return message
@@ -196,6 +206,11 @@ def _send_published_extra_messages(chart, refs, **kwargs):
         log.info("Sending AI summary...")
         send_slack_message(message=ai_summary, **kwargs)
 
+    # 4/ Tag explanation
+    tag_message = "*Why have I been tagged?*\nYou are tagged as the data steward for published charts."
+    log.info("Sending tag explanation...")
+    send_slack_message(message=tag_message, **kwargs)
+
 
 ####################################
 # Draft chart review pipeline
@@ -211,25 +226,44 @@ def _send_draft_chart_review(chart, channel_name: str, slack_username: str, icon
     """
     log.info(f"Selected draft chart: {chart['chart_id']}, {chart['slug']}")
 
-    # Build simple message
-    message = build_draft_message(chart)
+    # Find responsible user (creator, editor, or default)
+    slack_tag, reason, _ = _find_responsible_user(chart)
+
+    # Build message with responsible user tag
+    message = build_draft_message(chart, slack_tag=slack_tag)
 
     # Send message
     if SLACK_API_TOKEN:
         log.info("Sending draft review message...")
-        send_slack_message(
+        response = send_slack_message(
             message=message,
             channel=channel_name,
             icon_emoji=icon_emoji,
             username=slack_username,
         )
 
+        # Send tag explanation in thread
+        tag_message = f"*Why have I been tagged?*\n{reason}"
+        log.info("Sending tag explanation...")
+        send_slack_message(
+            message=tag_message,
+            channel=channel_name,
+            icon_emoji=icon_emoji,
+            username=slack_username,
+            thread_ts=response["ts"],
+        )
+
         # Add to reviewed
         owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
 
 
-def build_draft_message(chart):
-    """Build simple message for draft chart review."""
+def build_draft_message(chart, slack_tag: str | None = None):
+    """Build simple message for draft chart review.
+
+    Args:
+        chart: Chart row (pandas Series) to review.
+        slack_tag: Slack mention format for the creator (e.g., "<@username>") or None.
+    """
     last_edited = chart["last_edited_at"]
     today_str = TODAY.strftime("%d %b, %Y")
 
@@ -250,9 +284,11 @@ def build_draft_message(chart):
 
     date_str = last_edited.strftime("%d %b %Y")
 
-    # <{OWID_ENV.chart_admin_site(chart['chart_id'])}|*{config.get('title', '')}*>
+    # Format the tag part of the message
+    tag_part = f" {slack_tag}" if slack_tag else ""
+
     message = (
-        f"[{today_str}] *Delete <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this draft> if it's no longer needed* @responsible\n"
+        f"[{today_str}] *Delete <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this draft> if it's no longer needed*{tag_part}\n"
         f"title: {config.get('title', '')}\n"
         f"_last edited: {date_str} ({time_ago}), by {chart['last_edited_by']}_"
     )
@@ -267,6 +303,89 @@ def get_references(chart_id: int):
     api = AdminAPI(OWID_ENV)
     refs = api.get_chart_references(chart_id)
     return refs["references"]
+
+
+def _parse_revisions(revisions) -> list[dict]:
+    """Parse revisions field - handles both JSON string and list of dicts.
+
+    Can be removed if Metabase returns list directly.
+    """
+    import json
+
+    if revisions is None:
+        return []
+    if isinstance(revisions, str):
+        try:
+            return json.loads(revisions)
+        except json.JSONDecodeError:
+            return []
+    return revisions if isinstance(revisions, list) else []
+
+
+def _format_date(date_value) -> str:
+    """Format a date value to string."""
+    if date_value is None:
+        return ""
+    if hasattr(date_value, "strftime"):
+        return date_value.strftime("%d %b %Y")
+    return str(date_value)
+
+
+def _get_slack_tag(full_name: str | None) -> str | None:
+    """Convert fullName to Slack mention format, or None if not mapped.
+
+    Args:
+        full_name: The user's full name from chart revisions.
+
+    Returns:
+        Slack mention format like "<@username>" or None if no mapping exists.
+    """
+    if full_name is None:
+        return None
+    slack_username = SLACK_NAMES.get(full_name)
+    if slack_username:
+        return f"<@{slack_username}>"
+    return None
+
+
+def _find_responsible_user(chart) -> tuple[str, str, str | None]:
+    """Find the responsible user for a draft chart.
+
+    Logic:
+    1. Check created_by - if in SLACK_NAMES, use them
+    2. Check revisions chronologically - find first editor in SLACK_NAMES
+    3. Fall back to DAILY_DRAFT_CHART_REVIEWER_DEFAULT
+
+    Args:
+        chart: Chart row (pandas Series) with created_by and revisions fields.
+
+    Returns:
+        Tuple of (slack_tag, reason, date_str) where:
+        - slack_tag: Slack mention format "<@username>"
+        - reason: Why this person was tagged (for thread message)
+        - date_str: Relevant date (creation or edit date), or None for default
+    """
+    # 1. Check creator
+    creator = chart.get("created_by")
+    if creator and creator in SLACK_NAMES:
+        slack_tag = f"<@{SLACK_NAMES[creator]}>"
+        date_str = _format_date(chart.get("created_at"))
+        return slack_tag, f"You created this chart on {date_str}.", date_str
+
+    # 2. Check revisions chronologically
+    revisions = _parse_revisions(chart.get("revisions"))
+    # Sort by edited_at (oldest first)
+    sorted_revisions = sorted(revisions, key=lambda r: r.get("edited_at", ""))
+    for rev in sorted_revisions:
+        editor = rev.get("edited_by")
+        if editor and editor in SLACK_NAMES:
+            slack_tag = f"<@{SLACK_NAMES[editor]}>"
+            date_str = _format_date(rev.get("edited_at"))
+            return slack_tag, f"You edited this chart on {date_str}.", date_str
+
+    # 3. Fall back to default
+    slack_tag = f"<@{DAILY_DRAFT_CHART_REVIEWER_DEFAULT}>"
+    return slack_tag, "You are the default reviewer for draft charts.", None
 
 
 def _build_refs_message(refs):
