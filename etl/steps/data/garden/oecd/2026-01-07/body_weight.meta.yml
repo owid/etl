@@ -14,6 +14,6 @@ tables:
   body_weight:
     variables:
       obs_value:
-        title: << measure >> in << sex >>
+        title: << measure >> - << sex >>
         unit: "%"
         short_unit: "%"
