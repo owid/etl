@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: "CORE Econ - Growth rate of GDP per capita and labor productivity"
+  update_period_days: 365
+
+
+tables:
+  growth_rate_gdp_pc:
+    variables:
+      growth_rate_gdp_pc:
+        title: Growth rate of GDP per capita
+        unit: "%"
+        short_unit: "%"
+        description_short: Growth rates are 20-year moving averages.
+        display:
+          numDecimalPlaces: 1
+          tolerance: 0
+
+  growth_rate_productivity:
+    variables:
+      growth_rate_productivity:
+        title: Growth rate of labor productivity
+        unit: "%"
+        short_unit: "%"
+        description_short: Growth rates are 50-year moving averages.
+        display:
+          numDecimalPlaces: 1
+          tolerance: 0
+
+
