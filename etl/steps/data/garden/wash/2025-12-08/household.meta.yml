@@ -59,12 +59,6 @@ definitions:
     Menstrual materials are products used to absorb or collect menstrual blood, such as disposable or reusable pads, tampons, reusable cloths, menstrual cups, or absorbent underwear. They do not include materials such as toilet paper, paper towels, tissues, or rags that are not specifically designed for menstrual management.
   reusable_menstruation_materials_desc: &reusable_menstruation_materials_desc |
     Reusable menstrual materials are products that can be washed and reused multiple times. Examples are reusable cloth pads, menstrual cups, or absorbent underwear.
-  residence_desc: &residence_desc |
-    {{ if residence == "Rural" }}
-    This data refers to people living in rural areas.
-    {{ elif residence == "Urban" }}
-    This data refers to people living in urban areas.
-    {{ endif }}
 
 
 
@@ -86,7 +80,6 @@ tables:
           - *water_not_on_premises_desc
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_basal:
@@ -99,7 +92,6 @@ tables:
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
           - *safely_managed_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_imp:
@@ -109,7 +101,6 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_imp_av:
@@ -119,7 +110,6 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_imp_npip:
@@ -130,7 +120,6 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *non_piped_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_imp_prem:
@@ -141,7 +130,6 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *water_on_premises_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_imp_qual:
@@ -151,7 +139,6 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_lim:
@@ -163,7 +150,6 @@ tables:
           - *water_not_on_premises_desc
           - *limited_drinking_water_desc
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_ns:
@@ -174,7 +160,6 @@ tables:
           - *drinking_water_rationale
           - *surface_water_desc
           - This is the lowest level of drinking water service and indicates a lack of access to safe drinking water.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_pip:
@@ -185,7 +170,6 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *piped_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_sm:
@@ -197,7 +181,6 @@ tables:
           - *water_on_premises_desc
           - *safely_managed_water_desc
           - This is the highest level of drinking water service and indicates access to safe drinking water.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_unimp:
@@ -208,7 +191,6 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_bas:
@@ -220,7 +202,6 @@ tables:
           - *improved_sanitation_desc
           - *basic_sanitation_desc
           - *safely_managed_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_basal:
@@ -232,7 +213,6 @@ tables:
           - *improved_sanitation_desc
           - *basic_sanitation_desc
           - *safely_managed_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_fst_sm:
@@ -243,7 +223,6 @@ tables:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_imp:
@@ -253,7 +232,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_lim:
@@ -264,7 +242,6 @@ tables:
           - *sanitation_rationale
           - *limited_sanitation_desc
           - *improved_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_ns:
@@ -275,7 +252,6 @@ tables:
           - *sanitation_rationale
           - *open_defecation_desc
           - This is the lowest level of access to sanitation facilities and indicates a lack of sanitation infrastructure.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_othimp:
@@ -285,7 +261,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_sdo_sm:
@@ -296,7 +271,6 @@ tables:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_sep:
@@ -306,7 +280,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_sew:
@@ -317,7 +290,6 @@ tables:
           - *sanitation_rationale
           - *improved_sanitation_desc
           - Sewage treatment to at least secondary levels includes biological treatment processes that clear organic matter and pathogens in wastewater. This is the minimum level of treatment required to protect human health and the environment.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_sm:
@@ -328,7 +300,6 @@ tables:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates access to safe sanitation facilities.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_unimp:
@@ -339,7 +310,6 @@ tables:
           - *sanitation_rationale
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       hyg_bas:
@@ -348,7 +318,6 @@ tables:
         description_from_producer: Availability of a handwashing facility on premises with water and soap.
         description_key:
           - A basic handwashing facility is defined as a facility with soap and water available on premises.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       hyg_lim:
@@ -394,7 +363,6 @@ tables:
         description_key:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       mh_mat:
@@ -406,7 +374,6 @@ tables:
         description_key:
           - *menstrual_materials_rationale
           - *menstrual_materials_desc_short
-          - *residence_desc
       mh_nmat:
         title: Share of {definitions.residence} women and girls not using menstrual materials
         description_short: Proportion of women and girls age 15-49 who did not use menstrual materials during their last menstrual period.
@@ -416,7 +383,6 @@ tables:
         description_key:
           - *menstrual_materials_rationale
           - *menstrual_materials_desc_short
-          - *residence_desc
       mh_nreuse:
         title: Share of {definitions.residence} women and girls using non-reusable menstrual materials
         description_short: Proportion of women and girls age 15-49 who used single-use menstrual materials during their last menstrual period.
@@ -425,7 +391,6 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       mh_pain:
@@ -454,7 +419,6 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_bas_pop:
@@ -468,7 +432,6 @@ tables:
           - *water_not_on_premises_desc
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
-          - *residence_desc
       wat_basal_pop:
         title: |-
           {definitions.residence_pop} population with at least basic access to drinking water
@@ -483,7 +446,6 @@ tables:
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
           - *safely_managed_water_desc
-          - *residence_desc
       wat_imp_pop:
         title: |-
           {definitions.residence_pop} population with access to improved drinking water
@@ -496,7 +458,6 @@ tables:
           - *drinking_water_rationale
           - *water_not_on_premises_desc
           - *improved_drinking_water_desc
-          - *residence_desc
       wat_imp_av_pop:
         title: |-
           {definitions.residence_pop} population with access to improved drinking water available when needed
@@ -508,7 +469,6 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
-          - *residence_desc
       wat_imp_npip_pop:
         title: |-
           {definitions.residence_pop} population with access to non-piped improved drinking water
@@ -521,7 +481,6 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *non_piped_water_desc
-          - *residence_desc
       wat_imp_prem_pop:
         title: |-
           {definitions.residence_pop} population with access to improved drinking water on premises
@@ -533,7 +492,6 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
-          - *residence_desc
       wat_imp_qual_pop:
         title: |-
           {definitions.residence_pop} population with access to improved drinking water free of faecal and priority chemical contamination
@@ -545,8 +503,6 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
-          - *residence_desc
-
       wat_lim_pop:
         title: |-
           {definitions.residence_pop} population with only limited access to drinking water
@@ -560,7 +516,6 @@ tables:
           - *water_not_on_premises_desc
           - *limited_drinking_water_desc
           - *improved_drinking_water_desc
-          - *residence_desc
       wat_ns_pop:
         title: |-
           {definitions.residence_pop} population using surface water for drinking
@@ -573,7 +528,6 @@ tables:
           - *drinking_water_rationale
           - *surface_water_desc
           - This is the lowest level of drinking water service and indicates a lack of access to safe drinking water.
-          - *residence_desc
       wat_pip_pop:
         title: |-
           {definitions.residence_pop} population with access to piped drinking water
@@ -586,7 +540,6 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *piped_water_desc
-          - *residence_desc
       wat_sm_pop:
         title: |-
           {definitions.residence_pop} population with access to safely managed drinking water
@@ -599,7 +552,6 @@ tables:
           - *drinking_water_rationale
           - *safely_managed_water_desc
           - This is the highest level of drinking water service and indicates access to safe drinking water.
-          - *residence_desc
       wat_unimp_pop:
         title: |-
           {definitions.residence_pop} population using unimproved drinking water sources
@@ -612,7 +564,6 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
       san_bas_pop:
         title: |-
           {definitions.residence_pop} population with only basic access to sanitation
@@ -626,7 +577,6 @@ tables:
           - *basic_sanitation_desc
           - *improved_sanitation_desc
           - *safely_managed_sanitation_desc
-          - *residence_desc
       san_basal_pop:
         title: |-
           {definitions.residence_pop} population with at least basic sanitation
@@ -641,7 +591,6 @@ tables:
           - *improved_sanitation_desc
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates access to safe sanitation facilities.
-          - *residence_desc
       san_fst_sm_pop:
         title: |-
           {definitions.residence_pop} population with safely managed sanitation with offsite treatment
@@ -654,7 +603,6 @@ tables:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
-          - *residence_desc
       san_imp_pop:
         title: |-
           {definitions.residence_pop} population with access to improved sanitation facilities
@@ -666,7 +614,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
-          - *residence_desc
       san_lim_pop:
         title: |-
           {definitions.residence_pop} population with limited access to sanitation facilities
@@ -679,7 +626,6 @@ tables:
           - *sanitation_rationale
           - *limited_sanitation_desc
           - *improved_sanitation_desc
-          - *residence_desc
       san_ns_pop:
         title: |-
           {definitions.residence_pop} population practicing open defecation
@@ -692,7 +638,6 @@ tables:
           - *sanitation_rationale
           - *open_defecation_desc
           - This is the lowest level of access to sanitation facilities and indicates a lack of sanitation infrastructure.
-          - *residence_desc
       san_othimp_pop:
         title: |-
           {definitions.residence_pop} population with access to other improved sanitation facilities
@@ -704,7 +649,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
-          - *residence_desc
       san_sdo_sm_pop:
         title: |-
           {definitions.residence_pop} population with safely managed sanitation with onsite disposal
@@ -716,7 +660,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
-          - *residence_desc
       san_sep_pop:
         title: |-
           {definitions.residence_pop} population with access to septic tank sanitation
@@ -728,7 +671,6 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
-          - *residence_desc
       san_sew_pop:
         title: |-
           {definitions.residence_pop} population with access to sewer sanitation
@@ -741,7 +683,6 @@ tables:
           - *sanitation_rationale
           - *improved_sanitation_desc
           - Sewage treatment to at least secondary levels includes biological treatment processes that clear organic matter and pathogens in wastewater. This is the minimum level of treatment required to protect human health and the environment.
-          - *residence_desc
       san_sm_pop:
         title: |-
           {definitions.residence_pop} population with safely managed sanitation
@@ -754,7 +695,6 @@ tables:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates access to safe sanitation facilities.
-          - *residence_desc
       san_unimp_pop:
         title: |-
           {definitions.residence_pop} population with access to unimproved sanitation
@@ -767,7 +707,6 @@ tables:
           - *sanitation_rationale
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
       hyg_bas_pop:
         title: |-
           {definitions.residence_pop} population with basic handwashing facilities
@@ -778,7 +717,6 @@ tables:
           numDecimalPlaces: 0
         description_key:
           - A basic handwashing facility is defined as a facility with soap and water available on premises.
-          - *residence_desc
       hyg_lim_pop:
         title: |-
           {definitions.residence_pop} population with limited handwashing facilities
@@ -828,7 +766,6 @@ tables:
           numDecimalPlaces: 0
         description_key:
           - *menstruation_materials_desc
-          - *residence_desc
       mh_enoumat_pop:
         title: |-
           {definitions.residence_pop} women and girls with enough menstrual materials
@@ -841,7 +778,6 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - The official definition of this indicator is "having enough menstrual materials to change as often as wanted during the last period." However, countries may have used different definitions in their surveys, such as "never having problems affording menstrual materials" or "menstrual materials being easily accessible".
-          - *residence_desc
       mh_mat_pop:
         title: |-
           {definitions.residence_pop} women and girls using menstrual materials
@@ -853,7 +789,6 @@ tables:
         description_key:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
-          - *residence_desc
       mh_nmat_pop:
         title: |-
           {definitions.residence_pop} women and girls not using menstrual materials
@@ -865,7 +800,6 @@ tables:
         description_key:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
-          - *residence_desc
       mh_nreuse_pop:
         title: |-
           {definitions.residence_pop} women and girls using non-reusable menstrual materials
@@ -878,7 +812,6 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
-          - *residence_desc
       mh_pain_pop:
         title: |-
           {definitions.residence_pop} women and girls able to reduce menstruation-related pain
@@ -915,7 +848,6 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
-          - *residence_desc
       wat_basal_without:
         title: Share of {definitions.residence} population without basic access to drinking water
         description_short: Proportion of people without basic access to drinking water. This includes people using unimproved drinking water sources and those spending more than 30 minutes collecting water from an improved source.
@@ -924,7 +856,6 @@ tables:
           - *water_not_on_premises_desc
           - *unimp_drinking_water_desc
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_basal_pop_without:
@@ -936,7 +867,6 @@ tables:
           - *water_not_on_premises_desc
           - *unimp_drinking_water_desc
           - *improved_drinking_water_desc
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
@@ -947,7 +877,6 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_imp_pop_without:
@@ -958,7 +887,6 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
@@ -969,7 +897,6 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - *water_not_on_premises_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       wat_sm_pop_without:
@@ -980,7 +907,6 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - *water_not_on_premises_desc
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
@@ -992,7 +918,6 @@ tables:
           - *open_defecation_desc
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_imp_pop_without:
@@ -1004,7 +929,6 @@ tables:
           - *open_defecation_desc
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
@@ -1017,7 +941,6 @@ tables:
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
           - *safely_managed_sanitation_desc
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_sm_pop_without:
@@ -1029,7 +952,6 @@ tables:
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
           - *safely_managed_sanitation_desc
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
@@ -1038,7 +960,6 @@ tables:
         description_short: Proportion of people without access to a handwashing facility with soap and water available at home.
         description_key:
           - A basic handwashing facility is defined as a facility with soap and water available on premises.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       hyg_bas_pop_without:
@@ -1047,7 +968,6 @@ tables:
         description_short: People without access to a handwashing facility with soap and water available at home.
         description_key:
           - A basic handwashing facility is defined as a facility with soap and water available on premises.
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
@@ -1058,7 +978,6 @@ tables:
         description_key:
           - A hygiene facility is a place where people can wash their hands, shower or bathe.
           - No access to a hygiene facility means there is not even a place to wash ones hands at home. This is a risk factor for the spread of diseases.
-          - *residence_desc
         unit: percent
         short_unit: "%"
       hyg_ns_pop:
@@ -1072,7 +991,6 @@ tables:
         description_key:
           - A hygiene facility is a place where people can wash their hands, shower or bathe.
           - No access to a hygiene facility means there is not even a place to wash ones hands at home. This is a risk factor for the spread of diseases.
-          - *residence_desc
       san_sew_sm:
         title: Share of {definitions.residence} population using sanitation facilities connected to sewer networks and with sewage treated to at least secondary levels
         description_short: Proportion of people with access to sanitation facilities connected to sewer networks where sewage is treated to at least secondary levels.
@@ -1081,7 +999,6 @@ tables:
           - *sanitation_rationale
           - This indicator includes toilets connected to sewer networks where sewage is treated biologically or chemically to remove contaminants (solid waste, pathogens, and harmful chemicals) to at least secondary levels.
           - This is the minimum level considered effective for protecting public health and the environment
-          - *residence_desc
         unit: percent
         short_unit: "%"
       san_sew_sm_pop:
@@ -1093,7 +1010,6 @@ tables:
           - *sanitation_rationale
           - This indicator includes toilets connected to sewer networks where sewage is treated biologically or chemically to remove contaminants (solid waste, pathogens, and harmful chemicals) to at least secondary levels.
           - This is the minimum level considered effective for protecting public health and the environment
-          - *residence_desc
         unit: people
         display:
           numDecimalPlaces: 0
