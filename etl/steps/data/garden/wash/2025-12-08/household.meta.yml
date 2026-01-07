@@ -780,7 +780,7 @@ tables:
       mh_mat_pop:
         title: |-
           {definitions.residence_pop} women and girls using menstrual materials
-        description_short: Number of women and girls between ages 15-49 who used menstrual materials during their last menstrual period.
+        description_short: Number of women and girls between ages 15-49 who used [menstrual materials](#dod:menstrual-materials) during their last menstrual period. Those who do not use menstrual materials might be using insufficient substitutes, such as toilet paper or non-absorbent cloth or do not have access to any materials.
         description_from_producer: Use of menstrual materials
         unit: people
         display:
@@ -791,7 +791,7 @@ tables:
       mh_nmat_pop:
         title: |-
           {definitions.residence_pop} women and girls not using menstrual materials
-        description_short: Number of women and girls between ages 15-49 who did not use menstrual materials during their last menstrual period.
+        description_short: Number of women and girls between ages 15-49 who did not use [menstrual materials](#dod:menstrual-materials) during their last menstrual period.
         description_from_producer: No use of menstrual materials
         unit: people
         display:
