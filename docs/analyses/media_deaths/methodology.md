@@ -1,19 +1,17 @@
 # Does the news reflect what we die from?
 
-!!! info "This is the methodology for the data analysis used in our article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)"
+!!! info ""
+    :octicons-person-16: **[Tuna Acisu](https://ourworldindata.org/team/tuna-acisu)** • :octicons-calendar-16: November 24, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Media%20deaths)
 
-    **Resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code, and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
-
-    **Author**: Tuna Acisu
-
-    **Contact**: [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death)
-
-
-Our team ran an analysis and published an article ("Does the news reflect what we die from?") comparing what Americans die from, and the relative coverage that these causes of death get in media coverage.
+Our team ran an analysis and published the article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from) comparing what Americans die from, and the relative coverage that these causes of death get in media coverage.
 
 We wanted to understand how “representative” what people read in the news is of reality. To be clear, our expectation was not that these should exactly match, but we wanted to understand the media bias towards more exceptional — rather than common — events and make readers aware that this disconnect exists.
 
 In this document, we detail the methodology we used to do this analysis and highlight some additional checks that we ran to understand how sensitive the results were to our choices of media outlets and mentions.
+
+!!! note
+
+    Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code, and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
 
 ## Sources
 
