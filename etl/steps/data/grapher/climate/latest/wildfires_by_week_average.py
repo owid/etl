@@ -82,7 +82,7 @@ def run(dest_dir: str) -> None:
         tb = tb.drop(columns=[f"{group}_until_current_year_minus_2"] + group_columns)
 
         # Dynamically set origins based on the group
-        origin_column = f"_2024_{group}"  # Dynamically set based on group name
+        origin_column = f"_{CURRENT_YEAR}_{group}"  # Dynamically set based on group name
         if origin_column in tb.columns:  # Check if the origin column exists
             for col in [f"avg_{group}_until_current_year_minus_2", f"upper_bound_{group}", f"lower_bound_{group}"]:
                 tb[col].origins = tb[origin_column].origins
