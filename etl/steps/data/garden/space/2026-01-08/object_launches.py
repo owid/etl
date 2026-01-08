@@ -43,8 +43,10 @@ def run() -> None:
     # Process data.
     #
     # Filter out data from the current year, which is incomplete.
-    current_year = int(tb["annual_launches"].metadata.origins[0].date_published[0:4])
-    tb = tb[tb["year"] < current_year].reset_index(drop=True)
+    # NOTE: I commented this out because their latest update is precisely on 2025-12-31, according to
+    # https://www.unoosa.org/oosa/en/spaceobjectregister/index.html
+    # current_year = int(tb["annual_launches"].metadata.origins[0].date_published[0:4])
+    # tb = tb[tb["year"] < current_year].reset_index(drop=True)
 
     # Add a row for the world aggregate.
     tb = add_world_aggregate(tb)
