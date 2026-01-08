@@ -181,7 +181,7 @@ if DATA_API_ENV == "production":
 elif STAGING is not None:
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
     DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
-    SEARCH_API_URL = f"http://staging-site-{get_container_name(STAGING)}/etl/search"
+    SEARCH_API_URL = f"http://{get_container_name(STAGING)}/etl/search"
 else:
     # Local development
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
