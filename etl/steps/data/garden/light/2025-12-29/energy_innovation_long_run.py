@@ -48,6 +48,9 @@ def run() -> None:
     # Process lighting prices table to make it long with dimensions.
     tb_lighting_prices = process_lighting_prices(tb_lighting_prices=tb_lighting_prices)
 
+    # Add rolling average to lighting prices
+    tb_lighting_prices = add_rolling_average(tb=tb_lighting_prices)
+
     # Calculate weeks of earnings needed for reading
     tb_weeks_of_earnings = calculate_weeks_of_earnings_needed_for_reading(
         tb_lighting_prices=tb_lighting_prices,
@@ -218,3 +221,14 @@ def prepare_earnings_extended(tb_earnings_new: Table, tb_cpi: Table, tb_earnings
     tb_earnings = pr.concat([tb_earnings, tb_earnings_new_filtered], ignore_index=True)
 
     return tb_earnings
+
+
+def add_rolling_average(tb: Table) -> Table:
+    """
+    Add a 5-year rolling average to the table.
+    """
+    tb = tb.sort_values(by=["country", "year", "lighting_source", "price_year"])
+    tb["lighting_price_rolling_avg"] = tb.groupby(["country", "lighting_source", "price_year"])[
+        "lighting_price"
+    ].transform(lambda x: x.rolling(window=5, min_periods=1).mean())
+    return tb

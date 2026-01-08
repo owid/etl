@@ -28,6 +28,20 @@ tables:
           numDecimalPlaces: 2
           tolerance: 0
 
+      lighting_price_rolling_avg:
+        title: 5-year rolling average of the price of lighting (<<lighting_source>>, <<price_year>> prices)
+        unit: constant <<price_year>> US$ per million lumen-hours
+        short_unit: £
+        description_short: "The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1700 lumen. This data is expressed in British pounds, adjusted for inflation."
+        # description_key: List of key points about the indicator.
+        processing_level: major
+        description_processing: |-
+          We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
+        display:
+          name: Price of lighting (<<lighting_source>>)
+          numDecimalPlaces: 2
+          tolerance: 0
+
   weeks_of_earnings_needed_for_reading:
     variables:
       weeks_of_earnings_needed_for_reading:
