@@ -1,25 +1,5 @@
 steps:
   #
-  # United States Space Force - Number of objects in space
-  #
-  data://meadow/space/2025-03-04/objects_in_space:
-    - snapshot://space/2025-03-04/objects_in_space.csv
-  #
-  # United States Space Force - Number of objects in space
-  #
-  data://garden/space/2025-03-04/objects_in_space:
-    - data://meadow/space/2025-03-04/objects_in_space
-  #
-  # United States Space Force - Number of lower Earth objects in space by type
-  #
-  data://grapher/space/2025-03-04/lower_earth_objects_by_type:
-    - data://garden/space/2025-03-04/objects_in_space
-  #
-  # United States Space Force - Number of non-debris objects in space by orbit
-  #
-  data://grapher/space/2025-03-04/non_debris_objects_by_orbit:
-    - data://garden/space/2025-03-04/objects_in_space
-  #
   # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   #
   data://meadow/space/2025-03-04/international_astronaut_database:
@@ -125,3 +105,23 @@ steps:
   #
   data://grapher/space/2026-01-08/exoplanets:
     - data://garden/space/2026-01-08/exoplanets
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://meadow/space/2026-01-08/objects_in_space:
+    - snapshot://space/2026-01-08/objects_in_space.csv
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://garden/space/2026-01-08/objects_in_space:
+    - data://meadow/space/2026-01-08/objects_in_space
+  #
+  # United States Space Force - Number of lower Earth objects in space by type
+  #
+  data://grapher/space/2026-01-08/lower_earth_objects_by_type:
+    - data://garden/space/2026-01-08/objects_in_space
+  #
+  # United States Space Force - Number of non-debris objects in space by orbit
+  #
+  data://grapher/space/2026-01-08/non_debris_objects_by_orbit:
+    - data://garden/space/2026-01-08/objects_in_space
