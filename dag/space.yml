@@ -1,20 +1,5 @@
 steps:
   #
-  # UNOOSA - Online Index of Objects Launched into Outer Space
-  #
-  data://meadow/space/2025-03-04/object_launches:
-    - snapshot://space/2025-03-04/object_launches.csv
-  #
-  # UNOOSA - Online Index of Objects Launched into Outer Space
-  #
-  data://garden/space/2025-03-04/object_launches:
-    - data://meadow/space/2025-03-04/object_launches
-  #
-  # UNOOSA - Online Index of Objects Launched into Outer Space
-  #
-  data://grapher/space/2025-03-04/object_launches:
-    - data://garden/space/2025-03-04/object_launches
-  #
   # NASA - Exoplanets
   #
   data://meadow/space/2025-03-04/exoplanets:
