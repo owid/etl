@@ -24,13 +24,43 @@ COLLECTION_EXPERT_ID = 61  # Expert collection
 DATABASE_ID = 2  # Semantic Layer database
 
 
-def mb_cli(key: str | None = None):
+def mb_cli(domain: str | None = None, key: str | None = None):
+    if domain is None:
+        domain = METABASE_URL_LOCAL
     if key is None:
         key = METABASE_API_KEY
-    return Metabase_API(METABASE_URL_LOCAL, api_key=key)
+    return Metabase_API(domain, api_key=key)
 
 
-def read_metabase(sql: str) -> pd.DataFrame:
+def read_semantic_layer(sql: str) -> pd.DataFrame:
+    """Retrieve data from the Semantic Layer via Metabase.
+
+
+    To query another database via Metabase, use `read_metabase` instead.
+
+    Parameters
+    ----------
+    sql : str
+        SQL query to execute.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results of the query.
+
+    """
+    return read_metabase(
+        sql,
+        METABASE_SEMANTIC_LAYER_DATABASE_ID,
+    )
+
+
+def read_metabase(
+    sql: str,
+    database_id: int,
+    api_key: str | None = None,
+    mb_url: str | None = None,
+) -> pd.DataFrame:
     """Retrieve data from the Metabase API using an arbitrary sql query.
 
     NOTE: This function has been adapted from this example in the analytics repo:
@@ -48,15 +78,17 @@ def read_metabase(sql: str) -> pd.DataFrame:
 
     """
     # Prepare the header and body of the request to send to the Metabase API.
+    if api_key is None:
+        api_key = METABASE_API_KEY
     headers = {
-        "x-api-key": METABASE_API_KEY,
+        "x-api-key": api_key,
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
         "Accept": "application/json",
     }
     body = {
         "query": {
             # Database corresponding to the Semantic Layer (DuckDB).
-            "database": METABASE_SEMANTIC_LAYER_DATABASE_ID,
+            "database": database_id,
             "type": "native",
             "native": {"query": re.sub(r"\s+", " ", sql.strip())},
         }
@@ -72,8 +104,10 @@ def read_metabase(sql: str) -> pd.DataFrame:
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
 
     # Send request.
+    if mb_url is None:
+        mb_url = METABASE_URL
     response = requests.post(
-        f"{METABASE_URL}/api/dataset/csv",
+        f"{mb_url}/api/dataset/csv",
         headers=headers,
         data=urlencoded,
         timeout=30,
@@ -163,9 +197,19 @@ def create_question(
     return question
 
 
-def list_questions():
+def _get_domain(prod: bool = False) -> str:
+    if prod:
+        domain = METABASE_URL
+    else:
+        domain = METABASE_URL_LOCAL
+    return domain
+
+
+def list_questions(prod: bool = False) -> list[dict]:
+    domain = _get_domain(prod=prod)
+
     # Init API client
-    mb = mb_cli()
+    mb = mb_cli(domain=domain)
 
     # Get cards
     cards = mb.get("/api/card/")
@@ -180,9 +224,11 @@ def list_questions():
     return questions
 
 
-def get_question_info(question_id: int) -> dict:
+def get_question_info(question_id: int, prod: bool = False) -> dict:
+    domain = _get_domain(prod=prod)
+
     # Init API client
-    mb = mb_cli()
+    mb = mb_cli(domain=domain)
 
     # Get question
     question = mb.get_item_info(item_id=question_id, item_type="card")
@@ -192,9 +238,11 @@ def get_question_info(question_id: int) -> dict:
     return question
 
 
-def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
+def get_question_data(card_id: int, data_format: str = "csv", prod: bool = False) -> pd.DataFrame:
+    domain = _get_domain(prod=prod)
+
     # Init API client
-    mb = mb_cli()
+    mb = mb_cli(domain=domain)
 
     # Get card data
     data_str = mb.get_card_data(
@@ -204,15 +252,22 @@ def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
     if data_str is None:
         return pd.DataFrame()  # Return empty DataFrame if no data
 
+    # Fix encoding: the library may return UTF-8 bytes decoded as Latin-1
+    try:
+        data_str = data_str.encode("latin-1").decode("utf-8")
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        pass  # Already correct encoding
+
     # Parse raw data as dataframe
-    df = pd.read_csv(BytesIO(initial_bytes=data_str.encode()), encoding="utf-8")  # add encoding if needed
+    df = pd.read_csv(BytesIO(initial_bytes=data_str.encode("utf-8")), encoding="utf-8")
 
     return df
 
 
-def get_metabase_analytics():
+def get_metabase_analytics(prod: bool = False):
     """Get views on Metabase questions."""
-    mb = mb_cli(key=METABASE_API_KEY_ADMIN)
+    domain = _get_domain(prod=prod)
+    mb = mb_cli(key=METABASE_API_KEY_ADMIN, domain=domain)
 
     #########################
     # View counts
