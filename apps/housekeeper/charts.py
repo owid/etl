@@ -33,8 +33,8 @@ from etl.slack_helpers import send_slack_message
 log = get_logger()
 
 # Default reviewers for daily chart reviews
-DAILY_CHART_REVIEWER_DEFAULT = "fiona"
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "fiona"
+DAILY_CHART_REVIEWER_DEFAULT = "Fiona"
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "Fiona"
 
 
 ####################################
