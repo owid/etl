@@ -15,7 +15,7 @@ class Indicator(Doc, DataClassJsonMixin):
     n_charts: int
     catalogPath: str
     dataset: Optional[str] = None
-    popularity: Optional[float] = None
+    popularity: float = 0.0
 
     def text(self) -> str:
         # Combine the name and description into a single string
@@ -37,7 +37,7 @@ def _get_data_indicators_from_db() -> list[Indicator]:
         COALESCE(v.description, v.descriptionShort, '') as description,
         COALESCE(v.catalogPath, CONCAT('indicator/', v.id)) AS catalogPath,
         COALESCE(cd_counts.n_charts, 0) as n_charts,
-        ap.popularity
+        COALESCE(ap.popularity, 0) as popularity
     FROM datasets d
     INNER JOIN variables v ON d.id = v.datasetId
     LEFT JOIN (

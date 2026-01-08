@@ -25,7 +25,7 @@ class SemanticSearchResult(BaseModel):
     catalog_path: Optional[str] = None
     n_charts: int = 0
     description: Optional[str] = None
-    popularity: Optional[float] = None
+    popularity: float = 0.0
 
     class Config:
         extra = "forbid"

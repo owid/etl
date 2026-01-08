@@ -34,7 +34,7 @@ class Indicator:
     catalogPath: str
     similarity: float
     dataset: Optional[str] = None
-    popularity: Optional[float] = None
+    popularity: float = 0.0
 
     def to_dict(self):
         return {
@@ -80,7 +80,7 @@ def search_indicators_api(query: str, limit: int = MAX_RESULTS) -> list[Indicato
                 n_charts=result["n_charts"],
                 catalogPath=result["catalog_path"] or "",
                 similarity=result["score"],
-                popularity=result.get("popularity"),
+                popularity=result.get("popularity", 0.0),
             )
         )
     return indicators
@@ -94,7 +94,7 @@ def st_display_indicators(indicators: list[Indicator]):
     df["catalogPath"] = df["catalogPath"].str.replace("grapher/", "")
     df = df.drop(columns=["variableId", "description"])
 
-    styled_df = df.style.format("{:.0%}", subset=["similarity", "popularity"], na_rep="")
+    styled_df = df.style.format("{:.0%}", subset=["similarity", "popularity"])
 
     column_config = {
         "link": st.column_config.LinkColumn("Open", display_text="Open"),
@@ -221,7 +221,7 @@ if input_string:
                 case "Used in charts":
                     filtered_inds = [ind for ind in sorted_inds if ind.n_charts > 0]
                 case "Has popularity":
-                    filtered_inds = [ind for ind in sorted_inds if ind.popularity is not None]
+                    filtered_inds = [ind for ind in sorted_inds if ind.popularity > 0]
                 case _:
                     filtered_inds = sorted_inds
 
