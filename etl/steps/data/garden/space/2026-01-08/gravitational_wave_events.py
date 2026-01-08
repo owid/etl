@@ -7,11 +7,8 @@ paths = PathFinder(__file__)
 
 
 def check_inputs(tb):
-    # Gravitational wave events are named based on the date (and time, for more recent events) of their detection,
-    # using the following format: "GW" + YYMMDD (date) + hhmmss (UTC time) + version.
+    # Gravitational wave events are named based on the date (and time, for more recent events) of their detection, using the following format: "GW" + YYMMDD (date) + hhmmss (UTC time) + version.
     # Version is used if there are multiple versions of the data for the event (e.g., parameter estimation was improved).
-    error = "A confident event appears multiple times with different versions."
-    assert len(set(tb["id"].str.split("-").str[0])) == len(set(tb["id"])), error
     error = "Gravitational wave id format has changed."
     assert (tb["id"].str[0:2] == "GW").all(), error
     assert tb["id"].str[2:4].astype(int).max() <= int(tb["id"].metadata.origins[0].date_published[2:4]), error
@@ -43,6 +40,14 @@ def run() -> None:
 
     # Sanity check inputs.
     check_inputs(tb=tb)
+
+    # Some events have different versions of their parameter estimations.
+    # Keep the latest version.
+    tb = (
+        tb.sort_values(["commonname", "version"])
+        .drop_duplicates(subset=["commonname"], keep="last")
+        .reset_index(drop=True)
+    )
 
     # Extract discovery year from the event name.
     tb["year"] = "20" + tb["id"].str[2:4]

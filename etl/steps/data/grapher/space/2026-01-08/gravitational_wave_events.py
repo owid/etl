@@ -14,13 +14,16 @@ def run() -> None:
     ds_garden = paths.load_dataset("gravitational_wave_events")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("gravitational_wave_events", reset_index=False)
+    tb = ds_garden.read("gravitational_wave_events")
 
     #
     # Process data.
     #
     # Add a country column, to adapt to grapher.
     tb["country"] = "World"
+
+    # Improve table format.
+    tb = tb.format()
 
     #
     # Save outputs.
