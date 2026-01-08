@@ -32,7 +32,35 @@ def mb_cli(domain: str | None = None, key: str | None = None):
     return Metabase_API(domain, api_key=key)
 
 
-def read_metabase(sql: str) -> pd.DataFrame:
+def read_semantic_layer(sql: str) -> pd.DataFrame:
+    """Retrieve data from the Semantic Layer via Metabase.
+
+
+    To query another database via Metabase, use `read_metabase` instead.
+
+    Parameters
+    ----------
+    sql : str
+        SQL query to execute.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results of the query.
+
+    """
+    return read_metabase(
+        sql,
+        METABASE_SEMANTIC_LAYER_DATABASE_ID,
+    )
+
+
+def read_metabase(
+    sql: str,
+    database_id: int,
+    api_key: str | None = None,
+    mb_url: str | None = None,
+) -> pd.DataFrame:
     """Retrieve data from the Metabase API using an arbitrary sql query.
 
     NOTE: This function has been adapted from this example in the analytics repo:
@@ -50,15 +78,17 @@ def read_metabase(sql: str) -> pd.DataFrame:
 
     """
     # Prepare the header and body of the request to send to the Metabase API.
+    if api_key is None:
+        api_key = METABASE_API_KEY
     headers = {
-        "x-api-key": METABASE_API_KEY,
+        "x-api-key": api_key,
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
         "Accept": "application/json",
     }
     body = {
         "query": {
             # Database corresponding to the Semantic Layer (DuckDB).
-            "database": METABASE_SEMANTIC_LAYER_DATABASE_ID,
+            "database": database_id,
             "type": "native",
             "native": {"query": re.sub(r"\s+", " ", sql.strip())},
         }
@@ -74,8 +104,10 @@ def read_metabase(sql: str) -> pd.DataFrame:
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
 
     # Send request.
+    if mb_url is None:
+        mb_url = METABASE_URL
     response = requests.post(
-        f"{METABASE_URL}/api/dataset/csv",
+        f"{mb_url}/api/dataset/csv",
         headers=headers,
         data=urlencoded,
         timeout=30,
@@ -87,39 +119,6 @@ def read_metabase(sql: str) -> pd.DataFrame:
     df = pd.read_csv(BytesIO(response.content))
 
     return df
-
-
-def query_metabase(sql: str, database_id: int = DATABASE_ID, prod: bool = False) -> pd.DataFrame:
-    """Execute arbitrary SQL query using the Metabase API library.
-
-    Args:
-        sql: SQL query to execute.
-        database_id: Metabase database ID (default: Semantic Layer).
-        prod: Whether to use production Metabase instance.
-
-    Returns:
-        DataFrame with query results.
-    """
-    domain = _get_domain(prod=prod)
-    mb = mb_cli(domain=domain)
-
-    payload = {
-        "database": database_id,
-        "type": "native",
-        "native": {"query": sql},
-    }
-
-    # Use the library's post method
-    res = mb.post("/api/dataset", json=payload)
-
-    if not res:
-        raise RuntimeError("Metabase query failed")
-
-    # Extract data from response
-    cols = [col["name"] for col in res["data"]["cols"]]
-    rows = res["data"]["rows"]
-
-    return pd.DataFrame(rows, columns=cols)
 
 
 def _generate_question_url(card: dict) -> str:
