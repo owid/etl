@@ -34,8 +34,8 @@ log = get_logger()
 
 # Default reviewers for daily chart reviews
 # Users are identified by UserIDs. To get the ID for a user, check slackId column in MySQL table `users`.
-DAILY_CHART_REVIEWER_DEFAULT = "U01THNNPDCG"  # Lucas
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U01THNNPDCG"  # Lucas
+DAILY_CHART_REVIEWER_DEFAULT = "U01T5MG8DTM"  # Fiona
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U01T5MG8DTM"  # Fiona
 
 
 ####################################
@@ -61,7 +61,7 @@ def send_slack_chart_reviews(
     # Get user data (slack usernames)
     slack_users = get_usernames()
     # Uncomment below if you want to test the workflow without tagging people
-    slack_users = {k: "U011L616WE5" for k, v in slack_users.items()}
+    # slack_users = {k: "U011L616WE5" for k, v in slack_users.items()}
     # slack_users = {k: f"_{v}" for k, v in slack_users.items()}
 
     if include_published and not df_published.empty:
@@ -279,7 +279,7 @@ def _send_draft_chart_review(
         )
 
         # Send tag explanation in thread
-        tag_message = f"❓ *Why have I been tagged?*\n{reason}"
+        tag_message = f"❓ *Why have I been tagged?* {reason}"
         log.info("Sending tag explanation...")
         send_slack_message(
             message=tag_message,
