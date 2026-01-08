@@ -367,15 +367,15 @@ def get_usernames():
             "Martin Račák": "U06S4C4KGJZ",
             "Marwa Boukarim": "U03DTUH6T7S",
             "Matthieu Bergel": "ULG7KK63Z",
-            "max": "U3E5PRWNN",
-            "Mojmir": "U02US02AWA1",
+            "Max Roser": "U3E5PRWNN",
+            "Mojmir Vinkler": "U02US02AWA1",
             "Natalie Reynolds-Garcia": "U03QPP629GW",
             "Pablo Arriagada": "U03DR3BKE5R",
             "Pablo Rosado": "U02UVHS46AZ",
             "Sophia Mersmann": "U04QE4CFUKC",
             "Tuna Acisu": "U07437LD7JR",
-            "Valerie Rogers Muigai": "U027C4D5B7F",
-            "Veronika": "U053NDCFT7C",
+            "Valerie Muigai": "U027C4D5B7F",
+            "Veronika Samborska": "U053NDCFT7C",
         }
         df["slackId"] = df["fullName"].map(SLACK_NAMES)
 
