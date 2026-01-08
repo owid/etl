@@ -450,8 +450,8 @@ def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
 
 
 def _build_refs_message(refs):
-    """Build message with chart references."""
-    message = []
+    """Build message with chart references as bullet lists."""
+    sections = []
 
     explorers = refs.get("explorers", [])
     posts_gdoc = refs.get("postsGdocs", [])
@@ -460,32 +460,25 @@ def _build_refs_message(refs):
     # Explorers
     if explorers:
         num_explorers = len(explorers)
-        explorer_links = [f"<{OWID_ENV.explorer_site(e)}|{e}>" for e in explorers]
-        if num_explorers == 1:
-            message.append(f"*1 explorer:* {', '.join(explorer_links)}\n")
-        else:
-            message.append(f"*{num_explorers} explorers:* {', '.join(explorer_links)}\n")
+        explorer_items = [f"  • <{OWID_ENV.explorer_site(e)}|{e}>" for e in explorers]
+        header = f"• *Explorers ({num_explorers}):*"
+        sections.append(header + "\n" + "\n".join(explorer_items))
 
     # Posts
     if posts_gdoc or posts_wp:
         num_posts = len(posts_gdoc) + len(posts_wp)
-        message_posts = []
-        if posts_gdoc:
-            _msg = ", ".join([f"<{p['url']}|{p['slug']}>" for p in posts_gdoc])
-            message_posts.append(_msg)
-        if posts_wp:
-            _msg = ", ".join([f"<{p['url']}|{p['slug']}> (wordpress)" for p in posts_wp])
-            message_posts.append(_msg)
+        post_items = []
+        for p in posts_gdoc:
+            post_items.append(f"  • <{p['url']}|{p['slug']}>")
+        for p in posts_wp:
+            post_items.append(f"  • <{p['url']}|{p['slug']}> (wordpress)")
+        header = f"• *Posts ({num_posts}):*"
+        sections.append(header + "\n" + "\n".join(post_items))
 
-        if num_posts == 1:
-            message.append("*1 Post:* " + ", ".join(message_posts))
-        else:
-            message.append(f"*{num_posts} Posts:* " + ", ".join(message_posts))
-
-    if not message:
+    if not sections:
         return None
 
-    return "💬 *References*:\n" + "\n".join(message)
+    return "💬 *References*:\n" + "\n".join(sections)
 
 
 def _build_revisions_message(edits, include_time_range=False):
