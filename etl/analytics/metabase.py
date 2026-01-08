@@ -89,6 +89,39 @@ def read_metabase(sql: str) -> pd.DataFrame:
     return df
 
 
+def query_metabase(sql: str, database_id: int = DATABASE_ID, prod: bool = False) -> pd.DataFrame:
+    """Execute arbitrary SQL query using the Metabase API library.
+
+    Args:
+        sql: SQL query to execute.
+        database_id: Metabase database ID (default: Semantic Layer).
+        prod: Whether to use production Metabase instance.
+
+    Returns:
+        DataFrame with query results.
+    """
+    domain = _get_domain(prod=prod)
+    mb = mb_cli(domain=domain)
+
+    payload = {
+        "database": database_id,
+        "type": "native",
+        "native": {"query": sql},
+    }
+
+    # Use the library's post method
+    res = mb.post("/api/dataset", json=payload)
+
+    if not res:
+        raise RuntimeError("Metabase query failed")
+
+    # Extract data from response
+    cols = [col["name"] for col in res["data"]["cols"]]
+    rows = res["data"]["rows"]
+
+    return pd.DataFrame(rows, columns=cols)
+
+
 def _generate_question_url(card: dict) -> str:
     """
     Generate URL to access a Metabase question.
@@ -220,8 +253,14 @@ def get_question_data(card_id: int, data_format: str = "csv", prod: bool = False
     if data_str is None:
         return pd.DataFrame()  # Return empty DataFrame if no data
 
+    # Fix encoding: the library may return UTF-8 bytes decoded as Latin-1
+    try:
+        data_str = data_str.encode("latin-1").decode("utf-8")
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        pass  # Already correct encoding
+
     # Parse raw data as dataframe
-    df = pd.read_csv(BytesIO(initial_bytes=data_str.encode()), encoding="utf-8")  # add encoding if needed
+    df = pd.read_csv(BytesIO(initial_bytes=data_str.encode("utf-8")), encoding="utf-8")
 
     return df
 

@@ -82,6 +82,10 @@ def get_chart_summary(chart):
     user_prompt = f"1) Chart config:\n{config}\n{'='*20}\n2) {variable_description}\n{'='*20}\n3) Timeline edits:\n{edit_summary}\n4) Total views in the last 365 days: {num_chart_views}"
 
     # Query GPT
+    # Inputs:
+    # - variable_description: Description of variables used in the chart.
+    # - config: configuration of the current chart
+    # - revisions: List with revisions. Each revision has username, timestamp, config_diff, config_diff_count
     result = ask_llm(user_prompt)
 
     if result is not None:
@@ -104,12 +108,19 @@ def get_indicators_in_chart(chart_id) -> list[gm.Variable]:
 
 def _get_summary_indicators(variables):
     """String description of all variables."""
-    s = "Summary of the variables, by variableId:\n"
+    description = []
     for variable in variables:
-        s += "---------------\n"
-        s += _get_summary_indicator(variable)
+        description.append(
+            {
+                "name": variable.name,
+                "unit": variable.unit,
+                "description": variable.descriptionShort
+                if variable.descriptionShort is not None
+                else variable.description,
+            }
+        )
 
-    return s
+    return description
 
 
 def _get_summary_indicator(variable):

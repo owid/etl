@@ -11,6 +11,9 @@ NEXT STEPS:
         5. Reinstall the app to your workspace (required after adding scopes)
 """
 
+import json
+
+import pandas as pd
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
@@ -20,21 +23,15 @@ from apps.housekeeper.utils import (
     owidb_get_reviews_id,
     owidb_submit_review_id,
 )
-from etl.analytics.metabase import get_question_data
+from etl.analytics.metabase import get_question_data, query_metabase
 from etl.config import OWID_ENV, SLACK_API_TOKEN
 from etl.slack_helpers import send_slack_message
 
 log = get_logger()
 
 # Default reviewers for daily chart reviews
-DAILY_CHART_REVIEWER_DEFAULT = "fiona"
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "fiona"
-
-# Mapping from chart revision usernames (fullName) to Slack usernames
-# Edit this dictionary to add/update mappings
-SLACK_NAMES: dict[str, str] = {
-    # "Full Name": "slack_username",  # Example: "Lucas Rodriguez": "lucas"
-}
+DAILY_CHART_REVIEWER_DEFAULT = "lucas"
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "lucas"
 
 
 ####################################
@@ -57,12 +54,17 @@ def send_slack_chart_reviews(
     log.info("Getting all charts to review")
     df_published, df_draft = get_all_charts_to_review()
 
+    # Get user data (slack usernames)
+    slack_users = get_usernames()
+    slack_users = {k: f"_{v}" for k, v in slack_users.items()}  # --- IGNORE ---
+
     if include_published and not df_published.empty:
         _send_published_chart_review(
             df_published.iloc[0],
             channel_name=channel_name,
             slack_username="Daily chart",
             icon_emoji="sus-blue",
+            slack_users=slack_users,
         )
     elif include_published:
         log.info("No published charts to review")
@@ -73,6 +75,7 @@ def send_slack_chart_reviews(
             channel_name=channel_name,
             slack_username="Daily draft chart",
             icon_emoji="sus-white",
+            slack_users=slack_users,
         )
     elif include_draft:
         log.info("No draft charts to review")
@@ -93,13 +96,15 @@ def get_all_charts_to_review():
     # Fetch all charts from Metabase (question 812)
     df = get_question_data(812, prod=True)
 
-    # Dtypes
+    # Dtypes / Parsing
     df = df.astype(
         {
             "last_edited_at": "datetime64[ns]",
             "created_at": "datetime64[ns]",
         }
     )
+    df["post_details"] = df["post_details"].apply(lambda x: json.loads(x) if pd.notna(x) else [])
+    df["revisions"] = df["revisions"].apply(lambda x: json.loads(x) if pd.notna(x) else [])
 
     # Skip charts reviewed in the last year (both published and drafts use same object_type)
     reviews_id = owidb_get_reviews_id(object_type="chart")
@@ -115,7 +120,13 @@ def get_all_charts_to_review():
 ####################################
 # Published chart review pipeline
 ####################################
-def _send_published_chart_review(chart, channel_name: str, slack_username: str, icon_emoji: str):
+def _send_published_chart_review(
+    chart,
+    channel_name: str,
+    slack_username: str,
+    icon_emoji: str,
+    slack_users: dict[str, str],
+):
     """Send a published chart review to Slack.
 
     Args:
@@ -162,7 +173,7 @@ def build_published_message(chart, refs):
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* -- <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
         f"_{message_usage}_\n"
     )
     return message
@@ -188,10 +199,14 @@ def _get_published_message_usage(chart, refs):
 
 def _send_published_extra_messages(chart, refs, **kwargs):
     """Send extra context in thread for published chart."""
-    # 1/ Similar charts
-    similar_message = f"🕵️ <{OWID_ENV.wizard_url}related_charts?slug={chart['slug']}| → Explore related charts>"
-    log.info("Sending 'similar charts' link...")
-    send_slack_message(message=similar_message, **kwargs)
+    # 0/ Get chart description + Suggestion
+    log.info("Getting AI summary...")
+    ai_summary = get_chart_summary(chart=chart)
+
+    # 1/ Chart summary
+    if ai_summary:
+        log.info("Sending AI summary...")
+        send_slack_message(message=ai_summary, **kwargs)
 
     # 2/ References details
     refs_message = _build_refs_message(refs)
@@ -199,15 +214,22 @@ def _send_published_extra_messages(chart, refs, **kwargs):
         log.info("Sending reference message...")
         send_slack_message(message=refs_message, **kwargs)
 
-    # 3/ AI Summary
+    # 3/ Related charts
+    similar_message = f"🔍 *<{OWID_ENV.wizard_url}related_charts?slug={chart['slug']}|Explore related charts>*"
+    log.info("Sending 'similar charts' link...")
+    send_slack_message(message=similar_message, **kwargs)
+
+    # 4/ Suggestion
     log.info("Getting AI summary...")
     ai_summary = get_chart_summary(chart=chart)
     if ai_summary:
         log.info("Sending AI summary...")
         send_slack_message(message=ai_summary, **kwargs)
 
-    # 4/ Tag explanation
-    tag_message = "*Why have I been tagged?*\nYou are tagged as the data steward for published charts."
+    # 5 Revision history
+
+    # 6/ Tag explanation
+    tag_message = "*Why have I been tagged?* You are tagged as the data steward for published charts."
     log.info("Sending tag explanation...")
     send_slack_message(message=tag_message, **kwargs)
 
@@ -215,7 +237,13 @@ def _send_published_extra_messages(chart, refs, **kwargs):
 ####################################
 # Draft chart review pipeline
 ####################################
-def _send_draft_chart_review(chart, channel_name: str, slack_username: str, icon_emoji: str):
+def _send_draft_chart_review(
+    chart,
+    channel_name: str,
+    slack_username: str,
+    icon_emoji: str,
+    slack_users: dict[str, str],
+):
     """Send a draft chart review to Slack.
 
     Args:
@@ -227,7 +255,7 @@ def _send_draft_chart_review(chart, channel_name: str, slack_username: str, icon
     log.info(f"Selected draft chart: {chart['chart_id']}, {chart['slug']}")
 
     # Find responsible user (creator, editor, or default)
-    slack_tag, reason, _ = _find_responsible_user(chart)
+    slack_tag, reason, _ = _find_responsible_user(chart, slack_users)
 
     # Build message with responsible user tag
     message = build_draft_message(chart, slack_tag=slack_tag)
@@ -305,6 +333,50 @@ def get_references(chart_id: int):
     return refs["references"]
 
 
+def get_usernames():
+    df = query_metabase(
+        "select * from users",
+        database_id=5,
+        prod=True,
+    )
+
+    if "slackUsername" not in df.columns:
+        SLACK_NAMES = {
+            "Angela Wenham": "Angela",
+            "Antoinette Finnegan": "Antoinette",
+            "Bastian Herre": "Bastian",
+            "Bertha Rohenkohl": "Bertha",
+            "Bobbie Macdonald": "bobbie",
+            "Charlie Giattino": "charlie",
+            "Daniel Bachler": "daniel",
+            "Edouard Mathieu": "Ed",
+            "Esteban Ortiz-Ospina": "Este",
+            "Fiona Spooner": "Fiona",
+            "Hannah Ritchie": "hannah",
+            "Ike Saunders": "ike",
+            "Joe Hasell": "joe",
+            "Lucas Rodés-Guirao": "lucas",
+            "Marcel Gerber": "marcel",
+            "Martin Račák": "Martin",
+            "Marwa Boukarim": "Marwa",
+            "Matthieu Bergel": "matthieu",
+            "Max Roser": "max",
+            "Mojmir Vinkler": "Mojmir",
+            "Natalie Reynolds-Garcia": "Nat",
+            "Pablo Arriagada": "Pablo A",
+            "Pablo Rosado": "Pablo R",
+            "Sophia Mersmann": "sophia",
+            "Tuna Acisu": "Tuna",
+            "Valerie Muigai": "Valerie",
+            "Veronika Samborska": "Veronika",
+        }
+        df["slackUsername"] = df["fullName"].map(SLACK_NAMES)
+
+    df = df[["fullName", "slackUsername"]].dropna()
+    dix = df.set_index("fullName")["slackUsername"].to_dict()
+    return dix
+
+
 def _parse_revisions(revisions) -> list[dict]:
     """Parse revisions field - handles both JSON string and list of dicts.
 
@@ -331,24 +403,7 @@ def _format_date(date_value) -> str:
     return str(date_value)
 
 
-def _get_slack_tag(full_name: str | None) -> str | None:
-    """Convert fullName to Slack mention format, or None if not mapped.
-
-    Args:
-        full_name: The user's full name from chart revisions.
-
-    Returns:
-        Slack mention format like "<@username>" or None if no mapping exists.
-    """
-    if full_name is None:
-        return None
-    slack_username = SLACK_NAMES.get(full_name)
-    if slack_username:
-        return f"<@{slack_username}>"
-    return None
-
-
-def _find_responsible_user(chart) -> tuple[str, str, str | None]:
+def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
     """Find the responsible user for a draft chart.
 
     Logic:
@@ -358,6 +413,7 @@ def _find_responsible_user(chart) -> tuple[str, str, str | None]:
 
     Args:
         chart: Chart row (pandas Series) with created_by and revisions fields.
+        users: Dictionary with available users on Slack
 
     Returns:
         Tuple of (slack_tag, reason, date_str) where:
@@ -367,8 +423,8 @@ def _find_responsible_user(chart) -> tuple[str, str, str | None]:
     """
     # 1. Check creator
     creator = chart.get("created_by")
-    if creator and creator in SLACK_NAMES:
-        slack_tag = f"<@{SLACK_NAMES[creator]}>"
+    if creator and creator in users:
+        slack_tag = f"<@{users[creator]}>"
         date_str = _format_date(chart.get("created_at"))
         return slack_tag, f"You created this chart on {date_str}.", date_str
 
@@ -378,8 +434,8 @@ def _find_responsible_user(chart) -> tuple[str, str, str | None]:
     sorted_revisions = sorted(revisions, key=lambda r: r.get("edited_at", ""))
     for rev in sorted_revisions:
         editor = rev.get("edited_by")
-        if editor and editor in SLACK_NAMES:
-            slack_tag = f"<@{SLACK_NAMES[editor]}>"
+        if editor and editor in users:
+            slack_tag = f"<@{users[editor]}>"
             date_str = _format_date(rev.get("edited_at"))
             return slack_tag, f"You edited this chart on {date_str}.", date_str
 
@@ -401,9 +457,9 @@ def _build_refs_message(refs):
         num_explorers = len(explorers)
         explorer_links = [f"<{OWID_ENV.explorer_site(e)}|{e}>" for e in explorers]
         if num_explorers == 1:
-            message.append(f"*→ 1 explorer:* {', '.join(explorer_links)}\n")
+            message.append(f"*1 explorer:* {', '.join(explorer_links)}\n")
         else:
-            message.append(f"*→ {num_explorers} explorers:* {', '.join(explorer_links)}\n")
+            message.append(f"*{num_explorers} explorers:* {', '.join(explorer_links)}\n")
 
     # Posts
     if posts_gdoc or posts_wp:
@@ -417,9 +473,9 @@ def _build_refs_message(refs):
             message_posts.append(_msg)
 
         if num_posts == 1:
-            message.append("*→ 1 Post:* " + ", ".join(message_posts))
+            message.append("*1 Post:* " + ", ".join(message_posts))
         else:
-            message.append(f"*→ {num_posts} Posts:* " + ", ".join(message_posts))
+            message.append(f"*{num_posts} Posts:* " + ", ".join(message_posts))
 
     if not message:
         return None
