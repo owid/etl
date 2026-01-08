@@ -12,18 +12,21 @@ NEXT STEPS:
 """
 
 import json
+from collections import defaultdict
+from datetime import datetime
 
 import pandas as pd
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.housekeeper.utils import (
+    MODEL_DEFAULT_PRETTY,
     TODAY,
     get_chart_summary,
     owidb_get_reviews_id,
     owidb_submit_review_id,
 )
-from etl.analytics.metabase import get_question_data, query_metabase
+from etl.analytics.metabase import get_question_data, read_metabase
 from etl.config import OWID_ENV, SLACK_API_TOKEN
 from etl.slack_helpers import send_slack_message
 
@@ -56,11 +59,11 @@ def send_slack_chart_reviews(
 
     # Get user data (slack usernames)
     slack_users = get_usernames()
-    slack_users = {k: f"_{v}" for k, v in slack_users.items()}  # --- IGNORE ---
+    slack_users = {k: f"_{v}" for k, v in slack_users.items()}
 
     if include_published and not df_published.empty:
         _send_published_chart_review(
-            df_published.iloc[0],
+            chart=df_published.iloc[0],
             channel_name=channel_name,
             slack_username="Daily chart",
             icon_emoji="sus-blue",
@@ -71,7 +74,7 @@ def send_slack_chart_reviews(
 
     if include_draft and not df_draft.empty:
         _send_draft_chart_review(
-            df_draft.iloc[0],
+            chart=df_draft.iloc[0],
             channel_name=channel_name,
             slack_username="Daily draft chart",
             icon_emoji="sus-white",
@@ -173,7 +176,7 @@ def build_published_message(chart, refs):
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* -- <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
         f"_{message_usage}_\n"
     )
     return message
@@ -204,32 +207,34 @@ def _send_published_extra_messages(chart, refs, **kwargs):
     ai_summary = get_chart_summary(chart=chart)
 
     # 1/ Chart summary
-    if ai_summary:
-        log.info("Sending AI summary...")
-        send_slack_message(message=ai_summary, **kwargs)
+    if ai_summary and ai_summary["description"]:
+        log.info("Sending chart summary...")
+        msg_description = f"🧾 *Chart description* ({MODEL_DEFAULT_PRETTY})\n{ai_summary['description']}"
+        send_slack_message(message=msg_description, **kwargs)
 
-    # 2/ References details
-    refs_message = _build_refs_message(refs)
-    if refs_message:
+    # 2/ Suggestion
+    if ai_summary and ai_summary["suggestion"]:
+        log.info("Sending suggestion...")
+        msg_suggestion = _build_suggestion_message(ai_summary["suggestion"])
+        send_slack_message(message=msg_suggestion, **kwargs)
+
+    # 3/ References details
+    msg_refs = _build_refs_message(refs)
+    if msg_refs:
         log.info("Sending reference message...")
-        send_slack_message(message=refs_message, **kwargs)
+        send_slack_message(message=msg_refs, **kwargs)
 
-    # 3/ Related charts
-    similar_message = f"🔍 *<{OWID_ENV.wizard_url}related_charts?slug={chart['slug']}|Explore related charts>*"
-    log.info("Sending 'similar charts' link...")
-    send_slack_message(message=similar_message, **kwargs)
-
-    # 4/ Suggestion
-    log.info("Getting AI summary...")
-    ai_summary = get_chart_summary(chart=chart)
-    if ai_summary:
-        log.info("Sending AI summary...")
-        send_slack_message(message=ai_summary, **kwargs)
+    # 4/ Related charts
+    # msg_related = f"🔍 *<{OWID_ENV.wizard_url}related_charts?slug={chart['slug']}|Explore related charts>*"
+    # log.info("Sending 'similar charts' link...")
+    # send_slack_message(message=msg_related, **kwargs)
 
     # 5 Revision history
+    msg_revisions = _build_revisions_message(chart.revisions)
+    send_slack_message(message=msg_revisions, **kwargs)
 
     # 6/ Tag explanation
-    tag_message = "*Why have I been tagged?* You are tagged as the data steward for published charts."
+    tag_message = "❓ *Why have I been tagged?* You are tagged as the data steward for published charts."
     log.info("Sending tag explanation...")
     send_slack_message(message=tag_message, **kwargs)
 
@@ -271,7 +276,7 @@ def _send_draft_chart_review(
         )
 
         # Send tag explanation in thread
-        tag_message = f"*Why have I been tagged?*\n{reason}"
+        tag_message = f"❓ *Why have I been tagged?*\n{reason}"
         log.info("Sending tag explanation...")
         send_slack_message(
             message=tag_message,
@@ -313,7 +318,7 @@ def build_draft_message(chart, slack_tag: str | None = None):
     date_str = last_edited.strftime("%d %b %Y")
 
     # Format the tag part of the message
-    tag_part = f" {slack_tag}" if slack_tag else ""
+    tag_part = f" <@_{slack_tag}>" if slack_tag else ""
 
     message = (
         f"[{today_str}] *Delete <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this draft> if it's no longer needed*{tag_part}\n"
@@ -334,10 +339,9 @@ def get_references(chart_id: int):
 
 
 def get_usernames():
-    df = query_metabase(
+    df = read_metabase(
         "select * from users",
         database_id=5,
-        prod=True,
     )
 
     if "slackUsername" not in df.columns:
@@ -417,14 +421,14 @@ def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
 
     Returns:
         Tuple of (slack_tag, reason, date_str) where:
-        - slack_tag: Slack mention format "<@username>"
+        - slack_tag: Username to tag on Slack
         - reason: Why this person was tagged (for thread message)
         - date_str: Relevant date (creation or edit date), or None for default
     """
     # 1. Check creator
     creator = chart.get("created_by")
     if creator and creator in users:
-        slack_tag = f"<@{users[creator]}>"
+        slack_tag = users[creator]
         date_str = _format_date(chart.get("created_at"))
         return slack_tag, f"You created this chart on {date_str}.", date_str
 
@@ -435,12 +439,12 @@ def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
     for rev in sorted_revisions:
         editor = rev.get("edited_by")
         if editor and editor in users:
-            slack_tag = f"<@{users[editor]}>"
+            slack_tag = users[editor]
             date_str = _format_date(rev.get("edited_at"))
             return slack_tag, f"You edited this chart on {date_str}.", date_str
 
     # 3. Fall back to default
-    slack_tag = f"<@{DAILY_DRAFT_CHART_REVIEWER_DEFAULT}>"
+    slack_tag = DAILY_DRAFT_CHART_REVIEWER_DEFAULT
     return slack_tag, "You are the default reviewer for draft charts.", None
 
 
@@ -481,3 +485,50 @@ def _build_refs_message(refs):
         return None
 
     return "💬 *References*:\n" + "\n".join(message)
+
+
+def _build_revisions_message(edits, include_time_range=False):
+    """
+    Slack-friendly summary:
+      YYYY-MM-DD  Username (X revisions)
+    If include_time_range=True, appends: [HH:MM–HH:MM] (or [HH:MM] if single).
+    """
+    rows = []
+    for e in edits:
+        dt = datetime.strptime(e["edited_at"], "%Y-%m-%d %H:%M:%S")
+        rows.append((dt.date().isoformat(), e["edited_by"], dt))
+
+    # group counts (and times)
+    grouped = defaultdict(list)  # (date, user) -> [dt...]
+    for d, user, dt in rows:
+        grouped[(d, user)].append(dt)
+
+    # sort keys by date then user
+    keys = sorted(grouped.keys(), key=lambda k: (k[0], k[1]))
+
+    lines = []
+    for d, user in keys:
+        dts = sorted(grouped[(d, user)])
+        n = len(dts)
+
+        line = f"{d}  {user} ({n} revision{'s' if n != 1 else ''})"
+
+        if include_time_range:
+            start = dts[0].strftime("%H:%M")
+            end = dts[-1].strftime("%H:%M")
+            line += f" [{start}]" if start == end else f" [{start}–{end}]"
+
+        lines.append(line)
+
+    revisions_block = "\n".join(lines)
+    text = f"🕒 *Chart revisions*\n```\n{revisions_block}\n```"
+
+    return text
+
+
+def _build_suggestion_message(suggestion):
+    """Build Slack-friendly suggestion message from AI summary."""
+    msg_suggestion = f"💡 *Suggestion* ({MODEL_DEFAULT_PRETTY}): {suggestion.action}\n"
+    for reason in suggestion.reasons:
+        msg_suggestion += f"• {reason}\n"
+    return msg_suggestion

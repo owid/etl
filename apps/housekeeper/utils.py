@@ -1,8 +1,12 @@
+import json
 from datetime import date, datetime
 from pathlib import Path
+from typing import Any, Literal
 
+import pandas as pd
 import structlog
 import yaml
+from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from sqlalchemy.orm import Session
 
@@ -23,6 +27,51 @@ with open(CURRENT_DIR / "config.yaml", "r") as f:
 # System prompt to summarize chart information
 MODEL_DEFAULT = CONFIG["charts"]["llm"]["model_name"]
 SYSTEM_PROMPT = CONFIG["charts"]["llm"]["system_prompt"].format(TODAY=TODAY.strftime("%Y-%m-%d"))
+
+
+#####################################
+# Pydantic Models                   #
+#####################################
+class ChartRevision(BaseModel):
+    """A single revision of a chart."""
+
+    editor_name: str = Field(description="Name of the person who made the edit")
+    timestamp: datetime = Field(description="When the edit was made")
+    config_diff: dict[str, Any] = Field(description="Fields that changed: {path: {old: ..., new: ...}}")
+    config_diff_char_count: int = Field(description="Number of characters changed in the diff")
+
+
+class VariableInfo(BaseModel):
+    """Description of a variable/indicator used in the chart."""
+
+    name: str = Field(description="Name of the indicator")
+    unit: str = Field(description="Unit of measurement")
+    description: str = Field(description="Short description of the indicator")
+
+
+class ChartSummaryInput(BaseModel):
+    """Structured input for chart summary generation."""
+
+    config: dict[str, Any] = Field(description="Current chart configuration")
+    variables: list[VariableInfo] = Field(description="Variables/indicators used in the chart")
+    revisions: list[ChartRevision] = Field(description="Edit history with diffs")
+    views_365d: int = Field(description="Number of views in the last 365 days")
+
+
+class ChartSuggestion(BaseModel):
+    """Structured suggestion for chart action."""
+
+    action: Literal["Keep chart", "Unpublish chart", "Improve chart"] = Field(
+        description="Recommended action for the chart"
+    )
+    reasons: list[str] = Field(description="List of reasons motivating the suggested action")
+
+
+class ChartSummaryOutput(BaseModel):
+    """Structured output from chart summary LLM."""
+
+    description: str = Field(description="2-3 sentence description of what the chart shows")
+    suggestion: ChartSuggestion = Field(description="Recommended action with reasons")
 
 
 #####################################
@@ -56,48 +105,79 @@ def owidb_submit_review_id(object_type: str, object_id: int):
 #####################################
 # LLM                               #
 #####################################
-def get_chart_summary(chart):
-    """Summarize chart details with LLM.
+def get_chart_summary(chart) -> dict[str, str | int | float] | None:
+    """Summarize chart details with LLM using structured input/output.
 
     Generates a message to be shared on Slack.
+
+    Args:
+        chart: Dict with chart_id and views_365d keys
+
+    Returns:
+        Formatted Slack message with chart summary, or None if LLM call fails
     """
     # Get variables used in chart
     variables = get_indicators_in_chart(chart["chart_id"])
-    variable_description = _get_summary_indicators(variables)
+    variable_infos = [
+        VariableInfo(
+            name=v.name,
+            unit=v.unit or "",
+            description=v.descriptionShort or v.description or "",
+        )
+        for v in variables
+    ]
 
-    # Get last chart configuration
+    # Get revisions with diffs
     df = get_chart_revisions(chart["chart_id"])
-    config = df.sort_values(by="createdAt").iloc[-1]["config"]
+    revisions = build_revisions_from_df(df)
 
-    # Get all chart revisions
-    edit_summary = ""
-    for _, row in df.iterrows():
-        edit_summary += f"- Edit by '{row['fullName']}'  (date: {row['createdAt']})\n"
-        edit_summary += f"  chart config: {row['config']}\n"
+    # Current config (last revision)
+    df_sorted = df.sort_values("createdAt")
+    config = json.loads(df_sorted.iloc[-1]["config"])
 
-    # Get chart views
-    num_chart_views = chart["views_365d"]
+    # Build structured input
+    input_data = ChartSummaryInput(
+        config=config,
+        variables=variable_infos,
+        revisions=revisions,
+        views_365d=int(chart["views_365d"]),
+    )
 
-    # Prepare user prompt
-    user_prompt = f"1) Chart config:\n{config}\n{'='*20}\n2) {variable_description}\n{'='*20}\n3) Timeline edits:\n{edit_summary}\n4) Total views in the last 365 days: {num_chart_views}"
+    # Query LLM with structured output (pretty-printed for readability)
+    result = ask_llm(
+        user_prompt=input_data.model_dump_json(indent=2),
+        output_type=ChartSummaryOutput,
+    )
 
-    # Query GPT
-    # Inputs:
-    # - variable_description: Description of variables used in the chart.
-    # - config: configuration of the current chart
-    # - revisions: List with revisions. Each revision has username, timestamp, config_diff, config_diff_count
-    result = ask_llm(user_prompt)
-
+    # Format response for Slack
     if result is not None:
-        usage = result.usage()
+        output: ChartSummaryOutput = result.output
         cost = estimate_llm_cost(
             MODEL_DEFAULT,
-            usage=usage,
+            usage=result.usage(),
         )
 
-        message = f"*🤖 Summary* ({MODEL_DEFAULT})\n{result.output}\n\n(Cost: {cost} $)"
+        return {
+            "description": output.description,
+            "suggestion": output.suggestion,
+            "cost": cost,
+        }
 
-        return message
+    return None
+
+
+def pretty_model_name(model_name: str) -> str:
+    """Convert pydantic model name to pretty format for display."""
+    model = model_name.split(":")
+    if len(model) == 1:
+        return model[0]
+    elif len(model) == 2:
+        return model[1]
+    else:
+        raise ValueError(f"Unexpected model name format: {model_name}")
+
+
+MODEL_DEFAULT_PRETTY = pretty_model_name(MODEL_DEFAULT)
 
 
 def get_indicators_in_chart(chart_id) -> list[gm.Variable]:
@@ -142,31 +222,114 @@ def get_chart_revisions(chart_id):
     return df
 
 
-def ask_llm(user_prompt: str, system_prompt: str | None = None, model: str | None = None):
-    """Get AI summary using pydantic-ai instead of OpenAI library.
+def compute_config_diff(old: Any, new: Any, path: str = "") -> dict[str, Any]:
+    """Compute deep recursive difference between two values.
+
+    Returns nested dict with changes at each path:
+    - {"old": value, "new": value} for changed values
+    - {"added": value} for new fields
+    - {"removed": value} for removed fields
+    """
+    diff = {}
+
+    # Both are dicts - recurse
+    if isinstance(old, dict) and isinstance(new, dict):
+        all_keys = set(old.keys()) | set(new.keys())
+        for key in all_keys:
+            key_path = f"{path}.{key}" if path else key
+            if key not in old:
+                diff[key_path] = {"added": new[key]}
+            elif key not in new:
+                diff[key_path] = {"removed": old[key]}
+            else:
+                nested_diff = compute_config_diff(old[key], new[key], key_path)
+                diff.update(nested_diff)
+
+    # Both are lists - compare element by element
+    elif isinstance(old, list) and isinstance(new, list):
+        max_len = max(len(old), len(new))
+        for i in range(max_len):
+            idx_path = f"{path}[{i}]"
+            if i >= len(old):
+                diff[idx_path] = {"added": new[i]}
+            elif i >= len(new):
+                diff[idx_path] = {"removed": old[i]}
+            else:
+                nested_diff = compute_config_diff(old[i], new[i], idx_path)
+                diff.update(nested_diff)
+
+    # Leaf values - compare directly
+    elif old != new:
+        diff[path or "root"] = {"old": old, "new": new}
+
+    return diff
+
+
+def build_revisions_from_df(df: pd.DataFrame) -> list[ChartRevision]:
+    """Build structured revisions with config diffs from revision DataFrame.
+
+    Args:
+        df: DataFrame with columns: fullName (str), config (JSON str), createdAt (datetime64)
+
+    Returns:
+        List of ChartRevision objects with computed diffs between consecutive revisions.
+    """
+    # Sort by date ascending
+    df = df.sort_values("createdAt").reset_index(drop=True)
+
+    revisions = []
+    prev_config = None
+
+    for _, row in df.iterrows():
+        current_config = json.loads(row["config"])
+
+        if prev_config is None:
+            # First revision - no diff, it's the initial state
+            diff = {}
+            char_count = 0
+        else:
+            diff = compute_config_diff(prev_config, current_config)
+            char_count = len(json.dumps(diff))
+
+        revisions.append(
+            ChartRevision(
+                editor_name=row["fullName"] or "Unknown",
+                timestamp=row["createdAt"],
+                config_diff=diff,
+                config_diff_char_count=char_count,
+            )
+        )
+        prev_config = current_config
+
+    return revisions
+
+
+def ask_llm(
+    user_prompt: str,
+    system_prompt: str | None = None,
+    output_type: type | None = None,
+):
+    """Get AI response using pydantic-ai.
 
     Args:
         user_prompt: The user's prompt/question
         system_prompt: Optional system prompt. Defaults to SYSTEM_PROMPT if not provided
-        model: Optional model name. Defaults to MODEL_DEFAULT if not provided
+        output_type: Optional Pydantic model class for structured output
 
     Returns:
-        SimpleNamespace with:
-            - message_content: The AI response text
-            - cost: Cost in USD (None if unavailable)
+        RunResult object with .output (str or structured type) and .usage() method
     """
     log = structlog.get_logger()
 
     # Use defaults if not provided
     if system_prompt is None:
         system_prompt = SYSTEM_PROMPT
-    if model is None:
-        model = MODEL_DEFAULT
 
-    # Create agent with system prompt
+    # Create agent with system prompt and optional structured output
     agent = Agent(
-        model=model,
+        model=MODEL_DEFAULT,
         instructions=system_prompt,
+        output_type=output_type,
         retries=2,
     )
 
