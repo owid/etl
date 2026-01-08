@@ -1,5 +1,6 @@
 """Semantic search functionality for OWID indicators - API version."""
 
+import math
 import threading
 from typing import Any, Dict, List, Optional
 
@@ -82,7 +83,7 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
                 "catalog_path": indicator.catalogPath,
                 "n_charts": indicator.n_charts,
                 "description": indicator.description,
-                "popularity": indicator.popularity,
+                "popularity": None if indicator.popularity is None or math.isnan(indicator.popularity) else indicator.popularity,
             }
         )
 
