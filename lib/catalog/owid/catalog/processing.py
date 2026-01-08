@@ -1,6 +1,6 @@
 """Common operations performed on tables and variables."""
 
-from .tables import (
+from owid.catalog.tables import (
     ExcelFile,
     concat,
     keep_metadata,
@@ -26,7 +26,7 @@ from .tables import (
     to_datetime,
     to_numeric,
 )
-from .warnings import ignore_warnings
+from owid.catalog.warnings import ignore_warnings
 
 __all__ = [
     "ExcelFile",

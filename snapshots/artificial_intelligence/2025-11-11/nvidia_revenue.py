@@ -18,6 +18,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # URLs for NVIDIA quarterly revenue PDFs
 PDF_URLS = {
+    "Q3FY26": "https://s201.q4cdn.com/141608511/files/doc_financials/2026/Q326/Rev_by_Mkt_Qtrly_Trend_Q326.pdf",
     "Q4FY25": "https://s201.q4cdn.com/141608511/files/doc_financials/2025/Q425/Rev_by_Mkt_Qtrly_Trend_Q425.pdf",
     "Q4FY24": "https://s201.q4cdn.com/141608511/files/doc_financials/2024/Q4FY24/Rev_by_Mkt_Qtrly_Trend_Q424.pdf",
     "Q4FY23": "https://s201.q4cdn.com/141608511/files/doc_financials/2023/Q423/Q423-Qtrly-Revenue-by-Market-slide.pdf",
@@ -223,15 +224,22 @@ def extract_nvidia_revenue() -> pd.DataFrame:
 
     q_info = long_df["quarter"].str.extract(r"Q(?P<q>\d)\s+FY(?P<y>\d{2})")
 
-    # Build a PeriodIndex from year + quarter
-    years = 2000 + q_info["y"].astype(int)  # "24" -> 2024, "25" -> 2025
-    quarters = q_info["q"].astype(int)
+    # Convert fiscal quarters to calendar dates
+    # NVIDIA's fiscal year ends in January, so:
+    # FY Q1 (Feb-Apr), FY Q2 (May-Jul), FY Q3 (Aug-Oct), FY Q4 (Nov-Jan)
+    fiscal_years = 2000 + q_info["y"].astype(int)  # "24" -> 2024, "25" -> 2025
+    fiscal_quarters = q_info["q"].astype(int)
 
-    long_df["date"] = pd.PeriodIndex(
-        year=years,
-        quarter=quarters,
-        freq="Q",  # use "Q-MAR" or similar if your FY ends in March, etc.
-    ).to_timestamp()
+    # Map fiscal quarter to calendar month (start of quarter)
+    # FY Q1 -> Feb (month 2), Q2 -> May (month 5), Q3 -> Aug (month 8), Q4 -> Nov (month 11)
+    quarter_to_month = {1: 1, 2: 4, 3: 7, 4: 10}
+    months = fiscal_quarters.map(quarter_to_month)
+
+    # For Q1-Q3, the calendar year is fiscal_year - 1
+    # For Q4, the calendar year is also fiscal_year - 1 (Nov-Jan spans two calendar years, we use Nov)
+    calendar_years = fiscal_years - 1
+
+    long_df["date"] = pd.to_datetime({"year": calendar_years, "month": months, "day": 1})
 
     # Normalize segment names
     log.info("normalizing_segment_names")

@@ -1,0 +1,176 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+    description_key:
+    - |-
+      **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
+
+      The first level divides areas into cities, towns, and villages, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and villages further.
+
+      This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
+
+      To predict future urbanization (2025 to 2100), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
+
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns](#dod:towns-degurba), and [villages](#dod:villages-degurba) and estimate their respective populations.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ghsl_countries:
+    variables:
+      value:
+          title: |-
+            <% if location_type == "rural_total" and metric == 'area' and data_type == 'estimates' %>
+            Land covered by villages
+            <% elif location_type == "rural_total" and metric == 'population' and data_type == 'estimates' %>
+            Population living in villages
+            <% elif location_type == "rural_total" and metric == 'share' and data_type == 'estimates' %>
+            Share of land covered by villages
+            <% elif location_type == "rural_total" and metric == 'popshare' and data_type == 'estimates' %>
+            Share of population living in villages
+            <% elif location_type == "rural_total" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in villages
+
+            <% elif location_type == "urban_centre" and metric == 'area' and data_type == 'estimates' %>
+            Land covered by cities
+            <% elif location_type == "urban_centre" and metric == 'population' and data_type == 'estimates' %>
+            Population living in cities
+            <% elif location_type == "urban_centre" and metric == 'share' and data_type == 'estimates' %>
+            Share of land covered by cities
+            <% elif location_type == "urban_centre" and metric == 'popshare' and data_type == 'estimates' %>
+            Share of population living in cities
+            <% elif location_type == "urban_centre" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in cities
+
+            <% elif location_type == "urban_cluster" and metric == 'area' and data_type == 'estimates' %>
+            Land covered by towns
+            <% elif location_type == "urban_cluster" and metric == 'population' and data_type == 'estimates' %>
+            Population living in towns
+            <% elif location_type == "urban_cluster" and metric == 'share' and data_type == 'estimates' %>
+            Share of land covered by towns
+            <% elif location_type == "urban_cluster" and metric == 'popshare' and data_type == 'estimates' %>
+            Share of population living in towns
+            <% elif location_type == "urban_cluster" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in towns
+
+            <% elif location_type == "urban_total" and metric == 'area' and data_type == 'estimates' %>
+            Land covered by urban areas
+            <% elif location_type == "urban_total" and metric == 'population' and data_type == 'estimates' %>
+            Population living in urban areas
+            <% elif location_type == "urban_total" and metric == 'share' and data_type == 'estimates' %>
+            Share of land covered by urban areas
+            <% elif location_type == "urban_total" and metric == 'popshare' and data_type == 'estimates' %>
+            Share of population living in urban areas
+            <% elif location_type == "urban_total" and metric == 'built_up_area' and data_type == 'estimates' %>
+            Built-up area in urban areas
+
+            <% elif location_type == "rural_total" and metric == 'area' and data_type == 'projections' %>
+            Projected land covered by villages
+            <% elif location_type == "rural_total" and metric == 'population' and data_type == 'projections' %>
+            Projected population living in villages
+            <% elif location_type == "rural_total" and metric == 'share' and data_type == 'projections' %>
+            Projected share of land covered by villages
+            <% elif location_type == "rural_total" and metric == 'popshare' and data_type == 'projections' %>
+            Projected share of population living in villages
+            <% elif location_type == "rural_total" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in villages
+
+            <% elif location_type == "urban_centre" and metric == 'area' and data_type == 'projections' %>
+            Projected land covered by cities
+            <% elif location_type == "urban_centre" and metric == 'population' and data_type == 'projections' %>
+            Projected population living in cities
+            <% elif location_type == "urban_centre" and metric == 'share' and data_type == 'projections' %>
+            Projected share of land covered by cities
+            <% elif location_type == "urban_centre" and metric == 'popshare' and data_type == 'projections' %>
+            Projected share of population living in cities
+            <% elif location_type == "urban_centre" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in cities
+
+            <% elif location_type == "urban_cluster" and metric == 'area' and data_type == 'projections' %>
+            Projected land covered by towns
+            <% elif location_type == "urban_cluster" and metric == 'population' and data_type == 'projections' %>
+            Projected population living in towns
+            <% elif location_type == "urban_cluster" and metric == 'share' and data_type == 'projections' %>
+            Projected share of land covered by towns
+            <% elif location_type == "urban_cluster" and metric == 'popshare' and data_type == 'projections' %>
+            Projected share of population living in towns
+            <% elif location_type == "urban_cluster" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in towns
+
+            <% elif location_type == "urban_total" and metric == 'area' and data_type == 'projections' %>
+            Projected land covered by urban areas
+            <% elif location_type == "urban_total" and metric == 'population' and data_type == 'projections' %>
+            Projected population living in urban areas
+            <% elif location_type == "urban_total" and metric == 'share' and data_type == 'projections' %>
+            Projected share of land covered by urban areas
+            <% elif location_type == "urban_total" and metric == 'popshare' and data_type == 'projections' %>
+            Projected share of population living in urban areas
+            <% elif location_type == "urban_total" and metric == 'built_up_area' and data_type == 'projections' %>
+            Projected built-up area in urban areas
+
+            <% elif location_type == "urban_centre" and metric == 'density' and data_type == 'estimates' %>
+            Population density in cities
+            <% elif location_type == "urban_centre" and metric == 'density' and data_type == 'projections' %>
+            Projected population density in cities
+
+            <% elif location_type == "urban_cluster" and metric == 'density' and data_type == 'estimates' %>
+            Population density in towns
+            <% elif location_type == "urban_cluster" and metric == 'density' and data_type == 'projections' %>
+            Projected population density in towns
+
+            <% elif location_type == "rural_total" and metric == 'density' and data_type == 'estimates' %>
+            Population density in villages
+            <% elif location_type == "rural_total" and metric == 'density' and data_type == 'projections' %>
+            Projected population density in villages
+
+            <% elif location_type == "urban_total" and metric == 'density' and data_type == 'estimates' %>
+            Population density in urban areas
+            <% elif location_type == "urban_total" and metric == 'density' and data_type == 'projections' %>
+            Projected population density in urban areas
+
+            <% endif %>
+          unit:
+            <% if metric == 'area' or metric == 'built_up_area' %>
+            km²
+            <% elif metric == 'population' %>
+            people
+            <% elif metric == 'share' or metric == 'popshare' %>
+            %
+            <% elif metric == 'density' %>
+            people per km²
+            <%- endif -%>
+
+          short_unit:
+            <% if metric == 'area' or metric == 'built_up_area' %>
+            km²
+            <% elif metric == 'share' or metric == 'popshare' %>
+            %
+            <% elif metric == 'density' %>
+            per km²
+            <%- endif -%>
+          description_processing:
+            <% if metric == 'share' or metric == 'popshare' %>
+            The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns, villages) by the overall total, providing a percentage representation for each category.
+           <% elif metric == 'density' %>
+            Population density was calculated by dividing the population of cities by the total area it covers, providing a measure of the number of people living in each km².
+           <%- endif -%>
+          display:
+            numDecimalPlaces:
+                <% if metric == 'area' or metric == 'built_up_area' %>
+                0
+                <% elif metric == 'population' %>
+                0
+                <% elif metric == 'share' or metric == 'popshare' %>
+                1
+                <% elif metric == 'density' %>
+                0
+                <%- endif -%>

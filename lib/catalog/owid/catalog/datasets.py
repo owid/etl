@@ -19,12 +19,11 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from owid.catalog import tables, utils
+from owid.catalog.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
+from owid.catalog.processing_log import disable_processing_log
+from owid.catalog.properties import metadata_property
 from owid.repack import to_safe_types
-
-from . import tables, utils
-from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
-from .processing_log import disable_processing_log
-from .properties import metadata_property
 
 FileFormat = Literal["csv", "feather", "parquet"]
 

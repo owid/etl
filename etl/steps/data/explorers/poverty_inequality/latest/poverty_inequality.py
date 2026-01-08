@@ -23,10 +23,6 @@ def run() -> None:
     ds_wid = paths.load_dataset("world_inequality_database")
     tb_wid = ds_wid["world_inequality_database"].reset_index()
 
-    # Load LIS explorer step
-    ds_lis = paths.load_dataset("luxembourg_income_study")
-    tb_lis = ds_lis["luxembourg_income_study"].reset_index()
-
     # Load PIP data
     ds_pip = paths.load_dataset("world_bank_pip")
     tb_pip_old = ds_pip[f"income_consumption_{PPP_YEAR_OLD}"].reset_index()
@@ -36,13 +32,11 @@ def run() -> None:
     tb_explorer_old = merge_tables(
         tb_pip=tb_pip_old,
         tb_wid=tb_wid,
-        tb_lis=tb_lis,
         short_name=f"poverty_inequality_{PPP_YEAR_OLD}",
     )
     tb_explorer_current = merge_tables(
         tb_pip=tb_pip_current,
         tb_wid=tb_wid,
-        tb_lis=tb_lis,
         short_name=f"poverty_inequality_{PPP_YEAR_CURRENT}",
     )
 
@@ -51,20 +45,13 @@ def run() -> None:
     ds_explorer.save()
 
 
-def merge_tables(tb_pip: Table, tb_wid: Table, tb_lis: Table, short_name: str) -> Table:
+def merge_tables(tb_pip: Table, tb_wid: Table, short_name: str) -> Table:
     """
-    Merge the tables from PIP, WID and LIS datasets.
+    Merge the tables from PIP, WID datasets.
     """
     # Merge explorer datasets and assign a short name
     tb_explorer = pr.merge(
         tb_wid,
-        tb_lis,
-        on=["country", "year"],
-        how="outer",
-        validate="one_to_one",
-    )
-    tb_explorer = pr.merge(
-        tb_explorer,
         tb_pip,
         on=["country", "year"],
         how="outer",

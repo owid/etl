@@ -1,9 +1,10 @@
-__version__ = "0.4.0"
+__version__ = "1.0.0rc0"
 
-from . import processing, utils
-from .catalogs import CHANNEL, LocalCatalog, RemoteCatalog, find, find_latest, find_one
-from .datasets import Dataset
-from .meta import (
+from owid.catalog import api, processing, utils
+from owid.catalog.api import Client
+from owid.catalog.catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
+from owid.catalog.datasets import Dataset
+from owid.catalog.meta import (
     DatasetMeta,
     FaqLink,
     License,
@@ -13,19 +14,23 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from .processing_log import LogEntry, ProcessingLog
-from .tables import Table
-from .variables import Variable
+from owid.catalog.processing_log import LogEntry, ProcessingLog
+from owid.catalog.tables import Table
+from owid.catalog.variables import Variable
 
 __all__ = [
+    # New unified client API
+    "Client",
+    "api",
+    # Legacy catalog access (still supported)
     "LocalCatalog",
-    "RemoteCatalog",
+    "ETLCatalog",
     "find",
-    "find_latest",
-    "find_one",
+    # Core data structures
     "Dataset",
     "Table",
     "Variable",
+    # Metadata classes
     "DatasetMeta",
     "TableMeta",
     "VariableMeta",
@@ -36,6 +41,7 @@ __all__ = [
     "Source",
     "Origin",
     "License",
+    # Utilities
     "utils",
     "CHANNEL",
     "processing",

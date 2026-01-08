@@ -1,0 +1,84 @@
+config:
+  explorerTitle: "Incomes Across the Distribution - Luxembourg Income Study"
+  explorerSubtitle: "Explore Luxembourg Income Study data on the distribution of incomes."
+  selection:
+    - Brazil
+    - Chile
+    - China
+    - France
+    - South Africa
+    - United States
+  wpBlockId: 57755
+  isPublished: true
+  # pickerColumnSlugs:
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: mean
+        name: Mean income
+      - slug: median
+        name: Median income
+      - slug: avg
+        name: Mean income, by decile
+      - slug: thr
+        name: Decile thresholds
+      - slug: share
+        name: Decile shares
+  - name: Decile
+    slug: decile
+    choices:
+      - slug: "1.0"
+        name: "1 (poorest)"
+      - slug: "2.0"
+        name: "2"
+      - slug: "3.0"
+        name: "3"
+      - slug: "4.0"
+        name: "4"
+      - slug: "5.0"
+        name: "5"
+      - slug: "6.0"
+        name: "6"
+      - slug: "7.0"
+        name: "7"
+      - slug: "8.0"
+        name: "8"
+      - slug: "9.0"
+        name: "9"
+      - slug: "10.0"
+        name: "10 (richest)"
+      - slug: all
+        name: All deciles
+      - slug: nan
+        name: "-"
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: "dhi"
+        name: "After tax"
+      - slug: "mi"
+        name: "Before tax"
+      - slug: "after_vs_before_tax"
+        name: "After vs. before tax"
+  - name: Period
+    slug: period
+    choices:
+      - slug: "day"
+        name: "Day"
+      - slug: "month"
+        name: "Month"
+      - slug: "year"
+        name: "Year"
+      - slug: "nan"
+        name: ""
+  - name: Adjust for cost sharing within households (equivalized income)
+    slug: equivalence_scale
+    choices:
+      - slug: "per capita"
+        name: "Per capita"
+      - slug: "square root"
+        name: "Equivalized"
+
+views: []

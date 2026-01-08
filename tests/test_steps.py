@@ -239,7 +239,7 @@ def test_SnapshotStep_checksum_output(tmp_path):
         assert step.checksum_output() == "1867a4e329be8bb3c12a727513b931e8"
 
         # change metadata
-        meta["origin"]["producer"] = "B"
+        meta["origin"]["producer"] = "B"  # type: ignore[index]
         with open(snapshot_dvc, "w") as f:
             json.dump(meta, f)
 

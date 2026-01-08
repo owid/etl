@@ -105,3 +105,26 @@ Key environment variables and settings are defined in `config.py`:
 ## Limitations
 
 - We filter explorer views from `search_chart` because they don't have persistent CSV URLs or images.
+
+## Claude Code MCP Server
+
+The ETL includes an optional MCP (Model Context Protocol) server that provides Claude Code with tools to search OWID indicators, fetch chart data, and query the database directly.
+
+To enable it, add the OWID MCP server to your local Claude Code configuration:
+
+```bash
+# Production server (hosted)
+claude mcp add owid --transport http https://mcp.owid.io/mcp
+
+# Development server (local, requires running the server first)
+claude mcp add owid-dev --transport http http://0.0.0.0:8080/mcp/
+```
+
+This adds the following tools to Claude Code:
+- `search_indicator` - Find indicators using semantic search
+- `fetch_indicator_data` / `fetch_indicator_metadata` - Get indicator data and metadata
+- `search_chart` / `fetch_chart_data` / `fetch_chart_image` - Search and fetch chart data
+- `run_sql` - Execute read-only SQL queries against the OWID database
+- `search_posts` / `fetch_post` - Search and retrieve OWID articles
+
+Note: Enabling MCP adds ~7k tokens to the initial context.

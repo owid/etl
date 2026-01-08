@@ -12,8 +12,8 @@ from typing import Any, Dict
 
 import yaml
 
-from .openapi_to_markdown import generate_markdown
-from .openapi_utils import (
+from .openapi_to_markdown import generate_markdown  # ty: ignore
+from .openapi_utils import (  # ty:ignore
     load_openapi_spec_from_github,
     resolve_parameter_refs,
 )

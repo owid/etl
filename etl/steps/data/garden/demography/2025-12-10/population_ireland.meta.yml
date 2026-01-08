@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  population_ireland:
+    variables:
+      population:
+        title: Population - <<sex>>
+        unit: people
+        short_unit: ""
+        description_short: Population of the State of Ireland, between 1841 and 2006, by sex.
+        description_key:
+          - This series represents the total population of 26 counties that comprise the Republic of Ireland between 1841 and 2006.
+          - This data, provided by the Central Statistics Office of Ireland, is based on a combination of census data from the United Kingdom of Great Britain and Ireland (for years prior to 1926) and the Republic of Ireland (from 1926 onwards).
+        processing_level: minor
+        description_from_producer: Description of testing variable from producer.
+        display:
+          name: Population
+          numDecimalPlaces: 0
+          tolerance: 0
+
+

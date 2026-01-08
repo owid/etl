@@ -1,6 +1,6 @@
 [project]
 name = "owid-repack"
-version = "0.1.6"
+version = "0.1.7"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
@@ -14,10 +14,10 @@ dependencies = [
     "pyarrow>=18.0.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=7.2.0",
-    "pyright==1.1.373",
+    "ty>=0.0.4",
     "ruff==0.8.6",
     "ipdb>=0.13.13",
 ]
@@ -32,4 +32,3 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["owid"]
 
-[tool.pyright]

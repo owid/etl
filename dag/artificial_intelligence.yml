@@ -188,12 +188,12 @@ steps:
   #
   # Robotaxis dataset
   #
-  data://meadow/artificial_intelligence/2025-08-25/robotaxis:
-    - snapshot://artificial_intelligence/2025-08-25/robotaxis.csv
-  data://garden/artificial_intelligence/2025-08-25/robotaxis:
-    - data://meadow/artificial_intelligence/2025-08-25/robotaxis
-  data://grapher/artificial_intelligence/2025-08-25/robotaxis:
-    - data://garden/artificial_intelligence/2025-08-25/robotaxis
+  data://meadow/artificial_intelligence/2025-12-09/robotaxis:
+    - snapshot://artificial_intelligence/2025-12-09/robotaxis.csv
+  data://garden/artificial_intelligence/2025-12-09/robotaxis:
+    - data://meadow/artificial_intelligence/2025-12-09/robotaxis
+  data://grapher/artificial_intelligence/2025-12-09/robotaxis:
+    - data://garden/artificial_intelligence/2025-12-09/robotaxis
 
   #
   # Ireland Data Centres Metered Electricity Consumption
@@ -220,5 +220,39 @@ steps:
     - snapshot://us_census_bureau/2025-11-17/datacenter_construction.xlsx
   data://garden/us_census_bureau/2025-11-17/datacenter_construction:
     - data://meadow/us_census_bureau/2025-11-17/datacenter_construction
+    - data://garden/bls/2025-12-24/us_ppi_construction
   data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
     - data://garden/us_census_bureau/2025-11-17/datacenter_construction
+
+  # IEA Energy and AI dataset
+  data://meadow/artificial_intelligence/2025-11-07/energy_ai:
+    - snapshot://artificial_intelligence/2025-11-07/energy_ai.xlsx
+  data://garden/artificial_intelligence/2025-11-07/energy_ai:
+    - data://meadow/artificial_intelligence/2025-11-07/energy_ai
+    - data://garden/energy/2025-06-27/electricity_mix
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/artificial_intelligence/2025-11-07/energy_ai:
+    - data://garden/artificial_intelligence/2025-11-07/energy_ai
+
+  # TSMC operating data
+  data://meadow/tsmc/2025-11-10/operating_data:
+    - snapshot://tsmc/2025-11-10/operating_data.xlsx
+  data://garden/tsmc/2025-11-10/operating_data:
+    - data://meadow/tsmc/2025-11-10/operating_data
+  data://grapher/tsmc/2025-11-10/operating_data:
+    - data://garden/tsmc/2025-11-10/operating_data
+
+  # TWD/USD exchange rates from Central Bank of Taiwan
+  data://meadow/cbc_taiwan/2025-12-22/twd_usd_exchange_rate:
+    - snapshot://cbc_taiwan/2025-12-22/twd_usd_exchange_rate.csv
+  data://garden/cbc_taiwan/2025-12-22/twd_usd_exchange_rate:
+    - data://meadow/cbc_taiwan/2025-12-22/twd_usd_exchange_rate
+
+  # TSMC monthly revenue
+  data://meadow/tsmc/2025-11-10/monthly_revenue:
+    - snapshot://tsmc/2025-11-10/monthly_revenue.xlsx
+  data://garden/tsmc/2025-11-10/monthly_revenue:
+    - data://meadow/tsmc/2025-11-10/monthly_revenue
+    - data://garden/cbc_taiwan/2025-12-22/twd_usd_exchange_rate
+  data://grapher/tsmc/2025-11-10/monthly_revenue:
+    - data://garden/tsmc/2025-11-10/monthly_revenue
