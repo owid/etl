@@ -150,7 +150,7 @@ def calculate_weeks_of_earnings_needed_for_reading(
     tb["weeks_of_earnings_needed_for_reading"] = tb["lighting_price_reading"] / tb["real_average_weekly_earnings"]
 
     # Convert weeks to days
-    tb["days_of_earnings_needed_for_reading"] = tb["weeks_of_earnings_needed_for_reading"] * 7
+    tb["days_of_earnings_needed_for_reading"] = tb["weeks_of_earnings_needed_for_reading"] * 5
 
     # Keep only relevant columns
     tb = tb[["country", "year", "weeks_of_earnings_needed_for_reading", "days_of_earnings_needed_for_reading"]]
