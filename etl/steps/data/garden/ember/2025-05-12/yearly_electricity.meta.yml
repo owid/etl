@@ -468,134 +468,134 @@ tables:
           Electricity imports minus exports, measured in TWh.
         presentation:
           title_public: Net electricity imports
-      emissions__clean__mtco2:
-        title: Clean - mtCO2eq
+      emissions__lifecycle__clean__mtco2:
+        title: Lifecycle emissions from clean sources - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Low-carbon
         description_short: *description_short_low_carbon
         presentation:
-          title_public: CO₂ emissions from electricity generation from low-carbon sources
-      emissions__fossil__mtco2:
-        title: Fossil - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from low-carbon sources
+      emissions__lifecycle__fossil__mtco2:
+        title: Lifecycle emissions from fossil sources - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Fossil
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from fossil fuels
-      emissions__gas_and_other_fossil__mtco2:
-        title: Gas and other fossil - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from fossil fuels
+      emissions__lifecycle__gas_and_other_fossil__mtco2:
+        title: Lifecycle emissions from gas and other fossil sources - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Gas and other fossil
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from gas and other fossil fuels
-      emissions__hydro__bioenergy_and_other_renewables__mtco2:
-        title: Hydro, bioenergy and other renewables - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from gas and other fossil fuels
+      emissions__lifecycle__hydro__bioenergy_and_other_renewables__mtco2:
+        title: Lifecycle emissions from hydro, bioenergy and other renewables - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Hydro, bioenergy and other renewables
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from hydropower, bioenergy and other renewables
-      emissions__renewables__mtco2:
-        title: Renewables - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from hydropower, bioenergy and other renewables
+      emissions__lifecycle__renewables__mtco2:
+        title: Lifecycle emissions from renewables - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Renewables
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from renewables
-      emissions__wind_and_solar__mtco2:
-        title: Wind and solar - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from renewables
+      emissions__lifecycle__wind_and_solar__mtco2:
+        title: Lifecycle emissions from wind and solar - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Wind and solar
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from wind and solar power
-      emissions__bioenergy__mtco2:
-        title: Bioenergy - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from wind and solar power
+      emissions__lifecycle__bioenergy__mtco2:
+        title: Lifecycle emissions from bioenergy - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Bioenergy
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from bioenergy
-      emissions__coal__mtco2:
-        title: Coal - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from bioenergy
+      emissions__lifecycle__coal__mtco2:
+        title: Lifecycle emissions from coal - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Coal
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from coal
-      emissions__gas__mtco2:
-        title: Gas - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from coal
+      emissions__lifecycle__gas__mtco2:
+        title: Lifecycle emissions from gas - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Gas
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from gas
-      emissions__hydro__mtco2:
-        title: Hydro - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from gas
+      emissions__lifecycle__hydro__mtco2:
+        title: Lifecycle emissions from hydro - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Hydro
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from hydropower
-      emissions__nuclear__mtco2:
-        title: Nuclear - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from hydropower
+      emissions__lifecycle__nuclear__mtco2:
+        title: Lifecycle emissions from nuclear - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Nuclear
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from nuclear power
-      emissions__other_fossil__mtco2:
-        title: Other fossil - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from nuclear power
+      emissions__lifecycle__other_fossil__mtco2:
+        title: Lifecycle emissions from other fossil sources - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Other fossil
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from other fossil fuels
-      emissions__other_renewables__mtco2:
-        title: Other renewables - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from other fossil fuels
+      emissions__lifecycle__other_renewables__mtco2:
+        title: Lifecycle emissions from other renewables - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Other renewables
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from other renewables
-      emissions__solar__mtco2:
-        title: Solar - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from other renewables
+      emissions__lifecycle__solar__mtco2:
+        title: Lifecycle emissions from solar - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
           name: Solar
         description_short: *description_short_mtco2
         presentation:
-          title_public: CO₂ emissions from electricity generation from solar power
-      emissions__wind__mtco2:
-        title: Wind - mtCO2eq
+          title_public: Lifecycle CO₂ emissions from electricity generation from solar power
+      emissions__lifecycle__wind__mtco2:
+        title: Lifecycle emissions from wind - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
@@ -603,22 +603,22 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: CO₂ emissions from electricity generation from wind power
-      emissions__total_emissions__mtco2:
-        title: Total emissions - mtCO2eq
+      emissions__lifecycle__total_emissions__mtco2:
+        title: Total lifecycle emissions - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Total emissions
+          name: Total lifecycle emissions
         description_short: *description_short_mtco2
         presentation:
-          title_public: Total CO₂ emissions from electricity generation
-      emissions__co2_intensity__gco2_kwh:
-        title: CO2 intensity - gCO2eq/kWh
+          title_public: Total lifecycle CO₂ emissions from electricity generation
+      emissions__lifecycle__co2_intensity__gco2_kwh:
+        title: Lifecycle CO2 intensity - gCO2eq/kWh
         short_unit: gCO₂eq/kWh
         unit: grams of CO₂ equivalents per kilowatt-hour
         display:
-          name: CO₂ intensity
+          name: Lifecycle CO₂ intensity
         description_short: |-
           Greenhouse gases emitted per unit of generated electricity, measured in grams of CO₂ equivalents per kilowatt-hour.
         presentation:
-          title_public: CO₂ intensity of electricity generation
+          title_public: Lifecycle CO₂ intensity of electricity generation
