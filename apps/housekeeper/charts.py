@@ -1,51 +1,155 @@
+"""WIP: Currently integrating Draft charts into pipeline
+
+NEXT STEPS:
+    - QA #lucas-playground with Ed. Daily frequency is fine?
+    - We currently allow for re-suggestions if suggested more than 1 year ago. Check with Ed.
+    - We should detect when a chart is being "re-suggested", and include the thread that last-suggested it. For this we need more permissions for our bot
+        1. Go to https://api.slack.com/apps
+        2. Select your app
+        3. Go to OAuth & Permissions → Scopes → Bot Token Scopes
+        4. Add channels:history (and groups:history for private channels)
+        5. Reinstall the app to your workspace (required after adding scopes)
+"""
+
+import json
+from collections import defaultdict
+from datetime import datetime
+
 import pandas as pd
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.housekeeper.utils import (
+    MODEL_DEFAULT_PRETTY,
     TODAY,
-    YEAR_AGO,
-    add_reviews,
     get_chart_summary,
-    get_charts_with_slug_rename_last_year,
-    get_reviews_id,
+    owidb_get_reviews_id,
+    owidb_submit_review_id,
 )
-from apps.wizard.app_pages.similar_charts.data import get_raw_charts
+from etl.analytics.metabase import get_question_data, read_metabase
 from etl.config import OWID_ENV, SLACK_API_TOKEN
 from etl.slack_helpers import send_slack_message
 
 log = get_logger()
 
+# Default reviewers for daily chart reviews
+DAILY_CHART_REVIEWER_DEFAULT = "fiona"
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "fiona"
 
-def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: str):
-    # Get charts
-    log.info("Getting charts to review")
-    df = get_charts_to_review()
 
-    # Sort charts
-    log.info("Sorting charts...")
-    df = sort_charts(df)
+####################################
+# Main entry point
+####################################
+def send_slack_chart_reviews(
+    channel_name: str,
+    include_published: bool = True,
+    include_draft: bool = True,
+):
+    """Send daily chart reviews to Slack (both published and draft).
 
-    # Select chart
-    log.info("Select chart...")
-    chart = select_chart(df)
-    # DEBUGGING:
-    # 2582 (wordpress link), 1609 (no references), 5689 (explorer, no post), 4288 (explorer, wp post), 2093 (no explorer, post), 3475 (explorer, post), (explorer, post + wp)
-    # chart = df[df.chart_id == 3475].iloc[0]
-    # chart = df.iloc[0]
-    log.info(f"Selected chart: {chart['chart_id']}, {chart['slug']}")
+    This is the main entry point that fetches data once and runs both pipelines.
+
+    Args:
+        channel_name: Name of the Slack channel to send the message to.
+        include_published: Whether to send a published chart review.
+        include_draft: Whether to send a draft chart review.
+    """
+    log.info("Getting all charts to review")
+    df_published, df_draft = get_all_charts_to_review()
+
+    # Get user data (slack usernames)
+    slack_users = get_usernames()
+    # Uncomment below if you want to test the workflow without tagging people
+    # slack_users = {k: f"_{v}" for k, v in slack_users.items()}
+
+    if include_published and not df_published.empty:
+        _send_published_chart_review(
+            chart=df_published.iloc[0],
+            channel_name=channel_name,
+            slack_username="Daily chart",
+            icon_emoji="sus-blue",
+            slack_users=slack_users,
+        )
+    elif include_published:
+        log.info("No published charts to review")
+
+    if include_draft and not df_draft.empty:
+        _send_draft_chart_review(
+            chart=df_draft.iloc[0],
+            channel_name=channel_name,
+            slack_username="Daily draft chart",
+            icon_emoji="sus-white",
+            slack_users=slack_users,
+        )
+    elif include_draft:
+        log.info("No draft charts to review")
+
+
+####################################
+# Data fetching
+####################################
+def get_all_charts_to_review():
+    """Get both published and draft charts that need review.
+
+    Fetches from Metabase once, filters out charts reviewed in the last year,
+    and returns two filtered dataframes.
+
+    Returns:
+        tuple: (df_published, df_draft) - DataFrames of charts to review
+    """
+    # Fetch all charts from Metabase (question 812)
+    df = get_question_data(812, prod=True)
+
+    # Dtypes / Parsing
+    df = df.astype(
+        {
+            "last_edited_at": "datetime64[ns]",
+            "created_at": "datetime64[ns]",
+        }
+    )
+    df["post_details"] = df["post_details"].apply(lambda x: json.loads(x) if pd.notna(x) else [])
+    df["revisions"] = df["revisions"].apply(lambda x: json.loads(x) if pd.notna(x) else [])
+
+    # Skip charts reviewed in the last year (both published and drafts use same object_type)
+    reviews_id = owidb_get_reviews_id(object_type="chart")
+    df = df.loc[~df["chart_id"].isin(reviews_id)]
+
+    # Split into published and draft
+    df_published = df.loc[df["is_published"]].sort_values(["views_365d", "views_14d", "views_7d"], ascending=True)
+    df_draft = df.loc[~df["is_published"]].sort_values("last_edited_at", ascending=True)
+
+    return df_published, df_draft
+
+
+####################################
+# Published chart review pipeline
+####################################
+def _send_published_chart_review(
+    chart,
+    channel_name: str,
+    slack_username: str,
+    icon_emoji: str,
+    slack_users: dict[str, str],
+):
+    """Send a published chart review to Slack.
+
+    Args:
+        chart: Chart row (pandas Series) to review.
+        channel_name: Name of the Slack channel.
+        slack_username: Username to use when sending the message.
+        icon_emoji: Emoji to use as icon.
+    """
+    log.info(f"Selected published chart: {chart['chart_id']}, {chart['slug']}")
 
     # Get references
     refs = get_references(chart["chart_id"])
 
     # Prepare message
-    log.info("Preparing main message...")
-    message = build_main_message(chart, refs)
+    message = build_published_message(chart, refs)
 
     # Send message
     if SLACK_API_TOKEN:
-        # 1/ Main message
-        log.info("Sending main message, with image...")
+        log.info("Sending published chart message...")
         image_url = OWID_ENV.thumb_url(chart["slug"])
         response = send_slack_message(
             message=message,
@@ -55,151 +159,32 @@ def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: 
             username=slack_username,
         )
 
-        # 2/ More context in the thread
+        # Send thread messages
         kwargs = {
             "channel": channel_name,
             "icon_emoji": icon_emoji,
             "username": slack_username,
             "thread_ts": response["ts"],
         }
-        send_extra_messages(chart, refs, **kwargs)
+        _send_published_extra_messages(chart, refs, **kwargs)
 
-        # 3/ Add chart to reviewed charts
-        add_reviews(object_type="chart", object_id=chart["chart_id"])
-
-
-def get_charts_to_review():
-    def _get_chart_references():
-        """Get references to charts (complete).
-
-        This includes references in explorers and/or articles or any other post.
-        """
-        query_posts = """SELECT
-                a.target chart_slug,
-                a.componentType link_method,
-                b.slug post_slug,
-                b.TYPE post_type,
-                CASE
-                    WHEN type = 'data-insight' THEN CONCAT('https://ourworldindata.org/data-insights/', b.slug)
-                    WHEN type = 'team' THEN CONCAT('https://ourworldindata.org/team/', b.slug)
-                    ELSE CONCAT('https://ourworldindata.org/', b.slug)
-                END post_url,
-                b.published post_published
-            FROM posts_gdocs_links a
-            JOIN posts_gdocs b ON a.sourceId = b.id
-            WHERE linkType = "grapher";
-            """
-        df_exp, df_links = OWID_ENV.read_sqls(
-            [
-                "SELECT * FROM explorer_charts",
-                query_posts,
-            ]
-        )
-
-        return df_exp, df_links
-
-    def _add_explorer_references(df, df_exp) -> pd.DataFrame:
-        """Add explorer reference details to main dataframe."""
-        # Group by chart, get number of explorers and explorer slugs
-        df_exp = (
-            df_exp.groupby("chartId", as_index=False)["explorerSlug"]
-            .agg({"num_explorers": "size", "explorer_slugs": "unique"})
-            .rename(columns={"chartId": "chart_id"})
-        )
-
-        # Merge with main dataframe
-        df = df.merge(df_exp, how="left", on="chart_id")
-
-        # Set to NaNs to zero (this is a count indicator)
-        df["num_explorers"] = df["num_explorers"].fillna(0)
-
-        return df
-
-    def _add_post_references(df, df_posts) -> pd.DataFrame:
-        """Add post reference details to main dataframe."""
-        # Prepare post details for group by operation
-        df_posts["post_details"] = df_posts.set_index("chart_slug")[
-            ["post_type", "post_url", "post_published"]
-        ].to_dict(orient="records")
-
-        # Group by chart_slug, get number of posts and post details
-        df_posts = (
-            df_posts.groupby("chart_slug", as_index=False)["post_details"]
-            .agg({"num_posts": "size", "post_details": list})
-            .rename(columns={"chart_slug": "slug"})
-        )
-
-        # Merge with main dataframe
-        df = df.merge(df_posts, on="slug", how="left")
-
-        # Set to NaNs to zero (this is a count indicator)
-        df["num_posts"] = df["num_posts"].fillna(0)
-        return df
-
-    # Get all charts
-    df = get_raw_charts()
-
-    # Keep only older-than-a-year charts
-    df = df.loc[df["created_at"] < YEAR_AGO]
-
-    # The following code gets all references from explorers and posts for all charts. This is currently commented because we use AdminAPI instead to *just* get this information for the selected daily chart.
-    # If this details were needed to sort the charts, please use this instead.
-    # Add references (explorers and articles)
-    df_exp, df_links = _get_chart_references()
-    df = _add_explorer_references(df, df_exp)
-    df = _add_post_references(df, df_links)
-
-    # Ignore some charts (reviewed, recently slug-renamed)
-    ## Discard charts already presented in the chat
-    reviews_id = get_reviews_id(object_type="chart")
-    ## Keep only charts whose slug hasn't been changed in the last year
-    rename_id = get_charts_with_slug_rename_last_year()
-    ## Combine & ignore
-    df = df.loc[~df["chart_id"].isin(reviews_id + rename_id)]
-
-    return df
+        # Add chart to reviewed
+        owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
 
 
-def sort_charts(df: pd.DataFrame):
-    # Sort by views
-    df = df.sort_values(["views_365d", "views_14d", "views_7d"])
-
-    return df
-
-
-def select_chart(df: pd.DataFrame):
-    # Select oldest chart
-    chart = df.iloc[0]
-
-    return chart
-
-
-def get_references(chart_id: int):
-    api = AdminAPI(OWID_ENV)
-    refs = api.get_chart_references(chart_id)
-    refs = refs["references"]
-
-    return refs
-
-
-def build_main_message(chart, refs):
-    message_usage = _get_main_message_usage(chart, refs)
-    DATE = TODAY.date().strftime("%d %b, %Y")
+def build_published_message(chart, refs):
+    """Build message for published chart review."""
+    message_usage = _get_published_message_usage(chart, refs)
+    date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"{DATE}: *Daily chart:* "
-        f"<{OWID_ENV.chart_site(chart['slug'])}|{chart['title']}>\n"
-        f"{message_usage}\n"
-        f"Go to <{OWID_ENV.chart_admin_site(chart['chart_id'])}|edit :writing_hand:>\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
+        f"_{message_usage}_\n"
     )
-
     return message
 
 
-def _get_main_message_usage(chart, refs):
-    """Get brief message about chart usage.
-
-    This includes chart views, and references to chart (from explorers and posts).
-    """
+def _get_published_message_usage(chart, refs):
+    """Get brief message about chart usage (views and references)."""
     msg_chart_views = f"{chart['views_365d']:.0f} views last year"
 
     num_posts = len(refs.get("postsGdocs", [])) + len(refs.get("postsWordpress", []))
@@ -213,84 +198,331 @@ def _get_main_message_usage(chart, refs):
         ]
         references = " and ".join(filter(None, references))
         msg_references = f"referenced in {references}" if references else "no references"
-    message_usage = f"({msg_chart_views}; {msg_references})"
-
-    return message_usage
+    return f"{msg_chart_views}; {msg_references}"
 
 
-def send_extra_messages(chart, refs, **kwargs):
-    """Provide more context in the thread"""
-    ## 1/ Similar charts
-    similar_messages = (
-        f"🕵️ <{OWID_ENV.wizard_url}similar_charts?chart_search_text={chart['slug']}| → Explore similar charts>"
-    )
-
-    ## 2/ AI: Chart description, chart edit timeline, suggestion
+def _send_published_extra_messages(chart, refs, **kwargs):
+    """Send extra context in thread for published chart."""
+    # 0/ Get chart description + Suggestion
     log.info("Getting AI summary...")
     ai_summary = get_chart_summary(chart=chart)
 
-    ## 3/ Send extra info
-    ### Similar charts
-    log.info("Sending 'similar charts' link...")
-    send_slack_message(
-        message=similar_messages,
-        **kwargs,
+    # 1/ Chart summary
+    if ai_summary and ai_summary["description"]:
+        log.info("Sending chart summary...")
+        msg_description = f"🧾 *Chart description* ({MODEL_DEFAULT_PRETTY})\n{ai_summary['description']}"
+        send_slack_message(message=msg_description, **kwargs)
+
+    # 2/ Suggestion
+    if ai_summary and ai_summary["suggestion"]:
+        log.info("Sending suggestion...")
+        msg_suggestion = _build_suggestion_message(ai_summary["suggestion"])
+        send_slack_message(message=msg_suggestion, **kwargs)
+
+    # 3/ References details
+    msg_refs = _build_refs_message(refs)
+    if msg_refs:
+        log.info("Sending reference message...")
+        send_slack_message(message=msg_refs, **kwargs)
+
+    # 4/ Related charts
+    # msg_related = f"🔍 *<{OWID_ENV.wizard_url}related_charts?slug={chart['slug']}|Explore related charts>*"
+    # log.info("Sending 'similar charts' link...")
+    # send_slack_message(message=msg_related, **kwargs)
+
+    # 5 Revision history
+    msg_revisions = _build_revisions_message(chart.revisions)
+    send_slack_message(message=msg_revisions, **kwargs)
+
+    # 6/ Tag explanation
+    tag_message = "❓ *Why have I been tagged?* You are tagged as the data steward for published charts."
+    log.info("Sending tag explanation...")
+    send_slack_message(message=tag_message, **kwargs)
+
+
+####################################
+# Draft chart review pipeline
+####################################
+def _send_draft_chart_review(
+    chart,
+    channel_name: str,
+    slack_username: str,
+    icon_emoji: str,
+    slack_users: dict[str, str],
+):
+    """Send a draft chart review to Slack.
+
+    Args:
+        chart: Chart row (pandas Series) to review.
+        channel_name: Name of the Slack channel.
+        slack_username: Username to use when sending the message.
+        icon_emoji: Emoji to use as icon.
+    """
+    log.info(f"Selected draft chart: {chart['chart_id']}, {chart['slug']}")
+
+    # Find responsible user (creator, editor, or default)
+    slack_tag, reason, _ = _find_responsible_user(chart, slack_users)
+
+    # Build message with responsible user tag
+    message = build_draft_message(chart, slack_tag=slack_tag)
+
+    # Send message
+    if SLACK_API_TOKEN:
+        log.info("Sending draft review message...")
+        response = send_slack_message(
+            message=message,
+            channel=channel_name,
+            icon_emoji=icon_emoji,
+            username=slack_username,
+        )
+
+        # Send tag explanation in thread
+        tag_message = f"❓ *Why have I been tagged?*\n{reason}"
+        log.info("Sending tag explanation...")
+        send_slack_message(
+            message=tag_message,
+            channel=channel_name,
+            icon_emoji=icon_emoji,
+            username=slack_username,
+            thread_ts=response["ts"],
+        )
+
+        # Add to reviewed
+        owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
+
+
+def build_draft_message(chart, slack_tag: str | None = None):
+    """Build simple message for draft chart review.
+
+    Args:
+        chart: Chart row (pandas Series) to review.
+        slack_tag: Slack mention format for the creator (e.g., "<@username>") or None.
+    """
+    last_edited = chart["last_edited_at"]
+    today_str = TODAY.strftime("%d %b, %Y")
+
+    # Get chart title
+    api = AdminAPI(OWID_ENV)
+    config = api.get_chart_config(chart["chart_id"])
+
+    # Calculate time ago
+    days_ago = (TODAY - last_edited.date()).days
+    if days_ago > 365:
+        years = days_ago // 365
+        time_ago = f"{years} year{'s' if years > 1 else ''} ago"
+    elif days_ago > 30:
+        months = days_ago // 30
+        time_ago = f"{months} month{'s' if months > 1 else ''} ago"
+    else:
+        time_ago = f"{days_ago} day{'s' if days_ago != 1 else ''} ago"
+
+    date_str = last_edited.strftime("%d %b %Y")
+
+    # Format the tag part of the message
+    tag_part = f" <@{slack_tag}>" if slack_tag else ""
+
+    message = (
+        f"[{today_str}] *Delete <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this draft> if it's no longer needed*{tag_part}\n"
+        f"title: {config.get('title', '')}\n"
+        f"_last edited: {date_str} ({time_ago}), by {chart['last_edited_by']}_"
     )
-    ### References details
-    log.info("Sending reference message...")
-    refs_message = make_refs_message(refs)
-    if refs_message:
-        send_slack_message(
-            message=refs_message,
-            **kwargs,
-        )
-    ### AI Summary
-    log.info("Sending AI summary...")
-    if ai_summary:
-        send_slack_message(
-            message=ai_summary,
-            **kwargs,
-        )
+    return message
 
 
-def make_refs_message(refs):
-    """Prepare message with references."""
-    message = []
+####################################
+# Helpers
+####################################
+def get_references(chart_id: int):
+    """Get references to a chart (explorers, posts)."""
+    api = AdminAPI(OWID_ENV)
+    refs = api.get_chart_references(chart_id)
+    return refs["references"]
+
+
+def get_usernames():
+    df = read_metabase(
+        "select * from users",
+        database_id=5,
+    )
+
+    if "slackUsername" not in df.columns:
+        SLACK_NAMES = {
+            "Angela Wenham": "Angela",
+            "Antoinette Finnegan": "Antoinette",
+            "Bastian Herre": "Bastian",
+            "Bertha Rohenkohl": "Bertha",
+            "Bobbie Macdonald": "bobbie",
+            "Charlie Giattino": "charlie",
+            "Daniel Bachler": "daniel",
+            "Edouard Mathieu": "Ed",
+            "Esteban Ortiz-Ospina": "Este",
+            "Fiona Spooner": "Fiona",
+            "Hannah Ritchie": "hannah",
+            "Ike Saunders": "ike",
+            "Joe Hasell": "joe",
+            "Lucas Rodés-Guirao": "lucas",
+            "Marcel Gerber": "marcel",
+            "Martin Račák": "Martin",
+            "Marwa Boukarim": "Marwa",
+            "Matthieu Bergel": "matthieu",
+            "Max Roser": "max",
+            "Mojmir Vinkler": "Mojmir",
+            "Natalie Reynolds-Garcia": "Nat",
+            "Pablo Arriagada": "Pablo A",
+            "Pablo Rosado": "Pablo R",
+            "Sophia Mersmann": "sophia",
+            "Tuna Acisu": "Tuna",
+            "Valerie Muigai": "Valerie",
+            "Veronika Samborska": "Veronika",
+        }
+        df["slackUsername"] = df["fullName"].map(SLACK_NAMES)
+
+    df = df[["fullName", "slackUsername"]].dropna()
+    dix = df.set_index("fullName")["slackUsername"].to_dict()
+    return dix
+
+
+def _parse_revisions(revisions) -> list[dict]:
+    """Parse revisions field - handles both JSON string and list of dicts.
+
+    Can be removed if Metabase returns list directly.
+    """
+    import json
+
+    if revisions is None:
+        return []
+    if isinstance(revisions, str):
+        try:
+            return json.loads(revisions)
+        except json.JSONDecodeError:
+            return []
+    return revisions if isinstance(revisions, list) else []
+
+
+def _format_date(date_value) -> str:
+    """Format a date value to string."""
+    if date_value is None:
+        return ""
+    if hasattr(date_value, "strftime"):
+        return date_value.strftime("%d %b %Y")
+    return str(date_value)
+
+
+def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
+    """Find the responsible user for a draft chart.
+
+    Logic:
+    1. Check created_by - if in SLACK_NAMES, use them
+    2. Check revisions chronologically - find first editor in SLACK_NAMES
+    3. Fall back to DAILY_DRAFT_CHART_REVIEWER_DEFAULT
+
+    Args:
+        chart: Chart row (pandas Series) with created_by and revisions fields.
+        users: Dictionary with available users on Slack
+
+    Returns:
+        Tuple of (slack_tag, reason, date_str) where:
+        - slack_tag: Username to tag on Slack
+        - reason: Why this person was tagged (for thread message)
+        - date_str: Relevant date (creation or edit date), or None for default
+    """
+    # 1. Check creator
+    creator = chart.get("created_by")
+    if creator and creator in users:
+        slack_tag = users[creator]
+        date_str = _format_date(chart.get("created_at"))
+        return slack_tag, f"You created this chart on {date_str}.", date_str
+
+    # 2. Check revisions chronologically
+    revisions = _parse_revisions(chart.get("revisions"))
+    # Sort by edited_at (oldest first)
+    sorted_revisions = sorted(revisions, key=lambda r: r.get("edited_at", ""))
+    for rev in sorted_revisions:
+        editor = rev.get("edited_by")
+        if editor and editor in users:
+            slack_tag = users[editor]
+            date_str = _format_date(rev.get("edited_at"))
+            return slack_tag, f"You edited this chart on {date_str}.", date_str
+
+    # 3. Fall back to default
+    slack_tag = DAILY_DRAFT_CHART_REVIEWER_DEFAULT
+    return slack_tag, "You are the default reviewer for draft charts.", None
+
+
+def _build_refs_message(refs):
+    """Build message with chart references as bullet lists."""
+    sections = []
 
     explorers = refs.get("explorers", [])
     posts_gdoc = refs.get("postsGdocs", [])
     posts_wp = refs.get("postsWordpress", [])
 
     # Explorers
-    if explorers != []:
+    if explorers:
         num_explorers = len(explorers)
-        explorer_links = [f"<{OWID_ENV.explorer_site(e)}|{e}>" for e in explorers]
-        if num_explorers == 1:
-            message.append(f"*→ 1 explorer:* {', '.join(explorer_links)}\n")
-        else:
-            message.append(f"*→ {num_explorers} explorers:* {', '.join(explorer_links)}\n")
+        explorer_items = [f"  • <{OWID_ENV.explorer_site(e)}|{e}>" for e in explorers]
+        header = f"• *Explorers ({num_explorers}):*"
+        sections.append(header + "\n" + "\n".join(explorer_items))
 
     # Posts
-    if (posts_gdoc != []) or (posts_wp != []):
+    if posts_gdoc or posts_wp:
         num_posts = len(posts_gdoc) + len(posts_wp)
-        message_posts = []
-        if posts_gdoc != []:
-            _msg = ", ".join([f"<{p['url']}|{p['slug']}>" for p in posts_gdoc])
-            message_posts.append(_msg)
+        post_items = []
+        for p in posts_gdoc:
+            post_items.append(f"  • <{p['url']}|{p['slug']}>")
+        for p in posts_wp:
+            post_items.append(f"  • <{p['url']}|{p['slug']}> (wordpress)")
+        header = f"• *Posts ({num_posts}):*"
+        sections.append(header + "\n" + "\n".join(post_items))
 
-        if posts_wp != []:
-            _msg = ", ".join([f"<{p['url']}|{p['slug']}> (wordpress)" for p in posts_wp])
-            message_posts.append(_msg)
-
-        if num_posts == 1:
-            message.append("*→ 1 Post:* " + ", ".join(message_posts))
-        else:
-            message.append(f"*→ {num_posts} Posts:* " + ", ".join(message_posts))
-
-    # Build complete message
-    if message == []:
+    if not sections:
         return None
 
-    refs_message = "💬 *References*:\n" + "\n".join(message)
+    return "💬 *References*:\n" + "\n".join(sections)
 
-    return refs_message
+
+def _build_revisions_message(edits, include_time_range=False):
+    """
+    Slack-friendly summary:
+      YYYY-MM-DD  Username (X revisions)
+    If include_time_range=True, appends: [HH:MM–HH:MM] (or [HH:MM] if single).
+    """
+    rows = []
+    for e in edits:
+        dt = datetime.strptime(e["edited_at"], "%Y-%m-%d %H:%M:%S")
+        rows.append((dt.date().isoformat(), e["edited_by"], dt))
+
+    # group counts (and times)
+    grouped = defaultdict(list)  # (date, user) -> [dt...]
+    for d, user, dt in rows:
+        grouped[(d, user)].append(dt)
+
+    # sort keys by date then user
+    keys = sorted(grouped.keys(), key=lambda k: (k[0], k[1]))
+
+    lines = []
+    for d, user in keys:
+        dts = sorted(grouped[(d, user)])
+        n = len(dts)
+
+        line = f"{d}  {user} ({n} revision{'s' if n != 1 else ''})"
+
+        if include_time_range:
+            start = dts[0].strftime("%H:%M")
+            end = dts[-1].strftime("%H:%M")
+            line += f" [{start}]" if start == end else f" [{start}–{end}]"
+
+        lines.append(line)
+
+    revisions_block = "\n".join(lines)
+    text = f"🕒 *Chart revisions*\n```\n{revisions_block}\n```"
+
+    return text
+
+
+def _build_suggestion_message(suggestion):
+    """Build Slack-friendly suggestion message from AI summary."""
+    msg_suggestion = f"💡 *Suggestion* ({MODEL_DEFAULT_PRETTY}): {suggestion.action}\n"
+    for reason in suggestion.reasons:
+        msg_suggestion += f"• {reason}\n"
+    return msg_suggestion
