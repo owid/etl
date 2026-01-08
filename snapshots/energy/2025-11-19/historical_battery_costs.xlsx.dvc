@@ -8,9 +8,7 @@ meta:
     # Citation
     producer: Rupert Way
     citation_full: |-
-      Rupert Way (in preparation, 2026).
-      Compiled by Rupert Way, based on data from Ziegler and Trancik (Energy Environ. Sci., 2021, 14, 1635-1651), BloombergNEF, and Avicenne Energy.
-      The compiled dataset was shared with Our World in Data via private communication.
+      Rupert Way (in preparation, 2026). Compiled by Rupert Way, based on data from Ziegler and Trancik (Energy Environ. Sci., 2021, 14, 1635-1651), BloombergNEF, and Avicenne Energy. The compiled dataset was shared with Our World in Data via private communication.
 
     attribution: |-
       Rupert Way (2026) based on Ziegler and Trancik (2021), BloombergNEF, and Avicenne Energy
