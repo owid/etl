@@ -187,9 +187,9 @@ with st_horizontal():
     # Filter indicators
     selection = st.segmented_control(
         "Indicator status",
-        ["All", "Used in charts"],
+        ["All", "Used in charts", "Has popularity"],
         selection_mode="single",
-        default="All",
+        default="Has popularity",
         label_visibility="collapsed",
     )
 
@@ -220,6 +220,8 @@ if input_string:
                     filtered_inds = sorted_inds
                 case "Used in charts":
                     filtered_inds = [ind for ind in sorted_inds if ind.n_charts > 0]
+                case "Has popularity":
+                    filtered_inds = [ind for ind in sorted_inds if ind.popularity is not None]
                 case _:
                     filtered_inds = sorted_inds
 
