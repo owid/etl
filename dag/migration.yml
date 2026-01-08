@@ -94,3 +94,13 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/un/2025-07-03/refugee_data:
     - data://garden/un/2025-07-03/refugee_data
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/unicef/2026-01-07/child_migration:
+    - snapshot://unicef/2026-01-07/child_migration.csv
+  data://garden/unicef/2026-01-07/child_migration:
+    - data://meadow/unicef/2026-01-07/child_migration
+  data://grapher/unicef/2026-01-07/child_migration:
+    - data://garden/unicef/2026-01-07/child_migration
