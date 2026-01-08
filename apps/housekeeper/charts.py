@@ -33,8 +33,9 @@ from etl.slack_helpers import send_slack_message
 log = get_logger()
 
 # Default reviewers for daily chart reviews
-DAILY_CHART_REVIEWER_DEFAULT = "Fiona"
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "Fiona"
+# Users are identified by UserIDs. To get the ID for a user, check slackId column in MySQL table `users`.
+DAILY_CHART_REVIEWER_DEFAULT = "U01THNNPDCG"  # Lucas
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U01THNNPDCG"  # Lucas
 
 
 ####################################
@@ -60,6 +61,7 @@ def send_slack_chart_reviews(
     # Get user data (slack usernames)
     slack_users = get_usernames()
     # Uncomment below if you want to test the workflow without tagging people
+    slack_users = {k: "U011L616WE5" for k, v in slack_users.items()}
     # slack_users = {k: f"_{v}" for k, v in slack_users.items()}
 
     if include_published and not df_published.empty:
@@ -345,40 +347,40 @@ def get_usernames():
         database_id=5,
     )
 
-    if "slackUsername" not in df.columns:
+    if "slackId" not in df.columns:
         SLACK_NAMES = {
-            "Angela Wenham": "Angela",
-            "Antoinette Finnegan": "Antoinette",
-            "Bastian Herre": "Bastian",
-            "Bertha Rohenkohl": "Bertha",
-            "Bobbie Macdonald": "bobbie",
-            "Charlie Giattino": "charlie",
-            "Daniel Bachler": "daniel",
-            "Edouard Mathieu": "Ed",
-            "Esteban Ortiz-Ospina": "Este",
-            "Fiona Spooner": "Fiona",
-            "Hannah Ritchie": "hannah",
-            "Ike Saunders": "ike",
-            "Joe Hasell": "joe",
-            "Lucas Rodés-Guirao": "lucas",
-            "Marcel Gerber": "marcel",
-            "Martin Račák": "Martin",
-            "Marwa Boukarim": "Marwa",
-            "Matthieu Bergel": "matthieu",
-            "Max Roser": "max",
-            "Mojmir Vinkler": "Mojmir",
-            "Natalie Reynolds-Garcia": "Nat",
-            "Pablo Arriagada": "Pablo A",
-            "Pablo Rosado": "Pablo R",
-            "Sophia Mersmann": "sophia",
-            "Tuna Acisu": "Tuna",
-            "Valerie Muigai": "Valerie",
-            "Veronika Samborska": "Veronika",
+            "Angela Wenham": "U06U7HMGJSU",
+            "Antoinette Finnegan": "U0550KX9ZG9",
+            "Bastian Herre": "U01Q41A9PJS",
+            "Bertha Rohenkohl": "U07TQ8APT1T",
+            "Bobbie Macdonald": "U0117V5H16U",
+            "Charlie Giattino": "U01310BHF4J",
+            "Daniel Bachler": "U01TSHGPXRV",
+            "Edouard Mathieu": "U01129F6DQQ",
+            "Esteban Ortiz Ospina": "U3E8LTA3X",
+            "Fiona Spooner": "U01T5MG8DTM",
+            "Hannah Ritchie": "U4U46QBJ5",
+            "Ike Saunders": "U036Q593X54",
+            "Joe Hasell": "U3GSPFCV6",
+            "Lucas Rodés-Guirao": "U01THNNPDCG",
+            "Marcel Gerber": "U011L616WE5",
+            "Martin Račák": "U06S4C4KGJZ",
+            "Marwa Boukarim": "U03DTUH6T7S",
+            "Matthieu Bergel": "ULG7KK63Z",
+            "max": "U3E5PRWNN",
+            "Mojmir": "U02US02AWA1",
+            "Natalie Reynolds-Garcia": "U03QPP629GW",
+            "Pablo Arriagada": "U03DR3BKE5R",
+            "Pablo Rosado": "U02UVHS46AZ",
+            "Sophia Mersmann": "U04QE4CFUKC",
+            "Tuna Acisu": "U07437LD7JR",
+            "Valerie Rogers Muigai": "U027C4D5B7F",
+            "Veronika": "U053NDCFT7C",
         }
-        df["slackUsername"] = df["fullName"].map(SLACK_NAMES)
+        df["slackId"] = df["fullName"].map(SLACK_NAMES)
 
-    df = df[["fullName", "slackUsername"]].dropna()
-    dix = df.set_index("fullName")["slackUsername"].to_dict()
+    df = df[["fullName", "slackId"]].dropna()
+    dix = df.set_index("fullName")["slackId"].to_dict()
     return dix
 
 
