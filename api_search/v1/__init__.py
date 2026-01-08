@@ -54,20 +54,7 @@ async def search_indicators_semantic(
     raw_results = search_indicators(query, limit)
 
     # Convert results to API schema format
-    results = []
-    for result in raw_results:
-        results.append(
-            SemanticSearchResult(
-                title=result["title"],
-                indicator_id=result["indicator_id"],
-                snippet=result["snippet"],
-                score=result["score"],
-                metadata=result["metadata"],
-                catalog_path=result["catalog_path"],
-                n_charts=result["n_charts"],
-                description=result["description"],
-            )
-        )
+    results = [SemanticSearchResult(**result) for result in raw_results]
 
     return SemanticSearchResponse(results=results, query=query, total_results=len(results))
 
