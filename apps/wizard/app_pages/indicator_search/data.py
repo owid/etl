@@ -35,10 +35,7 @@ def _get_data_indicators_from_db() -> list[Indicator]:
         v.id as variableId,
         v.name,
         COALESCE(v.description, v.descriptionShort, '') as description,
-        CASE
-            WHEN v.catalogPath IS NULL THEN CONCAT('grapher/', COALESCE(d.namespace, 'NULL'), '/', COALESCE(d.version, 'NULL'), '/', 'NULL', '/NULL#', v.name)
-            ELSE v.catalogPath
-        END AS catalogPath,
+        COALESCE(v.catalogPath, CONCAT('indicator/', v.id)) AS catalogPath,
         COALESCE(cd_counts.n_charts, 0) as n_charts,
         ap.popularity
     FROM datasets d
