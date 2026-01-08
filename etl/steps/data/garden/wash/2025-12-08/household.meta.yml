@@ -1,4 +1,9 @@
-# NOTE: To learn more about the fields, hover over their names.
+# Important: The WASH indicators use specific terminology, especially around service levels and "access" vs "usage". This should be respected and consistently applied throughout the metadata.
+# From WASH-researchers: "A lot of governments track ‘access’ through infrastructure inventories, but the JMP relies more on population-based data on how many people use what type of infrastructure. We have been trying to not refer to “access” in JMP reports, and more generally in SDG reporting."
+
+
+
+
 definitions:
   common:
     presentation:
@@ -59,6 +64,10 @@ definitions:
     Menstrual materials are products used to absorb or collect menstrual blood, such as disposable or reusable pads, tampons, reusable cloths, menstrual cups, or absorbent underwear. They do not include materials such as toilet paper, paper towels, tissues, or rags that are not specifically designed for menstrual management.
   reusable_menstruation_materials_desc: &reusable_menstruation_materials_desc |
     Reusable menstrual materials are products that can be washed and reused multiple times. Examples are reusable cloth pads, menstrual cups, or absorbent underwear.
+  data_sources: &data_sources |
+    This data is provided by the WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP). They compile data from nationally representative household surveys and censuses, administrative data and service provider data. To learn more, see the [JMP Methodology](https://washdata.org/topics/methods/data-sources).
+  usage_vs_access: &usage_vs_access |
+    This data reflects actual service use, which is directly linked to health outcomes and can be consistently measured across countries using household surveys. It is possible to theoretically have access to some kind of water and sanitation infrastructure, but not use them for daily needs. Therefore we refer to "use" or "using" rather than "access" to better reflect the underlying data.
 
 
 
@@ -72,83 +81,99 @@ tables:
   household:
     variables:
       wat_bas:
-        title: Share of {definitions.residence} population with only basic access to drinking water
-        description_short: Proportion of people who can not access safe drinking water on their premises, but have access to an [improved drinking water source](#dod:improved-water-source), where collection takes no more than 30 minutes for a roundtrip.
+        title: Share of {definitions.residence} population using a basic drinking water source
+        description_short: Proportion of people who use an [improved drinking water source](#dod:improved-water-source), where collection takes no more than 30 minutes for a roundtrip.
         description_from_producer: Use of improved drinking water sources no more than 30 mins roundtrip, but not safely managed.
         description_key:
           - *drinking_water_rationale
           - *water_not_on_premises_desc
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_basal:
-        title: Share of {definitions.residence} population with at least basic access to drinking water
-        description_short: Proportion of people who can access safe drinking water on their premises, or have access to an [improved drinking water source](#dod:improved-water-source) where collection takes no more than 30 minutes for a roundtrip.
+        title: Share of {definitions.residence} population using at least a basic drinking water source
+        description_short: Proportion of people who use an [improved drinking water source](#dod:improved-water-source), which is either located on their premises, or at a collection point, which takes no more than 30 minutes for a roundtrip.
         description_from_producer: Use of improved drinking water sources no more than 30 mins roundtrip, inclusive of safely managed.
         description_key:
           - *drinking_water_rationale
           - *water_on_premises_desc
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_imp:
-        title: Share of {definitions.residence} population with access to improved drinking water
-        description_short: Proportion of people who can access safe drinking water, regardless of collection time.
+        title: Share of {definitions.residence} population using an improved drinking water source
+        description_short: Proportion of people who use an [improved drinking water source](#dod:improved-water-source), regardless of collection time. An improved drinking water source is a safely designed drinking water source and includes e.g. piped water, boreholes or tubewells and packaged or delivered water.
         description_from_producer: Use of improved drinking water sources.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_imp_av:
-        title: Share of {definitions.residence} population with access to improved drinking water available when needed
-        description_short: Proportion of people with access to an [improved drinking water source](#dod:improved-water-source) that is available when needed.
+        title: Share of {definitions.residence} population using an improved drinking water source that is available when needed
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is available when needed.
         description_from_producer: Use of improved drinking water sources available when needed.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_imp_npip:
-        title: Share of {definitions.residence} population with access to non-piped improved drinking water
-        description_short: Proportion of people with access to non-piped improved drinking water sources. These include e.g. boreholes or tubewells, protected dug wells and springs and packaged or delivered water.
+        title: Share of {definitions.residence} population using non-piped improved drinking water
+        description_short: Proportion of people using non-piped improved drinking water sources. These include e.g. boreholes or tubewells, protected dug wells and springs and packaged or delivered water.
         description_from_producer: Use of non-piped improved drinking water sources.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *non_piped_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_imp_prem:
-        title: Share of {definitions.residence} population with access to improved drinking water on premises
-        description_short: Proportion of people with access to an [improved drinking water source](#dod:improved-water-source) located on premises.
+        title: Share of {definitions.residence} population using an improved drinking water source on premises
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) located on premises.
         description_from_producer: Use of improved drinking water sources located on premises.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *water_on_premises_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_imp_qual:
-        title: Share of {definitions.residence} population with access to improved drinking water free of faecal and priority chemical contamination
-        description_short: Proportion of people with access to an [improved drinking water source](#dod:improved-water-source) that is free from faecal and priority chemical contamination.
+        title: Share of {definitions.residence} population using an improved drinking water source free of faecal and priority chemical contamination
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is free from faecal and priority chemical contamination.
         description_from_producer: Use of improved drinking water sources free of faecal and priority chemical contamination.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_lim:
-        title: Share of {definitions.residence} population with only limited access to drinking water
-        description_short: Proportion of people with access to an [improved drinking water source](#dod:improved-water-source) for which collection time exceeds 30 minutes for a roundtrip.
+        title: Share of {definitions.residence} population using a limited drinking water source
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) for which collection time exceeds 30 minutes for a roundtrip.
         description_from_producer: Use of improved drinking water sources with a collection time of more than 30 minutes roundtrip
         description_key:
           - *drinking_water_rationale
           - *water_not_on_premises_desc
           - *limited_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_ns:
@@ -159,88 +184,106 @@ tables:
           - *drinking_water_rationale
           - *surface_water_desc
           - This is the lowest level of drinking water service and indicates a lack of access to safe drinking water.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_pip:
-        title: Share of {definitions.residence} population with access to piped drinking water
-        description_short: Proportion of people with access to piped drinking water, such as tap water on their own or their neighbour's premises, or a public tap.
+        title: Share of {definitions.residence} population using piped drinking water
+        description_short: Proportion of people using piped drinking water, such as tap water on their own or their neighbour's premises, or a public tap.
         description_from_producer: Use of piped drinking water sources.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *piped_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_sm:
-        title: Share of {definitions.residence} population with access to safely managed drinking water
-        description_short: Proportion of people with access to an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
+        title: Share of {definitions.residence} population using safely managed drinking water
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
         description_from_producer: Use of safely managed drinking water services.
         description_key:
           - *drinking_water_rationale
           - *water_on_premises_desc
           - *safely_managed_water_desc
-          - This is the highest level of drinking water service and indicates access to safe drinking water.
+          - This is the highest level of drinking water service and indicates reliable access to safe drinking water.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_unimp:
-        title: Share of {definitions.residence} population with access to unimproved drinking water
-        description_short: Proportion of people with access to an unimproved drinking water source.
+        title: Share of {definitions.residence} population using unimproved drinking water
+        description_short: Proportion of people using an unimproved drinking water source.
         description_from_producer: Use of unimproved drinking water sources.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_bas:
-        title: Share of {definitions.residence} population with only basic sanitation access
-        description_short: Proportion of people with access to [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, that are not shared with other households. These do not meet the criteria for safely managed sanitation.
+        title: Share of {definitions.residence} population using only basic sanitation facilities
+        description_short: Proportion of people using [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, that are not shared with other households. These do not meet the criteria for safely managed sanitation.
         description_from_producer: Use of improved sanitation facilities not shared with other households, but not safely managed.
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
           - *basic_sanitation_desc
           - *safely_managed_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_basal:
-        title: Share of {definitions.residence} population with at least basic sanitation
-        description_short: Proportion of people with access to [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, that are not shared with other households.
+        title: Share of {definitions.residence} population using at least basic sanitation
+        description_short: Proportion of people using [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, that are not shared with other households.
         description_from_producer: Use of improved sanitation facilities not shared with other households, inclusive of safely managed.
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
           - *basic_sanitation_desc
           - *safely_managed_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_fst_sm:
-        title: Share of {definitions.residence} population with safely managed sanitation with offsite treatment
-        description_short: Proportion of people with access to onsite sanitation facilities where human waste is treated offsite.
+        title: Share of {definitions.residence} population using safely managed sanitation with offsite treatment
+        description_short: Proportion of people using onsite sanitation facilities where human waste is treated offsite.
         description_from_producer: Use of onsite sanitation facilities with human waste treated offsite.
         description_key:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_imp:
-        title: Share of {definitions.residence} population with access to improved sanitation facilities
-        description_short: Proportion of people with access to [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, regardless of whether they are shared with other households.
+        title: Share of {definitions.residence} population using improved sanitation facilities
+        description_short: Proportion of people using [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, regardless of whether they are shared with other households.
         description_from_producer: Use of improved sanitation facilities.
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_lim:
-        title: Share of {definitions.residence} population with limited access to sanitation facilities
-        description_short: Proportion of people with access to [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, that are shared with other households.
+        title: Share of {definitions.residence} population using limited sanitation facilities
+        description_short: Proportion of people using [improved sanitation facilities](#dod:improved-sanitation), such as toilets or latrines, that are shared with other households.
         description_from_producer: Use of improved sanitation facilities shared with other households.
         description_key:
           - *sanitation_rationale
           - *limited_sanitation_desc
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_ns:
@@ -250,65 +293,79 @@ tables:
         description_key:
           - *sanitation_rationale
           - *open_defecation_desc
-          - This is the lowest level of access to sanitation facilities and indicates a lack of sanitation infrastructure.
+          - This is the lowest level of services and indicates a lack of safe sanitation infrastructure.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_othimp:
-        title: Share of {definitions.residence} population with access to other improved sanitation facilities
-        description_short: Proportion of people with access to other [improved sanitation facilities](#dod:improved-sanitation), that are not shared with other households.
+        title: Share of {definitions.residence} population using other improved sanitation facilities
+        description_short: Proportion of people using other [improved sanitation facilities](#dod:improved-sanitation), that are not shared with other households.
         description_from_producer: Improved latrines and other sanitation facilities not shared with other households.
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_sdo_sm:
-        title: Share of {definitions.residence} population with safely managed sanitation with onsite disposal
-        description_short: Proportion of people with access to onsite sanitation facilities where human waste is disposed in-situ. This includes safely managed pit latrines as well as composting toilets or toilets connected to septic tanks.
+        title: Share of {definitions.residence} population using safely managed sanitation with onsite disposal
+        description_short: Proportion of people using onsite sanitation facilities where human waste is disposed in-situ. This includes safely managed pit latrines as well as composting toilets or toilets connected to septic tanks.
         description_from_producer: Use of onsite sanitation facilities with human waste disposed in-situ.
         description_key:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_sep:
-        title: Share of {definitions.residence} population with access to septic tank sanitation
-        description_short: Proportion of people with access to sanitation facilities connected to septic tanks that are not shared with other households.
+        title: Share of {definitions.residence} population using septic tank sanitation
+        description_short: Proportion of people using sanitation facilities connected to septic tanks that are not shared with other households.
         description_from_producer: Use of sanitation facilities connected to septic tanks not shared with other households.
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_sew:
-        title: Share of {definitions.residence} population with access to sewer sanitation
-        description_short: Proportion of people with access to sanitation facilities connected to sewer networks where sewage is treated to at least secondary levels.
+        title: Share of {definitions.residence} population using sewer sanitation
+        description_short: Proportion of people using sanitation facilities connected to sewer networks where sewage is treated to at least secondary levels.
         description_from_producer: Use of sanitation facilities connected to sewer networks and with sewage treated to at least secondary levels.
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
           - Sewage treatment to at least secondary levels includes biological treatment processes that clear organic matter and pathogens in wastewater. This is the minimum level of treatment required to protect human health and the environment.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_sm:
-        title: Share of {definitions.residence} population with access to safely managed sanitation
-        description_short: Proportion of people with access to [improved sanitation facilities](#dod:improved-sanitation) that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
+        title: Share of {definitions.residence} population using safely managed sanitation
+        description_short: Proportion of people using [improved sanitation facilities](#dod:improved-sanitation) that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
         description_from_producer: Use of safely managed sanitation services.
         description_key:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
-          - This is the highest level of sanitation service and indicates access to safe sanitation facilities.
+          - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_unimp:
         title: Share of {definitions.residence} population using unimproved sanitation facilities
-        description_short: Proportion of people who only have access to unimproved sanitation facilities. These include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+        description_short: Proportion of people using unimproved sanitation facilities. These include pit latrines without a slab or platform, hanging latrines or bucket latrines.
         description_from_producer: Use of unimproved sanitation facilities.
         description_key:
           - *sanitation_rationale
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       hyg_bas:
@@ -422,8 +479,8 @@ tables:
         short_unit: "%"
       wat_bas_pop:
         title: |-
-          {definitions.residence_pop} population with only basic access to drinking water
-        description_short: Number of people who do not have an improved water source at home, but have  access to a source and collection takes no more than 30 minutes for a roundtrip.
+          {definitions.residence_pop} population using only a basic drinking water source
+        description_short: Number of people who do not have an improved water source at home, but use an [improved drinking water source](#dod:improved-water-source) where collection takes no more than 30 minutes for a roundtrip.
         description_from_producer: Use of improved drinking water sources no more than 30 mins roundtrip, but not safely managed
         unit: people
         description_key:
@@ -431,10 +488,12 @@ tables:
           - *water_not_on_premises_desc
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_basal_pop:
         title: |-
-          {definitions.residence_pop} population with at least basic access to drinking water
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source), which is either available on premises, or collection time is no more than 30 minutes for a roundtrip.
+          {definitions.residence_pop} population using at least a basic drinking water source
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source), which is either available on premises, or collection time is no more than 30 minutes for a roundtrip.
         description_from_producer: Use of improved drinking water sources no more than 30 mins roundtrip, inclusive of safely managed
         unit: people
         display:
@@ -445,10 +504,12 @@ tables:
           - *basic_drinking_water_desc
           - *improved_drinking_water_desc
           - *safely_managed_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_imp_pop:
         title: |-
-          {definitions.residence_pop} population with access to improved drinking water
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source), regardless of collection time.
+          {definitions.residence_pop} population using improved drinking water
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source), regardless of collection time.
         description_from_producer: Use of improved drinking water sources
         unit: people
         display:
@@ -457,10 +518,12 @@ tables:
           - *drinking_water_rationale
           - *water_not_on_premises_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_imp_av_pop:
         title: |-
-          {definitions.residence_pop} population with access to improved drinking water available when needed
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source) that is available when needed.
+          {definitions.residence_pop} population using improved drinking water available when needed
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is available when needed.
         description_from_producer: Use of improved drinking water sources available when needed
         unit: people
         display:
@@ -468,10 +531,12 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_imp_npip_pop:
         title: |-
-          {definitions.residence_pop} population with access to non-piped improved drinking water
-        description_short: Number of people with access to non-piped improved drinking water sources. These include e.g. boreholes or tubewells, protected dug wells and springs and packaged or delivered water.
+          {definitions.residence_pop} population using non-piped improved drinking water
+        description_short: Number of people using non-piped improved drinking water sources. These include e.g. boreholes or tubewells, protected dug wells and springs and packaged or delivered water.
         description_from_producer: Use of non-piped improved drinking water sources
         unit: people
         display:
@@ -480,10 +545,12 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *non_piped_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_imp_prem_pop:
         title: |-
-          {definitions.residence_pop} population with access to improved drinking water on premises
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source) located on premises.
+          {definitions.residence_pop} population using improved drinking water on premises
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) located on premises.
         description_from_producer: Use of improved drinking water sources located on premises
         unit: people
         display:
@@ -491,10 +558,12 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_imp_qual_pop:
         title: |-
-          {definitions.residence_pop} population with access to improved drinking water free of faecal and priority chemical contamination
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source) that is free from faecal and priority chemical contamination.
+          {definitions.residence_pop} population using improved drinking water free of faecal and priority chemical contamination
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is free from faecal and priority chemical contamination.
         description_from_producer: Use of improved drinking water sources free of faecal and priority chemical contamination
         unit: people
         display:
@@ -502,10 +571,12 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_lim_pop:
         title: |-
-          {definitions.residence_pop} population with only limited access to drinking water
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source) for which collection time exceeds 30 minutes for a roundtrip.
+          {definitions.residence_pop} population using only a limited drinking water source
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) for which collection time exceeds 30 minutes for a roundtrip.
         description_from_producer: Use of improved drinking water sources with a collection time of more than 30 minutes roundtrip
         unit: people
         display:
@@ -515,6 +586,8 @@ tables:
           - *water_not_on_premises_desc
           - *limited_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_ns_pop:
         title: |-
           {definitions.residence_pop} population using surface water for drinking
@@ -527,10 +600,12 @@ tables:
           - *drinking_water_rationale
           - *surface_water_desc
           - This is the lowest level of drinking water service and indicates a lack of access to safe drinking water.
+          - *data_sources
+          - *usage_vs_access
       wat_pip_pop:
         title: |-
-          {definitions.residence_pop} population with access to piped drinking water
-        description_short: Number of people with access to piped drinking water, such as tap water on their own or their neighbour's premises, or a public tap.
+          {definitions.residence_pop} population using piped drinking water
+        description_short: Number of people using piped drinking water, such as tap water on their own or their neighbour's premises, or a public tap.
         description_from_producer: Use of piped drinking water sources
         unit: people
         display:
@@ -539,10 +614,12 @@ tables:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
           - *piped_water_desc
+          - *data_sources
+          - *usage_vs_access
       wat_sm_pop:
         title: |-
-          {definitions.residence_pop} population with access to safely managed drinking water
-        description_short: Number of people with access to an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
+          {definitions.residence_pop} population using safely managed drinking water
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
         description_from_producer: Use of safely managed drinking water services
         unit: people
         display:
@@ -550,11 +627,13 @@ tables:
         description_key:
           - *drinking_water_rationale
           - *safely_managed_water_desc
-          - This is the highest level of drinking water service and indicates access to safe drinking water.
+          - This is the highest level of drinking water service and indicates reliable access to safe drinking water.
+          - *data_sources
+          - *usage_vs_access
       wat_unimp_pop:
         title: |-
           {definitions.residence_pop} population using unimproved drinking water sources
-        description_short: Number of people who only have access to an unimproved drinking water source.
+        description_short: Number of people using only unimproved drinking water sources.
         description_from_producer: Use of unimproved drinking water sources
         unit: people
         display:
@@ -563,10 +642,12 @@ tables:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
       san_bas_pop:
         title: |-
-          {definitions.residence_pop} population with only basic access to sanitation
-        description_short: Number of people with access to [improved sanitation facilities](#dod:improved-sanitation) that are not shared with other households, but where the facilities do not meet the criteria for safely managed sanitation.
+          {definitions.residence_pop} population using only basic sanitation facilities
+        description_short: Number of people using [improved sanitation facilities](#dod:improved-sanitation) that are not shared with other households, but where the facilities do not meet the criteria for safely managed sanitation.
         description_from_producer: Use of improved sanitation facilities not shared with other households, but not safely managed
         unit: people
         display:
@@ -576,10 +657,12 @@ tables:
           - *basic_sanitation_desc
           - *improved_sanitation_desc
           - *safely_managed_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
       san_basal_pop:
         title: |-
           {definitions.residence_pop} population with at least basic sanitation
-        description_short: Number of people with access to [improved sanitation facilities](#dod:improved-sanitation) that are not shared with other households.
+        description_short: Number of people using [improved sanitation facilities](#dod:improved-sanitation) that are not shared with other households.
         description_from_producer: Use of improved sanitation facilities not shared with other households, inclusive of safely managed
         unit: people
         display:
@@ -589,11 +672,12 @@ tables:
           - *basic_sanitation_desc
           - *improved_sanitation_desc
           - *safely_managed_sanitation_desc
-          - This is the highest level of sanitation service and indicates access to safe sanitation facilities.
+          - *data_sources
+          - *usage_vs_access
       san_fst_sm_pop:
         title: |-
           {definitions.residence_pop} population with safely managed sanitation with offsite treatment
-        description_short: Number of people with access to onsite sanitation facilities where human waste is treated offsite. This includes septic tanks and pit latrines that are emptied and treated offsite, as well as toilets connected to sewer networks.
+        description_short: Number of people using onsite sanitation facilities where human waste is treated offsite. This includes septic tanks and pit latrines that are emptied and treated offsite, as well as toilets connected to sewer networks.
         description_from_producer: Use of onsite sanitation facilities with human waste treated offsite
         unit: people
         display:
@@ -602,10 +686,12 @@ tables:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
+          - *data_sources
+          - *usage_vs_access
       san_imp_pop:
         title: |-
-          {definitions.residence_pop} population with access to improved sanitation facilities
-        description_short: Number of people with access to [improved sanitation facilities](#dod:improved-sanitation), regardless of whether they are shared with other households.
+          {definitions.residence_pop} population using improved sanitation facilities
+        description_short: Number of people using [improved sanitation facilities](#dod:improved-sanitation), regardless of whether they are shared with other households.
         description_from_producer: Use of improved sanitation facilities
         unit: people
         display:
@@ -613,10 +699,12 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
       san_lim_pop:
         title: |-
-          {definitions.residence_pop} population with limited access to sanitation facilities
-        description_short: Number of people with access to [improved sanitation facilities](#dod:improved-sanitation) that are shared with other households.
+          {definitions.residence_pop} population using limited sanitation facilities
+        description_short: Number of people using [improved sanitation facilities](#dod:improved-sanitation) that are shared with other households.
         description_from_producer: Use of improved sanitation facilities shared with other households
         unit: people
         display:
@@ -625,6 +713,8 @@ tables:
           - *sanitation_rationale
           - *limited_sanitation_desc
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
       san_ns_pop:
         title: |-
           {definitions.residence_pop} population practicing open defecation
@@ -636,11 +726,13 @@ tables:
         description_key:
           - *sanitation_rationale
           - *open_defecation_desc
-          - This is the lowest level of access to sanitation facilities and indicates a lack of sanitation infrastructure.
+          - This is the lowest level of sanitation services and indicates a lack of accessible and safe sanitation infrastructure.
+          - *data_sources
+          - *usage_vs_access
       san_othimp_pop:
         title: |-
-          {definitions.residence_pop} population with access to other improved sanitation facilities
-        description_short: Number of people with access to other [improved sanitation facilities](#dod:improved-sanitation), that are not shared with other households.
+          {definitions.residence_pop} population using other improved sanitation facilities
+        description_short: Number of people using other [improved sanitation facilities](#dod:improved-sanitation), that are not shared with other households.
         description_from_producer: Improved latrines and other sanitation facilities not shared with other households
         unit: people
         display:
@@ -648,10 +740,12 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
       san_sdo_sm_pop:
         title: |-
-          {definitions.residence_pop} population with safely managed sanitation with onsite disposal
-        description_short: Number of people with access to onsite sanitation facilities where human waste is disposed in-situ. This includes safely managed pit latrines as well as composting toilets or toilets connected to septic tanks.
+          {definitions.residence_pop} population using safely managed sanitation with onsite disposal
+        description_short: Number of people using onsite sanitation facilities where human waste is disposed in-situ. This includes safely managed pit latrines as well as composting toilets or toilets connected to septic tanks.
         description_from_producer: Use of onsite sanitation facilities with human waste disposed in-situ
         unit: people
         display:
@@ -659,10 +753,12 @@ tables:
         description_key:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
       san_sep_pop:
         title: |-
-          {definitions.residence_pop} population with access to septic tank sanitation
-        description_short: Number of people with access to sanitation facilities connected to septic tanks that are not shared with other households.
+          {definitions.residence_pop} population using septic tank sanitation
+        description_short: Number of people using sanitation facilities connected to septic tanks that are not shared with other households.
         description_from_producer: Use of sanitation facilities connected to septic tanks not shared with other households.
         unit: people
         display:
@@ -670,10 +766,12 @@ tables:
         description_key:
           - *sanitation_rationale
           - *improved_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
       san_sew_pop:
         title: |-
-          {definitions.residence_pop} population with access to sewer sanitation
-        description_short: Number of people with access to sanitation facilities connected to sewer networks where sewage is treated to at least secondary levels.
+          {definitions.residence_pop} population using sewer sanitation
+        description_short: Number of people using sanitation facilities connected to sewer networks where sewage is treated to at least secondary levels.
         description_from_producer: Use of sanitation facilities connected to sewer networks and with sewage treated to at least secondary levels.
         unit: people
         display:
@@ -682,6 +780,8 @@ tables:
           - *sanitation_rationale
           - *improved_sanitation_desc
           - Sewage treatment to at least secondary levels includes biological treatment processes that clear organic matter and pathogens in wastewater. This is the minimum level of treatment required to protect human health and the environment.
+          - *data_sources
+          - *usage_vs_access
       san_sm_pop:
         title: |-
           {definitions.residence_pop} population with safely managed sanitation
@@ -693,11 +793,13 @@ tables:
         description_key:
           - *sanitation_rationale
           - *safely_managed_sanitation_desc
-          - This is the highest level of sanitation service and indicates access to safe sanitation facilities.
+          - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
+          - *data_sources
+          - *usage_vs_access
       san_unimp_pop:
         title: |-
-          {definitions.residence_pop} population with access to unimproved sanitation
-        description_short: Number of people who only have access to unimproved sanitation facilities. These include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+          {definitions.residence_pop} population using unimproved sanitation
+        description_short: Number of people using unimproved sanitation facilities. These include pit latrines without a slab or platform, hanging latrines or bucket latrines.
         description_from_producer: Use of unimproved sanitation facilities
         unit: people
         display:
@@ -706,6 +808,8 @@ tables:
           - *sanitation_rationale
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
       hyg_bas_pop:
         title: |-
           {definitions.residence_pop} population with basic handwashing facilities
@@ -848,109 +952,129 @@ tables:
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
       wat_basal_without:
-        title: Share of {definitions.residence} population without basic access to drinking water
-        description_short: Proportion of people without basic access to drinking water. This includes people using unimproved drinking water sources and those spending more than 30 minutes collecting water from an improved source.
+        title: Share of {definitions.residence} population not using at least basic drinking water sources
+        description_short: Proportion of people using unimproved drinking water sources and those spending more than 30 minutes collecting water from an improved source.
         description_key:
           - *drinking_water_rationale
           - *water_not_on_premises_desc
           - *unimp_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_basal_pop_without:
         title: |-
-          {definitions.residence_pop} population without basic access to drinking water
+          {definitions.residence_pop} population not using at least basic drinking water sources
         description_short: Number of people using unimproved drinking water sources or spending more than 30 minutes collecting water from an improved source.
         description_key:
           - *drinking_water_rationale
           - *water_not_on_premises_desc
           - *unimp_drinking_water_desc
           - *improved_drinking_water_desc
+          - *data_sources
+          - *usage_vs_access
         unit: people
         display:
           numDecimalPlaces: 0
       wat_imp_without:
-        title: Share of {definitions.residence} population without access to improved drinking water
-        description_short: Proportion of people without access to improved drinking water sources. These people might use surface water sources or unprotected springs or wells.
+        title: Share of {definitions.residence} population not using improved drinking water sources
+        description_short: Proportion of people not using improved drinking water sources. These people might use surface water sources or unprotected springs or wells, as no safe and reliable improved drinking water source is available to them.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_imp_pop_without:
         title: |-
-          {definitions.residence_pop} population without access to improved drinking water
-        description_short: Number of people without access to improved drinking water sources. These people might use surface water sources or unprotected springs or wells
+          {definitions.residence_pop} population not using improved drinking water sources
+        description_short: Number of people not using improved drinking water sources. These people might use surface water sources or unprotected springs or wells, as no safe and reliable improved drinking water source is available to them.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
         unit: people
         display:
           numDecimalPlaces: 0
       wat_sm_without:
-        title: Share of {definitions.residence} population without access to safely managed drinking water
-        description_short: People without access to safely managed drinking water either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contamination.
+        title: Share of {definitions.residence} population not using safely managed drinking water sources
+        description_short: People not using safely managed drinking water sources either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contamination.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - *water_not_on_premises_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       wat_sm_pop_without:
         title: |-
-          {definitions.residence_pop} population without access to safely managed drinking water
-        description_short: People without access to safely managed drinking water either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contamination.
+          {definitions.residence_pop} population not using safely managed drinking water sources
+        description_short: People not using safely managed drinking water sources either use unimproved drinking water sources or the improved sources they use are not located on their premises, not available when needed, or not free of contamination.
         description_key:
           - *drinking_water_rationale
           - *unimp_drinking_water_desc
           - *water_not_on_premises_desc
+          - *data_sources
+          - *usage_vs_access
         unit: people
         display:
           numDecimalPlaces: 0
       san_imp_without:
-        title: Share of {definitions.residence} population without access to improved sanitation facilities
-        description_short: People without access to [improved sanitation facilities](#dod:improved-sanitation) might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
+        title: Share of {definitions.residence} population not using improved sanitation facilities
+        description_short: People not using [improved sanitation facilities](#dod:improved-sanitation) might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
         description_key:
           - *sanitation_rationale
           - *open_defecation_desc
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_imp_pop_without:
         title: |-
-          {definitions.residence_pop} population without access to improved sanitation facilities
-        description_short: People without access to [improved sanitation facilities](#dod:improved-sanitation) might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
+          {definitions.residence_pop} population not using improved sanitation facilities
+        description_short: People not using [improved sanitation facilities](#dod:improved-sanitation) might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
         description_key:
           - *sanitation_rationale
           - *open_defecation_desc
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
+          - *data_sources
+          - *usage_vs_access
         unit: people
         display:
           numDecimalPlaces: 0
       san_sm_without:
-        title: Share of {definitions.residence} population without access to safely managed sanitation
+        title: Share of {definitions.residence} population not using safely managed sanitation
         description_short: |-
-          People without access to [safely managed sanitation](#dod:sanitation-safely-managed) services might practice [open defecation](#dod:sanitation-open-defecation), use [unimproved sanitation facilities](#dod:sanitation-unimproved), or use improved facilities that do not safely manage human waste.
+          People not using [safely managed sanitation](#dod:sanitation-safely-managed) services might practice [open defecation](#dod:sanitation-open-defecation), use [unimproved sanitation facilities](#dod:sanitation-unimproved), or use improved facilities that do not safely manage human waste.
         description_key:
           - *sanitation_rationale
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
           - *safely_managed_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_sm_pop_without:
         title: |-
-          {definitions.residence_pop} population without access to safely managed sanitation
-        description_short: People without access to [safely managed sanitation](#dod:sanitation-safely-managed) services might practice [open defecation](#dod:sanitation-open-defecation), use [unimproved sanitation facilities](#dod:sanitation-unimproved), or use improved facilities that do not safely manage human waste.
+          {definitions.residence_pop} population not using safely managed sanitation
+        description_short: People not using [safely managed sanitation](#dod:sanitation-safely-managed) services might practice [open defecation](#dod:sanitation-open-defecation), use [unimproved sanitation facilities](#dod:sanitation-unimproved), or use improved facilities that do not safely manage human waste.
         description_key:
           - *sanitation_rationale
           - *unimproved_sanitation_desc
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
           - *safely_managed_sanitation_desc
+          - *data_sources
+          - *usage_vs_access
         unit: people
         display:
           numDecimalPlaces: 0
@@ -976,7 +1100,7 @@ tables:
         description_from_producer: No handwashing facility on premises
         description_key:
           - A hygiene facility is a place where people can wash their hands, shower or bathe.
-          - No access to a hygiene facility means there is not even a place to wash ones hands at home. This is a risk factor for the spread of diseases.
+          - No access to a hygiene facility means there is not even a place to wash ones hands at home. This increases the risk of spreading diseases.
         unit: percent
         short_unit: "%"
       hyg_ns_pop:
@@ -989,15 +1113,16 @@ tables:
           numDecimalPlaces: 0
         description_key:
           - A hygiene facility is a place where people can wash their hands, shower or bathe.
-          - No access to a hygiene facility means there is not even a place to wash ones hands at home. This is a risk factor for the spread of diseases.
+          - No access to a hygiene facility means there is not even a place to wash ones hands at home. This increases the risk of spreading diseases.
       san_sew_sm:
         title: Share of {definitions.residence} population using sanitation facilities connected to sewer networks and with sewage treated to at least secondary levels
-        description_short: Proportion of people with access to sanitation facilities connected to sewer networks where sewage is treated to at least secondary levels.
         description_from_producer: Use of sanitation facilities connected to sewer networks and with sewage treated to at least secondary levels
         description_key:
           - *sanitation_rationale
           - This indicator includes toilets connected to sewer networks where sewage is treated biologically or chemically to remove contaminants (solid waste, pathogens, and harmful chemicals) to at least secondary levels.
           - This is the minimum level considered effective for protecting public health and the environment
+          - *data_sources
+          - *usage_vs_access
         unit: percent
         short_unit: "%"
       san_sew_sm_pop:
@@ -1009,6 +1134,8 @@ tables:
           - *sanitation_rationale
           - This indicator includes toilets connected to sewer networks where sewage is treated biologically or chemically to remove contaminants (solid waste, pathogens, and harmful chemicals) to at least secondary levels.
           - This is the minimum level considered effective for protecting public health and the environment
+          - *data_sources
+          - *usage_vs_access
         unit: people
         display:
           numDecimalPlaces: 0
