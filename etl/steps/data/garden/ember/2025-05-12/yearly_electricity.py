@@ -4,7 +4,7 @@ from typing import Dict
 
 import owid.catalog.processing as pr
 from owid.catalog import Table, utils
-from owid.datautils.dataframes import combine_two_overlapping_dataframes, map_series
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -329,7 +329,6 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         "electricity_generation": "Generation - ",
         "electricity_imports": "",
         "lifecycle_emissions": "Emissions (lifecycle) - ",
-        "direct_emissions": "Emissions (direct combustion) - ",
     }
     error = "Tables in yearly electricity dataset have changed"
     assert set(category_renaming) == set(tables), error
@@ -488,162 +487,6 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
         ].empty, error
 
 
-def estimate_emissions_and_carbon_intensity_of_direct_combustion(
-    tb: Table, tb_electricity_factors: Table, tb_energy_factors: Table
-) -> Table:
-    # Create a harmonized table of electricity emission factors.
-    # NOTE: Biomass has no factor; we simply assign zero
-    tb_factors = (
-        tb_electricity_factors[["source", "median_direct_combustion_emission_factor"]]
-        .fillna(0)
-        .rename(columns={"median_direct_combustion_emission_factor": "emission_factor"}, errors="raise")
-    )
-    # Add oil from the "Residual Fuel Oil" energy factor.
-    tb_factors = pr.concat(
-        [tb_factors, tb_energy_factors[tb_energy_factors["source"] == "Residual Fuel Oil"]], ignore_index=True
-    )
-    # Map ember sources to each of the emission factor sources.
-    technology_to_emission_factor = {
-        "Bioenergy": "Biomass-dedicated",
-        "Coal": "Coal",
-        "Gas": "Gas",
-        "Hard coal": "Coal",
-        "Hydro": "Hydropower",
-        "Lignite": "Coal",
-        "Nuclear": "Nuclear",
-        "Offshore wind": "Wind offshore",
-        "Onshore wind": "Wind onshore",
-        "Other fossil": "Residual Fuel Oil",
-        "Other renewables": "Geothermal",
-        "Solar": "Solar PV—utility",
-        "Wind": "Wind onshore",
-    }
-    error = "Incorrect mapping of emission factor source names."
-    assert set(technology_to_emission_factor.values()) <= set(tb_factors["source"]), error
-
-    # Aggregate sources and their individual components.
-    # NOTE: Ensure that the components are not aggregates, to ensure they will always be found.
-    aggregate_sources = {
-        "Gas and other fossil": ["Gas", "Other fossil"],
-        "Fossil": ["Coal", "Gas", "Other fossil"],
-        "Wind and solar": ["Wind", "Solar"],
-        "Hydro, bioenergy and other renewables": ["Hydro", "Bioenergy", "Other renewables"],
-        "Renewables": ["Hydro", "Bioenergy", "Other renewables", "Wind", "Solar"],
-        "Clean": ["Hydro", "Bioenergy", "Other renewables", "Wind", "Solar", "Nuclear"],
-        "Total generation": [
-            "Hydro",
-            "Bioenergy",
-            "Other renewables",
-            "Wind",
-            "Solar",
-            "Nuclear",
-            "Coal",
-            "Gas",
-            "Other fossil",
-        ],
-    }
-
-    # Check that the list of individual and aggregate sources are as expected.
-    error = "List of individual or aggregate sources may have changed."
-    assert set(tb[(tb["category"] == "Electricity generation") & (tb["unit"] == "TWh")]["variable"]) == (
-        set(technology_to_emission_factor) | set(aggregate_sources)
-    ), error
-
-    # Create a temporary table of electricity generation and emissions.
-    tb_generation = tb[
-        (tb["category"] == "Electricity generation")
-        & (tb["unit"] == "TWh")
-        & (tb["variable"].isin(list(technology_to_emission_factor)))
-    ].reset_index(drop=True)
-    assert set(tb_generation["subcategory"]) == {"Fuel"}
-
-    # Add a column with emission factors.
-    tb_generation["source"] = map_series(
-        tb_generation["variable"],
-        mapping=technology_to_emission_factor,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
-    )
-    tb_generation = tb_generation.merge(tb_factors, how="left", on=["source"]).drop(columns=["source"], errors="raise")
-    assert tb_generation["emission_factor"].notnull().all()
-
-    # Add a column with emissions.
-    tb_generation["emissions"] = tb_generation["value"] * tb_generation["emission_factor"]
-    # Calculate aggregate emissions (and also aggregate generation, for sanity checks).
-    for aggregate, components in aggregate_sources.items():
-        subcategory = "Total" if aggregate == "Total generation" else "Aggregate fuel"
-        _tb_generation_aggregate = (
-            tb_generation[(tb_generation["variable"].isin(components))]
-            .groupby(["country", "year", "unit", "category"], as_index=False)
-            .agg({"value": "sum", "emissions": "sum"})
-            .assign(**{"variable": aggregate, "subcategory": subcategory})
-        )
-        tb_generation = pr.concat([tb_generation, _tb_generation_aggregate], ignore_index=True)
-
-    # Add a column for carbon intensity of direct emissions.
-    assert tb_generation[(tb_generation["emissions"] > 0) & (tb_generation["value"] == 0)].empty
-    tb_generation["intensity"] = (tb_generation["emissions"] / tb_generation["value"]).fillna(0)
-
-    # Check that the generation aggregates coincide with the originals.
-    tb_generation = tb_generation.merge(
-        tb[(tb["category"] == "Electricity generation") & (tb["unit"] == "TWh")].rename(
-            columns={"value": "value_original"}
-        ),
-        on=["country", "year", "variable", "unit", "category", "subcategory"],
-        how="left",
-    )
-    error = "Failed to reconstruct the original generation of aggregates."
-    assert tb_generation[
-        (100 * abs(tb_generation["value"] - tb_generation["value_original"]) / tb_generation["value_original"]) > 1
-    ].empty, error
-    # After this check, we can expect that the aggregates for direct emissions are also well calculated.
-
-    # So now use the emission values to create a table of emissions.
-    tb_emissions = (
-        tb_generation.drop(columns=["unit", "category", "value", "value_original", "emission_factor", "intensity"])
-        .rename(columns={"emissions": "value"}, errors="raise")
-        .assign(**{"unit": "mtCO2", "category": "Direct emissions"})
-    )
-    tb_emissions.loc[(tb_emissions["variable"] == "Total generation"), "variable"] = "Total emissions"
-
-    # The original data has one emissions entry for each energy source; however, it has only one intensity entry.
-    # This must be based on the total emissions and generation.
-    tb_intensity = (
-        tb_generation[(tb_generation["variable"] == "Total generation")]
-        .drop(columns=["unit", "category", "value", "value_original", "emission_factor", "emissions"])
-        .rename(columns={"intensity": "value"}, errors="raise")
-        .assign(**{"unit": "gCO2/kWh", "category": "Direct emissions"})
-    )
-    tb_intensity.loc[(tb_intensity["variable"] == "Total generation"), "variable"] = "CO2 intensity"
-
-    # Check that clean variables have no emissions.
-    _all_zero_variables = tb_emissions.groupby(["variable"], as_index=False).agg(
-        {"value": lambda x: (sum(x) == 0).all()}
-    )
-    _all_zero_variables = set(_all_zero_variables[_all_zero_variables["value"] == 1]["variable"])
-    assert _all_zero_variables == {
-        "Bioenergy",
-        "Clean",
-        "Hydro",
-        "Hydro, bioenergy and other renewables",
-        "Nuclear",
-        "Offshore wind",
-        "Onshore wind",
-        "Other renewables",
-        "Renewables",
-        "Solar",
-        "Wind",
-        "Wind and solar",
-    }
-    # To avoid having columns with only zeros, remove those variables.
-    tb_emissions = tb_emissions[~tb_emissions["variable"].isin(_all_zero_variables)].reset_index(drop=True)
-
-    # Append the new direct emissions and intensities to the original table.
-    tb_emissions_and_intensities = pr.concat([tb_emissions, tb_intensity], ignore_index=True)
-
-    return tb_emissions_and_intensities
-
-
 def run() -> None:
     #
     # Load data.
@@ -652,13 +495,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("yearly_electricity")
     tb_global = ds_meadow.read("yearly_electricity__global")
     tb_europe = ds_meadow.read("yearly_electricity__europe")
-
-    # Load emission factors dataset.
-    ds_factors = paths.load_dataset("emission_factors")
-    # Read the electricity emission factors table (to calculate emissions and intensity for gas and coal).
-    tb_electricity_factors = ds_factors.read("electricity_emission_factors")
-    # Read the energy emission factors table (to calculate emissions and intensity for other fossil).
-    tb_energy_factors = ds_factors.read("energy_emission_factors")
 
     #
     # Process data.
@@ -679,12 +515,6 @@ def run() -> None:
     # Sanity check: replicate Ember's lifecycle emissions for a few sources.
     replicate_ember_lifecycle_emissions(tb=tb)
 
-    # Calculate emissions and carbon intensity of direct combustion.
-    # NOTE: Ember provides only lifecycle emissions and intensities.
-    tb_direct_emissions_and_intensities = estimate_emissions_and_carbon_intensity_of_direct_combustion(
-        tb=tb, tb_electricity_factors=tb_electricity_factors, tb_energy_factors=tb_energy_factors
-    )
-
     # Split data into different tables, one per category, and process each one individually.
     tables = {
         "capacity": make_wide_table(tb=tb, category="Capacity"),
@@ -692,7 +522,6 @@ def run() -> None:
         "electricity_generation": make_wide_table(tb=tb, category="Electricity generation"),
         "electricity_imports": make_wide_table(tb=tb, category="Electricity imports"),
         "lifecycle_emissions": make_wide_table(tb=tb, category="Power sector emissions"),
-        "direct_emissions": make_wide_table(tb=tb_direct_emissions_and_intensities, category="Direct emissions"),
     }
 
     for table_name in tables:

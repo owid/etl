@@ -19,11 +19,6 @@ definitions:
   description_processing_population: ""
   description_key_per_capita: &description_key_per_capita |-
     Per capita figures are calculated by dividing total values by the population of the country or region. Population data is constructed by Our World in Data, based on [various sources](https://ourworldindata.org/grapher/population).
-  # Processing description for direct combustion emissions.
-  description_processing_emissions_direct: &description_processing_emissions_direct |-
-    To estimate the direct combustion CO₂ emissions of electricity generation, we multiply each country's electricity generation by fuel (from Ember) by fixed emission factors for CO₂ per kWh. We use IPCC-based factors of 760 gCO₂/kWh for coal, 370 gCO₂/kWh for gas, 279 gCO₂/kWh for other fossil fuels, and 0 for all other sources. These emissions include only CO₂ released at power plants during fuel combustion, excluding other greenhouse gases, fugitive emissions, and all upstream or lifecycle components.
-  description_processing_intensity_direct: |-
-    To estimate the carbon intensity of direct combustion emissions, we sum the direct combustion CO₂ emissions from all fuels in each country, and divide the sum by their total electricity generation.
 
   common:
     processing_level: major
@@ -72,20 +67,6 @@ tables:
           shortUnit: g
         presentation:
           title_public: Lifecycle carbon intensity of electricity generation
-      direct_combustion_co2_intensity__gco2_kwh:
-        title: Direct combustion carbon intensity of electricity - gCO2/kWh
-        short_unit: gCO₂
-        unit: grams of CO₂ per kilowatt-hour
-        description_short: |-
-          Measured in grams of carbon dioxide (CO₂) emitted per [kilowatt-hour](#dod:watt-hours) of generated electricity. Includes only direct emissions from fuel combustion at power plants, excluding upstream, fugitive and non-CO₂ greenhouse gases.
-        display:
-          name: Carbon intensity
-          shortUnit: g
-        presentation:
-          title_public: Direct combustion carbon intensity of electricity generation
-        description_processing: |-
-          - {definitions.description_processing_emissions_direct}
-          - {definitions.description_processing_intensity_direct}
       coal_generation__twh:
         title: Electricity from coal - TWh
         short_unit: TWh
@@ -585,18 +566,6 @@ tables:
           name: Emissions
         presentation:
           title_public: Lifecycle emissions from electricity generation
-      direct_combustion_total_emissions__mtco2:
-        title: Direct combustion emissions - MtCO2
-        short_unit: Mt
-        unit: million tonnes CO₂ equivalents
-        description_short: Measured in megatonnes of [CO₂ equivalents](#dod:carbondioxideequivalents).
-        description_processing: |-
-          - {definitions.description_processing_only_ember_origins}
-          - {definitions.description_processing_emissions_direct}
-        display:
-          name: Emissions
-        presentation:
-          title_public: Direct combustion emissions from electricity generation
       total_generation__twh:
         title: Electricity generation - TWh
         short_unit: TWh
