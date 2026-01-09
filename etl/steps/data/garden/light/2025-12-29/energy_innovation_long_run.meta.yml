@@ -7,6 +7,17 @@ definitions:
         - Light at Night
         - Energy
 
+  description_short_price_of_lighting: |-
+    The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1600 lumen. This data is expressed in British pounds, adjusted for inflation.
+
+  description_processing_weeks_of_earnings_needed_for_reading: |-
+    To construct this indicator, we converted the lighting price series (originally expressed as the cost per 1 million lumen-hours) into the daily cost of lighting suitable for reading, assuming 800 lumen-hours per day. This was done by dividing the original series by 1,000,000 and multiplying by 800.
+
+    We then divided this daily lighting cost by a series of real average weekly earnings. The earnings data come from the A Millennium of Macroeconomic Data dataset, extended with average weekly earnings from the UK Office for National Statistics, and are expressed in the same price terms as the lighting data.
+
+  description_short_days_of_earnings_needed_for_reading: |-
+    Additionally, we converted weeks to days by multiplying the series by 5, assuming a 5-day workweek.
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -21,8 +32,9 @@ tables:
         title: Price of lighting (<<lighting_source>>, <<price_year>> prices)
         unit: constant <<price_year>> US$ per million lumen-hours
         short_unit: £
-        description_short: "The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1700 lumen. This data is expressed in British pounds, adjusted for inflation."
-        # description_key: List of key points about the indicator.
+        description_short: "{definitions.description_short_price_of_lighting}"
+        description_key:
+          - ""
         display:
           name: Price of lighting (<<lighting_source>>)
           numDecimalPlaces: 2
@@ -32,8 +44,9 @@ tables:
         title: 5-year rolling average of the price of lighting (<<lighting_source>>, <<price_year>> prices)
         unit: constant <<price_year>> US$ per million lumen-hours
         short_unit: £
-        description_short: "The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1700 lumen. This data is expressed in British pounds, adjusted for inflation."
-        # description_key: List of key points about the indicator.
+        description_short: "{definitions.description_short_price_of_lighting}"
+        description_key:
+          - ""
         processing_level: major
         description_processing: |-
           We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
@@ -49,17 +62,28 @@ tables:
         unit: weeks
         short_unit: weeks
         description_short: "The number of weeks of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
-        # description_key: List of key points about the indicator.
+        description_key:
+          - ""
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_weeks_of_earnings_needed_for_reading}
         display:
           name: Weeks of average earnings needed for reading
           numDecimalPlaces: 1
           tolerance: 0
+
       days_of_earnings_needed_for_reading:
         title: Days of average earnings needed to afford lighting for reading
         unit: days
         short_unit: days
         description_short: "The number of days of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
-        # description_key: List of key points about the indicator.
+        description_key:
+          - ""
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_weeks_of_earnings_needed_for_reading}
+
+          {definitions.description_short_days_of_earnings_needed_for_reading}
         display:
           name: Days of average earnings needed for reading
           numDecimalPlaces: 1
