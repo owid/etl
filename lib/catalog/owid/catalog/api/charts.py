@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import io
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -296,7 +297,7 @@ class ChartResult(BaseModel):
 
     Fields populated depend on the source:
     - fetch(): Provides config and metadata
-    - search(): Provides subtitle, available_entities, and num_related_articles
+    - search(): Provides subtitle, available_entities, num_related_articles, published_at, last_updated
 
     Core fields (slug, title, url) are always populated.
 
@@ -309,6 +310,8 @@ class ChartResult(BaseModel):
         subtitle: Chart subtitle/description (from search).
         available_entities: List of entities/countries in the chart (from search).
         num_related_articles: Number of related articles (from search).
+        published_at: When the chart was first published (from search).
+        last_updated: When the chart was last updated (from search).
     """
 
     model_config = ConfigDict(
@@ -328,6 +331,8 @@ class ChartResult(BaseModel):
     subtitle: str = ""
     available_entities: list[str] = Field(default_factory=list)
     num_related_articles: int = 0
+    published_at: datetime | None = None
+    last_updated: datetime | None = None
 
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
