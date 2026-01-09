@@ -19,7 +19,7 @@ Migration example:
     from owid.catalog import Client
     client = Client()
     results = client.tables.search(table="population", namespace="un")
-    table = results[0].data
+    table = results[0].fetch()
     ```
 
 """

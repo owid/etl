@@ -243,7 +243,7 @@ Note that you can also read datasets using our catalog [python API](../api/index
 ```pycon
 >>> from owid.catalog.api import Client
 >>> client = Client()
->>> client.tables.get_data("garden/biodiversity/2025-04-07/cherry_blossom/cherry_blossom")
+>>> client.tables.fetch("garden/biodiversity/2025-04-07/cherry_blossom/cherry_blossom")
               full_flowering_date  average_20_years
 country year
 Japan   812                    92               NaN
