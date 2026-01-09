@@ -28,5 +28,5 @@ def run() -> None:
     # Initialize a new meadow dataset.
     ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
 
-    # Save garden dataset.
+    # Save meadow dataset.
     ds_meadow.save()
