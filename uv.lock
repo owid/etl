@@ -1588,7 +1588,7 @@ requires-dist = [
     { name = "statsmodels", marker = "extra == 'wizard'", specifier = ">=0.14.4" },
     { name = "streamlit", marker = "extra == 'wizard'", specifier = ">=1.52.0" },
     { name = "streamlit-ace", marker = "extra == 'wizard'", specifier = ">=0.1.1" },
-    { name = "streamlit-aggrid", marker = "extra == 'wizard'", specifier = ">=1.1.0,!=1.1.8.*" },
+    { name = "streamlit-aggrid", marker = "extra == 'wizard'", specifier = ">=1.1.0,!=1.1.8.*,<1.1.9" },
     { name = "streamlit-agraph", marker = "extra == 'wizard'", specifier = ">=0.0.45" },
     { name = "streamlit-extras", marker = "extra == 'wizard'", specifier = ">=0.3.6" },
     { name = "streamlit-feedback", marker = "extra == 'wizard'", specifier = ">=0.1.3" },

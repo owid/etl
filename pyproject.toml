@@ -136,7 +136,7 @@ api = [
 
 wizard = [
     "streamlit>=1.52.0",
-    "streamlit-aggrid>=1.1.0,!=1.1.8.*",
+    "streamlit-aggrid>=1.1.0,!=1.1.8.*,<1.1.9",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",
     "streamlit-agraph>=0.0.45",
