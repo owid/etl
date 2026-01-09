@@ -334,6 +334,9 @@ def add_share_variables(combined: Table) -> Table:
 
 
 def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, combined: Table) -> Table:
+    # Firstly, remove "Other * (EI)" regions. They come from the Statistical Review, to include data that is not accounted for in any country. They needed to be included to able to create region aggregates. But Ember doesn't have these regions. If we keep them, they lead to inconsistencies, e.g. electricity shares larger than 100%.
+    combined = combined[~combined["country"].str.contains(r"Other.*\(EI\)", regex=True)].reset_index(drop=True)
+
     # In Ember's data, we removed data for aggregate regions (e.g. income groups) for the latest year.
     # We did that because the latest year is not informed for all countries, and aggregate regions therefore often
     # present a significant (spurious) dip.
