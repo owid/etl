@@ -35,9 +35,12 @@ tables:
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:
           - ""
+        presentation:
+          grapher_config:
+            note: This data is expressed in constant <<price_year>> British pounds.
         display:
           name: Price of lighting (<<lighting_source>>)
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 0
 
       lighting_price_rolling_avg:
@@ -50,9 +53,12 @@ tables:
         processing_level: major
         description_processing: |-
           We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
+        presentation:
+          grapher_config:
+            note: This data is expressed in constant <<price_year>> British pounds. Shown is a 5-year rolling average.
         display:
           name: Price of lighting (<<lighting_source>>)
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 0
 
   weeks_of_earnings_needed_for_reading:
