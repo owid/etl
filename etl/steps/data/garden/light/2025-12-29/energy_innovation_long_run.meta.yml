@@ -40,7 +40,7 @@ tables:
             note: This data is expressed in constant <<price_year>> British pounds.
         display:
           name: Price of lighting (<<lighting_source>>)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 2
           tolerance: 0
 
       lighting_price_rolling_avg:
@@ -58,7 +58,7 @@ tables:
             note: This data is expressed in constant <<price_year>> British pounds. Shown is a 5-year rolling average.
         display:
           name: Price of lighting (<<lighting_source>>)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 2
           tolerance: 0
 
   weeks_of_earnings_needed_for_reading:
