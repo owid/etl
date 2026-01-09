@@ -1,4 +1,4 @@
-et"""Garden step for Ember's Yearly Electricity Data (combining global and European data)."""
+"""Garden step for Ember's Yearly Electricity Data (combining global and European data)."""
 
 from typing import Dict
 
