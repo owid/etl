@@ -132,7 +132,7 @@ agent = Agent(
 
 # Agent for recommending follow-up questions
 if GOOGLE_API_KEY:
-    MODEL_SUGGESTIONS = "google-gla:gemini-2.5-flash"
+    MODEL_SUGGESTIONS = "openai:gpt-5-mini"
 else:
     MODEL_SUGGESTIONS = "openai:gpt-5-mini"
 recommender_agent = Agent(
