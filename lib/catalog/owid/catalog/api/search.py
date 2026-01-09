@@ -10,7 +10,8 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from owid.catalog.api.models import ChartResult, PageSearchResult, ResponseSet
+from owid.catalog.api.charts import ChartResult
+from owid.catalog.api.models import PageSearchResult, ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -149,7 +150,7 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
         )
 
     def pages(
@@ -200,5 +201,5 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
         )
