@@ -47,8 +47,8 @@ dependencies = [
     "platformdirs>=4.0.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=6.2.5",
     "pytest-cov>=2.12.1",
     "watchdog>=2.1.5",

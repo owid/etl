@@ -16,7 +16,7 @@ The Data API provides unified access to OWID's published data through a simple c
 from owid.catalog import Client
 
 client = Client()
-table = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
+tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
 ```
 
 
@@ -28,18 +28,12 @@ There are three main APIs available via the `Client` class: `IndicatorsAPI`, `Ta
 All `fetch()` methods return result objects with a `.data` property that loads data on first access:
 
 ```python
-# Metadata only - fast
-chart = client.charts.fetch("life-expectancy")
-print(chart.title)
+tb = client.charts.fetch("life-expectancy")
 
-# First access downloads data
-df = chart.data
-
-# Subsequent access uses cache
-df2 = chart.data  # Instant
-
-# Or preload immediately
-chart = client.charts.fetch("life-expectancy", load_data=True)
+# Or metadata only - fast
+tb = client.charts.fetch("life-expectancy", load_data=False)
+tb.metadata  # Available immediately
+tb["life_expectancy_0"].metadata  # Column metadata available
 ```
 
 ### Path Formats
@@ -97,7 +91,7 @@ Result objects returned by `fetch()` and `search()` methods.
       filters:
         - "!^_"
 
-::: owid.catalog.api.models.ChartResult
+::: owid.catalog.api.charts.ChartResult
     options:
       heading_level: 4
       show_root_heading: true
@@ -105,7 +99,7 @@ Result objects returned by `fetch()` and `search()` methods.
       filters:
         - "!^_"
 
-::: owid.catalog.api.models.IndicatorResult
+::: owid.catalog.api.indicators.IndicatorResult
     options:
       heading_level: 4
       show_root_heading: true
@@ -113,7 +107,7 @@ Result objects returned by `fetch()` and `search()` methods.
       filters:
         - "!^_"
 
-::: owid.catalog.api.models.TableResult
+::: owid.catalog.api.tables.TableResult
     options:
       heading_level: 4
       show_root_heading: true

@@ -6,19 +6,11 @@
 
 from __future__ import annotations
 
-from owid.catalog.api.charts import ChartsAPI
-from owid.catalog.api.indicators import IndicatorsAPI
-from owid.catalog.api.models import (
-    ChartNotFoundError,
-    ChartResult,
-    IndicatorResult,
-    LicenseError,
-    PageSearchResult,
-    ResponseSet,
-    TableResult,
-)
+from owid.catalog.api.charts import ChartNotFoundError, ChartResult, ChartsAPI, LicenseError
+from owid.catalog.api.indicators import IndicatorResult, IndicatorsAPI
+from owid.catalog.api.models import PageSearchResult, ResponseSet
 from owid.catalog.api.search import SiteSearchAPI
-from owid.catalog.api.tables import TablesAPI
+from owid.catalog.api.tables import TableResult, TablesAPI
 
 
 class Client:
@@ -45,17 +37,14 @@ class Client:
         # Charts: Published visualizations
         results = client.charts.search("climate change")
         chart = client.charts.fetch("life-expectancy")
-        df = client.charts.get_data("animals-slaughtered-for-meat")
 
         # Tables: Catalog datasets
         results = client.tables.search(table="population", namespace="un")
-        table = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
-        tb = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
+        tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
 
         # Indicators: Semantic search for data series
         results = client.indicators.search("renewable energy")
         variable = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
-        data = client.indicators.get_data("garden/un/2024-07-12/un_wpp/population#population")
 
         ```
     """

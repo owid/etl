@@ -3,7 +3,7 @@
 #
 import pytest
 
-from owid.catalog import Client
+from owid.catalog import Client, Table
 from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
@@ -13,6 +13,7 @@ from owid.catalog.api import (
     ResponseSet,
     TableResult,
 )
+from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
 
 class TestClient:
@@ -33,60 +34,81 @@ class TestClient:
 class TestChartsAPI:
     """Test the Charts API."""
 
-    def test_get_chart_data(self):
-        client = Client()
-        df = client.charts.get_data("life-expectancy")
-
-        assert df is not None
-        assert len(df) > 0
-        assert "entities" in df.columns
-        assert "years" in df.columns
-
-    def test_get_chart_data_by_url(self):
-        client = Client()
-        df = client.charts.get_data("https://ourworldindata.org/grapher/life-expectancy")
-
-        assert df is not None
-        assert len(df) > 0
-
-    def test_get_chart_metadata(self):
-        client = Client()
-        meta = client.charts.get_metadata("life-expectancy")
-
-        assert meta is not None
-        assert isinstance(meta, dict)
-        assert "columns" in meta
-
-    def test_get_chart_config(self):
-        client = Client()
-        config = client.charts.get_config("life-expectancy")
-
-        assert config is not None
-        assert isinstance(config, dict)
-
     def test_fetch_chart(self):
+        """Test fetching chart returns ChartTable directly."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
+        tb = client.charts.fetch("life-expectancy")
 
-        assert isinstance(chart, ChartResult)
-        assert chart.slug == "life-expectancy"
-        assert chart.title
-        assert chart.url == "https://ourworldindata.org/grapher/life-expectancy"
+        assert isinstance(tb, ChartTable)
+        # Table has data (load_data=True by default)
+        assert len(tb) > 0
+        # Chart slug stored in metadata.short_name
+        assert tb.metadata.short_name == "life-expectancy"
+
+    def test_fetch_chart_by_url(self):
+        """Test fetching chart by URL returns ChartTable."""
+        client = Client()
+        tb = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
+
+        assert isinstance(tb, ChartTable)
+        assert tb.metadata.short_name == "life-expectancy"
+
+    def test_fetch_chart_data(self):
+        """Test that fetched chart Table has expected index and columns."""
+        client = Client()
+        tb = client.charts.fetch("life-expectancy")
+
+        assert len(tb) > 0
+        # entities and years are now index columns
+        assert "entities" in tb.index.names
+        assert "years" in tb.index.names or "dates" in tb.index.names
+
+    def test_fetch_chart_metadata_and_config(self):
+        """Test that table metadata, column metadata and chart config are accessible."""
+        client = Client()
+        tb = client.charts.fetch("life-expectancy")
+
+        # Table metadata should be ChartTableMeta
+        assert tb.metadata is not None
+        assert isinstance(tb.metadata, ChartTableMeta)
+        assert tb.metadata.short_name == "life-expectancy"
+        assert tb.metadata.title is not None
+        # ChartTableMeta.uri returns chart URL
+        assert tb.metadata.uri == "https://ourworldindata.org/grapher/life-expectancy"
+        # ChartTableMeta.dataset returns None (charts don't have datasets)
+        assert tb.metadata.dataset is None
+
+        # Column metadata should be populated (columns are data columns only, index has entities/years)
+        assert len(tb.columns) > 0
+        col = tb.columns[0]
+        assert tb[col].metadata.unit is not None
+
+        # Origin with citation should be populated
+        assert len(tb[col].metadata.origins) > 0
+        origin = tb[col].metadata.origins[0]
+        assert origin.citation_full is not None
+
+        # Chart config should be accessible via .metadata.chart_config
+        assert tb.metadata.chart_config is not None
+        assert isinstance(tb.metadata.chart_config, dict)
+        assert "title" in tb.metadata.chart_config
 
     def test_chart_not_found(self):
         client = Client()
         with pytest.raises(ChartNotFoundError):
-            client.charts.get_data("this-chart-does-not-exist")
+            client.charts.fetch("this-chart-does-not-exist")
 
     def test_non_redistributable_chart(self):
+        """Test that non-redistributable charts raise LicenseError."""
         client = Client()
         with pytest.raises(LicenseError):
-            client.charts.get_data("test-scores-ai-capabilities-relative-human-performance")
+            # LicenseError is raised immediately since load_data=True by default
+            client.charts.fetch("test-scores-ai-capabilities-relative-human-performance")
 
     def test_invalid_url(self):
         client = Client()
         with pytest.raises(ValueError):
-            client.charts.get_data("https://example.com/not-a-grapher-url")
+            client.charts.fetch("https://example.com/not-a-grapher-url")
 
 
 class TestChartsAPISearch:
@@ -207,24 +229,22 @@ class TestIndicatorsAPI:
         assert "path" in frame.columns
 
     def test_fetch_indicator(self):
-        """Test fetching a specific indicator by URI."""
+        """Test fetching a specific indicator by path returns Table directly."""
         client = Client()
-        # First search to find an indicator URI
+        # First search to find an indicator path
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            # Fetch by URI (path)
+            # Fetch by path - returns Table with single column
             assert results[0].path
-            indicator = client.indicators.fetch(results[0].path)
-            assert indicator.column_name
-            assert indicator.title
-            assert indicator.path == results[0].path
-            # Test lazy loading - table should not be loaded yet
-            assert indicator._table is None
-            # Test data access - this triggers lazy loading
-            variable = indicator.data
-            assert variable is not None
-            # After accessing data, table should be cached
-            assert indicator._table is not None
+            tb = client.indicators.fetch(results[0].path)
+            assert isinstance(tb, Table)
+            # Table has data (since load_data=True by default)
+            assert len(tb) > 0
+            # Should have exactly one column (the indicator)
+            assert len(tb.columns) == 1
+            # Metadata is accessible on the column
+            col_name = tb.columns[0]
+            assert tb[col_name].metadata is not None
 
     def test_fetch_indicator_invalid_format(self):
         """Test that invalid path format raises error."""
@@ -245,21 +265,6 @@ class TestIndicatorsAPI:
             # Try to fetch with a non-existent column
             with pytest.raises(ValueError, match="Column 'nonexistent_column_12345' not found"):
                 client.indicators.fetch(f"{table_path}#nonexistent_column_12345")
-
-    def test_get_data(self):
-        """Test get_data convenience method."""
-        client = Client()
-        # Search to get an indicator path
-        results = client.indicators.search("solar power")
-        if len(results) > 0:
-            path = results[0].path
-            assert path is not None
-            # Use get_data - should return Variable directly
-            variable = client.indicators.get_data(path)
-            assert variable is not None
-            # Should be equivalent to fetch().data
-            variable2 = client.indicators.fetch(path).data
-            assert variable.name == variable2.name
 
 
 class TestTablesAPI:
@@ -294,19 +299,19 @@ class TestTablesAPI:
         assert hasattr(frame, "load")
 
     def test_fetch_table(self):
-        """Test fetching table metadata by path."""
+        """Test fetching table by path returns Table directly."""
         client = Client()
         # First search to find a path
         results = client.tables.search(table="population", namespace="un")
         if len(results) > 0:
             path = results[0].path
-            # Now fetch by path (should return same metadata)
-            table_result = client.tables.fetch(path)
-            assert isinstance(table_result, TableResult)
-            assert table_result.path == path
-            assert table_result.table
-            assert table_result.dataset
-            assert table_result.namespace == "un"
+            # Fetch table directly by path
+            tb = client.tables.fetch(path)
+            assert isinstance(tb, Table)
+            # Table has data (since load_data=True by default)
+            assert len(tb) > 0
+            # Metadata is accessible
+            assert tb.metadata is not None
 
     def test_fetch_invalid_path(self):
         """Test that fetching with invalid path format raises error."""
@@ -317,23 +322,8 @@ class TestTablesAPI:
     def test_fetch_nonexistent_table(self):
         """Test that fetching non-existent table raises error."""
         client = Client()
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(KeyError, match="No matching table found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
-
-    def test_get_data(self):
-        """Test get_data convenience method."""
-        client = Client()
-        # Search to get a table path
-        results = client.tables.search(table="population", namespace="un")
-        if len(results) > 0:
-            path = results[0].path
-            # Use get_data - should return Table directly
-            table = client.tables.get_data(path)
-            assert table is not None
-            assert len(table) > 0
-            # Should be equivalent to fetch().data
-            table2 = client.tables.fetch(path).data
-            assert table.m.short_name == table2.m.short_name
 
     def test_backwards_compatibility_datasets(self):
         """Test that client.datasets still works (backwards compatibility)."""
@@ -367,13 +357,13 @@ class TestResponseSet:
         results = ResponseSet(results=[1, 2, 3, 4, 5], query="test")
         assert len(results) == 5
 
-    def test_limit_auto_set(self):
+    def test_total_count_auto_set(self):
         results = ResponseSet(results=[1, 2, 3], query="test")
-        assert results.limit == 3
+        assert results.total_count == 3
 
-    def test_limit_explicit(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", limit=100)
-        assert results.limit == 100
+    def test_total_count_explicit(self):
+        results = ResponseSet(results=[1, 2, 3], query="test", total_count=100)
+        assert results.total_count == 100
 
     def test_filter(self):
         """Test filtering results with a predicate."""

@@ -1,10 +1,15 @@
 definitions:
   common:
-    processing_level: minor
+    display:
+      numDecimalPlaces: 0
     presentation:
       topic_tags:
         - Artificial Intelligence
-
+  desc_key: &desc_key
+    - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
+    - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only a small part of total data center investment, since IT hardware represents a significant additional cost.
+    - Data centers run the full spectrum of internet services from shopping to streaming, not solely AI.
+    - The values shown are not seasonally adjusted, meaning they reflect actual monthly spending including typical seasonal patterns such as slower winter construction or busier summer periods.
 dataset:
   update_period_days: 30
 
@@ -12,14 +17,26 @@ tables:
   datacenter_construction:
     variables:
       datacenter_construction_spending:
-        title: Construction spending on data center buildings in the United States
+        title: Investment in the physical construction of US data centre buildings
         unit: US dollars
         short_unit: $
-        description_short: Monthly private construction spending on data center buildings in the United States, covering materials, labor, and contractor costs for work done at construction sites. This excludes equipment like servers and IT hardware. The data is not adjusted for inflation.
+        description_short: This includes only the work done on site to construct data centre buildings each month, including materials and construction labour. It excludes the IT hardware inside the buildings, like servers and storage, which account for a large share of total investment. Expressed in nominal US dollars.
         description_key:
-          - This shows monthly spending on the physical construction of data center buildings in the United States — the actual value of work done at construction sites each month. This includes materials, labor, and contractor costs.
-          - The data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only part of total data center investment, since IT hardware represents a significant additional cost.
-          - The values shown are monthly spending figures that have been seasonally adjusted to remove typical seasonal patterns. This adjustment makes it easier to compare different months throughout the year by accounting for regular variations like slower winter construction or busier summer periods.
-          - The Census Bureau adjusts this data for seasonal patterns, holidays, and trading-day effects using statistical methods. These adjustments are updated each month as new information becomes available, which means recent months' figures may be revised.
-        display:
-          numDecimalPlaces: 0
+          - *desc_key
+        processing_level: minor
+
+      datacenter_construction_spending_real:
+        title: Investment in the physical construction of US data centre buildings (inflation-adjusted)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: This includes only the work done on site to construct data centre buildings each month, including materials and construction labour. It excludes the IT hardware inside the buildings, like servers and storage, which account for a large share of total investment. Expressed in US dollars, adjusted for inflation.
+        description_key:
+          - *desc_key
+          - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office building construction. Following guidance from the [Bureau of Economic Analysis (BEA)](https://www.census.gov/construction/c30/definitions.html), we assume data centre construction costs are similar to office-type buildings because both use comparable structural components, such as foundations, walls, and HVAC systems.
+        description_processing: We used the Producer Price Index (PPI) for new office building construction to adjust for inflation, following guidance from the [Bureau of Economic Analysis (BEA)](https://www.census.gov/construction/c30/definitions.html) that suggests data center construction costs are similar to office buildings due to their comparable structural components.
+        presentation:
+          title_public: Investment in the physical construction of US data centre buildings
+          grapher_config:
+            note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction.
+        processing_level: major
+

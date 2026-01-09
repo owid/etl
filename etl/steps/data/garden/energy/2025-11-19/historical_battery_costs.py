@@ -51,11 +51,11 @@ def run() -> None:
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
-    # Remove empty rows.
-    tb = tb.dropna().reset_index(drop=True)
-
     # Improve tables format.
     tb = tb.format(["year"])
+
+    # Remove empty rows.
+    tb = tb.dropna(how="all")
 
     #
     # Save outputs.
