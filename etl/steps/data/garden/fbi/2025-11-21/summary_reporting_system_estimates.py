@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -15,7 +17,10 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("summary_reporting_system_estimates")
-    tb = tb.drop(columns=["state_abbr", "rape_legacy", "rape_revised", "caveats"])
+    tb = tb.drop(columns=["state_abbr", "caveats"])
+    # Replacing the 0s in rape_legacy for 2017-2020 with NA.
+    tb.loc[tb["year"] >= 2017, "rape_legacy"] = pd.NA
+
     #
     # Process data.
     #
@@ -48,6 +53,8 @@ def calculate_crime_rates(tb):
         "burglary",
         "larceny",
         "motor_vehicle_theft",
+        "rape_legacy",
+        "rape_revised",
     ]
     for column in crime_columns:
         rate_column = f"{column}_per_100k"

@@ -339,18 +339,18 @@ steps:
   #
   # Rupert Way - Historical battery costs.
   #
-  data-private://meadow/energy/2025-11-19/historical_battery_costs:
-    - snapshot-private://energy/2025-11-19/historical_battery_costs.xlsx
+  data://meadow/energy/2025-11-19/historical_battery_costs:
+    - snapshot://energy/2025-11-19/historical_battery_costs.xlsx
   #
   # Rupert Way - Historical battery costs.
   #
-  data-private://garden/energy/2025-11-19/historical_battery_costs:
-    - data-private://meadow/energy/2025-11-19/historical_battery_costs
+  data://garden/energy/2025-11-19/historical_battery_costs:
+    - data://meadow/energy/2025-11-19/historical_battery_costs
   #
   # Rupert Way - Historical battery costs.
   #
-  data-private://grapher/energy/2025-11-19/historical_battery_costs:
-    - data-private://garden/energy/2025-11-19/historical_battery_costs
+  data://grapher/energy/2025-11-19/historical_battery_costs:
+    - data://garden/energy/2025-11-19/historical_battery_costs
 
   #
   # Energy - OWID Energy dataset.

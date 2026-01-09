@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional
 import httpx
 import structlog
 import yaml
+from owid.catalog.core import CatalogPath
 
 from owid_mcp.config import (
     ALGOLIA_API_KEY,
@@ -447,25 +448,13 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
     Args:
         catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
     """
-    # Split on '#' to separate path from column
-    path, column = catalog_path.split("#")
+    p = CatalogPath.from_str(catalog_path)
+    assert p.variable
 
-    # Parse the path: channel/namespace/version/dataset_slug/dataset_slug
-    parts = path.split("/")
-    channel, namespace, version, dataset_slug, table_name = (
-        parts[0],
-        parts[1],
-        parts[2],
-        parts[3],
-        parts[4],
-    )
-
-    parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{table_name}.parquet"
-    sql_tpl = "SELECT country, year, {col} FROM '{url}' " "WHERE country = '??' LIMIT 100".format(
-        col=column, url=parquet_url
-    )
+    parquet_url = f"{CATALOG_BASE}/{p.table_path}.parquet"
+    sql_tpl = f"SELECT country, year, {p.variable} FROM '{parquet_url}' WHERE country = '??' LIMIT 100"
     return {
         "parquet_url": parquet_url,
         "run_sql_template": sql_tpl,
-        "column": column,
+        "column": p.variable,
     }

@@ -140,7 +140,7 @@ def etl_catalog(
     - 3 if the tables have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_latest(
+        remote_df = catalog.ETLCatalog().find_latest(
             table=table,
             namespace=namespace,
             dataset=dataset,
@@ -161,7 +161,7 @@ def etl_catalog(
                 table=table,
                 namespace=namespace,
                 dataset=dataset,
-                channel=cast(catalog.CHANNEL, channel),
+                channel=channel,
                 version=version,  # type: ignore[reportArgumentType]
             )
         except ValueError as e:
@@ -172,7 +172,7 @@ def etl_catalog(
                     table=table,
                     namespace=namespace,
                     dataset=dataset,
-                    channel=cast(catalog.CHANNEL, channel),
+                    channel=channel,
                     version=version,  # type: ignore[reportArgumentType]
                 )
             else:

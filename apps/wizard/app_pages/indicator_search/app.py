@@ -34,6 +34,7 @@ class Indicator:
     catalogPath: str
     similarity: float
     dataset: Optional[str] = None
+    popularity: float = 0.0
 
     def to_dict(self):
         return {
@@ -43,6 +44,7 @@ class Indicator:
             "n_charts": self.n_charts,
             "catalogPath": self.catalogPath,
             "similarity": self.similarity,
+            "popularity": self.popularity,
         }
 
 
@@ -78,6 +80,7 @@ def search_indicators_api(query: str, limit: int = MAX_RESULTS) -> list[Indicato
                 n_charts=result["n_charts"],
                 catalogPath=result["catalog_path"] or "",
                 similarity=result["score"],
+                popularity=result.get("popularity", 0.0),
             )
         )
     return indicators
@@ -91,7 +94,7 @@ def st_display_indicators(indicators: list[Indicator]):
     df["catalogPath"] = df["catalogPath"].str.replace("grapher/", "")
     df = df.drop(columns=["variableId", "description"])
 
-    styled_df = df.style.format("{:.0%}", subset=["similarity"])
+    styled_df = df.style.format("{:.0%}", subset=["similarity", "popularity"])
 
     column_config = {
         "link": st.column_config.LinkColumn("Open", display_text="Open"),
@@ -99,7 +102,7 @@ def st_display_indicators(indicators: list[Indicator]):
 
     st.dataframe(
         styled_df,
-        column_order=["name", "catalogPath", "n_charts", "similarity", "link"],
+        column_order=["name", "catalogPath", "n_charts", "similarity", "popularity", "link"],
         width="stretch",
         hide_index=True,
         column_config=column_config,
@@ -184,9 +187,9 @@ with st_horizontal():
     # Filter indicators
     selection = st.segmented_control(
         "Indicator status",
-        ["All", "Used in charts"],
+        ["All", "Used in charts", "Has popularity"],
         selection_mode="single",
-        default="All",
+        default="Has popularity",
         label_visibility="collapsed",
     )
 
@@ -217,6 +220,8 @@ if input_string:
                     filtered_inds = sorted_inds
                 case "Used in charts":
                     filtered_inds = [ind for ind in sorted_inds if ind.n_charts > 0]
+                case "Has popularity":
+                    filtered_inds = [ind for ind in sorted_inds if ind.popularity > 0]
                 case _:
                     filtered_inds = sorted_inds
 

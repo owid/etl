@@ -318,7 +318,7 @@ for tab in range(len(tables)):
             df_graphers.loc[j, "ySlugs"] = (
                 f"headcount_ratio_50_median_{welfare['slug'][wel]}_{equivalence_scales['slug'][eq]}"
             )
-            df_graphers.loc[j, "Indicator Dropdown"] = f"Share in relative poverty"
+            df_graphers.loc[j, "Indicator Dropdown"] = "Share in relative poverty"
             df_graphers.loc[j, "Income measure Dropdown"] = f"{welfare['dropdown_option'][wel]}"
             df_graphers.loc[
                 j,
@@ -336,7 +336,7 @@ for tab in range(len(tables)):
 
         # COMPARE BEFORE AND AFTER TAX
         # Gini coefficient
-        df_graphers.loc[j, "title"] = f"Gini coefficient (after tax vs. before tax)"
+        df_graphers.loc[j, "title"] = "Gini coefficient (after tax vs. before tax)"
         df_graphers.loc[j, "ySlugs"] = (
             f"gini_mi_{equivalence_scales['slug'][eq]} gini_dhi_{equivalence_scales['slug'][eq]}"
         )
@@ -346,7 +346,7 @@ for tab in range(len(tables)):
             equivalence_scales["checkbox"][eq]
         )
         df_graphers.loc[j, "subtitle"] = (
-            f"The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality."
+            "The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality."
         )
         df_graphers.loc[j, "note"] = equivalence_scales["note"][eq]
         df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
@@ -355,7 +355,7 @@ for tab in range(len(tables)):
         j += 1
 
         # Share of the top 10%
-        df_graphers.loc[j, "title"] = f"Income share of the richest 10% (after tax vs. before tax)"
+        df_graphers.loc[j, "title"] = "Income share of the richest 10% (after tax vs. before tax)"
         df_graphers.loc[j, "ySlugs"] = (
             f"share_p100_mi_{equivalence_scales['slug'][eq]} share_p100_dhi_{equivalence_scales['slug'][eq]}"
         )
@@ -364,7 +364,7 @@ for tab in range(len(tables)):
         df_graphers.loc[j, "Adjust for cost sharing within households (equivalized income) Checkbox"] = (
             equivalence_scales["checkbox"][eq]
         )
-        df_graphers.loc[j, "subtitle"] = f"The share of income received by the richest 10% of the population."
+        df_graphers.loc[j, "subtitle"] = "The share of income received by the richest 10% of the population."
         df_graphers.loc[j, "note"] = equivalence_scales["note"][eq]
         df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
         df_graphers.loc[j, "hasMapTab"] = "false"
@@ -372,7 +372,7 @@ for tab in range(len(tables)):
         j += 1
 
         # Share of the bottom 50%
-        df_graphers.loc[j, "title"] = f"Income share of the poorest 50% (after tax vs. before tax)"
+        df_graphers.loc[j, "title"] = "Income share of the poorest 50% (after tax vs. before tax)"
         df_graphers.loc[j, "ySlugs"] = (
             f"share_bottom50_mi_{equivalence_scales['slug'][eq]} share_bottom50_dhi_{equivalence_scales['slug'][eq]}"
         )
@@ -381,7 +381,7 @@ for tab in range(len(tables)):
         df_graphers.loc[j, "Adjust for cost sharing within households (equivalized income) Checkbox"] = (
             equivalence_scales["checkbox"][eq]
         )
-        df_graphers.loc[j, "subtitle"] = f"The share of income received by the poorest 50% of the population."
+        df_graphers.loc[j, "subtitle"] = "The share of income received by the poorest 50% of the population."
         df_graphers.loc[j, "note"] = equivalence_scales["note"][eq]
         df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
         df_graphers.loc[j, "hasMapTab"] = "false"
@@ -389,7 +389,7 @@ for tab in range(len(tables)):
         j += 1
 
         # # Palma ratio
-        df_graphers.loc[j, "title"] = f"Palma ratio (after tax vs. before tax)"
+        df_graphers.loc[j, "title"] = "Palma ratio (after tax vs. before tax)"
         df_graphers.loc[j, "ySlugs"] = (
             f"palma_ratio_mi_{equivalence_scales['slug'][eq]} palma_ratio_dhi_{equivalence_scales['slug'][eq]}"
         )
@@ -399,7 +399,7 @@ for tab in range(len(tables)):
             equivalence_scales["checkbox"][eq]
         )
         df_graphers.loc[j, "subtitle"] = (
-            f"The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality."
+            "The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality."
         )
         df_graphers.loc[j, "note"] = equivalence_scales["note"][eq]
         df_graphers.loc[j, "selectedFacetStrategy"] = "entity"
@@ -408,11 +408,11 @@ for tab in range(len(tables)):
         j += 1
 
         # Headcount ratio (rel)
-        df_graphers.loc[j, "title"] = f"Share of people in relative poverty (after tax vs. before tax)"
+        df_graphers.loc[j, "title"] = "Share of people in relative poverty (after tax vs. before tax)"
         df_graphers.loc[j, "ySlugs"] = (
             f"headcount_ratio_50_median_mi_{equivalence_scales['slug'][eq]} headcount_ratio_50_median_dhi_{equivalence_scales['slug'][eq]}"
         )
-        df_graphers.loc[j, "Indicator Dropdown"] = f"Share in relative poverty"
+        df_graphers.loc[j, "Indicator Dropdown"] = "Share in relative poverty"
         df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
         df_graphers.loc[
             j,

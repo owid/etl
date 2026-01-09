@@ -1,65 +1,84 @@
-import pytest
+#
+#  Tests for owid.catalog.core.charts module
+#
+import pandas as pd
 
-from owid.catalog import charts
-from owid.catalog.internal import LicenseError
-
-# NOTE: the tests below make multiple network requests per check, we could consider
-#       mocking them out if they cause problems
-
-
-def test_fetch_chart_data_with_slug_as_column():
-    chart = charts.Chart("life-expectancy")
-    df = chart.get_data()
-    assert df is not None
-    assert len(df) > 0
-    assert "entities" in df.columns
-    assert "years" in df.columns
-    assert "life_expectancy" in df.columns
-
-    assert "metadata" in df.attrs
-    assert "life_expectancy" in df.attrs["metadata"]
+from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
 
-def test_fetch_chart_data_with_multiple_indicators():
-    df = charts.Chart("eat-lancet-diet-comparison").get_data()
-    value_cols = df.columns.difference(["entities", "years"])
-    assert len(value_cols) > 1
+class TestChartTableMeta:
+    """Test the ChartTableMeta class."""
 
-    assert "metadata" in df.attrs
-    assert all(c in df.attrs["metadata"] for c in value_cols)
+    def test_default_values(self):
+        """Test ChartTableMeta has correct defaults."""
+        meta = ChartTableMeta()
+        assert meta.short_name is None
+        assert meta.title is None
+        assert meta.description is None
+        assert meta.dataset is None
 
+    def test_uri_with_short_name(self):
+        """Test uri property returns grapher URL when short_name is set."""
+        meta = ChartTableMeta(short_name="life-expectancy")
+        assert meta.uri == "https://ourworldindata.org/grapher/life-expectancy"
 
-def test_fetch_non_redistributable_chart():
-    # a chart where nonRedistributable is true in the indicator's metadata; see also
-    # the dataset at https://admin.owid.io/admin/datasets/6457
-    chart = charts.Chart("test-scores-ai-capabilities-relative-human-performance")
-    with pytest.raises(LicenseError):
-        chart.get_data()
+    def test_uri_without_short_name(self):
+        """Test uri property returns None when short_name is not set."""
+        meta = ChartTableMeta()
+        assert meta.uri is None
 
-
-def test_fetch_missing_chart():
-    with pytest.raises(charts.ChartNotFoundError):
-        charts.Chart("this-chart-does-not-exist").bundle
-
-
-def test_fetch_chart_with_dates():
-    df = charts.get_data("sea-level")
-    assert "dates" in df.columns
-    assert "years" not in df.columns
-    assert len(df) > 0
+    def test_dataset_always_none(self):
+        """Test dataset field is always None for chart tables."""
+        meta = ChartTableMeta(short_name="test", title="Test Chart")
+        assert meta.dataset is None
 
 
-def test_fetch_chart_by_url():
-    df = charts.get_data("https://ourworldindata.org/grapher/life-expectancy")
-    assert set(df.columns) == {"entities", "years", "life_expectancy"}
-    assert len(df) > 0
+class TestChartTable:
+    """Test the ChartTable class."""
 
+    def test_create_empty(self):
+        """Test creating an empty ChartTable."""
+        tb = ChartTable()
+        assert isinstance(tb, ChartTable)
+        assert tb.metadata.chart_config == {}
 
-def test_fetch_chart_by_non_grapher_url():
-    with pytest.raises(ValueError):
-        charts.get_data("https://ourworldindata.org/this-is-not-a-grapher-url")
+    def test_create_with_config(self):
+        """Test creating ChartTable with chart_config."""
+        config = {"title": "Test Chart", "subtitle": "A test"}
+        meta = ChartTableMeta(chart_config=config)
+        tb = ChartTable(metadata=meta)
+        assert tb.metadata.chart_config == config
+        assert tb.metadata.chart_config["title"] == "Test Chart"
 
+    def test_create_from_dataframe(self):
+        """Test creating ChartTable from DataFrame."""
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+        config = {"title": "Test"}
+        meta = ChartTableMeta(chart_config=config)
+        tb = ChartTable(df, metadata=meta)
 
-def test_fetch_chart_by_missing_grapher_url():
-    with pytest.raises(charts.ChartNotFoundError):
-        charts.get_data("https://ourworldindata.org/grapher/this-chart-does-not-exist")
+        assert len(tb) == 3
+        assert list(tb.columns) == ["a", "b"]
+        assert tb.metadata.chart_config == config
+
+    def test_chart_config_setter(self):
+        """Test setting chart_config after creation."""
+        tb = ChartTable()
+        tb.metadata.chart_config = {"title": "Updated"}
+        assert tb.metadata.chart_config["title"] == "Updated"
+
+    def test_slicing_preserves_type(self):
+        """Test that slicing returns ChartTable."""
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+        meta = ChartTableMeta(chart_config={"title": "Test"})
+        tb = ChartTable(df, metadata=meta)
+
+        # Note: pandas operations may not always preserve subclass type
+        # This test documents current behavior
+        sliced = tb[["a"]]
+        assert isinstance(sliced, ChartTable)
+
+    def test_constructor_property(self):
+        """Test _constructor returns ChartTable type."""
+        tb = ChartTable()
+        assert tb._constructor == ChartTable
