@@ -83,7 +83,16 @@ def _load_chart_table(
         config = _fetch_chart_config(slug, timeout=timeout)
 
         # Load data from CSV as ChartTable
-        tb = _fetch_chart_data(slug, chart_config=config, timeout=timeout, load_data=load_data)
+        df = _fetch_chart_data(slug, timeout=timeout, load_data=load_data)
+
+        # Build table with metadata
+        meta = ChartTableMeta(
+            short_name=slug,
+            title=config.get("title"),
+            description=config.get("subtitle"),
+            chart_config=config,
+        )
+        tb = ChartTable(df, metadata=meta)
 
         # Apply column metadata to data columns
         for col in tb.columns:
@@ -92,13 +101,6 @@ def _load_chart_table(
             col_info = short_name_lookup.get(col, {})
             if col_info:
                 tb[col].metadata = _build_variable_meta(col_info)
-
-        # Set table metadata using ChartTableMeta
-        tb.metadata = ChartTableMeta(
-            short_name=slug,
-            title=config.get("title"),
-            description=config.get("subtitle"),
-        )
 
         # Set index columns (entities + years/dates)
         index_cols = []
@@ -109,14 +111,13 @@ def _load_chart_table(
         elif "dates" in tb.columns:
             index_cols.append("dates")
         if index_cols:
-            # Preserve chart_config and metadata before set_index
-            chart_config = tb.chart_config
+            # Preserve column metadata before set_index
             col_metadata = {col: tb[col].metadata for col in tb.columns if col not in index_cols}
 
-            # set_index returns Table, reconstruct ChartTable
+            # set_index may return Table instead of ChartTable due to pandas subclass behavior
+            # Convert back to ChartTable, preserving metadata with 'like' parameter
             indexed = tb.set_index(index_cols)
-            tb = ChartTable(indexed, chart_config=chart_config)
-            tb.metadata = indexed.metadata
+            tb = ChartTable(indexed, like=indexed)
 
             # Restore column metadata
             for col, meta in col_metadata.items():
@@ -199,7 +200,7 @@ def _fetch_chart_config(slug: str, *, timeout: int) -> dict[str, Any]:
     return resp.json()
 
 
-def _fetch_chart_data(slug: str, *, chart_config: dict[str, Any], timeout: int, load_data: bool = True) -> ChartTable:
+def _fetch_chart_data(slug: str, *, timeout: int, load_data: bool = True) -> pd.DataFrame:
     """Fetch chart data as a ChartTable.
 
     Args:
@@ -246,7 +247,7 @@ def _fetch_chart_data(slug: str, *, chart_config: dict[str, Any], timeout: int, 
         if df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
             df = df.rename(columns={"years": "dates"})
 
-    return ChartTable(df, chart_config=chart_config)
+    return df
 
 
 def _build_variable_meta(col_info: dict[str, Any]) -> VariableMeta:
@@ -386,7 +387,7 @@ class ChartsAPI:
         tb = client.charts.fetch("life-expectancy")
         print(tb.head())
         print(tb["life_expectancy_0"].metadata.unit)
-        print(tb.chart_config.get("title"))  # Access chart config
+        print(tb.metadata.chart_config.get("title"))  # Access chart config
 
         # Search for charts
         results = client.charts.search("gdp per capita")
@@ -464,14 +465,14 @@ class ChartsAPI:
 
         Returns:
             ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
-            is populated from the chart's metadata.json. Chart config is accessible via .chart_config.
+            is populated from the chart's metadata.json. Chart config is accessible via .metadata.chart_config.
 
         Example:
             ```python
             tb = client.charts.fetch("life-expectancy")
             print(tb.head())
             print(tb["life_expectancy_0"].metadata.unit)
-            print(tb.chart_config.get("title"))
+            print(tb.metadata.chart_config.get("title"))
             ```
         """
         effective_timeout = timeout or self._client.timeout

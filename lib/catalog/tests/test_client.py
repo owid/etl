@@ -88,10 +88,10 @@ class TestChartsAPI:
         origin = tb[col].metadata.origins[0]
         assert origin.citation_full is not None
 
-        # Chart config should be accessible via .chart_config property
-        assert tb.chart_config is not None
-        assert isinstance(tb.chart_config, dict)
-        assert "title" in tb.chart_config
+        # Chart config should be accessible via .metadata.chart_config
+        assert tb.metadata.chart_config is not None
+        assert isinstance(tb.metadata.chart_config, dict)
+        assert "title" in tb.metadata.chart_config
 
     def test_chart_not_found(self):
         client = Client()

@@ -40,35 +40,38 @@ class TestChartTable:
         """Test creating an empty ChartTable."""
         tb = ChartTable()
         assert isinstance(tb, ChartTable)
-        assert tb.chart_config == {}
+        assert tb.metadata.chart_config == {}
 
     def test_create_with_config(self):
         """Test creating ChartTable with chart_config."""
         config = {"title": "Test Chart", "subtitle": "A test"}
-        tb = ChartTable(chart_config=config)
-        assert tb.chart_config == config
-        assert tb.chart_config["title"] == "Test Chart"
+        meta = ChartTableMeta(chart_config=config)
+        tb = ChartTable(metadata=meta)
+        assert tb.metadata.chart_config == config
+        assert tb.metadata.chart_config["title"] == "Test Chart"
 
     def test_create_from_dataframe(self):
         """Test creating ChartTable from DataFrame."""
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
         config = {"title": "Test"}
-        tb = ChartTable(df, chart_config=config)
+        meta = ChartTableMeta(chart_config=config)
+        tb = ChartTable(df, metadata=meta)
 
         assert len(tb) == 3
         assert list(tb.columns) == ["a", "b"]
-        assert tb.chart_config == config
+        assert tb.metadata.chart_config == config
 
     def test_chart_config_setter(self):
         """Test setting chart_config after creation."""
         tb = ChartTable()
-        tb.chart_config = {"title": "Updated"}
-        assert tb.chart_config["title"] == "Updated"
+        tb.metadata.chart_config = {"title": "Updated"}
+        assert tb.metadata.chart_config["title"] == "Updated"
 
     def test_slicing_preserves_type(self):
         """Test that slicing returns ChartTable."""
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-        tb = ChartTable(df, chart_config={"title": "Test"})
+        meta = ChartTableMeta(chart_config={"title": "Test"})
+        tb = ChartTable(df, metadata=meta)
 
         # Note: pandas operations may not always preserve subclass type
         # This test documents current behavior

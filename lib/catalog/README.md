@@ -29,15 +29,15 @@ from owid.catalog import Client
 client = Client()
 
 # Get data from charts
-df = client.charts.get_data("life-expectancy")
+tb = client.charts.fetch("life-expectancy")
 
 # Search for indicators
 results = client.indicators.search("renewable energy")
-df = results[0].data
+tb = results[0].fetch()
 
 # Query catalog tables
 tables = client.tables.search(table="population", namespace="un")
-df = tables[0].data
+tb = tables[0].fetch()
 ```
 
 ### Working with Data Structures

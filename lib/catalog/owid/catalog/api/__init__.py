@@ -40,7 +40,7 @@ class Client:
 
         # Tables: Catalog datasets
         results = client.tables.search(table="population", namespace="un")
-        table = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+        tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
 
         # Indicators: Semantic search for data series
         results = client.indicators.search("renewable energy")
