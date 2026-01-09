@@ -86,7 +86,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_sm__residence_total
+        - catalogPath: who#wat_sm__residence_total
           display:
             name: Usage of safely managed drinking water services
             type: Numeric
@@ -107,7 +107,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_bas__residence_total
+        - catalogPath: who#wat_baso__residence_total
           display:
             name: Usage of basic drinking water services
             type: Numeric
@@ -128,7 +128,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_lim__residence_total
+        - catalogPath: who#wat_lim__residence_total
           display:
             name: Usage of limited drinking water services
             type: Numeric
@@ -149,7 +149,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_unimp__residence_total
+        - catalogPath: who#wat_unimp__residence_total
           display:
             name: Usage of unimproved drinking water sources
             type: Numeric
@@ -168,7 +168,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_ns__residence_total
+        - catalogPath: who#wat_ns__residence_total
           display:
             name: No usage of drinking water facilities
             type: Numeric
@@ -189,7 +189,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_imp__residence_total
+        - catalogPath: who#wat_imp__residence_total
           display:
             name: Usage of improved drinking water sources
             type: Numeric
@@ -210,7 +210,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_sm_pop__residence_total
+        - catalogPath: who#wat_sm_pop__residence_total
           display:
             name: Number using safely managed drinking water services
             type: Integer
@@ -230,7 +230,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_bas_pop__residence_total
+        - catalogPath: who#wat_baso_pop__residence_total
           display:
             name: Number using basic drinking water services
             type: Integer
@@ -250,7 +250,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_lim_pop__residence_total
+        - catalogPath: who#wat_lim_pop__residence_total
           display:
             name: Number using limited drinking water services
             type: Integer
@@ -270,7 +270,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_unimp_pop__residence_total
+        - catalogPath: who#wat_unimp_pop__residence_total
           display:
             name: Number using unimproved drinking water sources
             type: Integer
@@ -288,7 +288,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_ns_pop__residence_total
+        - catalogPath: who#wat_ns_pop__residence_total
           display:
             name: Number with not using drinking water facilities
             type: Integer
@@ -308,7 +308,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_imp_pop__residence_total
+        - catalogPath: who#wat_imp_pop__residence_total
           display:
             name: Number using improved drinking water sources
             type: Integer
@@ -328,7 +328,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_sm__residence_urban
+        - catalogPath: who#wat_sm__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -349,7 +349,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_bas__residence_urban
+        - catalogPath: who#wat_baso__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -370,7 +370,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_lim__residence_urban
+        - catalogPath: who#wat_lim__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -391,7 +391,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_unimp__residence_urban
+        - catalogPath: who#wat_unimp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -410,7 +410,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_ns__residence_urban
+        - catalogPath: who#wat_ns__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -431,7 +431,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_imp__residence_urban
+        - catalogPath: who#wat_imp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -452,7 +452,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_sm_pop__residence_urban
+        - catalogPath: who#wat_sm_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -472,7 +472,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_bas_pop__residence_urban
+        - catalogPath: who#wat_baso_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -492,7 +492,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_lim_pop__residence_urban
+        - catalogPath: who#wat_lim_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -512,7 +512,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_unimp_pop__residence_urban
+        - catalogPath: who#wat_unimp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -530,7 +530,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_ns_pop__residence_urban
+        - catalogPath: who#wat_ns_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -550,7 +550,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_imp_pop__residence_urban
+        - catalogPath: who#wat_imp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -570,7 +570,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_sm__residence_rural
+        - catalogPath: who#wat_sm__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -591,7 +591,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_bas__residence_rural
+        - catalogPath: who#wat_baso__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -612,7 +612,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_lim__residence_rural
+        - catalogPath: who#wat_lim__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -633,7 +633,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_unimp__residence_rural
+        - catalogPath: who#wat_unimp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -652,7 +652,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_ns__residence_rural
+        - catalogPath: who#wat_ns__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -673,7 +673,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_imp__residence_rural
+        - catalogPath: who#wat_imp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -694,7 +694,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_sm_pop__residence_rural
+        - catalogPath: who#wat_sm_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -714,7 +714,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_bas_pop__residence_rural
+        - catalogPath: who#wat_baso_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -734,7 +734,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_lim_pop__residence_rural
+        - catalogPath: who#wat_lim_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -754,7 +754,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_unimp_pop__residence_rural
+        - catalogPath: who#wat_unimp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -772,7 +772,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_ns_pop__residence_rural
+        - catalogPath: who#wat_ns_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -792,7 +792,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_imp_pop__residence_rural
+        - catalogPath: who#wat_imp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -812,7 +812,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_sm__residence_total
+        - catalogPath: who#san_sm__residence_total
           display:
             name: Usage of safely managed sanitation services
             type: Numeric
@@ -833,7 +833,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_bas__residence_total
+        - catalogPath: who#san_baso__residence_total
           display:
             name: Usage of basic sanitation services
             type: Numeric
@@ -853,7 +853,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_lim__residence_total
+        - catalogPath: who#san_lim__residence_total
           display:
             name: Usage of limited sanitation services
             type: Numeric
@@ -873,7 +873,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_unimp__residence_total
+        - catalogPath: who#san_unimp__residence_total
           display:
             name: Usage of unimproved sanitation facilities
             type: Numeric
@@ -893,7 +893,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_ns__residence_total
+        - catalogPath: who#san_ns__residence_total
           display:
             name: Open defecation (no use of any sanitation facilities)
             type: Numeric
@@ -914,7 +914,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_imp__residence_total
+        - catalogPath: who#san_imp__residence_total
           display:
             name: Usage of improved sanitation facilities
             type: Numeric
@@ -935,7 +935,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_sm_pop__residence_total
+        - catalogPath: who#san_sm_pop__residence_total
           display:
             name: Number using sanitation with off-site wastewater treatment
             type: Integer
@@ -955,7 +955,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_bas_pop__residence_total
+        - catalogPath: who#san_baso_pop__residence_total
           display:
             name: Number using basic sanitation services
             type: Integer
@@ -974,7 +974,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_lim_pop__residence_total
+        - catalogPath: who#san_lim_pop__residence_total
           display:
             name: Number using limited sanitation services
             type: Integer
@@ -993,7 +993,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_unimp_pop__residence_total
+        - catalogPath: who#san_unimp_pop__residence_total
           display:
             name: Number using unimproved sanitation facilities
             type: Integer
@@ -1012,7 +1012,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_ns_pop__residence_total
+        - catalogPath: who#san_ns_pop__residence_total
           display:
             name: Number practicing open defecation (no use of any sanitation facilities)
             type: Integer
@@ -1032,7 +1032,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_imp_pop__residence_total
+        - catalogPath: who#san_imp_pop__residence_total
           display:
             name: Number using improved sanitation facilities
             type: Integer
@@ -1052,7 +1052,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_sm__residence_urban
+        - catalogPath: who#san_sm__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1073,7 +1073,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_bas__residence_urban
+        - catalogPath: who#san_baso__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1093,7 +1093,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_lim__residence_urban
+        - catalogPath: who#san_lim__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1113,7 +1113,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_unimp__residence_urban
+        - catalogPath: who#san_unimp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1133,7 +1133,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_ns__residence_urban
+        - catalogPath: who#san_ns__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1154,7 +1154,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_imp__residence_urban
+        - catalogPath: who#san_imp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1175,7 +1175,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_sm_pop__residence_urban
+        - catalogPath: who#san_sm_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1195,7 +1195,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_bas_pop__residence_urban
+        - catalogPath: who#san_baso_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1214,7 +1214,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_lim_pop__residence_urban
+        - catalogPath: who#san_lim_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1233,7 +1233,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_unimp_pop__residence_urban
+        - catalogPath: who#san_unimp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1252,7 +1252,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_ns_pop__residence_urban
+        - catalogPath: who#san_ns_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1272,7 +1272,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_imp_pop__residence_urban
+        - catalogPath: who#san_imp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1292,7 +1292,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_sm__residence_rural
+        - catalogPath: who#san_sm__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1313,7 +1313,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_bas__residence_rural
+        - catalogPath: who#san_baso__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1333,7 +1333,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_lim__residence_rural
+        - catalogPath: who#san_lim__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1353,7 +1353,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_unimp__residence_rural
+        - catalogPath: who#san_unimp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1373,7 +1373,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_ns__residence_rural
+        - catalogPath: who#san_ns__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1394,7 +1394,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_imp__residence_rural
+        - catalogPath: who#san_imp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1415,7 +1415,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_sm_pop__residence_rural
+        - catalogPath: who#san_sm_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1435,7 +1435,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_bas_pop__residence_rural
+        - catalogPath: who#san_baso_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1454,7 +1454,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_lim_pop__residence_rural
+        - catalogPath: who#san_lim_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1473,7 +1473,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_unimp_pop__residence_rural
+        - catalogPath: who#san_unimp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1492,7 +1492,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_ns_pop__residence_rural
+        - catalogPath: who#san_ns_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1512,7 +1512,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_imp_pop__residence_rural
+        - catalogPath: who#san_imp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1532,7 +1532,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_bas__residence_total
+        - catalogPath: who#hyg_bas__residence_total
           display:
             name: Access to basic handwashing facilities
             type: Numeric
@@ -1551,7 +1551,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_lim__residence_total
+        - catalogPath: who#hyg_lim__residence_total
           display:
             name: Access to limited handwashing facilities
             type: Numeric
@@ -1570,7 +1570,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_ns__residence_total
+        - catalogPath: who#hyg_ns__residence_total
           display:
             name: No handwashing facilities
             type: Numeric
@@ -1589,7 +1589,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_bas_pop__residence_total
+        - catalogPath: who#hyg_bas_pop__residence_total
           display:
             name: Number with access to basic handwashing facilities
             type: Integer
@@ -1607,7 +1607,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_lim_pop__residence_total
+        - catalogPath: who#hyg_lim_pop__residence_total
           display:
             name: Number with access to limited handwashing facilities
             type: Integer
@@ -1625,7 +1625,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_ns_pop__residence_total
+        - catalogPath: who#hyg_ns_pop__residence_total
           display:
             name: Number with no handwashing facilities
             type: Integer
@@ -1643,7 +1643,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_bas__residence_urban
+        - catalogPath: who#hyg_bas__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1662,7 +1662,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_lim__residence_urban
+        - catalogPath: who#hyg_lim__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1681,7 +1681,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_ns__residence_urban
+        - catalogPath: who#hyg_ns__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1700,7 +1700,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_bas_pop__residence_urban
+        - catalogPath: who#hyg_bas_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1718,7 +1718,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_lim_pop__residence_urban
+        - catalogPath: who#hyg_lim_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1736,7 +1736,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_ns_pop__residence_urban
+        - catalogPath: who#hyg_ns_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1754,7 +1754,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_bas__residence_rural
+        - catalogPath: who#hyg_bas__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1773,7 +1773,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_lim__residence_rural
+        - catalogPath: who#hyg_lim__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1792,7 +1792,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_ns__residence_rural
+        - catalogPath: who#hyg_ns__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1811,7 +1811,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_bas_pop__residence_rural
+        - catalogPath: who#hyg_bas_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1829,7 +1829,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_lim_pop__residence_rural
+        - catalogPath: who#hyg_lim_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1847,7 +1847,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_ns_pop__residence_rural
+        - catalogPath: who#hyg_ns_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
