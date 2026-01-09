@@ -487,54 +487,6 @@ class TestResponseSet:
         with pytest.raises(ValueError, match="No results available"):
             results.latest(by="version")
 
-    def test_first_single(self):
-        """Test getting first single result."""
-        from pydantic import BaseModel
-
-        class MockResult(BaseModel):
-            name: str
-
-        items = [
-            MockResult(name="a"),
-            MockResult(name="b"),
-            MockResult(name="c"),
-        ]
-        results = ResponseSet(results=items, query="test")
-
-        # Get first item
-        first = results.first()
-        assert first.name == "a"
-
-        # First of empty results
-        empty_results = ResponseSet(results=[], query="test")
-        assert empty_results.first() is None
-
-    def test_first_multiple(self):
-        """Test getting first n results."""
-        from pydantic import BaseModel
-
-        class MockResult(BaseModel):
-            name: str
-
-        items = [
-            MockResult(name="a"),
-            MockResult(name="b"),
-            MockResult(name="c"),
-            MockResult(name="d"),
-        ]
-        results = ResponseSet(results=items, query="test")
-
-        # Get first 2
-        first_two = results.first(2)
-        assert isinstance(first_two, ResponseSet)
-        assert len(first_two) == 2
-        assert [r.name for r in first_two] == ["a", "b"]
-
-        # Get first 10 (more than available)
-        first_ten = results.first(10)
-        assert isinstance(first_ten, ResponseSet)
-        assert len(first_ten) == 4
-
     def test_chaining(self):
         """Test chaining multiple convenience methods."""
         from pydantic import BaseModel
@@ -552,16 +504,14 @@ class TestResponseSet:
         ]
         results = ResponseSet(results=items, query="test")
 
-        # Chain filter -> sort -> first
-        filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True).first(1)
+        # Chain filter -> sort -> index
+        filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True)[0]
         assert filtered.version == "2024-03-01"
         assert filtered.namespace == "un"
 
-        # Chain filter -> sort -> first multiple
-        top_two = results.filter(lambda r: r.score > 0.6).sort_by("score", reverse=True).first(2)
-        assert isinstance(top_two, ResponseSet)
-        assert len(top_two) == 2
-        assert [r.score for r in top_two] == [0.9, 0.8]
+        # Chain filter -> sort -> latest
+        top = results.filter(lambda r: r.score > 0.6).sort_by("score", reverse=True).latest(by="score")
+        assert top.score == 0.9
 
 
 class TestDataclassModels:
