@@ -5,6 +5,25 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Columns to select, and how to rename them.
+COLUMNS = {
+    "object.launch.stateOfRegistry_s1": "country",
+    "object.launch.dateOfLaunch_s1": "year",
+    "object.nameOfSpaceObjectO_s1": "name",
+}
+
+
+def plot_starlink_objects(tb):
+    # Just out of curiosity, plot how many of all objects are Starlink satellites.
+    import plotly.express as px
+
+    tb_plot = tb.copy()
+    tb_plot["is_starlink"] = tb_plot["name"].str.lower().str.contains("starlink", na=False)
+    tb_plot = tb_plot.groupby(["year"], as_index=False).agg(
+        total_objects=("name", "size"), starlink_objects=("is_starlink", "sum")
+    )
+    px.line(tb_plot.melt(id_vars=["year"]), x="year", y="value", color="variable", markers=True).show()
+
 
 def run() -> None:
     #
@@ -19,14 +38,14 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = tb[["object.launch.stateOfRegistry_s1", "object.launch.dateOfLaunch_s1"]].rename(
-        columns={
-            "object.launch.stateOfRegistry_s1": "country",
-            "object.launch.dateOfLaunch_s1": "year",
-        },
-        errors="raise",
-    )
-    tb["year"] = tb["year"].str[0:4]
+    # Select and rename columns.
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
+    # Create a year column.
+    tb["year"] = tb["year"].str[0:4].astype(int)
+
+    # Uncomment to plot the total number of objects and the number of Starlink objects.
+    # plot_starlink_objects(tb=tb)
 
     # Add the number of launches for each country and year (and add metadata to the new column).
     tb = tb.groupby(["country", "year"], as_index=False).size().rename(columns={"size": "annual_launches"})
