@@ -9,10 +9,10 @@ from owid.catalog.api import (
     ChartResult,
     IndicatorResult,
     LicenseError,
-    PageSearchResult,
     ResponseSet,
     TableResult,
 )
+from owid.catalog.api.search import PageSearchResult
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
 

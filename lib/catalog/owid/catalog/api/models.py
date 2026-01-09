@@ -8,34 +8,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
 
 import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
     from owid.catalog.api.catalogs import CatalogFrame
 
 T = TypeVar("T")
-
-
-class PageSearchResult(BaseModel):
-    """An article/page found via search.
-
-    Attributes:
-        slug: Page URL identifier.
-        title: Page title.
-        url: Full URL to the page.
-        excerpt: Short excerpt from the page content.
-        authors: List of author names.
-        published_at: Publication date string.
-        thumbnail_url: URL to thumbnail image.
-    """
-
-    slug: str
-    title: str
-    url: str
-    excerpt: str = ""
-    authors: list[str] = Field(default_factory=list)
-    published_at: str = ""
-    thumbnail_url: str = ""
 
 
 class ResponseSet(BaseModel, Generic[T]):
@@ -326,14 +304,39 @@ class ResponseSet(BaseModel, Generic[T]):
             total_count=self.total_count,
         )
 
-    def latest(self, by: str = "version") -> T:
-        """Get the most recent result by a specific field.
+    def _get_version_string(self, item: T) -> str:
+        """Get a sortable version string for any result type.
 
-        Returns the single item with the highest value for the specified field.
+        Returns a string that can be used for chronological sorting:
+        - ChartResult: ISO format string from last_updated (with time)
+        - TableResult/IndicatorResult: version string
+
+        This allows consistent sorting across different result types,
+        even in mixed-type ResponseSets.
+        """
+        type_name = type(item).__name__
+
+        if type_name == "ChartResult":
+            last_updated = getattr(item, "last_updated", None)
+            if last_updated:
+                return last_updated.isoformat()
+            return ""
+        else:
+            # TableResult, IndicatorResult - use version
+            version = getattr(item, "version", None)
+            if version:
+                return str(version)
+            return ""
+
+    def latest(self, by: str | None = None) -> T:
+        """Get the most recent result.
+
+        Returns the single item with the highest value for the sort key.
 
         Args:
-            by: Attribute name to sort by (default: 'version').
-                Common values: 'version', 'published_at', 'score'.
+            by: Attribute name to sort by. If None (default), auto-detects:
+                - ChartResult: uses last_updated (as ISO string with time)
+                - TableResult/IndicatorResult: uses version
 
         Returns:
             Single item with the highest value for the specified field.
@@ -344,21 +347,25 @@ class ResponseSet(BaseModel, Generic[T]):
 
         Example:
             ```py
-            >>> # For TableResult - use version (default)
+            >>> # For TableResult/IndicatorResult - auto-detects version
             >>> latest_table = results.latest()
             >>> tb = latest_table.fetch()
 
-            >>> # For IndicatorResult - use version (default)
-            >>> latest_indicator = results.latest()
-            ```
+            >>> # For ChartResult - auto-detects last_updated
+            >>> latest_chart = chart_results.latest()
 
-        Note:
-            Support for charts is coming soon.
+            >>> # Explicit attribute (works for any result type)
+            >>> results.latest(by='score')
+            ```
         """
         if not self.results:
             raise ValueError("No results available to get latest from")
 
-        # Check if attribute exists on first item
+        # Auto-detect sort key based on result type
+        if by is None:
+            return max(self.results, key=self._get_version_string)
+
+        # Explicit attribute name
         if not hasattr(self.results[0], by):
             # Get available attributes (exclude private ones)
             available = [

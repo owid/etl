@@ -10,12 +10,35 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import requests
+from pydantic import BaseModel, Field
 
 from owid.catalog.api.charts import ChartResult
-from owid.catalog.api.models import PageSearchResult, ResponseSet
+from owid.catalog.api.models import ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+
+
+class PageSearchResult(BaseModel):
+    """An article/page found via search.
+
+    Attributes:
+        slug: Page URL identifier.
+        title: Page title.
+        url: Full URL to the page.
+        excerpt: Short excerpt from the page content.
+        authors: List of author names.
+        published_at: Publication date string.
+        thumbnail_url: URL to thumbnail image.
+    """
+
+    slug: str
+    title: str
+    url: str
+    excerpt: str = ""
+    authors: list[str] = Field(default_factory=list)
+    published_at: str = ""
+    thumbnail_url: str = ""
 
 
 class SiteSearchAPI:
