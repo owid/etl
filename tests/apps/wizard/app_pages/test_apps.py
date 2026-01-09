@@ -260,4 +260,13 @@ def test_app_explorer():
 def test_app_chart_animation():
     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_animation.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
+    # Allow RuntimeError for missing ffmpeg
+    if at.exception:
+        msg = at.exception[0].message
+        allowed = [
+            "No ffmpeg exe could be found",
+        ]
+        if any(text in msg for text in allowed):
+            return
+
     assert not at.exception
