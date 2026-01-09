@@ -171,7 +171,7 @@ def _fetch_chart_metadata(slug: str, *, timeout: int) -> dict[str, Any]:
     resp = requests.get(url, timeout=timeout)
 
     if resp.status_code == 404:
-        raise ChartNotFoundError(f"No such chart found: {slug}")
+        raise ChartNotFoundError(f"Failed to retrieve chart metadata. No such chart found: {slug}")
 
     resp.raise_for_status()
     return resp.json()
@@ -194,7 +194,7 @@ def _fetch_chart_config(slug: str, *, timeout: int) -> dict[str, Any]:
     resp = requests.get(url, timeout=timeout)
 
     if resp.status_code == 404:
-        raise ChartNotFoundError(f"No such chart found: {slug}")
+        raise ChartNotFoundError(f"Failed to retrieve chart config. No such chart found: {slug}")
 
     resp.raise_for_status()
     return resp.json()
@@ -220,7 +220,7 @@ def _fetch_chart_data(slug: str, *, timeout: int, load_data: bool = True) -> pd.
     resp = requests.get(url, timeout=timeout)
 
     if resp.status_code == 404:
-        raise ChartNotFoundError(f"No such chart found: {slug}")
+        raise ChartNotFoundError(f"Failed to retrieve chart data. No such chart found: {slug}")
 
     if resp.status_code == 403:
         try:
