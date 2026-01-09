@@ -91,7 +91,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_basal:
         title: Share of {definitions.residence} population using at least a basic drinking water source
@@ -104,7 +104,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_imp:
         title: Share of {definitions.residence} population using an improved drinking water source
@@ -115,7 +115,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_imp_av:
         title: Share of {definitions.residence} population using an improved drinking water source that is available when needed
@@ -126,7 +126,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_imp_npip:
         title: Share of {definitions.residence} population using non-piped improved drinking water
@@ -138,7 +138,7 @@ tables:
           - *non_piped_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_imp_prem:
         title: Share of {definitions.residence} population using an improved drinking water source on premises
@@ -150,7 +150,7 @@ tables:
           - *water_on_premises_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_imp_qual:
         title: Share of {definitions.residence} population using an improved drinking water source free of faecal and priority chemical contamination
@@ -161,7 +161,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_lim:
         title: Share of {definitions.residence} population using a limited drinking water source
@@ -174,7 +174,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_ns:
         title: Share of {definitions.residence} population using surface water for drinking
@@ -186,7 +186,7 @@ tables:
           - This is the lowest level of drinking water service and indicates a lack of access to safe drinking water.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_pip:
         title: Share of {definitions.residence} population using piped drinking water
@@ -198,7 +198,7 @@ tables:
           - *piped_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_sm:
         title: Share of {definitions.residence} population using safely managed drinking water
@@ -211,7 +211,7 @@ tables:
           - This is the highest level of drinking water service and indicates reliable access to safe drinking water.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_unimp:
         title: Share of {definitions.residence} population using unimproved drinking water
@@ -223,7 +223,7 @@ tables:
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_bas:
         title: Share of {definitions.residence} population using only basic sanitation facilities
@@ -236,7 +236,7 @@ tables:
           - *safely_managed_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_basal:
         title: Share of {definitions.residence} population using at least basic sanitation
@@ -249,7 +249,7 @@ tables:
           - *safely_managed_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_fst_sm:
         title: Share of {definitions.residence} population using safely managed sanitation with offsite treatment
@@ -261,7 +261,7 @@ tables:
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_imp:
         title: Share of {definitions.residence} population using improved sanitation facilities
@@ -272,7 +272,7 @@ tables:
           - *improved_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_lim:
         title: Share of {definitions.residence} population using limited sanitation facilities
@@ -284,7 +284,7 @@ tables:
           - *improved_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_ns:
         title: Share of {definitions.residence} population practicing open defecation
@@ -296,7 +296,7 @@ tables:
           - This is the lowest level of services and indicates a lack of safe sanitation infrastructure.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_othimp:
         title: Share of {definitions.residence} population using other improved sanitation facilities
@@ -307,7 +307,7 @@ tables:
           - *improved_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_sdo_sm:
         title: Share of {definitions.residence} population using safely managed sanitation with onsite disposal
@@ -319,7 +319,7 @@ tables:
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_sep:
         title: Share of {definitions.residence} population using septic tank sanitation
@@ -330,7 +330,7 @@ tables:
           - *improved_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_sew:
         title: Share of {definitions.residence} population using sewer sanitation
@@ -342,7 +342,7 @@ tables:
           - Sewage treatment to at least secondary levels includes biological treatment processes that clear organic matter and pathogens in wastewater. This is the minimum level of treatment required to protect human health and the environment.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_sm:
         title: Share of {definitions.residence} population using safely managed sanitation
@@ -354,7 +354,7 @@ tables:
           - This is the highest level of sanitation service and indicates reliable access to safe sanitation facilities.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_unimp:
         title: Share of {definitions.residence} population using unimproved sanitation facilities
@@ -366,7 +366,7 @@ tables:
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_bas:
         title: Share of {definitions.residence} population with basic handwashing facilities
@@ -374,43 +374,43 @@ tables:
         description_from_producer: Availability of a handwashing facility on premises with water and soap.
         description_key:
           - A basic handwashing facility is defined as a facility with soap and water available on premises.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_lim:
         title: Share of {definitions.residence} population with limited handwashing facilities
         description_short: Proportion of people with access to a handwashing facility at home, which lacks soap or water.
         description_from_producer: Availability of a handwashing facility lacking water and/or soap.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_nfac:
         title: Share of {definitions.residence} population with no handwashing facilities
         description_short: Proportion of people with no handwashing facility at home.
         description_from_producer: No handwashing facility on premises.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_bfac:
         title: Share of {definitions.residence} population with bathing facilities
         description_short: Proportion of people with access to a bathing facility on premises.
         description_from_producer: Access to a bathing facility on premises.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_bfacw:
         title: Share of {definitions.residence} population with bathing facilities and water
         description_short: Proportion of people with access to a bathing facility on premises and with water available.
         description_from_producer: Access to a bathing facility on premises and with water available.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_aware:
         title: Share of girls and women aware of menstruation before their first period
         description_short: Proportion of women and girls age 15-49 who are aware of menstruation before menarche.
         description_from_producer: Awareness of menstruation before menarche.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_comfort:
         title: Share of {definitions.residence} women and girls comfortable seeking help for menstrual problems
         description_short: Proportion of women and girls age 15-49 who would feel comfortable seeking help for menstrual problems from a health care provider.
         description_from_producer: Comfort seeking help for menstrual problems from a health care provider.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_enoumat:
         title: Share of {definitions.residence} women and girls with enough menstrual materials
@@ -419,13 +419,13 @@ tables:
         description_key:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_mat:
         title: Share of {definitions.residence} women and girls using menstrual materials
         description_short: Proportion of women and girls age 15-49 who used menstrual materials during their last menstrual period.
         description_from_producer: Use of menstrual materials.
-        unit: percent
+        unit: "%"
         short_unit: "%"
         description_key:
           - *menstrual_materials_rationale
@@ -434,7 +434,7 @@ tables:
         title: Share of {definitions.residence} women and girls not using menstrual materials
         description_short: Proportion of women and girls age 15-49 who did not use menstrual materials during their last menstrual period.
         description_from_producer: No use of menstrual materials.
-        unit: percent
+        unit: "%"
         short_unit: "%"
         description_key:
           - *menstrual_materials_rationale
@@ -447,25 +447,25 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_pain:
         title: Share of {definitions.residence} women and girls able to reduce menstruation-related pain
         description_short: Proportion of women and girls age 15-49 who were able to reduce menstruation-related pain when needed during their last menstrual period.
         description_from_producer: Able to reduce menstruation-related pain when needed.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_part:
         title: Share of {definitions.residence} women and girls able to participate in activities during menstruation
         description_short: Proportion of women and girls age 15-49 who participated in school, work and social activities during their last menstrual period.
         description_from_producer: No trouble participating in work, education or training, or social activities during menstruation.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_priv:
         title: Share of {definitions.residence} women and girls with private place to wash and change at home
         description_short: Proportion of women and girls age 15-49 who had a private place to wash their bodies and change their menstrual materials at home during their last menstrual period.
         description_from_producer: Private place to wash and change at home.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       mh_reuse:
         title: Share of {definitions.residence} women and girls using reusable menstrual materials
@@ -475,7 +475,7 @@ tables:
           - *menstrual_materials_rationale
           - *menstruation_materials_desc
           - *reusable_menstruation_materials_desc
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_bas_pop:
         title: |-
@@ -961,7 +961,7 @@ tables:
           - *improved_drinking_water_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_basal_pop_without:
         title: |-
@@ -986,7 +986,7 @@ tables:
           - Unimproved drinking water sources are more likely to be contaminated and pose a higher risk to health.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_imp_pop_without:
         title: |-
@@ -1010,7 +1010,7 @@ tables:
           - *water_not_on_premises_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       wat_sm_pop_without:
         title: |-
@@ -1035,7 +1035,7 @@ tables:
           - Unimproved sanitation facilities are more likely to be contaminated and pose a higher risk to health.
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_imp_pop_without:
         title: |-
@@ -1062,7 +1062,7 @@ tables:
           - *safely_managed_sanitation_desc
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_sm_pop_without:
         title: |-
@@ -1083,7 +1083,7 @@ tables:
         description_short: Proportion of people without access to a handwashing facility with soap and water available at home.
         description_key:
           - A basic handwashing facility is defined as a facility with soap and water available on premises.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_bas_pop_without:
         title: |-
@@ -1101,7 +1101,7 @@ tables:
         description_key:
           - A hygiene facility is a place where people can wash their hands, shower or bathe.
           - No access to a hygiene facility means there is not even a place to wash ones hands at home. This increases the risk of spreading diseases.
-        unit: percent
+        unit: "%"
         short_unit: "%"
       hyg_ns_pop:
         title: |-
@@ -1123,7 +1123,7 @@ tables:
           - This is the minimum level considered effective for protecting public health and the environment
           - *data_sources
           - *usage_vs_access
-        unit: percent
+        unit: "%"
         short_unit: "%"
       san_sew_sm_pop:
         title: |-

@@ -1,5 +1,4 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# Definitions sent by JMP researchers per email, feel free to reach out to them in case definitions change in future releases.
 meta:
   origin:
     # Data product / Snapshot
@@ -14,7 +13,7 @@ meta:
     # Citation
     producer: World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
     citation_full: |-
-      World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (2024). Estimates for drinking water, sanitation and hygiene services by country (2000-2024), https://washdata.org/data
+      World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (2025). Estimates for drinking water, sanitation and hygiene services by country (2000-2024), https://washdata.org/data
     attribution_short: WHO/UNICEF JMP
 
     # Files
