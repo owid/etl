@@ -1,7 +1,7 @@
 __version__ = "1.0.0rc0"
 
 from owid.catalog import api, processing, utils
-from owid.catalog.api import Client
+from owid.catalog.api import Client, fetch, search
 from owid.catalog.catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
 from owid.catalog.datasets import Dataset
 from owid.catalog.meta import (
@@ -22,6 +22,8 @@ __all__ = [
     # New unified client API
     "Client",
     "api",
+    "search",
+    "fetch",
     # Legacy catalog access (still supported)
     "LocalCatalog",
     "ETLCatalog",
