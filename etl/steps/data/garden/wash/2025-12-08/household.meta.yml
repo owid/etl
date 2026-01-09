@@ -1027,7 +1027,7 @@ tables:
           numDecimalPlaces: 0
       san_imp_without:
         title: Share of {definitions.residence} population not using improved sanitation facilities
-        description_short: People not using [improved sanitation facilities](#dod:improved-sanitation) might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
+        description_short: If no [improved sanitation facility](#dod:improved-sanitation) is available, people might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
         description_key:
           - *sanitation_rationale
           - *open_defecation_desc
@@ -1040,7 +1040,7 @@ tables:
       san_imp_pop_without:
         title: |-
           {definitions.residence_pop} population not using improved sanitation facilities
-        description_short: People not using [improved sanitation facilities](#dod:improved-sanitation) might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
+        description_short: If no [improved sanitation facility](#dod:improved-sanitation) is available, people might practice [open defecation](#dod:sanitation-open-defecation) or use [unimproved sanitation facilities](#dod:sanitation-unimproved).
         description_key:
           - *sanitation_rationale
           - *open_defecation_desc
