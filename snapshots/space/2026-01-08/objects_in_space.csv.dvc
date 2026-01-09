@@ -14,7 +14,7 @@ meta:
     citation_full: United States Space Force - Number of objects in space (2026). 18th Space Defense Squadron.
     url_main: https://www.space-track.org/
     date_accessed: '2026-01-08'
-    # NOTE: The data seems to be updated regularly, so it's safe to assume that date_publised equals date_accessed.
+    # NOTE: The data seems to be updated regularly, so it's safe to assume that date_published equals date_accessed.
     date_published: '2026-01-08'
   license:
     name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
