@@ -5,7 +5,7 @@ electricity mix in the UK.
 
 import numpy as np
 from owid.catalog import Table
-from owid.datautils import dataframes
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.helpers import PathFinder
 
@@ -145,9 +145,7 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
     tb_beis = tb_beis.drop(columns=["implied_efficiency"], errors="raise")
 
     # Combine BEIS and electricity mix data.
-    tb_combined = dataframes.combine_two_overlapping_dataframes(
-        df1=tb_elec, df2=tb_beis, index_columns=["country", "year"]
-    )
+    tb_combined = combine_two_overlapping_dataframes(df1=tb_elec, df2=tb_beis, index_columns=["country", "year"])
 
     # Format table conveniently.
     tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)

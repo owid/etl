@@ -364,16 +364,6 @@ steps:
     - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://garden/energy/2025-06-27/energy_mix
   #
-  # Energy - OWID Energy dataset.
-  #
-  export://github/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2026-01-09/owid_energy
-  #
-  # Energy - OWID Energy dataset.
-  #
-  export://s3/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2026-01-09/owid_energy
-  #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
   data-private://meadow/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
@@ -396,7 +386,7 @@ steps:
     - snapshot://ember/2026-01-09/yearly_electricity__europe.csv
     - snapshot://ember/2026-01-09/yearly_electricity__global.csv
   #
-  # Ember - Yearly electricity data (Global and Europe).
+  # Ember - Yearly electricity data.
   #
   data://garden/ember/2026-01-09/yearly_electricity:
     - data://garden/regions/2023-01-01/regions
@@ -411,11 +401,21 @@ steps:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
   #
+  # Energy - Electricity mix (EI & Ember).
+  #
+  data://grapher/energy/2026-01-09/electricity_mix:
+    - data://garden/energy/2026-01-09/electricity_mix
+  #
   # Energy - UK historical electricity.
   #
   data://garden/energy/2026-01-09/uk_historical_electricity:
     - data://garden/energy/2026-01-09/electricity_mix
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
+  #
+  # Energy - UK historical electricity.
+  #
+  data://grapher/energy/2026-01-09/uk_historical_electricity:
+    - data://garden/energy/2026-01-09/uk_historical_electricity
   #
   # Energy - OWID Energy dataset.
   #
@@ -428,12 +428,12 @@ steps:
     - data://garden/energy/2025-06-27/energy_mix
     - data://garden/demography/2024-07-15/population
   #
-  # Energy - Electricity mix (EI & Ember).
+  # Energy - OWID Energy dataset.
   #
-  data://grapher/energy/2026-01-09/electricity_mix:
-    - data://garden/energy/2026-01-09/electricity_mix
+  export://github/energy_data/latest/owid_energy:
+    - data://garden/energy_data/2026-01-09/owid_energy
   #
-  # Energy - UK historical electricity.
+  # Energy - OWID Energy dataset.
   #
-  data://grapher/energy/2026-01-09/uk_historical_electricity:
-    - data://garden/energy/2026-01-09/uk_historical_electricity
+  export://s3/energy_data/latest/owid_energy:
+    - data://garden/energy_data/2026-01-09/owid_energy
