@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Gravitational Wave Open Science Center
-    title: Graviational wave events
+    title: Gravitational wave events
     description: |-
       Gravitational wave event list, accessed via the Gravitational Wave Open Science Center (GWOSC).
     citation_full: |-
