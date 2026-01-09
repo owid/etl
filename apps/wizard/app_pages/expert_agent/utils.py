@@ -9,12 +9,18 @@ log = get_logger()
 
 CURRENT_DIR = Path(__file__).parent
 
+# Filter unwanted models
+models_skip = {
+    "openai:gpt-5-mini",
+    "anthropic:claude-haiku-4-5",
+}
+LLM_MODELS["models"] = [m for m in LLM_MODELS["models"] if m["name"] not in models_skip]
 
 # Load available models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 MODELS_DISPLAY = {m["name"]: m["display_name"] for m in LLM_MODELS["models"]}
 MODELS_AVAILABLE_LIST = list(MODELS_DISPLAY.keys())
-MODEL_DEFAULT = "openai:gpt-5-mini"
+MODEL_DEFAULT = "openai:gpt-5.1-mini"
 
 
 class DataFrameModel(BaseModel):
