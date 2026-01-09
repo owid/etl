@@ -214,7 +214,10 @@ def prepare_earnings_extended(tb_earnings_new: Table, tb_cpi: Table, tb_earnings
             tb_earnings_debug["absolute_difference"] / tb_earnings_debug["real_average_weekly_earnings_old"]
         )
 
-        print("Earnings overlap debug info:")
+        min_year = tb_earnings_debug["year"].min()
+        max_year = tb_earnings_debug["year"].max()
+
+        print(f"Earnings overlap debug info ({min_year}-{max_year}):")
         print(tb_earnings_debug[["absolute_difference", "relative_difference"]].describe())
 
     # Append the filtered new earnings to the original earnings table
