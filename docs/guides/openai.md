@@ -1,5 +1,5 @@
 ---
-icon: simple/openai
+icon: fontawesome/brands/openai
 tags:
     - 👷 Staff
 ---
