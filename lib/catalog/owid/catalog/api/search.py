@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import warnings
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import requests
@@ -61,15 +62,16 @@ class SiteSearchAPI:
         # Warn if limit exceeds maximum
         if limit > 100:
             warnings.warn(
-                "Max allowed of result items is 100. Using limit=100 instead.",
+                "Max allowed of result items is 100. Using limit=100 instead. Use argument `page` to paginate results.",
                 UserWarning,
                 stacklevel=3,  # stacklevel=3 to point to the public method caller
             )
+            limit = min(max(1, limit), 100)
 
         params: dict = {
             "q": query,
             "type": type_,
-            "hitsPerPage": min(max(1, limit), 100),
+            "hitsPerPage": limit,
             "page": page,
         }
 
@@ -136,6 +138,16 @@ class SiteSearchAPI:
         results = []
         for hit in data.get("results", []):
             slug = hit.get("slug", "")
+
+            # Parse datetime fields
+            published_at = None
+            if hit.get("publishedAt"):
+                published_at = datetime.fromisoformat(hit["publishedAt"].replace("Z", "+00:00"))
+
+            last_updated = None
+            if hit.get("updatedAt"):
+                last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
+
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
@@ -143,6 +155,8 @@ class SiteSearchAPI:
                 subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
+                published_at=published_at,
+                last_updated=last_updated,
             )
             chart._timeout = effective_timeout
             results.append(chart)
