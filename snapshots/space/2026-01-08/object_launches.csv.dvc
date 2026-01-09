@@ -1,3 +1,6 @@
+# This snapshot has a dedicated script to fetch all data from UNOOSA.
+# (For future consideration) Another interesting alternative source for objects in space is this catalog:
+# https://planet4589.org/space/gcat/data/derived/currentcat.html
 meta:
   origin:
     producer: United Nations Office for Outer Space Affairs

@@ -10,6 +10,7 @@ COLUMNS = {
     "object.launch.stateOfRegistry_s1": "country",
     "object.launch.dateOfLaunch_s1": "year",
     "object.nameOfSpaceObjectO_s1": "name",
+    "object.nameOfSpaceObjectIno_s1": "name_ino",
 }
 
 
@@ -40,6 +41,13 @@ def run() -> None:
     #
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
+    # UNOOSA uses two different name fields for different time periods:
+    # - object.nameOfSpaceObjectO_s1: Used for older objects (pre-2025 mostly)
+    # - object.nameOfSpaceObjectIno_s1: Used for newer objects (2025 onwards)
+    # Combine both fields to get complete name coverage.
+    tb["name"] = tb["name"].fillna(tb["name_ino"])
+    tb = tb.drop(columns=["name_ino"])
 
     # Create a year column.
     tb["year"] = tb["year"].str[0:4].astype(int)
