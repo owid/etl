@@ -1,22 +1,21 @@
-"""Quick access functions for data discovery and retrieval.
+"""Quick access functions for data discovery and retrieval. For more complex use cases, refer to the [full API](../#owid.catalog.api.Client).
 
 This module provides convenience functions for discovering and accessing OWID catalog data.
-The API separates discovery (searching) from download (fetching) for better cost awareness.
 
-Functions:
-    search() - Search for available data without downloading (returns ResponseSet)
-    fetch() - Direct access by path (downloads and returns Table or ChartTable)
-
-Example:
+The API separates discovery (searching)
+Example: Search for available data (no download)
     ```python
-    >>> # Search for available data (no download)
-    >>> from owid.catalog.api.quick import search
+    >>> from owid.catalog import search
     >>> results = search("population")  # Returns ResponseSet[TableResult]
     >>> print(f"Found {len(results)} tables")
     >>> print(results[0].path)
+    ```
 
-    >>> # Fetch specific data by path
-    >>> from owid.catalog.api.quick import fetch
+from download (fetching)
+
+Example: Fetch specific data by path
+    ```python
+    >>> from owid.catalog import fetch
     >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")
     >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")
     >>> chart_tb = fetch("life-expectancy")  # Chart slug auto-detected
@@ -66,9 +65,9 @@ def search(
         name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy")
         kind: What to search for (default: "table"):
 
-                - "table": Search catalog tables (returns ResponseSet[TableResult])
-                - "indicator": Search indicators/variables (returns ResponseSet[IndicatorResult])
-                - "chart": Search published charts (returns ResponseSet[ChartResult])
+            - "table": Search catalog tables (returns ResponseSet[TableResult])
+            - "indicator": Search indicators/variables (returns ResponseSet[IndicatorResult])
+            - "chart": Search published charts (returns ResponseSet[ChartResult])
         limit: Maximum number of results to return (default: 10)
         namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
         version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
@@ -76,15 +75,15 @@ def search(
         channel: Filter by channel (e.g., "garden", "grapher"). Only for tables.
         match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables):
 
-                - "exact": Exact string match
-                - "contains": Substring match
-                - "regex": Regular expression
-                - "fuzzy": Typo-tolerant similarity matching
+            - "exact": Exact string match
+            - "contains": Substring match
+            - "regex": Regular expression
+            - "fuzzy": Typo-tolerant similarity matching
         fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables.
         case: Case-sensitive search (default: False).  Only for tables.
 
     Returns:
-        ResponseSet of results (TableResult, IndicatorResult, or ChartResult objects). Results can be indexed, iterated, and provide access to metadata without downloading data.
+        Search results. Results can be indexed, iterated, and provide access to metadata without downloading data.
 
     Example:
         ```python
@@ -111,7 +110,7 @@ def search(
         tb = results[0].fetch()
         ```
 
-    Note:
+    Warning:
         For indicators and charts, filtering parameters (namespace, version, dataset, channel)
         are ignored as they don't apply to those search types.
     """
@@ -154,7 +153,7 @@ def fetch(path: str) -> "Table | ChartTable":
             - Chart: "life-expectancy" (chart slug without '/' or '#')
 
     Returns:
-        - Table (for tables or indicators) or CharTable (for charts)
+        Table (for tables or indicators) or CharTable (for charts)
 
     Raises:
         ValueError: If path format is invalid or resource not found
