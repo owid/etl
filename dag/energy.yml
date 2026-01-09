@@ -111,20 +111,6 @@ steps:
   export://multidim/energy/latest/energy_prices:
     - data://grapher/energy/2025-02-03/energy_prices
   #
-  # Ember - Yearly electricity data.
-  #
-  data://meadow/ember/2025-05-12/yearly_electricity:
-    - snapshot://ember/2025-05-12/yearly_electricity__global.csv
-    - snapshot://ember/2025-05-12/yearly_electricity__europe.csv
-  #
-  # Ember - Yearly electricity data (Global and Europe).
-  #
-  data://garden/ember/2025-05-12/yearly_electricity:
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-    - data://meadow/ember/2025-05-12/yearly_electricity
-  #
   # IRENA - Renewable energy patents.
   #
   data://meadow/irena/2025-06-20/renewable_energy_patents:
@@ -171,29 +157,6 @@ steps:
     - data://meadow/eia/2025-07-08/energy_consumption
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
-  #
-  # Energy - Electricity mix (EI & Ember).
-  #
-  data://garden/energy/2025-06-27/electricity_mix:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    - data://garden/demography/2024-07-15/population
-    - data://garden/ember/2025-05-12/yearly_electricity
-  #
-  # Energy - Electricity mix (EI & Ember).
-  #
-  data://grapher/energy/2025-06-27/electricity_mix:
-    - data://garden/energy/2025-06-27/electricity_mix
-  #
-  # Energy - UK historical electricity.
-  #
-  data://garden/energy/2025-06-27/uk_historical_electricity:
-    - data://garden/energy/2025-06-27/electricity_mix
-    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
-  #
-  # Energy - UK historical electricity.
-  #
-  data://grapher/energy/2025-06-27/uk_historical_electricity:
-    - data://garden/energy/2025-06-27/uk_historical_electricity
   #
   # Energy - Energy mix.
   #
@@ -351,28 +314,6 @@ steps:
   #
   data://grapher/energy/2025-11-19/historical_battery_costs:
     - data://garden/energy/2025-11-19/historical_battery_costs
-
-  #
-  # Energy - OWID Energy dataset.
-  #
-  data://garden/energy_data/2025-11-11/owid_energy:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/electricity_mix
-    - data://garden/energy/2025-06-27/fossil_fuel_production
-    - data://garden/energy/2025-06-27/primary_energy_consumption
-    - data://garden/energy/2025-06-27/energy_mix
-  #
-  # Energy - OWID Energy dataset.
-  #
-  export://github/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2025-11-11/owid_energy
-  #
-  # Energy - OWID Energy dataset.
-  #
-  export://s3/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2025-11-11/owid_energy
   #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
@@ -402,3 +343,61 @@ steps:
     - data://garden/ons/2025-12-31/average_weekly_earnings_uk
   data://grapher/light/2025-12-29/energy_innovation_long_run:
     - data://garden/light/2025-12-29/energy_innovation_long_run
+  #
+  # Ember - Yearly electricity data.
+  #
+  data://meadow/ember/2026-01-09/yearly_electricity:
+    - snapshot://ember/2026-01-09/yearly_electricity__europe.csv
+    - snapshot://ember/2026-01-09/yearly_electricity__global.csv
+  #
+  # Ember - Yearly electricity data.
+  #
+  data://garden/ember/2026-01-09/yearly_electricity:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/ember/2026-01-09/yearly_electricity
+  #
+  # Energy - Electricity mix (EI & Ember).
+  #
+  data://garden/energy/2026-01-09/electricity_mix:
+    - data://garden/ember/2026-01-09/yearly_electricity
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/demography/2024-07-15/population
+  #
+  # Energy - Electricity mix (EI & Ember).
+  #
+  data://grapher/energy/2026-01-09/electricity_mix:
+    - data://garden/energy/2026-01-09/electricity_mix
+  #
+  # Energy - UK historical electricity.
+  #
+  data://garden/energy/2026-01-09/uk_historical_electricity:
+    - data://garden/energy/2026-01-09/electricity_mix
+    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
+  #
+  # Energy - UK historical electricity.
+  #
+  data://grapher/energy/2026-01-09/uk_historical_electricity:
+    - data://garden/energy/2026-01-09/uk_historical_electricity
+  #
+  # Energy - OWID Energy dataset.
+  #
+  data://garden/energy_data/2026-01-09/owid_energy:
+    - data://garden/energy/2026-01-09/electricity_mix
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2025-06-27/fossil_fuel_production
+    - data://garden/energy/2025-06-27/energy_mix
+    - data://garden/demography/2024-07-15/population
+  #
+  # Energy - OWID Energy dataset.
+  #
+  export://github/energy_data/latest/owid_energy:
+    - data://garden/energy_data/2026-01-09/owid_energy
+  #
+  # Energy - OWID Energy dataset.
+  #
+  export://s3/energy_data/latest/owid_energy:
+    - data://garden/energy_data/2026-01-09/owid_energy

@@ -102,23 +102,23 @@ nav = [
             "libraries/index.md",
             { "owid.catalog" = [
                 "libraries/catalog/index.md",
-                { "Data APIs" = "libraries/catalog/api.md" },
-                { "Processing" = "libraries/catalog/structures.md" },
+                { "APIs" = "libraries/catalog/api.md" },
+                { "Data processing" = "libraries/catalog/structures.md" },
+                { "Library maintenance" = "libraries/catalog/maintenance.md" },
             ] },
             { "owid-grapher-py" = "libraries/grapher-py.md" },
             { "owid.repack" = "libraries/repack.md" },
             { "owid.datautils" = "libraries/datautils.md" },
         ] },
     ] },
-    { "API and catalog" = [
+    { "APIs" = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
-        { "Search API" = "api/search-api.md" },
+        { "Tables API" = "api/catalog-api.md" },
         { "Indicators API" = "api/semantic-search-api.md" },
-        { "Catalog API" = "api/catalog-api.md" },
+        { "Search API" = "api/search-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
         # { "Content database" = "api/datasette.md" },
-        { "Maintenance" = "api/maintenance.md" },
         { "COVID-19" = "api/covid/" },
     ] },
     { "Technical publications" = [
@@ -198,11 +198,11 @@ link = "https://linkedin.com/company/ourworldindata"
 
 # Theme configuration
 [project.theme]
-variant = "modern"                    # Use "classic" for Material for MkDocs appearance
+variant = "modern"             # Use "classic" for Material for MkDocs appearance
 language = "en"
 custom_dir = "docs/overrides/"
 logo = "assets/site-logo.svg"
-favicon = "assets/images/favicon.png"
+favicon = "assets/favicon.png"
 
 features = [
     # "content.action.edit",         # Edit this page
