@@ -27,3 +27,14 @@ steps:
     - data://meadow/wash/2024-02-15/bathing_water
   data://grapher/wash/2024-02-15/bathing_water:
     - data://garden/wash/2024-02-15/bathing_water
+
+  #
+  # WHO/UNICEF JMP WASH
+  #
+  data://meadow/wash/2025-12-08/household:
+    - snapshot://wash/2025-12-08/household.xlsx
+  data://garden/wash/2025-12-08/household:
+    - snapshot://wash/2025-12-08/definitions.xlsx
+    - data://meadow/wash/2025-12-08/household
+  data://grapher/wash/2025-12-08/household:
+    - data://garden/wash/2025-12-08/household
