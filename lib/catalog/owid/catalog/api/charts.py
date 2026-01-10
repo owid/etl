@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import io
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -50,6 +51,7 @@ class LicenseError(Exception):
 def _load_chart_table(
     slug: str,
     *,
+    use_column_short_names: bool,
     load_data: bool = True,
     timeout: int = 30,
 ) -> ChartTable:
@@ -57,6 +59,7 @@ def _load_chart_table(
 
     Args:
         slug: Chart slug (e.g., "life-expectancy").
+        use_column_short_names: If True, use short column names (e.g., "life_expectancy_0"). If False, use full display names (e.g., "Life expectancy at birth").
         load_data: If True (default), load full chart data.
                    If False, load only structure (columns and metadata) without rows.
         timeout: HTTP request timeout in seconds.
@@ -83,7 +86,14 @@ def _load_chart_table(
         config = _fetch_chart_config(slug, timeout=timeout)
 
         # Load data from CSV as ChartTable
-        df = _fetch_chart_data(slug, timeout=timeout, load_data=load_data)
+        df = _fetch_chart_data(
+            slug,
+            timeout=timeout,
+            load_data=load_data,
+            params={
+                "useColumnShortNames": str(use_column_short_names).lower(),
+            },
+        )
 
         # Build table with metadata
         meta = ChartTableMeta(
@@ -200,14 +210,20 @@ def _fetch_chart_config(slug: str, *, timeout: int) -> dict[str, Any]:
     return resp.json()
 
 
-def _fetch_chart_data(slug: str, *, timeout: int, load_data: bool = True) -> pd.DataFrame:
+def _fetch_chart_data(
+    slug: str,
+    *,
+    timeout: int,
+    params: dict[str, str],
+    load_data: bool = True,
+) -> pd.DataFrame:
     """Fetch chart data as a ChartTable.
 
     Args:
         slug: Chart slug.
-        chart_config: Chart configuration dictionary.
         timeout: HTTP request timeout in seconds.
         load_data: If True, load full data. If False, load only header.
+        params: Query parameters for the CSV endpoint. Refer to https://docs.owid.io/projects/etl/api/chart-api/#get-grapherslugcsv for complete list of parameters available.
 
     Returns:
         ChartTable with data (or empty if load_data=False).
@@ -216,8 +232,12 @@ def _fetch_chart_data(slug: str, *, timeout: int, load_data: bool = True) -> pd.
         ChartNotFoundError: If the chart does not exist.
         LicenseError: If the chart contains non-redistributable data.
     """
-    url = f"{GRAPHER_BASE_URL}/{slug}.csv?useColumnShortNames=true"
-    resp = requests.get(url, timeout=timeout)
+    url = f"{GRAPHER_BASE_URL}/{slug}.csv"
+    resp = requests.get(
+        url,
+        params=params,
+        timeout=timeout,
+    )
 
     if resp.status_code == 404:
         raise ChartNotFoundError(f"Failed to retrieve chart data. No such chart found: {slug}")
@@ -296,7 +316,7 @@ class ChartResult(BaseModel):
 
     Fields populated depend on the source:
     - fetch(): Provides config and metadata
-    - search(): Provides subtitle, available_entities, and num_related_articles
+    - search(): Provides subtitle, available_entities, num_related_articles, published_at, last_updated
 
     Core fields (slug, title, url) are always populated.
 
@@ -309,6 +329,8 @@ class ChartResult(BaseModel):
         subtitle: Chart subtitle/description (from search).
         available_entities: List of entities/countries in the chart (from search).
         num_related_articles: Number of related articles (from search).
+        published_at: When the chart was first published (from search).
+        last_updated: When the chart was last updated (from search).
     """
 
     model_config = ConfigDict(
@@ -328,12 +350,18 @@ class ChartResult(BaseModel):
     subtitle: str = ""
     available_entities: list[str] = Field(default_factory=list)
     num_related_articles: int = 0
+    published_at: datetime | None = None
+    last_updated: datetime | None = None
 
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
     _timeout: int = PrivateAttr(default=30)
 
-    def fetch(self, *, load_data: bool = True) -> ChartTable:
+    def fetch(
+        self,
+        *,
+        load_data: bool = True,
+    ) -> ChartTable:
         """Fetch chart data as ChartTable with rich metadata.
 
         Args:
@@ -356,9 +384,14 @@ class ChartResult(BaseModel):
         if load_data and self._cached_chart_table is not None:
             return self._cached_chart_table
 
-        tb = _load_chart_table(self.slug, load_data=load_data, timeout=self._timeout)
+        tb = _load_chart_table(
+            self.slug,
+            load_data=load_data,
+            timeout=self._timeout,
+            use_column_short_names=True,
+        )
 
-        # Cache only if loading full data
+        # Cache only if loading full data with default params
         if load_data:
             self._cached_chart_table = tb
 
@@ -454,7 +487,13 @@ class ChartsAPI:
             timeout=timeout or self._client.timeout,
         )
 
-    def fetch(self, slug_or_url: str, *, load_data: bool = True, timeout: int | None = None) -> ChartTable:
+    def fetch(
+        self,
+        slug_or_url: str,
+        *,
+        load_data: bool = True,
+        timeout: int | None = None,
+    ) -> ChartTable:
         """Fetch chart data as a ChartTable with rich metadata.
 
         Args:
@@ -477,4 +516,9 @@ class ChartsAPI:
         """
         effective_timeout = timeout or self._client.timeout
         slug = parse_chart_slug(slug_or_url)
-        return _load_chart_table(slug, load_data=load_data, timeout=effective_timeout)
+        return _load_chart_table(
+            slug,
+            load_data=load_data,
+            timeout=effective_timeout,
+            use_column_short_names=True,
+        )
