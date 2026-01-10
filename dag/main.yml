@@ -663,6 +663,7 @@ steps:
     - data://meadow/worldbank_wdi/2025-09-08/wdi
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
     - snapshot://worldbank_wdi/2025-09-08/wdi.zip
 
   data://grapher/worldbank_wdi/2025-09-08/wdi:
