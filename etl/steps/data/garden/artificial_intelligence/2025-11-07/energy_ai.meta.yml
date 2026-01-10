@@ -11,7 +11,6 @@ definitions:
     - Improvements in energy efficiency are expected to play a key role in keeping electricity use from rising too quickly, even as demand for digital services continues to grow.
   data_centers_description: &data_centers_description
     - It covers total data-center electricity use (including cooling and other support systems), across both general-purpose and AI-specialized servers.
-    - This indicator includes electricity consumption for all data center operations, encompassing both conventional servers and accelerated servers used for AI and machine learning workloads.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
