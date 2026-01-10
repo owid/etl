@@ -691,13 +691,13 @@
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database. For more information and methodology, please see http://pip.worldbank.org.",
-    "dataPublisherSource": "Poverty and Inequality Platform - World Bank",
+    "dataPublisherSource": "World Bank Poverty and Inequality Platform",
     "name": "Poverty and Inequality Platform, World Bank"
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are compiled from official government sources or are computed by World Bank staff using national (i.e. country–specific) poverty lines.",
-    "dataPublisherSource": "Poverty and Inequality Platform - World Bank",
-    "name": "Poverty and Inequality Platform - World Bank"
+    "dataPublisherSource": "World Bank Poverty and Inequality Platform",
+    "name": "World Bank Poverty and Inequality Platform"
   },
   {
     "rawName": "UNESCO Institute for Statistics (http://uis.unesco.org/). Data as of March 2021.",
@@ -896,8 +896,8 @@
   },
   {
     "rawName": "World Bank’s Poverty and Inequality Platform: http://pip.worldbank.org.",
-    "dataPublisherSource": "Poverty and Inequality Platform - World Bank",
-    "name": "Poverty and Inequality Platform - World Bank"
+    "dataPublisherSource": "World Bank Poverty and Inequality Platform",
+    "name": "World Bank Poverty and Inequality Platform"
   },
   {
     "rawName": "Detailed documentation of the WGI, interactive tools for exploring the data, and full access to the underlying source data available at www.govindicators.org.The WGI are produced by Daniel Kaufmann (Natural Resource Governance Institute and Brookings Institution) and Aart Kraay (World Bank Development Research Group).  Please cite Kaufmann, Daniel, Aart Kraay and Massimo Mastruzzi (2010).  \"The Worldwide Governance Indicators:  Methodology and Analytical Issues\".  World Bank Policy Research Working Paper No. 5430 (http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1682130).  The WGI do not reflect the official views of the Natural Resource Governance Institute, the Brookings Institution, the World Bank, its Executive Directors, or the countries they represent.",
@@ -1776,7 +1776,7 @@
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database. For more information and methodology, please see http://pip.worldbank.org., World Bank (WB), uri: http://pip.worldbank.org",
-    "name": "World Bank Poverty and Inequality Platform (PIP)",
+    "name": "World Bank Poverty and Inequality Platform",
     "dataPublisherSource": ""
   },
   {
@@ -1886,7 +1886,7 @@
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database. For more information and methodology, please see http://pip.worldbank.org., World Bank (WB), uri: http://pip.worldbank.org, note: Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database.",
-    "name": "World Bank Poverty and Inequality Platform (PIP)",
+    "name": "World Bank Poverty and Inequality Platform",
     "dataPublisherSource": ""
   },
   {
@@ -1941,7 +1941,7 @@
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are compiled from official government sources or are computed by World Bank staff using national (i.e. country–specific) poverty lines., World Bank (WB), note: Data are compiled from official government sources or are computed by World Bank staff using national (i.e. country–specific) poverty lines.",
-    "name": "World Bank Poverty and Inequality Platform (PIP)",
+    "name": "World Bank Poverty and Inequality Platform",
     "dataPublisherSource": ""
   },
   {
@@ -2176,7 +2176,7 @@
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database. For more information and methodology, please see http://pip.worldbank.org., World Bank (WB), uri: http://www.worldbank.org/en/topic/poverty/brief/global-database-of-shared-prosperity",
-    "name": "Poverty and Inequality Platform - World Bank",
+    "name": "World Bank Poverty and Inequality Platform",
     "dataPublisherSource": ""
   },
   {
