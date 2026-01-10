@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Body weight"
+    date_published: "2024-12-31"
+
+    # Citation
+    producer: Organisation for Economic Co-operation and Development
+    citation_full: |-
+      Body weight (2025), Organisation for Economic Co-operation and Development.
+    attribution_short: OECD
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CHealth%23HEA%23%7CRisk%20factors%20for%20health%23HEA_RIS%23&pg=0&fc=Topic&bp=true&snb=7&vw=tb&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_HEALTH_LVNG%40DF_HEALTH_LVNG_BW&df[ag]=OECD.ELS.HD&df[vs]=1.0&dq=.A..._T..&pd=%2C&to[TIME_PERIOD]=false
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_HEALTH_LVNG@DF_HEALTH_LVNG_BW,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2026-01-07'
+
+    # License
+    license:
+      name: © Organisation for Economic Co-operation and Development
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: baba59bb6ea981d18706dafed41b0d83
+    size: 1675944
+    path: body_weight.csv
