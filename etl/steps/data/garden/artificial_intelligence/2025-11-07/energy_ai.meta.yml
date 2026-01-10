@@ -10,8 +10,7 @@ definitions:
     - In the short term, the main factor shaping this outlook is industry forecasts for server shipments up to 2028, with similar trends assumed to continue beyond that point.
     - Improvements in energy efficiency are expected to play a key role in keeping electricity use from rising too quickly, even as demand for digital services continues to grow.
   data_centers_description: &data_centers_description
-    - Data centers house the servers and computing infrastructure that power internet services, cloud computing, and artificial intelligence applications.
-    - This metric includes electricity consumption for all data center operations, encompassing both conventional servers and accelerated servers used for AI and machine learning workloads.
+    - It covers total data-center electricity use (including cooling and other support systems), across both general-purpose and AI-specialized servers.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -40,13 +39,13 @@ tables:
           numDecimalPlaces: 1
 
       total_electricity_consumption__share_of_total_electricity_demand__historical:
-        title: Share of total electricity demand consumed by data centers
+        title: Share of total electricity demand coming from data centers
         unit: "%"
         short_unit: "%"
         processing_level: major
-        description_short: Data center electricity consumption as a percentage of total electricity demand of the country or region.
+        description_short: Data center electricity consumption as a share of total electricity demand of the country or region. Data centers power a wide range of online services beyond AI, such as streaming services and cloud storage. The data does not allow a separate estimate for AI use.
         description_key:
-          - This metric shows the proportion of total electricity demand that is consumed by data centers.
+          - This indicator shows what share of a country’s or region’s total electricity demand comes from data centers.
           - *data_centers_description
         description_processing: We calculated this share by dividing data centre electricity consumption by total electricity demand for each country or region.
         display:
