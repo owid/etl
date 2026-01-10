@@ -7,7 +7,8 @@ definitions:
         - Artificial Intelligence
     description_key:
       - TSMC (Taiwan Semiconductor Manufacturing Company) is a semiconductor foundry that manufactures computer chips for other companies, including processors used in AI, smartphones, computers, and other technologies.
-      - Revenue figures have been converted from New Taiwan dollars to US dollars using the exchange rates from the Central Bank of the Republic of China (Taiwan).
+      - The figures come from TSMC's own financial reports, are self-reported by the company, and are originally reported in New Taiwan dollars.
+      - We converted revenue figures from New Taiwan dollars to US dollars using the exchange rates from the Central Bank of the Republic of China (Taiwan). This data is not adjusted for inflation.
       - Data covers the period from 2006 onwards. Consolidated reporting, which combines the financial results of TSMC and all its subsidiaries into unified statements, began in 2013. Pre-2013 figures may be reported on a different basis.
 
 # Learn more about the available fields:
