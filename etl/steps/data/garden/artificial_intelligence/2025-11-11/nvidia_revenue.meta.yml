@@ -25,6 +25,6 @@ tables:
         description_processing: We aligned NVIDIA's fiscal quarters with calendar quarters and assigned each data point to the first day of the quarter. Professional Visualization (workstations and design software), Automotive (automotive computing platforms), and OEM & Other (original equipment manufacturing and miscellaneous sales) segments are grouped together as "Other".
         presentation:
           grapher_config:
-            note: '"Other" includes revenue from professional visualization, automotive tech, and chips sold to other manufacturers.'
+            note: NVIDIA’s fiscal quarters were aligned with calendar quarters, with data points assigned to the first day of each quarter. "Other" includes revenue from professional visualization, automotive tech, and chips sold to other manufacturers.'"Other" includes revenue from professional visualization, automotive tech, and chips sold to other manufacturers.'
         display:
           numDecimalPlaces: 0
