@@ -6,7 +6,6 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import click
 import requests
-from moviepy import ImageSequenceClip
 from PIL import Image
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
@@ -287,6 +286,16 @@ def create_mp4_from_images(
     duration_of_animation=False,
     first_frame=0,
 ):
+    # Lazy import to avoid ffmpeg requirement at module load time
+    try:
+        from moviepy import ImageSequenceClip
+    except RuntimeError as e:
+        if "No ffmpeg exe could be found" in str(e):
+            raise RuntimeError(
+                "FFmpeg is required to create MP4 files. Please install ffmpeg or set the IMAGEIO_FFMPEG_EXE environment variable."
+            ) from e
+        raise
+
     # Prepare a list of image objects.
     images = prepare_images(
         image_paths=image_paths,
