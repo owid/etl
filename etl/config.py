@@ -103,6 +103,7 @@ R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
 
 # publishing to grapher's MySQL db
 GRAPHER_USER_ID = int(env["GRAPHER_USER_ID"]) if "GRAPHER_USER_ID" in env else None
+ADMIN_API_KEY = env.get("ADMIN_API_KEY")
 DB_NAME = env.get("DB_NAME", "grapher")
 DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
