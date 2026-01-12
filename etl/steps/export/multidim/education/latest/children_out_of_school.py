@@ -157,7 +157,6 @@ def run() -> None:
                 "presentation": {
                     "title_public": view.config["title"],
                 },
-            view.config.missingDataStrategy == "show",
             }
         else:
             # Only updated description_short for other views
@@ -249,6 +248,10 @@ def create_grouped_views(collection):
                     "chartTypes": ["StackedArea"],
                 }
             )
+
+        # Add missingDataStrategy for level_side_by_side views
+        if view.matches(level="level_side_by_side"):
+            config["missingDataStrategy"] = "show"
 
         return config
 
