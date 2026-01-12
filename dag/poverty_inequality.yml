@@ -39,12 +39,16 @@ steps:
     - snapshot://wid/2026-01-02/world_inequality_database.csv
     - snapshot://wid/2026-01-02/world_inequality_database_distribution.csv
     - snapshot://wid/2026-01-02/world_inequality_database_distribution_with_extrapolations.csv
-  data://garden/wid/2026-01-02/world_inequality_database:
+  data://garden/wid/2026-01-12/world_inequality_database:
     - data://meadow/wid/2026-01-02/world_inequality_database
-  data://grapher/wid/2026-01-02/world_inequality_database:
-    - data://garden/wid/2026-01-02/world_inequality_database
+  data://grapher/wid/2026-01-12/world_inequality_database:
+    - data://garden/wid/2026-01-12/world_inequality_database
+
+    # Legacy WID pipeline
+  data://garden/wid/2026-01-02/world_inequality_database_legacy:
+    - data://meadow/wid/2026-01-02/world_inequality_database
   data://explorers/wid/latest/world_inequality_database:
-    - data://garden/wid/2026-01-02/world_inequality_database
+    - data://garden/wid/2026-01-02/world_inequality_database_legacy
 
   #
   # Luxembourg Income Study
