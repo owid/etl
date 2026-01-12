@@ -412,15 +412,15 @@ class Report:
             self.emails = None
 
     def change_file_permissions(self) -> None:
-        # Add data providers emails with reading permissions.
+        # Add data providers emails with commenter permissions.
         if self.emails is not None:
             GoogleDrive().set_file_permissions(
                 file_id=self.pdf_id,  # type: ignore
-                role="reader",
+                role="commenter",
                 emails=self.emails,
                 send_notification_email=False,
             )
-            log.info(f"Read access has been granted to emails: {self.emails}")
+            log.info(f"Commenter access has been granted to emails: {self.emails}")
         else:
             log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
 
