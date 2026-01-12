@@ -254,9 +254,9 @@ def test_collection_prune_dimensions():
         assert "metric" in view.dimensions
 
 
-def test_collection_drop_views():
+def test_collection_drop_views_single_key_value():
     """
-    Test Collection.drop_views - removes views matching specified dimension filters.
+    Test Collection.drop_views - removes views matching a single dimension filter.
 
     Example: drop_views({"country": "usa"}) removes all views with country=usa
     """
@@ -287,6 +287,315 @@ def test_collection_drop_views():
     # After dropping - only UK view remains
     assert len(collection.views) == 1
     assert collection.views[0].dimensions["country"] == "uk"
+
+
+def test_collection_drop_views_multiple_key_value_pairs():
+    """
+    Test Collection.drop_views with multiple key-value pairs (AND logic).
+
+    Example: drop_views({"country": "usa", "metric": "cases"}) removes views
+    that have BOTH country=usa AND metric=cases.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[DimensionChoice(slug="usa", name="USA"), DimensionChoice(slug="uk", name="UK")],
+            ),
+            Dimension(
+                slug="metric",
+                name="Metric",
+                choices=[DimensionChoice(slug="cases", name="Cases"), DimensionChoice(slug="deaths", name="Deaths")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "usa", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    assert len(collection.views) == 4
+
+    # Drop views where country=usa AND metric=cases (only 1 view matches)
+    collection.drop_views({"country": "usa", "metric": "cases"})
+
+    assert len(collection.views) == 3
+    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in collection.views]
+    assert ("usa", "cases") not in remaining_dims
+    assert ("usa", "deaths") in remaining_dims
+    assert ("uk", "cases") in remaining_dims
+    assert ("uk", "deaths") in remaining_dims
+
+
+def test_collection_drop_views_list_values_or_logic():
+    """
+    Test Collection.drop_views with list values (OR logic within a dimension).
+
+    Example: drop_views({"country": ["usa", "uk"]}) removes views that have
+    country=usa OR country=uk.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[
+                    DimensionChoice(slug="usa", name="USA"),
+                    DimensionChoice(slug="uk", name="UK"),
+                    DimensionChoice(slug="france", name="France"),
+                ],
+            ),
+            Dimension(slug="metric", name="Metric", choices=[DimensionChoice(slug="cases", name="Cases")]),
+        ],
+        views=[
+            View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "france", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    assert len(collection.views) == 3
+
+    # Drop views where country is "usa" OR "uk"
+    collection.drop_views({"country": ["usa", "uk"]})
+
+    assert len(collection.views) == 1
+    assert collection.views[0].dimensions["country"] == "france"
+
+
+def test_collection_drop_views_list_of_dicts_or_logic():
+    """
+    Test Collection.drop_views with list of dicts (OR logic between dicts).
+
+    Example: drop_views([{"country": "usa", "metric": "cases"}, {"country": "uk", "metric": "deaths"}])
+    removes views that match the first dict OR the second dict.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[DimensionChoice(slug="usa", name="USA"), DimensionChoice(slug="uk", name="UK")],
+            ),
+            Dimension(
+                slug="metric",
+                name="Metric",
+                choices=[DimensionChoice(slug="cases", name="Cases"), DimensionChoice(slug="deaths", name="Deaths")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "usa", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    assert len(collection.views) == 4
+
+    # Drop views matching (country=usa AND metric=cases) OR (country=uk AND metric=deaths)
+    collection.drop_views([{"country": "usa", "metric": "cases"}, {"country": "uk", "metric": "deaths"}])
+
+    assert len(collection.views) == 2
+    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in collection.views]
+    assert ("usa", "cases") not in remaining_dims
+    assert ("uk", "deaths") not in remaining_dims
+    assert ("usa", "deaths") in remaining_dims
+    assert ("uk", "cases") in remaining_dims
+
+
+def test_collection_drop_views_combined_list_and_or_logic():
+    """
+    Test Collection.drop_views with combined list of dicts and list values.
+
+    Example: drop_views([{"country": ["usa", "uk"], "metric": "cases"}])
+    removes views that have (country=usa OR country=uk) AND metric=cases.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[
+                    DimensionChoice(slug="usa", name="USA"),
+                    DimensionChoice(slug="uk", name="UK"),
+                    DimensionChoice(slug="france", name="France"),
+                ],
+            ),
+            Dimension(
+                slug="metric",
+                name="Metric",
+                choices=[DimensionChoice(slug="cases", name="Cases"), DimensionChoice(slug="deaths", name="Deaths")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "usa", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "france", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "france", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    assert len(collection.views) == 6
+
+    # Drop views where (country=usa OR country=uk) AND metric=cases
+    collection.drop_views([{"country": ["usa", "uk"], "metric": "cases"}])
+
+    assert len(collection.views) == 4
+    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in collection.views]
+    assert ("usa", "cases") not in remaining_dims
+    assert ("uk", "cases") not in remaining_dims
+    assert ("usa", "deaths") in remaining_dims
+    assert ("uk", "deaths") in remaining_dims
+    assert ("france", "cases") in remaining_dims
+    assert ("france", "deaths") in remaining_dims
+
+
+def test_collection_drop_views_invalid_dimension_slug():
+    """
+    Test Collection.drop_views raises ValueError for invalid dimension slugs.
+
+    Example: drop_views({"invalid_dim": "value"}) should raise ValueError
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[DimensionChoice(slug="usa", name="USA"), DimensionChoice(slug="uk", name="UK")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(ValueError, match="Invalid dimension slug.*invalid_dim.*in drop_views filter"):
+        collection.drop_views({"invalid_dim": "value"})
+
+
+def test_collection_drop_views_invalid_slug_in_list_of_dicts():
+    """
+    Test Collection.drop_views raises ValueError when invalid slug is in one of multiple dicts.
+
+    Example: drop_views([{"country": "usa"}, {"invalid": "value"}]) should raise ValueError
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[DimensionChoice(slug="usa", name="USA"), DimensionChoice(slug="uk", name="UK")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(ValueError, match="Invalid dimension slug.*invalid.*in drop_views filter"):
+        collection.drop_views([{"country": "usa"}, {"invalid": "value"}])
+
+
+def test_collection_drop_views_multiple_invalid_slugs():
+    """
+    Test Collection.drop_views raises ValueError when multiple invalid slugs are provided.
+
+    Example: drop_views({"invalid1": "v1", "invalid2": "v2"}) should raise ValueError
+    mentioning multiple slugs.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[DimensionChoice(slug="usa", name="USA")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(ValueError, match="Invalid dimension slugs.*in drop_views filter"):
+        collection.drop_views({"invalid1": "v1", "invalid2": "v2"})
+
+
+def test_collection_drop_views_partial_dimension_filter():
+    """
+    Test Collection.drop_views with a filter that doesn't specify all dimensions.
+
+    Example: With 2 dimensions (country, metric), drop_views({"country": "usa"})
+    should drop all views with country=usa regardless of metric value.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(
+                slug="country",
+                name="Country",
+                choices=[DimensionChoice(slug="usa", name="USA"), DimensionChoice(slug="uk", name="UK")],
+            ),
+            Dimension(
+                slug="metric",
+                name="Metric",
+                choices=[DimensionChoice(slug="cases", name="Cases"), DimensionChoice(slug="deaths", name="Deaths")],
+            ),
+        ],
+        views=[
+            View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "usa", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "cases"}, indicators=ViewIndicators(y=[])),
+            View(dimensions={"country": "uk", "metric": "deaths"}, indicators=ViewIndicators(y=[])),
+        ],
+        _definitions=Definitions(),
+    )
+
+    assert len(collection.views) == 4
+
+    # Drop all views where country=usa (both cases and deaths)
+    collection.drop_views({"country": "usa"})
+
+    assert len(collection.views) == 2
+    for view in collection.views:
+        assert view.dimensions["country"] == "uk"
 
 
 def test_collection_check_duplicate_views():
