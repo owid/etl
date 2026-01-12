@@ -115,7 +115,9 @@ Combining the ranges of capacity factors and power densities, we can calculate a
 - Upper: 32 · 10⁶ ha x ( 0.7 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 28% of 8760 h / 1 year ) = 55 PWh / year
 
 Our fiducial value of 1 GWh / ha / year could be considered conservative, given that:
+
 - A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
+
 - The hypothetical transition from biofuel cropland to solar panels would take place in the coming years, so efficiencies would improve slightly with respect to the present.
 
 Therefore, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year.
