@@ -60,6 +60,11 @@ def send_slack_chart_reviews(
 
     # Get user data (slack usernames)
     slack_users = get_usernames()
+    # Replace Max for Hannah (https://owid.slack.com/archives/C087DMCTYM9/p1768236870922109)
+    HANNAH_ID = "U4U46QBJ5"
+    MAX_ID = "U3E5PRWNN"
+    slack_users = {k: (HANNAH_ID if v == MAX_ID else v) for k, v in slack_users.items()}
+
     # Uncomment below if you want to test the workflow without tagging people
     # slack_users = {k: "U011L616WE5" for k, v in slack_users.items()}
     # slack_users = {k: f"_{v}" for k, v in slack_users.items()}
