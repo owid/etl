@@ -235,8 +235,8 @@ def run() -> None:
 
     # Drop views that are not relevant: For `level`="metric_type_side_by_side", there is only one valid `level` choice (`level`="all"). All the other level choices should be dropped.
     c.drop_views(
-        {
-            "metric_type": "enrolment_type_side_by_side",
+        dimensions={
+            "enrolment_type": "enrolment_type_side_by_side",
             "level": "tertiary",
         }
     )
