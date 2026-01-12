@@ -9,6 +9,8 @@ definitions:
         type: LineChart DiscreteBar
         hasMapTab: true
         yScaleToggle: false
+        timeTolerance: 10
+
 config:
   subNavId: water
   yAxisMin: 0
@@ -136,7 +138,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
     config:
       title: Share of the population using limited drinking water services
@@ -257,7 +259,7 @@ views:
             unit: people
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people using limited drinking water services
@@ -378,7 +380,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
     config:
       title: Share of the urban population using limited drinking water services
@@ -499,7 +501,7 @@ views:
             unit: people
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in urban areas using limited drinking water services
@@ -620,7 +622,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
     config:
       title: Share of the rural population using limited drinking water services
@@ -741,7 +743,7 @@ views:
             unit: people
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in rural areas using limited drinking water services
@@ -861,7 +863,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the population using limited sanitation services
@@ -981,7 +983,7 @@ views:
             unit: people
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people using limited sanitation services
@@ -1101,7 +1103,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the urban population using limited sanitation services
@@ -1221,7 +1223,7 @@ views:
             unit: people
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in urban areas using limited sanitation services
@@ -1341,7 +1343,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the rural population using limited sanitation services
@@ -1461,7 +1463,7 @@ views:
             unit: people
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in rural areas using limited sanitation services
@@ -1570,7 +1572,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_ns__residence_total
+        - catalogPath: household#hyg_nfac__residence_total
           display:
             name: No handwashing facilities
             type: Numeric
@@ -1613,7 +1615,7 @@ views:
             type: Integer
             unit: people
             additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people that rely on limited handwashing facilities
@@ -1625,7 +1627,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_ns_pop__residence_total
+        - catalogPath: household#hyg_nfac_pop__residence_total
           display:
             name: Number with no handwashing facilities
             type: Integer
@@ -1681,14 +1683,14 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_ns__residence_urban
+        - catalogPath: household#hyg_nfac__residence_urban
           display:
             name: Urban usage
             type: Numeric
             unit: '%'
             shortUnit: '%'
             additionalInfo: No handwashing facility is available on the premises.
-            colorScaleScheme: YlGnBu
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
     config:
       title: Share of the urban population without handwashing facilities
@@ -1724,7 +1726,7 @@ views:
             type: Integer
             unit: people
             additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in urban areas that rely on limited handwashing facilities
@@ -1736,7 +1738,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_ns_pop__residence_urban
+        - catalogPath: household#hyg_nfac_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1792,7 +1794,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_ns__residence_rural
+        - catalogPath: household#hyg_nfac__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1835,7 +1837,7 @@ views:
             type: Integer
             unit: people
             additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
-            colorScaleScheme: YlOrBr
+            colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in rural areas that rely on limited handwashing facilities
@@ -1847,7 +1849,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_ns_pop__residence_rural
+        - catalogPath: household#hyg_nfac_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
