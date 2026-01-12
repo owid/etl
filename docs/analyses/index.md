@@ -21,7 +21,6 @@ This is just a sneak peek into some of our data work. But note that all our code
 
     ## Land use for biofuels vs. solar
     This document is a technical companion to the article ["Putting solar panels on land used for biofuels would produce enough electricity for all cars and trucks to go electric"](https://ourworldindata.org/biofuel-land-solar-electric-vehicles), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic.
-    This technical document serves as a companion to that article, where we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
 
     [:material-book-open-variant: Methodology](biofuels_land_use/index.md){ .md-button }
 
