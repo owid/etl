@@ -20,7 +20,17 @@ RENAME_COLUMNS = {
     "MG_UNRWA_RFGS_CNTRY_ASYLM: Refugees under UNRWA mandate, by host country: _T: Total (PS: Persons)": "refugees_under_18_unrwa_asylum",
 }
 
+RENAME_COLUMNS_NEW = {'MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_CONF_VIOLENCE: Share due to conflict and violence (PS: Persons)': 'idps_under_18_conflict_violence',
+       'MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_DISASTER: Share due to disaster (PS: Persons)': 'idps_under_18_disaster',
+       'MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): _T: Total (PS: Persons)': 'idps_under_18_total',
+       'MG_NEW_INTERNAL_DISP: New internal displacements: POP_CONF_VIOLENCE: Share due to conflict and violence (NUMBER: Number)': 'new_idps_under_18_conflict_violence',
+       'MG_NEW_INTERNAL_DISP: New internal displacements: POP_DISASTER: Share due to disaster (NUMBER: Number)': 'new_idps_under_18_disaster',
+       'MG_NEW_INTERNAL_DISP: New internal displacements: _T: Total (NUMBER: Number)': 'new_idps_under_18_total',
+       'MG_RFGS_CNTRY_ASYLM: Refugees, by country of asylum: _T: Total (PS: Persons)': 'refugees_under_18_asylum',
+       'MG_RFGS_CNTRY_ORIGIN: Refugees, by country of origin: _T: Total (PS: Persons)': 'refugees_under_18_origin',
+       'MG_UNRWA_RFGS_CNTRY_ASYLM: Refugees under UNRWA mandate, by host country: _T: Total (PS: Persons)': 'refugees_under_18_unrwa_asylum'}
 
+       
 IDP_COLUMNS = [
     "idps_under_18_conflict_violence",
     "idps_under_18_disaster",
@@ -72,15 +82,6 @@ ORIGINS = {
 
 
 def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("child_migration")
-
-    # Read table from meadow dataset.
-    tb = ds_meadow.read("child_migration")
-
     # Load inputs.
     #
     # Load meadow dataset.
@@ -102,6 +103,9 @@ def run() -> None:
         columns="indicator",
         values="value",
     ).reset_index()
+
+    # filter on relevant columns
+
 
     # rename columns
     tb = tb.rename(columns=RENAME_COLUMNS, errors="raise")
