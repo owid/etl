@@ -249,6 +249,10 @@ def create_grouped_views(collection):
                 }
             )
 
+        # Add missingDataStrategy for level_side_by_side views
+        if view.matches(level="level_side_by_side"):
+            config["missingDataStrategy"] = "show"
+
         return config
 
     collection.group_views(
