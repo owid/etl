@@ -102,7 +102,8 @@ global democracy_democraticness E236
 global democracy_elections_makes_diff E266
 
 * Religion questions
-global religion_how_often F028 F028B
+global religion_how_often_services F028
+global religion_how_often_pray F028B
 global religion_god_important F063
 
 * List of questions to work with
@@ -1304,7 +1305,7 @@ foreach var in $democracy_elections_makes_diff {
 }
 
 
-* Processing "how often" questions about religion
+* Processing "how often" question about attending religious services
 /*
            1 More than once a week
            2 Once a week
@@ -1322,7 +1323,7 @@ foreach var in $democracy_elections_makes_diff {
 
 */
 
-foreach var in $religion_how_often {
+foreach var in $religion_how_often_services {
 	keep if `var' >= 1
 	keep if `var' != .c
 	keep if `var' != .d
@@ -1368,12 +1369,80 @@ foreach var in $religion_how_often {
 	replace no_answer_`var' = 1 if `var' == .b
 
 	collapse (mean) up_to_once_month_`var' special_holydays_`var' less_than_once_year_`var' more_once_week_`var' once_week_`var' once_month_`var' holydays_chr_`var' holydays_oth_`var' once_year_`var' less_often_`var' never_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
-	tempfile religion_how_often_`var'_file
-	save "`religion_how_often_`var'_file'"
+	tempfile religion_services_`var'_file
+	save "`religion_services_`var'_file'"
 
 	restore
 	preserve
 }
+
+* Processing "how often" question about praying
+/*
+           1 Several times a day
+           2 Once a day
+           3 Several times each week
+           4 Only when attending religious services
+           5 Only on special holy days/Christmas/Easter days
+           6 Once a year
+           7 Less often
+           8 Never practically never
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $religion_how_often_pray {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen up_to_sev_week_`var' = 0
+	replace up_to_sev_week_`var' = 1 if `var' <= 3
+
+	gen less_than_once_year_`var' = 0
+	replace less_than_once_year_`var' = 1 if `var' >= 7 & `var' <= 8
+
+	gen sev_times_day_`var' = 0
+	replace sev_times_day_`var' = 1 if `var' == 1
+
+	gen once_day_`var' = 0
+	replace once_day_`var' = 1 if `var' == 2
+
+	gen sev_times_week_`var' = 0
+	replace sev_times_week_`var' = 1 if `var' == 3
+
+	gen only_services_`var' = 0
+	replace only_services_`var' = 1 if `var' == 4
+
+	gen special_holydays_`var' = 0
+	replace special_holydays_`var' = 1 if `var' == 5
+
+	gen once_year_`var' = 0
+	replace once_year_`var' = 1 if `var' == 6
+
+	gen less_often_`var' = 0
+	replace less_often_`var' = 1 if `var' == 7
+
+	gen never_`var' = 0
+	replace never_`var' = 1 if `var' == 8
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) up_to_sev_week_`var' less_than_once_year_`var' sev_times_day_`var' once_day_`var' sev_times_week_`var' only_services_`var' special_holydays_`var' once_year_`var' less_often_`var' never_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile religion_pray_`var'_file
+	save "`religion_pray_`var'_file'"
+
+	restore
+	preserve
+}
+
 
 * Processing "how important god is in your life"
 /*
@@ -1500,9 +1569,14 @@ foreach var in $democracy_elections_makes_diff {
 	qui merge 1:1 year country using "`elections_difference_`var'_file'", nogenerate // keep(master match)
 }
 
-foreach var in $religion_how_often {
-	qui merge 1:1 year country using "`religion_how_often_`var'_file'", nogenerate // keep(master match)
+foreach var in $religion_how_often_services {
+	qui merge 1:1 year country using "`religion_services_`var'_file'", nogenerate // keep(master match)
 }
+
+foreach var in $religion_how_often_pray {
+	qui merge 1:1 year country using "`religion_pray_`var'_file'", nogenerate // keep(master match)
+}
+
 
 qui merge 1:1 year country using "`god_important_file'", nogenerate // keep(master match)
 

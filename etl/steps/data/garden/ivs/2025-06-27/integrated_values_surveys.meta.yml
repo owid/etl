@@ -4642,7 +4642,7 @@ tables:
           <<: *common-display
       less_than_once_year_attend_religious_services:
         title: "Religion - Attend religious services: Less than once a year/never"
-        description_short: '% of respondents replying "less than often (than a year)" or "never, practically never" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        description_short: '% of respondents replying "less often (than a year)" or "never, practically never" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
         display:
           name: "Attend religious services: Less than once a year/never"
           <<: *common-display
@@ -4707,53 +4707,47 @@ tables:
           name: "Attend religious services: No answer"
           <<: *common-display
 
-      up_to_once_month_pray:
-        title: "Religion - Pray: Up to once a month"
-        description_short: '% of respondents replying "more than once a week", "once a week" or "once a month" when asked "Apart from weddings and funerals, about how often do you pray?"'
+      up_to_sev_week_pray:
+        title: "Religion - Pray: Up to several times a week"
+        description_short: '% of respondents replying "several times a day", "once a day", or "several times a week" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
-          name: "Pray: Up to once a month"
-          <<: *common-display
-      special_holydays_pray:
-        title: "Religion - Pray: Special holy days"
-        description_short: '% of respondents replying "only on special holy days/Christmas/Easter" or "other specific holy days" when asked "Apart from weddings and funerals, about how often do you pray?"'
-        display:
-          name: "Pray: Special holy days"
+          name: "Pray: Up to several times a week"
           <<: *common-display
       less_than_once_year_pray:
         title: "Religion - Pray: Less than once a year/never"
-        description_short: '% of respondents replying "less than often (than a year)" or "never, practically never" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        description_short: '% of respondents replying "less often (than a year)" or "never, practically never" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
           name: "Pray: Less than once a year/never"
           <<: *common-display
-      more_once_week_pray:
-        title: "Religion - Pray: More than once a week"
-        description_short: '% of respondents replying "more than once a week" when asked "Apart from weddings and funerals, about how often do you pray?"'
+      sev_times_day_pray:
+        title: "Religion - Pray: Several times a day"
+        description_short: '% of respondents replying "several times a day" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
-          name: "Pray: More than once a week"
+          name: "Pray: Several times a day"
           <<: *common-display
-      once_week_pray:
-        title: "Religion - Pray: Once a week"
-        description_short: '% of respondents replying "once a week" when asked "Apart from weddings and funerals, about how often do you pray?"'
+      once_day_pray:
+        title: "Religion - Pray: Once a day"
+        description_short: '% of respondents replying "once a day" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
-          name: "Pray: Once a week"
+          name: "Pray: Once a day"
           <<: *common-display
-      once_month_pray:
-        title: "Religion - Pray: Once a month"
-        description_short: '% of respondents replying "once a month" when asked "Apart from weddings and funerals, about how often do you pray?"'
+      sev_times_week_pray:
+        title: "Religion - Pray: Several times each week"
+        description_short: '% of respondents replying "several times each week" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
-          name: "Pray: Once a month"
+          name: "Pray: Several times each week"
           <<: *common-display
-      holydays_chr_pray:
-        title: "Religion - Pray: Only on special holy days/Christmas/Easter"
-        description_short: '% of respondents replying "only on special holy days/Christmas/Easter" when asked "Apart from weddings and funerals, about how often do you pray?"'
+      only_services_pray:
+        title: "Religion - Pray: Only when attending religious services"
+        description_short: '% of respondents replying "only when attending religious services" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
-          name: "Pray: Only on special holy days/Christmas/Easter"
+          name: "Pray: Only when attending religious services"
           <<: *common-display
-      holydays_oth_pray:
-        title: "Religion - Pray: Other specific holy days"
-        description_short: '% of respondents replying "other specific holy days" when asked "Apart from weddings and funerals, about how often do you pray?"'
+      special_holydays_pray:
+        title: "Religion - Pray: Only on special holy days"
+        description_short: '% of respondents replying "only on special holy days/Christmas/Easter days" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
-          name: "Pray: Other specific holy days"
+          name: "Pray: Only on special holy days"
           <<: *common-display
       once_year_pray:
         title: "Religion - Pray: Once a year"
@@ -4763,7 +4757,7 @@ tables:
           <<: *common-display
       less_often_pray:
         title: "Religion - Pray: Less often than once a year"
-        description_short: '% of respondents replying "less often (than a year)" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        description_short: '% of respondents replying "less often (than once a year)" when asked "Apart from weddings and funerals, about how often do you pray?"'
         display:
           name: "Pray: Less often than once a year"
           <<: *common-display
