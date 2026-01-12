@@ -1,0 +1,25 @@
+# This snapshot has a dedicated script to fetch all data from UNOOSA.
+# (For future consideration) Another interesting alternative source for objects in space is this catalog:
+# https://planet4589.org/space/gcat/data/derived/currentcat.html
+meta:
+  origin:
+    producer: United Nations Office for Outer Space Affairs
+    title: Online Index of Objects Launched into Outer Space
+    description: |-
+      This data is compiled from the Online Index of Objects Launched into Outer Space, maintained by the United Nations Office for Outer Space Affairs since 1962.
+    citation_full: |-
+      United Nations Office for Outer Space Affairs (UNOOSA, 2026). Online Index of Objects Launched into Outer Space. Retrieved from https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+    attribution_short: UNOOSA
+    url_main: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+    date_accessed: '2026-01-08'
+    # NOTE: The date_published can be found in:
+    # https://www.unoosa.org/oosa/en/spaceobjectregister/index.html
+    # See "Registration Submissions Update" right above the list of updates.
+    date_published: '2025-12-31'
+    license:
+      name: Copyright © United Nations
+      url: https://www.unoosa.org/oosa/en/aboutus/terms-of-use.html
+outs:
+  - md5: febb5c1014b5fb66fb06352ce31a1447
+    size: 7250387
+    path: object_launches.csv

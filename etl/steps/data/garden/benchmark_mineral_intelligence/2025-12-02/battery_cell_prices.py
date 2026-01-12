@@ -16,13 +16,13 @@ COLUMNS_ANNUAL = {
 }
 COLUMNS_QUARTERLY = {
     "date": "date",
-    "ncm_weighted_average_cell_price": "ncm_battery_cell_price",
+    "ncm_weighted_average_cell_price": "nmc_battery_cell_price",
     "lfp_weighted_average_cell_price": "lfp_battery_cell_price",
 }
 # Mapping of battery chemistries.
 CHEMISTRY_MAPPING = {
     "battery_cell_price": "Average",
-    "ncm_battery_cell_price": "NCM",
+    "nmc_battery_cell_price": "NMC",
     "lfp_battery_cell_price": "LFP",
 }
 

@@ -22,12 +22,12 @@ tables:
           numDecimalPlaces: 2
   battery_cell_prices_by_chemistry:
     variables:
-      ncm_battery_cell_price:
-        title: Quarterly NCM battery cell price
+      nmc_battery_cell_price:
+        title: Quarterly NMC battery cell price
         unit: "current US$ per kilowatt-hour"
         short_unit: "$/kWh"
         description_short: |-
-          Average quarterly price of lithium nickel manganese cobalt oxide (NCM) battery cells per [kilowatt-hour](#dod:watt-hours). Prices are expressed in US dollars, not adjusted for inflation.
+          Average quarterly price of lithium nickel manganese cobalt oxide (NMC) battery cells per [kilowatt-hour](#dod:watt-hours). Prices are expressed in US dollars, not adjusted for inflation.
         display:
           numDecimalPlaces: 2
       lfp_battery_cell_price:
@@ -47,6 +47,6 @@ tables:
         description_short: |-
           Average price of [battery cells](#dod:battery-cell) per [kilowatt-hour](#dod:watt-hours) in US dollars, not adjusted for inflation. The data includes an annual average and quarterly average prices of different [lithium-ion battery](#dod:lithium-ion-battery) chemistries commonly used in electric vehicles and renewable energy storage.
         description_key:
-          - Lithium iron phosphate (LFP) and lithium nickel manganese cobalt oxide (NCM) are two types of rechargeable batteries commonly used in electric vehicles and renewable energy storage.
+          - Lithium iron phosphate (LFP) and lithium nickel manganese cobalt oxide (NMC) are two types of rechargeable batteries commonly used in electric vehicles and renewable energy storage.
         display:
           numDecimalPlaces: 2

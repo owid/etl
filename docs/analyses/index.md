@@ -17,17 +17,12 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-download: Download data (ZIP)](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip){ .md-button }
 
 
-<!-- Keep commented out until the article is published.
--->
-<!--
 !!! note ""
 
     ## Land use for biofuels vs. solar
-    This document is a technical companion to the article ["***"](***), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic.
-    This technical document serves as a companion to that article, where we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
+    This document is a technical companion to the article ["Putting solar panels on land used for biofuels would produce enough electricity for all cars and trucks to go electric"](https://ourworldindata.org/biofuel-land-solar-electric-vehicles), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic.
 
     [:material-book-open-variant: Methodology](biofuels_land_use/index.md){ .md-button }
--->
 
 !!! note ""
 

@@ -6,14 +6,39 @@
 from __future__ import annotations
 
 import warnings
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import requests
+from pydantic import BaseModel, Field
 
-from owid.catalog.api.models import ChartResult, PageSearchResult, ResponseSet
+from owid.catalog.api.charts import ChartResult
+from owid.catalog.api.models import ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+
+
+class PageSearchResult(BaseModel):
+    """An article/page found via search.
+
+    Attributes:
+        slug: Page URL identifier.
+        title: Page title.
+        url: Full URL to the page.
+        excerpt: Short excerpt from the page content.
+        authors: List of author names.
+        published_at: Publication date string.
+        thumbnail_url: URL to thumbnail image.
+    """
+
+    slug: str
+    title: str
+    url: str
+    excerpt: str = ""
+    authors: list[str] = Field(default_factory=list)
+    published_at: str = ""
+    thumbnail_url: str = ""
 
 
 class SiteSearchAPI:
@@ -60,15 +85,16 @@ class SiteSearchAPI:
         # Warn if limit exceeds maximum
         if limit > 100:
             warnings.warn(
-                "Max allowed of result items is 100. Using limit=100 instead.",
+                "Max allowed of result items is 100. Using limit=100 instead. Use argument `page` to paginate results.",
                 UserWarning,
                 stacklevel=3,  # stacklevel=3 to point to the public method caller
             )
+            limit = min(max(1, limit), 100)
 
         params: dict = {
             "q": query,
             "type": type_,
-            "hitsPerPage": min(max(1, limit), 100),
+            "hitsPerPage": limit,
             "page": page,
         }
 
@@ -135,6 +161,16 @@ class SiteSearchAPI:
         results = []
         for hit in data.get("results", []):
             slug = hit.get("slug", "")
+
+            # Parse datetime fields
+            published_at = None
+            if hit.get("publishedAt"):
+                published_at = datetime.fromisoformat(hit["publishedAt"].replace("Z", "+00:00"))
+
+            last_updated = None
+            if hit.get("updatedAt"):
+                last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
+
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
@@ -142,6 +178,8 @@ class SiteSearchAPI:
                 subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
+                published_at=published_at,
+                last_updated=last_updated,
             )
             chart._timeout = effective_timeout
             results.append(chart)
@@ -149,7 +187,7 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
         )
 
     def pages(
@@ -200,5 +238,5 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
         )

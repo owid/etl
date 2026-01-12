@@ -60,11 +60,11 @@ def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame) -> None:
     assert df_posts[df_posts.duplicated(subset=["url"])].empty, error
 
 
-def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Dict[str, pd.DataFrame]:
-    # Get charts using data from the current data producer.
-    df_producer_charts = get_visualizations_using_data_by_producer(producers=[producer])
+def gather_producer_analytics(producers: List[str], min_date: str, max_date: str) -> Dict[str, pd.DataFrame]:
+    # Get charts using data from the data producer(s).
+    df_producer_charts = get_visualizations_using_data_by_producer(producers=producers)
 
-    assert not df_producer_charts.empty, f"No charts found for producer: {producer}"
+    assert not df_producer_charts.empty, f"No charts found for producer(s): {', '.join(producers)}"
 
     # Remove duplicate rows.
     # NOTE: This happens, for example, when a chart uses multiple snapshots of the same producer (so they are different origins for the same producer), e.g. chart 488 has two origins with producer "Global Carbon Project".
@@ -157,8 +157,10 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
 class Report:
     """An analytics report for a data producer."""
 
-    def __init__(self, producer: str, period: str, year: int):
-        self.producer = producer
+    def __init__(self, producer: str, period: str, year: int, aliases: List[str] | None = None):
+        self.producer = producer  # Canonical name for display
+        self.aliases = aliases or []
+        self.all_producer_names = [producer] + self.aliases  # All names for data gathering
         self.period = period
         self.year = year
         # For annual reports (period "Y"), use just the year. For other periods, include the period code.
@@ -248,9 +250,16 @@ class Report:
 
     def gather_analytics(self) -> None:
         """Gather analytics data for this report."""
-        log.info(f"Gathering analytics for {self.producer} {self.period} {self.year}")
+        if self.aliases:
+            log.info(
+                f"Gathering analytics for {self.producer} (with aliases: {', '.join(self.aliases)}) {self.period} {self.year}"
+            )
+        else:
+            log.info(f"Gathering analytics for {self.producer} {self.period} {self.year}")
+
+        # Gather analytics for all producer names at once (primary + aliases)
         self.analytics = gather_producer_analytics(
-            producer=self.producer, min_date=self.min_date, max_date=self.max_date
+            producers=self.all_producer_names, min_date=self.min_date, max_date=self.max_date
         )
 
     def create_google_doc(self) -> None:
@@ -377,13 +386,22 @@ class Report:
         return links
 
     def gather_emails(self) -> None:
-        # Fetch data provider contacts from Notion table.
-        df = get_data_producer_contacts(producers=[self.producer])
+        # Try to fetch data provider contacts from Notion table using all producer names
+        df = get_data_producer_contacts(producers=self.all_producer_names)
 
-        if len(df) == 1:
-            emails_raw = df["Emails for analytics reports"].item()
-            email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-            emails = re.findall(email_pattern, emails_raw)
+        if len(df) >= 1:
+            # If multiple rows found (unlikely but possible), try each one
+            all_emails = []
+            for _, row in df.iterrows():
+                emails_raw = row["Emails for analytics reports"]
+                # Handle empty cells (None or NaN)
+                if pd.notna(emails_raw) and emails_raw:
+                    email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                    emails = re.findall(email_pattern, emails_raw)
+                    all_emails.extend(emails)
+
+            # Remove duplicates while preserving order
+            emails = list(dict.fromkeys(all_emails))
         else:
             emails = []
 
@@ -394,15 +412,15 @@ class Report:
             self.emails = None
 
     def change_file_permissions(self) -> None:
-        # Add data providers emails with reading permissions.
+        # Add data providers emails with commenter permissions.
         if self.emails is not None:
             GoogleDrive().set_file_permissions(
                 file_id=self.pdf_id,  # type: ignore
-                role="reader",
+                role="commenter",
                 emails=self.emails,
                 send_notification_email=False,
             )
-            log.info(f"Read access has been granted to emails: {self.emails}")
+            log.info(f"Commenter access has been granted to emails: {self.emails}")
         else:
             log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
 
@@ -410,8 +428,10 @@ class Report:
         """Create a complete report from scratch."""
         self.gather_analytics()
 
-        # Get impact highlights
-        highlights = get_impact_highlights(producers=[self.producer], min_date=self.min_date, max_date=self.max_date)
+        # Get impact highlights for all producer names
+        highlights = get_impact_highlights(
+            producers=self.all_producer_names, min_date=self.min_date, max_date=self.max_date
+        )
         print_impact_highlights(highlights=highlights)
 
         # Create the report
@@ -447,7 +467,13 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
 @click.option(
     "--producer",
     type=str,
-    help="Producer name(s).",
+    help="Producer name (canonical name used in report title).",
+)
+@click.option(
+    "--alias",
+    "aliases",
+    multiple=True,
+    help="Alternative producer names (can be specified multiple times, e.g., --alias 'UCDP' --alias 'Uppsala University').",
 )
 @click.option(
     "--period",
@@ -470,7 +496,7 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     default=False,
     help="Grant permissions to data providers to access PDF file.",
 )
-def run(producer, period, year, overwrite_pdf, grant_permissions):
+def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
     # First check if all required definitions of Google Drive, Doc and Sheet IDs are in place.
     for drive_id in [
         DATA_PRODUCER_REPORT_FOLDER_ID,
@@ -480,8 +506,11 @@ def run(producer, period, year, overwrite_pdf, grant_permissions):
         error = "Your .env file should contain all definitions of DATA_PRODUCER_REPORT_*_ID (see .env.example)."
         assert drive_id != "", error
 
+    # Convert aliases tuple to list
+    aliases_list = list(aliases) if aliases else []
+
     # Create report instance (it will automatically check for existing reports).
-    report = Report(producer, period, year)
+    report = Report(producer, period, year, aliases=aliases_list)
 
     if report.exists:
         log.warning(f"Google Doc report already exists for {producer} {period} {year}")

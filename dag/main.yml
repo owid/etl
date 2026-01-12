@@ -743,6 +743,18 @@ steps:
   data://grapher/oecd/2025-12-23/official_development_assistance:
     - data://garden/oecd/2025-12-23/official_development_assistance
 
+
+  #
+  # CORE Econ - Growth rate of GDP per capita and productivity
+  #
+  data://meadow/core_econ/2026-01-07/growth_rate_gdp_productivity:
+    - snapshot://core_econ/2026-01-07/growth_rate_productivity.csv
+    - snapshot://core_econ/2026-01-07/growth_rate_gdp_pc.csv
+  data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity:
+    - data://meadow/core_econ/2026-01-07/growth_rate_gdp_productivity
+  data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
+    - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

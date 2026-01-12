@@ -184,7 +184,7 @@ def load_latest_population():
     candidates = Client().tables.search(table="population", namespace="demography", dataset="population")
 
     # Pick highest version available
-    population = candidates.latest(by="version").data
+    population = candidates.latest(by="version").fetch()
 
     population = population.reset_index()[["country", "year", "population"]].rename(
         columns={"country": "entity_name"}, errors="raise"
