@@ -586,6 +586,16 @@ class Collection(MDIMBase):
         if isinstance(dimensions, dict):
             dimensions = [dimensions]
 
+        # Validate that all dimension slugs in the filter are valid
+        valid_slugs = set(dimensions_available.keys())
+        for dim_filter in dimensions:
+            invalid_slugs = set(dim_filter.keys()) - valid_slugs
+            if invalid_slugs:
+                raise ValueError(
+                    f"Invalid dimension slug{'s' if len(invalid_slugs) > 1 else ''} {invalid_slugs} in drop_views filter. "
+                    f"Valid dimension slugs are: {list(valid_slugs)}"
+                )
+
         # Get list of dimension arrangements to drop: Iterate over each dimension filter, and obtain explicit filter.
         dimensions_drop = []
         for dimensions_ in dimensions:
