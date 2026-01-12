@@ -157,6 +157,7 @@ def run() -> None:
                 "presentation": {
                     "title_public": view.config["title"],
                 },
+            view.config.missingDataStrategy == "show",
             }
         else:
             # Only updated description_short for other views
