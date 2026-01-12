@@ -5,55 +5,148 @@ definitions:
       topic_tags:
         - Migration
         - Violence Against Children & Children's Rights
+      grapher_config:
+        originUrl: "https://ourworldindata.org/migration"
+    unit: people
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+  unicef_descriptions:
+    refugee: &refugee |-
+      Person who are outside their country of nationality or habitual residence, who cannot return due to a well-founded fear of being persecuted because of their race, religion, nationality, membership of a particular social group or political opinion. This number only accounts those who have been recognized as refugees or find themselves in refugee-like situations.
+      This data is sourced from: *United Nations High Commissioner for Refugees, Global Trends: Forced Displacement in 2018, UNHCR, Geneva, 2019.* Share of under 18 from UNHCR unpublished data, cited with permission.
+    internally_displaced: &internally_displaced |-
+      Persons who have been forced or obliged to flee or leave their homes or places of habitual residence, in particular as a result of or in order to avoid the effects of armed conflict, situations of generalized violence, violations of human rights or natural or human-made disasters, and who have not crossed an internationally recognized border. Data presented in this table refer only to persons displaced due to conflict and violence.
+      This data is sourced from: *Internal Displacement Monitoring Centre, Global Report on Internal Displacement 2019 (GIDD), IDMC, Geneva, 2019.*
+  other_descriptions:
+    unrwa: &unrwa |-
+      The United Nations Relief and Works Agency for Palestine Refugees in the Near East (UNRWA) is a UN agency that was established in 1949 to carry out direct relief and works programmes for Palestine refugees.
+      UNRWA has a humanitarian and development mandate to “provide assistance and protection to Palestine refugees pending a just and lasting solution to their plight.” This includes essential service delivery, primarily in the areas of basic education, primary health care and mental health care, relief and social services, microcredit, and emergency assistance, including in situations of armed conflict to registered Palestinian refugees.
+      They operate in Jordan, Lebanon, Syria the West Bank including East Jerusalem, and Gaza. The Agency does not have a mandate to engage in political negotiations or durable solutions.
+    new_displacement: &new_displacement |-
+      One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+    population: &population |-
+      To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 546
-
+  update_period_days: 365
 
 tables:
   child_migration:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      idps_under_18_conflict_violence:
+        title: Internally displaced children due to conflict and violence
+        description_short: |-
+         [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to conflict and violence but remain within their country's borders. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+        description_from_producer: *internally_displaced
+      idps_under_18_disaster:
+        title: Internally displaced children due to disasters
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to disasters but remain within their country's borders. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+        description_from_producer: *internally_displaced
+      idps_under_18_total:
+        title: Internally displaced children
+        description_short: |-
+          Total [internally displaced children](#dod:internally-displaced) under 18 years old, who were forced or obliged to leave their homes but remain within their country's borders. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+        description_from_producer: *internally_displaced
+      new_idps_under_18_conflict_violence:
+        title: New internal displacements of children due to conflict
+        description_short: |-
+          New [internal displacements](#dod:displacements) of children under 18 years old, due to conflict and violence. Internal displacement describes the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_from_producer: *internally_displaced
+      new_idps_under_18_disaster:
+        title: New internal displacements of children due to disasters
+        description_short: |-
+          New [internal displacements](#dod:displacements) of children under 18 years old, due to disasters. Internal displacement describes the movement of a child who is forced to leave their home due to disasters but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_from_producer: *internally_displaced
+      new_idps_under_18_total:
+        title: New internal displacements of children
+        description_short: |-
+          Total number of new [internal displacements](#dod:displacements) of children under 18 years old. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_from_producer: *internally_displaced
+      refugees_under_18_asylum:
+        title: Child refugees by country of asylum
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of asylum. This number describes all refugees who are currently living in the asylum country, not only refugees arriving in this year.
+        description_from_producer: *refugee
+      refugees_under_18_asylum_per_1000:
+        title: Child refugees by country of asylum per 1000 inhabitants of all ages
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the asylum country. This number describes all refugees who are currently living in the asylum country, not only refugees arriving in this year.
+        description_from_producer: *refugee
+        processing_level: major
+        description_processing: |-
+          - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+        display:
+          numDecimalPlaces: 1
+      refugees_under_18_origin:
+        title: Child refugees by country of origin
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by their country of origin. This number describes all refugees who have left their origin country, not only refugees leaving in this year.
+        description_from_producer: *refugee
+      refugees_under_18_origin_per_1000:
+        title: Child refugees by country of origin per 1000 inhabitants of all ages
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the origin country. This number describes all refugees who have left their origin country, not only refugees leaving in this year.
+        description_from_producer: *refugee
+        processing_level: major
+        description_processing: |-
+          - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+        display:
+          numDecimalPlaces: 1
+      refugees_under_18_unrwa_asylum:
+        title: Child refugees under UNRWA mandate
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) under [UNRWA mandate](#dod:unrwa). These are registered Palestinian refugees who live in Jordan, Lebanon, Syria, the West Bank and Gaza.
+        description_from_producer: *refugee
+        description_key:
+          - *unrwa
 
+      #idp shares
+      idps_under_18_total_per_1000:
+        title: Internally displaced children per 1000 inhabitants of all ages
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who were forced or obliged to leave their homes but remain within their country's borders, per 1000 inhabitants of the country. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+        description_from_producer: *internally_displaced
+        processing_level: major
+        description_processing: *population
+        display:
+          numDecimalPlaces: 1
+      idps_under_18_conflict_violence_per_1000:
+        title: Internally displaced children due to conflict and violence per 1000 inhabitants of all ages
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to conflict and violence but remain within their country's borders, per 1000 inhabitants of the country. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+        description_from_producer: *internally_displaced
+        processing_level: major
+        description_processing: *population
+        display:
+          numDecimalPlaces: 1
+      idps_under_18_disaster_per_1000:
+        title: Internally displaced children due to disasters per 1000 inhabitants of all ages
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to disasters but remain within their country's borders, per 1000 inhabitants of the country. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+        description_from_producer: *internally_displaced
+        processing_level: major
+        description_processing: *population
+        display:
+          numDecimalPlaces: 1
+      new_idps_under_18_total_per_1000:
+        title: New internal displacements of children per 1000 inhabitants of all ages
+        description_short: New [internally displacements](#dod:displacements) of children under 18 years old, per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_from_producer: *internally_displaced
+        processing_level: major
+        description_processing: *population
+        display:
+          numDecimalPlaces: 1
+      new_idps_under_18_conflict_violence_per_1000:
+        title: New internal displacements of children due to conflict per 1000 inhabitants of all ages
+        description_short: New [internal displacements](#dod:displacements) of children under 18 years old due to conflict and violence per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_from_producer: *internally_displaced
+        processing_level: major
+        description_processing: *population
+        display:
+          numDecimalPlaces: 1
+      new_idps_under_18_disaster_per_1000:
+        title: New internal displacements of children due to disasters per 1000 inhabitants of all ages
+        description_short: New [internal displacements](#dod:displacements) of children under 18 years old due to disasters per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home due to disaster but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_from_producer: *internally_displaced
+        processing_level: major
+        description_processing: *population
+        display:
+          numDecimalPlaces: 1

@@ -11,7 +11,7 @@ RENAME_COLUMNS = {
     "MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_CONF_VIOLENCE: Share due to conflict and violence (PS: Persons)": "idps_under_18_conflict_violence",
     "MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_DISASTER: Share due to disaster (PS: Persons)": "idps_under_18_disaster",
     "MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): _T: Total (PS: Persons)": "idps_under_18_total",
-    "MG_INTNL_MG_CNTRY_DEST: International migrants, by country of destination: _T: Total (PS: Persons)": "international_migrants_under_18_dest",
+    # "MG_INTNL_MG_CNTRY_DEST: International migrants, by country of destination: _T: Total (PS: Persons)": "international_migrants_under_18_dest",
     "MG_NEW_INTERNAL_DISP: New internal displacements: POP_CONF_VIOLENCE: Share due to conflict and violence (NUMBER: Number)": "new_idps_under_18_conflict_violence",
     "MG_NEW_INTERNAL_DISP: New internal displacements: POP_DISASTER: Share due to disaster (NUMBER: Number)": "new_idps_under_18_disaster",
     "MG_NEW_INTERNAL_DISP: New internal displacements: _T: Total (NUMBER: Number)": "new_idps_under_18_total",
@@ -20,17 +20,7 @@ RENAME_COLUMNS = {
     "MG_UNRWA_RFGS_CNTRY_ASYLM: Refugees under UNRWA mandate, by host country: _T: Total (PS: Persons)": "refugees_under_18_unrwa_asylum",
 }
 
-RENAME_COLUMNS_NEW = {'MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_CONF_VIOLENCE: Share due to conflict and violence (PS: Persons)': 'idps_under_18_conflict_violence',
-       'MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_DISASTER: Share due to disaster (PS: Persons)': 'idps_under_18_disaster',
-       'MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): _T: Total (PS: Persons)': 'idps_under_18_total',
-       'MG_NEW_INTERNAL_DISP: New internal displacements: POP_CONF_VIOLENCE: Share due to conflict and violence (NUMBER: Number)': 'new_idps_under_18_conflict_violence',
-       'MG_NEW_INTERNAL_DISP: New internal displacements: POP_DISASTER: Share due to disaster (NUMBER: Number)': 'new_idps_under_18_disaster',
-       'MG_NEW_INTERNAL_DISP: New internal displacements: _T: Total (NUMBER: Number)': 'new_idps_under_18_total',
-       'MG_RFGS_CNTRY_ASYLM: Refugees, by country of asylum: _T: Total (PS: Persons)': 'refugees_under_18_asylum',
-       'MG_RFGS_CNTRY_ORIGIN: Refugees, by country of origin: _T: Total (PS: Persons)': 'refugees_under_18_origin',
-       'MG_UNRWA_RFGS_CNTRY_ASYLM: Refugees under UNRWA mandate, by host country: _T: Total (PS: Persons)': 'refugees_under_18_unrwa_asylum'}
 
-       
 IDP_COLUMNS = [
     "idps_under_18_conflict_violence",
     "idps_under_18_disaster",
@@ -85,6 +75,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
+
     ds_meadow = paths.load_dataset("child_migration")
     ds_population = paths.load_dataset("population")
 
@@ -106,7 +97,6 @@ def run() -> None:
 
     # filter on relevant columns
 
-
     # rename columns
     tb = tb.rename(columns=RENAME_COLUMNS, errors="raise")
 
@@ -114,6 +104,7 @@ def run() -> None:
     # Process data.
     #
     # Harmonize country names.
+    tb["country"] = tb["country"].str.split(":").str[1].str.strip()
     tb = paths.regions.harmonize_names(tb=tb)
 
     # calculate shares per population
@@ -129,8 +120,6 @@ def run() -> None:
 
     # drop duplicated (aggregated rows show up more than once)
     tb = tb.drop_duplicates()
-
-    tb = tb.format(["country", "year"])
 
     # Improve table format.
     tb = tb.format(["country", "year"])
@@ -148,8 +137,6 @@ def run() -> None:
 def calculate_shares(tb):
     tb["refugees_under_18_asylum_per_1000"] = tb["refugees_under_18_asylum"] / tb["population"] * 1000
     tb["refugees_under_18_origin_per_1000"] = tb["refugees_under_18_origin"] / tb["population"] * 1000
-
-    tb["migrants_under_18_dest_per_1000"] = tb["international_migrants_under_18_dest"] / tb["population"] * 1000
 
     tb["idps_under_18_total_per_1000"] = tb["idps_under_18_total"] / tb["population"] * 1000
     tb["new_idps_under_18_total_per_1000"] = tb["new_idps_under_18_total"] / tb["population"] * 1000
