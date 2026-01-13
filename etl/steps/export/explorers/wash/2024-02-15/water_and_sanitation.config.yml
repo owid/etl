@@ -641,7 +641,7 @@ views:
             shortUnit: '%'
             additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,:80
+            colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,;80
     config:
       title: Share of the rural population using unimproved drinking water sources
       subtitle: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
@@ -661,7 +661,7 @@ views:
             additionalInfo: |-
               Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,,;,,;40,,;50,,;60
+            colorScaleNumericBins: 5,,;10,,;20,,;40,,;50,,;60
     config:
       title: Share of the rural population not using a drinking water facility
       subtitle: |-

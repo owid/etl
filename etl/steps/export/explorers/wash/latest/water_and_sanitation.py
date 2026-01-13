@@ -58,7 +58,4 @@ def check_lower_perc_columns(view):
     dim = view.dimensions
     resources = ["drinking_water", "sanitation"]
     levels = ["limited", "unimproved", "no_facilities"]
-    if dim.get("resource") in resources and dim.get("level_of_use_access") in levels:
-        return True
-    else:
-        return False
+    return dim.get("resource") in resources and dim.get("level_of_use_access") in levels
