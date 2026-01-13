@@ -398,8 +398,6 @@ class TablesAPI:
         if not results:
             return
 
-        from owid.catalog.api.popularity import fetch_popularity
-
         # Build dataset slugs: namespace/version/dataset
         slug_to_results: dict[str, list[TableResult]] = {}
         for r in results:
@@ -408,8 +406,8 @@ class TablesAPI:
                 slug_to_results[slug] = []
             slug_to_results[slug].append(r)
 
-        # Fetch popularity
-        popularity_data = fetch_popularity(
+        # Fetch popularity via Datasette API
+        popularity_data = self._client._datasette.fetch_popularity(
             list(slug_to_results.keys()),
             type="dataset",
             timeout=timeout or self._client.timeout,
