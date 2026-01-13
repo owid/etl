@@ -97,6 +97,7 @@ class IndicatorResult(BaseModel):
         unit: Unit of measurement.
         score: Semantic similarity score (0-1).
         n_charts: Number of charts using this indicator.
+        popularity: Popularity score (0.0 to 1.0) based on analytics views.
     """
 
     model_config = ConfigDict(
@@ -124,6 +125,7 @@ class IndicatorResult(BaseModel):
     # Usage metadata
     score: float
     n_charts: int | None = None
+    popularity: float = 0.0
 
     _cached_table: Table | None = PrivateAttr(default=None)
     _legacy: bool = PrivateAttr(default=False)
@@ -324,11 +326,48 @@ class IndicatorsAPI:
                 )
             )
 
+        # Enrich results with popularity from datasette
+        self._enrich_with_popularity(results, timeout=timeout)
+
         return ResponseSet(
             results=results,
             query=query,
             total_count=data.get("total_results", len(results)),
         )
+
+    def _enrich_with_popularity(
+        self, results: list[IndicatorResult], timeout: int | None = None
+    ) -> None:
+        """Enrich indicator results with popularity from datasette.
+
+        Uses indicator-level popularity (full catalog path format).
+        """
+        if not results:
+            return
+
+        from owid.catalog.api.popularity import fetch_popularity
+
+        # Build indicator slugs (full path)
+        slug_to_result: dict[str, IndicatorResult] = {}
+        for r in results:
+            if r.path:
+                slug_to_result[r.path] = r
+
+        if not slug_to_result:
+            return
+
+        # Fetch popularity
+        popularity_data = fetch_popularity(
+            list(slug_to_result.keys()),
+            type="indicator",
+            timeout=timeout or self._client.timeout,
+        )
+
+        # Enrich results
+        for slug, pop in popularity_data.items():
+            r = slug_to_result.get(slug)
+            if r:
+                object.__setattr__(r, "popularity", pop)
 
     def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:
         """Fetch a specific indicator by catalog path.

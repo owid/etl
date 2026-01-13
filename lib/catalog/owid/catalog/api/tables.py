@@ -107,6 +107,7 @@ class TableResult(BaseModel):
         dimensions: List of dimension columns.
         is_public: Whether the data is publicly accessible.
         formats: List of available formats.
+        popularity: Popularity score (0.0 to 1.0) based on analytics views.
     """
 
     model_config = ConfigDict(
@@ -131,6 +132,9 @@ class TableResult(BaseModel):
     # Technical metadata
     is_public: bool = True
     formats: list[str] = Field(default_factory=list)
+
+    # Usage metadata
+    popularity: float = 0.0
 
     _cached_table: Table | None = PrivateAttr(default=None)
 
@@ -365,6 +369,9 @@ class TablesAPI:
                 )
             )
 
+        # Enrich results with popularity from datasette
+        self._enrich_with_popularity(results, timeout=timeout)
+
         # Build descriptive query from search parameters
         query = self._build_query(
             table=table,
@@ -379,6 +386,38 @@ class TablesAPI:
             query=query,
             total_count=len(results),
         )
+
+    def _enrich_with_popularity(
+        self, results: list[TableResult], timeout: int | None = None
+    ) -> None:
+        """Enrich table results with popularity from datasette.
+
+        Uses dataset-level popularity (namespace/version/dataset format).
+        """
+        if not results:
+            return
+
+        from owid.catalog.api.popularity import fetch_popularity
+
+        # Build dataset slugs: namespace/version/dataset
+        slug_to_results: dict[str, list[TableResult]] = {}
+        for r in results:
+            slug = f"{r.namespace}/{r.version}/{r.dataset}"
+            if slug not in slug_to_results:
+                slug_to_results[slug] = []
+            slug_to_results[slug].append(r)
+
+        # Fetch popularity
+        popularity_data = fetch_popularity(
+            list(slug_to_results.keys()),
+            type="dataset",
+            timeout=timeout or self._client.timeout,
+        )
+
+        # Enrich results
+        for slug, pop in popularity_data.items():
+            for r in slug_to_results.get(slug, []):
+                object.__setattr__(r, "popularity", pop)
 
     def fetch(
         self,
