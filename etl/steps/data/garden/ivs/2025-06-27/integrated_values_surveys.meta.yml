@@ -7,11 +7,14 @@ definitions:
         - Trust
     processing_level: major
     description_key:
+      - When available, we consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Missing” responses, however, are excluded from the set of possible answers.
       - The years in the data represent the latest year of each Integrated Values Surveys wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022. This is done to improve comparability across waves.
     description_processing: |
       We collected the data by merging the World Values Survey and the European Values Study, following the methodology described in the [Integrated Values Surveys (IVS) website](https://www.worldvaluessurvey.org/WVSEVStrend.jsp).
 
       We processed the indicators from microdata of the IVS using Stata. Weights are applied for each country.
+
+      We consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Missing” responses, however, are excluded from the set of possible answers.
 
       We processed the years in the data to represent the latest year of each IVS wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022.
     display: &common-display

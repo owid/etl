@@ -35,7 +35,7 @@ global democracy_elections_makes_diff E266
 
 foreach var in $democracy_questions {
 	di "`var'"
-	tab `var'
+	tab `var', missing
 	label list `var'
 }
 
@@ -108,7 +108,7 @@ global religion_god_important F063
 
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important $religion_how_often_services $religion_how_often_pray
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -140,6 +140,14 @@ preserve
 
 /*
 A165 is the question "most people can be trusted"
+           1 Most people can be trusted
+           2 Can´t be too careful
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
 */
 
 * Keep only "most people can be trusted" (1), "Need to be very careful" (2), "Don't know" (-1)
@@ -162,9 +170,16 @@ preserve
 
 /*
 G007_34 is the question about trusting people you meet fot the first time
+           1 Trust completely
+           2 Trust somewhat
+           3 Do not trust very much
+           4 Do not trust at all
 */
 
 keep if G007_34 >= 1
+keep if G007_34 != .c
+keep if G007_34 != .d
+keep if G007_34 != .e
 
 gen trust_first = 0
 replace trust_first = 1 if G007_34 == 1 | G007_34 == 2
@@ -184,9 +199,16 @@ preserve
 
 /*
 G007_33 is the question about trusting people you know personally
+           1 Trust completely
+           2 Trust somewhat
+           3 Do not trust very much
+           4 Do not trust at all
 */
 
 keep if G007_33 >= 1
+keep if G007_33 != .c
+keep if G007_33 != .d
+keep if G007_33 != .e
 
 gen trust_personally = 0
 replace trust_personally = 1 if G007_33 == 1 | G007_33 == 2
@@ -206,6 +228,13 @@ preserve
 
 /*
 A168 is the question "do you think most people try to take advantage of you"
+           1 Would take advantage
+           2 Try to be fair
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
 */
 
 keep if A168 >= 1
@@ -225,6 +254,16 @@ preserve
 
 /*
 Processing of multiple additional trust and confidence questions
+           1 A great deal
+           2 Quite a lot
+           3 Not very much
+           4 None at all
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
 */
 
 foreach var in $additional_questions {
