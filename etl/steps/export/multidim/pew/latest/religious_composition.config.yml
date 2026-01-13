@@ -28,6 +28,7 @@ definitions:
         map:
           colorScale:
             baseColorScheme: Blues
+            binningStrategy: manual
             customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     - dimensions:
         religion: christians
@@ -75,10 +76,10 @@ definitions:
               - "#E0C29A"
               - "#D5B07F"
               - "#CA9E65"
-              - "#BC8E5A"
-              - "#A97645"
-              - "#8E5F32"
-              - "#6F4521"
+              - "#A56F45"
+              - "#8E5E3A"
+              - "#74492D"
+              - "#56321A"
             customNumericColorsActive: true
     - dimensions:
         religion: religiously_unaffiliated
@@ -93,10 +94,10 @@ definitions:
               - "#A7E7E7"
               - "#91DEDE"
               - "#72D0D0"
-              - "#54C1C1"
-              - "#36B0B0"
-              - "#1A9797"
-              - "#006F6F"
+              - "#4AB0B0"
+              - "#2B8F8F"
+              - "#156B6B"
+              - "#003A3A"
             customNumericColorsActive: true
 
 dimensions:
