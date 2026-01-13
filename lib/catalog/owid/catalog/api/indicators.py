@@ -335,9 +335,7 @@ class IndicatorsAPI:
             total_count=data.get("total_results", len(results)),
         )
 
-    def _enrich_with_popularity(
-        self, results: list[IndicatorResult], timeout: int | None = None
-    ) -> None:
+    def _enrich_with_popularity(self, results: list[IndicatorResult], timeout: int | None = None) -> None:
         """Enrich indicator results with popularity from datasette.
 
         Uses indicator-level popularity (full catalog path format).
