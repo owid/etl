@@ -882,7 +882,7 @@ views:
             additionalInfo: |-
               Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 10,,;20,;40,,;60,,;80,,;100
+            colorScaleNumericBins: 10,,;20,,;40,,;60,,;80,,;100
     config:
       title: Share of the population using unimproved sanitation facilities
       subtitle: Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.
@@ -902,7 +902,7 @@ views:
             additionalInfo: |-
               Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,;40,,;60,,;80,,;100
+            colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,;80,,;100
     config:
       title: Share of the population not using sanitation facilities
       subtitle: |-
@@ -1122,7 +1122,7 @@ views:
             additionalInfo: |-
               Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 10,,;20,;40,,;60,,;80,,;100
+            colorScaleNumericBins: 10,,;20,,;40,,;60,,;80,,;100
     config:
       title: Share of the urban population using unimproved sanitation facilities
       subtitle: Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.
@@ -1142,7 +1142,7 @@ views:
             additionalInfo: |-
               Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,;40,,;60,,;80,,;100
+            colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,;80,,;100
     config:
       title: Share of the urban population not using sanitation facilities
       subtitle: |-
@@ -1362,7 +1362,7 @@ views:
             additionalInfo: |-
               Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,:80
+            colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,;80
     config:
       title: Share of the rural population using unimproved sanitation facilities
       subtitle: Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.
@@ -1382,7 +1382,7 @@ views:
             additionalInfo: |-
               Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,,;,,;40,,;50,,;60
+            colorScaleNumericBins: 5,,;10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the rural population not using sanitation facilities
       subtitle: |-
