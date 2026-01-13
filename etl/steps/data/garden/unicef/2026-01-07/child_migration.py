@@ -11,7 +11,7 @@ RENAME_COLUMNS = {
     "MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_CONF_VIOLENCE: Share due to conflict and violence (PS: Persons)": "idps_under_18_conflict_violence",
     "MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): POP_DISASTER: Share due to disaster (PS: Persons)": "idps_under_18_disaster",
     "MG_INTERNAL_DISP_PERS: Internally displaced persons (IDPs): _T: Total (PS: Persons)": "idps_under_18_total",
-    # "MG_INTNL_MG_CNTRY_DEST: International migrants, by country of destination: _T: Total (PS: Persons)": "international_migrants_under_18_dest",
+    # "MG_INTNL_MG_CNTRY_DEST: International migrants, by country of destination: _T: Total (PS: Persons)": "international_migrants_under_18_dest", # removed in 2025 update by UNICEF, kept for reference
     "MG_NEW_INTERNAL_DISP: New internal displacements: POP_CONF_VIOLENCE: Share due to conflict and violence (NUMBER: Number)": "new_idps_under_18_conflict_violence",
     "MG_NEW_INTERNAL_DISP: New internal displacements: POP_DISASTER: Share due to disaster (NUMBER: Number)": "new_idps_under_18_disaster",
     "MG_NEW_INTERNAL_DISP: New internal displacements: _T: Total (NUMBER: Number)": "new_idps_under_18_total",
@@ -20,53 +20,23 @@ RENAME_COLUMNS = {
     "MG_UNRWA_RFGS_CNTRY_ASYLM: Refugees under UNRWA mandate, by host country: _T: Total (PS: Persons)": "refugees_under_18_unrwa_asylum",
 }
 
-
-IDP_COLUMNS = [
-    "idps_under_18_conflict_violence",
-    "idps_under_18_disaster",
-    "idps_under_18_total",
-    "new_idps_under_18_conflict_violence",
-    "new_idps_under_18_disaster",
-    "new_idps_under_18_total",
-    "idps_under_18_conflict_violence_per_1000",
-    "idps_under_18_disaster_per_1000",
-    "idps_under_18_total_per_1000",
-    "new_idps_under_18_conflict_violence_per_1000",
-    "new_idps_under_18_disaster_per_1000",
-    "new_idps_under_18_total_per_1000",
-]
-
-REFUGEE_COLUMNS = [
-    "refugees_under_18_asylum",
-    "refugees_under_18_origin",
-    "refugees_under_18_unrwa_asylum",
-    "refugees_under_18_asylum_per_1000",
-    "refugees_under_18_origin_per_1000",
-]
-
-MIGRANT_COLUMNS = [
-    "international_migrants_under_18_dest",
-    "migrants_under_18_dest_per_1000",
-]
-
 ORIGINS = {
-    "UNHCR": {
-        "attribution": "United Nations High Commissioner For Refugees via UNICEF (2024)",
+    "United Nations High Commissioner for Refugees, Global Trends: Forced Displacement in 2023. UNHCR, 2024.": {
+        "attribution": "United Nations High Commissioner for Refugees via UNICEF (2024)",
         "attribution_short": "UNHCR",
-        "citation_full": "United Nations High Commissioner for Refugees, Global Trends: Forced Displacement in 2018, UNHCR, Geneva, 2019. Share of under 18 from UNHCR unpublished data, cited with permission. Cited via UNICEF.",
+        "citation_full": "United Nations High Commissioner for Refugees, Global Trends: Forced Displacement in 2023. UNHCR, 2024. Cited via UNICEF.",
         "data_published": "2024",
     },
-    "IDMC": {
+    "Internal Displacement Monitoring Centre, Global Internal Displacement Database (GIDD), IDMC, 2024.": {
         "attribution": "Internal Displacement Monitoring Centre via UNICEF (2024)",
         "attribution_short": "IDMC",
-        "citation_full": "Internal Displacement Monitoring Centre, Global Report on Internal Displacement 2019 (GIDD), IDMC, Geneva, 2019. Cited via UNICEF.",
+        "citation_full": "Internal Displacement Monitoring Centre, Global Internal Displacement Database (GIDD), IDMC, 2024. Cited via UNICEF.",
         "data_published": "2024",
     },
-    "UNDESA": {
-        "attribution": "United Nations, Department of Economic and Social Affairs via UNICEF (2024)",
-        "attribution_short": "UNDESA",
-        "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division, Trends in International Migrant Stock: The 2019 Revision, United Nations, New York, 2017. Share of under 18 calculated by UNICEF based on United Nations, Department of Economic and Social Affairs, Population Division, Trends in International Migrant Stock: Migrants by Age. Cited via UNICEF.",
-        "data_published": "2024",
+    "The United Nations Relief and Works Agency for Palestine Refugees, UNRWA, 2024.": {
+        "attribution": "The United Nations Relief and Works Agency for Palestine Refugees via UNICEF (2024)",
+        "attribution_short": "UNRWA",
+        "citation_full": "The United Nations Relief and Works Agency for Palestine Refugees, UNRWA, 2024. Cited via UNICEF.",
     },
 }
 
@@ -87,6 +57,8 @@ def run() -> None:
     tb["indicator"] = (
         tb["indicator"].astype(str) + ": " + tb["stat_pop"].astype(str) + " (" + tb["unit"].astype(str) + ")"
     )
+
+    sources = get_sources_per_indicator(tb)
 
     # pivot table to get seperate columns per asylum and origin
     tb = tb.pivot(
@@ -116,7 +88,7 @@ def run() -> None:
     tb = tb.drop(columns=["population"])
 
     # update origins for metadata (to add in original source)
-    tb = overwrite_origins(tb)
+    tb = overwrite_origins(tb, sources)
 
     # drop duplicated (aggregated rows show up more than once)
     tb = tb.drop_duplicates()
@@ -132,6 +104,15 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def get_sources_per_indicator(tb):
+    sources = {}
+    for indicator in tb["indicator"].unique():
+        subset = tb[tb["indicator"] == indicator]
+        data_sources = subset["data_source"].unique()
+        sources[indicator] = data_sources.tolist()
+    return sources
 
 
 def calculate_shares(tb):
@@ -152,16 +133,11 @@ def calculate_shares(tb):
     return tb
 
 
-def overwrite_origins(tb):
-    for col in tb.columns:
-        if col in IDP_COLUMNS:
-            src_key = "IDMC"
-        elif col in REFUGEE_COLUMNS:
-            src_key = "UNHCR"
-        elif col in MIGRANT_COLUMNS:
-            src_key = "UNDESA"
-        else:  # skip columns that are not from the original sources
-            continue
+def overwrite_origins(tb, sources):
+    indicator_cols = [col for col in tb.columns if col not in ["country", "year"]]
+    for col in indicator_cols:
+        assert len(sources[col]) == 1, f"Multiple sources found for indicator {col}: {sources[col]}"
+        src_key = sources[col][0]
         tb[col].metadata.origins[0].attribution = ORIGINS[src_key]["attribution"]
         tb[col].metadata.origins[0].citation_full = ORIGINS[src_key]["citation_full"]
         tb[col].metadata.origins[0].date_published = ORIGINS[src_key]["data_published"]

@@ -14,6 +14,7 @@ RENAME_COLUMNS = {
     "STAT_POP:Statistical Population": "stat_pop",
     "UNIT_MEASURE:Unit of measure": "unit",
     "UNIT_MULTIPLIER:Unit multiplier": "unit_multiplier",
+    "DATA_SOURCE:Data Source": "data_source",
 }
 
 COLUMNS_TO_KEEP = [
@@ -25,6 +26,7 @@ COLUMNS_TO_KEEP = [
     "STAT_POP:Statistical Population",
     "UNIT_MEASURE:Unit of measure",
     "UNIT_MULTIPLIER:Unit multiplier",
+    "DATA_SOURCE:Data Source",
 ]
 
 # NA is one because it should not affect the value when multiplying
