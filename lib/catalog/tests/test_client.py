@@ -12,6 +12,7 @@ from owid.catalog.api import (
     ResponseSet,
     TableResult,
 )
+from owid.catalog.api.datasette import DatasetteAPI
 from owid.catalog.api.search import PageSearchResult
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
@@ -550,3 +551,98 @@ class TestDataclassModels:
 
         assert result.table == "population"
         assert result.namespace == "un"
+
+
+class TestDatasetteAPI:
+    """Test the DatasetteAPI for Datasette integration."""
+
+    def test_client_has_datasette(self):
+        """Test that Client has _datasette attribute."""
+        client = Client()
+        assert hasattr(client, "_datasette")
+        assert isinstance(client._datasette, DatasetteAPI)
+
+    def test_datasette_repr(self):
+        """Test DatasetteAPI repr."""
+        api = DatasetteAPI()
+        assert "DatasetteAPI" in repr(api)
+        assert "datasette-public.owid.io" in repr(api)
+
+    def test_execute_sql(self):
+        """Test executing raw SQL query."""
+        api = DatasetteAPI()
+        results = api.execute_sql("SELECT 1 as value")
+
+        assert isinstance(results, list)
+        assert len(results) == 1
+        assert results[0]["value"] == 1
+
+    def test_execute_sql_empty_on_error(self):
+        """Test that invalid SQL returns empty list (graceful failure)."""
+        api = DatasetteAPI()
+        results = api.execute_sql("SELECT * FROM nonexistent_table_12345")
+
+        # Should return empty list, not raise exception
+        assert results == []
+
+    def test_list_tables(self):
+        """Test listing available tables."""
+        api = DatasetteAPI()
+        tables = api.list_tables()
+
+        assert isinstance(tables, list)
+        assert len(tables) > 0
+        # Check for known table
+        assert "analytics_popularity" in tables
+
+    def test_fetch_popularity_empty_slugs(self):
+        """Test that empty slugs returns empty dict."""
+        api = DatasetteAPI()
+        result = api.fetch_popularity([], "indicator")
+
+        assert result == {}
+
+    def test_fetch_popularity_indicator(self):
+        """Test fetching indicator popularity."""
+        api = DatasetteAPI()
+        # Use a known indicator path that should exist
+        results = api.execute_sql("SELECT slug FROM analytics_popularity WHERE type = 'indicator' LIMIT 1")
+
+        if results:
+            slug = results[0]["slug"]
+            popularity = api.fetch_popularity([slug], "indicator")
+
+            assert isinstance(popularity, dict)
+            if slug in popularity:
+                assert 0.0 <= popularity[slug] <= 1.0
+
+    def test_fetch_popularity_dataset(self):
+        """Test fetching dataset popularity."""
+        api = DatasetteAPI()
+        # Use a known dataset path that should exist
+        results = api.execute_sql("SELECT slug FROM analytics_popularity WHERE type = 'dataset' LIMIT 1")
+
+        if results:
+            slug = results[0]["slug"]
+            popularity = api.fetch_popularity([slug], "dataset")
+
+            assert isinstance(popularity, dict)
+            if slug in popularity:
+                assert 0.0 <= popularity[slug] <= 1.0
+
+    def test_fetch_popularity_nonexistent_slugs(self):
+        """Test that nonexistent slugs are not in result dict."""
+        api = DatasetteAPI()
+        result = api.fetch_popularity(["nonexistent_slug_12345"], "indicator")
+
+        assert isinstance(result, dict)
+        assert "nonexistent_slug_12345" not in result
+
+    def test_custom_timeout(self):
+        """Test that custom timeout is respected."""
+        api = DatasetteAPI(timeout=5)
+        assert api.timeout == 5
+
+        # Can override per-request
+        tables = api.list_tables(timeout=10)
+        assert isinstance(tables, list)
