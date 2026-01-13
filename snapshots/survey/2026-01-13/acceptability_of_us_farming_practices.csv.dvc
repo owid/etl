@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Public Acceptability Of Standard U.S. Animal Agriculture Practices"
+    description: |-
+      Survey of approximately 1,000 U.S. adults on their perceptions of standard animal agriculture practices.
+    date_published: "2025-11-26"
+
+    # Citation
+    producer: Faunalytics
+    citation_full: |-
+      Polanco, A., & Troy, A. (2025). Public Acceptability Of Standard U.S. Animal Agriculture Practices. Faunalytics.
+
+    # Files
+    url_main: https://faunalytics.org/public-acceptability-of-standard-u-s-animal-agriculture-practices/
+    url_download: https://osf.io/yz79e/?action=download
+    date_accessed: '2026-01-13'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://osf.io/vx5jz/overview
+outs:
+  - md5: 79d912d157052c2b364c45abf262aaf0
+    size: 814447
+    path: acceptability_of_us_farming_practices.csv

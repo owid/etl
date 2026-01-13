@@ -1,0 +1,53 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: ""
+    short_unit: ""
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  acceptability_of_us_farming_practices:
+    variables:
+      very_acceptable:
+        title: Respondents who consider a farming practice very acceptable
+        display:
+          name: Very acceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who consider a farming practice very acceptable
+      somewhat_acceptable:
+        title: Respondents who consider a farming practice somewhat acceptable
+        display:
+          name: Somewhat acceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who consider a farming practice somewhat acceptable
+      neither_acceptable_nor_unacceptable:
+        title: Respondents who neither consider a farming practice acceptable nor unacceptable
+        display:
+          name: Neither acceptable nor unacceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who neither consider a farming practice acceptable nor unacceptable
+      somewhat_unacceptable:
+        title: Respondents who consider a farming practice somewhat unacceptable
+        display:
+          name: Somewhat unacceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who consider a farming practice somewhat unacceptable
+      very_unacceptable:
+        title: Respondents who consider a farming practice very unacceptable
+        display:
+          name: Very unacceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who consider a farming practice very unacceptable
