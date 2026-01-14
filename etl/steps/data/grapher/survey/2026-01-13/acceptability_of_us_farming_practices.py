@@ -31,9 +31,8 @@ def run() -> None:
     # Rename question to country for grapher.
     tb = tb.rename(columns={"question": "country"})
 
-    # Add a year column (take it from the origin's publication date).
-    # Use any column to get metadata (they all have the same origins).
-    tb["year"] = int(tb["very_unacceptable"].metadata.origins[0].date_published.split("-")[0])
+    # Add a year column from the dataset version (YYYY-MM-DD format).
+    tb["year"] = int(ds_garden.metadata.version.split("-")[0])
 
     # Set index for grapher format (country and year).
     tb = tb.set_index(["country", "year"], verify_integrity=True)
