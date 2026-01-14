@@ -568,19 +568,19 @@ class TestDatasetteAPI:
         assert "DatasetteAPI" in repr(api)
         assert "datasette-public.owid.io" in repr(api)
 
-    def test_execute_sql(self):
+    def test_query(self):
         """Test executing raw SQL query."""
         api = DatasetteAPI()
-        results = api.execute_sql("SELECT 1 as value")
+        results = api.query("SELECT 1 as value")
 
         assert isinstance(results, list)
         assert len(results) == 1
         assert results[0]["value"] == 1
 
-    def test_execute_sql_empty_on_error(self):
+    def test_query_empty_on_error(self):
         """Test that invalid SQL returns empty list (graceful failure)."""
         api = DatasetteAPI()
-        results = api.execute_sql("SELECT * FROM nonexistent_table_12345")
+        results = api.query("SELECT * FROM nonexistent_table_12345")
 
         # Should return empty list, not raise exception
         assert results == []
@@ -606,7 +606,7 @@ class TestDatasetteAPI:
         """Test fetching indicator popularity."""
         api = DatasetteAPI()
         # Use a known indicator path that should exist
-        results = api.execute_sql("SELECT slug FROM analytics_popularity WHERE type = 'indicator' LIMIT 1")
+        results = api.query("SELECT slug FROM analytics_popularity WHERE type = 'indicator' LIMIT 1")
 
         if results:
             slug = results[0]["slug"]
@@ -620,7 +620,7 @@ class TestDatasetteAPI:
         """Test fetching dataset popularity."""
         api = DatasetteAPI()
         # Use a known dataset path that should exist
-        results = api.execute_sql("SELECT slug FROM analytics_popularity WHERE type = 'dataset' LIMIT 1")
+        results = api.query("SELECT slug FROM analytics_popularity WHERE type = 'dataset' LIMIT 1")
 
         if results:
             slug = results[0]["slug"]

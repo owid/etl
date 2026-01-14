@@ -24,7 +24,7 @@ class DatasetteAPI:
         api = DatasetteAPI()
 
         # Execute raw SQL
-        results = api.execute_sql("SELECT * FROM analytics_popularity LIMIT 10")
+        results = api.query("SELECT * FROM analytics_popularity LIMIT 10")
 
         # List available tables
         tables = api.list_tables()
@@ -44,7 +44,7 @@ class DatasetteAPI:
         self.base_url = base_url
         self.timeout = timeout
 
-    def execute_sql(self, sql: str, timeout: int | None = None) -> list[dict[str, Any]]:
+    def query(self, sql: str, timeout: int | None = None) -> list[dict[str, Any]]:
         """Execute a SQL query and return results as a list of dicts.
 
         Args:
@@ -75,7 +75,7 @@ class DatasetteAPI:
             List of table names. Empty list on error.
         """
         sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-        results = self.execute_sql(sql, timeout=timeout)
+        results = self.query(sql, timeout=timeout)
         return [row["name"] for row in results]
 
     def fetch_popularity(
@@ -108,7 +108,7 @@ class DatasetteAPI:
         WHERE type = '{type}' AND slug IN ({slugs_str})
         """
 
-        results = self.execute_sql(sql, timeout=timeout)
+        results = self.query(sql, timeout=timeout)
         return {row["slug"]: float(row["popularity"]) for row in results}
 
     def __repr__(self) -> str:
