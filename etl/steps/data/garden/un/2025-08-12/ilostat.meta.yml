@@ -269,6 +269,24 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
+      share_employment_by_sex_and_status_in_employment:
+        title: Share of employment - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of {definitions.sex_plural} in employment working as {definitions.description_short_status_in_employment}, as a percentage of total{definitions.sex} employment.
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
+        display:
+          name: Share of employment - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
       informal_employment_rate_by_sex:
         title: Informal employment rate - <<sex>>
         unit: "%"
