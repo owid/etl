@@ -134,7 +134,6 @@ def calculate_shares(tb):
     return tb
 
 
-
 def overwrite_origins(tb, sources):
     indicator_cols = [col for col in tb.columns if col not in ["country", "year"]]
     for col in indicator_cols:

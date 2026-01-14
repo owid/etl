@@ -24,8 +24,6 @@ definitions:
       The United Nations Relief and Works Agency for Palestine Refugees in the Near East (UNRWA) is a UN agency that was established in 1949 to carry out direct relief and works programmes for Palestine refugees.
       UNRWA has a humanitarian and development mandate to “provide assistance and protection to Palestine refugees pending a just and lasting solution to their plight.” This includes essential service delivery, primarily in the areas of basic education, primary health care and mental health care, relief and social services, microcredit, and emergency assistance, including in situations of armed conflict to registered Palestinian refugees.
       They operate in Jordan, Lebanon, Syria the West Bank including East Jerusalem, and Gaza. The Agency does not have a mandate to engage in political negotiations or durable solutions.
-    new_displacement: &new_displacement |-
-      One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
     population: &population |-
       To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
 
