@@ -96,33 +96,30 @@ class DatasetteAPI:
         PAGE_SIZE = 1000
         request_timeout = timeout or self.timeout
 
-        try:
-            all_rows: list[dict[str, Any]] = []
-            offset = 0
+        all_rows: list[dict[str, Any]] = []
+        offset = 0
 
-            while True:
-                # Add LIMIT/OFFSET to the query for pagination
-                paginated_sql = f"{sql.rstrip(';')} LIMIT {PAGE_SIZE} OFFSET {offset}"
+        while True:
+            # Add LIMIT/OFFSET to the query for pagination
+            paginated_sql = f"{sql.rstrip(';')} LIMIT {PAGE_SIZE} OFFSET {offset}"
 
-                resp = requests.get(
-                    self.base_url,
-                    params={"sql": paginated_sql, "_shape": "array"},
-                    timeout=request_timeout,
-                )
-                resp.raise_for_status()
-                rows = resp.json()
+            resp = requests.get(
+                self.base_url,
+                params={"sql": paginated_sql, "_shape": "array"},
+                timeout=request_timeout,
+            )
+            resp.raise_for_status()
+            rows = resp.json()
 
-                all_rows.extend(rows)
+            all_rows.extend(rows)
 
-                # Stop if we got fewer rows than requested (last page) or not paginating
-                if not paginate or len(rows) < PAGE_SIZE:
-                    break
+            # Stop if we got fewer rows than requested (last page) or not paginating
+            if not paginate or len(rows) < PAGE_SIZE:
+                break
 
-                offset += PAGE_SIZE
+            offset += PAGE_SIZE
 
-            return pd.DataFrame(all_rows)
-        except Exception:
-            return pd.DataFrame()
+        return pd.DataFrame(all_rows)
 
     def list_tables(self, with_metadata: bool = False, timeout: int | None = None) -> list[DatasetteTable]:
         """List available tables in the database.
@@ -151,11 +148,7 @@ class DatasetteAPI:
         request_timeout = timeout or self.timeout
         tables = []
         for name in table_names:
-            try:
-                tables.append(self.get_table(name, timeout=request_timeout))
-            except Exception:
-                # Fall back to name-only if metadata fetch fails
-                tables.append(DatasetteTable(name=name))
+            tables.append(self.get_table(name, timeout=request_timeout))
         return tables
 
     def get_table(self, name: str, timeout: int | None = None) -> DatasetteTable:
