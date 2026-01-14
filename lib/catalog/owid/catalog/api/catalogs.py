@@ -6,10 +6,12 @@
 from __future__ import annotations
 
 import heapq
+import http.client
 import json
 import os
 import re
 import tempfile
+import time
 from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -36,6 +38,62 @@ from owid.catalog.tables import Table
 
 log = structlog.get_logger()
 
+# Network errors that are safe to retry
+_RETRYABLE_EXCEPTIONS = (
+    http.client.IncompleteRead,
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.ChunkedEncodingError,
+    ConnectionResetError,
+    TimeoutError,
+)
+
+
+def _retry_on_network_error(
+    func: Any,
+    max_retries: int = 3,
+    initial_delay: float = 1.0,
+    backoff_factor: float = 2.0,
+) -> Any:
+    """Retry a function on transient network errors with exponential backoff.
+
+    Args:
+        func: Callable to execute
+        max_retries: Maximum number of retry attempts
+        initial_delay: Initial delay between retries in seconds
+        backoff_factor: Multiplier for delay after each retry
+
+    Returns:
+        Result of the function call
+
+    Raises:
+        The last exception if all retries are exhausted
+    """
+    delay = initial_delay
+    last_exception: Exception | None = None
+
+    for attempt in range(max_retries + 1):
+        try:
+            return func()
+        except _RETRYABLE_EXCEPTIONS as e:
+            last_exception = e
+            if attempt < max_retries:
+                log.warning(
+                    "network_error_retry",
+                    attempt=attempt + 1,
+                    max_retries=max_retries,
+                    delay=delay,
+                    error=str(e),
+                )
+                time.sleep(delay)
+                delay *= backoff_factor
+            else:
+                raise
+
+    # This should never be reached, but satisfies type checker
+    if last_exception:
+        raise last_exception
+
 
 def download_private_file_s3(uri: str, tmpdir: str) -> str:
     """Download private files from S3 to temporary directory."""
@@ -53,18 +111,28 @@ def download_private_file_s3(uri: str, tmpdir: str) -> str:
 
 
 def read_frame(uri: str | Path) -> pd.DataFrame:
-    """Read catalog index from various formats."""
+    """Read catalog index from various formats.
+
+    For HTTP(S) URIs, automatically retries on transient network errors.
+    """
     if isinstance(uri, Path):
         uri = str(uri)
 
-    if uri.endswith(".feather"):
-        return cast(pd.DataFrame, pd.read_feather(uri))
-    elif uri.endswith(".parquet"):
-        return cast(pd.DataFrame, pd.read_parquet(uri))
-    elif uri.endswith(".csv"):
-        return pd.read_csv(uri)
+    is_remote = uri.startswith("http://") or uri.startswith("https://")
 
-    raise ValueError(f"could not detect format of uri: {uri}")
+    def _read() -> pd.DataFrame:
+        if uri.endswith(".feather"):
+            return cast(pd.DataFrame, pd.read_feather(uri))
+        elif uri.endswith(".parquet"):
+            return cast(pd.DataFrame, pd.read_parquet(uri))
+        elif uri.endswith(".csv"):
+            return pd.read_csv(uri)
+        raise ValueError(f"could not detect format of uri: {uri}")
+
+    if is_remote:
+        return _retry_on_network_error(_read)
+    else:
+        return _read()
 
 
 def save_frame(df: pd.DataFrame, path: str | Path) -> None:
