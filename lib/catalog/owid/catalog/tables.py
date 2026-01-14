@@ -2582,7 +2582,7 @@ def read_stata(
 
 def read_rda(
     filepath_or_buffer: str | Path | IO[AnyStr],
-    table_name: str,
+    table_name: str | None = None,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
@@ -2590,10 +2590,21 @@ def read_rda(
     parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
     converted = rdata.conversion.convert(parsed)
 
+    available_tables = list(converted.keys())
+
+    if table_name is None:
+        if len(available_tables) == 1:
+            # If only one table, use it automatically.
+            table_name = available_tables[0]
+        else:
+            raise ValueError(f"No table name specified. Available tables in RDA file: {', '.join(available_tables)}")
+
     if table_name not in converted:
-        raise ValueError(f"Table {table_name} not found in RDA file.")
+        raise ValueError(f"Table '{table_name}' not found in RDA file. Available tables: {', '.join(available_tables)}")
+
     table = Table(converted[table_name], underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+
     return cast(Table, table)
 
 
