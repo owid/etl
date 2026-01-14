@@ -10,18 +10,31 @@ definitions:
     description_key:
     - "Survey participants were asked about the acceptability of 12 standard farming practices in the U.S. The responses were categorized into five levels: 'Very acceptable', 'Somewhat acceptable', 'Neither acceptable nor unacceptable', 'Somewhat unacceptable', and 'Very unacceptable'."
     - "Weighted counts are adjusted by age, gender, race, income, and region to match U.S. Census demographics."
-    - "1. Cutting the tails off new-born piglets, almost always without anesthesia or pain-killers."
-    - "2. Killing pigs in gas chambers by use of carbon dioxide (CO2) gas."
-    - "3. Keeping pigs in cages which prevent them from turning around for several weeks."
-    - "4. Keeping chickens in cages with 67-86 square inches of space per bird (smaller than a standard sheet of letter paper)."
-    - "5. Cutting the beaks off new-born chickens, almost always without anesthesia or pain-killers."
-    - "6. Killing new-born male chicks who can't lay eggs by use of meat-grinders."
-    - "7. Castrating new-born calves by surgically removing the testicles, almost always without anesthesia or pain-killers."
-    - "8. Removing calves' horn buds (undeveloped horn tissue before it grows into a visible horn) using a knife or hot iron, sometimes without anesthesia or pain-killers."
-    - "9. Permanently separating calves from their mothers immediately after birth."
-    - "10. Keeping chickens inside a barn with no outdoor access and with less than one square foot of space per bird."
-    - "11. Growing chickens to reach market weight size by 47 days, leading to difficulties with walking and standing."
-    - "12. Hanging live chickens upside down by their legs before stunning them in electrified water, slitting their throats, and finally submerging them in boiling water."
+    - "List of farming practices considered, as described in the survey:
+
+      * Keeping chickens inside a barn with no outdoor access and with less than one square foot of space per bird.
+
+      * Growing chickens to reach market weight size by 47 days, leading to difficulties with walking and standing.
+
+      * Hanging live chickens upside down by their legs before stunning them in electrified water, slitting their throats, and finally submerging them in boiling water.
+
+      * Castrating new-born calves by surgically removing the testicles, almost always without anesthesia or pain-killers.
+
+      * Removing calves' horn buds (undeveloped horn tissue before it grows into a visible horn) using a knife or hot iron, sometimes without anesthesia or pain-killers.
+
+      * Permanently separating calves from their mothers immediately after birth.
+
+      * Cutting the beaks off new-born chickens, almost always without anesthesia or pain-killers.
+
+      * Killing new-born male chicks who can't lay eggs by use of meat-grinders.
+
+      * Keeping chickens in cages with 67-86 square inches of space per bird (smaller than a standard sheet of letter paper).
+
+      * Keeping pigs in cages which prevent them from turning around for several weeks.
+
+      * Killing pigs in gas chambers by use of carbon dioxide (CO2) gas.
+
+      * Cutting the tails off new-born piglets, almost always without anesthesia or pain-killers."
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
