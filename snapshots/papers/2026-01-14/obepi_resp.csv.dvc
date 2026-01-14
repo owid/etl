@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: |
+      Prevalence of Overweight and Obesity in France: The 2020 Obepi-Roche Study by the “Ligue Contre l’Obésité”
+
+    description: |-
+      Obepi-Roche 2020 by the “Ligue Contre l’Obésité” (League Against Obesity) estimated overweight and obesity prevalence in France. The adopted methodology was chosen to be as similar as possible to that of a series of quota-based surveys conducted every three years from 1997 to 2012 (Obepi-Roche studies). The 2020 survey was conducted online from 24th September to 5th October 2020 by the Odoxa polling institute on a sample of metropolitan French subjects aged 18 years or over. Participants (n = 9598) self-measured their height and weight according to detailed instructions. Prevalence estimates were produced for all categories of body mass index. The prevalence of excess weight was 47.3% (17.0% of subjects with obesity), with higher values in the north and east of France. When comparing these 2020 estimates to previous Obepi-Roche estimates in order to visualize trends since 1997, it appeared that overweight fluctuated around 30%, and obesity prevalence increased steadily at a rapid pace. The increase was even steeper in the youngest age groups and for severe and complex obesity. Given the slightly different methodologies between the 1997–2012 studies and the 2020 survey, the worrying trends in obesity prevalence since 1997 must be confirmed, calling for a reedition of the Obepi-Roche series.
+
+    date_published: "2023-01-24"
+
+    # Citation
+    producer: Fontbonne et al.
+    citation_full: |-
+      Fontbonne A, Currie A, Tounian P, Picot M-C, Foulatier O, Nedelcu M, Nocca D. Prevalence of Overweight and Obesity in France: The 2020 Obepi-Roche Study by the “Ligue Contre l’Obésité”. Journal of Clinical Medicine. 2023; 12(3):925. https://doi.org/10.3390/jcm12030925
+
+    # Files
+    url_main: https://www.jstor.org/stable/4588131
+    date_accessed: '2025-03-12'
+
+    # License
+    license:
+      name: © 2026 MDPI AG (Basel, Switzerland)
+      url: https://www.mdpi.com/about/termsofuse
+outs:
+  - md5: 4492374595ab3df8e911bbcefcfda3ab
+    size: 432
+    path: obepi_resp.csv
