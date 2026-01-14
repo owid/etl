@@ -13,15 +13,17 @@ paths = PathFinder(__file__)
 # Columns on people's acceptability of animal welfare practices.
 # The questions are organized by animal type (pigs, laying hens, cows, broilers).
 # Question text taken from the survey instrument as shown in the Faunalytics report.
+# The mapping can be found in Faunalytics main results file:
+# https://osf.io/vx5jz/files/cy2w4
 COLUMNS_ACCEPTABILITY = {
     # Pig practices.
-    "pigs_1": "Cutting the tails off new-born piglets, almost always without anesthesia or pain-killers",
+    "pigs_1": "Keeping pigs in cages which prevent them from turning around for several weeks",
     "pigs_2": "Killing pigs in gas chambers by use of carbon dioxide (CO2) gas",
-    "pigs_3": "Keeping pigs in cages which prevent them from turning around for several weeks",
+    "pigs_3": "Cutting the tails off new-born piglets, almost always without anesthesia or pain-killers",
     # Laying hen practices.
-    "layinghens_1": "Keeping chickens in cages with 67-86 square inches of space per bird (smaller than a standard sheet of letter paper)",
-    "layinghens_2": "Cutting the beaks off new-born chickens, almost always without anesthesia or pain-killers",
-    "layinghens_3": "Killing new-born male chicks who can't lay eggs by use of meat-grinders",
+    "layinghens_1": "Cutting the beaks off new-born chickens, almost always without anesthesia or pain-killers",
+    "layinghens_2": "Killing new-born male chicks who can't lay eggs by use of meat-grinders",
+    "layinghens_3": "Keeping chickens in cages with 67-86 square inches of space per bird (smaller than a standard sheet of letter paper)",
     # Cow/cattle practices.
     "cows_1": "Castrating new-born calves by surgically removing the testicles, almost always without anesthesia or pain-killers",
     "cows_2": "Removing calves' horn buds (undeveloped horn tissue before it grows into a visible horn) using a knife or hot iron, sometimes without anesthesia or pain-killers",
