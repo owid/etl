@@ -53,7 +53,7 @@ class DatasetteAPI:
 
     Example:
         ```python
-        from owid.catalog.api import DatasetteAPI
+        from owid.catalog.api.datasette import DatasetteAPI
 
         api = DatasetteAPI()
 
