@@ -12,7 +12,7 @@ from owid.catalog.api import (
     ResponseSet,
     TableResult,
 )
-from owid.catalog.api.datasette import DatasetteAPI
+from owid.catalog.api.datasette import DatasetteAPI, DatasetteTable
 from owid.catalog.api.search import PageSearchResult
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
@@ -591,14 +591,65 @@ class TestDatasetteAPI:
         assert df.empty
 
     def test_list_tables(self):
-        """Test listing available tables."""
+        """Test listing available tables (fast mode, names only)."""
         api = DatasetteAPI()
         tables = api.list_tables()
 
         assert isinstance(tables, list)
         assert len(tables) > 0
+        assert all(isinstance(t, DatasetteTable) for t in tables)
+
         # Check for known table
-        assert "analytics_popularity" in tables
+        table_names = [t.name for t in tables]
+        assert "analytics_popularity" in table_names
+
+        # Fast mode should have empty columns
+        assert tables[0].columns == []
+        assert tables[0].row_count is None
+
+    def test_list_tables_with_metadata(self):
+        """Test listing tables with full metadata (slow mode)."""
+        api = DatasetteAPI()
+        # Just fetch metadata for first 2 tables to keep test fast
+        all_tables = api.list_tables()
+        tables_with_meta = [api.get_table(t.name) for t in all_tables[:2]]
+
+        assert len(tables_with_meta) == 2
+        for t in tables_with_meta:
+            assert isinstance(t, DatasetteTable)
+            assert len(t.columns) > 0  # Should have columns
+            assert t.row_count is not None  # Should have row count
+
+    def test_get_table(self):
+        """Test getting metadata for a single table."""
+        api = DatasetteAPI()
+        table = api.get_table("analytics_popularity")
+
+        assert isinstance(table, DatasetteTable)
+        assert table.name == "analytics_popularity"
+        assert "slug" in table.columns
+        assert "type" in table.columns
+        assert "popularity" in table.columns
+        assert table.row_count is not None
+        assert table.row_count > 0
+        assert table.is_view is False
+
+    def test_table_fetch(self):
+        """Test fetching full metadata for a table from list_tables()."""
+        api = DatasetteAPI()
+        tables = api.list_tables()
+
+        # Fast mode tables should have empty columns
+        table = tables[0]
+        assert table.columns == []
+        assert table.row_count is None
+
+        # .fetch() should return a new table with full metadata
+        full_table = table.fetch()
+        assert isinstance(full_table, DatasetteTable)
+        assert full_table.name == table.name
+        assert len(full_table.columns) > 0
+        assert full_table.row_count is not None
 
     def test_fetch_popularity_empty_slugs(self):
         """Test that empty slugs returns empty dict."""
@@ -651,3 +702,4 @@ class TestDatasetteAPI:
         # Can override per-request
         tables = api.list_tables(timeout=10)
         assert isinstance(tables, list)
+        assert all(isinstance(t, DatasetteTable) for t in tables)
