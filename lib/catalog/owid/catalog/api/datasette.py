@@ -195,6 +195,11 @@ class DatasetteAPI:
         if not slugs:
             return {}
 
+        # Runtime validation for type parameter (Literal only enforces at static analysis)
+        _VALID_TYPES = ("indicator", "dataset")
+        if type not in _VALID_TYPES:
+            raise ValueError(f"Invalid type: {type!r}. Must be one of {_VALID_TYPES}")
+
         # Escape single quotes in slugs
         escaped_slugs = [s.replace("'", "''") for s in slugs]
         slugs_str = ", ".join(f"'{s}'" for s in escaped_slugs)
