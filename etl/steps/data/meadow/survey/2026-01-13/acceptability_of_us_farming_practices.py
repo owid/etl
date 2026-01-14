@@ -30,9 +30,10 @@ COLUMNS = [
 def sanity_check_missing_values(tb):
     # There were missing responses in the RData file.
     # They seem to coincide with the answers "Very acceptable".
+    # Load the original data (a csv file that does not contain weights) and check that all instances of "Very acceptable" in that file coincide with all instances of nan in the RData file.
     import pandas as pd
 
-    df = pd.read_csv("~/Downloads/data_cleaned.csv")
+    df = pd.read_csv("https://osf.io/yz79e/?action=download")
     for c in COLUMNS:
         assert len(df[df[c] == "Very acceptable"]) == len(tb[tb[c].isnull()]), f"Failed on {c}"
 
