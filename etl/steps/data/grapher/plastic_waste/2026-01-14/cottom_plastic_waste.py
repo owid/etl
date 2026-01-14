@@ -14,16 +14,12 @@ def run() -> None:
     ds_garden = paths.load_dataset("cottom_plastic_waste")
 
     # Read tables from garden dataset.
-    tb_national = ds_garden["cottom_plastic_waste_national"]
-    tb_regional = ds_garden["cottom_plastic_waste_regional"]
+    tb = ds_garden.read("cottom_plastic_waste", reset_index=False)
 
     #
     # Save outputs.
     #
     # Create grapher dataset with both tables.
-    ds_grapher = paths.create_dataset(
-        tables=[tb_national, tb_regional],
-        check_variables_metadata=True,
-    )
+    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
     ds_grapher.save()

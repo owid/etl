@@ -101,5 +101,6 @@ steps:
     - snapshot://plastic_waste/2026-01-14/cottom_plastic_waste.zip
   data://garden/plastic_waste/2026-01-14/cottom_plastic_waste:
     - data://meadow/plastic_waste/2026-01-14/cottom_plastic_waste
+    - data://garden/demography/2024-07-15/population
   data://grapher/plastic_waste/2026-01-14/cottom_plastic_waste:
     - data://garden/plastic_waste/2026-01-14/cottom_plastic_waste

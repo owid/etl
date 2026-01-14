@@ -133,15 +133,22 @@ def process_data(df: pd.DataFrame, is_national: bool) -> Table:
         df = df[cols_to_keep].copy()
         df = df.rename(columns={"Country": "country"})
     else:
-        # Regional data has Aggregation_lv2 as country
-        id_cols = ["Aggregation_lv2"]
+        # Regional data - filter by Aggregation_lv1
+        # Keep Aggregation_lv1 temporarily for filtering
+        id_cols = ["Aggregation_lv1", "Aggregation_lv2"]
         cols_to_keep = id_cols + available_vars
         df = df[cols_to_keep].copy()
+
+        # Filter by Aggregation_lv1
+        df = df[df["Aggregation_lv1"].isin(["World", "Income category", "UN Region"])].copy()
+
+        # Now drop Aggregation_lv1 and rename Aggregation_lv2
+        df = df.drop(columns=["Aggregation_lv1"])
+
         df = df.rename(columns={"Aggregation_lv2": "country"})
         # Remove rows with NaN country
         df = df.dropna(subset=["country"])
-        # Exclude countries that are in national data
-        df = df[~df["country"].isin(["USA", "Canada", "China", "India", "Micronesia"])]
+        print(df["country"].unique())
 
     # The data appears to be for a single year (2020 based on Population_2020)
     # Add year column
