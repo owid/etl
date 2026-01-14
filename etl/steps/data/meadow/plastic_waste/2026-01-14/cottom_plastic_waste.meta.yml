@@ -1,0 +1,428 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+        - Waste Management
+
+tables:
+  cottom_plastic_waste_national:
+    variables:
+      wg:
+        title: Waste generation
+        unit: tonnes
+        short_unit: t
+        description_short: Total municipal solid waste generation.
+        display:
+          numDecimalPlaces: 0
+
+      wg_per_cap:
+        title: Waste generation per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Municipal solid waste generation per person.
+        display:
+          numDecimalPlaces: 1
+
+      pwg:
+        title: Properly managed waste generation
+        unit: tonnes
+        short_unit: t
+        description_short: Total properly collected and managed waste.
+        display:
+          numDecimalPlaces: 0
+
+      pwg_per_cap:
+        title: Properly managed waste generation per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Properly collected and managed waste per person.
+        display:
+          numDecimalPlaces: 1
+
+      plas_debris_em:
+        title: Plastic debris emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Total emissions of plastic debris to the environment.
+        display:
+          numDecimalPlaces: 0
+
+      plas_burn_em:
+        title: Plastic burn emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Total emissions from burning of plastic waste.
+        display:
+          numDecimalPlaces: 0
+
+      plas_em:
+        title: Total plastic emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Total plastic emissions to the environment (debris + burn).
+        display:
+          numDecimalPlaces: 0
+
+      plas_debris_em_per_cap:
+        title: Plastic debris emissions per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Plastic debris emissions per person.
+        display:
+          numDecimalPlaces: 2
+
+      plas_burn_em_per_cap:
+        title: Plastic burn emissions per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Plastic burn emissions per person.
+        display:
+          numDecimalPlaces: 2
+
+      plas_em_per_cap:
+        title: Total plastic emissions per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Total plastic emissions per person.
+        display:
+          numDecimalPlaces: 2
+
+      plas_litter_em:
+        title: Plastic litter emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from littered plastic waste.
+        display:
+          numDecimalPlaces: 0
+
+      plas_uncol_em:
+        title: Plastic uncollected emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from uncollected plastic waste.
+        display:
+          numDecimalPlaces: 0
+
+      plas_collection_em:
+        title: Plastic collection emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions during waste collection process.
+        display:
+          numDecimalPlaces: 0
+
+      plas_disp_em:
+        title: Plastic disposal emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from waste disposal sites.
+        display:
+          numDecimalPlaces: 0
+
+      plas_recy_em:
+        title: Plastic recycling emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from recycling processes.
+        display:
+          numDecimalPlaces: 0
+
+      col_cov_pct_gen_exc_lit:
+        title: Collection coverage (% of generation excluding litter)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of waste generation covered by collection services, excluding litter.
+        display:
+          numDecimalPlaces: 1
+
+      col_del_pct_gen:
+        title: Collection delivery (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of generated waste that is collected and delivered.
+        display:
+          numDecimalPlaces: 1
+
+      litter_em_pct_gen:
+        title: Litter emissions (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Litter emissions as percentage of total waste generation.
+        display:
+          numDecimalPlaces: 1
+
+      uncol_em_pct_gen:
+        title: Uncollected emissions (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Uncollected waste emissions as percentage of total generation.
+        display:
+          numDecimalPlaces: 1
+
+      collection_em_pct_gen:
+        title: Collection emissions (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Collection process emissions as percentage of total generation.
+        display:
+          numDecimalPlaces: 1
+
+      cont_disp_pct_disp:
+        title: Controlled disposal (% of disposed waste)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of disposed waste that goes to controlled facilities.
+        display:
+          numDecimalPlaces: 1
+
+      uncont_disp_pct_disp:
+        title: Uncontrolled disposal (% of disposed waste)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of disposed waste that goes to uncontrolled sites.
+        display:
+          numDecimalPlaces: 1
+
+      man_cont_pct_gen:
+        title: Managed and controlled (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of generated waste that is properly managed and controlled.
+        display:
+          numDecimalPlaces: 1
+
+      open_burn_msw_pct_gen:
+        title: Open burning (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of generated waste that is openly burned.
+        display:
+          numDecimalPlaces: 1
+
+      people_no_col:
+        title: People without collection services
+        unit: people
+        short_unit: ""
+        description_short: Number of people without access to waste collection services.
+        display:
+          numDecimalPlaces: 0
+
+      people_no_col_pct_pop:
+        title: People without collection services (% of population)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population without access to waste collection services.
+        display:
+          numDecimalPlaces: 1
+
+  cottom_plastic_waste_regional:
+    variables:
+      wg:
+        title: Waste generation
+        unit: tonnes
+        short_unit: t
+        description_short: Total municipal solid waste generation.
+        display:
+          numDecimalPlaces: 0
+
+      wg_per_cap:
+        title: Waste generation per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Municipal solid waste generation per person.
+        display:
+          numDecimalPlaces: 1
+
+      pwg:
+        title: Properly managed waste generation
+        unit: tonnes
+        short_unit: t
+        description_short: Total properly collected and managed waste.
+        display:
+          numDecimalPlaces: 0
+
+      pwg_per_cap:
+        title: Properly managed waste generation per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Properly collected and managed waste per person.
+        display:
+          numDecimalPlaces: 1
+
+      plas_debris_em:
+        title: Plastic debris emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Total emissions of plastic debris to the environment.
+        display:
+          numDecimalPlaces: 0
+
+      plas_burn_em:
+        title: Plastic burn emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Total emissions from burning of plastic waste.
+        display:
+          numDecimalPlaces: 0
+
+      plas_em:
+        title: Total plastic emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Total plastic emissions to the environment (debris + burn).
+        display:
+          numDecimalPlaces: 0
+
+      plas_debris_em_per_cap:
+        title: Plastic debris emissions per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Plastic debris emissions per person.
+        display:
+          numDecimalPlaces: 2
+
+      plas_burn_em_per_cap:
+        title: Plastic burn emissions per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Plastic burn emissions per person.
+        display:
+          numDecimalPlaces: 2
+
+      plas_em_per_cap:
+        title: Total plastic emissions per capita
+        unit: kilograms per person
+        short_unit: kg/person
+        description_short: Total plastic emissions per person.
+        display:
+          numDecimalPlaces: 2
+
+      plas_litter_em:
+        title: Plastic litter emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from littered plastic waste.
+        display:
+          numDecimalPlaces: 0
+
+      plas_uncol_em:
+        title: Plastic uncollected emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from uncollected plastic waste.
+        display:
+          numDecimalPlaces: 0
+
+      plas_collection_em:
+        title: Plastic collection emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions during waste collection process.
+        display:
+          numDecimalPlaces: 0
+
+      plas_disp_em:
+        title: Plastic disposal emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from waste disposal sites.
+        display:
+          numDecimalPlaces: 0
+
+      plas_recy_em:
+        title: Plastic recycling emissions
+        unit: tonnes
+        short_unit: t
+        description_short: Emissions from recycling processes.
+        display:
+          numDecimalPlaces: 0
+
+      col_cov_pct_gen_exc_lit:
+        title: Collection coverage (% of generation excluding litter)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of waste generation covered by collection services, excluding litter.
+        display:
+          numDecimalPlaces: 1
+
+      col_del_pct_gen:
+        title: Collection delivery (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of generated waste that is collected and delivered.
+        display:
+          numDecimalPlaces: 1
+
+      litter_em_pct_gen:
+        title: Litter emissions (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Litter emissions as percentage of total waste generation.
+        display:
+          numDecimalPlaces: 1
+
+      uncol_em_pct_gen:
+        title: Uncollected emissions (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Uncollected waste emissions as percentage of total generation.
+        display:
+          numDecimalPlaces: 1
+
+      collection_em_pct_gen:
+        title: Collection emissions (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Collection process emissions as percentage of total generation.
+        display:
+          numDecimalPlaces: 1
+
+      cont_disp_pct_disp:
+        title: Controlled disposal (% of disposed waste)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of disposed waste that goes to controlled facilities.
+        display:
+          numDecimalPlaces: 1
+
+      uncont_disp_pct_disp:
+        title: Uncontrolled disposal (% of disposed waste)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of disposed waste that goes to uncontrolled sites.
+        display:
+          numDecimalPlaces: 1
+
+      man_cont_pct_gen:
+        title: Managed and controlled (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of generated waste that is properly managed and controlled.
+        display:
+          numDecimalPlaces: 1
+
+      open_burn_msw_pct_gen:
+        title: Open burning (% of generation)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of generated waste that is openly burned.
+        display:
+          numDecimalPlaces: 1
+
+      people_no_col:
+        title: People without collection services
+        unit: people
+        short_unit: ""
+        description_short: Number of people without access to waste collection services.
+        display:
+          numDecimalPlaces: 0
+
+      people_no_col_pct_pop:
+        title: People without collection services (% of population)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population without access to waste collection services.
+        display:
+          numDecimalPlaces: 1
