@@ -59,9 +59,6 @@ def run() -> None:
     # Replace the decadal values with NaN for all years except the start of each decade
     combined.loc[combined["year"] % 10 != 0, ["temperature_anomaly_decadal", "temperature_2m_decadal"]] = np.nan
     combined = combined.drop(columns=["decade"])
-    # Remove the latest as it's often not representation of the full year
-    latest_year = combined["year"].max()
-    combined = combined[combined["year"] != latest_year]
 
     # Set decadal values to NaN for non-decadal years
     combined.loc[combined["year"] % 10 != 0, ["temperature_anomaly_decadal", "temperature_2m_decadal"]] = np.nan
