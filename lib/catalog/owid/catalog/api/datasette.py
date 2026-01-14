@@ -44,24 +44,51 @@ class DatasetteAPI:
         self.base_url = base_url
         self.timeout = timeout
 
-    def query(self, sql: str, timeout: int | None = None) -> list[dict[str, Any]]:
+    def query(
+        self, sql: str, timeout: int | None = None, paginate: bool = True
+    ) -> list[dict[str, Any]]:
         """Execute a SQL query and return results as a list of dicts.
 
+        Automatically paginates through all results using LIMIT/OFFSET.
+        Datasette has a 1000-row limit per request for raw SQL queries.
+
         Args:
-            sql: SQL query to execute.
+            sql: SQL query to execute. Should NOT include LIMIT/OFFSET if paginate=True.
             timeout: Optional timeout override for this request.
+            paginate: If True (default), automatically fetch all pages of results.
+                      If False, return only the first page (up to 1000 rows).
 
         Returns:
             List of row dictionaries. Empty list on error.
         """
+        PAGE_SIZE = 1000
+        request_timeout = timeout or self.timeout
+
         try:
-            resp = requests.get(
-                self.base_url,
-                params={"sql": sql, "_shape": "array"},
-                timeout=timeout or self.timeout,
-            )
-            resp.raise_for_status()
-            return resp.json()
+            all_rows: list[dict[str, Any]] = []
+            offset = 0
+
+            while True:
+                # Add LIMIT/OFFSET to the query for pagination
+                paginated_sql = f"{sql.rstrip(';')} LIMIT {PAGE_SIZE} OFFSET {offset}"
+
+                resp = requests.get(
+                    self.base_url,
+                    params={"sql": paginated_sql, "_shape": "array"},
+                    timeout=request_timeout,
+                )
+                resp.raise_for_status()
+                rows = resp.json()
+
+                all_rows.extend(rows)
+
+                # Stop if we got fewer rows than requested (last page) or not paginating
+                if not paginate or len(rows) < PAGE_SIZE:
+                    break
+
+                offset += PAGE_SIZE
+
+            return all_rows
         except Exception:
             return []
 
