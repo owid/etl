@@ -17,7 +17,9 @@ meta:
 
     # Files
     url_main: https://www.nature.com/articles/s41586-024-07758-6
-    url_download: https://datadryad.org/stash/dataset/doi:10.5061/dryad.8cz8w9gxb
+    # url_download: https://datadryad.org/downloads/file_stream/3338334
+    # Bot protection on the website means we should manually download the file and upload it to our S3 bucket.
+    # To add the file run: etls cottom_plastic_waste --path-to-file <path_to_downloaded_file>
     date_accessed: '2026-01-14'
 
     # License
@@ -25,6 +27,6 @@ meta:
       name: CC0 1.0
       url: https://creativecommons.org/publicdomain/zero/1.0/
 outs:
-  - md5: cb696998731e05f7f33af8fa31505d1b
-    size: 47936
+  - md5: 09514d217fdd2aed5d4a827fd490c135
+    size: 4153853
     path: cottom_plastic_waste.zip
