@@ -461,14 +461,15 @@ class ChartsAPI:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            ResponseSet containing ChartResult objects.
+            ResponseSet containing ChartResult objects, sorted by popularity (most viewed first).
+            Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python
-            # Basic search
+            # Basic search (sorted by popularity)
             results = client.charts.search("life expectancy")
             for chart in results:
-                print(chart.title)
+                print(f"{chart.title}: popularity={chart.popularity:.3f}")
 
             # Filter by countries
             results = client.charts.search(

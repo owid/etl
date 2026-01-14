@@ -283,7 +283,9 @@ class TablesAPI:
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
 
         Returns:
-            ResponseSet containing matching TableResult objects. If match="fuzzy", results are sorted by relevance score.
+            ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
+            If match="fuzzy", results are sorted by fuzzy relevance score instead.
+            Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python

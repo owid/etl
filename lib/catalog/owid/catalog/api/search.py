@@ -187,6 +187,9 @@ class SiteSearchAPI:
         # Enrich results with popularity from datasette
         self._enrich_charts_with_popularity(results, timeout=effective_timeout)
 
+        # Sort by popularity (descending) - most popular first
+        results.sort(key=lambda r: r.popularity, reverse=True)
+
         return ResponseSet(
             results=results,
             query=query,

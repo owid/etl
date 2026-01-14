@@ -277,21 +277,25 @@ class IndicatorsAPI:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            SearchResults containing IndicatorResult objects.
+            SearchResults containing IndicatorResult objects, sorted by semantic similarity score.
+            Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python
             # Search for indicators
             results = client.indicators.search("CO2 emissions per capita")
 
-            # View results
+            # View results (sorted by semantic score)
             for ind in results:
                 print(f"{ind.title}")
                 print(f"  Score: {ind.score:.3f}")
-                print(f"  Path: {ind.path}")
+                print(f"  Popularity: {ind.popularity:.3f}")
 
             # Load data from top result
             tb = results[0].fetch()
+
+            # Re-sort by popularity if desired
+            by_popularity = results.sort_by('popularity', reverse=True)
             ```
         """
         params = {
