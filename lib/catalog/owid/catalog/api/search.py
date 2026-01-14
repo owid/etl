@@ -196,9 +196,7 @@ class SiteSearchAPI:
             total_count=data.get("totalCount", len(results)),
         )
 
-    def _enrich_charts_with_popularity(
-        self, results: list[ChartResult], timeout: int | None = None
-    ) -> None:
+    def _enrich_charts_with_popularity(self, results: list[ChartResult], timeout: int | None = None) -> None:
         """Enrich chart results with popularity from datasette.
 
         Chart slugs in datasette are stored as full URLs (e.g., https://ourworldindata.org/grapher/life-expectancy).
