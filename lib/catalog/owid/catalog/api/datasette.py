@@ -171,14 +171,14 @@ class DatasetteAPI:
     def fetch_popularity(
         self,
         slugs: list[str],
-        type: Literal["indicator", "dataset"],
+        type: Literal["indicator", "dataset", "chart"],
         timeout: int | None = None,
     ) -> dict[str, float]:
         """Fetch popularity scores for given slugs.
 
         Args:
             slugs: List of slugs to fetch popularity for.
-            type: Type of popularity to fetch ("indicator" or "dataset").
+            type: Type of popularity to fetch ("indicator", "dataset", or "chart").
             timeout: Optional timeout override for this request.
 
         Returns:
@@ -189,7 +189,7 @@ class DatasetteAPI:
             return {}
 
         # Runtime validation for type parameter (Literal only enforces at static analysis)
-        _VALID_TYPES = ("indicator", "dataset")
+        _VALID_TYPES = ("indicator", "dataset", "chart")
         if type not in _VALID_TYPES:
             raise ValueError(f"Invalid type: {type!r}. Must be one of {_VALID_TYPES}")
 
