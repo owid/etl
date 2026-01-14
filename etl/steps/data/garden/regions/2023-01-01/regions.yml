@@ -2650,8 +2650,8 @@
   region_type: "aggregate"
   defined_by: un_m49_1
   members:
-    - UNM49_NAM
-    - UNM49_LAC
+    - UN_NAM
+    - UN_LAC
 
 #### members
 - code: UNM49_CAR
@@ -2721,7 +2721,6 @@
     - "SUR"
     - "URY"
     - "VEN"
-
 
 ### members
 - code: UNM49_CAS
@@ -2799,7 +2798,6 @@
     - "ARE"
     - "YEM"
 
-
 ### members
 - code: UNM49_EEU
   name: "Eastern Europe (UN M49)"
@@ -2872,7 +2870,6 @@
     - "MCO"
     - "NLD"
     - "CHE"
-
 
 ### members
 - code: UNM49_ANZ
