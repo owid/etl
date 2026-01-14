@@ -343,8 +343,6 @@ class IndicatorsAPI:
         if not results:
             return
 
-        from owid.catalog.api.popularity import fetch_popularity
-
         # Build indicator slugs (full path)
         slug_to_result: dict[str, IndicatorResult] = {}
         for r in results:
@@ -354,8 +352,8 @@ class IndicatorsAPI:
         if not slug_to_result:
             return
 
-        # Fetch popularity
-        popularity_data = fetch_popularity(
+        # Fetch popularity via Datasette API
+        popularity_data = self._client._datasette.fetch_popularity(
             list(slug_to_result.keys()),
             type="indicator",
             timeout=timeout or self._client.timeout,
