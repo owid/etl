@@ -14,7 +14,7 @@ definitions:
       numDecimalPlaces: 0
   unicef_descriptions:
     refugee: &refugee |-
-      Person who are outside their country of nationality or habitual residence, who cannot return due to a well-founded fear of being persecuted because of their race, religion, nationality, membership of a particular social group or political opinion. This number only accounts those who have been recognized as refugees or find themselves in refugee-like situations.
+      People who are outside their country of nationality or habitual residence, who cannot return due to a well-founded fear of being persecuted because of their race, religion, nationality, membership of a particular social group or political opinion. This number only accounts those who have been recognized as refugees or find themselves in refugee-like situations.
       This data is sourced from: *United Nations High Commissioner for Refugees, Global Trends: Forced Displacement in 2018, UNHCR, Geneva, 2019.* Share of under 18 from UNHCR unpublished data, cited with permission.
     internally_displaced: &internally_displaced |-
       Persons who have been forced or obliged to flee or leave their homes or places of habitual residence, in particular as a result of or in order to avoid the effects of armed conflict, situations of generalized violence, violations of human rights or natural or human-made disasters, and who have not crossed an internationally recognized border. Data presented in this table refer only to persons displaced due to conflict and violence.
@@ -126,7 +126,7 @@ tables:
           numDecimalPlaces: 1
       new_idps_under_18_total_per_1000:
         title: New internal displacements of children per 1000 inhabitants of all ages
-        description_short: New [internally displacements](#dod:displacements) of children under 18 years old, per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_short: New [internal displacements](#dod:displacements) of children under 18 years old, per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
         description_from_producer: *internally_displaced
         processing_level: major
         description_processing: *population

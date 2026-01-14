@@ -61,7 +61,7 @@ def run() -> None:
 
     sources = get_sources_per_indicator(tb)
 
-    # pivot table to get seperate columns per asylum and origin
+    # pivot table to get separate columns per asylum and origin
     tb = tb.pivot(
         index=["country", "year"],
         columns="indicator",
@@ -139,9 +139,9 @@ def overwrite_origins(tb, sources):
     for col in indicator_cols:
         # remove per 1000 to get original indicator name
         if col.endswith("_per_1000"):
-            col = col[: -len("_per_1000")]
+            col_tmp = col[: -len("_per_1000")]
         # get source(s) for this indicator
-        s_col = sources[[key for key, val in RENAME_COLUMNS.items() if val == col][0]]
+        s_col = sources[[key for key, val in RENAME_COLUMNS.items() if val == col_tmp][0]]
         assert len(s_col) == 1, f"Multiple sources found for indicator {col}: {s_col}"
         src_key = s_col[0]
         tb[col].metadata.origins[0].attribution = ORIGINS[src_key]["attribution"]
