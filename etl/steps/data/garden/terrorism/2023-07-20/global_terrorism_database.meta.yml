@@ -21,7 +21,7 @@ definitions:
     An act, excluding the use of an explosive, whose primary objective is to cause damage to a non-human target, such as a building, monument, train, pipeline, etc. Such attacks include arson and various forms of sabotage (e.g., sabotaging a train track is a facility/infrastructure attack, even if passengers are killed). Facility/infrastructure attacks can include acts which aim to harm an installation, yet also cause harm to people incidentally (e.g. an arson attack primarily aimed at damaging a building, but causes injuries or fatalities).
 
   description_key_hijacking: &description_key_hijacking |-
-    An act whose primary objective is to take control of a vehicle such as an aircraft, boat, bus, etc. for the purpose of diverting it to an unprogrammed destination, force the release of prisoners, or some other political objective. Obtaining payment of a ransom should not the sole purpose of a Hijacking, but can be one element of the incident so long as additional objectives have also been stated. Hijackings are distinct from Hostage Taking because the target is a vehicle, regardless of whether there are people/passengers in the vehicle.
+    An act whose primary objective is to take control of a vehicle such as an aircraft, boat, bus, etc. for the purpose of diverting it to an unprogrammed destination, force the release of prisoners, or some other political objective. Obtaining payment of a ransom should not the sole purpose of a hijacking, but can be one element of the incident so long as additional objectives have also been stated. Hijackings are distinct from Hostage Taking because the target is a vehicle, regardless of whether there are people/passengers in the vehicle.
 
   description_key_hostage_barricade: &description_key_hostage_barricade |-
     An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Such attacks are distinguished from kidnapping since the incident occurs and usually plays out at the target location with little or no intention to hold the hostages for an extended period in a separate clandestine location.
@@ -63,11 +63,12 @@ definitions:
 
     - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of more profound, systemic economic change.
     - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective if every individual involved in carrying out the act was aware of this intention. As long as any of the planners or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is met.
-    - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
+    - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants.
 
   desc_uncertainty: &desc_uncertainty |-
-      The source notes that in some cases it may be unclear whether an incident meets all inclusion criteria. In these ambiguous cases, terrorism is considered likely but not certain. These incidents are included in the dataset.
-dataset:
+      In some cases, it is unclear whether an incident fully meets all inclusion criteria. In these ambiguous situations, terrorism is considered probable but not certain, and such incidents are nonetheless included in the dataset.
+
+      For example, GTD includes non-state attacks with political or ideological motives—whether targeted killings, infrastructure sabotage, or even 5G mast arson linked to conspiracy theories. It excludes state terrorism, lawful warfare, and non-political violence like most U.S. school shootings, profit-driven crimes, and personal disputes.
   title: Global Terrorism Database
   update_period_days: 365
 
