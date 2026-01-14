@@ -15,7 +15,10 @@ meta:
 
     # Files
     url_main: https://faunalytics.org/public-acceptability-of-standard-u-s-animal-agriculture-practices/
-    url_download: https://osf.io/yz79e/?action=download
+    # The csv file does not contain weights.
+    # url_download: https://osf.io/yz79e/?action=download
+    # Get the rdata file, which contains weights.
+    url_download: https://osf.io/download/47kx9/
     date_accessed: '2026-01-13'
 
     # License
@@ -23,6 +26,6 @@ meta:
       name: CC BY 4.0
       url: https://osf.io/vx5jz/overview
 outs:
-  - md5: 79d912d157052c2b364c45abf262aaf0
-    size: 814447
-    path: acceptability_of_us_farming_practices.csv
+  - md5: 32c5162da27c5c57404412a94d48dcc7
+    size: 42451
+    path: acceptability_of_us_farming_practices.rdata

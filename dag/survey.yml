@@ -33,7 +33,7 @@ steps:
   # Faunalytics - Public Acceptability Of Standard U.S. Animal Agriculture Practices.
   #
   data://meadow/survey/2026-01-13/acceptability_of_us_farming_practices:
-    - snapshot://survey/2026-01-13/acceptability_of_us_farming_practices.csv
+    - snapshot://survey/2026-01-13/acceptability_of_us_farming_practices.rdata
   #
   # Faunalytics - Public Acceptability Of Standard U.S. Animal Agriculture Practices.
   #
