@@ -91,17 +91,31 @@ class DatasetteAPI:
                       If False, return only the first page (up to 1000 rows).
 
         Returns:
-            DataFrame with query results. Empty DataFrame on error.
+            DataFrame with query results.
+
+        Raises:
+            requests.HTTPError: If the query fails.
         """
+        import re
+
         PAGE_SIZE = 1000
         request_timeout = timeout or self.timeout
 
         all_rows: list[dict[str, Any]] = []
         offset = 0
 
+        # Check if query already has LIMIT clause - if so, don't paginate
+        sql_stripped = sql.rstrip("; \n\t")
+        has_limit = bool(re.search(r"\bLIMIT\b", sql_stripped, re.IGNORECASE))
+        if has_limit:
+            paginate = False
+
         while True:
-            # Add LIMIT/OFFSET to the query for pagination
-            paginated_sql = f"{sql.rstrip(';')} LIMIT {PAGE_SIZE} OFFSET {offset}"
+            # Add LIMIT/OFFSET to the query for pagination (only if no existing LIMIT)
+            if has_limit:
+                paginated_sql = sql_stripped
+            else:
+                paginated_sql = f"{sql_stripped} LIMIT {PAGE_SIZE} OFFSET {offset}"
 
             resp = requests.get(
                 self.base_url,
@@ -184,6 +198,7 @@ class DatasetteAPI:
         Returns:
             Dict mapping slug to popularity score (0.0 to 1.0).
             Missing slugs will not be in the dict.
+            Returns empty dict on any error (graceful degradation).
         """
         if not slugs:
             return {}
@@ -203,10 +218,15 @@ class DatasetteAPI:
         WHERE type = '{type}' AND slug IN ({slugs_str})
         """
 
-        df = self.query(sql, timeout=timeout)
-        if df.empty:
+        try:
+            df = self.query(sql, timeout=timeout)
+            if df.empty:
+                return {}
+            return dict(zip(df["slug"], df["popularity"].astype(float)))
+        except Exception:
+            # Graceful degradation - return empty dict if fetch fails
+            # (e.g., URI too long for many slugs, network errors)
             return {}
-        return dict(zip(df["slug"], df["popularity"].astype(float)))
 
     def __repr__(self) -> str:
         return f"DatasetteAPI(base_url={self.base_url!r})"

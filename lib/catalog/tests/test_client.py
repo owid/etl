@@ -579,16 +579,13 @@ class TestDatasetteAPI:
         assert len(df) == 1
         assert df["value"].iloc[0] == 1
 
-    def test_query_empty_on_error(self):
-        """Test that invalid SQL returns empty DataFrame (graceful failure)."""
-        import pandas as pd
+    def test_query_raises_on_error(self):
+        """Test that invalid SQL raises an exception."""
+        import requests
 
         api = DatasetteAPI()
-        df = api.query("SELECT * FROM nonexistent_table_12345")
-
-        # Should return empty DataFrame, not raise exception
-        assert isinstance(df, pd.DataFrame)
-        assert df.empty
+        with pytest.raises(requests.HTTPError):
+            api.query("SELECT * FROM nonexistent_table_12345")
 
     def test_list_tables(self):
         """Test listing available tables (fast mode, names only)."""
