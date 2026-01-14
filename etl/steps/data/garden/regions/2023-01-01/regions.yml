@@ -2484,40 +2484,60 @@
     - UNM49_NAF
     - UNM49_SSA
 
+### Northern America
 - code: UN_NAM
   name: "Northern America (UN)"
   region_type: "aggregate"
   defined_by: un
   members:
-    - UNM49_NAM
-
+    - "BMU"
+    - "CAN"
+    - "GRL"
+    - "SPM"
+    - "USA"
+### Latin America and the Caribbean
 - code: UN_LAC
   name: "Latin America and the Caribbean (UN)"
   region_type: "aggregate"
   defined_by: un
   members:
-    - UNM49_LAC
+    - UNM49_CAR
+    - UNM49_CAM
+    - UNM49_SAM
 
+## Asia
 - code: UN_ASI
   name: "Asia (UN)"
   region_type: "aggregate"
   defined_by: un
   members:
-    - UNM49_ASI
+    - UNM49_CAS
+    - UNM49_EAS
+    - UNM49_SEA
+    - UNM49_SAS
+    - UNM49_WAS
 
+## Europe
 - code: UN_EUR
   name: "Europe (UN)"
   region_type: "aggregate"
   defined_by: un
   members:
-    - UNM49_EUR
+    - UNM49_EEU
+    - UNM49_NEU
+    - UNM49_SEU
+    - UNM49_WEU
 
+## Oceania
 - code: UN_OCE
   name: "Oceania (UN)"
   region_type: "aggregate"
   defined_by: un
   members:
-    - UNM49_OCE
+    - UNM49_ANZ
+    - UNM49_MEL
+    - UNM49_MIC
+    - UNM49_POL
 
 ##########
 # UN M49
@@ -2525,14 +2545,7 @@
 ##########
 
 ## In this Taiwan and Kosovo are not recognized and part of China and Serbia respectively
-## Africa
-- code: UNM49_AFR
-  name: "Africa (UN M49)"
-  region_type: "aggregate"
-  defined_by: un_m49_1
-  members:
-    - UNM49_NAF
-    - UNM49_SSA
+
 ### Northern Africa
 - code: UNM49_NAF
   name: "Northern Africa (UN M49)"
@@ -2639,26 +2652,7 @@
   members:
     - UNM49_NAM
     - UNM49_LAC
-### Northern America
-- code: UNM49_NAM
-  name: "Northern America (UN M49)"
-  region_type: "aggregate"
-  defined_by: un_m49_2
-  members:
-    - "BMU"
-    - "CAN"
-    - "GRL"
-    - "SPM"
-    - "USA"
-### Latin America and the Caribbean
-- code: UNM49_LAC
-  name: "Latin America and the Caribbean (UN M49)"
-  region_type: "aggregate"
-  defined_by: un_m49_2
-  members:
-    - UNM49_CAR
-    - UNM49_CAM
-    - UNM49_SAM
+
 #### members
 - code: UNM49_CAR
   name: "Caribbean (UN M49)"
@@ -2728,17 +2722,7 @@
     - "URY"
     - "VEN"
 
-## Asia
-- code: UNM49_ASI
-  name: "Asia (UN M49)"
-  region_type: "aggregate"
-  defined_by: un_m49_1
-  members:
-    - UNM49_CAS
-    - UNM49_EAS
-    - UNM49_SEA
-    - UNM49_SAS
-    - UNM49_WAS
+
 ### members
 - code: UNM49_CAS
   name: "Central Asia (UN M49)"
@@ -2815,16 +2799,7 @@
     - "ARE"
     - "YEM"
 
-## Europe
-- code: UNM49_EUR
-  name: "Europe (UN M49)"
-  region_type: "aggregate"
-  defined_by: un_m49_1
-  members:
-    - UNM49_EEU
-    - UNM49_NEU
-    - UNM49_SEU
-    - UNM49_WEU
+
 ### members
 - code: UNM49_EEU
   name: "Eastern Europe (UN M49)"
@@ -2898,16 +2873,7 @@
     - "NLD"
     - "CHE"
 
-## Oceania
-- code: UNM49_OCE
-  name: "Oceania (UN M49)"
-  region_type: "aggregate"
-  defined_by: un_m49_1
-  members:
-    - UNM49_ANZ
-    - UNM49_MEL
-    - UNM49_MIC
-    - UNM49_POL
+
 ### members
 - code: UNM49_ANZ
   name: "Australia and New Zealand (UN M49)"
