@@ -25,18 +25,19 @@ ORIGINS = {
         "attribution": "United Nations High Commissioner for Refugees via UNICEF (2024)",
         "attribution_short": "UNHCR",
         "citation_full": "United Nations High Commissioner for Refugees, Global Trends: Forced Displacement in 2023. UNHCR, 2024. Cited via UNICEF.",
-        "data_published": "2024",
+        "date_published": "2024",
     },
     "Internal Displacement Monitoring Centre, Global Internal Displacement Database (GIDD), IDMC, 2024.": {
         "attribution": "Internal Displacement Monitoring Centre via UNICEF (2024)",
         "attribution_short": "IDMC",
         "citation_full": "Internal Displacement Monitoring Centre, Global Internal Displacement Database (GIDD), IDMC, 2024. Cited via UNICEF.",
-        "data_published": "2024",
+        "date_published": "2024",
     },
-    "The United Nations Relief and Works Agency for Palestine Refugees, UNRWA, 2024.": {
+    "The United Nations Relief and Works Agency for Palestine Refugees. UNRWA, 2024": {
         "attribution": "The United Nations Relief and Works Agency for Palestine Refugees via UNICEF (2024)",
         "attribution_short": "UNRWA",
         "citation_full": "The United Nations Relief and Works Agency for Palestine Refugees, UNRWA, 2024. Cited via UNICEF.",
+        "date_published": "2024",
     },
 }
 
@@ -80,7 +81,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # calculate shares per population
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = geo.add_population_to_table(tb, ds_population, warn_on_missing_countries=False)
 
     tb = calculate_shares(tb)
 
@@ -133,13 +134,19 @@ def calculate_shares(tb):
     return tb
 
 
+
 def overwrite_origins(tb, sources):
     indicator_cols = [col for col in tb.columns if col not in ["country", "year"]]
     for col in indicator_cols:
-        assert len(sources[col]) == 1, f"Multiple sources found for indicator {col}: {sources[col]}"
-        src_key = sources[col][0]
+        # remove per 1000 to get original indicator name
+        if col.endswith("_per_1000"):
+            col = col[: -len("_per_1000")]
+        # get source(s) for this indicator
+        s_col = sources[[key for key, val in RENAME_COLUMNS.items() if val == col][0]]
+        assert len(s_col) == 1, f"Multiple sources found for indicator {col}: {s_col}"
+        src_key = s_col[0]
         tb[col].metadata.origins[0].attribution = ORIGINS[src_key]["attribution"]
         tb[col].metadata.origins[0].citation_full = ORIGINS[src_key]["citation_full"]
-        tb[col].metadata.origins[0].date_published = ORIGINS[src_key]["data_published"]
+        tb[col].metadata.origins[0].date_published = ORIGINS[src_key]["date_published"]
         tb[col].metadata.origins[0].attribution_short = ORIGINS[src_key]["attribution_short"]
     return tb
