@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
+import pandas as pd
 import requests
 
 DATASETTE_BASE_URL = "https://datasette-public.owid.io/owid.json"
@@ -44,10 +45,8 @@ class DatasetteAPI:
         self.base_url = base_url
         self.timeout = timeout
 
-    def query(
-        self, sql: str, timeout: int | None = None, paginate: bool = True
-    ) -> list[dict[str, Any]]:
-        """Execute a SQL query and return results as a list of dicts.
+    def query(self, sql: str, timeout: int | None = None, paginate: bool = True) -> pd.DataFrame:
+        """Execute a SQL query and return results as a DataFrame.
 
         Automatically paginates through all results using LIMIT/OFFSET.
         Datasette has a 1000-row limit per request for raw SQL queries.
@@ -59,7 +58,7 @@ class DatasetteAPI:
                       If False, return only the first page (up to 1000 rows).
 
         Returns:
-            List of row dictionaries. Empty list on error.
+            DataFrame with query results. Empty DataFrame on error.
         """
         PAGE_SIZE = 1000
         request_timeout = timeout or self.timeout
@@ -88,9 +87,9 @@ class DatasetteAPI:
 
                 offset += PAGE_SIZE
 
-            return all_rows
+            return pd.DataFrame(all_rows)
         except Exception:
-            return []
+            return pd.DataFrame()
 
     def list_tables(self, timeout: int | None = None) -> list[str]:
         """List available tables in the database.
@@ -102,8 +101,8 @@ class DatasetteAPI:
             List of table names. Empty list on error.
         """
         sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-        results = self.query(sql, timeout=timeout)
-        return [row["name"] for row in results]
+        df = self.query(sql, timeout=timeout)
+        return df["name"].tolist() if not df.empty else []
 
     def fetch_popularity(
         self,
@@ -135,8 +134,10 @@ class DatasetteAPI:
         WHERE type = '{type}' AND slug IN ({slugs_str})
         """
 
-        results = self.query(sql, timeout=timeout)
-        return {row["slug"]: float(row["popularity"]) for row in results}
+        df = self.query(sql, timeout=timeout)
+        if df.empty:
+            return {}
+        return dict(zip(df["slug"], df["popularity"].astype(float)))
 
     def __repr__(self) -> str:
         return f"DatasetteAPI(base_url={self.base_url!r})"

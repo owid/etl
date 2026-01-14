@@ -570,20 +570,25 @@ class TestDatasetteAPI:
 
     def test_query(self):
         """Test executing raw SQL query."""
-        api = DatasetteAPI()
-        results = api.query("SELECT 1 as value")
+        import pandas as pd
 
-        assert isinstance(results, list)
-        assert len(results) == 1
-        assert results[0]["value"] == 1
+        api = DatasetteAPI()
+        df = api.query("SELECT 1 as value")
+
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 1
+        assert df["value"].iloc[0] == 1
 
     def test_query_empty_on_error(self):
-        """Test that invalid SQL returns empty list (graceful failure)."""
-        api = DatasetteAPI()
-        results = api.query("SELECT * FROM nonexistent_table_12345")
+        """Test that invalid SQL returns empty DataFrame (graceful failure)."""
+        import pandas as pd
 
-        # Should return empty list, not raise exception
-        assert results == []
+        api = DatasetteAPI()
+        df = api.query("SELECT * FROM nonexistent_table_12345")
+
+        # Should return empty DataFrame, not raise exception
+        assert isinstance(df, pd.DataFrame)
+        assert df.empty
 
     def test_list_tables(self):
         """Test listing available tables."""
@@ -606,10 +611,10 @@ class TestDatasetteAPI:
         """Test fetching indicator popularity."""
         api = DatasetteAPI()
         # Use a known indicator path that should exist
-        results = api.query("SELECT slug FROM analytics_popularity WHERE type = 'indicator' LIMIT 1")
+        df = api.query("SELECT slug FROM analytics_popularity WHERE type = 'indicator' LIMIT 1")
 
-        if results:
-            slug = results[0]["slug"]
+        if not df.empty:
+            slug = df["slug"].iloc[0]
             popularity = api.fetch_popularity([slug], "indicator")
 
             assert isinstance(popularity, dict)
@@ -620,10 +625,10 @@ class TestDatasetteAPI:
         """Test fetching dataset popularity."""
         api = DatasetteAPI()
         # Use a known dataset path that should exist
-        results = api.query("SELECT slug FROM analytics_popularity WHERE type = 'dataset' LIMIT 1")
+        df = api.query("SELECT slug FROM analytics_popularity WHERE type = 'dataset' LIMIT 1")
 
-        if results:
-            slug = results[0]["slug"]
+        if not df.empty:
+            slug = df["slug"].iloc[0]
             popularity = api.fetch_popularity([slug], "dataset")
 
             assert isinstance(popularity, dict)
