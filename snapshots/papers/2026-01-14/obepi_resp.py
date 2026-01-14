@@ -22,10 +22,6 @@ DATA = pd.DataFrame(
             2020,
         ],
         "obesity_share": [8.5, 10.1, 11.9, 13.1, 14.5, 15.0, 17],
-        "source": [
-            "https://www.mdpi.com/2077-0383/12/3/925",
-        ]
-        * 7,
     }
 )
 
