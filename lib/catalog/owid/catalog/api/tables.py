@@ -397,6 +397,159 @@ class TablesAPI:
 
         return " ".join(query_parts) if query_parts else "all tables"
 
+    def _filter_index(
+        self,
+        index: pd.DataFrame,
+        *,
+        table: str | None,
+        dataset: str | None,
+        namespace: str | None,
+        version: str | None,
+        channel: str,
+        match: Literal["exact", "contains", "regex", "fuzzy"],
+        case: bool,
+        fuzzy_threshold: int,
+    ) -> tuple[pd.DataFrame, npt.NDArray[np.float64] | None]:
+        """Apply search criteria to index, return filtered matches and optional scores.
+
+        Args:
+            index: Catalog index DataFrame.
+            table: Table name pattern to search for.
+            dataset: Dataset name pattern to search for.
+            namespace: Filter by namespace (exact match).
+            version: Filter by version (exact match).
+            channel: Filter by channel (exact match).
+            match: Matching mode for table/dataset patterns.
+            case: Case-sensitive matching.
+            fuzzy_threshold: Minimum score for fuzzy matching.
+
+        Returns:
+            Tuple of (filtered DataFrame, optional fuzzy scores array).
+        """
+        criteria: npt.ArrayLike = np.ones(len(index), dtype=bool)
+        scores: npt.NDArray[np.float64] | None = None
+
+        # Table matching with scoring
+        if table:
+            table_scores = _match_score(index["table"], table, match, case, fuzzy_threshold)
+            if match == "fuzzy":
+                criteria &= table_scores >= fuzzy_threshold
+                scores = table_scores
+            else:
+                criteria &= table_scores > 0
+
+        # Dataset matching with scoring
+        if dataset:
+            dataset_scores = _match_score(index["dataset"], dataset, match, case, fuzzy_threshold)
+            if match == "fuzzy":
+                criteria &= dataset_scores >= fuzzy_threshold
+                # Average scores if both table and dataset specified
+                scores = dataset_scores if scores is None else (scores + dataset_scores) / 2
+            else:
+                criteria &= dataset_scores > 0
+
+        # Exact match filters
+        if namespace:
+            criteria &= index["namespace"] == namespace
+        if version:
+            criteria &= index["version"] == version
+        if channel:
+            criteria &= index["channel"] == channel
+
+        matches = index[criteria]
+
+        # Drop checksum column if present
+        if "checksum" in matches.columns:
+            matches = matches.drop(columns=["checksum"])
+
+        # Sort by relevance if fuzzy matching was used
+        if match == "fuzzy" and scores is not None:
+            sort_order = np.argsort(-scores[criteria])
+            matches = matches.iloc[sort_order]
+
+        return matches, scores[criteria] if scores is not None else None
+
+    def _fetch_popularity(
+        self,
+        matches: pd.DataFrame,
+        timeout: int | None,
+    ) -> dict[str, float]:
+        """Fetch popularity data for matched datasets.
+
+        Args:
+            matches: Filtered DataFrame of matching tables.
+            timeout: HTTP request timeout in seconds.
+
+        Returns:
+            Dict mapping dataset slugs to popularity scores.
+        """
+        if matches.empty:
+            return {}
+
+        # Vectorized slug creation (much faster than iterrows)
+        dataset_slugs = (
+            matches["namespace"] + "/" + matches["version"].astype(str) + "/" + matches["dataset"]
+        ).tolist()
+
+        return self._client._datasette.fetch_popularity(
+            sorted(set(dataset_slugs)),
+            type="dataset",
+            timeout=timeout or self._client.timeout,
+        )
+
+    def _to_results(
+        self,
+        matches: pd.DataFrame,
+        popularity: dict[str, float],
+    ) -> list[TableResult]:
+        """Convert DataFrame matches to TableResult objects.
+
+        Args:
+            matches: Filtered DataFrame of matching tables.
+            popularity: Dict mapping dataset slugs to popularity scores.
+
+        Returns:
+            List of TableResult objects sorted by popularity.
+        """
+        results = []
+
+        # Use to_dict("records") for better performance than iterrows
+        for row in matches.to_dict("records"):
+            # Handle dimensions - could be list or JSON string
+            dimensions = row.get("dimensions", [])
+            if isinstance(dimensions, str):
+                dimensions = json.loads(dimensions)
+
+            # Handle formats - could be list, numpy array, or None
+            formats_raw = row.get("formats", None)
+            if formats_raw is None or (hasattr(formats_raw, "__len__") and len(formats_raw) == 0):
+                # Fallback to single format field
+                format_single = row.get("format", None)
+                formats = [format_single] if format_single else []
+            else:
+                formats = list(formats_raw) if hasattr(formats_raw, "__iter__") else []
+
+            slug = f"{row['namespace']}/{row['version']}/{row['dataset']}"
+            results.append(
+                TableResult(
+                    table=row["table"],
+                    dataset=row["dataset"],
+                    version=str(row["version"]),
+                    namespace=row["namespace"],
+                    channel=row["channel"],
+                    path=row["path"],
+                    is_public=row.get("is_public", True),
+                    dimensions=list(dimensions) if dimensions is not None else [],
+                    formats=formats,
+                    popularity=popularity.get(slug, 0.0),
+                    catalog_url=self.catalog_url,
+                )
+            )
+
+        # Sort by popularity (descending) - most popular first
+        results.sort(key=lambda r: r.popularity, reverse=True)
+        return results
+
     def search(
         self,
         table: str | None = None,
@@ -472,98 +625,25 @@ class TablesAPI:
         if channel is None:
             channel = "garden"
 
-        # Load catalog index
+        # Load and filter catalog index
         index = self._get_index(timeout=timeout)
-
-        # Apply filters
-        criteria: npt.ArrayLike = np.ones(len(index), dtype=bool)
-        scores: npt.NDArray[np.float64] | None = None
-
-        # Table matching with scoring
-        if table:
-            table_scores = _match_score(index["table"], table, match, case, fuzzy_threshold)
-            if match == "fuzzy":
-                criteria &= table_scores >= fuzzy_threshold
-                scores = table_scores
-            else:
-                criteria &= table_scores > 0
-
-        # Dataset matching with scoring
-        if dataset:
-            dataset_scores = _match_score(index["dataset"], dataset, match, case, fuzzy_threshold)
-            if match == "fuzzy":
-                criteria &= dataset_scores >= fuzzy_threshold
-                # Average scores if both table and dataset specified
-                scores = dataset_scores if scores is None else (scores + dataset_scores) / 2
-            else:
-                criteria &= dataset_scores > 0
-
-        # Exact match filters
-        if namespace:
-            criteria &= index["namespace"] == namespace
-        if version:
-            criteria &= index["version"] == version
-        if channel:
-            criteria &= index["channel"] == channel
-
-        matches = index[criteria]
-
-        # Drop checksum column if present
-        if "checksum" in matches.columns:
-            matches = matches.drop(columns=["checksum"])
-
-        # Sort by relevance if fuzzy matching was used
-        if match == "fuzzy" and scores is not None:
-            sort_order = np.argsort(-scores[criteria])
-            matches = matches.iloc[sort_order]
-
-        # Fetch popularity via Datasette API (dataset-level: namespace/version/dataset)
-        dataset_slugs = [f"{row['namespace']}/{str(row['version'])}/{row['dataset']}" for _, row in matches.iterrows()]
-        popularity_data = (
-            self._client._datasette.fetch_popularity(
-                sorted(set(dataset_slugs)),
-                type="dataset",
-                timeout=timeout or self._client.timeout,
-            )
-            if dataset_slugs
-            else {}
+        matches, _ = self._filter_index(
+            index,
+            table=table,
+            dataset=dataset,
+            namespace=namespace,
+            version=version,
+            channel=channel,
+            match=match,
+            case=case,
+            fuzzy_threshold=fuzzy_threshold,
         )
 
-        # Convert to TableResult objects
-        results = []
-        for _, row in matches.iterrows():
-            dimensions = row.get("dimensions", [])
-            if isinstance(dimensions, str):
-                dimensions = json.loads(dimensions)
+        # Fetch popularity data
+        popularity = self._fetch_popularity(matches, timeout)
 
-            # Handle formats - could be list, numpy array, or None
-            formats_raw = row.get("formats", None)
-            if formats_raw is None or (hasattr(formats_raw, "__len__") and len(formats_raw) == 0):
-                # Fallback to single format field
-                format_single = row.get("format", None)
-                formats = [format_single] if format_single else []
-            else:
-                formats = list(formats_raw) if hasattr(formats_raw, "__iter__") else []
-
-            slug = f"{row['namespace']}/{str(row['version'])}/{row['dataset']}"
-            results.append(
-                TableResult(
-                    table=row["table"],
-                    dataset=row["dataset"],
-                    version=str(row["version"]),
-                    namespace=row["namespace"],
-                    channel=row["channel"],
-                    path=row["path"],
-                    is_public=row.get("is_public", True),
-                    dimensions=list(dimensions) if dimensions is not None else [],
-                    formats=formats,
-                    popularity=popularity_data.get(slug, 0.0),
-                    catalog_url=self.catalog_url,
-                )
-            )
-
-        # Sort by popularity (descending) - most popular first
-        results.sort(key=lambda r: r.popularity, reverse=True)
+        # Convert to results
+        results = self._to_results(matches, popularity)
 
         # Build descriptive query from search parameters
         query = self._build_query(
