@@ -342,9 +342,7 @@ class TablesAPI:
         )
 
         # Fetch popularity via Datasette API (dataset-level: namespace/version/dataset)
-        dataset_slugs = [
-            f"{row['namespace']}/{str(row['version'])}/{row['dataset']}" for _, row in matches.iterrows()
-        ]
+        dataset_slugs = [f"{row['namespace']}/{str(row['version'])}/{row['dataset']}" for _, row in matches.iterrows()]
         popularity_data = (
             self._client._datasette.fetch_popularity(
                 sorted(set(dataset_slugs)),

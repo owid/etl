@@ -159,11 +159,7 @@ class SiteSearchAPI:
 
         # Fetch popularity via Datasette API (chart slugs are full URLs)
         hits = data.get("results", [])
-        urls = [
-            f"https://ourworldindata.org/grapher/{hit.get('slug', '')}"
-            for hit in hits
-            if hit.get("slug")
-        ]
+        urls = [f"https://ourworldindata.org/grapher/{hit.get('slug', '')}" for hit in hits if hit.get("slug")]
         popularity_data = (
             self._client._datasette.fetch_popularity(
                 sorted(set(urls)),
