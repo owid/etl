@@ -51,6 +51,7 @@ def _load_chart_table(
     use_column_short_names: bool,
     load_data: bool = True,
     timeout: int = 30,
+    base_url: str = GRAPHER_BASE_URL,
 ) -> ChartTable:
     """Load chart data as ChartTable with rich metadata.
 
@@ -61,6 +62,7 @@ def _load_chart_table(
         load_data: If True (default), load full chart data.
                    If False, load only structure (columns and metadata) without rows.
         timeout: HTTP request timeout in seconds.
+        base_url: Base URL for the Grapher. Defaults to GRAPHER_BASE_URL.
 
     Returns:
         ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
@@ -218,6 +220,7 @@ def _load_chart_table_data(
     params: dict[str, str],
     base_url: str,
     load_data: bool = True,
+    base_url: str = GRAPHER_BASE_URL,
 ) -> pd.DataFrame:
     """Fetch chart data as a ChartTable.
 

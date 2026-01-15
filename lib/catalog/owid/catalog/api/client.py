@@ -1,6 +1,6 @@
-from owid.catalog.api.charts import ChartsAPI
+from owid.catalog.api.charts import GRAPHER_BASE_URL, ChartsAPI
 from owid.catalog.api.datasette import DatasetteAPI
-from owid.catalog.api.indicators import IndicatorsAPI
+from owid.catalog.api.indicators import OWID_SEARCH_API, IndicatorsAPI
 from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
 from owid.catalog.api.utils import (
@@ -54,6 +54,10 @@ class Client:
     tables: TablesAPI
     datasets: TablesAPI  # Backwards compatibility alias
     timeout: int
+    catalog_url: str
+    grapher_url: str
+    indicators_search_url: str
+    site_search_url: str
     _datasette: DatasetteAPI
     _site_search: SiteSearchAPI
 
@@ -75,6 +79,10 @@ class Client:
             site_search_url: URL for site search API. Default: https://ourworldindata.org/api/search
         """
         self.timeout = timeout
+        self.catalog_url = catalog_url
+        self.grapher_url = grapher_url
+        self.indicators_search_url = indicators_search_url
+        self.site_search_url = site_search_url
         self._datasette = DatasetteAPI(timeout=timeout)
         self.charts = ChartsAPI(self, base_url=grapher_url)
         self.indicators = IndicatorsAPI(self, search_url=indicators_search_url, catalog_url=catalog_url)
