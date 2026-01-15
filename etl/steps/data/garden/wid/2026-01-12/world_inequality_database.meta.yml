@@ -5,6 +5,58 @@ definitions:
       topic_tags:
         - Economic Inequality
 
+  # NOTE: Change this if needed in the future
+  ppp_year: 2023
+
+  extrapolated: |-
+    <% if extrapolated == "yes" %>
+     - Extrapolated
+    <%- endif %>
+
+  description_short_welfare_type_inequality: |-
+    <% if welfare_type == "before tax" %>
+    Inequality is measured here in terms of income before taxes and benefits.
+    <%- elif welfare_type in ["after tax", "after tax (disposable)"] %>
+    Inequality is measured here in terms of income after taxes and benefits.
+    <%- elif welfare_type == "wealth" %>
+    Inequality is measured here in terms of net wealth.
+    <%- endif %>
+
+  description_key_welfare_type: |-
+    <% if welfare_type == "before tax" %>
+    Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.
+    <%- elif welfare_type == "after tax" %>
+    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
+    <%- elif welfare_type == "after tax (disposable)" %>
+    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.
+    <%- elif welfare_type == "wealth" %>
+    This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
+    <%- endif %>
+
+  description_key_methodology: &description_key_methodology |-
+    <% if welfare_type != "wealth" %>
+    - The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+    - These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).
+    <%- else %>
+    - The data is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
+    - Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).
+    <%- endif %>
+
+  description_key_methodology_1: |-
+    <% if welfare_type != "wealth" %>
+    The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+    <%- else %>
+    The data is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
+    <%- endif %>
+
+  description_key_methodology_2: |-
+    <% if welfare_type != "wealth" %>
+    These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).
+    <%- else %>
+    Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).
+    <%- endif %>
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -13,14 +65,18 @@ dataset:
 
 
 tables:
-  world_inequality_database:
+  inequality:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
+      gini:
+        title: Gini coefficient (<<welfare_type>>){definitions.extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+          - *description_key_methodology
       #   processing_level: minor
       #   description_processing: Description of processing of testing variable.
       #   description_from_producer: Description of testing variable from producer.
@@ -53,6 +109,6 @@ tables:
       #     zeroDay:
       #     roundingMode:
       #     numSignificantFigures:
-      #
-      {}
+
+      # p50_p10_ratio	p90_p10_ratio	p90_p50_ratio	palma_ratio	s80_s20_ratio	s90_s10_ratio	s90_s50_ratio	bottom_50_share	middle_40_share	top_10_share	top_1_share	top_90_99_share
 
