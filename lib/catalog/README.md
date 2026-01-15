@@ -17,27 +17,24 @@ The `owid-catalog` library is the foundation of Our World in Data's data managem
 pip install owid-catalog
 ```
 
-> **Note**: The library is currently in Release Candidate stage (v1.0.0-rc1). Install with: `pip install owid-catalog==1.0.0rc1`
+> **Note**: The library is currently in Release Candidate stage (v1.0.0-rc2). Install with: `pip install owid-catalog==1.0.0rc2`
 
 ## Quick Examples
 
 ### Accessing OWID Data
 
 ```python
-from owid.catalog import Client
+from owid.catalog import fetch, search
 
-client = Client()
-
-# Get data from charts
-tb = client.charts.fetch("life-expectancy")
-
-# Search for indicators
-results = client.indicators.search("renewable energy")
-tb = results[0].fetch()
-
-# Query catalog tables
-tables = client.tables.search(table="population", namespace="un")
+# Search and fetch a catalog table
+tables = search(table="population", namespace="un")
 tb = tables[0].fetch()
+
+# Fetch data from OWID Chart at ourworldindata.org/grapher/life-expectancy
+tb = fetch("life-expectancy")
+
+# Search indicators (using semantic search)
+search("renewable energy", kind="indicator")
 ```
 
 ### Working with Data Structures
@@ -86,23 +83,38 @@ make watch
 
 ## Changelog
 
-### `v1.0.0rc0` (Release Candidate)
-  - **Highlights**
-    - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
-    - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
-    - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
-    - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
-    - **Breaking changes**:
-      - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
-      - `catalog.charts` module has been removed in favor of `Client().chart`  - **Others**
-    - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
-    - Documentation restructure: Split into intro, API reference, and data structures guides
-    - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
-    - Enhanced type checking with pydantic `BaseModel` for all result types
-    - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
-    - `ResponseSet` container with iteration, indexing, and DataFrame conversion
-    - Loading indicators for long-running API requests
-    - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
+### `v1.0.0rc2` (Release Candidate)
+- **Highlights**
+    - **Integrate `Table` object into API module:** All `fetch()` methods now return `owid.catalog.Table` objects with full metadata support, including charts.
+    - **Popularity scores**: Search results now include `popularity` field (0.0-1.0) based on analytics views
+    - **CatalogPath helper**: New pathlib-like class for parsing catalog paths (e.g., `grapher/who/2024/gho/table#indicator`)
+    - **Performance improvements**: Replaced slow `iterrows()` with vectorized operations in TablesAPI
+    - **refresh_index parameter**: New `search(..., refresh_index=True)` to force catalog index reload
+- **Others**
+    - Embedded catalog index loading directly in TablesAPI (removed ETLCatalog dependency)
+    - Modularized `search()` into helper methods: `_filter_index()`, `_fetch_popularity()`, `_to_results()`
+    - API URLs now immutable with Pydantic `Field(frozen=True)` - consistent flow from Client → API → Result
+    - Improved `.latest()` method with better version handling and timestamps
+    - Legacy catalog code moved to `owid.catalog.api.legacy` module
+    - Results sorted by popularity by default (most viewed first)
+
+### `v1.0.0rc1` (Release Candidate)
+- **Highlights**
+  - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
+  - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
+  - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
+  - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
+  - **Breaking changes**:
+    - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
+    - `catalog.charts` module has been removed in favor of `Client().chart`  - **Others**
+  - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
+  - Documentation restructure: Split into intro, API reference, and data structures guides
+  - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
+  - Enhanced type checking with pydantic `BaseModel` for all result types
+  - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
+  - `ResponseSet` container with iteration, indexing, and DataFrame conversion
+  - Loading indicators for long-running API requests
+  - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
 
 
 <details>
