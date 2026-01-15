@@ -9,13 +9,14 @@ paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
+    "chartTypes": ["StackedDiscreteBar"],
 }
 
 # Configuration for stacked bar charts
 STACKED_VIEW_CONFIG = {
     "hasMapTab": False,
     "tab": "chart",
-    "chartTypes": ["StackedBar"],
+    "chartTypes": ["StackedDiscreteBar"],
 }
 
 

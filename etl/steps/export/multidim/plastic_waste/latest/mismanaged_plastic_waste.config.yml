@@ -1,10 +1,15 @@
 title:
-  title: "Plastic waste emissions"
-  title_variant: "by emission type and source"
+  title: Plastic waste emissions
+  title_variant: by emission type and source
 default_selection:
-  - "World"
+  - Russia
+  - China
+  - United States
+  - Brazil
+  - Nigeria
+
 topic_tags:
-  - "Plastic Pollution"
+  - Plastic Pollution
 dimensions:
   - slug: "emission_type"
     name: "Emission type"
