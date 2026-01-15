@@ -4,12 +4,14 @@ This CLI provides tools for managing indicator upgrades, including:
 - Matching variables between old and new datasets
 - Upgrading indicators in the database
 - Undoing indicator upgrades
+- Automatically detecting and upgrading dataset migrations
 """
 
 import rich_click as click
 from rich_click.rich_group import RichGroup
 from structlog import get_logger
 
+from apps.indicator_upgrade.detect import detect_dataset_migrations
 from apps.indicator_upgrade.match import main as match_main
 from apps.indicator_upgrade.upgrade import (
     cli_upgrade_indicators,
@@ -220,6 +222,143 @@ def undo_command(dry_run: bool) -> None:
         log.info("Indicator upgrade undo completed successfully!")
     else:
         log.info("DRY RUN completed - no changes made")
+
+
+@cli.command(name="auto")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Preview changes without applying them.",
+)
+@click.option(
+    "--perfect-only",
+    is_flag=True,
+    default=False,
+    help="Only match and upgrade indicators with perfect similarity (100%% match).",
+)
+@click.option(
+    "--threshold",
+    type=float,
+    default=100.0,
+    help="Similarity threshold (0-100) for automatic mapping. Default: 100.0 (perfect match only)",
+)
+@click.option(
+    "-s",
+    "--similarity-name",
+    type=str,
+    default="partial_ratio",
+    help=(
+        "Name of similarity function to use when fuzzy matching variables."
+        " Default: partial_ratio. Available methods:"
+        " token_set_ratio, token_sort_ratio, partial_ratio,"
+        " partial_token_set_ratio, partial_token_sort_ratio, ratio,"
+        " quick_ratio, weighted_ratio."
+    ),
+)
+@click.option(
+    "--interactive",
+    is_flag=True,
+    default=False,
+    help="Prompt for confirmation before processing each migration.",
+)
+@click.option(
+    "--archived",
+    is_flag=True,
+    default=False,
+    help="Include archived datasets in the detection.",
+)
+def auto_command(
+    dry_run: bool,
+    perfect_only: bool,
+    threshold: float,
+    similarity_name: str,
+    interactive: bool,
+    archived: bool,
+) -> None:
+    """Automatically detect and upgrade dataset migrations.
+
+    This command combines dataset detection, variable matching, and upgrade into a single workflow.
+    It detects which datasets have been updated based on version tracker changes, matches
+    variables between old and new versions, and applies the upgrades.
+
+    By default, only perfect matches (100% similarity) are processed automatically.
+    Use --threshold to adjust the similarity threshold for automatic matching.
+    """
+    log.info("Starting automatic indicator upgrade workflow")
+
+    # 1. Detect dataset migrations
+    log.info("Step 1: Detecting dataset migrations...")
+    migrations = detect_dataset_migrations(archived=archived)
+
+    if not migrations:
+        log.info("No dataset migrations detected. Nothing to do.")
+        return
+
+    log.info(f"Found {len(migrations)} dataset migration(s) to process")
+
+    # 2. Process each migration
+    for i, (old_dataset_id, new_dataset_id) in enumerate(migrations, 1):
+        log.info(f"\nProcessing migration {i}/{len(migrations)}: {old_dataset_id} -> {new_dataset_id}")
+
+        # Ask for confirmation if --interactive is used
+        if interactive:
+            response = click.prompt(
+                "Process this migration? [y/n/q] (q=quit)",
+                type=str,
+                default="y",
+            )
+            if response.lower() == "q":
+                log.info("Quitting...")
+                break
+            elif response.lower() != "y":
+                log.info("Skipping this migration")
+                continue
+
+        # 3. Match variables
+        log.info(f"  Matching indicators between datasets {old_dataset_id} and {new_dataset_id}...")
+        try:
+            match_main(
+                old_dataset_id=old_dataset_id,
+                new_dataset_id=new_dataset_id,
+                dry_run=dry_run,
+                match_identical=True,
+                similarity_name=similarity_name,
+                max_suggestions=10,
+                no_interactive=True,
+                auto_threshold=threshold,
+                quiet=True,
+                perfect_match_only=perfect_only,
+            )
+        except Exception as e:
+            log.error(f"  Failed to match indicators: {e}")
+            if interactive:
+                if not click.confirm("Continue with remaining migrations?"):
+                    break
+            continue
+
+        # 4. Upgrade indicators (skip in dry-run mode since mappings aren't actually saved)
+        if not dry_run:
+            log.info("  Upgrading matched indicators...")
+            try:
+                cli_upgrade_indicators(dry_run=dry_run)
+            except Exception as e:
+                log.error(f"  Failed to upgrade indicators: {e}")
+                if interactive:
+                    if not click.confirm("Continue with remaining migrations?"):
+                        break
+                continue
+        else:
+            log.info("  [DRY RUN] Would upgrade matched indicators")
+
+        log.info(f"  ✓ Completed migration {i}/{len(migrations)}")
+
+    # 5. Summary
+    if dry_run:
+        log.info("\nDRY RUN completed - no changes were made")
+    else:
+        log.info("\n✓ Automatic indicator upgrade workflow completed!")
+        log.info(f"Processed {len(migrations)} dataset migration(s)")
 
 
 if __name__ == "__main__":
