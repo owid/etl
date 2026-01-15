@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING
 from deprecated import deprecated
 
 # Re-export catalog classes for backwards compatibility
-from owid.catalog.api.catalogs import (
+from owid.catalog.api.legacy import (
     CatalogFrame,
     CatalogSeries,
     ETLCatalog,

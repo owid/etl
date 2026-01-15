@@ -1,5 +1,5 @@
 #
-#  owid.catalog.api.catalogs
+#  owid.catalog.api.legacy
 #
 #  Catalog classes for finding and loading data.
 #
@@ -445,7 +445,7 @@ class ETLCatalog(CatalogMixin):
         self.channels = channels
         self.timeout = timeout
         self.metadata = self._read_metadata(self.uri + "catalog.meta.json", timeout=timeout)
-        if self.metadata["format_version"] > OWID_CATALOG_VERSION:
+        if self.metadata["format_version"] > 5:
             raise PackageUpdateRequired(
                 f"library supports api version {OWID_CATALOG_VERSION}, "
                 f"but the remote catalog has version {self.metadata['format_version']} "
