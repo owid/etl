@@ -331,7 +331,6 @@ class User(Base):
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
     githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
-    password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
