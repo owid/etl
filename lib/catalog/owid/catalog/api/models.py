@@ -35,7 +35,7 @@ class ResponseSet(BaseModel, Generic[T]):
     results: list[T]
     query: str = ""
     total_count: int = 0
-    base_url: str = Field(default="", frozen=True)
+    base_url: str = Field(frozen=True)
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
