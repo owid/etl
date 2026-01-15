@@ -138,6 +138,7 @@ def overwrite_origins(tb, sources):
     indicator_cols = [col for col in tb.columns if col not in ["country", "year"]]
     for col in indicator_cols:
         # remove per 1000 to get original indicator name
+        col_tmp = col
         if col.endswith("_per_1000"):
             col_tmp = col[: -len("_per_1000")]
         # get source(s) for this indicator
