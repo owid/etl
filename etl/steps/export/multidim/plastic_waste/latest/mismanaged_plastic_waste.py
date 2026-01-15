@@ -20,6 +20,45 @@ STACKED_VIEW_CONFIG = {
 }
 
 
+def generate_title_by_type(view):
+    """Generate title based on emission type breakdown and measure."""
+    measure = view.dimensions.get("measure")
+    source = view.dimensions.get("emissions_source")
+
+    # Map measure to title text
+    measure_text = {
+        "total": "Plastic waste emissions by type",
+        "per_person": "Plastic waste emissions per person by type",
+    }.get(measure, "Plastic waste emissions by type")
+
+    # Add source context if not "all"
+    if source and source != "all":
+        source_names = {
+            "uncollected_waste": "from uncollected waste",
+            "litter": "from litter",
+            "disposal": "from disposal sites",
+            "collection_system": "from collection system",
+            "rejects": "from recycling rejects",
+        }
+        source_text = source_names.get(source, "")
+        if source_text:
+            measure_text += f" {source_text}"
+
+    return measure_text
+
+
+def generate_subtitle_by_type(view):
+    """Generate subtitle based on measure."""
+    measure = view.dimensions.get("measure")
+
+    if measure == "total":
+        return "Breakdown of macroplastic emissions by open burning and debris, measured in tonnes per year."
+    elif measure == "per_person":
+        return "Breakdown of macroplastic emissions by open burning and debris, measured in kilograms per person per year."
+    else:
+        return "Breakdown of macroplastic emissions by open burning and debris."
+
+
 def run() -> None:
     """
     Main function to process plastic waste emissions data and create multidimensional data views.
@@ -195,16 +234,46 @@ def run() -> None:
     )
 
     # Add grouped stacked bar views for "Total (by type)" - breakdown by burning vs debris
+    view_metadata = {
+        "presentation": {
+            "title_public": "{title}",
+        },
+        "description_short": "{subtitle}",
+        "description_key": [
+            "Macroplastic emissions include debris (intact items that escape into the environment) and plastic burned in open, uncontrolled fires.",
+            "These values combine emissions from all sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites and rejects from sorting and reprocessing.",
+            "Values are model-based estimates with inherent uncertainty.",
+        ],
+    }
+
+    view_config = STACKED_VIEW_CONFIG | {
+        "title": "{title}",
+        "subtitle": "{subtitle}",
+    }
+
     c.group_views(
         groups=[
             {
                 "dimension": "emission_type",
                 "choice_new_slug": "total_by_type",
                 "choices": ["open_burning", "debris"],
-                "view_config": STACKED_VIEW_CONFIG,
+                "view_config": view_config,
+                "view_metadata": view_metadata,
             },
         ],
+        params={
+            "title": lambda view: generate_title_by_type(view),
+            "subtitle": lambda view: generate_subtitle_by_type(view),
+        },
     )
+
+    # Remove "Total by type" views for share_of_global_total measure
+    # (stacked bar doesn't make sense for percentage shares)
+    c.views = [
+        view
+        for view in c.views
+        if not (view.dimensions.get("emission_type") == "total_by_type" and view.dimensions.get("measure") == "share_of_global_total")
+    ]
 
     #
     # Save outputs.

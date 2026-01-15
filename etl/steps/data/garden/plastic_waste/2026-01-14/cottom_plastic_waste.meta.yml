@@ -330,6 +330,11 @@ tables:
         description_key: *desc_key_plastic_emissions_debris
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Reds
 
       plas_burn_em:
         title: Plastic burn emissions
@@ -338,6 +343,11 @@ tables:
         description_key: *desc_key_plastic_emissions_burn
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Oranges
 
       plas_em:
         title: Total plastic emissions
@@ -346,6 +356,11 @@ tables:
         description_key: *desc_key_plastic_emissions_total
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_debris_em_per_cap:
         title: Plastic debris emissions per capita
@@ -354,6 +369,11 @@ tables:
         description_key: *desc_key_plastic_emissions_debris_per_cap
         display:
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Reds
 
       plas_burn_em_per_cap:
         title: Plastic burn emissions per capita
@@ -362,6 +382,11 @@ tables:
         description_key: *desc_key_plastic_emissions_burn_per_cap
         display:
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Oranges
 
       plas_em_per_cap:
         title: Total plastic emissions per capita
@@ -370,6 +395,11 @@ tables:
         description_key: *desc_key_plastic_emissions_total_per_cap
         display:
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_litter_em:
         title: Plastic litter emissions
@@ -559,6 +589,11 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_burn_em_share_global:
         title: Share of global plastic burn emissions
@@ -569,6 +604,11 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Oranges
 
       plas_debris_em_share_global:
         title: Share of global plastic debris emissions
@@ -579,3 +619,8 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Reds
