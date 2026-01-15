@@ -22,10 +22,6 @@ if TYPE_CHECKING:
     from owid.catalog.api import Client
 
 
-# Base URL for OWID Grapher
-GRAPHER_BASE_URL = "https://ourworldindata.org/grapher"
-
-
 # =============================================================================
 # Exceptions
 # =============================================================================
@@ -51,6 +47,7 @@ class LicenseError(Exception):
 def _load_chart_table(
     slug: str,
     *,
+    base_url: str,
     use_column_short_names: bool,
     load_data: bool = True,
     timeout: int = 30,
@@ -59,6 +56,7 @@ def _load_chart_table(
 
     Args:
         slug: Chart slug (e.g., "life-expectancy").
+        base_url: Base URL for the Grapher (required).
         use_column_short_names: If True, use short column names (e.g., "life_expectancy_0"). If False, use full display names (e.g., "Life expectancy at birth").
         load_data: If True (default), load full chart data.
                    If False, load only structure (columns and metadata) without rows.
@@ -76,20 +74,21 @@ def _load_chart_table(
 
     def _load():
         # Fetch metadata (contains column info)
-        metadata = _fetch_chart_metadata(slug, timeout=timeout)
+        metadata = _load_chart_table_metadata(slug, timeout=timeout, base_url=base_url)
 
         # Build lookup from shortName to column metadata
         columns_meta = metadata.get("columns", {})
         short_name_lookup = {col_info.get("shortName"): col_info for col_info in columns_meta.values()}
 
         # Fetch config
-        config = _fetch_chart_config(slug, timeout=timeout)
+        config = _load_chart_table_config(slug, timeout=timeout, base_url=base_url)
 
         # Load data from CSV as ChartTable
-        df = _fetch_chart_data(
+        df = _load_chart_table_data(
             slug,
             timeout=timeout,
             load_data=load_data,
+            base_url=base_url,
             params={
                 "useColumnShortNames": str(use_column_short_names).lower(),
             },
@@ -164,12 +163,13 @@ def parse_chart_slug(slug_or_url: str) -> str:
     return slug_or_url
 
 
-def _fetch_chart_metadata(slug: str, *, timeout: int) -> dict[str, Any]:
+def _load_chart_table_metadata(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
     """Fetch metadata JSON from a chart.
 
     Args:
         slug: Chart slug.
         timeout: HTTP request timeout in seconds.
+        base_url: Base URL for the Grapher (required).
 
     Returns:
         Metadata dictionary containing column info.
@@ -177,7 +177,7 @@ def _fetch_chart_metadata(slug: str, *, timeout: int) -> dict[str, Any]:
     Raises:
         ChartNotFoundError: If the chart does not exist.
     """
-    url = f"{GRAPHER_BASE_URL}/{slug}.metadata.json"
+    url = f"{base_url}/{slug}.metadata.json"
     resp = requests.get(url, timeout=timeout)
 
     if resp.status_code == 404:
@@ -187,12 +187,13 @@ def _fetch_chart_metadata(slug: str, *, timeout: int) -> dict[str, Any]:
     return resp.json()
 
 
-def _fetch_chart_config(slug: str, *, timeout: int) -> dict[str, Any]:
+def _load_chart_table_config(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
     """Fetch config JSON from a chart.
 
     Args:
         slug: Chart slug.
         timeout: HTTP request timeout in seconds.
+        base_url: Base URL for the Grapher (required).
 
     Returns:
         Chart configuration dictionary.
@@ -200,7 +201,7 @@ def _fetch_chart_config(slug: str, *, timeout: int) -> dict[str, Any]:
     Raises:
         ChartNotFoundError: If the chart does not exist.
     """
-    url = f"{GRAPHER_BASE_URL}/{slug}.config.json"
+    url = f"{base_url}/{slug}.config.json"
     resp = requests.get(url, timeout=timeout)
 
     if resp.status_code == 404:
@@ -210,11 +211,12 @@ def _fetch_chart_config(slug: str, *, timeout: int) -> dict[str, Any]:
     return resp.json()
 
 
-def _fetch_chart_data(
+def _load_chart_table_data(
     slug: str,
     *,
     timeout: int,
     params: dict[str, str],
+    base_url: str,
     load_data: bool = True,
 ) -> pd.DataFrame:
     """Fetch chart data as a ChartTable.
@@ -222,8 +224,9 @@ def _fetch_chart_data(
     Args:
         slug: Chart slug.
         timeout: HTTP request timeout in seconds.
-        load_data: If True, load full data. If False, load only header.
         params: Query parameters for the CSV endpoint. Refer to https://docs.owid.io/projects/etl/api/chart-api/#get-grapherslugcsv for complete list of parameters available.
+        base_url: Base URL for the Grapher (required).
+        load_data: If True, load full data. If False, load only header.
 
     Returns:
         ChartTable with data (or empty if load_data=False).
@@ -232,7 +235,7 @@ def _fetch_chart_data(
         ChartNotFoundError: If the chart does not exist.
         LicenseError: If the chart contains non-redistributable data.
     """
-    url = f"{GRAPHER_BASE_URL}/{slug}.csv"
+    url = f"{base_url}/{slug}.csv"
     resp = requests.get(
         url,
         params=params,
@@ -357,6 +360,9 @@ class ChartResult(BaseModel):
     # Usage metadata
     popularity: float = 0.0
 
+    # API configuration (immutable)
+    base_url: str = Field(frozen=True)
+
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
     _timeout: int = PrivateAttr(default=30)
@@ -393,6 +399,7 @@ class ChartResult(BaseModel):
             load_data=load_data,
             timeout=self._timeout,
             use_column_short_names=True,
+            base_url=self.base_url,
         )
 
         # Cache only if loading full data with default params
@@ -432,10 +439,20 @@ class ChartsAPI:
         ```
     """
 
-    BASE_URL = GRAPHER_BASE_URL
+    def __init__(self, client: "Client", base_url: str) -> None:
+        """Initialize the ChartsAPI.
 
-    def __init__(self, client: "Client") -> None:
+        Args:
+            client: The Client instance.
+            base_url: Base URL for the Grapher (e.g., "https://ourworldindata.org/grapher").
+        """
         self._client = client
+        self._base_url = base_url
+
+    @property
+    def base_url(self) -> str:
+        """Base URL for the Grapher (read-only)."""
+        return self._base_url
 
     def search(
         self,
@@ -490,6 +507,7 @@ class ChartsAPI:
             limit=limit,
             page=page,
             timeout=timeout or self._client.timeout,
+            grapher_url=self.base_url,
         )
 
     def fetch(
@@ -526,4 +544,5 @@ class ChartsAPI:
             load_data=load_data,
             timeout=effective_timeout,
             use_column_short_names=True,
+            base_url=self.base_url,
         )
