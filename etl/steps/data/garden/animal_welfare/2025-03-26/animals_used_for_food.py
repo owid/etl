@@ -270,7 +270,7 @@ def improve_metadata(tb, tb_qcl_flat):
             title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered for meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
             tb[column].metadata.description_short = """Based on the country of production, not consumption."""
             tb[column].metadata.description_key = [
-                """Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.""",
+                f"""<% if animal not in ["{WILD_FISH_LABEL}", "{FARMED_FISH_LABEL}", "{FARMED_CRUSTACEANS_LABEL}"] %>Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.<% endif %>""",
                 """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
             ]
             description_from_producer = ""
