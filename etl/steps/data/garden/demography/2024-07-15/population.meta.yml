@@ -38,7 +38,6 @@ definitions:
     presentation:
       topic_tags:
         - Population Growth
-      attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
     processing_level: major
     description_processing: |-
       {definitions.others.different_sources_processing}
@@ -87,6 +86,9 @@ tables:
 
   # Table with full metadata (to be used when showing the population time series, e.g. the data page for the population indicator)
   population_original:
+    common:
+      presentation:
+        attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
     title: Population
     variables:
       population:
@@ -125,6 +127,9 @@ tables:
 
   # Population density
   population_growth_rate:
+    common:
+      presentation:
+        attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
     variables:
       growth_rate:
         title: Population growth rate
