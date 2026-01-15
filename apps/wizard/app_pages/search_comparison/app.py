@@ -1,36 +1,13 @@
 """Compare Algolia keyword search with semantic (AI) search side-by-side."""
 
-import random
 import time
 
 import requests
 import streamlit as st
 
+from apps.wizard.app_pages.search_comparison.random_queries import get_random_search_query
 from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
 from etl.db import read_sql
-
-# Sample queries for testing - replace with real data later
-SAMPLE_QUERIES = [
-    "climate change",
-    "gdp per capita",
-    "life expectancy",
-    "carbon emissions",
-    "population growth",
-    "renewable energy",
-    "poverty rate",
-    "child mortality",
-    "education spending",
-    "deforestation",
-]
-
-# Queries that return zero results in Algolia - replace with real data later
-ZERO_RESULT_QUERIES = [
-    "what causes global warming",
-    "how many people died from malaria",
-    "countries with highest inequality",
-    "effect of vaccines on mortality",
-    "relationship between education and income",
-]
 
 # Page config must be first Streamlit command
 st.set_page_config(
@@ -125,6 +102,7 @@ def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None)
 
     # View stats
     views_365d = hit.get("views_365d", 0)
+    fm_rank = hit.get("fmRank")
 
     # Rank change indicator
     rank_indicator = get_rank_change_indicator(index, other_rank)
@@ -141,10 +119,12 @@ def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None)
         stats = []
         if score is not None:
             stats.append(f"Score: **{score:.3f}**")
+        if fm_rank is not None:
+            stats.append(f"FM Rank: **{fm_rank}**")
         if views_365d:
             stats.append(f"Views: **{views_365d:,}**")
         if stats:
-            st.markdown(" · ".join(stats), help="Annual views")
+            st.markdown(" · ".join(stats), help="FM Rank = Fusion Model rank, Views = annual pageviews")
 
 
 def build_slug_to_rank(hits: list[dict]) -> dict[str, int]:
@@ -188,11 +168,11 @@ def main():
     # Quick actions
     with st_horizontal():
         st.markdown("**Try:**")
-        if st.button("🎲 Random query", help="Pick a random sample query"):
-            st.session_state["_set_random_query"] = random.choice(SAMPLE_QUERIES)
+        if st.button("🎲 Random query", help="Pick a random query from real user searches (weighted by popularity)"):
+            st.session_state["_set_random_query"] = get_random_search_query(require_hits=True)
             st.rerun()
-        if st.button("🔍 Zero Algolia results", help="Pick a query that returns zero results in Algolia"):
-            st.session_state["_set_random_query"] = random.choice(ZERO_RESULT_QUERIES)
+        if st.button("🔍 Zero Algolia results", help="Pick a query that returned zero results in Algolia"):
+            st.session_state["_set_random_query"] = get_random_search_query(require_hits=False)
             st.rerun()
 
     if not query:
