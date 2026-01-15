@@ -98,6 +98,9 @@ make watch
     - Legacy catalog code moved to `owid.catalog.api.legacy` module
     - Results sorted by popularity by default (most viewed first)
 
+<details>
+<summary>See previous versions</summary>
+
 ### `v1.0.0rc1` (Release Candidate)
 - **Highlights**
   - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
@@ -115,10 +118,6 @@ make watch
   - `ResponseSet` container with iteration, indexing, and DataFrame conversion
   - Loading indicators for long-running API requests
   - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
-
-
-<details>
-<summary>See previous versions</summary>
 
 
 #### `v0.4.5`
