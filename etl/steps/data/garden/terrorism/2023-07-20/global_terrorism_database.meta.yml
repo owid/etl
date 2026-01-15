@@ -66,8 +66,9 @@ definitions:
     - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants.
 
   desc_uncertainty: &desc_uncertainty |-
-      In some cases it’s unclear whether an incident fully meets the criteria. In these borderline cases, terrorism is considered likely but not certain, and the incident is still included. For example, the GTD includes non-state attacks with political or ideological motives (from targeted killings and sabotage to 5G mast arson linked to conspiracy theories). It excludes state terrorism, lawful warfare, and non-political violence such as most U.S. school shootings, profit-driven crime, and personal disputes.
+      In some cases it's unclear whether an incident fully meets the criteria. In these borderline cases, terrorism is considered likely but not certain, and the incident is still included. For example, the GTD includes non-state attacks with political or ideological motives (from targeted killings and sabotage to 5G mast arson linked to conspiracy theories). It excludes state terrorism, lawful warfare, and non-political violence such as most U.S. school shootings, profit-driven crime, and personal disputes.
 
+dataset:
   title: Global Terrorism Database
   update_period_days: 365
 
