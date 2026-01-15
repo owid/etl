@@ -307,7 +307,7 @@ class IndicatorsAPI:
         resp.raise_for_status()
         data = resp.json()
 
-        results = []
+        raw_results: list[tuple[dict[str, Any], str | None]] = []
         for r in data.get("results", []):
             path = r.get("catalog_path", "")
 
@@ -317,57 +317,40 @@ class IndicatorsAPI:
                     # Skip legacy indicators unless requested
                     continue
                 path = None
-            results.append(
-                IndicatorResult(
-                    indicator_id=r.get("indicator_id", 0),
-                    title=r.get("title", ""),
-                    score=r.get("score", 0.0),
-                    path=path,
-                    description=r.get("description", ""),
-                    column_name=r.get("metadata", {}).get("column", ""),
-                    unit=r.get("metadata", {}).get("unit", ""),
-                    n_charts=r.get("n_charts", 0),
-                )
-            )
+            raw_results.append((r, path))
 
-        # Enrich results with popularity from datasette
-        self._enrich_with_popularity(results, timeout=timeout)
+        # Fetch popularity via Datasette API
+        slugs = [path for _, path in raw_results if path]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                slugs,
+                type="indicator",
+                timeout=timeout or self._client.timeout,
+            )
+            if slugs
+            else {}
+        )
+
+        results = [
+            IndicatorResult(
+                indicator_id=r.get("indicator_id", 0),
+                title=r.get("title", ""),
+                score=r.get("score", 0.0),
+                path=path,
+                description=r.get("description", ""),
+                column_name=r.get("metadata", {}).get("column", ""),
+                unit=r.get("metadata", {}).get("unit", ""),
+                n_charts=r.get("n_charts", 0),
+                popularity=popularity_data.get(path, 0.0) if path else 0.0,
+            )
+            for r, path in raw_results
+        ]
 
         return ResponseSet(
             results=results,
             query=query,
             total_count=data.get("total_results", len(results)),
         )
-
-    def _enrich_with_popularity(self, results: list[IndicatorResult], timeout: int | None = None) -> None:
-        """Enrich indicator results with popularity from datasette.
-
-        Uses indicator-level popularity (full catalog path format).
-        """
-        if not results:
-            return
-
-        # Build indicator slugs (full path)
-        slug_to_result: dict[str, IndicatorResult] = {}
-        for r in results:
-            if r.path:
-                slug_to_result[r.path] = r
-
-        if not slug_to_result:
-            return
-
-        # Fetch popularity via Datasette API
-        popularity_data = self._client._datasette.fetch_popularity(
-            list(slug_to_result.keys()),
-            type="indicator",
-            timeout=timeout or self._client.timeout,
-        )
-
-        # Enrich results
-        for slug, pop in popularity_data.items():
-            r = slug_to_result.get(slug)
-            if r:
-                object.__setattr__(r, "popularity", pop)
 
     def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:
         """Fetch a specific indicator by catalog path.

@@ -157,9 +157,26 @@ class SiteSearchAPI:
         # Perform search
         data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
+        # Fetch popularity via Datasette API (chart slugs are full URLs)
+        hits = data.get("results", [])
+        urls = [
+            f"https://ourworldindata.org/grapher/{hit.get('slug', '')}"
+            for hit in hits
+            if hit.get("slug")
+        ]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                sorted(set(urls)),
+                type="chart",
+                timeout=effective_timeout,
+            )
+            if urls
+            else {}
+        )
+
         # Parse results
         results = []
-        for hit in data.get("results", []):
+        for hit in hits:
             slug = hit.get("slug", "")
 
             # Parse datetime fields
@@ -171,21 +188,20 @@ class SiteSearchAPI:
             if hit.get("updatedAt"):
                 last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
 
+            url = f"https://ourworldindata.org/grapher/{slug}"
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                url=f"https://ourworldindata.org/grapher/{slug}",
+                url=url,
                 subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
                 published_at=published_at,
                 last_updated=last_updated,
+                popularity=popularity_data.get(url, 0.0),
             )
             chart._timeout = effective_timeout
             results.append(chart)
-
-        # Enrich results with popularity from datasette
-        self._enrich_charts_with_popularity(results, timeout=effective_timeout)
 
         # Sort by popularity (descending) - most popular first
         results.sort(key=lambda r: r.popularity, reverse=True)
@@ -195,32 +211,6 @@ class SiteSearchAPI:
             query=query,
             total_count=data.get("totalCount", len(results)),
         )
-
-    def _enrich_charts_with_popularity(self, results: list[ChartResult], timeout: int | None = None) -> None:
-        """Enrich chart results with popularity from datasette.
-
-        Chart slugs in datasette are stored as full URLs (e.g., https://ourworldindata.org/grapher/life-expectancy).
-        """
-        if not results:
-            return
-
-        # Build URL to result mapping (datasette uses full URLs as chart slugs)
-        url_to_result: dict[str, ChartResult] = {}
-        for r in results:
-            url_to_result[r.url] = r
-
-        # Fetch popularity using URLs
-        popularity_data = self._client._datasette.fetch_popularity(
-            list(url_to_result.keys()),
-            type="chart",
-            timeout=timeout or self._client.timeout,
-        )
-
-        # Enrich results
-        for url, pop in popularity_data.items():
-            r = url_to_result.get(url)
-            if r:
-                object.__setattr__(r, "popularity", pop)
 
     def pages(
         self,

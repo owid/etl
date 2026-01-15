@@ -341,6 +341,20 @@ class TablesAPI:
             fuzzy_threshold=fuzzy_threshold,
         )
 
+        # Fetch popularity via Datasette API (dataset-level: namespace/version/dataset)
+        dataset_slugs = [
+            f"{row['namespace']}/{str(row['version'])}/{row['dataset']}" for _, row in matches.iterrows()
+        ]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                sorted(set(dataset_slugs)),
+                type="dataset",
+                timeout=timeout or self._client.timeout,
+            )
+            if dataset_slugs
+            else {}
+        )
+
         # Convert to TableResult objects
         results = []
         for _, row in matches.iterrows():
@@ -357,6 +371,7 @@ class TablesAPI:
             else:
                 formats = list(formats_raw) if hasattr(formats_raw, "__iter__") else []
 
+            slug = f"{row['namespace']}/{str(row['version'])}/{row['dataset']}"
             results.append(
                 TableResult(
                     table=row["table"],
@@ -368,11 +383,9 @@ class TablesAPI:
                     is_public=row.get("is_public", True),
                     dimensions=list(dimensions) if dimensions is not None else [],
                     formats=formats,
+                    popularity=popularity_data.get(slug, 0.0),
                 )
             )
-
-        # Enrich results with popularity from datasette
-        self._enrich_with_popularity(results, timeout=timeout)
 
         # Sort by popularity (descending) - most popular first
         results.sort(key=lambda r: r.popularity, reverse=True)
@@ -391,34 +404,6 @@ class TablesAPI:
             query=query,
             total_count=len(results),
         )
-
-    def _enrich_with_popularity(self, results: list[TableResult], timeout: int | None = None) -> None:
-        """Enrich table results with popularity from datasette.
-
-        Uses dataset-level popularity (namespace/version/dataset format).
-        """
-        if not results:
-            return
-
-        # Build dataset slugs: namespace/version/dataset
-        slug_to_results: dict[str, list[TableResult]] = {}
-        for r in results:
-            slug = f"{r.namespace}/{r.version}/{r.dataset}"
-            if slug not in slug_to_results:
-                slug_to_results[slug] = []
-            slug_to_results[slug].append(r)
-
-        # Fetch popularity via Datasette API
-        popularity_data = self._client._datasette.fetch_popularity(
-            list(slug_to_results.keys()),
-            type="dataset",
-            timeout=timeout or self._client.timeout,
-        )
-
-        # Enrich results
-        for slug, pop in popularity_data.items():
-            for r in slug_to_results.get(slug, []):
-                object.__setattr__(r, "popularity", pop)
 
     def fetch(
         self,
