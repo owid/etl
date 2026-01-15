@@ -74,17 +74,17 @@ def _load_chart_table(
 
     def _load():
         # Fetch metadata (contains column info)
-        metadata = _fetch_chart_metadata(slug, timeout=timeout, base_url=base_url)
+        metadata = _load_chart_table_metadata(slug, timeout=timeout, base_url=base_url)
 
         # Build lookup from shortName to column metadata
         columns_meta = metadata.get("columns", {})
         short_name_lookup = {col_info.get("shortName"): col_info for col_info in columns_meta.values()}
 
         # Fetch config
-        config = _fetch_chart_config(slug, timeout=timeout, base_url=base_url)
+        config = _load_chart_table_config(slug, timeout=timeout, base_url=base_url)
 
         # Load data from CSV as ChartTable
-        df = _fetch_chart_data(
+        df = _load_chart_table_data(
             slug,
             timeout=timeout,
             load_data=load_data,
@@ -163,7 +163,7 @@ def parse_chart_slug(slug_or_url: str) -> str:
     return slug_or_url
 
 
-def _fetch_chart_metadata(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
+def _load_chart_table_metadata(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
     """Fetch metadata JSON from a chart.
 
     Args:
@@ -187,7 +187,7 @@ def _fetch_chart_metadata(slug: str, *, timeout: int, base_url: str) -> dict[str
     return resp.json()
 
 
-def _fetch_chart_config(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
+def _load_chart_table_config(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
     """Fetch config JSON from a chart.
 
     Args:
@@ -211,7 +211,7 @@ def _fetch_chart_config(slug: str, *, timeout: int, base_url: str) -> dict[str, 
     return resp.json()
 
 
-def _fetch_chart_data(
+def _load_chart_table_data(
     slug: str,
     *,
     timeout: int,
