@@ -229,7 +229,9 @@ class TablesAPI:
         if self._catalog is None:
             # Load all available channels
             self._catalog = ETLCatalog(
-                channels=cast(Iterable[CHANNEL], VALID_CHANNELS), timeout=timeout or self._client.timeout
+                uri=self.catalog_url,
+                channels=cast(Iterable[CHANNEL], VALID_CHANNELS),
+                timeout=timeout or self._client.timeout,
             )
 
         return self._catalog
