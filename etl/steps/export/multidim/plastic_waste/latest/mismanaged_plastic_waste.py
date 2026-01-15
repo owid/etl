@@ -5,6 +5,19 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Common configuration for all charts
+MULTIDIM_CONFIG = {
+    "hasMapTab": True,
+    "tab": "map",
+}
+
+# Configuration for stacked bar charts
+STACKED_VIEW_CONFIG = {
+    "hasMapTab": False,
+    "tab": "chart",
+    "chartTypes": ["StackedBar"],
+}
+
 
 def run() -> None:
     """
@@ -171,19 +184,25 @@ def run() -> None:
         }
         tb["plas_recy_em_per_cap"].m.original_short_name = "emissions"
 
-    # Common view configuration
-    common_view_config = {
-        "hasMapTab": True,
-        "tab": "map",
-    }
-
     # Create collection - this will automatically generate views from dimensions
     c = paths.create_collection(
         config=config,
         tb=tb,
         indicator_names=["emissions"],
         dimensions=["emission_type", "emissions_source", "measure"],
-        common_view_config=common_view_config,
+        common_view_config=MULTIDIM_CONFIG,
+    )
+
+    # Add grouped stacked bar views for "Total (by type)" - breakdown by burning vs debris
+    c.group_views(
+        groups=[
+            {
+                "dimension": "emission_type",
+                "choice_new_slug": "total_by_type",
+                "choices": ["open_burning", "debris"],
+                "view_config": STACKED_VIEW_CONFIG,
+            },
+        ],
     )
 
     #

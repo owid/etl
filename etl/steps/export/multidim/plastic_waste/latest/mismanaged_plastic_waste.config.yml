@@ -10,10 +10,10 @@ dimensions:
     name: "Emission type"
     choices:
       - slug: "total_burned_debris"
-        name: "Total (burned + debris)"
+        name: "Total"
         description: "Total macroplastic emissions combining debris and open burning"
       - slug: "total_by_type"
-        name: "Total (by type)"
+        name: "Total by type"
         description: "Total macroplastic emissions"
       - slug: "open_burning"
         name: "Open burning"
