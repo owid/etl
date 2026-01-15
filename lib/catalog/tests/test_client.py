@@ -523,10 +523,12 @@ class TestDataclassModels:
             slug="test-chart",
             title="Test Chart",
             url="https://ourworldindata.org/grapher/test-chart",
+            base_url="https://ourworldindata.org/grapher",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
+        assert result.base_url == "https://ourworldindata.org/grapher"
 
     def test_indicator_result(self):
         result = IndicatorResult(
@@ -534,10 +536,12 @@ class TestDataclassModels:
             title="Test Indicator",
             score=0.95,
             path="grapher/test/2024/dataset/table#column",
+            catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.indicator_id == 123
         assert result.score == 0.95
+        assert result.catalog_url == "https://catalog.ourworldindata.org/"
 
     def test_table_result(self):
         result = TableResult(
@@ -547,10 +551,12 @@ class TestDataclassModels:
             namespace="un",
             channel="garden",
             path="garden/un/2024-07-11/un_wpp/population",
+            catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.table == "population"
         assert result.namespace == "un"
+        assert result.catalog_url == "https://catalog.ourworldindata.org/"
 
 
 class TestDatasetteAPI:

@@ -17,7 +17,6 @@ from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import (
     OWID_CATALOG_URI,
     PREFERRED_FORMAT,
-    S3_OWID_URI,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
 )
@@ -35,6 +34,7 @@ def _load_table(
     formats: list[str] | None = None,
     is_public: bool = True,
     load_data: bool = True,
+    catalog_url: str = OWID_CATALOG_URI,
 ) -> Table:
     """Load a table from the catalog by path.
 
@@ -45,6 +45,7 @@ def _load_table(
         formats: List of formats to try. If None, tries all supported formats.
         is_public: Whether the table is publicly accessible.
         load_data: If True, load full data. If False, load only table structure (columns and metadata) without rows.
+        catalog_url: Base URL for the catalog. Defaults to OWID_CATALOG_URI.
 
     Returns:
         Table object with data and metadata (or just metadata if load_data=False).
@@ -58,7 +59,7 @@ def _load_table(
     message = f"Loading table '{table_name}'"
 
     def fct():
-        base_uri = OWID_CATALOG_URI
+        base_uri = catalog_url
         uri = "/".join([base_uri.rstrip("/"), path])
 
         # Determine format preference
@@ -136,6 +137,9 @@ class TableResult(BaseModel):
     # Usage metadata
     popularity: float = 0.0
 
+    # API configuration (immutable)
+    catalog_url: str = Field(frozen=True)
+
     _cached_table: Table | None = PrivateAttr(default=None)
 
     def fetch(self, *, load_data: bool = True) -> Table:
@@ -160,7 +164,13 @@ class TableResult(BaseModel):
         if load_data and self._cached_table is not None:
             return self._cached_table
 
-        tb = _load_table(self.path, formats=self.formats, is_public=self.is_public, load_data=load_data)
+        tb = _load_table(
+            self.path,
+            formats=self.formats,
+            is_public=self.is_public,
+            load_data=load_data,
+            catalog_url=self.catalog_url,
+        )
 
         # Cache only if loading full data
         if load_data:
@@ -193,11 +203,15 @@ class TablesAPI:
         ```
     """
 
-    CATALOG_URI = OWID_CATALOG_URI
-    S3_URI = S3_OWID_URI
+    def __init__(self, client: "Client", catalog_url: str) -> None:
+        """Initialize the TablesAPI.
 
-    def __init__(self, client: Client) -> None:
+        Args:
+            client: The Client instance.
+            catalog_url: Base URL for the catalog (e.g., "https://catalog.ourworldindata.org/").
+        """
         self._client = client
+        self.catalog_url = catalog_url
         self._catalog: ETLCatalog | None = None
 
     def _get_catalog(self, timeout: int | None = None) -> ETLCatalog:
@@ -382,6 +396,7 @@ class TablesAPI:
                     dimensions=list(dimensions) if dimensions is not None else [],
                     formats=formats,
                     popularity=popularity_data.get(slug, 0.0),
+                    catalog_url=self.catalog_url,
                 )
             )
 
@@ -401,6 +416,7 @@ class TablesAPI:
             results=results,
             query=query,
             total_count=len(results),
+            base_url=self.catalog_url,
         )
 
     def fetch(
@@ -448,4 +464,6 @@ class TablesAPI:
         if not catalog_path.table:
             raise ValueError(f"Invalid path format: {path}. Expected format: channel/namespace/version/dataset/table")
 
-        return _load_table(path, formats=formats, is_public=is_public, load_data=load_data)
+        return _load_table(
+            path, formats=formats, is_public=is_public, load_data=load_data, catalog_url=self.catalog_url
+        )
