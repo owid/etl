@@ -312,6 +312,11 @@ tables:
         <<: *unit_tonnes
         description_short: Municipal solid waste from households, shops and offices collected and treated in controlled facilities such as sanitary landfills, incinerators or recycling plants.
         description_key: *desc_key_properly_managed_msw
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Reds
         display:
           numDecimalPlaces: 0
 
@@ -320,6 +325,11 @@ tables:
         <<: *unit_kg_per_person
         description_short: Municipal solid waste from households, shops and offices collected and treated in controlled facilities such as sanitary landfills, incinerators or recycling plants per person each year.
         description_key: *desc_key_properly_managed_msw_per_cap
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Oranges
         display:
           numDecimalPlaces: 1
 
