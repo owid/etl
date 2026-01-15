@@ -211,8 +211,13 @@ class TablesAPI:
             catalog_url: Base URL for the catalog (e.g., "https://catalog.ourworldindata.org/").
         """
         self._client = client
-        self.catalog_url = catalog_url
+        self._catalog_url = catalog_url
         self._catalog: ETLCatalog | None = None
+
+    @property
+    def catalog_url(self) -> str:
+        """Base URL for the catalog (read-only)."""
+        return self._catalog_url
 
     def _get_catalog(self, timeout: int | None = None) -> ETLCatalog:
         """Get or create the remote catalog with all channels loaded.

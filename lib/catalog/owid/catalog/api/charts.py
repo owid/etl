@@ -447,7 +447,12 @@ class ChartsAPI:
             base_url: Base URL for the Grapher (e.g., "https://ourworldindata.org/grapher").
         """
         self._client = client
-        self.base_url = base_url
+        self._base_url = base_url
+
+    @property
+    def base_url(self) -> str:
+        """Base URL for the Grapher (read-only)."""
+        return self._base_url
 
     def search(
         self,

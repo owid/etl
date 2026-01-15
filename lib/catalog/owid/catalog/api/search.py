@@ -75,8 +75,18 @@ class SiteSearchAPI:
             grapher_url: Base URL for the Grapher (e.g., "https://ourworldindata.org/grapher").
         """
         self._client = client
-        self.base_url = base_url
-        self.grapher_url = grapher_url
+        self._base_url = base_url
+        self._grapher_url = grapher_url
+
+    @property
+    def base_url(self) -> str:
+        """Base URL for the search API (read-only)."""
+        return self._base_url
+
+    @property
+    def grapher_url(self) -> str:
+        """Base URL for the Grapher (read-only)."""
+        return self._grapher_url
 
     def _search(
         self,
@@ -269,4 +279,5 @@ class SiteSearchAPI:
             results=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
+            base_url="https://ourworldindata.org",
         )

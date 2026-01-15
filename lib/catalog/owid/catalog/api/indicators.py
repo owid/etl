@@ -261,8 +261,18 @@ class IndicatorsAPI:
             catalog_url: Base URL for the catalog (e.g., "https://catalog.ourworldindata.org/").
         """
         self._client = client
-        self.search_url = search_url
-        self.catalog_url = catalog_url
+        self._search_url = search_url
+        self._catalog_url = catalog_url
+
+    @property
+    def search_url(self) -> str:
+        """URL for the indicators search API (read-only)."""
+        return self._search_url
+
+    @property
+    def catalog_url(self) -> str:
+        """Base URL for the catalog (read-only)."""
+        return self._catalog_url
 
     def search(
         self,
