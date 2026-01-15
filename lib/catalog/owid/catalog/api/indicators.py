@@ -357,7 +357,6 @@ class IndicatorsAPI:
 
         Args:
             path: Catalog path in format "channel/namespace/version/dataset/table#column"
-                  (e.g., "garden/un/2024/pop/population#population_total")
             load_data: If True (default), load full indicator data.
                        If False, load only structure (columns and metadata) without rows.
             timeout: HTTP request timeout in seconds (reserved for future use).
