@@ -6,26 +6,149 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Literal, cast
+from urllib.parse import urlparse
 
+import numpy as np
+import numpy.typing as npt
+import pandas as pd
+import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from rapidfuzz import fuzz
 
-from owid.catalog.api.legacy import ETLCatalog, download_private_file_s3
+from owid.catalog import s3_utils
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import (
+    OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
+    S3_OWID_URI,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
 )
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
-from owid.catalog.datasets import CHANNEL
 from owid.catalog.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+
+
+# =============================================================================
+# Catalog Index Utilities
+# =============================================================================
+
+
+def _download_private_file_s3(uri: str, tmpdir: str) -> str:
+    """Download private files from S3 to temporary directory."""
+    parsed = urlparse(uri)
+    base, ext = os.path.splitext(parsed.path)
+    s3_utils.download(
+        S3_OWID_URI + base + ".meta.json",
+        tmpdir + "/data.meta.json",
+    )
+    s3_utils.download(
+        S3_OWID_URI + base + ext,
+        tmpdir + "/data" + ext,
+    )
+    return tmpdir + "/data" + ext
+
+
+class CatalogVersionError(Exception):
+    """Raised when catalog format version is newer than library version."""
+
+    pass
+
+
+def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
+    """Read catalog index from remote URI.
+
+    Args:
+        uri: Base URI for the catalog (e.g., "https://catalog.ourworldindata.org/")
+        timeout: HTTP request timeout in seconds.
+
+    Returns:
+        DataFrame with catalog index.
+
+    Raises:
+        CatalogVersionError: If catalog format version is newer than library version.
+    """
+    # Read metadata to check version
+    metadata_url = uri.rstrip("/") + "/catalog.meta.json"
+    resp = requests.get(metadata_url, timeout=timeout)
+    resp.raise_for_status()
+    metadata = resp.json()
+
+    if metadata["format_version"] > OWID_CATALOG_VERSION:
+        raise CatalogVersionError(
+            f"Library supports catalog version {OWID_CATALOG_VERSION}, "
+            f"but the remote catalog has version {metadata['format_version']} "
+            "-- please update owid-catalog"
+        )
+
+    # Read all channels
+    frames = []
+    for channel in VALID_CHANNELS:
+        index_url = f"{uri.rstrip('/')}/catalog-{channel}.{PREFERRED_FORMAT}"
+        try:
+            df = cast(pd.DataFrame, pd.read_feather(index_url))
+            frames.append(df)
+        except Exception:
+            # Channel might not exist, skip it
+            continue
+
+    if not frames:
+        return pd.DataFrame()
+
+    return pd.concat(frames, ignore_index=True)
+
+
+def _match_score(
+    series: pd.Series,  # type: ignore[type-arg]
+    query: str,
+    mode: Literal["exact", "contains", "regex", "fuzzy"],
+    case: bool,
+    threshold: int = 70,
+) -> npt.NDArray[np.float64]:
+    """Calculate match scores for a text column based on search mode.
+
+    Args:
+        series: Text column to search
+        query: Search pattern
+        mode: Matching mode - "exact", "contains", "regex", or "fuzzy"
+        case: Case-sensitive matching
+        threshold: Score cutoff for fuzzy matching (only used when mode="fuzzy")
+
+    Returns:
+        Array of match scores: 0-100 for fuzzy, 0 or 100 for other modes.
+    """
+    if mode == "fuzzy":
+        # Fuzzy matching with similarity scoring (0-100)
+        if not case:
+            query = query.lower()
+            series = series.str.lower()
+        return np.array([fuzz.WRatio(query, x, score_cutoff=threshold) for x in series], dtype=np.float64)
+    elif mode == "regex":
+        # Regex pattern matching (0 or 100)
+        matches = series.str.contains(query, regex=True, case=case, na=False)
+        return np.where(matches, 100.0, 0.0)
+    elif mode == "contains":
+        # Substring matching (0 or 100)
+        matches = series.str.contains(query, regex=False, case=case, na=False)
+        return np.where(matches, 100.0, 0.0)
+    else:  # mode == "exact"
+        # Exact string matching (0 or 100)
+        if case:
+            matches = series == query
+        else:
+            matches = series.str.lower() == query.lower()
+        return np.where(matches, 100.0, 0.0)
+
+
+# =============================================================================
+# Table Loading
+# =============================================================================
 
 
 def _load_table(
@@ -79,7 +202,7 @@ def _load_table(
                 # Handle private files
                 if not is_public:
                     tmpdir = tempfile.mkdtemp()
-                    table_uri = download_private_file_s3(table_uri, tmpdir)
+                    table_uri = _download_private_file_s3(table_uri, tmpdir)
 
                 # If header_only, return empty table with same structure
                 return Table.read(table_uri, load_data=load_data)
@@ -212,29 +335,30 @@ class TablesAPI:
         """
         self._client = client
         self._catalog_url = catalog_url
-        self._catalog: ETLCatalog | None = None
+        self._index: pd.DataFrame | None = None
 
     @property
     def catalog_url(self) -> str:
         """Base URL for the catalog (read-only)."""
         return self._catalog_url
 
-    def _get_catalog(self, timeout: int | None = None) -> ETLCatalog:
-        """Get or create the remote catalog with all channels loaded.
+    def _get_index(self, timeout: int | None = None) -> pd.DataFrame:
+        """Get or load the catalog index.
 
         Args:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
-                     Only used during initial catalog loading.
+                     Only used during initial index loading.
+
+        Returns:
+            DataFrame with catalog index.
         """
-        if self._catalog is None:
-            # Load all available channels
-            self._catalog = ETLCatalog(
-                uri=self.catalog_url,
-                channels=cast(Iterable[CHANNEL], VALID_CHANNELS),
+        if self._index is None:
+            self._index = _read_catalog_index(
+                self.catalog_url,
                 timeout=timeout or self._client.timeout,
             )
 
-        return self._catalog
+        return self._index
 
     def _build_query(
         self,
@@ -348,19 +472,50 @@ class TablesAPI:
         if channel is None:
             channel = "garden"
 
-        catalog = self._get_catalog(timeout=timeout)
+        # Load catalog index
+        index = self._get_index(timeout=timeout)
 
-        # Use catalog.find() with the new match parameter
-        matches = catalog.find(
-            table=table,
-            namespace=namespace,
-            version=version,
-            dataset=dataset,
-            channel=cast(CHANNEL, channel) if channel else None,
-            case=case,
-            match=match,
-            fuzzy_threshold=fuzzy_threshold,
-        )
+        # Apply filters
+        criteria: npt.ArrayLike = np.ones(len(index), dtype=bool)
+        scores: npt.NDArray[np.float64] | None = None
+
+        # Table matching with scoring
+        if table:
+            table_scores = _match_score(index["table"], table, match, case, fuzzy_threshold)
+            if match == "fuzzy":
+                criteria &= table_scores >= fuzzy_threshold
+                scores = table_scores
+            else:
+                criteria &= table_scores > 0
+
+        # Dataset matching with scoring
+        if dataset:
+            dataset_scores = _match_score(index["dataset"], dataset, match, case, fuzzy_threshold)
+            if match == "fuzzy":
+                criteria &= dataset_scores >= fuzzy_threshold
+                # Average scores if both table and dataset specified
+                scores = dataset_scores if scores is None else (scores + dataset_scores) / 2
+            else:
+                criteria &= dataset_scores > 0
+
+        # Exact match filters
+        if namespace:
+            criteria &= index["namespace"] == namespace
+        if version:
+            criteria &= index["version"] == version
+        if channel:
+            criteria &= index["channel"] == channel
+
+        matches = index[criteria]
+
+        # Drop checksum column if present
+        if "checksum" in matches.columns:
+            matches = matches.drop(columns=["checksum"])
+
+        # Sort by relevance if fuzzy matching was used
+        if match == "fuzzy" and scores is not None:
+            sort_order = np.argsort(-scores[criteria])
+            matches = matches.iloc[sort_order]
 
         # Fetch popularity via Datasette API (dataset-level: namespace/version/dataset)
         dataset_slugs = [f"{row['namespace']}/{str(row['version'])}/{row['dataset']}" for _, row in matches.iterrows()]
