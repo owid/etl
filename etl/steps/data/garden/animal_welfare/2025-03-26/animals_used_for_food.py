@@ -271,7 +271,7 @@ def improve_metadata(tb, tb_qcl_flat):
             tb[column].metadata.description_short = """Based on the country of production, not consumption."""
             tb[column].metadata.description_key = [
                 f"""<% if animal not in ["{WILD_FISH_LABEL}", "{FARMED_FISH_LABEL}", "{FARMED_CRUSTACEANS_LABEL}"] %>Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.<% endif %>""",
-                """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
+                """<% if animal in ["chickens", "poultry"] %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
             ]
             description_from_producer = ""
             for animal, description in descriptions_from_producer_killed.items():
