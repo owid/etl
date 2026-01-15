@@ -11,7 +11,7 @@ import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
-    from owid.catalog.api.catalogs import CatalogFrame
+    from owid.catalog.api.legacy import CatalogFrame
 
 T = TypeVar("T")
 
@@ -205,7 +205,7 @@ class ResponseSet(BaseModel, Generic[T]):
         Returns:
             CatalogFrame that can use .load() method.
         """
-        from owid.catalog.api.catalogs import CatalogFrame as CF
+        from owid.catalog.api.legacy import CatalogFrame as CF
         from owid.catalog.api.utils import OWID_CATALOG_URI
         from owid.catalog.core import CatalogPath
 

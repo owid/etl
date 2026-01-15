@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
-from owid.catalog.api.catalogs import ETLCatalog, download_private_file_s3
+from owid.catalog.api.legacy import ETLCatalog, download_private_file_s3
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import (
     PREFERRED_FORMAT,
