@@ -35,7 +35,8 @@ MEAT_TOTAL_ITEM_CODES = {
     "00001108": "donkeys",  # 'Meat of asses, fresh or chilled',
     "00001158": "other camelids",  # 'Meat of other domestic camelids, fresh or chilled',
     "00001111": "mules",  # 'Meat of mules, fresh or chilled',
-    "00001166": "other non-mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
+    # The following item is confusing. It's called (as of 2026-01) "Other meat of mammals, fresh or chilled", and yet the item description is "Including frog legs, marine mammals, etc. Some countries includeunder this heading meats that are listed above, but which are notreported separately. Fresh, chilled or frozen. (Unofficial definition)". Additionally, it only has data for France until 2017; so I'll exclude this item.
+    # "00001166": "other non-mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
     "00001163": "game animals",  # 'Game meat, fresh, chilled or frozen',
     # "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
