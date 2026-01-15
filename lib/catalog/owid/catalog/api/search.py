@@ -157,9 +157,22 @@ class SiteSearchAPI:
         # Perform search
         data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
+        # Fetch popularity via Datasette API (chart slugs are full URLs)
+        hits = data.get("results", [])
+        urls = [f"https://ourworldindata.org/grapher/{hit.get('slug', '')}" for hit in hits if hit.get("slug")]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                sorted(set(urls)),
+                type="chart",
+                timeout=effective_timeout,
+            )
+            if urls
+            else {}
+        )
+
         # Parse results
         results = []
-        for hit in data.get("results", []):
+        for hit in hits:
             slug = hit.get("slug", "")
 
             # Parse datetime fields
@@ -171,18 +184,23 @@ class SiteSearchAPI:
             if hit.get("updatedAt"):
                 last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
 
+            url = f"https://ourworldindata.org/grapher/{slug}"
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                url=f"https://ourworldindata.org/grapher/{slug}",
+                url=url,
                 subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
                 published_at=published_at,
                 last_updated=last_updated,
+                popularity=popularity_data.get(url, 0.0),
             )
             chart._timeout = effective_timeout
             results.append(chart)
+
+        # Sort by popularity (descending) - most popular first
+        results.sort(key=lambda r: r.popularity, reverse=True)
 
         return ResponseSet(
             results=results,

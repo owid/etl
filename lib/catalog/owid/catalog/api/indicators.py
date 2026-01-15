@@ -97,6 +97,7 @@ class IndicatorResult(BaseModel):
         unit: Unit of measurement.
         score: Semantic similarity score (0-1).
         n_charts: Number of charts using this indicator.
+        popularity: Popularity score (0.0 to 1.0) based on analytics views.
     """
 
     model_config = ConfigDict(
@@ -124,6 +125,7 @@ class IndicatorResult(BaseModel):
     # Usage metadata
     score: float
     n_charts: int | None = None
+    popularity: float = 0.0
 
     _cached_table: Table | None = PrivateAttr(default=None)
     _legacy: bool = PrivateAttr(default=False)
@@ -275,21 +277,25 @@ class IndicatorsAPI:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            SearchResults containing IndicatorResult objects.
+            SearchResults containing IndicatorResult objects, sorted by semantic similarity score.
+            Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python
             # Search for indicators
             results = client.indicators.search("CO2 emissions per capita")
 
-            # View results
+            # View results (sorted by semantic score)
             for ind in results:
                 print(f"{ind.title}")
                 print(f"  Score: {ind.score:.3f}")
-                print(f"  Path: {ind.path}")
+                print(f"  Popularity: {ind.popularity:.3f}")
 
             # Load data from top result
             tb = results[0].fetch()
+
+            # Re-sort by popularity if desired
+            by_popularity = results.sort_by('popularity', reverse=True)
             ```
         """
         params = {
@@ -301,7 +307,7 @@ class IndicatorsAPI:
         resp.raise_for_status()
         data = resp.json()
 
-        results = []
+        raw_results: list[tuple[dict[str, Any], str | None]] = []
         for r in data.get("results", []):
             path = r.get("catalog_path", "")
 
@@ -311,18 +317,34 @@ class IndicatorsAPI:
                     # Skip legacy indicators unless requested
                     continue
                 path = None
-            results.append(
-                IndicatorResult(
-                    indicator_id=r.get("indicator_id", 0),
-                    title=r.get("title", ""),
-                    score=r.get("score", 0.0),
-                    path=path,
-                    description=r.get("description", ""),
-                    column_name=r.get("metadata", {}).get("column", ""),
-                    unit=r.get("metadata", {}).get("unit", ""),
-                    n_charts=r.get("n_charts", 0),
-                )
+            raw_results.append((r, path))
+
+        # Fetch popularity via Datasette API
+        slugs = [path for _, path in raw_results if path]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                slugs,
+                type="indicator",
+                timeout=timeout or self._client.timeout,
             )
+            if slugs
+            else {}
+        )
+
+        results = [
+            IndicatorResult(
+                indicator_id=r.get("indicator_id", 0),
+                title=r.get("title", ""),
+                score=r.get("score", 0.0),
+                path=path,
+                description=r.get("description", ""),
+                column_name=r.get("metadata", {}).get("column", ""),
+                unit=r.get("metadata", {}).get("unit", ""),
+                n_charts=r.get("n_charts", 0),
+                popularity=popularity_data.get(path, 0.0) if path else 0.0,
+            )
+            for r, path in raw_results
+        ]
 
         return ResponseSet(
             results=results,

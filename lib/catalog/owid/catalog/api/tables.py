@@ -107,6 +107,7 @@ class TableResult(BaseModel):
         dimensions: List of dimension columns.
         is_public: Whether the data is publicly accessible.
         formats: List of available formats.
+        popularity: Popularity score (0.0 to 1.0) based on analytics views.
     """
 
     model_config = ConfigDict(
@@ -131,6 +132,9 @@ class TableResult(BaseModel):
     # Technical metadata
     is_public: bool = True
     formats: list[str] = Field(default_factory=list)
+
+    # Usage metadata
+    popularity: float = 0.0
 
     _cached_table: Table | None = PrivateAttr(default=None)
 
@@ -279,7 +283,9 @@ class TablesAPI:
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
 
         Returns:
-            ResponseSet containing matching TableResult objects. If match="fuzzy", results are sorted by relevance score.
+            ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
+            If match="fuzzy", results are sorted by fuzzy relevance score instead.
+            Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python
@@ -335,6 +341,18 @@ class TablesAPI:
             fuzzy_threshold=fuzzy_threshold,
         )
 
+        # Fetch popularity via Datasette API (dataset-level: namespace/version/dataset)
+        dataset_slugs = [f"{row['namespace']}/{str(row['version'])}/{row['dataset']}" for _, row in matches.iterrows()]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                sorted(set(dataset_slugs)),
+                type="dataset",
+                timeout=timeout or self._client.timeout,
+            )
+            if dataset_slugs
+            else {}
+        )
+
         # Convert to TableResult objects
         results = []
         for _, row in matches.iterrows():
@@ -351,6 +369,7 @@ class TablesAPI:
             else:
                 formats = list(formats_raw) if hasattr(formats_raw, "__iter__") else []
 
+            slug = f"{row['namespace']}/{str(row['version'])}/{row['dataset']}"
             results.append(
                 TableResult(
                     table=row["table"],
@@ -362,8 +381,12 @@ class TablesAPI:
                     is_public=row.get("is_public", True),
                     dimensions=list(dimensions) if dimensions is not None else [],
                     formats=formats,
+                    popularity=popularity_data.get(slug, 0.0),
                 )
             )
+
+        # Sort by popularity (descending) - most popular first
+        results.sort(key=lambda r: r.popularity, reverse=True)
 
         # Build descriptive query from search parameters
         query = self._build_query(
