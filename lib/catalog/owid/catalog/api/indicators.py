@@ -12,7 +12,6 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.tables import _load_table
-from owid.catalog.api.utils import OWID_CATALOG_URI
 from owid.catalog.core import CatalogPath
 from owid.catalog.tables import Table
 
@@ -39,7 +38,6 @@ def _load_indicator(
         path: Catalog path in format "channel/namespace/version/dataset/table#column"
         catalog_url: Base URL for the catalog (required).
         load_data: If True, load full data. If False, load only structure.
-        catalog_url: Base URL for the catalog. Defaults to OWID_CATALOG_URI.
 
     Returns:
         Table with a single indicator column (plus index).

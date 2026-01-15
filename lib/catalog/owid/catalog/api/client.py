@@ -1,6 +1,6 @@
-from owid.catalog.api.charts import GRAPHER_BASE_URL, ChartsAPI
+from owid.catalog.api.charts import ChartsAPI
 from owid.catalog.api.datasette import DatasetteAPI
-from owid.catalog.api.indicators import OWID_SEARCH_API, IndicatorsAPI
+from owid.catalog.api.indicators import IndicatorsAPI
 from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
 from owid.catalog.api.utils import (

@@ -35,7 +35,6 @@ def _load_table(
     formats: list[str] | None = None,
     is_public: bool = True,
     load_data: bool = True,
-    catalog_url: str = OWID_CATALOG_URI,
 ) -> Table:
     """Load a table from the catalog by path.
 
@@ -47,7 +46,6 @@ def _load_table(
         formats: List of formats to try. If None, tries all supported formats.
         is_public: Whether the table is publicly accessible.
         load_data: If True, load full data. If False, load only table structure (columns and metadata) without rows.
-        catalog_url: Base URL for the catalog. Defaults to OWID_CATALOG_URI.
 
     Returns:
         Table object with data and metadata (or just metadata if load_data=False).
