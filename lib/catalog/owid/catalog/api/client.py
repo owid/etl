@@ -1,4 +1,5 @@
 from owid.catalog.api.charts import ChartsAPI
+from owid.catalog.api.datasette import DatasetteAPI
 from owid.catalog.api.indicators import IndicatorsAPI
 from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
@@ -45,6 +46,7 @@ class Client:
     tables: TablesAPI
     datasets: TablesAPI  # Backwards compatibility alias
     timeout: int
+    _datasette: DatasetteAPI
     _site_search: SiteSearchAPI
 
     def __init__(self, timeout: int = 30) -> None:
@@ -54,6 +56,7 @@ class Client:
             timeout: HTTP request timeout in seconds. Default 30.
         """
         self.timeout = timeout
+        self._datasette = DatasetteAPI(timeout=timeout)
         self.charts = ChartsAPI(self)
         self.indicators = IndicatorsAPI(self)
         self.tables = TablesAPI(self)

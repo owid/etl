@@ -316,7 +316,7 @@ class ChartResult(BaseModel):
 
     Fields populated depend on the source:
     - fetch(): Provides config and metadata
-    - search(): Provides subtitle, available_entities, num_related_articles, published_at, last_updated
+    - search(): Provides subtitle, available_entities, num_related_articles, published_at, last_updated, popularity
 
     Core fields (slug, title, url) are always populated.
 
@@ -331,6 +331,7 @@ class ChartResult(BaseModel):
         num_related_articles: Number of related articles (from search).
         published_at: When the chart was first published (from search).
         last_updated: When the chart was last updated (from search).
+        popularity: Popularity score (0.0 to 1.0) based on analytics views (from search).
     """
 
     model_config = ConfigDict(
@@ -352,6 +353,9 @@ class ChartResult(BaseModel):
     num_related_articles: int = 0
     published_at: datetime | None = None
     last_updated: datetime | None = None
+
+    # Usage metadata
+    popularity: float = 0.0
 
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
@@ -457,14 +461,15 @@ class ChartsAPI:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            ResponseSet containing ChartResult objects.
+            ResponseSet containing ChartResult objects, sorted by popularity (most viewed first).
+            Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python
-            # Basic search
+            # Basic search (sorted by popularity)
             results = client.charts.search("life expectancy")
             for chart in results:
-                print(chart.title)
+                print(f"{chart.title}: popularity={chart.popularity:.3f}")
 
             # Filter by countries
             results = client.charts.search(
