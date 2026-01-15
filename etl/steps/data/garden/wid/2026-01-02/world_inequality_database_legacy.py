@@ -39,11 +39,23 @@ def run() -> None:
 
     # Read tables from meadow dataset.
     tb = ds_meadow["world_inequality_database"].reset_index()
+    tb_extrapolated = ds_meadow["world_inequality_database_with_extrapolations"].reset_index()
     tb_percentiles = ds_meadow["world_inequality_database_distribution"].reset_index()
+    tb_percentiles_extrapolated = ds_meadow["world_inequality_database_distribution_with_extrapolations"].reset_index()
     tb_fiscal = ds_meadow["world_inequality_database_fiscal"].reset_index()
 
     #
     # Process data.
+    # Merge main tables with and without extrapolations
+    tb = pr.merge(tb, tb_extrapolated, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
+    # Merge percentile tables with and without extrapolations
+    tb_percentiles = pr.merge(
+        tb_percentiles,
+        tb_percentiles_extrapolated,
+        on=["country", "year", "welfare", "p", "percentile"],
+        how="outer",
+        suffixes=("", "_extrapolated"),
+    )
     # Change units and drop unnecessary columns
     tb = drop_columns_and_transform(tb)
 

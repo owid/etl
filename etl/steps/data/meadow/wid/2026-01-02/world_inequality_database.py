@@ -146,20 +146,19 @@ def run() -> None:
         # Load data from snapshot.
         tb_extrapolations = snap.read(keep_default_na=False, na_values=NA_VALUES)
 
-        # Combine both datasets
-        tb = pr.merge(tb, tb_extrapolations, on=tb_ids, how="outer", suffixes=("", "_extrapolated"), short_name=tb_name)
-
         #
         # Process data.
         #
         # Harmonize countries
         tb = harmonize_countries(tb, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
+        tb_extrapolations = harmonize_countries(tb_extrapolations, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
 
         # Set index and sort
-        tb = tb.format(tb_ids)
+        tb = tb.format(tb_ids, short_name=tb_name)
+        tb_extrapolations = tb_extrapolations.format(tb_ids, short_name=f"{tb_name}_with_extrapolations")
 
-        # Append current table
-        tables.append(tb)
+        # Append current tables
+        tables.extend([tb, tb_extrapolations])
 
     # Add fiscal income data
     snap_fiscal = paths.load_snapshot("world_inequality_database_fiscal.csv")
@@ -167,12 +166,11 @@ def run() -> None:
 
     # Harmonize countries
     tb_fiscal = harmonize_countries(tb_fiscal, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
-    tb_fiscal.metadata.short_name = "world_inequality_database_fiscal"
-    tb_fiscal = tb_fiscal.format()
+    tb_fiscal = tb_fiscal.format(short_name="world_inequality_database_fiscal")
 
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(
-        tables=tables + [tb_fiscal], check_variables_metadata=True, default_metadata=snap_main.metadata
+        tables=tables + [tb_fiscal], check_variables_metadata=True, default_metadata=snap_main.metadata, repack=False
     )
 
     # Save changes in the new meadow dataset.
