@@ -1,12 +1,14 @@
-from owid.catalog.api.charts import GRAPHER_BASE_URL, ChartsAPI
+from owid.catalog.api.charts import ChartsAPI
 from owid.catalog.api.datasette import DatasetteAPI
-from owid.catalog.api.indicators import OWID_SEARCH_API, IndicatorsAPI
+from owid.catalog.api.indicators import IndicatorsAPI
 from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
-from owid.catalog.api.utils import OWID_CATALOG_URI
-
-# Default URL for OWID site search API
-SITE_SEARCH_URL = "https://ourworldindata.org/api/search"
+from owid.catalog.api.utils import (
+    DEFAULT_CATALOG_URL,
+    DEFAULT_GRAPHER_URL,
+    DEFAULT_INDICATORS_SEARCH_URL,
+    DEFAULT_SITE_SEARCH_URL,
+)
 
 
 class Client:
@@ -62,10 +64,10 @@ class Client:
     def __init__(
         self,
         timeout: int = 30,
-        catalog_url: str = OWID_CATALOG_URI,
-        grapher_url: str = GRAPHER_BASE_URL,
-        indicators_search_url: str = OWID_SEARCH_API,
-        site_search_url: str = SITE_SEARCH_URL,
+        catalog_url: str = DEFAULT_CATALOG_URL,
+        grapher_url: str = DEFAULT_GRAPHER_URL,
+        indicators_search_url: str = DEFAULT_INDICATORS_SEARCH_URL,
+        site_search_url: str = DEFAULT_SITE_SEARCH_URL,
     ) -> None:
         """Initialize the client with all API interfaces.
 

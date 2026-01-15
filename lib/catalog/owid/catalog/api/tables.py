@@ -15,7 +15,6 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from owid.catalog.api.catalogs import ETLCatalog, download_private_file_s3
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import (
-    OWID_CATALOG_URI,
     PREFERRED_FORMAT,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
@@ -31,10 +30,11 @@ if TYPE_CHECKING:
 
 def _load_table(
     path: str,
+    *,
+    catalog_url: str,
     formats: list[str] | None = None,
     is_public: bool = True,
     load_data: bool = True,
-    catalog_url: str = OWID_CATALOG_URI,
 ) -> Table:
     """Load a table from the catalog by path.
 
@@ -42,10 +42,10 @@ def _load_table(
 
     Args:
         path: Table path in catalog (e.g., "grapher/namespace/version/dataset/table")
+        catalog_url: Base URL for the catalog (required).
         formats: List of formats to try. If None, tries all supported formats.
         is_public: Whether the table is publicly accessible.
         load_data: If True, load full data. If False, load only table structure (columns and metadata) without rows.
-        catalog_url: Base URL for the catalog. Defaults to OWID_CATALOG_URI.
 
     Returns:
         Table object with data and metadata (or just metadata if load_data=False).

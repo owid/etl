@@ -22,10 +22,6 @@ if TYPE_CHECKING:
     from owid.catalog.api import Client
 
 
-# Base URL for OWID Grapher
-GRAPHER_BASE_URL = "https://ourworldindata.org/grapher"
-
-
 # =============================================================================
 # Exceptions
 # =============================================================================
@@ -51,20 +47,20 @@ class LicenseError(Exception):
 def _load_chart_table(
     slug: str,
     *,
+    base_url: str,
     use_column_short_names: bool,
     load_data: bool = True,
     timeout: int = 30,
-    base_url: str = GRAPHER_BASE_URL,
 ) -> ChartTable:
     """Load chart data as ChartTable with rich metadata.
 
     Args:
         slug: Chart slug (e.g., "life-expectancy").
+        base_url: Base URL for the Grapher (required).
         use_column_short_names: If True, use short column names (e.g., "life_expectancy_0"). If False, use full display names (e.g., "Life expectancy at birth").
         load_data: If True (default), load full chart data.
                    If False, load only structure (columns and metadata) without rows.
         timeout: HTTP request timeout in seconds.
-        base_url: Base URL for the Grapher. Defaults to GRAPHER_BASE_URL.
 
     Returns:
         ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
@@ -167,13 +163,13 @@ def parse_chart_slug(slug_or_url: str) -> str:
     return slug_or_url
 
 
-def _fetch_chart_metadata(slug: str, *, timeout: int, base_url: str = GRAPHER_BASE_URL) -> dict[str, Any]:
+def _fetch_chart_metadata(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
     """Fetch metadata JSON from a chart.
 
     Args:
         slug: Chart slug.
         timeout: HTTP request timeout in seconds.
-        base_url: Base URL for the Grapher. Defaults to GRAPHER_BASE_URL.
+        base_url: Base URL for the Grapher (required).
 
     Returns:
         Metadata dictionary containing column info.
@@ -191,13 +187,13 @@ def _fetch_chart_metadata(slug: str, *, timeout: int, base_url: str = GRAPHER_BA
     return resp.json()
 
 
-def _fetch_chart_config(slug: str, *, timeout: int, base_url: str = GRAPHER_BASE_URL) -> dict[str, Any]:
+def _fetch_chart_config(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
     """Fetch config JSON from a chart.
 
     Args:
         slug: Chart slug.
         timeout: HTTP request timeout in seconds.
-        base_url: Base URL for the Grapher. Defaults to GRAPHER_BASE_URL.
+        base_url: Base URL for the Grapher (required).
 
     Returns:
         Chart configuration dictionary.
@@ -220,17 +216,17 @@ def _fetch_chart_data(
     *,
     timeout: int,
     params: dict[str, str],
+    base_url: str,
     load_data: bool = True,
-    base_url: str = GRAPHER_BASE_URL,
 ) -> pd.DataFrame:
     """Fetch chart data as a ChartTable.
 
     Args:
         slug: Chart slug.
         timeout: HTTP request timeout in seconds.
-        load_data: If True, load full data. If False, load only header.
         params: Query parameters for the CSV endpoint. Refer to https://docs.owid.io/projects/etl/api/chart-api/#get-grapherslugcsv for complete list of parameters available.
-        base_url: Base URL for the Grapher. Defaults to GRAPHER_BASE_URL.
+        base_url: Base URL for the Grapher (required).
+        load_data: If True, load full data. If False, load only header.
 
     Returns:
         ChartTable with data (or empty if load_data=False).
