@@ -1,6 +1,6 @@
 [project]
 name = "owid-catalog"
-version = "1.0.0rc1"
+version = "1.0.0rc2"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]

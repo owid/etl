@@ -685,3 +685,6 @@ include:
   - dag/archive/families.yml
   - dag/archive/natural_disasters.yml
   - dag/archive/minerals.yml
+  - dag/archive/chartbook.yml
+  - dag/archive/corruption.yml
+  - dag/archive/geography.yml

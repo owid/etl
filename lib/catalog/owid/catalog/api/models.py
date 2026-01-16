@@ -8,10 +8,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
 
 import pandas as pd
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
-    from owid.catalog.api.catalogs import CatalogFrame
+    from owid.catalog.api.legacy import CatalogFrame
 
 T = TypeVar("T")
 
@@ -35,6 +35,7 @@ class ResponseSet(BaseModel, Generic[T]):
     results: list[T]
     query: str = ""
     total_count: int = 0
+    base_url: str = Field(frozen=True)
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
@@ -204,7 +205,7 @@ class ResponseSet(BaseModel, Generic[T]):
         Returns:
             CatalogFrame that can use .load() method.
         """
-        from owid.catalog.api.catalogs import CatalogFrame as CF
+        from owid.catalog.api.legacy import CatalogFrame as CF
         from owid.catalog.api.utils import OWID_CATALOG_URI
         from owid.catalog.core import CatalogPath
 
@@ -232,7 +233,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     }
                 )
             frame = CF(rows)
-            frame._base_uri = OWID_CATALOG_URI
+            frame._base_uri = self.base_url or OWID_CATALOG_URI
             return frame
 
         elif type_name == "IndicatorResult":
@@ -273,7 +274,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     }
                 )
             frame = CF(rows)
-            frame._base_uri = OWID_CATALOG_URI
+            frame._base_uri = self.base_url or OWID_CATALOG_URI
             return frame
 
         else:
@@ -308,6 +309,7 @@ class ResponseSet(BaseModel, Generic[T]):
             results=filtered_results,
             query=self.query,
             total_count=len(filtered_results),
+            base_url=self.base_url,
         )
 
     def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
@@ -348,6 +350,7 @@ class ResponseSet(BaseModel, Generic[T]):
             results=sorted_results,
             query=self.query,
             total_count=self.total_count,
+            base_url=self.base_url,
         )
 
     def _get_version_string(self, item: T) -> str:

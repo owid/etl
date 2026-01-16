@@ -66,10 +66,27 @@ class SiteSearchAPI:
         ```
     """
 
-    BASE_URL = "https://ourworldindata.org/api/search"
+    def __init__(self, client: "Client", base_url: str, grapher_url: str) -> None:
+        """Initialize the SiteSearchAPI.
 
-    def __init__(self, client: "Client") -> None:
+        Args:
+            client: The Client instance.
+            base_url: Base URL for the search API (e.g., "https://ourworldindata.org/api/search").
+            grapher_url: Base URL for the Grapher (e.g., "https://ourworldindata.org/grapher").
+        """
         self._client = client
+        self._base_url = base_url
+        self._grapher_url = grapher_url
+
+    @property
+    def base_url(self) -> str:
+        """Base URL for the search API (read-only)."""
+        return self._base_url
+
+    @property
+    def grapher_url(self) -> str:
+        """Base URL for the Grapher (read-only)."""
+        return self._grapher_url
 
     def _search(
         self,
@@ -101,7 +118,7 @@ class SiteSearchAPI:
         if extra_params:
             params.update(extra_params)
 
-        resp = requests.get(self.BASE_URL, params=params, timeout=timeout or self._client.timeout)
+        resp = requests.get(self.base_url, params=params, timeout=timeout or self._client.timeout)
         resp.raise_for_status()
         return resp.json()
 
@@ -115,6 +132,7 @@ class SiteSearchAPI:
         limit: int = 20,
         page: int = 0,
         timeout: int | None = None,
+        grapher_url: str | None = None,
     ) -> ResponseSet[ChartResult]:
         """Search for charts matching a query.
 
@@ -127,6 +145,7 @@ class SiteSearchAPI:
             limit: Maximum results to return (1-100). Default 20.
             page: Page number for pagination (0-indexed). Default 0.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
+            grapher_url: Base URL for the Grapher. Defaults to self.grapher_url.
 
         Returns:
             ResponseSet containing ChartResult objects.
@@ -144,6 +163,7 @@ class SiteSearchAPI:
             ```
         """
         effective_timeout = timeout or self._client.timeout
+        effective_grapher_url = grapher_url or self.grapher_url
 
         # Build extra parameters for chart-specific filters
         extra_params: dict = {}
@@ -157,9 +177,22 @@ class SiteSearchAPI:
         # Perform search
         data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
+        # Fetch popularity via Datasette API (chart slugs are full URLs)
+        hits = data.get("results", [])
+        urls = [f"{effective_grapher_url}/{hit.get('slug', '')}" for hit in hits if hit.get("slug")]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                sorted(set(urls)),
+                type="chart",
+                timeout=effective_timeout,
+            )
+            if urls
+            else {}
+        )
+
         # Parse results
         results = []
-        for hit in data.get("results", []):
+        for hit in hits:
             slug = hit.get("slug", "")
 
             # Parse datetime fields
@@ -171,23 +204,30 @@ class SiteSearchAPI:
             if hit.get("updatedAt"):
                 last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
 
+            url = f"{effective_grapher_url}/{slug}"
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                url=f"https://ourworldindata.org/grapher/{slug}",
+                url=url,
                 subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
                 published_at=published_at,
                 last_updated=last_updated,
+                popularity=popularity_data.get(url, 0.0),
+                base_url=effective_grapher_url,
             )
             chart._timeout = effective_timeout
             results.append(chart)
+
+        # Sort by popularity (descending) - most popular first
+        results.sort(key=lambda r: r.popularity, reverse=True)
 
         return ResponseSet(
             results=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
+            base_url=effective_grapher_url,
         )
 
     def pages(
@@ -239,4 +279,5 @@ class SiteSearchAPI:
             results=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
+            base_url="https://ourworldindata.org",
         )
