@@ -276,11 +276,13 @@ def _combine_notes(notes_list: List[Optional[str]], separator: str) -> str:
     # Add notes to metadata.
     combined_notes = ""
     notes_exist = False
+    added_notes = set()
     for notes in notes_list:
-        if notes:
+        if notes and notes not in added_notes:
             if notes_exist:
                 combined_notes += separator
             combined_notes += notes
+            added_notes.add(notes)
             notes_exist = True
 
     return combined_notes
