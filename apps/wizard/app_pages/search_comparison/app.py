@@ -40,6 +40,32 @@ def get_pageviews_for_slugs(slugs: tuple[str, ...]) -> dict[str, int]:
     return dict(zip(df["slug"], df["views_365d"]))
 
 
+@st.cache_data(ttl=3600)
+def get_fm_ranks_for_slugs(slugs: tuple[str, ...]) -> dict[str, int]:
+    """Fetch featured metric ranks from MySQL for given slugs.
+
+    Returns the minimum (best) rank for each slug since a chart can be
+    featured in multiple topics.
+    """
+    if not slugs:
+        return {}
+
+    # Build SQL query with quoted slugs
+    quoted_slugs = ", ".join(f"'{s}'" for s in slugs if s)
+    query = f"""
+    SELECT
+        SUBSTRING_INDEX(url, '/', -1) as slug,
+        MIN(ranking) as fm_rank
+    FROM featured_metrics
+    WHERE incomeGroup = 'default'
+      AND url LIKE '%%/grapher/%%'
+      AND SUBSTRING_INDEX(url, '/', -1) IN ({quoted_slugs})
+    GROUP BY slug
+    """
+    df = read_sql(query)
+    return dict(zip(df["slug"], df["fm_rank"]))
+
+
 def fetch_semantic_search(query: str, hits_per_page: int) -> tuple[dict, float]:
     """Fetch results from semantic (AI) search API."""
     start = time.time()
@@ -193,15 +219,19 @@ def main():
     algolia_hits = algolia_data.get("hits", [])
     max_hits = max(len(semantic_hits), len(algolia_hits))
 
-    # Fetch pageviews for Algolia results (they don't include views)
+    # Fetch pageviews and FM ranks for Algolia results (they don't include these)
     algolia_slugs = tuple(h.get("slug") for h in algolia_hits if h.get("slug"))
     if algolia_slugs:
         pageviews = get_pageviews_for_slugs(algolia_slugs)
-        # Enrich Algolia hits with pageview data
+        fm_ranks = get_fm_ranks_for_slugs(algolia_slugs)
+        # Enrich Algolia hits with pageview and FM rank data
         for hit in algolia_hits:
             slug = hit.get("slug")
-            if slug and slug in pageviews:
-                hit["views_365d"] = pageviews[slug]
+            if slug:
+                if slug in pageviews:
+                    hit["views_365d"] = pageviews[slug]
+                if slug in fm_ranks:
+                    hit["fmRank"] = fm_ranks[slug]
 
     semantic_slug_to_rank = build_slug_to_rank(semantic_hits)
     algolia_slug_to_rank = build_slug_to_rank(algolia_hits)

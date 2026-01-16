@@ -72,7 +72,7 @@ def get_random_search_query(
     """Get a random search query weighted by search volume.
 
     Args:
-        require_hits: If True, only include queries that returned results.
+        require_hits: If True, include all.
                      If False, only include queries with zero results.
         days: Number of days to look back for data.
         filter_prefixes: If True, remove queries that are prefixes of more popular queries.
@@ -88,9 +88,7 @@ def get_random_search_query(
     df = _fetch_search_queries(start_date.isoformat(), end_date.isoformat())
 
     # Filter by hits
-    if require_hits:
-        df = df[df["n_hits"] > 0]
-    else:
+    if not require_hits:
         df = df[df["n_hits"] == 0]
 
     # Exclude queries containing URLs (user typos)
