@@ -24,10 +24,6 @@ __all__ = [
     "api",
     "search",
     "fetch",
-    # Legacy catalog access (still supported)
-    "LocalCatalog",
-    "ETLCatalog",
-    "find",
     # Core data structures
     "Dataset",
     "Table",
