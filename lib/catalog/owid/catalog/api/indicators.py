@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import requests
-from pydantic import BaseModel, ConfigDict, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.tables import _load_table
@@ -19,21 +19,24 @@ if TYPE_CHECKING:
     from owid.catalog.api import Client
 
 
-OWID_SEARCH_API = "https://search.owid.io/indicators"
-
-
 # =============================================================================
 # Indicator Loading Functions
 # =============================================================================
 
 
-def _load_indicator(path: str, *, load_data: bool = True) -> Table:
+def _load_indicator(
+    path: str,
+    *,
+    catalog_url: str,
+    load_data: bool = True,
+) -> Table:
     """Load indicator data by catalog path.
 
     Shared logic for IndicatorResult.fetch() and IndicatorsAPI.fetch().
 
     Args:
         path: Catalog path in format "channel/namespace/version/dataset/table#column"
+        catalog_url: Base URL for the catalog (required).
         load_data: If True, load full data. If False, load only structure.
 
     Returns:
@@ -61,7 +64,7 @@ def _load_indicator(path: str, *, load_data: bool = True) -> Table:
         )
 
     # Load table
-    table = _load_table(table_path, load_data=load_data)
+    table = _load_table(table_path, load_data=load_data, catalog_url=catalog_url)
 
     # Validate column exists
     if column_name not in table.columns:
@@ -127,6 +130,9 @@ class IndicatorResult(BaseModel):
     n_charts: int | None = None
     popularity: float = 0.0
 
+    # API configuration (immutable)
+    catalog_url: str = Field(frozen=True)
+
     _cached_table: Table | None = PrivateAttr(default=None)
     _legacy: bool = PrivateAttr(default=False)
 
@@ -171,7 +177,7 @@ class IndicatorResult(BaseModel):
         if load_data and self._cached_table is not None:
             return self._cached_table
 
-        tb = _load_indicator(self.path, load_data=load_data)
+        tb = _load_indicator(self.path, load_data=load_data, catalog_url=self.catalog_url)
 
         # Cache only if loading full data
         if load_data:
@@ -218,7 +224,7 @@ class IndicatorResult(BaseModel):
         # Use table_path property (without variable)
         if parsed.table_path is None:
             raise ValueError(f"Invalid catalog path: {self.path}")
-        return _load_table(parsed.table_path, load_data=load_data)
+        return _load_table(parsed.table_path, load_data=load_data, catalog_url=self.catalog_url)
 
 
 class IndicatorsAPI:
@@ -246,15 +252,27 @@ class IndicatorsAPI:
         ```
     """
 
-    BASE_URL = OWID_SEARCH_API
-
-    def __init__(self, client: "Client") -> None:
+    def __init__(self, client: "Client", search_url: str, catalog_url: str) -> None:
         """Initialize the IndicatorsAPI.
 
         Args:
             client: The Client instance.
+            search_url: URL for the indicators search API (e.g., "https://search.owid.io/indicators").
+            catalog_url: Base URL for the catalog (e.g., "https://catalog.ourworldindata.org/").
         """
         self._client = client
+        self._search_url = search_url
+        self._catalog_url = catalog_url
+
+    @property
+    def search_url(self) -> str:
+        """URL for the indicators search API (read-only)."""
+        return self._search_url
+
+    @property
+    def catalog_url(self) -> str:
+        """Base URL for the catalog (read-only)."""
+        return self._catalog_url
 
     def search(
         self,
@@ -303,7 +321,7 @@ class IndicatorsAPI:
             "limit": limit,
         }
 
-        resp = requests.get(self.BASE_URL, params=params, timeout=timeout or self._client.timeout)
+        resp = requests.get(self.search_url, params=params, timeout=timeout or self._client.timeout)
         resp.raise_for_status()
         data = resp.json()
 
@@ -342,6 +360,7 @@ class IndicatorsAPI:
                 unit=r.get("metadata", {}).get("unit", ""),
                 n_charts=r.get("n_charts", 0),
                 popularity=popularity_data.get(path, 0.0) if path else 0.0,
+                catalog_url=self.catalog_url,
             )
             for r, path in raw_results
         ]
@@ -350,6 +369,7 @@ class IndicatorsAPI:
             results=results,
             query=query,
             total_count=data.get("total_results", len(results)),
+            base_url=self.catalog_url,
         )
 
     def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:
@@ -357,7 +377,6 @@ class IndicatorsAPI:
 
         Args:
             path: Catalog path in format "channel/namespace/version/dataset/table#column"
-                  (e.g., "garden/un/2024/pop/population#population_total")
             load_data: If True (default), load full indicator data.
                        If False, load only structure (columns and metadata) without rows.
             timeout: HTTP request timeout in seconds (reserved for future use).
@@ -377,4 +396,4 @@ class IndicatorsAPI:
             ```
         """
         _ = timeout  # Reserved for future use
-        return _load_indicator(path, load_data=load_data)
+        return _load_indicator(path, load_data=load_data, catalog_url=self.catalog_url)

@@ -54,7 +54,7 @@ class TestChartsAPI:
         assert isinstance(tb, ChartTable)
         assert tb.metadata.short_name == "life-expectancy"
 
-    def test_fetch_chart_data(self):
+    def test_load_chart_table_data(self):
         """Test that fetched chart Table has expected index and columns."""
         client = Client()
         tb = client.charts.fetch("life-expectancy")
@@ -64,7 +64,7 @@ class TestChartsAPI:
         assert "entities" in tb.index.names
         assert "years" in tb.index.names or "dates" in tb.index.names
 
-    def test_fetch_chart_metadata_and_config(self):
+    def test_load_chart_table_metadata_and_config(self):
         """Test that table metadata, column metadata and chart config are accessible."""
         client = Client()
         tb = client.charts.fetch("life-expectancy")
@@ -337,33 +337,48 @@ class TestTablesAPI:
         # Verify it's the same as tables
         assert client.datasets is client.tables
 
+    def test_search_with_refresh_index(self):
+        """Test that refresh_index parameter forces index re-download."""
+        client = Client()
+
+        # First search caches the index
+        results1 = client.tables.search(table="population")
+        assert len(results1) > 0
+
+        # Search with refresh_index=True should work (forces re-download)
+        results2 = client.tables.search(table="population", refresh_index=True)
+        assert len(results2) > 0
+
+        # Results should be equivalent
+        assert len(results1) == len(results2)
+
 
 class TestResponseSet:
     """Test the ResponseSet container."""
 
     def test_iteration(self):
-        results = ResponseSet(results=[1, 2, 3], query="test")
+        results = ResponseSet(results=[1, 2, 3], query="test", base_url="https://example.com")
 
         items = list(results)
         assert items == [1, 2, 3]
 
     def test_indexing(self):
-        results = ResponseSet(results=["a", "b", "c"], query="test")
+        results = ResponseSet(results=["a", "b", "c"], query="test", base_url="https://example.com")
 
         assert results[0] == "a"
         assert results[1] == "b"
         assert results[2] == "c"
 
     def test_len(self):
-        results = ResponseSet(results=[1, 2, 3, 4, 5], query="test")
+        results = ResponseSet(results=[1, 2, 3, 4, 5], query="test", base_url="https://example.com")
         assert len(results) == 5
 
     def test_total_count_auto_set(self):
-        results = ResponseSet(results=[1, 2, 3], query="test")
+        results = ResponseSet(results=[1, 2, 3], query="test", base_url="https://example.com")
         assert results.total_count == 3
 
     def test_total_count_explicit(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", total_count=100)
+        results = ResponseSet(results=[1, 2, 3], query="test", total_count=100, base_url="https://example.com")
         assert results.total_count == 100
 
     def test_filter(self):
@@ -381,7 +396,7 @@ class TestResponseSet:
             MockResult(version="2023-12-01", name="c"),
             MockResult(version="2024-03-01", name="d"),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Filter by version (>= "2024-03-01" matches 2024-03-01 and 2024-06-01)
         filtered = results.filter(lambda r: r.version >= "2024-03-01")
@@ -411,7 +426,7 @@ class TestResponseSet:
             MockResult(version="2024-01-01", score=0.9),
             MockResult(version="2024-06-01", score=0.7),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Sort by version ascending
         sorted_results = results.sort_by("version")
@@ -441,7 +456,7 @@ class TestResponseSet:
             MockResult(name="a", value=1),
             MockResult(name="b", value=2),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Sort by value using lambda
         sorted_results = results.sort_by(lambda r: r.value)
@@ -467,7 +482,7 @@ class TestResponseSet:
             MockResult(version="2024-06-01", published_at="2024-06-15", score=0.9),
             MockResult(version="2024-03-01", published_at="2024-03-15", score=0.7),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Get latest by version
         latest = results.latest(by="version")
@@ -483,7 +498,7 @@ class TestResponseSet:
 
     def test_latest_empty_results(self):
         """Test that latest() raises ValueError on empty results."""
-        results = ResponseSet(results=[], query="test")
+        results = ResponseSet(results=[], query="test", base_url="https://example.com")
 
         with pytest.raises(ValueError, match="No results available"):
             results.latest(by="version")
@@ -503,7 +518,7 @@ class TestResponseSet:
             MockResult(version="2024-03-01", namespace="un", score=0.7),
             MockResult(version="2024-02-01", namespace="worldbank", score=0.6),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Chain filter -> sort -> index
         filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True)[0]
@@ -523,10 +538,12 @@ class TestDataclassModels:
             slug="test-chart",
             title="Test Chart",
             url="https://ourworldindata.org/grapher/test-chart",
+            base_url="https://ourworldindata.org/grapher",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
+        assert result.base_url == "https://ourworldindata.org/grapher"
 
     def test_indicator_result(self):
         result = IndicatorResult(
@@ -534,10 +551,12 @@ class TestDataclassModels:
             title="Test Indicator",
             score=0.95,
             path="grapher/test/2024/dataset/table#column",
+            catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.indicator_id == 123
         assert result.score == 0.95
+        assert result.catalog_url == "https://catalog.ourworldindata.org/"
 
     def test_table_result(self):
         result = TableResult(
@@ -547,10 +566,12 @@ class TestDataclassModels:
             namespace="un",
             channel="garden",
             path="garden/un/2024-07-11/un_wpp/population",
+            catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.table == "population"
         assert result.namespace == "un"
+        assert result.catalog_url == "https://catalog.ourworldindata.org/"
 
 
 class TestDatasetteAPI:
