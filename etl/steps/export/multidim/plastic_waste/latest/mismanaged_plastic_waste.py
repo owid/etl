@@ -54,7 +54,9 @@ def generate_subtitle_by_type(view):
     if measure == "total":
         return "Breakdown of macroplastic emissions by open burning and debris, measured in tonnes per year."
     elif measure == "per_person":
-        return "Breakdown of macroplastic emissions by open burning and debris, measured in kilograms per person per year."
+        return (
+            "Breakdown of macroplastic emissions by open burning and debris, measured in kilograms per person per year."
+        )
     else:
         return "Breakdown of macroplastic emissions by open burning and debris."
 
@@ -272,7 +274,10 @@ def run() -> None:
     c.views = [
         view
         for view in c.views
-        if not (view.dimensions.get("emission_type") == "total_by_type" and view.dimensions.get("measure") == "share_of_global_total")
+        if not (
+            view.dimensions.get("emission_type") == "total_by_type"
+            and view.dimensions.get("measure") == "share_of_global_total"
+        )
     ]
 
     #
