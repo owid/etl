@@ -9,8 +9,6 @@ definitions:
         type: LineChart DiscreteBar
         hasMapTab: true
         yScaleToggle: false
-        timeTolerance: 10
-
 config:
   subNavId: water
   yAxisMin: 0
@@ -88,7 +86,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_sm__residence_total
+        - catalogPath: who#wat_sm__residence_total
           display:
             name: Usage of safely managed drinking water services
             type: Numeric
@@ -109,7 +107,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_bas__residence_total
+        - catalogPath: who#wat_baso__residence_total
           display:
             name: Usage of basic drinking water services
             type: Numeric
@@ -130,7 +128,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_lim__residence_total
+        - catalogPath: who#wat_lim__residence_total
           display:
             name: Usage of limited drinking water services
             type: Numeric
@@ -138,7 +136,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
     config:
       title: Share of the population using limited drinking water services
@@ -151,7 +149,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_unimp__residence_total
+        - catalogPath: who#wat_unimp__residence_total
           display:
             name: Usage of unimproved drinking water sources
             type: Numeric
@@ -170,7 +168,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_ns__residence_total
+        - catalogPath: who#wat_ns__residence_total
           display:
             name: No usage of drinking water facilities
             type: Numeric
@@ -191,7 +189,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_imp__residence_total
+        - catalogPath: who#wat_imp__residence_total
           display:
             name: Usage of improved drinking water sources
             type: Numeric
@@ -212,7 +210,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_sm_pop__residence_total
+        - catalogPath: who#wat_sm_pop__residence_total
           display:
             name: Number using safely managed drinking water services
             type: Integer
@@ -232,7 +230,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_bas_pop__residence_total
+        - catalogPath: who#wat_baso_pop__residence_total
           display:
             name: Number using basic drinking water services
             type: Integer
@@ -252,14 +250,14 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_lim_pop__residence_total
+        - catalogPath: who#wat_lim_pop__residence_total
           display:
             name: Number using limited drinking water services
             type: Integer
             unit: people
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people using limited drinking water services
@@ -272,7 +270,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_unimp_pop__residence_total
+        - catalogPath: who#wat_unimp_pop__residence_total
           display:
             name: Number using unimproved drinking water sources
             type: Integer
@@ -290,7 +288,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_ns_pop__residence_total
+        - catalogPath: who#wat_ns_pop__residence_total
           display:
             name: Number with not using drinking water facilities
             type: Integer
@@ -310,7 +308,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_imp_pop__residence_total
+        - catalogPath: who#wat_imp_pop__residence_total
           display:
             name: Number using improved drinking water sources
             type: Integer
@@ -330,7 +328,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_sm__residence_urban
+        - catalogPath: who#wat_sm__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -351,7 +349,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_bas__residence_urban
+        - catalogPath: who#wat_baso__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -372,7 +370,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_lim__residence_urban
+        - catalogPath: who#wat_lim__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -380,7 +378,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
     config:
       title: Share of the urban population using limited drinking water services
@@ -393,7 +391,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_unimp__residence_urban
+        - catalogPath: who#wat_unimp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -412,7 +410,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_ns__residence_urban
+        - catalogPath: who#wat_ns__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -433,7 +431,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_imp__residence_urban
+        - catalogPath: who#wat_imp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -454,7 +452,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_sm_pop__residence_urban
+        - catalogPath: who#wat_sm_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -474,7 +472,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_bas_pop__residence_urban
+        - catalogPath: who#wat_baso_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -494,14 +492,14 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_lim_pop__residence_urban
+        - catalogPath: who#wat_lim_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
             unit: people
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in urban areas using limited drinking water services
@@ -514,7 +512,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_unimp_pop__residence_urban
+        - catalogPath: who#wat_unimp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -532,7 +530,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_ns_pop__residence_urban
+        - catalogPath: who#wat_ns_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -552,7 +550,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_imp_pop__residence_urban
+        - catalogPath: who#wat_imp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -572,7 +570,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_sm__residence_rural
+        - catalogPath: who#wat_sm__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -593,7 +591,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_bas__residence_rural
+        - catalogPath: who#wat_baso__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -614,7 +612,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_lim__residence_rural
+        - catalogPath: who#wat_lim__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -622,7 +620,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
     config:
       title: Share of the rural population using limited drinking water services
@@ -635,7 +633,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_unimp__residence_rural
+        - catalogPath: who#wat_unimp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -654,7 +652,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_ns__residence_rural
+        - catalogPath: who#wat_ns__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -663,7 +661,7 @@ views:
             additionalInfo: |-
               Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
-            colorScaleNumericBins: 5,,;10,,;20,,;30,,;40,,;50,,;60
+            colorScaleNumericBins: 5,,;10,,;20,,;40,,;50,,;60
     config:
       title: Share of the rural population not using a drinking water facility
       subtitle: |-
@@ -675,7 +673,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#wat_imp__residence_rural
+        - catalogPath: who#wat_imp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -696,7 +694,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_sm_pop__residence_rural
+        - catalogPath: who#wat_sm_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -716,7 +714,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_bas_pop__residence_rural
+        - catalogPath: who#wat_baso_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -736,14 +734,14 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_lim_pop__residence_rural
+        - catalogPath: who#wat_lim_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
             unit: people
             additionalInfo: |-
               Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in rural areas using limited drinking water services
@@ -756,7 +754,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_unimp_pop__residence_rural
+        - catalogPath: who#wat_unimp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -774,7 +772,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_ns_pop__residence_rural
+        - catalogPath: who#wat_ns_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -794,7 +792,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#wat_imp_pop__residence_rural
+        - catalogPath: who#wat_imp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -814,7 +812,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_sm__residence_total
+        - catalogPath: who#san_sm__residence_total
           display:
             name: Usage of safely managed sanitation services
             type: Numeric
@@ -835,7 +833,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_bas__residence_total
+        - catalogPath: who#san_baso__residence_total
           display:
             name: Usage of basic sanitation services
             type: Numeric
@@ -855,7 +853,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_lim__residence_total
+        - catalogPath: who#san_lim__residence_total
           display:
             name: Usage of limited sanitation services
             type: Numeric
@@ -863,7 +861,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the population using limited sanitation services
@@ -875,7 +873,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_unimp__residence_total
+        - catalogPath: who#san_unimp__residence_total
           display:
             name: Usage of unimproved sanitation facilities
             type: Numeric
@@ -895,7 +893,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_ns__residence_total
+        - catalogPath: who#san_ns__residence_total
           display:
             name: Open defecation (no use of any sanitation facilities)
             type: Numeric
@@ -916,7 +914,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_imp__residence_total
+        - catalogPath: who#san_imp__residence_total
           display:
             name: Usage of improved sanitation facilities
             type: Numeric
@@ -937,7 +935,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_sm_pop__residence_total
+        - catalogPath: who#san_sm_pop__residence_total
           display:
             name: Number using sanitation with off-site wastewater treatment
             type: Integer
@@ -957,7 +955,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_bas_pop__residence_total
+        - catalogPath: who#san_baso_pop__residence_total
           display:
             name: Number using basic sanitation services
             type: Integer
@@ -976,14 +974,14 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_lim_pop__residence_total
+        - catalogPath: who#san_lim_pop__residence_total
           display:
             name: Number using limited sanitation services
             type: Integer
             unit: people
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people using limited sanitation services
@@ -995,7 +993,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_unimp_pop__residence_total
+        - catalogPath: who#san_unimp_pop__residence_total
           display:
             name: Number using unimproved sanitation facilities
             type: Integer
@@ -1014,7 +1012,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_ns_pop__residence_total
+        - catalogPath: who#san_ns_pop__residence_total
           display:
             name: Number practicing open defecation (no use of any sanitation facilities)
             type: Integer
@@ -1034,7 +1032,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_imp_pop__residence_total
+        - catalogPath: who#san_imp_pop__residence_total
           display:
             name: Number using improved sanitation facilities
             type: Integer
@@ -1054,7 +1052,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_sm__residence_urban
+        - catalogPath: who#san_sm__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1075,7 +1073,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_bas__residence_urban
+        - catalogPath: who#san_baso__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1095,7 +1093,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_lim__residence_urban
+        - catalogPath: who#san_lim__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1103,7 +1101,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the urban population using limited sanitation services
@@ -1115,7 +1113,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_unimp__residence_urban
+        - catalogPath: who#san_unimp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1135,7 +1133,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_ns__residence_urban
+        - catalogPath: who#san_ns__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1156,7 +1154,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_imp__residence_urban
+        - catalogPath: who#san_imp__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1177,7 +1175,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_sm_pop__residence_urban
+        - catalogPath: who#san_sm_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1197,7 +1195,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_bas_pop__residence_urban
+        - catalogPath: who#san_baso_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1216,14 +1214,14 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_lim_pop__residence_urban
+        - catalogPath: who#san_lim_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
             unit: people
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in urban areas using limited sanitation services
@@ -1235,7 +1233,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_unimp_pop__residence_urban
+        - catalogPath: who#san_unimp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1254,7 +1252,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_ns_pop__residence_urban
+        - catalogPath: who#san_ns_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1274,7 +1272,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_imp_pop__residence_urban
+        - catalogPath: who#san_imp_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1294,7 +1292,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_sm__residence_rural
+        - catalogPath: who#san_sm__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1315,7 +1313,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_bas__residence_rural
+        - catalogPath: who#san_baso__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1335,7 +1333,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_lim__residence_rural
+        - catalogPath: who#san_lim__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1343,7 +1341,7 @@ views:
             shortUnit: '%'
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
     config:
       title: Share of the rural population using limited sanitation services
@@ -1355,7 +1353,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_unimp__residence_rural
+        - catalogPath: who#san_unimp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1375,7 +1373,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_ns__residence_rural
+        - catalogPath: who#san_ns__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1396,7 +1394,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#san_imp__residence_rural
+        - catalogPath: who#san_imp__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1417,7 +1415,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_sm_pop__residence_rural
+        - catalogPath: who#san_sm_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1437,7 +1435,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_bas_pop__residence_rural
+        - catalogPath: who#san_baso_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1456,14 +1454,14 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_lim_pop__residence_rural
+        - catalogPath: who#san_lim_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
             unit: people
             additionalInfo: |-
               Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in rural areas using limited sanitation services
@@ -1475,7 +1473,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_unimp_pop__residence_rural
+        - catalogPath: who#san_unimp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1494,7 +1492,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_ns_pop__residence_rural
+        - catalogPath: who#san_ns_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1514,7 +1512,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#san_imp_pop__residence_rural
+        - catalogPath: who#san_imp_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1534,7 +1532,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_bas__residence_total
+        - catalogPath: who#hyg_bas__residence_total
           display:
             name: Access to basic handwashing facilities
             type: Numeric
@@ -1553,7 +1551,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_lim__residence_total
+        - catalogPath: who#hyg_lim__residence_total
           display:
             name: Access to limited handwashing facilities
             type: Numeric
@@ -1572,7 +1570,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_nfac__residence_total
+        - catalogPath: who#hyg_ns__residence_total
           display:
             name: No handwashing facilities
             type: Numeric
@@ -1591,7 +1589,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_bas_pop__residence_total
+        - catalogPath: who#hyg_bas_pop__residence_total
           display:
             name: Number with access to basic handwashing facilities
             type: Integer
@@ -1609,13 +1607,13 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_lim_pop__residence_total
+        - catalogPath: who#hyg_lim_pop__residence_total
           display:
             name: Number with access to limited handwashing facilities
             type: Integer
             unit: people
             additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people that rely on limited handwashing facilities
@@ -1627,7 +1625,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_nfac_pop__residence_total
+        - catalogPath: who#hyg_ns_pop__residence_total
           display:
             name: Number with no handwashing facilities
             type: Integer
@@ -1645,7 +1643,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_bas__residence_urban
+        - catalogPath: who#hyg_bas__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1664,7 +1662,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_lim__residence_urban
+        - catalogPath: who#hyg_lim__residence_urban
           display:
             name: Urban usage
             type: Numeric
@@ -1683,14 +1681,14 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_nfac__residence_urban
+        - catalogPath: who#hyg_ns__residence_urban
           display:
             name: Urban usage
             type: Numeric
             unit: '%'
             shortUnit: '%'
             additionalInfo: No handwashing facility is available on the premises.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlGnBu
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
     config:
       title: Share of the urban population without handwashing facilities
@@ -1702,7 +1700,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_bas_pop__residence_urban
+        - catalogPath: who#hyg_bas_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1720,13 +1718,13 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_lim_pop__residence_urban
+        - catalogPath: who#hyg_lim_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
             unit: people
             additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in urban areas that rely on limited handwashing facilities
@@ -1738,7 +1736,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_nfac_pop__residence_urban
+        - catalogPath: who#hyg_ns_pop__residence_urban
           display:
             name: Urban usage (number of people)
             type: Integer
@@ -1756,7 +1754,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_bas__residence_rural
+        - catalogPath: who#hyg_bas__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1775,7 +1773,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_lim__residence_rural
+        - catalogPath: who#hyg_lim__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1794,7 +1792,7 @@ views:
       relative_to_population: share_of_population
     indicators:
       y:
-        - catalogPath: household#hyg_nfac__residence_rural
+        - catalogPath: who#hyg_ns__residence_rural
           display:
             name: Rural usage
             type: Numeric
@@ -1813,7 +1811,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_bas_pop__residence_rural
+        - catalogPath: who#hyg_bas_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
@@ -1831,13 +1829,13 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_lim_pop__residence_rural
+        - catalogPath: who#hyg_lim_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer
             unit: people
             additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
-            colorScaleScheme: YlOrRd
+            colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
       title: Number of people in rural areas that rely on limited handwashing facilities
@@ -1849,7 +1847,7 @@ views:
       relative_to_population: number_of_people
     indicators:
       y:
-        - catalogPath: household#hyg_nfac_pop__residence_rural
+        - catalogPath: who#hyg_ns_pop__residence_rural
           display:
             name: Rural usage (number of people)
             type: Integer

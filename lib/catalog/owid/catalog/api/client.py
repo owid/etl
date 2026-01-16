@@ -3,6 +3,12 @@ from owid.catalog.api.datasette import DatasetteAPI
 from owid.catalog.api.indicators import IndicatorsAPI
 from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
+from owid.catalog.api.utils import (
+    DEFAULT_CATALOG_URL,
+    DEFAULT_GRAPHER_URL,
+    DEFAULT_INDICATORS_SEARCH_URL,
+    DEFAULT_SITE_SEARCH_URL,
+)
 
 
 class Client:
@@ -38,6 +44,8 @@ class Client:
         results = client.indicators.search("renewable energy")
         variable = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
 
+        # Custom URLs (e.g., for staging environments)
+        staging_client = Client(catalog_url="https://staging-catalog.example.com/")
         ```
     """
 
@@ -49,19 +57,30 @@ class Client:
     _datasette: DatasetteAPI
     _site_search: SiteSearchAPI
 
-    def __init__(self, timeout: int = 30) -> None:
+    def __init__(
+        self,
+        timeout: int = 30,
+        catalog_url: str = DEFAULT_CATALOG_URL,
+        grapher_url: str = DEFAULT_GRAPHER_URL,
+        indicators_search_url: str = DEFAULT_INDICATORS_SEARCH_URL,
+        site_search_url: str = DEFAULT_SITE_SEARCH_URL,
+    ) -> None:
         """Initialize the client with all API interfaces.
 
         Args:
             timeout: HTTP request timeout in seconds. Default 30.
+            catalog_url: Base URL for the catalog. Default: https://catalog.ourworldindata.org/
+            grapher_url: Base URL for the Grapher. Default: https://ourworldindata.org/grapher
+            indicators_search_url: URL for indicators search API. Default: https://search.owid.io/indicators
+            site_search_url: URL for site search API. Default: https://ourworldindata.org/api/search
         """
         self.timeout = timeout
         self._datasette = DatasetteAPI(timeout=timeout)
-        self.charts = ChartsAPI(self)
-        self.indicators = IndicatorsAPI(self)
-        self.tables = TablesAPI(self)
+        self.charts = ChartsAPI(self, base_url=grapher_url)
+        self.indicators = IndicatorsAPI(self, search_url=indicators_search_url, catalog_url=catalog_url)
+        self.tables = TablesAPI(self, catalog_url=catalog_url)
         self.datasets = self.tables  # Backwards compatibility alias
-        self._site_search = SiteSearchAPI(self)
+        self._site_search = SiteSearchAPI(self, base_url=site_search_url, grapher_url=grapher_url)
 
     def __repr__(self) -> str:
         return "Client(charts=..., indicators=..., tables=...)"

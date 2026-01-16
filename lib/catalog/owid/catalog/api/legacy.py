@@ -1,5 +1,5 @@
 #
-#  owid.catalog.api.catalogs
+#  owid.catalog.api.legacy
 #
 #  Catalog classes for finding and loading data.
 #
