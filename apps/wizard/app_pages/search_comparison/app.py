@@ -155,7 +155,7 @@ def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None)
 
 def build_slug_to_rank(hits: list[dict]) -> dict[str, int]:
     """Build a mapping from slug to rank (1-indexed)."""
-    return {hit.get("slug"): i + 1 for i, hit in enumerate(hits)}
+    return {hit["slug"]: i + 1 for i, hit in enumerate(hits) if hit.get("slug")}
 
 
 def main():
