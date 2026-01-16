@@ -68,6 +68,17 @@ tables:
           - Population Growth
         attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
       processing_level: major
+      description_key: &population-description-key
+        - Population is the most commonly used metric throughout Our World in Data. It is used directly to understand population growth over time, and indirectly to calculate per-capita indicators, making it easier to compare countries of different sizes.
+        - |-
+          We construct this indicator by combining multiple sources covering different periods.
+            - HYDE v3.3 (2023): historical estimates from 10,000 BCE to 1799.
+            - Gapminder v7 (2022): for 1800-1949.
+            - UN World Population Prospects (2024): for 1950 onwards, including 2100 projections.
+            - Gapminder Systema Globalis (2023): additional source for former countries (Yugoslavia, USSR, etc.)
+        - Breaks in the data may occur at the boundaries between sources due to their methodological differences.
+        - You can read more about the sources and methodology in our [dedicated article](https://ourworldindata.org/population-sources). We also provide a table of sources showing the source we use for each country-year.
+        - We calculate geographical aggregates (continents, income groups, etc.) by summing individual country populations. For years before 1800, we rely directly on HYDE's values for continents to ensure historical consistency.
       description_processing: |-
         {definitions.others.different_sources_processing}
 
@@ -158,21 +169,11 @@ tables:
           {tables.population.variables.population.title} (historical)
         description_short: |-
           Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
+        description_key: *population-description-key
         unit: "{tables.population.variables.population.unit}"
         display:
           name: Population
           numDecimalPlaces: 0
-        description_key:
-          - Population is the most commonly used metric throughout Our World in Data. It is used directly to understand population growth over time, and indirectly to calculate per-capita indicators, making it easier to compare countries of different sizes.
-          - |-
-            We construct this indicator by combining multiple sources covering different periods.
-              - HYDE v3.3 (2023): historical estimates from 10,000 BCE to 1799.
-              - Gapminder v7 (2022): for 1800-1949.
-              - UN World Population Prospects (2024): for 1950 onwards, including 2100 projections.
-              - Gapminder Systema Globalis (2023): additional source for former countries (Yugoslavia, USSR, etc.)
-          - Breaks in the data may occur at the boundaries between sources due to their methodological differences.
-          - You can read more about the sources and methodology in our [dedicated article](https://ourworldindata.org/population-sources). We also provide a table of sources showing the source we use for each country-year.
-          - We calculate geographical aggregates (continents, income groups, etc.) by summing individual country populations. For years before 1800, we rely directly on HYDE's values for continents to ensure historical consistency.
 
         presentation:
           title_variant: Long-run data
