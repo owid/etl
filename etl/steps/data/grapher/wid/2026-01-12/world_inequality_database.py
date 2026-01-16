@@ -23,7 +23,12 @@ def run() -> None:
     #
     # Initialize a new grapher dataset.
     ds_grapher = paths.create_dataset(
-        tables=[tb_inequality, tb_incomes, tb_relative_poverty], default_metadata=ds_garden.metadata
+        tables=[
+            tb_inequality,
+            tb_incomes,
+            tb_relative_poverty,
+        ],
+        default_metadata=ds_garden.metadata,
     )
 
     # Save grapher dataset.

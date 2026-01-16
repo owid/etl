@@ -1,16 +1,98 @@
 # NOTE: To learn more about the fields, hover over their names.
+macros: |-
+  <% macro quantiles_thr(quantile) %>
+  <% if quantile == "p10p20" %>
+  Poorest decile
+  <%- elif quantile == "p20p30" %>
+  2nd decile
+  <%- elif quantile == "p30p40" %>
+  3rd decile
+  <%- elif quantile in ["p40p50", "p50p60", "p60p70", "p70p80", "p80p90"] %>
+  <<quantile[1]>>th decile
+  <%- elif quantile == "p90p100" %>
+  Richest decile
+  <%- elif quantile == "p99p100" %>
+  Richest 1%
+  <%- elif quantile == "p99_9p100" %>
+  Richest 0.1%
+  <%- elif quantile == "p99_99p100" %>
+  Richest 0.01%
+  <%- elif quantile == "p99_999p100" %>
+  Richest 0.001%
+  <%- endif %>
+  <% endmacro %>
+
+  <% macro quantiles_avg_share(quantile) %>
+  <% if quantile == "p0p10" %>
+  Poorest decile
+  <%- elif quantile == "p10p20" %>
+  2nd decile
+  <%- elif quantile == "p20p30" %>
+  3rd decile
+  <%- elif quantile in ["p30p40", "p40p50", "p50p60", "p60p70", "p70p80", "p80p90"] %>
+  <<quantile[4]>>th decile
+  <%- elif quantile == "p90p100" %>
+  Richest decile
+  <%- elif quantile == "p99p100" %>
+  Richest 1%
+  <%- elif quantile == "p99_9p100" %>
+  Richest 0.1%
+  <%- elif quantile == "p99_99p100" %>
+  Richest 0.01%
+  <%- elif quantile == "p99_999p100" %>
+  Richest 0.001%
+  <%- endif %>
+  <% endmacro %>
+
+  <% macro quantiles_avg_share_tenth_population(quantile) %>
+  <% if quantile not in ["p99p100", "p99_9p100", "p99_99p100", "p99_999p100"] %>
+   (tenth of the population)
+  <%- endif %>
+  <% endmacro %>
+
+  <% macro quantiles_thr_percentage(quantile) %>
+  <% if quantile not in ["p99_9p100", "p99_99p100", "p99_999p100"] %>
+  <<quantile[1]>><<quantile[2]>>
+  <%- elif quantile == "p99_9p100" %>
+  99.9
+  <%- elif quantile == "p99_99p100" %>
+  99.99
+  <%- elif quantile == "p99_999p100" %>
+  99.999
+  <%- endif %>
+  <% endmacro %>
+
 definitions:
   common:
+    processing_level: major
+    description_processing: |-
+      {definitions.description_processing_general}
+
+      {definitions.description_processing_extrapolated}
     presentation:
+      attribution_short: WID
+      title_variant: "{definitions.title_variant_extrapolated}"
       topic_tags:
         - Economic Inequality
+    display: &common_display
+      tolerance: 5
 
   # NOTE: Change this if needed in the future
   ppp_year: 2023
 
-  extrapolated: |-
+  title_extrapolated: |-
     <% if extrapolated == "yes" %>
      - Extrapolated
+    <%- endif %>
+
+  title_variant_extrapolated: |-
+    <% if extrapolated == "yes" %>
+    with extrapolations
+    <%- endif %>
+
+  per_period: |-
+    <% if period in ["day", "month", "year"] %>
+    per <<period>>
     <%- endif %>
 
   description_short_welfare_type_inequality: |-
@@ -33,14 +115,8 @@ definitions:
     This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
     <%- endif %>
 
-  description_key_methodology: &description_key_methodology |-
-    <% if welfare_type != "wealth" %>
-    - The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
-    - These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).
-    <%- else %>
-    - The data is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
-    - Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).
-    <%- endif %>
+  description_key_ppp: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
 
   description_key_methodology_1: |-
     <% if welfare_type != "wealth" %>
@@ -56,6 +132,36 @@ definitions:
     Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).
     <%- endif %>
 
+  description_key_relative_poverty: |-
+    This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+
+  description_processing_general: |-
+    We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
+
+  description_processing_relative_poverty: |-
+    This data has been estimated by calculating the <<poverty_line>>, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold.
+
+  description_processing_extrapolated: |-
+    <% if extrapolated == "yes" %>
+    Interpolations and extrapolations are included by not using the option `exclude` in the Stata command.
+    <%- else %>
+    Interpolations and extrapolations are excluded by using the option `exclude` in the Stata command.
+    <%- endif %>
+
+  subtitle_welfare_type: |-
+    <% if welfare_type in ["after tax", "after tax (disposable)"] %>
+    Income here is measured after taxes and benefits.
+    <%- elif welfare_type == "before tax" %>
+    Income here is measured before taxes and benefits.
+    <%- endif %>
+
+  numdecimalplaces_period: |-
+    <% if period == "day" %>
+    2
+    <%- else %>
+    0
+    <%- endif %>
+
 
 
 # Learn more about the available fields:
@@ -68,7 +174,7 @@ tables:
   inequality:
     variables:
       gini:
-        title: Gini coefficient (<<welfare_type>>){definitions.extrapolated}
+        title: Gini coefficient (<<welfare_type>>){definitions.title_extrapolated}
         unit: ""
         short_unit: ""
         description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
@@ -76,39 +182,318 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
-          - *description_key_methodology
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Gini coefficient (<<welfare_type>>)
+          numDecimalPlaces: 2
+          <<: *common_display
 
-      # p50_p10_ratio	p90_p10_ratio	p90_p50_ratio	palma_ratio	s80_s20_ratio	s90_s10_ratio	s90_s50_ratio	bottom_50_share	middle_40_share	top_10_share	top_1_share	top_90_99_share
+      palma_ratio:
+        title: Palma ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Palma ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
 
+      p50_p10_ratio:
+        title: P50/P10 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income is two times higher than that of someone just falling in the poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: P50/P10 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p90_p10_ratio:
+        title: P90/P10 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: P90 and P10 are the levels of income below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: P90/P10 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p90_p50_ratio:
+        title: P90/P50 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: P90/P50 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s80_s20_ratio:
+        title: S80/S20 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The S80/S20 ratio measures the share of income received by the richest 20% of the population divided by the share received by the poorest 20%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: S80/S20 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s90_s10_ratio:
+        title: S90/S10 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The S90/S10 ratio measures the share of income received by the richest 10% of the population divided by the share received by the poorest 10%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: S90/S10 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s90_s50_ratio:
+        title: S90/S50 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The S90/S50 ratio measures the share of income received by the richest 10% of the population divided by the share received by the richest 50%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: S90/S50 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_bottom_50:
+        title: Share (bottom 50%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of income received by the poorest 50% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Share (bottom 50%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_middle_40:
+        title: Share (middle 40%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of income received by the middle 40% of the population. The middle 40% is the share of the population whose income lies between the poorest 50% and the richest 10%. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Share (middle 40%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_top_10:
+        title: Share (top 10%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of income received by the richest 10% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Share (top 10%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_top_1:
+        title: Share (top 1%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of income received by the richest 1% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Share (top 1%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_top_90_99:
+        title: Share (top 90-99%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of income received by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Share (top 90-99%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+  relative_poverty:
+    variables:
+      headcount_ratio:
+        title: Share in relative poverty (<<poverty_line>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage living with income below <<poverty_line>> income. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+
+          {definitions.description_processing_general}
+
+          {definitions.description_processing_extrapolated}
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Share below <<poverty_line>> income (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+  incomes:
+    variables:
+      mean:
+        title: Mean income ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: Average income {definitions.per_period}. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Mean income (<<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+
+      median:
+        title: Median income ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: Value of income {definitions.per_period} below which 50% of the population live. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: Median income (<<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+
+      avg:
+        title: |-
+          {macros}
+          Average ({definitions.per_period}, <<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: |-
+          {macros}
+          The mean income {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: |-
+            {macros}
+            Average (<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+
+      share:
+        title: |-
+          {macros}
+          Share (<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          {macros}
+          The share of income received by the <<quantiles_avg_share(quantile) | lower>> (tenth of the population). {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: |-
+            {macros}
+            Share (<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      thr:
+        title: |-
+          {macros}
+          Threshold ({definitions.per_period}, <<quantiles_thr(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: |-
+          {macros}
+          The level of income {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        # presentation:
+        #   grapher_config:
+        display:
+          name: |-
+            {macros}
+            Threshold (<<quantiles_thr(quantile) | lower>>, <<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display

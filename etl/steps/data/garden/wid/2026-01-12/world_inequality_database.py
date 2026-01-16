@@ -3,6 +3,7 @@
 from typing import Tuple
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -28,11 +29,11 @@ INEQUALITY_INDICATORS = {
     "p90_p10_ratio": "p90_p10_ratio",
     "p90_p50_ratio": "p90_p50_ratio",
     "p50_p10_ratio": "p50_p10_ratio",
-    "p0p50_share": "bottom_50_share",
-    "p50p90_share": "middle_40_share",
-    "p90p100_share": "top_10_share",
-    "p99p100_share": "top_1_share",
-    "p90p99_share": "top_90_99_share",
+    "p0p50_share": "share_bottom_50",
+    "p50p90_share": "share_middle_40",
+    "p90p100_share": "share_top_10",
+    "p99p100_share": "share_top_1",
+    "p90p99_share": "share_top_90_99",
 }
 
 
@@ -71,7 +72,7 @@ def run() -> None:
     tb_incomes["share"] *= 100
     tb_distribution["share"] *= 100
     tb_fiscal[list(tb_fiscal.filter(like="share"))] *= 100
-    tb_inequality[["bottom_50_share", "middle_40_share", "top_10_share", "top_1_share", "top_90_99_share"]] *= 100
+    tb_inequality[["share_bottom_50", "share_middle_40", "share_top_10", "share_top_1", "share_top_90_99"]] *= 100
 
     # Add period dimension to incomes table
     tb_incomes = add_period_dimension(tb=tb_incomes)
@@ -171,7 +172,7 @@ def make_table_long_and_separate(tb: Table) -> Tuple[Table, Table]:
 
     # Create tb_incomes, which is a table with avg, thr, share, median and mean
     # Remove top 10 and top 1 from INEQUALITY_INDICATORS keys
-    indicators_to_remove = INEQUALITY_INDICATORS.keys() - {"p90p100_share", "p99p100_share"}
+    indicators_to_remove = INEQUALITY_INDICATORS.keys() - {"share_p90p100", "share_p99p100"}
     tb_incomes = tb_long[~tb_long["indicator"].isin(indicators_to_remove)].copy()
 
     # Rename p0p100_avg to mean
@@ -237,6 +238,9 @@ def add_period_dimension(tb: Table) -> Table:
 
     # Concatenate all the tables
     tb = pr.concat([tb_period, tb_day, tb_month, tb_non_period], ignore_index=True, sort=False)
+
+    # Extra: for thr, make all the values pd.NA when quantile is p0p10
+    tb.loc[tb["quantile"] == "p0p10", "thr"] = pd.NA
 
     return tb
 
