@@ -342,17 +342,18 @@ class TablesAPI:
         """Base URL for the catalog (read-only)."""
         return self._catalog_url
 
-    def _get_index(self, timeout: int | None = None) -> pd.DataFrame:
+    def _get_index(self, timeout: int | None = None, *, force: bool = False) -> pd.DataFrame:
         """Get or load the catalog index.
 
         Args:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
-                     Only used during initial index loading.
+                     Only used during index loading.
+            force: If True, force re-download even if cached.
 
         Returns:
             DataFrame with catalog index.
         """
-        if self._index is None:
+        if self._index is None or force:
             self._index = _read_catalog_index(
                 self.catalog_url,
                 timeout=timeout or self._client.timeout,
@@ -561,6 +562,7 @@ class TablesAPI:
         match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
         fuzzy_threshold: int = 70,
         timeout: int | None = None,
+        refresh_index: bool = False,
     ) -> ResponseSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
@@ -579,6 +581,7 @@ class TablesAPI:
             fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
                 Only used when match="fuzzy". (default: 70)
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
+            refresh_index: If True, force re-download of the catalog index. Default False.
 
         Returns:
             ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
@@ -626,7 +629,7 @@ class TablesAPI:
             channel = "garden"
 
         # Load and filter catalog index
-        index = self._get_index(timeout=timeout)
+        index = self._get_index(timeout=timeout, force=refresh_index)
         matches, _ = self._filter_index(
             index,
             table=table,
