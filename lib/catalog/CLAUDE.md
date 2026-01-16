@@ -10,7 +10,7 @@ The library provides pandas-enhanced data structures with rich metadata support:
 - **Dataset**: Container for multiple tables with shared metadata
 - **Table**: pandas.DataFrame subclass with column-level metadata
 - **Variable**: pandas.Series subclass with variable-specific metadata
-- **ETLCatalog/LocalCatalog**: APIs for querying and loading datasets
+- **Client**: APIs for querying and loading data from tables, indicators and charts.
 
 This library is part of the larger `etl` repository under `lib/catalog/` and is installed as an editable package called `owid-catalog`.
 
