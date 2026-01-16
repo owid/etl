@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
 
 def search(
-    name: str,
+    name: str | None = None,
     *,
     kind: Literal["table", "indicator", "chart"] = "table",
     limit: int = 10,
@@ -62,7 +62,8 @@ def search(
     slug, then use fetch() to download the data.
 
     Args:
-        name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy")
+        name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy").
+            Required for indicators and charts. Optional for tables (can filter by other params).
         kind: What to search for (default: "table"):
 
             - "table": Search catalog tables (returns ResponseSet[TableResult])
@@ -114,6 +115,10 @@ def search(
         For indicators and charts, filtering parameters (namespace, version, dataset, channel)
         are ignored as they don't apply to those search types.
     """
+    # Validate name is provided for indicators and charts
+    if name is None and kind in ("indicator", "chart"):
+        raise ValueError(f"'name' is required when searching for {kind}s.")
+
     # Route to appropriate search method based on kind
     client = Client()
 
@@ -131,9 +136,11 @@ def search(
         )
     elif kind == "indicator":
         # Search indicators using IndicatorsAPI
+        assert name is not None  # Validated above
         return client.indicators.search(name, limit=limit)
     elif kind == "chart":
         # Search charts using ChartsAPI
+        assert name is not None  # Validated above
         return client.charts.search(name, limit=limit)
     else:
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")
