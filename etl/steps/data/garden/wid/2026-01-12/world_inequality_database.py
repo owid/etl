@@ -172,7 +172,7 @@ def make_table_long_and_separate(tb: Table) -> Tuple[Table, Table]:
 
     # Create tb_incomes, which is a table with avg, thr, share, median and mean
     # Remove top 10 and top 1 from INEQUALITY_INDICATORS keys
-    indicators_to_remove = INEQUALITY_INDICATORS.keys() - {"share_p90p100", "share_p99p100"}
+    indicators_to_remove = INEQUALITY_INDICATORS.keys() - {"p90p100_share", "p99p100_share"}
     tb_incomes = tb_long[~tb_long["indicator"].isin(indicators_to_remove)].copy()
 
     # Rename p0p100_avg to mean
