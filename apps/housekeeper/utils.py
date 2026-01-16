@@ -17,7 +17,6 @@ from etl.grapher import model as gm
 
 # Today and one year ago
 TODAY = date.today()
-YEAR_AGO = TODAY.replace(year=TODAY.year - 1)
 
 # Load LLM configuration
 CURRENT_DIR = Path(__file__).parent
@@ -77,17 +76,18 @@ class ChartSummaryOutput(BaseModel):
 #####################################
 # Get / Submit Housekeeper reviews  #
 #####################################
-def owidb_get_reviews_id(object_type: str, since_year_ago: bool = True) -> list[int]:
+def owidb_get_reviews_id(object_type: str, num_years_skip: int = 3) -> list[int]:
     """Get IDs of objects (e.g. charts) that have been suggested for review by Housekeeper.
 
     Args:
         object_type: Type of object (e.g., 'chart')
-        since_year_ago: If True, only return reviews from the last year (allows re-review after 1 year)
+        num_years_skip: Number of years before which we should review charts again even if they were reviewed in the past. That is, if `num_years_skip` is 2 and a chart was reviewed and kept more than 2 years ago but continues to have low number of views, it will be kept.
 
     Returns:
         List of object IDs that have been reviewed
     """
-    since = datetime.combine(YEAR_AGO, datetime.min.time()) if since_year_ago else None
+    LIMIT = TODAY.replace(year=TODAY.year - num_years_skip)
+    since = datetime.combine(LIMIT, datetime.min.time())
     with Session(OWID_ENV.engine) as session:
         return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type, since=since)
 
