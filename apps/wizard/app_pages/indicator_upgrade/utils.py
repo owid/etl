@@ -5,13 +5,12 @@ from typing import Dict, Tuple, cast
 import pandas as pd
 import streamlit as st
 from pymysql import OperationalError
-from rapidfuzz import fuzz
 from structlog import get_logger
 
+from apps.indicator_upgrade.detect import get_datasets_with_migrations
 from apps.indicator_upgrade.match import find_mapping_suggestions, preliminary_mapping
-from apps.wizard.utils.io import get_steps_df
 from etl.db import get_connection
-from etl.grapher.io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
+from etl.grapher.io import get_all_datasets, get_variables_in_dataset
 
 # Logger
 log = get_logger()
@@ -19,59 +18,16 @@ log = get_logger()
 
 @st.spinner("Retrieving datasets...", show_time=True)
 def get_datasets(archived: bool) -> pd.DataFrame:
-    # Get steps_df and grapher_changes
-    steps_df_grapher, grapher_changes = get_steps_df(archived=archived)
+    """Get datasets with migration detection information.
 
-    # Add column marking migrations
-    steps_df_grapher["migration_new"] = False
-    steps_df_grapher["new_dataset_mappable"] = False
-    if grapher_changes:
-        dataset_ids = [g["new"]["id"] for g in grapher_changes]
-        steps_df_grapher.loc[steps_df_grapher["id"].isin(dataset_ids), "migration_new"] = True
-        # Add column ranking possible old datasets
-        ## Criteria:
-        for g in grapher_changes:
-            col_name = f"score_{g['new']['id']}"
+    This is a wrapper around the detect module's get_datasets_with_migrations function,
+    adapted for use in the Streamlit UI.
+    """
+    # Get datasets with migration information
+    steps_df_grapher = get_datasets_with_migrations(archived=archived)
 
-            # Create a filter to select the new dataset.
-            filter_new = steps_df_grapher["id"] == g["new"]["id"]
-
-            ##  - First, fuzzy match the step short_names (and names to account for old datasets not in ETL)
-            score_step = steps_df_grapher["step"].apply(lambda x: fuzz.ratio(g["new"]["step"], x))
-            score_name = steps_df_grapher["name"].apply(lambda x: fuzz.ratio(g["new"]["name"], x))
-            steps_df_grapher[col_name] = (score_step + score_name) / 2
-
-            ##  - Then, prioritize those detected by grapher_changes ('old' keyword)
-            if "old" in g:
-                steps_df_grapher.loc[steps_df_grapher["id"] == g["old"]["id"], col_name] = 200
-                # This is a new dataset that does have an old counterpart (hence is mappable).
-                steps_df_grapher.loc[filter_new, "new_dataset_mappable"] = True
-
-            ## Set own dataset as last
-            steps_df_grapher.loc[filter_new, col_name] = -1
-
-        if "new_dataset_selectbox" not in st.session_state:
-            # If indicator upgrader has been restarted, ensure the new dataset selected has not already been mapped.
-            # Add column with the number of charts of new dataset, and then sort steps_df_grapher by that column.
-            # This way, the new datasets dropdown will always start with a dataset that has not yet been mapped.
-            # NOTE: This could be taken from version tracker, but restarting version tracker takes time, so it's better to get
-            # this info directly from db.
-            new_dataset_charts = get_dataset_charts(dataset_ids=dataset_ids)
-            new_dataset_charts["n_new_charts"] = new_dataset_charts["chart_ids"].apply(len)  # type: ignore
-            steps_df_grapher = (
-                steps_df_grapher.merge(
-                    new_dataset_charts[["dataset_id", "n_new_charts"]].rename(columns={"dataset_id": "id"}),  # type: ignore
-                    on="id",
-                    how="left",
-                )
-                .sort_values(["new_dataset_mappable", "n_new_charts"], ascending=[False, True], na_position="last")
-                .reset_index(drop=True)
-            )
-
+    # Set session state for UI
     st.session_state.is_any_migration = steps_df_grapher["migration_new"].any()
-
-    # Replace NaN with empty string in etl paths (otherwise dataset won't be shown if 'show step names' is chosen)
-    steps_df_grapher["step"] = steps_df_grapher["step"].fillna("")
 
     return steps_df_grapher
 
