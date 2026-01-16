@@ -15,13 +15,13 @@ tables:
     variables:
       co2_concentration:
         title: Long-run CO₂ concentration
-        unit: parts per million volume
-        short_unit: ppmv
+        unit: parts per million
+        short_unit: ppm
       ch4_concentration:
         title: Long-run CH₄ concentration
-        unit: parts per billion volume
-        short_unit: ppbv
+        unit: parts per billion
+        short_unit: ppb
       n2o_concentration:
         title: Long-run N₂O concentration
-        unit: parts per billion volume
-        short_unit: ppbv
+        unit: parts per billion
+        short_unit: ppb

@@ -173,7 +173,6 @@ def run() -> None:
             validate="one_to_one",
             short_name="climate_change_impacts_annual",
         )
-    tb_annual.metadata.short_name = "climate_change_impacts_annual"
 
     # Set an appropriate index to monthly and annual tables, and sort conveniently.
     tb_monthly = tb_monthly.format(["location", "date"])
