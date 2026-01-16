@@ -7,7 +7,7 @@ import structlog
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 
-from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, OWIDEnv
+from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
 
 log = structlog.get_logger()
 
@@ -20,13 +20,13 @@ def is_502_error(exception):
 class AdminAPI(object):
     def __init__(self, owid_env: OWIDEnv, api_key: Optional[str] = ADMIN_API_KEY):
         self.owid_env = owid_env
-        if not api_key:
-            raise ValueError("ADMIN_API_KEY is required. Set it in .env.")
         self.api_key = api_key
 
     def _headers(self, user_id: Optional[int] = None) -> Dict[str, str]:
         """Build headers for API requests."""
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        headers: Dict[str, str] = {}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
         if user_id is not None:
             headers["x-act-as-user"] = str(user_id)
         return headers
@@ -34,6 +34,12 @@ class AdminAPI(object):
     def _json_from_response(self, resp: requests.Response) -> dict:
         if resp.status_code != 200:
             log.error("Admin API error", status_code=resp.status_code, text=resp.text)
+        if resp.status_code == 401 and not self.api_key:
+            user_id_hint = f" --userId {GRAPHER_USER_ID}" if GRAPHER_USER_ID else " --userId <YOUR_USER_ID>"
+            raise AdminAPIError(
+                "Unauthorized: ADMIN_API_KEY is required. Set it in .env.\n"
+                f'Generate it with: ssh owid@owid-admin-prod "cd ~/owid-grapher && yarn createAdminApiKey{user_id_hint}"'
+            )
         resp.raise_for_status()
         try:
             js = resp.json()
