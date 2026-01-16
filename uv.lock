@@ -5106,7 +5106,7 @@ wheels = [
 
 [[package]]
 name = "owid-catalog"
-version = "1.0.0rc1"
+version = "1.0.0rc2"
 source = { editable = "lib/catalog" }
 dependencies = [
     { name = "dataclasses-json" },

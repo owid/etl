@@ -337,6 +337,21 @@ class TestTablesAPI:
         # Verify it's the same as tables
         assert client.datasets is client.tables
 
+    def test_search_with_refresh_index(self):
+        """Test that refresh_index parameter forces index re-download."""
+        client = Client()
+
+        # First search caches the index
+        results1 = client.tables.search(table="population")
+        assert len(results1) > 0
+
+        # Search with refresh_index=True should work (forces re-download)
+        results2 = client.tables.search(table="population", refresh_index=True)
+        assert len(results2) > 0
+
+        # Results should be equivalent
+        assert len(results1) == len(results2)
+
 
 class TestResponseSet:
     """Test the ResponseSet container."""
