@@ -21,14 +21,14 @@ class AdminAPI(object):
     def __init__(self, owid_env: OWIDEnv, api_key: Optional[str] = ADMIN_API_KEY):
         self.owid_env = owid_env
         if not api_key:
-            raise ValueError("ADMIN_API_KEY is required. Set it in .env or pass api_key parameter.")
+            raise ValueError("ADMIN_API_KEY is required. Set it in .env.")
         self.api_key = api_key
 
     def _headers(self, user_id: Optional[int] = None) -> Dict[str, str]:
         """Build headers for API requests."""
         headers = {"Authorization": f"Bearer {self.api_key}"}
         if user_id is not None:
-            headers["X-Act-As-User-Id"] = str(user_id)
+            headers["x-act-as-user"] = str(user_id)
         return headers
 
     def _json_from_response(self, resp: requests.Response) -> dict:
