@@ -1,8 +1,4 @@
-import base64
-import datetime as dt
 import json
-import random
-import string
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
@@ -10,11 +6,8 @@ import requests
 import structlog
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
-from sqlalchemy import text
-from sqlalchemy.orm import Session
 
-from etl.config import DEFAULT_GRAPHER_SCHEMA, ENV_GRAPHER_USER_ID, OWIDEnv
-from etl.grapher import model as gm
+from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
 
 log = structlog.get_logger()
 
@@ -25,13 +18,28 @@ def is_502_error(exception):
 
 
 class AdminAPI(object):
-    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = ENV_GRAPHER_USER_ID):
+    def __init__(self, owid_env: OWIDEnv, api_key: Optional[str] = ADMIN_API_KEY):
         self.owid_env = owid_env
-        self.session_id = create_session_id(owid_env, grapher_user_id)
+        self.api_key = api_key
+
+    def _headers(self, user_id: Optional[int] = None) -> Dict[str, str]:
+        """Build headers for API requests."""
+        headers: Dict[str, str] = {}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        if user_id is not None:
+            headers["x-act-as-user"] = str(user_id)
+        return headers
 
     def _json_from_response(self, resp: requests.Response) -> dict:
         if resp.status_code != 200:
             log.error("Admin API error", status_code=resp.status_code, text=resp.text)
+        if resp.status_code == 401 and not self.api_key:
+            user_id_hint = f" --userId {GRAPHER_USER_ID}" if GRAPHER_USER_ID else " --userId <YOUR_USER_ID>"
+            raise AdminAPIError(
+                "Unauthorized: ADMIN_API_KEY is required. Set it in .env.\n"
+                f'Generate it with: ssh owid@owid-admin-prod "cd ~/owid-grapher && yarn createAdminApiKey{user_id_hint}"'
+            )
         resp.raise_for_status()
         try:
             js = resp.json()
@@ -39,16 +47,10 @@ class AdminAPI(object):
             raise AdminAPIError(resp.text) from e
         return js
 
-    def _get_session_id(self, user_id: Optional[int] = None) -> str:
-        """Return the session id for the given user, or the default session id."""
-        if user_id:
-            return create_session_id(self.owid_env, user_id)
-        return self.session_id
-
     def get_chart_config(self, chart_id: int) -> dict:
         resp = requests.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
-            cookies={"sessionid": self.session_id},
+            headers=self._headers(),
         )
         js = self._json_from_response(resp)
         return js
@@ -56,7 +58,7 @@ class AdminAPI(object):
     def get_chart_references(self, chart_id: int) -> dict:
         resp = requests.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.references.json",
-            cookies={"sessionid": self.session_id},
+            headers=self._headers(),
         )
         js = self._json_from_response(resp)
         return js
@@ -74,7 +76,7 @@ class AdminAPI(object):
 
         resp = requests.post(
             self.owid_env.admin_api + "/charts",
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json=config,
             params=params,
         )
@@ -96,7 +98,7 @@ class AdminAPI(object):
 
         resp = requests.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json=config,
             params=params,
         )
@@ -108,7 +110,7 @@ class AdminAPI(object):
     def set_tags(self, chart_id: int, tags: List[Dict[str, Any]], user_id: Optional[int] = None) -> dict:
         resp = requests.post(
             f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json={"tags": tags},
         )
         js = self._json_from_response(resp)
@@ -123,7 +125,7 @@ class AdminAPI(object):
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
-            cookies={"sessionid": self.session_id},
+            headers=self._headers(),
             json=grapher_config,
         )
         js = self._json_from_response(resp)
@@ -134,7 +136,7 @@ class AdminAPI(object):
     def delete_grapher_config(self, variable_id: int) -> dict:
         resp = requests.delete(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
-            cookies={"sessionid": self.session_id},
+            headers=self._headers(),
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -146,7 +148,7 @@ class AdminAPI(object):
         url = self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}"
         resp = requests_with_retry().put(
             url,
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json={"config": mdim_config},
         )
         js = self._json_from_response(resp)
@@ -161,7 +163,7 @@ class AdminAPI(object):
         url = self.owid_env.admin_api + f"/explorers/{slug}"
         resp = requests_with_retry().put(
             url,
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json={"tsv": tsv, "commitMessage": "Update explorer from ETL"},
         )
         js = self._json_from_response(resp)
@@ -177,7 +179,7 @@ class AdminAPI(object):
         }
         resp = requests.post(
             f"{self.owid_env.admin_api}/dods",
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json=data,
         )
         js = self._json_from_response(resp)
@@ -192,7 +194,7 @@ class AdminAPI(object):
         }
         resp = requests.patch(
             f"{self.owid_env.admin_api}/dods/{dod_id}",
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json=data,
         )
         js = self._json_from_response(resp)
@@ -205,7 +207,7 @@ class AdminAPI(object):
         """Get a narrative chart by ID."""
         resp = requests.get(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
-            cookies={"sessionid": self.session_id},
+            headers=self._headers(),
         )
         js = self._json_from_response(resp)
         return js
@@ -223,7 +225,7 @@ class AdminAPI(object):
         """
         resp = requests.put(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}",
-            cookies={"sessionid": self._get_session_id(user_id)},
+            headers=self._headers(user_id),
             json={"config": config},
         )
         js = self._json_from_response(resp)
@@ -232,63 +234,12 @@ class AdminAPI(object):
         return js
 
 
-# NOTE: turned this off because I have a suspicion sessions are short-lived. We should switch to tokens for auth
-# as soon as possible
-# @cache
-def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
-    engine = owid_env.get_engine()
-    with Session(engine) as session:
-        user = session.get(gm.User, grapher_user_id)
-        # User is not in a database, use GRAPHER_USER_ID from .env
-        if not user:
-            user = session.get(gm.User, ENV_GRAPHER_USER_ID)
-            assert user, f"User with id {ENV_GRAPHER_USER_ID} not found in the database. Initially tried to use user with id {grapher_user_id}."
-        session_id = _create_user_session(session, user.email)
-        session.commit()
-
-    return session_id
-
-
 def requests_with_retry() -> requests.Session:
     s = requests.Session()
     retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 504])
     s.mount("http://", HTTPAdapter(max_retries=retries))
     s.mount("https://", HTTPAdapter(max_retries=retries))
     return s
-
-
-def _generate_random_string(length=32) -> str:
-    letters_and_digits = string.ascii_letters + string.digits
-    result_str = "".join(random.choice(letters_and_digits) for i in range(length))
-    return result_str
-
-
-def _create_user_session(session: Session, user_email: str, expiration_seconds=3600) -> str:
-    """Create a new short-lived session for given user and return its session id."""
-    # Generate a random string
-    session_key = _generate_random_string()
-
-    json_str = json.dumps({"user_email": user_email})
-
-    # Base64 encode
-    session_data = base64.b64encode(("prefix:" + json_str).encode("utf-8")).decode("utf-8")
-
-    query = text(
-        """
-        INSERT INTO sessions (session_key, session_data, expire_date)
-        VALUES (:session_key, :session_data, :expire_date);
-    """
-    )
-    session.execute(
-        query,
-        params={
-            "session_key": session_key,
-            "session_data": session_data,
-            "expire_date": dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=expiration_seconds),
-        },
-    )
-
-    return session_key
 
 
 class AdminAPIError(Exception):

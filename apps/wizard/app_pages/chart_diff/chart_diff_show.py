@@ -17,6 +17,7 @@ import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
+from apps.chart_sync.admin_api import AdminAPI
 from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
@@ -607,15 +608,9 @@ class ChartDiffShow:
 
         st.markdown("##### 📖 Narrative Charts")
 
-        from apps.chart_sync.admin_api import AdminAPI
-        from etl.config import OWIDEnv
-
         # Get narrative chart configs from both environments
-        # Use staging-site-master for production (TARGET) since we can't write sessions to production DB
-        # TODO: this is a workaround, ideally we should be able to access Admin API in production
         source_api = AdminAPI(SOURCE)
-        target_env = OWIDEnv.from_staging("master")
-        target_api = AdminAPI(target_env)
+        target_api = AdminAPI(TARGET)
 
         for nc in narrative_charts:
             with st.container(border=True):
@@ -635,7 +630,7 @@ class ChartDiffShow:
                 with col1:
                     st.markdown("Production")
                     if target_config:
-                        grapher_chart(chart_config=target_config, owid_env=target_env)
+                        grapher_chart(chart_config=target_config, owid_env=TARGET)
                     else:
                         st.info("Not available in production")
 
