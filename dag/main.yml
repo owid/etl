@@ -9,6 +9,10 @@ steps:
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
+  # Create a step with latest population and GDP per capita for Grapher (entity sorting, peer countries).
+  data://external/owid_grapher/latest/population_and_gdp:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
