@@ -13,8 +13,8 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, ETLCatalog, LocalCatalog, Table, VariableMeta, find
-from owid.catalog.api.legacy import CHANNEL
+from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, find
+from owid.catalog.api.legacy import CHANNEL, ETLCatalog, LocalCatalog
 from owid.catalog.api.utils import OWID_CATALOG_URI
 from rich.console import Console
 from rich.panel import Panel

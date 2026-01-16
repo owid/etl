@@ -15,7 +15,7 @@ from urllib.error import HTTPError
 import pandas as pd
 import rich_click as click
 from botocore.client import ClientError
-from owid.catalog import CHANNEL, LocalCatalog
+from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 from owid.catalog.api.utils import INDEX_FORMATS
 from owid.catalog.datasets import FileFormat
 from owid.catalog.s3_utils import connect_r2

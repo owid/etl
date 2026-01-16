@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 import rich_click as click
-from owid.catalog import CHANNEL, LocalCatalog
+from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 
 from etl import config
 from etl.paths import DATA_DIR
