@@ -15,7 +15,7 @@ paths = PathFinder(__file__)
 WELFARE_TYPES = {
     "pretax": "before tax",
     "posttax_nat": "after tax",
-    "posttax_dis": "after tax (disposable)",
+    "posttax_dis": "after tax disposable",
     "wealth": "wealth",
 }
 

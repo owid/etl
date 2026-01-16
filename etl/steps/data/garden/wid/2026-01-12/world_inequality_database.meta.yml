@@ -98,7 +98,7 @@ definitions:
   description_short_welfare_type_inequality: |-
     <% if welfare_type == "before tax" %>
     Inequality is measured here in terms of income before taxes and benefits.
-    <%- elif welfare_type in ["after tax", "after tax (disposable)"] %>
+    <%- elif welfare_type in ["after tax", "after tax disposable"] %>
     Inequality is measured here in terms of income after taxes and benefits.
     <%- elif welfare_type == "wealth" %>
     Inequality is measured here in terms of net wealth.
@@ -109,7 +109,7 @@ definitions:
     Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.
     <%- elif welfare_type == "after tax" %>
     Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
-    <%- elif welfare_type == "after tax (disposable)" %>
+    <%- elif welfare_type == "after tax disposable" %>
     Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.
     <%- elif welfare_type == "wealth" %>
     This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
@@ -149,7 +149,7 @@ definitions:
     <%- endif %>
 
   subtitle_welfare_type: |-
-    <% if welfare_type in ["after tax", "after tax (disposable)"] %>
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
     Income here is measured after taxes and benefits.
     <%- elif welfare_type == "before tax" %>
     Income here is measured before taxes and benefits.
