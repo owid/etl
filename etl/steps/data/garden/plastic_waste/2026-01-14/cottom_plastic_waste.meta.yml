@@ -302,7 +302,7 @@ tables:
       wg_per_cap:
         title: Waste generation per capita
         <<: *unit_kg_per_person
-        description_short:  Total municipal solid waste from households, shops and offices generated per person each year.
+        description_short: Total municipal solid waste from households, shops and offices generated per person each year.
         description_key: *desc_key_msw_generation_per_cap
         display:
           numDecimalPlaces: 1
@@ -340,20 +340,24 @@ tables:
         description_key: *desc_key_plastic_emissions_debris
         display:
           numDecimalPlaces: 0
+          name: Debris
         presentation:
+          title_public: Plastic debris emissions
           grapher_config:
             map:
               colorScale:
                 baseColorScheme: Reds
 
       plas_burn_em:
-        title: Plastic burn emissions
+        title: Plastic emissions from open burning
         <<: *unit_tonnes
         description_short: Macroplastic waste burned in open, uncontrolled fires, not in controlled incineration facilities.
         description_key: *desc_key_plastic_emissions_burn
         display:
           numDecimalPlaces: 0
+          name: Open burning
         presentation:
+          title_public: Plastic emissions from open burning
           grapher_config:
             map:
               colorScale:
@@ -379,20 +383,24 @@ tables:
         description_key: *desc_key_plastic_emissions_debris_per_cap
         display:
           numDecimalPlaces: 2
+          name: Debris
         presentation:
+          title_public: Plastic debris emissions per capita
           grapher_config:
             map:
               colorScale:
                 baseColorScheme: Reds
 
       plas_burn_em_per_cap:
-        title: Plastic burn emissions per capita
+        title: Plastic emissions from open burning per capita
         <<: *unit_kg_per_person
         description_short: Macroplastic waste burned in open, uncontrolled fires per person each year.
         description_key: *desc_key_plastic_emissions_burn_per_cap
         display:
           numDecimalPlaces: 2
+          name: Open burning
         presentation:
+          title_public: Plastic emissions from open burning per capita
           grapher_config:
             map:
               colorScale:
