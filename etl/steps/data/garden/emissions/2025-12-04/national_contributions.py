@@ -287,12 +287,6 @@ def run() -> None:
     # Add per-capita variables.
     tb = paths.regions.add_per_capita(tb=tb, warn_on_missing_countries=False, columns=PER_CAPITA_VARIABLES)
 
-    ####################################################################################################################
-    # Temporary solution to remove population metadata in per capita variables.
-    for column in [column for column in tb.columns if "capita" in column]:
-        tb[column].metadata.description_key = []
-    ####################################################################################################################
-
     # Fix spurious jump in the data in 1850.
     tb = fix_emissions_jump_in_1850(tb=tb)
 
