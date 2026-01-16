@@ -2,7 +2,7 @@ __version__ = "1.0.0rc0"
 
 from owid.catalog import api, processing, utils
 from owid.catalog.api import Client, fetch, search
-from owid.catalog.catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
+from owid.catalog.catalogs import CHANNEL
 from owid.catalog.datasets import Dataset
 from owid.catalog.meta import (
     DatasetMeta,
