@@ -270,18 +270,12 @@ class Namespace(Base):
 
 class Tag(Base):
     __tablename__ = "tags"
-    __table_args__ = (
-        ForeignKeyConstraint(["parentId"], ["tags.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="tags_ibfk_1"),
-        Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
-        Index("parentId", "parentId"),
-        Index("slug", "slug", unique=True),
-    )
+    __table_args__ = (Index("slug", "slug", unique=True),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
-    parentId: Mapped[Optional[int]] = mapped_column(Integer)
     specialType: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     slug: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
 
@@ -434,7 +428,6 @@ class Chart(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
-    isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     _updatedAt: Mapped[datetime] = mapped_column("updatedAt", DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
