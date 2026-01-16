@@ -331,7 +331,7 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 3
 
       plas_debris_em:
         title: Plastic debris emissions
