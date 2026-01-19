@@ -73,14 +73,14 @@ def search(
         namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
         version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
         dataset: Filter by dataset name. Only for tables.
-        channel: Filter by channel (e.g., "garden", "grapher"). Only for tables.
-        match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables):
+        channel: Filter by channel (e.g., "garden", "grapher"). Only for tables, and `name` field.
+        match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables, and `name` field):
 
             - "exact": Exact string match
             - "contains": Substring match
             - "regex": Regular expression
             - "fuzzy": Typo-tolerant similarity matching
-        fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables.
+        fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables, and `name` field.
         case: Case-sensitive search (default: False).  Only for tables.
 
     Returns:
