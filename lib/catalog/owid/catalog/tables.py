@@ -333,6 +333,9 @@ class Table(pd.DataFrame):
         Save this table as a JSON file plus accompanying JSON metadata file.
         If the table is stored at "mytable.json", the metadata will be at
         "mytable.meta.json".
+
+        By default, uses orient="records" which outputs a simple array of objects
+        without schema information. The index is reset and included as regular columns.
         """
         # return string
         if path is None:
@@ -341,19 +344,15 @@ class Table(pd.DataFrame):
         if not str(path).endswith(".json"):
             raise ValueError(f'filename must end in ".json": {path}')
 
-        df = pd.DataFrame(self)
+        # Reset index to include index columns as regular data columns
+        # Use drop=True if there's no meaningful index (empty primary_key) to avoid
+        # creating an unwanted "index" column from a RangeIndex
+        df = pd.DataFrame(self.reset_index(drop=not self.primary_key))
 
         # Set default orient if not specified
         if "orient" not in kwargs:
-            # Use 'table' format by default as it supports index and is well-structured
-            kwargs["orient"] = "table"
-
-        # Handle index parameter based on orient
-        if "index" not in kwargs:
-            orient = kwargs.get("orient", "table")
-            # Only set index parameter for orientations that support it
-            if orient in ["split", "table", "index", "columns"]:
-                kwargs["index"] = self.primary_key != []
+            # Use 'records' format by default - simple array of objects, no schema
+            kwargs["orient"] = "records"
 
         df.to_json(path, **kwargs)
 
@@ -804,12 +803,15 @@ class Table(pd.DataFrame):
         if not path.endswith(".json"):
             raise ValueError(f'filename must end in ".json": {path}')
 
-        # Try to read with orient='table' first (our default format)
-        # If that fails, let pandas auto-detect the format
+        # Try to read with orient='records' first (our default format)
+        # If that fails, try 'table' format for backwards compatibility, then auto-detect
         try:
-            df = Table(pd.read_json(path, orient="table"))
+            df = Table(pd.read_json(path, orient="records"))
         except (ValueError, KeyError):
-            df = Table(pd.read_json(path))
+            try:
+                df = Table(pd.read_json(path, orient="table"))
+            except (ValueError, KeyError):
+                df = Table(pd.read_json(path))
 
         cls._add_metadata(df, path, **kwargs)
         return df

@@ -1351,7 +1351,11 @@ class TestJsonFormat:
             Table.read_json("/tmp/table.txt")
 
     def test_json_with_multiindex(self) -> None:
-        """Test JSON round-trip with multi-index table."""
+        """Test JSON round-trip with multi-index table.
+
+        The index is reset when writing to JSON, but restored when reading
+        based on the primary_key in the metadata sidecar file.
+        """
         t1 = Table({"gdp": [100, 102, 104, 106], "country": ["AU", "AU", "SE", "SE"], "year": [2020, 2021, 2020, 2021]})
         t1.set_index(["country", "year"], inplace=True)
         with tempfile.TemporaryDirectory() as path:
@@ -1362,6 +1366,7 @@ class TestJsonFormat:
             assert exists(splitext(filename)[0] + ".meta.json")
 
             t2 = Table.read_json(filename)
+            # Index is restored from metadata
             assert_tables_eq(t1, t2)
 
     def test_json_with_field_metadata(self) -> None:
@@ -1378,24 +1383,24 @@ class TestJsonFormat:
             assert t2.gdp.metadata.description == "GDP description"
             assert t2.gdp.metadata.title == "GDP Title"
 
-    def test_json_default_orient_is_table(self) -> None:
-        """Test that default orient is 'table' which supports index."""
+    def test_json_default_orient_is_records(self) -> None:
+        """Test that default orient is 'records' - simple array of objects."""
         t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
         t1.set_index("country", inplace=True)
         with tempfile.TemporaryDirectory() as path:
             filename = join(path, "table.json")
             t1.to_json(filename)
 
-            # Read the raw JSON to verify orient='table' structure
+            # Read the raw JSON to verify orient='records' structure
             with open(filename) as f:
                 data = json.load(f)
 
-            # 'table' orient has 'schema' and 'data' keys
-            assert "schema" in data
-            assert "data" in data
-            assert "primaryKey" in data["schema"]
+            # 'records' orient is a simple array of objects, no schema
+            assert isinstance(data, list)
+            assert len(data) == 3
+            assert data[0] == {"country": "AU", "gdp": 100}
 
-            # Read it back and verify round-trip
+            # Read it back - index is restored from metadata
             t2 = Table.read_json(filename)
             assert_tables_eq(t1, t2)
 
