@@ -245,7 +245,9 @@ def main():
             st.info(f"**{total:,}** total results ({algolia_time:.2f}s)")
     with col_semantic:
         st.subheader("🧠 Semantic (AI)")
-        if "error" not in semantic_data:
+        if "error" in semantic_data:
+            st.error(f"API Error: {semantic_data['error']}")
+        else:
             total = semantic_data.get("nbHits", len(semantic_hits))
             st.info(f"**{total:,}** total results ({semantic_time:.2f}s)")
 
