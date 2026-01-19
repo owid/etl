@@ -24,7 +24,6 @@ class Client:
         charts: ChartsAPI instance for chart operations and search.
         indicators: IndicatorsAPI instance for indicator search.
         tables: TablesAPI instance for catalog operations.
-        datasets: Deprecated alias for tables (backwards compatibility).
 
     Example:
         ```python
