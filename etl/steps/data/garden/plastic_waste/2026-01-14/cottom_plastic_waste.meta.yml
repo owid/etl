@@ -568,7 +568,7 @@ tables:
       plas_litter_em_per_cap:
         title: Plastic emissions from littering per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from littering per person per year.
+        description_short: Estimated amount of plastic waste emitted via littering per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_litter_pathway_per_cap
         description_processing: *processing_per_cap_litter
         processing_level: major
@@ -585,7 +585,7 @@ tables:
       plas_uncol_em_per_cap:
         title: Plastic emissions from uncollected waste per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from uncollected waste per person per year.
+        description_short: Estimated amount of plastic waste emitted from uncollected waste per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_uncollected_pathway_per_cap
         description_processing: *processing_per_cap_uncollected
         processing_level: major
@@ -602,7 +602,7 @@ tables:
       plas_collection_em_per_cap:
         title: Plastic emissions from collection and transport per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from collection and transport losses per person per year.
+        description_short: Estimated amount of plastic waste emitted from collection and transport losses per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_collection_pathway_per_cap
         description_processing: *processing_per_cap_collection
         processing_level: major
@@ -619,7 +619,7 @@ tables:
       plas_disp_em_per_cap:
         title: Plastic emissions from disposal per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from uncontrolled disposal sites per person per year.
+        description_short: Estimated amount of plastic waste emitted from disposal sites per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_disposal_pathway_per_cap
         description_processing: *processing_per_cap_disposal
         processing_level: major
@@ -636,7 +636,7 @@ tables:
       plas_recy_em_per_cap:
         title: Plastic emissions from rejects of recycling per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from sorting and reprocessing losses per person per year.
+        description_short: Estimated amount of plastic waste emitted from sorting and reprocessing losses per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_recycling_pathway_per_cap
         description_processing: *processing_per_cap_recycling
         processing_level: major
