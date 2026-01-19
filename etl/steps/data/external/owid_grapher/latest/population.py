@@ -19,10 +19,10 @@ def run() -> None:
     tb = tb_pop.loc[idx_latest, ["country", "year", "population_historical"]]
 
     # Rename columns
-    tb = tb.rename(columns={"country": "entityName", "population_historical": "value"})
+    tb = tb.rename(columns={"country": "entity", "population_historical": "value"})
 
     # Set index and name
-    tb = tb.set_index(["entityName", "year"], verify_integrity=True)
+    tb = tb.set_index(["entity", "year"], verify_integrity=True)
     tb.metadata.short_name = "population"
 
     # Save as CSV
