@@ -52,7 +52,6 @@ class Client:
     charts: ChartsAPI
     indicators: IndicatorsAPI
     tables: TablesAPI
-    datasets: TablesAPI  # Backwards compatibility alias
     timeout: int
     _datasette: DatasetteAPI
     _site_search: SiteSearchAPI
@@ -79,7 +78,6 @@ class Client:
         self.charts = ChartsAPI(self, base_url=grapher_url)
         self.indicators = IndicatorsAPI(self, search_url=indicators_search_url, catalog_url=catalog_url)
         self.tables = TablesAPI(self, catalog_url=catalog_url)
-        self.datasets = self.tables  # Backwards compatibility alias
         self._site_search = SiteSearchAPI(self, base_url=site_search_url, grapher_url=grapher_url)
 
     def __repr__(self) -> str:
