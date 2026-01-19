@@ -1054,7 +1054,7 @@ class Table(pd.DataFrame):
             ... )
             ```
         """
-        from owid.catalog.yaml_metadata import update_metadata_from_yaml
+        from owid.catalog.core.yaml_metadata import update_metadata_from_yaml
 
         return update_metadata_from_yaml(
             tb=self,

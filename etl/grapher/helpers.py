@@ -10,8 +10,8 @@ import structlog
 from jsonschema import validate
 from owid import catalog
 from owid.catalog import Table, jinja, warnings
-from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
-from owid.catalog.yaml_metadata import merge_with_shared_meta
+from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
+from owid.catalog.core.yaml_metadata import merge_with_shared_meta
 from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
