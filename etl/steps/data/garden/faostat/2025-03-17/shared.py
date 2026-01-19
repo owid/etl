@@ -21,8 +21,8 @@ import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
 from owid import repack  # type: ignore
-from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta, warnings
-from owid.catalog.core.utils import underscore
+from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
+from owid.catalog.core import utils, warnings
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
@@ -1761,7 +1761,7 @@ def create_variable_short_names(variable_name: str) -> str:
     # Check that the extraction was correct by constructing the variable name again and comparing with the original.
     assert variable_name == f"{item} | {item_code} || {element} | {element_code} || {unit}"
 
-    new_name = underscore(variable_name)
+    new_name = utils.underscore(variable_name)
 
     # Check that the number of characters of the short name is not too long.
     n_char = len(new_name)
@@ -1772,8 +1772,8 @@ def create_variable_short_names(variable_name: str) -> str:
         # It could happen that it is not the item name that is long, but the element name, dataset, or unit.
         # But for the moment, assume it is the item name.
         assert len(item) > n_char_to_be_removed, "Variable name is too long, but it is not due to item name."
-        new_item = underscore(item)[0:-n_char_to_be_removed]
-        new_name = underscore(f"{new_item} | {item_code} || {element} | {element_code} || {unit}")
+        new_item = utils.underscore(item)[0:-n_char_to_be_removed]
+        new_name = utils.underscore(f"{new_item} | {item_code} || {element} | {element_code} || {unit}")
 
     # Check that now the new name now fulfils the length requirement.
     error = "Variable short name is too long. Improve create_variable_names function to account for this case."
