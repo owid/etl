@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import numpy as np
-import owid.catalog.processing as pr
+import owid.catalog.core.processing as pr
 import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
 from owid import repack  # type: ignore
 from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta, warnings
-from owid.catalog.utils import underscore
+from owid.catalog.core.utils import underscore
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 

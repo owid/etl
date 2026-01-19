@@ -1,7 +1,7 @@
 """Load a garden dataset and create an explorers dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table, warnings
+from owid.catalog.core import Table, warnings
 
 from etl.helpers import PathFinder
 
