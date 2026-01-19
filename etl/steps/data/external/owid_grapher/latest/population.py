@@ -1,0 +1,30 @@
+"""Latest population for each entity.
+
+Published as CSV for use by Grapher codebase (entity sorting, peer countries).
+Not meant to be imported to MySQL.
+"""
+
+from owid.catalog import Table
+
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
+
+
+def run() -> None:
+    # Load population dataset from grapher
+    ds_pop = paths.load_dataset()
+    tb_pop = ds_pop["historical"].reset_index()
+
+    # Get latest year per country for population
+    idx_latest = tb_pop.groupby("country")["year"].idxmax()
+    tb = tb_pop.loc[idx_latest, ["country", "year", "population_historical"]]
+    tb = tb.rename(columns={"population_historical": "population"})
+
+    # Set index and name
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb.metadata.short_name = "population"
+
+    # Save as CSV
+    ds = paths.create_dataset(tables=[tb], formats=["csv"])
+    ds.save()
