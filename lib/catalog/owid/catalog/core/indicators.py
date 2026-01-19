@@ -18,20 +18,19 @@ from pandas._typing import Scalar
 from pandas.core.series import Series
 
 if TYPE_CHECKING:
-    from owid.catalog.tables import Table
+    from owid.catalog.core.tables import Table
 
-from owid.catalog.core import processing_log as pl
 from owid.catalog.core import warnings
 from owid.catalog.core.meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
     License,
     Origin,
-    ProcessingLog,
     Source,
     VariableMeta,
     VariablePresentationMeta,
 )
+from owid.catalog.core.processing_log import ProcessingLog, enabled
 from owid.catalog.core.properties import metadata_property
 
 log = structlog.get_logger()
@@ -998,7 +997,7 @@ def combine_indicators_metadata(
         indicators=indicators_only, field="dimensions", operation=operation, warn_if_different=True
     )
 
-    if pl.enabled():
+    if enabled():
         metadata.processing_log = combine_indicators_processing_logs(indicators=indicators_only)
         if operation:
             metadata.processing_log.add_entry(

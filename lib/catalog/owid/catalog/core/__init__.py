@@ -30,13 +30,7 @@ from owid.catalog.core.meta import (
 )
 from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.processing_log import (
-    LogEntry,
-    ProcessingLog,
-    disable_processing_log,
-    enable_processing_log,
     enabled,
-    preprocess_log,
-    random_hash,
     wrap,
 )
 from owid.catalog.core.properties import MetadataClass, metadata_property
@@ -65,13 +59,7 @@ __all__ = [
     "simplefilter",
     "warn",
     # processing_log
-    "LogEntry",
-    "ProcessingLog",
-    "disable_processing_log",
-    "enable_processing_log",
     "enabled",
-    "preprocess_log",
-    "random_hash",
     "wrap",
     # meta
     "SOURCE_EXISTS_OPTIONS",

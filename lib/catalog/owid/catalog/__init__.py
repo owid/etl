@@ -15,7 +15,6 @@ from owid.catalog.core.meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from owid.catalog.core.processing_log import LogEntry, ProcessingLog
 from owid.catalog.core.tables import Table
 
 __all__ = [
@@ -34,8 +33,6 @@ __all__ = [
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
-    "LogEntry",
-    "ProcessingLog",
     "FaqLink",
     "Source",
     "Origin",

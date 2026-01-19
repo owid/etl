@@ -23,10 +23,6 @@ from owid.catalog.core.meta import (
     update_variable_metadata,
 )
 
-# ProcessingLog is also re-exported from meta for backwards compatibility
-# (some code imports it from here instead of processing_log)
-from owid.catalog.core.processing_log import ProcessingLog
-
 # pruned_json is re-exported from utils for backwards compatibility
 from owid.catalog.core.utils import pruned_json
 
@@ -51,6 +47,5 @@ __all__ = [
     "to_html",
     "is_year_or_date",
     "update_variable_metadata",
-    "ProcessingLog",
     "pruned_json",
 ]
