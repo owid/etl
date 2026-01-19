@@ -202,7 +202,7 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     ds_hdr = paths.load_dataset("undp_hdr")
     ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_who = paths.load_dataset("who")
+    ds_who = paths.load_dataset("household")
     ds_ghe = paths.load_dataset("ghe")
 
     # Load meadow dataset.
@@ -387,7 +387,7 @@ def add_external_indicators(
     tb_pip = tb_pip.rename(columns={"headcount_ratio_300": "extreme_poverty"})
 
     # WHO
-    tb_who = ds_who.read("who")
+    tb_who = ds_who.read("household")
     tb_who = tb_who.loc[(tb_who["year"] > 2010) & (tb_who["residence"] == "Total"), ["country", "year", "hyg_bas"]]
     ## get most recent data
     cols = ["hyg_bas"]

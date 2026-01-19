@@ -35,7 +35,8 @@ MEAT_TOTAL_ITEM_CODES = {
     "00001108": "donkeys",  # 'Meat of asses, fresh or chilled',
     "00001158": "other camelids",  # 'Meat of other domestic camelids, fresh or chilled',
     "00001111": "mules",  # 'Meat of mules, fresh or chilled',
-    "00001166": "other non-mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
+    # The following item is confusing. It's called (as of 2026-01) "Other meat of mammals, fresh or chilled", and yet the item description is "Including frog legs, marine mammals, etc. Some countries includeunder this heading meats that are listed above, but which are notreported separately. Fresh, chilled or frozen. (Unofficial definition)". Additionally, it only has data for France until 2017; so I'll exclude this item.
+    # "00001166": "other non-mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
     "00001163": "game animals",  # 'Game meat, fresh, chilled or frozen',
     # "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
@@ -270,8 +271,8 @@ def improve_metadata(tb, tb_qcl_flat):
             title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered for meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
             tb[column].metadata.description_short = """Based on the country of production, not consumption."""
             tb[column].metadata.description_key = [
-                """Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.""",
-                """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
+                f"""<% if animal not in ["{WILD_FISH_LABEL}", "{FARMED_FISH_LABEL}", "{FARMED_CRUSTACEANS_LABEL}"] %>Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.<% endif %>""",
+                """<% if animal in ["chickens", "poultry"] %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
             ]
             description_from_producer = ""
             for animal, description in descriptions_from_producer_killed.items():

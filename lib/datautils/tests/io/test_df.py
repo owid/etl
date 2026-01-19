@@ -30,7 +30,7 @@ class TestLoadDf:
             if extension in ["dta", "pickle", "pkl", "feather"]:
                 funct(file)
             else:
-                funct(file, index=False)
+                funct(file, index=False)  # type: ignore[call-arg]
             df = from_file(str(file))
             assert df.equals(self.df_original)
 
