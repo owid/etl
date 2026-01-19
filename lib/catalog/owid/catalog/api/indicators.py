@@ -322,7 +322,24 @@ class IndicatorsAPI:
         }
 
         resp = requests.get(self.search_url, params=params, timeout=timeout or self._client.timeout)
-        resp.raise_for_status()
+
+        # Handle HTTP errors with informative messages from response body
+        if not resp.ok:
+            error_detail = ""
+            try:
+                error_data = resp.json()
+                error_detail = error_data.get("detail", "")
+            except Exception:
+                pass
+
+            if error_detail:
+                raise requests.HTTPError(
+                    f"{resp.status_code} Error for url: {resp.url} - {error_detail}",
+                    response=resp,
+                )
+            else:
+                resp.raise_for_status()
+
         data = resp.json()
 
         raw_results: list[tuple[dict[str, Any], str | None]] = []
