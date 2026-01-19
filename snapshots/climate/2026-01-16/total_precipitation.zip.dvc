@@ -15,6 +15,6 @@ meta:
       name: Copernicus License
       url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
 outs:
-  - md5: 608c3d43fce53907c82c1134355ec37c
-    size: 1493240921
+  - md5: eb8bb96a673ca2c886d79b5ed527cda3
+    size: 1409155698
     path: total_precipitation.zip

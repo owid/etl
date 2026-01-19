@@ -461,11 +461,14 @@ class Dataset:
             pattern = join(self.path, f"*.{format}")
             files.extend(glob(pattern))
 
-        # Exclude metadata files from data files
+        # Exclude metadata and config files from data files
         # - index.json is the dataset metadata file
         # - *.meta.json are table metadata sidecar files
+        # - *.config.json are collection config files (from export steps)
         index_file = join(self.path, "index.json")
-        files = [f for f in files if f != index_file and not f.endswith(".meta.json")]
+        files = [
+            f for f in files if f != index_file and not f.endswith(".meta.json") and not f.endswith(".config.json")
+        ]
 
         return sorted(files)
 

@@ -46,7 +46,7 @@ definitions:
   common:
     presentation:
       # Population values are used for regional aggregates in 2010 and 2020. No need to add to chart footer.
-      attribution: Pew Research Centre (2025)
+      attribution: Pew Research Center (2025)
       topic_tags:
         - Religion
     description_key: *wysk_cond
