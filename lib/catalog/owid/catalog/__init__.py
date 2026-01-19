@@ -16,7 +16,7 @@ from owid.catalog.meta import (
 )
 from owid.catalog.processing_log import LogEntry, ProcessingLog
 from owid.catalog.tables import Table
-from owid.catalog.variables import Variable
+from owid.catalog.variables import Indicator, Variable
 
 __all__ = [
     # New unified client API
@@ -28,6 +28,7 @@ __all__ = [
     "Dataset",
     "Table",
     "Variable",
+    "Indicator",
     # Metadata classes
     "DatasetMeta",
     "TableMeta",

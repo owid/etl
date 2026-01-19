@@ -1,11 +1,8 @@
-# Stub file for backwards compatibility - re-exports from core/processing.py
-# New code should import from owid.catalog.core.processing
 """Common operations performed on tables and variables."""
 
-from owid.catalog.core.processing import (
+from owid.catalog.core.tables import (
     ExcelFile,
     concat,
-    ignore_warnings,
     keep_metadata,
     melt,
     merge,
@@ -29,6 +26,7 @@ from owid.catalog.core.processing import (
     to_datetime,
     to_numeric,
 )
+from owid.catalog.core.warnings import ignore_warnings
 
 __all__ = [
     "ExcelFile",
@@ -40,20 +38,20 @@ __all__ = [
     "multi_merge",
     "pivot",
     "read_csv",
-    "read_custom",
-    "read_df",
-    "read_excel",
     "read_feather",
+    "read_excel",
     "read_from_df",
     "read_from_dict",
     "read_from_records",
-    "read_fwf",
     "read_json",
-    "read_parquet",
+    "read_fwf",
+    "read_stata",
     "read_rda",
     "read_rda_multiple",
     "read_rds",
-    "read_stata",
+    "read_df",
+    "read_custom",
+    "read_parquet",
     "to_datetime",
     "to_numeric",
 ]

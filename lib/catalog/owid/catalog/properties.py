@@ -1,23 +1,5 @@
-#
-#  properties.py
-#
+# Stub file for backwards compatibility - re-exports from core/properties.py
+# New code should import from owid.catalog.core.properties or owid.catalog directly
+from owid.catalog.core.properties import MetadataClass, metadata_property
 
-from typing import Any, Protocol
-
-
-class MetadataClass(Protocol):
-    metadata: Any
-
-
-def metadata_property(k: str) -> property:
-    """
-    Make metadata fields available directly on a base class.
-    """
-
-    def getter(self: MetadataClass) -> Any:
-        return getattr(self.metadata, k)
-
-    def setter(self: MetadataClass, v: Any) -> None:
-        return setattr(self.metadata, k, v)
-
-    return property(getter, setter)
+__all__ = ["MetadataClass", "metadata_property"]

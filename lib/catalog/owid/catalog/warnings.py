@@ -1,54 +1,31 @@
-import contextlib
-import warnings
-from collections.abc import Iterable
-from warnings import catch_warnings, simplefilter, warn  # noqa: F401
+# Stub file for backwards compatibility - re-exports from core/warnings.py
+# New code should import from owid.catalog.core.warnings or owid.catalog directly
+from owid.catalog.core.warnings import (
+    DifferentValuesWarning,
+    DisplayNameWarning,
+    GroupingByCategoricalWarning,
+    MetadataWarning,
+    NoOriginsWarning,
+    StepWarning,
+    catch_warnings,
+    ignore_warnings,
+    log,
+    simplefilter,
+    warn,
+    warn_with_structlog,
+)
 
-import structlog
-
-log = structlog.get_logger()
-
-
-def warn_with_structlog(message, category, filename, lineno, file=None, line=None):
-    log.warning(message, category=category.__name__, filename=filename, lineno=lineno)
-
-
-# Replace the default showwarning with structlog warnings
-warnings.showwarning = warn_with_structlog  # type: ignore
-
-
-class MetadataWarning(Warning):
-    pass
-
-
-class StepWarning(Warning):
-    pass
-
-
-class DifferentValuesWarning(MetadataWarning):
-    pass
-
-
-class DisplayNameWarning(MetadataWarning):
-    pass
-
-
-class NoOriginsWarning(MetadataWarning):
-    pass
-
-
-class GroupingByCategoricalWarning(StepWarning):
-    pass
-
-
-@contextlib.contextmanager
-def ignore_warnings(ignore_warnings: Iterable[type] = (Warning,)):
-    """Ignore warnings. You can pass a list of specific warnings to ignore like MetadataWarning or StepWarning.
-
-    Usage:
-        with ignore_warnings():
-            ds_garden = create_dataset(...)
-    """
-    with warnings.catch_warnings():
-        for w in ignore_warnings:
-            warnings.filterwarnings("ignore", category=w)  # type: ignore
-        yield
+__all__ = [
+    "MetadataWarning",
+    "StepWarning",
+    "DifferentValuesWarning",
+    "DisplayNameWarning",
+    "NoOriginsWarning",
+    "GroupingByCategoricalWarning",
+    "ignore_warnings",
+    "catch_warnings",
+    "simplefilter",
+    "warn",
+    "warn_with_structlog",
+    "log",
+]
