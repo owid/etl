@@ -195,6 +195,47 @@ def test_add_table_parquet():
         assert t2.equals_table(t)
 
 
+def test_add_table_json():
+    t = mock_table()
+
+    with temp_dataset_dir() as dirname:
+        # make a dataset
+        ds = Dataset.create_empty(dirname)
+
+        # add the table, it should be on disk now
+        ds.add(t, formats=["json"])
+
+        # check that it's really on disk
+        assert exists(join(dirname, t.metadata.checked_name + ".json"))
+
+        # metadata exists as a sidecar JSON
+        assert exists(join(dirname, t.metadata.checked_name + ".meta.json"))
+
+        # load a fresh copy from disk
+        t2 = ds[t.metadata.checked_name]
+        assert id(t2) != id(t)
+
+        # the fresh copy from disk should be identical to the copy we added
+        assert t2.equals_table(t)
+
+
+def test_json_data_files_exclude_metadata():
+    """Test that JSON metadata files are not counted as data files."""
+    t = mock_table()
+
+    with temp_dataset_dir() as dirname:
+        ds = Dataset.create_empty(dirname)
+        ds.add(t, formats=["json"])
+
+        # There should be one data file (the .json file)
+        # The .meta.json and index.json should NOT be counted
+        data_files = ds._data_files
+        assert len(data_files) == 1
+        assert data_files[0].endswith(".json")
+        assert not data_files[0].endswith(".meta.json")
+        assert "index.json" not in data_files[0]
+
+
 def test_metadata_roundtrip():
     with temp_dataset_dir() as dirname:
         d = Dataset.create_empty(dirname)
