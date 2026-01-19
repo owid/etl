@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.tables import _load_table
 from owid.catalog.core import CatalogPath
-from owid.catalog.tables import Table
+from owid.catalog.core.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client

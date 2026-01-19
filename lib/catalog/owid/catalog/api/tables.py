@@ -29,7 +29,7 @@ from owid.catalog.api.utils import (
 )
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
-from owid.catalog.tables import Table
+from owid.catalog.core.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client

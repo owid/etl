@@ -39,7 +39,7 @@ _CHART_SLUG_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 
 if TYPE_CHECKING:
     from owid.catalog.core.charts import ChartTable
-    from owid.catalog.tables import Table
+    from owid.catalog.core.tables import Table
 
 
 def search(

@@ -34,7 +34,7 @@ from owid.catalog.api.utils import (
     SUPPORTED_FORMATS,
 )
 from owid.catalog.core.datasets import CHANNEL, Dataset, FileFormat
-from owid.catalog.tables import Table
+from owid.catalog.core.tables import Table
 
 log = structlog.get_logger()
 
