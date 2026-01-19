@@ -1,63 +1,53 @@
 # NOTE: To learn more about the fields, hover over their names.
 macros: |-
   <% macro quantiles_thr(quantile) %>
-  <% if quantile == "p10p20" %>
+  <% if quantile == "1" %>
   Poorest decile
-  <%- elif quantile == "p20p30" %>
+  <%- elif quantile == "2" %>
   2nd decile
-  <%- elif quantile == "p30p40" %>
+  <%- elif quantile == "3" %>
   3rd decile
-  <%- elif quantile in ["p40p50", "p50p60", "p60p70", "p70p80", "p80p90"] %>
-  <<quantile[1]>>th decile
-  <%- elif quantile == "p90p100" %>
+  <%- elif quantile in ["4", "5", "6", "7", "8"] %>
+  <<quantile>>th decile
+  <%- elif quantile == "9" %>
   Richest decile
-  <%- elif quantile == "p99p100" %>
-  Richest 1%
-  <%- elif quantile == "p99_9p100" %>
-  Richest 0.1%
-  <%- elif quantile == "p99_99p100" %>
-  Richest 0.01%
-  <%- elif quantile == "p99_999p100" %>
-  Richest 0.001%
+  <%- elif quantile in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+  <<quantile>>
   <%- endif %>
   <% endmacro %>
 
   <% macro quantiles_avg_share(quantile) %>
-  <% if quantile == "p0p10" %>
+  <% if quantile == "1" %>
   Poorest decile
-  <%- elif quantile == "p10p20" %>
+  <%- elif quantile == "2" %>
   2nd decile
-  <%- elif quantile == "p20p30" %>
+  <%- elif quantile == "3" %>
   3rd decile
-  <%- elif quantile in ["p30p40", "p40p50", "p50p60", "p60p70", "p70p80", "p80p90"] %>
-  <<quantile[4]>>th decile
-  <%- elif quantile == "p90p100" %>
+  <%- elif quantile in ["4", "5", "6", "7", "8", "9"] %>
+  <<quantile>>th decile
+  <%- elif quantile == "10" %>
   Richest decile
-  <%- elif quantile == "p99p100" %>
-  Richest 1%
-  <%- elif quantile == "p99_9p100" %>
-  Richest 0.1%
-  <%- elif quantile == "p99_99p100" %>
-  Richest 0.01%
-  <%- elif quantile == "p99_999p100" %>
-  Richest 0.001%
+  <%- elif quantile in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+  <<quantile>>
   <%- endif %>
   <% endmacro %>
 
   <% macro quantiles_avg_share_tenth_population(quantile) %>
-  <% if quantile not in ["p99p100", "p99_9p100", "p99_99p100", "p99_999p100"] %>
+  <% if quantile not in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
    (tenth of the population)
   <%- endif %>
   <% endmacro %>
 
   <% macro quantiles_thr_percentage(quantile) %>
-  <% if quantile not in ["p99_9p100", "p99_99p100", "p99_999p100"] %>
-  <<quantile[1]>><<quantile[2]>>
-  <%- elif quantile == "p99_9p100" %>
+  <% if quantile not in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+  <<quantile>>
+  <%- elif quantile == "Richest 1%" %>
+  99
+  <%- elif quantile == "Richest 0.1%" %>
   99.9
-  <%- elif quantile == "p99_99p100" %>
+  <%- elif quantile == "Richest 0.01%" %>
   99.99
-  <%- elif quantile == "p99_999p100" %>
+  <%- elif quantile == "Richest 0.001%" %>
   99.999
   <%- endif %>
   <% endmacro %>
@@ -179,9 +169,9 @@ definitions:
   title_threshold: |-
     {macros}
     <% if quantile == "p50p60" %>
-    Threshold {definitions.concept_welfare_type_capitalized} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>> (median) ({definitions.welfare_type})
+    Threshold {definitions.concept_welfare_type_capitalized} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>> (median) (<<welfare_type>>)
     <%- else %>
-    Threshold {definitions.concept_welfare_type_capitalized} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>> ({definitions.welfare_type})
+    Threshold {definitions.concept_welfare_type_capitalized} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>> (<<welfare_type>>)
     <%- endif %>
 
   subtitle_welfare_type: |-
@@ -278,77 +268,77 @@ definitions:
   map_brackets_avg: &map_brackets_avg
     <% if period == "year" %>
       <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif decile in [2] %>
+        <%- elif quantile in ["2"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif decile in [3, 4, 5, 6, 7, 8] %>
+        <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif decile in [9] %>
+        <%- elif quantile in ["9"] %>
         [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif decile in [10] %>
+        <%- elif quantile in ["10"] %>
         [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
         <%- endif %>
       <% elif welfare_type == "before tax" %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif decile in [2, 3] %>
+        <%- elif quantile in ["2", "3"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif decile in [4, 5, 6, 7, 8] %>
+        <%- elif quantile in ["4", "5", "6", "7", "8"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif decile in [9] %>
+        <%- elif quantile in ["9"] %>
         [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif decile in [10] %>
+        <%- elif quantile in ["10"] %>
         [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
         <%- endif %>
       <%- endif %>
     <% elif period == "month" %>
       <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
-        <%- elif decile in [2, 3] %>
+        <%- elif quantile in ["2", "3"] %>
         [0, 100, 200, 500, 1000, 2000, 1]
-        <%- elif decile in [4, 5, 6, 7] %>
+        <%- elif quantile in ["4", "5", "6", "7"] %>
         [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif decile in [8, 9] %>
+        <%- elif quantile in ["8", "9"] %>
         [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif decile in [10] %>
+        <%- elif quantile in ["10"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 1]
         <%- endif %>
       <% elif welfare_type == "before tax" %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 1, 2, 5, 10, 20, 50, 100, 1]
-        <%- elif decile in [2] %>
+        <%- elif quantile in ["2"] %>
         [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif decile in [3, 4, 5, 6] %>
+        <%- elif quantile in ["3", "4", "5", "6"] %>
         [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif decile in [7, 8] %>
+        <%- elif quantile in ["7", "8"] %>
         [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
-        <%- elif decile in [9] %>
+        <%- elif quantile in ["9"] %>
         [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif decile in [10] %>
+        <%- elif quantile in ["10"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 1]
         <%- endif %>
       <%- endif %>
     <% elif period == "day" %>
       <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 1]
-        <%- elif decile in [2] %>
+        <%- elif quantile in ["2"] %>
         [0, 10, 20, 50, 100, 1]
-        <%- elif decile in [3, 4, 5, 6, 7, 8, 9] %>
+        <%- elif quantile in ["3", "4", "5", "6", "7", "8", "9"] %>
         [0, 10, 20, 50, 100, 200, 1]
-        <%- elif decile in [10] %>
+        <%- elif quantile in ["10"] %>
         [0, 10, 20, 50, 100, 200, 500, 1]
         <%- endif %>
       <% elif welfare_type == "before tax" %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 0.1, 0.2, 0.5, 1, 2, 5, 1]
-        <%- elif decile in [2, 3] %>
+        <%- elif quantile in ["2", "3"] %>
         [0, 1, 2, 5, 10, 20, 50, 100, 1]
-        <%- elif decile in [4, 5, 6, 7, 8, 9] %>
+        <%- elif quantile in ["4", "5", "6", "7", "8", "9"] %>
         [0, 10, 20, 50, 100, 200, 1]
-        <%- elif decile in [10] %>
+        <%- elif quantile in ["10"] %>
         [0, 10, 20, 50, 100, 200, 500, 1000, 1]
         <%- endif %>
       <%- endif %>
@@ -356,47 +346,47 @@ definitions:
 
   map_brackets_share: &map_brackets_share
     <% if welfare_type in ["after tax", "after tax disposable"] %>
-      <% if decile in [1] %>
+      <% if quantile in ["1"] %>
       [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 1]
-      <%- elif decile in [2] %>
+      <%- elif quantile in ["2"] %>
       [0, 1, 2, 3, 4, 5, 6, 1]
-      <%- elif decile in [3] %>
+      <%- elif quantile in ["3"] %>
       [0, 1, 2, 3, 4, 5, 6, 7, 1]
-      <%- elif decile in [4] %>
+      <%- elif quantile in ["4"] %>
       [100, 2, 3, 4, 5, 6, 7, 8, 1]
-      <%- elif decile in [5] %>
+      <%- elif quantile in ["5"] %>
       [100, 3, 4, 5, 6, 7, 8, 9, 1]
-      <%- elif decile in [6] %>
+      <%- elif quantile in ["6"] %>
       [100, 4, 5, 6, 7, 8, 9, 10, 1]
-      <%- elif decile in [7] %>
+      <%- elif quantile in ["7"] %>
       [100, 5, 6, 7, 8, 9, 10, 11, 1]
-      <%- elif decile in [8] %>
+      <%- elif quantile in ["8"] %>
       [100, 8, 9, 10, 11, 12, 1]
-      <%- elif decile in [9] %>
+      <%- elif quantile in ["9"] %>
       [100, 10, 12, 14, 16, 1]
-      <%- elif decile in [10] %>
+      <%- elif quantile in ["10"] %>
       [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
       <%- endif %>
     <% elif welfare_type == "before tax" %>
-      <% if decile in [1] %>
+      <% if quantile in ["1"] %>
       [0, 0.5, 1, 1.5, 2, 2.5, 3, 1]
-      <%- elif decile in [2] %>
+      <%- elif quantile in ["2"] %>
       [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 1]
-      <%- elif decile in [3] %>
+      <%- elif quantile in ["3"] %>
       [100, 2, 3, 4, 5, 1]
-      <%- elif decile in [4] %>
+      <%- elif quantile in ["4"] %>
       [100, 2, 3, 4, 5, 6, 1]
-      <%- elif decile in [5] %>
+      <%- elif quantile in ["5"] %>
       [100, 3, 4, 5, 6, 7, 8, 1]
-      <%- elif decile in [6] %>
+      <%- elif quantile in ["6"] %>
       [100, 3, 4, 5, 6, 7, 8, 9, 1]
-      <%- elif decile in [7] %>
+      <%- elif quantile in ["7"] %>
       [100, 6, 7, 8, 9, 10, 1]
-      <%- elif decile in [8] %>
+      <%- elif quantile in ["8"] %>
       [100, 8, 9, 10, 11, 12, 1]
-      <%- elif decile in [9] %>
+      <%- elif quantile in ["9"] %>
       [100, 10, 12, 14, 16, 1]
-      <%- elif decile in [10] %>
+      <%- elif quantile in ["10"] %>
       [100, 30, 35, 40, 45, 50, 55, 60, 1]
       <%- endif %>
     <%- endif %>
@@ -404,69 +394,69 @@ definitions:
   map_brackets_thr: &map_brackets_thr
     <% if period == "year" %>
       <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if decile in [1, 2, 3, 4, 5, 6] %>
+        <% if quantile in ["1", "2", "3", "4", "5", "6"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif decile in [7] %>
+        <%- elif quantile in ["7"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif decile in [8, 9] %>
+        <%- elif quantile in ["8", "9"] %>
         [0, 10_000, 20_000, 50_000, 1]
         <%- endif %>
       <% elif welfare_type == "before tax" %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 100, 200, 500, 1000, 5000, 1]
-        <%- elif decile in [2] %>
+        <%- elif quantile in ["2"] %>
         [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif decile in [3, 4, 5] %>
+        <%- elif quantile in ["3", "4", "5"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif decile in [6, 7] %>
+        <%- elif quantile in ["6", "7"] %>
         [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif decile in [8] %>
+        <%- elif quantile in ["8"] %>
         [0, 10_000, 20_000, 50_000, 1]
-        <%- elif decile in [9] %>
+        <%- elif quantile in ["9"] %>
         [0, 10_000, 20_000, 50_000, 100_000, 1]
         <%- endif %>
       <%- endif %>
     <% elif period == "month" %>
       <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 100, 200, 500, 1000, 1]
-        <%- elif decile in [2, 3, 4, 5, 6, 7] %>
+        <%- elif quantile in ["2", "3", "4", "5", "6", "7"] %>
         [0, 100, 200, 500, 1000, 2000, 1]
-        <%- elif decile in [8, 9] %>
+        <%- elif quantile in ["8", "9"] %>
         [0, 100, 200, 500, 1000, 2000, 5000, 1]
         <%- endif %>
       <% elif welfare_type == "before tax" %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 10, 20, 50, 100, 200, 500, 1]
-        <%- elif decile in [2, 3] %>
+        <%- elif quantile in ["2", "3"] %>
         [0, 100, 200, 500, 1000, 1]
-        <%- elif decile in [4, 5, 6] %>
+        <%- elif quantile in ["4", "5", "6"] %>
         [0, 100, 200, 500, 1000, 2000, 1]
-        <%- elif decile in [7] %>
+        <%- elif quantile in ["7"] %>
         [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif decile in [8, 9] %>
+        <%- elif quantile in ["8", "9"] %>
         [0, 1000, 2000, 5000, 1]
         <%- endif %>
       <%- endif %>
     <% elif period == "day" %>
       <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if decile in [1, 2, 3, 4] %>
+        <% if quantile in ["1", "2", "3", "4"] %>
         [0, 10, 20, 50, 1]
-        <%- elif decile in [5, 6, 7, 8] %>
+        <%- elif quantile in ["5", "6", "7", "8"] %>
         [0, 10, 20, 50, 100, 1]
-        <%- elif decile in [9] %>
+        <%- elif quantile in ["9"] %>
         [0, 10, 20, 50, 100, 200, 1]
         <%- endif %>
       <% elif welfare_type == "before tax" %>
-        <% if decile in [1] %>
+        <% if quantile in ["1"] %>
         [0, 1, 2, 5, 10, 20, 1]
-        <%- elif decile in [2] %>
+        <%- elif quantile in ["2"] %>
         [0, 1, 2, 5, 10, 20, 50, 1]
-        <%- elif decile in [3] %>
+        <%- elif quantile in ["3"] %>
         [0, 10, 20, 50, 1]
-        <%- elif decile in [4, 5, 6, 7] %>
+        <%- elif quantile in ["4", "5", "6", "7"] %>
         [0, 10, 20, 50, 100, 1]
-        <%- elif decile in [8, 9] %>
+        <%- elif quantile in ["8", "9"] %>
         [0, 10, 20, 50, 100, 200, 1]
         <%- endif %>
       <%- endif %>
@@ -959,7 +949,7 @@ tables:
               {definitions.title_threshold}
             subtitle: |-
               {macros}
-              The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}}
+              The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map

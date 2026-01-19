@@ -37,6 +37,42 @@ INEQUALITY_INDICATORS = {
     "p90p99_share": "share_top_90_99",
 }
 
+# Define deciles for thr and their new names
+DECILES_THR = {
+    "p0p10": "0",
+    "p10p20": "1",
+    "p20p30": "2",
+    "p30p40": "3",
+    "p40p50": "4",
+    "p50p60": "5",
+    "p60p70": "6",
+    "p70p80": "7",
+    "p80p90": "8",
+    "p90p100": "9",
+    "p99p100": "Richest 1%",
+    "p99_9p100": "Richest 0.1%",
+    "p99_99p100": "Richest 0.01%",
+    "p99_999p100": "Richest 0.001%",
+}
+
+# Define decile for avg and share and their new names
+DECILES_AVG_SHARE = {
+    "p0p10": "1",
+    "p10p20": "2",
+    "p20p30": "3",
+    "p30p40": "4",
+    "p40p50": "5",
+    "p50p60": "6",
+    "p60p70": "7",
+    "p70p80": "8",
+    "p80p90": "9",
+    "p90p100": "10",
+    "p99p100": "Richest 1%",
+    "p99_9p100": "Richest 0.1%",
+    "p99_99p100": "Richest 0.01%",
+    "p99_999p100": "Richest 0.001%",
+}
+
 
 def run() -> None:
     #
@@ -186,6 +222,19 @@ def make_table_long_and_separate(tb: Table) -> Tuple[Table, Table]:
     # Separate indicators in tb_incomes into two columns: quantile and ind, considering the last underscore as separator
     tb_incomes[["quantile", "ind"]] = tb_incomes["indicator"].str.rsplit("_", n=1, expand=True).values
 
+    # If ind is avg or share, replace quantile values using DECILES_AVG_SHARE
+    tb_incomes.loc[tb_incomes["ind"].isin(["avg", "share"]), "quantile"] = tb_incomes.loc[
+        tb_incomes["ind"].isin(["avg", "share"]), "quantile"
+    ].replace(DECILES_AVG_SHARE)
+
+    # If ind is thr, replace quantile values using DECILES_THR
+    tb_incomes.loc[tb_incomes["ind"] == "thr", "quantile"] = tb_incomes.loc[
+        tb_incomes["ind"] == "thr", "quantile"
+    ].replace(DECILES_THR)
+
+    # Drop quantile == "0"
+    tb_incomes = tb_incomes[tb_incomes["quantile"] != "0"].reset_index(drop=True)
+
     # Make the table wide with the indicators as columns.
     tb_incomes = tb_incomes.pivot_table(
         index=["country", "year", "welfare_type", "quantile", "extrapolated"],
@@ -239,9 +288,6 @@ def add_period_dimension(tb: Table) -> Table:
 
     # Concatenate all the tables
     tb = pr.concat([tb_period, tb_day, tb_month, tb_non_period], ignore_index=True, sort=False)
-
-    # Extra: for thr, make all the values pd.NA when quantile is p0p10
-    tb.loc[tb["quantile"] == "p0p10", "thr"] = pd.NA
 
     return tb
 
