@@ -844,7 +844,7 @@ class Table(pd.DataFrame):
                 # variable needs to be assigned name to make VariableMeta work
                 if not value.name:
                     value.name = key
-                if value.name == indicators.UNNAMED_VARIABLE:
+                if value.name == indicators.UNNAMED_INDICATOR:
                     # Update the variable name, if it had the unnamed variable tag.
                     # Replace all instances of unnamed variables in the processing log by the actual name of the new
                     # variable.
@@ -1806,7 +1806,7 @@ class Table(pd.DataFrame):
         return cast(Table, tb)
 
     def sum(self, *args, **kwargs) -> indicators.Indicator:
-        variable_name = indicators.UNNAMED_VARIABLE
+        variable_name = indicators.UNNAMED_INDICATOR
         variable = indicators.Indicator(super().sum(*args, **kwargs), name=variable_name)  # type: ignore
         variable.metadata = indicators.combine_indicators_metadata(
             variables=[self[column] for column in self.columns], operation="+", name=variable_name
@@ -1815,7 +1815,7 @@ class Table(pd.DataFrame):
         return variable
 
     def prod(self, *args, **kwargs) -> indicators.Indicator:
-        variable_name = indicators.UNNAMED_VARIABLE
+        variable_name = indicators.UNNAMED_INDICATOR
         variable = indicators.Indicator(super().prod(*args, **kwargs), name=variable_name)  # type: ignore
         variable.metadata = indicators.combine_indicators_metadata(
             variables=[self[column] for column in self.columns], operation="*", name=variable_name

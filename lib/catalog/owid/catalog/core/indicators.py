@@ -73,8 +73,6 @@ OPERATION = Literal[
 # passed a temporary indicator name. Therefore, this temporary name may be irrelevant in practice.
 # Keep the original string for backwards compatibility in processing logs
 UNNAMED_INDICATOR = "**TEMPORARY UNNAMED VARIABLE**"
-# Backwards-compatible alias
-UNNAMED_VARIABLE = UNNAMED_INDICATOR
 
 
 class Indicator(pd.Series):
@@ -657,10 +655,6 @@ def _get_metadata_value_from_indicators_if_all_identical(
     return combined_value
 
 
-# Backwards-compatible alias
-_get_metadata_value_from_variables_if_all_identical = _get_metadata_value_from_indicators_if_all_identical
-
-
 def get_unique_sources_from_indicators(indicators: list[Indicator]) -> list[Source]:
     """Get unique sources from a list of indicators.
 
@@ -764,10 +758,6 @@ def get_unique_description_key_points_from_indicators(indicators: list[Indicator
     return description_key_points
 
 
-# Backwards-compatible alias
-get_unique_description_key_points_from_variables = get_unique_description_key_points_from_indicators
-
-
 def combine_indicators_processing_logs(
     indicators: list[Indicator] | None = None,
     *,
@@ -841,19 +831,11 @@ def combine_indicators_display(
         return _get_dict_from_list_if_all_identical(list_of_objects=list_of_displays)
 
 
-# Backwards-compatible alias
-combine_variables_display = combine_indicators_display
-
-
 def combine_indicators_presentation(
     indicators: list[Indicator], operation: OPERATION | None
 ) -> VariablePresentationMeta | None:
     # Apply the same logic as for displays.
     return combine_indicators_display(indicators=indicators, operation=operation, _field_name="presentation")  # type: ignore
-
-
-# Backwards-compatible alias
-combine_variables_presentation = combine_indicators_presentation
 
 
 def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSING_LEVELS | None:
@@ -879,10 +861,6 @@ def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSI
     combined_processing_level = {value: key for key, value in PROCESSING_LEVELS_ORDER.items()}[maximum_level]
 
     return cast(PROCESSING_LEVELS, combined_processing_level)
-
-
-# Backwards-compatible alias
-combine_variables_processing_level = combine_indicators_processing_level
 
 
 def combine_indicators_sort(indicators: list[Indicator]) -> list[str]:
