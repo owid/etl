@@ -293,28 +293,28 @@ definitions:
 
   # Processing descriptions
   processing_per_cap_litter: &processing_per_cap_litter
-    We calculated per capita emissions by dividing total plastic litter emissions by the population of each entity.
+    We calculated per capita emissions by dividing total plastic litter emissions by the population of each country or region.
 
   processing_per_cap_uncollected: &processing_per_cap_uncollected
-    We calculated per capita emissions by dividing total plastic emissions from uncollected waste by the population of each entity.
+    We calculated per capita emissions by dividing total plastic emissions from uncollected waste by the population of each country or region.
 
   processing_per_cap_collection: &processing_per_cap_collection
-    We calculated per capita emissions by dividing total plastic emissions from collection losses by the population of each entity.
+    We calculated per capita emissions by dividing total plastic emissions from collection losses by the population of each country or region.
 
   processing_per_cap_disposal: &processing_per_cap_disposal
-    We calculated per capita emissions by dividing total plastic emissions from disposal sites by the population of each entity.
+    We calculated per capita emissions by dividing total plastic emissions from disposal sites by the population of each country or region.
 
   processing_per_cap_recycling: &processing_per_cap_recycling
-    We calculated per capita emissions by dividing total plastic emissions from recycling losses by the population of each entity.
+    We calculated per capita emissions by dividing total plastic emissions from recycling losses by the population of each country or region.
 
   processing_share_global: &processing_share_global
-    We calculated this share by dividing plastic emissions for each entity by the global total, then multiplying by 100.
+    We calculated this share by dividing plastic emissions for each country or region by the global total, then multiplying by 100.
 
   processing_share_global_burn: &processing_share_global_burn
-    We calculated this share by dividing plastic burn emissions for each entity by the global total, then multiplying by 100.
+    We calculated this share by dividing plastic burn emissions for each country or region by the global total, then multiplying by 100.
 
   processing_share_global_debris: &processing_share_global_debris
-    We calculated this share by dividing plastic debris emissions for each entity by the global total, then multiplying by 100.
+    We calculated this share by dividing plastic debris emissions for each country or region by the global total, then multiplying by 100.
 
 
 dataset:
@@ -327,7 +327,7 @@ tables:
       wg:
         title: Waste generation
         <<: *unit_tonnes
-        description_short: Estimated municipal solid waste generated in a year.
+        description_short: Estimated amount of municipal solid waste generated in a year from households and similar sources, such as shops and offices.
         description_key: *desc_key_msw_generation
         display:
           numDecimalPlaces: 0
@@ -335,7 +335,7 @@ tables:
       wg_per_cap:
         title: Waste generation per capita
         <<: *unit_kg_per_person
-        description_short: Estimated municipal solid waste generated per person per year.
+        description_short: Estimated amount of municipal solid waste generated per person in a year from households and similar sources, such as shops and offices.
         description_key: *desc_key_msw_generation_per_cap
         display:
           numDecimalPlaces: 1
@@ -343,7 +343,7 @@ tables:
       pwg:
         title: Plastic waste generation
         <<: *unit_tonnes
-        description_short: Estimated municipal plastic waste generated in a year.
+        description_short: Estimated amount of plastic waste generated in a year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_waste_generation
         presentation:
           grapher_config:
@@ -356,7 +356,7 @@ tables:
       pwg_per_cap:
         title: Plastic waste generation per capita
         <<: *unit_kg_per_person
-        description_short: Estimated municipal plastic waste generated per person per year.
+        description_short: Estimated amount of plastic waste generated per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_waste_generation_per_cap
         presentation:
           grapher_config:
@@ -364,18 +364,18 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
 
       plas_debris_em:
-        title: Plastic debris emissions
+        title: Plastic emissions in a form of debris
         <<: *unit_tonnes
-        description_short: Estimated plastic emitted to the environment as unburned debris per year.
+        description_short: Estimated amount of plastic waste that ends up in the environment as unburned debris (physical plastic pieces) per year from municipal sources such as households, shops, and offices, after escaping waste management.
         description_key: *desc_key_plastic_emissions_debris
         display:
           numDecimalPlaces: 0
           name: Debris
         presentation:
-          title_public: Plastic debris emissions
+          title_public: Plastic emissions in a form of debris
           grapher_config:
             map:
               colorScale:
@@ -384,7 +384,7 @@ tables:
       plas_burn_em:
         title: Plastic emissions from open burning
         <<: *unit_tonnes
-        description_short: Estimated macroplastic burned in open, uncontrolled fires per year.
+        description_short: Estimated amount of plastic waste burned in open, uncontrolled fires per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_emissions_burn
         display:
           numDecimalPlaces: 0
@@ -399,26 +399,28 @@ tables:
       plas_em:
         title: Total plastic emissions
         <<: *unit_tonnes
-        description_short: Estimated total macroplastic emissions to the unmanaged environment each year (debris + open burning).
+        description_short: Estimated total amount of plastic waste released to the environment each year through debris and open burning from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_emissions_total
         display:
           numDecimalPlaces: 0
+          name: Total
         presentation:
+          title_public: Total plastic emissions
           grapher_config:
             map:
               colorScale:
                 baseColorScheme: YlOrRd
 
       plas_debris_em_per_cap:
-        title: Plastic debris emissions per capita
+        title: Plastic emissions in a form of debris per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic debris emissions to the environment per person per year.
+        description_short: Estimated amount of plastic waste that ends up in the environment as unburned debris (physical plastic pieces) per person per year from municipal sources such as households, shops, and offices, after escaping waste management.
         description_key: *desc_key_plastic_emissions_debris_per_cap
         display:
           numDecimalPlaces: 2
           name: Debris
         presentation:
-          title_public: Plastic debris emissions per capita
+          title_public: Plastic emissions in a form of debris per capita
           grapher_config:
             map:
               colorScale:
@@ -427,7 +429,7 @@ tables:
       plas_burn_em_per_cap:
         title: Plastic emissions from open burning per capita
         <<: *unit_kg_per_person
-        description_short: Estimated macroplastic burned in open, uncontrolled fires per person per year.
+        description_short: Estimated amount of plastic waste burned in open, uncontrolled fires per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_emissions_burn_per_cap
         display:
           numDecimalPlaces: 2
@@ -439,10 +441,44 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
 
+      plas_burn_em_share_global:
+        title: Share of global plastic emissions from open burning
+        <<: *unit_percent
+        description_short: Estimated share of global plastic waste emitted via open burning from municipal sources such as households, shops, and offices, attributed to each country or region.
+        description_key: *desc_key_plastic_emissions_shares
+        description_processing: *processing_share_global_burn
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Open burning
+        presentation:
+          title_public: Share of global plastic emissions from open burning
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Oranges
+
+      plas_debris_em_share_global:
+        title: Share of global plastic emissions in a form of debris
+        <<: *unit_percent
+        description_short: Estimated share of global plastic waste from municipal sources such as households, shops, and offices that escapes waste management and ends up in the environment as debris, attributed to each country or region.
+        description_key: *desc_key_plastic_emissions_shares
+        description_processing: *processing_share_global_debris
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Debris
+        presentation:
+          title_public: Share of global plastic emissions in a form of debris
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: Reds
+
       plas_em_per_cap:
         title: Total plastic emissions per capita
         <<: *unit_kg_per_person
-        description_short: Estimated total macroplastic emissions per person each year (debris + open burning).
+        description_short: Estimated total amount of plastic waste released to the environment per person each year through debris and open burning from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_emissions_total_per_cap
         display:
           numDecimalPlaces: 2
@@ -453,113 +489,233 @@ tables:
                 baseColorScheme: YlOrRd
 
       plas_litter_em:
-        title: Plastic litter emissions
+        title: Plastic emissions from littering
         <<: *unit_tonnes
-        description_short: Estimated macroplastic emissions from littering per year.
+        description_short: Estimated amount of plastic waste emitted via littering per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_litter_pathway
         display:
           numDecimalPlaces: 0
+          name: Littering
+        presentation:
+          title_public: Plastic emissions from littering
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_uncol_em:
-        title: Plastic uncollected emissions
+        title: Plastic emissions from uncollected waste
         <<: *unit_tonnes
-        description_short: Estimated macroplastic emissions from uncollected waste per year.
+        description_short: Estimated amount of plastic waste emitted from uncollected waste per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_uncollected_pathway
         display:
           numDecimalPlaces: 0
+          name: Uncollected waste
+        presentation:
+          title_public: Plastic emissions from uncollected waste
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_collection_em:
-        title: Plastic collection emissions
+        title: Plastic emissions during collection and transport
         <<: *unit_tonnes
-        description_short: Estimated macroplastic emissions from losses during collection and transport per year.
+        description_short: Estimated amount of plastic waste emitted from losses during collection and transport per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_collection_pathway
         display:
           numDecimalPlaces: 0
+          name: Collection and transport
+        presentation:
+          title_public: Plastic emissions during collection and transport
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_disp_em:
-        title: Plastic disposal emissions
+        title: Plastic emissions from disposal sites
         <<: *unit_tonnes
-        description_short: Estimated macroplastic emissions from uncontrolled disposal sites (open dumps) per year.
+        description_short: Estimated amount of plastic waste emitted from uncontrolled disposal sites (open dumps) per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_disposal_pathway
         display:
           numDecimalPlaces: 0
+          name: Disposal sites
+        presentation:
+          title_public: Plastic emissions from disposal sites
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       plas_recy_em:
-        title: Plastic recycling emissions
+        title: Plastic emissions from rejects of recycling
         <<: *unit_tonnes
-        description_short: Estimated macroplastic emissions from sorting and reprocessing losses per year.
+        description_short: Estimated amount of plastic waste emitted from sorting and reprocessing losses per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_recycling_pathway
         display:
           numDecimalPlaces: 0
+          name: Rejects
+        presentation:
+          title_public: Plastic emissions from rejects of recycling
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+
+      plas_litter_em_per_cap:
+        title: Plastic emissions from littering per capita
+        <<: *unit_kg_per_person
+        description_short: Estimated macroplastic emissions from littering per person per year.
+        description_key: *desc_key_litter_pathway_per_cap
+        description_processing: *processing_per_cap_litter
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Littering
+        presentation:
+          title_public: Plastic emissions from littering per capita
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+
+      plas_uncol_em_per_cap:
+        title: Plastic emissions from uncollected waste per capita
+        <<: *unit_kg_per_person
+        description_short: Estimated macroplastic emissions from uncollected waste per person per year.
+        description_key: *desc_key_uncollected_pathway_per_cap
+        description_processing: *processing_per_cap_uncollected
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Uncollected waste
+        presentation:
+          title_public: Plastic emissions from uncollected waste per capita
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+
+      plas_collection_em_per_cap:
+        title: Plastic emissions from collection and transport per capita
+        <<: *unit_kg_per_person
+        description_short: Estimated macroplastic emissions from collection and transport losses per person per year.
+        description_key: *desc_key_collection_pathway_per_cap
+        description_processing: *processing_per_cap_collection
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Collection and transport
+        presentation:
+          title_public: Plastic emissions from collection and transport per capita
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+
+      plas_disp_em_per_cap:
+        title: Plastic emissions from disposal per capita
+        <<: *unit_kg_per_person
+        description_short: Estimated macroplastic emissions from uncontrolled disposal sites per person per year.
+        description_key: *desc_key_disposal_pathway_per_cap
+        description_processing: *processing_per_cap_disposal
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Disposal sites
+        presentation:
+          title_public: Plastic emissions from disposal per capita
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+
+      plas_recy_em_per_cap:
+        title: Plastic emissions from rejects of recycling per capita
+        <<: *unit_kg_per_person
+        description_short: Estimated macroplastic emissions from sorting and reprocessing losses per person per year.
+        description_key: *desc_key_recycling_pathway_per_cap
+        description_processing: *processing_per_cap_recycling
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+          name: Rejects
+        presentation:
+          title_public: Plastic emissions from rejects of recycling per capita
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
 
       col_cov_pct_gen_exc_lit:
-        title: Collection coverage (% of generation excluding litter)
+        title: Share of waste covered by collection services excluding litter
         <<: *unit_percent
-        description_short: Estimated share of municipal waste generation covered by collection services (excluding litter).
+        description_short: Estimated share of municipal waste generation covered by collection services (excluding litter) from municipal sources such as households, shops, and offices.
         description_key: *desc_key_collection_coverage
         display:
           numDecimalPlaces: 1
 
       col_del_pct_gen:
-        title: Collection delivery (% of generation)
+        title: Share of waste actually collected and delivered to treatment or disposal
         <<: *unit_percent
-        description_short: Estimated share of municipal waste generation that is actually collected and delivered to treatment or disposal.
+        description_short: Estimated share of municipal waste generation that is actually collected and delivered to treatment or disposal from municipal sources such as households, shops, and offices.
         description_key: *desc_key_collection_delivery
         display:
           numDecimalPlaces: 1
 
       litter_em_pct_gen:
-        title: Litter emissions (% of generation)
+        title: Share of littering emissions (% of generation)
         <<: *unit_percent
-        description_short: Share of municipal plastic waste generation emitted via littering.
+        description_short: Share of municipal plastic waste generation emitted via littering from municipal sources such as households, shops, and offices.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
 
       uncol_em_pct_gen:
-        title: Uncollected emissions (% of generation)
+        title: Share of uncollected emissions (% of generation)
         <<: *unit_percent
-        description_short: Share of municipal plastic waste generation emitted via uncollected waste.
+        description_short: Share of municipal plastic waste generation emitted via uncollected waste from municipal sources such as households, shops, and offices.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
 
       collection_em_pct_gen:
-        title: Collection emissions (% of generation)
+        title: Share of collection emissions (% of generation)
         <<: *unit_percent
-        description_short: Share of municipal plastic waste generation emitted via collection and transport losses.
+        description_short: Share of municipal plastic waste generation emitted via collection and transport losses from municipal sources such as households, shops, and offices.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
 
       cont_disp_pct_disp:
-        title: Controlled disposal (% of disposed waste)
+        title: Share of controlled disposal (% of disposed waste)
         <<: *unit_percent
-        description_short: Share of disposed waste sent to controlled facilities such as sanitary landfills.
+        description_short: Share of disposed waste sent to controlled facilities such as sanitary landfills from municipal sources such as households, shops, and offices.
         description_key: *desc_key_disposal_shares
         display:
           numDecimalPlaces: 1
 
       uncont_disp_pct_disp:
-        title: Uncontrolled disposal (% of disposed waste)
+        title: Share of uncontrolled disposal (% of disposed waste)
         <<: *unit_percent
-        description_short: Share of disposed waste sent to uncontrolled sites such as open dumps.
+        description_short: Share of disposed waste sent to uncontrolled sites such as open dumps from municipal sources such as households, shops, and offices.
         description_key: *desc_key_disposal_shares
         display:
           numDecimalPlaces: 1
 
       man_cont_pct_gen:
-        title: Managed and controlled (% of generation)
+        title: Share of managed and controlled (% of generation)
         <<: *unit_percent
-        description_short: Share of municipal waste generation managed in controlled facilities.
+        description_short: Share of municipal waste generation managed in controlled facilities from municipal sources such as households, shops, and offices.
         description_key: *desc_key_properly_managed_msw
         display:
           numDecimalPlaces: 1
 
       open_burn_msw_pct_gen:
-        title: Open burning (% of generation)
+        title: Share of open burning (% of generation)
         <<: *unit_percent
-        description_short: Share of municipal solid waste generation that is openly burned in uncontrolled fires.
+        description_short: Share of municipal solid waste generation that is openly burned in uncontrolled fires from municipal sources such as households, shops, and offices.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
@@ -581,56 +737,6 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      plas_litter_em_per_cap:
-        title: Plastic litter emissions per capita
-        <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from littering per person per year.
-        description_key: *desc_key_litter_pathway_per_cap
-        description_processing: *processing_per_cap_litter
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-
-      plas_uncol_em_per_cap:
-        title: Plastic uncollected emissions per capita
-        <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from uncollected waste per person per year.
-        description_key: *desc_key_uncollected_pathway_per_cap
-        description_processing: *processing_per_cap_uncollected
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-
-      plas_collection_em_per_cap:
-        title: Plastic collection emissions per capita
-        <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from collection and transport losses per person per year.
-        description_key: *desc_key_collection_pathway_per_cap
-        description_processing: *processing_per_cap_collection
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-
-      plas_disp_em_per_cap:
-        title: Plastic disposal emissions per capita
-        <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from uncontrolled disposal sites per person per year.
-        description_key: *desc_key_disposal_pathway_per_cap
-        description_processing: *processing_per_cap_disposal
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-
-      plas_recy_em_per_cap:
-        title: Plastic recycling emissions per capita
-        <<: *unit_kg_per_person
-        description_short: Estimated macroplastic emissions from sorting and reprocessing losses per person per year.
-        description_key: *desc_key_recycling_pathway_per_cap
-        description_processing: *processing_per_cap_recycling
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-
       plas_em_share_global:
         title: Share of global plastic emissions
         <<: *unit_percent
@@ -640,38 +746,4 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
-        presentation:
-          grapher_config:
-            map:
-              colorScale:
-                baseColorScheme: YlOrRd
 
-      plas_burn_em_share_global:
-        title: Share of global plastic burn emissions
-        <<: *unit_percent
-        description_short: Share of global macroplastic emissions from open burning attributed to each country or region.
-        description_key: *desc_key_plastic_emissions_shares
-        description_processing: *processing_share_global_burn
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-        presentation:
-          grapher_config:
-            map:
-              colorScale:
-                baseColorScheme: Oranges
-
-      plas_debris_em_share_global:
-        title: Share of global plastic debris emissions
-        <<: *unit_percent
-        description_short: Share of global macroplastic debris emissions attributed to each country or region.
-        description_key: *desc_key_plastic_emissions_shares
-        description_processing: *processing_share_global_debris
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
-        presentation:
-          grapher_config:
-            map:
-              colorScale:
-                baseColorScheme: Reds

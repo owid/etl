@@ -42,6 +42,8 @@ def run() -> None:
         "plas_recy_em": "plas_recy_em_per_cap",
     }
 
+    tb["pwg_per_cap"] = tb["pwg_per_cap"] * 1000  # Convert from tonnes to kg
+
     for total_var, per_cap_var in per_capita_vars.items():
         if total_var in tb.columns:
             # Convert tonnes to kg (multiply by 1000) and divide by population
