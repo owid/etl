@@ -1778,3 +1778,13 @@ steps:
   #
   data://grapher/climate/2025-11-17/climate_change_impacts_monthly:
     - data://garden/climate/2025-11-17/climate_change_impacts
+  #
+  # Copernicus Climate Change Service - Precipitation (2025-01-07).
+  #
+  data://meadow/climate/2025-01-07/total_precipitation:
+  - snapshot://climate/2025-01-07/total_precipitation.zip
+  - snapshot://countries/2023-12-27/world_bank.zip
+  data://garden/climate/2025-01-07/total_precipitation:
+    - data://meadow/climate/2025-01-07/total_precipitation
+  data://grapher/climate/2025-01-07/total_precipitation_annual:
+    - data://garden/climate/2025-01-07/total_precipitation
