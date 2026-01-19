@@ -170,3 +170,19 @@ display:
     <img src="../../assets/annotations-chart.png" alt="OWID chart with annotations" style="width:80%;">
     <figcaption>Example chart with entity annotations. Note that the space for annotations.</figcaption>
 </figure>
+
+## Which population indicator to use?
+
+We use our population data both as (1) a primary indicator (e.g. to create charts about population growth), and (2) an auxiliary indicator (e.g. to create charts of per capita indicators).
+
+Our population data is built as a combination of multiple origins. When using population as (1), we want to show all those origins in our charts. However, when using population as (2), we don't want those origins to pollute the limited space we have to display sources. For this reason, we decided to create two separate `population` indicators in our population garden dataset, to cater for those two use cases:
+
+(1) `population_original#population`. This indicator has various origins (Hyde, Gapminder, UN WPP). These origins are what we see in charts about population, e.g. [Population by world region](https://ourworldindata.org/grapher/population-regions-with-projections). In fact, the grapher dataset that generates [our Population grapher dataset](https://admin.owid.io/admin/datasets/6621) only uses `population_original`.
+
+  - Note that in most of these charts, population can also be considered as "auxiliary" (e.g. used to define the size of the bubbles in scatter charts). However, in all these cases, population is still shown as a primary indicator, with its own metadata. In other words, **the metadata of `population_original#population` is shown directly in our charts (in the sources tab), as a primary indicator**.
+
+(2) `population#population`. This indicator has only one collapsed origin, with attribution "Population based on various sources (2024)". This is what we see e.g. in our chart [Per capita electricity demand](https://ourworldindata.org/grapher/per-capita-electricity-demand).
+
+  - Importantly, in these charts, **the metadata of `population#population` is always shown indirectly in our charts, propagated to other indicators**.
+
+In the majority of cases, you may want to use population as an auxiliary indicator, and therefore use (2).
