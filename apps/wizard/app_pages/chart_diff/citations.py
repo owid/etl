@@ -7,6 +7,7 @@ URLs that scroll directly to those citations.
 """
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import quote
@@ -14,6 +15,8 @@ from urllib.parse import quote
 import streamlit as st
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+from etl.config import OWIDEnv
 
 
 @dataclass
@@ -33,11 +36,12 @@ class ArticleCitations:
 
     slug: str
     post_type: str
+    base_url: str
     citations: list[Citation]
 
     @property
     def url(self) -> str:
-        return f"https://ourworldindata.org/{self.slug}"
+        return f"{self.base_url}/{self.slug}"
 
 
 def extract_text_from_value(value_list: list) -> str:
@@ -156,8 +160,6 @@ def extract_heading_text(heading_obj: dict) -> str:
 
 def heading_to_slug(heading_text: str) -> str:
     """Convert heading text to URL slug (matching OWID's slugification)."""
-    import re
-
     slug = heading_text.lower()
     # Replace spaces and special chars with hyphens
     slug = re.sub(r"[^\w\s-]", "", slug)
@@ -194,15 +196,22 @@ def find_context_before_chart(body: list, chart_index: int) -> tuple[str | None,
     return None, None
 
 
-def find_chart_citations_in_content(content: str, slug: str, chart_slug: str) -> list[Citation]:
-    """Find all citations of a chart in post content JSON."""
+def find_chart_citations_in_content(content: str, slug: str, chart_slug: str, base_site_url: str) -> list[Citation]:
+    """Find all citations of a chart in post content JSON.
+
+    Args:
+        content: JSON content of the post
+        slug: Post slug
+        chart_slug: Chart slug to search for
+        base_site_url: Base URL for the site (e.g., https://ourworldindata.org)
+    """
     citations = []
     try:
         data = json.loads(content)
     except json.JSONDecodeError:
         return citations
 
-    base_url = f"https://ourworldindata.org/{slug}"
+    base_url = f"{base_site_url}/{slug}"
     body = data.get("body", [])
     seen_urls: set[str] = set()  # Track URLs to avoid duplicates
 
@@ -284,12 +293,13 @@ def find_chart_citations_in_content(content: str, slug: str, chart_slug: str) ->
 
 
 @st.cache_data(show_spinner=False)
-def find_all_citations(_session: Session, chart_slug: str) -> list[ArticleCitations]:
+def find_all_citations(_session: Session, chart_slug: str, base_site_url: str) -> list[ArticleCitations]:
     """Find all posts citing the given chart.
 
     Args:
         _session: Database session (underscore prefix for Streamlit cache)
         chart_slug: The chart's URL slug
+        base_site_url: Base URL for the site (e.g., https://ourworldindata.org)
 
     Returns:
         List of ArticleCitations, one per article that cites the chart
@@ -308,12 +318,13 @@ def find_all_citations(_session: Session, chart_slug: str) -> list[ArticleCitati
 
     for row in rows:
         _post_id, slug, post_type, content = row
-        citations = find_chart_citations_in_content(content, slug, chart_slug)
+        citations = find_chart_citations_in_content(content, slug, chart_slug, base_site_url)
         if citations:
             results.append(
                 ArticleCitations(
                     slug=slug,
                     post_type=post_type,
+                    base_url=base_site_url,
                     citations=citations,
                 )
             )
@@ -321,46 +332,177 @@ def find_all_citations(_session: Session, chart_slug: str) -> list[ArticleCitati
     return results
 
 
-def st_show_citations(chart_slug: str, session: Session) -> None:
-    """Display citations for a chart in Streamlit UI.
+@dataclass
+class MergedCitation:
+    """A citation merged from both environments for unified display."""
+
+    article_slug: str
+    post_type: str
+    citation_type: str  # "embedded" or "hyperlink"
+    context: str | None
+    chart_url: str  # The grapher URL with query params (e.g., /grapher/chart?country=USA)
+    prod_url: str | None  # Fragment URL for production article
+    staging_url: str | None  # Fragment URL for staging article
+
+
+def _chart_url_to_thumbnail(chart_url: str, base_site_url: str) -> str:
+    """Convert a chart URL to a thumbnail SVG URL.
+
+    Args:
+        chart_url: Chart URL which may be absolute or relative, like:
+            - https://ourworldindata.org/grapher/chart?country=USA
+            - /grapher/chart?country=USA
+        base_site_url: Base site URL like https://ourworldindata.org
+
+    Returns:
+        Full thumbnail URL like https://ourworldindata.org/grapher/chart.svg?country=USA
+    """
+    # Extract the path portion (everything after /grapher/)
+    if "/grapher/" in chart_url:
+        # Get everything from /grapher/ onwards
+        grapher_idx = chart_url.index("/grapher/")
+        path_and_query = chart_url[grapher_idx:]
+
+        # Insert .svg before query params
+        if "?" in path_and_query:
+            path, query = path_and_query.split("?", 1)
+            return f"{base_site_url}{path}.svg?{query}"
+        else:
+            return f"{base_site_url}{path_and_query}.svg"
+
+    # Fallback: just append .svg
+    return f"{chart_url}.svg"
+
+
+def _merge_citations(
+    target_citations: list[ArticleCitations],
+    source_citations: list[ArticleCitations],
+) -> list[MergedCitation]:
+    """Merge citations from both environments into a unified list.
+
+    Context is assumed to be identical between environments since it comes
+    from the same article content.
+    """
+    merged: list[MergedCitation] = []
+
+    # Build lookup for staging citations by (article_slug, index)
+    source_by_article: dict[str, list[Citation]] = {}
+    for article in source_citations:
+        source_by_article[article.slug] = article.citations
+
+    # Use production as primary, add staging URLs where available
+    seen_articles: set[str] = set()
+    for article in target_citations:
+        seen_articles.add(article.slug)
+        source_list = source_by_article.get(article.slug, [])
+
+        for i, citation in enumerate(article.citations):
+            # Try to match with staging citation at same index
+            staging_url = source_list[i].fragment_url if i < len(source_list) else None
+
+            merged.append(
+                MergedCitation(
+                    article_slug=article.slug,
+                    post_type=article.post_type,
+                    citation_type=citation.type,
+                    context=citation.surrounding_text,
+                    chart_url=citation.chart_url,
+                    prod_url=citation.fragment_url,
+                    staging_url=staging_url,
+                )
+            )
+
+    # Add any staging-only articles
+    for article in source_citations:
+        if article.slug not in seen_articles:
+            for citation in article.citations:
+                merged.append(
+                    MergedCitation(
+                        article_slug=article.slug,
+                        post_type=article.post_type,
+                        citation_type=citation.type,
+                        context=citation.surrounding_text,
+                        chart_url=citation.chart_url,
+                        prod_url=None,
+                        staging_url=citation.fragment_url,
+                    )
+                )
+
+    return merged
+
+
+def st_show_citations(
+    chart_slug: str,
+    source_session: Session,
+    target_session: Session,
+    source_env: OWIDEnv,
+    target_env: OWIDEnv,
+) -> None:
+    """Display citations for a chart in Streamlit UI as a unified table.
 
     Args:
         chart_slug: The chart's URL slug
-        session: Database session for queries
+        source_session: Database session for staging
+        target_session: Database session for production
+        source_env: Staging environment config
+        target_env: Production environment config
     """
     if not chart_slug:
         return
 
     with st.spinner("Finding article citations..."):
-        article_citations = find_all_citations(session, chart_slug)
+        # Get citations from both environments
+        source_citations = find_all_citations(source_session, chart_slug, source_env.site)
+        target_citations = find_all_citations(target_session, chart_slug, target_env.site)
 
-    if not article_citations:
+    # Only show section if there are citations in either environment
+    if not source_citations and not target_citations:
         return
 
     st.markdown("##### :material/format_quote: Article Citations")
 
-    for article in article_citations:
-        with st.expander(f"**{article.slug}** ({article.post_type})", expanded=False):
-            st.caption(article.url)
+    # Merge citations from both environments
+    merged = _merge_citations(target_citations, source_citations)
 
-            for i, citation in enumerate(article.citations, 1):
-                with st.container(border=True):
-                    # Citation type badge
-                    if citation.type == "embedded":
-                        st.markdown(f"**[{i}]** :blue-badge[EMBEDDED]")
-                    else:
-                        st.markdown(f"**[{i}]** :orange-badge[HYPERLINK]")
+    # Build markdown table with thumbnails
+    rows = []
+    rows.append("| Article | Type | Context | Production | Staging |")
+    rows.append("|---------|------|---------|------------|---------|")
 
-                    # Link text (for hyperlinks)
-                    if citation.link_text:
-                        st.markdown(f'Link text: "{citation.link_text}"')
+    for citation in merged:
+        # Article column
+        article = f"**{citation.article_slug}** ({citation.post_type})"
 
-                    # Context preview
-                    if citation.surrounding_text:
-                        context_preview = citation.surrounding_text[:150]
-                        if len(citation.surrounding_text) > 150:
-                            context_preview += "..."
-                        st.caption(f'Context: "{context_preview}"')
+        # Type badge
+        if citation.citation_type == "embedded":
+            type_badge = "Embedded"
+        else:
+            type_badge = "Hyperlink"
 
-                    # Fragment URL
-                    st.markdown(f"[View in article]({citation.fragment_url})")
+        # Context (truncated)
+        if citation.context:
+            context = citation.context[:80]
+            if len(citation.context) > 80:
+                context += "..."
+            # Escape pipe characters and newlines for markdown table
+            context = context.replace("|", "\\|").replace("\n", " ")
+        else:
+            context = "-"
+
+        # Thumbnails and links for each environment
+        prod_thumb = _chart_url_to_thumbnail(citation.chart_url, target_env.site)
+        staging_thumb = _chart_url_to_thumbnail(citation.chart_url, source_env.site)
+
+        if citation.prod_url:
+            prod_cell = f"![thumb]({prod_thumb}) [View]({citation.prod_url})"
+        else:
+            prod_cell = "-"
+
+        if citation.staging_url:
+            staging_cell = f"![thumb]({staging_thumb}) [View]({citation.staging_url})"
+        else:
+            staging_cell = "-"
+
+        rows.append(f"| {article} | {type_badge} | {context} | {prod_cell} | {staging_cell} |")
+
+    st.markdown("\n".join(rows))

@@ -644,7 +644,13 @@ class ChartDiffShow:
 
     def _show_citations(self) -> None:
         """Show articles that cite this chart with scroll-to-text fragment URLs."""
-        st_show_citations(self.diff.slug, self.target_session)
+        st_show_citations(
+            self.diff.slug,
+            self.source_session,
+            self.target_session,
+            SOURCE,
+            TARGET,
+        )
 
     def _show(self) -> None:
         """Show chart diff.
