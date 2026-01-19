@@ -138,7 +138,7 @@ def find(
         current_channels = set(REMOTE_CATALOG.channels)
         new_channels = set(channels) - current_channels
         if new_channels:
-            REMOTE_CATALOG = ETLCatalog(channels=tuple(current_channels | set(channels)))
+            REMOTE_CATALOG = ETLCatalog(channels=tuple(current_channels | set(channels)))  # type: ignore[arg-type]
 
     # Convert old parameters to new match parameter for backwards compatibility
     if fuzzy:
