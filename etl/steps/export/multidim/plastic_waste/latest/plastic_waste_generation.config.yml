@@ -1,5 +1,5 @@
 title:
-  title: Properly managed plastic waste generation
+  title: Plastic waste generation
   title_variant: by measure
 
 default_selection:
@@ -17,10 +17,10 @@ dimensions:
     choices:
       - slug: "total"
         name: "Total"
-        description: "Total properly managed waste generation in tonnes"
+        description: "Total plastic waste generation in tonnes"
       - slug: "per_person"
         name: "Per person"
-        description: "Properly managed waste generation per capita in kilograms"
+        description: "Plastic waste generation per capita in kilograms"
 views:
   # Views will be filled out programmatically.
   []

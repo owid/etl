@@ -5,245 +5,278 @@ definitions:
       topic_tags:
         - Plastic Pollution
 
-  # Reusable text snippets
-  text_msw_definition: &text_msw_definition
-    Municipal solid waste is everyday waste from households, shops, offices and similar sources. It does not include industrial, construction or hazardous waste.
+  text_spot_model_principles: &text_spot_model_principles
+    The (SPOT model)[https://www.nature.com/articles/s41586-024-07758-6] fills gaps in municipal waste data using statistical predictions, then estimates how plastic moves through the waste system and how uncertain those estimates are. It produces results for about 50,700 municipalities, which are then aggregated to countries and regions.
 
-  text_msw_methodology: &text_msw_methodology
-    These estimates combine measured waste data from cities and towns with machine-learning predictions to fill gaps where data are missing.
+  text_scope_exclusions: &text_scope_exclusions
+    This dataset covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). They do not include emissions from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.
+
+  text_msw_definition: &text_msw_definition
+    Municipal solid waste is everyday non-hazardous waste from households and other municipal sources such as shops, offices and institutions. It does not include industrial, construction or hazardous waste.
+
+  text_plastic_waste_definition: &text_plastic_waste_definition
+    Municipal plastic waste is the plastic fraction of municipal solid waste (for example, packaging and consumer products discarded with household waste).
 
   text_model_uncertainty: &text_model_uncertainty
-    Values are model-based estimates produced with probabilistic material flow analysis and should be interpreted as estimates rather than exact measurements.
+    Values are model-based estimates and come with uncertainty. They should be interpreted as approximate estimates rather than exact measurements.
 
   text_per_capita_calculation: &text_per_capita_calculation
-    Per-capita values are calculated by dividing total annual waste by the relevant population, for example the population of a country, region or income group.
-
-  text_per_capita_debris_calculation: &text_per_capita_debris_calculation
-    Per-capita values are calculated by dividing total debris emissions by the relevant population, for example the population of a country or region.
-
-  text_per_capita_plastic_calculation: &text_per_capita_plastic_calculation
-    Per-capita values are calculated by dividing total plastic emissions by the relevant population, for example the population of a country or region.
+    Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
 
   text_macroplastic_definition: &text_macroplastic_definition
-    These values refer to macroplastic, meaning plastic pieces larger than 5 millimetres.
+    These emissions refer to macroplastic, meaning physical plastic pieces larger than 5 millimetres.
+
+  text_emissions_definition: &text_emissions_definition
+    Emissions are plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
 
   text_plastic_debris_definition: &text_plastic_debris_definition
-    Plastic debris emissions are macroplastic items that escape from the waste system into the environment as intact items.
+    Debris emissions are unburned macroplastic items that escape from the waste system into the environment as intact items.
 
-  text_debris_sources: &text_debris_sources
-    "In this dataset, debris emissions are estimated from five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites and rejects from sorting and reprocessing."
-
-  text_spot_model_uncertainty: &text_spot_model_uncertainty
-    Values are model-based estimates derived from the SPOT ([Spatio-temporal quantification of plastic pollution origins and transport](https://www.nature.com/articles/s41586-024-07758-6#MOESM1)) framework and have inherent uncertainty.
+  text_emission_sources: &text_emission_sources
+    "Emissions are attributed to five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites (open dumps), and rejects from sorting and reprocessing."
 
   text_open_burning_definition: &text_open_burning_definition
-    These indicators measure the mass of plastic waste that is burned in open, uncontrolled fires.
+   This indicator measures how much macroplastic waste is burned in open, uncontrolled fires.
 
   text_controlled_vs_uncontrolled: &text_controlled_vs_uncontrolled
-    This is different from controlled incineration in engineered facilities, which is counted as managed disposal rather than emissions.
+    This is different from controlled incineration in engineered facilities, which is counted as managed treatment rather than emissions.
 
   text_burning_clarification: &text_burning_clarification
     The values refer to the mass of plastic subjected to open burning, not to the gaseous pollutants released by the fires.
 
+  text_total_emissions_definition: &text_total_emissions_definition
+    Total plastic emissions are the sum of debris (unburned plastic that escapes into the environment as physical items) and plastic burned in open, uncontrolled fires.
+
+  text_dumpsite_working_face: &text_dumpsite_working_face
+    For open dumps, emissions refer to plastic that escapes from exposed waste, not plastic that stays buried in the dump.
+
   desc_key_msw_generation: &desc_key_msw_generation
     - *text_msw_definition
-    - *text_msw_methodology
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_msw_generation_per_cap: &desc_key_msw_generation_per_cap
     - *text_msw_definition
-    - *text_msw_methodology
+    - *text_spot_model_principles
+    - *text_per_capita_calculation
+
+  desc_key_plastic_waste_generation: &desc_key_plastic_waste_generation
+    - *text_plastic_waste_definition
+    - *text_scope_exclusions
+    - *text_spot_model_principles
+    - *text_model_uncertainty
+
+  desc_key_plastic_waste_generation_per_cap: &desc_key_plastic_waste_generation_per_cap
+    - *text_plastic_waste_definition
+    - *text_scope_exclusions
+    - *text_spot_model_principles
     - *text_per_capita_calculation
 
   text_properly_managed_definition: &text_properly_managed_definition
-    Properly managed waste is collected and treated in controlled facilities such as sanitary landfills, engineered incinerators and formal recycling plants.
+    Managed and controlled waste is collected and treated in controlled facilities such as sanitary landfills, engineered incinerators and formal recycling plants.
 
   text_properly_managed_exclusions: &text_properly_managed_exclusions
-    It does not include waste that is left uncollected, dumped in open sites, burned in the open or leaked into the environment.
+    It does not include waste that is left uncollected, dumped in open sites, burned in the open or emitted into the unmanaged environment.
 
   text_properly_managed_context: &text_properly_managed_context
-    These values show how much municipal waste remains within a managed system instead of becoming pollution.
-
-  text_per_capita_managed_calculation: &text_per_capita_managed_calculation
-    Per-capita values are calculated by dividing the total properly managed waste by the relevant population, for example the population of a country or region.
+    These values describe how much municipal waste remains within a controlled system instead of becoming pollution.
 
   desc_key_properly_managed_msw: &desc_key_properly_managed_msw
     - *text_msw_definition
     - *text_properly_managed_definition
     - *text_properly_managed_exclusions
     - *text_properly_managed_context
-
-  desc_key_properly_managed_msw_per_cap: &desc_key_properly_managed_msw_per_cap
-    - *text_msw_definition
-    - *text_properly_managed_definition
-    - *text_properly_managed_exclusions
-    - *text_per_capita_managed_calculation
+    - *text_spot_model_principles
 
   desc_key_plastic_emissions_debris: &desc_key_plastic_emissions_debris
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_plastic_debris_definition
-    - *text_debris_sources
-    - *text_spot_model_uncertainty
+    - *text_emission_sources
+    - *text_scope_exclusions
+    - *text_model_uncertainty
 
   desc_key_plastic_emissions_debris_per_cap: &desc_key_plastic_emissions_debris_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_plastic_debris_definition
-    - *text_debris_sources
-    - *text_per_capita_debris_calculation
+    - *text_emission_sources
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   desc_key_plastic_emissions_burn: &desc_key_plastic_emissions_burn
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_open_burning_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
+    - *text_emission_sources
+    - *text_scope_exclusions
+    - *text_model_uncertainty
 
   desc_key_plastic_emissions_burn_per_cap: &desc_key_plastic_emissions_burn_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_open_burning_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
-
-  text_total_emissions_definition: &text_total_emissions_definition
-    Total plastic emissions combine debris, which are intact macroplastic items that escape into the environment, and plastic burned in open, uncontrolled fires.
-
-  text_emissions_definition: &text_emissions_definition
-    Emissions are defined here as plastic that moves from a managed or mismanaged state into the unmanaged environment, where it is no longer under control.
-
-  text_msw_plastic_only: &text_msw_plastic_only
-    These results cover plastic in municipal solid waste only and are model-based estimates with inherent uncertainty.
+    - *text_emission_sources
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   desc_key_plastic_emissions_total: &desc_key_plastic_emissions_total
     - *text_macroplastic_definition
     - *text_total_emissions_definition
     - *text_emissions_definition
-    - *text_msw_plastic_only
+    - *text_emission_sources
+    - *text_scope_exclusions
+    - *text_model_uncertainty
 
   desc_key_plastic_emissions_total_per_cap: &desc_key_plastic_emissions_total_per_cap
     - *text_macroplastic_definition
     - *text_total_emissions_definition
-    - *text_per_capita_plastic_calculation
-
-  text_model_framework_reference: &text_model_framework_reference
-    Values are model-based estimates derived from the same framework as the total emissions indicators.
+    - *text_emissions_definition
+    - *text_emission_sources
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   # Individual pathway descriptions
   text_litter_pathway: &text_litter_pathway
-    This pathway captures plastic waste that is directly discarded into the environment by individuals, rather than being placed in waste collection systems.
+    This pathway captures macroplastic discarded directly into the environment by people (littering), rather than placed in waste collection systems.
 
   text_uncollected_pathway: &text_uncollected_pathway
-    This pathway captures plastic waste that was never collected by formal waste services, often in areas lacking access to waste collection infrastructure.
+    This pathway captures macroplastic waste generated in areas without collection services (or not collected in practice), which is left unmanaged or handled informally and can escape into the environment.
 
   text_collection_pathway: &text_collection_pathway
-    This pathway captures plastic waste that escapes during the collection and transport process, such as items falling from collection vehicles or blowing away during handling.
+    This pathway captures macroplastic that escapes during collection and transport to disposal or treatment facilities.
 
   text_disposal_pathway: &text_disposal_pathway
-    This pathway captures plastic waste that escapes from uncontrolled disposal sites such as open dumps, where waste is not properly contained.
+    This pathway captures macroplastic that escapes from uncontrolled disposal sites such as open dumps.
 
   text_recycling_pathway: &text_recycling_pathway
-    This pathway captures plastic waste that escapes during sorting and recycling operations, including rejected materials and processing losses.
-
-  text_per_capita_litter_calculation: &text_per_capita_litter_calculation
-    Per-capita values are calculated by dividing total plastic litter emissions by the relevant population.
-
-  text_per_capita_uncollected_calculation: &text_per_capita_uncollected_calculation
-    Per-capita values are calculated by dividing total plastic emissions from uncollected waste by the relevant population.
-
-  text_per_capita_collection_calculation: &text_per_capita_collection_calculation
-    Per-capita values are calculated by dividing total plastic emissions from collection losses by the relevant population.
-
-  text_per_capita_disposal_calculation: &text_per_capita_disposal_calculation
-    Per-capita values are calculated by dividing total plastic emissions from disposal sites by the relevant population.
-
-  text_per_capita_recycling_calculation: &text_per_capita_recycling_calculation
-    Per-capita values are calculated by dividing total plastic emissions from recycling losses by the relevant population.
+    This pathway captures macroplastic that escapes during sorting and reprocessing operations, including rejected materials and processing losses.
 
   desc_key_litter_pathway: &desc_key_litter_pathway
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_litter_pathway
-    - *text_model_framework_reference
+    - *text_model_uncertainty
 
   desc_key_litter_pathway_per_cap: &desc_key_litter_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_litter_pathway
-    - *text_per_capita_litter_calculation
-    - *text_model_framework_reference
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   desc_key_uncollected_pathway: &desc_key_uncollected_pathway
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_uncollected_pathway
-    - *text_model_framework_reference
+    - *text_model_uncertainty
 
   desc_key_uncollected_pathway_per_cap: &desc_key_uncollected_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_uncollected_pathway
-    - *text_per_capita_uncollected_calculation
-    - *text_model_framework_reference
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   desc_key_collection_pathway: &desc_key_collection_pathway
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_collection_pathway
-    - *text_model_framework_reference
+    - *text_model_uncertainty
 
   desc_key_collection_pathway_per_cap: &desc_key_collection_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_collection_pathway
-    - *text_per_capita_collection_calculation
-    - *text_model_framework_reference
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   desc_key_disposal_pathway: &desc_key_disposal_pathway
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_disposal_pathway
-    - *text_model_framework_reference
+    - *text_dumpsite_working_face
+    - *text_model_uncertainty
 
   desc_key_disposal_pathway_per_cap: &desc_key_disposal_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_disposal_pathway
-    - *text_per_capita_disposal_calculation
-    - *text_model_framework_reference
+    - *text_dumpsite_working_face
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
 
   desc_key_recycling_pathway: &desc_key_recycling_pathway
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_recycling_pathway
-    - *text_model_framework_reference
+    - *text_model_uncertainty
 
   desc_key_recycling_pathway_per_cap: &desc_key_recycling_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_emissions_definition
     - *text_recycling_pathway
-    - *text_per_capita_recycling_calculation
-    - *text_model_framework_reference
+    - *text_per_capita_calculation
+    - *text_model_uncertainty
+
+  text_share_global_definition: &text_share_global_definition
+    These indicators show emissions as a percentage of the global total.
+
+  text_share_global_interpretation: &text_share_global_interpretation
+    Because they are shares of a global total, they show each country or region's contribution regardless of population size.
+
+  text_collection_coverage_interpretation: &text_collection_coverage_interpretation
+    Lower collection coverage is often associated with higher emissions from uncollected waste, because more waste remains outside formal systems.
+
+  text_collection_delivery_interpretation: &text_collection_delivery_interpretation
+    Low delivery rates can indicate limited capacity or unreliable service, even where collection services exist.
+
+  text_no_collection_derived: &text_no_collection_derived
+    It is derived from modelled collection coverage and population estimates used in the SPOT inventory.
 
   desc_key_plastic_emissions_shares: &desc_key_plastic_emissions_shares
-    - These indicators show plastic emissions as a percentage of the global total for each country or region.
-    - Because they are expressed as a share of global emissions, they show how much each country or region contributes to worldwide plastic pollution, regardless of its population size.
-    - Values are based on the same modelled emissions as the other plastic indicators in this dataset.
+    - *text_share_global_definition
+    - *text_share_global_interpretation
+    - *text_model_uncertainty
 
   desc_key_collection_coverage: &desc_key_collection_coverage
-    - Collection coverage shows the share of waste generation that has access to formal collection services.
-    - This indicator excludes litter, focusing on waste that should enter the formal waste system.
-    - Low collection coverage means many people lack access to waste collection, which is strongly linked to higher plastic emissions from uncollected waste.
+    - Collection coverage shows the share of municipal waste generation that occurs in areas served by formal collection services.
+    - This indicator excludes littering, focusing on waste that would otherwise enter the waste collection system.
+    - *text_collection_coverage_interpretation
+    - *text_model_uncertainty
 
   desc_key_collection_delivery: &desc_key_collection_delivery
-    - Collection delivery shows the share of generated waste that is actually collected and transported to treatment or disposal facilities.
-    - It differs from collection coverage by measuring realised performance, not just whether services are available on paper.
-    - Low delivery rates suggest problems with the reliability or capacity of collection systems, even where services officially exist.
+    - Collection delivery shows the share of generated municipal waste that is actually collected and transported to treatment or disposal facilities.
+    - It differs from collection coverage by measuring realised performance, not just whether services are available.
+    - *text_collection_delivery_interpretation
+    - *text_model_uncertainty
 
   desc_key_emissions_shares_generation: &desc_key_emissions_shares_generation
-    - These indicators show emissions from a specific pathway as a percentage of total waste generated.
-    - For plastic pathways, both the numerator and denominator refer to plastic waste. For the open burning indicator, they refer to all municipal solid waste burned and generated.
-    - "Expressing emissions as a share of generation allows comparisons between places with very different waste volumes: low percentages mean only a small share of waste follows that pathway, while high values point to substantial pollution and health risks."
+    - These indicators show the share of waste generation that follows a specific pathway (expressed as a percentage).
+    - For littering, uncollected waste and collection-loss indicators, the numerator is macroplastic emissions and the denominator is municipal plastic waste generation.
+    - For open burning (% of generation), the numerator is total municipal solid waste openly burned (all materials) and the denominator is total municipal solid waste generation.
+    - *text_controlled_vs_uncontrolled
+    - *text_model_uncertainty
 
   desc_key_disposal_shares: &desc_key_disposal_shares
-    - These indicators show how waste that is disposed of on land is split between controlled and uncontrolled facilities.
+    - These indicators show how waste disposed on land is split between controlled and uncontrolled facilities.
     - Controlled disposal includes sanitary landfills and engineered sites designed to contain waste. Uncontrolled disposal refers to open dumps and similar sites with little or no containment.
-    - Higher shares of uncontrolled disposal are associated with more plastic pollution, because waste in open dumps is more likely to escape into the environment or be burned.
+    - Higher shares of uncontrolled disposal are often associated with greater risks of plastic emissions and open burning.
+    - *text_model_uncertainty
 
   desc_key_no_collection_count: &desc_key_no_collection_count
     - This indicator counts how many people do not have access to formal municipal waste collection services.
-    - People without collection typically have to manage their own waste, often by dumping it nearby or burning it, which is a major source of plastic pollution in many low- and middle-income countries.
+    - *text_no_collection_derived
+    - *text_model_uncertainty
 
   desc_key_no_collection_share: &desc_key_no_collection_share
     - This indicator shows the share of the population without access to formal municipal waste collection services.
-    - People without collection typically have to manage their own waste, often by dumping it nearby or burning it, which is a major source of plastic pollution in many low- and middle-income countries.
+    - *text_no_collection_derived
+    - *text_model_uncertainty
 
   # Unit definitions
   unit_tonnes: &unit_tonnes
@@ -285,7 +318,7 @@ definitions:
 
 
 dataset:
-  title: Plastic Waste - Cottom et al. (2024)
+  title: Plastic Waste and Emissions (SPOT) - Cottom et al. (2024)
   update_period_days: 365
 
 tables:
@@ -294,7 +327,7 @@ tables:
       wg:
         title: Waste generation
         <<: *unit_tonnes
-        description_short: Total municipal solid waste from households, shops and offices generated in a year.
+        description_short: Estimated municipal solid waste generated in a year.
         description_key: *desc_key_msw_generation
         display:
           numDecimalPlaces: 0
@@ -302,16 +335,16 @@ tables:
       wg_per_cap:
         title: Waste generation per capita
         <<: *unit_kg_per_person
-        description_short: Total municipal solid waste from households, shops and offices generated per person each year.
+        description_short: Estimated municipal solid waste generated per person per year.
         description_key: *desc_key_msw_generation_per_cap
         display:
           numDecimalPlaces: 1
 
       pwg:
-        title: Properly managed waste generation
+        title: Plastic waste generation
         <<: *unit_tonnes
-        description_short: Municipal solid waste from households, shops and offices collected and treated in controlled facilities such as sanitary landfills, incinerators or recycling plants.
-        description_key: *desc_key_properly_managed_msw
+        description_short: Estimated municipal plastic waste generated in a year.
+        description_key: *desc_key_plastic_waste_generation
         presentation:
           grapher_config:
             map:
@@ -321,10 +354,10 @@ tables:
           numDecimalPlaces: 0
 
       pwg_per_cap:
-        title: Properly managed waste generation per capita
+        title: Plastic waste generation per capita
         <<: *unit_kg_per_person
-        description_short: Municipal solid waste from households, shops and offices collected and treated in controlled facilities such as sanitary landfills, incinerators or recycling plants per person each year.
-        description_key: *desc_key_properly_managed_msw_per_cap
+        description_short: Estimated municipal plastic waste generated per person per year.
+        description_key: *desc_key_plastic_waste_generation_per_cap
         presentation:
           grapher_config:
             map:
@@ -336,7 +369,7 @@ tables:
       plas_debris_em:
         title: Plastic debris emissions
         <<: *unit_tonnes
-        description_short: Macroplastic items that escape from the waste system into the environment as intact debris each year.
+        description_short: Estimated plastic emitted to the environment as unburned debris per year.
         description_key: *desc_key_plastic_emissions_debris
         display:
           numDecimalPlaces: 0
@@ -351,7 +384,7 @@ tables:
       plas_burn_em:
         title: Plastic emissions from open burning
         <<: *unit_tonnes
-        description_short: Macroplastic waste burned in open, uncontrolled fires, not in controlled incineration facilities.
+        description_short: Estimated macroplastic burned in open, uncontrolled fires per year.
         description_key: *desc_key_plastic_emissions_burn
         display:
           numDecimalPlaces: 0
@@ -366,7 +399,7 @@ tables:
       plas_em:
         title: Total plastic emissions
         <<: *unit_tonnes
-        description_short: Total macroplastic emissions to the environment, combining debris and macroplastic burned in open fires.
+        description_short: Estimated total macroplastic emissions to the unmanaged environment each year (debris + open burning).
         description_key: *desc_key_plastic_emissions_total
         display:
           numDecimalPlaces: 0
@@ -379,7 +412,7 @@ tables:
       plas_debris_em_per_cap:
         title: Plastic debris emissions per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic debris that escapes into the environment per person each year.
+        description_short: Estimated macroplastic debris emissions to the environment per person per year.
         description_key: *desc_key_plastic_emissions_debris_per_cap
         display:
           numDecimalPlaces: 2
@@ -394,7 +427,7 @@ tables:
       plas_burn_em_per_cap:
         title: Plastic emissions from open burning per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic waste burned in open, uncontrolled fires per person each year.
+        description_short: Estimated macroplastic burned in open, uncontrolled fires per person per year.
         description_key: *desc_key_plastic_emissions_burn_per_cap
         display:
           numDecimalPlaces: 2
@@ -409,7 +442,7 @@ tables:
       plas_em_per_cap:
         title: Total plastic emissions per capita
         <<: *unit_kg_per_person
-        description_short: Total macroplastic that escapes into the environment as debris or is burned in open fires, per person each year.
+        description_short: Estimated total macroplastic emissions per person each year (debris + open burning).
         description_key: *desc_key_plastic_emissions_total_per_cap
         display:
           numDecimalPlaces: 2
@@ -422,7 +455,7 @@ tables:
       plas_litter_em:
         title: Plastic litter emissions
         <<: *unit_tonnes
-        description_short: Macroplastic waste that enters the environment directly through littering each year.
+        description_short: Estimated macroplastic emissions from littering per year.
         description_key: *desc_key_litter_pathway
         display:
           numDecimalPlaces: 0
@@ -430,7 +463,7 @@ tables:
       plas_uncol_em:
         title: Plastic uncollected emissions
         <<: *unit_tonnes
-        description_short: Macroplastic waste that escapes into the environment because it was never collected by formal waste services.
+        description_short: Estimated macroplastic emissions from uncollected waste per year.
         description_key: *desc_key_uncollected_pathway
         display:
           numDecimalPlaces: 0
@@ -438,7 +471,7 @@ tables:
       plas_collection_em:
         title: Plastic collection emissions
         <<: *unit_tonnes
-        description_short: Macroplastic waste that escapes into the environment during collection and transport to disposal or treatment facilities.
+        description_short: Estimated macroplastic emissions from losses during collection and transport per year.
         description_key: *desc_key_collection_pathway
         display:
           numDecimalPlaces: 0
@@ -446,7 +479,7 @@ tables:
       plas_disp_em:
         title: Plastic disposal emissions
         <<: *unit_tonnes
-        description_short: Macroplastic waste that escapes from uncontrolled disposal sites such as open dumps.
+        description_short: Estimated macroplastic emissions from uncontrolled disposal sites (open dumps) per year.
         description_key: *desc_key_disposal_pathway
         display:
           numDecimalPlaces: 0
@@ -454,7 +487,7 @@ tables:
       plas_recy_em:
         title: Plastic recycling emissions
         <<: *unit_tonnes
-        description_short: Macroplastic waste that escapes into the environment during sorting and recycling processes, including rejected materials.
+        description_short: Estimated macroplastic emissions from sorting and reprocessing losses per year.
         description_key: *desc_key_recycling_pathway
         display:
           numDecimalPlaces: 0
@@ -462,7 +495,7 @@ tables:
       col_cov_pct_gen_exc_lit:
         title: Collection coverage (% of generation excluding litter)
         <<: *unit_percent
-        description_short: Share of waste generation, excluding litter, that has access to formal municipal collection services.
+        description_short: Estimated share of municipal waste generation covered by collection services (excluding litter).
         description_key: *desc_key_collection_coverage
         display:
           numDecimalPlaces: 1
@@ -470,7 +503,7 @@ tables:
       col_del_pct_gen:
         title: Collection delivery (% of generation)
         <<: *unit_percent
-        description_short: Share of total waste generated that is actually collected and transported to treatment or disposal facilities.
+        description_short: Estimated share of municipal waste generation that is actually collected and delivered to treatment or disposal.
         description_key: *desc_key_collection_delivery
         display:
           numDecimalPlaces: 1
@@ -478,7 +511,7 @@ tables:
       litter_em_pct_gen:
         title: Litter emissions (% of generation)
         <<: *unit_percent
-        description_short: Share of plastic waste generated that escapes into the environment through littering.
+        description_short: Share of municipal plastic waste generation emitted via littering.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
@@ -486,7 +519,7 @@ tables:
       uncol_em_pct_gen:
         title: Uncollected emissions (% of generation)
         <<: *unit_percent
-        description_short: Share of plastic waste generated that escapes into the environment because it was never collected.
+        description_short: Share of municipal plastic waste generation emitted via uncollected waste.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
@@ -494,7 +527,7 @@ tables:
       collection_em_pct_gen:
         title: Collection emissions (% of generation)
         <<: *unit_percent
-        description_short: Share of plastic waste generated that escapes into the environment during collection and transport.
+        description_short: Share of municipal plastic waste generation emitted via collection and transport losses.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
@@ -502,7 +535,7 @@ tables:
       cont_disp_pct_disp:
         title: Controlled disposal (% of disposed waste)
         <<: *unit_percent
-        description_short: Share of disposed waste sent to controlled facilities, such as sanitary landfills and engineered sites designed to contain waste.
+        description_short: Share of disposed waste sent to controlled facilities such as sanitary landfills.
         description_key: *desc_key_disposal_shares
         display:
           numDecimalPlaces: 1
@@ -510,7 +543,7 @@ tables:
       uncont_disp_pct_disp:
         title: Uncontrolled disposal (% of disposed waste)
         <<: *unit_percent
-        description_short: Share of disposed waste sent to uncontrolled sites, such as open dumps, with little or no containment.
+        description_short: Share of disposed waste sent to uncontrolled sites such as open dumps.
         description_key: *desc_key_disposal_shares
         display:
           numDecimalPlaces: 1
@@ -518,7 +551,7 @@ tables:
       man_cont_pct_gen:
         title: Managed and controlled (% of generation)
         <<: *unit_percent
-        description_short: Share of waste generation that is collected and treated in controlled facilities such as sanitary landfills, incinerators and recycling plants.
+        description_short: Share of municipal waste generation managed in controlled facilities.
         description_key: *desc_key_properly_managed_msw
         display:
           numDecimalPlaces: 1
@@ -526,7 +559,7 @@ tables:
       open_burn_msw_pct_gen:
         title: Open burning (% of generation)
         <<: *unit_percent
-        description_short: Share of municipal solid waste generation that is burned in open, uncontrolled fires.
+        description_short: Share of municipal solid waste generation that is openly burned in uncontrolled fires.
         description_key: *desc_key_emissions_shares_generation
         display:
           numDecimalPlaces: 1
@@ -551,7 +584,7 @@ tables:
       plas_litter_em_per_cap:
         title: Plastic litter emissions per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic waste that enters the environment through littering, per person each year.
+        description_short: Estimated macroplastic emissions from littering per person per year.
         description_key: *desc_key_litter_pathway_per_cap
         description_processing: *processing_per_cap_litter
         processing_level: major
@@ -561,7 +594,7 @@ tables:
       plas_uncol_em_per_cap:
         title: Plastic uncollected emissions per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic waste that escapes into the environment because it was never collected, per person each year.
+        description_short: Estimated macroplastic emissions from uncollected waste per person per year.
         description_key: *desc_key_uncollected_pathway_per_cap
         description_processing: *processing_per_cap_uncollected
         processing_level: major
@@ -571,7 +604,7 @@ tables:
       plas_collection_em_per_cap:
         title: Plastic collection emissions per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic waste that escapes during collection and transport to disposal or treatment facilities, per person each year.
+        description_short: Estimated macroplastic emissions from collection and transport losses per person per year.
         description_key: *desc_key_collection_pathway_per_cap
         description_processing: *processing_per_cap_collection
         processing_level: major
@@ -581,7 +614,7 @@ tables:
       plas_disp_em_per_cap:
         title: Plastic disposal emissions per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic waste that escapes from uncontrolled disposal sites, such as open dumps, per person each year.
+        description_short: Estimated macroplastic emissions from uncontrolled disposal sites per person per year.
         description_key: *desc_key_disposal_pathway_per_cap
         description_processing: *processing_per_cap_disposal
         processing_level: major
@@ -591,7 +624,7 @@ tables:
       plas_recy_em_per_cap:
         title: Plastic recycling emissions per capita
         <<: *unit_kg_per_person
-        description_short: Macroplastic waste that escapes during sorting and recycling processes, including rejected materials, per person each year.
+        description_short: Estimated macroplastic emissions from sorting and reprocessing losses per person per year.
         description_key: *desc_key_recycling_pathway_per_cap
         description_processing: *processing_per_cap_recycling
         processing_level: major
@@ -601,7 +634,7 @@ tables:
       plas_em_share_global:
         title: Share of global plastic emissions
         <<: *unit_percent
-        description_short: Share of global macroplastic emissions to the environment that come from a given country or region.
+        description_short: Share of global macroplastic emissions attributed to each country or region.
         description_key: *desc_key_plastic_emissions_shares
         description_processing: *processing_share_global
         processing_level: major
@@ -616,7 +649,7 @@ tables:
       plas_burn_em_share_global:
         title: Share of global plastic burn emissions
         <<: *unit_percent
-        description_short: Share of global macroplastic emissions from open burning that come from a given country or region.
+        description_short: Share of global macroplastic emissions from open burning attributed to each country or region.
         description_key: *desc_key_plastic_emissions_shares
         description_processing: *processing_share_global_burn
         processing_level: major
@@ -631,7 +664,7 @@ tables:
       plas_debris_em_share_global:
         title: Share of global plastic debris emissions
         <<: *unit_percent
-        description_short: Share of global macroplastic debris emissions that come from a given country or region.
+        description_short: Share of global macroplastic debris emissions attributed to each country or region.
         description_key: *desc_key_plastic_emissions_shares
         description_processing: *processing_share_global_debris
         processing_level: major
