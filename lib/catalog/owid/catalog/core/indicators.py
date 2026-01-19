@@ -551,8 +551,7 @@ class IndicatorRolling:
     that the resulting Indicator retains the original metadata.
 
     Note:
-        This class was formerly called `VariableRolling`. The old name is still available
-        as an alias for backwards compatibility.
+        This class was formerly called `VariableRolling`.
 
     Attributes:
         rolling: The underlying pandas Rolling object.
@@ -608,10 +607,6 @@ class IndicatorRolling:
 
         self.__annotations__[name] = Callable[..., Indicator]
         return func
-
-
-# Backwards-compatible alias
-VariableRolling = IndicatorRolling
 
 
 def _hash_dict(d):
@@ -692,10 +687,6 @@ def get_unique_sources_from_indicators(indicators: list[Indicator]) -> list[Sour
     return sources
 
 
-# Backwards-compatible alias
-get_unique_sources_from_variables = get_unique_sources_from_indicators
-
-
 def get_unique_origins_from_indicators(indicators: list[Indicator]) -> list[Origin]:
     """Get unique origins from a list of indicators.
 
@@ -723,10 +714,6 @@ def get_unique_origins_from_indicators(indicators: list[Indicator]) -> list[Orig
     return origins
 
 
-# Backwards-compatible alias
-get_unique_origins_from_variables = get_unique_origins_from_indicators
-
-
 def get_unique_licenses_from_indicators(indicators: list[Indicator]) -> list[License]:
     """Get unique licenses from a list of indicators.
 
@@ -750,10 +737,6 @@ def get_unique_licenses_from_indicators(indicators: list[Indicator]) -> list[Lic
     for indicator in indicators:
         licenses += [license for license in indicator.metadata.licenses if license not in licenses]
     return licenses
-
-
-# Backwards-compatible alias
-get_unique_licenses_from_variables = get_unique_licenses_from_indicators
 
 
 def get_unique_description_key_points_from_indicators(indicators: list[Indicator]) -> list[str]:
@@ -825,10 +808,6 @@ def combine_indicators_processing_logs(
     )
 
     return ProcessingLog(processing_log)  # type: ignore
-
-
-# Backwards-compatible alias
-combine_variables_processing_logs = combine_indicators_processing_logs
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
@@ -914,10 +893,6 @@ def combine_indicators_sort(indicators: list[Indicator]) -> list[str]:
         return []
     else:
         return sorts[0] if all(sort == sorts[0] for sort in sorts) else []
-
-
-# Backwards-compatible alias
-combine_variables_sort = combine_indicators_sort
 
 
 def combine_indicators_metadata(
@@ -1033,10 +1008,6 @@ def combine_indicators_metadata(
             )
 
     return metadata
-
-
-# Backwards-compatible alias
-combine_variables_metadata = combine_indicators_metadata
 
 
 @overload

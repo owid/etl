@@ -5,15 +5,7 @@
 #
 from owid.catalog.core.datasets import Dataset
 from owid.catalog.core.indicators import (
-    Indicator,
-    IndicatorRolling,
     Variable,
-    VariableRolling,
-    combine_indicators_metadata,
-    combine_indicators_processing_logs,
-    combine_variables_metadata,
-    combine_variables_processing_logs,
-    copy_metadata,
 )
 from owid.catalog.core.meta import (
     PROCESSING_LEVELS,
@@ -102,13 +94,5 @@ __all__ = [
     "is_year_or_date",
     "update_variable_metadata",
     # indicators
-    "Indicator",
-    "IndicatorRolling",
     "Variable",
-    "VariableRolling",
-    "combine_indicators_metadata",
-    "combine_indicators_processing_logs",
-    "combine_variables_metadata",
-    "combine_variables_processing_logs",
-    "copy_metadata",
 ]

@@ -35,9 +35,6 @@ from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, 
 from owid.datautils import dataframes
 from owid.repack import repack_frame
 
-# Alias for backwards compatibility - code references variables.Variable
-variables = indicators
-
 log = structlog.get_logger()
 
 # Schema is in parent directory (not core/)
@@ -48,7 +45,7 @@ METADATA_FIELDS = list(SCHEMA["properties"])
 AnyStr = TypeVar("AnyStr", str, bytes)
 
 # pd.Series or Variable
-SeriesOrVariable = TypeVar("SeriesOrVariable", pd.Series, variables.Variable)
+SeriesOrVariable = TypeVar("SeriesOrVariable", pd.Series, indicators.Indicator)
 
 
 class Table(pd.DataFrame):
@@ -102,7 +99,7 @@ class Table(pd.DataFrame):
 
     @property
     def _constructor_sliced(self) -> Any:
-        return variables.Variable
+        return indicators.Indicator
 
     def __init__(
         self,
@@ -843,11 +840,11 @@ class Table(pd.DataFrame):
 
         # propagate metadata when we add a series to a table
         if isinstance(key, str):
-            if isinstance(value, variables.Variable):
+            if isinstance(value, indicators.Indicator):
                 # variable needs to be assigned name to make VariableMeta work
                 if not value.name:
                     value.name = key
-                if value.name == variables.UNNAMED_VARIABLE:
+                if value.name == indicators.UNNAMED_VARIABLE:
                     # Update the variable name, if it had the unnamed variable tag.
                     # Replace all instances of unnamed variables in the processing log by the actual name of the new
                     # variable.
@@ -991,7 +988,7 @@ class Table(pd.DataFrame):
         combined: list[str] = filter(None, list(self.index.names) + list(self.columns))  # type: ignore
         return combined
 
-    def get_column_or_index(self, name) -> variables.Variable:
+    def get_column_or_index(self, name) -> indicators.Indicator:
         """Get a variable by name from either columns or index.
 
         Retrieves a Variable from the table, checking both regular columns
@@ -1016,7 +1013,7 @@ class Table(pd.DataFrame):
         if name in self.columns:
             return self[name]
         elif name in self.index.names:
-            return variables.Variable(self.index.get_level_values(name), name=name, metadata=self._fields[name])
+            return indicators.Indicator(self.index.get_level_values(name), name=name, metadata=self._fields[name])
         else:
             raise ValueError(f"'{name}' not found in columns or index")
 
@@ -1759,7 +1756,7 @@ class Table(pd.DataFrame):
         variable_names: list[str] | None = None,
         comment: str | None = None,
     ) -> Table:
-        # Append a new entry to the processing log of the required variables.
+        # Append a new entry to the processing log of the required indicators.
         if variable_names is None:
             # If no variable is specified, assume all (including index columns).
             variable_names = list(self.all_columns)
@@ -1782,7 +1779,7 @@ class Table(pd.DataFrame):
         operation: str | None = None,
     ) -> Table:
         """Amend operation or comment of the latest processing log entry."""
-        # Append a new entry to the processing log of the required variables.
+        # Append a new entry to the processing log of the required indicators.
         if variable_names is None:
             # If no variable is specified, assume all (including index columns).
             variable_names = list(self.all_columns)
@@ -1808,19 +1805,19 @@ class Table(pd.DataFrame):
 
         return cast(Table, tb)
 
-    def sum(self, *args, **kwargs) -> variables.Variable:
-        variable_name = variables.UNNAMED_VARIABLE
-        variable = variables.Variable(super().sum(*args, **kwargs), name=variable_name)  # type: ignore
-        variable.metadata = variables.combine_variables_metadata(
+    def sum(self, *args, **kwargs) -> indicators.Indicator:
+        variable_name = indicators.UNNAMED_VARIABLE
+        variable = indicators.Indicator(super().sum(*args, **kwargs), name=variable_name)  # type: ignore
+        variable.metadata = indicators.combine_indicators_metadata(
             variables=[self[column] for column in self.columns], operation="+", name=variable_name
         )
 
         return variable
 
-    def prod(self, *args, **kwargs) -> variables.Variable:
-        variable_name = variables.UNNAMED_VARIABLE
-        variable = variables.Variable(super().prod(*args, **kwargs), name=variable_name)  # type: ignore
-        variable.metadata = variables.combine_variables_metadata(
+    def prod(self, *args, **kwargs) -> indicators.Indicator:
+        variable_name = indicators.UNNAMED_VARIABLE
+        variable = indicators.Indicator(super().prod(*args, **kwargs), name=variable_name)  # type: ignore
+        variable.metadata = indicators.combine_indicators_metadata(
             variables=[self[column] for column in self.columns], operation="*", name=variable_name
         )
 
@@ -1833,7 +1830,7 @@ class Table(pd.DataFrame):
         return super().reorder_levels(*args, **kwargs)  # type: ignore
 
     @staticmethod
-    def _update_log(tb: Table, other: Scalar | Series | variables.Variable | Table, operation: str) -> None:  # type: ignore
+    def _update_log(tb: Table, other: Scalar | Series | indicators.Indicator | Table, operation: str) -> None:  # type: ignore
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
         # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
         # Instead, update the processing log of each variable in the table.
@@ -1844,60 +1841,60 @@ class Table(pd.DataFrame):
                 parents = [tb[column], other]
             tb[column].update_log(parents=parents, operation=operation)
 
-    def __add__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "+")
         return tb
 
-    def __iadd__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "-")
         return tb
 
-    def __isub__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "*")
         return tb
 
-    def __imul__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "/")
         return tb
 
-    def __itruediv__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "//")
         return tb
 
-    def __ifloordiv__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "%")
         return tb
 
-    def __imod__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "**")
         return tb
 
-    def __ipow__(self, other: Scalar | Series | variables.Variable | Table) -> Table:  # type: ignore
+    def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
         return self.__pow__(other)
 
     def sort_index(self, *args, **kwargs) -> Table:
@@ -1942,7 +1939,7 @@ class Table(pd.DataFrame):
             if type(value) is type(self):
                 for column in tb.columns:
                     if column in value.columns:
-                        tb._fields[column] = variables.combine_variables_metadata(
+                        tb._fields[column] = indicators.combine_indicators_metadata(
                             variables=[tb[column], value[column]], operation="fillna", name=column
                         )
         else:
@@ -2044,7 +2041,7 @@ class TableGroupBy:
 
         return tb
 
-    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> Table | variables.Variable:
+    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> Table | indicators.Indicator:
         mem = {}
 
         @wraps(func)
@@ -2064,13 +2061,13 @@ class TableGroupBy:
             if isinstance(df, Table):
                 return _create_table(df, self.metadata, self._fields)
             else:
-                return variables.Variable(df)
+                return indicators.Indicator(df)
         elif isinstance(mem["table"], Table):
             return _create_table(df, mem["table"].metadata, mem["table"]._fields)
-        elif isinstance(mem["table"], variables.Variable) and isinstance(df, variables.Variable):
+        elif isinstance(mem["table"], indicators.Indicator) and isinstance(df, indicators.Indicator):
             df.metadata = mem["table"].metadata
             return df
-        elif isinstance(mem["table"], variables.Variable) and isinstance(df, Table):
+        elif isinstance(mem["table"], indicators.Indicator) and isinstance(df, Table):
             # func returns Variable
             out = _create_table(df, self.metadata, self._fields)
             if mem["table"].name and mem["table"].name in out.columns:
@@ -2109,11 +2106,11 @@ class VariableGroupBy:
                 out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
                 out.metadata = self.table_metadata.copy()
                 return out
-            elif isinstance(out, variables.Variable):
+            elif isinstance(out, indicators.Indicator):
                 out.metadata = self.metadata.copy()
                 return out
             elif isinstance(out, pd.Series):
-                return variables.Variable(out, name=self.name, metadata=self.metadata)
+                return indicators.Indicator(out, name=self.name, metadata=self.metadata)
             else:
                 raise NotImplementedError()
 
@@ -2181,12 +2178,12 @@ def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> tuple
     if left.dtype.name == "category" and right.dtype.name == "category":
         common_categories = left.cat.categories.union(right.cat.categories)
 
-        if isinstance(left, variables.Variable):
+        if isinstance(left, indicators.Indicator):
             left = left.set_categories(common_categories)
         else:
             left = left.cat.set_categories(common_categories)
 
-        if isinstance(right, variables.Variable):
+        if isinstance(right, indicators.Indicator):
             right = right.set_categories(common_categories)
         else:
             right = right.cat.set_categories(common_categories)
@@ -2280,17 +2277,19 @@ def merge(
             new_column = f"{column}{suffixes[0]}"
         else:
             new_column = column
-        tb[new_column].metadata = variables.combine_variables_metadata([left[column]], operation="merge", name=column)
+        tb[new_column].metadata = indicators.combine_indicators_metadata([left[column]], operation="merge", name=column)
 
     for column in columns_from_right:
         if column in overlapping_columns:
             new_column = f"{column}{suffixes[1]}"
         else:
             new_column = column
-        tb[new_column].metadata = variables.combine_variables_metadata([right[column]], operation="merge", name=column)
+        tb[new_column].metadata = indicators.combine_indicators_metadata(
+            [right[column]], operation="merge", name=column
+        )
 
     for column in common_columns:
-        tb[column].metadata = variables.combine_variables_metadata(
+        tb[column].metadata = indicators.combine_indicators_metadata(
             [left[column], right[column]], operation="merge", name=column
         )
 
@@ -2364,7 +2363,7 @@ def concat(
         # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
         for column in table.all_columns:
             variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
-            table._fields[column] = variables.combine_variables_metadata(
+            table._fields[column] = indicators.combine_indicators_metadata(
                 variables=variables_to_combine, operation="concat", name=column
             )
 
@@ -2398,7 +2397,7 @@ def melt(
         )
     )
 
-    # Get the list of column names used as id variables.
+    # Get the list of column names used as id indicators.
     if id_vars is None:
         id_vars_list = []
     elif isinstance(id_vars, str):
@@ -2406,7 +2405,7 @@ def melt(
     else:
         id_vars_list = id_vars  # type: ignore
 
-    # Get the list of column names used as id and value variables.
+    # Get the list of column names used as id and value indicators.
     if value_vars is None:
         value_vars_list = [column for column in frame.columns if column not in id_vars_list]
     elif isinstance(value_vars, str):
@@ -2415,18 +2414,18 @@ def melt(
         value_vars_list = value_vars  # type: ignore
 
     # Combine metadata of value variables and assign the combination to the new "value" column.
-    table[value_name].metadata = variables.combine_variables_metadata(
+    table[value_name].metadata = indicators.combine_indicators_metadata(
         variables=[frame[var] for var in value_vars_list], operation="melt", name=value_name
     )
 
     # Assign that combined metadata also to the new "variable" column.
-    table[var_name].metadata = variables.combine_variables_metadata(
+    table[var_name].metadata = indicators.combine_indicators_metadata(
         variables=[frame[var] for var in value_vars_list], operation="melt", name=var_name
     )
 
     for variable in id_vars_list:
         # Combine metadata of id variables and assign the combination to the new "id" variable.
-        table[variable].metadata = variables.combine_variables_metadata(
+        table[variable].metadata = indicators.combine_indicators_metadata(
             variables=[frame[variable]], operation="melt", name=variable
         )
 
@@ -2487,7 +2486,7 @@ def pivot(
         # For now, I assume the only metadata we want to propagate is the one of the upper level.
         # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
         # variable of all subsequent levels.
-        column_metadata = variables.combine_variables_metadata(
+        column_metadata = indicators.combine_indicators_metadata(
             variables=variables_to_combine, operation="pivot", name=column
         )
         # Assign metadata of the original variable in the upper level to the new multiindex column.
@@ -3016,7 +3015,7 @@ def multi_merge(tables: list[Table], *args, **kwargs) -> Table:
     return combined
 
 
-def _extract_variables(t: Table, cols: list[str] | str | None) -> list[variables.Variable]:
+def _extract_variables(t: Table, cols: list[str] | str | None) -> list[indicators.Indicator]:
     if not cols:
         return []
     if isinstance(cols, str):
@@ -3050,7 +3049,7 @@ def read_df(
     return cast(Table, table)
 
 
-def keep_metadata(func: Callable[..., pd.DataFrame | pd.Series]) -> Callable[..., Table | variables.Variable]:
+def keep_metadata(func: Callable[..., pd.DataFrame | pd.Series]) -> Callable[..., Table | indicators.Indicator]:
     """Decorator that turns a function that works on DataFrame or Series into a function that works
     on Table or Variable and preserves metadata.  If the decorated function renames columns, their
     metadata won't be copied.
@@ -3074,11 +3073,11 @@ def keep_metadata(func: Callable[..., pd.DataFrame | pd.Series]) -> Callable[...
         ```
     """
 
-    def wrapper(*args: Any, **kwargs: Any) -> Table | variables.Variable:
+    def wrapper(*args: Any, **kwargs: Any) -> Table | indicators.Indicator:
         tb = args[0]
         df = func(*args, **kwargs)
         if isinstance(df, pd.Series):
-            return variables.Variable(df, name=tb.name, metadata=tb.metadata)
+            return indicators.Indicator(df, name=tb.name, metadata=tb.metadata)
         elif isinstance(df, pd.DataFrame):
             return Table(df).copy_metadata(tb)
         else:

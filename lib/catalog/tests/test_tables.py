@@ -13,6 +13,7 @@ import pandas as pd
 import pytest
 
 from owid.catalog import VariablePresentationMeta, tables
+from owid.catalog.core.indicators import Indicator
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import (
@@ -22,7 +23,6 @@ from owid.catalog.tables import (
     get_unique_sources_from_tables,
     keep_metadata,
 )
-from owid.catalog.variables import Variable
 
 from .mocking import mock
 
@@ -203,7 +203,7 @@ def test_field_metadata_serialised():
 def test_tables_from_dataframes_have_variable_columns():
     df = pd.DataFrame({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
     t = Table(df)
-    assert isinstance(t.gdp, Variable)
+    assert isinstance(t.gdp, Indicator)
 
     t.gdp.metadata.title = "test"
 

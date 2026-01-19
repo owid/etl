@@ -250,8 +250,8 @@ def wrap(operation: str, parents: list[str] = []):
                 tb = func(*args, **kwargs)
 
             # TODO: fix circular imports
-            from owid.catalog import Table
-            from owid.catalog.variables import combine_variables_processing_logs
+            from owid.catalog.core.indicators import combine_indicators_processing_logs
+            from owid.catalog.core.tables import Table
 
             if isinstance(args[0], Table):
                 input_table = args[0]
@@ -263,7 +263,7 @@ def wrap(operation: str, parents: list[str] = []):
                     # if column is not there, use `parents` columns
                     else:
                         parent_variables = [input_table.loc[:, c] for c in parents]
-                        tb[col].m.processing_log = combine_variables_processing_logs(variables=parent_variables)
+                        tb[col].m.processing_log = combine_indicators_processing_logs(variables=parent_variables)
                         tb[col].m.processing_log.add_entry(col, parents=parent_variables, operation=operation)
 
             else:
