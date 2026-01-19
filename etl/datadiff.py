@@ -13,7 +13,7 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, find
+from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, fetch
 from owid.catalog.api.legacy import CHANNEL, ETLCatalog, LocalCatalog
 from owid.catalog.api.utils import OWID_CATALOG_URI
 from rich.console import Console
@@ -295,20 +295,9 @@ class RemoteDataset:
         self.table_names = table_names
 
     def __getitem__(self, name: str) -> Table:
-        tables = find(
-            table=name,
-            namespace=self.metadata.namespace,
-            version=str(self.metadata.version),
-            dataset=self.metadata.short_name,
-            channels=[self.metadata.channel],  # type: ignore
-        )
-
-        tables = tables[tables.channel == self.metadata.channel]  # type: ignore
-
-        # find matches substrings, we have to further filter it
-        tables = tables[tables.table == name]
-
-        return tables.load()
+        tb_uri = f"{self.metadata.channel}/{self.metadata.namespace}/{self.metadata.version}/{self.metadata.short_name}/{name}"
+        tb = fetch(tb_uri)
+        return tb
 
 
 @click.command(name="diff", help=__doc__)
