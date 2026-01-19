@@ -107,7 +107,7 @@ def run() -> None:
     tb_epi = ds_meadow.read("epi")  ## 1,683,598 rows
 
     # # Create EPI table
-    tb_epi = make_table_epi(tb_epi, dimensions, tb_art_old)
+    tb_epi = make_table_epi(tb_epi, dimensions, tb_art_old)  # 354,799
 
     # # Format
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
