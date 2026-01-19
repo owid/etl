@@ -6,7 +6,7 @@ definitions:
         - Plastic Pollution
 
   text_spot_model_principles: &text_spot_model_principles
-    The [SPOT model](https://www.nature.com/articles/s41586-024-07758-6) fills gaps in municipal waste data using statistical predictions, then estimates how plastic moves through the waste system and how uncertain those estimates are. It produces results for about 50,700 municipalities, which are then aggregated to countries and regions.
+    Cottom et al. (2024) developed the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6) model, which first fills gaps in municipal waste data using statistical predictions. It then estimates how plastic flows through the waste system and quantifies the uncertainty in those estimates. The model produces results for around 50,700 municipalities, which are subsequently aggregated to country and regional totals.
 
   text_scope_exclusions: &text_scope_exclusions
     This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include emissions from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.
@@ -62,14 +62,14 @@ definitions:
 
   desc_key_plastic_waste_generation: &desc_key_plastic_waste_generation
     - *text_plastic_waste_definition
-    - *text_scope_exclusions
     - *text_spot_model_principles
+    - *text_scope_exclusions
     - *text_model_uncertainty
 
   desc_key_plastic_waste_generation_per_cap: &desc_key_plastic_waste_generation_per_cap
     - *text_plastic_waste_definition
-    - *text_scope_exclusions
     - *text_spot_model_principles
+    - *text_scope_exclusions
     - *text_per_capita_calculation
 
   text_properly_managed_definition: &text_properly_managed_definition
@@ -83,13 +83,15 @@ definitions:
 
   desc_key_properly_managed_msw: &desc_key_properly_managed_msw
     - *text_msw_definition
+    - *text_spot_model_principles
     - *text_properly_managed_definition
     - *text_properly_managed_exclusions
     - *text_properly_managed_context
-    - *text_spot_model_principles
+    - *text_model_uncertainty
 
   desc_key_plastic_emissions_debris: &desc_key_plastic_emissions_debris
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_plastic_debris_definition
     - *text_emission_sources
@@ -98,6 +100,7 @@ definitions:
 
   desc_key_plastic_emissions_debris_per_cap: &desc_key_plastic_emissions_debris_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_plastic_debris_definition
     - *text_emission_sources
@@ -106,6 +109,7 @@ definitions:
 
   desc_key_plastic_emissions_burn: &desc_key_plastic_emissions_burn
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_open_burning_definition
     - *text_controlled_vs_uncontrolled
@@ -116,6 +120,7 @@ definitions:
 
   desc_key_plastic_emissions_burn_per_cap: &desc_key_plastic_emissions_burn_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_open_burning_definition
     - *text_controlled_vs_uncontrolled
@@ -126,6 +131,7 @@ definitions:
 
   desc_key_plastic_emissions_total: &desc_key_plastic_emissions_total
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_total_emissions_definition
     - *text_emissions_definition
     - *text_emission_sources
@@ -134,6 +140,7 @@ definitions:
 
   desc_key_plastic_emissions_total_per_cap: &desc_key_plastic_emissions_total_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_total_emissions_definition
     - *text_emissions_definition
     - *text_emission_sources
@@ -158,12 +165,14 @@ definitions:
 
   desc_key_litter_pathway: &desc_key_litter_pathway
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_litter_pathway
     - *text_model_uncertainty
 
   desc_key_litter_pathway_per_cap: &desc_key_litter_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_litter_pathway
     - *text_per_capita_calculation
@@ -171,12 +180,14 @@ definitions:
 
   desc_key_uncollected_pathway: &desc_key_uncollected_pathway
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_uncollected_pathway
     - *text_model_uncertainty
 
   desc_key_uncollected_pathway_per_cap: &desc_key_uncollected_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_uncollected_pathway
     - *text_per_capita_calculation
@@ -184,12 +195,14 @@ definitions:
 
   desc_key_collection_pathway: &desc_key_collection_pathway
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_collection_pathway
     - *text_model_uncertainty
 
   desc_key_collection_pathway_per_cap: &desc_key_collection_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_collection_pathway
     - *text_per_capita_calculation
@@ -197,6 +210,7 @@ definitions:
 
   desc_key_disposal_pathway: &desc_key_disposal_pathway
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_disposal_pathway
     - *text_dumpsite_working_face
@@ -204,6 +218,7 @@ definitions:
 
   desc_key_disposal_pathway_per_cap: &desc_key_disposal_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_disposal_pathway
     - *text_dumpsite_working_face
@@ -212,19 +227,19 @@ definitions:
 
   desc_key_recycling_pathway: &desc_key_recycling_pathway
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_recycling_pathway
     - *text_model_uncertainty
 
   desc_key_recycling_pathway_per_cap: &desc_key_recycling_pathway_per_cap
     - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_emissions_definition
     - *text_recycling_pathway
     - *text_per_capita_calculation
     - *text_model_uncertainty
 
-  text_share_global_definition: &text_share_global_definition
-    These indicators show emissions as a percentage of the global total.
 
   text_share_global_interpretation: &text_share_global_interpretation
     Because they are shares of a global total, they show each country or region's contribution regardless of population size.
@@ -238,9 +253,24 @@ definitions:
   text_no_collection_derived: &text_no_collection_derived
     It is derived from modelled collection coverage and population estimates used in the SPOT inventory.
 
-  desc_key_plastic_emissions_shares: &desc_key_plastic_emissions_shares
-    - *text_share_global_definition
+  desc_key_plastic_emissions_shares_burn: &desc_key_plastic_emissions_shares_burn
+    - This indicator shows the estimated share of global plastic waste emitted via open burning from municipal sources such as households, shops, and offices, attributed to each country or region.
     - *text_share_global_interpretation
+    - *text_open_burning_definition
+    - *text_controlled_vs_uncontrolled
+    - *text_burning_clarification
+    - *text_model_uncertainty
+
+  desc_key_plastic_emissions_shares_debris: &desc_key_plastic_emissions_shares_debris
+    - This indicator shows the estimated share of global plastic waste from municipal sources such as households, shops, and offices that escapes waste management and ends up in the environment as debris, attributed to each country or region.
+    - *text_share_global_interpretation
+    - *text_plastic_debris_definition
+    - *text_model_uncertainty
+
+  desc_key_plastic_emissions_shares_total: &desc_key_plastic_emissions_shares_total
+    - This indicator shows the share of global macroplastic emissions attributed to each country or region.
+    - *text_share_global_interpretation
+    - *text_total_emissions_definition
     - *text_model_uncertainty
 
   desc_key_collection_coverage: &desc_key_collection_coverage
@@ -445,7 +475,7 @@ tables:
         title: Share of global plastic emissions from open burning
         <<: *unit_percent
         description_short: Estimated share of global plastic waste emitted via open burning from municipal sources such as households, shops, and offices, attributed to each country or region.
-        description_key: *desc_key_plastic_emissions_shares
+        description_key: *desc_key_plastic_emissions_shares_burn
         description_processing: *processing_share_global_burn
         processing_level: major
         display:
@@ -462,7 +492,7 @@ tables:
         title: Share of global plastic emissions in a form of debris
         <<: *unit_percent
         description_short: Estimated share of global plastic waste from municipal sources such as households, shops, and offices that escapes waste management and ends up in the environment as debris, attributed to each country or region.
-        description_key: *desc_key_plastic_emissions_shares
+        description_key: *desc_key_plastic_emissions_shares_debris
         description_processing: *processing_share_global_debris
         processing_level: major
         display:
@@ -743,7 +773,7 @@ tables:
         title: Share of global plastic emissions
         <<: *unit_percent
         description_short: Share of global macroplastic emissions attributed to each country or region.
-        description_key: *desc_key_plastic_emissions_shares
+        description_key: *desc_key_plastic_emissions_shares_total
         description_processing: *processing_share_global
         processing_level: major
         display:
