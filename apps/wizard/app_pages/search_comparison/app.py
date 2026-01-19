@@ -7,6 +7,7 @@ import streamlit as st
 
 from apps.wizard.app_pages.search_comparison.random_queries import get_random_search_query
 from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
+from etl.config import OWID_ENV
 from etl.db import read_sql
 
 # Page config must be first Streamlit command
@@ -118,7 +119,8 @@ def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None)
     title = hit.get("title", "Untitled")
     slug = hit.get("slug", "")
     subtitle = hit.get("subtitle", "")
-    url = hit.get("url", f"{API_BASE}/grapher/{slug}")
+    # Use URL from API response, or fallback to current environment's site
+    url = hit.get("url") or f"{OWID_ENV.site}/grapher/{slug}"
 
     # Get score based on search type
     if search_type == "semantic":
