@@ -711,7 +711,7 @@ class Table(pd.DataFrame):
         if primary_key:
             # Check if the index is already set correctly (e.g., from JSON orient='table')
             current_index_names = [name for name in tb.index.names if name is not None]
-            if current_index_names != primary_key:
+            if set(current_index_names) != set(primary_key):
                 tb.set_index(primary_key, inplace=True)
 
     @classmethod
