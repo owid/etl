@@ -1,0 +1,246 @@
+epi:
+  "PLWH": "plwh"
+  "NEW_INFECTIONS": "new_infections"
+  "AIDS_DEATHS": "aids_deaths"
+  "HIV_INCIDENCE": "hiv_incidence"
+  "HIV_PREVALENCE": "hiv_prevalence"
+  "AIDS_MORTALITY_1000_POP": "aids_mortality_1000_pop"
+  "PERCENT_PLWH": "percent_plwh"
+  "PERCENT_KNOW_STATUS_ON_ART": "percent_know_status_on_art"
+  "PLHIV_KNOWLEDGE_OF_STATUS": "plhiv_knowledge_of_status"
+  "DEATHS_PLHIV_ALL_CAUSES": "deaths_plhiv_all_causes"
+  "AIDS_ORPHANS": "aids_orphans"
+  "PEOPLE_RECEIVING_ART": "people_receiving_art"
+  "PERCENT_ON_ART_VL_SUPPRESSED": "percent_art_vl_suppressed"
+  "VIRAL_LOAD_SUPPRESSION": "viral_load_suppression"
+  "IPR": "ipr"
+  "CHILDREN_EXPOSED_UNINFECTED": "children_exposed_uninfected"
+  "INFECTIONS_AVERTED_PMTCT": "infections_averted_pmtct"
+  "NUMBER_PLHIV_KNOWLEDGE_OF_STATUS": "number_plhiv_knowledge_of_status"
+  "DEATHS_AVERTED_ART": "deaths_averted_art"
+  "IMR": "imr"
+  "NUMBER_VIRAL_SUPPRESSION": "number_viral_suppression"
+  "MOTHERS_NEEDING_ARV_FOR_PMTCT": "mothers_needing_arv_for_pmtct"
+  "COVERAGE_MOTHERS_RECEIVING_ARV": "coverage_mothers_receiving_arv"
+  "PEOPLE_UNSUPP_VL": "people_unsupp_vl"
+  "MTCT_RATE": "mtct_rate"
+  "MOTHERS_RECEIVING_ARV_FOR_PMTCT": "mothers_receiving_arv_for_pmtct"
+  ##
+  "NO_RECEIVE_ART_DURING_BF": "art_none_bf"
+  "DID_NOT_RECEIVE_ART_DURING_PREGNANCY_CHILD_INFECTED_DURING_": "art_none_preg_child_inf_preg"
+  "MOTHER_DROPPED_OFF_ART_DURING_BREASTFEEDING_CHILD_INFECTED_": "art_drop_bf_child_inf"
+  "MOTHER_DROPPED_OFF_ART_DURING_PREGNANCY_CHILD_INFECTED_DURI": "art_drop_preg_child_inf"
+  "MOTHER_INFECTED_DURING_BREASTFEEDING_CHILD_INFECTED_DURING_": "mother_child_inf_bf"
+  "MOTHER_INFECTED_DURING_PREGNANCY_CHILD_INFECTED_DURING_PREG": "mother_child_inf_preg"
+  ##
+  "STARTED_ART_BEFORE_THE_PREGNANCY_CHILD_INFECTED_DURING_BREA": "art_start_before_preg_child_inf_bf"
+  "STARTED_ART_BEFORE_THE_PREGNANCY_CHILD_INFECTED_DURING_PREG": "art_start_before_preg_child_inf_preg"
+  "STARTED_ART_DURING_IN_PREGNANCY_CHILD_INFECTED_DURING_BREAS": "art_start_during_preg_child_inf_bf"
+  "STARTED_ART_DURING_IN_PREGNANCY_CHILD_INFECTED_DURING_PREGN": "art_start_child_inf_during_preg"
+  "STARTED_ART_LATE_IN_PREGNANCY_CHILD_INFECTED_DURING_BREASTF": "art_start_late_preg_child_inf_bf"
+  "STARTED_ART_LATE_IN_PREGNANCY_CHILD_INFECTED_DURING_PREGNAN": "art_start_late_preg_child_inf_preg"
+  ##
+  "PCT_CHANGE_AIDS_DEATHS_2010": "pct_change_aids_deaths_2010"
+  "PCT_CHANGE_NEW_INFECTIONS_2010": "pct_change_new_infections_2010"
+  ## DISCARD
+  "TARGET_IPR": null
+  "NEWLY_INITIATING_ART": null
+  "LATE_HIV_DIAGNOSIS": null
+  "TARGET_PLHIV_VIRAL_SUPPRESSION": null
+  "TARGET_ON_ART_VL_SUPPRESSED": null
+  "ANC_TESTING": null
+  "TARGET_PLHIV_KNOWLEDGE_OF_STATUS": null
+  "TARGET_KNOW_STATUS_ON_ART": null
+  "TARGET_PLHIV_ON_ART": null
+  "EARLY_INFANT_DIAGNOSIS": null
+gam:
+  #######################
+  # GAM
+  #######################
+  # low quality
+  "Expenditure on collaborative TB/HIV activities": "expenditure_tb_hiv_activities"
+  # Newly enrolled to HIV treatment
+  "People newly enrolled in HIV treatment": "hiv_care"
+  "People newly enrolled in HIV treatment diagnosed as having TB during the reporting period": "hiv_tb_diagnosis"
+  "People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)": "hiv_tb_patients_under_ipt"
+  "Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)": "newly_enrolled_care"
+  "Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease": "plhiv_in_care_with_active_tb"
+  "Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy": "plhiv_receiving_tb_preventive_therapy"
+  # Currently enrolled to HIV treatment
+  "People currently enrolled in HIV treatment": "plhiv_current_enrolled"
+  "Proportion of people living with HIV currently enrolled in HIV treatment started on TB preventive therapy": "plhiv_current_tb_preventative"
+  "People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period": "plhiv_current_treatment_tb"
+  # Condoms distributed to prisoners
+  "Condoms distributed to prisoners": "prisoners_condoms_distributed"
+  # TB
+  "TB patients living with HIV receiving ART": "hiv_tb_patients_receiving_art"
+  "Percent of TB patients living with HIV receiving ART": "share_hiv_tb_patients_receiving_art" # NEW
+  "TB patients living with HIV receiving CPT": "hiv_tb_patients_receiving_cpt"
+  "Percent of TB patients living with HIV receiving CPT": "share_hiv_tb_patients_receiving_cpt" # NEW
+  "Total new and relapse TB cases": "new_relapse_tb_cases"
+  "Total notified TB cases": "notified_tb_cases"
+  # TPT, ART
+  "People on ART who were eligible for TB preventive treatment (TPT)": "people_art_elig_tpt"
+  "People on ART who were eligible for TB preventive treatment (TPT) that started TPT": "people_art_elig_tpt_strt"
+  "People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT": "people_new_art_elig_tpt_strt"
+  "Number of people on antiretroviral treatment who completed TPT among those who initiated any course of TPT during the previous year": "num_art_complt_tpt"
+  "Number of people on antiretroviral treatment who initiated any course of TPT during the previous year": "num_art_init_tpt"
+  "Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT": "prop_art_tpt_start"
+  "Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT": "prop_new_art_tpt_strt"
+  # Others
+  "Estimated resource needs": "resource_needs_ft"
+  "Total TB expenditure": "tb_expenditure"
+  # Prisoners
+  "Tuberculosis (TB) infection among prisoners": "prisoners_tb"
+  "People receiving pre-exposure prophylaxis (PrEP)": "people_on_prep"
+  "Proportion of people living with HIV on ART who completed a course of TPT": "per_tpt_art_cmplt"
+  # Needles
+  "Needles and syringes distributed per person who inject drugs": "pwid_needles"
+  "Sterile needles distributed to prisoners": "prisoners_needles" # NEW
+  # TB patients with HIV documented status
+  "Proportion of registered new and relapse TB patients with documented HIV status": "tb_patients_documented_hiv_status"
+  "Proportion of registered new and relapse TB patients with documented HIV-positive status": "tb_patients_documented_hiv_positive_status"
+  "TB patients tested positive for HIV": "tb_patients_tested_positive_hiv"
+  #######################
+  # GAM SEX
+  #######################
+  "Knowledge about HIV prevention in young people": "knowledge_in_young_people"
+  #######################
+  # GAM AGE
+  #######################
+  "Annual number of males voluntarily circumcised": "male_circumcisions_performed"
+  #######################
+  # GAM GROUP
+  #######################
+  "Experience of HIV-related discrimination in healthcare settings": "discrimination_hc_settings"
+  "Country-reported HIV expenditure by funding source": "domestic_spending_fund_source"
+  "Estimated HIV resource availability for low- and middle-income countries in constant 2019 USD": "resource_avail_constant"
+  ## condoms_distributed_pp
+  "Condoms distributed per person in prevention programmes for sex workers": "sw_condoms_distributed"
+  "Condoms distributed per person in prevention programmes for men who have sex with men": "msm_condoms_distributed"
+  ## population
+  "Population": "population"
+  "Sex workers: Population size estimate": "sex_workers_population_size"
+  "Transgender people: Population size estimate": "tg_population_size"
+  "People who inject drugs: Population size estimate": "pwid_population_size"
+  "Prisoners: Population size estimate": "prisoners_population_size"
+  "Men who have sex with men: Population size estimate": "msm_population_size"
+  #######################
+  # GAM ESTIMATES
+  #######################
+  "Co-management of tuberculosis and HIV treatment": "comanagement_tb_hiv"
+  "Estimated HIV in new TB cases": "hiv_new_tb_cases"
+  "Incident TB cases in people living with HIV": "incident_tb_cases"
+  "Estimated TB-related deaths among people living with HIV": "tb_related_deaths"
+  #######################
+  # GAM HEPATITIS
+  #######################
+  ## viral_hepatitis
+  "Viral hepatitis among transgender people": "tg_hepatitis"
+  "Viral hepatitis among men who have sex with men": "msm_hepatitis"
+  "Viral hepatitis among sex workers": "sw_hepatitis"
+  "Viral hepatitis among people who inject drugs": "pwid_hepatitis"
+  ##
+  "Hepatitis C (HCV) infection among prisoners": "prisoners_hepatitis_c"
+  #######################
+  # GAM AGE GROUP
+  #######################
+  "Prevalence of male circumcision": "prevalence_male_circumcision"
+  "HIV self-tests": "hiv_self_tests" # This is not collapsed under hiv_tests actually
+  #######################
+  # GAM SEX GROUP
+  #######################
+  "Annual number of condoms distributed": "condoms_distributed"
+  ## experience_violence
+  "Experience of sexual and/or physical violence among sex workers": "sw_exp_phys_sv"
+  "Experience of sexual and/or physical violence among people who inject drugs": "idu_exp_phys_sv"
+  "Experience of sexual and/or physical violence among men who have sex with men": "msm_exp_phys_sv"
+  "Experience of sexual and/or physical violence among transgender people": "tg_exp_phys_sv"
+  ## syphilis_prevalence
+  "Syphilis prevalence among sex workers": "sw_syphilis"
+  "Syphilis prevalence among men who have sex with men": "msm_syphilis"
+  "Syphilis prevalence among transgender people": "tg_syphilis" # NEW
+  #######################
+  # GAM AGE SEX
+  #######################
+  "Attitudes towards violence against women": "att_tow_wife_beating"
+  "Demand for family planning satisfied by modern methods": "demand_family_planning"
+  "Prevalence of recent intimate partner violence": "prevalence_ipv"
+  "Coverage of opioid agonist maintenance therapy": "pwid_ost_coverage"
+  "HIV positivity rate": "hiv_pos_rate"
+  #######################
+  # GAM AGE SEX GROUP
+  #######################
+  ## art_coverage
+  "Antiretroviral therapy coverage among sex workers living with HIV": "sex_workers_art_coverage"
+  "Antiretroviral therapy coverage among men who have sex with men living with HIV": "msm_art_coverage"
+  "Antiretroviral therapy coverage among people who inject drugs": "pwid_art_coverage"
+  "Antiretroviral therapy coverage among transgender people": "tg_art_coverage"
+  "Antiretroviral therapy coverage among prisoners living with HIV": "prisoners_art_coverage"
+  ## avoidance_care
+  "Sex workers: Avoidance of health care because of stigma and discrimination": "sw_avoidance_care"
+  "People who inject drugs: Avoidance of health care because of stigma and discrimination": "pwid_avoidance_care"
+  "Transgender people: Avoidance of health care because of stigma and discrimination": "tg_avoided_healthcare_facility"
+  "Men who have sex with men: Avoidance of health care because of stigma and discrimination": "msm_afraid_to_seek_health_services"
+  ## condom_use
+  "Condom use at last high-risk sex": "condom_use"
+  "Condom use among sex workers": "sex_workers_condom_use"
+  "Condom use among transgender people": "tg_condom_use"
+  "Condom use among people who inject drugs": "pwid_condom_use"
+  "Condom use among men who have sex with men": "msm_condom_use"
+  ##
+  "Discriminatory attitudes towards people living with HIV": "discriminatory_attitudes"
+  ## experience_stigma
+  "Experience of stigma and discrimination among sex workers": "sw_kp_report_exp_sd"
+  "Experience of stigma and discrimination among transgender people": "tg_kp_report_exp_sd"
+  "Experience of stigma and discrimination among people who inject drugs": "idu_kp_report_exp_sd"
+  "Experience of stigma and discrimination among men who have sex with men": "msm_kp_report_exp_sd"
+  ## hiv_prevalence
+  "HIV prevalence among transgender people": "tg_hiv_prevalence"
+  "HIV prevalence among men who have sex with men": "msm_hiv_prevalence"
+  "HIV prevalence among sex workers": "sex_workers_hiv_prevalence"
+  "HIV prevalence among people who inject drugs": "pwid_hiv_prevalence"
+  "HIV prevalence among prisoners": "prisoners_hiv_prevalence"
+  ## hiv_programmes_coverage
+  "Coverage of HIV prevention programmes among transgender people": "tg_programmes"
+  "Coverage of HIV prevention programmes among sex workers": "sw_programmes"
+  "Coverage of HIV prevention programmes among people who inject drugs": "pwid_programmes"
+  "Coverage of HIV prevention programmes among men who have sex with men": "msm_programmes"
+  ## hiv_status_awareness
+  "HIV testing and status awareness among transgender people": "tg_hiv_status"
+  "HIV testing and status awareness among sex workers": "sw_hiv_status"
+  "HIV testing and status awareness among people who inject drugs": "pwid_hiv_status"
+  "HIV testing and status awareness among men who have sex with men": "msm_hiv_status"
+  ## hiv_tests
+  "HIV testing among TB patients": "hiv_testing_tb_patients"
+  "HIV tests (volume)": "hiv_tests_vol"
+  ##
+  "Safe injecting practices among people who inject drugs": "pwid_safety"
+  #####################################################################
+  # TO BE MAPPED
+  #####################################################################
+  # Cervical cancer
+  "Number of women living with HIV who were screened for cervical cancer using any screening test": null
+  "Programmatic data on cervical cancer screening among women living with HIV": null
+  "Survey-based data on cervical cancer screening among women living with HIV": null
+  "Cervical precancer treatment in women living with HIV": null
+  "Treatment of invasive cervical cancer in women living with HIV": null
+  # Congenital syphilis
+  "Congenital syphilis cases": null
+  "Congenital syphilis rate per 100000": null
+  # Hepatitis C
+  "Hepatits C testing": null
+  # Syphilis
+  "Vertical transmission of syphilis": null
+  # Stigma
+  "Internalized stigma reported by people living with HIV": null
+  # Others
+  "Advanced HIV disease": null
+  "Coverage of differentiated service delivery ART models": null
+  "Viral suppression among people living with HIV engaged in differentiated service delivery ART models": null
+  "Proportion of people coinfected with HIV and HCV starting HCV treatment": null
+  "Stigma and discrimination experienced by people living with HIV in community settings": null
+  "People newly on ART who were eligible for TB preventive treatment (TPT) ": null
+  "People living with HIV seeking redress for violations of their rights": null
+  "Denied health services because of their HIV status in the last 12 months": null
+  "Prisoners receiving opioid agonist maintenance therapy": null #prisoners_ost

@@ -1,0 +1,805 @@
+epi:
+  # Total
+  "ESTIMATE":
+    age: total
+    sex: total
+    estimate: central
+  "ESTIMATE_TOTAL":
+    age: total
+    sex: total
+    estimate: central
+  "ESTIMATE_ALL_AGES":
+    age: total
+    sex: total
+    estimate: central
+  "ALL_AGES":
+    age: total
+    sex: total
+    estimate: central
+  "TOTAL":
+    age: total
+    sex: total
+    estimate: central
+
+  "HIGH_ESTIMATE":
+    age: total
+    sex: total
+    estimate: high
+  "HIGH_ESTIMATE_TOTAL":
+    age: total
+    sex: total
+    estimate: high
+  "HIGH_ESTIMATE_ALL_AGES":
+    age: total
+    sex: total
+    estimate: high
+
+  "LOW_ESTIMATE":
+    age: total
+    sex: total
+    estimate: low
+  "LOW_ESTIMATE_TOTAL":
+    age: total
+    sex: total
+    estimate: low
+  "LOW_ESTIMATE_ALL_AGES":
+    age: total
+    sex: total
+    estimate: low
+
+  # ERROR HERE, because of AIDS_MORTALITY_1000_POP! #
+  "ESTIMATE_FEMALES":
+    age: total
+    sex: female
+    estimate: central
+  "FEMALES_ALL_ESTIMATE":
+    age: total
+    sex: female
+    estimate: central
+
+  "HIGH_ESTIMATE_FEMALES":
+    age: total
+    sex: female
+    estimate: high
+  "FEMALES_ALL_HIGH_ESTIMATE":
+    age: total
+    sex: female
+    estimate: high
+
+  "LOW_ESTIMATE_FEMALES":
+    age: total
+    sex: female
+    estimate: low
+  "FEMALES_ALL_LOW_ESTIMATE":
+    age: total
+    sex: female
+    estimate: low
+
+  "ESTIMATE_MALES":
+    age: total
+    sex: male
+    estimate: central
+  "MALES_ALL_ESTIMATE":
+    age: total
+    sex: male
+    estimate: central
+
+  "HIGH_ESTIMATE_MALES":
+    age: total
+    sex: male
+    estimate: high
+  "MALES_ALL_HIGH_ESTIMATE":
+    age: total
+    sex: male
+    estimate: high
+
+  "LOW_ESTIMATE_MALES":
+    age: total
+    sex: male
+    estimate: low
+  "MALES_ALL_LOW_ESTIMATE":
+    age: total
+    sex: male
+    estimate: low
+
+  "PROGRAM_DATA":
+    age: total
+    sex: total
+    estimate: program
+
+  # 0-14
+  "0_14":
+    age: 0-14
+    sex: total
+    estimate: central
+  "ESTIMATE_0_14":
+    age: 0-14
+    sex: total
+    estimate: central
+
+  "HIGH_ESTIMATE_0_14":
+    age: 0-14
+    sex: total
+    estimate: high
+
+  "LOW_ESTIMATE_0_14":
+    age: 0-14
+    sex: total
+    estimate: low
+
+  # 0-17
+  "ESTIMATE_0_17":
+    age: 0-17
+    sex: total
+    estimate: central
+
+  "HIGH_ESTIMATE_0_17":
+    age: 0-17
+    sex: total
+    estimate: high
+
+  "LOW_ESTIMATE_0_17":
+    age: 0-17
+    sex: total
+    estimate: low
+
+  # 10-19
+  "10_19_ESTIMATE":
+    age: 10-19
+    sex: total
+    estimate: central
+
+  "10_19_HIGH_ESTIMATE":
+    age: 10-19
+    sex: total
+    estimate: high
+
+  "10_19_LOW_ESTIMATE":
+    age: 10-19
+    sex: total
+    estimate: low
+
+  "FEMALES_10_19_ESTIMATE":
+    age: 10-19
+    sex: female
+    estimate: central
+
+  "FEMALES_10_19_HIGH_ESTIMATE":
+    age: 10-19
+    sex: female
+    estimate: high
+
+  "FEMALES_10_19_LOW_ESTIMATE":
+    age: 10-19
+    sex: female
+    estimate: low
+
+  "MALES_10_19_ESTIMATE":
+    age: 10-19
+    sex: male
+    estimate: central
+
+  "MALES_10_19_HIGH_ESTIMATE":
+    age: 10-19
+    sex: male
+    estimate: high
+
+  "MALES_10_19_LOW_ESTIMATE":
+    age: 10-19
+    sex: male
+    estimate: low
+
+  # 15-24
+  "15_24_ESTIMATE":
+    age: 15-24
+    sex: total
+    estimate: central
+
+  "15_24_HIGH_ESTIMATE":
+    age: 15-24
+    sex: total
+    estimate: high
+
+  "15_24_LOW_ESTIMATE":
+    age: 15-24
+    sex: total
+    estimate: low
+
+  "FEMALES_15_24_ESTIMATE":
+    age: 15-24
+    sex: female
+    estimate: central
+
+  "ESTIMATE_FEMALES_15_24_MODELLED":
+    age: 15-24
+    sex: female
+    estimate: central
+
+  "FEMALES_15_24_HIGH_ESTIMATE":
+    age: 15-24
+    sex: female
+    estimate: high
+  "HIGH_ESTIMATE_FEMALES_15_24_MODELLED":
+    age: 15-24
+    sex: female
+    estimate: high
+
+  "FEMALES_15_24_LOW_ESTIMATE":
+    age: 15-24
+    sex: female
+    estimate: low
+  "LOW_ESTIMATE_FEMALES_15_24_MODELLED":
+    age: 15-24
+    sex: female
+    estimate: low
+
+  "MALES_15_24_ESTIMATE":
+    age: 15-24
+    sex: male
+    estimate: central
+  "ESTIMATE_MALES_15_24_MODELLED":
+    age: 15-24
+    sex: male
+    estimate: central
+
+  "MALES_15_24_HIGH_ESTIMATE":
+    age: 15-24
+    sex: male
+    estimate: high
+  "HIGH_ESTIMATE_MALES_15_24_MODELLED":
+    age: 15-24
+    sex: male
+    estimate: high
+
+  "MALES_15_24_LOW_ESTIMATE":
+    age: 15-24
+    sex: male
+    estimate: low
+  "LOW_ESTIMATE_MALES_15_24_MODELLED":
+    age: 15-24
+    sex: male
+    estimate: low
+
+  # 15-49
+  "ESTIMATE_15_49":
+    age: 15-49
+    sex: total
+    estimate: central
+  "ESTIMATE_15_49_MODELLED":
+    age: 15-49
+    sex: total
+    estimate: central
+
+  "HIGH_ESTIMATE_15_49":
+    age: 15-49
+    sex: total
+    estimate: high
+  "HIGH_ESTIMATE_15_49_MODELLED":
+    age: 15-49
+    sex: total
+    estimate: high
+
+  "LOW_ESTIMATE_15_49":
+    age: 15-49
+    sex: total
+    estimate: low
+  "LOW_ESTIMATE_15_49_MODELLED":
+    age: 15-49
+    sex: total
+    estimate: low
+
+  "FEMALES_ADULTS_ESTIMATE":
+    age: 15-49
+    sex: female
+    estimate: central
+
+  "FEMALES_ADULTS_HIGH_ESTIMATE":
+    age: 15-49
+    sex: female
+    estimate: high
+
+  "FEMALES_ADULTS_LOW_ESTIMATE":
+    age: 15-49
+    sex: female
+    estimate: low
+
+  "MALES_ADULTS_ESTIMATE":
+    age: 15-49
+    sex: male
+    estimate: central
+
+  "MALES_ADULTS_HIGH_ESTIMATE":
+    age: 15-49
+    sex: male
+    estimate: high
+
+  "MALES_ADULTS_LOW_ESTIMATE":
+    age: 15-49
+    sex: male
+    estimate: low
+
+  # 15+
+  "15_AND_UP":
+    age: 15+
+    sex: total
+    estimate: central
+  "ESTIMATE_15_AND_UP":
+    age: 15+
+    sex: total
+    estimate: central
+
+  "HIGH_ESTIMATE_15_AND_UP":
+    age: 15+
+    sex: total
+    estimate: high
+
+  "LOW_ESTIMATE_15_AND_UP":
+    age: 15+
+    sex: total
+    estimate: low
+
+  "FEMALE_ADULTS":
+    age: 15+
+    sex: female
+    estimate: central
+  "ESTIMATE_FEMALES_15_AND_UP":
+    age: 15+
+    sex: female
+    estimate: central
+
+  "HIGH_ESTIMATE_FEMALES_15_AND_UP":
+    age: 15+
+    sex: female
+    estimate: high
+
+  "LOW_ESTIMATE_FEMALES_15_AND_UP":
+    age: 15+
+    sex: female
+    estimate: low
+
+  "MALE_ADULTS":
+    age: 15+
+    sex: male
+    estimate: central
+  "ESTIMATE_MALES_15_AND_UP":
+    age: 15+
+    sex: male
+    estimate: central
+
+  "HIGH_ESTIMATE_MALES_15_AND_UP":
+    age: 15+
+    sex: male
+    estimate: high
+
+  "LOW_ESTIMATE_MALES_15_AND_UP":
+    age: 15+
+    sex: male
+    estimate: low
+
+  # 50+
+  "50_AND_UP_ESTIMATE":
+    age: 50+
+    sex: total
+    estimate: central
+
+  "50_AND_UP_HIGH_ESTIMATE":
+    age: 50+
+    sex: total
+    estimate: high
+
+  "50_AND_UP_LOW_ESTIMATE":
+    age: 50+
+    sex: total
+    estimate: low
+
+  "FEMALES_50_AND_UP_ESTIMATE":
+    age: 50+
+    sex: female
+    estimate: central
+
+  "FEMALES_50_AND_UP_HIGH_ESTIMATE":
+    age: 50+
+    sex: female
+    estimate: high
+
+  "FEMALES_50_AND_UP_LOW_ESTIMATE":
+    age: 50+
+    sex: female
+    estimate: low
+
+  "MALES_50_AND_UP_ESTIMATE":
+    age: 50+
+    sex: male
+    estimate: central
+
+  "MALES_50_AND_UP_LOW_ESTIMATE":
+    age: 50+
+    sex: male
+    estimate: high
+
+  "MALES_50_AND_UP_HIGH_ESTIMATE":
+    age: 50+
+    sex: male
+    estimate: low
+
+gam:
+  "Distributed":
+    sex: "total"
+    age: "total" # CHECK
+    group: "distributed"
+  "Domestic (Public and Private)":
+    group: "domestic"
+  "Domestic Public":
+    group: "domestic public"
+  "Domestic Private":
+    group: "domestic private"
+  ########################################
+  # ALL
+  ########################################
+  # estimates
+  "estimate":
+    sex: total
+    age: total
+    estimate: central
+  "upper estimate":
+    estimate: "high"
+  "lower estimate":
+    estimate: "low"
+  # all
+  "All ages":
+    age: "total"
+  "All sexes":
+    sex: total
+  "Total":
+    sex: "total"
+    age: "total"
+    group: "total"
+  "Total No to all questions":
+    sex: "total"
+    age: "total"
+    group: "all questions"
+  "Total No to question 1":
+    sex: "total"
+    age: "total"
+    group: "question 1"
+  "Total No to question 2":
+    sex: "total"
+    age: "total"
+    group: "question 2"
+  # 0-14
+  "Children (0-14)":
+    age: 0-14
+  # <1
+  "<1":
+    age: "0-1"
+  # 1-9
+  "1-9":
+    age: 1-9
+  # <25
+  "< 25":
+    age: "0-25"
+  # 10-14
+  "10-14":
+    age: 10-14
+  # 15-19
+  "15-19":
+    age: 15-19
+  # 15-24
+  "All sexes Young people (15-24) Yes to all questions":
+    age: 15-24
+    sex: total
+    group: all questions
+  # 15-49
+  "Adults (15-49)":
+    age: 15-49
+  "All sexes Adults (15-49)":
+    sex: "total"
+    age: "15-49"
+  # 20-24
+  "20-24":
+    age: 20-24
+  # 25-29
+  "25-29":
+    age: 25-29
+  "25-49":
+    age: 25-49
+  # 25+
+  "25+":
+    age: 25+
+  # 50+
+  "50+":
+    age: 50+
+  ########################################
+  # FEMALES
+  ########################################
+  # Females
+  "Females":
+    sex: "female"
+    age: "total"
+  "Females No to all questions":
+    sex: "female"
+    age: "total"
+    group: "all questions"
+  "Females No to question 1":
+    sex: "female"
+    age: "total"
+    group: "question 1"
+  "Females No to question 2":
+    sex: "female"
+    age: "total"
+    group: "question 2"
+  # adults (15+)
+  "Females Adults (15+)":
+    sex: "female"
+    age: "15+"
+  # 15-19
+  "Females 15-19":
+    sex: "female"
+    age: "15-19"
+  "Females 15-19 No to all questions":
+    sex: "female"
+    age: "15-19"
+    group: all questions
+  "Females 15-19 No to question 1":
+    sex: "female"
+    age: "15-19"
+    group: "question 1"
+  "Females 15-19 No to question 2":
+    sex: "female"
+    age: "15-19"
+    group: "question 2"
+  # 15-24
+  "Females Young people (15-24) Yes to all questions": # Only affects `knowledge_in_young_people`, fine to have just `sex` dimension
+    age: "15-24"
+    sex: "female"
+    group: "all questions"
+  "Females Young people (15-24)":
+    sex: "female"
+    age: "15-24"
+  # 15-49
+  "Females Adults (15-49)":
+    sex: "female"
+    age: "15-49"
+  # 20-24
+  "Females 20-24":
+    sex: "female"
+    age: "20-24"
+  "Females 20-24 No to all questions":
+    sex: "female"
+    age: "20-24"
+    group: "all questions"
+  "Females 20-24 No to question 1":
+    sex: "female"
+    age: "20-24"
+    group: "question 1"
+  "Females 20-24 No to question 2":
+    sex: "female"
+    age: "20-24"
+    group: "question 2"
+  # 25-49
+  "Females 25-49":
+    sex: "female"
+    age: "25-49"
+  "Females 25-49 No to all questions":
+    sex: "female"
+    age: "25-49"
+    group: "all questions"
+  "Females 25-49 No to question 1":
+    sex: "female"
+    age: "25-49"
+    group: "question 1"
+  "Females 25-49 No to question 2":
+    sex: "female"
+    age: "25-49"
+    group: "question 2"
+  # others
+  "Female condoms NGOs":
+    sex: "female"
+    age: "total"
+    group: "NGO"
+  "Female condoms Private":
+    sex: "female"
+    age: "total"
+    group: "private"
+  "Female condoms Public":
+    sex: "female"
+    age: "total"
+    group: "public"
+  "Female condoms Total":
+    sex: "female"
+    age: "total"
+    group: "total"
+  ########################################
+  # MALES
+  ########################################
+  # Males
+  "Males":
+    sex: "male"
+    age: "total"
+  "Males No to all questions":
+    sex: "male"
+    age: "total"
+    group: "all questions"
+  "Males No to question 1":
+    sex: "male"
+    age: "total"
+    group: "question 1"
+  "Males No to question 2":
+    sex: "male"
+    age: "total"
+    group: "question 2"
+  # 15+
+  "Males Adults (15+)":
+    sex: "male"
+    age: "15+"
+  # 15-19
+  "Males 15-19":
+    sex: "male"
+    age: "15-19"
+  "Males 15-19 No to all questions":
+    sex: "male"
+    age: "15-19"
+    group: "all questions"
+  "Males 15-19 No to question 1":
+    sex: "male"
+    age: "15-19"
+    group: "question 1"
+  "Males 15-19 No to question 2":
+    sex: "male"
+    age: "15-19"
+    group: "question 2"
+  # 15-24
+  "Males Young people (15-24)":
+    sex: "male"
+    age: "15-24"
+  "Males Young people (15-24) Yes to all questions": # Only affects `knowledge_in_young_people`, fine to have just `sex` dimension
+    age: 15-24
+    sex: male
+    group: all questions
+  # 15-49
+  "Males Adults (15-49)":
+    sex: "male"
+    age: "15-49"
+  # 20-24
+  "Males 20-24":
+    sex: "male"
+    age: "20-24"
+  "Males 20-24 No to all questions":
+    sex: "male"
+    age: "20-24"
+    group: "all questions"
+  "Males 20-24 No to question 1":
+    sex: "male"
+    age: "20-24"
+    group: "question 1"
+  "Males 20-24 No to question 2":
+    sex: "male"
+    age: "20-24"
+    group: "question 2"
+  # 25-49
+  "Males 25-49":
+    sex: "male"
+    age: "25-49"
+  "Males 25-49 No to all questions":
+    sex: "male"
+    age: "25-49"
+    group: "all questions"
+  "Males 25-49 No to question 1":
+    sex: "male"
+    age: "25-49"
+    group: "question 1"
+  "Males 25-49 No to question 2":
+    sex: "male"
+    age: "25-49"
+    group: "question 2"
+  # others
+  "Male condoms NGOs":
+    sex: "male"
+    age: "total"
+    group: "NGO"
+  "Male condoms Private":
+    sex: "male"
+    age: "total"
+    group: "private"
+  "Male condoms Public":
+    sex: "male"
+    age: "total"
+    group: "public"
+  "Male condoms Total":
+    sex: "male"
+    age: "total"
+    group: "total"
+  ########################################
+  # HEPATITIS
+  ########################################
+  # Hepatitis B, total
+  "Hepatitis B Total":
+    sex: "total"
+    age: "total"
+    hepatitis: "B"
+  "Hepatitis B Females":
+    sex: "female"
+    age: "total"
+    hepatitis: "B"
+  "Hepatitis B Males":
+    sex: "male"
+    age: "total"
+    hepatitis: "B"
+  # Hepatitis C, total
+  "Hepatitis C Total":
+    sex: "total"
+    age: "total"
+    hepatitis: "C"
+  "Hepatitis C Females":
+    sex: "female"
+    age: "total"
+    hepatitis: "C"
+  "Hepatitis C Males":
+    sex: "male"
+    age: "total"
+    hepatitis: "C"
+  # Hepatitis B, others
+  "Hepatitis B < 25":
+    sex: "total"
+    age: "0-25"
+    hepatitis: "B"
+  "Hepatitis B 25+":
+    sex: "total"
+    age: "25+"
+    hepatitis: "B"
+  "Hepatitis B Transgender":
+    sex: "total"
+    age: "total"
+    group: transgender
+    hepatitis: "B"
+  # Hepatitis C, others
+  "Hepatitis C < 25":
+    sex: "total"
+    age: "0-25"
+    hepatitis: "C"
+  "Hepatitis C 25+":
+    sex: "total"
+    age: "25+"
+    hepatitis: "C"
+  "Hepatitis C Transgender":
+    sex: "total"
+    age: "total"
+    group: transgender
+    hepatitis: "C"
+  ####
+  # Healthcare
+  "All healthcare services":
+    group: "all healthcare"
+  "HIV-related healthcare services":
+    group: "HIV-related"
+  "Formal healthcare":
+    group: "formal healthcare"
+  "Non-HIV-related healthcare services":
+    group: "non-HIV related"
+  "United States (bilateral)":
+    group: "US bilateral"
+  "Global Fund":
+    group: "global fund"
+  # Source
+  "International":
+    group: "international"
+  "Other international":
+    group: "other international"
+  "PEPFAR":
+    group: "PEPFAR"
+  "Procured":
+    sex: "total"
+    age: "total"
+    group: "procured"
+  # Trans
+  "Transgender":
+    group: "transgender"
+  "Transman":
+    group: "transman"
+  "Transother":
+    group: "transother"
+  "Transwoman":
+    group: "transwoman"
+  # Others
+  "Traditional practitioner":
+    group: "traditional"
