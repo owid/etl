@@ -19,8 +19,11 @@ def run() -> None:
     idx_latest = tb_gdp.groupby("country")["year"].idxmax()
     tb = tb_gdp.loc[idx_latest, ["country", "year", "gdp_per_capita"]]
 
+    # Rename columns
+    tb = tb.rename(columns={"country": "entityName", "gdp_per_capita": "value"})
+
     # Set index and name
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.set_index(["entityName", "year"], verify_integrity=True)
     tb.metadata.short_name = "gdp"
 
     # Save as CSV
