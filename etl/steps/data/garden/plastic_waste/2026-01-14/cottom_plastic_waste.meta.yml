@@ -6,10 +6,10 @@ definitions:
         - Plastic Pollution
 
   text_spot_model_principles: &text_spot_model_principles
-    The (SPOT model)[https://www.nature.com/articles/s41586-024-07758-6] fills gaps in municipal waste data using statistical predictions, then estimates how plastic moves through the waste system and how uncertain those estimates are. It produces results for about 50,700 municipalities, which are then aggregated to countries and regions.
+    The [SPOT model](https://www.nature.com/articles/s41586-024-07758-6) fills gaps in municipal waste data using statistical predictions, then estimates how plastic moves through the waste system and how uncertain those estimates are. It produces results for about 50,700 municipalities, which are then aggregated to countries and regions.
 
   text_scope_exclusions: &text_scope_exclusions
-    This dataset covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). They do not include emissions from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.
+    This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include emissions from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.
 
   text_msw_definition: &text_msw_definition
     Municipal solid waste is everyday non-hazardous waste from households and other municipal sources such as shops, offices and institutions. It does not include industrial, construction or hazardous waste.
