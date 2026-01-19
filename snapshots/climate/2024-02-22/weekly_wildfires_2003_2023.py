@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import pandas as pd
 import requests
-from owid.catalog import fetch, search
+from owid.catalog import fetch
 from owid.datautils.io import df_to_file
 from structlog import get_logger
 from tqdm import tqdm
