@@ -4,8 +4,6 @@ Published as CSV for use by Grapher codebase (entity sorting, peer countries).
 Not meant to be imported to MySQL.
 """
 
-from owid.catalog import Table
-
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -26,5 +24,5 @@ def run() -> None:
     tb.metadata.short_name = "gdp"
 
     # Save as CSV
-    ds = paths.create_dataset(tables=[tb], formats=["csv"])
+    ds = paths.create_dataset(tables=[tb], formats=["csv", "json"])
     ds.save()
