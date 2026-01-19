@@ -8,6 +8,13 @@ tables:
         title: Industrial robots per 10,000 employees
         description_short: Number of industrial robots per 10,000 employees in the manufacturing industry.
         unit: "robots per 10,000 employees"
+        description_key:
+          - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
+          - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
+          - Reprogrammable means their functions can be changed through software without altering their physical parts.
+          - Multipurpose means they can be adapted for different tasks with mechanical changes.
+          - Robots are becoming easier to install and more flexible, which means even small production runs can be automated.
+          - Companies use robots to improve product quality, increase speed, reduce waste, and cut costs.
         short_unit: ""
         display:
           numDecimalPlaces: 0
