@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from owid.catalog.datasets import FileFormat
+    from owid.catalog.core.datasets import FileFormat
 
 # Constants
 OWID_CATALOG_VERSION = 3

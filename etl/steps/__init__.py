@@ -33,7 +33,7 @@ import structlog
 from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import OWID_CATALOG_URI
-from owid.catalog.datasets import DEFAULT_FORMATS
+from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 

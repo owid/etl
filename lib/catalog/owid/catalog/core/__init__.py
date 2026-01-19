@@ -3,7 +3,6 @@
 #
 #  Core utilities for the OWID catalog.
 #
-from owid.catalog.core.datasets import Dataset
 from owid.catalog.core.indicators import (
     Variable,
 )
@@ -36,8 +35,6 @@ __all__ = [
     "CatalogPath",
     # tables
     "Table",
-    # datasets
-    "Dataset",
     # properties
     # warnings
     "NoOriginsWarning",

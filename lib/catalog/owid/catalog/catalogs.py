@@ -41,7 +41,7 @@ from owid.catalog.api.legacy import (
 from owid.catalog.api.utils import INDEX_FORMATS, OWID_CATALOG_URI, S3_OWID_URI
 
 # Re-export constants
-from owid.catalog.datasets import CHANNEL, PREFERRED_FORMAT, SUPPORTED_FORMATS, FileFormat
+from owid.catalog.core.datasets import CHANNEL, FileFormat
 
 __all__ = [
     # Classes (backwards compatibility)
@@ -55,8 +55,6 @@ __all__ = [
     "OWID_CATALOG_URI",
     "S3_OWID_URI",
     "INDEX_FORMATS",
-    "PREFERRED_FORMAT",
-    "SUPPORTED_FORMATS",
     "FileFormat",
     # Utilities
     "read_frame",

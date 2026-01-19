@@ -33,7 +33,7 @@ from owid.catalog.api.utils import (
     S3_OWID_URI,
     SUPPORTED_FORMATS,
 )
-from owid.catalog.datasets import CHANNEL, Dataset, FileFormat
+from owid.catalog.core.datasets import CHANNEL, Dataset, FileFormat
 from owid.catalog.tables import Table
 
 log = structlog.get_logger()

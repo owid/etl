@@ -13,8 +13,8 @@ import pandas as pd
 import pytest
 
 from owid.catalog import VariablePresentationMeta, tables
+from owid.catalog.core.datasets import FileFormat
 from owid.catalog.core.indicators import Indicator
-from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import (
     SCHEMA,
