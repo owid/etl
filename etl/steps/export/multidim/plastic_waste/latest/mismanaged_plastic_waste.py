@@ -242,9 +242,12 @@ def run() -> None:
         },
         "description_short": "{subtitle}",
         "description_key": [
-            "Macroplastic emissions include debris (intact items that escape into the environment) and plastic burned in open, uncontrolled fires.",
-            "These values combine emissions from all sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites and rejects from sorting and reprocessing.",
-            "Values are model-based estimates with inherent uncertainty.",
+            "These emissions refer to macroplastic, meaning physical plastic pieces larger than 5 millimetres.",
+            "Total plastic emissions are the sum of debris (unburned plastic that escapes into the environment as physical items) and plastic burned in open, uncontrolled fires.",
+            "Emissions are plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.",
+            "Emissions are attributed to five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites (open dumps), and rejects from sorting and reprocessing.",
+            "This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include emissions from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.",
+            "Values are model-based estimates and come with uncertainty. They should be interpreted as approximate estimates rather than exact measurements.",
         ],
     }
 
