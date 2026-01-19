@@ -332,6 +332,48 @@ def find_all_citations(_session: Session, chart_slug: str, base_site_url: str) -
     return results
 
 
+def _truncate_context_around_link(context: str, link_text: str | None, max_len: int = 100) -> str:
+    """Truncate context text, centering around and highlighting the link text.
+
+    Args:
+        context: Full context text
+        link_text: The hyperlink text to highlight (or None for embedded charts)
+        max_len: Maximum length of the output (excluding markdown bold markers)
+
+    Returns:
+        Truncated context with link text in bold, e.g.:
+        "...small population meaning their total **annual emissions** are low."
+    """
+    if not link_text or link_text not in context:
+        # No link text, just truncate from start
+        if len(context) > max_len:
+            return context[:max_len] + "..."
+        return context
+
+    link_pos = context.find(link_text)
+    link_end = link_pos + len(link_text)
+
+    # Calculate how much context to show before and after
+    available = max_len - len(link_text)
+    before = min(link_pos, available // 2)
+    after = min(len(context) - link_end, available - before)
+
+    # Adjust if we have room on one side
+    if before < available // 2:
+        after = min(len(context) - link_end, available - before)
+    if after < available // 2:
+        before = min(link_pos, available - after)
+
+    start = link_pos - before
+    end = link_end + after
+
+    # Build the truncated context with highlighted link
+    prefix = "..." if start > 0 else ""
+    suffix = "..." if end < len(context) else ""
+    snippet = context[start:link_pos] + f"**{link_text}**" + context[link_end:end]
+    return prefix + snippet + suffix
+
+
 @dataclass
 class MergedCitation:
     """A citation merged from both environments for unified display."""
@@ -340,6 +382,7 @@ class MergedCitation:
     post_type: str
     citation_type: str  # "embedded" or "hyperlink"
     context: str | None
+    link_text: str | None  # The hyperlink text (for hyperlink citations)
     chart_url: str  # The grapher URL with query params (e.g., /grapher/chart?country=USA)
     prod_url: str | None  # Fragment URL for production article
     staging_url: str | None  # Fragment URL for staging article
@@ -406,6 +449,7 @@ def _merge_citations(
                     post_type=article.post_type,
                     citation_type=citation.type,
                     context=citation.surrounding_text,
+                    link_text=citation.link_text,
                     chart_url=citation.chart_url,
                     prod_url=citation.fragment_url,
                     staging_url=staging_url,
@@ -422,6 +466,7 @@ def _merge_citations(
                         post_type=article.post_type,
                         citation_type=citation.type,
                         context=citation.surrounding_text,
+                        link_text=citation.link_text,
                         chart_url=citation.chart_url,
                         prod_url=None,
                         staging_url=citation.fragment_url,
@@ -479,11 +524,9 @@ def st_show_citations(
         else:
             type_badge = "Hyperlink"
 
-        # Context (truncated)
+        # Context (truncated), with link text highlighted in bold
         if citation.context:
-            context = citation.context[:80]
-            if len(citation.context) > 80:
-                context += "..."
+            context = _truncate_context_around_link(citation.context, citation.link_text)
             # Escape pipe characters and newlines for markdown table
             context = context.replace("|", "\\|").replace("\n", " ")
         else:
