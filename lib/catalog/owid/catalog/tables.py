@@ -22,7 +22,6 @@ from owid.catalog.core.tables import (
     combine_tables_description,
     combine_tables_metadata,
     combine_tables_title,
-    combine_tables_update_period_days,
     concat,
     copy_metadata,
     get_unique_licenses_from_tables,
@@ -47,15 +46,12 @@ from owid.catalog.core.tables import (
     read_json,
     read_parquet,
     read_rda,
-    read_rda_multiple,
     read_rds,
     read_stata,
     # Conversion functions
     to_datetime,
     to_numeric,
     # Processing log functions
-    update_processing_logs_when_loading_or_creating_table,
-    update_processing_logs_when_saving_table,
     # Variable dimension function
     update_variable_dimensions,
 )
@@ -84,7 +80,6 @@ __all__ = [
     "combine_tables_description",
     "combine_tables_metadata",
     "combine_tables_title",
-    "combine_tables_update_period_days",
     "concat",
     "copy_metadata",
     "get_unique_licenses_from_tables",
@@ -107,15 +102,12 @@ __all__ = [
     "read_json",
     "read_parquet",
     "read_rda",
-    "read_rda_multiple",
     "read_rds",
     "read_stata",
     # Conversion functions
     "to_datetime",
     "to_numeric",
     # Processing log functions
-    "update_processing_logs_when_loading_or_creating_table",
-    "update_processing_logs_when_saving_table",
     # Variable dimension function
     "update_variable_dimensions",
 ]
