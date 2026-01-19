@@ -50,12 +50,7 @@ from owid.catalog.core.processing_log import (
 from owid.catalog.core.properties import MetadataClass, metadata_property
 from owid.catalog.core.tables import Table
 from owid.catalog.core.warnings import (
-    DifferentValuesWarning,
-    DisplayNameWarning,
-    GroupingByCategoricalWarning,
-    MetadataWarning,
     NoOriginsWarning,
-    StepWarning,
     catch_warnings,
     ignore_warnings,
     simplefilter,
@@ -72,12 +67,7 @@ __all__ = [
     "MetadataClass",
     "metadata_property",
     # warnings
-    "MetadataWarning",
-    "StepWarning",
-    "DifferentValuesWarning",
-    "DisplayNameWarning",
     "NoOriginsWarning",
-    "GroupingByCategoricalWarning",
     "ignore_warnings",
     "catch_warnings",
     "simplefilter",
