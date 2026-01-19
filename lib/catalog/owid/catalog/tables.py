@@ -345,7 +345,9 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".json": {path}')
 
         # Reset index to include index columns as regular data columns
-        df = pd.DataFrame(self.reset_index())
+        # Use drop=True if there's no meaningful index (empty primary_key) to avoid
+        # creating an unwanted "index" column from a RangeIndex
+        df = pd.DataFrame(self.reset_index(drop=not self.primary_key))
 
         # Set default orient if not specified
         if "orient" not in kwargs:
