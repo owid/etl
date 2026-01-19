@@ -1081,7 +1081,7 @@ def test_groupby_apply_variable(table_1) -> None:
 
 def test_groupby_apply_variable_2(table_1) -> None:
     def func(tb):
-        return Variable({"c": 1})
+        return Indicator({"c": 1})
 
     df_out = pd.DataFrame(table_1).groupby("country", as_index=False).apply(func)
     tb_out = table_1.groupby("country", as_index=False).apply(func)
