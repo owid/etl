@@ -1,0 +1,32 @@
+# Find data at https://aidsinfo.unaids.org/ (go to 'Factsheets')
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global AIDS Update, Global Aids Monitoring"
+    description: |-
+      GAM is a standardized reporting framework coordinated by UNAIDS in which countries report HIV-related data every year. The data are used to assess progress toward global targets (currently the 95–95–95 targets and post-2025 goals).
+
+      The indicators and questions in this document are designed for use by national AIDS programmes and partners to assess the state of a country's HIV and AIDS response, and to measure progress towards achieving national HIV targets. Countries are encouraged to integrate these indicators and questions into their ongoing monitoring efforts and to report comprehensive national data through the Global AIDS Monitoring (GAM) process. In this way they will contribute to improving understanding of the global response to the HIV epidemic, including progress that has been made towards achieving the commitments and global targets set out in the new United Nations Political Declaration on HIV and AIDS: Ending Inequalities and Getting on Track to End AIDS by 2030, adopted in June 2021, and the linked Sustainable Development Goals.
+
+    date_published: "2026-01-15"
+
+    # Citation
+    producer: Joint United Nations Programme on HIV/AIDS
+    citation_full: |-
+      AIDS, crisis and the power to transform: UNAIDS Global AIDS Update 2025. Geneva: Joint United Nations Programme on HIV/AIDS; 2025. Full report: https://www.unaids.org/en/resources/documents/2025/2025-global-aids-update-summary
+
+    attribution_short: UNAIDS
+
+    # Files
+    url_main: https://aidsinfo.unaids.org/dataset
+    url_download: https://aidsinfo.unaids.org/documents/GAM_2025_en.zip
+    date_accessed: "2026-01-19"
+
+    # License
+    license:
+      name: CC BY 3.0
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: 696a13736db1b4d9c34316f53822e62a
+    size: 1234425
+    path: unaids_gam.zip
