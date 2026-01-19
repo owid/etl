@@ -23,7 +23,6 @@ from owid.catalog.core.processing_log import (
     enabled,
     wrap,
 )
-from owid.catalog.core.properties import MetadataClass, metadata_property
 from owid.catalog.core.tables import Table
 from owid.catalog.core.warnings import (
     NoOriginsWarning,
@@ -40,8 +39,6 @@ __all__ = [
     # datasets
     "Dataset",
     # properties
-    "MetadataClass",
-    "metadata_property",
     # warnings
     "NoOriginsWarning",
     "ignore_warnings",
