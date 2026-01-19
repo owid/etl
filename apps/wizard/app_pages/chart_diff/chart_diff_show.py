@@ -20,6 +20,7 @@ from apps.backport.datasync.data_metadata import (
 from apps.chart_sync.admin_api import AdminAPI
 from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
+from apps.wizard.app_pages.chart_diff.citations import st_show_citations
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
@@ -641,6 +642,10 @@ class ChartDiffShow:
                     else:
                         st.info("Not available in staging")
 
+    def _show_citations(self) -> None:
+        """Show articles that cite this chart with scroll-to-text fragment URLs."""
+        st_show_citations(self.diff.slug, self.target_session)
+
     def _show(self) -> None:
         """Show chart diff.
 
@@ -699,6 +704,9 @@ class ChartDiffShow:
 
         # SHOW NARRATIVE CHARTS
         self._show_narrative_charts()
+
+        # SHOW ARTICLE CITATIONS
+        self._show_citations()
 
         # Copy link
         if self.show_link:
