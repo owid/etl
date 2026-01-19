@@ -188,6 +188,8 @@ class ResponseSet(BaseModel, Generic[T]):
                         "num_related_articles": getattr(r, "num_related_articles", 0),
                         # Only show count of entities, not full list
                         "num_entities": len(getattr(r, "available_entities", [])),
+                        "popularity": getattr(r, "popularity", 0),
+                        "last_updated": getattr(r, "last_updated", None),
                     }
                 else:
                     row = r.model_dump()
