@@ -17,10 +17,12 @@ def run() -> None:
     # Get latest year per country for population
     idx_latest = tb_pop.groupby("country")["year"].idxmax()
     tb = tb_pop.loc[idx_latest, ["country", "year", "population_historical"]]
-    tb = tb.rename(columns={"population_historical": "population"})
+
+    # Rename columns
+    tb = tb.rename(columns={"country": "entityName", "population_historical": "value"})
 
     # Set index and name
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.set_index(["entityName", "year"], verify_integrity=True)
     tb.metadata.short_name = "population"
 
     # Save as CSV
