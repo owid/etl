@@ -109,6 +109,13 @@ definitions:
     wealth
     <%- endif %>
 
+  concept_welfare_type_capitalized: |-
+    <% if welfare_type != "wealth" %>
+    Income
+    <%- else %>
+    Wealth
+    <%- endif %>
+
   description_short_welfare_type_inequality: |-
     <% if welfare_type == "before tax" %>
     Inequality is measured here in terms of income before taxes and benefits.
@@ -193,6 +200,257 @@ definitions:
     [0, 1, 2, 3, 4, 5, 6, 7, 1]
     <%- elif welfare_type == "before tax" %>
     [0, 2, 4, 6, 8, 10, 12, 14, 16, 1]
+    <%- endif %>
+
+  map_brackets_share_top_10: &map_brackets_share_top_10
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
+    <%- elif welfare_type == "before tax" %>
+    [100, 30, 35, 40, 45, 50, 55, 60, 1]
+    <%- endif %>
+
+  map_brackets_share_top_1: &map_brackets_share_top_1
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 5, 10, 15, 20, 25, 1]
+    <%- elif welfare_type == "before tax" %>
+    [0, 5, 10, 15, 20, 25, 1]
+    <%- endif %>
+
+  map_brackets_share_top_0_1: &map_brackets_share_top_0_1
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 2 , 4, 6, 8, 10, 12, 1]
+    <%- elif welfare_type == "before tax" %>
+    [0, 2 , 4, 6, 8, 10, 12, 1]
+    <%- endif %>
+
+  map_brackets_share_bottom_50: &map_brackets_share_bottom_50
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [100, 10, 15, 20, 25, 30, 1]
+    <%- elif welfare_type == "before tax" %>
+    [100, 10, 15, 20, 25, 1]
+    <%- endif %>
+
+  map_brackets_relative_poverty: &map_brackets_relative_poverty |-
+    <% if poverty_line in ["40% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
+    <%- elif poverty_line in ["50% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
+    <%- elif poverty_line in ["60% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- elif poverty_line in ["40% of the median"] and welfare_type == "before tax" %>
+    [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- elif poverty_line in ["50% of the median"] and welfare_type == "before tax" %>
+    [1000, 20, 25, 30, 35, 1]
+    <%- elif poverty_line in ["60% of the median"] and welfare_type == "before tax" %>
+    [1000, 20, 25, 30, 35, 40, 1]
+    <%- endif %>
+
+  map_brackets_mean_median: &map_brackets_mean_median
+    <% if period == "year" %>
+    [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+    <%- elif period == "month" %>
+    [0, 100, 200, 500, 1000, 2000, 5000, 1]
+    <%- elif period == "day" %>
+    [0, 10, 20, 50, 100, 200, 1]
+    <%- endif %>
+
+  map_brackets_avg: &map_brackets_avg
+    <% if period == "year" %>
+      <% if welfare_type == "dhi" %>
+        <% if decile in [1] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif decile in [2, 3, 4, 5, 6] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif decile in [7, 8, 9] %>
+        [0, 10_000, 20_000, 50_000, 1]
+        <%- elif decile in [10] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "mi" %>
+        <% if decile in [1] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif decile in [2, 3] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif decile in [4, 5, 6] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif decile in [7, 8] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif decile in [9] %>
+        [0, 10_000, 20_000, 50_000, 1]
+        <%- elif decile in [10] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "month" %>
+      <% if welfare_type == "dhi" %>
+        <% if decile in [1, 2] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif decile in [3, 4, 5, 6, 7] %>
+        [0, 100, 200, 500, 1000, 2000, 1]
+        <%- elif decile in [8, 9] %>
+        [0, 1000, 2000, 5000, 1]
+        <%- elif decile in [10] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "mi" %>
+        <% if decile in [1] %>
+        [0, 10, 20, 50, 100, 1]
+        <%- elif decile in [2] %>
+        [0, 10, 20, 50, 100, 200, 500, 1]
+        <%- elif decile in [3] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif decile in [4, 5, 6, 7] %>
+        [0, 100, 200, 500, 1000, 2000, 1]
+        <%- elif decile in [8] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif decile in [9] %>
+        [0, 1000, 2000, 5000, 1]
+        <%- elif decile in [10] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "day" %>
+      <% if welfare_type == "dhi" %>
+        <% if decile in [1] %>
+        [0, 1, 2, 5, 10, 20, 1]
+        <%- elif decile in [2, 3, 4] %>
+        [0, 10, 20, 50, 1]
+        <%- elif decile in [5, 6, 7, 8] %>
+        [0, 10, 20, 50, 100, 1]
+        <%- elif decile in [9, 10] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- endif %>
+      <% elif welfare_type == "mi" %>
+        <% if decile in [1] %>
+        [0, 0.1, 0.2, 0.5, 1, 2, 5, 1]
+        <%- elif decile in [2, 3] %>
+        [0, 1, 2, 5, 10, 20, 1]
+        <%- elif decile in [4, 5, 6] %>
+        [0, 10, 20, 50, 1]
+        <%- elif decile in [7, 8, 9] %>
+        [0, 10, 20, 50, 100, 1]
+        <%- elif decile in [10] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- endif %>
+      <%- endif %>
+    <%- endif %>
+
+  map_brackets_share: &map_brackets_share
+    <% if welfare_type == "dhi" %>
+      <% if decile in [1] %>
+      [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 1]
+      <%- elif decile in [2] %>
+      [0, 1, 2, 3, 4, 5, 1]
+      <%- elif decile in [3] %>
+      [0, 1, 2, 3, 4, 5, 6, 1]
+      <%- elif decile in [4] %>
+      [100, 2, 3, 4, 5, 6, 7, 1]
+      <%- elif decile in [5] %>
+      [100, 3, 4, 5, 6, 7, 8, 1]
+      <%- elif decile in [6] %>
+      [100, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif decile in [7] %>
+      [100, 5, 6, 7, 8, 9, 10, 11, 1]
+      <%- elif decile in [8] %>
+      [100, 8, 9, 10, 11, 12, 13, 1]
+      <%- elif decile in [9] %>
+      [100, 10, 12, 14, 16, 1]
+      <%- elif decile in [10] %>
+      [100, 20, 25, 30, 35, 40, 1]
+      <%- endif %>
+    <% elif welfare_type == "mi" %>
+      <% if decile in [1] %>
+      [0, 0.1, 0.2, 0.3, 0.4, 0.00001]
+      <%- elif decile in [2] %>
+      [0, 0.5, 1, 1.5, 2, 2.5, 3, 1]
+      <%- elif decile in [3] %>
+      [100, 2, 3, 4, 5, 1]
+      <%- elif decile in [4] %>
+      [100, 2, 3, 4, 5, 6, 1]
+      <%- elif decile in [5] %>
+      [100, 3, 4, 5, 6, 7, 8, 1]
+      <%- elif decile in [6] %>
+      [100, 3, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif decile in [7] %>
+      [100, 6, 7, 8, 9, 10, 11, 1]
+      <%- elif decile in [8] %>
+      [100, 8, 9, 10, 11, 12, 13, 1]
+      <%- elif decile in [9] %>
+      [100, 10, 12, 14, 16, 17, 1]
+      <%- elif decile in [10] %>
+      [100, 30, 35, 40, 45, 50, 1]
+      <%- endif %>
+    <%- endif %>
+
+  map_brackets_thr: &map_brackets_thr
+    <% if period == "year" %>
+      <% if welfare_type == "dhi" %>
+        <% if decile in [1, 2, 3, 4, 5, 6] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif decile in [7] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif decile in [8, 9] %>
+        [0, 10_000, 20_000, 50_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "mi" %>
+        <% if decile in [1] %>
+        [0, 100, 200, 500, 1000, 5000, 1]
+        <%- elif decile in [2] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif decile in [3, 4, 5] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif decile in [6, 7] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif decile in [8] %>
+        [0, 10_000, 20_000, 50_000, 1]
+        <%- elif decile in [9] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "month" %>
+      <% if welfare_type == "dhi" %>
+        <% if decile in [1] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif decile in [2, 3, 4, 5, 6, 7] %>
+        [0, 100, 200, 500, 1000, 2000, 1]
+        <%- elif decile in [8, 9] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- endif %>
+      <% elif welfare_type == "mi" %>
+        <% if decile in [1] %>
+        [0, 10, 20, 50, 100, 200, 500, 1]
+        <%- elif decile in [2, 3] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif decile in [4, 5, 6] %>
+        [0, 100, 200, 500, 1000, 2000, 1]
+        <%- elif decile in [7] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif decile in [8, 9] %>
+        [0, 1000, 2000, 5000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "day" %>
+      <% if welfare_type == "dhi" %>
+        <% if decile in [1, 2, 3, 4] %>
+        [0, 10, 20, 50, 1]
+        <%- elif decile in [5, 6, 7, 8] %>
+        [0, 10, 20, 50, 100, 1]
+        <%- elif decile in [9] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- endif %>
+      <% elif welfare_type == "mi" %>
+        <% if decile in [1] %>
+        [0, 1, 2, 5, 10, 20, 1]
+        <%- elif decile in [2] %>
+        [0, 1, 2, 5, 10, 20, 50, 1]
+        <%- elif decile in [3] %>
+        [0, 10, 20, 50, 1]
+        <%- elif decile in [4, 5, 6, 7] %>
+        [0, 10, 20, 50, 100, 1]
+        <%- elif decile in [8, 9] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- endif %>
+      <%- endif %>
     <%- endif %>
 
   entity_names_inequality: &entity_names_inequality
@@ -382,6 +640,20 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
 
+      share_top_90_99:
+        title: Share (90-99th percentiles, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (90-99th percentiles, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
       share_top_10:
         title: Share (richest 10%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
@@ -395,6 +667,20 @@ tables:
           name: Share (richest 10%, <<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the richest 10% (<<welfare_type>>)"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                customNumericValues: *map_brackets_share_top_10
+            selectedEntityNames: *entity_names_inequality
 
       share_top_1:
         title: Share (richest 1%, <<welfare_type>>){definitions.title_extrapolated}
@@ -409,20 +695,48 @@ tables:
           name: Share (richest 1%, <<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the richest 1% (<<welfare_type>>)"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                customNumericValues: *map_brackets_share_top_1
+            selectedEntityNames: *entity_names_inequality
 
-      share_top_90_99:
-        title: Share (90-99th percentiles, <<welfare_type>>){definitions.title_extrapolated}
+      share_top_0_1:
+        title: Share (richest 0.1%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
         display:
-          name: Share (90-99th percentiles, <<welfare_type>>)
+          name: Share (richest 0.1%, <<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the richest 0.1% (<<welfare_type>>)"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                customNumericValues: *map_brackets_share_top_0_1
+            selectedEntityNames: *entity_names_inequality
 
   relative_poverty:
     variables:
@@ -446,6 +760,20 @@ tables:
           name: Share below <<poverty_line>> (<<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Relative poverty: Share of the population below <<poverty_line>> (<<welfare_type>>)"
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at <<poverty_line>> {definitions.concept_welfare_type}. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrBr"
+                customNumericValues: *map_brackets_relative_poverty
+            selectedEntityNames: *entity_names_inequality
 
   incomes:
     variables:
@@ -463,6 +791,10 @@ tables:
           name: Mean (<<welfare_type>>)
           numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Mean {definitions.concept_welfare_type} {definitions.per_period} (<<welfare_type>>)"
+            subtitle:
 
       median:
         title: Median ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
