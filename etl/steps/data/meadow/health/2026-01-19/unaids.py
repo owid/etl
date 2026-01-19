@@ -70,13 +70,16 @@ def clean_table(tb):
     tb = tb.rename(columns=columns)[columns.values()]
 
     # Sanity check: only one code per indicator
-    assert tb.groupby('indicator')['indicator_id'].nunique().max() == 1
-    assert tb.groupby('indicator_id')['indicator'].nunique().max() == 1
+    assert tb.groupby("indicator")["indicator_id"].nunique().max() == 1
+    assert tb.groupby("indicator_id")["indicator"].nunique().max() == 1
 
     # Drop duplicates
     tb = tb.drop_duplicates(subset=["country", "year", "indicator", "dimension"], keep="first")
 
     # Handle NaNs
+    assert tb[tb["value"].isna()]["value_rounded"].unique() == [
+        "..."
+    ], "Unexpected non-numeric missing value indicators"
     # tb.loc[:, "value"] = tb["value"].replace("...", np.nan)
     tb = tb.dropna(subset=["value"])
 
