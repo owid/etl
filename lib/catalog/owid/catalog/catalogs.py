@@ -38,7 +38,7 @@ from owid.catalog.api.legacy import (
 )
 
 # Re-export constants from utils
-from owid.catalog.api.utils import INDEX_FORMATS, OWID_CATALOG_URI, S3_OWID_URI
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL, INDEX_FORMATS, S3_OWID_URI
 
 # Re-export constants
 from owid.catalog.core.datasets import CHANNEL, FileFormat
@@ -52,7 +52,7 @@ __all__ = [
     "PackageUpdateRequired",
     # Constants
     "CHANNEL",
-    "OWID_CATALOG_URI",
+    "DEFAULT_CATALOG_URL",
     "S3_OWID_URI",
     "INDEX_FORMATS",
     "FileFormat",

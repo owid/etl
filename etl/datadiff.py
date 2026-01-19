@@ -15,7 +15,7 @@ import rich_click as click
 import structlog
 from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, fetch
 from owid.catalog.api.legacy import CHANNEL, ETLCatalog, LocalCatalog
-from owid.catalog.api.utils import OWID_CATALOG_URI
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -873,7 +873,7 @@ def _local_catalog_datasets(
 
 
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
-    uri = f"{OWID_CATALOG_URI}{path}/index.json"
+    uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
     js = requests.get(uri).json()
     # drop origins for backward compatibility
     js.pop("origins", None)

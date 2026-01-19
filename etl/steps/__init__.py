@@ -32,7 +32,7 @@ import requests
 import structlog
 from owid import catalog
 from owid.catalog import s3_utils
-from owid.catalog.api.utils import OWID_CATALOG_URI
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -686,7 +686,7 @@ class DataStep(Step):
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
-        url = f"{OWID_CATALOG_URI}{self.path}/index.json"
+        url = f"{DEFAULT_CATALOG_URL}{self.path}/index.json"
         resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
@@ -734,7 +734,7 @@ class DataStep(Step):
                 futures.append(
                     executor.submit(
                         download_file_from_url,
-                        f"{OWID_CATALOG_URI}/{self.path}/{fname}",
+                        f"{DEFAULT_CATALOG_URL}/{self.path}/{fname}",
                         f"{self._dest_dir}/{fname}",
                     )
                 )

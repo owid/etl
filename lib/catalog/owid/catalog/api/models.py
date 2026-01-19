@@ -208,8 +208,8 @@ class ResponseSet(BaseModel, Generic[T]):
             CatalogFrame that can use .load() method.
         """
         from owid.catalog.api.legacy import CatalogFrame as CF
-        from owid.catalog.api.utils import OWID_CATALOG_URI
-        from owid.catalog.core import CatalogPath
+        from owid.catalog.api.utils import DEFAULT_CATALOG_URL
+        from owid.catalog.core.paths import CatalogPath
 
         if not self.results:
             return CF.create_empty()
@@ -235,7 +235,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     }
                 )
             frame = CF(rows)
-            frame._base_uri = self.base_url or OWID_CATALOG_URI
+            frame._base_uri = self.base_url or DEFAULT_CATALOG_URL
             return frame
 
         elif type_name == "IndicatorResult":
@@ -276,7 +276,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     }
                 )
             frame = CF(rows)
-            frame._base_uri = self.base_url or OWID_CATALOG_URI
+            frame._base_uri = self.base_url or DEFAULT_CATALOG_URL
             return frame
 
         else:

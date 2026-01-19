@@ -32,9 +32,6 @@ DEFAULT_GRAPHER_URL = "https://ourworldindata.org/grapher"
 DEFAULT_INDICATORS_SEARCH_URL = "https://search.owid.io/indicators"
 DEFAULT_SITE_SEARCH_URL = "https://ourworldindata.org/api/search"
 
-# Backwards compatibility alias (deprecated, use DEFAULT_CATALOG_URL instead)
-OWID_CATALOG_URI = DEFAULT_CATALOG_URL
-
 
 @contextmanager
 def _loading_data_from_api(message: str = "Loading data"):
