@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title: Improving waste systems in the global south to tackle international environmental impacts
+    description: |-
+      This dataset provides comprehensive information on municipal solid waste management infrastructure and practices across nations worldwide. It includes data on waste collection rates, treatment methods (including open dumping, controlled landfills, sanitary landfills, incineration, composting, and recycling), and the classification of waste management systems. The research demonstrates that investment in advancing waste infrastructure in the global south achieves higher mitigation of greenhouse gas emissions and marine plastics than further upgrades in the global north. Basic collection is shown to be the essential step to reducing marine plastics, and transitioning from open dumps and burning to controlled landfills does more to reduce methane and black carbon emissions than upgrading existing systems to advanced technologies.
+    date_published: 2025-09-01
+    producer: Anshassi and Townsend
+    citation_full: |-
+      Anshassi, M., Townsend, T.G. Improving waste systems in the global south to tackle international environmental impacts. Nature Sustainability (2025). https://doi.org/10.1038/s41893-025-01607-8
+    attribution_short: Anshassi & Townsend
+    url_main: https://www.nature.com/articles/s41893-025-01607-8
+    url_download: https://static-content.springer.com/esm/art%3A10.1038%2Fs41893-025-01607-8/MediaObjects/41893_2025_1607_MOESM3_ESM.xlsx
+    date_accessed: 2025-01-19
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 694924acde74e552589674eed338af82
+    size: 232922
+    path: waste_management.xlsx

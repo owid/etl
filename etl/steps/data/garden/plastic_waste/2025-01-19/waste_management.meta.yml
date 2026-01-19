@@ -1,0 +1,53 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+dataset:
+  update_period_days: 365
+
+tables:
+  waste_management:
+    variables:
+      final_classification:
+        title: Waste management system classification
+        unit: ''
+        description_short: Classification of waste management system (1-4).
+      collected:
+        title: Collected waste
+        unit: '%'
+        description_short: Share of waste that is collected.
+      uncollected:
+        title: Uncollected waste
+        unit: '%'
+        description_short: Share of waste that is not collected.
+      open_dump_landfill:
+        title: Open dump landfill
+        unit: '%'
+        description_short: Total share of waste sent to open dump landfills (from both collected and uncollected waste).
+      controlled_landfill:
+        title: Controlled landfill
+        unit: '%'
+        description_short: Total share of waste sent to controlled landfills (from both collected and uncollected waste).
+      sanitary_landfill:
+        title: Sanitary landfill
+        unit: '%'
+        description_short: Total share of waste sent to sanitary landfills (from both collected and uncollected waste).
+      open_air_burning:
+        title: Open air burning
+        unit: '%'
+        description_short: Total share of waste that is openly burned (from both collected and uncollected waste).
+      mswi_incineration:
+        title: MSWI incineration
+        unit: '%'
+        description_short: Share of waste sent to municipal solid waste incinerators.
+      composting:
+        title: Composting
+        unit: '%'
+        description_short: Share of waste that is composted.
+      recycling:
+        title: Recycling
+        unit: '%'
+        description_short: Share of waste that is recycled.
