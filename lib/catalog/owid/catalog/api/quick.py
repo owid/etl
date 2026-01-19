@@ -39,11 +39,11 @@ _CHART_SLUG_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 
 if TYPE_CHECKING:
     from owid.catalog.core.charts import ChartTable
-    from owid.catalog.tables import Table
+    from owid.catalog.core.tables import Table
 
 
 def search(
-    name: str,
+    name: str | None = None,
     *,
     kind: Literal["table", "indicator", "chart"] = "table",
     limit: int = 10,
@@ -62,7 +62,8 @@ def search(
     slug, then use fetch() to download the data.
 
     Args:
-        name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy")
+        name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy").
+            Required for indicators and charts. Optional for tables (can filter by other params).
         kind: What to search for (default: "table"):
 
             - "table": Search catalog tables (returns ResponseSet[TableResult])
@@ -72,14 +73,14 @@ def search(
         namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
         version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
         dataset: Filter by dataset name. Only for tables.
-        channel: Filter by channel (e.g., "garden", "grapher"). Only for tables.
-        match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables):
+        channel: Filter by channel (e.g., "garden", "grapher"). Only for tables, and `name` field.
+        match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables, and `name` field):
 
+            - "fuzzy": Typo-tolerant similarity matching
             - "exact": Exact string match
             - "contains": Substring match
             - "regex": Regular expression
-            - "fuzzy": Typo-tolerant similarity matching
-        fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables.
+        fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables, and `name` field.
         case: Case-sensitive search (default: False).  Only for tables.
 
     Returns:
@@ -114,6 +115,10 @@ def search(
         For indicators and charts, filtering parameters (namespace, version, dataset, channel)
         are ignored as they don't apply to those search types.
     """
+    # Validate name is provided for indicators and charts
+    if name is None and kind in ("indicator", "chart"):
+        raise ValueError(f"'name' is required when searching for {kind}s.")
+
     # Route to appropriate search method based on kind
     client = Client()
 
@@ -131,9 +136,11 @@ def search(
         )
     elif kind == "indicator":
         # Search indicators using IndicatorsAPI
+        assert name is not None  # Validated above
         return client.indicators.search(name, limit=limit)
     elif kind == "chart":
         # Search charts using ChartsAPI
+        assert name is not None  # Validated above
         return client.charts.search(name, limit=limit)
     else:
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")

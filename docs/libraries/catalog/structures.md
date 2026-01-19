@@ -54,7 +54,7 @@ Tables support multiple formats with automatic detection: feather, parquet, and 
 
 Metadata-aware alternatives to pandas functions.
 
-::: owid.catalog.processing
+::: owid.catalog.core.processing
     options:
       heading_level: 3
       filters: ["!^_"]
@@ -62,7 +62,7 @@ Metadata-aware alternatives to pandas functions.
 
 Container for multiple tables with shared metadata.
 
-::: owid.catalog.datasets
+::: owid.catalog.core.datasets
     options:
       heading_level: 3
       filters: ["!^_"]
@@ -71,7 +71,7 @@ Container for multiple tables with shared metadata.
 
 pandas DataFrame with column-level metadata.
 
-::: owid.catalog.tables
+::: owid.catalog.core.tables
     options:
       heading_level: 3
       filters: ["!^_"]
@@ -80,27 +80,27 @@ pandas DataFrame with column-level metadata.
 
 pandas Series with metadata.
 
-::: owid.catalog.variables
+::: owid.catalog.core.variables
     options:
       heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 
-::: owid.catalog.meta
+::: owid.catalog.core.meta
     options:
       heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
 
-::: owid.catalog.utils
+::: owid.catalog.core.utils
     options:
       heading_level: 3
       filters: ["!^_"]
       members_order: alphabetical
 
-::: owid.catalog.s3_utils
+::: owid.catalog.core.s3_utils
     options:
       heading_level: 3
       filters: ["!^_"]

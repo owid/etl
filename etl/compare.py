@@ -9,8 +9,9 @@ import click
 import pandas as pd
 import rich
 from dotenv import dotenv_values
-from owid import catalog
 from owid.catalog import CHANNEL
+from owid.catalog.api.legacy import ETLCatalog, LocalCatalog
+from owid.catalog.tables import Table
 from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
@@ -140,7 +141,7 @@ def etl_catalog(
     - 3 if the tables have different structure and/or different values.
     """
     try:
-        remote_df = catalog.ETLCatalog().find_latest(
+        remote_df = ETLCatalog().find_latest(
             table=table,
             namespace=namespace,
             dataset=dataset,
@@ -154,7 +155,7 @@ def etl_catalog(
         exit(1)
 
     try:
-        local_catalog = catalog.LocalCatalog("data")
+        local_catalog = LocalCatalog("data")
         local_catalog.reindex(table)
         try:
             local_df = local_catalog.find_latest(
@@ -387,16 +388,16 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     return cast(pd.DataFrame, df)
 
 
-def load_table(path_str: str) -> catalog.Table:
+def load_table(path_str: str) -> Table:
     """Loads a Table (dataframe + metadata) from a path."""
     path = Path(path_str)
     if not path.exists():
         raise Exception("File does not exist: " + path_str)
 
     if path.suffix.lower() == ".feather":
-        return catalog.tables.Table.read_feather(path_str)
+        return Table.read_feather(path_str)
     elif path.suffix.lower() == ".csv":
-        return catalog.tables.Table.read_csv(path_str)
+        return Table.read_csv(path_str)
     else:
         raise Exception("Unknown file format: " + path_str)
 

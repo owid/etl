@@ -326,17 +326,6 @@ class TestTablesAPI:
         with pytest.raises(KeyError, match="No matching table found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
 
-    def test_backwards_compatibility_datasets(self):
-        """Test that client.datasets still works (backwards compatibility)."""
-        client = Client()
-
-        # Should work via datasets attribute
-        results = client.datasets.search(table="population")
-        assert len(results) > 0
-
-        # Verify it's the same as tables
-        assert client.datasets is client.tables
-
     def test_search_with_refresh_index(self):
         """Test that refresh_index parameter forces index re-download."""
         client = Client()

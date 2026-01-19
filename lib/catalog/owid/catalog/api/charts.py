@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import _loading_data_from_api
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
-from owid.catalog.meta import Origin, VariableMeta
+from owid.catalog.core.meta import Origin, VariableMeta
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client

@@ -21,7 +21,7 @@ import pytest
 import yaml
 
 from owid.catalog import Dataset, DatasetMeta, Table
-from owid.catalog.datasets import NonUniqueIndex, PrimaryKeyMissing
+from owid.catalog.core.datasets import NonUniqueIndex, PrimaryKeyMissing
 
 from .mocking import mock
 from .test_tables import mock_table
