@@ -373,7 +373,7 @@ tables:
         description_key: *desc_key_plastic_emissions_debris
         display:
           numDecimalPlaces: 0
-          name: Debris
+          name: Debris emissions
         presentation:
           title_public: Plastic emissions in a form of debris
           grapher_config:
@@ -388,7 +388,7 @@ tables:
         description_key: *desc_key_plastic_emissions_burn
         display:
           numDecimalPlaces: 0
-          name: Open burning
+          name: Open burning emissions
         presentation:
           title_public: Plastic emissions from open burning
           grapher_config:
@@ -403,7 +403,7 @@ tables:
         description_key: *desc_key_plastic_emissions_total
         display:
           numDecimalPlaces: 0
-          name: Total
+          name: Total plastic emissions
         presentation:
           title_public: Total plastic emissions
           grapher_config:
@@ -418,7 +418,7 @@ tables:
         description_key: *desc_key_plastic_emissions_debris_per_cap
         display:
           numDecimalPlaces: 2
-          name: Debris
+          name: Debris emissions per capita
         presentation:
           title_public: Plastic emissions in a form of debris per capita
           grapher_config:
@@ -433,7 +433,7 @@ tables:
         description_key: *desc_key_plastic_emissions_burn_per_cap
         display:
           numDecimalPlaces: 2
-          name: Open burning
+          name: Open burning emissions per capita
         presentation:
           title_public: Plastic emissions from open burning per capita
           grapher_config:
@@ -450,7 +450,7 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
-          name: Open burning
+          name: Share of global open burning emissions
         presentation:
           title_public: Share of global plastic emissions from open burning
           grapher_config:
@@ -467,7 +467,7 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
-          name: Debris
+          name: Share of global debris emissions
         presentation:
           title_public: Share of global plastic emissions in a form of debris
           grapher_config:
@@ -482,7 +482,9 @@ tables:
         description_key: *desc_key_plastic_emissions_total_per_cap
         display:
           numDecimalPlaces: 2
+          name: Total plastic emissions per capita
         presentation:
+          title_public: Total plastic emissions per capita
           grapher_config:
             map:
               colorScale:
