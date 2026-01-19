@@ -3,6 +3,10 @@ definitions:
     presentation:
       topic_tags:
       - Climate Change
+  description_processing_baseline: &description_processing_baseline |-
+    - We switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times.
+    - For each region, we calculate the mean temperature anomalies for 1961-1990 and for 1861-1890. The difference between these two means serves as the adjustment factor.
+    - This factor is applied uniformly to both the temperature anomalies and the confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861-1890 baseline.
 
 dataset:
   title: Climate Change Impacts
@@ -102,18 +106,28 @@ tables:
           name: Global temperature anomaly
         presentation:
           title_public: Global average temperature anomaly relative to 1861-1890
+        description_processing: *description_processing_baseline
       near_surface_temperature_anomaly_upper:
         title: Upper bound of the annual temperature anomaly (95% confidence interval)
         display:
           name: Upper bound
         presentation:
           title_public: Upper bound of the annual temperature anomaly (95% confidence interval)
+        description_processing: *description_processing_baseline
       near_surface_temperature_anomaly_lower:
         title: Lower bound of the annual temperature anomaly (95% confidence interval)
         display:
           name: Lower bound
         presentation:
           title_public: Lower bound of the annual temperature anomaly (95% confidence interval)
+        description_processing: *description_processing_baseline
+      # mass_balance_us_glaciers:
+      sea_temperature_anomaly_annual:
+        description_processing: *description_processing_baseline
+      sea_temperature_anomaly_high_annual:
+        description_processing: *description_processing_baseline
+      sea_temperature_anomaly_low_annual:
+        description_processing: *description_processing_baseline
   climate_change_impacts_monthly:
     title: Climate Change Impacts - Monthly
     variables:
@@ -195,3 +209,14 @@ tables:
           name: Annual average
         presentation:
           title_public: Rolling yearly average of the concentration of atmospheric nitrous oxide
+      # ocean_heat_content_2000m:
+      # ocean_heat_content_700m:
+      # ocean_ph:
+      # ocean_ph_yearly_average:
+      # sea_ice_extent:
+      sea_temperature_anomaly:
+        description_processing: *description_processing_baseline
+      sea_temperature_anomaly_high:
+        description_processing: *description_processing_baseline
+      sea_temperature_anomaly_low:
+        description_processing: *description_processing_baseline

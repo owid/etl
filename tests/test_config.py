@@ -1,6 +1,6 @@
 import pytest
 
-from etl.config import Config, OWIDEnv, get_container_name
+from etl.config import ETL_GRAPHER_USER_ID, Config, OWIDEnv, get_container_name
 
 
 def test_get_container_name():
@@ -26,7 +26,7 @@ def test_OWIDEnv_staging():
 def test_OWIDEnv_production():
     env = OWIDEnv(
         Config(
-            GRAPHER_USER_ID=1,
+            GRAPHER_USER_ID=ETL_GRAPHER_USER_ID,
             DB_USER="user",
             DB_NAME="live_grapher",
             DB_PASS="xxx",
@@ -49,7 +49,7 @@ def test_OWIDEnv_production():
 def test_OWIDEnv_dev():
     env = OWIDEnv(
         Config(
-            GRAPHER_USER_ID=1,
+            GRAPHER_USER_ID=ETL_GRAPHER_USER_ID,
             DB_USER="grapher",
             DB_NAME="grapher",
             DB_PASS="xxx",

@@ -128,7 +128,7 @@ def test_saving_empty_table_fails():
 
 
 # The parametrize decorator runs this test multiple times with different formats
-@pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
+@pytest.mark.parametrize("format", ["csv", "feather", "parquet", "json"])
 def test_round_trip_no_metadata(format: FileFormat) -> None:
     t1 = Table({"gdp": [100, 102, 104, 100], "countries": ["AU", "SE", "NA", "💡"]})
     with tempfile.TemporaryDirectory() as path:
@@ -136,14 +136,14 @@ def test_round_trip_no_metadata(format: FileFormat) -> None:
         t1.to(filename)
 
         assert exists(filename)
-        if format in ["csv", "feather"]:
+        if format in ["csv", "feather", "json"]:
             assert exists(splitext(filename)[0] + ".meta.json")
 
         t2 = Table.read(filename)
         assert_tables_eq(t1, t2)
 
 
-@pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
+@pytest.mark.parametrize("format", ["csv", "feather", "parquet", "json"])
 def test_round_trip_with_index(format: FileFormat) -> None:
     t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "NA"]})
     t1.set_index("country", inplace=True)
@@ -152,14 +152,14 @@ def test_round_trip_with_index(format: FileFormat) -> None:
         t1.to(filename)
 
         assert exists(filename)
-        if format in ["csv", "feather"]:
+        if format in ["csv", "feather", "json"]:
             assert exists(splitext(filename)[0] + ".meta.json")
 
         t2 = Table.read(filename)
         assert_tables_eq(t1, t2)
 
 
-@pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
+@pytest.mark.parametrize("format", ["csv", "feather", "parquet", "json"])
 def test_round_trip_with_metadata(format: FileFormat) -> None:
     t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "NA"]})
     t1.set_index("country", inplace=True)
@@ -171,7 +171,7 @@ def test_round_trip_with_metadata(format: FileFormat) -> None:
         t1.to(filename)
 
         assert exists(filename)
-        if format in ["csv", "feather"]:
+        if format in ["csv", "feather", "json"]:
             assert exists(splitext(filename)[0] + ".meta.json")
 
         t2 = Table.read(filename)
@@ -1326,3 +1326,117 @@ def test_assign_table(table_1: Table):
     tb = table_1[["a"]].copy()
     tb["b"] = table_1[["b"]]
     assert tb.b.m.title == "Title of Table 1 Variable b"
+
+
+# JSON format specific tests
+class TestJsonFormat:
+    def test_json_to_string(self) -> None:
+        """Test that to_json without path returns a string."""
+        t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        result = t.to_json()
+        assert isinstance(result, str)
+        assert "gdp" in result
+        assert "country" in result
+
+    def test_json_invalid_extension(self) -> None:
+        """Test that to_json raises error for invalid file extension."""
+        t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        with tempfile.TemporaryDirectory() as path:
+            with pytest.raises(ValueError, match='filename must end in ".json"'):
+                t.to_json(join(path, "table.txt"))
+
+    def test_read_json_invalid_extension(self) -> None:
+        """Test that read_json raises error for invalid file extension."""
+        with pytest.raises(ValueError, match='filename must end in ".json"'):
+            Table.read_json("/tmp/table.txt")
+
+    def test_json_with_multiindex(self) -> None:
+        """Test JSON round-trip with multi-index table.
+
+        The index is reset when writing to JSON, but restored when reading
+        based on the primary_key in the metadata sidecar file.
+        """
+        t1 = Table({"gdp": [100, 102, 104, 106], "country": ["AU", "AU", "SE", "SE"], "year": [2020, 2021, 2020, 2021]})
+        t1.set_index(["country", "year"], inplace=True)
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            assert exists(filename)
+            assert exists(splitext(filename)[0] + ".meta.json")
+
+            t2 = Table.read_json(filename)
+            # Index is restored from metadata
+            assert_tables_eq(t1, t2)
+
+    def test_json_with_field_metadata(self) -> None:
+        """Test that field-level metadata is preserved in JSON round-trip."""
+        t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        t1.gdp.description = "GDP description"
+        t1.gdp.title = "GDP Title"
+
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            t2 = Table.read_json(filename)
+            assert t2.gdp.metadata.description == "GDP description"
+            assert t2.gdp.metadata.title == "GDP Title"
+
+    def test_json_default_orient_is_records(self) -> None:
+        """Test that default orient is 'records' - simple array of objects."""
+        t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        t1.set_index("country", inplace=True)
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            # Read the raw JSON to verify orient='records' structure
+            with open(filename) as f:
+                data = json.load(f)
+
+            # 'records' orient is a simple array of objects, no schema
+            assert isinstance(data, list)
+            assert len(data) == 3
+            assert data[0] == {"country": "AU", "gdp": 100}
+
+            # Read it back - index is restored from metadata
+            t2 = Table.read_json(filename)
+            assert_tables_eq(t1, t2)
+
+    def test_json_with_numeric_types(self) -> None:
+        """Test JSON handles various numeric types correctly."""
+        t1 = Table(
+            {
+                "int_col": [1, 2, 3],
+                "float_col": [1.5, 2.5, 3.5],
+                "bool_col": [True, False, True],
+            }
+        )
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            t2 = Table.read_json(filename)
+            assert list(t2.int_col) == [1, 2, 3]
+            assert list(t2.float_col) == [1.5, 2.5, 3.5]
+
+    def test_json_metadata_file_structure(self) -> None:
+        """Test that JSON metadata sidecar file has correct structure."""
+        t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        t1.set_index("country", inplace=True)
+        t1.gdp.description = "Test description"
+
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            meta_filename = join(path, "table.meta.json")
+            with open(meta_filename) as f:
+                meta = json.load(f)
+
+            assert "primary_key" in meta
+            assert meta["primary_key"] == ["country"]
+            assert "fields" in meta
+            assert "gdp" in meta["fields"]
+            assert meta["fields"]["gdp"]["description"] == "Test description"

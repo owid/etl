@@ -25,6 +25,9 @@ def run() -> None:
     tb_reg["country"] = tb_reg["region"] + " (" + tb_reg["region_type"] + ")"
     tb_reg = tb_reg.drop(columns=["region", "region_type"])
 
+    # rename hyg_ns to hyg_nfac in regions table to match countries table
+    tb_reg = tb_reg.rename(columns={"hyg_ns": "hyg_nfac"})
+
     tb = pr.concat([tb, tb_reg], ignore_index=True)
 
     tb = tb.drop(columns=["iso3"])

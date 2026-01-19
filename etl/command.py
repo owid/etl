@@ -274,7 +274,7 @@ def main_cli(
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
     """Find and print closest matches for misspelled step names."""
-    print(f"No steps matched `{includes_str}`. Closest matches:")
+    print(f"No steps matched `{includes_str}`; check the spelling or try with the `--private` flag.\nClosest matches:")
     # NOTE: We could use a better edit distance to find the closest matches.
     for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
         print(match)

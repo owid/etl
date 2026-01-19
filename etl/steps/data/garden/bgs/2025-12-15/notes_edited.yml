@@ -250,7 +250,7 @@ production|Bauxite|Mine|tonnes:
   - In addition to the countries listed, some bauxite continues to be produced in Mexico but it is all used as construction aggregates and figures are not reported.
   # - Break in series.
   - Including beneficiated and direct shipping ore.
-  - Excludes non-metallugical bauxite.
+  - Excludes non-metallurgical bauxite.
   - Dried bauxite equivalent.
   - For non-metallurgical uses.
   - No adjustment has been made for moisture content.
@@ -271,7 +271,7 @@ production|Cobalt|Refinery|tonnes:
   - In addition to the production listed above, several countries, including the United Kingdom, are known to produce substantial amounts of cobalt compounds which are not shown here to avoid double counting.
   - Refined cobalt can be in the form of metal, oxides, carbonates, sulphates and many other compounds. Efforts are made to avoid double-counting but it is not always possible to be certain.
   - Production not reported. Much of the metal recorded under Zaire is believed to be further processed in Belgium and elsewhere.
-  - In addition to the production listed above, several countries, including the United Kingdom, Finland, France and USA, are known to substantial amounts of cobalt compounds.
+  - In addition to the production listed above, several countries, including the United Kingdom, Finland, France, and the USA, are known to produce substantial amounts of cobalt compounds.
   - Much of the metal recorded under Zaire is believed to be further processed in Belgium and elsewhere.
   - Much of the metal recorded under Democratic Republic of the Congo is believed to be further processed in Belgium and elsewhere.
   - Some refined cobalt production in China is recorded in Belgium.
@@ -718,7 +718,7 @@ production|Selenium|Refinery|tonnes:
   - In addition to the countries listed, Australia, Iran, the Republic of Korea and Zimbabwe are believed to produce refined selenium.
   # - Estimates.
   # - Exports.
-  - In addition to the countries listed, Australia, India and the Republic of Korea are are believed to produce selenium metal.
+  - In addition to the countries listed, Australia, India, and the Republic of Korea are believed to produce selenium metal.
   - In addition to the countries listed, Australia, the Republic of Korea and Zimbabwe are believed to produce selenium metal.
   - In addition to the countries listed, Australia, Chile, the Republic of Korea and Zimbabwe are believed to produce selenium metal.
   - Includes production of secondary metal.
@@ -775,7 +775,7 @@ production|Platinum group metals|Mine, palladium|tonnes:
   - In addition to the countries listed, Bulgaria, China, Ethiopia, Indonesia and Philippines are believed to produce platinum group metals.
   - In addition to the production listed, concentrates produced in Spain, and possibly other countries, are believed to be processed in China to recover platinum group metals.
   - Platinum group metals; all forms.
-  - South Africa thought to be the only country to produce osmium, however data is unavailable.
+  - South Africa is thought to be the only country to produce osmium, however data is unavailable.
   - Platinum metals content of concentrates (produced from Ni-Cu ores), residues and matte exported.
   # - Break in series.
   # - Metal production.
@@ -789,7 +789,7 @@ production|Platinum group metals|Mine, platinum|tonnes:
   - Wherever possible, figures relate to quantities of platinum group metals thought to be recovered from ores originating in the country stated.
   - In addition to the countries listed, Bulgaria, China, Ethiopia, Indonesia and Philippines are believed to produce platinum group metals.
   - In addition to the production listed, concentrates produced in Spain, and possibly other countries, are believed to be processed in China to recover platinum group metals.
-  - South Africa thought to be the only country to produce osmium, however data is unavailable.
+  - South Africa is thought to be the only country to produce osmium, however data is unavailable.
   - Platinum metals content of concentrates (produced from Ni-Cu ores), residues and matte exported.
   # - Break in series.
   # - Metal production.
@@ -804,9 +804,9 @@ production|Titanium|Mine, ilmenite|tonnes:
   - In 1995 South Africa produced 988 000 tonnes of slag (85% TiO2) and Canada produced 816 000 tonnes of slag (80% TiO2).
   - Some ilmenite is converted to synthetic rutile in Australia, India, Japan, Taiwan and USA.
   - The figures in this table refer to gross tonnage of titanium concentrates.
-  - In 2008 South Africa produced an estimated 1 200 000 tonnes of slag (85% TiO2) and Canada produced an estimated 1 110 000 tonnes of slg (80-95% TiO2).
+  - In 2008 South Africa produced an estimated 1 200 000 tonnes of slag (85% TiO2) and Canada produced an estimated 1 110 000 tonnes of slag (80-95% TiO2).
   - In 2009 South Africa produced an estimated 1 850 000 tonnes of slag (85% TiO2) and Canada produced an estimated 800 000 tonnes of slag (80-95% TiO2).
-  - In 2010 South Africa produced an estimated xxxxx tonnes of slag (85% TiO2) and Canada produced an estimated xxxxx tonnes of slag (80-95% TiO2).
+  # - In 2010 South Africa produced an estimated xxxxx tonnes of slag (85% TiO2) and Canada produced an estimated xxxxx tonnes of slag (80-95% TiO2).
   - Some ilmenite is converted to synthetic rutile in Australia, India, Japan and USA.
   # - Break in series.
   # - Years ended 30 June of that stated.
@@ -825,9 +825,9 @@ production|Titanium|Mine, rutile|tonnes:
   - In 1995 South Africa produced 988 000 tonnes of slag (85% TiO2) and Canada produced 816 000 tonnes of slag (80% TiO2).
   - Some ilmenite is converted to synthetic rutile in Australia, India, Japan, Taiwan and USA.
   - The figures in this table refer to gross tonnage of titanium concentrates.
-  - In 2008 South Africa produced an estimated 1 200 000 tonnes of slag (85% TiO2) and Canada produced an estimated 1 110 000 tonnes of slg (80-95% TiO2).
+  - In 2008 South Africa produced an estimated 1 200 000 tonnes of slag (85% TiO2) and Canada produced an estimated 1 110 000 tonnes of slag (80-95% TiO2).
   - In 2009 South Africa produced an estimated 1 850 000 tonnes of slag (85% TiO2) and Canada produced an estimated 800 000 tonnes of slag (80-95% TiO2).
-  - In 2010 South Africa produced an estimated xxxxx tonnes of slag (85% TiO2) and Canada produced an estimated xxxxx tonnes of slag (80-95% TiO2).
+  # - In 2010 South Africa produced an estimated xxxxx tonnes of slag (85% TiO2) and Canada produced an estimated xxxxx tonnes of slag (80-95% TiO2).
   - Some ilmenite is converted to synthetic rutile in Australia, India, Japan and USA.
   # - Break in series.
   # - Years ended 30 June of that stated.
@@ -994,19 +994,19 @@ production|Platinum group metals|Mine, iridium|tonnes:
   # - Estimates.
   - Figures for metal production are only given for countries where recovery is thought to be based predominantly on domestic materials or on imported materials which have not been recorded as mine production elsewhere in the table.
   - In addition to the production listed, concentrates produced in Spain, and possibly other countries, are believed to be processed in China to recover platinum group metals.
-  - South Africa thought to be the only country to produce osmium, however data is unavailable.
+  - South Africa is thought to be the only country to produce osmium, however data is unavailable.
   - Recovered by refineries from domestic platinum, gold and copper ores.
 production|Platinum group metals|Mine, rhodium|tonnes:
   - Figures for metal production are only given for countries where recovery is thought to be based predominantly on domestic materials or on imported materials which have not been recorded as mine production elsewhere in the table.
   - In addition to the production listed, concentrates produced in Spain, and possibly other countries, are believed to be processed in China to recover platinum group metals.
-  - South Africa thought to be the only country to produce osmium, however data is unavailable.
+  - South Africa is thought to be the only country to produce osmium, however data is unavailable.
   # - Estimates.
   - Recovered by refineries from domestic platinum, gold and copper ores.
 production|Platinum group metals|Mine, ruthenium|tonnes:
   # - Estimates.
   - Figures for metal production are only given for countries where recovery is thought to be based predominantly on domestic materials or on imported materials which have not been recorded as mine production elsewhere in the table.
   - In addition to the production listed, concentrates produced in Spain, and possibly other countries, are believed to be processed in China to recover platinum group metals.
-  - South Africa thought to be the only country to produce osmium, however data is unavailable.
+  - South Africa is thought to be the only country to produce osmium, however data is unavailable.
 production|Gallium|Processing|tonnes:
   # - Estimates.
   - Accurate data for gallium is difficult to obtain because it is produced only as a by-product of bauxite or zinc processing using proprietary techniques. As a consequence, this table may not be complete.

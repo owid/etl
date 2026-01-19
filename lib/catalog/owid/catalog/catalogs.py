@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING
 from deprecated import deprecated
 
 # Re-export catalog classes for backwards compatibility
-from owid.catalog.api.catalogs import (
+from owid.catalog.api.legacy import (
     CatalogFrame,
     CatalogSeries,
     ETLCatalog,
@@ -138,7 +138,7 @@ def find(
         current_channels = set(REMOTE_CATALOG.channels)
         new_channels = set(channels) - current_channels
         if new_channels:
-            REMOTE_CATALOG = ETLCatalog(channels=tuple(current_channels | set(channels)))
+            REMOTE_CATALOG = ETLCatalog(channels=tuple(current_channels | set(channels)))  # type: ignore[arg-type]
 
     # Convert old parameters to new match parameter for backwards compatibility
     if fuzzy:

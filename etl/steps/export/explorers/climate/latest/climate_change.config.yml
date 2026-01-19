@@ -92,7 +92,7 @@ views:
     config:
       title: "Global warming: monthly sea surface temperature anomaly"
       subtitle: |-
-        This is measured at a nominal depth of 20cm, and given relative to the average temperature from the period of 1961 - 1990.
+        This is measured at a nominal depth of 20cm, and given relative to the average temperature from the period of 1861-1890.
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
@@ -110,7 +110,7 @@ views:
     config:
       title: "Global warming: heat content in the top 700 meters of the world's oceans"
       subtitle: |-
-        Ocean heat content is measured relative to the 1971–2000 average, which is set at zero for reference. It is measured in 10²² joules. For reference, 10²² joules are equal to approximately 17 times the amount of energy used globally every year.
+        Ocean heat content is measured relative to the 1971-2000 average, which is set at zero for reference. It is measured in 10²² joules. For reference, 10²² joules are equal to approximately 17 times the amount of energy used globally every year.
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
@@ -129,7 +129,7 @@ views:
     config:
       title: "Global warming: heat content in the top 2,000 meters of the world's oceans"
       subtitle: |-
-        Ocean heat content is measured relative to the 1971–2000 average, which is set at zero for reference. It is measured in 10²² joules. For reference, 10²² joules are equal to approximately 17 times the amount of energy used globally every year.
+        Ocean heat content is measured relative to the 1971-2000 average, which is set at zero for reference. It is measured in 10²² joules. For reference, 10²² joules are equal to approximately 17 times the amount of energy used globally every year.
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
