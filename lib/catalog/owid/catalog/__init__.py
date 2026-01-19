@@ -7,7 +7,6 @@ from owid.catalog.core.datasets import Dataset
 from owid.catalog.core.indicators import Indicator, Variable
 from owid.catalog.core.meta import (
     DatasetMeta,
-    FaqLink,
     License,
     Origin,
     Source,
@@ -33,7 +32,6 @@ __all__ = [
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
-    "FaqLink",
     "Source",
     "Origin",
     "License",

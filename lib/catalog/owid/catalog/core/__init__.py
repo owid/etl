@@ -8,13 +8,7 @@ from owid.catalog.core.indicators import (
     Variable,
 )
 from owid.catalog.core.meta import (
-    PROCESSING_LEVELS,
-    PROCESSING_LEVELS_ORDER,
-    SOURCE_EXISTS_OPTIONS,
-    VARIABLE_TYPE,
     DatasetMeta,
-    FaqLink,
-    GrapherConfig,
     License,
     MetaBase,
     Origin,
@@ -22,11 +16,7 @@ from owid.catalog.core.meta import (
     TableDimension,
     TableMeta,
     VariableMeta,
-    VariablePresentationMeta,
-    YearDateLatest,
-    is_year_or_date,
     to_html,
-    update_variable_metadata,
 )
 from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.processing_log import (
@@ -62,25 +52,15 @@ __all__ = [
     "enabled",
     "wrap",
     # meta
-    "SOURCE_EXISTS_OPTIONS",
-    "VARIABLE_TYPE",
-    "YearDateLatest",
     "MetaBase",
     "License",
     "Source",
     "Origin",
-    "PROCESSING_LEVELS",
-    "PROCESSING_LEVELS_ORDER",
-    "FaqLink",
-    "GrapherConfig",
-    "VariablePresentationMeta",
     "VariableMeta",
     "DatasetMeta",
     "TableDimension",
     "TableMeta",
     "to_html",
-    "is_year_or_date",
-    "update_variable_metadata",
     # indicators
     "Variable",
 ]

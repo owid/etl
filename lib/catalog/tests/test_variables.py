@@ -15,7 +15,7 @@ from owid.catalog.core.indicators import (
     get_unique_origins_from_indicators,
     get_unique_sources_from_indicators,
 )
-from owid.catalog.meta import VariableMeta, VariablePresentationMeta
+from owid.catalog.core.meta import VariableMeta, VariablePresentationMeta
 
 
 def test_create_empty_variable() -> None:
