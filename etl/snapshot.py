@@ -8,14 +8,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Optional, Union, cast
 
-import owid.catalog.processing as pr
+import owid.catalog.core.processing as pr
 import pandas as pd
 import requests
 import structlog
 import yaml
 from deprecated import deprecated
 from owid.catalog import Table, s3_utils
-from owid.catalog.meta import (
+from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     MetaBase,
