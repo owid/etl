@@ -2,7 +2,7 @@ __version__ = "1.0.0rc2"
 
 from owid.catalog import api
 from owid.catalog.api import Client, fetch, search
-from owid.catalog.core import processing, utils
+from owid.catalog.core import processing, tables, utils
 from owid.catalog.core.datasets import CHANNEL, Dataset
 from owid.catalog.core.indicators import Indicator, Variable
 from owid.catalog.core.meta import (
@@ -35,8 +35,9 @@ __all__ = [
     "Source",
     "Origin",
     "License",
-    # Utilities
+    # backwards compatibility re-exports
     "utils",
+    "tables",
     "CHANNEL",
     "processing",
 ]
