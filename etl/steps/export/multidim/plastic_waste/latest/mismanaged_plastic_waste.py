@@ -52,13 +52,11 @@ def generate_subtitle_by_type(view):
     measure = view.dimensions.get("measure")
 
     if measure == "total":
-        return "Breakdown of macroplastic emissions by open burning and debris, measured in tonnes per year."
+        return "Breakdown of the estimated total amount of plastic waste released to the environment each year through debris and open burning from municipal sources such as households, shops, and offices."
     elif measure == "per_person":
-        return (
-            "Breakdown of macroplastic emissions by open burning and debris, measured in kilograms per person per year."
-        )
+        return "Breakdown of the estimated total amount of plastic waste released to the environment per person each year through debris and open burning from municipal sources such as households, shops, and offices."
     else:
-        return "Breakdown of macroplastic emissions by open burning and debris."
+        return "Breakdown of the estimated total amount of plastic waste released to the environment through debris and open burning from municipal sources such as households, shops, and offices."
 
 
 def run() -> None:
