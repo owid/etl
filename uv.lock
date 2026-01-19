@@ -5292,7 +5292,7 @@ requires-dist = [
     { name = "pyarrow", specifier = ">=18.0.0" },
     { name = "pydrive2", specifier = ">=1.15.0" },
     { name = "structlog", specifier = ">=21.5.0" },
-    { name = "urllib3", specifier = "<2" },
+    { name = "urllib3", specifier = "<3" },
 ]
 
 [package.metadata.requires-dev]
