@@ -11,6 +11,42 @@ icon: lucide/lightbulb
     Contribute by [documenting](../dev/docs/){data-preview} your tricks and tips!.
 
 
+## Browse and search ETL steps interactively
+
+Use `etlr --browse` (or `-b`) to open an interactive step browser with fuzzy search. This is useful when you don't remember the exact step name.
+
+<div style="text-align: center;">
+  <video controls width="100%" style="max-width: 800px;">
+    <source src="../../assets/demo-etlr-b.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+```bash
+# Open the interactive browser for private steps
+etlr --browse --private
+
+# Short form
+etlr -b -p
+```
+
+The browser supports:
+
+- **Fuzzy search**: Type partial matches like `fao qcl` to find `faostat_qcl`
+- **Arrow keys**: Navigate through results
+- **Enter**: Select a step and run it
+- **Escape/Ctrl-C**: Cancel
+
+Once you select a step, it will be executed with the flags you specified (e.g., `--private`, `--dry-run`).
+
+```bash
+# Browse and preview what would run (dry-run)
+etlr -b -p --dry-run
+
+# Browse with grapher upload
+etlr -b -p --grapher
+```
+
 ## Interpolate values
 Sometimes, you may have empty values in your dataset. In general, a solution for these cases is to use interpolation to fill those gaps based on previous and following values. In `data_helpers.misc` module, you will find the function `interpolate_table` that can be used to interpolate values in a table.
 
