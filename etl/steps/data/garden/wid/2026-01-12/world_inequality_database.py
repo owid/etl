@@ -362,7 +362,7 @@ def add_relative_poverty(tb_inequality: Table, tb_incomes: Table, tb_distributio
         tb_min = tb_min.rename(columns={"p": "headcount_ratio"})
 
         # Add poverty line column
-        tb_min["poverty_line"] = f"{pct}% of median"
+        tb_min["poverty_line"] = f"{pct}% of the median"
 
         # Append to list
         tables_relative_poverty.append(tb_min)
