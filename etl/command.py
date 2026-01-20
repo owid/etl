@@ -184,6 +184,12 @@ def complete_steps(ctx: click.Context, param: click.Argument, incomplete: str) -
     "--subset",
     help="Filter to speed up development - works as regex for both data processing and grapher upload.",
 )
+@click.option(
+    "--browse",
+    "-b",
+    is_flag=True,
+    help="Open interactive step browser to search and select steps.",
+)
 @click.argument(
     "steps",
     nargs=-1,
@@ -211,6 +217,7 @@ def main_cli(
     force_upload: bool = False,
     prefer_download: bool = False,
     subset: Optional[str] = None,
+    browse: bool = False,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -233,17 +240,11 @@ def main_cli(
     ```
     $ etl run mars prio --dry-run
     ```
-
-    **Example 4**: Interactive mode - run `etlr` with flags but no step argument to browse steps:
-
-    ```
-    $ etlr --private
-    ```
     """
     _update_open_file_limit()
 
-    # Interactive mode: no steps provided + interactive terminal
-    if not steps and sys.stdin.isatty() and sys.stdout.isatty():
+    # Interactive browse mode: explicit --browse flag
+    if browse:
         from etl.step_browser import browse_steps
 
         dag = load_dag(dag_path)
