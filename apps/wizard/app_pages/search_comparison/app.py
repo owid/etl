@@ -1,13 +1,15 @@
 """Compare Algolia keyword search with semantic (AI) search side-by-side."""
 
+import json
 import time
+from typing import Generator
 
 import requests
 import streamlit as st
 
 from apps.wizard.app_pages.search_comparison.random_queries import get_random_search_query
 from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, STAGING
 from etl.db import read_sql
 
 # Page config must be first Streamlit command
@@ -17,8 +19,8 @@ st.set_page_config(
     layout="wide",
 )
 
-# API base URL (local dev server)
-API_BASE = "http://127.0.0.1:8788"
+# API base URL - localhost:8788 for local dev, OWID_ENV.site for staging/prod
+API_BASE = OWID_ENV.site if STAGING else "http://localhost:8788"
 
 
 @st.cache_data(ttl=3600)
@@ -97,6 +99,29 @@ def fetch_algolia_search(query: str, hits_per_page: int) -> tuple[dict, float]:
         return {"error": str(e), "hits": []}, time.time() - start
 
 
+def fetch_answer_stream(query: str) -> Generator[str, None, None]:
+    """Stream answer from AI search SSE endpoint."""
+    try:
+        response = requests.get(
+            f"{API_BASE}/api/ai-search/answer",
+            params={"q": query},
+            stream=True,
+            timeout=60,
+        )
+        response.raise_for_status()
+        # Force UTF-8 encoding for proper Unicode handling (e.g., CO₂)
+        response.encoding = "utf-8"
+
+        for line in response.iter_lines(decode_unicode=True):
+            if line and line.startswith("data:"):
+                data = line[5:].strip()
+                if data:
+                    chunk = json.loads(data)
+                    yield chunk.get("text", "")
+    except requests.RequestException as e:
+        yield f"\n\n*Error: {e}*"
+
+
 def get_rank_change_indicator(current_rank: int, other_rank: int | None) -> str:
     """Get an indicator showing rank change between search results."""
     if other_rank is None:
@@ -114,13 +139,22 @@ def get_rank_change_indicator(current_rank: int, other_rank: int | None) -> str:
         return ":gray[=]"
 
 
+def is_explorer(hit: dict) -> bool:
+    """Check if the hit is an explorer (not a chart)."""
+    url = hit.get("url", "")
+    return "/explorers/" in url
+
+
 def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None):
     """Display a single search hit."""
     title = hit.get("title", "Untitled")
-    slug = hit.get("slug", "")
     subtitle = hit.get("subtitle", "")
     # Use URL from API response, or fallback to current environment's site
-    url = hit.get("url") or f"{OWID_ENV.site}/grapher/{slug}"
+    url = hit.get("url")
+
+    # Check if this is an explorer
+    explorer = is_explorer(hit)
+    type_icon = "🧭" if explorer else "📊"
 
     # Get score based on search type
     if search_type == "semantic":
@@ -136,8 +170,8 @@ def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None)
     rank_indicator = get_rank_change_indicator(index, other_rank)
 
     with st.container(border=True):
-        # Title with rank change as suffix
-        st.markdown(f"**{index}.** [{title}]({url}) {rank_indicator}")
+        # Title with type icon and rank change
+        st.markdown(f"**{index}.** {type_icon} [{title}]({url}) {rank_indicator}")
 
         # Subtitle
         if subtitle:
@@ -238,6 +272,10 @@ def main():
     semantic_slug_to_rank = build_slug_to_rank(semantic_hits)
     algolia_slug_to_rank = build_slug_to_rank(algolia_hits)
 
+    # Create placeholder for AI answer at the top (will be filled after charts render)
+    st.subheader("🤖 AI Answer")
+    ai_answer_placeholder = st.empty()
+
     # Headers - Algolia on left, Semantic on right
     col_algolia, col_semantic = st.columns(2)
     with col_algolia:
@@ -270,6 +308,15 @@ def main():
                 slug = hit.get("slug")
                 other_rank = algolia_slug_to_rank.get(slug)
                 display_hit(hit, i + 1, "semantic", other_rank)
+
+    # Now stream the AI answer into the placeholder (charts are already rendered)
+    # Manually accumulate text since placeholder.write_stream doesn't work correctly
+    full_response = ""
+    for chunk in fetch_answer_stream(query):
+        full_response += str(chunk) if chunk else ""
+        ai_answer_placeholder.markdown(full_response + "▌")
+    # Final render without cursor
+    ai_answer_placeholder.markdown(full_response)
 
 
 main()
