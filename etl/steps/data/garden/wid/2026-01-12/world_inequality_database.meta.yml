@@ -741,7 +741,7 @@ tables:
           <<: *common_display
 
       share_top_10:
-        title: Share (richest 10%, <<welfare_type>>){definitions.title_extrapolated}
+        title: Share (top 10%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
@@ -750,7 +750,7 @@ tables:
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
         display:
-          name: Share (richest 10%, <<welfare_type>>)
+          name: Share (top 10%, <<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -770,7 +770,7 @@ tables:
             selectedEntityNames: *entity_names_inequality
 
       share_top_1:
-        title: Share (richest 1%, <<welfare_type>>){definitions.title_extrapolated}
+        title: Share (top 1%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
@@ -779,7 +779,7 @@ tables:
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
         display:
-          name: Share (richest 1%, <<welfare_type>>)
+          name: Share (top 1%, <<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -799,7 +799,7 @@ tables:
             selectedEntityNames: *entity_names_inequality
 
       share_top_0_1:
-        title: Share (richest 0.1%, <<welfare_type>>){definitions.title_extrapolated}
+        title: Share (top 0.1%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
@@ -808,7 +808,7 @@ tables:
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
         display:
-          name: Share (richest 0.1%, <<welfare_type>>)
+          name: Share (top 0.1%, <<welfare_type>>)
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
