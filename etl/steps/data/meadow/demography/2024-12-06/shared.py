@@ -15,7 +15,7 @@ from pathlib import Path
 import owid.catalog.processing as pr
 import pyreadr
 from owid.catalog import Table
-from owid.catalog.tables import _add_table_and_variables_metadata_to_table
+from owid.catalog.core.tables import _add_table_and_variables_metadata_to_table
 
 from etl.helpers import PathFinder
 
