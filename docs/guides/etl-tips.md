@@ -186,3 +186,72 @@ Our population data is built as a combination of multiple origins. When using po
   - Importantly, in these charts, **the metadata of `population#population` is always shown indirectly in our charts, propagated to other indicators**.
 
 In the majority of cases, you may want to use population as an auxiliary indicator, and therefore use (2).
+
+## Reading from zipped snapshots
+
+When a snapshot is a zip/tar archive containing multiple files, use `extracted()` to access its contents.
+
+### Basic usage
+
+```python
+snap = paths.load_snapshot("my_archive.zip")
+
+with snap.extracted() as archive:
+    # List all files in the archive
+    print(archive.files)  # ['data/2020.csv', 'data/2021.csv', 'metadata.json']
+
+    # Read a specific file
+    tb = archive.read("data/2020.csv")
+```
+
+### Finding files with glob patterns
+
+```python
+with snap.extracted() as archive:
+    # Find all CSVs anywhere in the archive
+    csv_files = archive.glob("**/*.csv")
+
+    # Find files in a specific folder
+    data_files = archive.glob("data/*")
+
+    # Read all matching files
+    tables = [archive.read(f) for f in archive.glob("**/*.csv")]
+```
+
+### Checking if a file exists
+
+```python
+with snap.extracted() as archive:
+    if "optional_file.csv" in archive:
+        tb = archive.read("optional_file.csv")
+```
+
+### Error handling
+
+If you try to read a file that doesn't exist, you'll get a helpful error message listing available files:
+
+```
+FileNotFoundError: File 'wrong_name.csv' not found in archive.
+Available files:
+  - data/2020.csv
+  - data/2021.csv
+  - metadata.json
+```
+
+### Accessing raw path for custom operations
+
+For non-tabular data or custom file operations, you can access the underlying path:
+
+```python
+with snap.extracted() as archive:
+    # For custom file operations (e.g., non-tabular data)
+    with open(archive.path / "readme.txt") as f:
+        content = f.read()
+
+    # Or use pathlib operations
+    json_path = archive.path / "config.json"
+    if json_path.exists():
+        import json
+        with open(json_path) as f:
+            config = json.load(f)
+```
