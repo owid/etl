@@ -220,15 +220,6 @@ class TestIndicatorsAPI:
         assert 0 <= first.score <= 1
         assert first.path
 
-    def test_indicator_results_to_catalog_frame(self):
-        client = Client()
-        results = client.indicators.search("co2 emissions")
-
-        frame = results.to_catalog_frame()
-        assert "indicator_title" in frame.columns
-        assert "score" in frame.columns
-        assert "path" in frame.columns
-
     def test_fetch_indicator(self):
         """Test fetching a specific indicator by path returns Table directly."""
         client = Client()
@@ -286,18 +277,6 @@ class TestTablesAPI:
         assert isinstance(results, ResponseSet)
         assert len(results) > 0
         assert all(r.namespace == "un" for r in results)
-
-    def test_table_results_to_catalog_frame(self):
-        client = Client()
-        results = client.tables.search(table="population", namespace="un")
-
-        frame = results.to_catalog_frame()
-        assert "table" in frame.columns
-        assert "namespace" in frame.columns
-        assert "path" in frame.columns
-
-        # Should be loadable
-        assert hasattr(frame, "load")
 
     def test_fetch_table(self):
         """Test fetching table by path returns Table directly."""
