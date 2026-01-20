@@ -13,9 +13,6 @@ paths = PathFinder(__file__)
 BASE = "https://www.prisonstudies.org/country/"
 
 
-country_harmonizer = {"Sint-Maarten-(Netherlands)"}
-
-
 def run(upload: bool = True) -> None:
     """Create a new snapshot.
 
@@ -47,7 +44,11 @@ def get_country_names() -> List[str]:
     countries = [c.replace("-of", "") for c in countries]
     countries = [c.replace("/", "") for c in countries]
     countries = [c.replace(":", "") for c in countries]
-    countries = [c.replace("&", "") for c in countries]
+    countries = [c.replace("-&", "") for c in countries]
+    countries = [c.replace(",", "") for c in countries]
+    countries = [c.replace(".", "") for c in countries]
+    countries = [c.replace("-the", "") for c in countries]
+    countries = [c.replace("'", "") for c in countries]
 
     return countries
 
