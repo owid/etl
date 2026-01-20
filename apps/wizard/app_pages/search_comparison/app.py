@@ -9,7 +9,7 @@ import streamlit as st
 
 from apps.wizard.app_pages.search_comparison.random_queries import get_random_search_query
 from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
-from etl.config import OWID_ENV, STAGING
+from etl.config import ENV_IS_REMOTE, OWID_ENV, STAGING
 from etl.db import read_sql
 
 # Page config must be first Streamlit command
@@ -19,8 +19,8 @@ st.set_page_config(
     layout="wide",
 )
 
-# API base URL - localhost:8788 for local dev, OWID_ENV.site for staging/prod
-API_BASE = OWID_ENV.site if STAGING else "http://localhost:8788"
+# API base URL - OWID_ENV.site for staging/prod, localhost for local dev
+API_BASE = "http://localhost:8788" if not ENV_IS_REMOTE and not STAGING else OWID_ENV.site
 
 
 @st.cache_data(ttl=3600)
