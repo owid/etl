@@ -22,7 +22,7 @@ def run() -> None:
     #
     # Load garden datasets
     ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_wid = paths.load_dataset("world_inequality_database")
+    ds_wid = paths.load_dataset("world_inequality_database_legacy")
     ds_wdi = paths.load_dataset("wdi")
 
     # Read tables from garden datasets.
