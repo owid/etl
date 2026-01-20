@@ -5,15 +5,13 @@
 #
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
+from urllib import parse
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
-from pathlib import Path
-from urllib import parse
 
-if TYPE_CHECKING:
-    from owid.catalog.api.legacy import CatalogFrame
 
 T = TypeVar("T")
 
@@ -112,19 +110,25 @@ class ResponseSet(BaseModel, Generic[T]):
             df = df.copy()
 
             # Add thumbnail column - clickable to open chart
-            df.insert(0, "preview", df["url"].apply(
-                lambda x: f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>' if x else ""
-            ))
-
-            # Make URL a clickable link
-            df["url"] = df["url"].apply(
-                lambda x: f'<a href="{x}" target="_blank">{x.split("/")[-1]}</a>' if x else ""
+            df.insert(
+                0,
+                "preview",
+                df["url"].apply(
+                    lambda x: f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>'
+                    if x
+                    else ""
+                ),
             )
 
+            # Make URL a clickable link
+            df["url"] = df["url"].apply(lambda x: f'<a href="{x}" target="_blank">{x.split("/")[-1]}</a>' if x else "")
+
         # Use pandas Styler for left-alignment on all result types
-        styler = df.style.set_table_styles([
-            {"selector": "td, th", "props": [("text-align", "left")]},
-        ])
+        styler = df.style.set_table_styles(
+            [
+                {"selector": "td, th", "props": [("text-align", "left")]},
+            ]
+        )
 
         df_html = styler.to_html(escape=False)
 
