@@ -3,11 +3,8 @@ from functools import lru_cache
 from typing import Any
 
 import jinja2
-import structlog
 
-from owid.catalog.utils import remove_details_on_demand
-
-log = structlog.get_logger()
+from owid.catalog.core.utils import remove_details_on_demand
 
 jinja_env = jinja2.Environment(
     block_start_string="<%",

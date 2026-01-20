@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: International Federation of Robotics
+    title: Robot Density
+    description: |-
+      Number of multipurpose industrial robots per 10,000 persons employed in the manufacturing industry.
+
+      Robot density data combines operational stock data from IFR and national robot associations with labor market data from various sources including OECD, ILO, Eurostat, and national statistics offices.
+    citation_full: |-
+      International Federation of Robotics (2024). Robot Density in the manufacturing industry.
+
+      Sources: Operational stock data: IFR, national robot associations; labor market data: OECD short-term labour market statistics, ILO LFS employment by economic activity, Eurostat lfsa_egan2, national statistics offices (Canada: Statistics Canada, China: China Statistical Yearbook, Germany: Statistisches Bundesamt, Korea: Ministry of Employment and Labour, USA: Bureau of Labor Statistics, Singapore: Ministry of Manpower).
+    attribution: International Federation of Robotics
+    attribution_short: IFR
+    url_main: https://ifr.org/
+    #
+    # This dataset was obtained via email by contacting the IFR team.
+    # To add the file run: etls robot_density --path-to-file <path_to_downloaded_file>
+
+    date_accessed: '2024-06-25'
+    date_published: '2024-06-25'
+    license:
+      name: © International Federation of Robotics
+      url: https://ifr.org/
+outs:
+  - md5: 03497a6f65e14b5eabbf6a9ad42daee1
+    size: 10812
+    path: robot_density.xlsx

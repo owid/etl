@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 import pandas as pd
 import rich_click as click
 from owid.catalog import Dataset, utils
-from owid.catalog.yaml_metadata import _merge_variable_metadata
+from owid.catalog.core.yaml_metadata import _merge_variable_metadata
 from rich.console import Console
 from rich.syntax import Syntax
 
