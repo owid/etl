@@ -218,26 +218,26 @@ definitions:
     [0, 2, 4, 6, 8, 10, 12, 14, 16, 1]
     <%- endif %>
 
-  map_brackets_share_top_10: &map_brackets_share_top_10
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-    [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
-    <%- elif welfare_type == "before tax" %>
-    [100, 30, 35, 40, 45, 50, 55, 60, 1]
-    <%- endif %>
+  # map_brackets_share_top_10: &map_brackets_share_top_10
+  #   <% if welfare_type in ["after tax", "after tax disposable"] %>
+  #   [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
+  #   <%- elif welfare_type == "before tax" %>
+  #   [100, 30, 35, 40, 45, 50, 55, 60, 1]
+  #   <%- endif %>
 
-  map_brackets_share_top_1: &map_brackets_share_top_1
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-    [0, 5, 10, 15, 20, 25, 1]
-    <%- elif welfare_type == "before tax" %>
-    [0, 5, 10, 15, 20, 25, 1]
-    <%- endif %>
+  # map_brackets_share_top_1: &map_brackets_share_top_1
+  #   <% if welfare_type in ["after tax", "after tax disposable"] %>
+  #   [0, 5, 10, 15, 20, 25, 1]
+  #   <%- elif welfare_type == "before tax" %>
+  #   [0, 5, 10, 15, 20, 25, 1]
+  #   <%- endif %>
 
-  map_brackets_share_top_0_1: &map_brackets_share_top_0_1
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-    [0, 2 , 4, 6, 8, 10, 12, 1]
-    <%- elif welfare_type == "before tax" %>
-    [0, 2 , 4, 6, 8, 10, 12, 1]
-    <%- endif %>
+  # map_brackets_share_top_0_1: &map_brackets_share_top_0_1
+  #   <% if welfare_type in ["after tax", "after tax disposable"] %>
+  #   [0, 2 , 4, 6, 8, 10, 12, 1]
+  #   <%- elif welfare_type == "before tax" %>
+  #   [0, 2 , 4, 6, 8, 10, 12, 1]
+  #   <%- endif %>
 
   map_brackets_share_bottom_50: &map_brackets_share_bottom_50
     <% if welfare_type in ["after tax", "after tax disposable"] %>
@@ -762,7 +762,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
-                customNumericValues: *map_brackets_share_top_10
+                customNumericValues: <% set quantile = "10" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
 
       share_top_1:
@@ -790,7 +790,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
-                customNumericValues: *map_brackets_share_top_1
+                customNumericValues: <% set quantile = "Richest 1%" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
 
       share_top_0_1:
@@ -818,7 +818,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
-                customNumericValues: *map_brackets_share_top_0_1
+                customNumericValues: <% set quantile = "Richest 0.1%" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
 
   relative_poverty:
