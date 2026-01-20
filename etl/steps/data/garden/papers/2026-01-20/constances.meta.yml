@@ -16,3 +16,5 @@ tables:
       obesity_share:
         title: Share of << sex >> adults aged 18-69 years old who are obese
         unit: "%"
+        display:
+          entityAnnotationsMap: "France: 18-69 years old"
