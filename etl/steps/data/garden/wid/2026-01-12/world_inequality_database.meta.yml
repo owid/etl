@@ -565,6 +565,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "Oranges"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_gini
             selectedEntityNames: *entity_names_inequality
 
@@ -593,6 +594,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_palma_ratio
             selectedEntityNames: *entity_names_inequality
 
@@ -705,6 +707,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "Blues"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_share_bottom_50
             selectedEntityNames: *entity_names_inequality
 
@@ -762,6 +765,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
+                binningStrategy: "manual"
                 customNumericValues: <% set quantile = "10" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
 
@@ -790,6 +794,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
+                binningStrategy: "manual"
                 customNumericValues: <% set quantile = "Richest 1%" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
 
@@ -818,6 +823,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
+                binningStrategy: "manual"
                 customNumericValues: <% set quantile = "Richest 0.1%" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
 
@@ -855,6 +861,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_relative_poverty
             selectedEntityNames: *entity_names_inequality
 
@@ -887,6 +894,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "BuGn"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_mean_median
             selectedEntityNames: *entity_names_inequality
 
@@ -917,6 +925,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "Blues"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_mean_median
             selectedEntityNames: *entity_names_inequality
 
@@ -956,6 +965,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "Greens"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_avg
             selectedEntityNames: *entity_names_inequality
 
@@ -994,6 +1004,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "OrRd"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_share
             selectedEntityNames: *entity_names_inequality
 
@@ -1032,5 +1043,6 @@ tables:
             map:
               colorScale:
                 baseColorScheme: "Purples"
+                binningStrategy: "manual"
                 customNumericValues: *map_brackets_thr
             selectedEntityNames: *entity_names_inequality
