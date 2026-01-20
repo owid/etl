@@ -103,6 +103,9 @@ R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
 
 # publishing to grapher's MySQL db
 GRAPHER_USER_ID = int(env["GRAPHER_USER_ID"]) if "GRAPHER_USER_ID" in env else None
+ADMIN_API_KEY = env.get("ADMIN_API_KEY")
+# Default user ID for ETL operations on staging (instead of Admin user 1)
+ETL_GRAPHER_USER_ID = 74
 DB_NAME = env.get("DB_NAME", "grapher")
 DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
@@ -163,7 +166,7 @@ STAGING = load_STAGING()
 
 # if STAGING is used, override ENV values
 if STAGING is not None:
-    GRAPHER_USER_ID = 1  # use Admin user when working with staging
+    GRAPHER_USER_ID = ETL_GRAPHER_USER_ID
     DB_USER = "owid"
     DB_NAME = "owid"
     DB_PASS = ""
@@ -181,7 +184,7 @@ if DATA_API_ENV == "production":
 elif STAGING is not None:
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
     DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
-    SEARCH_API_URL = f"http://staging-site-{get_container_name(STAGING)}/etl/search"
+    SEARCH_API_URL = f"http://{get_container_name(STAGING)}/etl/search"
 else:
     # Local development
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
@@ -412,7 +415,7 @@ class OWIDEnv:
     @classmethod
     def from_local(cls):
         conf = Config(
-            GRAPHER_USER_ID=1,
+            GRAPHER_USER_ID=ETL_GRAPHER_USER_ID,
             DB_USER="owid",
             DB_NAME="owid",
             DB_PASS="",
@@ -425,7 +428,7 @@ class OWIDEnv:
     def from_staging(cls, branch: str):
         """Create OWIDEnv for staging."""
         conf = Config(
-            GRAPHER_USER_ID=1,
+            GRAPHER_USER_ID=ETL_GRAPHER_USER_ID,
             DB_USER="owid",
             DB_NAME="owid",
             DB_PASS="",

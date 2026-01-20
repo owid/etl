@@ -8,14 +8,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Optional, Union, cast
 
-import owid.catalog.processing as pr
+import owid.catalog.core.processing as pr
 import pandas as pd
 import requests
 import structlog
 import yaml
 from deprecated import deprecated
 from owid.catalog import Table, s3_utils
-from owid.catalog.meta import (
+from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     MetaBase,
@@ -358,6 +358,10 @@ class Snapshot:
         return pr.read_parquet(
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
+
+    def read_from_df(self, *args, **kwargs) -> Table:
+        """Read data from a dataframe into a Table and populate it with metadata."""
+        return pr.read_from_df(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
         """Read data file using a custom reader function, and return a Table with metadata.

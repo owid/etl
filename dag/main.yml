@@ -9,6 +9,11 @@ steps:
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
+  # Create steps with latest population and GDP per capita for Grapher (entity sorting, peer countries).
+  data://external/owid_grapher/latest/population:
+    - data://grapher/demography/2024-07-15/population
+  data://external/owid_grapher/latest/gdp:
+    - data://grapher/ggdc/2024-04-26/maddison_project_database
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -86,6 +91,10 @@ steps:
     - snapshot://bls/2025-04-12/us_consumer_prices.csv
   data://grapher/bls/2025-04-12/us_consumer_prices:
     - data://garden/bls/2025-04-12/us_consumer_prices
+
+  # USA PPI New Office Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2025-12-24/us_ppi_construction:
+    - snapshot://bls/2025-12-24/us_ppi_construction.csv
 
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
@@ -738,6 +747,18 @@ steps:
 
   data://grapher/oecd/2025-12-23/official_development_assistance:
     - data://garden/oecd/2025-12-23/official_development_assistance
+
+
+  #
+  # CORE Econ - Growth rate of GDP per capita and productivity
+  #
+  data://meadow/core_econ/2026-01-07/growth_rate_gdp_productivity:
+    - snapshot://core_econ/2026-01-07/growth_rate_productivity.csv
+    - snapshot://core_econ/2026-01-07/growth_rate_gdp_pc.csv
+  data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity:
+    - data://meadow/core_econ/2026-01-07/growth_rate_gdp_productivity
+  data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
+    - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity
 
 include:
   - dag/open_numbers.yml

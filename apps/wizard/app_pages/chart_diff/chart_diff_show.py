@@ -17,6 +17,7 @@ import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
+from apps.chart_sync.admin_api import AdminAPI
 from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
@@ -592,6 +593,54 @@ class ChartDiffShow:
                 hide_index=True,
             )
 
+    def _show_narrative_charts(self) -> None:
+        """Show narrative charts that use this chart as parent, with side-by-side comparison."""
+        if not self.diff.chart_id:
+            return
+
+        # Load narrative charts for this parent chart
+        narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
+            self.source_session, {self.diff.chart_id}
+        )
+
+        if not narrative_charts:
+            return
+
+        st.markdown("##### 📖 Narrative Charts")
+
+        # Get narrative chart configs from both environments
+        source_api = AdminAPI(SOURCE)
+        target_api = AdminAPI(TARGET)
+
+        for nc in narrative_charts:
+            with st.container(border=True):
+                # Get full configs from both environments via API
+                source_nc = source_api.get_narrative_chart(nc.id)
+                source_config = source_nc.get("configFull", {})
+
+                try:
+                    target_nc = target_api.get_narrative_chart(nc.id)
+                    target_config = target_nc.get("configFull", {})
+                except Exception:
+                    target_config = None
+
+                # Show side-by-side comparison
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.markdown("Production")
+                    if target_config:
+                        grapher_chart(chart_config=target_config, owid_env=TARGET)
+                    else:
+                        st.info("Not available in production")
+
+                with col2:
+                    st.markdown("Staging")
+                    if source_config:
+                        grapher_chart(chart_config=source_config, owid_env=SOURCE)
+                    else:
+                        st.info("Not available in staging")
+
     def _show(self) -> None:
         """Show chart diff.
 
@@ -647,6 +696,9 @@ class ChartDiffShow:
                 _ = self._show_chart_comparison()
             with tab2:
                 self._show_approval_history(self.diff.df_approvals)
+
+        # SHOW NARRATIVE CHARTS
+        self._show_narrative_charts()
 
         # Copy link
         if self.show_link:

@@ -5,6 +5,7 @@ from typing import Dict, List
 
 import click
 import pandas as pd
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher.model as gm
@@ -12,8 +13,13 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
+from etl.db import get_engine
 from etl.files import get_schema_from_url
-from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
+from etl.indicator_upgrade.indicator_update import (
+    find_charts_from_variable_ids,
+    update_chart_config,
+    update_narrative_chart_config,
+)
 
 # Default number of parallel workers
 DEFAULT_MAX_WORKERS = 5
@@ -29,7 +35,9 @@ def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]
     return charts
 
 
-def _update_single_chart(chart: gm.Chart, indicator_mapping: Dict[int, int], api: AdminAPI) -> int:
+def _update_single_chart(
+    chart: gm.Chart, indicator_mapping: Dict[int, int], api: AdminAPI, user_id: int | None = None
+) -> int:
     """Update a single chart and return its ID."""
     # Update chart config
     config_new = update_chart_config(
@@ -47,8 +55,68 @@ def _update_single_chart(chart: gm.Chart, indicator_mapping: Dict[int, int], api
         raise ValueError(f"Chart {chart} does not have an ID in config.")
 
     # Push new chart to DB
-    api.update_chart(chart_id=chart_id, chart_config=config_new)
+    api.update_chart(chart_id=chart_id, chart_config=config_new, user_id=user_id)
     return chart_id
+
+
+def get_affected_narrative_charts_cli(charts: List[gm.Chart]) -> List[gm.NarrativeChart]:
+    """Get affected narrative charts for CLI (without Streamlit dependencies).
+
+    Finds narrative charts by looking up which ones have the affected charts as parents.
+    """
+    log.info("Finding affected narrative charts...")
+    parent_chart_ids = {chart.id for chart in charts if chart.id}
+    with Session(get_engine()) as session:
+        narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(session, parent_chart_ids)
+    log.info(f"Found {len(narrative_charts)} affected narrative charts")
+    return narrative_charts
+
+
+def push_new_narrative_charts_cli(
+    narrative_charts: List[gm.NarrativeChart],
+    indicator_mapping: Dict[int, int],
+    dry_run: bool = False,
+) -> None:
+    """Update narrative charts in the database (CLI version).
+
+    Uses AdminAPI to:
+    1. GET merged config (full config = parent + patch merged)
+    2. Update variable IDs in the merged config
+    3. PUT the updated merged config - backend recalculates the patch
+    """
+    if not narrative_charts:
+        log.warning("No narrative charts to update")
+        return
+
+    if dry_run:
+        log.info(
+            f"DRY RUN: Would update {len(narrative_charts)} narrative charts with indicator mapping: {indicator_mapping}"
+        )
+        for nc in narrative_charts:
+            log.info(f"DRY RUN: Would update narrative chart {nc.id} - {nc.name}")
+        return
+
+    log.info(f"Updating {len(narrative_charts)} narrative charts...")
+
+    user_id = get_grapher_user().id
+
+    # API to interact with the admin tool
+    api = AdminAPI(OWID_ENV)
+
+    # Update narrative charts sequentially
+    for nc in narrative_charts:
+        # Get full config via API (full config = parent + patch merged)
+        response = api.get_narrative_chart(nc.id)
+        full_config = response["configFull"]
+
+        # Update variable IDs in the full config
+        config_new = update_narrative_chart_config(full_config, indicator_mapping)
+
+        # PUT the updated full config - backend will recalculate the patch
+        api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new, user_id=user_id)
+        log.info(f"Successfully updated narrative chart {nc.id}")
+
+    log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
 
 
 def push_new_charts_cli(
@@ -71,10 +139,10 @@ def push_new_charts_cli(
 
     log.info(f"Updating {len(charts)} charts in parallel (max_workers={max_workers})...")
 
-    grapher_user_id = get_grapher_user().id
+    user_id = get_grapher_user().id
 
     # API to interact with the admin tool
-    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
+    api = AdminAPI(OWID_ENV)
 
     # Update charts in parallel
     successful_updates = 0
@@ -82,7 +150,7 @@ def push_new_charts_cli(
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all chart updates
         future_to_chart = {
-            executor.submit(_update_single_chart, chart, indicator_mapping, api): chart for chart in charts
+            executor.submit(_update_single_chart, chart, indicator_mapping, api, user_id): chart for chart in charts
         }
 
         # Process completed updates - fail fast on any error
@@ -122,8 +190,19 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
         chart_url = OWID_ENV.chart_site(chart.slug) if chart.slug else f"Chart {chart.id}"
         log.info(f"  - Chart {chart.id}: {chart_url}")
 
-    # 4. Update charts
+    # 4. Get affected narrative charts (children of affected charts)
+    narrative_charts = get_affected_narrative_charts_cli(charts)
+
+    if narrative_charts:
+        log.info("Affected narrative charts:")
+        for nc in narrative_charts:
+            log.info(f"  - Narrative chart {nc.id}: {nc.name}")
+
+    # 5. Update charts
     push_new_charts_cli(charts, indicator_mapping, dry_run=dry_run, max_workers=max_workers)
+
+    # 6. Update narrative charts
+    push_new_narrative_charts_cli(narrative_charts, indicator_mapping, dry_run=dry_run)
 
     if not dry_run:
         log.info("Indicator upgrade completed successfully!")

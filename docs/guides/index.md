@@ -69,7 +69,7 @@ Below is a list of some of the most common guides to get you started. Use the le
 
     Improve, update our documentation.
 
--   **:simple-openai: &nbsp; [OpenAI setup ](openai)**
+-   **:fontawesome-brands-openai: &nbsp; [OpenAI setup ](openai)**
 
     ***
 

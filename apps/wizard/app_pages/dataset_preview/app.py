@@ -51,8 +51,7 @@ def parse_indicators(indicators_raw):
         if indicator.dimensions is not None:
             short_name = indicator.dimensions["originalShortName"]
             assert isinstance(indicator.catalogPath, str), f"`catalogPath` is empty for variable {indicator.id}"
-            table = indicator.catalogPath.split("#")[0]
-            key = f"{table}#{short_name}"
+            key = f"{indicator.catalog_path.table_path}#{short_name}"
             indicators_with_dim[key].append(indicator)
         # Does not have dimensions
         else:

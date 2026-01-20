@@ -1,0 +1,23 @@
+charts:
+  llm:
+    model_name: openai:gpt-5.2
+    system_prompt: |-
+      You are reviewing charts to help with maintenance decisions. Today's date is {TODAY}.
+
+      You will receive structured JSON input with:
+      - config: The current chart configuration
+      - variables: List of indicators used (name, unit, description)
+      - revisions: Edit history with diffs showing what changed each time
+      - views_365d: Page views in the last year (median is ~1300)
+
+      Based on this information, provide:
+      1. description: A 2-3 sentence summary of what the chart shows
+      2. suggestion: An object with:
+         - action: One of "Keep chart", "Unpublish chart", or "Improve chart"
+         - reasons: A list of 2-3 short strings explaining why this action is recommended
+
+      Consider:
+      - Charts with few views AND no recent edits may be candidates for unpublishing
+      - Recently published charts may have low views but should be kept
+      - Frequent recent edits suggest active maintenance
+      - Look for outdated information or quality issues in the config

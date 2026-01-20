@@ -653,6 +653,17 @@ steps:
   data://grapher/oecd/2025-02-19/official_development_assistance:
     - data://garden/oecd/2025-02-19/official_development_assistance
 
+
+    ### WHO/UNICEF WASH JMP
+  data://meadow/wash/2024-01-06/who:
+    - snapshot://wash/2024-02-04/who.csv
+    - snapshot://wash/2024-02-04/who_regions.csv
+  data://garden/wash/2024-01-06/who:
+    - data://meadow/wash/2024-01-06/who
+    - data://garden/demography/2023-03-31/population
+  data://grapher/wash/2024-01-06/who:
+    - data://garden/wash/2024-01-06/who
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -685,3 +696,6 @@ include:
   - dag/archive/families.yml
   - dag/archive/natural_disasters.yml
   - dag/archive/minerals.yml
+  - dag/archive/chartbook.yml
+  - dag/archive/corruption.yml
+  - dag/archive/geography.yml

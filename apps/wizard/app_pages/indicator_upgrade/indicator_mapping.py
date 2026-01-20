@@ -218,26 +218,32 @@ def st_show_header(search_form):
             on_change=lambda: set_states({"submitted_indicators": False}),
         )
 
+        def _set_all_skip_states(skip: bool):
+            """Set skip state for all indicators by updating both the tracking dict and checkbox keys."""
+            set_states(
+                {
+                    "submitted_indicators": False,
+                    "ignore-all": skip,
+                    "not-ignore-all": not skip,
+                }
+            )
+            # Update the indicator_upgrades_ignore dict
+            if "indicator_upgrades_ignore" in st.session_state:
+                for key in st.session_state["indicator_upgrades_ignore"]:
+                    st.session_state["indicator_upgrades_ignore"][key] = skip
+                    # Also update the checkbox widget's key directly
+                    checkbox_key = f"{key}-ignore"
+                    if checkbox_key in st.session_state:
+                        st.session_state[checkbox_key] = skip
+
         st.divider()
         st.button(
             label="🗑️ Skip all indicators",
-            on_click=lambda: set_states(
-                {
-                    "submitted_indicators": False,
-                    "ignore-all": True,
-                    "not-ignore-all": False,
-                }
-            ),
+            on_click=lambda: _set_all_skip_states(True),
         )
         st.button(
             label="↩️ Unskip all indicators",
-            on_click=lambda: set_states(
-                {
-                    "submitted_indicators": False,
-                    "not-ignore-all": True,
-                    "ignore-all": False,
-                }
-            ),
+            on_click=lambda: _set_all_skip_states(False),
         )
 
 
@@ -452,11 +458,13 @@ class IndicatorUpgradeShow:
             k = "indicator_upgrades_ignore"
             st.session_state[k][self.iu.key] = not st.session_state[k][self.iu.key]
 
+        # Initialize checkbox state if not already set
+        if self.iu.key_ignore not in st.session_state:
+            st.session_state[self.iu.key_ignore] = self.iu.skip
+
         st.checkbox(
             label="Skip",
             key=self.iu.key_ignore,
-            # label_visibility="collapsed",
-            value=self.iu.skip,
             on_change=_set_states_checkbox,
         )
 

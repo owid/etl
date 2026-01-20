@@ -13,9 +13,9 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table
-from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
-from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
-from owid.catalog.tables import (
+from owid.catalog.core.datasets import DEFAULT_FORMATS, FileFormat
+from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS
+from owid.catalog.core.tables import (
     combine_tables_description,
     combine_tables_title,
     combine_tables_update_period_days,

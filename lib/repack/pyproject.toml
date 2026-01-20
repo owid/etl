@@ -14,10 +14,10 @@ dependencies = [
     "pyarrow>=18.0.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=7.2.0",
-    "ty>=0.0.4",
+    "ty==0.0.8",
     "ruff==0.8.6",
     "ipdb>=0.13.13",
 ]

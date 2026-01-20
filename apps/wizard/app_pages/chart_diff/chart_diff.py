@@ -5,6 +5,7 @@ import pprint
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+import git
 import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
@@ -840,13 +841,18 @@ def _modified_data_metadata_on_staging(
         return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
 
     # Get all changed files and their catalog paths, including downstream dependencies.
-    files_changed = get_changed_files()
-    catalog_paths = get_all_changed_catalog_paths(files_changed)
+    # This is used to filter out spurious changes from lagging behind master.
+    try:
+        files_changed = get_changed_files()
+        catalog_paths = get_all_changed_catalog_paths(files_changed)
 
-    # Exclude variables that haven't been changed by updating the files. This is to prevent showing
-    # spurious changes from lagging behind master.
-    dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
-    source_df = source_df[dataset_paths.isin(catalog_paths)]
+        # Exclude variables that haven't been changed by updating the files. This is to prevent showing
+        # spurious changes from lagging behind master.
+        dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
+        source_df = source_df[dataset_paths.isin(catalog_paths)]
+    except git.exc.GitCommandError as e:
+        # If git merge-base fails (e.g., exit code -11), skip filtering and show a warning
+        log.warning(f"Could not get changed files from git, skipping spurious change filtering: {e}")
 
     # no charts, return empty dataframe
     if source_df.empty:

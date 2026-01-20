@@ -1,3 +1,5 @@
+from typing import Optional
+
 import structlog
 from fastapi import APIRouter, HTTPException, Query
 
@@ -30,8 +32,12 @@ def health() -> dict:
     },
 )
 async def search_indicators_semantic(
-    query: str = Query(..., description="Search query", examples=["gdp", "population"]),
+    query: Optional[str] = Query(None, description="Search query", examples=["gdp", "population"]),
+    q: Optional[str] = Query(None, description="Search query (alias for 'query')"),
     limit: int = Query(10, description="Limit the number of results", le=100),
+    min_popularity: Optional[float] = Query(
+        None, description="Minimum popularity score (0-1) to filter results", ge=0, le=1
+    ),
 ) -> SemanticSearchResponse:
     """
     Search for indicators using semantic similarity.
@@ -39,11 +45,16 @@ async def search_indicators_semantic(
     This endpoint performs semantic search on OWID indicators using preloaded embeddings
     and returns the most relevant results.
     """
+    # Support both 'query' and 'q' parameters
+    search_query = query or q
+    if not search_query:
+        raise HTTPException(status_code=422, detail="Either 'query' or 'q' parameter is required")
+
     # Check if model is ready
     if not is_ready():
         raise HTTPException(
             status_code=503,
-            detail="Semantic search model is still initializing. Please try again in a few seconds.",
+            detail="Semantic search model is still initializing. Check /indicators/info for status.",
             headers={"Retry-After": "5"},
         )
 
@@ -51,25 +62,18 @@ async def search_indicators_semantic(
     limit = min(limit, 100)
 
     # Perform semantic search using preloaded model
-    raw_results = search_indicators(query, limit)
+    # Request more results if filtering by popularity, since many will be filtered out
+    fetch_limit = limit * 10 if min_popularity is not None else limit
+    raw_results = search_indicators(search_query, fetch_limit)
 
-    # Convert results to API schema format
-    results = []
-    for result in raw_results:
-        results.append(
-            SemanticSearchResult(
-                title=result["title"],
-                indicator_id=result["indicator_id"],
-                snippet=result["snippet"],
-                score=result["score"],
-                metadata=result["metadata"],
-                catalog_path=result["catalog_path"],
-                n_charts=result["n_charts"],
-                description=result["description"],
-            )
-        )
+    # Filter by minimum popularity if specified
+    if min_popularity is not None:
+        raw_results = [r for r in raw_results if r["popularity"] is not None and r["popularity"] >= min_popularity]
 
-    return SemanticSearchResponse(results=results, query=query, total_results=len(results))
+    # Convert results to API schema format and apply limit
+    results = [SemanticSearchResult(**result) for result in raw_results[:limit]]
+
+    return SemanticSearchResponse(results=results, query=search_query, total_results=len(results))
 
 
 @v1.get("/indicators/info", include_in_schema=False)

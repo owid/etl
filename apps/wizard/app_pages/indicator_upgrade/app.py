@@ -157,7 +157,7 @@ if st.session_state.submitted_datasets:
                 st.toast("Updating charts...")
 
                 # Push charts
-                push_new_charts(charts)
+                push_new_charts()
 
                 # Save variable mapping
                 save_variable_mapping(
