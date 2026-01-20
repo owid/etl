@@ -207,8 +207,30 @@ def main_cli(
     ```
     $ etl run mars prio --dry-run
     ```
+
+    **Example 4**: Interactive mode - run `etlr` with flags but no step argument to browse steps:
+
+    ```
+    $ etlr --private
+    ```
     """
     _update_open_file_limit()
+
+    # Interactive mode: no steps provided + interactive terminal
+    if not steps and sys.stdin.isatty() and sys.stdout.isatty():
+        from etl.step_browser import browse_steps
+
+        dag = load_dag(dag_path)
+        result, is_exact = browse_steps(dag, private=private)
+
+        if result is None:
+            # User cancelled (Ctrl-C/Escape)
+            return
+
+        steps = [result]
+        if is_exact:
+            # User selected a specific step, force exact match
+            exact_match = True
 
     # make everything single threaded, useful for debugging
     if not use_threads:
