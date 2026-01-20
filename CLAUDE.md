@@ -11,6 +11,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
 - If not told otherwise, save outputs to `ai/` directory.
+- **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 
 
 ## Pipeline Overview
@@ -111,6 +112,20 @@ data = ruamel_load(file_path)
 data['key'] = new_value
 with open(file_path, 'w') as f:
     f.write(ruamel_dump(data))
+```
+
+## Querying MySQL
+
+### Quick queries (staging)
+```bash
+make query SQL="SELECT COUNT(*) FROM variables WHERE catalogPath IS NULL"
+```
+Automatically connects to `staging-site-{branch}` based on current git branch.
+
+### Python (for more control)
+```python
+from etl.config import OWID_ENV
+df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 ```
 
 ## Additional Tools
