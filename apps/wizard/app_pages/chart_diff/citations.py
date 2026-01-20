@@ -596,12 +596,12 @@ def st_show_citations(
         staging_url = _replace_entity_placeholders(citation.staging_url) if citation.staging_url else None
 
         if prod_url:
-            prod_cell = f"![thumb]({prod_thumb}) [View]({prod_url})"
+            prod_cell = f"[![thumb]({prod_thumb})]({prod_url})"
         else:
             prod_cell = "-"
 
         if staging_url:
-            staging_cell = f"![thumb]({staging_thumb}) [View]({staging_url})"
+            staging_cell = f"[![thumb]({staging_thumb})]({staging_url})"
         else:
             staging_cell = "-"
 
