@@ -6,7 +6,7 @@ tables:
     variables:
       robot_density:
         title: Industrial robots in operation per 1,000 employees
-        description_short: Number of industrial robots in operation per 1,000 employees in the manufacturing industry. Industrial robots are automated, reprogrammable machines that perform a variety of tasks in industrial settings.
+        description_short: Number of industrial robots in operation per 1,000 employees in the manufacturing industry. Industrial robots are automated, reprogrammable machines that can move in three or more directions and perform a variety of tasks in industrial settings.
         unit: "robots per 1,000 employees"
         description_key:
           - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
