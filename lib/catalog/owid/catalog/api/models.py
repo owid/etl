@@ -6,12 +6,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
+from typing import Any, Callable, Generic, Iterator, TypeVar
 from urllib import parse
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
-
 
 T = TypeVar("T")
 

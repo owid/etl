@@ -534,12 +534,31 @@ class TestDataclassModels:
             namespace="un",
             channel="garden",
             path="garden/un/2024-07-11/un_wpp/population",
+            title="World Population Prospects",
+            description="UN World Population Prospects data",
             catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.table == "population"
         assert result.namespace == "un"
+        assert result.title == "World Population Prospects"
+        assert result.description == "UN World Population Prospects data"
         assert result.catalog_url == "https://catalog.ourworldindata.org/"
+
+    def test_table_result_optional_fields(self):
+        """Test that title and description are optional and default to None."""
+        result = TableResult(
+            table="population",
+            dataset="un_wpp",
+            version="2024-07-11",
+            namespace="un",
+            channel="garden",
+            path="garden/un/2024-07-11/un_wpp/population",
+            catalog_url="https://catalog.ourworldindata.org/",
+        )
+
+        assert result.title is None
+        assert result.description is None
 
 
 class TestDatasetteAPI:
