@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 
 def load_wdi_snapshot(snap):
     with snap.extracted() as archive:
-        file_name = [file_name for file_name in e.files if "Metadata" not in file_name][0]
+        file_name = [file_name for file_name in archive.files if "Metadata" not in file_name][0]
         tb = archive.read(filename=file_name, skiprows=4)
 
     return tb
