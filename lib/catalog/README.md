@@ -26,12 +26,16 @@ pip install owid-catalog
 ```python
 from owid.catalog import fetch, search
 
-# Search and fetch a catalog table
-tables = search(table="population", namespace="un")
-tb = tables[0].fetch()
+# Search for charts (default)
+charts = search("population")
+tb = charts[0].fetch()
 
 # Fetch data from OWID Chart at ourworldindata.org/grapher/life-expectancy
 tb = fetch("life-expectancy")
+
+# Search for tables
+tables = search("population", kind="table", namespace="un")
+tb = tables[0].fetch()
 
 # Search indicators (using semantic search)
 search("renewable energy", kind="indicator")
