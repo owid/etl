@@ -201,7 +201,9 @@ def browse_steps(dag: DAG, private: bool = False) -> Tuple[Optional[str], bool]:
         return lines
 
     # Create layout
-    prompt_window = Window(content=FormattedTextControl(get_prompt_text), height=1, dont_extend_height=True)
+    prompt_window = Window(
+        content=FormattedTextControl(get_prompt_text), height=1, dont_extend_height=True, dont_extend_width=True
+    )
     input_window = Window(content=BufferControl(buffer=input_buffer), height=1, dont_extend_height=True)
     matches_window = Window(content=FormattedTextControl(get_matches_text), wrap_lines=False)
 
