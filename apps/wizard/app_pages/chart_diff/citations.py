@@ -57,14 +57,15 @@ def extract_text_from_value(value_list: list) -> str:
             if span_type == "span-simple-text":
                 text_parts.append(item.get("text", ""))
             elif span_type == "span-link":
-                for child in item.get("children", []):
-                    if isinstance(child, dict) and child.get("spanType") == "span-simple-text":
-                        text_parts.append(child.get("text", ""))
+                # Recursively extract text from link children
+                children = item.get("children", [])
+                if children:
+                    text_parts.append(extract_text_from_value(children))
             elif span_type in ("span-subscript", "span-superscript"):
-                # Keep as plain text for text fragment matching
-                for child in item.get("children", []):
-                    if isinstance(child, dict):
-                        text_parts.append(child.get("text", ""))
+                # Recursively extract text from subscript/superscript children
+                children = item.get("children", [])
+                if children:
+                    text_parts.append(extract_text_from_value(children))
             elif "text" in item:
                 text_parts.append(item["text"])
     return "".join(text_parts)
@@ -196,7 +197,27 @@ def find_context_before_chart(body: list, chart_index: int) -> tuple[str | None,
     return None, None
 
 
-def find_chart_citations_in_content(content: str, slug: str, chart_slug: str, base_site_url: str) -> list[Citation]:
+def _build_post_url(base_site_url: str, slug: str, post_type: str) -> str:
+    """Build the full URL for a post based on its type.
+
+    Args:
+        base_site_url: Base URL for the site (e.g., https://ourworldindata.org)
+        slug: Post slug
+        post_type: Post type (e.g., 'article', 'data-insight', 'topic-page')
+
+    Returns:
+        Full URL like https://ourworldindata.org/data-insights/slug
+    """
+    # Data insights have a different URL structure
+    if post_type == "data-insight":
+        return f"{base_site_url}/data-insights/{slug}"
+    # Most other types use the slug directly
+    return f"{base_site_url}/{slug}"
+
+
+def find_chart_citations_in_content(
+    content: str, slug: str, chart_slug: str, base_site_url: str, post_type: str
+) -> list[Citation]:
     """Find all citations of a chart in post content JSON.
 
     Args:
@@ -204,6 +225,7 @@ def find_chart_citations_in_content(content: str, slug: str, chart_slug: str, ba
         slug: Post slug
         chart_slug: Chart slug to search for
         base_site_url: Base URL for the site (e.g., https://ourworldindata.org)
+        post_type: Post type (e.g., 'article', 'data-insight')
     """
     citations = []
     try:
@@ -211,7 +233,7 @@ def find_chart_citations_in_content(content: str, slug: str, chart_slug: str, ba
     except json.JSONDecodeError:
         return citations
 
-    base_url = f"{base_site_url}/{slug}"
+    base_url = _build_post_url(base_site_url, slug, post_type)
     body = data.get("body", [])
     seen_urls: set[str] = set()  # Track URLs to avoid duplicates
 
@@ -318,7 +340,7 @@ def find_all_citations(_session: Session, chart_slug: str, base_site_url: str) -
 
     for row in rows:
         _post_id, slug, post_type, content = row
-        citations = find_chart_citations_in_content(content, slug, chart_slug, base_site_url)
+        citations = find_chart_citations_in_content(content, slug, chart_slug, base_site_url, post_type)
         if citations:
             results.append(
                 ArticleCitations(
