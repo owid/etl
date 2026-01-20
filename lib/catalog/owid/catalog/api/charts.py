@@ -408,6 +408,11 @@ class ChartResult(BaseModel):
 
         return tb
 
+    @property
+    def description(self) -> str:
+        """Return a string description of the chart result."""
+        return self.subtitle
+
 
 # =============================================================================
 # ChartsAPI

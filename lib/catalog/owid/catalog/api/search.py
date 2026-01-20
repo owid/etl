@@ -228,6 +228,7 @@ class SiteSearchAPI:
             query=query,
             total_count=data.get("totalCount", len(results)),
             base_url=effective_grapher_url,
+            _ui_advanced=False,
         )
 
     def pages(
@@ -280,4 +281,5 @@ class SiteSearchAPI:
             query=query,
             total_count=data.get("totalCount", len(results)),
             base_url="https://ourworldindata.org",
+            _ui_advanced=True,
         )

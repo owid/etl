@@ -387,6 +387,7 @@ class IndicatorsAPI:
             query=query,
             total_count=data.get("total_results", len(results)),
             base_url=self.catalog_url,
+            _ui_advanced=False,
         )
 
     def fetch(self, path: str, *, load_data: bool = True, timeout: int | None = None) -> Table:

@@ -662,6 +662,7 @@ class TablesAPI:
             query=query,
             total_count=len(results),
             base_url=self.catalog_url,
+            _ui_advanced=False,
         )
 
     def fetch(

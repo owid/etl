@@ -140,7 +140,7 @@ class TestChartsAPISearch:
         results = client.charts.search("population")
 
         df = results.to_frame()
-        assert "slug" in df.columns
+        assert "url" in df.columns
         assert "title" in df.columns
         assert len(df) == len(results)
 

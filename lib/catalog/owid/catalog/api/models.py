@@ -37,6 +37,9 @@ class ResponseSet(BaseModel, Generic[T]):
     total_count: int = 0
     base_url: str = Field(frozen=True)
 
+    # Tweak this to have a more advanced display
+    _ui_advanced: bool = False
+
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
         if not self.results:
@@ -183,7 +186,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     row = {
                         "slug": getattr(r, "slug", ""),
                         "title": getattr(r, "title", ""),
-                        "subtitle": getattr(r, "subtitle", ""),
+                        "description": getattr(r, "description", ""),
                         "url": getattr(r, "url", ""),
                         "num_related_articles": getattr(r, "num_related_articles", 0),
                         # Only show count of entities, not full list
@@ -191,8 +194,27 @@ class ResponseSet(BaseModel, Generic[T]):
                         "popularity": getattr(r, "popularity", 0),
                         "last_updated": getattr(r, "last_updated", None),
                     }
+
+                    # Simplify if not advanced UI
+                    if not self._ui_advanced:
+                        row = {
+                            # "slug": row["slug"],
+                            "url": row["url"],
+                            "title": row["title"],
+                            "description": row["description"],
+                            "last_updated": row["last_updated"],
+                        }
                 else:
                     row = r.model_dump()
+
+                    # Simplify if not advanced UI
+                    if not self._ui_advanced:
+                        row = {
+                            "path": row.get("path", ""),
+                            "title": row.get("title", ""),
+                            "description": row.get("description", ""),
+                            "version": row.get("version", ""),
+                        }
                 rows.append(row)
             else:
                 rows.append(r)
@@ -312,6 +334,7 @@ class ResponseSet(BaseModel, Generic[T]):
             query=self.query,
             total_count=len(filtered_results),
             base_url=self.base_url,
+            _ui_advanced=self._ui_advanced,
         )
 
     def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
@@ -353,6 +376,7 @@ class ResponseSet(BaseModel, Generic[T]):
             query=self.query,
             total_count=self.total_count,
             base_url=self.base_url,
+            _ui_advanced=self._ui_advanced,
         )
 
     def _get_version_string(self, item: T) -> str:
