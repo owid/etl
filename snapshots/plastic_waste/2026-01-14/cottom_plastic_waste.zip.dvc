@@ -24,8 +24,8 @@ meta:
 
     # License
     license:
-      name: CC0 1.0
-      url: https://creativecommons.org/publicdomain/zero/1.0/
+      name: CC BY 4.0
+      url: https://www.nature.com/articles/s41586-024-07758-6
 outs:
   - md5: 09514d217fdd2aed5d4a827fd490c135
     size: 4153853

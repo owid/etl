@@ -1,9 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import tempfile
-import zipfile
-from pathlib import Path
-
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -49,43 +46,31 @@ def run() -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("cottom_plastic_waste.zip")
-    # Extract Excel files from zip
-    with tempfile.TemporaryDirectory() as temp_dir:
-        with zipfile.ZipFile(snap.path, "r") as zip_ref:
-            zip_ref.extractall(temp_dir)
 
-        # Find the Excel files within the extracted structure
-        temp_path = Path(temp_dir)
-        national_file = list(temp_path.glob("**/SD_03_Cottom_et_al_V1.1.0-G-1223_SPOT_MFA_Outputs_National.xlsx"))
-        regional_file = list(
-            temp_path.glob("**/SD_04_Cottom_et_al_V1.1.0-G-1223_SPOT_MFA_Outputs_Global_Regional_Income.xlsx")
+    # Load data from Excel files within the zip archive
+    # Data is in 03_Outputs sheet, with header in row 1 (0-indexed)
+    with snap.open_archive():
+        tb_national = snap.read_from_archive(
+            "files of interest/SD_03_Cottom_et_al_V1.1.0-G-1223_SPOT_MFA_Outputs_National.xlsx",
+            sheet_name="03_Outputs",
+            header=1,
         )
-
-        if not national_file or not regional_file:
-            raise FileNotFoundError(
-                "Could not find the expected Excel files in the zip archive. "
-                f"Found files: {list(temp_path.rglob('*.xlsx'))}"
-            )
-        # Load data from Excel files (data is in 03_Outputs sheet)
-        # Header is in row 1 (0-indexed)
-        df_national = pd.read_excel(national_file[0], sheet_name="03_Outputs", header=1)
-        df_regional = pd.read_excel(regional_file[0], sheet_name="03_Outputs", header=1)
+        tb_regional = snap.read_from_archive(
+            "files of interest/SD_04_Cottom_et_al_V1.1.0-G-1223_SPOT_MFA_Outputs_Global_Regional_Income.xlsx",
+            sheet_name="03_Outputs",
+            header=1,
+        )
 
     #
     # Process data.
     #
     # Process national data
-    df_national = process_data(df_national, is_national=True)
+    tb_national = process_data(tb_national, is_national=True)
 
     # Process regional data
-    df_regional = process_data(df_regional, is_national=False)
+    tb_regional = process_data(tb_regional, is_national=False)
 
-    df = pd.concat([df_national, df_regional], ignore_index=True)
-    tb = Table(df, short_name="cottom_plastic_waste")
-
-    # Add origins to all columns
-    for col in tb.columns:
-        tb[col].metadata.origins = [snap.metadata.origin]
+    tb = pr.concat([tb_national, tb_regional], ignore_index=True)
 
     tb = tb.format(["country", "year"])
 
@@ -103,13 +88,13 @@ def run() -> None:
     ds_meadow.save()
 
 
-def process_data(df: pd.DataFrame, is_national: bool) -> Table:
+def process_data(tb: Table, is_national: bool) -> Table:
     """
     Process the plastic waste data from Excel files.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Raw data from Excel file
     is_national : bool
         True if processing national data, False for regional data
@@ -120,38 +105,37 @@ def process_data(df: pd.DataFrame, is_national: bool) -> Table:
         Processed table with standardized format
     """
     # Filter for only "Mean" statistic
-    df = df[df["Statistic"] == "Mean"].copy()
+    tb = tb[tb["Statistic"] == "Mean"].copy()
 
     # Get all variable columns (these are already the column names in the Excel)
     # Keep only the ones we defined in VARIABLES list
-    available_vars = [col for col in df.columns if col in VARIABLES]
+    available_vars = [col for col in tb.columns if col in VARIABLES]
 
     if is_national:
         # National data has Country and ISO3 columns
         id_cols = ["Country"]
         cols_to_keep = id_cols + available_vars
-        df = df[cols_to_keep].copy()
-        df = df.rename(columns={"Country": "country"})
+        tb = tb[cols_to_keep].copy()
+        tb = tb.rename(columns={"Country": "country"})
     else:
         # Regional data - filter by Aggregation_lv1
         # Keep Aggregation_lv1 temporarily for filtering
         id_cols = ["Aggregation_lv1", "Aggregation_lv2"]
         cols_to_keep = id_cols + available_vars
-        df = df[cols_to_keep].copy()
+        tb = tb[cols_to_keep].copy()
 
         # Filter by Aggregation_lv1
-        df = df[df["Aggregation_lv1"].isin(["World", "Income category", "UN Region"])].copy()
+        tb = tb[tb["Aggregation_lv1"].isin(["World", "Income category", "UN Region"])].copy()
 
         # Now drop Aggregation_lv1 and rename Aggregation_lv2
-        df = df.drop(columns=["Aggregation_lv1"])
+        tb = tb.drop(columns=["Aggregation_lv1"])
 
-        df = df.rename(columns={"Aggregation_lv2": "country"})
+        tb = tb.rename(columns={"Aggregation_lv2": "country"})
         # Remove rows with NaN country
-        df = df.dropna(subset=["country"])
-        print(df["country"].unique())
+        tb = tb.dropna(subset=["country"])
 
     # The data appears to be for a single year (2020 based on Population_2020)
     # Add year column
-    df["year"] = 2020
+    tb["year"] = 2020
 
-    return df
+    return tb

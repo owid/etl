@@ -12,6 +12,18 @@ MULTIDIM_CONFIG = {
     "chartTypes": ["StackedDiscreteBar"],
 }
 
+# Define dimensions for all variables
+DIMENSIONS_DETAILS = {
+    "pwg": {
+        "measure": "total",
+        "original_short_name": "waste_generation",
+    },
+    "pwg_per_cap": {
+        "measure": "per_person",
+        "original_short_name": "waste_generation",
+    },
+}
+
 
 def run() -> None:
     """
@@ -31,20 +43,13 @@ def run() -> None:
     # Process data.
     #
     # Add dimension metadata to columns based on their measure type
-
-    # Properly managed waste - total
-    if "pwg" in tb.columns:
-        tb["pwg"].m.dimensions = {
-            "measure": "total",
-        }
-        tb["pwg"].m.original_short_name = "waste_generation"
-
-    # Properly managed waste - per person
-    if "pwg_per_cap" in tb.columns:
-        tb["pwg_per_cap"].m.dimensions = {
-            "measure": "per_person",
-        }
-        tb["pwg_per_cap"].m.original_short_name = "waste_generation"
+    for col, details in DIMENSIONS_DETAILS.items():
+        if col in tb.columns:
+            # Set dimensions (all keys except original_short_name)
+            tb[col].m.dimensions = {k: v for k, v in details.items() if k != "original_short_name"}
+            # Set original_short_name if present
+            if "original_short_name" in details:
+                tb[col].m.original_short_name = details["original_short_name"]
 
     # Create collection - this will automatically generate views from dimensions
     c = paths.create_collection(
