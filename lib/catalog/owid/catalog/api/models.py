@@ -307,6 +307,10 @@ class ResponseSet(BaseModel, Generic[T]):
                 else:
                     row = r.model_dump()
 
+                    # Exclude internal config fields that aren't useful to display
+                    row.pop("catalog_url", None)
+                    row.pop("base_url", None)
+
                     # Simplify if not advanced UI
                     if not self._ui_advanced:
                         row = {
