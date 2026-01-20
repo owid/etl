@@ -162,12 +162,24 @@ def extract_heading_text(heading_obj: dict) -> str:
 def heading_to_slug(heading_text: str) -> str:
     """Convert heading text to URL slug (matching OWID's slugification)."""
     slug = heading_text.lower()
-    # Replace spaces and special chars with hyphens
+    # Replace apostrophes and similar with hyphens (OWID keeps them as separators)
+    slug = re.sub(r"['']", "-", slug)
+    # Replace other special chars (not hyphens, spaces, or word chars) with nothing
     slug = re.sub(r"[^\w\s-]", "", slug)
+    # Replace spaces and underscores with hyphens
     slug = re.sub(r"[\s_]+", "-", slug)
+    # Collapse multiple hyphens
     slug = re.sub(r"-+", "-", slug)
     slug = slug.strip("-")
     return slug
+
+
+def _replace_entity_placeholders_for_slug(text: str) -> str:
+    """Replace entity placeholders with Spain before slugifying.
+
+    This ensures apostrophes in "Spain's" are properly converted to hyphens.
+    """
+    return text.replace("$entityName", "Spain").replace("$entityCode", "ESP")
 
 
 def find_context_before_chart(body: list, chart_index: int) -> tuple[str | None, str | None]:
@@ -181,7 +193,9 @@ def find_context_before_chart(body: list, chart_index: int) -> tuple[str | None,
         item = body[i]
         if isinstance(item, dict) and item.get("type") == "heading":
             text = extract_heading_text(item)
-            slug = heading_to_slug(text)
+            # Replace entity placeholders before slugifying so apostrophes are handled correctly
+            text_for_slug = _replace_entity_placeholders_for_slug(text)
+            slug = heading_to_slug(text_for_slug)
             return text, slug
 
     # Fall back to nearest text block
@@ -211,6 +225,9 @@ def _build_post_url(base_site_url: str, slug: str, post_type: str) -> str:
     # Data insights have a different URL structure
     if post_type == "data-insight":
         return f"{base_site_url}/data-insights/{slug}"
+    # Profile pages need a country in the URL, use "spain" as placeholder
+    if post_type == "profile":
+        return f"{base_site_url}/profile/{slug}/spain"
     # Most other types use the slug directly
     return f"{base_site_url}/{slug}"
 
@@ -410,6 +427,19 @@ class MergedCitation:
     staging_url: str | None  # Fragment URL for staging article
 
 
+def _replace_entity_placeholders(text: str) -> str:
+    """Replace entity placeholders with Spain as example country.
+
+    Profile pages use placeholders like $entityName, $entityCode that get
+    resolved client-side. We replace them with Spain for preview purposes.
+    """
+    return (
+        text.replace("$entityName", "Spain")
+        .replace("$entityCode", "ESP")
+        .replace("entityname", "spain")  # For slugified headings
+    )
+
+
 def _chart_url_to_thumbnail(chart_url: str, base_site_url: str) -> str:
     """Convert a chart URL to a thumbnail SVG URL.
 
@@ -422,6 +452,9 @@ def _chart_url_to_thumbnail(chart_url: str, base_site_url: str) -> str:
     Returns:
         Full thumbnail URL like https://ourworldindata.org/grapher/chart.svg?country=USA
     """
+    # Replace entity placeholders with Spain
+    chart_url = _replace_entity_placeholders(chart_url)
+
     # Extract the path portion (everything after /grapher/)
     if "/grapher/" in chart_url:
         # Get everything from /grapher/ onwards
@@ -558,13 +591,17 @@ def st_show_citations(
         prod_thumb = _chart_url_to_thumbnail(citation.chart_url, target_env.site)
         staging_thumb = _chart_url_to_thumbnail(citation.chart_url, source_env.site)
 
-        if citation.prod_url:
-            prod_cell = f"![thumb]({prod_thumb}) [View]({citation.prod_url})"
+        # Replace entity placeholders in URLs (for profile pages)
+        prod_url = _replace_entity_placeholders(citation.prod_url) if citation.prod_url else None
+        staging_url = _replace_entity_placeholders(citation.staging_url) if citation.staging_url else None
+
+        if prod_url:
+            prod_cell = f"![thumb]({prod_thumb}) [View]({prod_url})"
         else:
             prod_cell = "-"
 
-        if citation.staging_url:
-            staging_cell = f"![thumb]({staging_thumb}) [View]({citation.staging_url})"
+        if staging_url:
+            staging_cell = f"![thumb]({staging_thumb}) [View]({staging_url})"
         else:
             staging_cell = "-"
 
