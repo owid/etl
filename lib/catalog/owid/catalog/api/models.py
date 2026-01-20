@@ -235,10 +235,10 @@ class ResponseSet(BaseModel, Generic[T]):
                     # Simplify if not advanced UI
                     if not self._ui_advanced:
                         row = {
-                            "title": row.get("title", ""),
-                            "description": row.get("description", ""),
-                            "version": row.get("version", ""),
-                            "path": row.get("path", ""),
+                            "title": row.get("title") or "",
+                            "description": row.get("description") or "",
+                            "version": row.get("version") or "",
+                            "path": row.get("path") or "",
                         }
                 rows.append(row)
             else:
