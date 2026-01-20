@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable, Generic, Iterator, TypeVar
+from typing import Any, Callable, Generic, Iterator, TypeVar, overload
 from urllib import parse
 
 import pandas as pd
@@ -61,8 +61,62 @@ class ResponseSet(BaseModel, Generic[T]):
     def __len__(self) -> int:
         return len(self.results)
 
-    def __getitem__(self, index: int) -> T:
+    @overload
+    def __getitem__(self, index: int) -> T: ...
+
+    @overload
+    def __getitem__(self, index: slice) -> "ResponseSet[T]": ...
+
+    def __getitem__(self, index: int | slice) -> "T | ResponseSet[T]":
+        if isinstance(index, slice):
+            return ResponseSet(
+                results=self.results[index],
+                query=self.query,
+                total_count=len(self.results[index]),
+                base_url=self.base_url,
+                _ui_advanced=self._ui_advanced,
+            )
         return self.results[index]
+
+    # Display settings
+    _MAX_DISPLAY_ROWS: int = 60
+    _HEAD_ROWS: int = 5
+    _TAIL_ROWS: int = 5
+    _MAX_STR_LENGTH: int = 80
+
+    def _truncate_string(self, val: Any, max_len: int) -> Any:
+        """Truncate string values that exceed max length. Skip HTML content."""
+        if isinstance(val, str):
+            # Skip HTML content (contains tags)
+            if "<" in val and ">" in val:
+                return val
+            if len(val) > max_len:
+                return val[: max_len - 3] + "..."
+        return val
+
+    def _truncate_strings_in_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Truncate all string values in DataFrame for display."""
+        df = df.copy()
+        for col in df.columns:
+            if df[col].dtype == object:
+                df[col] = df[col].apply(lambda x: self._truncate_string(x, self._MAX_STR_LENGTH))
+        return df
+
+    def _get_display_frame(self) -> tuple[pd.DataFrame, bool]:
+        """Get DataFrame for display, truncated if needed.
+
+        Returns:
+            Tuple of (display DataFrame, whether it was truncated).
+        """
+        df = self.to_frame()
+
+        if len(df) <= self._MAX_DISPLAY_ROWS:
+            return df, False
+
+        # Truncate: show head and tail
+        head = df.head(self._HEAD_ROWS)
+        tail = df.tail(self._TAIL_ROWS)
+        return pd.concat([head, tail]), True
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
@@ -71,14 +125,22 @@ class ResponseSet(BaseModel, Generic[T]):
         if not self.results:
             return f"{type_display}(query={self.query!r}, total_count=0, results=[])"
 
-        # Convert to DataFrame for nice tabular display
-        df = self.to_frame()
+        df, truncated = self._get_display_frame()
 
-        # Limit display to first 10 rows for readability
         if len(df) == 0:
             return f"{type_display}(query={self.query!r}, total_count={self.total_count}, results=[])"
-        else:
-            df_str = str(df)
+
+        df_str = str(df)
+
+        # Insert ellipsis row if truncated
+        if truncated:
+            lines = df_str.split("\n")
+            # Find where to insert "..." (after header + HEAD_ROWS data rows)
+            # Header is first line, then HEAD_ROWS of data
+            insert_pos = 1 + self._HEAD_ROWS
+            ellipsis_line = "..." + " " * (len(lines[0]) - 3) if lines else "..."
+            lines.insert(insert_pos, ellipsis_line)
+            df_str = "\n".join(lines)
 
         # Format as bullet points to show attributes at same level
         # Indent DataFrame lines to align with bullet points
@@ -102,7 +164,7 @@ class ResponseSet(BaseModel, Generic[T]):
         if not self.results:
             return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
 
-        df = self.to_frame()
+        df, truncated = self._get_display_frame()
 
         # For ChartResult, add thumbnail column and make URL clickable
         if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
@@ -121,6 +183,19 @@ class ResponseSet(BaseModel, Generic[T]):
 
             # Make URL a clickable link
             df["url"] = df["url"].apply(lambda x: f'<a href="{x}" target="_blank">{x.split("/")[-1]}</a>' if x else "")
+
+        # Insert ellipsis row if truncated
+        if truncated:
+            df = df.reset_index(drop=True)
+            # Create ellipsis row
+            ellipsis_row = pd.DataFrame([{col: "..." for col in df.columns}])
+            # Split at HEAD_ROWS and insert ellipsis
+            head = df.iloc[: self._HEAD_ROWS]
+            tail = df.iloc[self._HEAD_ROWS :]
+            df = pd.concat([head, ellipsis_row, tail], ignore_index=True)
+
+        # Truncate long strings for display (skips HTML content)
+        df = self._truncate_strings_in_df(df)
 
         # Use pandas Styler for left-alignment on all result types
         styler = df.style.set_table_styles(
