@@ -227,7 +227,7 @@ def main():
             key="hits_per_page",
         )
 
-    # Quick actions
+    # Quick actions and options
     with st_horizontal():
         st.markdown("**Try:**")
         if st.button("🎲 Random query", help="Pick a random query from real user searches (weighted by popularity)"):
@@ -236,6 +236,11 @@ def main():
         if st.button("🔍 Zero Algolia results", help="Pick a query that returned zero results in Algolia"):
             st.session_state["_set_random_query"] = get_random_search_query(require_hits=False)
             st.rerun()
+        enable_ai_answer = url_persist(st.checkbox)(
+            key="ai_answer",
+            label="AI Answer",
+            value=True,
+        )
 
     if not query:
         st.info("Enter a search query above to compare results.")
@@ -273,8 +278,9 @@ def main():
     algolia_slug_to_rank = build_slug_to_rank(algolia_hits)
 
     # Create placeholder for AI answer at the top (will be filled after charts render)
-    st.subheader("🤖 AI Answer")
-    ai_answer_placeholder = st.empty()
+    if enable_ai_answer:
+        st.subheader("🤖 AI Answer")
+        ai_answer_placeholder = st.empty()
 
     # Headers - Algolia on left, Semantic on right
     col_algolia, col_semantic = st.columns(2)
@@ -310,13 +316,14 @@ def main():
                 display_hit(hit, i + 1, "semantic", other_rank)
 
     # Now stream the AI answer into the placeholder (charts are already rendered)
-    # Manually accumulate text since placeholder.write_stream doesn't work correctly
-    full_response = ""
-    for chunk in fetch_answer_stream(query):
-        full_response += str(chunk) if chunk else ""
-        ai_answer_placeholder.markdown(full_response + "▌")
-    # Final render without cursor
-    ai_answer_placeholder.markdown(full_response)
+    if enable_ai_answer:
+        # Manually accumulate text since placeholder.write_stream doesn't work correctly
+        full_response = ""
+        for chunk in fetch_answer_stream(query):
+            full_response += str(chunk) if chunk else ""
+            ai_answer_placeholder.markdown(full_response + "▌")
+        # Final render without cursor
+        ai_answer_placeholder.markdown(full_response)
 
 
 main()
