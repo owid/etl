@@ -288,9 +288,7 @@ def run() -> None:
 
     # Load data from snapshot.
     with snap.extracted() as archive:
-        tb = archive.read(
-            "V-Dem-CY-Full+Others-v15.csv", usecols=COLUMNS_KEEP, dtype={"v2exnamhog": "string"}
-        )
+        tb = archive.read("V-Dem-CY-Full+Others-v15.csv", usecols=COLUMNS_KEEP, dtype={"v2exnamhog": "string"})
     #
     # Process data.
     #
