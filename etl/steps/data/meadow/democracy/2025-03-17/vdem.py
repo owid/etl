@@ -287,8 +287,8 @@ def run() -> None:
     snap = paths.load_snapshot("vdem.zip")
 
     # Load data from snapshot.
-    with snap.open_archive():
-        tb = snap.read_from_archive(
+    with snap.extracted() as archive:
+        tb = archive.read(
             "V-Dem-CY-Full+Others-v15.csv", usecols=COLUMNS_KEEP, dtype={"v2exnamhog": "string"}
         )
     #
