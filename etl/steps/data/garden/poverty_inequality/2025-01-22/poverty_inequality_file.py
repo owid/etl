@@ -139,6 +139,7 @@ def run() -> None:
     ds_explorer = paths.create_dataset(
         tables=[tb, tb_percentiles, tb_wdi],
         default_metadata=ds_pip.metadata,
+        repack=False,
     )
     ds_explorer.save()
 
