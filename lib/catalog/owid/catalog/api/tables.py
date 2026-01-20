@@ -29,7 +29,7 @@ from owid.catalog.api.utils import (
 )
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
-from owid.catalog.tables import Table
+from owid.catalog.core.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -574,10 +574,10 @@ class TablesAPI:
             channel: Filter by channel (exact match). Defaults to 'garden' if not specified.
             case: Case-sensitive search (default: False)
             match: How to match table/dataset names (default: "exact"):
+                - "fuzzy": Typo-tolerant similarity matching
                 - "exact": Exact string match
                 - "contains": Substring match
                 - "regex": Regular expression pattern
-                - "fuzzy": Typo-tolerant similarity matching
             fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
                 Only used when match="fuzzy". (default: 70)
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.

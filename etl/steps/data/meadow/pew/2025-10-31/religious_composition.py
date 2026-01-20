@@ -26,10 +26,10 @@ def run() -> None:
     }
     tbs = []
     tb_regions = None
-    with snap.open_archive():
+    with snap.extracted() as archive:
         for varname, fname in files.items():
             # Read raw data
-            tb = snap.read_from_archive(
+            tb = archive.read(
                 f"{folder_name}/{fname}",
             )
             # Extract region information
