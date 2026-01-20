@@ -22,6 +22,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional
 
 import rich_click as click
 import structlog
+from click.shell_completion import CompletionItem
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, files, paths
@@ -48,6 +49,30 @@ config.enable_sentry()
 LIMIT_NOFILE = 4096
 
 log = structlog.get_logger()
+
+
+def complete_steps(ctx: click.Context, param: click.Argument, incomplete: str) -> List[CompletionItem]:
+    """Complete step names from DAG with fuzzy matching.
+
+    Used for shell tab-completion (bash, zsh, fish).
+    """
+    try:
+        from etl.step_browser import filter_steps, get_all_steps
+
+        # Load DAG and get all steps
+        dag = load_dag(paths.DEFAULT_DAG_FILE)
+        private = ctx.params.get("private", False)
+        all_steps = get_all_steps(dag, private=private)
+
+        # Filter using existing fuzzy logic
+        if incomplete:
+            matches = filter_steps(incomplete, all_steps)
+        else:
+            matches = all_steps[:50]  # Show top 50 if no input
+
+        return [CompletionItem(m) for m in matches[:50]]
+    except Exception:
+        return []  # Graceful degradation
 
 
 @click.command(name="run")
@@ -163,6 +188,7 @@ log = structlog.get_logger()
     "steps",
     nargs=-1,
     type=str,
+    shell_complete=complete_steps,
 )
 def main_cli(
     steps: List[str],
