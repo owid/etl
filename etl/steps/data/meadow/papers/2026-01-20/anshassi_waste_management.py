@@ -9,7 +9,7 @@ paths = PathFinder(__file__)
 def run() -> None:
     """Load snapshot and create meadow dataset."""
     # Load snapshot
-    snap = paths.load_snapshot("waste_management.xlsx")
+    snap = paths.load_snapshot("anshassi_waste_management.xlsx")
 
     # Read the specific sheet with multi-level headers
     tb = snap.read(sheet_name="Country MSW Data 2", header=[0, 1])
@@ -65,7 +65,6 @@ def run() -> None:
 
     # Format table
     tb = tb.format(["country"])
-
     # Create a new meadow dataset
     ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
 

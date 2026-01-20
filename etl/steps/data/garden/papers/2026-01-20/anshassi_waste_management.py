@@ -11,8 +11,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("waste_management")
-    tb = ds_meadow.read("waste_management")
+    ds_meadow = paths.load_dataset("anshassi_waste_management")
+    tb = ds_meadow.read("anshassi_waste_management")
 
     #
     # Process data.
@@ -80,7 +80,7 @@ def run() -> None:
     tb["year"] = 2020
 
     # Format table
-    tb = tb.format(["country"])
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

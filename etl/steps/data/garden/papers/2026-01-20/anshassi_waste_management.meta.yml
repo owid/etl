@@ -9,7 +9,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  waste_management:
+  anshassi_waste_management:
     variables:
       final_classification:
         title: Waste management system classification
