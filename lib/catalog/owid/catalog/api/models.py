@@ -124,7 +124,7 @@ class ResponseSet(BaseModel, Generic[T]):
         # Use pandas Styler for left-alignment on all result types
         styler = df.style.set_table_styles([
             {"selector": "td, th", "props": [("text-align", "left")]},
-        ]).hide(axis="index")
+        ])
 
         df_html = styler.to_html(escape=False)
 
