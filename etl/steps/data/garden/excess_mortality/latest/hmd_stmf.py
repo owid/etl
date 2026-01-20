@@ -5,7 +5,7 @@ from datetime import date
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.utils import underscore
-from shared import harmonize_countries
+from shared import harmonize_countries  # type: ignore
 from structlog import get_logger
 
 from etl.data_helpers.misc import check_values_in_column
@@ -19,7 +19,7 @@ paths = PathFinder(__file__)
 THIS_YEAR = date.today().year
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED = 1990
-YEAR_MAX_EXPECTED = 2025
+YEAR_MAX_EXPECTED = 2026
 # Year range to be used (rest is filtered out)
 YEAR_MIN = 2010
 YEAR_MAX = 3000  # (No actual limit)
