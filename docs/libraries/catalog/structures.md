@@ -80,7 +80,7 @@ pandas DataFrame with column-level metadata.
 
 pandas Series with metadata.
 
-::: owid.catalog.core.variables
+::: owid.catalog.core.indicators
     options:
       heading_level: 3
       filters: ["!^_"]
@@ -100,7 +100,7 @@ pandas Series with metadata.
       filters: ["!^_"]
       members_order: alphabetical
 
-::: owid.catalog.core.s3_utils
+::: owid.catalog.s3_utils
     options:
       heading_level: 3
       filters: ["!^_"]
