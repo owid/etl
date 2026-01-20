@@ -111,9 +111,9 @@ class ResponseSet(BaseModel, Generic[T]):
         if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
             df = df.copy()
 
-            # Add thumbnail column with small preview images (enlarge on hover via CSS class)
+            # Add thumbnail column - clickable to open chart
             df.insert(0, "preview", df["url"].apply(
-                lambda x: f'<img class="owid-thumb" src="{get_thumbnail_url(x)}">' if x else ""
+                lambda x: f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>' if x else ""
             ))
 
             # Make URL a clickable link
@@ -127,13 +127,6 @@ class ResponseSet(BaseModel, Generic[T]):
         ])
 
         df_html = styler.to_html(escape=False)
-
-        # Add CSS for thumbnail hover effect (only needed for ChartResult, but harmless otherwise)
-        css = """<style>
-.owid-thumb { max-height: 100px; border-radius: 4px; transition: transform 0.2s ease; }
-.owid-thumb:hover { transform: scale(3); z-index: 100; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-</style>"""
-        df_html = css + df_html
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
