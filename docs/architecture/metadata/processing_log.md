@@ -32,7 +32,7 @@ Sometimes you have a function that is so complex that its visualisation doesn't 
 
 ```python
 
-from owid.catalog import processing_log as pl
+from owid.catalog.core import processing_log as pl
 
 @pl.wrap("complex_processing")
 def func(...) -> Table:

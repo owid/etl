@@ -30,13 +30,13 @@ steps:
   #
   # Copernicus Climate Change Service - Precipitation.
   #
-  data://meadow/climate/2025-01-07/total_precipitation:
-  - snapshot://climate/2025-01-07/total_precipitation.zip
+  data://meadow/climate/2026-01-16/total_precipitation:
+  - snapshot://climate/2026-01-16/total_precipitation.zip
   - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/climate/2025-01-07/total_precipitation:
-    - data://meadow/climate/2025-01-07/total_precipitation
-  data://grapher/climate/2025-01-07/total_precipitation_annual:
-    - data://garden/climate/2025-01-07/total_precipitation
+  data://garden/climate/2026-01-16/total_precipitation:
+    - data://meadow/climate/2026-01-16/total_precipitation
+  data://grapher/climate/2026-01-16/total_precipitation_annual:
+    - data://garden/climate/2026-01-16/total_precipitation
   #
   # Global Wildfire Information System - Monthly burned area.
   #

@@ -11,8 +11,8 @@ The Maddison Database is a different project from Maddison Project Database: the
 
 """
 
-import owid.catalog.processing as pr
-from owid.catalog import Table, warnings
+import owid.catalog.core.processing as pr
+from owid.catalog.core import Table, warnings
 
 from etl.helpers import PathFinder, create_dataset
 

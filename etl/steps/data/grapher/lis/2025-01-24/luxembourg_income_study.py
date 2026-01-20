@@ -1,6 +1,6 @@
 """Load luxembourg_income_Study garden dataset and create the luxembourg_income_study grapher dataset."""
 
-from owid.catalog import warnings
+from owid.catalog.core import warnings
 
 from etl.helpers import PathFinder
 

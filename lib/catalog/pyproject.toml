@@ -45,6 +45,9 @@ dependencies = [
     "rapidfuzz>=3.14.3",
     "tqdm>=4.66.0",
     "platformdirs>=4.0.0",
+    "marshmallow>=3.26.2",
+    "brotli>=1.2.0",
+    "urllib3>=1.26.20",
 ]
 
 [dependency-groups]
@@ -53,7 +56,7 @@ dev = [
     "pytest-cov>=2.12.1",
     "watchdog>=2.1.5",
     "argh>=0.26.2",
-    "ty>=0.0.4",
+    "ty==0.0.8",
     "pandas-stubs==1.2.0.62",
     "ruff==0.8.6",
     "ipykernel>=6.29.0",
