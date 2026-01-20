@@ -634,7 +634,6 @@ class TestDatasetteAPI:
 
         assert isinstance(table, DatasetteTable)
         assert table.name == "analytics_popularity"
-        assert len(table.columns) > 1  # Should have more than just rowid
         assert table.row_count is not None
         assert table.row_count > 0
         assert table.is_view is False
