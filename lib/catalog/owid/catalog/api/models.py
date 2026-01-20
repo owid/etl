@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
+from pathlib import Path
+from urllib import parse
 
 if TYPE_CHECKING:
     from owid.catalog.api.legacy import CatalogFrame
@@ -104,7 +106,34 @@ class ResponseSet(BaseModel, Generic[T]):
             return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
 
         df = self.to_frame()
-        df_html = df._repr_html_()
+
+        # For ChartResult, add thumbnail column and make URL clickable
+        if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
+            df = df.copy()
+
+            # Add thumbnail column with small preview images (enlarge on hover via CSS class)
+            df.insert(0, "preview", df["url"].apply(
+                lambda x: f'<img class="owid-thumb" src="{get_thumbnail_url(x)}">' if x else ""
+            ))
+
+            # Make URL a clickable link
+            df["url"] = df["url"].apply(
+                lambda x: f'<a href="{x}" target="_blank">{x.split("/")[-1]}</a>' if x else ""
+            )
+
+        # Use pandas Styler for left-alignment on all result types
+        styler = df.style.set_table_styles([
+            {"selector": "td, th", "props": [("text-align", "left")]},
+        ]).hide(axis="index")
+
+        df_html = styler.to_html(escape=False)
+
+        # Add CSS for thumbnail hover effect (only needed for ChartResult, but harmless otherwise)
+        css = """<style>
+.owid-thumb { max-height: 100px; border-radius: 4px; transition: transform 0.2s ease; }
+.owid-thumb:hover { transform: scale(3); z-index: 100; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+</style>"""
+        df_html = css + df_html
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
@@ -199,10 +228,10 @@ class ResponseSet(BaseModel, Generic[T]):
                     if not self._ui_advanced:
                         row = {
                             # "slug": row["slug"],
-                            "url": row["url"],
                             "title": row["title"],
                             "description": row["description"],
                             "last_updated": row["last_updated"],
+                            "url": row["url"],
                         }
                 else:
                     row = r.model_dump()
@@ -210,10 +239,10 @@ class ResponseSet(BaseModel, Generic[T]):
                     # Simplify if not advanced UI
                     if not self._ui_advanced:
                         row = {
-                            "path": row.get("path", ""),
                             "title": row.get("title", ""),
                             "description": row.get("description", ""),
                             "version": row.get("version", ""),
+                            "path": row.get("path", ""),
                         }
                 rows.append(row)
             else:
@@ -402,3 +431,13 @@ class ResponseSet(BaseModel, Generic[T]):
             if version:
                 return str(version)
             return ""
+
+
+def get_thumbnail_url(grapher_url: str) -> str:
+    """
+    Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
+    Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png?country=~CHN
+    """
+    parts = parse.urlparse(grapher_url)
+
+    return f"{parts.scheme}://{parts.netloc}/grapher/thumbnail/{Path(parts.path).name}.png?{parts.query}"
