@@ -48,13 +48,13 @@ def run() -> None:
 
     # Load data from Excel files within the zip archive
     # Data is in 03_Outputs sheet, with header in row 1 (0-indexed)
-    with snap.open_archive():
-        tb_national = snap.read_from_archive(
+    with snap.extracted() as archive:
+        tb_national = archive.read(
             "files of interest/SD_03_Cottom_et_al_V1.1.0-G-1223_SPOT_MFA_Outputs_National.xlsx",
             sheet_name="03_Outputs",
             header=1,
         )
-        tb_regional = snap.read_from_archive(
+        tb_regional = archive.read(
             "files of interest/SD_04_Cottom_et_al_V1.1.0-G-1223_SPOT_MFA_Outputs_Global_Regional_Income.xlsx",
             sheet_name="03_Outputs",
             header=1,
