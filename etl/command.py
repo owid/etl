@@ -48,7 +48,7 @@ def complete_steps(ctx: click.Context, param: click.Argument, incomplete: str) -
     Used for shell tab-completion (bash, zsh, fish).
     """
     try:
-        from etl.step_browser import filter_steps, get_all_steps
+        from etl.browser import filter_steps, get_all_steps
 
         # Load DAG and get all steps
         dag = load_dag(paths.DEFAULT_DAG_FILE)
@@ -238,7 +238,7 @@ def main_cli(
     # This is a fast path that doesn't need config/files imports
     # UI shows immediately while DAG loads in background thread
     if browse:
-        from etl.step_browser import browse_steps
+        from etl.browser import browse_steps
 
         result, is_exact = browse_steps(
             dag_loader=lambda: load_dag(dag_path),

@@ -1,13 +1,10 @@
 #
-#  step_browser.py
-#  Interactive step browser for etlr
+#  core.py
+#  Generic browser UI components for interactive selection
 #
 
-import json
 import re
-import threading
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 from prompt_toolkit import Application
 from prompt_toolkit.buffer import Buffer
@@ -16,51 +13,46 @@ from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.styles import Style
 
-from etl.dag_helpers import graph_nodes
-
-# Simple type alias - avoids importing heavy etl.steps module
-DAG = Dict[str, Set[str]]
-
 # OWID-styled colors (reused from harmonize.py and apps/pr/cli.py)
 OWID_YELLOW = "#fac800"
 OWID_GREEN = "#54cc90"
 OWID_GRAY = "#888888"
 
-# Style for the step browser
+# Style for the browser
 BROWSER_STYLE = Style.from_dict(
     {
         "prompt": f"fg:{OWID_YELLOW} bold",
         "input": "bold",
         "match-count": f"fg:{OWID_GRAY}",
         "separator": f"fg:{OWID_GRAY}",
-        "step": f"fg:{OWID_GRAY}",
-        "step.highlight": f"fg:{OWID_GREEN} bold",
-        "step.selected": f"bg:{OWID_YELLOW} fg:#000000 bold",
-        "step.selected.highlight": f"bg:{OWID_YELLOW} fg:#000000 bold underline",
+        "item": f"fg:{OWID_GRAY}",
+        "item.highlight": f"fg:{OWID_GREEN} bold",
+        "item.selected": f"bg:{OWID_YELLOW} fg:#000000 bold",
+        "item.selected.highlight": f"bg:{OWID_YELLOW} fg:#000000 bold underline",
         "hint": f"fg:{OWID_GRAY} italic",
         "shortcut-key": f"bg:{OWID_GRAY} fg:#000000 bold",
         "shortcut-desc": f"fg:{OWID_GRAY}",
     }
 )
 
-# Maximum number of steps to display
-MAX_DISPLAY_STEPS = 15
+# Maximum number of items to display
+MAX_DISPLAY_ITEMS = 15
 
 
-def highlight_matches(step: str, pattern: str, is_selected: bool) -> List[Tuple[str, str]]:
+def highlight_matches(item: str, pattern: str, is_selected: bool) -> List[Tuple[str, str]]:
     """Create styled text segments with matching terms highlighted.
 
     Returns a list of (style, text) tuples for prompt_toolkit.
     """
     if not pattern:
-        style = "class:step.selected" if is_selected else "class:step"
-        return [(style, step)]
+        style = "class:item.selected" if is_selected else "class:item"
+        return [(style, item)]
 
-    base_style = "class:step.selected" if is_selected else "class:step"
-    highlight_style = "class:step.selected.highlight" if is_selected else "class:step.highlight"
+    base_style = "class:item.selected" if is_selected else "class:item"
+    highlight_style = "class:item.selected.highlight" if is_selected else "class:item.highlight"
 
     terms = pattern.split()
-    step_lower = step.lower()
+    item_lower = item.lower()
 
     # Find all match positions
     matches: List[Tuple[int, int]] = []  # (start, end) positions
@@ -68,14 +60,14 @@ def highlight_matches(step: str, pattern: str, is_selected: bool) -> List[Tuple[
         term_lower = term.lower()
         start = 0
         while True:
-            pos = step_lower.find(term_lower, start)
+            pos = item_lower.find(term_lower, start)
             if pos == -1:
                 break
             matches.append((pos, pos + len(term)))
             start = pos + 1
 
     if not matches:
-        return [(base_style, step)]
+        return [(base_style, item)]
 
     # Merge overlapping matches and sort by position
     matches.sort()
@@ -91,17 +83,17 @@ def highlight_matches(step: str, pattern: str, is_selected: bool) -> List[Tuple[
     pos = 0
     for start, end in merged:
         if pos < start:
-            segments.append((base_style, step[pos:start]))
-        segments.append((highlight_style, step[start:end]))
+            segments.append((base_style, item[pos:start]))
+        segments.append((highlight_style, item[start:end]))
         pos = end
-    if pos < len(step):
-        segments.append((base_style, step[pos:]))
+    if pos < len(item):
+        segments.append((base_style, item[pos:]))
 
     return segments
 
 
 class BrowserState:
-    """State container for the step browser application."""
+    """State container for the browser application."""
 
     def __init__(self) -> None:
         self.selected_index: int = -1  # -1 means no selection (run all matches)
@@ -110,16 +102,16 @@ class BrowserState:
         self.result: Optional[str] = None
         self.is_exact: bool = False
         self.cancelled: bool = False
-        self.loading: bool = False  # True while DAG is loading in background
-        self.all_steps: List[str] = []  # Populated when loading completes
+        self.loading: bool = False  # True while items are loading in background
+        self.all_items: List[str] = []  # Populated when loading completes
         self.app: Optional[Application[None]] = None  # Reference to app for invalidation
 
 
-def filter_steps(pattern: str, all_steps: List[str]) -> List[str]:
-    """Filter steps by pattern using segment matching.
+def filter_items(pattern: str, all_items: List[str]) -> List[str]:
+    """Filter items by pattern using segment matching.
 
     Supports two modes:
-    1. Space-separated terms: "energy 2024" matches steps containing BOTH terms
+    1. Space-separated terms: "energy 2024" matches items containing BOTH terms
     2. Single term: treated as regex (or substring if invalid regex)
 
     Matches are case-insensitive and sorted by relevance.
@@ -132,7 +124,7 @@ def filter_steps(pattern: str, all_steps: List[str]) -> List[str]:
     # Multiple terms: AND matching (all terms must be present)
     if len(terms) > 1:
         terms_lower = [t.lower() for t in terms]
-        matches = [s for s in all_steps if all(term in s.lower() for term in terms_lower)]
+        matches = [s for s in all_items if all(term in s.lower() for term in terms_lower)]
 
         # Sort by: number of terms matched at word boundaries, then length
         def score(s: str) -> Tuple[int, int, str]:
@@ -149,166 +141,78 @@ def filter_steps(pattern: str, all_steps: List[str]) -> List[str]:
     # Single term: regex matching with substring fallback
     try:
         compiled = re.compile(pattern, re.IGNORECASE)
-        matches = [s for s in all_steps if compiled.search(s)]
-        # Sort by: exact matches first, then by step length (shorter = more specific)
+        matches = [s for s in all_items if compiled.search(s)]
+        # Sort by: exact matches first, then by item length (shorter = more specific)
         matches.sort(key=lambda s: (pattern.lower() not in s.lower(), len(s), s))
         return matches
     except re.error:
         # If the pattern is not a valid regex, fall back to simple substring match
         pattern_lower = pattern.lower()
-        matches = [s for s in all_steps if pattern_lower in s.lower()]
+        matches = [s for s in all_items if pattern_lower in s.lower()]
         matches.sort(key=lambda s: (len(s), s))
         return matches
 
 
-def get_all_steps(dag: DAG, private: bool = False) -> List[str]:
-    """Get all step URIs from the DAG.
-
-    If private=False, filter out private steps.
-    """
-    all_steps = sorted(graph_nodes(dag))
-
-    # Filter based on private flag
-    if not private:
-        all_steps = [s for s in all_steps if "private://" not in s]
-
-    # Filter out steps that are not relevant for etlr (snapshots, github, etag)
-    # Focus on data and grapher steps
-    relevant_prefixes = ("data://", "data-private://", "grapher://", "export://")
-    all_steps = [s for s in all_steps if s.startswith(relevant_prefixes)]
-
-    return all_steps
-
-
-def get_dag_max_mtime(dag_path: Path) -> float:
-    """Get the max mtime of all DAG YAML files (excluding archive/).
-
-    The DAG uses includes, so we need to check all .yml files, not just main.yml.
-    """
-    dag_dir = dag_path.parent
-    max_mtime = 0.0
-
-    for yml_file in dag_dir.glob("*.yml"):
-        max_mtime = max(max_mtime, yml_file.stat().st_mtime)
-
-    return max_mtime
-
-
-def load_cached_steps(dag_path: Path, private: bool) -> Optional[List[str]]:
-    """Load steps from cache if valid (no DAG files have changed).
-
-    Returns cached steps list, or None if cache is invalid/missing.
-    """
-    from etl import paths
-
-    cache_file = paths.STEP_CACHE_FILE
-    if not cache_file.exists():
-        return None
-
-    try:
-        with open(cache_file) as f:
-            cache = json.load(f)
-
-        # Check if cache matches current settings
-        if cache.get("dag_path") != str(dag_path):
-            return None
-        if cache.get("private") != private:
-            return None
-
-        # Check if any DAG file has been modified (main.yml + includes)
-        dag_max_mtime = get_dag_max_mtime(dag_path)
-        if cache.get("dag_max_mtime") != dag_max_mtime:
-            return None
-
-        return cache.get("steps", [])
-    except (json.JSONDecodeError, OSError, KeyError):
-        return None
-
-
-def save_step_cache(dag_path: Path, private: bool, steps: List[str]) -> None:
-    """Save steps to cache for instant startup next time."""
-    from etl import paths
-
-    cache_file = paths.STEP_CACHE_FILE
-    try:
-        # Ensure cache directory exists
-        cache_file.parent.mkdir(parents=True, exist_ok=True)
-
-        dag_max_mtime = get_dag_max_mtime(dag_path)
-        cache = {
-            "dag_path": str(dag_path),
-            "dag_max_mtime": dag_max_mtime,
-            "private": private,
-            "steps": steps,
-        }
-        with open(cache_file, "w") as f:
-            json.dump(cache, f)
-    except OSError:
-        pass  # Silently fail - cache is optional
-
-
-def browse_steps(
-    dag: Optional[DAG] = None,
-    private: bool = False,
-    dag_loader: Optional[Callable[[], DAG]] = None,
-    dag_path: Optional[Path] = None,
+def browse_items(
+    items_loader: Callable[[], List[str]],
+    prompt: str = "> ",
+    loading_message: str = "Loading...",
+    empty_message: str = "No items found.",
+    item_noun: str = "item",
+    item_noun_plural: str = "items",
+    cached_items: Optional[List[str]] = None,
+    on_items_loaded: Optional[Callable[[List[str]], None]] = None,
 ) -> Tuple[Optional[str], bool]:
-    """Interactive step browser using prompt_toolkit.
+    """Interactive item browser using prompt_toolkit.
 
     Args:
-        dag: Pre-loaded DAG (if available)
-        private: Whether to include private steps
-        dag_loader: Callable that returns DAG (for async loading)
-        dag_path: Path to DAG file (for caching)
+        items_loader: Callable that returns list of items to browse
+        prompt: The prompt text to display (e.g., "etlr> ")
+        loading_message: Message shown while items load
+        empty_message: Message shown when no items exist
+        item_noun: Singular noun for items (e.g., "step")
+        item_noun_plural: Plural noun for items (e.g., "steps")
+        cached_items: Pre-loaded items (skips loading if provided)
+        on_items_loaded: Callback when items finish loading (for caching)
 
     Returns:
-        Tuple of (pattern_or_step, is_exact_match):
+        Tuple of (pattern_or_item, is_exact_match):
         - If user presses Enter: (current_text, False) to run all matches
-        - If user selects a step: (step_uri, True) to run just that step
+        - If user selects an item: (item, True) to run just that item
         - If user cancels: (None, False)
     """
+    import threading
+
     # State for the application
     state = BrowserState()
 
-    # If dag is provided directly, use it immediately
-    if dag is not None:
-        state.all_steps = get_all_steps(dag, private=private)
+    # If cached_items provided, use them immediately
+    if cached_items is not None:
+        state.all_items = cached_items
         state.loading = False
-    elif dag_loader is not None:
-        # Try loading from cache first (instant startup)
-        cached_steps = load_cached_steps(dag_path, private) if dag_path else None
-
-        if cached_steps is not None:
-            # Cache hit: mtime matched, cache is fresh - use it directly
-            # (load_cached_steps already validated mtime)
-            state.all_steps = cached_steps
-            state.loading = False
-        else:
-            # Cache miss: show loading state
-            state.loading = True
-
-            def load_in_background() -> None:
-                loaded_dag = dag_loader()
-                state.all_steps = get_all_steps(loaded_dag, private=private)
-                state.loading = False
-
-                # Save to cache for next time
-                if dag_path:
-                    save_step_cache(dag_path, private, state.all_steps)
-
-                # Trigger UI refresh from background thread
-                if state.app is not None:
-                    state.app.invalidate()
-
-            thread = threading.Thread(target=load_in_background, daemon=True)
-            thread.start()
     else:
-        raise ValueError("Either dag or dag_loader must be provided")
+        # Show loading state and load in background
+        state.loading = True
+
+        def load_in_background() -> None:
+            state.all_items = items_loader()
+            state.loading = False
+
+            # Call the on_items_loaded callback for caching
+            if on_items_loaded is not None:
+                on_items_loaded(state.all_items)
+
+            # Trigger UI refresh from background thread
+            if state.app is not None:
+                state.app.invalidate()
+
+        thread = threading.Thread(target=load_in_background, daemon=True)
+        thread.start()
 
     # Create the input buffer
     def on_text_changed(buf: Buffer) -> None:
         text = buf.text.strip()
-        state.matches = filter_steps(text, state.all_steps)
+        state.matches = filter_items(text, state.all_items)
         state.selected_index = -1  # Reset selection when text changes
         state.scroll_offset = 0  # Reset scroll when text changes
 
@@ -324,7 +228,7 @@ def browse_steps(
     def handle_enter(event: Any) -> None:
         text = input_buffer.text.strip()
         if state.selected_index >= 0 and state.matches:
-            # User has selected a specific step
+            # User has selected a specific item
             state.result = state.matches[state.selected_index]
             state.is_exact = True
         elif text:
@@ -350,8 +254,8 @@ def browse_steps(
             if state.selected_index < max_idx:
                 state.selected_index += 1
                 # Scroll down if selection goes past visible window
-                if state.selected_index >= state.scroll_offset + MAX_DISPLAY_STEPS:
-                    state.scroll_offset = state.selected_index - MAX_DISPLAY_STEPS + 1
+                if state.selected_index >= state.scroll_offset + MAX_DISPLAY_ITEMS:
+                    state.scroll_offset = state.selected_index - MAX_DISPLAY_ITEMS + 1
 
     @kb.add("up")
     @kb.add("s-tab")
@@ -364,7 +268,7 @@ def browse_steps(
 
     # Layout components
     def get_prompt_text() -> List[Tuple[str, str]]:
-        return [("class:prompt", "etlr> ")]
+        return [("class:prompt", prompt)]
 
     def get_matches_text() -> List[Tuple[str, str]]:
         text = input_buffer.text.strip()
@@ -374,7 +278,7 @@ def browse_steps(
 
         # Show loading state
         if state.loading:
-            lines.append(("class:hint", "  Loading steps..."))
+            lines.append(("class:hint", f"  {loading_message}"))
             lines.append(("", "\n"))
             lines.append(("class:separator", "  " + "-" * 50 + "\n"))
             return lines
@@ -393,13 +297,13 @@ def browse_steps(
                 lines.append(("class:match-count", "  No matches"))
                 add_shortcuts([("^C", "Exit")])
             else:
-                count_text = "1 step" if count == 1 else f"{count} steps"
+                count_text = f"1 {item_noun}" if count == 1 else f"{count} {item_noun_plural}"
                 lines.append(("class:match-count", f"  {count_text}"))
                 run_desc = "Run all" if state.selected_index < 0 else "Run selected"
                 shortcuts = [("↑↓", "Select"), ("Enter", run_desc), ("^C", "Exit")]
                 add_shortcuts(shortcuts)
         else:
-            lines.append(("class:hint", f"  Type to filter {len(state.all_steps)} steps"))
+            lines.append(("class:hint", f"  Type to filter {len(state.all_items)} {item_noun_plural}"))
             add_shortcuts([("^C", "Exit")])
 
         lines.append(("", "\n"))
@@ -409,7 +313,7 @@ def browse_steps(
 
         # Display matches with highlighting and scrolling
         start = state.scroll_offset
-        end = min(start + MAX_DISPLAY_STEPS, len(matches))
+        end = min(start + MAX_DISPLAY_ITEMS, len(matches))
         display_matches = matches[start:end]
 
         # Show "more above" indicator
@@ -417,13 +321,13 @@ def browse_steps(
             lines.append(("class:hint", f"    ... {start} more above"))
             lines.append(("", "\n"))
 
-        for i, step in enumerate(display_matches):
+        for i, item in enumerate(display_matches):
             absolute_idx = start + i
             is_selected = absolute_idx == state.selected_index
-            prefix_style = "class:step.selected" if is_selected else "class:step"
+            prefix_style = "class:item.selected" if is_selected else "class:item"
             prefix = "  > " if is_selected else "    "
             lines.append((prefix_style, prefix))
-            lines.extend(highlight_matches(step, text, is_selected))
+            lines.extend(highlight_matches(item, text, is_selected))
             lines.append(("", "\n"))
 
         # Show "more below" indicator
@@ -469,9 +373,9 @@ def browse_steps(
     if state.cancelled:
         return None, False
 
-    # Check if no steps were loaded (empty DAG)
-    if not state.all_steps and not state.loading:
-        print("No steps found in DAG.")
+    # Check if no items were loaded
+    if not state.all_items and not state.loading:
+        print(empty_message)
         return None, False
 
     return state.result, state.is_exact
