@@ -419,7 +419,7 @@ class LocalCatalog(CatalogMixin):
 
         df = pd.concat(frames, ignore_index=True)
 
-        keys = ["table", "dataset", "version", "namespace", "channel", "is_public"]
+        keys = ["table", "dataset", "version", "namespace", "channel", "is_public", "title", "description"]
         columns = keys + [c for c in df.columns if c not in keys]
 
         df.sort_values(keys, inplace=True)  # type: ignore
