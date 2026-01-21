@@ -155,7 +155,7 @@ def run() -> None:
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     for col in tb.columns:
-        tb[col].metadata.origins = snap.metadata.origin
+        tb[col].metadata.origins = [snap.metadata.origin]
     #
     # Save outputs.
     #
