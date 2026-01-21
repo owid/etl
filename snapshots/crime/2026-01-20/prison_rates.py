@@ -30,25 +30,44 @@ def run(upload: bool = True) -> None:
     snap.create_snapshot(upload=upload)
 
 
+# def get_country_names() -> List[str]:
+#    url = "https://www.prisonstudies.org/highest-to-lowest/prison-population-total?field_region_taxonomy_tid=All"
+
+# Read the first table on the page
+#    df = pd.read_html(url)[0]
+
+# The country/territory names are in the "Title" column
+#    countries = df["Title"].dropna().tolist()
+#    countries = [c.replace(" ", "-") for c in countries]
+#   countries = [c.replace("(", "") for c in countries]
+#   countries = [c.replace(")", "") for c in countries]
+#   countries = [c.replace("-of", "") for c in countries]
+#  countries = [c.replace("/", "") for c in countries]
+# countries = [c.replace(":", "") for c in countries]
+#    countries = [c.replace("-&", "") for c in countries]
+#   countries = [c.replace(",", "") for c in countries]
+#   countries = [c.replace(".", "") for c in countries]
+#   countries = [c.replace("-the", "") for c in countries]
+#   countries = [c.replace("'", "") for c in countries]
+
+# return countries
+
+
 def get_country_names() -> List[str]:
     url = "https://www.prisonstudies.org/highest-to-lowest/prison-population-total?field_region_taxonomy_tid=All"
 
-    # Read the first table on the page
     df = pd.read_html(url)[0]
 
-    # The country/territory names are in the "Title" column
-    countries = df["Title"].dropna().tolist()
-    countries = [c.replace(" ", "-") for c in countries]
-    countries = [c.replace("(", "") for c in countries]
-    countries = [c.replace(")", "") for c in countries]
-    countries = [c.replace("-of", "") for c in countries]
-    countries = [c.replace("/", "") for c in countries]
-    countries = [c.replace(":", "") for c in countries]
-    countries = [c.replace("-&", "") for c in countries]
-    countries = [c.replace(",", "") for c in countries]
-    countries = [c.replace(".", "") for c in countries]
-    countries = [c.replace("-the", "") for c in countries]
-    countries = [c.replace("'", "") for c in countries]
+    countries = (
+        df["Title"]
+        .dropna()
+        .str.lower()
+        .str.replace(r"[()/:,&.'’]", "", regex=True)
+        .str.replace(r"\b(of|the)\b", "", regex=True)
+        .str.replace(r"\s+", "-", regex=True)
+        .str.strip("-")
+        .tolist()
+    )
 
     return countries
 
