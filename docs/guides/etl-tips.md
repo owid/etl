@@ -22,6 +22,8 @@ Use `etlr --browse` (or `-b`) to open an interactive step browser with fuzzy sea
   </video>
 </div>
 
+Once you select a step, it will be executed with the flags you specified. For example, to run private steps:
+
 ```bash
 # Open the interactive browser for private steps
 etlr --browse --private
@@ -30,22 +32,19 @@ etlr --browse --private
 etlr -b -p
 ```
 
-The browser supports:
+!!! tip "Also works for snapshots"
 
-- **Fuzzy search**: Type partial matches like `fao qcl` to find `faostat_qcl`
-- **Arrow keys**: Navigate through results
-- **Enter**: Select a step and run it
-- **Escape/Ctrl-C**: Cancel
+    The same browse functionality is available for snapshots using `etls --browse` (or `etls -b`). This lets you interactively search and select from all available snapshots in the `snapshots/` directory.
 
-Once you select a step, it will be executed with the flags you specified (e.g., `--private`, `--dry-run`).
+    ```bash
+    # Browse and run a snapshot
+    etls --browse
 
-```bash
-# Browse and preview what would run (dry-run)
-etlr -b -p --dry-run
+    # Browse with dry-run to preview
+    etls -b --dry-run
+    ```
 
-# Browse with grapher upload
-etlr -b -p --grapher
-```
+
 
 ## Interpolate values
 Sometimes, you may have empty values in your dataset. In general, a solution for these cases is to use interpolation to fill those gaps based on previous and following values. In `data_helpers.misc` module, you will find the function `interpolate_table` that can be used to interpolate values in a table.
