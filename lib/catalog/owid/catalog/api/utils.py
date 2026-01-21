@@ -28,7 +28,7 @@ INDEX_FORMATS: list[FileFormat] = ["feather"]
 # and classes require URLs to be passed explicitly.
 
 DEFAULT_CATALOG_URL = "https://catalog.ourworldindata.org/"
-DEFAULT_GRAPHER_URL = "https://ourworldindata.org/grapher"
+DEFAULT_SITE_URL = "https://ourworldindata.org"
 DEFAULT_INDICATORS_SEARCH_URL = "https://search.owid.io/indicators"
 DEFAULT_SITE_SEARCH_URL = "https://ourworldindata.org/api/search"
 
