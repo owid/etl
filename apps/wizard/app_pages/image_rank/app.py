@@ -46,6 +46,11 @@ def find_image_in_content(content: str, filename: str, slug: str, post_type: str
         return None
 
     base_url = _build_post_url(BASE_SITE_URL, slug, post_type)
+
+    # Check if it's the featured image (appears at top of page)
+    if data.get("featured-image") == filename:
+        return base_url
+
     body = data.get("body", [])
 
     # Find the image in body
@@ -145,43 +150,40 @@ def get_posts_for_image(image_id: int) -> list[dict]:
 
 def display_image_row(rank: int, image: dict) -> None:
     """Display a single image row with expandable posts."""
-    thumbnail_url = f"{CLOUDFLARE_IMAGES_URL}/{image['cloudflareId']}/w=200"
+    thumbnail_url = f"{CLOUDFLARE_IMAGES_URL}/{image['cloudflareId']}/w=400"
     filename = image["filename"]
 
-    with st.expander(f"**#{rank}** - {filename}", expanded=False):
-        col1, col2 = st.columns([1, 3])
+    with st.expander(f"**#{rank}** - {filename}", expanded=True):
+        col1, col2 = st.columns([1, 2])
 
         with col1:
-            st.image(thumbnail_url, width=200)
+            st.image(thumbnail_url, width="stretch")
 
         with col2:
             st.markdown(f"**Alt text:** {image['defaultAlt'] or 'N/A'}")
-            st.markdown(f"**Views (7d):** {image['views_7d']:,}")
-            st.markdown(f"**Views (365d):** {image['views_365d']:,}")
-            st.markdown(f"**Posts:** {image['post_count']}")
+            st.markdown(f"**Views (7d):** {int(image['views_7d']):,} | **Views (365d):** {int(image['views_365d']):,}")
 
-        # Show posts using this image
-        if image["post_count"] > 0:
-            st.markdown("---")
-            st.markdown("**Posts using this image:**")
+            # Show posts using this image
+            if image["post_count"] > 0:
+                st.markdown(f"**Posts using this image:** ({image['post_count']})")
 
-            posts = get_posts_for_image(image["id"])
-            for post in posts:
-                # Try to get a fragment URL pointing to the image location
-                fragment_url = None
-                if post.get("content"):
-                    fragment_url = find_image_in_content(
-                        post["content"], filename, post["slug"], post["type"]
+                posts = get_posts_for_image(image["id"])
+                for post in posts:
+                    # Try to get a fragment URL pointing to the image location
+                    fragment_url = None
+                    if post.get("content"):
+                        fragment_url = find_image_in_content(
+                            post["content"], filename, post["slug"], post["type"]
+                        )
+                    # Fall back to base post URL
+                    if not fragment_url:
+                        fragment_url = _build_post_url(BASE_SITE_URL, post["slug"], post["type"])
+
+                    title = post["title"] or post["slug"]
+                    st.markdown(
+                        f"- [{title}]({fragment_url}) ({post['type']}) - "
+                        f"7d: {int(post['views_7d']):,} | 365d: {int(post['views_365d']):,}"
                     )
-                # Fall back to base post URL
-                if not fragment_url:
-                    fragment_url = _build_post_url(BASE_SITE_URL, post["slug"], post["type"])
-
-                title = post["title"] or post["slug"]
-                st.markdown(
-                    f"- [{title}]({fragment_url}) ({post['type']}) - "
-                    f"7d: {post['views_7d']:,} | 365d: {post['views_365d']:,}"
-                )
 
 
 # Main UI
