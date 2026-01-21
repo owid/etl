@@ -1227,9 +1227,10 @@ class GraphStep(Step):
         return None
 
     def run(self) -> None:
-        """Create or update chart in database."""
+        """Save graph metadata locally, and optionally upsert to database with --graph flag."""
+        from etl import config
         from etl.dag_helpers import load_dag
-        from etl.grapher.graph import upsert_graph
+        from etl.grapher.graph import upsert_graph, _save_graph_metadata
 
         # Load DAG to get original dependency strings with #indicator parts
         dag = load_dag()
@@ -1243,13 +1244,26 @@ class GraphStep(Step):
             )
 
         source_checksum = self.checksum_input()
-        upsert_graph(
-            slug=self.slug,
-            metadata_file=self.metadata_file,
-            dependencies=dep_uris,
-            source_checksum=source_checksum,
-            force=False,
-        )
+
+        if config.GRAPH:
+            # --graph flag set: upsert to database
+            upsert_graph(
+                slug=self.slug,
+                metadata_file=self.metadata_file,
+                dependencies=dep_uris,
+                source_checksum=source_checksum,
+                force_graph=config.FORCE_GRAPH,
+            )
+        else:
+            # No --graph flag: only save metadata locally (like grapher step without --grapher)
+            # Build minimal config just for storing checksum
+            from etl.grapher.graph import _load_metadata_file
+
+            config_dict = {}
+            if self.metadata_file and self.metadata_file.exists():
+                config_dict = _load_metadata_file(self.metadata_file)
+
+            _save_graph_metadata(self.slug, source_checksum, config_dict)
 
     def is_dirty(self) -> bool:
         """

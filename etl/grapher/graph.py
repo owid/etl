@@ -30,7 +30,7 @@ def upsert_graph(
     metadata_file: Optional[Path],
     dependencies: List[str],
     source_checksum: str,
-    force: bool = False,
+    force_graph: bool = False,
 ) -> int:
     """
     Create or update a chart in the grapher database.
@@ -40,7 +40,7 @@ def upsert_graph(
         metadata_file: Optional path to .meta.yml file with chart metadata
         dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/..."])
         source_checksum: Checksum of inputs (metadata file + dependencies) for dirty detection
-        force: If True, overwrite manual edits made in Admin UI
+        force_graph: If True, overwrite manual edits made in Admin UI
 
     Returns:
         Chart ID
@@ -124,10 +124,9 @@ def upsert_graph(
                 config["isPublished"] = chart.config.get("isPublished", False)
             is_inheritance_enabled = False
 
-        # 6. Check for manual overrides if chart exists, not forcing, and we're keeping inheritance enabled
-        # (If we're switching to explicit config, the overrides will be replaced anyway)
-        if chart and not force and is_inheritance_enabled:
-            _check_manual_overrides(session, chart)
+        # 6. Check for manual overrides if chart exists and not forcing
+        if chart and not force_graph:
+            _check_manual_overrides(session, chart, config, is_inheritance_enabled, source_checksum)
 
         # 7. Add dimensions (variable IDs) to config
         config["dimensions"] = [{"variableId": vid, "property": "y", "display": {}} for vid in variable_ids]
@@ -163,27 +162,37 @@ def upsert_graph(
             admin_url=f"{OWID_ENV.admin_site}/admin/charts/{chart_id}/edit",
         )
 
-        # Save checksum to local file for dirty detection
-        _save_graph_metadata(slug, source_checksum)
+        # Save checksum and config to local file for dirty detection and conflict detection
+        _save_graph_metadata(slug, source_checksum, config)
 
         return chart_id
 
 
-def _save_graph_metadata(slug: str, source_checksum: str) -> None:
+def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any]) -> None:
     """
-    Save graph metadata to local index.json file for dirty detection.
+    Save graph metadata to local index.json file for dirty detection and conflict detection.
 
     Args:
         slug: Chart slug
         source_checksum: Checksum of inputs (metadata file + dependencies)
+        config: The config that was written to the database
     """
     graph_dir = paths.DATA_DIR / "graphs" / slug
     graph_dir.mkdir(parents=True, exist_ok=True)
+
+    # Store key fields we wrote to DB for conflict detection
+    # Only store fields that users might manually edit in Admin UI
+    last_config = {
+        k: config.get(k)
+        for k in ["title", "subtitle", "note", "chartTypes", "hasMapTab", "tab", "selectedEntityNames"]
+        if k in config
+    }
 
     metadata = {
         "channel": "graph",
         "short_name": slug,
         "source_checksum": source_checksum,
+        "last_config": last_config,
     }
 
     index_path = graph_dir / "index.json"
@@ -293,26 +302,47 @@ def _load_metadata_file(metadata_file: Path) -> Dict[str, Any]:
     return metadata
 
 
-def _check_manual_overrides(session: Session, chart: Chart) -> None:
+def _check_manual_overrides(
+    session: Session,
+    chart: Chart,
+    expected_config: Dict[str, Any],
+    is_inheritance_enabled: bool,
+    current_checksum: str,
+) -> None:
     """
-    Check if chart has manual overrides from Admin UI.
+    Check if chart has manual overrides from Admin UI that would be lost.
 
-    If the chart has isInheritanceEnabled=True but has a non-empty patch config,
-    it means someone manually overrode fields in the Admin UI. We should warn
-    the user rather than silently overwriting their work.
+    Only raises error if BOTH of these are true:
+    1. ETL metadata has changed (current_checksum != stored_checksum)
+    2. Database config has diverged from what ETL last wrote
+
+    This prevents false positives when you update .meta.yml but DB hasn't been touched.
 
     Args:
         session: Database session
         chart: Chart object
+        expected_config: The config we're about to write (from ETL metadata)
+        is_inheritance_enabled: Whether the new config will have inheritance enabled
+        current_checksum: Current checksum of ETL inputs
 
     Raises:
-        ValueError: If chart has manual overrides and force=False
+        ValueError: If chart has manual overrides and force_graph=False
     """
-    # System fields that are always in patch config (not actual overrides)
-    SYSTEM_FIELDS = {"id", "slug", "$schema", "version", "dimensions", "isPublished", "createdAt", "updatedAt"}
+    # System fields that change automatically or are expected to differ
+    SYSTEM_FIELDS = {
+        "id",
+        "slug",
+        "$schema",
+        "version",
+        "dimensions",  # We're updating this
+        "isPublished",  # We preserve this
+        "createdAt",
+        "updatedAt",
+        "isInheritanceEnabled",  # We're updating this
+    }
 
+    # For inheritance-enabled charts, check patch config
     if chart.isInheritanceEnabled and chart.chart_config.patch:
-        # Filter out system fields to find actual user overrides
         overridden_fields = [field for field in chart.chart_config.patch.keys() if field not in SYSTEM_FIELDS]
 
         if overridden_fields:
@@ -324,7 +354,49 @@ def _check_manual_overrides(session: Session, chart: Chart) -> None:
                 f"  2. Use --force to reset chart to ETL-managed state (WARNING: loses manual edits)"
             )
 
-    # If inheritance is disabled, it means the chart has explicit config
-    # In this case, we're intentionally managing it from ETL
-    if not chart.isInheritanceEnabled:
-        log.info("graph.explicit_config", slug=chart.slug)
+    # For explicit config charts, detect divergence between ETL and DB
+    # Only do this if chart is using explicit config (not inheritance)
+    if not chart.isInheritanceEnabled and not is_inheritance_enabled:
+        # Load what we last wrote to this chart
+        metadata = _load_graph_metadata(chart.slug)
+        stored_checksum = metadata.get("source_checksum")
+
+        # If no stored checksum, this is the first ETL run - allow it
+        if not stored_checksum:
+            log.info("graph.first_etl_run", slug=chart.slug)
+            return
+
+        # If checksum hasn't changed, ETL metadata is unchanged - no conflict possible
+        if stored_checksum == current_checksum:
+            log.debug("graph.no_etl_changes", slug=chart.slug)
+            return
+
+        # ETL metadata HAS changed - now check if DB was also manually edited
+        # We do this by storing the config we last wrote and comparing to current DB
+        stored_config = metadata.get("last_config", {})
+        current_config = chart.config
+
+        # Compare key fields that users might edit manually
+        COMPARABLE_FIELDS = {"title", "subtitle", "note", "chartTypes", "hasMapTab", "tab", "selectedEntityNames"}
+
+        db_changed_fields = []
+        for field in COMPARABLE_FIELDS:
+            stored_value = stored_config.get(field)
+            current_value = current_config.get(field)
+
+            # If DB value differs from what we last wrote → manual edit
+            if stored_value is not None and current_value != stored_value:
+                db_changed_fields.append(field)
+
+        # Only raise error if BOTH ETL and DB changed (divergence)
+        if db_changed_fields:
+            raise ValueError(
+                f"Chart '{chart.slug}' has diverged: both ETL metadata and database were modified.\n"
+                f"Manually edited fields in database: {db_changed_fields}\n"
+                f"Last ETL values: {[f'{k}={stored_config.get(k)}' for k in db_changed_fields]}\n"
+                f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
+                f"New ETL values: {[f'{k}={expected_config.get(k)}' for k in db_changed_fields]}\n"
+                f"Either:\n"
+                f"  1. Update your .meta.yml file to match the database edits, or\n"
+                f"  2. Use --force-metadata to overwrite database with ETL metadata (WARNING: loses manual edits)"
+            )

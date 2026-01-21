@@ -226,6 +226,12 @@ INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
+# if set, graph steps will overwrite manual edits from Admin UI
+FORCE_GRAPH = env.get("FORCE_GRAPH") in ("True", "true", "1")
+
+# if set, graph steps will upsert charts to database
+GRAPH = env.get("GRAPH") in ("True", "true", "1")
+
 # if set, export steps will not upload/commit files (e.g. S3, GitHub)
 DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
 

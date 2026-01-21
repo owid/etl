@@ -81,6 +81,12 @@ log = structlog.get_logger()
     help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
 @click.option(
+    "--graph/--no-graph",
+    default=False,
+    type=bool,
+    help="Upsert charts from graph steps to DB _(OWID staff only, DB access required)_",
+)
+@click.option(
     "--export/--no-export",
     default=False,
     type=bool,
@@ -151,6 +157,11 @@ log = structlog.get_logger()
     help="Always upload grapher data & metadata JSON files even if checksums match.",
 )
 @click.option(
+    "--force-graph",
+    is_flag=True,
+    help="Overwrite manual edits made to charts in Admin UI (for graph steps only).",
+)
+@click.option(
     "--prefer-download",
     is_flag=True,
     help="Prefer downloading datasets from catalog instead of building them.",
@@ -183,8 +194,10 @@ def main_cli(
     watch: bool = False,
     continue_on_failure: bool = False,
     force_upload: bool = False,
+    force_graph: bool = False,
     prefer_download: bool = False,
     subset: Optional[str] = None,
+    graph: bool = False,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -231,6 +244,14 @@ def main_cli(
     # Set FORCE_UPLOAD from CLI flag
     if force_upload:
         config.FORCE_UPLOAD = force_upload
+
+    # Set FORCE_GRAPH from CLI flag (for graph steps)
+    if force_graph:
+        config.FORCE_GRAPH = force_graph
+
+    # Set GRAPH from CLI flag (for graph steps)
+    if graph:
+        config.GRAPH = graph
 
     # Set PREFER_DOWNLOAD from CLI flag
     if prefer_download:
