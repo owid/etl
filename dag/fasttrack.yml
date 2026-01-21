@@ -259,4 +259,6 @@ steps:
   data-private://grapher/fasttrack/latest/end_of_slavery: !!set
     ? snapshot-private://fasttrack/latest/end_of_slavery.csv
   data://grapher/fasttrack/latest/price_for_light: !!set
-    snapshot://fasttrack/latest/price_for_light.csv:
+    ? snapshot://fasttrack/latest/price_for_light.csv
+  data://grapher/fasttrack/latest/residential_electricity_consumption: !!set
+    snapshot://fasttrack/latest/residential_electricity_consumption.csv:

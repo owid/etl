@@ -110,11 +110,11 @@ Run:
 ```python
 from owid.catalog import search
 
-# Preview list of available datasets (each row = dataset)
-results = search(namespace="covid")
+# Search for COVID tables (namespace filter requires kind="table")
+results = search(namespace="covid", kind="table")
 results
 
-# You can load any dataset (using the row of the above-returned table)
+# You can load any table (using the row of the above-returned results)
 tb = results[0].fetch()
 ```
 
