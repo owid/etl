@@ -89,3 +89,23 @@ steps:
     - data://meadow/papers/2025-05-14/davenport_2021
   data://grapher/papers/2025-05-14/davenport_2021:
     - data://garden/papers/2025-05-14/davenport_2021
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/papers/2026-01-14/obepi_resp:
+    - snapshot://papers/2026-01-14/obepi_resp.csv
+  data://garden/papers/2026-01-14/obepi_resp:
+    - data://meadow/papers/2026-01-14/obepi_resp
+  data://grapher/papers/2026-01-14/obepi_resp:
+    - data://garden/papers/2026-01-14/obepi_resp
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/papers/2026-01-20/constances:
+    - snapshot://papers/2026-01-20/constances.csv
+  data://garden/papers/2026-01-20/constances:
+    - data://meadow/papers/2026-01-20/constances
+  data://grapher/papers/2026-01-20/constances:
+    - data://garden/papers/2026-01-20/constances

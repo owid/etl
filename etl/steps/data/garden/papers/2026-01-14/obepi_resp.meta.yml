@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Obesity
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  obepi_resp:
+    variables:
+      obesity_share:
+        title: Share of the adult population that are obese (BMI >30)
+        description_short: Share of adults (>18 years) whose BMI is greater than or equal to 30.
+        description_key:
+          - Participation is voluntary and involved individuals who have entered polling panels and have agreed to be contacted for surveys
+          - Height and weight is self-measured. Typically self-reported height is overestimated and weight is underestimated, meaning that BMI is underestimated. As such the values given in this study could be seen as a minimum.
+        unit: "%"
+        short_unit: "%"

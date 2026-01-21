@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: |
+      Evolution of the prevalence of obesity in the adult population in France, 2013–2016: the Constances study
+
+    description: |-
+      This study provides trends in obesity prevalence in adults from 2013 to 2016 in France. 63,582 men and women from independent samples upon inclusion from the Constances cohort were included.
+      Anthropometrics were measured at Health Screening Centers and obesity defined as a Body mass index (BMI) ≥ 30 kg/m2; obesity classes according to BMI are as follows: class 1 [30–34.9]; class 2 [35–39.9]; class 3 [≥ 40 kg/m2]. Linear trends across obesity classes by sex and age groups were examined in regression models and percentage point change from 2013 to 2016 for each age category calculated. All analyses accounted for sample weights for non-response, age and sex-calibrated to the French population.
+      Prevalence of obesity ranged from 14.2 to 15.2% and from 14 to 15.3% in women and men respectively from 2013 to 2016. Class 1 obesity category prevalence was the only one to increase significantly across survey years in both men and women (p for linear trend = 0.04 and 0.01 in women and men respectively). The only significant increase for obesity was observed in the age group 18–29 y in both women and men (+ 2.71% and + 3.26% point increase respectively, equivalent to an approximate rise of 50% in women and 93% in men, p = 0.03 and 0.02 respectively). After adjustment for survey non-response and for age and sex distribution, the results show that class 1 obesity prevalence has significantly increased in both women and men from 2013 to 2016, and only in young adults in a representative sample of the French population aged 18–69 years old.
+    date_published: "2021-07-08"
+    # Citation
+    producer: Czernichow et al.
+    citation_full: |-
+      Czernichow, S., Renuy, A., Rives-Lange, C. et al. Evolution of the prevalence of obesity in the adult population in France, 2013–2016: the Constances study. Sci Rep 11, 14152 (2021). https://doi.org/10.1038/s41598-021-93432-0
+
+    # Files
+    url_main: https://www.nature.com/articles/s41598-021-93432-0
+    date_accessed: "2026-01-20"
+
+    # License
+    license:
+      name: © 2026 Springer Nature Limited
+      url: https://www.nature.com/info/terms-and-conditions
+outs:
+  - md5: 0161738a8a6ea4d8974f0200a1b58da6
+    size: 222
+    path: constances.csv
