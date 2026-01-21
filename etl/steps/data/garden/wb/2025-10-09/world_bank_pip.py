@@ -905,7 +905,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
+def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     """
     Separate income and consumption data
     """
