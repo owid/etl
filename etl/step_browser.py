@@ -4,7 +4,8 @@
 #
 
 import re
-from typing import Any, Dict, List, Optional, Set, Tuple
+import threading
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from prompt_toolkit import Application
 from prompt_toolkit.buffer import Buffer
@@ -49,6 +50,9 @@ class BrowserState:
         self.result: Optional[str] = None
         self.is_exact: bool = False
         self.cancelled: bool = False
+        self.loading: bool = False  # True while DAG is loading in background
+        self.all_steps: List[str] = []  # Populated when loading completes
+        self.app: Optional[Application[None]] = None  # Reference to app for invalidation
 
 
 def filter_steps(pattern: str, all_steps: List[str]) -> List[str]:
@@ -92,8 +96,17 @@ def get_all_steps(dag: DAG, private: bool = False) -> List[str]:
     return all_steps
 
 
-def browse_steps(dag: DAG, private: bool = False) -> Tuple[Optional[str], bool]:
+def browse_steps(
+    dag: Optional[DAG] = None,
+    private: bool = False,
+    dag_loader: Optional[Callable[[], DAG]] = None,
+) -> Tuple[Optional[str], bool]:
     """Interactive step browser using prompt_toolkit.
+
+    Args:
+        dag: Pre-loaded DAG (if available)
+        private: Whether to include private steps
+        dag_loader: Callable that returns DAG (for async loading)
 
     Returns:
         Tuple of (pattern_or_step, is_exact_match):
@@ -101,19 +114,34 @@ def browse_steps(dag: DAG, private: bool = False) -> Tuple[Optional[str], bool]:
         - If user selects a step: (step_uri, True) to run just that step
         - If user cancels: (None, False)
     """
-    all_steps = get_all_steps(dag, private=private)
-
-    if not all_steps:
-        print("No steps found in DAG.")
-        return None, False
-
     # State for the application
     state = BrowserState()
+
+    # If dag is provided directly, use it immediately
+    if dag is not None:
+        state.all_steps = get_all_steps(dag, private=private)
+        state.loading = False
+    elif dag_loader is not None:
+        # Start loading in background - UI shows immediately
+        state.loading = True
+
+        def load_in_background() -> None:
+            loaded_dag = dag_loader()
+            state.all_steps = get_all_steps(loaded_dag, private=private)
+            state.loading = False
+            # Trigger UI refresh from background thread
+            if state.app is not None:
+                state.app.invalidate()
+
+        thread = threading.Thread(target=load_in_background, daemon=True)
+        thread.start()
+    else:
+        raise ValueError("Either dag or dag_loader must be provided")
 
     # Create the input buffer
     def on_text_changed(buf: Buffer) -> None:
         text = buf.text.strip()
-        state.matches = filter_steps(text, all_steps)
+        state.matches = filter_steps(text, state.all_steps)
         state.selected_index = -1  # Reset selection when text changes
 
     input_buffer = Buffer(
@@ -169,6 +197,13 @@ def browse_steps(dag: DAG, private: bool = False) -> Tuple[Optional[str], bool]:
 
         lines: List[Tuple[str, str]] = []
 
+        # Show loading state
+        if state.loading:
+            lines.append(("class:hint", "  Loading steps..."))
+            lines.append(("", "\n"))
+            lines.append(("class:separator", "  " + "-" * 50 + "\n"))
+            return lines
+
         # Match count and hint line
         if text:
             count = len(matches)
@@ -181,7 +216,7 @@ def browse_steps(dag: DAG, private: bool = False) -> Tuple[Optional[str], bool]:
                 else:
                     lines.append(("class:match-count", f"  {count} steps match ({hint}, Esc=cancel)"))
         else:
-            lines.append(("class:hint", f"  Type to filter {len(all_steps)} steps..."))
+            lines.append(("class:hint", f"  Type to filter {len(state.all_steps)} steps..."))
 
         lines.append(("", "\n"))
 
@@ -227,12 +262,20 @@ def browse_steps(dag: DAG, private: bool = False) -> Tuple[Optional[str], bool]:
         mouse_support=False,
     )
 
+    # Store app reference so background thread can trigger refresh
+    state.app = app
+
     try:
         app.run()
     except EOFError:
         state.cancelled = True
 
     if state.cancelled:
+        return None, False
+
+    # Check if no steps were loaded (empty DAG)
+    if not state.all_steps and not state.loading:
+        print("No steps found in DAG.")
         return None, False
 
     return state.result, state.is_exact

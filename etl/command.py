@@ -20,9 +20,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Set
 
 import rich_click as click
-import structlog
 from click.shell_completion import CompletionItem
-from ipdb import launch_ipdb_on_exception
 
 from etl import paths
 from etl.dag_helpers import load_dag
@@ -42,8 +40,6 @@ DAG = Dict[str, Set[str]]
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
-
-log = structlog.get_logger()
 
 
 def complete_steps(ctx: click.Context, param: click.Argument, incomplete: str) -> List[CompletionItem]:
@@ -240,11 +236,14 @@ def main_cli(
 
     # Interactive browse mode: explicit --browse flag
     # This is a fast path that doesn't need config/files imports
+    # UI shows immediately while DAG loads in background thread
     if browse:
         from etl.step_browser import browse_steps
 
-        dag = load_dag(dag_path)
-        result, is_exact = browse_steps(dag, private=private)
+        result, is_exact = browse_steps(
+            dag_loader=lambda: load_dag(dag_path),
+            private=private,
+        )
 
         if result is None:
             # User cancelled (Ctrl-C/Escape)
@@ -312,6 +311,8 @@ def main_cli(
 
     for _ in runs:
         if ipdb:
+            from ipdb import launch_ipdb_on_exception
+
             config.IPDB_ENABLED = True  # type: ignore[assignment]
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
@@ -535,6 +536,9 @@ def run_steps(
 def exec_steps(
     steps: "List[Step]", strict_after: Any, continue_on_failure: bool, strict: Optional[bool] = None
 ) -> None:
+    import structlog
+
+    log = structlog.get_logger()
     execution_times = {}
     failing_steps: "List[Step]" = []
     skipped_steps: "List[Step]" = []
@@ -659,6 +663,9 @@ def exec_graph_parallel(
     :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
     :param kwargs: Additional keyword arguments to be passed to the function.
     """
+    import structlog
+
+    log = structlog.get_logger()
     topological_sorter = TopologicalSorter(exec_graph)
     topological_sorter.prepare()
 
@@ -755,6 +762,9 @@ def _exec_step_job(
     :param step_lookup: Dictionary mapping step names to Step objects.
     :param strict: The strictness level for the step execution.
     """
+    import structlog
+
+    log = structlog.get_logger()
     print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
     step = step_lookup[step_name]
     strict = _detect_strictness_level(step, strict_after, strict)
