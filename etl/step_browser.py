@@ -38,6 +38,8 @@ BROWSER_STYLE = Style.from_dict(
         "step.selected": f"bg:{OWID_YELLOW} fg:#000000 bold",
         "step.selected.highlight": f"bg:{OWID_YELLOW} fg:#000000 bold underline",
         "hint": f"fg:{OWID_GRAY} italic",
+        "shortcut-key": f"bg:{OWID_GRAY} fg:#000000 bold",
+        "shortcut-desc": f"fg:{OWID_GRAY}",
     }
 )
 
@@ -103,6 +105,7 @@ class BrowserState:
 
     def __init__(self) -> None:
         self.selected_index: int = -1  # -1 means no selection (run all matches)
+        self.scroll_offset: int = 0  # First visible item index
         self.matches: List[str] = []
         self.result: Optional[str] = None
         self.is_exact: bool = False
@@ -309,6 +312,7 @@ def browse_steps(
         text = buf.text.strip()
         state.matches = filter_steps(text, state.all_steps)
         state.selected_index = -1  # Reset selection when text changes
+        state.scroll_offset = 0  # Reset scroll when text changes
 
     input_buffer = Buffer(
         multiline=False,
@@ -344,14 +348,21 @@ def browse_steps(
     @kb.add("tab")
     def handle_down(event: Any) -> None:
         if state.matches:
-            max_idx = min(len(state.matches), MAX_DISPLAY_STEPS) - 1
-            state.selected_index = min(state.selected_index + 1, max_idx)
+            max_idx = len(state.matches) - 1
+            if state.selected_index < max_idx:
+                state.selected_index += 1
+                # Scroll down if selection goes past visible window
+                if state.selected_index >= state.scroll_offset + MAX_DISPLAY_STEPS:
+                    state.scroll_offset = state.selected_index - MAX_DISPLAY_STEPS + 1
 
     @kb.add("up")
     @kb.add("s-tab")
     def handle_up(event: Any) -> None:
         if state.selected_index > -1:
             state.selected_index -= 1
+            # Scroll up if selection goes above visible window
+            if state.selected_index >= 0 and state.selected_index < state.scroll_offset:
+                state.scroll_offset = state.selected_index
 
     # Layout components
     def get_prompt_text() -> List[Tuple[str, str]]:
@@ -370,37 +381,57 @@ def browse_steps(
             lines.append(("class:separator", "  " + "-" * 50 + "\n"))
             return lines
 
-        # Match count and hint line
+        # Match count and hint line with styled shortcuts
+        def add_shortcuts(shortcuts: List[Tuple[str, str]]) -> None:
+            """Add nano-style shortcuts: [(key, description), ...]"""
+            for i, (key, desc) in enumerate(shortcuts):
+                lines.append(("", "  "))
+                lines.append(("class:shortcut-key", f" {key} "))
+                lines.append(("class:shortcut-desc", f" {desc}"))
+
         if text:
             count = len(matches)
             if count == 0:
                 lines.append(("class:match-count", "  No matches"))
+                add_shortcuts([("^C", "Exit")])
             else:
-                hint = "Enter=run all" if state.selected_index < 0 else "Enter=run selected"
-                if count == 1:
-                    lines.append(("class:match-count", f"  1 step matches ({hint}, Esc=cancel)"))
-                else:
-                    lines.append(("class:match-count", f"  {count} steps match ({hint}, Esc=cancel)"))
+                count_text = "1 step" if count == 1 else f"{count} steps"
+                lines.append(("class:match-count", f"  {count_text}"))
+                run_desc = "Run all" if state.selected_index < 0 else "Run selected"
+                shortcuts = [("↑↓", "Select"), ("Enter", run_desc), ("^C", "Exit")]
+                add_shortcuts(shortcuts)
         else:
-            lines.append(("class:hint", f"  Type to filter {len(state.all_steps)} steps..."))
+            lines.append(("class:hint", f"  Type to filter {len(state.all_steps)} steps"))
+            add_shortcuts([("^C", "Exit")])
 
         lines.append(("", "\n"))
 
         # Separator
         lines.append(("class:separator", "  " + "-" * 50 + "\n"))
 
-        # Display matches with highlighting
-        display_matches = matches[:MAX_DISPLAY_STEPS]
+        # Display matches with highlighting and scrolling
+        start = state.scroll_offset
+        end = min(start + MAX_DISPLAY_STEPS, len(matches))
+        display_matches = matches[start:end]
+
+        # Show "more above" indicator
+        if start > 0:
+            lines.append(("class:hint", f"    ... {start} more above"))
+            lines.append(("", "\n"))
+
         for i, step in enumerate(display_matches):
-            is_selected = i == state.selected_index
+            absolute_idx = start + i
+            is_selected = absolute_idx == state.selected_index
             prefix_style = "class:step.selected" if is_selected else "class:step"
             prefix = "  > " if is_selected else "    "
             lines.append((prefix_style, prefix))
             lines.extend(highlight_matches(step, text, is_selected))
             lines.append(("", "\n"))
 
-        if len(matches) > MAX_DISPLAY_STEPS:
-            lines.append(("class:hint", f"    ... and {len(matches) - MAX_DISPLAY_STEPS} more"))
+        # Show "more below" indicator
+        remaining = len(matches) - end
+        if remaining > 0:
+            lines.append(("class:hint", f"    ... {remaining} more below"))
             lines.append(("", "\n"))
 
         return lines
