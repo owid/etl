@@ -1,6 +1,7 @@
 """Script to create a snapshot of dataset."""
 
 import re
+from io import StringIO
 from typing import List
 
 import pandas as pd
@@ -19,55 +20,43 @@ def run(upload: bool = True) -> None:
     Args:
         upload: Whether to upload the snapshot to S3.
     """
+    all_data = []
     countries = get_country_names()
-    for country in countries:
-        print(country)
-        snapshot, trends = fetch_wpb_country(country)
+    for country_info in countries:
+        print(country_info["name"])
+        country_df = fetch_wpb_country(country_info["slug"], country_info["name"])
+        all_data.append(country_df)
+
+    combined_data = pd.concat(all_data, ignore_index=True)
+
     # Init Snapshot object
     snap = paths.init_snapshot()
 
     # Save snapshot.
-    snap.create_snapshot(upload=upload)
+    snap.create_snapshot(upload=upload, data=combined_data)
 
 
-# def get_country_names() -> List[str]:
-#    url = "https://www.prisonstudies.org/highest-to-lowest/prison-population-total?field_region_taxonomy_tid=All"
-
-# Read the first table on the page
-#    df = pd.read_html(url)[0]
-
-# The country/territory names are in the "Title" column
-#    countries = df["Title"].dropna().tolist()
-#    countries = [c.replace(" ", "-") for c in countries]
-#   countries = [c.replace("(", "") for c in countries]
-#   countries = [c.replace(")", "") for c in countries]
-#   countries = [c.replace("-of", "") for c in countries]
-#  countries = [c.replace("/", "") for c in countries]
-# countries = [c.replace(":", "") for c in countries]
-#    countries = [c.replace("-&", "") for c in countries]
-#   countries = [c.replace(",", "") for c in countries]
-#   countries = [c.replace(".", "") for c in countries]
-#   countries = [c.replace("-the", "") for c in countries]
-#   countries = [c.replace("'", "") for c in countries]
-
-# return countries
-
-
-def get_country_names() -> List[str]:
+def get_country_names() -> List[dict]:
+    """Get list of countries with both name and slug."""
     url = "https://www.prisonstudies.org/highest-to-lowest/prison-population-total?field_region_taxonomy_tid=All"
 
     df = pd.read_html(url)[0]
 
-    countries = (
-        df["Title"]
-        .dropna()
-        .str.lower()
-        .str.replace(r"[()/:,&.'’]", "", regex=True)
-        .str.replace(r"\b(of|the)\b", "", regex=True)
-        .str.replace(r"\s+", "-", regex=True)
-        .str.strip("-")
-        .tolist()
-    )
+    countries = []
+    for name in df["Title"].dropna():
+        slug = (
+            name.lower()
+            .replace(r"[()/:,&.'']", "")
+            .replace("(", "").replace(")", "").replace("/", "").replace(":", "")
+            .replace(",", "").replace("&", "").replace(".", "").replace("'", "")
+        )
+        # Remove "of" and "the"
+        slug = " ".join(word for word in slug.split() if word not in ["of", "the"])
+        # Replace spaces with hyphens
+        slug = "-".join(slug.split())
+        slug = slug.strip("-")
+
+        countries.append({"name": name, "slug": slug})
 
     return countries
 
@@ -89,6 +78,9 @@ def _extract_value_and_date(block_text: str):
         return None, None
 
     t = _clean_space(block_text)
+
+    # Remove leading "c." / "circa"
+    t = re.sub(r"^(c\.|circa)\s*", "", t, flags=re.IGNORECASE)
 
     # 1) Extract a leading numeric-ish value (first number on the string)
     m_val = re.search(r"^(?P<value>\d[\d\s,\.]*)\b", t)
@@ -176,11 +168,62 @@ def _to_number(s: str):
 # --- main ------------------------------------------------------------------
 
 
-def fetch_wpb_country(country_slug: str):
+def _get_overview_container(soup: BeautifulSoup):
     """
+    Return the BeautifulSoup node containing the Overview tab content.
+    Falls back to the full soup if not found.
+    """
+    # Common patterns on WPB pages (Bootstrap-ish tabs)
+    return (
+        soup.select_one(".tab-pane.active")  # currently active tab pane
+        or soup.select_one("#overview")  # if an explicit id exists
+        or soup.select_one("[id*='overview']")  # fallback
+        or soup
+    )
+
+
+def _clean_trend_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Clean and normalize a prison population trend table."""
+    df = df.copy()
+    df.columns = [str(c).strip() for c in df.columns]
+
+    # Clean year and sort
+    df["Year"] = pd.to_numeric(df["Year"], errors="coerce")
+    df = df.dropna(subset=["Year"]).sort_values("Year")
+
+    # Clean numeric-ish strings (handles commas, spaces, and "c.")
+    for col in ["Prison population total", "Prison population rate"]:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.replace(r"^\s*(c\.|circa)\s*", "", regex=True)  # remove leading "c." / "circa"
+                .str.replace(",", "", regex=False)
+                .str.replace(" ", "", regex=False)
+                .str.strip()
+            )
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    # Rename to match snapshot naming convention
+    df = df.rename(columns={
+        "Year": "year",
+        "Prison population total": "prison_population_total",
+        "Prison population rate": "prison_population_rate"
+    })
+
+    return df.drop_duplicates().reset_index(drop=True)
+
+
+def fetch_wpb_country(country_slug: str, country_name: str):
+    """
+    Fetch prison data for a country from World Prison Brief.
+
+    Args:
+        country_slug: URL slug for the country
+        country_name: Actual country name to use in the data
+
     Returns:
-      snapshot_df: one-row dataframe with value + date columns
-      trend_dfs: dict of extracted trend tables (prison population trend, and possibly "up to 2000")
+      combined_df: dataframe with both snapshot and trend data, with aligned column names
     """
     url = BASE + country_slug
     r = requests.get(url, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
@@ -189,8 +232,7 @@ def fetch_wpb_country(country_slug: str):
     soup = BeautifulSoup(r.text, "html.parser")
     page_text = soup.get_text("\n")
 
-    # We’ll key off the exact labels used on the page.
-    # (If WPB tweaks wording slightly, you can add variants here.)
+    # Extract current snapshot statistics
     labels = {
         "prison_population_total": "Prison population total (including pre-trial detainees / remand prisoners)",
         "prison_population_rate": "Prison population rate (per 100,000 of national population)",
@@ -203,22 +245,16 @@ def fetch_wpb_country(country_slug: str):
 
     snapshot = {}
 
-    # Strategy:
-    # Find each label in the raw page text and capture the next ~250 chars.
-    # This is surprisingly robust for WPB pages because the label and its value/date are close.
     for key, label in labels.items():
         idx = page_text.find(label)
         if idx == -1:
             snapshot[key] = {"value_raw": None, "value": None, "date": None}
             continue
 
-        window = page_text[idx : idx + 400]  # enough to include value + date
-        # remove the label itself, keep what's after it
+        window = page_text[idx : idx + 400]
         after = window.split(label, 1)[-1].strip()
-
-        # value tends to be on the next non-empty lines; take first few lines
         lines = [ln.strip() for ln in after.splitlines() if ln.strip()]
-        candidate = " ".join(lines[:3])  # value + date usually fit here
+        candidate = " ".join(lines[:3])
 
         value_raw, date = _extract_value_and_date(candidate)
         snapshot[key] = {
@@ -227,72 +263,71 @@ def fetch_wpb_country(country_slug: str):
             "date": date,
         }
 
+    # Convert snapshot date strings to years for matching
+    def _extract_year(date_str):
+        """Extract year from various date formats."""
+        if date_str is None:
+            return None
+        # Match 4-digit year
+        match = re.search(r'(19|20)\d{2}', str(date_str))
+        return int(match.group(0)) if match else None
+
     snapshot_df = pd.DataFrame(
         [
             {
-                "country_slug": country_slug,
+                "country": country_name,
+                "year": _extract_year(snapshot["prison_population_total"]["date"]),
                 "prison_population_total": snapshot["prison_population_total"]["value"],
-                "prison_population_total_date": snapshot["prison_population_total"]["date"],
                 "prison_population_rate": snapshot["prison_population_rate"]["value"],
-                "prison_population_rate_date": snapshot["prison_population_rate"]["date"],  # may be None on some pages
                 "pretrial_detainees_pct": snapshot["pretrial_percent"]["value"],
-                "pretrial_detainees_pct_date": snapshot["pretrial_percent"]["date"],
                 "female_prisoners_pct": snapshot["female_percent"]["value"],
-                "female_prisoners_pct_date": snapshot["female_percent"]["date"],
                 "number_of_institutions": snapshot["institutions_count"]["value"],
-                "number_of_institutions_date": snapshot["institutions_count"]["date"],
                 "official_capacity": snapshot["official_capacity"]["value"],
-                "official_capacity_date": snapshot["official_capacity"]["date"],
                 "occupancy_level_pct": snapshot["occupancy_level"]["value"],
-                "occupancy_level_pct_date": snapshot["occupancy_level"]["date"],
             }
         ]
     )
 
-    # --- trend tables -------------------------------------------------------
-    # Use read_html to pull all tables; then pick the ones we want by column names.
-    tables = pd.read_html(r.text)
-    trend_dfs = {}
-
-    def normalise_cols(df):
-        df2 = df.copy()
-        df2.columns = [str(c).strip() for c in df2.columns]
-        return df2
+    # Extract trend tables from Overview section
+    trend_dfs = []
+    overview = _get_overview_container(soup)
+    tables = pd.read_html(StringIO(str(overview)))
 
     for i, df in enumerate(tables):
-        df = normalise_cols(df)
+        # Normalize column names for checking
+        df_check = df.copy()
+        df_check.columns = [str(c).strip() for c in df_check.columns]
+        cols = set(df_check.columns)
 
-        # Prison population trend table: usually columns like
-        # Year | Prison population total | Prison population rate
-        cols = set(df.columns)
+        # Check if this is a prison population trend table by column names
         if {"Year", "Prison population total", "Prison population rate"}.issubset(cols):
-            # Some pages duplicate the same table; de-duplicate by content
-            df2 = df.copy()
-            df2["Year"] = pd.to_numeric(df2["Year"], errors="coerce")
-            df2 = df2.dropna(subset=["Year"]).sort_values("Year")
-            df2 = df2.drop_duplicates()
-            # Convert numeric-ish strings
-            for c in ["Prison population total", "Prison population rate"]:
-                df2[c] = (
-                    df2[c]
-                    .astype(str)
-                    .str.replace(",", "", regex=False)
-                    .str.replace("c", "", regex=False)
-                    .str.replace(" ", "", regex=False)
-                )
-                df2[c] = pd.to_numeric(df2[c], errors="coerce")
-            # If we already captured one, store additional ones under different keys
-            key = (
-                "prison_population_trend"
-                if "prison_population_trend" not in trend_dfs
-                else f"prison_population_trend_{i}"
-            )
-            trend_dfs[key] = df2.reset_index(drop=True)
+            df_clean = _clean_trend_table(df)
+            df_clean["country"] = country_name
+            trend_dfs.append(df_clean)
 
-    return snapshot_df, trend_dfs
+        # Alternative: check if first cell contains "Prison population trend"
+        # (handles tables where the header is in the first row)
+        elif df.shape[1] >= 3 and df.shape[0] > 1:
+            first_cell = str(df.iloc[0, 0]).lower() if not df.empty else ""
+            if "prison population trend" in first_cell:
+                # Skip header row and use numeric columns
+                df_trend = df.iloc[1:].copy()
+                df_trend.columns = ["Year", "Prison population total", "Prison population rate"]
+                df_clean = _clean_trend_table(df_trend)
+                df_clean["country"] = country_name
+                trend_dfs.append(df_clean)
 
+    # Concatenate all trend dataframes
+    trend_df = pd.concat(trend_dfs, ignore_index=True) if trend_dfs else pd.DataFrame()
 
-# Example:
-# snapshot, trends = fetch_wpb_country("algeria")
-# print(snapshot)
-# print(trends["prison_population_trend"].tail())
+    # Combine snapshot and trend data
+    if not trend_df.empty:
+        combined_df = pd.concat([trend_df, snapshot_df], ignore_index=True)
+    else:
+        combined_df = snapshot_df
+
+    # Sort by country and year
+    if "year" in combined_df.columns:
+        combined_df = combined_df.sort_values(["country", "year"]).reset_index(drop=True)
+
+    return combined_df
