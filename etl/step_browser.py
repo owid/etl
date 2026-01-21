@@ -132,19 +132,17 @@ def filter_steps(pattern: str, all_steps: List[str]) -> List[str]:
     # Multiple terms: AND matching (all terms must be present)
     if len(terms) > 1:
         terms_lower = [t.lower() for t in terms]
-        matches = [
-            s for s in all_steps
-            if all(term in s.lower() for term in terms_lower)
-        ]
+        matches = [s for s in all_steps if all(term in s.lower() for term in terms_lower)]
+
         # Sort by: number of terms matched at word boundaries, then length
         def score(s: str) -> Tuple[int, int, str]:
             s_lower = s.lower()
             # Count terms that match at segment boundaries (after / or -)
             boundary_matches = sum(
-                1 for term in terms_lower
-                if f"/{term}" in s_lower or f"-{term}" in s_lower or s_lower.startswith(term)
+                1 for term in terms_lower if f"/{term}" in s_lower or f"-{term}" in s_lower or s_lower.startswith(term)
             )
             return (-boundary_matches, len(s), s)
+
         matches.sort(key=score)
         return matches
 
