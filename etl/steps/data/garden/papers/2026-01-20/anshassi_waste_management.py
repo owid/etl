@@ -17,8 +17,14 @@ def run() -> None:
     #
     # Process data.
     #
+
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb)
+
+    # Fix UAE data error (collected and uncollected values were swapped by factor of 100) - classfied as level 2 country so can't possibly have such low values of collected waste and likely a decimal place error
+    uae_mask = tb["country"] == "United Arab Emirates"
+    tb.loc[uae_mask, "collected"] = tb.loc[uae_mask, "collected"] * 100
+    tb.loc[uae_mask, "uncollected"] = tb.loc[uae_mask, "uncollected"] / 100
 
     # Check and fix floating-point rounding errors in percentages
     # Collected + uncollected should equal 100%
