@@ -433,10 +433,7 @@ def _notify_slack_archived_datasets(archived_datasets: list[dict], source: str, 
 
     # Build list of archived datasets for the message
     dataset_list = "\n".join(
-        [
-            f"• Dataset {ds['id']}: `{ds['name']}` ({ds['catalogPath'] or 'no catalog path'})"
-            for ds in archived_datasets
-        ]
+        [f"• Dataset {ds['id']}: `{ds['name']}` ({ds['catalogPath'] or 'no catalog path'})" for ds in archived_datasets]
     )
 
     message = f"""
