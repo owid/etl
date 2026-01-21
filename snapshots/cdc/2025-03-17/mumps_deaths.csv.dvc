@@ -34,12 +34,12 @@ meta:
 
     # Files
     url_main: https://wonder.cdc.gov/ucd-icd10.html
-    date_accessed: 2025-03-14
+    date_accessed: '2025-03-14'
 
     # License
     license:
       name: Public domain
 outs:
-  - md5: 5ed8a6687a5f87782de24a0bd3b95f1c
+  - md5: 1c7dc8c11c02eb8bb73c9a99b7a28fde
     size: 3669
     path: mumps_deaths.csv
