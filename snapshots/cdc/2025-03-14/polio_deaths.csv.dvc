@@ -13,11 +13,13 @@ meta:
 
       * 1960-1967: [Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)](https://www.jstor.org/stable/44323897?read-now=1&seq=5#page_scan_tab_contents)
 
-      * 1968-1978: [Compressed Mortality, 1968-1978 - CDC Wonder (ICD-8)](https://wonder.cdc.gov/cmf-icd8.html)
+      * 1968-1978: [Compressed Mortality, 1968-1978 - CDC WONDER (ICD-8)](https://wonder.cdc.gov/cmf-icd8.html)
 
-      * 1979-1998: [Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)](https://wonder.cdc.gov/cmf-icd9.html)
+      * 1979-1998: [Compressed Mortality, 1979-1998 - CDC WONDER (ICD-9)](https://wonder.cdc.gov/cmf-icd9.html)
 
-      * 1999-2020: [Compressed Mortality, 1999-2020 - CDC Wonder (ICD-10)](https://wonder.cdc.gov/cmf-icd10.html)
+      * 1999-2020: [Underlying Cause of Death, 1999-2020 - CDC WONDER (ICD-10)](https://wonder.cdc.gov/ucd-icd10.html)
+
+      * 2018-2023: [Underlying Cause of Death by Single-Race Categories - CDC WONDER (ICD-10)](https://wonder.cdc.gov/deaths-by-underlying-cause.html)
 
     date_published: "2023"
 
@@ -28,11 +30,13 @@ meta:
 
       Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)
 
-      Compressed Mortality, 1968-1978 - CDC Wonder (ICD-8)
+      Compressed Mortality, 1968-1978 - CDC WONDER (ICD-8)
 
-      Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)
+      Compressed Mortality, 1979-1998 - CDC WONDER (ICD-9)
 
-      Compressed Mortality, 1999-2020 - CDC Wonder (ICD-10)
+      Underlying Cause of Death, 1999-2020 - CDC WONDER (ICD-10)
+
+      Underlying Cause of Death by Single-Race Categories - CDC WONDER (ICD-10)
 
     # Files
     url_main: https://wonder.cdc.gov/ucd-icd10.html
