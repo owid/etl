@@ -251,7 +251,7 @@ definitions:
     Low delivery rates can indicate limited capacity or unreliable service, even where collection services exist.
 
   text_no_collection_derived: &text_no_collection_derived
-    It is derived from modelled collection coverage and population estimates used in the SPOT inventory.
+    It is derived from the modelled collection coverage and population estimates produced by the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6), which first fills gaps in municipal waste data using statistical predictions, then simulates how plastic flows through waste systems and quantifies uncertainty in those estimates. The model generates results for around 50,700 municipalities, which are then aggregated to country and regional totals.
 
   desc_key_plastic_emissions_shares_burn: &desc_key_plastic_emissions_shares_burn
     - This indicator shows the estimated share of global plastic waste emitted via open burning from municipal sources such as households, shops, and offices, attributed to each country or region.
