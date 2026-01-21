@@ -43,8 +43,6 @@ def run() -> None:
     # Select only the columns we need
     columns_to_keep = [
         "country",
-        "income_level",
-        "region",
         "final_classification",
         "collected",
         "uncollected",

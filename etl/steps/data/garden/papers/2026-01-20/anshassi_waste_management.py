@@ -20,12 +20,22 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb)
 
+    # Check and fix floating-point rounding errors in percentages
+    # Collected + uncollected should equal 100%
+    total_collection = tb["collected"] + tb["uncollected"]
+    if (total_collection > 100.001).any():
+        raise ValueError("collected + uncollected significantly exceeds 100% for some countries")
+
     # Calculate total shares for each waste management category
-    # These combine both collected and uncollected fractions
+    # Each subcategory is expressed as: (collected%/100 * collected_method%/100) + (uncollected%/100 * uncollected_method%/100)
+    # This gives us the share of TOTAL waste (collected + uncollected) that goes to each method
 
     # Convert percentages to fractions for calculation
     collected_fraction = tb["collected"] / 100
     uncollected_fraction = tb["uncollected"] / 100
+
+    # For collected methods: multiply collected fraction by the method's share of collected waste (also as fraction)
+    # For uncollected methods: multiply uncollected fraction by the method's share of uncollected waste (also as fraction)
 
     # Open dump landfill
     tb["open_dump_landfill"] = (
@@ -50,13 +60,16 @@ def run() -> None:
         + uncollected_fraction * tb["uncollected_open_air_burning"]
     )
 
-    # MSWI Incineration (only in collected fraction)
+    # These categories only exist in the collected waste stream so to calculate the total share,
+    # we only multiply the collected fraction by the method's share of collected waste.
+
+    # MSWI Incineration (only in collected waste)
     tb["mswi_incineration"] = collected_fraction * tb["collected_mswi_incineration"]
 
-    # Composting (only in collected fraction)
+    # Composting (only in collected waste)
     tb["composting"] = collected_fraction * tb["collected_composting"]
 
-    # Recycling (only in collected fraction)
+    # Recycling (only in collected waste)
     tb["recycling"] = collected_fraction * tb["collected_recycling"]
 
     # Select final columns for output
