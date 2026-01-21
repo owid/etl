@@ -377,7 +377,7 @@ NET_TEMPLATE = (
 )
 
 NET_GROUPED_TEMPLATE = (
-    "Shown for each level of education as the [net enrolment ratio](#dod:net-enrolment-ratio) — "
+    "Shown for each level of education as the [net enrollment ratio](#dod:net-enrolment-ratio) — "
     "the share of {subject} within the official school-age group who are enrolled in the relevant level of education."
 )
 
@@ -394,7 +394,7 @@ GROSS_GROUPED_TEMPLATE = (
 )
 
 ENROLMENT_TYPE_TEMPLATE = (
-    "Comparing [net](#dod:net-enrolment-ratio) and [gross enrollment ratios](#dod:gross-enrolment-ratio) "
+    "Comparing [net](#dod:net-enrollment-ratio) and [gross enrollment ratios](#dod:gross-enrolment-ratio) "
     "for {subject} in {level_dod} education. Net enrollment shows the share of {subject} of {level_plain} "
     "who are enrolled, while gross enrollment includes all {subject} regardless of age, expressed as a "
     "percentage of {population} of the same age group."
@@ -657,9 +657,9 @@ def edit_indicator_displays(view):
     if view.matches(enrolment_type="enrolment_type_side_by_side"):
         # Display name and color mappings for enrolment types
         ENROLMENT_TYPE_CONFIG = {
-            "net": {"name": "Net enrolment", "color": COLOR_NET_ENROLMENT, "patterns": ["net_enrolment"]},
+            "net": {"name": "Net enrollment", "color": COLOR_NET_ENROLMENT, "patterns": ["net_enrolment"]},
             "gross": {
-                "name": "Gross enrolment",
+                "name": "Gross enrollment",
                 "color": COLOR_GROSS_ENROLMENT,
                 "patterns": ["gross_enrolment", "pre_enrr"],
             },
