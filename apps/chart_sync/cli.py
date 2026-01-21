@@ -65,7 +65,7 @@ log = structlog.get_logger()
 )
 @click.option(
     "--archive/--no-archive",
-    default=False,
+    default=True,
     type=bool,
     help="Archive datasets in target that have no charts using their indicators.",
 )
