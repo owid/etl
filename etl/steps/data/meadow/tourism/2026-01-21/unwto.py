@@ -54,6 +54,8 @@ def run() -> None:
             "Tourism Industries",
         ),
         ("06_Employment/UN_Tourism_8_9_2_employed_persons_04_2025.xlsx", "Employment"),
+        ("07_SDGs/UN_Tourism_12_b_1_TSA_SEEA_04_2025.xlsx", "Tourism Industries-Environment"),
+        ("05_Macroeconomic/UN_Tourism_8_9_1_TDGDP_04_2025.xlsx", "Tourism Industries-GDP"),
     ]
 
     # Read the ZIP file using snapshot's extracted() context manager
@@ -64,7 +66,7 @@ def run() -> None:
                 # Read the Excel file from the extracted archive
                 full_path = archive.path / file_path
 
-                # Employment file uses a different format
+                # SDG files use a different format (Employment, Environment, GDP)
                 if "Employment" in file_path:
                     tb = pr.read_excel(full_path, sheet_name="SDG 8.9.2")
                     # Rename columns for Employment file
@@ -77,6 +79,30 @@ def run() -> None:
                         }
                     )
                     # Select only the columns we need
+                    tb = tb[["country", "year", "indicator", "value"]].copy()
+                elif "12_b_1_TSA_SEEA" in file_path:
+                    # Environment monitoring file
+                    tb = pr.read_excel(full_path, sheet_name="SDG 12.b.1")
+                    tb = tb.rename(
+                        columns={
+                            "GeoAreaName": "country",
+                            "SeriesDescription": "indicator",
+                            "TimePeriod": "year",
+                            "Value": "value",
+                        }
+                    )
+                    tb = tb[["country", "year", "indicator", "value"]].copy()
+                elif "8_9_1_TDGDP" in file_path:
+                    # GDP file
+                    tb = pr.read_excel(full_path, sheet_name="SDG 8.9.1")
+                    tb = tb.rename(
+                        columns={
+                            "GeoAreaName": "country",
+                            "SeriesDescription": "indicator",
+                            "TimePeriod": "year",
+                            "Value": "value",
+                        }
+                    )
                     tb = tb[["country", "year", "indicator", "value"]].copy()
                 elif "by_region" in file_path:
                     # Regions file has partner_area_label that needs to be part of indicator

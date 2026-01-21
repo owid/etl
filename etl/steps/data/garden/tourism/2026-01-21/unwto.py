@@ -130,6 +130,27 @@ def run() -> None:
 
         tb = pr.concat([tb, tb_regions_sum], axis=0)
 
+    #
+    # Rename environment and GDP variables to shorter names
+    # These have already been processed by shorten_column_names function
+    #
+    rename_dict = {}
+
+    # Environment variables (after shortening)
+    if "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables" in tb.columns:
+        rename_dict["tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables"] = "seea_tables"
+    if "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables" in tb.columns:
+        rename_dict["tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables"] = "tsa_tables"
+    if "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables" in tb.columns:
+        rename_dict["tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"] = "total_tables"
+
+    # GDP variable (after shortening)
+    if "tour_ind_gdp_direct_as_a_proportion_of_total_pct" in tb.columns:
+        rename_dict["tour_ind_gdp_direct_as_a_proportion_of_total_pct"] = "tourism_share_gdp"
+
+    if rename_dict:
+        tb = tb.rename(columns=rename_dict)
+
     # Adjust inbound and outbound expenditure for inflation and cost of living
     tb = tb.format(["country", "year"])
 
