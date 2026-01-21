@@ -79,8 +79,30 @@ def compile_steps(
     List[Step]
         Steps in dependency order, ready for execution.
     """
+    # Convert indicator URIs to dataset URIs for topological sorting
+    # Graph steps specify dependencies as indicator URIs (e.g., data://grapher/.../table#indicator)
+    # but for execution order we need the runnable dataset URI (e.g., data://grapher/.../dataset)
+    normalized_subdag = {}
+    for step_name, deps in subdag.items():
+        normalized_deps = set()
+        for dep in deps:
+            # Convert indicator URI to dataset URI:
+            # data://grapher/ns/ver/ds/table#indicator -> data://grapher/ns/ver/ds
+            if "#" in dep:
+                # Strip #indicator suffix
+                dep = dep.split("#")[0]
+            # Strip table name (last path component) for grapher steps
+            if dep.startswith("data://grapher/") and dep.count("/") >= 5:
+                # Parts: ['data:', '', 'grapher', 'namespace', 'version', 'dataset', 'table']
+                parts = dep.split("/")
+                if len(parts) > 6:  # Has table component
+                    # Reconstruct without table: data://grapher/ns/ver/ds
+                    dep = "/".join(parts[:6])
+            normalized_deps.add(dep)
+        normalized_subdag[step_name] = normalized_deps
+
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(subdag)
+    steps = to_dependency_order(normalized_subdag)
 
     # parse the steps into Python objects
     # NOTE: We need the full DAG here to get complete dependencies of each step
@@ -173,6 +195,12 @@ def traverse(graph: DAG, nodes: Set[str]) -> DAG:
         node = to_visit.pop()
         if node in reachable:
             continue  # already visited
+
+        # Only add node if it's actually in the graph
+        # This prevents indicator URIs (e.g., data://...#indicator) from being added as steps
+        if node not in graph:
+            continue
+
         reachable[node] = set(graph.get(node, set()))
         to_visit = to_visit.union(reachable[node])
 
@@ -212,39 +240,52 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
-    # dependencies are new objects
-    dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
-    step: Step
-    if step_type == "data":
-        step = DataStep(path, dependencies)
-
-    elif step_type == "snapshot":
-        step = SnapshotStep(path)
-
-    elif step_type == "github":
-        step = GithubStep(path)
-
-    elif step_type == "etag":
-        step = ETagStep(path)
-
-    elif step_type == "grapher":
-        step = GrapherStep(path, dependencies)
-
-    elif step_type == "graph":
-        step = GraphStep(path, dependencies)
-
-    elif step_type == "export":
-        step = ExportStep(path, dependencies)
-
-    elif step_type == "data-private":
-        step = DataStepPrivate(path, dependencies)
-
-    elif step_type == "snapshot-private":
-        step = SnapshotStepPrivate(path)
-
+    # For graph steps, parse the dataset portion of dependencies (strip table name and #indicator)
+    if step_type == "graph":
+        # Dependencies like "data://grapher/ns/ver/ds/table#indicator"
+        # -> parse "data://grapher/ns/ver/ds" as a Step (strip table name and indicator)
+        dataset_deps = []
+        for dep_uri in dag.get(step_name, []):
+            # Strip #indicator suffix
+            without_indicator = dep_uri.split("#")[0]
+            # Strip table name (last path component after the version)
+            # e.g., "data://grapher/ns/ver/ds/table" -> "data://grapher/ns/ver/ds"
+            parts = without_indicator.rsplit("/", 1)
+            dataset_uri = parts[0] if len(parts) > 1 else without_indicator
+            dataset_deps.append(parse_step(dataset_uri, dag))
+        step = GraphStep(path, dataset_deps)
     else:
-        raise Exception(f"no recipe for executing step: {step_name}")
+        # dependencies are new objects
+        dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
+
+        step: Step
+        if step_type == "data":
+            step = DataStep(path, dependencies)
+
+        elif step_type == "snapshot":
+            step = SnapshotStep(path)
+
+        elif step_type == "github":
+            step = GithubStep(path)
+
+        elif step_type == "etag":
+            step = ETagStep(path)
+
+        elif step_type == "grapher":
+            step = GrapherStep(path, dependencies)
+
+        elif step_type == "export":
+            step = ExportStep(path, dependencies)
+
+        elif step_type == "data-private":
+            step = DataStepPrivate(path, dependencies)
+
+        elif step_type == "snapshot-private":
+            step = SnapshotStepPrivate(path)
+
+        else:
+            raise Exception(f"no recipe for executing step: {step_name}")
 
     return step
 
@@ -1201,54 +1242,65 @@ class GraphStep(Step):
                 f"Graph steps must have at least one indicator dependency."
             )
 
-        upsert_graph(slug=self.slug, metadata_file=self.metadata_file, dependencies=dep_uris, force=False)
+        source_checksum = self.checksum_input()
+        upsert_graph(
+            slug=self.slug,
+            metadata_file=self.metadata_file,
+            dependencies=dep_uris,
+            source_checksum=source_checksum,
+            force=False,
+        )
 
     def is_dirty(self) -> bool:
         """
         Check if graph needs update based on:
-        - Chart doesn't exist in database
-        - .meta.yml file modified (if it exists)
-        - Dependency indicator checksums changed
+        - Local index.json doesn't exist
+        - Expected checksum differs from stored checksum
         """
-        from sqlalchemy.orm import Session
-        from sqlalchemy.orm.exc import NoResultFound
+        from etl.grapher.graph import _load_graph_metadata
 
-        from etl.db import get_engine
-        from etl.grapher.model import Chart
+        # 1. Check if local index.json exists
+        metadata = _load_graph_metadata(self.slug)
+        if not metadata:
+            return True  # No metadata file, needs to be created
 
-        engine = get_engine()
+        # 2. Check if any dependency changed
+        if any(d.is_dirty() for d in self.dependencies):
+            return True
 
-        with Session(engine) as session:
-            # 1. Check if chart exists
-            try:
-                chart = Chart.load_chart(session, slug=self.slug)
-            except NoResultFound:
-                return True  # Chart doesn't exist, needs to be created
+        # 3. Compare stored checksum with expected checksum
+        stored_checksum = metadata.get("source_checksum")
+        expected_checksum = self.checksum_input()
 
-            # 2. Check if .meta.yml was modified
-            if self.metadata_file and self.metadata_file.exists():
-                from etl.files import checksum_file
+        if stored_checksum != expected_checksum:
+            return True
 
-                file_checksum = checksum_file(str(self.metadata_file))
-                # For now, always consider it dirty if metadata file exists
-                # TODO: Store checksum in chart config and compare
-                # For prototype, we'll rely on manual runs
-
-            # 3. Check if any dependency changed
-            # This is the key: if indicator metadata changes, chart should update
-            for dep in self.dependencies:
-                if dep.is_dirty():
-                    return True
-
-        # For prototype, default to not dirty to avoid unnecessary updates
-        # In production, we'd want more sophisticated checking
         return False
 
+    def checksum_input(self) -> str:
+        """
+        Return checksum of all inputs to this graph step.
+        Similar to DataStep.checksum_input() but for graph metadata.
+        """
+        import hashlib
+
+        checksums = {}
+
+        # Include dependency checksums
+        for d in self.dependencies:
+            checksums[d.path] = d.checksum_output()
+
+        # Include metadata file checksum if it exists
+        if self.metadata_file and self.metadata_file.exists():
+            checksums["metadata_file"] = files.checksum_file(str(self.metadata_file))
+
+        # Sort and hash
+        in_order = [v for _, v in sorted(checksums.items())]
+        return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
+
     def checksum_output(self) -> str:
-        """Return checksum of chart config in database."""
-        # For prototype, return a simple checksum
-        # In production, this would hash the chart config from database
-        return f"graph://{self.slug}"
+        """Return checksum representing the graph step's state."""
+        return self.checksum_input()
 
 
 class PrivateMixin:

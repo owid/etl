@@ -816,8 +816,26 @@ def _check_dag_completeness(dag: DAG) -> None:
         for dep in deps:
             if re.match(r"^(snapshot|snapshot-private|github|etag)://", dep):
                 pass
-            elif dep not in dag:
-                raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
+            else:
+                # For dependencies with #indicator and/or table fragments, check the base dataset
+                # Strip both #indicator and table name to get dataset-level dependency
+                dep_base = dep.split("#")[0] if "#" in dep else dep
+
+                # For grapher URIs with table names (e.g., data://grapher/ns/ver/ds/table),
+                # check if dataset-level dependency exists (data://grapher/ns/ver/ds)
+                if dep_base.startswith("data://grapher/"):
+                    # Remove data:// prefix for counting
+                    path_without_prefix = dep_base[7:]  # Remove "data://"
+                    parts = path_without_prefix.split("/")
+                    # parts: ['grapher', 'namespace', 'version', 'dataset', 'table']
+                    if len(parts) > 4:  # Has table component
+                        # Reconstruct dataset URI: data://grapher/ns/ver/ds
+                        dep_dataset = "data://" + "/".join(parts[:4])
+                        if dep_dataset in dag:
+                            continue
+
+                if dep_base not in dag:
+                    raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":

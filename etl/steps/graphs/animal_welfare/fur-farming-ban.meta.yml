@@ -1,10 +1,29 @@
-# Graph metadata for fur-farming-ban chart
-# This chart uses a single indicator and inherits its title, subtitle, etc.
-
-# Indicators to include in the chart
-indicators:
-  - grapher/animal_welfare/2024-12-17/fur_laws/fur_laws#fur_farming_status
-
-# Optional: Override inherited metadata (commented out for auto-inheritance)
-# title: "Which countries have banned fur farming?"
-# subtitle: "Countries that have banned fur farming at a national level."
+selectedEntityNames:
+  - Croatia
+  - North Macedonia
+  - New Zealand
+  - Hungary
+chartTypes: []
+hasMapTab: true
+tab: map
+yAxis:
+  min: auto
+map:
+  hideTimeline: true
+  colorScale:
+    customNumericColorsActive: true
+    customCategoryColors:
+      Banned: "#759ac8"
+      Not banned: "#ae2e3f"
+      Partially banned: "#a46f49"
+      Banned (not yet effective): "#058580"
+      Phased out due to stricter regulations: "#6d3e91"
+  timeTolerance: 10
+slug: fur-farming-ban
+title: Which countries have banned fur farming?
+note: Partially banned means that there are only sub-national bans or that only
+  certain species are banned. Some countries do not have bans but introduced
+  stricter regulations that led to the phase-out of farms, as they were no
+  longer profitable.
+originUrl: /animal-welfare
+$schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
