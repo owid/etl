@@ -95,7 +95,7 @@ def run() -> None:
 
     tb = tb[columns_to_keep]
 
-    # For now use 2020 but confirm with Hannah
+    #  Add year column based on the paper
     tb["year"] = 2020
 
     # Format table
