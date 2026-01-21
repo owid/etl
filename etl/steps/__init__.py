@@ -1263,14 +1263,15 @@ class GraphStep(Step):
             if self.metadata_file and self.metadata_file.exists():
                 config_dict = _load_metadata_file(self.metadata_file)
 
-            _save_graph_metadata(self.slug, source_checksum, config_dict)
+            _save_graph_metadata(self.slug, source_checksum, config_dict, to_db=False)
 
     def is_dirty(self) -> bool:
         """
         Check if graph needs update based on:
-        - Local index.json doesn't exist
-        - Expected checksum differs from stored checksum
+        - Local index.json doesn't exist or checksum differs
+        - (If --graph flag) Database chart doesn't exist or has different checksum
         """
+        from etl import config
         from etl.grapher.graph import _load_graph_metadata
 
         # 1. Check if local index.json exists
@@ -1282,12 +1283,20 @@ class GraphStep(Step):
         if any(d.is_dirty() for d in self.dependencies):
             return True
 
-        # 3. Compare stored checksum with expected checksum
-        stored_checksum = metadata.get("source_checksum")
+        # 3. Compare local checksum with expected checksum
+        local_checksum = metadata.get("local_checksum")
         expected_checksum = self.checksum_input()
 
-        if stored_checksum != expected_checksum:
+        if local_checksum != expected_checksum:
             return True
+
+        # 4. If --graph flag is set, also check if database needs updating
+        if config.GRAPH:
+            from etl.grapher.graph import _fetch_db_checksum
+
+            db_checksum = _fetch_db_checksum(self.slug)
+            if db_checksum != expected_checksum:
+                return True
 
         return False
 

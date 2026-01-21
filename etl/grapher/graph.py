@@ -168,38 +168,49 @@ def upsert_graph(
         return chart_id
 
 
-def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any]) -> None:
+def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any], to_db: bool = True) -> None:
     """
     Save graph metadata to local index.json file for dirty detection and conflict detection.
 
     Args:
         slug: Chart slug
         source_checksum: Checksum of inputs (metadata file + dependencies)
-        config: The config that was written to the database
+        config: The config that was written to the database (or local config if to_db=False)
+        to_db: If True, this was written to database (update db_checksum). If False, only local (update local_checksum).
     """
     graph_dir = paths.DATA_DIR / "graphs" / slug
     graph_dir.mkdir(parents=True, exist_ok=True)
 
-    # Store key fields we wrote to DB for conflict detection
-    # Only store fields that users might manually edit in Admin UI
+    # Load existing metadata to preserve checksums
+    index_path = graph_dir / "index.json"
+    if index_path.exists():
+        with open(index_path) as f:
+            metadata = json.load(f)
+    else:
+        metadata = {
+            "channel": "graph",
+            "short_name": slug,
+        }
+
+    # Store key fields for conflict detection
     last_config = {
         k: config.get(k)
         for k in ["title", "subtitle", "note", "chartTypes", "hasMapTab", "tab", "selectedEntityNames"]
         if k in config
     }
 
-    metadata = {
-        "channel": "graph",
-        "short_name": slug,
-        "source_checksum": source_checksum,
-        "last_config": last_config,
-    }
+    # Always update local_checksum (step ran successfully)
+    metadata["local_checksum"] = source_checksum
 
-    index_path = graph_dir / "index.json"
+    # Additionally, if written to database, update db_checksum and last_config
+    if to_db:
+        metadata["db_checksum"] = source_checksum
+        metadata["last_config"] = last_config
+
     with open(index_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
-    log.debug("graph.metadata_saved", path=str(index_path), checksum=source_checksum)
+    log.debug("graph.metadata_saved", path=str(index_path), checksum=source_checksum, to_db=to_db)
 
 
 def _load_graph_metadata(slug: str) -> Dict[str, Any]:
@@ -218,6 +229,23 @@ def _load_graph_metadata(slug: str) -> Dict[str, Any]:
 
     with open(index_path) as f:
         return json.load(f)
+
+
+def _fetch_db_checksum(slug: str) -> Optional[str]:
+    """
+    Fetch the checksum of what was last written to the database.
+
+    This is stored in the local index.json after each successful upsert with --graph.
+    Used to detect if database needs updating when --graph flag is used.
+
+    Args:
+        slug: Chart slug
+
+    Returns:
+        Checksum from the last database write, or None if chart never uploaded
+    """
+    metadata = _load_graph_metadata(slug)
+    return metadata.get("db_checksum") if metadata else None
 
 
 def _resolve_indicator_paths(session: Session, catalog_paths: List[str]) -> List[int]:
@@ -359,16 +387,16 @@ def _check_manual_overrides(
     if not chart.isInheritanceEnabled and not is_inheritance_enabled:
         # Load what we last wrote to this chart
         metadata = _load_graph_metadata(chart.slug)
-        stored_checksum = metadata.get("source_checksum")
+        db_checksum = metadata.get("db_checksum")
 
-        # If no stored checksum, this is the first ETL run - allow it
-        if not stored_checksum:
-            log.info("graph.first_etl_run", slug=chart.slug)
+        # If no DB checksum, this is the first upload to DB - allow it
+        if not db_checksum:
+            log.info("graph.first_db_upload", slug=chart.slug)
             return
 
-        # If checksum hasn't changed, ETL metadata is unchanged - no conflict possible
-        if stored_checksum == current_checksum:
-            log.debug("graph.no_etl_changes", slug=chart.slug)
+        # If DB checksum matches current, ETL metadata hasn't changed since last DB write - no conflict possible
+        if db_checksum == current_checksum:
+            log.debug("graph.no_etl_changes_since_db", slug=chart.slug)
             return
 
         # ETL metadata HAS changed - now check if DB was also manually edited
@@ -398,5 +426,5 @@ def _check_manual_overrides(
                 f"New ETL values: {[f'{k}={expected_config.get(k)}' for k in db_changed_fields]}\n"
                 f"Either:\n"
                 f"  1. Update your .meta.yml file to match the database edits, or\n"
-                f"  2. Use --force-metadata to overwrite database with ETL metadata (WARNING: loses manual edits)"
+                f"  2. Use --force-graph to overwrite database with ETL metadata (WARNING: loses manual edits)"
             )
