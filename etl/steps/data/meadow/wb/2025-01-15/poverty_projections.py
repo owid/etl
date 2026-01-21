@@ -28,10 +28,10 @@ def run() -> None:
 
     # Define empty list to store tables.
     tables = []
-    with snap.open_archive():
+    with snap.extracted() as archive:
         for table, table_config in TABLE_PARAMETERS.items():
             # Load data from snapshot.
-            tb = snap.read_in_archive(f"{FILES_DIRECTORY}/{table_config['file']}")
+            tb = archive.read(f"{FILES_DIRECTORY}/{table_config['file']}")
 
             #
             # Process data.

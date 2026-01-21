@@ -34,8 +34,8 @@ log = get_logger()
 
 # Default reviewers for daily chart reviews
 # Users are identified by UserIDs. To get the ID for a user, check slackId column in MySQL table `users`.
-DAILY_CHART_REVIEWER_DEFAULT = "U01T5MG8DTM"  # Fiona
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U01T5MG8DTM"  # Fiona
+DAILY_CHART_REVIEWER_DEFAULT = "U07437LD7JR"  # Tuna
+DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U07437LD7JR"  # Tuna - alt: Fiona (U01T5MG8DTM)
 
 
 ####################################

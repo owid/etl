@@ -31,8 +31,8 @@ import requests
 import structlog
 from deprecated import deprecated
 from owid import catalog
-from owid.catalog.core import CatalogPath
-from owid.catalog.meta import VARIABLE_TYPE
+from owid.catalog.core.meta import VARIABLE_TYPE
+from owid.catalog.core.paths import CatalogPath
 from pyarrow import feather
 from sqlalchemy import (
     CHAR,
@@ -331,7 +331,6 @@ class User(Base):
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
     githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
-    password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -1031,7 +1030,7 @@ class PostsGdocsVariablesFaqsLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
+    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.core.meta.FaqLink]) -> None:
         """Link the given Variable ID with Faqs"""
         # Fetch current linked Faqs for the given Variable ID
         existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
@@ -1170,7 +1169,7 @@ class Variable(Base):
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     dimensions: Mapped[Optional[Dimensions]] = mapped_column(JSON, default=None)
-    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30), default=None)
+    processingLevel: Mapped[Optional[catalog.core.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30), default=None)
     processingLog: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
     titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
@@ -1454,7 +1453,7 @@ class Variable(Base):
         return _infer_variable_type(values)
 
     def update_links(
-        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
+        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.core.meta.FaqLink], tag_names: List[str]
     ) -> None:
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.

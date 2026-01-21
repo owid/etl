@@ -6,7 +6,7 @@ The Data API provides unified access to OWID's published data through a simple c
 
 !!! warning "This library is under active development"
 
-    This documentation reflects the latest version, v1.0.0rc1, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc1`.
+    This documentation reflects the latest version, v1.0.0rc2, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc2`.
 
     We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon.
 
@@ -26,10 +26,13 @@ For convenience, the library provides functions for the most common use cases:
 
 ```python
 from owid.catalog import search, fetch
-# Search and fetch
+
+# Search for charts (default)
 results = search("population")
 tb = results[0].fetch()
-# Direct fetch
+
+# Direct fetch (by chart slug or table path)
+tb = fetch("life-expectancy")
 tb = fetch("garden/un/2024-07-12/un_wpp/population")
 ```
 

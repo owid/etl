@@ -6,9 +6,9 @@ The API separates discovery (searching)
 Example: Search for available data (no download)
     ```python
     >>> from owid.catalog import search
-    >>> results = search("population")  # Returns ResponseSet[TableResult]
-    >>> print(f"Found {len(results)} tables")
-    >>> print(results[0].path)
+    >>> results = search("population")  # Returns ResponseSet[ChartResult] (default)
+    >>> print(f"Found {len(results)} charts")
+    >>> print(results[0].slug)
     ```
 
 from download (fetching)
@@ -16,9 +16,9 @@ from download (fetching)
 Example: Fetch specific data by path
     ```python
     >>> from owid.catalog import fetch
-    >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")
-    >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")
-    >>> chart_tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")  # Table path
+    >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")  # Indicator
     ```
 """
 
@@ -39,13 +39,13 @@ _CHART_SLUG_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 
 if TYPE_CHECKING:
     from owid.catalog.core.charts import ChartTable
-    from owid.catalog.tables import Table
+    from owid.catalog.core.tables import Table
 
 
 def search(
-    name: str,
+    name: str | None = None,
     *,
-    kind: Literal["table", "indicator", "chart"] = "table",
+    kind: Literal["table", "indicator", "chart"] = "chart",
     limit: int = 10,
     namespace: str | None = None,
     version: str | None = None,
@@ -62,24 +62,25 @@ def search(
     slug, then use fetch() to download the data.
 
     Args:
-        name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy")
-        kind: What to search for (default: "table"):
+        name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy").
+            Required for indicators and charts. Optional for tables (can filter by other params).
+        kind: What to search for (default: "chart"):
 
+            - "chart": Search published charts (returns ResponseSet[ChartResult])
             - "table": Search catalog tables (returns ResponseSet[TableResult])
             - "indicator": Search indicators/variables (returns ResponseSet[IndicatorResult])
-            - "chart": Search published charts (returns ResponseSet[ChartResult])
         limit: Maximum number of results to return (default: 10)
         namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
         version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
         dataset: Filter by dataset name. Only for tables.
-        channel: Filter by channel (e.g., "garden", "grapher"). Only for tables.
-        match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables):
+        channel: Filter by channel (e.g., "garden", "grapher"). Only for tables, and `name` field.
+        match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables, and `name` field):
 
+            - "fuzzy": Typo-tolerant similarity matching
             - "exact": Exact string match
             - "contains": Substring match
             - "regex": Regular expression
-            - "fuzzy": Typo-tolerant similarity matching
-        fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables.
+        fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables, and `name` field.
         case: Case-sensitive search (default: False).  Only for tables.
 
     Returns:
@@ -87,24 +88,24 @@ def search(
 
     Example:
         ```python
-        # Search for tables (fuzzy search by default)
+        # Search for charts (default)
         results = search("population")
-        print(f"Found {len(results)} tables")
-        print(results[0].path)  # Access table path without downloading data
+        print(f"Found {len(results)} charts")
+        print(results[0].slug)  # Access chart slug without downloading data
+
+        # Search for tables
+        results = search("population", kind="table")
+        print(results[0].path)
 
         # Search for indicators
         results = search("gdp", kind="indicator")
         print(results[0].title)
 
-        # Search for charts
-        results = search("life expectancy", kind="chart")
-        print(results[0].slug)
-
         # Exact match for tables
-        results = search("population", match="exact")
+        results = search("population", kind="table", match="exact")
 
         # Filter tables by namespace and version
-        results = search("wdi", namespace="worldbank_wdi", version="2024-01-10")
+        results = search("wdi", kind="table", namespace="worldbank_wdi", version="2024-01-10")
 
         # Then fetch the data you need:
         tb = results[0].fetch()
@@ -114,6 +115,10 @@ def search(
         For indicators and charts, filtering parameters (namespace, version, dataset, channel)
         are ignored as they don't apply to those search types.
     """
+    # Validate name is provided for indicators and charts
+    if name is None and kind in ("indicator", "chart"):
+        raise ValueError(f"'name' is required when searching for {kind}s.")
+
     # Route to appropriate search method based on kind
     client = Client()
 
@@ -131,9 +136,11 @@ def search(
         )
     elif kind == "indicator":
         # Search indicators using IndicatorsAPI
+        assert name is not None  # Validated above
         return client.indicators.search(name, limit=limit)
     elif kind == "chart":
         # Search charts using ChartsAPI
+        assert name is not None  # Validated above
         return client.charts.search(name, limit=limit)
     else:
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")

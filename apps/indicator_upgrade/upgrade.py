@@ -35,7 +35,9 @@ def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]
     return charts
 
 
-def _update_single_chart(chart: gm.Chart, indicator_mapping: Dict[int, int], api: AdminAPI) -> int:
+def _update_single_chart(
+    chart: gm.Chart, indicator_mapping: Dict[int, int], api: AdminAPI, user_id: int | None = None
+) -> int:
     """Update a single chart and return its ID."""
     # Update chart config
     config_new = update_chart_config(
@@ -53,7 +55,7 @@ def _update_single_chart(chart: gm.Chart, indicator_mapping: Dict[int, int], api
         raise ValueError(f"Chart {chart} does not have an ID in config.")
 
     # Push new chart to DB
-    api.update_chart(chart_id=chart_id, chart_config=config_new)
+    api.update_chart(chart_id=chart_id, chart_config=config_new, user_id=user_id)
     return chart_id
 
 
@@ -96,10 +98,10 @@ def push_new_narrative_charts_cli(
 
     log.info(f"Updating {len(narrative_charts)} narrative charts...")
 
-    grapher_user_id = get_grapher_user().id
+    user_id = get_grapher_user().id
 
     # API to interact with the admin tool
-    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
+    api = AdminAPI(OWID_ENV)
 
     # Update narrative charts sequentially
     for nc in narrative_charts:
@@ -111,7 +113,7 @@ def push_new_narrative_charts_cli(
         config_new = update_narrative_chart_config(full_config, indicator_mapping)
 
         # PUT the updated full config - backend will recalculate the patch
-        api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new)
+        api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new, user_id=user_id)
         log.info(f"Successfully updated narrative chart {nc.id}")
 
     log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
@@ -137,10 +139,10 @@ def push_new_charts_cli(
 
     log.info(f"Updating {len(charts)} charts in parallel (max_workers={max_workers})...")
 
-    grapher_user_id = get_grapher_user().id
+    user_id = get_grapher_user().id
 
     # API to interact with the admin tool
-    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
+    api = AdminAPI(OWID_ENV)
 
     # Update charts in parallel
     successful_updates = 0
@@ -148,7 +150,7 @@ def push_new_charts_cli(
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all chart updates
         future_to_chart = {
-            executor.submit(_update_single_chart, chart, indicator_mapping, api): chart for chart in charts
+            executor.submit(_update_single_chart, chart, indicator_mapping, api, user_id): chart for chart in charts
         }
 
         # Process completed updates - fail fast on any error

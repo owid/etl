@@ -1,12 +1,12 @@
-__version__ = "1.0.0rc0"
+__version__ = "1.0.0rc2"
 
-from owid.catalog import api, processing, utils
+from owid.catalog import api
 from owid.catalog.api import Client, fetch, search
-from owid.catalog.catalogs import CHANNEL, ETLCatalog, LocalCatalog, find
-from owid.catalog.datasets import Dataset
-from owid.catalog.meta import (
+from owid.catalog.core import processing, tables, utils
+from owid.catalog.core.datasets import CHANNEL, Dataset
+from owid.catalog.core.indicators import Indicator, Variable
+from owid.catalog.core.meta import (
     DatasetMeta,
-    FaqLink,
     License,
     Origin,
     Source,
@@ -14,9 +14,7 @@ from owid.catalog.meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from owid.catalog.processing_log import LogEntry, ProcessingLog
-from owid.catalog.tables import Table
-from owid.catalog.variables import Variable
+from owid.catalog.core.tables import Table
 
 __all__ = [
     # New unified client API
@@ -24,27 +22,22 @@ __all__ = [
     "api",
     "search",
     "fetch",
-    # Legacy catalog access (still supported)
-    "LocalCatalog",
-    "ETLCatalog",
-    "find",
     # Core data structures
     "Dataset",
     "Table",
     "Variable",
+    "Indicator",
     # Metadata classes
     "DatasetMeta",
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
-    "LogEntry",
-    "ProcessingLog",
-    "FaqLink",
     "Source",
     "Origin",
     "License",
-    # Utilities
+    # backwards compatibility re-exports
     "utils",
+    "tables",
     "CHANNEL",
     "processing",
 ]

@@ -488,6 +488,12 @@ def _show_options_display():
             key="arrange-charts-vertically",
             on_change=arrange_charts,  # type: ignore
         )
+        st.toggle(
+            "Show **article citations**",
+            key="show-article-citations",
+            value=True,
+            help="Show which articles cite each chart with links to the citation location.",
+        )
 
 
 def _show_options_misc():

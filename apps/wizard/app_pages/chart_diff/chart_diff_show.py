@@ -17,8 +17,10 @@ import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
+from apps.chart_sync.admin_api import AdminAPI
 from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
+from apps.wizard.app_pages.chart_diff.citations import st_show_citations
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
@@ -138,35 +140,22 @@ class ChartDiffShow:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
-        with st.spinner():
-            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
-            self.diff.set_status(session=session, status=status)
-
-            # Notify user
-            match status:
-                case gm.ChartStatus.APPROVED.value:
-                    st.toast(f":green[Chart {self.diff.chart_id} has been **approved**]", icon="✅")
-                case gm.ChartStatus.REJECTED.value:
-                    st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
-                case gm.ChartStatus.PENDING.value:
-                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+        status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
+        self.diff.set_status(session=session, status=status)
         self.diff._clean_cache()
+        # Store toast message in session state to display after fragment reruns
+        # (displaying elements in fragment callbacks causes duplication bugs)
+        st.session_state[f"toast-{self.diff.chart_id}"] = status
 
     def _push_status_binary(self, session: Optional[Session] = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
-        with st.spinner():
-            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
-            self.diff.set_status(session=session, status=status)
-
-            # Notify user
-            match status:
-                case gm.ChartStatus.APPROVED.value:
-                    st.toast(f":green[Chart {self.diff.chart_id} has been **reviewed**]", icon="✅")
-                case gm.ChartStatus.PENDING.value:
-                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+        status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
+        self.diff.set_status(session=session, status=status)
         self.diff._clean_cache()
+        # Store toast message in session state to display after fragment reruns
+        st.session_state[f"toast-{self.diff.chart_id}"] = status
 
     def _refresh_chart_diff(self):
         """Get latest chart version from database."""
@@ -607,15 +596,9 @@ class ChartDiffShow:
 
         st.markdown("##### 📖 Narrative Charts")
 
-        from apps.chart_sync.admin_api import AdminAPI
-        from etl.config import OWIDEnv
-
         # Get narrative chart configs from both environments
-        # Use staging-site-master for production (TARGET) since we can't write sessions to production DB
-        # TODO: this is a workaround, ideally we should be able to access Admin API in production
         source_api = AdminAPI(SOURCE)
-        target_env = OWIDEnv.from_staging("master")
-        target_api = AdminAPI(target_env)
+        target_api = AdminAPI(TARGET)
 
         for nc in narrative_charts:
             with st.container(border=True):
@@ -635,7 +618,7 @@ class ChartDiffShow:
                 with col1:
                     st.markdown("Production")
                     if target_config:
-                        grapher_chart(chart_config=target_config, owid_env=target_env)
+                        grapher_chart(chart_config=target_config, owid_env=TARGET)
                     else:
                         st.info("Not available in production")
 
@@ -645,6 +628,18 @@ class ChartDiffShow:
                         grapher_chart(chart_config=source_config, owid_env=SOURCE)
                     else:
                         st.info("Not available in staging")
+
+    def _show_citations(self) -> None:
+        """Show articles that cite this chart with scroll-to-text fragment URLs."""
+        if not st.session_state.get("show-article-citations", True):
+            return
+        st_show_citations(
+            self.diff.slug,
+            self.source_session,
+            self.target_session,
+            SOURCE,
+            TARGET,
+        )
 
     def _show(self) -> None:
         """Show chart diff.
@@ -705,6 +700,9 @@ class ChartDiffShow:
         # SHOW NARRATIVE CHARTS
         self._show_narrative_charts()
 
+        # SHOW ARTICLE CITATIONS
+        self._show_citations()
+
         # Copy link
         if self.show_link:
             # with col3:
@@ -720,9 +718,25 @@ class ChartDiffShow:
                 url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
                 st.caption(body=url)
 
+    def _show_deferred_toast(self) -> None:
+        """Show toast message if one was queued by a status change callback."""
+        toast_key = f"toast-{self.diff.chart_id}"
+        if toast_key in st.session_state:
+            status = st.session_state.pop(toast_key)
+            match status:
+                case gm.ChartStatus.APPROVED.value:
+                    st.toast(f":green[Chart {self.diff.chart_id} has been **approved**]", icon="✅")
+                case gm.ChartStatus.REJECTED.value:
+                    st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
+                case gm.ChartStatus.PENDING.value:
+                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+
     @st.fragment
     def show(self):
         """Show chart diff."""
+        # Show deferred toast from previous status change (must be outside callback to avoid duplication bug)
+        self._show_deferred_toast()
+
         # Show in expander or not
         if self.expander:
             with st.expander(
