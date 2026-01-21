@@ -81,7 +81,7 @@ DATA_CDC = pd.DataFrame(
             *["https://www.jstor.org/stable/44323897"] * 9,
             *["https://wonder.cdc.gov/cmf-icd8.html"] * 11,
             *["https://wonder.cdc.gov/cmf-icd9.html"] * 20,
-            *["https://wonder.cdc.gov/cmf-icd10.html"] * 22,
+            *["https://wonder.cdc.gov/ucd-icd10.html"] * 22,
         ],
     }
 )
