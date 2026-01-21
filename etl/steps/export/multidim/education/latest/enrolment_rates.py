@@ -19,14 +19,14 @@ COLOR_GIRLS = "#E56E5A"
 COLOR_NET_ENROLMENT = "#883039"
 COLOR_GROSS_ENROLMENT = "#4C6A9C"
 
-# Used in enrolment type side-by-side comparison views
+# Used in enrollment type side-by-side comparison views
 ENROLLMENT_TYPE_DESCRIPTION_KEY = [
-    "Net and gross enrolment ratios measure school participation from different perspectives, providing complementary insights into education systems.",
-    "**Net enrolment** shows what percentage of children are enrolled at the education level intended for their age. It compares children enrolled at the correct level to the total population in that age group. The maximum value is 100%.",
-    "**Gross enrolment** counts all students enrolled at a specific education level, regardless of age. It includes students who started early, late, or repeated grades. Values can exceed 100% when older or younger students are enrolled.",
-    "High net enrolment indicates children are progressing at the expected pace. High gross enrolment above 100% may signal grade repetition or late school entry.",
-    "Low net enrolment suggests children are out of school or enrolled at different levels than expected for their age. Low gross enrolment indicates many children of the official age are not enrolled at the expected level.",
-    "Data comes from school administrative records tracking enrolment by age, combined with population estimates from national statistics offices or UN sources.",
+    "Net and gross enrollment ratios measure school participation from different perspectives, providing complementary insights into education systems.",
+    "**Net enrollment** shows what percentage of children are enrolled at the education level intended for their age. It compares children enrolled at the correct level to the total population in that age group. The maximum value is 100%.",
+    "**Gross enrollment** counts all students enrolled at a specific education level, regardless of age. It includes students who started early, late, or repeated grades. Values can exceed 100% when older or younger students are enrolled.",
+    "High net enrollment indicates children are progressing at the expected pace. High gross enrollment above 100% may signal grade repetition or late school entry.",
+    "Low net enrollment suggests children are out of school or enrolled at different levels than expected for their age. Low gross enrollment indicates many children of the official age are not enrolled at the expected level.",
+    "Data comes from school administrative records tracking enrollment by age, combined with population estimates from national statistics offices or UN sources.",
 ]
 
 MULTIDIM_CONFIG = {
@@ -189,7 +189,7 @@ def run() -> None:
                 if actual_level:
                     gender_term = _get_gender_term(sex, actual_level, "title")
                     level_name = LEVEL_MAPPINGS["title"].get(actual_level, actual_level)
-                    view.config["title"] = f"Share of {gender_term} enrolled in {level_name}, by enrolment measure"
+                    view.config["title"] = f"Share of {gender_term} enrolled in {level_name}, by enrollment measure"
                 else:
                     view.config["title"] = generate_title_by_gender_and_level(sex, level)
             else:
@@ -372,7 +372,7 @@ LEVEL_MAPPINGS = {
 }
 
 NET_TEMPLATE = (
-    "Shown as the [net enrolment ratio](#dod:net-enrolment-ratio) — "
+    "Shown as the [net enrollment ratio](#dod:net-enrolment-ratio) — "
     "the share of {subject} of {level_plain} who are enrolled in {level_dod} education."
 )
 
@@ -382,21 +382,21 @@ NET_GROUPED_TEMPLATE = (
 )
 
 GROSS_TEMPLATE = (
-    "Shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — "
+    "Shown as the [gross enrollment ratio](#dod:gross-enrolment-ratio) — "
     "the number of {subject}, regardless of their age, who are enrolled in {level_dod} education, "
     "expressed as a percentage of {population} of {level_plain}."
 )
 
 GROSS_GROUPED_TEMPLATE = (
-    "Shown for each level of education as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — "
+    "Shown for each level of education as the [gross enrollment ratio](#dod:gross-enrolment-ratio) — "
     "the number of {subject}, regardless of their age, who are enrolled at that level of education, "
     "expressed as a percentage of the official school-age population {population_suffix}."
 )
 
 ENROLMENT_TYPE_TEMPLATE = (
-    "Comparing [net](#dod:net-enrolment-ratio) and [gross enrolment ratios](#dod:gross-enrolment-ratio) "
-    "for {subject} in {level_dod} education. Net enrolment shows the share of {subject} of {level_plain} "
-    "who are enrolled, while gross enrolment includes all {subject} regardless of age, expressed as a "
+    "Comparing [net](#dod:net-enrolment-ratio) and [gross enrollment ratios](#dod:gross-enrolment-ratio) "
+    "for {subject} in {level_dod} education. Net enrollment shows the share of {subject} of {level_plain} "
+    "who are enrolled, while gross enrollment includes all {subject} regardless of age, expressed as a "
     "percentage of {population} of the same age group."
 )
 
@@ -500,7 +500,7 @@ def generate_title_by_gender_and_level(sex, level):
     elif level == "enrolment_type_side_by_side":
         # For enrolment type grouping, we need to determine the actual level
         # This will be handled dynamically in the main loop where we have access to the view
-        return "Share of {gender_term} enrolled in {level_name}, by enrolment measure"
+        return "Share of {gender_term} enrolled in {level_name}, by enrollment measure"
 
     level_term = LEVEL_MAPPINGS["title"].get(level, "")
     if not level_term:
