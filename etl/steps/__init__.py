@@ -1215,13 +1215,13 @@ class GraphStep(Step):
         return f"graph://{self.path}"
 
     def _find_metadata_file(self) -> Optional[Path]:
-        """Search for {slug}.meta.yml in etl/steps/graphs/**/"""
-        graphs_dir = Path(__file__).parent / "graphs"
-        if not graphs_dir.exists():
+        """Search for {slug}.meta.yml in etl/steps/graph/**/"""
+        graph_dir = Path(__file__).parent / "graph"
+        if not graph_dir.exists():
             return None
 
         # Search all subdirectories for matching .meta.yml file
-        for meta_file in graphs_dir.rglob(f"{self.slug}.meta.yml"):
+        for meta_file in graph_dir.rglob(f"{self.slug}.meta.yml"):
             return meta_file
 
         return None

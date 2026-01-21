@@ -178,7 +178,7 @@ def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any]
         config: The config that was written to the database (or local config if to_db=False)
         to_db: If True, this was written to database (update db_checksum). If False, only local (update local_checksum).
     """
-    graph_dir = paths.DATA_DIR / "graphs" / slug
+    graph_dir = paths.DATA_DIR / "graph" / slug
     graph_dir.mkdir(parents=True, exist_ok=True)
 
     # Load existing metadata to preserve checksums
@@ -223,7 +223,7 @@ def _load_graph_metadata(slug: str) -> Dict[str, Any]:
     Returns:
         Dictionary with metadata (empty dict if file doesn't exist)
     """
-    index_path = paths.DATA_DIR / "graphs" / slug / "index.json"
+    index_path = paths.DATA_DIR / "graph" / slug / "index.json"
     if not index_path.exists():
         return {}
 
