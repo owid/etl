@@ -804,3 +804,4 @@ include:
   - dag/growth.yml
   - dag/labor.yml
   - dag/economics.yml
+  - dag/graphs.yml

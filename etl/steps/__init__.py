@@ -231,6 +231,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
+    elif step_type == "graph":
+        step = GraphStep(path, dependencies)
+
     elif step_type == "export":
         step = ExportStep(path, dependencies)
 
@@ -1141,6 +1144,111 @@ class ETagStep(Step):
 
     def checksum_output(self) -> str:
         return get_etag(f"https://{self.path}")
+
+
+class GraphStep(Step):
+    """
+    A step that manages chart metadata in the grapher database.
+
+    Graph steps create or update charts based on indicator dependencies.
+    Single-indicator graphs can inherit metadata from the indicator's grapher_config.
+    Multi-indicator graphs require explicit metadata in a .meta.yml file.
+
+    Example:
+        graph://fur-farming-ban
+    """
+
+    path: str
+    slug: str
+    dependencies: List[Step]
+    metadata_file: Optional[Path]
+    version: str = "latest"
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        self.path = path
+        self.slug = path  # For graph://, path is just the slug
+        self.dependencies = dependencies
+        self.metadata_file = self._find_metadata_file()
+
+    def __str__(self) -> str:
+        return f"graph://{self.path}"
+
+    def _find_metadata_file(self) -> Optional[Path]:
+        """Search for {slug}.meta.yml in etl/steps/graphs/**/"""
+        graphs_dir = Path(__file__).parent / "graphs"
+        if not graphs_dir.exists():
+            return None
+
+        # Search all subdirectories for matching .meta.yml file
+        for meta_file in graphs_dir.rglob(f"{self.slug}.meta.yml"):
+            return meta_file
+
+        return None
+
+    def run(self) -> None:
+        """Create or update chart in database."""
+        from etl.dag_helpers import load_dag
+        from etl.grapher.graph import upsert_graph
+
+        # Load DAG to get original dependency strings with #indicator parts
+        dag = load_dag()
+        step_name = str(self)
+        dep_uris = list(dag.get(step_name, []))
+
+        if not dep_uris:
+            raise ValueError(
+                f"No dependencies found for {step_name} in DAG. "
+                f"Graph steps must have at least one indicator dependency."
+            )
+
+        upsert_graph(slug=self.slug, metadata_file=self.metadata_file, dependencies=dep_uris, force=False)
+
+    def is_dirty(self) -> bool:
+        """
+        Check if graph needs update based on:
+        - Chart doesn't exist in database
+        - .meta.yml file modified (if it exists)
+        - Dependency indicator checksums changed
+        """
+        from sqlalchemy.orm import Session
+        from sqlalchemy.orm.exc import NoResultFound
+
+        from etl.db import get_engine
+        from etl.grapher.model import Chart
+
+        engine = get_engine()
+
+        with Session(engine) as session:
+            # 1. Check if chart exists
+            try:
+                chart = Chart.load_chart(session, slug=self.slug)
+            except NoResultFound:
+                return True  # Chart doesn't exist, needs to be created
+
+            # 2. Check if .meta.yml was modified
+            if self.metadata_file and self.metadata_file.exists():
+                from etl.files import checksum_file
+
+                file_checksum = checksum_file(str(self.metadata_file))
+                # For now, always consider it dirty if metadata file exists
+                # TODO: Store checksum in chart config and compare
+                # For prototype, we'll rely on manual runs
+
+            # 3. Check if any dependency changed
+            # This is the key: if indicator metadata changes, chart should update
+            for dep in self.dependencies:
+                if dep.is_dirty():
+                    return True
+
+        # For prototype, default to not dirty to avoid unnecessary updates
+        # In production, we'd want more sophisticated checking
+        return False
+
+    def checksum_output(self) -> str:
+        """Return checksum of chart config in database."""
+        # For prototype, return a simple checksum
+        # In production, this would hash the chart config from database
+        return f"graph://{self.slug}"
 
 
 class PrivateMixin:

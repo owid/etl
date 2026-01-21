@@ -1,0 +1,10 @@
+# Graph metadata for fur-farming-ban chart
+# This chart uses a single indicator and inherits its title, subtitle, etc.
+
+# Indicators to include in the chart
+indicators:
+  - grapher/animal_welfare/2024-12-17/fur_laws/fur_laws#fur_farming_status
+
+# Optional: Override inherited metadata (commented out for auto-inheritance)
+# title: "Which countries have banned fur farming?"
+# subtitle: "Countries that have banned fur farming at a national level."

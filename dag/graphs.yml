@@ -1,0 +1,21 @@
+# Graph DAG - Charts as first-class citizens in ETL
+#
+# This file defines chart metadata steps (graphs) that create or update charts
+# in the grapher database. Each graph step references indicator dependencies.
+#
+# Single-indicator graphs automatically inherit metadata from the indicator's
+# grapher_config. Multi-indicator graphs require explicit metadata in a .meta.yml file.
+#
+# Example:
+#   graph://chart-slug:
+#     - data://grapher/namespace/version/dataset#indicator
+#
+# See: etl/steps/graphs/**/chart-slug.meta.yml for explicit metadata
+
+steps:
+  # Test: Animal welfare - Fur farming ban
+  # Single indicator, inherits from indicator metadata
+  # Note: Dependencies are at dataset level, but we specify indicators in comments
+  # Indicator: fur_farming_status
+  graph://fur-farming-ban:
+    - data://grapher/animal_welfare/2024-12-17/fur_laws
