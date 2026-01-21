@@ -15,6 +15,8 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("prison_rates")
+    # Don't keep this
+    tb = tb.dropna(subset="year")
 
     #
     # Process data.
