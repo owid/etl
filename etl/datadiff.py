@@ -13,9 +13,9 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, ETLCatalog, LocalCatalog, Table, VariableMeta, find
-from owid.catalog.api.catalogs import CHANNEL
-from owid.catalog.api.utils import OWID_CATALOG_URI
+from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, fetch
+from owid.catalog.api.legacy import CHANNEL, ETLCatalog, LocalCatalog
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -295,20 +295,9 @@ class RemoteDataset:
         self.table_names = table_names
 
     def __getitem__(self, name: str) -> Table:
-        tables = find(
-            table=name,
-            namespace=self.metadata.namespace,
-            version=str(self.metadata.version),
-            dataset=self.metadata.short_name,
-            channels=[self.metadata.channel],  # type: ignore
-        )
-
-        tables = tables[tables.channel == self.metadata.channel]  # type: ignore
-
-        # find matches substrings, we have to further filter it
-        tables = tables[tables.table == name]
-
-        return tables.load()
+        tb_uri = f"{self.metadata.channel}/{self.metadata.namespace}/{self.metadata.version}/{self.metadata.short_name}/{name}"
+        tb = fetch(tb_uri)
+        return tb
 
 
 @click.command(name="diff", help=__doc__)
@@ -884,7 +873,7 @@ def _local_catalog_datasets(
 
 
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
-    uri = f"{OWID_CATALOG_URI}{path}/index.json"
+    uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
     js = requests.get(uri).json()
     # drop origins for backward compatibility
     js.pop("origins", None)

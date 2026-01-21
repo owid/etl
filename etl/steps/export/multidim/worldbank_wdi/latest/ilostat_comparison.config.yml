@@ -70,11 +70,11 @@ views:
       y:
         - catalogPath: wdi#sl_uem_totl_ne_zs
           display:
-            name: Unemployment rate, national
+            name: National estimates
             plotMarkersOnlyInLineChart: true
         - catalogPath: wdi#sl_uem_totl_zs
           display:
-            name: Unemployment rate, modeled
+            name: Modeled estimates by the ILO
     config:
       title: "Unemployment rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_unemployment_rate} {definitions.description_short_modeled_vs_national}"
@@ -98,11 +98,11 @@ views:
       y:
         - catalogPath: wdi#sl_tlf_cact_ne_zs
           display:
-            name: Labor force participation rate, national
+            name: National estimates
             plotMarkersOnlyInLineChart: true
         - catalogPath: wdi#sl_tlf_cact_zs
           display:
-            name: Labor force participation rate, modeled
+            name: Modeled estimates by the ILO
     config:
       title: "Labor force participation rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_labor_force_participation_rate} {definitions.description_short_modeled_vs_national}"
@@ -127,11 +127,11 @@ views:
       y:
         - catalogPath: wdi#sl_emp_totl_sp_ne_zs
           display:
-            name: Employment-to-population ratio, national
+            name: National estimates
             plotMarkersOnlyInLineChart: true
         - catalogPath: wdi#sl_emp_totl_sp_zs
           display:
-            name: Employment-to-population ratio, modeled
+            name: Modeled estimates by the ILO
     config:
       title: "Employment-to-population ratios: modeled vs. national estimates"
       subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"

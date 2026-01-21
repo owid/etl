@@ -84,4 +84,4 @@ If you want to make a private step public simply follow the steps below:
 - **In the snapshot DVC file**: Set `meta.is_public` to `true` (or simply remove this property).
 - (Optional) **Allow for Grapher downloads**: Set `dataset.non_redistributable` to `false` in the dataset garden metadata (or simply remove this property).
 
-After this, re-run the snapshot step and commit your changes.
+After this, re-run the snapshot step to upload it to the public bucket (`r2:owid-snapshots/`). Without this step, the file would remain in the private bucket (`r2:owid-snapshots-private/`). Then commit your changes.

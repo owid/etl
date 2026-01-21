@@ -15,7 +15,7 @@ meta:
       More details can be found on [their technical documentation](https://www.epa.gov/sites/default/files/2021-03/documents/ghg-concentrations_td.pdf).
     attribution: EPA based on various sources (2022)
     attribution_short: EPA
-    url_main: https://www.epa.gov/climate-indicators/climate-change-indicators-atmospheric-concentrations-greenhouse-gases
+    url_main: https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-atmospheric-concentrations-greenhouse-gases/
     url_download: https://www.epa.gov/system/files/other-files/2022-07/ghg-concentrations_fig-1.csv
     date_accessed: '2024-04-17'
     date_published: '2022-07-01'

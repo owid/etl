@@ -7,15 +7,15 @@ import dataclasses
 import pandas as pd
 import pytest
 
-from owid.catalog.meta import VariableMeta, VariablePresentationMeta
-from owid.catalog.variables import (
+from owid.catalog.core.indicators import (
     License,
     Variable,
-    combine_variables_metadata,
-    get_unique_licenses_from_variables,
-    get_unique_origins_from_variables,
-    get_unique_sources_from_variables,
+    combine_indicators_metadata,
+    get_unique_licenses_from_indicators,
+    get_unique_origins_from_indicators,
+    get_unique_sources_from_indicators,
 )
+from owid.catalog.core.meta import VariableMeta, VariablePresentationMeta
 
 
 def test_create_empty_variable() -> None:
@@ -85,10 +85,10 @@ def test_create_new_variable_as_sum_of_other_two(table_1, sources, origins, lice
     assert tb1["c"].metadata.title is None
     assert tb1["c"].metadata.description is None
     assert tb1["c"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
-        "Key description point 1 of Variable 2",
-        "Key description point 2 of Variable 2",
+        "Key description point 1 of Indicator 2",
+        "Key description point 2 of Indicator 2",
     ]
     assert tb1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
@@ -109,7 +109,7 @@ def test_create_new_variable_as_sum_of_another_variable_plus_a_scalar(table_1) -
     assert tb1["d"].metadata.title == table_1["a"].metadata.title
     assert tb1["d"].metadata.description == table_1["a"].metadata.description
     assert tb1["d"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
     ]
     assert tb1["d"].metadata.sources == table_1["a"].metadata.sources
@@ -166,10 +166,10 @@ def test_create_new_variable_as_product_of_other_two(table_1, sources, origins, 
     assert tb1["e"].metadata.title is None
     assert tb1["e"].metadata.description is None
     assert tb1["e"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
-        "Key description point 1 of Variable 2",
-        "Key description point 2 of Variable 2",
+        "Key description point 1 of Indicator 2",
+        "Key description point 2 of Indicator 2",
     ]
     assert tb1["e"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["e"].metadata.origins == [origins[2], origins[1], origins[3]]
@@ -192,10 +192,10 @@ def test_create_new_variable_as_product_of_other_three(table_1, sources, origins
     assert tb1["f"].metadata.title is None
     assert tb1["f"].metadata.description is None
     assert tb1["f"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
-        "Key description point 1 of Variable 2",
-        "Key description point 2 of Variable 2",
+        "Key description point 1 of Indicator 2",
+        "Key description point 2 of Indicator 2",
     ]
     assert tb1["f"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["f"].metadata.origins == [origins[2], origins[1], origins[3]]
@@ -216,10 +216,10 @@ def test_create_new_variable_as_division_of_other_two(table_1, sources, origins,
     assert tb1["g"].metadata.title is None
     assert tb1["g"].metadata.description is None
     assert tb1["g"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
-        "Key description point 1 of Variable 2",
-        "Key description point 2 of Variable 2",
+        "Key description point 1 of Indicator 2",
+        "Key description point 2 of Indicator 2",
     ]
     assert tb1["g"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["g"].metadata.origins == [origins[2], origins[1], origins[3]]
@@ -241,10 +241,10 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, or
     assert tb1["h"].metadata.description is None
     # Note that the order of key description points should be first b and then a.
     assert tb1["h"].metadata.description_key == [
-        "Key description point 1 of Variable 2",
+        "Key description point 1 of Indicator 2",
         "Common key description point",
-        "Key description point 2 of Variable 2",
-        "Key description point 1 of Variable 1",
+        "Key description point 2 of Indicator 2",
+        "Key description point 1 of Indicator 1",
     ]
     assert tb1["h"].metadata.sources == [sources[2], sources[3], sources[1]]
     assert tb1["h"].metadata.origins == [origins[2], origins[3], origins[1]]
@@ -265,10 +265,10 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, sources, o
     assert tb1["i"].metadata.title is None
     assert tb1["i"].metadata.description is None
     assert tb1["i"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
-        "Key description point 1 of Variable 2",
-        "Key description point 2 of Variable 2",
+        "Key description point 1 of Indicator 2",
+        "Key description point 2 of Indicator 2",
     ]
     assert tb1["i"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["i"].metadata.origins == [origins[2], origins[1], origins[3]]
@@ -286,10 +286,10 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
     tb1["j"] = tb1["a"] ** 2
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["j"] == pd.Series([1, 4, 9])).all()
-    assert tb1["j"].metadata.title == "Title of Table 1 Variable a"
-    assert tb1["j"].metadata.description == "Description of Table 1 Variable a"
+    assert tb1["j"].metadata.title == "Title of Table 1 Indicator a"
+    assert tb1["j"].metadata.description == "Description of Table 1 Indicator a"
     assert tb1["j"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
     ]
     assert tb1["j"].metadata.sources == [sources[2], sources[1]]
@@ -310,10 +310,10 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert tb1["k"].metadata.title is None
     assert tb1["k"].metadata.description is None
     assert tb1["k"].metadata.description_key == [
-        "Key description point 1 of Variable 1",
+        "Key description point 1 of Indicator 1",
         "Common key description point",
-        "Key description point 1 of Variable 2",
-        "Key description point 2 of Variable 2",
+        "Key description point 1 of Indicator 2",
+        "Key description point 2 of Indicator 2",
     ]
     assert tb1["k"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["k"].metadata.origins == [origins[2], origins[1], origins[3]]
@@ -326,30 +326,30 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert tb1["k"].metadata.display == tb1["a"].metadata.display
 
 
-def test_get_unique_sources_from_variables(variable_1, variable_2, sources):
-    assert get_unique_sources_from_variables([variable_1, variable_2]) == [sources[2], sources[1], sources[3]]
+def test_get_unique_sources_from_indicators(variable_1, variable_2, sources):
+    assert get_unique_sources_from_indicators([variable_1, variable_2]) == [sources[2], sources[1], sources[3]]
     # Ensure that the function respects the order in which sources appear.
-    assert get_unique_sources_from_variables([variable_2, variable_1]) == [sources[2], sources[3], sources[1]]
+    assert get_unique_sources_from_indicators([variable_2, variable_1]) == [sources[2], sources[3], sources[1]]
 
 
-def test_get_unique_origins_from_variables(variable_1, variable_2, origins):
-    assert get_unique_origins_from_variables([variable_1, variable_2]) == [origins[2], origins[1], origins[3]]
+def test_get_unique_origins_from_indicators(variable_1, variable_2, origins):
+    assert get_unique_origins_from_indicators([variable_1, variable_2]) == [origins[2], origins[1], origins[3]]
     # Ensure that the function respects the order in which origins appear.
-    assert get_unique_origins_from_variables([variable_2, variable_1]) == [origins[2], origins[3], origins[1]]
+    assert get_unique_origins_from_indicators([variable_2, variable_1]) == [origins[2], origins[3], origins[1]]
 
 
-def test_get_unique_licenses_from_variables(variable_1, variable_2, licenses):
-    assert get_unique_licenses_from_variables([variable_1, variable_2]) == [licenses[1], licenses[2], licenses[3]]
+def test_get_unique_licenses_from_indicators(variable_1, variable_2, licenses):
+    assert get_unique_licenses_from_indicators([variable_1, variable_2]) == [licenses[1], licenses[2], licenses[3]]
     # Ensure that the function respects the order in which sources appear.
-    assert get_unique_licenses_from_variables([variable_2, variable_1]) == [licenses[2], licenses[3], licenses[1]]
+    assert get_unique_licenses_from_indicators([variable_2, variable_1]) == [licenses[2], licenses[3], licenses[1]]
 
 
-def test_combine_variables_metadata_with_different_fields(variable_1, variable_2, sources, origins, licenses) -> None:
+def test_combine_indicators_metadata_with_different_fields(variable_1, variable_2, sources, origins, licenses) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
         # TODO: Assert this raises a warning because units are different.
-        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)  # type: ignore
+        metadata = combine_indicators_metadata([variable_1, variable_2], operation=operation)  # type: ignore
         # If titles/descriptions/units/short_units are different, they should not be propagated.
         assert metadata.title is None
         assert metadata.description is None
@@ -366,12 +366,12 @@ def test_combine_variables_metadata_with_different_fields(variable_1, variable_2
         assert metadata.display == variable_1.metadata.display
 
 
-def test_combine_variables_metadata_with_equal_fields(variable_1, variable_2) -> None:
+def test_combine_indicators_metadata_with_equal_fields(variable_1, variable_2) -> None:
     variable_1 = variable_1.copy()
     # Impose that variable 2 is identical to 1.
     variable_2 = variable_1.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
-        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)  # type: ignore
+        metadata = combine_indicators_metadata([variable_1, variable_2], operation=operation)  # type: ignore
         # If titles/descriptions/units/short_units are identical, they should be propagated.
         assert metadata.title == variable_1.metadata.title
         assert metadata.description == variable_1.metadata.description
@@ -552,10 +552,10 @@ def test_combine_variables_sort(variable_1, variable_2) -> None:
     assert variable_3.m.sort == []
 
 
-def test_combine_variables_metadata_uses_all_fields() -> None:
-    """Make sure we don't forget to process new fields in combine_variables_metadata in case we're adding
+def test_combine_indicators_metadata_uses_all_fields() -> None:
+    """Make sure we don't forget to process new fields in combine_indicators_metadata in case we're adding
     new fields to the VariableMeta.
-    If you add a new field to VariableMeta, you should add it to combine_variables_metadata as well and
+    If you add a new field to VariableMeta, you should add it to combine_indicators_metadata as well and
     this unit test.
     """
     assert {f.name for f in dataclasses.fields(VariableMeta)} == {
@@ -590,7 +590,7 @@ def test_combine_variables_metadata_uses_all_fields() -> None:
 def test_set_categories(variable_3) -> None:
     new_var = variable_3.astype("category")
     new_var = new_var.set_categories(["a", "b", "c", "d"])
-    assert new_var.m.title == "Title of Variable 3"
+    assert new_var.m.title == "Title of Indicator 3"
     assert tuple(new_var.cat.categories) == ("a", "b", "c", "d")
 
 

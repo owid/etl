@@ -94,3 +94,15 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/un/2025-07-03/refugee_data:
     - data://garden/un/2025-07-03/refugee_data
+
+  #
+  # UNICEF child migration data (up to 2024)
+  #
+  data://meadow/unicef/2026-01-07/child_migration:
+    - snapshot://unicef/2026-01-07/child_migration.csv
+  data://garden/unicef/2026-01-07/child_migration:
+    - data://meadow/unicef/2026-01-07/child_migration
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/unicef/2026-01-07/child_migration:
+    - data://garden/unicef/2026-01-07/child_migration

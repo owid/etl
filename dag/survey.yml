@@ -29,3 +29,18 @@ steps:
   #
   data-private://grapher/survey/2025-09-12/acceptability_of_uk_farming_practices:
     - data-private://garden/survey/2025-09-12/acceptability_of_uk_farming_practices
+  #
+  # Faunalytics - Public Acceptability Of Standard U.S. Animal Agriculture Practices.
+  #
+  data://meadow/survey/2026-01-13/acceptability_of_us_farming_practices:
+    - snapshot://survey/2026-01-13/acceptability_of_us_farming_practices.rdata
+  #
+  # Faunalytics - Public Acceptability Of Standard U.S. Animal Agriculture Practices.
+  #
+  data://garden/survey/2026-01-13/acceptability_of_us_farming_practices:
+    - data://meadow/survey/2026-01-13/acceptability_of_us_farming_practices
+  #
+  # Faunalytics - Public Acceptability Of Standard U.S. Animal Agriculture Practices.
+  #
+  data://grapher/survey/2026-01-13/acceptability_of_us_farming_practices:
+    - data://garden/survey/2026-01-13/acceptability_of_us_farming_practices

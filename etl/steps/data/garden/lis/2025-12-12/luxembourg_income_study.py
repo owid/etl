@@ -1,12 +1,32 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""
+Load a meadow dataset and create a garden dataset.
+
+NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
+    1. Define DEBUG as True.
+    2. (optional) Define LONG_FORMAT as True to see the full tables in the log.
+    3. Run the following command in the terminal:
+        nohup .venv/bin/etlr luxembourg_income_study > output_lis.log 2>&1 &
+
+"""
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
+from tabulate import tabulate
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Set table format when printing
+TABLEFMT = "pretty"
+
+# Define if sanity checks should run (set to True to see sanity check output)
+DEBUG = False
+
+# Define if I show the full table or just the first 5 rows for assertions (only applies when DEBUG=True)
+LONG_FORMAT = False
 
 # Define absolute poverty columns and new names
 ABSOLUTE_POVERTY_COLUMNS = {
@@ -124,6 +144,13 @@ def run() -> None:
         [tb_absolute_poverty, tb_relative_poverty],
         ignore_index=True,
         sort=False,
+    )
+
+    # Sanity checks
+    sanity_checks(
+        tb_inequality=tb_inequality,
+        tb_incomes=tb_incomes,
+        tb_poverty=tb_poverty,
     )
 
     # Improve table format.
@@ -319,3 +346,552 @@ def add_period_dimension(tb: Table) -> Table:
     tb = pr.concat([tb_period, tb_day, tb_month, tb_non_period], ignore_index=True, sort=False)
 
     return tb
+
+
+def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_poverty: Table) -> None:
+    """
+    Perform sanity checks on the data
+    """
+    if not DEBUG:
+        return
+
+    check_between_0_and_1(tb_inequality)
+    check_shares_sum_100(tb_incomes)
+    check_negative_values(tb_inequality, tb_incomes)
+    check_monotonicity(tb_incomes)
+    check_avg_between_thr(tb_incomes)
+    check_poverty_range(tb_poverty)
+    check_poverty_monotonicity(tb_poverty)
+
+
+def check_between_0_and_1(tb_inequality: Table) -> None:
+    """
+    Check that gini indicators are between 0 and 1
+    """
+    tb = tb_inequality.reset_index()
+
+    # Check gini values for all welfare_type and equivalence_scale combinations
+    for welfare_type in tb["welfare_type"].unique():
+        for equivalence_scale in tb["equivalence_scale"].unique():
+            mask = (tb["welfare_type"] == welfare_type) & (tb["equivalence_scale"] == equivalence_scale)
+            tb_subset = tb[mask].copy()
+
+            # Check gini
+            gini_mask = (tb_subset["gini"] > 1) | (tb_subset["gini"] < 0)
+            any_error = gini_mask.any()
+
+            if any_error:
+                tb_error = tb_subset[gini_mask][["country", "year", "gini"]].copy()
+                paths.log.fatal(
+                    f"""{len(tb_error)} gini values for {welfare_type} ({equivalence_scale}) are not between 0 and 1:
+                    {_tabulate(tb_error)}"""
+                )
+
+
+def check_shares_sum_100(tb_incomes: Table, margin: float = 0.5) -> None:
+    """
+    Check if the sum of decile shares is 100 (with a margin)
+    """
+    tb = tb_incomes.reset_index()
+
+    # Filter to only share values for deciles 1-10 (exclude period dimension)
+    deciles = list(range(1, 11))
+    tb_shares = tb[(tb["decile"].isin(deciles)) & (tb["period"].isnull())].copy()
+
+    for welfare_type in tb_shares["welfare_type"].unique():
+        for equivalence_scale in tb_shares["equivalence_scale"].unique():
+            # Filter by welfare type and equivalence scale
+            mask = (tb_shares["welfare_type"] == welfare_type) & (tb_shares["equivalence_scale"] == equivalence_scale)
+            tb_subset = tb_shares[mask].copy()
+
+            # Calculate sum of shares for each country-year
+            tb_sum = (
+                tb_subset.groupby(["country", "year", "welfare_type", "equivalence_scale"])["share"]
+                .sum()
+                .reset_index(name="sum_check")
+            )
+
+            # Count how many deciles have data for each country-year
+            tb_count = (
+                tb_subset.groupby(["country", "year", "welfare_type", "equivalence_scale"])["share"]
+                .count()
+                .reset_index(name="count_check")
+            )
+
+            # Merge
+            tb_check = pr.merge(tb_sum, tb_count, on=["country", "year", "welfare_type", "equivalence_scale"])
+
+            # Only check when all 10 deciles are present
+            error_mask = ((tb_check["sum_check"] >= 100 + margin) | (tb_check["sum_check"] <= 100 - margin)) & (
+                tb_check["count_check"] == 10
+            )
+            any_error = error_mask.any()
+
+            if any_error:
+                tb_error = tb_check[error_mask][["country", "year", "sum_check"]].sort_values(
+                    by="sum_check", ascending=False
+                )
+                paths.log.fatal(
+                    f"""{len(tb_error)} share observations for {welfare_type} ({equivalence_scale}) are not adding up to 100%:
+                    {_tabulate(tb_error, floatfmt=".1f")}"""
+                )
+
+
+def check_negative_values(tb_inequality: Table, tb_incomes: Table) -> None:
+    """
+    Check if there are negative values in the variables (excluding gini)
+    """
+    # 1. Check tb_inequality - all numeric columns (exclude gini)
+    tb = tb_inequality.reset_index()
+
+    # Get all numeric columns excluding index columns and gini
+    cols_to_check = [
+        col
+        for col in tb.columns
+        if col not in ["country", "year", "welfare_type", "equivalence_scale", "gini", "index"]
+        and any(dtype_str in str(tb[col].dtype).lower() for dtype_str in ["float", "int"])
+    ]
+
+    for col in cols_to_check:
+        mask = tb[col] < 0
+        any_error = mask.any()
+
+        if any_error:
+            tb_error = tb[mask][["country", "year", "welfare_type", "equivalence_scale", col]].copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {col} are negative:
+                {_tabulate(tb_error)}"""
+            )
+
+    # 2. Check tb_incomes (avg, thr, share, mean, median)
+    tb = tb_incomes.reset_index()
+
+    # Get all numeric columns excluding index columns
+    cols_to_check = [
+        col
+        for col in tb.columns
+        if col not in ["country", "year", "welfare_type", "equivalence_scale", "decile", "period", "index"]
+        and any(dtype_str in str(tb[col].dtype).lower() for dtype_str in ["float", "int"])
+    ]
+
+    for col in cols_to_check:
+        mask = tb[col] < 0
+        any_error = mask.any()
+
+        if any_error:
+            # Include decile in output if present
+            cols_to_show = ["country", "year", "welfare_type", "equivalence_scale"]
+            if "decile" in tb.columns:
+                cols_to_show.append("decile")
+            cols_to_show.append(col)
+
+            tb_error = tb[mask][cols_to_show].copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {col} are negative:
+                {_tabulate(tb_error)}"""
+            )
+
+
+def check_monotonicity(tb_incomes: Table) -> None:
+    """
+    Check monotonicity for shares, thresholds and averages across deciles
+    """
+    tb = tb_incomes.reset_index()
+
+    for welfare_type in tb["welfare_type"].unique():
+        for equivalence_scale in tb["equivalence_scale"].unique():
+            for metric in ["avg", "thr", "share"]:
+                # All metrics use deciles 1-10
+                deciles = list(range(1, 11))
+
+                # Filter to the right deciles
+                # For avg and thr, use period="year"; for share, use period=null
+                if metric in ["avg", "thr"]:
+                    tb_deciles = tb[(tb["decile"].isin(deciles)) & (tb["period"] == "year")].copy()
+                else:  # share
+                    tb_deciles = tb[(tb["decile"].isin(deciles)) & (tb["period"].isnull())].copy()
+
+                # Filter by welfare type and equivalence scale
+                mask = (tb_deciles["welfare_type"] == welfare_type) & (
+                    tb_deciles["equivalence_scale"] == equivalence_scale
+                )
+                tb_subset = tb_deciles[mask].copy()
+
+                # Skip if no data for this combination
+                if tb_subset.empty or metric not in tb_subset.columns:
+                    continue
+
+                # Sort by country, year, and decile
+                tb_subset = tb_subset.sort_values(["country", "year", "decile"])
+
+                # First, ensure each country-year has ALL expected rows (not just non-null values)
+                # Count rows per country-year and filter to only those with the expected number
+                expected_row_count = len(deciles)
+                tb_subset["row_count"] = tb_subset.groupby(["country", "year"])["decile"].transform("count")
+                tb_subset = tb_subset[tb_subset["row_count"] == expected_row_count].copy()
+
+                if tb_subset.empty:
+                    continue
+
+                # Now count non-null values per country-year group to only check complete sets
+                tb_subset["null_count"] = tb_subset.groupby(["country", "year"])[metric].transform(
+                    lambda x: x.isnull().sum()
+                )
+
+                # Only check country-years where ALL deciles have non-null values
+                tb_complete = tb_subset[tb_subset["null_count"] == 0].copy()
+
+                if tb_complete.empty:
+                    continue
+
+                # Get previous value within each country-year group
+                tb_complete["prev_value"] = tb_complete.groupby(["country", "year"])[metric].shift(1)
+                tb_complete["prev_decile"] = tb_complete.groupby(["country", "year"])["decile"].shift(1)
+
+                # Check monotonicity: current value should be >= previous value
+                # Only check where we have both current and previous values
+                tb_complete["is_monotonic"] = (tb_complete[metric] >= tb_complete["prev_value"]) | tb_complete[
+                    "prev_value"
+                ].isnull()
+
+                # Find violations (excluding first decile in each group which has no previous)
+                errors = tb_complete[~tb_complete["is_monotonic"] & tb_complete["prev_value"].notnull()].copy()
+
+                if not errors.empty:
+                    # Format error output
+                    errors["error_desc"] = (
+                        "Decile "
+                        + errors["prev_decile"].astype(str)
+                        + " ("
+                        + errors["prev_value"].round(4).astype(str)
+                        + ") -> Decile "
+                        + errors["decile"].astype(str)
+                        + " ("
+                        + errors[metric].round(4).astype(str)
+                        + ")"
+                    )
+
+                    tb_error = errors[["country", "year", "error_desc"]].copy()
+                    paths.log.fatal(
+                        f"""{len(tb_error)} observations for {metric} {welfare_type} ({equivalence_scale}) are not monotonically increasing:
+                        {_tabulate(tb_error)}"""
+                    )
+
+
+def check_avg_between_thr(tb_incomes: Table) -> None:
+    """
+    Check that each avg is between the corresponding thr boundaries
+    Note: Both avg and thr use deciles 1-10
+    avg decile i should be between thr decile (i-1) and thr decile i
+    But thr decile 0 doesn't exist, so:
+      avg decile 1 -> only upper bound: thr decile 1
+      avg decile 2-10 -> thr decile (i-1) (lower) and thr decile i (upper)
+    """
+    tb = tb_incomes.reset_index()
+
+    for welfare_type in tb["welfare_type"].unique():
+        for equivalence_scale in tb["equivalence_scale"].unique():
+            # Get avg data (deciles 1-10, period="year")
+            avg_deciles = list(range(1, 11))
+            tb_avg = tb[
+                (tb["decile"].isin(avg_deciles))
+                & (tb["period"] == "year")
+                & (tb["welfare_type"] == welfare_type)
+                & (tb["equivalence_scale"] == equivalence_scale)
+            ].copy()
+
+            # Get thr data (deciles 1-10, period="year")
+            thr_deciles = list(range(1, 11))
+            tb_thr = tb[
+                (tb["decile"].isin(thr_deciles))
+                & (tb["period"] == "year")
+                & (tb["welfare_type"] == welfare_type)
+                & (tb["equivalence_scale"] == equivalence_scale)
+            ].copy()
+
+            # Skip if no data
+            if tb_avg.empty or tb_thr.empty or "avg" not in tb_avg.columns or "thr" not in tb_thr.columns:
+                continue
+
+            # First, count rows per country-year to ensure all deciles are present
+            avg_row_counts = tb_avg.groupby(["country", "year"])["decile"].count().reset_index(name="row_count_avg")
+            thr_row_counts = tb_thr.groupby(["country", "year"])["decile"].count().reset_index(name="row_count_thr")
+
+            # Filter to country-years with all expected rows
+            complete_avg_rows = avg_row_counts[avg_row_counts["row_count_avg"] == 10][["country", "year"]]
+            complete_thr_rows = thr_row_counts[thr_row_counts["row_count_thr"] == 10][["country", "year"]]
+
+            # Now count non-null values to only check complete sets
+            avg_nulls = (
+                tb_avg.groupby(["country", "year"])["avg"]
+                .apply(lambda x: x.isnull().sum())
+                .reset_index(name="null_count_avg")
+            )
+            thr_nulls = (
+                tb_thr.groupby(["country", "year"])["thr"]
+                .apply(lambda x: x.isnull().sum())
+                .reset_index(name="null_count_thr")
+            )
+
+            # Find country-years with complete data (all deciles present AND non-null)
+            complete_avg = pr.merge(
+                complete_avg_rows,
+                avg_nulls[avg_nulls["null_count_avg"] == 0][["country", "year"]],
+                on=["country", "year"],
+            )
+            complete_thr = pr.merge(
+                complete_thr_rows,
+                thr_nulls[thr_nulls["null_count_thr"] == 0][["country", "year"]],
+                on=["country", "year"],
+            )
+            complete_both = pr.merge(complete_avg, complete_thr, on=["country", "year"])
+
+            if complete_both.empty:
+                continue
+
+            # Filter to only complete country-years
+            tb_avg_complete = pr.merge(tb_avg, complete_both, on=["country", "year"])[
+                ["country", "year", "decile", "avg"]
+            ]
+            tb_thr_complete = pr.merge(tb_thr, complete_both, on=["country", "year"])[
+                ["country", "year", "decile", "thr"]
+            ]
+
+            # For each avg decile i (1-10), check boundaries:
+            # avg decile 1 -> only upper bound: thr decile 1
+            # avg decile 2 -> thr decile 1 (lower) and thr decile 2 (upper)
+            # ...
+            # avg decile 10 -> thr decile 9 (lower) and thr decile 10 (upper)
+
+            errors_list = []
+            for avg_d in range(1, 11):
+                tb_avg_d = tb_avg_complete[tb_avg_complete["decile"] == avg_d].copy()
+
+                # Lower bound is thr decile (avg_d - 1), but decile 0 doesn't exist
+                # So only check lower bound for avg_d >= 2
+                if avg_d >= 2:
+                    thr_lower_d = avg_d - 1
+                    tb_thr_lower = tb_thr_complete[tb_thr_complete["decile"] == thr_lower_d].copy()
+                    tb_thr_lower = tb_thr_lower[["country", "year", "thr"]].rename(columns={"thr": "thr_lower"})
+
+                    # Merge to get lower bound
+                    tb_check = pr.merge(
+                        tb_avg_d,
+                        tb_thr_lower,
+                        on=["country", "year"],
+                    )
+                else:
+                    # For avg decile 1, no lower bound (thr decile 0 doesn't exist)
+                    tb_check = tb_avg_d.copy()
+                    tb_check["thr_lower"] = None
+
+                # Upper bound is thr decile avg_d
+                thr_upper_d = avg_d
+                tb_thr_upper = tb_thr_complete[tb_thr_complete["decile"] == thr_upper_d].copy()
+                tb_thr_upper = tb_thr_upper[["country", "year", "thr"]].rename(columns={"thr": "thr_upper"})
+                tb_check = pr.merge(
+                    tb_check,
+                    tb_thr_upper,
+                    on=["country", "year"],
+                )
+
+                # Check validity
+                if avg_d == 1:
+                    # Only upper bound: avg <= thr_upper
+                    tb_check["is_valid"] = tb_check["avg"] <= tb_check["thr_upper"]
+                else:
+                    # Both bounds: thr_lower <= avg <= thr_upper
+                    tb_check["is_valid"] = (tb_check["avg"] >= tb_check["thr_lower"]) & (
+                        tb_check["avg"] <= tb_check["thr_upper"]
+                    )
+
+                # Find violations
+                violations = tb_check[~tb_check["is_valid"]].copy()
+                if not violations.empty:
+                    errors_list.append(violations)
+
+            if errors_list:
+                errors = pr.concat(errors_list, ignore_index=True)
+
+                # Format error output
+                errors["thr_lower_str"] = (
+                    errors["thr_lower"].round(4).astype(str) if "thr_lower" in errors.columns else "N/A"
+                )
+                errors["thr_upper_str"] = errors["thr_upper"].apply(lambda x: f"{x:.4f}" if pd.notnull(x) else "N/A")
+
+                errors["error_desc"] = (
+                    "Decile "
+                    + errors["decile"].astype(str)
+                    + ": avg="
+                    + errors["avg"].round(4).astype(str)
+                    + ", thr_lower="
+                    + errors["thr_lower_str"]
+                    + ", thr_upper="
+                    + errors["thr_upper_str"]
+                )
+
+                tb_error = errors[["country", "year", "error_desc"]].copy()
+                paths.log.fatal(
+                    f"""{len(tb_error)} observations for avg {welfare_type} ({equivalence_scale}) are not between the corresponding thresholds:
+                    {_tabulate(tb_error)}"""
+                )
+
+
+def _tabulate(tb: Table, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    """Helper function to format tables for display"""
+    if LONG_FORMAT:
+        return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)
+    else:
+        return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
+
+
+def check_poverty_range(tb_poverty: Table) -> None:
+    """
+    Check that headcount_ratio is between 0 and 100
+    """
+    tb = tb_poverty.reset_index()
+
+    # Check headcount_ratio values for all combinations
+    for welfare_type in tb["welfare_type"].unique():
+        for equivalence_scale in tb["equivalence_scale"].unique():
+            mask = (tb["welfare_type"] == welfare_type) & (tb["equivalence_scale"] == equivalence_scale)
+            tb_subset = tb[mask].copy()
+
+            # Check headcount_ratio
+            if "headcount_ratio" in tb_subset.columns:
+                ratio_mask = (tb_subset["headcount_ratio"] > 100) | (tb_subset["headcount_ratio"] < 0)
+                any_error = ratio_mask.any()
+
+                if any_error:
+                    tb_error = tb_subset[ratio_mask][["country", "year", "poverty_line", "headcount_ratio"]].copy()
+                    paths.log.fatal(
+                        f"""{len(tb_error)} headcount_ratio values for {welfare_type} ({equivalence_scale}) are not between 0 and 100:
+                        {_tabulate(tb_error)}"""
+                    )
+
+
+def check_poverty_monotonicity(tb_poverty: Table) -> None:
+    """
+    Check monotonicity of headcount_ratio and headcount across poverty lines.
+    Uses dynamic sorting: numeric for absolute poverty, alphabetic for relative poverty.
+    """
+    tb = tb_poverty.reset_index()
+
+    # Identify absolute vs relative poverty by checking if poverty_line is numeric or contains text
+    # Absolute poverty lines are numeric strings like "3", "4.20", "8.30"
+    # Relative poverty lines contain text like "40% of the median"
+    tb["is_absolute"] = ~tb["poverty_line"].str.contains("%", na=False)
+
+    # Split into absolute and relative
+    tb_absolute = tb[tb["is_absolute"]].copy()
+    tb_relative = tb[~tb["is_absolute"]].copy()
+
+    # Check absolute poverty with numeric sorting
+    if not tb_absolute.empty:
+        _check_poverty_monotonicity_by_type(
+            tb_absolute, poverty_type="absolute", metrics=["headcount_ratio", "headcount"]
+        )
+
+    # Check relative poverty with alphabetic sorting
+    if not tb_relative.empty:
+        _check_poverty_monotonicity_by_type(
+            tb_relative, poverty_type="relative", metrics=["headcount_ratio", "headcount"]
+        )
+
+
+def _check_poverty_monotonicity_by_type(tb: Table, poverty_type: str, metrics: list) -> None:
+    """
+    Check monotonicity for a specific poverty type (absolute or relative).
+
+    Args:
+        tb: Table with poverty data (already filtered to one type)
+        poverty_type: "absolute" or "relative"
+        metrics: List of metrics to check (e.g., ["headcount_ratio", "headcount"])
+    """
+    for welfare_type in tb["welfare_type"].unique():
+        for equivalence_scale in tb["equivalence_scale"].unique():
+            mask = (tb["welfare_type"] == welfare_type) & (tb["equivalence_scale"] == equivalence_scale)
+            tb_subset = tb[mask].copy()
+
+            if tb_subset.empty:
+                continue
+
+            # Apply sorting based on poverty type
+            if poverty_type == "absolute":
+                # Convert poverty_line to numeric and sort
+                tb_subset["poverty_line_numeric"] = tb_subset["poverty_line"].astype(float)
+                tb_subset = tb_subset.sort_values(["country", "year", "poverty_line_numeric"])
+            else:  # relative
+                # Sort alphabetically by poverty_line text
+                tb_subset = tb_subset.sort_values(["country", "year", "poverty_line"])
+
+            # Get unique poverty lines in sorted order
+            if poverty_type == "absolute":
+                poverty_lines_sorted = sorted(tb_subset["poverty_line"].unique(), key=float)
+            else:
+                poverty_lines_sorted = sorted(tb_subset["poverty_line"].unique())
+
+            # Require at least 2 poverty lines to check monotonicity
+            if len(poverty_lines_sorted) < 2:
+                continue
+
+            # Check each metric
+            for metric in metrics:
+                if metric not in tb_subset.columns:
+                    continue
+
+                # Work with a fresh copy for each metric
+                tb_metric = tb_subset.copy()
+
+                # First, ensure each country-year has at least 2 poverty lines (minimum for monotonicity check)
+                poverty_line_counts = (
+                    tb_metric.groupby(["country", "year"])["poverty_line"].nunique().reset_index(name="line_count")
+                )
+                tb_metric = pr.merge(tb_metric, poverty_line_counts, on=["country", "year"])
+                tb_metric = tb_metric[tb_metric["line_count"] >= 2].copy()
+
+                if tb_metric.empty:
+                    continue
+
+                # Filter out country-years with any NULL values in the metric
+                null_counts = (
+                    tb_metric.groupby(["country", "year"])[metric]
+                    .apply(lambda x: x.isnull().sum())
+                    .reset_index(name="null_count")
+                )
+                tb_complete = pr.merge(tb_metric, null_counts, on=["country", "year"])
+                tb_complete = tb_complete[tb_complete["null_count"] == 0].copy()
+
+                if tb_complete.empty:
+                    continue
+
+                # Use shift() to compare consecutive values
+                tb_complete["prev_value"] = tb_complete.groupby(["country", "year"])[metric].shift(1)
+                tb_complete["prev_poverty_line"] = tb_complete.groupby(["country", "year"])["poverty_line"].shift(1)
+
+                # Check monotonicity: current value should be >= previous value
+                tb_complete["is_monotonic"] = (tb_complete[metric] >= tb_complete["prev_value"]) | tb_complete[
+                    "prev_value"
+                ].isnull()
+
+                # Find violations
+                errors = tb_complete[~tb_complete["is_monotonic"] & tb_complete["prev_value"].notnull()].copy()
+
+                if not errors.empty:
+                    # Format error output with 4 decimal precision
+                    errors["error_desc"] = (
+                        errors["prev_poverty_line"]
+                        + " ("
+                        + errors["prev_value"].round(4).astype(str)
+                        + ") -> "
+                        + errors["poverty_line"]
+                        + " ("
+                        + errors[metric].round(4).astype(str)
+                        + ")"
+                    )
+
+                    tb_error = errors[["country", "year", "error_desc"]].copy()
+                    paths.log.fatal(
+                        f"""{len(tb_error)} observations for {metric} ({poverty_type} poverty, {welfare_type}, {equivalence_scale}) are not monotonically increasing:
+                        {_tabulate(tb_error)}"""
+                    )

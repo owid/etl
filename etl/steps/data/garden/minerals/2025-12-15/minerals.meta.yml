@@ -934,7 +934,7 @@ tables:
         title: reserves|Strontium|Mine|tonnes
         unit: tonnes
         short_unit: t
-        description_short: Reserves of [strontium](#dod:strontium), in tonnnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        description_short: Reserves of [strontium](#dod:strontium), in tonnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
         presentation:
           title_public: Strontium reserves
       reserves_talc_and_pyrophyllite_mine_tonnes:
@@ -983,7 +983,7 @@ tables:
         title: reserves|Vanadium|Mine|tonnes
         unit: tonnes
         short_unit: t
-        description_short: Reserves of [vanadium](#dod:vandium), in tonnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        description_short: Reserves of [vanadium](#dod:vanadium), in tonnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
         presentation:
           title_public: Vanadium reserves
       reserves_zinc_mine_tonnes:

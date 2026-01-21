@@ -12,15 +12,25 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from owid.catalog.datasets import FileFormat
+    from owid.catalog.core.datasets import FileFormat
 
 # Constants
 OWID_CATALOG_VERSION = 3
-OWID_CATALOG_URI = "https://catalog.ourworldindata.org/"
 S3_OWID_URI = "s3://owid-catalog"
 PREFERRED_FORMAT: FileFormat = "feather"
 SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
 INDEX_FORMATS: list[FileFormat] = ["feather"]
+
+# =============================================================================
+# Default API URLs
+# =============================================================================
+# These are used only by Client.__init__() as defaults. All other functions
+# and classes require URLs to be passed explicitly.
+
+DEFAULT_CATALOG_URL = "https://catalog.ourworldindata.org/"
+DEFAULT_SITE_URL = "https://ourworldindata.org"
+DEFAULT_INDICATORS_SEARCH_URL = "https://search.owid.io/indicators"
+DEFAULT_SITE_SEARCH_URL = "https://ourworldindata.org/api/search"
 
 
 @contextmanager

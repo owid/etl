@@ -40,7 +40,7 @@ def set_config():
         branch_name = os.environ["BUILDKITE_BRANCH"]
         env_config = config.OWIDEnv(
             config.Config(
-                GRAPHER_USER_ID=1,
+                GRAPHER_USER_ID=config.ETL_GRAPHER_USER_ID,
                 DB_USER="owid",
                 DB_NAME="owid",
                 DB_PASS="",
