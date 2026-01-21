@@ -1252,7 +1252,7 @@ class GraphStep(Step):
                 metadata_file=self.metadata_file,
                 dependencies=dep_uris,
                 source_checksum=source_checksum,
-                force_graph=config.FORCE_GRAPH,
+                graph_push=config.GRAPH_PUSH,
             )
         else:
             # No --graph flag: only save metadata locally (like grapher step without --grapher)
@@ -1292,10 +1292,15 @@ class GraphStep(Step):
 
         # 4. If --graph flag is set, also check if database needs updating
         if config.GRAPH:
-            from etl.grapher.graph import _fetch_db_checksum
+            from etl.grapher.graph import _fetch_db_checksum, has_db_divergence
 
             db_checksum = _fetch_db_checksum(self.slug)
             if db_checksum != expected_checksum:
+                return True
+
+            # Check if database has diverged from what we last wrote
+            # This queries the DB to detect manual edits (similar to grapher steps)
+            if has_db_divergence(self.slug):
                 return True
 
         return False

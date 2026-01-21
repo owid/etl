@@ -30,7 +30,7 @@ def upsert_graph(
     metadata_file: Optional[Path],
     dependencies: List[str],
     source_checksum: str,
-    force_graph: bool = False,
+    graph_push: bool = False,
 ) -> int:
     """
     Create or update a chart in the grapher database.
@@ -40,7 +40,7 @@ def upsert_graph(
         metadata_file: Optional path to .meta.yml file with chart metadata
         dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/..."])
         source_checksum: Checksum of inputs (metadata file + dependencies) for dirty detection
-        force_graph: If True, overwrite manual edits made in Admin UI
+        graph_push: If True, overwrite manual edits made in Admin UI
 
     Returns:
         Chart ID
@@ -125,7 +125,7 @@ def upsert_graph(
             is_inheritance_enabled = False
 
         # 6. Check for manual overrides if chart exists and not forcing
-        if chart and not force_graph:
+        if chart and not graph_push:
             _check_manual_overrides(session, chart, config, is_inheritance_enabled, source_checksum)
 
         # 7. Add dimensions (variable IDs) to config
@@ -248,6 +248,62 @@ def _fetch_db_checksum(slug: str) -> Optional[str]:
     return metadata.get("db_checksum") if metadata else None
 
 
+def has_db_divergence(slug: str) -> bool:
+    """
+    Check if the database chart has diverged from what ETL last wrote.
+
+    This is used in dirty detection to determine if the chart needs to be checked
+    for manual edits. Returns True if:
+    - Chart doesn't exist in DB yet (needs creation)
+    - Chart config in DB differs from what we last wrote (potential manual edit)
+
+    Args:
+        slug: Chart slug
+
+    Returns:
+        True if DB might have diverged, False if DB matches what we last wrote
+    """
+    metadata = _load_graph_metadata(slug)
+    if not metadata or not metadata.get("last_config"):
+        # No tracking yet - either first run or chart never uploaded
+        return False
+
+    engine = get_engine()
+    with Session(engine) as session:
+        try:
+            chart = Chart.load_chart(session, slug=slug)
+        except NoResultFound:
+            # Chart doesn't exist in DB yet
+            return True
+
+        # Only check for explicit config charts (not inheritance-enabled)
+        if chart.isInheritanceEnabled:
+            # For inheritance charts, check patch config
+            if chart.chart_config.patch:
+                # Has patch config = has manual overrides
+                SYSTEM_FIELDS = {"id", "slug", "$schema", "version", "dimensions", "isPublished", "createdAt", "updatedAt", "isInheritanceEnabled"}
+                overridden_fields = [f for f in chart.chart_config.patch.keys() if f not in SYSTEM_FIELDS]
+                return len(overridden_fields) > 0
+            return False
+
+        # For explicit config, compare with last written config
+        stored_config = metadata.get("last_config", {})
+        current_config = chart.config
+
+        # Compare key fields
+        COMPARABLE_FIELDS = {"title", "subtitle", "note", "chartTypes", "hasMapTab", "tab", "selectedEntityNames"}
+
+        for field in COMPARABLE_FIELDS:
+            stored_value = stored_config.get(field)
+            current_value = current_config.get(field)
+
+            # If DB value differs from what we last wrote → divergence
+            if stored_value is not None and current_value != stored_value:
+                return True
+
+        return False
+
+
 def _resolve_indicator_paths(session: Session, catalog_paths: List[str]) -> List[int]:
     """
     Convert indicator catalog paths to variable IDs.
@@ -354,7 +410,7 @@ def _check_manual_overrides(
         current_checksum: Current checksum of ETL inputs
 
     Raises:
-        ValueError: If chart has manual overrides and force_graph=False
+        ValueError: If chart has manual overrides and graph_push=False
     """
     # System fields that change automatically or are expected to differ
     SYSTEM_FIELDS = {
@@ -378,8 +434,9 @@ def _check_manual_overrides(
                 f"Chart '{chart.slug}' has manual overrides from Admin UI in these fields: {overridden_fields}\n"
                 f"These changes would be lost if you continue.\n"
                 f"Either:\n"
-                f"  1. Copy the overrides to your .meta.yml file, or\n"
-                f"  2. Use --force to reset chart to ETL-managed state (WARNING: loses manual edits)"
+                f"  1. Use --graph-pull to pull database edits to your .meta.yml file (NOT YET IMPLEMENTED), or\n"
+                f"  2. Manually copy the overrides to your .meta.yml file, or\n"
+                f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
             )
 
     # For explicit config charts, detect divergence between ETL and DB
@@ -394,13 +451,7 @@ def _check_manual_overrides(
             log.info("graph.first_db_upload", slug=chart.slug)
             return
 
-        # If DB checksum matches current, ETL metadata hasn't changed since last DB write - no conflict possible
-        if db_checksum == current_checksum:
-            log.debug("graph.no_etl_changes_since_db", slug=chart.slug)
-            return
-
-        # ETL metadata HAS changed - now check if DB was also manually edited
-        # We do this by storing the config we last wrote and comparing to current DB
+        # Check if DB was manually edited by comparing current DB config with what we last wrote
         stored_config = metadata.get("last_config", {})
         current_config = chart.config
 
@@ -416,15 +467,32 @@ def _check_manual_overrides(
             if stored_value is not None and current_value != stored_value:
                 db_changed_fields.append(field)
 
-        # Only raise error if BOTH ETL and DB changed (divergence)
+        # If DB has manual edits, raise error
         if db_changed_fields:
-            raise ValueError(
-                f"Chart '{chart.slug}' has diverged: both ETL metadata and database were modified.\n"
-                f"Manually edited fields in database: {db_changed_fields}\n"
-                f"Last ETL values: {[f'{k}={stored_config.get(k)}' for k in db_changed_fields]}\n"
-                f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
-                f"New ETL values: {[f'{k}={expected_config.get(k)}' for k in db_changed_fields]}\n"
-                f"Either:\n"
-                f"  1. Update your .meta.yml file to match the database edits, or\n"
-                f"  2. Use --force-graph to overwrite database with ETL metadata (WARNING: loses manual edits)"
-            )
+            etl_changed = db_checksum != current_checksum
+
+            if etl_changed:
+                # Both ETL and DB changed (divergence)
+                raise ValueError(
+                    f"Chart '{chart.slug}' has diverged: both ETL metadata and database were modified.\n"
+                    f"Manually edited fields in database: {db_changed_fields}\n"
+                    f"Last ETL values: {[f'{k}={stored_config.get(k)}' for k in db_changed_fields]}\n"
+                    f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
+                    f"New ETL values: {[f'{k}={expected_config.get(k)}' for k in db_changed_fields]}\n"
+                    f"Either:\n"
+                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file (NOT YET IMPLEMENTED), or\n"
+                    f"  2. Manually update your .meta.yml file to match the database edits, or\n"
+                    f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
+                )
+            else:
+                # Only DB changed (no ETL changes)
+                raise ValueError(
+                    f"Chart '{chart.slug}' has manual edits from Admin UI that would be overwritten.\n"
+                    f"Manually edited fields in database: {db_changed_fields}\n"
+                    f"Last values: {[f'{k}={stored_config.get(k)}' for k in db_changed_fields]}\n"
+                    f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
+                    f"Either:\n"
+                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file (NOT YET IMPLEMENTED), or\n"
+                    f"  2. Keep the database edits (do nothing and don't run this step), or\n"
+                    f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
+                )

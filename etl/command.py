@@ -157,9 +157,14 @@ log = structlog.get_logger()
     help="Always upload grapher data & metadata JSON files even if checksums match.",
 )
 @click.option(
-    "--force-graph",
+    "--graph-push",
     is_flag=True,
-    help="Overwrite manual edits made to charts in Admin UI (for graph steps only).",
+    help="Push ETL metadata to database, overwriting any manual edits in Admin UI (for graph steps).",
+)
+@click.option(
+    "--graph-pull",
+    is_flag=True,
+    help="Pull database metadata to local .meta.yml file (for graph steps). NOT YET IMPLEMENTED.",
 )
 @click.option(
     "--prefer-download",
@@ -194,7 +199,8 @@ def main_cli(
     watch: bool = False,
     continue_on_failure: bool = False,
     force_upload: bool = False,
-    force_graph: bool = False,
+    graph_push: bool = False,
+    graph_pull: bool = False,
     prefer_download: bool = False,
     subset: Optional[str] = None,
     graph: bool = False,
@@ -245,9 +251,15 @@ def main_cli(
     if force_upload:
         config.FORCE_UPLOAD = force_upload
 
-    # Set FORCE_GRAPH from CLI flag (for graph steps)
-    if force_graph:
-        config.FORCE_GRAPH = force_graph
+    # Set GRAPH_PUSH from CLI flag (for graph steps)
+    if graph_push:
+        config.GRAPH_PUSH = graph_push
+
+    # Set GRAPH_PULL from CLI flag (for graph steps)
+    if graph_pull:
+        if graph_pull:
+            raise NotImplementedError("--graph-pull is not yet implemented")
+        config.GRAPH_PULL = graph_pull
 
     # Set GRAPH from CLI flag (for graph steps)
     if graph:
