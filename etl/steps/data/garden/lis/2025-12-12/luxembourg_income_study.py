@@ -780,7 +780,7 @@ def check_poverty_monotonicity(tb_poverty: Table) -> None:
     # Identify absolute vs relative poverty by checking if poverty_line is numeric or contains text
     # Absolute poverty lines are numeric strings like "3", "4.20", "8.30"
     # Relative poverty lines contain text like "40% of the median"
-    tb["is_absolute"] = tb["poverty_line"].str.contains("%", na=False) == False
+    tb["is_absolute"] = ~tb["poverty_line"].str.contains("%", na=False)
 
     # Split into absolute and relative
     tb_absolute = tb[tb["is_absolute"]].copy()
