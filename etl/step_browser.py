@@ -3,8 +3,10 @@
 #  Interactive step browser for etlr
 #
 
+import json
 import re
 import threading
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from prompt_toolkit import Application
@@ -96,10 +98,78 @@ def get_all_steps(dag: DAG, private: bool = False) -> List[str]:
     return all_steps
 
 
+def get_dag_max_mtime(dag_path: Path) -> float:
+    """Get the max mtime of all DAG YAML files (excluding archive/).
+
+    The DAG uses includes, so we need to check all .yml files, not just main.yml.
+    """
+    dag_dir = dag_path.parent
+    max_mtime = 0.0
+
+    for yml_file in dag_dir.glob("*.yml"):
+        max_mtime = max(max_mtime, yml_file.stat().st_mtime)
+
+    return max_mtime
+
+
+def load_cached_steps(dag_path: Path, private: bool) -> Optional[List[str]]:
+    """Load steps from cache if valid (no DAG files have changed).
+
+    Returns cached steps list, or None if cache is invalid/missing.
+    """
+    from etl import paths
+
+    cache_file = paths.STEP_CACHE_FILE
+    if not cache_file.exists():
+        return None
+
+    try:
+        with open(cache_file) as f:
+            cache = json.load(f)
+
+        # Check if cache matches current settings
+        if cache.get("dag_path") != str(dag_path):
+            return None
+        if cache.get("private") != private:
+            return None
+
+        # Check if any DAG file has been modified (main.yml + includes)
+        dag_max_mtime = get_dag_max_mtime(dag_path)
+        if cache.get("dag_max_mtime") != dag_max_mtime:
+            return None
+
+        return cache.get("steps", [])
+    except (json.JSONDecodeError, OSError, KeyError):
+        return None
+
+
+def save_step_cache(dag_path: Path, private: bool, steps: List[str]) -> None:
+    """Save steps to cache for instant startup next time."""
+    from etl import paths
+
+    cache_file = paths.STEP_CACHE_FILE
+    try:
+        # Ensure cache directory exists
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+
+        dag_max_mtime = get_dag_max_mtime(dag_path)
+        cache = {
+            "dag_path": str(dag_path),
+            "dag_max_mtime": dag_max_mtime,
+            "private": private,
+            "steps": steps,
+        }
+        with open(cache_file, "w") as f:
+            json.dump(cache, f)
+    except OSError:
+        pass  # Silently fail - cache is optional
+
+
 def browse_steps(
     dag: Optional[DAG] = None,
     private: bool = False,
     dag_loader: Optional[Callable[[], DAG]] = None,
+    dag_path: Optional[Path] = None,
 ) -> Tuple[Optional[str], bool]:
     """Interactive step browser using prompt_toolkit.
 
@@ -107,6 +177,7 @@ def browse_steps(
         dag: Pre-loaded DAG (if available)
         private: Whether to include private steps
         dag_loader: Callable that returns DAG (for async loading)
+        dag_path: Path to DAG file (for caching)
 
     Returns:
         Tuple of (pattern_or_step, is_exact_match):
@@ -122,19 +193,33 @@ def browse_steps(
         state.all_steps = get_all_steps(dag, private=private)
         state.loading = False
     elif dag_loader is not None:
-        # Start loading in background - UI shows immediately
-        state.loading = True
+        # Try loading from cache first (instant startup)
+        cached_steps = load_cached_steps(dag_path, private) if dag_path else None
 
-        def load_in_background() -> None:
-            loaded_dag = dag_loader()
-            state.all_steps = get_all_steps(loaded_dag, private=private)
+        if cached_steps is not None:
+            # Cache hit: mtime matched, cache is fresh - use it directly
+            # (load_cached_steps already validated mtime)
+            state.all_steps = cached_steps
             state.loading = False
-            # Trigger UI refresh from background thread
-            if state.app is not None:
-                state.app.invalidate()
+        else:
+            # Cache miss: show loading state
+            state.loading = True
 
-        thread = threading.Thread(target=load_in_background, daemon=True)
-        thread.start()
+            def load_in_background() -> None:
+                loaded_dag = dag_loader()
+                state.all_steps = get_all_steps(loaded_dag, private=private)
+                state.loading = False
+
+                # Save to cache for next time
+                if dag_path:
+                    save_step_cache(dag_path, private, state.all_steps)
+
+                # Trigger UI refresh from background thread
+                if state.app is not None:
+                    state.app.invalidate()
+
+            thread = threading.Thread(target=load_in_background, daemon=True)
+            thread.start()
     else:
         raise ValueError("Either dag or dag_loader must be provided")
 

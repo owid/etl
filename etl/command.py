@@ -243,6 +243,7 @@ def main_cli(
         result, is_exact = browse_steps(
             dag_loader=lambda: load_dag(dag_path),
             private=private,
+            dag_path=dag_path,
         )
 
         if result is None:
