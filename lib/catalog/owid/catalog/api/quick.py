@@ -6,9 +6,9 @@ The API separates discovery (searching)
 Example: Search for available data (no download)
     ```python
     >>> from owid.catalog import search
-    >>> results = search("population")  # Returns ResponseSet[TableResult]
-    >>> print(f"Found {len(results)} tables")
-    >>> print(results[0].path)
+    >>> results = search("population")  # Returns ResponseSet[ChartResult] (default)
+    >>> print(f"Found {len(results)} charts")
+    >>> print(results[0].slug)
     ```
 
 from download (fetching)
@@ -16,9 +16,9 @@ from download (fetching)
 Example: Fetch specific data by path
     ```python
     >>> from owid.catalog import fetch
-    >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")
-    >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")
-    >>> chart_tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")  # Table path
+    >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")  # Indicator
     ```
 """
 
@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 def search(
     name: str | None = None,
     *,
-    kind: Literal["table", "indicator", "chart"] = "table",
+    kind: Literal["table", "indicator", "chart"] = "chart",
     limit: int = 10,
     namespace: str | None = None,
     version: str | None = None,
@@ -64,11 +64,11 @@ def search(
     Args:
         name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy").
             Required for indicators and charts. Optional for tables (can filter by other params).
-        kind: What to search for (default: "table"):
+        kind: What to search for (default: "chart"):
 
+            - "chart": Search published charts (returns ResponseSet[ChartResult])
             - "table": Search catalog tables (returns ResponseSet[TableResult])
             - "indicator": Search indicators/variables (returns ResponseSet[IndicatorResult])
-            - "chart": Search published charts (returns ResponseSet[ChartResult])
         limit: Maximum number of results to return (default: 10)
         namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
         version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
@@ -88,24 +88,24 @@ def search(
 
     Example:
         ```python
-        # Search for tables (fuzzy search by default)
+        # Search for charts (default)
         results = search("population")
-        print(f"Found {len(results)} tables")
-        print(results[0].path)  # Access table path without downloading data
+        print(f"Found {len(results)} charts")
+        print(results[0].slug)  # Access chart slug without downloading data
+
+        # Search for tables
+        results = search("population", kind="table")
+        print(results[0].path)
 
         # Search for indicators
         results = search("gdp", kind="indicator")
         print(results[0].title)
 
-        # Search for charts
-        results = search("life expectancy", kind="chart")
-        print(results[0].slug)
-
         # Exact match for tables
-        results = search("population", match="exact")
+        results = search("population", kind="table", match="exact")
 
         # Filter tables by namespace and version
-        results = search("wdi", namespace="worldbank_wdi", version="2024-01-10")
+        results = search("wdi", kind="table", namespace="worldbank_wdi", version="2024-01-10")
 
         # Then fetch the data you need:
         tb = results[0].fetch()

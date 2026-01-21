@@ -1,0 +1,48 @@
+dataset:
+  title: Residential electricity consumption (IEA)
+  description: Estimates of electricity consumption in the residential sector only.
+  licenses:
+    - {}
+tables:
+  residential_electricity_consumption:
+    variables:
+      residential_electricity_twh:
+        title: Residential electricity consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Residential electricity consumption
+        description: Total electricity consumption per year for the residential sector only.
+      residential_elec_per_capita_kwh:
+        title: Residential electricity consumption per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+        display:
+          name: Per capita residential electricity consumption
+        description: Residential electricity consumption per person per year.
+      daily_residential_elec_per_capita_wh:
+        title: Daily residential electricity consumption per capita
+        unit: watt-hours
+        short_unit: Wh
+        display:
+          name: Daily residential electricity use per person (adjusted)
+        description: Daily residential electricity consumption per person.
+      residential_elec_per_capita_adjusted_access:
+        title: Residential electricity consumption per capita (adjusted)
+        unit: kilowatt-hours
+        short_unit: kWh
+        display:
+          name: Per capita residential electricity consumption
+        description: Residential electricity consumption per person per year, adjusted only for those who have access to electricity.
+      daily_residential_elec_per_capita_adjusted_wh:
+        title: Daily residential electricity consumption per capita (adjusted)
+        unit: watt-hours
+        short_unit: Wh
+        display:
+          name: Daily residential electricity use per person (adjusted)
+        description: Daily residential electricity consumption per person, adjusted only for those who have access to electricity.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

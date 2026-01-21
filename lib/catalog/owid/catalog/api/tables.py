@@ -229,6 +229,8 @@ class TableResult(BaseModel):
         version: Version string.
         dataset: Dataset name.
         dimensions: List of dimension columns.
+        title: Human-readable title (from table or dataset metadata).
+        description: Detailed description (from table or dataset metadata).
         is_public: Whether the data is publicly accessible.
         formats: List of available formats.
         popularity: Popularity score (0.0 to 1.0) based on analytics views.
@@ -252,6 +254,8 @@ class TableResult(BaseModel):
 
     # Content metadata
     dimensions: list[str] = Field(default_factory=list)
+    title: str | None = None
+    description: str | None = None
 
     # Technical metadata
     is_public: bool = True
@@ -541,6 +545,8 @@ class TablesAPI:
                     path=row["path"],
                     is_public=row.get("is_public", True),
                     dimensions=list(dimensions) if dimensions is not None else [],
+                    title=row.get("title"),
+                    description=row.get("description"),
                     formats=formats,
                     popularity=popularity.get(slug, 0.0),
                     catalog_url=self.catalog_url,
@@ -662,6 +668,7 @@ class TablesAPI:
             query=query,
             total_count=len(results),
             base_url=self.catalog_url,
+            _ui_advanced=False,
         )
 
     def fetch(
