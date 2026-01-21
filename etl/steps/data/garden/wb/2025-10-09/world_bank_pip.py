@@ -4,7 +4,7 @@ Load a meadow dataset and create a garden dataset.
 When running this step in an update, be sure to check all the outputs and logs to ensure the data is correct.
 
 NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal (and set DEBUG = True in the code):
-    nohup uv run etl run world_bank_pip > output_pip.log 2>&1 &
+    nohup .venv/bin/etlr world_bank_pip > output_pip.log 2>&1 &
 
 """
 
@@ -892,7 +892,9 @@ def sanity_checks(
 
         ############################
         # delete columns created for the checks
-        tb_pivot = tb_pivot.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"], errors="raise")
+        tb_pivot = tb_pivot.sort_index(axis=1).drop(
+            columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"], errors="raise"
+        )
 
         obs_after_checks = len(tb_pivot)
         log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_year} PPPs.")
@@ -1118,10 +1120,12 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
     # Drop the columns created in this function
-    tb_both_inc_and_cons_smoothed = tb_both_inc_and_cons_smoothed.drop(
+    tb_both_inc_and_cons_smoothed = tb_both_inc_and_cons_smoothed.sort_index(axis=1).drop(
         columns=["only_inc_or_cons", "duplicate_flag"], errors="raise"
     )
-    tb_only_inc_or_cons = tb_only_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"], errors="raise")
+    tb_only_inc_or_cons = tb_only_inc_or_cons.sort_index(axis=1).drop(
+        columns=["only_inc_or_cons", "duplicate_flag"], errors="raise"
+    )
 
     # Restore the format of the table
     tb_both_inc_and_cons_smoothed = unpivot_table(
