@@ -137,6 +137,14 @@ tables:
           grapher_config:
             note: *note_exp
 
+      in_tour_exp_balance_of_payments_total_vis:
+        title: Total inbound tourism expenditure
+        unit: US dollars
+        short_unit: $
+        presentation:
+          grapher_config:
+            note: *note_exp
+
       in_tour_purpose_trips_by_business_overnight_vis_tourists:
         title: International trips for business and professional reasons
         unit: arrivals
@@ -202,6 +210,12 @@ tables:
         description_short: Number of trips by people who arrive from all regions.
         description_key: *desc_key_arrivals
 
+      in_tour_regions_trips_by_area_of_residence_overnight_vis_tourists_res_abroad_world:
+        title: International tourists who are residents abroad
+        unit: arrivals
+        description_short: Number of trips by people who are residents abroad.
+        description_key: *desc_key_arrivals
+
       in_tour_transport_trips_air_overnight_vis_tourists:
         title: International tourists arriving by air
         unit: arrivals
@@ -251,6 +265,14 @@ tables:
 
       out_tour_exp_balance_of_payments_travel_vis:
         title: International expenditure on travel abroad
+        unit: US dollars
+        description_key: *desc_key_exp
+        presentation:
+          grapher_config:
+            note: *note_exp
+
+      out_tour_exp_balance_of_payments_total_vis:
+        title: Total outbound tourism expenditure
         unit: US dollars
         description_key: *desc_key_exp
         presentation:
@@ -385,3 +407,15 @@ tables:
           - The underlying premise behind this indicator is that the country linked to the arrival should correspond to the individual's country of residence.
           - However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
 
+      out_tour_departures_trips_total_overnight_vis_tourists_per_1000:
+        title: International tourist departures per 1,000 people
+        unit: departures per 1,000 people
+        description_short: Number of trips by people who travel abroad and stay overnight.
+        description_key:
+          - *desc_key_departures
+          - Per "1,000 people" in the context of international departures refers to the calculation of trips per 1,000 individuals within the population of the country.
+          - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
+          - For instance, if there are "10 departures per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 instances of international departures.
+          - This indicator provides an estimate of outbound tourism intensity in the country of reference.
+        display:
+          numDecimalPlaces: 1

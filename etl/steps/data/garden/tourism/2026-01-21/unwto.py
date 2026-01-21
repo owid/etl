@@ -27,7 +27,6 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb)
     # Drop columns with all NaN values
     tb = tb.dropna(axis=1, how="all")
-    print(len(tb.columns))
 
     # Find columns that start with the specified prefixes - units are not thousands
     prefixes_not_thousands = ["inbound_tourism_expenditure", "outbound_tourism_expenditure", "tourism_industries"]
@@ -133,7 +132,6 @@ def run() -> None:
 
     # Adjust inbound and outbound expenditure for inflation and cost of living
     tb = tb.format(["country", "year"])
-    print(len(tb.columns))
 
     #
     # Save outputs.
