@@ -94,3 +94,15 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/un/2025-07-03/refugee_data:
     - data://garden/un/2025-07-03/refugee_data
+
+
+    # IDMC Internal Displacement Data (2025 update)
+  data://meadow/idmc/2026-01-19/internal_displacement:
+    - snapshot://idmc/2026-01-19/internal_displacement.csv
+  data://garden/idmc/2026-01-19/internal_displacement:
+    - data://meadow/idmc/2026-01-19/internal_displacement
+    - data://garden/demography/2024-07-15/population
+  data://grapher/idmc/2026-01-19/internal_displacement:
+    - data://garden/idmc/2026-01-19/internal_displacement
+
+

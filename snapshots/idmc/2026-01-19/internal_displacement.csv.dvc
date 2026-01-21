@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global Internal Displacement Database (GIDD)"
+    description: |-
+      The GIDD is an annual dataset that provides validated and peer-reviewed estimates of internal displacement resulting from conflict and disasters. Conflict-related displacement figures are reported at the national level by calendar year, while disaster-related displacement is recorded at the event level. Since 2023, the dataset includes additional disaggregation by location, displacement cause, and event.
+
+      The GIDD captures both population flows (new displacements during the year) and stocks (total number of people living in displacement at the end of the year), covering the period from 1 January to 31 December.
+
+      Additional methodological notes, caveats, and information on historical revisions are available through the Public Figure Analysis API, which complements the main dataset with detailed contextual insights. This dataset is available since 2009 for conflict and 2008 for disaster induced displacement.
+
+
+    date_published: "2026"
+
+    # Citation
+    producer: Internal Displacement Monitoring Centre
+    citation_full: |-
+      Internal Displacement Monitoring Centre. Global Internal Displacement Database. IDMC (2025). Available at: https://www.internal-displacement.org/database/displacement-data/ (Accessed: 2026-01-19).
+    attribution_short: IDMC
+
+    # Files
+    url_main: https://www.internal-displacement.org/database/displacement-data/
+    date_accessed: '2026-01-19'
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://www.internal-displacement.org/terms-of-use/
+outs:
+  - md5: 321612fb9e0e1faddc62384b6e9bb429
+    size: 111768
+    path: internal_displacement.csv
