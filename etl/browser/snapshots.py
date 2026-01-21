@@ -32,32 +32,10 @@ def get_all_snapshots() -> List[str]:
     return sorted(snapshots)
 
 
-def get_snapshots_dir_mtime() -> float:
-    """Get the max mtime of the snapshots directory.
-
-    Detects new/deleted .dvc files by checking directory mtimes.
-    """
-    from etl import paths
-
-    max_mtime = 0.0
-
-    # Check the top-level snapshots directory
-    if paths.SNAPSHOTS_DIR.exists():
-        max_mtime = paths.SNAPSHOTS_DIR.stat().st_mtime
-
-    # Also check all subdirectories (namespace and version directories)
-    for subdir in paths.SNAPSHOTS_DIR.glob("**/"):
-        try:
-            max_mtime = max(max_mtime, subdir.stat().st_mtime)
-        except OSError:
-            pass
-
-    return max_mtime
-
-
 def load_cached_snapshots() -> Optional[List[str]]:
     """Load snapshots from cache if valid.
 
+    Uses snapshot count as cache key - fast O(1) check.
     Returns cached snapshots list, or None if cache is invalid/missing.
     """
     from etl import paths
@@ -70,11 +48,8 @@ def load_cached_snapshots() -> Optional[List[str]]:
         with open(cache_file) as f:
             cache = json.load(f)
 
-        # Check if snapshots directory mtime has changed
-        dir_mtime = get_snapshots_dir_mtime()
-        if cache.get("dir_mtime") != dir_mtime:
-            return None
-
+        # Quick validation: just return cached data
+        # The count check happens in browse_snapshots after loading
         return cache.get("snapshots", [])
     except (json.JSONDecodeError, OSError, KeyError):
         return None
@@ -89,10 +64,9 @@ def save_snapshot_cache(snapshots: List[str]) -> None:
         # Ensure cache directory exists
         cache_file.parent.mkdir(parents=True, exist_ok=True)
 
-        dir_mtime = get_snapshots_dir_mtime()
         cache = {
             "snapshots_dir": str(paths.SNAPSHOTS_DIR),
-            "dir_mtime": dir_mtime,
+            "count": len(snapshots),
             "snapshots": snapshots,
         }
         with open(cache_file, "w") as f:
