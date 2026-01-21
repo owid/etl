@@ -4,8 +4,7 @@ Load World Inequality Database meadow dataset and create a garden dataset.
 NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
     1. Define LONG_FORMAT as True.
     2. Run the following command in the terminal:
-        nohup uv run etl run world_inequality_database > output_wid.log 2>&1 &
-
+        nohup .venv/bin/etlr world_inequality_database_legacy > output_wid_legacy.log 2>&1 &
 """
 
 import owid.catalog.processing as pr
