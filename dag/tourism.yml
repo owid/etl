@@ -1,6 +1,14 @@
 steps:
 
 # UNWTO tourism datasets
+  data://meadow/tourism/2026-01-21/unwto:
+    - snapshot://tourism/2026-01-21/unwto.xlsx
+  data://garden/tourism/2026-01-21/unwto:
+    - data://meadow/tourism/2026-01-21/unwto
+    - data://garden/demography/2024-07-15/population
+  data://grapher/tourism/2026-01-21/unwto:
+    - data://garden/tourism/2026-01-21/unwto
+
   data://meadow/tourism/2024-08-17/unwto:
     - snapshot://tourism/2024-08-17/unwto.xlsx
   data://garden/tourism/2024-08-17/unwto:
