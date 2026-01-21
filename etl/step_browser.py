@@ -34,13 +34,68 @@ BROWSER_STYLE = Style.from_dict(
         "match-count": f"fg:{OWID_GRAY}",
         "separator": f"fg:{OWID_GRAY}",
         "step": f"fg:{OWID_GRAY}",
+        "step.highlight": f"fg:{OWID_GREEN} bold",
         "step.selected": f"bg:{OWID_YELLOW} fg:#000000 bold",
+        "step.selected.highlight": f"bg:{OWID_YELLOW} fg:#000000 bold underline",
         "hint": f"fg:{OWID_GRAY} italic",
     }
 )
 
 # Maximum number of steps to display
 MAX_DISPLAY_STEPS = 15
+
+
+def highlight_matches(step: str, pattern: str, is_selected: bool) -> List[Tuple[str, str]]:
+    """Create styled text segments with matching terms highlighted.
+
+    Returns a list of (style, text) tuples for prompt_toolkit.
+    """
+    if not pattern:
+        style = "class:step.selected" if is_selected else "class:step"
+        return [(style, step)]
+
+    base_style = "class:step.selected" if is_selected else "class:step"
+    highlight_style = "class:step.selected.highlight" if is_selected else "class:step.highlight"
+
+    terms = pattern.split()
+    step_lower = step.lower()
+
+    # Find all match positions
+    matches: List[Tuple[int, int]] = []  # (start, end) positions
+    for term in terms:
+        term_lower = term.lower()
+        start = 0
+        while True:
+            pos = step_lower.find(term_lower, start)
+            if pos == -1:
+                break
+            matches.append((pos, pos + len(term)))
+            start = pos + 1
+
+    if not matches:
+        return [(base_style, step)]
+
+    # Merge overlapping matches and sort by position
+    matches.sort()
+    merged: List[Tuple[int, int]] = []
+    for start, end in matches:
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+
+    # Build styled segments
+    segments: List[Tuple[str, str]] = []
+    pos = 0
+    for start, end in merged:
+        if pos < start:
+            segments.append((base_style, step[pos:start]))
+        segments.append((highlight_style, step[start:end]))
+        pos = end
+    if pos < len(step):
+        segments.append((base_style, step[pos:]))
+
+    return segments
 
 
 class BrowserState:
@@ -58,13 +113,39 @@ class BrowserState:
 
 
 def filter_steps(pattern: str, all_steps: List[str]) -> List[str]:
-    """Filter steps by pattern using regex matching.
+    """Filter steps by pattern using segment matching.
 
-    Matches steps that contain the pattern anywhere in their name.
+    Supports two modes:
+    1. Space-separated terms: "energy 2024" matches steps containing BOTH terms
+    2. Single term: treated as regex (or substring if invalid regex)
+
+    Matches are case-insensitive and sorted by relevance.
     """
     if not pattern:
         return []
 
+    terms = pattern.split()
+
+    # Multiple terms: AND matching (all terms must be present)
+    if len(terms) > 1:
+        terms_lower = [t.lower() for t in terms]
+        matches = [
+            s for s in all_steps
+            if all(term in s.lower() for term in terms_lower)
+        ]
+        # Sort by: number of terms matched at word boundaries, then length
+        def score(s: str) -> Tuple[int, int, str]:
+            s_lower = s.lower()
+            # Count terms that match at segment boundaries (after / or -)
+            boundary_matches = sum(
+                1 for term in terms_lower
+                if f"/{term}" in s_lower or f"-{term}" in s_lower or s_lower.startswith(term)
+            )
+            return (-boundary_matches, len(s), s)
+        matches.sort(key=score)
+        return matches
+
+    # Single term: regex matching with substring fallback
     try:
         compiled = re.compile(pattern, re.IGNORECASE)
         matches = [s for s in all_steps if compiled.search(s)]
@@ -308,13 +389,14 @@ def browse_steps(
         # Separator
         lines.append(("class:separator", "  " + "-" * 50 + "\n"))
 
-        # Display matches
+        # Display matches with highlighting
         display_matches = matches[:MAX_DISPLAY_STEPS]
         for i, step in enumerate(display_matches):
-            if i == state.selected_index:
-                lines.append(("class:step.selected", f"  > {step}"))
-            else:
-                lines.append(("class:step", f"    {step}"))
+            is_selected = i == state.selected_index
+            prefix_style = "class:step.selected" if is_selected else "class:step"
+            prefix = "  > " if is_selected else "    "
+            lines.append((prefix_style, prefix))
+            lines.extend(highlight_matches(step, text, is_selected))
             lines.append(("", "\n"))
 
         if len(matches) > MAX_DISPLAY_STEPS:
