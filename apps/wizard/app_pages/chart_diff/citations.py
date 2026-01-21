@@ -159,11 +159,23 @@ def extract_heading_text(heading_obj: dict) -> str:
     return str(text_content) if text_content else ""
 
 
+# Unicode subscript/superscript to ASCII mapping
+UNICODE_SUB_SUPER_MAP = str.maketrans({
+    "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4",
+    "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9",
+    "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4",
+    "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9",
+})
+
+
 def heading_to_slug(heading_text: str) -> str:
     """Convert heading text to URL slug (matching OWID's slugification)."""
     slug = heading_text.lower()
+    # Convert Unicode subscript/superscript numbers to regular digits
+    slug = slug.translate(UNICODE_SUB_SUPER_MAP)
     # Replace apostrophes and similar with hyphens (OWID keeps them as separators)
-    slug = re.sub(r"['']", "-", slug)
+    # Include: straight apostrophe ', left single quote ', right single quote '
+    slug = re.sub(r"['\u2018\u2019]", "-", slug)
     # Replace other special chars (not hyphens, spaces, or word chars) with nothing
     slug = re.sub(r"[^\w\s-]", "", slug)
     # Replace spaces and underscores with hyphens
