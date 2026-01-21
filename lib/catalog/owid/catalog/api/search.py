@@ -224,7 +224,7 @@ class SiteSearchAPI:
                 title=hit.get("title", ""),
                 url=url,
                 type=chart_type,  # type: ignore[arg-type]
-                subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
+                subtitle=hit.get("subtitle", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
                 published_at=published_at,

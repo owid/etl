@@ -170,6 +170,12 @@ class ResponseSet(BaseModel, Generic[T]):
         if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
             df = df.copy()
 
+            # Get slugs from results (order matches df rows)
+            slugs = [getattr(r, "slug", "") for r in self.results]
+            # Handle truncated display (head + tail)
+            if truncated:
+                slugs = slugs[: self._HEAD_ROWS] + slugs[-self._TAIL_ROWS :]
+
             # Add thumbnail column - clickable to open chart
             df.insert(
                 0,
@@ -181,8 +187,11 @@ class ResponseSet(BaseModel, Generic[T]):
                 ),
             )
 
-            # Make URL a clickable link
-            df["url"] = df["url"].apply(lambda x: f'<a href="{x}" target="_blank">{x.split("/")[-1]}</a>' if x else "")
+            # Make URL a clickable link using slug from results
+            df["url"] = [
+                f'<a href="{url}" target="_blank">{slug}</a>' if url else ""
+                for url, slug in zip(df["url"], slugs)
+            ]
 
         # Insert ellipsis row if truncated
         if truncated:
