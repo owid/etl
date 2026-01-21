@@ -343,6 +343,12 @@ steps:
     - data://garden/ons/2025-12-31/average_weekly_earnings_uk
   data://grapher/light/2025-12-29/energy_innovation_long_run:
     - data://garden/light/2025-12-29/energy_innovation_long_run
+
+  data://garden/light/2026-01-21/energy_innovation_long_run:
+    - data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data
+    - data://meadow/light/2025-12-29/energy_innovation_long_run
+  data://grapher/light/2026-01-21/energy_innovation_long_run:
+    - data://garden/light/2026-01-21/energy_innovation_long_run
   #
   # Ember - Yearly electricity data.
   #
