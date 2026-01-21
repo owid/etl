@@ -760,6 +760,17 @@ steps:
   data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
     - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/crime/2026-01-21/prison_rates:
+    - snapshot://crime/2026-01-20/prison_rates.csv
+  data://garden/crime/2026-01-21/prison_rates:
+    - data://meadow/crime/2026-01-21/prison_rates
+  data://grapher/crime/2026-01-21/prison_rates:
+    - data://garden/crime/2026-01-21/prison_rates
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
