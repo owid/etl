@@ -23,6 +23,12 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Set debug mode
+DEBUG = False
+
+# Set table format when printing
+TABLEFMT = "pretty"
+
 # Initialize logger.
 log = get_logger()
 
@@ -93,12 +99,6 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Ukraine",
     "Uzbekistan",
 ]
-
-# Set debug mode
-DEBUG = False
-
-# Set table format when printing
-TABLEFMT = "pretty"
 
 # Define indicators that don't depend on poverty lines
 INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES = [
