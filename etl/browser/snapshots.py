@@ -1,0 +1,125 @@
+#
+#  snapshots.py
+#  Snapshot browser for etls command
+#
+
+import json
+from typing import List, Optional, Tuple
+
+from etl.browser.core import browse_items
+
+
+def get_all_snapshots() -> List[str]:
+    """Get all snapshot URIs from the snapshots directory.
+
+    Scans snapshots/**/*.dvc and returns URIs in the format:
+    namespace/version/short_name (without extension)
+    """
+    from etl import paths
+
+    snapshots = []
+    for dvc_file in paths.SNAPSHOTS_DIR.glob("**/*.dvc"):
+        # Get relative path from snapshots dir
+        rel_path = dvc_file.relative_to(paths.SNAPSHOTS_DIR)
+
+        # Convert to snapshot URI: namespace/version/short_name
+        # The .dvc file is like: namespace/version/short_name.ext.dvc
+        # We want: namespace/version/short_name.ext (without .dvc)
+        # But the URI format is: namespace/version/short_name (remove both .dvc and file extension)
+        uri = str(rel_path.with_suffix(""))  # Remove .dvc
+        snapshots.append(uri)
+
+    return sorted(snapshots)
+
+
+def get_snapshots_dir_mtime() -> float:
+    """Get the max mtime of the snapshots directory.
+
+    Detects new/deleted .dvc files by checking directory mtimes.
+    """
+    from etl import paths
+
+    max_mtime = 0.0
+
+    # Check the top-level snapshots directory
+    if paths.SNAPSHOTS_DIR.exists():
+        max_mtime = paths.SNAPSHOTS_DIR.stat().st_mtime
+
+    # Also check all subdirectories (namespace and version directories)
+    for subdir in paths.SNAPSHOTS_DIR.glob("**/"):
+        try:
+            max_mtime = max(max_mtime, subdir.stat().st_mtime)
+        except OSError:
+            pass
+
+    return max_mtime
+
+
+def load_cached_snapshots() -> Optional[List[str]]:
+    """Load snapshots from cache if valid.
+
+    Returns cached snapshots list, or None if cache is invalid/missing.
+    """
+    from etl import paths
+
+    cache_file = paths.SNAPSHOT_CACHE_FILE
+    if not cache_file.exists():
+        return None
+
+    try:
+        with open(cache_file) as f:
+            cache = json.load(f)
+
+        # Check if snapshots directory mtime has changed
+        dir_mtime = get_snapshots_dir_mtime()
+        if cache.get("dir_mtime") != dir_mtime:
+            return None
+
+        return cache.get("snapshots", [])
+    except (json.JSONDecodeError, OSError, KeyError):
+        return None
+
+
+def save_snapshot_cache(snapshots: List[str]) -> None:
+    """Save snapshots to cache for instant startup next time."""
+    from etl import paths
+
+    cache_file = paths.SNAPSHOT_CACHE_FILE
+    try:
+        # Ensure cache directory exists
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+
+        dir_mtime = get_snapshots_dir_mtime()
+        cache = {
+            "snapshots_dir": str(paths.SNAPSHOTS_DIR),
+            "dir_mtime": dir_mtime,
+            "snapshots": snapshots,
+        }
+        with open(cache_file, "w") as f:
+            json.dump(cache, f)
+    except OSError:
+        pass  # Silently fail - cache is optional
+
+
+def browse_snapshots() -> Tuple[Optional[str], bool]:
+    """Interactive snapshot browser using prompt_toolkit.
+
+    Returns:
+        Tuple of (pattern_or_snapshot, is_exact_match):
+        - If user presses Enter: (current_text, False) to run all matches
+        - If user selects a snapshot: (snapshot_uri, True) to run just that snapshot
+        - If user cancels: (None, False)
+    """
+    # Try loading from cache first
+    cached_items = load_cached_snapshots()
+
+    return browse_items(
+        items_loader=get_all_snapshots,
+        prompt="etls> ",
+        loading_message="Loading snapshots...",
+        empty_message="No snapshots found.",
+        item_noun="snapshot",
+        item_noun_plural="snapshots",
+        cached_items=cached_items,
+        on_items_loaded=save_snapshot_cache,
+    )
