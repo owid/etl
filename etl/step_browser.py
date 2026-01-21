@@ -4,7 +4,7 @@
 #
 
 import re
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from prompt_toolkit import Application
 from prompt_toolkit.buffer import Buffer
@@ -13,7 +13,10 @@ from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.styles import Style
 
-from etl.steps import DAG, graph_nodes
+from etl.dag_helpers import graph_nodes
+
+# Simple type alias - avoids importing heavy etl.steps module
+DAG = Dict[str, Set[str]]
 
 # OWID-styled colors (reused from harmonize.py and apps/pr/cli.py)
 OWID_YELLOW = "#fac800"
