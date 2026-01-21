@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -118,15 +117,9 @@ def run() -> None:
         tb_regions_sum = tb_regions_sum.rename(columns=rename_mapping)
 
         # Melt the Table so that each region is a row in a country column
-        tb_regions_sum = pd.melt(
+        tb_regions_sum = pr.melt(
             tb_regions_sum, id_vars=["year"], var_name="country", value_name="inbound_tourism_by_region"
         )
-
-        # Add origins to the new column
-        if existing_region_columns:
-            tb_regions_sum["inbound_tourism_by_region"].metadata.origins = tb[
-                existing_region_columns[0]
-            ].metadata.origins
 
         tb = pr.concat([tb, tb_regions_sum], axis=0)
 
