@@ -15,7 +15,7 @@ meta:
 
       * 1979-1998: [Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)](https://wonder.cdc.gov/cmf-icd9.html)
 
-      * 1999-2020: [Compressed Mortality, 1999-2020 - CDC Wonder (ICD-10)](https://wonder.cdc.gov/cmf-icd10.html)
+      * 1999-2020: [Underlying Cause of Death, 1999-2020 - CDC WONDER (ICD-10)](https://wonder.cdc.gov/ucd-icd10.html)
 
     date_published: "2023"
 
@@ -30,7 +30,7 @@ meta:
 
       Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)
 
-      Compressed Mortality, 1999-2020 - CDC Wonder (ICD-10)
+      Underlying Cause of Death, 1999-2020 - CDC WONDER (ICD-10)
 
     # Files
     url_main: https://wonder.cdc.gov/ucd-icd10.html
