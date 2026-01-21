@@ -23,7 +23,6 @@ def run(upload: bool = True) -> None:
     all_data = []
     countries = get_country_names()
     for country_info in countries:
-        print(country_info["name"])
         country_df = fetch_wpb_country(country_info["slug"], country_info["name"])
         all_data.append(country_df)
 
@@ -47,8 +46,14 @@ def get_country_names() -> List[dict]:
         slug = (
             name.lower()
             .replace(r"[()/:,&.'']", "")
-            .replace("(", "").replace(")", "").replace("/", "").replace(":", "")
-            .replace(",", "").replace("&", "").replace(".", "").replace("'", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("/", "")
+            .replace(":", "")
+            .replace(",", "")
+            .replace("&", "")
+            .replace(".", "")
+            .replace("'", "")
         )
         # Remove "of" and "the"
         slug = " ".join(word for word in slug.split() if word not in ["of", "the"])
@@ -205,11 +210,13 @@ def _clean_trend_table(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Rename to match snapshot naming convention
-    df = df.rename(columns={
-        "Year": "year",
-        "Prison population total": "prison_population_total",
-        "Prison population rate": "prison_population_rate"
-    })
+    df = df.rename(
+        columns={
+            "Year": "year",
+            "Prison population total": "prison_population_total",
+            "Prison population rate": "prison_population_rate",
+        }
+    )
 
     return df.drop_duplicates().reset_index(drop=True)
 
@@ -269,7 +276,7 @@ def fetch_wpb_country(country_slug: str, country_name: str):
         if date_str is None:
             return None
         # Match 4-digit year
-        match = re.search(r'(19|20)\d{2}', str(date_str))
+        match = re.search(r"(19|20)\d{2}", str(date_str))
         return int(match.group(0)) if match else None
 
     snapshot_df = pd.DataFrame(
