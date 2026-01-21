@@ -23,7 +23,6 @@ import rich_click as click
 import structlog
 from click.shell_completion import CompletionItem
 from ipdb import launch_ipdb_on_exception
-from sympy.codegen.ast import continue_
 
 from etl import paths
 from etl.dag_helpers import load_dag
