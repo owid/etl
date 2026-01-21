@@ -177,20 +177,19 @@ class ResponseSet(BaseModel, Generic[T]):
                 slugs = slugs[: self._HEAD_ROWS] + slugs[-self._TAIL_ROWS :]
 
             # Add thumbnail column - clickable to open chart
-            df.insert(
-                0,
-                "preview",
-                df["url"].apply(
-                    lambda x: f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>'
+            preview_col = pd.Series(
+                [
+                    f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>'
                     if x
                     else ""
-                ),
+                    for x in df["url"]
+                ]
             )
+            df.insert(0, "preview", preview_col)
 
             # Make URL a clickable link using slug from results
             df["url"] = [
-                f'<a href="{url}" target="_blank">{slug}</a>' if url else ""
-                for url, slug in zip(df["url"], slugs)
+                f'<a href="{url}" target="_blank">{slug}</a>' if url else "" for url, slug in zip(df["url"], slugs)
             ]
 
         # Insert ellipsis row if truncated
