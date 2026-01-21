@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: "A millenium of macroeconomic data"
     description: |-
-      The dataset contains a broad set of macroeconomic and financial data for the UK stretching back in some cases to the C13th and with one or two benchmark estimates available for 1086, the year of the Domesday Book. The dataset was originally called the 'Three centuries of macroeconomic data' spreadsheet but has now been renamed given its broader coverage.  This is a slice of the data that will be published on 2026, consisting in wages and and CPI.
+      The dataset contains a broad set of macroeconomic and financial data for the UK stretching back in some cases to the C13th and with one or two benchmark estimates available for 1086, the year of the Domesday Book. The dataset was originally called the 'Three centuries of macroeconomic data' spreadsheet but has now been renamed given its broader coverage. This is an extract of the data that will be published on 2026, consisting in wages and and CPI.
     date_published: "2026-01-01"
     version_producer: '4'
 

@@ -104,3 +104,10 @@ steps:
     - snapshot://ons/2025-12-31/average_weekly_earnings_uk.xlsx
   data://garden/ons/2025-12-31/average_weekly_earnings_uk:
     - data://meadow/ons/2025-12-31/average_weekly_earnings_uk
+  #
+  # A millennium of macroeconomic data (Bank of England) - Version 4 (extract)
+  #
+  data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data:
+    - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
+  data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data:
+    - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data
