@@ -19,23 +19,10 @@ This is just a sneak peek into some of our data work. But note that all our code
 
 !!! note ""
 
-    ## COVID-19 work
-    Summary of our data work during COVID-19 pandemic, with all the relevant links to data and research. For a less technical, but more narrative summary, refer to our [COVID-19 history article](https://ourworldindata.org/owid-covid-history).
-
-    [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
-    [:material-download: Download data (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }
-
-<!-- Keep commented out until the article is published.
--->
-<!--
-!!! note ""
-
     ## Land use for biofuels vs. solar
-    This document is a technical companion to the article ["***"](***), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic.
-    This technical document serves as a companion to that article, where we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
+    This document is a technical companion to the article ["Putting solar panels on land used for biofuels would produce enough electricity for all cars and trucks to go electric"](https://ourworldindata.org/biofuel-land-solar-electric-vehicles), that examines how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic.
 
     [:material-book-open-variant: Methodology](biofuels_land_use/index.md){ .md-button }
--->
 
 !!! note ""
 
@@ -45,3 +32,12 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-notebook: View notebook](food_supply_of_world_regions/food_supply_of_world_regions.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
+
+
+!!! note ""
+
+    ## COVID-19 work
+    Summary of our data work during COVID-19 pandemic, with all the relevant links to data and research. For a less technical, but more narrative summary, refer to our [COVID-19 history article](https://ourworldindata.org/owid-covid-history).
+
+    [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
+    [:material-download: Download data (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }

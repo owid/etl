@@ -30,13 +30,13 @@ meta:
     # Files
     url_main: https://epoch.ai/mlinputs/visualization
     url_download: https://epoch.ai/data/epochdb/notable_ai_models.csv
-    date_accessed: '2026-01-04'
+    date_accessed: '2026-01-13'
 
     # License
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: cc98d2284f17a22dea3b8fbcd636eab2
-    size: 2095548
+  - md5: b4a332b99b105163b022b11e611d4a8d
+    size: 2096704
     path: epoch.csv

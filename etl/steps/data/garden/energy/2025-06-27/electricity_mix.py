@@ -132,8 +132,8 @@ def process_ember_data(tb_ember: Table) -> Table:
         "generation__fossil__twh": "fossil_generation__twh",
         "generation__total_generation__twh": "total_generation__twh",
         "demand__total_demand__twh": "total_demand__twh",
-        "emissions__total_emissions__mtco2": "total_emissions__mtco2",
-        "emissions__co2_intensity__gco2_kwh": "co2_intensity__gco2_kwh",
+        "emissions__lifecycle__total_emissions__mtco2": "total_emissions__mtco2",
+        "emissions__lifecycle__co2_intensity__gco2_kwh": "co2_intensity__gco2_kwh",
         "imports__total_net_imports__twh": "total_net_imports__twh",
     }
     tb_ember = tb_ember[list(columns)].rename(columns=columns, errors="raise")
@@ -410,6 +410,30 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     return combined
 
 
+def check_carbon_intensity(combined: Table) -> None:
+    # There is already a carbon intensity variable in the Ember dataset, but now that we have combined EI and Ember data, intensities might need to be recalculated for consistency.
+    # However, before doing that, check if it's necessary. If the resulting calculated intensity is very similar to the original, just keep the original.
+    _combined = combined.copy()
+    _combined["_co2_intensity"] = (combined["total_emissions__mtco2"] * MT_TO_G) / (
+        combined["total_generation__twh"] * TWH_TO_KWH
+    )
+    error = "Carbon intensities differ from expected values by more than the tolerance. Consider recalculating intensities or increasing the relative tolerance."
+    assert (
+        _combined[
+            ~np.isclose(
+                _combined["_co2_intensity"].to_numpy(),
+                _combined["co2_intensity__gco2_kwh"].to_numpy(),
+                rtol=1e-3,
+                equal_nan=True,
+            )
+        ][["country", "year", "_co2_intensity", "co2_intensity__gco2_kwh"]]
+        .dropna()
+        .empty
+    ), error
+    # If the assertion is not fulfilled, consider simply recalculating intensities.
+    # combined["co2_intensity__gco2_kwh"] = co2_intensity.copy()
+
+
 def run() -> None:
     #
     # Load data.
@@ -484,12 +508,8 @@ def run() -> None:
     # This way we avoid spurious jumps in the combined series.
     combined = fix_discrepancies_in_aggregate_regions(tb_review=tb_review, tb_ember=tb_ember, combined=combined)
 
-    # Add carbon intensities.
-    # There is already a variable for this in the Ember dataset, but now that we have combined
-    # EI and Ember data, intensities should be recalculated for consistency.
-    combined["co2_intensity__gco2_kwh"] = (combined["total_emissions__mtco2"] * MT_TO_G) / (
-        combined["total_generation__twh"] * TWH_TO_KWH
-    )
+    # Check if carbon intensity needs to be recalculated.
+    check_carbon_intensity(combined=combined)
 
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined, ds_population=ds_population)

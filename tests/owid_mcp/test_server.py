@@ -321,7 +321,7 @@ async def test_search_posts_algolia_vs_sql():
 
 
 @pytest.mark.asyncio
-async def test_fetch_chart_data_global_warming():
+async def test_load_chart_table_data_global_warming():
     """Test fetch_chart_data with global warming by gas and source dataset."""
     async with Client(mcp) as client:
         # Test fetching chart data with specific URL and time filter

@@ -903,21 +903,21 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         # If neither is available, set as NaN
         tb[f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
         tb.loc[tb[ind_national].notna() & tb[ind_modeled].isna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
-            "Survey only"
+            "Only national estimate available"
         )
         tb.loc[tb[ind_national].isna() & tb[ind_modeled].notna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
-            "Modeled only"
+            "Only ILO modeled available"
         )
         tb.loc[
             tb[f"{indicator}_absolute_difference"] < MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE,
             f"{indicator}_ilo_modeling_comparison_absolute",
-        ] = "Both matching"
+        ] = "Both available (agreeing)"
         tb.loc[
             (tb[f"{indicator}_absolute_difference"] >= MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE)
             & tb[ind_national].notna()
             & tb[ind_modeled].notna(),
             f"{indicator}_ilo_modeling_comparison_absolute",
-        ] = "Both not matching"
+        ] = "Both available (disagreeing)"
 
         # Copy metadata from the modeled indicator to the new comparison indicator
         tb[f"{indicator}_ilo_modeling_comparison_absolute"] = tb[

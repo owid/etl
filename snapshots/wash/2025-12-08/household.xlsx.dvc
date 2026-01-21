@@ -1,0 +1,50 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP)"
+    description: |-
+      The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990. The JMP maintains an extensive global database and has become the leading source of comparable estimates of progress at national, regional and global levels.
+    date_published: "2025-08-01"
+    version_producer: 2000-2024 report
+    title_snapshot: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) - Household Data
+    description_snapshot: |-
+      The WHO/UNICEF JMP WASH collects three data on household, school and healthcare facility level. Household data includes the following indicators:
+
+      Drinking water
+
+      Drinking water services refers to the accessibility, availability and quality of the main source used by households for drinking, cooking, personal hygiene and other domestic uses
+
+      Sanitation
+
+      Sanitation services refer to the management of excreta from the facilities used by individuals, through emptying and transport of excreta for treatment and eventual discharge or reuse.​​​​​​
+
+      Hygiene
+
+      Hygiene refers to the conditions and practices that help maintain health and prevent spread of disease including handwashing, food hygiene, and menstrual hygiene management (see Menstrual Health).
+
+
+      Menstrual Health
+
+      Menstrual health refers to ‘a state of complete physical, mental, and social well-being and not merely the absence of disease or infirmity, in relation to the menstrual cycle’.
+
+
+    # Citation
+    producer: World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
+    citation_full: |-
+      World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (2025). Estimates for drinking water, sanitation and hygiene services by country (2000-2024), https://washdata.org/data
+    attribution_short: WHO/UNICEF JMP
+
+    # Files
+    url_main: https://washdata.org/data/downloads#WLD
+    date_accessed: '2025-12-08'
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://data.unicef.org/resources/jmp-report-2025/
+outs:
+  - md5: ef077008ef377d17626e4eac747a34ee
+    size: 6125956
+    path: household.xlsx

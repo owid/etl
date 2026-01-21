@@ -6,7 +6,7 @@ Check out this issue with the refactoring plan on next update https://github.com
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
-from owid.catalog.datasets import NULLABLE_DTYPES
+from owid.catalog.core.datasets import NULLABLE_DTYPES
 from structlog import get_logger
 
 from etl.data_helpers import geo

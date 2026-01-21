@@ -1,0 +1,34 @@
+# NOTE: File was provided by CORE Econ via email.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Maddison Project Database"
+    description: |-
+      The Maddison Project has launched an updated version of the original Maddison dataset in January 2013. The update incorporates much of the latest research in the field, and presents new estimates of economic growth in the world economic between AD 1 and 2010. The new estimates are presented and discussed in Bolt and Van Zanden (2014). The Maddison Project: collaborative research on historical national accounts. The Economic History Review, 67 (3): 627–651.
+    date_published: "2013-01-01"
+    version_producer: '2013'
+    title_snapshot: Maddison Project Database - GDP per capita growth in the UK
+    description_snapshot: |-
+      GDP per capita growth in the UK processed by CORE Econ.
+
+    # Citation
+    producer: Bolt and van Zanden
+    citation_full: |-
+      Maddison Project Database, version 2013. Bolt, J. and J. L. van Zanden (2014). The Maddison Project: collaborative research on historical national accounts. [The Economic History Review, 67 (3): 627–651](http://dx.doi.org/10.1111/1468-0289.12032), [working paper](https://www.rug.nl/ggdc/historicaldevelopment/maddison/test/publications/wp4.pdf)
+    attribution: Bolt and van Zanden – Maddison Project Database 2013
+
+    # Files
+    url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2013
+    date_accessed: '2026-01-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2013
+outs:
+  - md5: f8901b47da8a483a0cffe644c1126fd7
+    size: 19649
+    path: growth_rate_gdp_pc.csv

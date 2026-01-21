@@ -1,11 +1,11 @@
 # Land use for biofuels vs. solar
 
 !!! info ""
-    :octicons-person-16: **Pablo Rosado, Hannah Ritchie** • :octicons-calendar-16: December 12, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Land%20use%20for%20biofuels%20vs.%20solar)
+    :octicons-person-16: **[Pablo Rosado](https://ourworldindata.org/team/pablo-rosado), [Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie)** • :octicons-calendar-16: December 12, 2025 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Land%20use%20for%20biofuels%20vs.%20solar)
 
 ## Introduction and summary
 
-In our article ["***"](***), we explore how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
+In our article ["Putting solar panels on land used for biofuels would produce enough electricity for all cars and trucks to go electric"](https://ourworldindata.org/biofuel-land-solar-electric-vehicles), we explore how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
 
 This technical document serves as a companion to that article.
 Here, we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
@@ -115,7 +115,9 @@ Combining the ranges of capacity factors and power densities, we can calculate a
 - Upper: 32 · 10⁶ ha x ( 0.7 MW / ha ) x ( 1 PWh / 10⁹ MWh ) x ( 28% of 8760 h / 1 year ) = 55 PWh / year
 
 Our fiducial value of 1 GWh / ha / year could be considered conservative, given that:
+
 - A significant fraction of the biofuel cropland is in the US and Brazil, which have good conditions for solar generation.
+
 - The hypothetical transition from biofuel cropland to solar panels would take place in the coming years, so efficiencies would improve slightly with respect to the present.
 
 Therefore, if we filled the entire cropland of biofuel feedstocks with solar panels, we could produce ~32 PWh per year.

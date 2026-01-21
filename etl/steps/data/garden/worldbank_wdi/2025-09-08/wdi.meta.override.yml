@@ -1897,17 +1897,26 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          Availability and differences between ILO [modeled estimates](#dod:ilo-modelled-estimates) and [national estimates](#dod:ilo-national-estimates) of unemployment rate.
+          Availability and agreement between countries' [national estimates](#dod:ilo-national-estimates) of unemployment rates and the International Labour Organization (ILO) [modeled estimates](#dod:ilo-modelled-estimates).
         description_key:
           - "{definitions.description_key_modelling_status}"
           - "{definitions.description_key_no_published_estimates}"
         processing_level: "major"
         description_processing: |-
           We derive this indicator by calculating the absolute difference between the ILO modeled estimates and the national estimates for unemployment rate in each country and year. If the absolute difference is less than 0.1 percentage points, we consider the estimates to be the same value. If the absolute difference is 0.1 percentage points or more, we classify it as a different value. If data is only available in one of the datasets, we indicate that as well.
+        presentation:
+          grapher_config:
+            note: When both national survey estimates and ILO modeled estimates are available, they are classified as "agreeing" if they differ by less than 0.1 percentage points, and as "disagreeing" otherwise.
         display:
           name: Availability of unemployment estimates by source
           numDecimalPlaces: 0
           tolerance: 0
+          type: categorical
+          sort:
+            - Both available (agreeing)
+            - Both available (disagreeing)
+            - Only ILO modeled available
+            - Only national estimate available
 
       number_below_working_age:
         title: Number of people below working age

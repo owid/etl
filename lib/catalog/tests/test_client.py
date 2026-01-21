@@ -3,16 +3,18 @@
 #
 import pytest
 
-from owid.catalog import Client
+from owid.catalog import Client, Table
 from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
     IndicatorResult,
     LicenseError,
-    PageSearchResult,
     ResponseSet,
     TableResult,
 )
+from owid.catalog.api.datasette import DatasetteAPI, DatasetteTable
+from owid.catalog.api.search import PageSearchResult
+from owid.catalog.core.charts import ChartTable, ChartTableMeta
 
 
 class TestClient:
@@ -34,41 +36,63 @@ class TestChartsAPI:
     """Test the Charts API."""
 
     def test_fetch_chart(self):
+        """Test fetching chart returns ChartTable directly."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
+        tb = client.charts.fetch("life-expectancy")
 
-        assert isinstance(chart, ChartResult)
-        assert chart.slug == "life-expectancy"
-        assert chart.title
-        assert chart.url == "https://ourworldindata.org/grapher/life-expectancy"
+        assert isinstance(tb, ChartTable)
+        # Table has data (load_data=True by default)
+        assert len(tb) > 0
+        # Chart slug stored in metadata.short_name
+        assert tb.metadata.short_name == "life-expectancy"
 
     def test_fetch_chart_by_url(self):
+        """Test fetching chart by URL returns ChartTable."""
         client = Client()
-        chart = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
+        tb = client.charts.fetch("https://ourworldindata.org/grapher/life-expectancy")
 
-        assert isinstance(chart, ChartResult)
-        assert chart.slug == "life-expectancy"
+        assert isinstance(tb, ChartTable)
+        assert tb.metadata.short_name == "life-expectancy"
 
-    def test_fetch_chart_data(self):
+    def test_load_chart_table_data(self):
+        """Test that fetched chart Table has expected index and columns."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
-        df = chart.data
+        tb = client.charts.fetch("life-expectancy")
 
-        assert df is not None
-        assert len(df) > 0
-        assert "entities" in df.columns
-        assert "years" in df.columns
+        assert len(tb) > 0
+        # entities and years are now index columns
+        assert "entities" in tb.index.names
+        assert "years" in tb.index.names or "dates" in tb.index.names
 
-    def test_fetch_chart_metadata_and_config(self):
+    def test_load_chart_table_metadata_and_config(self):
+        """Test that table metadata, column metadata and chart config are accessible."""
         client = Client()
-        chart = client.charts.fetch("life-expectancy")
+        tb = client.charts.fetch("life-expectancy")
 
-        assert chart.metadata is not None
-        assert isinstance(chart.metadata, dict)
-        assert "columns" in chart.metadata
+        # Table metadata should be ChartTableMeta
+        assert tb.metadata is not None
+        assert isinstance(tb.metadata, ChartTableMeta)
+        assert tb.metadata.short_name == "life-expectancy"
+        assert tb.metadata.title is not None
+        # ChartTableMeta.uri returns chart URL
+        assert tb.metadata.uri == "https://ourworldindata.org/grapher/life-expectancy"
+        # ChartTableMeta.dataset returns None (charts don't have datasets)
+        assert tb.metadata.dataset is None
 
-        assert chart.config is not None
-        assert isinstance(chart.config, dict)
+        # Column metadata should be populated (columns are data columns only, index has entities/years)
+        assert len(tb.columns) > 0
+        col = tb.columns[0]
+        assert tb[col].metadata.unit is not None
+
+        # Origin with citation should be populated
+        assert len(tb[col].metadata.origins) > 0
+        origin = tb[col].metadata.origins[0]
+        assert origin.citation_full is not None
+
+        # Chart config should be accessible via .metadata.chart_config
+        assert tb.metadata.chart_config is not None
+        assert isinstance(tb.metadata.chart_config, dict)
+        assert "title" in tb.metadata.chart_config
 
     def test_chart_not_found(self):
         client = Client()
@@ -76,10 +100,11 @@ class TestChartsAPI:
             client.charts.fetch("this-chart-does-not-exist")
 
     def test_non_redistributable_chart(self):
+        """Test that non-redistributable charts raise LicenseError."""
         client = Client()
         with pytest.raises(LicenseError):
-            chart = client.charts.fetch("test-scores-ai-capabilities-relative-human-performance")
-            _ = chart.data  # Access data to trigger LicenseError
+            # LicenseError is raised immediately since load_data=True by default
+            client.charts.fetch("test-scores-ai-capabilities-relative-human-performance")
 
     def test_invalid_url(self):
         client = Client()
@@ -115,7 +140,7 @@ class TestChartsAPISearch:
         results = client.charts.search("population")
 
         df = results.to_frame()
-        assert "slug" in df.columns
+        assert "url" in df.columns
         assert "title" in df.columns
         assert len(df) == len(results)
 
@@ -195,34 +220,23 @@ class TestIndicatorsAPI:
         assert 0 <= first.score <= 1
         assert first.path
 
-    def test_indicator_results_to_catalog_frame(self):
-        client = Client()
-        results = client.indicators.search("co2 emissions")
-
-        frame = results.to_catalog_frame()
-        assert "indicator_title" in frame.columns
-        assert "score" in frame.columns
-        assert "path" in frame.columns
-
     def test_fetch_indicator(self):
-        """Test fetching a specific indicator by URI."""
+        """Test fetching a specific indicator by path returns Table directly."""
         client = Client()
-        # First search to find an indicator URI
+        # First search to find an indicator path
         results = client.indicators.search("solar power")
         if len(results) > 0:
-            # Fetch by URI (path)
+            # Fetch by path - returns Table with single column
             assert results[0].path
-            indicator = client.indicators.fetch(results[0].path)
-            assert indicator.column_name
-            assert indicator.title
-            assert indicator.path == results[0].path
-            # Test lazy loading - table should not be loaded yet
-            assert indicator._table is None
-            # Test data access - this triggers lazy loading
-            variable = indicator.data
-            assert variable is not None
-            # After accessing data, table should be cached
-            assert indicator._table is not None
+            tb = client.indicators.fetch(results[0].path)
+            assert isinstance(tb, Table)
+            # Table has data (since load_data=True by default)
+            assert len(tb) > 0
+            # Should have exactly one column (the indicator)
+            assert len(tb.columns) == 1
+            # Metadata is accessible on the column
+            col_name = tb.columns[0]
+            assert tb[col_name].metadata is not None
 
     def test_fetch_indicator_invalid_format(self):
         """Test that invalid path format raises error."""
@@ -264,32 +278,20 @@ class TestTablesAPI:
         assert len(results) > 0
         assert all(r.namespace == "un" for r in results)
 
-    def test_table_results_to_catalog_frame(self):
-        client = Client()
-        results = client.tables.search(table="population", namespace="un")
-
-        frame = results.to_catalog_frame()
-        assert "table" in frame.columns
-        assert "namespace" in frame.columns
-        assert "path" in frame.columns
-
-        # Should be loadable
-        assert hasattr(frame, "load")
-
     def test_fetch_table(self):
-        """Test fetching table metadata by path."""
+        """Test fetching table by path returns Table directly."""
         client = Client()
         # First search to find a path
         results = client.tables.search(table="population", namespace="un")
         if len(results) > 0:
             path = results[0].path
-            # Now fetch by path (should return same metadata)
-            table_result = client.tables.fetch(path)
-            assert isinstance(table_result, TableResult)
-            assert table_result.path == path
-            assert table_result.table
-            assert table_result.dataset
-            assert table_result.namespace == "un"
+            # Fetch table directly by path
+            tb = client.tables.fetch(path)
+            assert isinstance(tb, Table)
+            # Table has data (since load_data=True by default)
+            assert len(tb) > 0
+            # Metadata is accessible
+            assert tb.metadata is not None
 
     def test_fetch_invalid_path(self):
         """Test that fetching with invalid path format raises error."""
@@ -300,48 +302,52 @@ class TestTablesAPI:
     def test_fetch_nonexistent_table(self):
         """Test that fetching non-existent table raises error."""
         client = Client()
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(KeyError, match="No matching table found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
 
-    def test_backwards_compatibility_datasets(self):
-        """Test that client.datasets still works (backwards compatibility)."""
+    def test_search_with_refresh_index(self):
+        """Test that refresh_index parameter forces index re-download."""
         client = Client()
 
-        # Should work via datasets attribute
-        results = client.datasets.search(table="population")
-        assert len(results) > 0
+        # First search caches the index
+        results1 = client.tables.search(table="population")
+        assert len(results1) > 0
 
-        # Verify it's the same as tables
-        assert client.datasets is client.tables
+        # Search with refresh_index=True should work (forces re-download)
+        results2 = client.tables.search(table="population", refresh_index=True)
+        assert len(results2) > 0
+
+        # Results should be equivalent
+        assert len(results1) == len(results2)
 
 
 class TestResponseSet:
     """Test the ResponseSet container."""
 
     def test_iteration(self):
-        results = ResponseSet(results=[1, 2, 3], query="test")
+        results = ResponseSet(results=[1, 2, 3], query="test", base_url="https://example.com")
 
         items = list(results)
         assert items == [1, 2, 3]
 
     def test_indexing(self):
-        results = ResponseSet(results=["a", "b", "c"], query="test")
+        results = ResponseSet(results=["a", "b", "c"], query="test", base_url="https://example.com")
 
         assert results[0] == "a"
         assert results[1] == "b"
         assert results[2] == "c"
 
     def test_len(self):
-        results = ResponseSet(results=[1, 2, 3, 4, 5], query="test")
+        results = ResponseSet(results=[1, 2, 3, 4, 5], query="test", base_url="https://example.com")
         assert len(results) == 5
 
-    def test_limit_auto_set(self):
-        results = ResponseSet(results=[1, 2, 3], query="test")
-        assert results.limit == 3
+    def test_total_count_auto_set(self):
+        results = ResponseSet(results=[1, 2, 3], query="test", base_url="https://example.com")
+        assert results.total_count == 3
 
-    def test_limit_explicit(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", limit=100)
-        assert results.limit == 100
+    def test_total_count_explicit(self):
+        results = ResponseSet(results=[1, 2, 3], query="test", total_count=100, base_url="https://example.com")
+        assert results.total_count == 100
 
     def test_filter(self):
         """Test filtering results with a predicate."""
@@ -358,7 +364,7 @@ class TestResponseSet:
             MockResult(version="2023-12-01", name="c"),
             MockResult(version="2024-03-01", name="d"),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Filter by version (>= "2024-03-01" matches 2024-03-01 and 2024-06-01)
         filtered = results.filter(lambda r: r.version >= "2024-03-01")
@@ -388,7 +394,7 @@ class TestResponseSet:
             MockResult(version="2024-01-01", score=0.9),
             MockResult(version="2024-06-01", score=0.7),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Sort by version ascending
         sorted_results = results.sort_by("version")
@@ -418,7 +424,7 @@ class TestResponseSet:
             MockResult(name="a", value=1),
             MockResult(name="b", value=2),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Sort by value using lambda
         sorted_results = results.sort_by(lambda r: r.value)
@@ -444,7 +450,7 @@ class TestResponseSet:
             MockResult(version="2024-06-01", published_at="2024-06-15", score=0.9),
             MockResult(version="2024-03-01", published_at="2024-03-15", score=0.7),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
         # Get latest by version
         latest = results.latest(by="version")
@@ -460,58 +466,10 @@ class TestResponseSet:
 
     def test_latest_empty_results(self):
         """Test that latest() raises ValueError on empty results."""
-        results = ResponseSet(results=[], query="test")
+        results = ResponseSet(results=[], query="test", base_url="https://example.com")
 
         with pytest.raises(ValueError, match="No results available"):
             results.latest(by="version")
-
-    def test_first_single(self):
-        """Test getting first single result."""
-        from pydantic import BaseModel
-
-        class MockResult(BaseModel):
-            name: str
-
-        items = [
-            MockResult(name="a"),
-            MockResult(name="b"),
-            MockResult(name="c"),
-        ]
-        results = ResponseSet(results=items, query="test")
-
-        # Get first item
-        first = results.first()
-        assert first.name == "a"
-
-        # First of empty results
-        empty_results = ResponseSet(results=[], query="test")
-        assert empty_results.first() is None
-
-    def test_first_multiple(self):
-        """Test getting first n results."""
-        from pydantic import BaseModel
-
-        class MockResult(BaseModel):
-            name: str
-
-        items = [
-            MockResult(name="a"),
-            MockResult(name="b"),
-            MockResult(name="c"),
-            MockResult(name="d"),
-        ]
-        results = ResponseSet(results=items, query="test")
-
-        # Get first 2
-        first_two = results.first(2)
-        assert isinstance(first_two, ResponseSet)
-        assert len(first_two) == 2
-        assert [r.name for r in first_two] == ["a", "b"]
-
-        # Get first 10 (more than available)
-        first_ten = results.first(10)
-        assert isinstance(first_ten, ResponseSet)
-        assert len(first_ten) == 4
 
     def test_chaining(self):
         """Test chaining multiple convenience methods."""
@@ -528,18 +486,16 @@ class TestResponseSet:
             MockResult(version="2024-03-01", namespace="un", score=0.7),
             MockResult(version="2024-02-01", namespace="worldbank", score=0.6),
         ]
-        results = ResponseSet(results=items, query="test")
+        results = ResponseSet(results=items, query="test", base_url="https://example.com")
 
-        # Chain filter -> sort -> first
-        filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True).first(1)
+        # Chain filter -> sort -> index
+        filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True)[0]
         assert filtered.version == "2024-03-01"
         assert filtered.namespace == "un"
 
-        # Chain filter -> sort -> first multiple
-        top_two = results.filter(lambda r: r.score > 0.6).sort_by("score", reverse=True).first(2)
-        assert isinstance(top_two, ResponseSet)
-        assert len(top_two) == 2
-        assert [r.score for r in top_two] == [0.9, 0.8]
+        # Chain filter -> sort -> latest
+        top = results.filter(lambda r: r.score > 0.6).sort_by("score", reverse=True).latest(by="score")
+        assert top.score == 0.9
 
 
 class TestDataclassModels:
@@ -550,10 +506,15 @@ class TestDataclassModels:
             slug="test-chart",
             title="Test Chart",
             url="https://ourworldindata.org/grapher/test-chart",
+            site_url="https://ourworldindata.org",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
+        assert result.site_url == "https://ourworldindata.org"
+        assert result.grapher_url == "https://ourworldindata.org/grapher"
+        assert result.explorer_url == "https://ourworldindata.org/explorers"
+        assert result.type == "chart"
 
     def test_indicator_result(self):
         result = IndicatorResult(
@@ -561,10 +522,12 @@ class TestDataclassModels:
             title="Test Indicator",
             score=0.95,
             path="grapher/test/2024/dataset/table#column",
+            catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.indicator_id == 123
         assert result.score == 0.95
+        assert result.catalog_url == "https://catalog.ourworldindata.org/"
 
     def test_table_result(self):
         result = TableResult(
@@ -574,7 +537,174 @@ class TestDataclassModels:
             namespace="un",
             channel="garden",
             path="garden/un/2024-07-11/un_wpp/population",
+            title="World Population Prospects",
+            description="UN World Population Prospects data",
+            catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.table == "population"
         assert result.namespace == "un"
+        assert result.title == "World Population Prospects"
+        assert result.description == "UN World Population Prospects data"
+        assert result.catalog_url == "https://catalog.ourworldindata.org/"
+
+    def test_table_result_optional_fields(self):
+        """Test that title and description are optional and default to None."""
+        result = TableResult(
+            table="population",
+            dataset="un_wpp",
+            version="2024-07-11",
+            namespace="un",
+            channel="garden",
+            path="garden/un/2024-07-11/un_wpp/population",
+            catalog_url="https://catalog.ourworldindata.org/",
+        )
+
+        assert result.title is None
+        assert result.description is None
+
+
+class TestDatasetteAPI:
+    """Test the DatasetteAPI for Datasette integration."""
+
+    def test_client_has_datasette(self):
+        """Test that Client has _datasette attribute."""
+        client = Client()
+        assert hasattr(client, "_datasette")
+        assert isinstance(client._datasette, DatasetteAPI)
+
+    def test_datasette_repr(self):
+        """Test DatasetteAPI repr."""
+        api = DatasetteAPI()
+        assert "DatasetteAPI" in repr(api)
+        assert "datasette-public.owid.io" in repr(api)
+
+    def test_query(self):
+        """Test executing raw SQL query."""
+        import pandas as pd
+
+        api = DatasetteAPI()
+        df = api.query("SELECT 1 as value")
+
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 1
+        assert df["value"].iloc[0] == 1
+
+    def test_query_raises_on_error(self):
+        """Test that invalid SQL raises an exception."""
+        import requests
+
+        api = DatasetteAPI()
+        with pytest.raises(requests.HTTPError):
+            api.query("SELECT * FROM nonexistent_table_12345")
+
+    def test_list_tables(self):
+        """Test listing available tables (fast mode, names only)."""
+        api = DatasetteAPI()
+        tables = api.list_tables()
+
+        assert isinstance(tables, list)
+        assert len(tables) > 0
+        assert all(isinstance(t, DatasetteTable) for t in tables)
+
+        # Check for known table
+        table_names = [t.name for t in tables]
+        assert "analytics_popularity" in table_names
+
+        # Fast mode should have empty columns
+        assert tables[0].columns == []
+        assert tables[0].row_count is None
+
+    def test_list_tables_with_metadata(self):
+        """Test listing tables with full metadata (slow mode)."""
+        api = DatasetteAPI()
+        # Just fetch metadata for first 2 tables to keep test fast
+        all_tables = api.list_tables()
+        tables_with_meta = [api.get_table(t.name) for t in all_tables[:2]]
+
+        assert len(tables_with_meta) == 2
+        for t in tables_with_meta:
+            assert isinstance(t, DatasetteTable)
+            assert len(t.columns) > 0  # Should have columns
+            assert t.row_count is not None  # Should have row count
+
+    def test_get_table(self):
+        """Test getting metadata for a single table."""
+        api = DatasetteAPI()
+        table = api.get_table("analytics_popularity")
+
+        assert isinstance(table, DatasetteTable)
+        assert table.name == "analytics_popularity"
+        assert table.row_count is not None
+        assert table.row_count > 0
+        assert table.is_view is False
+
+    def test_table_fetch(self):
+        """Test fetching full metadata for a table from list_tables()."""
+        api = DatasetteAPI()
+        tables = api.list_tables()
+
+        # Fast mode tables should have empty columns
+        table = tables[0]
+        assert table.columns == []
+        assert table.row_count is None
+
+        # .fetch() should return a new table with full metadata
+        full_table = table.fetch()
+        assert isinstance(full_table, DatasetteTable)
+        assert full_table.name == table.name
+        assert len(full_table.columns) > 0
+        assert full_table.row_count is not None
+
+    def test_fetch_popularity_empty_slugs(self):
+        """Test that empty slugs returns empty dict."""
+        api = DatasetteAPI()
+        result = api.fetch_popularity([], "indicator")
+
+        assert result == {}
+
+    def test_fetch_popularity_indicator(self):
+        """Test fetching indicator popularity."""
+        api = DatasetteAPI()
+        # Use a known indicator path that should exist
+        df = api.query("SELECT slug FROM analytics_popularity WHERE type = 'indicator' LIMIT 1")
+
+        if not df.empty:
+            slug = df["slug"].iloc[0]
+            popularity = api.fetch_popularity([slug], "indicator")
+
+            assert isinstance(popularity, dict)
+            if slug in popularity:
+                assert 0.0 <= popularity[slug] <= 1.0
+
+    def test_fetch_popularity_dataset(self):
+        """Test fetching dataset popularity."""
+        api = DatasetteAPI()
+        # Use a known dataset path that should exist
+        df = api.query("SELECT slug FROM analytics_popularity WHERE type = 'dataset' LIMIT 1")
+
+        if not df.empty:
+            slug = df["slug"].iloc[0]
+            popularity = api.fetch_popularity([slug], "dataset")
+
+            assert isinstance(popularity, dict)
+            if slug in popularity:
+                assert 0.0 <= popularity[slug] <= 1.0
+
+    def test_fetch_popularity_nonexistent_slugs(self):
+        """Test that nonexistent slugs are not in result dict."""
+        api = DatasetteAPI()
+        result = api.fetch_popularity(["nonexistent_slug_12345"], "indicator")
+
+        assert isinstance(result, dict)
+        assert "nonexistent_slug_12345" not in result
+
+    def test_custom_timeout(self):
+        """Test that custom timeout is respected."""
+        api = DatasetteAPI(timeout=5)
+        assert api.timeout == 5
+
+        # Can override per-request
+        tables = api.list_tables(timeout=10)
+        assert isinstance(tables, list)
+        assert all(isinstance(t, DatasetteTable) for t in tables)

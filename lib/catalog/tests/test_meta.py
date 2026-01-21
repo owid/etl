@@ -9,7 +9,7 @@ import pytest
 import yaml
 from dataclasses_json import dataclass_json
 
-from owid.catalog import meta
+from owid.catalog.core import meta
 
 
 def test_dict_mixin():

@@ -6,14 +6,39 @@
 from __future__ import annotations
 
 import warnings
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import requests
+from pydantic import BaseModel, Field
 
-from owid.catalog.api.models import ChartResult, PageSearchResult, ResponseSet
+from owid.catalog.api.charts import ChartResult
+from owid.catalog.api.models import ResponseSet
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+
+
+class PageSearchResult(BaseModel):
+    """An article/page found via search.
+
+    Attributes:
+        slug: Page URL identifier.
+        title: Page title.
+        url: Full URL to the page.
+        excerpt: Short excerpt from the page content.
+        authors: List of author names.
+        published_at: Publication date string.
+        thumbnail_url: URL to thumbnail image.
+    """
+
+    slug: str
+    title: str
+    url: str
+    excerpt: str = ""
+    authors: list[str] = Field(default_factory=list)
+    published_at: str = ""
+    thumbnail_url: str = ""
 
 
 class SiteSearchAPI:
@@ -41,10 +66,32 @@ class SiteSearchAPI:
         ```
     """
 
-    BASE_URL = "https://ourworldindata.org/api/search"
+    def __init__(self, client: "Client", base_url: str, site_url: str) -> None:
+        """Initialize the SiteSearchAPI.
 
-    def __init__(self, client: "Client") -> None:
+        Args:
+            client: The Client instance.
+            base_url: Base URL for the search API (e.g., "https://ourworldindata.org/api/search").
+            site_url: Base URL for the OWID website (e.g., "https://ourworldindata.org").
+        """
         self._client = client
+        self._base_url = base_url
+        self._site_url = site_url
+
+    @property
+    def base_url(self) -> str:
+        """Base URL for the search API (read-only)."""
+        return self._base_url
+
+    @property
+    def grapher_url(self) -> str:
+        """Base URL for the Grapher (read-only)."""
+        return f"{self._site_url}/grapher"
+
+    @property
+    def explorer_url(self) -> str:
+        """Base URL for explorers (read-only)."""
+        return f"{self._site_url}/explorers"
 
     def _search(
         self,
@@ -60,22 +107,23 @@ class SiteSearchAPI:
         # Warn if limit exceeds maximum
         if limit > 100:
             warnings.warn(
-                "Max allowed of result items is 100. Using limit=100 instead.",
+                "Max allowed of result items is 100. Using limit=100 instead. Use argument `page` to paginate results.",
                 UserWarning,
                 stacklevel=3,  # stacklevel=3 to point to the public method caller
             )
+            limit = min(max(1, limit), 100)
 
         params: dict = {
             "q": query,
             "type": type_,
-            "hitsPerPage": min(max(1, limit), 100),
+            "hitsPerPage": limit,
             "page": page,
         }
 
         if extra_params:
             params.update(extra_params)
 
-        resp = requests.get(self.BASE_URL, params=params, timeout=timeout or self._client.timeout)
+        resp = requests.get(self.base_url, params=params, timeout=timeout or self._client.timeout)
         resp.raise_for_status()
         return resp.json()
 
@@ -131,25 +179,71 @@ class SiteSearchAPI:
         # Perform search
         data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
+        # Fetch popularity via Datasette API (chart slugs are full URLs)
+        # For popularity lookup, use grapher URLs for regular charts
+        hits = data.get("results", [])
+        urls = [
+            f"{self.grapher_url}/{hit.get('slug', '')}"
+            for hit in hits
+            if hit.get("slug") and hit.get("type", "chart") == "chart"
+        ]
+        popularity_data = (
+            self._client._datasette.fetch_popularity(
+                sorted(set(urls)),
+                type="chart",
+                timeout=effective_timeout,
+            )
+            if urls
+            else {}
+        )
+
         # Parse results
         results = []
-        for hit in data.get("results", []):
+        for hit in hits:
             slug = hit.get("slug", "")
+            chart_type = hit.get("type", "chart")
+            query_params = hit.get("queryParams", "") or ""
+
+            # Parse datetime fields
+            published_at = None
+            if hit.get("publishedAt"):
+                published_at = datetime.fromisoformat(hit["publishedAt"].replace("Z", "+00:00"))
+
+            last_updated = None
+            if hit.get("updatedAt"):
+                last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
+
+            # Build URL based on type
+            if chart_type == "explorerView":
+                url = f"{self.explorer_url}/{slug}{query_params}"
+            else:
+                url = f"{self.grapher_url}/{slug}"
+
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                url=f"https://ourworldindata.org/grapher/{slug}",
-                subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
+                url=url,
+                type=chart_type,  # type: ignore[arg-type]
+                subtitle=hit.get("subtitle", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
+                published_at=published_at,
+                last_updated=last_updated,
+                popularity=popularity_data.get(f"{self.grapher_url}/{slug}", 0.0),
+                site_url=self._site_url,
             )
             chart._timeout = effective_timeout
             results.append(chart)
 
+        # Sort by popularity (descending) - most popular first
+        results.sort(key=lambda r: r.popularity, reverse=True)
+
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
+            base_url=self._site_url,
+            _ui_advanced=False,
         )
 
     def pages(
@@ -200,5 +294,7 @@ class SiteSearchAPI:
         return ResponseSet(
             results=results,
             query=query,
-            limit=data.get("totalCount", len(results)),
+            total_count=data.get("totalCount", len(results)),
+            base_url="https://ourworldindata.org",
+            _ui_advanced=True,
         )

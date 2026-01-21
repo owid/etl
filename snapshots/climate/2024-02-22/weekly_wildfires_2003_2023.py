@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import pandas as pd
 import requests
-from owid.catalog import find
+from owid.catalog import fetch
 from owid.datautils.io import df_to_file
 from structlog import get_logger
 from tqdm import tqdm
@@ -23,7 +23,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 YEARS = range(2003, 2024)
 
 # Load the list of countries from the OWID dataset.
-TB_REGIONS = find(table="regions", dataset="regions").iloc[0].load().reset_index()
+TB_REGIONS = fetch("garden/regions/2023-01-01/regions/regions")
 COUNTRIES = {code: name for code, name in zip(TB_REGIONS["code"], TB_REGIONS["name"])}
 # Add specific countries that are not in the OWID dataset.
 GWIS_SPECIFIC = {

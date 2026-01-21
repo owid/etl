@@ -15,6 +15,6 @@ meta:
       name: IVS Conditions of use
       url: https://www.worldvaluessurvey.org/WVSEVStrend.jsp
 outs:
-  - md5: 67a368f0cf417392de110e7c75102ede
-    size: 1449694
+  - md5: 2515bceff54b1781f55ebb0989c32339
+    size: 1447011
     path: integrated_values_surveys.csv

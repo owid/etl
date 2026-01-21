@@ -21,7 +21,7 @@ from typing import Set, Tuple
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, warnings
+from owid.catalog.core import Table, warnings
 from scipy import stats
 from structlog import get_logger
 
@@ -2631,9 +2631,6 @@ def prepare_and_aggregate_gini_mean_data(tb: Table, tb_maddison: Table, tb_popul
 
     # Preserve mean origins and add population
     tb_gini_mean["mean"].m.origins = (tb["mean"] + tb_gini_mean["population"]).m.origins
-
-    # Remove attribution for population column
-    tb_gini_mean["mean"].m.presentation.attribution = None
 
     # Keep only relevant columns
     tb_gini_mean = (

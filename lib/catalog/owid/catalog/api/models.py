@@ -5,387 +5,14 @@
 #
 from __future__ import annotations
 
-import io
-import json
-from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
+from pathlib import Path
+from typing import Any, Callable, Generic, Iterator, TypeVar, overload
+from urllib import parse
 
 import pandas as pd
-import requests
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
-
-from owid.catalog.api.utils import _loading_data_from_api
-from owid.catalog.core import CatalogPath
-from owid.catalog.tables import Table
-
-if TYPE_CHECKING:
-    from owid.catalog.api.catalogs import CatalogFrame
-    from owid.catalog.variables import Variable
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
-
-
-class ChartNotFoundError(Exception):
-    """Raised when a chart does not exist."""
-
-    pass
-
-
-class LicenseError(Exception):
-    """Raised when chart data cannot be downloaded due to licensing."""
-
-    pass
-
-
-def _load_table(
-    path: str,
-    formats: list[str] | None = None,
-    is_public: bool = True,
-    load_data: bool = True,
-) -> "Table":
-    """Load a table from the catalog by path.
-
-    Helper function for loading table data. Used by TableResult and IndicatorResult.
-
-    Args:
-        path: Table path in catalog (e.g., "grapher/namespace/version/dataset/table")
-        formats: List of formats to try. If None, tries all supported formats.
-        is_public: Whether the table is publicly accessible.
-        load_data: If True, load full data. If False, load only table structure (columns and metadata) without rows.
-
-    Returns:
-        Table object with data and metadata (or just metadata if load_data=False).
-
-    Raises:
-        KeyError: If no table found at the specified path.
-    """
-    import tempfile
-
-    from owid.catalog.api.catalogs import download_private_file_s3
-    from owid.catalog.api.utils import (
-        OWID_CATALOG_URI,
-        PREFERRED_FORMAT,
-        SUPPORTED_FORMATS,
-    )
-
-    # Extract table name for display
-    catalog_path = CatalogPath.from_str(path)
-    table_name = catalog_path.table or path
-    message = f"Loading table '{table_name}'"
-
-    def fct():
-        base_uri = OWID_CATALOG_URI
-        uri = "/".join([base_uri.rstrip("/"), path])
-
-        # Determine format preference
-        if formats:
-            formats_to_try = formats
-        else:
-            formats_to_try = SUPPORTED_FORMATS
-
-        # Prefer feather if available
-        if PREFERRED_FORMAT in formats_to_try:
-            formats_to_try = [PREFERRED_FORMAT] + [f for f in formats_to_try if f != PREFERRED_FORMAT]
-
-        for fmt in formats_to_try:
-            try:
-                table_uri = f"{uri}.{fmt}"
-
-                # Handle private files
-                if not is_public:
-                    tmpdir = tempfile.mkdtemp()
-                    table_uri = download_private_file_s3(table_uri, tmpdir)
-
-                # If header_only, return empty table with same structure
-                return Table.read(table_uri, load_data=load_data)
-            except Exception:
-                continue
-
-        raise KeyError(f"No matching table found at: {path}")
-
-    if load_data:
-        with _loading_data_from_api(message):
-            return fct()
-    else:
-        return fct()
-
-
-class ChartResult(BaseModel):
-    """An OWID chart (from fetch or search).
-
-    Fields populated depend on the source:
-    - fetch(): Provides config and metadata
-    - search(): Provides subtitle, available_entities, and num_related_articles
-
-    Core fields (slug, title, url) are always populated.
-
-    Attributes:
-        slug: Chart URL identifier (e.g., "life-expectancy").
-        title: Chart title.
-        url: Full URL to the interactive chart.
-        config: Raw grapher configuration dict (from fetch).
-        metadata: Chart metadata dict including column info (from fetch).
-        subtitle: Chart subtitle/description (from search).
-        available_entities: List of entities/countries in the chart (from search).
-        num_related_articles: Number of related articles (from search).
-    """
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-    )
-
-    # Core fields (always present)
-    slug: str
-    title: str
-    url: str
-
-    # From fetch() - full chart details
-    config: dict[str, Any] = Field(default_factory=dict)
-    metadata: dict[str, Any] = Field(default_factory=dict)
-
-    # From search() - search-specific metadata
-    subtitle: str = ""
-    available_entities: list[str] = Field(default_factory=list)
-    num_related_articles: int = 0
-
-    # Private cached data field
-    _data: pd.DataFrame | None = PrivateAttr(default=None)
-    _timeout: int = PrivateAttr(default=30)
-
-    @property
-    def data(self) -> pd.DataFrame:
-        """Lazy-load chart data. Data is cached after first access.
-
-        Returns:
-            DataFrame with chart data. Metadata is available in df.attrs.
-        """
-        if self._data is None:
-            self._data = self._load_data()
-        return self._data
-
-    def _load_data(self) -> pd.DataFrame:
-        """Internal method to fetch chart data."""
-        with _loading_data_from_api(f"Fetching chart '{self.slug}'"):
-            # Fetch CSV data from the chart
-            url = f"https://ourworldindata.org/grapher/{self.slug}.csv?useColumnShortNames=true"
-            resp = requests.get(url, timeout=self._timeout)
-
-            if resp.status_code == 404:
-                raise ChartNotFoundError(f"No such chart found: {self.slug}")
-
-            if resp.status_code == 403:
-                try:
-                    error_data = resp.json()
-                    raise LicenseError(error_data.get("error", "This chart contains non-redistributable data"))
-                except (json.JSONDecodeError, ValueError):
-                    raise LicenseError("This chart contains non-redistributable data that cannot be downloaded")
-
-            resp.raise_for_status()
-
-            df = pd.read_csv(io.StringIO(resp.text))
-
-            # Normalize column names
-            df = df.rename(columns={"Entity": "entities", "Year": "years", "Day": "years"})
-            if "Code" in df.columns:
-                df = df.drop(columns=["Code"])
-
-            # Attach metadata
-            df.attrs["slug"] = self.slug
-            df.attrs["url"] = self.url
-
-            # Rename "years" to "dates" if values are date strings
-            if "years" in df.columns and df["years"].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$").all():
-                df = df.rename(columns={"years": "dates"})
-
-            return df
-
-
-class PageSearchResult(BaseModel):
-    """An article/page found via search.
-
-    Attributes:
-        slug: Page URL identifier.
-        title: Page title.
-        url: Full URL to the page.
-        excerpt: Short excerpt from the page content.
-        authors: List of author names.
-        published_at: Publication date string.
-        thumbnail_url: URL to thumbnail image.
-    """
-
-    slug: str
-    title: str
-    url: str
-    excerpt: str = ""
-    authors: list[str] = Field(default_factory=list)
-    published_at: str = ""
-    thumbnail_url: str = ""
-
-
-class IndicatorResult(BaseModel):
-    """An indicator found via semantic search.
-
-    Attributes:
-        title: Indicator title/name.
-        indicator_id: Unique indicator ID.
-        path: Path in the catalog (e.g., "grapher/un/2024-07-12/un_wpp/population#population").
-        channel: Data channel (parsed from path).
-        namespace: Data provider namespace (parsed from path).
-        version: Version string (parsed from path).
-        dataset: Dataset name (parsed from path).
-        column_name: Column name in the table.
-        description: Full indicator description.
-        unit: Unit of measurement.
-        score: Semantic similarity score (0-1).
-        n_charts: Number of charts using this indicator.
-    """
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-    )
-
-    # Identification
-    title: str
-    indicator_id: int | None
-
-    # Location
-    path: str | None
-
-    # Structural metadata
-    channel: str | None = None
-    namespace: str | None = None
-    version: str | None = None
-    dataset: str | None = None
-
-    # Content metadata
-    column_name: str = ""
-    description: str = ""
-    unit: str = ""
-
-    # Usage metadata
-    score: float
-    n_charts: int | None = None
-
-    _table: "Table | None" = PrivateAttr(default=None)
-    _legacy: bool = PrivateAttr(default=False)
-
-    def model_post_init(self, __context: Any) -> None:
-        """Parse dataset, version, namespace, channel from path."""
-        if self.path and not self.dataset:
-            # Parse using CatalogPath
-            try:
-                # CatalogPath.from_str() handles the "#" automatically
-                parsed = CatalogPath.from_str(self.path)
-                # Set parsed fields
-                object.__setattr__(self, "dataset", parsed.dataset)
-                object.__setattr__(self, "version", parsed.version)
-                object.__setattr__(self, "namespace", parsed.namespace)
-                object.__setattr__(self, "channel", parsed.channel)
-            except Exception:
-                # If parsing fails, leave fields empty
-                object.__setattr__(self, "_legacy", True)
-
-    @property
-    def data(self) -> "Variable":
-        """Lazy-load indicator data as a Variable (Series). Data is cached after first access.
-
-        Returns:
-            Variable object (pandas Series subclass) with the indicator data.
-        """
-
-        if self._table is None:
-            self._table = self._load_table()
-        # Extract the specific column/variable
-        return self._table[self.column_name].dropna()  # type: ignore
-
-    @property
-    def table(self) -> "Table":
-        """Lazy-load the full table containing this indicator.
-
-        Returns:
-            Table object with all columns including this indicator.
-        """
-        if self._table is None:
-            self._table = self._load_table()
-        return self._table
-
-    def _load_table(self) -> "Table":
-        """Internal method to load the table containing this indicator."""
-        # Check path is not None
-        if self.path is None:
-            raise ValueError("Cannot load table: path is None. Likely because this is a legacy (pre-ETL) table.")
-        # Parse path using CatalogPath
-        parsed = CatalogPath.from_str(self.path)
-        # Use table_path property (without variable)
-        if parsed.table_path is None:
-            raise ValueError(f"Invalid catalog path: {self.path}")
-        return _load_table(parsed.table_path)
-
-
-class TableResult(BaseModel):
-    """A table found in the catalog.
-
-    Attributes:
-        table: Table name.
-        path: Full path to the table.
-        channel: Data channel (garden, meadow, etc.).
-        namespace: Data provider namespace.
-        version: Version string.
-        dataset: Dataset name.
-        dimensions: List of dimension columns.
-        is_public: Whether the data is publicly accessible.
-        formats: List of available formats.
-    """
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-    )
-
-    # Identification
-    table: str
-
-    # Location
-    path: str
-
-    # Structural metadata
-    channel: str
-    namespace: str
-    version: str
-    dataset: str
-
-    # Content metadata
-    dimensions: list[str] = Field(default_factory=list)
-
-    # Technical metadata
-    is_public: bool = True
-    formats: list[str] = Field(default_factory=list)
-
-    _data: "Table | None" = PrivateAttr(default=None)
-
-    @property
-    def data(self) -> "Table":
-        """Lazy-load table data. Data is cached after first access.
-
-        Returns:
-            Table object with data and metadata.
-        """
-        if self._data is None:
-            self._data = self._load()
-        return self._data
-
-    @property
-    def data_header(self) -> "Table":
-        """Load only the table structure (columns and metadata) without rows.
-
-        This is useful for quickly accessing metadata without loading potentially large datasets.
-
-        Returns:
-            Empty Table object with columns and metadata but no data rows.
-        """
-        return _load_table(self.path, formats=self.formats, is_public=self.is_public, load_data=False)
-
-    def _load(self) -> "Table":
-        """Internal method to load table data."""
-        return _load_table(self.path, formats=self.formats, is_public=self.is_public)
 
 
 class ResponseSet(BaseModel, Generic[T]):
@@ -397,7 +24,7 @@ class ResponseSet(BaseModel, Generic[T]):
     Attributes:
         results: List of result objects.
         query: The query that produced these results.
-        limit: Total number of results (may be more than len(results)).
+        total_count: Total number of results available (may be more than len(results)).
     """
 
     model_config = ConfigDict(
@@ -406,7 +33,11 @@ class ResponseSet(BaseModel, Generic[T]):
 
     results: list[T]
     query: str = ""
-    limit: int = 0
+    total_count: int = 0
+    base_url: str = Field(frozen=True)
+
+    # Tweak this to have a more advanced display
+    _ui_advanced: bool = False
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
@@ -419,9 +50,9 @@ class ResponseSet(BaseModel, Generic[T]):
         return f"ResponseSet[{type_name}]"
 
     def model_post_init(self, __context: Any) -> None:
-        """Set limit to length of results if not provided."""
-        if self.limit == 0:
-            self.limit = len(self.results)
+        """Set total_count to length of results if not provided."""
+        if self.total_count == 0:
+            self.total_count = len(self.results)
 
     def __iter__(self) -> Iterator[T]:  # type: ignore[override]
         """Iterate over results, not model fields."""
@@ -430,31 +61,93 @@ class ResponseSet(BaseModel, Generic[T]):
     def __len__(self) -> int:
         return len(self.results)
 
-    def __getitem__(self, index: int) -> T:
+    @overload
+    def __getitem__(self, index: int) -> T: ...
+
+    @overload
+    def __getitem__(self, index: slice) -> "ResponseSet[T]": ...
+
+    def __getitem__(self, index: int | slice) -> "T | ResponseSet[T]":
+        if isinstance(index, slice):
+            return ResponseSet(
+                results=self.results[index],
+                query=self.query,
+                total_count=len(self.results[index]),
+                base_url=self.base_url,
+                _ui_advanced=self._ui_advanced,
+            )
         return self.results[index]
+
+    # Display settings
+    _MAX_DISPLAY_ROWS: int = 60
+    _HEAD_ROWS: int = 5
+    _TAIL_ROWS: int = 5
+    _MAX_STR_LENGTH: int = 80
+
+    def _truncate_string(self, val: Any, max_len: int) -> Any:
+        """Truncate string values that exceed max length. Skip HTML content."""
+        if isinstance(val, str):
+            # Skip HTML content (contains tags)
+            if "<" in val and ">" in val:
+                return val
+            if len(val) > max_len:
+                return val[: max_len - 3] + "..."
+        return val
+
+    def _truncate_strings_in_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Truncate all string values in DataFrame for display."""
+        df = df.copy()
+        for col in df.columns:
+            if df[col].dtype == object:
+                df[col] = df[col].apply(lambda x: self._truncate_string(x, self._MAX_STR_LENGTH))
+        return df
+
+    def _get_display_frame(self) -> tuple[pd.DataFrame, bool]:
+        """Get DataFrame for display, truncated if needed.
+
+        Returns:
+            Tuple of (display DataFrame, whether it was truncated).
+        """
+        df = self.to_frame()
+
+        if len(df) <= self._MAX_DISPLAY_ROWS:
+            return df, False
+
+        # Truncate: show head and tail
+        head = df.head(self._HEAD_ROWS)
+        tail = df.tail(self._TAIL_ROWS)
+        return pd.concat([head, tail]), True
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
         type_display = self._get_type_display()
 
         if not self.results:
-            return f"{type_display}(query={self.query!r}, limit=0, results=[])"
+            return f"{type_display}(query={self.query!r}, total_count=0, results=[])"
 
-        # Convert to DataFrame for nice tabular display
-        df = self.to_frame()
+        df, truncated = self._get_display_frame()
 
-        # Limit display to first 10 rows for readability
         if len(df) == 0:
-            return f"{type_display}(query={self.query!r}, limit={self.limit}, results=[])"
-        else:
-            df_str = str(df)
+            return f"{type_display}(query={self.query!r}, total_count={self.total_count}, results=[])"
+
+        df_str = str(df)
+
+        # Insert ellipsis row if truncated
+        if truncated:
+            lines = df_str.split("\n")
+            # Find where to insert "..." (after header + HEAD_ROWS data rows)
+            # Header is first line, then HEAD_ROWS of data
+            insert_pos = 1 + self._HEAD_ROWS
+            ellipsis_line = "..." + " " * (len(lines[0]) - 3) if lines else "..."
+            lines.insert(insert_pos, ellipsis_line)
+            df_str = "\n".join(lines)
 
         # Format as bullet points to show attributes at same level
         # Indent DataFrame lines to align with bullet points
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"{type_display}\n.query={self.query!r}\n.limit={self.limit}\n.results:\n    {indented_df}"
+        header = f"{type_display}\n.query={self.query!r}\n.total_count={self.total_count}\n.results:\n    {indented_df}"
 
         # Add helper tip at the end
         tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
@@ -471,15 +164,62 @@ class ResponseSet(BaseModel, Generic[T]):
         if not self.results:
             return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
 
-        df = self.to_frame()
-        df_html = df._repr_html_()
+        df, truncated = self._get_display_frame()
+
+        # For ChartResult, add thumbnail column and make URL clickable
+        if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
+            df = df.copy()
+
+            # Get slugs from results (order matches df rows)
+            slugs = [getattr(r, "slug", "") for r in self.results]
+            # Handle truncated display (head + tail)
+            if truncated:
+                slugs = slugs[: self._HEAD_ROWS] + slugs[-self._TAIL_ROWS :]
+
+            # Add thumbnail column - clickable to open chart
+            preview_col = pd.Series(
+                [
+                    f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>'
+                    if x
+                    else ""
+                    for x in df["url"]
+                ]
+            )
+            df.insert(0, "preview", preview_col)
+
+            # Make URL a clickable link using slug from results
+            df["url"] = [
+                f'<a href="{url}" target="_blank">{slug}</a>' if url else "" for url, slug in zip(df["url"], slugs)
+            ]
+
+        # Insert ellipsis row if truncated
+        if truncated:
+            df = df.reset_index(drop=True)
+            # Create ellipsis row
+            ellipsis_row = pd.DataFrame([{col: "..." for col in df.columns}])
+            # Split at HEAD_ROWS and insert ellipsis
+            head = df.iloc[: self._HEAD_ROWS]
+            tail = df.iloc[self._HEAD_ROWS :]
+            df = pd.concat([head, ellipsis_row, tail], ignore_index=True)
+
+        # Truncate long strings for display (skips HTML content)
+        df = self._truncate_strings_in_df(df)
+
+        # Use pandas Styler for left-alignment on all result types
+        styler = df.style.set_table_styles(
+            [
+                {"selector": "td, th", "props": [("text-align", "left")]},
+            ]
+        )
+
+        df_html = styler.to_html(escape=False)
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
   <p><strong>{type_display}</strong></p>
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
-    <li><strong>.limit</strong>: {self.limit}</li>
+    <li><strong>.total_count</strong>: {self.total_count}</li>
     <li><strong>.results</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
@@ -488,6 +228,52 @@ class ResponseSet(BaseModel, Generic[T]):
   </ul>
 </div>"""
         return html
+
+    def latest(self, by: str | None = None) -> T:
+        """Get the most recent result.
+
+        Returns the single item with the highest value for the sort key.
+
+        Args:
+            by: Attribute name to sort by. If None (default), auto-detects:
+                - ChartResult: uses last_updated (as ISO string with time)
+                - TableResult/IndicatorResult: uses version
+
+        Returns:
+            Single item with the highest value for the specified field.
+
+        Raises:
+            ValueError: If no results are available.
+            AttributeError: If the specified attribute doesn't exist on the results.
+
+        Example:
+            ```py
+            >>> # For TableResult/IndicatorResult - auto-detects version
+            >>> latest_table = results.latest()
+            >>> tb = latest_table.fetch()
+
+            >>> # For ChartResult - auto-detects last_updated
+            >>> latest_chart = chart_results.latest()
+            ```
+        """
+        if not self.results:
+            raise ValueError("No results available to get latest from")
+
+        # Auto-detect sort key based on result type
+        if by is None:
+            return max(self.results, key=self._get_version_string)
+
+        # Explicit attribute name
+        if not hasattr(self.results[0], by):
+            # Get available attributes (exclude private ones)
+            available = [
+                k for k in dir(self.results[0]) if not k.startswith("_") and not callable(getattr(self.results[0], k))
+            ]
+            raise AttributeError(
+                f"Results don't have '{by}' attribute. " f"Available attributes: {', '.join(sorted(available))}"
+            )
+
+        return max(self.results, key=lambda item: getattr(item, by))
 
     def to_frame(self) -> pd.DataFrame:
         """Convert results to a DataFrame.
@@ -503,100 +289,49 @@ class ResponseSet(BaseModel, Generic[T]):
         for r in self.results:
             if isinstance(r, BaseModel):
                 # For ChartResult, exclude large dict fields for better display
-                if isinstance(r, ChartResult):
+                # Use type name check to avoid circular imports
+                if type(r).__name__ == "ChartResult":
                     row = {
-                        "slug": r.slug,
-                        "title": r.title,
-                        "subtitle": r.subtitle,
-                        "url": r.url,
-                        "num_related_articles": r.num_related_articles,
+                        "slug": getattr(r, "slug", ""),
+                        "title": getattr(r, "title", ""),
+                        "description": getattr(r, "description", ""),
+                        "url": getattr(r, "url", ""),
+                        "num_related_articles": getattr(r, "num_related_articles", 0),
                         # Only show count of entities, not full list
-                        "num_entities": len(r.available_entities),
+                        "num_entities": len(getattr(r, "available_entities", [])),
+                        "popularity": getattr(r, "popularity", 0),
+                        "last_updated": getattr(r, "last_updated", None),
                     }
+
+                    # Simplify if not advanced UI
+                    if not self._ui_advanced:
+                        row = {
+                            # "slug": row["slug"],
+                            "title": row["title"],
+                            "description": row["description"],
+                            "last_updated": row["last_updated"],
+                            "url": row["url"],
+                        }
                 else:
                     row = r.model_dump()
+
+                    # Exclude internal config fields that aren't useful to display
+                    row.pop("catalog_url", None)
+                    row.pop("base_url", None)
+
+                    # Simplify if not advanced UI
+                    if not self._ui_advanced:
+                        row = {
+                            "title": row.get("title") or "",
+                            "description": row.get("description") or "",
+                            "version": row.get("version") or "",
+                            "path": row.get("path") or "",
+                        }
                 rows.append(row)
             else:
                 rows.append(r)
 
         return pd.DataFrame(rows)
-
-    def to_catalog_frame(self) -> "CatalogFrame":
-        """Convert to CatalogFrame for backwards compatibility.
-
-        Only works for TableResult and IndicatorResult types.
-
-        Returns:
-            CatalogFrame that can use .load() method.
-        """
-        from owid.catalog.api.catalogs import CatalogFrame as CF
-        from owid.catalog.api.utils import OWID_CATALOG_URI
-
-        if not self.results:
-            return CF.create_empty()
-
-        # Check result type
-        first = self.results[0]
-        if isinstance(first, TableResult):
-            rows = []
-            for r in self.results:
-                rows.append(
-                    {
-                        "table": r.table,  # type: ignore
-                        "dataset": r.dataset,  # type: ignore
-                        "version": r.version,  # type: ignore
-                        "namespace": r.namespace,  # type: ignore
-                        "channel": r.channel,  # type: ignore
-                        "path": r.path,  # type: ignore
-                        "is_public": r.is_public,  # type: ignore
-                        "dimensions": r.dimensions,  # type: ignore
-                        "format": r.formats[0] if r.formats else "feather",  # type: ignore
-                    }
-                )
-            frame = CF(rows)
-            frame._base_uri = OWID_CATALOG_URI
-            return frame
-
-        elif isinstance(first, IndicatorResult):
-            rows = []
-            for r in self.results:
-                # Parse catalog path using CatalogPath
-                try:
-                    parsed = CatalogPath.from_str(r.path)  # type: ignore
-                    indicator = parsed.variable or ""
-                    channel = parsed.channel
-                    namespace = parsed.namespace
-                    version = parsed.version
-                    dataset = parsed.dataset
-                    table = parsed.table or dataset
-                    # Use table_path property (without variable)
-                    path_part = parsed.table_path or parsed.dataset_path
-                except Exception:
-                    # Fallback if parsing fails
-                    indicator = channel = namespace = version = dataset = table = ""
-                    path_part = r.path.split("#")[0] if "#" in r.path else r.path  # type: ignore
-
-                rows.append(
-                    {
-                        "indicator_title": r.title,  # type: ignore
-                        "indicator": indicator,
-                        "score": r.score,  # type: ignore
-                        "table": table,
-                        "dataset": dataset,
-                        "version": version,
-                        "namespace": namespace,
-                        "channel": channel,
-                        "is_public": True,
-                        "path": path_part,
-                        "format": "parquet",
-                    }
-                )
-            frame = CF(rows)
-            frame._base_uri = OWID_CATALOG_URI
-            return frame
-
-        else:
-            raise TypeError(f"Cannot convert {type(first).__name__} results to CatalogFrame")
 
     def filter(self, predicate: Callable[[T], bool]) -> "ResponseSet[T]":
         """Filter results by predicate function.
@@ -605,7 +340,7 @@ class ResponseSet(BaseModel, Generic[T]):
         The predicate should return True for items to keep.
 
         Args:
-            predicate: Function that takes an item and returns True/False.
+            predicate: Function that takes an item of results (e.g. ChartResult) and returns True/False.
 
         Returns:
             New ResponseSet with filtered results.
@@ -626,7 +361,9 @@ class ResponseSet(BaseModel, Generic[T]):
         return ResponseSet(
             results=filtered_results,
             query=self.query,
-            limit=len(filtered_results),
+            total_count=len(filtered_results),
+            base_url=self.base_url,
+            _ui_advanced=self._ui_advanced,
         )
 
     def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
@@ -666,81 +403,44 @@ class ResponseSet(BaseModel, Generic[T]):
         return ResponseSet(
             results=sorted_results,
             query=self.query,
-            limit=self.limit,
+            total_count=self.total_count,
+            base_url=self.base_url,
+            _ui_advanced=self._ui_advanced,
         )
 
-    def latest(self, by: str = "version") -> T:
-        """Get the most recent result by a specific field.
+    def _get_version_string(self, item: T) -> str:
+        """Get a sortable version string for any result type.
 
-        Returns the single item with the highest value for the specified field.
+        Returns a string that can be used for chronological sorting:
+        - ChartResult: ISO format string from last_updated (with time)
+        - TableResult/IndicatorResult: version string
 
-        Args:
-            by: Attribute name to sort by (default: 'version').
-                Common values: 'version', 'published_at', 'score'.
-
-        Returns:
-            Single item with the highest value for the specified field.
-
-        Raises:
-            ValueError: If no results are available.
-            AttributeError: If the specified attribute doesn't exist on the results.
-
-        Example:
-            ```py
-            >>> # For TableResult - use version (default)
-            >>> latest_table = results.latest()
-            >>> tb = latest_table.data
-
-            >>> # For IndicatorResult - use version (default)
-            >>> latest_indicator = results.latest()
-            ```
-
-        Note:
-            Support for charts is coming soon.
+        This allows consistent sorting across different result types,
+        even in mixed-type ResponseSets.
         """
-        if not self.results:
-            raise ValueError("No results available to get latest from")
+        type_name = type(item).__name__
 
-        # Check if attribute exists on first item
-        if not hasattr(self.results[0], by):
-            # Get available attributes (exclude private ones)
-            available = [
-                k for k in dir(self.results[0]) if not k.startswith("_") and not callable(getattr(self.results[0], k))
-            ]
-            raise AttributeError(
-                f"Results don't have '{by}' attribute. " f"Available attributes: {', '.join(sorted(available))}"
-            )
-
-        return max(self.results, key=lambda item: getattr(item, by))
-
-    def first(self, n: int = 1) -> T | "ResponseSet[T]":
-        """Get the first n results.
-
-        Args:
-            n: Number of results to return (default: 1).
-
-        Returns:
-            If n=1, returns a single item (or None if no results).
-            If n>1, returns a new ResponseSet with the first n results.
-
-        Example:
-            ```python
-            >>> # Get first result
-            >>> first_result = results.first()
-            >>> tb = first_result.data
-
-            >>> # Get first 5 results
-            >>> top_five = results.first(5)
-
-            >>> # Combine with sorting
-            >>> latest_five = results.sort_by('version', reverse=True).first(5)
-            ```
-        """
-        if n == 1:
-            return self.results[0] if self.results else None  # type: ignore
+        if type_name == "ChartResult":
+            last_updated = getattr(item, "last_updated", None)
+            if last_updated:
+                return last_updated.isoformat()
+            return ""
         else:
-            return ResponseSet(
-                results=self.results[:n],
-                query=self.query,
-                limit=self.limit,
-            )
+            # TableResult, IndicatorResult - use version
+            version = getattr(item, "version", None)
+            if version:
+                return str(version)
+            return ""
+
+
+def get_thumbnail_url(url: str) -> str:
+    """
+    Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
+    Into https://ourworldindata.org/grapher/life-expectancy.png?country=~CHN
+    """
+    parts = parse.urlparse(url)
+    if "/explorers/" in url:
+        url = f"{parts.scheme}://{parts.netloc}/explorers/{Path(parts.path).name}.png?{parts.query}"
+    else:
+        url = f"{parts.scheme}://{parts.netloc}/grapher/{Path(parts.path).name}.png?{parts.query}"
+    return url

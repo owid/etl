@@ -1205,6 +1205,8 @@ def clean_notes(notes):
                 continue
             # Fix detected typos.
             note = note.replace("puposes", "purposes")
+            if note.startswith("hat part"):
+                note = note.replace("hat part", "that part")
             # Ensure each note starts with a capital letter, and ends in a single period.
             # NOTE: Using capitalize() would make all characters lower case except the first.
             note = note[0].upper() + (note[1:].replace("\xa0", " ") + ".").replace("..", ".")

@@ -6,41 +6,47 @@ The Data API provides unified access to OWID's published data through a simple c
 
 !!! warning "This library is under active development"
 
-    This documentation reflects the latest version, v1.0.0rc0, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc0`.
+    This documentation reflects the latest version, v1.0.0rc2, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc2`.
 
     We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon.
 
 ## Quick Reference
+The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
+
+For example to fetch a table by its path:
 
 ```python
 from owid.catalog import Client
 
 client = Client()
-table = client.tables.get_data("garden/un/2024-07-12/un_wpp/population")
+tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
 ```
 
+For convenience, the library provides functions for the most common use cases:
 
-There are three main APIs available via the `Client` class: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. All of them provide `search()`, `fetch()`, and `get_data()` methods.
+```python
+from owid.catalog import search, fetch
 
+# Search for charts (default)
+results = search("population")
+tb = results[0].fetch()
+
+# Direct fetch (by chart slug or table path)
+tb = fetch("life-expectancy")
+tb = fetch("garden/un/2024-07-12/un_wpp/population")
+```
 
 ### Lazy Loading
 
-All `fetch()` methods return result objects with a `.data` property that loads data on first access:
-
+All `fetch()` methods return `Table`-like objects, which resemble pandas.DataFrame with the addition of metadata attributes that describe the data.
 ```python
-# Metadata only - fast
-chart = client.charts.fetch("life-expectancy")
-print(chart.title)
-
-# First access downloads data
-df = chart.data
-
-# Subsequent access uses cache
-df2 = chart.data  # Instant
-
-# Or preload immediately
-chart = client.charts.fetch("life-expectancy", load_data=True)
+tb = client.charts.fetch("life-expectancy")
+tb.metadata  # Available immediately
+tb["life_expectancy_0"].metadata  # Column metadata available
 ```
+
+Optionally, you can defer data loading until it's actually needed, by using the `load_data=False` parameter in `fetch()` methods.
+
 
 ### Path Formats
 
@@ -52,6 +58,13 @@ Different APIs use different path conventions:
 
 ## API Reference
 
+::: owid.catalog.api.quick
+    options:
+      heading_level: 3
+      show_root_heading: true
+      members_order: source
+      filters:
+        - "!^_"
 
 ::: owid.catalog.api.Client
     options:
@@ -97,8 +110,9 @@ Result objects returned by `fetch()` and `search()` methods.
       show_root_heading: true
       filters:
         - "!^_"
+        - "!model_post_init"
 
-::: owid.catalog.api.models.ChartResult
+::: owid.catalog.api.charts.ChartResult
     options:
       heading_level: 4
       show_root_heading: true
@@ -106,7 +120,16 @@ Result objects returned by `fetch()` and `search()` methods.
       filters:
         - "!^_"
 
-::: owid.catalog.api.models.IndicatorResult
+::: owid.catalog.api.indicators.IndicatorResult
+    options:
+      heading_level: 4
+      show_root_heading: true
+      members_order: source
+      filters:
+        - "!^_"
+        - "!model_post_init"
+
+::: owid.catalog.api.tables.TableResult
     options:
       heading_level: 4
       show_root_heading: true
@@ -114,10 +137,3 @@ Result objects returned by `fetch()` and `search()` methods.
       filters:
         - "!^_"
 
-::: owid.catalog.api.models.TableResult
-    options:
-      heading_level: 4
-      show_root_heading: true
-      members_order: source
-      filters:
-        - "!^_"

@@ -3,7 +3,7 @@
 import json
 
 import pandas as pd
-from owid.catalog.tables import Table, _add_table_and_variables_metadata_to_table
+from owid.catalog.core.tables import Table, _add_table_and_variables_metadata_to_table
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot

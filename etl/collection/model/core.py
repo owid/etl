@@ -7,13 +7,13 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, cast
+from typing import Any, Callable, cast
 
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.meta import GrapherConfig
-from owid.catalog.utils import underscore
+from owid.catalog.core.meta import GrapherConfig
+from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
 
@@ -47,7 +47,7 @@ log = get_logger()
 @pruned_json
 @dataclass
 class Definitions(MDIMBase):
-    common_views: List[CommonView] | None = None
+    common_views: list[CommonView] | None = None
 
     def __post_init__(self):
         # Validate that there is no duplicate common view (based on dimensions)
@@ -73,24 +73,24 @@ class Definitions(MDIMBase):
 class Collection(MDIMBase):
     """Overall MDIM/Explorer config"""
 
-    dimensions: List[Dimension]
-    views: List[View]
+    dimensions: list[Dimension]
+    views: list[View]
     catalog_path: str
-    title: Dict[str, str]
-    default_selection: List[str]
+    title: dict[str, str]
+    default_selection: list[str]
 
     _definitions: Definitions
 
     dependencies: set[str] = field(default_factory=set)
-    topic_tags: List[str] | None = None
-    _default_dimensions: Dict[str, str] | None = None
+    topic_tags: list[str] | None = None
+    _default_dimensions: dict[str, str] | None = None
 
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
     _group_operations_done: int = field(init=False, default=0)
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> Self:
+    def from_dict(cls, d: dict[str, Any]) -> Self:
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
         # Make a shallow copy so we don't mutate the user's dictionary in-place
         data = dict(d)
@@ -123,11 +123,11 @@ class Collection(MDIMBase):
         return self._definitions
 
     @property
-    def default_dimensions(self) -> Dict[str, str] | None:
+    def default_dimensions(self) -> dict[str, str] | None:
         return self._default_dimensions
 
     @default_dimensions.setter
-    def default_dimensions(self, view_dimensions: Dict[str, str]) -> None:
+    def default_dimensions(self, view_dimensions: dict[str, str]) -> None:
         """Set the default view for the collection.
 
         Args:
@@ -290,7 +290,7 @@ class Collection(MDIMBase):
 
         # 2) Check that all mappings are not repeated (dimension_mapping)
         # Check that all dimension slugs are unique and raise error with duplicates
-        def ensure_unique(mapping: Dict[str, str], mapping_name: str):
+        def ensure_unique(mapping: dict[str, str], mapping_name: str):
             if len(set(mapping.values())) != len(mapping):
                 duplicates = [
                     slug for slug, count in pd.Series(list(mapping.values())).value_counts().items() if count > 1
@@ -335,7 +335,7 @@ class Collection(MDIMBase):
             # Update dimensions
             view.dimensions = view_dimensions
 
-    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
             dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
@@ -348,7 +348,7 @@ class Collection(MDIMBase):
                 return dim
         raise ValueError(f"Dimension {slug} not found in dimensions!")
 
-    def get_choice_names(self, dimension_slug: str) -> Dict[str, str]:
+    def get_choice_names(self, dimension_slug: str) -> dict[str, str]:
         """Get all choice names in a given dimension."""
         dimension = self.get_dimension(dimension_slug)
         choice_names = {}
@@ -428,7 +428,7 @@ class Collection(MDIMBase):
         """Check for duplicate views in the collection."""
         check_duplicate_views(self.views)
 
-    def sort_choices(self, slug_order: Dict[str, List[str] | Callable]):
+    def sort_choices(self, slug_order: dict[str, list[str] | Callable]):
         """Sort choices based on the given order."""
         not_expected = set(slug_order).difference(self.dimension_slugs)
         if not_expected:
@@ -542,11 +542,11 @@ class Collection(MDIMBase):
         return [dim.slug for dim in self.dimensions]
 
     @property
-    def dimension_choices(self) -> Dict[str, List[str]]:
+    def dimension_choices(self) -> dict[str, list[str]]:
         """Get all dimension choices in the collection."""
         return {dim.slug: [choice.slug for choice in dim.choices] for dim in self.dimensions}
 
-    def dimension_choices_in_use(self) -> Dict[str, Set[str]]:
+    def dimension_choices_in_use(self) -> dict[str, set[str]]:
         from collections import defaultdict
 
         # Get all dimension choices in use
@@ -560,7 +560,7 @@ class Collection(MDIMBase):
 
     def drop_views(
         self,
-        dimensions: Dict[str, List[str] | str] | List[Dict[str, List[str] | str]],
+        dimensions: dict[str, list[str] | str] | list[dict[str, list[str] | str]],
     ):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
@@ -569,7 +569,7 @@ class Collection(MDIMBase):
         Depending on the structure of `dimensions`, you can define ANDs and ORs operations. Read the documentation below for examples.
 
         Args:
-            dimensions (Dict[str, Union[List[str], str]]): Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
+            dimensions (dict[str, list[str] | str]): Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
                     - Example 1: `dimensions = {"sex": "female"}`.
                         Drop all views that have "female" in dimension sex.
                     - Example 2: `dimensions = {"age": ["0-4", "5-9"]}`.
@@ -586,6 +586,16 @@ class Collection(MDIMBase):
         if isinstance(dimensions, dict):
             dimensions = [dimensions]
 
+        # Validate that all dimension slugs in the filter are valid
+        valid_slugs = set(dimensions_available.keys())
+        for dim_filter in dimensions:
+            invalid_slugs = set(dim_filter.keys()) - valid_slugs
+            if invalid_slugs:
+                raise ValueError(
+                    f"Invalid dimension slug{'s' if len(invalid_slugs) > 1 else ''} {invalid_slugs} in drop_views filter. "
+                    f"Valid dimension slugs are: {list(valid_slugs)}"
+                )
+
         # Get list of dimension arrangements to drop: Iterate over each dimension filter, and obtain explicit filter.
         dimensions_drop = []
         for dimensions_ in dimensions:
@@ -596,7 +606,7 @@ class Collection(MDIMBase):
         # Function to get key for each view
         dimensions_order = list(dimensions_available.keys())
 
-        def _get_view_key(dimension_choices: Dict[str, str]):
+        def _get_view_key(dimension_choices: dict[str, str]):
             return tuple(dimension_choices[dim] for dim in dimensions_order)
 
         # Convert the list to set of IDs. Each element in the set identifies a dimension arrangement by a tuple with the choices.
@@ -612,25 +622,25 @@ class Collection(MDIMBase):
 
     def group_views(
         self,
-        groups: List[GroupViewsConfig],  # Also accepts List[Dict[str, Any]] for backward compatibility
+        groups: list[GroupViewsConfig],  # Also accepts list[dict[str, Any]] for backward compatibility
         drop_dimensions_if_single_choice: bool = True,
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ):
         """Group views into new ones.
 
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
 
         Args:
-            groups (List[GroupViewsConfig]): List of group configurations with the following keys:
+            groups (list[GroupViewsConfig]): List of group configurations with the following keys:
                     - dimension: str
                         Slug of the dimension that contains the choices to group.
-                    - choices: List[str]
+                    - choices: list[str]
                         Slugs of the choices to group. If none, all choices are used!
                     - choice_new_slug: str
                         The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
-                    - view_config: Optional[Dict[str, Any]], default=None
+                    - view_config: Optional[dict[str, Any]], default=None
                         The view config for the new choice. E.g. useful to tweak the chart type.
-                    - view_metadata: Optional[Dict[str, Any]], default=None
+                    - view_metadata: Optional[dict[str, Any]], default=None
                         The metadata for the new view. Useful to tweak the metadata around the chart in a data page (e.g. description key, etc.)
                     - replace: Optional[bool], default=False
                         If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
@@ -638,7 +648,7 @@ class Collection(MDIMBase):
                         If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
             drop_dimensions_if_single_choice (bool):
                 If True, drop dimensions that always have one choice in use. A dropdown (or dimension) that always is set to a constant value is not really useful, and hence we drop it by default. Default: True. To keep the dropdown, even if just with one option, set this to False.
-            params (Dict[str, Any]):
+            params (dict[str, Any]):
                 Optional parameters to pass to the config and metadata. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
 
         Example 1:
@@ -797,7 +807,7 @@ class Collection(MDIMBase):
     def set_global_config(
         self,
         config: ViewConfigParam,
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ):
         self.edit_views(
             [
@@ -812,7 +822,7 @@ class Collection(MDIMBase):
     def set_global_metadata(
         self,
         metadata: ViewMetadataParam,
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ):
         self.edit_views(
             [
@@ -826,20 +836,20 @@ class Collection(MDIMBase):
 
     def edit_views(
         self,
-        edits: List[Dict[str, Any]],
-        params: Dict[str, Any] | None = None,
+        edits: list[dict[str, Any]],
+        params: dict[str, Any] | None = None,
     ):
         """Edit the display of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
 
         Args:
-            edits (List[Dict[str, Any]]): List of dictionaries with the following keys
-                - dimensions: Dict[str, str]
+            edits (list[dict[str, Any]]): List of dictionaries with the following keys
+                - dimensions: dict[str, str]
                     Slugs of the dimensions to edit. The keys are the dimension slugs, and the values are the new choice slugs.
-                - config: Dict[str, Any]
+                - config: dict[str, Any]
                     The config for the new choice. E.g. useful to tweak the chart type.
-                - metadata: Dict[str, Any]
+                - metadata: dict[str, Any]
                     The metadata for the new choice. E.g. useful to tweak the metadata around the chart in a data page (e.g. description key, etc.)
-            params (Dict[str, Any]): Optional parameters to pass to the config and metadata. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
+            params (dict[str, Any]): Optional parameters to pass to the config and metadata. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
         """
         # Check edits is a list of dicts
         if not isinstance(edits, list):
@@ -865,7 +875,7 @@ class Collection(MDIMBase):
     def _sanity_check_view_grouping(
         self,
         dimension: str,
-        choices: List[str],
+        choices: list[str],
         choice_new_slug: str,
     ):
         # Sanity checks
@@ -890,12 +900,12 @@ class Collection(MDIMBase):
     def create_new_grouped_views(
         self,
         dimension: str,
-        choices: List[str],
+        choices: list[str],
         choice_new_slug: str,
         view_config: ViewConfigParam | None = None,
         view_metadata: ViewMetadataParam | None = None,
-        params: Dict[str, Any] | None = None,
-    ) -> List[View]:
+        params: dict[str, Any] | None = None,
+    ) -> list[View]:
         """Create new grouped views."""
         if params is None:
             params = {}
@@ -939,7 +949,7 @@ class Collection(MDIMBase):
         return new_views
 
 
-def _expand_params(params: Dict[str, Any], view: View) -> Dict[str, Any]:
+def _expand_params(params: dict[str, Any], view: View) -> dict[str, Any]:
     """Expand parameters in the config and metadata."""
     # Create config for new view
     params_view = params.copy()
@@ -953,7 +963,7 @@ def _set_config_metadata_with_params(
     view,
     view_config: ViewConfigParam | GrapherConfig | None = None,
     view_metadata: ViewMetadataParam | Any | None = None,
-    params: Dict[str, Any] | None = None,
+    params: dict[str, Any] | None = None,
 ) -> View:
     # Set params to dict if None
     if params is None:
@@ -964,7 +974,7 @@ def _set_config_metadata_with_params(
         return view
         # raise ValueError("Either view_config or view_metadata must be provided!")
 
-    # Execute callables in params to get a proper Dict[str, str]
+    # Execute callables in params to get a proper dict[str, str]
     params_view = _expand_params(params, view)
 
     # Get config and metadata filled with params
@@ -983,7 +993,7 @@ def _set_config_metadata_with_params(
     return view
 
 
-def _combine_view_indicators(views: List[View]):
+def _combine_view_indicators(views: list[View]):
     y_indicators = []
     for view in views:
         if view.indicators.has_non_y_indicators():
@@ -998,7 +1008,7 @@ def _combine_view_indicators(views: List[View]):
     return indicators
 
 
-def check_duplicate_views(views: List[View]):
+def check_duplicate_views(views: list[View]):
     """Check for duplicate views in the collection."""
     seen_dims = set()
     for view in views:
@@ -1055,7 +1065,7 @@ def snake_to_camel(s: str) -> str:
 
 
 # model.core
-def camelize(obj: Any, exclude_keys: Set[str] | None = None) -> Any:
+def camelize(obj: Any, exclude_keys: set[str] | None = None) -> Any:
     """
     Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
 
