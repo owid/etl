@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import io
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
@@ -181,7 +181,7 @@ def _load_chart_table_metadata(slug: str, *, timeout: int, base_url: str) -> dic
     resp = requests.get(url, timeout=timeout)
 
     if resp.status_code == 404:
-        raise ChartNotFoundError(f"Failed to retrieve chart metadata. No such chart found: {slug}")
+        raise ChartNotFoundError(f"Failed to retrieve chart metadata. No such chart found: {slug} (url {url})")
 
     resp.raise_for_status()
     return resp.json()
@@ -345,6 +345,7 @@ class ChartResult(BaseModel):
     slug: str
     title: str
     url: str
+    type: Literal["chart", "explorerView", "multiDimView"] = "chart"
 
     # From fetch() - full chart details
     config: dict[str, Any] = Field(default_factory=dict)
@@ -361,7 +362,25 @@ class ChartResult(BaseModel):
     popularity: float = 0.0
 
     # API configuration (immutable)
-    base_url: str = Field(frozen=True)
+    site_url: str = Field(frozen=True)
+
+    @property
+    def grapher_url(self) -> str:
+        """Base URL for the Grapher (derived from site_url)."""
+        return f"{self.site_url}/grapher"
+
+    @property
+    def explorer_url(self) -> str:
+        """Base URL for explorers (derived from site_url)."""
+        return f"{self.site_url}/explorers"
+
+    @property
+    def chart_base_url(self) -> str:
+        """Base URL for this chart (derived from type)."""
+        if self.type == "explorerView":
+            return f"{self.explorer_url}"
+        else:
+            return f"{self.grapher_url}"
 
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
@@ -399,7 +418,7 @@ class ChartResult(BaseModel):
             load_data=load_data,
             timeout=self._timeout,
             use_column_short_names=True,
-            base_url=self.base_url,
+            base_url=self.chart_base_url,
         )
 
         # Cache only if loading full data with default params
@@ -444,20 +463,20 @@ class ChartsAPI:
         ```
     """
 
-    def __init__(self, client: "Client", base_url: str) -> None:
+    def __init__(self, client: "Client", site_url: str) -> None:
         """Initialize the ChartsAPI.
 
         Args:
             client: The Client instance.
-            base_url: Base URL for the Grapher (e.g., "https://ourworldindata.org/grapher").
+            site_url: Base URL for the OWID website (e.g., "https://ourworldindata.org").
         """
         self._client = client
-        self._base_url = base_url
+        self._site_url = site_url
 
     @property
     def base_url(self) -> str:
         """Base URL for the Grapher (read-only)."""
-        return self._base_url
+        return f"{self._site_url}/grapher"
 
     def search(
         self,
@@ -512,7 +531,6 @@ class ChartsAPI:
             limit=limit,
             page=page,
             timeout=timeout or self._client.timeout,
-            grapher_url=self.base_url,
         )
 
     def fetch(
@@ -523,6 +541,9 @@ class ChartsAPI:
         timeout: int | None = None,
     ) -> ChartTable:
         """Fetch chart data as a ChartTable with rich metadata.
+
+        Note:
+            Can only retrieve charts at the moment. In the future, we aim to also support Explorer and MultiDim views.
 
         Args:
             slug_or_url: Chart slug or full URL.

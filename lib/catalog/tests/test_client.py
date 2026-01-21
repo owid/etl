@@ -506,12 +506,15 @@ class TestDataclassModels:
             slug="test-chart",
             title="Test Chart",
             url="https://ourworldindata.org/grapher/test-chart",
-            base_url="https://ourworldindata.org/grapher",
+            site_url="https://ourworldindata.org",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
-        assert result.base_url == "https://ourworldindata.org/grapher"
+        assert result.site_url == "https://ourworldindata.org"
+        assert result.grapher_url == "https://ourworldindata.org/grapher"
+        assert result.explorer_url == "https://ourworldindata.org/explorers"
+        assert result.type == "chart"
 
     def test_indicator_result(self):
         result = IndicatorResult(

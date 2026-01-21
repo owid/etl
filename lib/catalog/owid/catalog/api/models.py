@@ -425,11 +425,14 @@ class ResponseSet(BaseModel, Generic[T]):
             return ""
 
 
-def get_thumbnail_url(grapher_url: str) -> str:
+def get_thumbnail_url(url: str) -> str:
     """
     Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
-    Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png?country=~CHN
+    Into https://ourworldindata.org/grapher/life-expectancy.png?country=~CHN
     """
-    parts = parse.urlparse(grapher_url)
-
-    return f"{parts.scheme}://{parts.netloc}/grapher/thumbnail/{Path(parts.path).name}.png?{parts.query}"
+    parts = parse.urlparse(url)
+    if "/explorers/" in url:
+        url = f"{parts.scheme}://{parts.netloc}/explorers/{Path(parts.path).name}.png?{parts.query}"
+    else:
+        url = f"{parts.scheme}://{parts.netloc}/grapher/{Path(parts.path).name}.png?{parts.query}"
+    return url

@@ -66,17 +66,17 @@ class SiteSearchAPI:
         ```
     """
 
-    def __init__(self, client: "Client", base_url: str, grapher_url: str) -> None:
+    def __init__(self, client: "Client", base_url: str, site_url: str) -> None:
         """Initialize the SiteSearchAPI.
 
         Args:
             client: The Client instance.
             base_url: Base URL for the search API (e.g., "https://ourworldindata.org/api/search").
-            grapher_url: Base URL for the Grapher (e.g., "https://ourworldindata.org/grapher").
+            site_url: Base URL for the OWID website (e.g., "https://ourworldindata.org").
         """
         self._client = client
         self._base_url = base_url
-        self._grapher_url = grapher_url
+        self._site_url = site_url
 
     @property
     def base_url(self) -> str:
@@ -86,7 +86,12 @@ class SiteSearchAPI:
     @property
     def grapher_url(self) -> str:
         """Base URL for the Grapher (read-only)."""
-        return self._grapher_url
+        return f"{self._site_url}/grapher"
+
+    @property
+    def explorer_url(self) -> str:
+        """Base URL for explorers (read-only)."""
+        return f"{self._site_url}/explorers"
 
     def _search(
         self,
@@ -132,7 +137,6 @@ class SiteSearchAPI:
         limit: int = 20,
         page: int = 0,
         timeout: int | None = None,
-        grapher_url: str | None = None,
     ) -> ResponseSet[ChartResult]:
         """Search for charts matching a query.
 
@@ -145,7 +149,6 @@ class SiteSearchAPI:
             limit: Maximum results to return (1-100). Default 20.
             page: Page number for pagination (0-indexed). Default 0.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
-            grapher_url: Base URL for the Grapher. Defaults to self.grapher_url.
 
         Returns:
             ResponseSet containing ChartResult objects.
@@ -163,7 +166,6 @@ class SiteSearchAPI:
             ```
         """
         effective_timeout = timeout or self._client.timeout
-        effective_grapher_url = grapher_url or self.grapher_url
 
         # Build extra parameters for chart-specific filters
         extra_params: dict = {}
@@ -178,8 +180,13 @@ class SiteSearchAPI:
         data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
         # Fetch popularity via Datasette API (chart slugs are full URLs)
+        # For popularity lookup, use grapher URLs for regular charts
         hits = data.get("results", [])
-        urls = [f"{effective_grapher_url}/{hit.get('slug', '')}" for hit in hits if hit.get("slug")]
+        urls = [
+            f"{self.grapher_url}/{hit.get('slug', '')}"
+            for hit in hits
+            if hit.get("slug") and hit.get("type", "chart") == "chart"
+        ]
         popularity_data = (
             self._client._datasette.fetch_popularity(
                 sorted(set(urls)),
@@ -194,6 +201,8 @@ class SiteSearchAPI:
         results = []
         for hit in hits:
             slug = hit.get("slug", "")
+            chart_type = hit.get("type", "chart")
+            query_params = hit.get("queryParams", "") or ""
 
             # Parse datetime fields
             published_at = None
@@ -204,18 +213,24 @@ class SiteSearchAPI:
             if hit.get("updatedAt"):
                 last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
 
-            url = f"{effective_grapher_url}/{slug}"
+            # Build URL based on type
+            if chart_type == "explorerView":
+                url = f"{self.explorer_url}/{slug}{query_params}"
+            else:
+                url = f"{self.grapher_url}/{slug}"
+
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
                 url=url,
+                type=chart_type,  # type: ignore[arg-type]
                 subtitle=hit.get("subtitle", "") or hit.get("variantName", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
                 published_at=published_at,
                 last_updated=last_updated,
-                popularity=popularity_data.get(url, 0.0),
-                base_url=effective_grapher_url,
+                popularity=popularity_data.get(f"{self.grapher_url}/{slug}", 0.0),
+                site_url=self._site_url,
             )
             chart._timeout = effective_timeout
             results.append(chart)
@@ -227,7 +242,7 @@ class SiteSearchAPI:
             results=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
-            base_url=effective_grapher_url,
+            base_url=self._site_url,
             _ui_advanced=False,
         )
 
