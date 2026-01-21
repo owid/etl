@@ -137,12 +137,27 @@ def run() -> None:
     rename_dict = {}
 
     # Environment variables (after shortening)
-    if "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables" in tb.columns:
-        rename_dict["tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables"] = "seea_tables"
-    if "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables" in tb.columns:
-        rename_dict["tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables"] = "tsa_tables"
-    if "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables" in tb.columns:
-        rename_dict["tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"] = "total_tables"
+    if (
+        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables"
+        in tb.columns
+    ):
+        rename_dict[
+            "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables"
+        ] = "seea_tables"
+    if (
+        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables"
+        in tb.columns
+    ):
+        rename_dict[
+            "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables"
+        ] = "tsa_tables"
+    if (
+        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"
+        in tb.columns
+    ):
+        rename_dict[
+            "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"
+        ] = "total_tables"
 
     # GDP variable (after shortening)
     if "tour_ind_gdp_direct_as_a_proportion_of_total_pct" in tb.columns:
