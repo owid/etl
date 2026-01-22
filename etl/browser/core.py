@@ -4,9 +4,12 @@
 #
 
 import re
-from typing import Any, Callable, List, Optional, Protocol, Tuple
+from typing import TYPE_CHECKING, Any, Callable, List, Literal, Optional, Protocol, Tuple
 
 from prompt_toolkit import Application
+
+if TYPE_CHECKING:
+    from etl.browser.commands import Command
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
@@ -198,6 +201,13 @@ class BrowserState:
         self.loading: bool = False  # True while items are loading in background
         self.all_items: List[str] = []  # Populated when loading completes
         self.app: Optional[Application[None]] = None  # Reference to app for invalidation
+        # Command mode state
+        self.mode: Literal["search", "command"] = "search"
+        self.command_matches: List["Command"] = []
+        self.available_commands: List["Command"] = []
+        # Refresh callback for reload functionality
+        self.items_loader: Optional[Callable[[], List[str]]] = None
+        self.on_items_loaded: Optional[Callable[[List[str]], None]] = None
 
 
 def filter_items(pattern: str, all_items: List[str]) -> List[str]:
@@ -256,6 +266,7 @@ def browse_items(
     cached_items: Optional[List[str]] = None,
     on_items_loaded: Optional[Callable[[List[str]], None]] = None,
     rank_matches: Optional[Ranker] = None,
+    commands: Optional[List["Command"]] = None,
 ) -> Tuple[Optional[str], bool]:
     """Interactive item browser using prompt_toolkit.
 
@@ -271,6 +282,8 @@ def browse_items(
         rank_matches: Optional ranker to reorder matches by relevance.
             If provided, called after filtering to sort results.
             If None, uses default sort (filter_items ordering).
+        commands: Optional list of commands available via / prefix.
+            If provided, typing / enters command mode.
 
     Returns:
         Tuple of (pattern_or_item, is_exact_match):
@@ -280,8 +293,13 @@ def browse_items(
     """
     import threading
 
+    from etl.browser.commands import filter_commands
+
     # State for the application
     state = BrowserState()
+    state.available_commands = commands or []
+    state.items_loader = items_loader
+    state.on_items_loaded = on_items_loaded
 
     # If cached_items provided, use them immediately
     if cached_items is not None:
@@ -309,12 +327,24 @@ def browse_items(
     # Create the input buffer
     def on_text_changed(buf: Buffer) -> None:
         text = buf.text.strip()
-        matches = filter_items(text, state.all_items)
-        # Apply custom ranking if provided
-        if rank_matches is not None and matches:
-            matches = rank_matches(text, matches)
-        state.matches = matches
-        state.selected_index = -1  # Reset selection when text changes
+
+        # Check for command mode (input starts with /)
+        if text.startswith("/") and state.available_commands:
+            state.mode = "command"
+            pattern = text[1:]  # Strip leading /
+            state.command_matches = filter_commands(pattern, state.available_commands)
+            state.selected_index = 0 if state.command_matches else -1
+        else:
+            # Search mode (existing behavior)
+            state.mode = "search"
+            state.command_matches = []
+            matches = filter_items(text, state.all_items)
+            # Apply custom ranking if provided
+            if rank_matches is not None and matches:
+                matches = rank_matches(text, matches)
+            state.matches = matches
+            state.selected_index = -1  # Reset selection when text changes
+
         state.scroll_offset = 0  # Reset scroll when text changes
 
     input_buffer = Buffer(
@@ -327,6 +357,38 @@ def browse_items(
 
     @kb.add("enter")
     def handle_enter(event: Any) -> None:
+        # Handle command mode
+        if state.mode == "command" and state.selected_index >= 0 and state.command_matches:
+            cmd = state.command_matches[state.selected_index]
+            result = cmd.handler(state)
+
+            if result.action == "exit":
+                state.cancelled = True
+                event.app.exit()
+            elif result.action == "refresh":
+                # Reload items
+                if state.items_loader is not None:
+                    state.loading = True
+                    state.all_items = []
+                    state.matches = []
+
+                    def reload_items() -> None:
+                        state.all_items = state.items_loader()  # type: ignore[misc]
+                        state.loading = False
+                        if state.on_items_loaded is not None:
+                            state.on_items_loaded(state.all_items)
+                        if state.app is not None:
+                            state.app.invalidate()
+
+                    thread = threading.Thread(target=reload_items, daemon=True)
+                    thread.start()
+
+                # Clear input and go back to search mode
+                input_buffer.text = ""
+            # "continue" action - stay in browser with input cleared
+            return
+
+        # Handle search mode
         text = input_buffer.text.strip()
         if state.selected_index >= 0 and state.matches:
             # User has selected a specific item
@@ -350,7 +412,12 @@ def browse_items(
     @kb.add("down")
     @kb.add("tab")
     def handle_down(event: Any) -> None:
-        if state.matches:
+        if state.mode == "command":
+            if state.command_matches:
+                max_idx = len(state.command_matches) - 1
+                if state.selected_index < max_idx:
+                    state.selected_index += 1
+        elif state.matches:
             max_idx = len(state.matches) - 1
             if state.selected_index < max_idx:
                 state.selected_index += 1
@@ -361,7 +428,10 @@ def browse_items(
     @kb.add("up")
     @kb.add("s-tab")
     def handle_up(event: Any) -> None:
-        if state.selected_index > -1:
+        if state.mode == "command":
+            if state.selected_index > 0:
+                state.selected_index -= 1
+        elif state.selected_index > -1:
             state.selected_index -= 1
             # Scroll up if selection goes above visible window
             if state.selected_index >= 0 and state.selected_index < state.scroll_offset:
@@ -373,7 +443,6 @@ def browse_items(
 
     def get_matches_text() -> List[Tuple[str, str]]:
         text = input_buffer.text.strip()
-        matches = state.matches
 
         lines: List[Tuple[str, str]] = []
 
@@ -383,13 +452,50 @@ def browse_items(
             lines.append(("", "\n"))
             return lines
 
-        # Match count and hint line with styled shortcuts
+        # Helper to add nano-style shortcuts
         def add_shortcuts(shortcuts: List[Tuple[str, str]]) -> None:
             """Add nano-style shortcuts: [(key, description), ...]"""
-            for i, (key, desc) in enumerate(shortcuts):
+            for key, desc in shortcuts:
                 lines.append(("", "  "))
                 lines.append(("class:shortcut-key", f" {key} "))
                 lines.append(("class:shortcut-desc", f" {desc}"))
+
+        # Command mode rendering
+        if state.mode == "command":
+            cmd_matches = state.command_matches
+            count = len(cmd_matches)
+
+            if count == 0:
+                lines.append(("class:match-count", "  No commands"))
+                add_shortcuts([("^C", "Exit")])
+            else:
+                count_text = "1 command" if count == 1 else f"{count} commands"
+                lines.append(("class:match-count", f"  {count_text}"))
+                add_shortcuts([("↑↓", "Select"), ("Enter", "Run"), ("^C", "Exit")])
+
+            lines.append(("", "\n"))
+
+            # Display commands
+            pattern = text[1:] if text.startswith("/") else ""  # Strip leading /
+            for i, cmd in enumerate(cmd_matches):
+                is_selected = i == state.selected_index
+                prefix_style = "class:item.selected" if is_selected else "class:item"
+                prefix = "  > " if is_selected else "    "
+                lines.append((prefix_style, prefix))
+
+                # Highlight matching portion of command name
+                cmd_name = f"/{cmd.name}"
+                lines.extend(highlight_matches(cmd_name, pattern, is_selected))
+
+                # Add description in dimmer style
+                desc_style = "class:item.selected" if is_selected else "class:hint"
+                lines.append((desc_style, f"  {cmd.description}"))
+                lines.append(("", "\n"))
+
+            return lines
+
+        # Search mode rendering (existing behavior)
+        matches = state.matches
 
         if text:
             count = len(matches)

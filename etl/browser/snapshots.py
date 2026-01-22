@@ -6,6 +6,7 @@
 import json
 from typing import Callable, List, Optional, Tuple
 
+from etl.browser.commands import DEFAULT_COMMANDS
 from etl.browser.core import browse_items
 from etl.browser.scoring import create_ranker, extract_version_from_snapshot
 
@@ -120,4 +121,5 @@ def browse_snapshots() -> Tuple[Optional[str], bool]:
         cached_items=cached_items,
         on_items_loaded=save_snapshot_cache,
         rank_matches=ranker,
+        commands=DEFAULT_COMMANDS,
     )

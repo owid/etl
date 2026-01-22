@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
+from etl.browser.commands import DEFAULT_COMMANDS
 from etl.browser.core import browse_items, filter_items
 from etl.browser.scoring import create_ranker, extract_version_from_uri
 from etl.dag_helpers import graph_nodes
@@ -328,6 +329,7 @@ def browse_steps(
         cached_items=cached_items,
         on_items_loaded=on_items_loaded,
         rank_matches=ranker,
+        commands=DEFAULT_COMMANDS,
     )
 
 
