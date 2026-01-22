@@ -288,18 +288,23 @@ class PathFinder:
     def step_type(self) -> str:
         if self._is_snapshot_file:
             return "snapshot"
-        # For graph steps, return "graph"; for data steps, return "data"
-        if self.channel == "graph":
+        # Check if this is a graph step: etl/steps/graph/...
+        step_dir_parent = self.f.parent.parent.parent.name
+        if step_dir_parent == "graph":
             return "graph"
-        return "data"
+        # Otherwise it's a data step: etl/steps/data/...
+        return self.f.parent.parent.parent.parent.name
 
     @property
     def channel(self) -> CHANNEL:
         if self._is_snapshot_file:
             return "snapshot"  # type: ignore
-        # For all data and graph steps: etl/steps/{channel}/{namespace}/{version}/{short_name}
-        parent_name = self.f.parent.parent.parent.name
-        return parent_name  # type: ignore
+        # Check if this is a graph step: etl/steps/graph/namespace/version/slug
+        step_dir_parent = self.f.parent.parent.parent.name
+        if step_dir_parent == "graph":
+            return "graph"  # type: ignore
+        # Data steps: etl/steps/data/channel/namespace/version/slug
+        return self.f.parent.parent.parent.name  # type: ignore
 
     @property
     def namespace(self) -> str:

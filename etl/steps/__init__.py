@@ -79,30 +79,8 @@ def compile_steps(
     List[Step]
         Steps in dependency order, ready for execution.
     """
-    # Convert indicator URIs to dataset URIs for topological sorting
-    # Graph steps specify dependencies as indicator URIs (e.g., data://grapher/.../table#indicator)
-    # but for execution order we need the runnable dataset URI (e.g., data://grapher/.../dataset)
-    normalized_subdag = {}
-    for step_name, deps in subdag.items():
-        normalized_deps = set()
-        for dep in deps:
-            # Convert indicator URI to dataset URI:
-            # data://grapher/ns/ver/ds/table#indicator -> data://grapher/ns/ver/ds
-            if "#" in dep:
-                # Strip #indicator suffix
-                dep = dep.split("#")[0]
-            # Strip table name (last path component) for grapher steps
-            if dep.startswith("data://grapher/") and dep.count("/") >= 5:
-                # Parts: ['data:', '', 'grapher', 'namespace', 'version', 'dataset', 'table']
-                parts = dep.split("/")
-                if len(parts) > 6:  # Has table component
-                    # Reconstruct without table: data://grapher/ns/ver/ds
-                    dep = "/".join(parts[:6])
-            normalized_deps.add(dep)
-        normalized_subdag[step_name] = normalized_deps
-
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(normalized_subdag)
+    steps = to_dependency_order(subdag)
 
     # parse the steps into Python objects
     # NOTE: We need the full DAG here to get complete dependencies of each step
@@ -195,12 +173,6 @@ def traverse(graph: DAG, nodes: Set[str]) -> DAG:
         node = to_visit.pop()
         if node in reachable:
             continue  # already visited
-
-        # Only add node if it's actually in the graph
-        # This prevents indicator URIs (e.g., data://...#indicator) from being added as steps
-        if node not in graph:
-            continue
-
         reachable[node] = set(graph.get(node, set()))
         to_visit = to_visit.union(reachable[node])
 
@@ -240,52 +212,39 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
+    # dependencies are new objects
+    dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
-    # For graph steps, parse the dataset portion of dependencies (strip table name and #indicator)
-    if step_type == "graph":
-        # Dependencies like "data://grapher/ns/ver/ds/table#indicator"
-        # -> parse "data://grapher/ns/ver/ds" as a Step (strip table name and indicator)
-        dataset_deps = []
-        for dep_uri in dag.get(step_name, []):
-            # Strip #indicator suffix
-            without_indicator = dep_uri.split("#")[0]
-            # Strip table name (last path component after the version)
-            # e.g., "data://grapher/ns/ver/ds/table" -> "data://grapher/ns/ver/ds"
-            parts = without_indicator.rsplit("/", 1)
-            dataset_uri = parts[0] if len(parts) > 1 else without_indicator
-            dataset_deps.append(parse_step(dataset_uri, dag))
-        step = GraphStep(path, dataset_deps)
+    step: Step
+    if step_type == "data":
+        step = DataStep(path, dependencies)
+
+    elif step_type == "snapshot":
+        step = SnapshotStep(path)
+
+    elif step_type == "github":
+        step = GithubStep(path)
+
+    elif step_type == "etag":
+        step = ETagStep(path)
+
+    elif step_type == "grapher":
+        step = GrapherStep(path, dependencies)
+
+    elif step_type == "export":
+        step = ExportStep(path, dependencies)
+
+    elif step_type == "graph":
+        step = GraphStep(path, dependencies)
+
+    elif step_type == "data-private":
+        step = DataStepPrivate(path, dependencies)
+
+    elif step_type == "snapshot-private":
+        step = SnapshotStepPrivate(path)
+
     else:
-        # dependencies are new objects
-        dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
-
-        step: Step
-        if step_type == "data":
-            step = DataStep(path, dependencies)
-
-        elif step_type == "snapshot":
-            step = SnapshotStep(path)
-
-        elif step_type == "github":
-            step = GithubStep(path)
-
-        elif step_type == "etag":
-            step = ETagStep(path)
-
-        elif step_type == "grapher":
-            step = GrapherStep(path, dependencies)
-
-        elif step_type == "export":
-            step = ExportStep(path, dependencies)
-
-        elif step_type == "data-private":
-            step = DataStepPrivate(path, dependencies)
-
-        elif step_type == "snapshot-private":
-            step = SnapshotStepPrivate(path)
-
-        else:
-            raise Exception(f"no recipe for executing step: {step_name}")
+        raise Exception(f"no recipe for executing step: {step_name}")
 
     return step
 
