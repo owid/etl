@@ -100,8 +100,7 @@ def run() -> None:
         "in_tour_arrivals_trips_total_same_day_vis_excur",
         "out_tour_departures_trips_total_overnight_vis_tourists",
         "dom_tour_trips_total_same_day_vis_excur",
-        "employment_employed_persons_in_the_ind_num",
-        "employment_employed_persons_in_the_ind_num",  # Using same column for both
+        "employment_employed_persons_in_the_tour_ind_num",
     ]
 
     for col in cols_per_1000:

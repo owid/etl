@@ -217,7 +217,6 @@ tables:
         description_short: Number of trips by people who arrive from South Asia.
         description_key: *desc_key_arrivals
 
-
       inbound_outbound_tourism:
         title: Ratio of inbound to outbound tourist trips
         unit: ratio
@@ -269,5 +268,18 @@ tables:
           - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
           - For instance, if there are "10 departures per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 instances of international departures.
           - This indicator provides an estimate of outbound tourism intensity in the country of reference.
+        display:
+          numDecimalPlaces: 1
+
+      employment_employed_persons_in_the_tour_ind_num_per_1000:
+        title: Employment in the tourism industries per 1,000 people
+        unit: persons per 1,000 people
+        description_short: Number of persons employed in tourism industries, including both employees and self-employed individuals.
+        description_key:
+          - *note_employee
+          - Per "1,000 people" in the context of employment in the tourism industries refers to the calculation of employed persons per 1,000 individuals within the population of the country.
+          - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
+          - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
+          - This indicator provides an estimate of the significance of the tourism sector in terms of employment within the country of reference.
         display:
           numDecimalPlaces: 1
