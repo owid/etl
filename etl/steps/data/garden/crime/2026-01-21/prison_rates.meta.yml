@@ -21,11 +21,11 @@ tables:
         title: Prison population rate
         unit: prisoners per 100,000 people
       pretrial_detainees_pct:
-        title: Pretrial detainees
+        title: Share of prisoners that are pretrial detainees
         unit: "%"
         short_unit: "%"
       female_prisoners_pct:
-        title: Female prisoners
+        title: Share of prisoners that are female
         unit: "%"
         short_unit: "%"
       juvenile_prisoners_pct:
