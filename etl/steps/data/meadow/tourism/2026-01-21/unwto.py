@@ -145,9 +145,6 @@ def run() -> None:
     # Concatenate all the processed DataFrames
     tb = pr.concat(tbs, axis=0, ignore_index=True)
 
-    # Convert 'value' to float
-    tb["value"] = tb["value"].astype(float)
-
     # Pivot the Table to have 'indicator' as columns and 'value' as cell values
     tb = tb.pivot(index=["country", "year"], columns="indicator", values="value").reset_index()
 

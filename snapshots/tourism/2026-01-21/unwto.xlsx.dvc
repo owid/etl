@@ -3,16 +3,15 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Tourism Statistics Database
+    title: UN Tourism Statistics Database
     description: |-
-      UN Tourism collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations. The data covers various aspects of tourism, such as inbound tourism (including arrivals by region, main purpose, and mode of transport, as well as accommodation and tourism expenditure in the country), domestic tourism (including trips and accommodation), outbound tourism (including departures and tourism expenditure in other countries), tourism industries (such as accommodation in hotels and similar establishments), and employment (including the number of employees in tourism industries).
+      UN World Tourism Organization collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations. The data covers various aspects of tourism, such as inbound tourism (including arrivals by region, main purpose, and mode of transport, as well as accommodation and tourism expenditure in the country), domestic tourism (including trips and accommodation), outbound tourism (including departures and tourism expenditure in other countries), tourism industries (such as accommodation in hotels and similar establishments), and employment (including the number of employees in tourism industries).
     date_published: 2025-12-01
 
     # Citation
-    producer: UN Tourism
+    producer: UN World Tourism Organization
     citation_full: |-
-      UN Tourism (2025), Tourism Statistics Database, UN Tourism, Madrid:
-      https://www.untourism.int/tourism-statistics/tourism-statistics-database [21-01-2026].
+     "World Tourism Organization (2025). UN Tourism Statistics Database, Madrid. Data updated on 23 December 2025. More information: https://www.untourism.int/tourism-statistics/tourism-statistics-database"
 
     # Files
     url_main: https://www.untourism.int/tourism-statistics/tourism-statistics-database

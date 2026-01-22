@@ -8,6 +8,33 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Columns to keep after shortening column names
+COLUMNS_TO_KEEP = [
+    "dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests",
+    "employment_employed_persons_in_the_tour_ind_num",
+    "in_tour_accom_short_term_hotels_and_similar_isic_5510_guests",
+    "in_tour_arrivals_trips_total_overnight_vis_tourists",
+    "in_tour_arrivals_trips_total_same_day_vis_excur",
+    "in_tour_exp_balance_of_payments_passenger_transport_vis",
+    "in_tour_exp_balance_of_payments_total_vis",
+    "in_tour_exp_balance_of_payments_travel_vis",
+    "in_tour_purpose_trips_by_business_overnight_vis_tourists",
+    "in_tour_purpose_trips_by_personal_overnight_vis_tourists",
+    "in_tour_purpose_trips_by_total_overnight_vis_tourists",
+    "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total",
+    "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total",
+    "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total",
+    "in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total",
+    "in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total",
+    "in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total",
+    "out_tour_departures_trips_total_overnight_vis_tourists",
+    "out_tour_exp_balance_of_payments_passenger_transport_vis",
+    "out_tour_exp_balance_of_payments_total_vis",
+    "out_tour_exp_balance_of_payments_travel_vis",
+    "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables",
+    "tour_ind_gdp_direct_as_a_proportion_of_total_pct",
+]
+
 
 def run() -> None:
     #
@@ -30,7 +57,6 @@ def run() -> None:
     # Find columns that start with the specified prefixes - units are not thousands
     prefixes_not_thousands = ["inbound_tourism_expenditure", "outbound_tourism_expenditure", "tourism_industries"]
     matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in prefixes_not_thousands)]
-
     # Multiply the all the other columns by 1000 as these are in thousands
     for col in tb.columns:
         if col not in matching_columns + ["country", "year"]:
@@ -44,6 +70,10 @@ def run() -> None:
         tb[col] = tb[col] * 1e6
     # Shortern column names
     tb.columns = shorten_column_names(tb.columns)
+
+    # Select only the columns we want to keep (plus country and year)
+    columns_to_select = ["country", "year"] + [col for col in COLUMNS_TO_KEEP if col in tb.columns]
+    tb = tb[columns_to_select]
 
     # Calculate the business/personal ratio column
     tb["business_personal_ratio"] = (
