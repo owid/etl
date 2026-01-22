@@ -334,12 +334,20 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
+def graph_nodes(graph: Graph) -> Set[str]:
+    """Get all nodes from a DAG (both keys and values)."""
+    all_steps = set(graph)
+    for children in graph.values():
+        all_steps.update(children)
+    return all_steps
+
+
 def get_active_snapshots() -> Set[str]:
     DAG = load_dag()
 
     active_snapshots = set()
 
-    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
+    for s in graph_nodes(DAG):
         if s.startswith("snapshot"):
             active_snapshots.add(s.split("://")[1])
 
@@ -352,7 +360,7 @@ def get_active_steps() -> Set[str]:
 
     active_steps = set()
 
-    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
+    for s in graph_nodes(DAG):
         if not s.startswith("snapshot"):
             active_steps.add(s.split("://")[1])
 

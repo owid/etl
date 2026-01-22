@@ -4,7 +4,7 @@ Load a meadow dataset and create a garden dataset.
 When running this step in an update, be sure to check all the outputs and logs to ensure the data is correct.
 
 NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal (and set DEBUG = True in the code):
-    nohup uv run etl run world_bank_pip > output_pip.log 2>&1 &
+    nohup .venv/bin/etlr world_bank_pip > output_pip.log 2>&1 &
 
 """
 
@@ -22,6 +22,12 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Set debug mode
+DEBUG = False
+
+# Set table format when printing
+TABLEFMT = "pretty"
 
 # Initialize logger.
 log = get_logger()
@@ -93,12 +99,6 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Ukraine",
     "Uzbekistan",
 ]
-
-# Set debug mode
-DEBUG = False
-
-# Set table format when printing
-TABLEFMT = "pretty"
 
 # Define indicators that don't depend on poverty lines
 INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES = [
@@ -617,6 +617,9 @@ def sanity_checks(
     Sanity checks for the table
     """
 
+    if not DEBUG:
+        return tb
+
     # Define index for pivot
     index = ["country", "year", "welfare_type", "filled"]
 
@@ -650,8 +653,7 @@ def sanity_checks(
             col_decile_thr.append(f"decile{i}_thr")
 
     for ppp_year, povlines in POVLINES_DICT.items():
-        if DEBUG:
-            log.info(f"SANITY CHECKS FOR {ppp_year} PRICES")
+        log.info(f"SANITY CHECKS FOR {ppp_year} PRICES")
         # Save the number of observations before the checks
         obs_before_checks = len(tb_pivot)
         ############################
@@ -744,11 +746,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""{len(tb_error)} observations of all stacked values are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-                )
+            log.warning(
+                f"""{len(tb_error)} observations of all stacked values are not adding up to 100% and will be deleted:
+                {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
         # For the reduced set of intervals
@@ -757,11 +758,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""{len(tb_error)} observations of the reduced set of stacked values are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-                )
+            log.warning(
+                f"""{len(tb_error)} observations of the reduced set of stacked values are not adding up to 100% and will be deleted:
+                {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
         ############################
@@ -773,12 +773,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-                    {tabulate(tb_error[(index + ["headcount_ratio"])], headers = 'keys', tablefmt = TABLEFMT)}"""
-                )
-
+            log.warning(
+                f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
+                {tabulate(tb_error[(index + ["headcount_ratio"])], headers = 'keys', tablefmt = TABLEFMT)}"""
+            )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
         ############################
@@ -796,11 +794,10 @@ def sanity_checks(
         tb_error = tb_pivot[~tb_pivot["check_total"]].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
-                )
+            log.warning(
+                f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
+            )
             tb_pivot = tb_pivot[tb_pivot["check_total"]].reset_index(drop=True)
 
         ############################
@@ -821,11 +818,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
-                )
+            log.warning(
+                f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
+            )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
         ############################
@@ -845,11 +841,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-                )
+            log.warning(
+                f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
         ############################
@@ -865,11 +860,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-                )
+            log.warning(
+                f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
+                {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
         ############################
@@ -887,11 +881,10 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            if DEBUG:
-                log.warning(
-                    f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-                )
+            log.warning(
+                f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
+                {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
             # Make columns None if mask is True
             tb_pivot.loc[mask, [("top90_99_share", ppp_year, povlines[1]), ("top1_share", ppp_year, povlines[1])]] = (
                 pd.NA
@@ -899,7 +892,9 @@ def sanity_checks(
 
         ############################
         # delete columns created for the checks
-        tb_pivot = tb_pivot.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"], errors="raise")
+        tb_pivot = tb_pivot.sort_index(axis=1).drop(
+            columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"], errors="raise"
+        )
 
         obs_after_checks = len(tb_pivot)
         log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_year} PPPs.")
@@ -910,7 +905,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
+def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     """
     Separate income and consumption data
     """
@@ -1125,10 +1120,12 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
     # Drop the columns created in this function
-    tb_both_inc_and_cons_smoothed = tb_both_inc_and_cons_smoothed.drop(
+    tb_both_inc_and_cons_smoothed = tb_both_inc_and_cons_smoothed.sort_index(axis=1).drop(
         columns=["only_inc_or_cons", "duplicate_flag"], errors="raise"
     )
-    tb_only_inc_or_cons = tb_only_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"], errors="raise")
+    tb_only_inc_or_cons = tb_only_inc_or_cons.sort_index(axis=1).drop(
+        columns=["only_inc_or_cons", "duplicate_flag"], errors="raise"
+    )
 
     # Restore the format of the table
     tb_both_inc_and_cons_smoothed = unpivot_table(

@@ -184,6 +184,8 @@ definitions:
     Income here is measured after taxes and benefits.
     <%- elif welfare_type == "before tax" %>
     Income here is measured before taxes and benefits.
+    <%- elif welfare_type == "wealth" %>
+    Wealth is defined as the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.
     <%- endif %>
 
   subtitle_ppp: |-
@@ -217,27 +219,6 @@ definitions:
     <%- elif welfare_type == "before tax" %>
     [0, 2, 4, 6, 8, 10, 12, 14, 16, 1]
     <%- endif %>
-
-  # map_brackets_share_top_10: &map_brackets_share_top_10
-  #   <% if welfare_type in ["after tax", "after tax disposable"] %>
-  #   [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
-  #   <%- elif welfare_type == "before tax" %>
-  #   [100, 30, 35, 40, 45, 50, 55, 60, 1]
-  #   <%- endif %>
-
-  # map_brackets_share_top_1: &map_brackets_share_top_1
-  #   <% if welfare_type in ["after tax", "after tax disposable"] %>
-  #   [0, 5, 10, 15, 20, 25, 1]
-  #   <%- elif welfare_type == "before tax" %>
-  #   [0, 5, 10, 15, 20, 25, 1]
-  #   <%- endif %>
-
-  # map_brackets_share_top_0_1: &map_brackets_share_top_0_1
-  #   <% if welfare_type in ["after tax", "after tax disposable"] %>
-  #   [0, 2 , 4, 6, 8, 10, 12, 1]
-  #   <%- elif welfare_type == "before tax" %>
-  #   [0, 2 , 4, 6, 8, 10, 12, 1]
-  #   <%- endif %>
 
   map_brackets_share_bottom_50: &map_brackets_share_bottom_50
     <% if welfare_type in ["after tax", "after tax disposable"] %>
