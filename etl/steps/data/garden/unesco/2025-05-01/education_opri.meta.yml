@@ -198,7 +198,7 @@ definitions:
     - This indicator tracks how much a government spends on education at a specific level annually, adjusted for inflation and differences in the cost of living. Spending is expressed in constant [international-$](#dod:int_dollar_abbreviation), which allows for comparisons across countries and over time.
     - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
     - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations.
-    - This measure provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrolment and per-student spending.
+    - This measure provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrollment and per-student spending.
 
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
     - This indicator shows how much a government spends per student per year at a particular level of education, expressed in constant [international-$](#dod:int_dollar_abbreviation).
@@ -214,24 +214,24 @@ definitions:
     - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
     - It covers all types of public education spending — including teacher salaries, textbooks, school maintenance, capital projects such as building classrooms, and even external funding from international donors that is channeled through government budgets.
     - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
-    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
+    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrollment rates.
 
   # Enrollment and attendance descriptions
   desc_key_net_enr: &desc_key_net_enr
-    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrolment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
+    - The net enrollment rate shows what percentage of children are enrolled at the education level intended for their age.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrollment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
     - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
-    - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
+    - The data comes from school administrative records that track enrollment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
-    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
-    - It measures enrolment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrolment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
-    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - The gross enrollment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures enrollment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrollment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrollment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
     - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
     - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
     - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
-    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
+    - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
@@ -244,7 +244,7 @@ definitions:
     - The data may not reflect recent progress in countries with infrequent surveys or outdated census information
 
   desc_key_sle: &desc_key_sle
-     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrolment patterns observed in that country in that specific year.
+     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrollment patterns observed in that country in that specific year.
      - The calculation looks at how many students are enrolled at each age and education level, then estimates how long a new student would stay in school if those patterns continued. This includes time spent repeating grades, not just the official length of each school level.
      - It measures participation in schooling - how long students are likely to stay in school - rather than whether they actually learn or graduate.
      - Higher numbers mean students spend more years in school, either because the official school system is longer or because many students repeat grades.
@@ -256,18 +256,18 @@ definitions:
     - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
     - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
-    - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
-    - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+    - The data comes from administrative school enrollment records and household surveys, which provide age-specific insights when compared to population estimates.
+    - As with all education data, results should be interpreted carefully. Differences in how enrollment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
 
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
-    - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
+    - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrollment is taking place in privately run schools or educational programmes.
     - It captures the share of students enrolled in private institutions at a given level of education as a percentage of all students enrolled at that level, including both public and private schools.
     - The indicator is calculated by dividing the number of students in private institutions by the total number of students enrolled at the same education level, then multiplying by 100.
     - A high percentage means that non-governmental providers — such as private individuals, companies, religious bodies, or community organizations — play a significant role in delivering education at that level.
-    - The data comes from school censuses and other administrative records that report enrolment numbers by type of institution and education level.
+    - The data comes from school censuses and other administrative records that report enrollment numbers by type of institution and education level.
     - This indicator is often disaggregated by level of education and by sex, allowing for analysis of how the role of private education differs across schooling stages and between boys and girls.
-    - There are some important limitations. In some countries, the distinction between public and private institutions is blurred — especially where private schools receive government subsidies or public funds are used to support student enrolment through scholarships.
+    - There are some important limitations. In some countries, the distinction between public and private institutions is blurred — especially where private schools receive government subsidies or public funds are used to support student enrollment through scholarships.
     - Additionally, some private schools may operate without formal registration or may not follow national curricula, which can lead to underreporting and incomplete data in official statistics.
     - Despite these challenges, this indicator helps assess the scale and role of the private education sector within a national education system and informs discussions about education financing, accessibility, and regulation.
 
@@ -284,7 +284,7 @@ definitions:
     - To address this, the UNESCO Institute for Statistics (UIS) adjusts age data when possible using birth month and year. If only the age in years is reported and the survey was conducted more than six months after the start of the academic year, one year is subtracted from the recorded age.
     - When survey data is collected within five months of the school year’s start, the recorded age is used as-is.
     - Despite adjustments, differences between survey responses and national education structures may affect comparability. Incomplete data — such as missing age, attendance status, or grade — are excluded from the calculation.
-    - Even with these limitations, the total net attendance rate is a valuable measure of school participation that complements enrolment data and helps track progress toward universal access to education.
+    - Even with these limitations, the total net attendance rate is a valuable measure of school participation that complements enrollment data and helps track progress toward universal access to education.
 
   # Female teachers descriptions
   desc_key_female_teachers: &desc_key_female_teachers
@@ -497,7 +497,7 @@ tables:
           - The data comes from household surveys or population censuses, where individuals report the highest level of education they have completed. These levels are then converted into years of schooling based on standard durations defined by [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced).
           - Because this indicator reflects accumulated schooling over time, it shows how gender disparities have developed across generations.
           - Some limitations include differences in education system structures between countries and challenges in mapping survey responses to ISCED levels. The indicator measures duration of schooling, not its quality or outcomes.
-          - Even so, the GPIA for average years of schooling provides a clear measure of gender equality in education over the life course, and is an important complement to indicators focused on current enrolment or access.
+          - Even so, the GPIA for average years of schooling provides a clear measure of gender equality in education over the life course, and is an important complement to indicators focused on current enrollment or access.
         display:
           numDecimalPlaces: 1
 
@@ -506,7 +506,7 @@ tables:
       # ========================================================================
 
       percentage_of_enrolment_in_pre_primary_education_in_private_institutions__both_sexes__pct:
-        title: Percentage of enrolment in pre-primary education in private institutions
+        title: Percentage of enrollment in pre-primary education in private institutions
         description_short: Private [pre-primary education](#dod:pre-primary-education) institutions are managed by private entities, such as NGOs, religious groups, or businesses, rather than public authorities, regardless of profit motive.
         unit: "%"
         short_unit: "%"
@@ -515,7 +515,7 @@ tables:
           numDecimalPlaces: 1
 
       percentage_of_enrolment_in_primary_education_in_private_institutions__both_sexes__pct:
-        title: Percentage of enrolment in primary education in private institutions
+        title: Percentage of enrollment in primary education in private institutions
         description_short: Private [primary](#dod:primary-education) institutions are managed by private entities, such as NGOs, religious groups, or businesses, rather than public authorities, regardless of profit motive.
         unit: "%"
         short_unit: "%"
@@ -550,7 +550,7 @@ tables:
 
       inbound_mobility_rate__both_sexes__uis_estimate__pct:
         title: Share of students from abroad
-        description_short: International students as a share of the country's overall [tertiary](#dod:tertiary-education) enrolment. International students are those who move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
+        description_short: International students as a share of the country's overall [tertiary](#dod:tertiary-education) enrollment. International students are those who move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -578,7 +578,7 @@ tables:
         - Children around the world begin formal education at different ages — this indicator shows the age at which students are officially expected to start a given level of education in their country.
         - It assumes that students begin schooling on time, attend full-time, and progress without repeating or skipping any grades.
         - The official entrance age is typically determined by national laws or education policies and usually reflects the most common age of entry, though not always.
-        - This indicator is essential for understanding how an education system is structured and is used as a reference point when calculating other key indicators like enrolment rates or school-age population estimates.
+        - This indicator is essential for understanding how an education system is structured and is used as a reference point when calculating other key indicators like enrollment rates or school-age population estimates.
         - It helps identify the age-specific demand for education services and supports national planning for staffing, infrastructure, and learning materials at each education level.
         - Data on official entrance age is reported by national ministries of education and compiled by the UNESCO Institute for Statistics, following [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) to ensure international comparability.
         - While this provides a standard benchmark, actual school entry may vary due to parental choices, local policies, or flexibility in school admissions.
@@ -598,7 +598,7 @@ tables:
           - Data on compulsory education duration are collected from national legislation and formal education standards, and are mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) to ensure international comparability.
           - It's important to note that while legislation may define the duration of compulsory education, actual implementation and enforcement can vary, and some children may not attend school for the full duration.
           - Changes in national education policies, such as extending or reducing the years of compulsory education, can impact this indicator and should be considered when analyzing trends over time.
-          - This indicator is useful for understanding government commitment to education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
+          - This indicator is useful for understanding government commitment to education and for planning resource allocation, but it should be interpreted alongside other indicators like enrollment rates and completion rates for a comprehensive view.
           - Limitations include potential discrepancies between legal provisions and actual practice, and differences in how countries define and implement compulsory education.
         display:
           numDecimalPlaces: 0
@@ -611,7 +611,7 @@ tables:
           - Children begin their education journeys at different ages around the world — this indicator shows the age at which they are officially expected to start pre-primary education in a given country.
           - It captures the official entrance age for pre-primary education, based on the assumption that children begin schooling at the standard age, attend full-time, and progress through the education system without repeating or skipping any grades.
           - The official entrance age is typically set by national education laws or regulations and often corresponds to the most common age at which children enter pre-primary programmes.
-          - This indicator helps estimate the expected demand for early childhood education services and is a key input for producing many other education statistics, including enrolment rates and school-age population estimates.
+          - This indicator helps estimate the expected demand for early childhood education services and is a key input for producing many other education statistics, including enrollment rates and school-age population estimates.
           - The data are reported by ministries of education and compiled by the UNESCO Institute for Statistics, using the International Standard Classification of Education ([International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure international comparability.
           - While the official age provides a national benchmark, actual entry ages may vary due to cultural preferences, availability of early childhood programmes, or local policy flexibility.
           - Understanding the official entrance age to pre-primary education is essential for education planning and for identifying gaps in access to early learning opportunities that support school readiness and long-term development.
@@ -630,47 +630,47 @@ tables:
           - Data on pre-primary education duration are collected from national legislation and formal education standards, and are mapped to the International Standard Classification of Education ([International Standard Classification of Education(ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure international comparability.
           - It's important to note that while legislation may define the duration of pre-primary education, actual implementation and enforcement can vary, and some children may not attend school for the full duration.
           - Changes in national education policies, such as extending or reducing the years of pre-primary education, can impact this indicator and should be considered when analyzing trends over time.
-          - This indicator is useful for understanding government commitment to early childhood education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
+          - This indicator is useful for understanding government commitment to early childhood education and for planning resource allocation, but it should be interpreted alongside other indicators like enrollment rates and completion rates for a comprehensive view.
           - Limitations include potential discrepancies between legal provisions and actual practice, and differences in how countries define and implement pre-primary education.
         display:
           numDecimalPlaces: 0
 
 
       # ========================================================================
-      # GENDER PARITY INDICES (enrolment rates)
+      # GENDER PARITY INDICES (enrollment rates)
       # ========================================================================
 
       total_net_enrolment_rate__primary__adjusted_gender_parity_index__gpia:
-        title: Net enrolment rates in primary education, adjusted gender parity index
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrolment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        title: Net enrollment rates in primary education, adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
-          - Boys and girls don’t always have equal access to primary education — this indicator shows how close we are to gender parity in age-appropriate school enrolment.
-          - It captures gender equality in net enrolment rates for primary education by comparing the percentage of girls and boys of official primary school age who are enrolled at the primary level.
-          - The adjusted gender parity index (GPIA) is calculated by dividing the female net enrolment rate by the male net enrolment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
+          - Boys and girls don’t always have equal access to primary education — this indicator shows how close we are to gender parity in age-appropriate school enrollment.
+          - It captures gender equality in net enrollment rates for primary education by comparing the percentage of girls and boys of official primary school age who are enrolled at the primary level.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female net enrollment rate by the male net enrollment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
           - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
-          - This indicator is useful for identifying gender-based barriers to primary school enrolment and for monitoring progress toward equitable access to basic education.
-          - The data comes from administrative records reporting enrolment by age and sex, as well as population estimates for children of official primary school age.
+          - This indicator is useful for identifying gender-based barriers to primary school enrollment and for monitoring progress toward equitable access to basic education.
+          - The data comes from administrative records reporting enrollment by age and sex, as well as population estimates for children of official primary school age.
           - It’s important to interpret this indicator alongside others, such as attendance rates or completion rates, to get a full picture of gender disparities in education.
-          - As with all indicators based on enrolment and population estimates, small inconsistencies between data sources may affect accuracy. Differences may also arise due to early or delayed school entry, which can influence age-specific enrolment.
-          - Despite these limitations, the GPIA for net enrolment in primary education is a valuable measure of progress toward inclusive and equitable education for all children, regardless of gender.
+          - As with all indicators based on enrollment and population estimates, small inconsistencies between data sources may affect accuracy. Differences may also arise due to early or delayed school entry, which can influence age-specific enrollment.
+          - Despite these limitations, the GPIA for net enrollment in primary education is a valuable measure of progress toward inclusive and equitable education for all children, regardless of gender.
         display:
           numDecimalPlaces: 1
 
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
-        title: Net enrolment rates in lower secondary education, adjusted gender parity index
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrolment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        title: Net enrollment rates in lower secondary education, adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
-          - Boys and girls don’t always have equal access to lower secondary education — this indicator shows how close we are to gender parity in age-appropriate school enrolment at that level.
-          - It captures gender equality in net enrolment rates for lower secondary education by comparing the percentage of girls and boys of official lower secondary school age who are enrolled at that level.
-          - The adjusted gender parity index (GPIA) is calculated by dividing the female net enrolment rate by the male net enrolment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
+          - Boys and girls don’t always have equal access to lower secondary education — this indicator shows how close we are to gender parity in age-appropriate school enrollment at that level.
+          - It captures gender equality in net enrollment rates for lower secondary education by comparing the percentage of girls and boys of official lower secondary school age who are enrolled at that level.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female net enrollment rate by the male net enrollment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
           - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
-          - This indicator is useful for identifying gender-based disparities in lower secondary school enrolment and for tracking progress toward equitable access to post-primary education.
-          - The data comes from administrative records reporting enrolment by age and sex, along with population estimates for children in the official lower secondary school age range.
+          - This indicator is useful for identifying gender-based disparities in lower secondary school enrollment and for tracking progress toward equitable access to post-primary education.
+          - The data comes from administrative records reporting enrollment by age and sex, along with population estimates for children in the official lower secondary school age range.
           - It should be interpreted alongside related indicators — such as attendance, progression, and completion rates — to build a clearer picture of gender equity in education beyond access alone.
-          - Like all indicators derived from enrolment and population estimates, data inconsistencies or timing issues, such as early or delayed school entry, may affect the accuracy of age-specific enrolment figures.
-          - Despite these limitations, the GPIA for net enrolment in lower secondary education remains a powerful tool for assessing gender equity and informing inclusive education policy.
+          - Like all indicators derived from enrollment and population estimates, data inconsistencies or timing issues, such as early or delayed school entry, may affect the accuracy of age-specific enrollment figures.
+          - Despite these limitations, the GPIA for net enrollment in lower secondary education remains a powerful tool for assessing gender equity and informing inclusive education policy.
         display:
           numDecimalPlaces: 1
 
@@ -757,117 +757,117 @@ tables:
       # ========================================================================
 
       total_net_enrolment_rate__primary__both_sexes__pct:
-        title: Net enrolment rate in primary education
+        title: Net enrollment rate in primary education
         description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in primary education
+          title_public:  Net enrollment rate in primary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Primary education
 
       total_net_enrolment_rate__primary__male__pct:
-        title: Net enrolment rate in primary education among boys
+        title: Net enrollment rate in primary education among boys
         description_short: Percentage of boys of official primary school age who are enrolled in [primary education](#dod:primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in primary education among boys
+          title_public:  Net enrollment rate in primary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
 
       total_net_enrolment_rate__primary__female__pct:
-        title: Net enrolment rate in primary education among girls
+        title: Net enrollment rate in primary education among girls
         description_short: Percentage of girls of official primary school age who are enrolled in [primary education](#dod:primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in primary education among girls
+          title_public:  Net enrollment rate in primary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
 
       total_net_enrolment_rate__lower_secondary__both_sexes__pct:
-        title: Net enrolment rate in lower secondary education
+        title: Net enrollment rate in lower secondary education
         description_short: Percentage of children of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in lower secondary education
+          title_public:  Net enrollment rate in lower secondary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Lower secondary education
 
       total_net_enrolment_rate__lower_secondary__male__pct:
-        title: Net enrolment rate in lower secondary education among boys
+        title: Net enrollment rate in lower secondary education among boys
         description_short: Percentage of boys of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in lower secondary education among boys
+          title_public:  Net enrollment rate in lower secondary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
 
       total_net_enrolment_rate__lower_secondary__female__pct:
-        title: Net enrolment rate in lower secondary education among girls
+        title: Net enrollment rate in lower secondary education among girls
         description_short: Percentage of girls of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in lower secondary education among girls
+          title_public:  Net enrollment rate in lower secondary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
 
       total_net_enrolment_rate__upper_secondary__both_sexes__pct:
-        title: Net enrolment rate in upper secondary education
+        title: Net enrollment rate in upper secondary education
         description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in upper secondary education
+          title_public:  Net enrollment rate in upper secondary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Upper secondary education
 
       total_net_enrolment_rate__upper_secondary__male__pct:
-        title: Net enrolment rate in upper secondary education among boys
+        title: Net enrollment rate in upper secondary education among boys
         description_short: Percentage of boys of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in upper secondary education among boys
+          title_public:  Net enrollment rate in upper secondary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
 
       total_net_enrolment_rate__upper_secondary__female__pct:
-        title: Net enrolment rate in upper secondary education among girls
+        title: Net enrollment rate in upper secondary education among girls
         description_short: Percentage of girls of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrolment rate in upper secondary education among girls
+          title_public:  Net enrollment rate in upper secondary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -878,124 +878,124 @@ tables:
       # ========================================================================
 
       gross_enrolment_ratio__primary__both_sexes__pct:
-        title: Gross enrolment ratio in primary education
+        title: Gross enrollment ratio in primary education
         description_short: Number of children of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of the official primary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in primary education
+          title_public:  Gross enrollment ratio in primary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Primary education
 
       gross_enrolment_ratio__primary__male__pct:
-        title: Gross enrolment ratio in primary education among boys
+        title: Gross enrollment ratio in primary education among boys
         description_short: Number of boys of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of boys of official primary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in primary education among boys
+          title_public:  Gross enrollment ratio in primary education among boys
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
 
       gross_enrolment_ratio__primary__female__pct:
-        title: Gross enrolment ratio in primary education among girls
+        title: Gross enrollment ratio in primary education among girls
         description_short: Number of girls of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of girls of official primary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in primary education among girls
+          title_public:  Gross enrollment ratio in primary education among girls
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
 
       gross_enrolment_ratio__lower_secondary__both_sexes__pct:
-        title: Gross enrolment ratio in lower secondary education
+        title: Gross enrollment ratio in lower secondary education
         description_short: Number of children of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of the official lower secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in lower secondary education
+          title_public:  Gross enrollment ratio in lower secondary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Lower secondary education
 
       gross_enrolment_ratio__lower_secondary__male__pct:
-        title: Gross enrolment ratio in lower secondary education among boys
+        title: Gross enrollment ratio in lower secondary education among boys
         description_short: Number of boys of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of boys of official lower secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in lower secondary education among boys
+          title_public:  Gross enrollment ratio in lower secondary education among boys
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
 
       gross_enrolment_ratio__lower_secondary__female__pct:
-        title: Gross enrolment ratio in lower secondary education among girls
+        title: Gross enrollment ratio in lower secondary education among girls
         description_short: Number of girls of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of girls of official lower secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in lower secondary education among girls
+          title_public:  Gross enrollment ratio in lower secondary education among girls
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
 
       gross_enrolment_ratio__upper_secondary__both_sexes__pct:
-        title: Gross enrolment ratio in upper secondary education
+        title: Gross enrollment ratio in upper secondary education
         description_short: Number of children of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of the official upper secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in upper secondary education
+          title_public:  Gross enrollment ratio in upper secondary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name:  Upper secondary education
 
       gross_enrolment_ratio__upper_secondary__female__pct:
-        title: Gross enrolment ratio in upper secondary education among girls
+        title: Gross enrollment ratio in upper secondary education among girls
         description_short: Number of girls of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of girls of official upper secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in upper secondary education among girls
+          title_public:  Gross enrollment ratio in upper secondary education among girls
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
 
       gross_enrolment_ratio__upper_secondary__male__pct:
-        title: Gross enrolment ratio in upper secondary education among boys
+        title: Gross enrollment ratio in upper secondary education among boys
         description_short: Number of boys of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of boys of official upper secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrolment ratio in upper secondary education among boys
+          title_public:  Gross enrollment ratio in upper secondary education among boys
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
 
       gross_enrolment_ratio__secondary__both_sexes__pct:
-        title: Gross enrolment ratio in secondary education
+        title: Gross enrollment ratio in secondary education
         description_short: Number of children of any age group who are enrolled in [secondary](#dod:secondary-education) education expressed as a percentage of the total population of the official secondary school age.
         unit: "%"
         short_unit: "%"
@@ -1008,7 +1008,7 @@ tables:
 
       school_life_expectancy__pre_primary__both_sexes__years:
         title: School life expectancy in pre-primary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1020,7 +1020,7 @@ tables:
 
       school_life_expectancy__pre_primary__female__years:
         title: School life expectancy in pre-primary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1032,7 +1032,7 @@ tables:
 
       school_life_expectancy__pre_primary__male__years:
         title: School life expectancy in pre-primary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1044,7 +1044,7 @@ tables:
 
       school_life_expectancy__primary__both_sexes__years:
         title: School life expectancy in primary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1056,7 +1056,7 @@ tables:
 
       school_life_expectancy__primary__female__years:
         title: School life expectancy in primary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1068,7 +1068,7 @@ tables:
 
       school_life_expectancy__primary__male__years:
         title: School life expectancy in primary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1080,7 +1080,7 @@ tables:
 
       school_life_expectancy__secondary__both_sexes__years:
         title: School life expectancy in secondary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1092,7 +1092,7 @@ tables:
 
       school_life_expectancy__secondary__female__years:
         title: School life expectancy in secondary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1104,7 +1104,7 @@ tables:
 
       school_life_expectancy__secondary__male__years:
         title: School life expectancy in secondary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1116,7 +1116,7 @@ tables:
 
       school_life_expectancy__tertiary__both_sexes__years:
         title: School life expectancy in tertiary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1128,7 +1128,7 @@ tables:
 
       school_life_expectancy__tertiary__female__years:
         title: School life expectancy in tertiary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1140,7 +1140,7 @@ tables:
 
       school_life_expectancy__tertiary__male__years:
         title: School life expectancy in tertiary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1156,10 +1156,10 @@ tables:
         unit: "index"
         description_key:
             - In many countries, boys and girls do not spend the same amount of time in primary school — this indicator shows how close they are to parity in expected school duration at the primary level.
-            - It focuses specifically on school life expectancy in [primary education](#dod:primary-education), comparing the average number of years girls and boys are expected to spend in primary school based on current age-specific enrolment rates.
+            - It focuses specifically on school life expectancy in [primary education](#dod:primary-education), comparing the average number of years girls and boys are expected to spend in primary school based on current age-specific enrollment rates.
             - The adjusted gender parity index (GPIA) is calculated by dividing the female school life expectancy in primary education by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2 to produce a symmetrical scale from 0 to 2, with 1 representing perfect parity.
             - A value of 1 means boys and girls are expected to spend the same number of years in primary school. Values below 1 indicate boys are expected to spend more time in school; values above 1 indicate girls are.
-            - This indicator assumes current enrolment trends continue over time and includes all children, even those who may never enrol, giving a comprehensive view of participation in primary education.
+            - This indicator assumes current enrollment trends continue over time and includes all children, even those who may never enrol, giving a comprehensive view of participation in primary education.
             - The data comes from administrative sources such as school censuses and registers, as well as population estimates by age, typically provided by national statistical offices or the United Nations Population Division.
             - Disaggregated by sex, this indicator helps identify gender gaps in access to and retention in primary schooling.
             - As with all expectancy-based indicators, it does not reflect actual completion or quality of education and may not account for repetition or part-time attendance, which can vary across contexts.

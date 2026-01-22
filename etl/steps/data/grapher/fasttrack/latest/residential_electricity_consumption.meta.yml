@@ -41,6 +41,14 @@ tables:
         display:
           name: Daily residential electricity use per person (adjusted)
         description: Daily residential electricity consumption per person, adjusted only for those who have access to electricity.
+      minutes_ac_per_day:
+        title: Minutes of AC that could be run with current electricity demand
+        unit: minutes
+        short_unit: mins
+        display:
+          name: Minutes of air conditioning
+        description: |-
+          The number of minutes that someone could run an air conditioner per day based on their current residential electricity use. This assumes an air conditioner uses around 1000 Wh per hour.
     dimensions:
       - name: country
         slug: country
