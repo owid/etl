@@ -201,6 +201,7 @@ definitions:
     Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
 
   description_key_welfare_type_poverty: |-
+    <% if welfare_type is defined %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -208,12 +209,19 @@ definitions:
     <%- else %>
     {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
     <%- endif %>
+    <%- else %>
+    {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
+    <%- endif %>
 
   description_key_welfare_type: |-
+    <% if welfare_type is defined %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
     The data relates to consumption [per capita](#dod:per-capita).
+    <%- else %>
+    {definitions.description_key_welfare_type_base}
+    <%- endif %>
     <%- else %>
     {definitions.description_key_welfare_type_base}
     <%- endif %>
