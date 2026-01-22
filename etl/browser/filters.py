@@ -241,3 +241,99 @@ def apply_filters(items: List[str], filters: Dict[str, str]) -> List[str]:
             result.append(item)
 
     return result
+
+
+@dataclass
+class FilterOptions:
+    """Cached unique values for each filterable attribute."""
+
+    channels: List[str] = field(default_factory=list)
+    namespaces: List[str] = field(default_factory=list)
+    versions: List[str] = field(default_factory=list)
+    datasets: List[str] = field(default_factory=list)
+
+    def get(self, attr: str) -> List[str]:
+        """Get options for a given attribute name."""
+        mapping = {
+            "channel": self.channels,
+            "namespace": self.namespaces,
+            "version": self.versions,
+            "dataset": self.datasets,
+        }
+        return mapping.get(attr, [])
+
+
+def extract_filter_options(items: List[str]) -> FilterOptions:
+    """Extract unique values for each filterable attribute from items.
+
+    Args:
+        items: List of step URIs
+
+    Returns:
+        FilterOptions with sorted unique values for each attribute.
+    """
+    channels: Dict[str, int] = {}
+    namespaces: Dict[str, int] = {}
+    versions: Dict[str, int] = {}
+    datasets: Dict[str, int] = {}
+
+    for item in items:
+        path = StepPath.from_uri(item)
+        if path is None:
+            continue
+
+        if path.channel:
+            channels[path.channel] = channels.get(path.channel, 0) + 1
+        if path.namespace:
+            namespaces[path.namespace] = namespaces.get(path.namespace, 0) + 1
+        if path.version:
+            versions[path.version] = versions.get(path.version, 0) + 1
+        if path.dataset:
+            datasets[path.dataset] = datasets.get(path.dataset, 0) + 1
+
+    # Sort by frequency (most common first), then alphabetically
+    def sort_by_freq(d: Dict[str, int]) -> List[str]:
+        return [k for k, _ in sorted(d.items(), key=lambda x: (-x[1], x[0]))]
+
+    return FilterOptions(
+        channels=sort_by_freq(channels),
+        namespaces=sort_by_freq(namespaces),
+        versions=sort_by_freq(versions),
+        datasets=sort_by_freq(datasets),
+    )
+
+
+@dataclass
+class ActiveFilter:
+    """Information about the filter currently being typed."""
+
+    attr: str  # e.g., "namespace"
+    prefix: str  # e.g., "n"
+    value: str  # e.g., "wh" (partial value typed so far)
+    start: int  # position in input string
+    end: int  # position in input string
+
+
+def get_active_filter(text: str) -> Optional[ActiveFilter]:
+    """Detect if user is currently typing a filter value.
+
+    Returns information about the active filter if the cursor is at the end
+    of a filter token (e.g., "n:" or "n:wh").
+    """
+    # Check if text ends with a filter pattern
+    # We want to detect: "n:", "n:wh", "namespace:who", etc.
+    match = re.search(r"\b(n|namespace|c|channel|v|version|d|dataset):(\S*)$", text, re.IGNORECASE)
+    if not match:
+        return None
+
+    prefix = match.group(1).lower()
+    value = match.group(2)
+    attr = FILTER_PREFIXES[prefix]
+
+    return ActiveFilter(
+        attr=attr,
+        prefix=prefix,
+        value=value,
+        start=match.start(),
+        end=match.end(),
+    )

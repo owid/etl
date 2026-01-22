@@ -13,7 +13,7 @@ from prompt_toolkit.lexers import Lexer
 
 if TYPE_CHECKING:
     from etl.browser.commands import Command
-    from etl.browser.filters import ParsedInput
+    from etl.browser.filters import FilterOptions, ParsedInput
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
@@ -284,6 +284,8 @@ class BrowserState:
         self.on_items_loaded: Optional[Callable[[List[str]], None]] = None
         # Filter parsing state
         self.parsed_input: Optional["ParsedInput"] = None
+        # Filter autocomplete options (cached)
+        self.filter_options: Optional["FilterOptions"] = None
 
 
 def filter_items(pattern: str, all_items: List[str]) -> List[str]:
@@ -370,7 +372,13 @@ def browse_items(
     import threading
 
     from etl.browser.commands import filter_commands
-    from etl.browser.filters import apply_filters, find_filter_match_spans, parse_filters
+    from etl.browser.filters import (
+        apply_filters,
+        extract_filter_options,
+        find_filter_match_spans,
+        get_active_filter,
+        parse_filters,
+    )
 
     # State for the application
     state = BrowserState()
@@ -381,6 +389,7 @@ def browse_items(
     # If cached_items provided, use them immediately
     if cached_items is not None:
         state.all_items = cached_items
+        state.filter_options = extract_filter_options(cached_items)
         state.loading = False
     else:
         # Show loading state and load in background
@@ -388,6 +397,7 @@ def browse_items(
 
         def load_in_background() -> None:
             state.all_items = items_loader()
+            state.filter_options = extract_filter_options(state.all_items)
             state.loading = False
 
             # Call the on_items_loaded callback for caching
@@ -611,6 +621,31 @@ def browse_items(
             add_shortcuts([("^C", "Exit")])
 
         lines.append(("", "\n"))
+
+        # Show filter suggestions when user is typing a filter
+        active_filter = get_active_filter(text)
+        if active_filter and state.filter_options:
+            options = state.filter_options.get(active_filter.attr)
+            if options:
+                # Filter options by what user has typed so far
+                if active_filter.value:
+                    matching = [o for o in options if o.lower().startswith(active_filter.value.lower())]
+                else:
+                    matching = options
+
+                if matching:
+                    # Show up to 8 suggestions
+                    display_options = matching[:8]
+                    more = len(matching) - 8 if len(matching) > 8 else 0
+
+                    attr_label = active_filter.attr + "s"  # e.g., "namespaces"
+                    suggestions = ", ".join(display_options)
+                    if more > 0:
+                        suggestions += f", +{more} more"
+
+                    lines.append(("class:hint", f"  {attr_label}: "))
+                    lines.append(("class:filter", suggestions))
+                    lines.append(("", "\n"))
 
         # Display matches with highlighting and scrolling
         start = state.scroll_offset
