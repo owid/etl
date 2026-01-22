@@ -10,6 +10,7 @@ from prompt_toolkit import Application
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
+from prompt_toolkit.layout.containers import Container
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.styles import Style
 
@@ -17,26 +18,98 @@ from prompt_toolkit.styles import Style
 OWID_YELLOW = "#fac800"
 OWID_GREEN = "#54cc90"
 OWID_GRAY = "#888888"
+OWID_DIM_GRAY = "#666666"  # Even dimmer for navigation hints
 
 # Style for the browser
 BROWSER_STYLE = Style.from_dict(
     {
         "prompt": f"fg:{OWID_YELLOW} bold",
         "input": "bold",
-        "match-count": f"fg:{OWID_GRAY}",
-        "separator": f"fg:{OWID_GRAY}",
-        "item": f"fg:{OWID_GRAY}",
+        "match-count": f"fg:{OWID_DIM_GRAY}",
+        "item": f"fg:{OWID_GRAY}",  # Dim gray for results
         "item.highlight": f"fg:{OWID_GREEN} bold",
         "item.selected": f"bg:{OWID_YELLOW} fg:#000000 bold",
         "item.selected.highlight": f"bg:{OWID_YELLOW} fg:#000000 bold underline",
-        "hint": f"fg:{OWID_GRAY} italic",
-        "shortcut-key": f"bg:{OWID_GRAY} fg:#000000 bold",
-        "shortcut-desc": f"fg:{OWID_GRAY}",
+        "hint": f"fg:{OWID_DIM_GRAY} italic",  # Even dimmer for hints
+        "shortcut-key": f"bg:{OWID_DIM_GRAY} fg:#000000 bold",
+        "shortcut-desc": f"fg:{OWID_DIM_GRAY}",
+        "frame.border": f"fg:{OWID_GRAY}",  # Subtle gray border
     }
 )
 
 # Maximum number of items to display
 MAX_DISPLAY_ITEMS = 15
+
+# Dashed box-drawing characters for OWID-styled frame
+ROUNDED_TOP_LEFT = "╭"
+ROUNDED_TOP_RIGHT = "╮"
+ROUNDED_BOTTOM_LEFT = "╰"
+ROUNDED_BOTTOM_RIGHT = "╯"
+HORIZONTAL = "┄"  # Light triple dash horizontal
+VERTICAL = "┆"  # Light triple dash vertical
+
+
+def create_rounded_frame(body: Container) -> Container:
+    """Create a frame with rounded corners around the given content.
+
+    Args:
+        body: The container to wrap in a frame
+
+    Returns:
+        A container with rounded border around the body
+    """
+    # Corner windows (fixed width)
+    top_left = Window(
+        content=FormattedTextControl([("class:frame.border", ROUNDED_TOP_LEFT)]),
+        width=1,
+        height=1,
+        dont_extend_width=True,
+        dont_extend_height=True,
+    )
+    top_right = Window(
+        content=FormattedTextControl([("class:frame.border", ROUNDED_TOP_RIGHT)]),
+        width=1,
+        height=1,
+        dont_extend_width=True,
+        dont_extend_height=True,
+    )
+    bottom_left = Window(
+        content=FormattedTextControl([("class:frame.border", ROUNDED_BOTTOM_LEFT)]),
+        width=1,
+        height=1,
+        dont_extend_width=True,
+        dont_extend_height=True,
+    )
+    bottom_right = Window(
+        content=FormattedTextControl([("class:frame.border", ROUNDED_BOTTOM_RIGHT)]),
+        width=1,
+        height=1,
+        dont_extend_width=True,
+        dont_extend_height=True,
+    )
+
+    # Horizontal lines (extend to fill width)
+    top_line = Window(char=HORIZONTAL, height=1, dont_extend_height=True, style="class:frame.border")
+    bottom_line = Window(char=HORIZONTAL, height=1, dont_extend_height=True, style="class:frame.border")
+
+    # Vertical borders (fixed width)
+    left_border = Window(
+        content=FormattedTextControl([("class:frame.border", VERTICAL)]),
+        width=1,
+        dont_extend_width=True,
+    )
+    right_border = Window(
+        content=FormattedTextControl([("class:frame.border", VERTICAL)]),
+        width=1,
+        dont_extend_width=True,
+    )
+
+    # Build rows
+    top_row = VSplit([top_left, top_line, top_right])
+    middle_row = VSplit([left_border, body, right_border])
+    bottom_row = VSplit([bottom_left, bottom_line, bottom_right])
+
+    return HSplit([top_row, middle_row, bottom_row])
 
 
 class Ranker(Protocol):
@@ -308,7 +381,6 @@ def browse_items(
         if state.loading:
             lines.append(("class:hint", f"  {loading_message}"))
             lines.append(("", "\n"))
-            lines.append(("class:separator", "  " + "-" * 50 + "\n"))
             return lines
 
         # Match count and hint line with styled shortcuts
@@ -335,9 +407,6 @@ def browse_items(
             add_shortcuts([("^C", "Exit")])
 
         lines.append(("", "\n"))
-
-        # Separator
-        lines.append(("class:separator", "  " + "-" * 50 + "\n"))
 
         # Display matches with highlighting and scrolling
         start = state.scroll_offset
@@ -373,10 +442,11 @@ def browse_items(
     input_window = Window(content=BufferControl(buffer=input_buffer), height=1, dont_extend_height=True)
     matches_window = Window(content=FormattedTextControl(get_matches_text), wrap_lines=False)
 
-    # Combine prompt and input on the same line
+    # Combine prompt and input on the same line, wrapped in a rounded frame
     input_row = VSplit([prompt_window, input_window])
+    input_frame = create_rounded_frame(input_row)
 
-    root_container = HSplit([input_row, matches_window])
+    root_container = HSplit([input_frame, matches_window])
 
     layout = Layout(root_container)
     layout.focus(input_window)
