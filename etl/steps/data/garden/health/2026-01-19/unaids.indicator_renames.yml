@@ -247,3 +247,141 @@ gam:
   "PLHIV_SEEK_RV": null
   "DENIED_SERVICES_HIV_STATUS": null
   "PRISONERS_OST": null #prisoners_ost
+kpa:
+  #######################
+  # GAM
+  #######################
+  # Condoms distributed to prisoners
+  "PRISONERS_CONDOMS_DISTRIBUTED": "prisoners_condoms_distributed"
+  # Prisoners
+  "PRISONERS_TB": "prisoners_tb"
+  # Needles
+  "PWID_NEEDLES": "pwid_needles"
+  "PWID_NEEDLES_DISTRIBUTED": "prisoners_needles"
+  #######################
+  # GAM GROUP
+  #######################
+  ## condoms_distributed_pp
+  "SW_CONDOMS_DISTRIBUTED": "sw_condoms_distributed"
+  "MSM_CONDOMS_DISTRIBUTED": "msm_condoms_distributed"
+  ## population
+  "SEX_WORKERS_POPULATION_SIZE": "sex_workers_population_size"
+  "TG_POPULATION_SIZE": "tg_population_size"
+  "PWID_POPULATION_SIZE": "pwid_population_size"
+  "PRISONERS_POPULATION_SIZE": "prisoners_population_size"
+  "MSM_POPULATION_SIZE": "msm_population_size"
+  #######################
+  # GAM HEPATITIS
+  #######################
+  ## viral_hepatitis
+  "TG_HEPATITIS": "tg_hepatitis"
+  "MSM_HEPATITIS": "msm_hepatitis"
+  "SW_HEPATITIS": "sw_hepatitis"
+  "PWID_HEPATITIS": "pwid_hepatitis"
+  ##
+  "PRISONERS_HEPATITIS_C": "prisoners_hepatitis_c"
+  #######################
+  # GAM SEX GROUP
+  #######################
+  ## experience_violence
+  "SW_EXP_PHYS_SV": "sw_exp_phys_sv"
+  "IDU_EXP_PHYS_SV": "idu_exp_phys_sv"
+  "MSM_EXP_PHYS_SV": "msm_exp_phys_sv"
+  "TG_EXP_PHYS_SV": "tg_exp_phys_sv"
+  ## syphilis_prevalence
+  "SW_SYPHILIS": "sw_syphilis"
+  "MSM_SYPHILIS": "msm_syphilis"
+  "TG_SYPHILIS": "tg_syphilis" # NEW
+  #######################
+  # GAM AGE SEX
+  #######################
+  "PWID_OST_COVERAGE": "pwid_ost_coverage"
+  #######################
+  # GAM AGE SEX GROUP
+  #######################
+  ## art_coverage
+  "SEX_WORKERS_ART_COVERAGE": "sex_workers_art_coverage"
+  "MSM_ART_COVERAGE": "msm_art_coverage"
+  "PWID_ART_COVERAGE": "pwid_art_coverage"
+  "TG_ART_COVERAGE": "tg_art_coverage"
+  "PRISONERS_ART_COVERAGE": "prisoners_art_coverage"
+  ## avoidance_care
+  "SW_AVOIDANCE_CARE": "sw_avoidance_care"
+  "PWID_AVOIDANCE_CARE": "pwid_avoidance_care"
+  "TG_AVOIDED_HEALTHCARE_FACILITY": "tg_avoided_healthcare_facility"
+  "MSM_AFRAID_TO_SEEK_HEALTH_SERVICES": "msm_afraid_to_seek_health_services"
+  ## condom_use
+  "SEX_WORKERS_CONDOM_USE": "sex_workers_condom_use"
+  "TG_CONDOM_USE": "tg_condom_use"
+  "PWID_CONDOM_USE": "pwid_condom_use"
+  "MSM_CONDOM_USE": "msm_condom_use"
+  ## experience_stigma
+  "SW_KP_REPORT_EXP_SD": "sw_kp_report_exp_sd"
+  "TG_KP_REPORT_EXP_SD": "tg_kp_report_exp_sd"
+  "IDU_KP_REPORT_EXP_SD": "idu_kp_report_exp_sd"
+  "MSM_KP_REPORT_EXP_SD": "msm_kp_report_exp_sd"
+  ## hiv_prevalence
+  "TG_HIV_PREVALENCE": "tg_hiv_prevalence"
+  "MSM_HIV_PREVALENCE": "msm_hiv_prevalence"
+  "SEX_WORKERS_HIV_PREVALENCE": "sex_workers_hiv_prevalence"
+  "PWID_HIV_PREVALENCE": "pwid_hiv_prevalence"
+  "PRISONERS_HIV_PREVALENCE": "prisoners_hiv_prevalence"
+  ## hiv_programmes_coverage
+  "TG_PROGRAMMES": "tg_programmes"
+  "SW_PROGRAMMES": "sw_programmes"
+  "PWID_PROGRAMMES": "pwid_programmes"
+  "MSM_PROGRAMMES": "msm_programmes"
+  ## hiv_status_awareness
+  "TG_HIV_STATUS": "tg_hiv_status"
+  "SW_HIV_STATUS": "sw_hiv_status"
+  "PWID_HIV_STATUS": "pwid_hiv_status"
+  "MSM_HIV_STATUS": "msm_hiv_status"
+  ##
+  "PWID_SAFETY": "pwid_safety"
+  #######################
+  # DROPPING
+  #######################
+  ## Present in GAM
+  "DENIED_SERVICES_HIV_STATUS": null
+  "PRISONERS_OST": null
+  ## New to KPA
+  "EMIS_HIV_DIAGNOSIS": null
+  "EMIS_RECENT_DIAGNOSIS": null
+  "Q_A_74": null
+  "Q_A_67": null
+  "EMIS_PREP_KNOWLEDGE": null
+  "EMIS_SMT_GON": null
+  "EMIS_HAV": null
+  "EMIS_SMT_CHL": null
+  "EMIS_SMT_SYP": null
+  "EMIS_DISCLOSED_MSM": null
+  "PRISON_HAS_NSP": null
+  "EMIS_CONDOMLESS": null
+  "Q_A_68": null
+  "PRISONERS_HEPATITIS": null
+  "EMIS_HIV_STI_INFO": null
+  "EMIS_GONOR": null
+  "EMIS_STI_TEST": null
+  "EMIS_HIV_TESTING": null
+  "EMIS_FULL_STI_SCREEN": null
+  "HC_PROF_TOLD_HIV_STATUS": null
+  "DOMESTIC_SPENDING_KP": null
+  "EMIS_CHLAM": null
+  "EMIS_OUTNESS": null
+  "EMIS_HBV": null
+  "EMIS_COMMUNITY_TESTING": null
+  "Q_A_120": null
+  "EMIS_SYP": null
+  "EMIS_CONDOMS_DIST": null
+  "EMIS_PREP": null
+  "EMIS_UU_KNOWLEDGE": null
+  "EMIS_GON_NOT": null
+  "PRISON_HAS_OST": null
+  "EMIS_MSM_REACHED": null
+  "Q_A_69": null
+  "EMIS_PEP_KNOWLEDGE": null
+  "Q_A_65": null
+  "EMIS_SYP_NOT": null
+  # In consideration
+  "MSM_POPULATION_SIZE_AY": null
+  "SEX_WORKERS_POPULATION_SIZE_AY": null
