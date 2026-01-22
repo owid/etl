@@ -4,7 +4,7 @@
 #
 
 import re
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Protocol, Tuple
 
 from prompt_toolkit import Application
 from prompt_toolkit.buffer import Buffer
@@ -37,6 +37,26 @@ BROWSER_STYLE = Style.from_dict(
 
 # Maximum number of items to display
 MAX_DISPLAY_ITEMS = 15
+
+
+class Ranker(Protocol):
+    """Protocol for ranking match results.
+
+    Rankers take a search pattern and list of matched items, and return
+    them reordered by relevance. Called after filtering, before display.
+    """
+
+    def __call__(self, pattern: str, matches: List[str]) -> List[str]:
+        """Rank matches by relevance to pattern.
+
+        Args:
+            pattern: The search pattern used for filtering
+            matches: List of items that matched the pattern
+
+        Returns:
+            Same items, reordered by relevance (most relevant first)
+        """
+        ...
 
 
 def highlight_matches(item: str, pattern: str, is_selected: bool) -> List[Tuple[str, str]]:
@@ -162,6 +182,7 @@ def browse_items(
     item_noun_plural: str = "items",
     cached_items: Optional[List[str]] = None,
     on_items_loaded: Optional[Callable[[List[str]], None]] = None,
+    rank_matches: Optional[Ranker] = None,
 ) -> Tuple[Optional[str], bool]:
     """Interactive item browser using prompt_toolkit.
 
@@ -174,6 +195,9 @@ def browse_items(
         item_noun_plural: Plural noun for items (e.g., "steps")
         cached_items: Pre-loaded items (skips loading if provided)
         on_items_loaded: Callback when items finish loading (for caching)
+        rank_matches: Optional ranker to reorder matches by relevance.
+            If provided, called after filtering to sort results.
+            If None, uses default sort (filter_items ordering).
 
     Returns:
         Tuple of (pattern_or_item, is_exact_match):
@@ -212,7 +236,11 @@ def browse_items(
     # Create the input buffer
     def on_text_changed(buf: Buffer) -> None:
         text = buf.text.strip()
-        state.matches = filter_items(text, state.all_items)
+        matches = filter_items(text, state.all_items)
+        # Apply custom ranking if provided
+        if rank_matches is not None and matches:
+            matches = rank_matches(text, matches)
+        state.matches = matches
         state.selected_index = -1  # Reset selection when text changes
         state.scroll_offset = 0  # Reset scroll when text changes
 

@@ -4,9 +4,10 @@
 #
 
 import json
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from etl.browser.core import browse_items
+from etl.browser.scoring import create_ranker, extract_version_from_snapshot
 
 
 def get_all_snapshots() -> List[str]:
@@ -75,6 +76,25 @@ def save_snapshot_cache(snapshots: List[str]) -> None:
         pass  # Silently fail - cache is optional
 
 
+def create_snapshot_ranker() -> Callable[[str, List[str]], List[str]]:
+    """Create a ranker for snapshot browser results.
+
+    Uses lexicographic sorting:
+    1. Match quality (better matches first)
+    2. Version recency (newer versions first, as tiebreaker)
+
+    No popularity data for snapshots.
+
+    Returns:
+        Ranker function for use with browse_items
+    """
+    return create_ranker(
+        popularity_data=None,
+        slug_extractor=None,
+        version_extractor=extract_version_from_snapshot,
+    )
+
+
 def browse_snapshots() -> Tuple[Optional[str], bool]:
     """Interactive snapshot browser using prompt_toolkit.
 
@@ -87,6 +107,9 @@ def browse_snapshots() -> Tuple[Optional[str], bool]:
     # Try loading from cache first
     cached_items = load_cached_snapshots()
 
+    # Create ranker for improved match ordering
+    ranker = create_snapshot_ranker()
+
     return browse_items(
         items_loader=get_all_snapshots,
         prompt="etls> ",
@@ -96,4 +119,5 @@ def browse_snapshots() -> Tuple[Optional[str], bool]:
         item_noun_plural="snapshots",
         cached_items=cached_items,
         on_items_loaded=save_snapshot_cache,
+        rank_matches=ranker,
     )
