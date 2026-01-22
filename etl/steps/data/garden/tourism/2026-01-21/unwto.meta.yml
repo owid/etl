@@ -37,6 +37,12 @@ dataset:
 tables:
   unwto:
     variables:
+      dom_tour_trips_total_overnight_vis_tourists:
+        title: Domestic overnight trips
+        unit: trips
+        description_short: Number of domestic trips by visitors who stay overnight.
+        description_key: *descr_key_domestic
+
       dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
         title: Domestic tourists staying in hotels and similar establishments
         unit: guests
@@ -281,5 +287,26 @@ tables:
           - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
           - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
           - This indicator provides an estimate of the significance of the tourism sector in terms of employment within the country of reference.
+        display:
+          numDecimalPlaces: 1
+
+      dom_tour_trips_total_overnight_vis_tourists_per_person:
+        title: Domestic overnight trips per person
+        unit: trips per person
+        description_short: Number of domestic trips by visitors who stay overnight, per person in the population.
+        description_key:
+          - A domestic trip refers to the travel of a visitor from the time of leaving their usual residence until they return.
+          - When an individual travels domestically multiple times within a year, each journey is counted as a separate trip.
+          - This indicator provides insights into the frequency of domestic overnight travel among the population, which can inform tourism development strategies and policies aimed at promoting local tourism.
+        display:
+          numDecimalPlaces: 2
+
+      tour_ind_cap_accom_short_term_hotels_and_similar_isic_5510_length_of_stay_avg:
+        title: Average length of stay of tourists in hotels and similar establishments
+        unit: days
+        description_short: Average number of days tourists stay in hotels and similar establishments.
+        description_key:
+          - The average length of stay is calculated by dividing the total number of overnight stays by the total number of guests.
+          - This metric provides insights into the typical duration of a tourist's visit, which can inform hospitality services, marketing strategies, and resource allocation within the tourism sector.
         display:
           numDecimalPlaces: 1

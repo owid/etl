@@ -10,6 +10,7 @@ paths = PathFinder(__file__)
 
 # Columns to keep after shortening column names
 COLUMNS_TO_KEEP = [
+    "dom_tour_trips_total_overnight_vis_tourists",
     "dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests",
     "employment_employed_persons_in_the_tour_ind_num",
     "in_tour_accom_short_term_hotels_and_similar_isic_5510_guests",
@@ -33,6 +34,7 @@ COLUMNS_TO_KEEP = [
     "out_tour_exp_balance_of_payments_travel_vis",
     "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables",
     "tour_ind_gdp_direct_as_a_proportion_of_total_pct",
+    "tour_ind_cap_accom_short_term_hotels_and_similar_isic_5510_length_of_stay_avg",
 ]
 
 
