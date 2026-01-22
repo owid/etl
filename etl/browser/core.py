@@ -7,9 +7,13 @@ import re
 from typing import TYPE_CHECKING, Any, Callable, List, Literal, Optional, Protocol, Tuple
 
 from prompt_toolkit import Application
+from prompt_toolkit.document import Document
+from prompt_toolkit.formatted_text import StyleAndTextTuples
+from prompt_toolkit.lexers import Lexer
 
 if TYPE_CHECKING:
     from etl.browser.commands import Command
+    from etl.browser.filters import ParsedInput
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
@@ -27,16 +31,19 @@ OWID_DIM_GRAY = "#666666"  # Even dimmer for navigation hints
 BROWSER_STYLE = Style.from_dict(
     {
         "prompt": f"fg:{OWID_YELLOW} bold",
-        "input": "bold",
+        "input": "",  # Regular weight for search terms
         "match-count": f"fg:{OWID_DIM_GRAY}",
         "item": f"fg:{OWID_GRAY}",  # Dim gray for results
-        "item.highlight": f"fg:{OWID_GREEN} bold",
+        "item.highlight": f"fg:{OWID_GREEN} bold",  # Bold green for search matches
+        "item.filter-match": f"fg:{OWID_GREEN} italic",  # Italic green for filter-matched segments
         "item.selected": f"bg:{OWID_YELLOW} fg:#000000 bold",
         "item.selected.highlight": f"bg:{OWID_YELLOW} fg:#000000 bold underline",
+        "item.selected.filter-match": f"bg:{OWID_YELLOW} fg:#000000 bold italic",
         "hint": f"fg:{OWID_DIM_GRAY} italic",  # Even dimmer for hints
         "shortcut-key": f"bg:{OWID_DIM_GRAY} fg:#000000 bold",
         "shortcut-desc": f"fg:{OWID_DIM_GRAY}",
         "frame.border": f"fg:{OWID_GRAY}",  # Subtle gray border
+        "filter": f"fg:{OWID_GREEN} italic",  # Italic green for filter tokens in input
     }
 )
 
@@ -135,57 +142,124 @@ class Ranker(Protocol):
         ...
 
 
-def highlight_matches(item: str, pattern: str, is_selected: bool) -> List[Tuple[str, str]]:
-    """Create styled text segments with matching terms highlighted.
+def highlight_matches(
+    item: str,
+    pattern: str,
+    is_selected: bool,
+    filter_spans: Optional[List[Tuple[int, int]]] = None,
+) -> List[Tuple[str, str]]:
+    """Create styled text segments with matching terms and filter matches highlighted.
 
-    Returns a list of (style, text) tuples for prompt_toolkit.
+    Args:
+        item: The item text to highlight
+        pattern: Search pattern (space-separated terms)
+        is_selected: Whether this item is currently selected
+        filter_spans: Optional list of (start, end) positions for filter-matched segments
+
+    Returns:
+        List of (style, text) tuples for prompt_toolkit.
     """
-    if not pattern:
-        style = "class:item.selected" if is_selected else "class:item"
-        return [(style, item)]
-
     base_style = "class:item.selected" if is_selected else "class:item"
-    highlight_style = "class:item.selected.highlight" if is_selected else "class:item.highlight"
+    search_style = "class:item.selected.highlight" if is_selected else "class:item.highlight"
+    filter_style = "class:item.selected.filter-match" if is_selected else "class:item.filter-match"
 
-    terms = pattern.split()
-    item_lower = item.lower()
+    # Collect all highlight spans with their types
+    # Type 1 = search match (higher priority), Type 2 = filter match
+    all_spans: List[Tuple[int, int, int]] = []  # (start, end, type)
 
-    # Find all match positions
-    matches: List[Tuple[int, int]] = []  # (start, end) positions
-    for term in terms:
-        term_lower = term.lower()
-        start = 0
-        while True:
-            pos = item_lower.find(term_lower, start)
-            if pos == -1:
-                break
-            matches.append((pos, pos + len(term)))
-            start = pos + 1
+    # Add filter match spans
+    if filter_spans:
+        for start, end in filter_spans:
+            all_spans.append((start, end, 2))
 
-    if not matches:
+    # Find search term matches
+    if pattern:
+        terms = pattern.split()
+        item_lower = item.lower()
+
+        for term in terms:
+            term_lower = term.lower()
+            start = 0
+            while True:
+                pos = item_lower.find(term_lower, start)
+                if pos == -1:
+                    break
+                all_spans.append((pos, pos + len(term), 1))
+                start = pos + 1
+
+    # If no highlights at all, return plain text
+    if not all_spans:
         return [(base_style, item)]
 
-    # Merge overlapping matches and sort by position
-    matches.sort()
-    merged: List[Tuple[int, int]] = []
-    for start, end in matches:
-        if merged and start <= merged[-1][1]:
-            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
-        else:
-            merged.append((start, end))
+    # Sort spans by position, then by type (search matches first for overlap handling)
+    all_spans.sort(key=lambda x: (x[0], x[2]))
 
-    # Build styled segments
+    # Build a character-level style map
+    # 0 = base, 1 = search highlight, 2 = filter highlight
+    char_styles = [0] * len(item)
+
+    for start, end, span_type in all_spans:
+        for i in range(start, min(end, len(item))):
+            # Search matches (type 1) override filter matches (type 2)
+            if span_type == 1 or char_styles[i] == 0:
+                char_styles[i] = span_type
+
+    # Build segments from character styles
     segments: List[Tuple[str, str]] = []
-    pos = 0
-    for start, end in merged:
-        if pos < start:
-            segments.append((base_style, item[pos:start]))
-        segments.append((highlight_style, item[start:end]))
-        pos = end
-    if pos < len(item):
-        segments.append((base_style, item[pos:]))
+    if not item:
+        return segments
+
+    current_style = char_styles[0]
+    segment_start = 0
+
+    style_map = {0: base_style, 1: search_style, 2: filter_style}
+
+    for i in range(1, len(item)):
+        if char_styles[i] != current_style:
+            segments.append((style_map[current_style], item[segment_start:i]))
+            current_style = char_styles[i]
+            segment_start = i
+
+    # Add final segment
+    segments.append((style_map[current_style], item[segment_start:]))
 
     return segments
+
+
+class FilterLexer(Lexer):
+    """Lexer that highlights filter tokens (n:value, c:value, etc.) in the input."""
+
+    def __init__(self, state: "BrowserState") -> None:
+        self.state = state
+
+    def lex_document(self, document: Document) -> Callable[[int], StyleAndTextTuples]:
+        """Return a function that returns styled text for a given line."""
+
+        def get_line(lineno: int) -> StyleAndTextTuples:
+            text = document.lines[lineno] if lineno < len(document.lines) else ""
+            parsed = self.state.parsed_input
+
+            # No filters or not in search mode - return plain text
+            if not parsed or not parsed.filter_spans or self.state.mode != "search":
+                return [("class:input", text)]
+
+            # Build styled fragments with filter tokens highlighted
+            fragments: StyleAndTextTuples = []
+            pos = 0
+            for start, end in sorted(parsed.filter_spans):
+                # Add text before this filter token
+                if pos < start:
+                    fragments.append(("class:input", text[pos:start]))
+                # Add the filter token with highlight
+                fragments.append(("class:filter", text[start:end]))
+                pos = end
+            # Add remaining text after last filter
+            if pos < len(text):
+                fragments.append(("class:input", text[pos:]))
+
+            return fragments
+
+        return get_line
 
 
 class BrowserState:
@@ -208,6 +282,8 @@ class BrowserState:
         # Refresh callback for reload functionality
         self.items_loader: Optional[Callable[[], List[str]]] = None
         self.on_items_loaded: Optional[Callable[[List[str]], None]] = None
+        # Filter parsing state
+        self.parsed_input: Optional["ParsedInput"] = None
 
 
 def filter_items(pattern: str, all_items: List[str]) -> List[str]:
@@ -294,6 +370,7 @@ def browse_items(
     import threading
 
     from etl.browser.commands import filter_commands
+    from etl.browser.filters import apply_filters, find_filter_match_spans, parse_filters
 
     # State for the application
     state = BrowserState()
@@ -331,17 +408,36 @@ def browse_items(
         # Check for command mode (input starts with /)
         if text.startswith("/") and state.available_commands:
             state.mode = "command"
+            state.parsed_input = None  # Clear filter state in command mode
             pattern = text[1:]  # Strip leading /
             state.command_matches = filter_commands(pattern, state.available_commands)
             state.selected_index = 0 if state.command_matches else -1
         else:
-            # Search mode (existing behavior)
+            # Search mode with filter support
             state.mode = "search"
             state.command_matches = []
-            matches = filter_items(text, state.all_items)
-            # Apply custom ranking if provided
+
+            # Parse filter prefixes from input
+            parsed = parse_filters(text)
+            state.parsed_input = parsed
+
+            # Build search pattern from remaining terms
+            search_pattern = " ".join(parsed.search_terms)
+
+            # Filter by search terms first
+            if search_pattern:
+                matches = filter_items(search_pattern, state.all_items)
+            else:
+                # No search terms - start with all items if filters are present
+                matches = state.all_items[:] if parsed.filters else []
+
+            # Apply attribute filters
+            matches = apply_filters(matches, parsed.filters)
+
+            # Apply custom ranking
             if rank_matches is not None and matches:
-                matches = rank_matches(text, matches)
+                matches = rank_matches(search_pattern, matches)
+
             state.matches = matches
             state.selected_index = -1  # Reset selection when text changes
 
@@ -509,7 +605,9 @@ def browse_items(
                 shortcuts = [("↑↓", "Select"), ("Enter", run_desc), ("^C", "Exit")]
                 add_shortcuts(shortcuts)
         else:
-            lines.append(("class:hint", f"  Type to filter {len(state.all_items)} {item_noun_plural}"))
+            # Show hint with filter prefixes for discoverability
+            filter_hint = " (n: c: v: d:)" if state.all_items else ""
+            lines.append(("class:hint", f"  Type to filter {len(state.all_items)} {item_noun_plural}{filter_hint}"))
             add_shortcuts([("^C", "Exit")])
 
         lines.append(("", "\n"))
@@ -524,13 +622,20 @@ def browse_items(
             lines.append(("class:hint", f"    ... {start} more above"))
             lines.append(("", "\n"))
 
+        # Use only search terms for highlighting (not filter tokens)
+        highlight_pattern = " ".join(state.parsed_input.search_terms) if state.parsed_input else text
+        # Get filters for highlighting matched segments
+        filters = state.parsed_input.filters if state.parsed_input else {}
+
         for i, item in enumerate(display_matches):
             absolute_idx = start + i
             is_selected = absolute_idx == state.selected_index
             prefix_style = "class:item.selected" if is_selected else "class:item"
             prefix = "  > " if is_selected else "    "
             lines.append((prefix_style, prefix))
-            lines.extend(highlight_matches(item, text, is_selected))
+            # Compute filter match spans for this item
+            filter_spans = find_filter_match_spans(item, filters) if filters else None
+            lines.extend(highlight_matches(item, highlight_pattern, is_selected, filter_spans))
             lines.append(("", "\n"))
 
         # Show "more below" indicator
@@ -541,11 +646,14 @@ def browse_items(
 
         return lines
 
-    # Create layout
+    # Create layout with filter-highlighting lexer
+    filter_lexer = FilterLexer(state)
     prompt_window = Window(
         content=FormattedTextControl(get_prompt_text), height=1, dont_extend_height=True, dont_extend_width=True
     )
-    input_window = Window(content=BufferControl(buffer=input_buffer), height=1, dont_extend_height=True)
+    input_window = Window(
+        content=BufferControl(buffer=input_buffer, lexer=filter_lexer), height=1, dont_extend_height=True
+    )
     matches_window = Window(content=FormattedTextControl(get_matches_text), wrap_lines=False)
 
     # Combine prompt and input on the same line, wrapped in a rounded frame
