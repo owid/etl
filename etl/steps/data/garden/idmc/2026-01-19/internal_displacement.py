@@ -7,17 +7,6 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-# columns:
-# conflict_new_displacement_rounded
-# conflict_total_displacement
-# conflict_total_displacement_rounded
-# disaster_new_displacement
-# disaster_new_displacement_rounded
-# disaster_total_displacement
-# disaster_total_displacement_rounded
-# everything + _per_thousand
-
-
 def run() -> None:
     #
     # Load inputs.

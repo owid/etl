@@ -33,15 +33,15 @@ definitions:
       Movements of people triggered by disasters are grouped into two categories: weather-related and geophysical. Weather-related displacements, for example, include hazards such as floods, droughts, landslides, storms – including cyclones and other storms –, wildfires and extreme temperatures. Geophysical displacements include, for example, earthquakes, volcanic eruptions and landslides.
   processing_notes:
     stock_data: &stock_data |-
-      This data of internally displaced people represents the total number of internally displaced people living in a region at the end of the year.
+      This data represents the total number of internally displaced people living in a region at the end of the year.
     flow_data: &flow_data |-
-      This data represents the total number of internal displacements that occurred during the year, so everytime a person is forced to leave their home but remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+      This data represents the total number of internal displacements that occurred during the year. A displacement occurs every time a person is forced to leave their home but remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     population_share: &population_share |-
       We calculate this by taking the total rounded number of internally displaced people divided by the total population of the country and multiply this by 1,000. For this we use our long-term population data set, which can be explored in the [population data explorer](https://ourworldindata.org/explorers/population-and-demography).
     footnote_displacements: &footnote_displacements |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     idmc_rounded: &idmc_rounded |-
-      IDMC provides rounded numbers to reflect the inherent uncertainty in displacement data. All figures have been rounded at the national level. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
+      IDMC provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
     idmc_criteria: &idmc_criteria |-
       A displaced person is included in the IDMC if their displacement was forced/ involuntary, they have left their habitual residence and they have not crossed an international border.
 
