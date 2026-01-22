@@ -1,0 +1,4 @@
+steps:
+  # Multidimensional collection
+  graph://covid/latest/covid-vax-simple:
+    - data://grapher/covid/latest/vaccinations_global

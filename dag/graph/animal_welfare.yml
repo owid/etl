@@ -1,12 +1,6 @@
-# Graph DAG
 steps:
-  # Animal welfare charts
   graph://animal_welfare/latest/fur-farming-ban:
     - data://grapher/animal_welfare/2024-12-17/fur_laws
 
   graph://animal_welfare/latest/banning-of-chick-culling:
     - data://grapher/animal_welfare/2023-09-01/chick_culling_laws
-
-  # Multidimensional collection
-  graph://covid/latest/covid-vax-simple:
-    - data://grapher/covid/latest/vaccinations_global

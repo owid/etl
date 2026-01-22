@@ -804,4 +804,5 @@ include:
   - dag/growth.yml
   - dag/labor.yml
   - dag/economics.yml
-  - dag/graphs.yml
+  - dag/graph/animal_welfare.yml
+  - dag/graph/covid.yml
