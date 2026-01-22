@@ -6,29 +6,29 @@ macros: |-
   <% set poverty_line_umic = ["685", "830"] %>
 
   <% macro percentiles_thr(decile) -%>
-    <% if decile == 1 -%>
+    <% if decile == "1" -%>
     Poorest decile
-    <%- elif decile == 2 -%>
+    <%- elif decile == "2" -%>
     2nd decile
-    <%- elif decile == 3 -%>
+    <%- elif decile == "3" -%>
     3rd decile
-    <%- elif decile in [4, 5, 6, 7, 8] -%>
+    <%- elif decile in ["4", "5", "6", "7", "8"] -%>
     <<decile>>th decile
-    <%- elif decile == 9 -%>
+    <%- elif decile == "9" -%>
     Richest decile
     <%- endif -%>
   <% endmacro %>
 
   <% macro percentiles_avg_share(decile) -%>
-    <% if decile == 1 -%>
+    <% if decile == "1" -%>
     Poorest decile
-    <%- elif decile == 2 -%>
+    <%- elif decile == "2" -%>
     2nd decile
-    <%- elif decile == 3 -%>
+    <%- elif decile == "3" -%>
     3rd decile
-    <%- elif decile in [4, 5, 6, 7, 8, 9] -%>
+    <%- elif decile in ["4", "5", "6", "7", "8", "9"] -%>
     <<decile>>th decile
-    <%- elif decile == 10 -%>
+    <%- elif decile == "10" -%>
     Richest decile
     <%- endif -%>
   <% endmacro %>
@@ -373,7 +373,7 @@ definitions:
 
   threshold_title: |-
     {macros}
-    <% if decile == 5 %>
+    <% if decile == "5" %>
     Threshold <<welfare_type>> per day marking the <<percentiles_thr(decile) | lower>> (median)
     <%- else %>
     Threshold <<welfare_type>> per day marking the <<percentiles_thr(decile) | lower>>
@@ -619,43 +619,43 @@ definitions:
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
-  map_brackets_avg: &map_brackets_avg <% if decile in [1, 2, 3, 4] %>
+  map_brackets_avg: &map_brackets_avg <% if decile in ["1", "2", "3", "4"] %>
     [0, 1, 2, 5, 10, 20, 1]
-    <%- elif decile in [5, 6, 7, 8] %>
+    <%- elif decile in ["5", "6", "7", "8"] %>
     [0, 1, 2, 5, 10, 20, 50, 1]
-    <%- elif decile in [9] %>
+    <%- elif decile in ["9"] %>
     [0, 1, 2, 5, 10, 20, 50, 100, 1]
-    <%- elif decile in [10] %>
+    <%- elif decile in ["10"] %>
     [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
     <%- endif %>
 
-  map_brackets_share: &map_brackets_share <% if decile in [1] %>
+  map_brackets_share: &map_brackets_share <% if decile in ["1"] %>
     [0, 1, 2, 3, 4, 1]
-    <%- elif decile in [2] %>
+    <%- elif decile in ["2"] %>
     [0, 1, 2, 3, 4, 5, 1]
-    <%- elif decile in [3] %>
+    <%- elif decile in ["3"] %>
     [100, 2, 3, 4, 5, 6, 1]
-    <%- elif decile in [4] %>
+    <%- elif decile in ["4"] %>
     [100, 2, 3, 4, 5, 6, 7, 1]
-    <%- elif decile in [5] %>
+    <%- elif decile in ["5"] %>
     [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif decile in [6] %>
+    <%- elif decile in ["6"] %>
     [100, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif decile in [7] %>
+    <%- elif decile in ["7"] %>
     [100, 6, 7, 8, 9, 10, 11, 1]
-    <%- elif decile in [8] %>
+    <%- elif decile in ["8"] %>
     [100, 8, 9, 10, 11, 12, 13, 1]
-    <%- elif decile in [9] %>
+    <%- elif decile in ["9"] %>
     [100, 8, 10, 12, 14, 16, 1]
-    <%- elif decile in [10] %>
+    <%- elif decile in ["10"] %>
     [100, 20, 25, 30, 35, 40, 45, 1]
     <%- endif %>
 
-  map_brackets_thr: &map_brackets_thr <% if decile in [1, 2, 3] %>
+  map_brackets_thr: &map_brackets_thr <% if decile in ["1", "2", "3"] %>
     [0, 1, 2, 5, 10, 20, 1]
-    <% elif decile in [4, 5, 6, 7] %>
+    <% elif decile in ["4", "5", "6", "7"] %>
     [0, 1, 2, 5, 10, 20, 50, 1]
-    <% elif decile in [8, 9] %>
+    <% elif decile in ["8", "9"] %>
     [0, 1, 2, 5, 10, 20, 50, 100, 1]
     <%- endif %>
 
@@ -1679,7 +1679,7 @@ tables:
       avg:
         title: |-
           {macros}
-          Average (<<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+          Average (<<percentiles_avg_share(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
