@@ -57,7 +57,13 @@ def run() -> None:
     tb = tb.dropna(axis=1, how="all")
 
     # Find columns that start with the specified prefixes - units are not thousands
-    prefixes_not_thousands = ["inbound_tourism_expenditure", "outbound_tourism_expenditure", "tourism_industries"]
+    prefixes_not_thousands = [
+        "inbound_tourism_expenditure",
+        "outbound_tourism_expenditure",
+        "employment_employed_persons",
+        "tourism_industries",
+        "tour_ind_environmen_implementa",
+    ]
     matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in prefixes_not_thousands)]
     # Multiply the all the other columns by 1000 as these are in thousands
     for col in tb.columns:
@@ -161,20 +167,6 @@ def run() -> None:
     rename_dict = {}
 
     # Environment variables (after shortening)
-    if (
-        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables"
-        in tb.columns
-    ):
-        rename_dict[
-            "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_seea_tables"
-        ] = "seea_tables"
-    if (
-        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables"
-        in tb.columns
-    ):
-        rename_dict[
-            "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_satellite_account_tables"
-        ] = "tsa_tables"
     if (
         "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"
         in tb.columns
