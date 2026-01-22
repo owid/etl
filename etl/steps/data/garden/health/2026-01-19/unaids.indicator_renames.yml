@@ -243,7 +243,7 @@ gam:
   "VLS_PLHIV_DSD_ART_MODELS": null
   "HEPATITIS_C_TREATMENT": null
   "PLHIV_REP_EXP_SD_CS": null
-  "PEOPLE_NEW_ART_ELIG_TPT ": null
+  "PEOPLE_NEW_ART_ELIG_TPT": null
   "PLHIV_SEEK_RV": null
   "DENIED_SERVICES_HIV_STATUS": null
-  "PRIOSNERS_OST": null #prisoners_ost
+  "PRISONERS_OST": null #prisoners_ost
