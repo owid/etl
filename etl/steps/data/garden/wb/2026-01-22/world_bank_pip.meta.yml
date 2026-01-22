@@ -63,6 +63,11 @@ definitions:
     an <<welfare_type>>
     <%- endif %>
 
+  per_period: |-
+    <% if period in ["day", "month", "year"] %>
+    per <<period>>
+    <%- endif %>
+
   poverty_line: |-
     <% if poverty_line == "215" %>
     $2.15
@@ -1554,7 +1559,7 @@ tables:
 
       # DISTRIBUTIONAL INDICATORS
       mean:
-        title: Mean (<<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+        title: Mean ({definitions.per_period}, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
@@ -1603,7 +1608,7 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
-        title: Median (<<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+        title: Median ({definitions.per_period}, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
@@ -1654,7 +1659,7 @@ tables:
       avg:
         title: |-
           {macros}
-          Average (<<percentiles_avg_share(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+          Average ({definitions.per_period}, <<percentiles_avg_share(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
@@ -1766,7 +1771,7 @@ tables:
       thr:
         title: |-
           {macros}
-          Threshold (<<percentiles_thr(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+          Threshold ({definitions.per_period}, <<percentiles_thr(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
