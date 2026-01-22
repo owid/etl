@@ -308,7 +308,9 @@ def main_cli(
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
     """Find and print closest matches for misspelled step names."""
-    print(f"No steps matched `{includes_str}`; check the spelling, try with the `--private` flag, or the `--graph` flag to run graph steps.\nClosest matches:")
+    print(
+        f"No steps matched `{includes_str}`; check the spelling, try with the `--private` flag, or the `--graph` flag to run graph steps.\nClosest matches:"
+    )
     # NOTE: We could use a better edit distance to find the closest matches.
     for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
         print(match)
@@ -388,7 +390,11 @@ def construct_full_dag(dag: DAG) -> DAG:
 
     # For export:// and graph:// steps, add the grapher:// steps that are needed to upsert data to DB.
     for step in list(dag.keys()):
-        if step.startswith("export://multidim/") or step.startswith("export://explorers/") or step.startswith("graph://"):
+        if (
+            step.startswith("export://multidim/")
+            or step.startswith("export://explorers/")
+            or step.startswith("graph://")
+        ):
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
                     dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))

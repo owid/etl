@@ -1237,7 +1237,7 @@ class GraphStep(Step):
         """Save graph metadata locally, and optionally upsert to database with --graph flag."""
         from etl import config
         from etl.dag_helpers import load_dag
-        from etl.grapher.graph import upsert_graph, _save_graph_metadata
+        from etl.grapher.graph import _save_graph_metadata, upsert_graph
 
         # Load DAG to get original dependency strings with #indicator parts
         dag = load_dag()

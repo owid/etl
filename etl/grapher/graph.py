@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Optional
 
 import structlog
 import yaml
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -290,7 +289,17 @@ def has_db_divergence(slug: str) -> bool:
             # For inheritance charts, check patch config
             if chart.chart_config.patch:
                 # Has patch config = has manual overrides
-                SYSTEM_FIELDS = {"id", "slug", "$schema", "version", "dimensions", "isPublished", "createdAt", "updatedAt", "isInheritanceEnabled"}
+                SYSTEM_FIELDS = {
+                    "id",
+                    "slug",
+                    "$schema",
+                    "version",
+                    "dimensions",
+                    "isPublished",
+                    "createdAt",
+                    "updatedAt",
+                    "isInheritanceEnabled",
+                }
                 overridden_fields = [f for f in chart.chart_config.patch.keys() if f not in SYSTEM_FIELDS]
                 return len(overridden_fields) > 0
             return False
