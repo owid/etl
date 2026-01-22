@@ -772,8 +772,8 @@ gam:
     hepatitis: "C"
   ####
   # Healthcare
-  "All healthcare services": # TODO: it is missing in the new snapshot data. why
-    group: "all healthcare"
+  # "All healthcare services": # TODO: it is missing in the new snapshot data. why
+  #   group: "all healthcare"
   "HIV_RELATED":
     group: "HIV-related"
   "FORMAL_HEALTHCARE":
