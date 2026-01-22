@@ -124,7 +124,6 @@ def run() -> None:
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["girls", "boys"],
                 "view_config": {
-                    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
@@ -138,7 +137,6 @@ def run() -> None:
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
                 "view_config": {
-                    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
@@ -153,7 +151,6 @@ def run() -> None:
                 "choice_new_slug": "enrolment_type_side_by_side",
                 "choices": ["net_enrolment", "gross_enrolment"],
                 "view_config": {
-                    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
@@ -180,11 +177,13 @@ def run() -> None:
             if enrolment_type == "enrolment_type_side_by_side":
                 # For enrolment type grouping, get the actual level from the view's indicators
                 actual_level = None
-                for indicator in view.indicators.y:
-                    if hasattr(indicator, "metadata") and hasattr(indicator.metadata, "dimensions"):
-                        if "level" in indicator.metadata.dimensions:
-                            actual_level = indicator.metadata.dimensions["level"]
-                            break
+                if view.indicators.y:
+                    for indicator in view.indicators.y:
+                        if hasattr(indicator, "metadata") and hasattr(indicator.metadata, "dimensions"):
+                            dims = indicator.metadata.dimensions
+                            if isinstance(dims, dict) and "level" in dims:
+                                actual_level = dims["level"]
+                                break
 
                 if actual_level:
                     gender_term = _get_gender_term(sex, actual_level, "title")

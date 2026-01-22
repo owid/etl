@@ -124,17 +124,17 @@ def run() -> None:
         if sex == "sex_side_by_side" or age == "age_side_by_side":
             view.metadata = {
                 "description_from_producer": "",
-                "description_short": view.config["subtitle"],
+                "description_short": view.config["subtitle"] if view.config else "",
                 "presentation": {
-                    "title_public": view.config["title"],
+                    "title_public": view.config["title"] if view.config else "",
                 },
             }
         else:
             # Only updated description_short for other views
             view.metadata = {
-                "description_short": view.config["subtitle"],
+                "description_short": view.config["subtitle"] if view.config else "",
                 "presentation": {
-                    "title_public": view.config["title"],
+                    "title_public": view.config["title"] if view.config else "",
                 },
             }
         edit_indicator_displays(view)
