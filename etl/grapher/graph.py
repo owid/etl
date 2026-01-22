@@ -53,21 +53,30 @@ def upsert_graph(
     engine = get_engine()
 
     with Session(engine) as session:
-        # 1. Get indicator catalog paths from DAG dependencies
-        # Dependencies are URIs like: data://grapher/namespace/version/dataset/table#indicator
-        indicator_paths = []
-        for dep_uri in dependencies:
-            # Convert URI to catalog path (strip data:// prefix)
-            catalog_path = _uri_to_catalog_path(dep_uri)
-            indicator_paths.append(catalog_path)
-
-        log.info("graph.indicators_from_dag", paths=indicator_paths)
-
-        # 2. Load metadata file if it exists (for overriding inherited config)
+        # 1. Load metadata file if it exists
         if metadata_file and metadata_file.exists():
             metadata = _load_metadata_file(metadata_file)
         else:
             metadata = {}
+
+        # 2. Get indicator catalog paths from metadata dimensions (not DAG)
+        # DAG dependencies are now dataset-level, indicators are in metadata
+        indicator_paths = []
+        if "dimensions" in metadata:
+            # Extract catalogPath from dimensions
+            for dim in metadata["dimensions"]:
+                if "catalogPath" in dim:
+                    indicator_paths.append(dim["catalogPath"])
+
+        if not indicator_paths:
+            # Fallback: if no dimensions in metadata, try old format from DAG
+            # This maintains backward compatibility
+            for dep_uri in dependencies:
+                if "#" in dep_uri:
+                    catalog_path = _uri_to_catalog_path(dep_uri)
+                    indicator_paths.append(catalog_path)
+
+        log.info("graph.indicators", paths=indicator_paths, source="metadata" if "dimensions" in metadata else "dag")
 
         # 3. Resolve indicator catalog paths to variable IDs
         variable_ids = _resolve_indicator_paths(session, indicator_paths)

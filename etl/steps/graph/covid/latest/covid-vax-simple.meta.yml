@@ -1,0 +1,46 @@
+definitions:
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+        originUrl: ourworldindata.org/coronavirus
+
+title:
+  title: COVID-19 vaccinations
+  title_variant: Simple test
+
+default_selection:
+  - United States
+  - United Kingdom
+
+topic_tags:
+  - COVID-19
+
+dimensions:
+  - slug: indicator
+    name: Indicator
+    choices:
+      - slug: total
+        name: Total doses
+        description: Total vaccine doses administered
+      - slug: people
+        name: People vaccinated
+        description: People who received at least one dose
+
+views:
+  - dimensions:
+      indicator: total
+    indicators:
+      y:
+        - catalogPath: grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations
+    config:
+      title: Total COVID-19 vaccine doses
+
+  - dimensions:
+      indicator: people
+    indicators:
+      y:
+        - catalogPath: grapher/covid/latest/vaccinations_global/vaccinations_global#people_vaccinated
+    config:
+      title: People vaccinated against COVID-19

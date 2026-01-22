@@ -288,13 +288,18 @@ class PathFinder:
     def step_type(self) -> str:
         if self._is_snapshot_file:
             return "snapshot"
-        return self.f.parent.parent.parent.parent.name
+        # For graph steps, return "graph"; for data steps, return "data"
+        if self.channel == "graph":
+            return "graph"
+        return "data"
 
     @property
     def channel(self) -> CHANNEL:
         if self._is_snapshot_file:
             return "snapshot"  # type: ignore
-        return self.f.parent.parent.parent.name  # type: ignore
+        # For all data and graph steps: etl/steps/{channel}/{namespace}/{version}/{short_name}
+        parent_name = self.f.parent.parent.parent.name
+        return parent_name  # type: ignore
 
     @property
     def namespace(self) -> str:
@@ -416,6 +421,9 @@ class PathFinder:
 
         if step_type == "export":
             step_name = f"export://{channel}/{namespace}/{version}/{short_name}"
+        elif step_type == "graph" or channel == "graph":
+            # Graph steps use same format as data steps
+            step_name = f"graph://{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"

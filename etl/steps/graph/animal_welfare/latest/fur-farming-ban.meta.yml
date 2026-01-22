@@ -27,3 +27,8 @@ note: Partially banned means that there are only sub-national bans or that only
   longer profitable.
 originUrl: /animal-welfare
 $schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
+
+# Indicators used in this chart
+dimensions:
+  - property: y
+    catalogPath: grapher/animal_welfare/2024-12-17/fur_laws/fur_laws#fur_farming_status

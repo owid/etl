@@ -1200,33 +1200,81 @@ class GraphStep(Step):
     """
 
     path: str
-    slug: str
     dependencies: List[Step]
-    metadata_file: Optional[Path]
-    version: str = "latest"
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
+        # path is now "namespace/version/short_name" like data steps
         self.path = path
-        self.slug = path  # For graph://, path is just the slug
         self.dependencies = dependencies
-        self.metadata_file = self._find_metadata_file()
 
     def __str__(self) -> str:
         return f"graph://{self.path}"
 
-    def _find_metadata_file(self) -> Optional[Path]:
-        """Search for {slug}.meta.yml in etl/steps/graph/**/"""
-        graph_dir = Path(__file__).parent / "graph"
-        if not graph_dir.exists():
-            return None
+    @property
+    def slug(self) -> str:
+        """Extract slug from path (namespace/version/slug -> slug)."""
+        return self.path.split("/")[-1]
 
-        # Search all subdirectories for matching .meta.yml file
-        for meta_file in graph_dir.rglob(f"{self.slug}.meta.yml"):
-            return meta_file
+    @property
+    def _step_dir(self) -> Path:
+        """Directory containing the step files."""
+        return paths.STEP_DIR / "graph" / self.path
 
-        return None
+    @property
+    def metadata_file(self) -> Optional[Path]:
+        """Path to .meta.yml file."""
+        meta_file = self._step_dir.with_suffix(".meta.yml")
+        return meta_file if meta_file.exists() else None
+
+    @property
+    def _python_file(self) -> Optional[Path]:
+        """Path to .py file if it exists."""
+        py_file = self._step_dir.with_suffix(".py")
+        if py_file.exists():
+            return py_file
+        # Check for __init__.py in directory
+        init_file = self._step_dir / "__init__.py"
+        return init_file if init_file.exists() else None
 
     def run(self) -> None:
+        """Run graph step - either Python file or YAML-only."""
+        # Check if there's a Python file
+        py_file = self._python_file
+        if py_file:
+            # Has Python code - run it
+            self._run_python_step(py_file)
+        else:
+            # YAML-only - use existing logic
+            self._run_yaml_only()
+
+    def _run_python_step(self, py_file: Path) -> None:
+        """Run Python module for graph step."""
+        # Import here to avoid circular imports
+        from importlib import import_module
+
+        # Import and run the module
+        if config.DEBUG:
+            # Run in isolated environment (same process, but isolated imports)
+            with isolated_env(py_file.parent):
+                module_path = py_file.relative_to(paths.BASE_DIR).as_posix().replace("/", ".").replace(".py", "")
+                step_module = import_module(module_path)
+                run_module_run(step_module, dest_dir=None)  # Graph steps don't have dest_dir
+        else:
+            # Run in subprocess (safer, but slower)
+            args = ["uv", "run", "etl", "d", "run-python-step"]
+            if config.IPDB_ENABLED:
+                args.append("--ipdb")
+            args.extend([str(self), ""])  # Empty string for dest_dir
+
+            env = os.environ.copy()
+            env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
+            try:
+                subprocess.check_call(args, env=env)
+            except subprocess.CalledProcessError as e:
+                sys.exit(e.returncode)
+
+    def _run_yaml_only(self) -> None:
         """Save graph metadata locally, and optionally upsert to database with --graph flag."""
         from etl import config
         from etl.dag_helpers import load_dag
