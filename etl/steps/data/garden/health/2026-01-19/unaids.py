@@ -205,6 +205,8 @@ def run() -> None:
     tb = tb.loc[~mask]
 
     # Handle dimensions: Expand raw dimensions, group indicators, etc.
+    # This creates `dimension_0` (temporary column with group info from indicator consolidation)
+    # which gets merged into `group` later via `incorporate_dimension_0()`.
     tb = handle_dimensions_clean_gam(
         tb,
         dimensions,
@@ -448,6 +450,24 @@ def add_old_art_averted_deaths_data(tb, tb_aux):
 
 # GAM
 def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
+    """Process GAM dimensions: consolidate indicators and expand dimension IDs.
+
+    This function applies two transformations that both produce "group" information:
+
+    1. Indicator consolidation (indicators_to_dimensions.yml):
+       Multiple indicators → one indicator + `dimension_0` column
+       E.g., tg_hiv_prevalence → hiv_prevalence with dimension_0="transgender"
+
+    2. Dimension ID expansion (dimensions.yml):
+       Dimension IDs → structured columns including `group`
+       E.g., "TRANSGENDER" → group="transgender"
+
+    The `dimension_0` column is a TEMPORARY holding column for group values from
+    indicator consolidation. It gets merged into `group` later via `incorporate_dimension_0()`.
+
+    Why two sources? Some group info comes from the indicator name itself (consolidated
+    indicators), while other group info comes from the dimension ID string.
+    """
     # Collapse original indicators into indicator + dimension
     dix = {}
     for dim in dimensions_collapse_gam:
