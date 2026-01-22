@@ -7,6 +7,18 @@ import re
 from typing import Callable, Dict, List, Optional, Tuple
 
 
+def _strip_extension(segment: str) -> str:
+    """Strip file extension from a path segment for matching purposes.
+
+    Handles common data file extensions like .csv, .xlsx, .json, etc.
+    """
+    # Common data file extensions to strip
+    for ext in (".csv", ".xlsx", ".xls", ".json", ".parquet", ".feather", ".zip", ".gz", ".dvc"):
+        if segment.endswith(ext):
+            return segment[: -len(ext)]
+    return segment
+
+
 def score_match_term(term: str, item: str) -> float:
     """Score how well a single search term matches an item.
 
@@ -32,8 +44,8 @@ def score_match_term(term: str, item: str) -> float:
         return 0.0
 
     # Check matches in final segment (dataset name)
-    # Final segment is after the last /
-    final_segment = item_lower.rsplit("/", 1)[-1]
+    # Final segment is after the last /, with extension stripped for fair comparison
+    final_segment = _strip_extension(item_lower.rsplit("/", 1)[-1])
 
     if term_lower in final_segment:
         # Exact match of entire final segment
@@ -178,7 +190,7 @@ def create_ranker(
         def score_match_fast(item: str) -> float:
             """Optimized match scoring inline."""
             item_lower = item.lower()
-            final_segment = item_lower.rsplit("/", 1)[-1]
+            final_segment = _strip_extension(item_lower.rsplit("/", 1)[-1])
 
             total = 0.0
             for term in terms:
