@@ -1,3 +1,7 @@
+# Dimension ID to structured values mapping.
+# Parses composite IDs like "FEMALES_15_24_ESTIMATE" into {sex, age, estimate} columns.
+# Supported dimensions: sex, age, estimate, group, hepatitis.
+
 epi:
   # Total
   "ESTIMATE":
@@ -423,189 +427,189 @@ epi:
     estimate: low
 
 gam:
-  "Distributed":
+  "DISTRIBUTED":
     sex: "total"
     age: "total" # CHECK
     group: "distributed"
-  "Domestic (Public and Private)":
+  "DOMESTIC":
     group: "domestic"
-  "Domestic Public":
+  "DOMESTIC_PUBLIC":
     group: "domestic public"
-  "Domestic Private":
+  "PRIVATE":
     group: "domestic private"
   ########################################
   # ALL
   ########################################
   # estimates
-  "estimate":
+  "ESTIMATE":
     sex: total
     age: total
     estimate: central
-  "upper estimate":
+  "HIGH_ESTIMATE":
     estimate: "high"
-  "lower estimate":
+  "LOW_ESTIMATE":
     estimate: "low"
   # all
-  "All ages":
+  "ALL_AGES":
     age: "total"
-  "All sexes":
+  "ALL_SEXES":
     sex: total
-  "Total":
+  "TOTAL":
     sex: "total"
     age: "total"
     group: "total"
-  "Total No to all questions":
+  "TOTAL_NO_ALL_QUESTIONS":
     sex: "total"
     age: "total"
     group: "all questions"
-  "Total No to question 1":
+  "TOTAL_NO_QUESTION_1":
     sex: "total"
     age: "total"
     group: "question 1"
-  "Total No to question 2":
+  "TOTAL_NO_QUESTION_2":
     sex: "total"
     age: "total"
     group: "question 2"
   # 0-14
-  "Children (0-14)":
+  "0_14":
     age: 0-14
   # <1
-  "<1":
+  "LESS_1":
     age: "0-1"
   # 1-9
-  "1-9":
+  "1_9":
     age: 1-9
   # <25
-  "< 25":
+  "LESS_25":
     age: "0-25"
   # 10-14
-  "10-14":
+  "10_14":
     age: 10-14
   # 15-19
-  "15-19":
+  "15_19":
     age: 15-19
   # 15-24
-  "All sexes Young people (15-24) Yes to all questions":
+  "ALL_SEXES_15_24_ALL_QUESTIONS":
     age: 15-24
     sex: total
     group: all questions
   # 15-49
-  "Adults (15-49)":
+  "15_49":
     age: 15-49
-  "All sexes Adults (15-49)":
+  "ALL_SEXES_15_49":
     sex: "total"
     age: "15-49"
   # 20-24
-  "20-24":
+  "20_24":
     age: 20-24
   # 25-29
-  "25-29":
+  "25_29":
     age: 25-29
-  "25-49":
+  "25_49":
     age: 25-49
   # 25+
-  "25+":
+  "25_AND_UP":
     age: 25+
   # 50+
-  "50+":
+  "50_AND_UP":
     age: 50+
   ########################################
   # FEMALES
   ########################################
   # Females
-  "Females":
+  "FEMALES":
     sex: "female"
     age: "total"
-  "Females No to all questions":
+  "FEMALES_NO_ALL_QUESTIONS":
     sex: "female"
     age: "total"
     group: "all questions"
-  "Females No to question 1":
+  "FEMALES_NO_QUESTION_1":
     sex: "female"
     age: "total"
     group: "question 1"
-  "Females No to question 2":
+  "FEMALES_NO_QUESTION_2":
     sex: "female"
     age: "total"
     group: "question 2"
   # adults (15+)
-  "Females Adults (15+)":
+  "FEMALE_ADULTS":
     sex: "female"
     age: "15+"
   # 15-19
-  "Females 15-19":
+  "FEMALES_15_19":
     sex: "female"
     age: "15-19"
-  "Females 15-19 No to all questions":
+  "FEMALES_15_19_NO_ALL_QUESTIONS":
     sex: "female"
     age: "15-19"
     group: all questions
-  "Females 15-19 No to question 1":
+  "FEMALES_15_19_NO_QUESTION_1":
     sex: "female"
     age: "15-19"
     group: "question 1"
-  "Females 15-19 No to question 2":
+  "FEMALES_15_19_NO_QUESTION_2":
     sex: "female"
     age: "15-19"
     group: "question 2"
   # 15-24
-  "Females Young people (15-24) Yes to all questions": # Only affects `knowledge_in_young_people`, fine to have just `sex` dimension
+  "FEMALES_15_24_ALL_QUESTIONS": # Only affects `knowledge_in_young_people`, fine to have just `sex` dimension
     age: "15-24"
     sex: "female"
     group: "all questions"
-  "Females Young people (15-24)":
+  "FEMALES_15_24":
     sex: "female"
     age: "15-24"
   # 15-49
-  "Females Adults (15-49)":
+  "FEMALES_15_49":
     sex: "female"
     age: "15-49"
   # 20-24
-  "Females 20-24":
+  "FEMALES_20_24":
     sex: "female"
     age: "20-24"
-  "Females 20-24 No to all questions":
+  "FEMALES_20_24_NO_ALL_QUESTIONS":
     sex: "female"
     age: "20-24"
     group: "all questions"
-  "Females 20-24 No to question 1":
+  "FEMALES_20_24_NO_QUESTION_1":
     sex: "female"
     age: "20-24"
     group: "question 1"
-  "Females 20-24 No to question 2":
+  "FEMALES_20_24_NO_QUESTION_2":
     sex: "female"
     age: "20-24"
     group: "question 2"
   # 25-49
-  "Females 25-49":
+  "FEMALES_25_49":
     sex: "female"
     age: "25-49"
-  "Females 25-49 No to all questions":
+  "FEMALES_25_49_NO_ALL_QUESTIONS":
     sex: "female"
     age: "25-49"
     group: "all questions"
-  "Females 25-49 No to question 1":
+  "FEMALES_25_49_NO_QUESTION_1":
     sex: "female"
     age: "25-49"
     group: "question 1"
-  "Females 25-49 No to question 2":
+  "FEMALES_25_49_NO_QUESTION_2":
     sex: "female"
     age: "25-49"
     group: "question 2"
   # others
-  "Female condoms NGOs":
+  "FEMALE_CONDOMS_NGO":
     sex: "female"
     age: "total"
     group: "NGO"
-  "Female condoms Private":
+  "FEMALE_CONDOMS_PRIVATE":
     sex: "female"
     age: "total"
     group: "private"
-  "Female condoms Public":
+  "FEMALE_CONDOMS_PUBLIC":
     sex: "female"
     age: "total"
     group: "public"
-  "Female condoms Total":
+  "FEMALE_CONDOMS_TOTAL":
     sex: "female"
     age: "total"
     group: "total"
@@ -613,99 +617,99 @@ gam:
   # MALES
   ########################################
   # Males
-  "Males":
+  "MALES":
     sex: "male"
     age: "total"
-  "Males No to all questions":
+  "MALES_NO_ALL_QUESTIONS":
     sex: "male"
     age: "total"
     group: "all questions"
-  "Males No to question 1":
+  "MALES_NO_QUESTION_1":
     sex: "male"
     age: "total"
     group: "question 1"
-  "Males No to question 2":
+  "MALES_NO_QUESTION_2":
     sex: "male"
     age: "total"
     group: "question 2"
   # 15+
-  "Males Adults (15+)":
+  "MALE_ADULTS":
     sex: "male"
     age: "15+"
   # 15-19
-  "Males 15-19":
+  "MALES_15_19":
     sex: "male"
     age: "15-19"
-  "Males 15-19 No to all questions":
+  "MALES_15_19_NO_ALL_QUESTIONS":
     sex: "male"
     age: "15-19"
     group: "all questions"
-  "Males 15-19 No to question 1":
+  "MALES_15_19_NO_QUESTION_1":
     sex: "male"
     age: "15-19"
     group: "question 1"
-  "Males 15-19 No to question 2":
+  "MALES_15_19_NO_QUESTION_2":
     sex: "male"
     age: "15-19"
     group: "question 2"
   # 15-24
-  "Males Young people (15-24)":
+  "MALES_15_24":
     sex: "male"
     age: "15-24"
-  "Males Young people (15-24) Yes to all questions": # Only affects `knowledge_in_young_people`, fine to have just `sex` dimension
+  "MALES_15_24_ALL_QUESTIONS": # Only affects `knowledge_in_young_people`, fine to have just `sex` dimension
     age: 15-24
     sex: male
     group: all questions
   # 15-49
-  "Males Adults (15-49)":
+  "MALES_15_49":
     sex: "male"
     age: "15-49"
   # 20-24
-  "Males 20-24":
+  "MALES_20_24":
     sex: "male"
     age: "20-24"
-  "Males 20-24 No to all questions":
+  "MALES_20_24_NO_ALL_QUESTIONS":
     sex: "male"
     age: "20-24"
     group: "all questions"
-  "Males 20-24 No to question 1":
+  "MALES_20_24_NO_QUESTION_1":
     sex: "male"
     age: "20-24"
     group: "question 1"
-  "Males 20-24 No to question 2":
+  "MALES_20_24_NO_QUESTION_2":
     sex: "male"
     age: "20-24"
     group: "question 2"
   # 25-49
-  "Males 25-49":
+  "MALES_25_49":
     sex: "male"
     age: "25-49"
-  "Males 25-49 No to all questions":
+  "MALES_25_49_NO_ALL_QUESTIONS":
     sex: "male"
     age: "25-49"
     group: "all questions"
-  "Males 25-49 No to question 1":
+  "MALES_25_49_NO_QUESTION_1":
     sex: "male"
     age: "25-49"
     group: "question 1"
-  "Males 25-49 No to question 2":
+  "MALES_25_49_NO_QUESTION_2":
     sex: "male"
     age: "25-49"
     group: "question 2"
   # others
-  "Male condoms NGOs":
+  "MALE_CONDOMS_NGO":
     sex: "male"
     age: "total"
     group: "NGO"
-  "Male condoms Private":
+  "MALE_CONDOMS_PRIVATE":
     sex: "male"
     age: "total"
     group: "private"
-  "Male condoms Public":
+  "MALE_CONDOMS_PUBLIC":
     sex: "male"
     age: "total"
     group: "public"
-  "Male condoms Total":
+  "MALE_CONDOMS_TOTAL":
     sex: "male"
     age: "total"
     group: "total"
@@ -713,93 +717,93 @@ gam:
   # HEPATITIS
   ########################################
   # Hepatitis B, total
-  "Hepatitis B Total":
+  "HEPATITIS_B_TOTAL":
     sex: "total"
     age: "total"
     hepatitis: "B"
-  "Hepatitis B Females":
+  "HEPATITIS_B_FEMALES":
     sex: "female"
     age: "total"
     hepatitis: "B"
-  "Hepatitis B Males":
+  "HEPATITIS_B_MALES":
     sex: "male"
     age: "total"
     hepatitis: "B"
   # Hepatitis C, total
-  "Hepatitis C Total":
+  "HEPATITIS_C_TOTAL":
     sex: "total"
     age: "total"
     hepatitis: "C"
-  "Hepatitis C Females":
+  "HEPATITIS_C_FEMALES":
     sex: "female"
     age: "total"
     hepatitis: "C"
-  "Hepatitis C Males":
+  "HEPATITIS_C_MALES":
     sex: "male"
     age: "total"
     hepatitis: "C"
   # Hepatitis B, others
-  "Hepatitis B < 25":
+  "HEPATITIS_B_LT_25":
     sex: "total"
     age: "0-25"
     hepatitis: "B"
-  "Hepatitis B 25+":
+  "HEPATITIS_B_GTE_25":
     sex: "total"
     age: "25+"
     hepatitis: "B"
-  "Hepatitis B Transgender":
+  "HEPATITIS_B_TRANSGENDER":
     sex: "total"
     age: "total"
     group: transgender
     hepatitis: "B"
   # Hepatitis C, others
-  "Hepatitis C < 25":
+  "HEPATITIS_C_LT_25":
     sex: "total"
     age: "0-25"
     hepatitis: "C"
-  "Hepatitis C 25+":
+  "HEPATITIS_C_GTE_25":
     sex: "total"
     age: "25+"
     hepatitis: "C"
-  "Hepatitis C Transgender":
+  "HEPATITIS_C_TRANSGENDER":
     sex: "total"
     age: "total"
     group: transgender
     hepatitis: "C"
   ####
   # Healthcare
-  "All healthcare services":
+  "All healthcare services": # TODO: it is missing in the new snapshot data. why
     group: "all healthcare"
-  "HIV-related healthcare services":
+  "HIV_RELATED":
     group: "HIV-related"
-  "Formal healthcare":
+  "FORMAL_HEALTHCARE":
     group: "formal healthcare"
-  "Non-HIV-related healthcare services":
+  "NON_HIV_RELATED":
     group: "non-HIV related"
-  "United States (bilateral)":
+  "US_BILATERAL":
     group: "US bilateral"
-  "Global Fund":
+  "GLOBAL_FUND":
     group: "global fund"
   # Source
-  "International":
+  "INTERNATIONAL":
     group: "international"
-  "Other international":
+  "OTHER_INTERNATIONAL":
     group: "other international"
   "PEPFAR":
     group: "PEPFAR"
-  "Procured":
+  "PROCURED":
     sex: "total"
     age: "total"
     group: "procured"
   # Trans
-  "Transgender":
+  "TRANSGENDER":
     group: "transgender"
-  "Transman":
+  "TRANSMAN":
     group: "transman"
-  "Transother":
+  "TRANSOTHER":
     group: "transother"
-  "Transwoman":
+  "TRANSWOMAN":
     group: "transwoman"
   # Others
-  "Traditional practitioner":
+  "TRADITIONAL":
     group: "traditional"
