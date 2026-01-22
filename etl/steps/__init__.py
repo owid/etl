@@ -1234,12 +1234,73 @@ class GraphStep(Step):
                 sys.exit(e.returncode)
 
     def _run_yaml_only(self) -> None:
-        """Save graph metadata locally, and optionally upsert to database with --graph flag."""
+        """Create graph from YAML metadata - either a single chart or multidimensional collection."""
         from etl import config
         from etl.dag_helpers import load_dag
-        from etl.grapher.graph import _save_graph_metadata, upsert_graph
 
-        # Load DAG to get original dependency strings with #indicator parts
+        # Load metadata to determine if this is a multidim collection or normal chart
+        if not self.metadata_file or not self.metadata_file.exists():
+            raise ValueError(f"Metadata file not found for {self}")
+
+        from etl.grapher.graph import _load_metadata_file
+
+        metadata = _load_metadata_file(self.metadata_file)
+
+        # Determine if this is a multidimensional collection
+        if self._is_multidim_collection(metadata):
+            self._create_multidim_collection(metadata)
+        else:
+            self._create_single_chart(metadata)
+
+    @staticmethod
+    def _is_multidim_collection(metadata: dict) -> bool:
+        """
+        Determine if metadata defines a multidimensional collection.
+
+        A multidimensional collection has:
+        - A 'views' array defining multiple chart variants
+        - Dimensions with choices that users can select between
+
+        Examples:
+            # Multidim: Has views array
+            views:
+              - dimensions: {indicator: total}
+                indicators: {...}
+              - dimensions: {indicator: people}
+                indicators: {...}
+
+            # Normal chart: No views, just dimensions for indicator mapping
+            dimensions:
+              - property: y
+                catalogPath: grapher/.../indicator
+        """
+        return "views" in metadata and isinstance(metadata["views"], list)
+
+    def _create_multidim_collection(self, metadata: dict) -> None:
+        """Create a multidimensional collection from YAML config."""
+        from etl.collection.core.create import create_collection
+        from etl.dag_helpers import load_dag
+
+        # Load DAG to get dependencies
+        dag = load_dag()
+        step_name = str(self)
+        dep_uris = list(dag.get(step_name, []))
+
+        # Create collection
+        c = create_collection(
+            config_yaml=metadata,
+            dependencies=dep_uris,
+            catalog_path=f"graph/{self.slug}#{self.slug}",
+        )
+        c.save()
+
+    def _create_single_chart(self, metadata: dict) -> None:
+        """Create a single chart from YAML config."""
+        from etl import config
+        from etl.dag_helpers import load_dag
+        from etl.grapher.graph import upsert_graph
+
+        # Load DAG to get original dependency strings
         dag = load_dag()
         step_name = str(self)
         dep_uris = list(dag.get(step_name, []))

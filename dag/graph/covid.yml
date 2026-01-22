@@ -1,4 +1,8 @@
 steps:
-  # Multidimensional collection
-  graph://covid/latest/covid-vax-simple:
-    - data://grapher/covid/latest/vaccinations_global
+  # TEST: Replicate export://multidim/covid/latest/covid.cases
+  graph://covid/latest/covid-cases-test:
+    - data://grapher/covid/latest/cases_deaths
+
+  # TEST: Replicate export://multidim/covid/latest/covid.deaths
+  graph://covid/latest/covid-deaths-test:
+    - data://grapher/covid/latest/cases_deaths
