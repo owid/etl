@@ -15,6 +15,7 @@ tables:
     variables:
       prison_population_total:
         title: Prison population total
+        description_short: Total prison population including pre-trial detainees and remand prisoners.
         unit: prisoners
       prison_population_rate:
         title: Prison population rate
@@ -22,15 +23,29 @@ tables:
       pretrial_detainees_pct:
         title: Pretrial detainees
         unit: "%"
+        short_unit: "%"
       female_prisoners_pct:
         title: Female prisoners
         unit: "%"
+        short_unit: "%"
+      juvenile_prisoners_pct:
+        title: Share of prisoners that are juveniles
+        description_short: The definition of juveniles may vary between countries.
+        unit: "%"
+        short_unit: "%"
+      foreign_prisoners_pct:
+        title: Share of prisoners that are foreigners
+        unit: "%"
+        short_unit: "%"
       number_of_institutions:
         title: Number of institutions
         unit: institutions
       official_capacity:
         title: Prison capacity
+        description_short: The number of prisoners that can officially be accommodated by the prison system.
         unit: places
       occupancy_level_pct:
         title: Prison capacity percent
+        description_short: The occupancy level of prisons, based on the official capacity.
         unit: "%"
+        short_unit: "%"

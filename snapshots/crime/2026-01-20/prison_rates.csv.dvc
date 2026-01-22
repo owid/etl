@@ -26,6 +26,6 @@ meta:
     license:
       name: © 2024 Institute for Crime & Justice Policy Research and the authors
 outs:
-  - md5: 6f31d00682907f2ac7d5e14555613015
-    size: 87247
+  - md5: aa611bf3c0bf13f43299e5e78b6af8a4
+    size: 93303
     path: prison_rates.csv
