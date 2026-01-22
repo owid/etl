@@ -169,18 +169,24 @@ def run() -> None:
     ###############################
     # EPI data
     ###############################
-    tb_epi = ds_meadow.read("epi")  ## 1,850,098 rows
-
+    # tb_epi = ds_meadow.read("epi")  ## 1,850,098 rows
     # # Create EPI table
-    tb_epi = make_table_epi(tb_epi, dimensions, tb_art_old)  # 360,223 rows
+    # tb_epi = make_table_epi(tb_epi, dimensions, tb_art_old)  # 360,223 rows
 
     # # Format
-    tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
+    # tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
     ###############################
     # KPA data
     ###############################
     tb = ds_meadow.read("kpa")  ## 49,971 rows
+
+    ################
+    # SANITY CHECKS
+    ################
+    tb = clean_indicator_names(tb, "kpa")
+    # # Sanity check dimensions
+    # _check_dimensions(tb, dimensions, "kpa")
 
     ###############################
     # GAM data
@@ -509,29 +515,32 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
 
 
 def handle_countries_gam(tb):
-    territories_extra = {
-        "Liechtenstein",
-        "Holy See",
-        "Saint-Martin (French part)",
-        "Martinique",
-        "Saint Helena",
-        "French Guiana",
-        "Isle of Man",
-        "Guadeloupe",
-        "Western Sahara",
-        "Jersey",
-        "Guernsey",
-    }
+    # territories_extra = {
+    #     "Liechtenstein",
+    #     "Holy See",
+    #     "Saint-Martin (French part)",
+    #     "Martinique",
+    #     "Saint Helena",
+    #     "French Guiana",
+    #     "Isle of Man",
+    #     "Guadeloupe",
+    #     "Western Sahara",
+    #     "Jersey",
+    #     "Guernsey",
+    # }
     # Drop areas that are not countries (we look for areas appearing very few times)
-    territories = tb["country"].value_counts().sort_values(ascending=False)
-    territories = set(territories[territories >= 88].index)
-    tb = tb.loc[(tb["country"].isin(territories | territories_extra))]
+    # territories = tb["country"].value_counts().sort_values(ascending=False)
+    # territories = set(territories[territories >= 88].index)
+    # tb = tb.loc[(tb["country"].isin(territories | territories_extra))]
 
     # Harmonize
     tb = paths.regions.harmonize_names(
         tb=tb,
         make_missing_countries_nan=True,
     )
+
+    # Drop unmapped regions/countries
+    tb = tb.dropna(subset=["country"])
 
     return tb
 
