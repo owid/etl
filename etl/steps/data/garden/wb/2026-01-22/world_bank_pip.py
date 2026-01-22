@@ -99,34 +99,45 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Uzbekistan",
 ]
 
-# Define indicators that don't depend on poverty lines
-INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES = [
-    "mean",
-    "median",
-    "mld",
+# Define inequality indicators
+INDICATORS_INEQUALITY = [
     "gini",
-    "polarization",
-    "cpi",
-    "ppp",
-    "reporting_pop",
-    "reporting_gdp",
-    "reporting_pce",
-    "spl",
-    "spr",
-    "pg",
-    "estimate_type",
-    "pop_in_poverty",
-    "bottom50_share",
-    "middle40_share",
     "palma_ratio",
     "s80_s20_ratio",
     "p90_p10_ratio",
     "p90_p50_ratio",
     "p50_p10_ratio",
-    "top1_thr",
-    "top1_share",
-    "top1_avg",
+    "bottom50_share",
+    "middle40_share",
     "top90_99_share",
+    "top1_share",
+    "top1_thr",
+    "top1_avg",
+    "mld",
+    "polarization",
+]
+
+# Define CPI indicators
+INDICATORS_CPI = [
+    "cpi",
+]
+
+# Define the rest of indicators that depend on PPPs
+INDICATORS_REST_PPP = [
+    "ppp",
+    "spl",
+    "spr",
+    "pg",
+]
+
+# Define indicators we won't use
+INDICATORS_NOT_USED = [
+    "is_interpolated",
+    "reporting_pop",
+    "reporting_gdp",
+    "reporting_pce",
+    "estimate_type",
+    "pop_in_poverty",
 ]
 
 
@@ -174,45 +185,68 @@ def run() -> None:
     # Currently, for some checks, if there is an issue for the old PPP version, it will be deleted for the current one too (it is not a big deal)
     tb = sanity_checks(tb=tb)
 
-    tb = make_distributional_indicators_long(tb=tb)
+    tb, tb_incomes = make_distributional_indicators_long(tb=tb)
 
     tb = make_relative_poverty_long(tb=tb)
 
-    tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
-
-    # Drop ppp years for CPI
-    tb = make_cpi_not_depending_on_ppp(tb=tb)
+    tb_poverty, tb_inequality, tb_cpi, tb_rest = separate_rest_of_tables(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb, tb_inc_or_cons_complete, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
+    tb_poverty, tb_poverty_inc_or_cons_complete, tb_poverty_inc_or_cons_smooth = inc_or_cons_data(
+        tb=tb_poverty, dimensions=["ppp_version", "poverty_line"]
+    )
+    tb_incomes, tb_incomes_inc_or_cons_complete, tb_incomes_inc_or_cons_smooth = inc_or_cons_data(
+        tb=tb_incomes, dimensions=["ppp_version", "decile"]
+    )
+    tb_inequality, tb_inequality_inc_or_cons_complete, tb_inequality_inc_or_cons_smooth = inc_or_cons_data(
+        tb=tb_inequality, dimensions=[]
+    )
+    tb_rest, tb_rest_inc_or_cons_complete, tb_rest_inc_or_cons_smooth = inc_or_cons_data(
+        tb=tb_rest, dimensions=["ppp_version"]
+    )
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_inc_or_cons_smooth = survey_count(tb=tb_inc_or_cons_smooth)
+    tb_survey = survey_count(tb=tb_poverty_inc_or_cons_smooth)
 
-    # Concatenate the final table
-    tb = pr.concat([tb, tb_inc_or_cons_smooth], ignore_index=True)
+    # Concatenate with smoothed tables
+    tb_poverty = pr.concat([tb_poverty, tb_poverty_inc_or_cons_smooth], ignore_index=True)
+    tb_incomes = pr.concat([tb_incomes, tb_incomes_inc_or_cons_smooth], ignore_index=True)
+    tb_inequality = pr.concat([tb_inequality, tb_inequality_inc_or_cons_smooth], ignore_index=True)
 
-    # Drop columns not needed
-    tb = drop_columns(tb)
-    tb_inc_or_cons_complete = drop_columns(tb_inc_or_cons_complete)
+    # Concatenate complete series tables (not to send to grapher, but to save in garden for reference)
+    tb_complete = pr.concat(
+        [tb_poverty_inc_or_cons_complete, tb_incomes_inc_or_cons_complete, tb_inequality_inc_or_cons_complete],
+        ignore_index=True,
+    )
 
-    # Make empty values of survey_comparability to "No spells"
-    tb["survey_comparability"] = tb["survey_comparability"].astype(str)
-    tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
-
-    # Do the same for poverty_line
-    tb["poverty_line"] = tb["poverty_line"].fillna("No poverty line")
+    # Define tb_rest_inc_or_cons_smooth as tb_rest and drop table and survey_comparability columns
+    tb_rest = tb_rest_inc_or_cons_smooth.drop(columns=["table", "survey_comparability"], errors="raise")
 
     # Improve table format.
-    tb = tb.format(
+    tb_poverty = tb_poverty.format(
+        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "table", "survey_comparability"],
+        short_name="poverty",
+    )
+    tb_incomes = tb_incomes.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
+        short_name="incomes",
     )
-    tb_inc_or_cons_complete = tb_inc_or_cons_complete.format(
-        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile"],
-        short_name="world_bank_pip_complete_series",
+    tb_inequality = tb_inequality.format(
+        ["country", "year", "welfare_type", "table", "survey_comparability"],
+        short_name="inequality",
     )
+    tb_cpi = tb_cpi.format(short_name="cpi")
+    tb_rest = tb_rest.format(["country", "year", "welfare_type"], short_name="other_indicators")
+    tb_survey = tb_survey.format(short_name="survey_count")
+
     tb_percentiles = tb_percentiles.format(
         ["country", "year", "ppp_version", "welfare_type", "reporting_level", "percentile"],
+        short_name="percentiles",
+    )
+
+    tb_complete = tb_complete.format(
+        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile"],
+        short_name="complete_series",
     )
 
     #
@@ -220,8 +254,18 @@ def run() -> None:
     #
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_inc_or_cons_complete, tb_percentiles],
+        tables=[
+            tb_poverty,
+            tb_incomes,
+            tb_inequality,
+            tb_cpi,
+            tb_rest,
+            tb_survey,
+            tb_percentiles,
+            tb_complete,
+        ],
         default_metadata=ds_meadow.metadata,
+        repack=False,
     )
 
     # Save garden dataset.
@@ -910,7 +954,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
+def inc_or_cons_data(tb: Table, dimensions: List[str]) -> Tuple[Table, Table, Table]:
     """
     Separate income and consumption data
     """
@@ -933,7 +977,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     tb_cons_no_spells = tb_no_spells[tb_no_spells["welfare_type"] == "consumption"].reset_index(drop=True)
 
     # Create tb_no_spells_smooth, which cleans tb_no_spells, by removing jumps generated by changes in welfare_type
-    tb_no_spells_smooth = create_smooth_inc_cons_series(tb_no_spells)
+    tb_no_spells_smooth = create_smooth_inc_cons_series(tb_no_spells, dimensions=dimensions)
 
     check_jumps_in_grapher_dataset(tb_no_spells_smooth)
 
@@ -972,7 +1016,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     return tb, tb_no_spells, tb_no_spells_smooth
 
 
-def create_smooth_inc_cons_series(tb: Table) -> Table:
+def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
     """
     Construct an income and consumption series that is a combination of the two.
     """
@@ -983,7 +1027,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb = pivot_table(
         tb=tb,
         index=["country", "year", "welfare_type"],
-        columns=["ppp_version", "poverty_line", "decile"],
+        columns=dimensions,
     )
 
     # Reset index in tb_both_inc_and_cons
@@ -1136,12 +1180,12 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb_both_inc_and_cons_smoothed = unpivot_table(
         tb=tb_both_inc_and_cons_smoothed,
         index=["country", "year", "welfare_type"],
-        level=["ppp_version", "poverty_line", "decile"],
+        level=dimensions,
     )
     tb_only_inc_or_cons = unpivot_table(
         tb=tb_only_inc_or_cons,
         index=["country", "year", "welfare_type"],
-        level=["ppp_version", "poverty_line", "decile"],
+        level=dimensions,
     )
 
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
@@ -1275,46 +1319,10 @@ def survey_count(tb: Table) -> Table:
     # Keep columns needed
     tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
 
-    # Define ppp_version and poverty_line columns, empty
-    tb_survey["ppp_version"] = pd.NA
-    tb_survey["poverty_line"] = pd.NA
-    tb_survey["welfare_type"] = "income or consumption"
-    tb_survey["table"] = "Income or consumption consolidated"
-    tb_survey["decile"] = pd.NA
-
-    # Merge with original table
-    tb = pr.merge(
-        tb_survey,
-        tb,
-        on=["country", "year", "welfare_type", "ppp_version", "poverty_line", "table", "decile"],
-        how="outer",
-    )
-
-    return tb
+    return tb_survey
 
 
-def drop_columns(tb: Table) -> Table:
-    """
-    Drop columns not needed
-    """
-
-    # Remove columns
-    tb = tb.drop(
-        columns=[
-            "is_interpolated",
-            "reporting_pop",
-            "reporting_gdp",
-            "reporting_pce",
-            "estimate_type",
-            "pop_in_poverty",
-        ],
-        errors="raise",
-    )
-
-    return tb
-
-
-def make_distributional_indicators_long(tb: Table) -> Table:
+def make_distributional_indicators_long(tb: Table) -> Tuple[Table, Table]:
     """
     Convert decile1, ..., decile10 and decile1_thr, ..., decile9_thr to a long format.
     """
@@ -1360,22 +1368,22 @@ def make_distributional_indicators_long(tb: Table) -> Table:
     )
 
     # Merge newly created tables
-    tb_distributional = pr.multi_merge(
+    tb_incomes = pr.multi_merge(
         [tb_share, tb_thr, tb_avg],
         on=index_columns + ["decile"],
         how="outer",
     )
 
     # Remove "decile" from the decile column
-    tb_distributional["decile"] = tb_distributional["decile"].str.replace("decile", "")
+    tb_incomes["decile"] = tb_incomes["decile"].str.replace("decile", "")
 
     # Do the same with "_share", "_thr", and "_avg"
     for indicator in ["share", "thr", "avg"]:
-        tb_distributional["decile"] = tb_distributional["decile"].str.replace(f"_{indicator}", "")
+        tb_incomes["decile"] = tb_incomes["decile"].str.replace(f"_{indicator}", "")
 
     # Group the rows by country, year, welfare_type, ppp_version, and decile
-    tb_distributional = (
-        tb_distributional.groupby(
+    tb_incomes = (
+        tb_incomes.groupby(
             index_columns + ["decile"],
             as_index=False,
             dropna=False,
@@ -1390,16 +1398,23 @@ def make_distributional_indicators_long(tb: Table) -> Table:
         .reset_index(drop=True)
     )
 
-    # Create an empty decile column in tb
-    tb["decile"] = pd.NA
+    # Add mean and median indicators to tb_incomes
+    tb_mean_median = tb_base[index_columns + ["mean", "median"]].reset_index(drop=True)
 
-    # Concatenate tb and tb_distributional
-    tb = pr.concat([tb, tb_distributional], ignore_index=True)
+    # Concatenate with tb_incomes
+    tb_incomes = pr.concat([tb_incomes, tb_mean_median], ignore_index=True)
 
-    # Remove share_columns and threshold_columns
-    tb = tb.drop(columns=share_columns + thr_columns + avg_columns, errors="raise")
+    # Remove all columns already in tb_incomes
+    tb = tb.drop(columns=share_columns + thr_columns + avg_columns + ["mean", "median"], errors="raise")
 
-    return tb
+    # Make empty values of survey_comparability to "No spells"
+    tb["survey_comparability"] = tb["survey_comparability"].astype(str)
+    tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
+
+    tb_incomes["survey_comparability"] = tb_incomes["survey_comparability"].astype(str)
+    tb_incomes["survey_comparability"] = tb_incomes["survey_comparability"].replace("<NA>", "No spells")
+
+    return tb, tb_incomes
 
 
 def make_relative_poverty_long(tb: Table) -> Table:
@@ -1452,9 +1467,10 @@ def make_relative_poverty_long(tb: Table) -> Table:
     return tb
 
 
-def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
+def separate_rest_of_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
     """
-    Avoid repetition of the same values for indicators not depending on poverty lines.
+    Separate the tables for a clearer dimensionality between them
+    From tb, I produce tb_inequality, tb_cpi and tb_rest (the latter depending on PPPs)
     """
 
     tb_non_dimensional = tb.copy()
@@ -1462,52 +1478,34 @@ def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
     # Extract both values from INTERNATIONAL_POVERTY_LINES. They are the values of the dictionary
     ipl_list = list(INTERNATIONAL_POVERTY_LINES.values())
 
-    # Filter only for values in the list
-    tb_non_dimensional = tb_non_dimensional[
-        (tb_non_dimensional["poverty_line"].isin(ipl_list)) & tb_non_dimensional["decile"].isna()
+    # Extract the current IPL value as the second value of the list
+    current_ipl = ipl_list[1]
+
+    # Filter tables
+    tb_inequality = tb_non_dimensional[(tb_non_dimensional["poverty_line"] == current_ipl)][
+        ["country", "year", "welfare_type", "survey_comparability", "filled"] + INDICATORS_INEQUALITY
     ].reset_index(drop=True)
 
-    # Define index columns
-    index_columns = [
-        "country",
-        "year",
-        "welfare_type",
-        "ppp_version",
-        "survey_comparability",
-        "filled",
-        "poverty_line",
-        "decile",
-    ]
+    tb_cpi = (
+        tb_non_dimensional[
+            (tb_non_dimensional["poverty_line"] == current_ipl)
+            & (tb_non_dimensional["survey_comparability"] == "No spells")
+            & (tb_non_dimensional["filled"])
+        ][["country", "year"] + INDICATORS_CPI]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
 
-    # Select the columns we want
-    tb_non_dimensional = tb_non_dimensional[index_columns + INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES]
-
-    # Add a missing poverty_line and decile columns
-    tb_non_dimensional["poverty_line"] = pd.NA
+    tb_rest = tb_non_dimensional[(tb_non_dimensional["poverty_line"].isin(ipl_list))][
+        ["country", "year", "welfare_type", "ppp_version", "survey_comparability", "filled"] + INDICATORS_REST_PPP
+    ].reset_index(drop=True)
 
     # Drop the columns in tb
-    tb = tb.drop(columns=INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES, errors="raise")
+    tb = tb.drop(
+        columns=INDICATORS_INEQUALITY + INDICATORS_CPI + INDICATORS_REST_PPP + INDICATORS_NOT_USED, errors="raise"
+    )
 
-    # Concatenate tb and tb_non_dimensional
-    tb = pr.merge(tb, tb_non_dimensional, on=index_columns, how="outer")
-
-    return tb
-
-
-def make_cpi_not_depending_on_ppp(tb: Table) -> Table:
-    """
-    Make the cpi not depending on ppp_version.
-    """
-
-    tb = tb.copy()
-
-    # Extract last key from POVLINES_DICT, so we can filter for the latest ppp year
-    current_ppp_year = list(POVLINES_DICT.keys())[-1]
-
-    # Make all the cpi values different from the current ppp year None
-    tb.loc[tb["ppp_version"] != current_ppp_year, "cpi"] = pd.NA
-
-    return tb
+    return tb, tb_inequality, tb_cpi, tb_rest
 
 
 def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
