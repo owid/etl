@@ -245,7 +245,7 @@ def create_grouped_views(collection):
             {
                 "dimension": "age_group",
                 "choice_new_slug": "age_side_by_side",
-                "choices": {"adult", "youth", "elderly"},
+                "choices": ["adult", "youth", "elderly"],
                 "view_config": view_config,
                 "view_metadata": view_metadata,
             },
