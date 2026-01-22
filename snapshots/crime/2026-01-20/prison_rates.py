@@ -185,7 +185,9 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
         if not years.empty:
             invalid_years = years[(years < 1990) | (years > current_year)]
             if not invalid_years.empty:
-                print(f"⚠️  WARNING [{country_name}]: Found {len(invalid_years)} years outside valid range (1990-{current_year}): {invalid_years.tolist()}")
+                print(
+                    f"⚠️  WARNING [{country_name}]: Found {len(invalid_years)} years outside valid range (1990-{current_year}): {invalid_years.tolist()}"
+                )
 
     # Check prison population total
     if "prison_population_total" in df.columns:
@@ -199,7 +201,9 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
             # Check for unreasonably high values (> 10 million)
             very_high = pop[pop > 10_000_000]
             if not very_high.empty:
-                print(f"⚠️  WARNING [{country_name}]: Found {len(very_high)} prison population values > 10 million: {very_high.tolist()}")
+                print(
+                    f"⚠️  WARNING [{country_name}]: Found {len(very_high)} prison population values > 10 million: {very_high.tolist()}"
+                )
 
     # Check prison population rate (per 100k)
     if "prison_population_rate" in df.columns:
@@ -213,7 +217,9 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
             # Check for unreasonably high rates (> 1000 per 100k)
             very_high = rate[rate > 1000]
             if not very_high.empty:
-                print(f"⚠️  WARNING [{country_name}]: Found {len(very_high)} prison population rate values > 1000 per 100k: {very_high.tolist()}")
+                print(
+                    f"⚠️  WARNING [{country_name}]: Found {len(very_high)} prison population rate values > 1000 per 100k: {very_high.tolist()}"
+                )
 
     # Check percentage columns
     percentage_cols = [
@@ -221,7 +227,7 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
         "female_prisoners_pct",
         "juvenile_prisoners_pct",
         "foreign_prisoners_pct",
-        "occupancy_level_pct"
+        "occupancy_level_pct",
     ]
 
     for col in percentage_cols:
@@ -237,7 +243,9 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
                 max_allowed = 300 if col == "occupancy_level_pct" else 100
                 too_high = pct[pct > max_allowed]
                 if not too_high.empty:
-                    print(f"⚠️  WARNING [{country_name}]: Found {len(too_high)} values > {max_allowed}% in {col}: {too_high.tolist()}")
+                    print(
+                        f"⚠️  WARNING [{country_name}]: Found {len(too_high)} values > {max_allowed}% in {col}: {too_high.tolist()}"
+                    )
 
     # Check that prison population rate is consistent with total
     if all(col in df.columns for col in ["prison_population_total", "prison_population_rate"]):
@@ -247,11 +255,12 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
             # Rate should be roughly: (total / country_population) * 100,000
             # We can't verify exactly without population data, but we can check if rate is zero when total is not
             zero_rate_nonzero_total = check_df[
-                (check_df["prison_population_rate"] == 0) &
-                (check_df["prison_population_total"] > 0)
+                (check_df["prison_population_rate"] == 0) & (check_df["prison_population_total"] > 0)
             ]
             if not zero_rate_nonzero_total.empty:
-                print(f"⚠️  WARNING [{country_name}]: Found {len(zero_rate_nonzero_total)} rows with prison population but zero rate")
+                print(
+                    f"⚠️  WARNING [{country_name}]: Found {len(zero_rate_nonzero_total)} rows with prison population but zero rate"
+                )
 
     # Check official capacity vs actual population
     if all(col in df.columns for col in ["prison_population_total", "official_capacity"]):
@@ -264,12 +273,11 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
                 pass
 
             # Check for capacity being zero while population exists
-            zero_capacity = check_df[
-                (check_df["official_capacity"] == 0) &
-                (check_df["prison_population_total"] > 0)
-            ]
+            zero_capacity = check_df[(check_df["official_capacity"] == 0) & (check_df["prison_population_total"] > 0)]
             if not zero_capacity.empty:
-                print(f"⚠️  WARNING [{country_name}]: Found {len(zero_capacity)} rows with prison population but zero official capacity")
+                print(
+                    f"⚠️  WARNING [{country_name}]: Found {len(zero_capacity)} rows with prison population but zero official capacity"
+                )
 
 
 # --- main ------------------------------------------------------------------
