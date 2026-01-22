@@ -1,4 +1,69 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""UNAIDS Garden ETL Step
+
+This script processes UNAIDS HIV/AIDS data from meadow to garden stage, handling
+epidemiological estimates (EPI) and Global AIDS Monitoring (GAM) data.
+
+## Harmonization Pipeline
+
+The three YAML files are applied sequentially to transform raw data:
+
+    ┌───────────────────────────────────────────────────────────────────────────────┐
+    │  RAW DATA                                                                     │
+    │  indicator_id: "HIV_PREVALENCE", dimension_id: "FEMALES_15_24_ESTIMATE"       │
+    └───────────────────────────────┬───────────────────────────────────────────────┘
+                                    │
+                                    ▼
+    ┌───────────────────────────────────────────────────────────────────────────────┐
+    │  1. indicator_renames.yml                                                     │
+    │     Rename indicator IDs → short names (or drop if null)                      │
+    │     "HIV_PREVALENCE" → "hiv_prevalence"                                       │
+    └───────────────────────────────┬───────────────────────────────────────────────┘
+                                    │
+                                    ▼
+    ┌───────────────────────────────────────────────────────────────────────────────┐
+    │  2. dimensions.yml                                                            │
+    │     Parse dimension IDs → structured columns                                  │
+    │     "FEMALES_15_24_ESTIMATE" → {sex: female, age: 15-24, estimate: central}   │
+    └───────────────────────────────┬───────────────────────────────────────────────┘
+                                    │
+                                    ▼
+    ┌───────────────────────────────────────────────────────────────────────────────┐
+    │  3. indicators_to_dimensions.yml  (GAM only)                                  │
+    │     Consolidate related indicators → one indicator + group dimension          │
+    │     tg_hiv_prevalence, msm_hiv_prevalence, ... → hiv_prevalence + group       │
+    └───────────────────────────────┬───────────────────────────────────────────────┘
+                                    │
+                                    ▼
+    ┌───────────────────────────────────────────────────────────────────────────────┐
+    │  FINAL DATA                                                                   │
+    │  indicator: "hiv_prevalence", sex: "female", age: "15-24", group: "..."       │
+    └───────────────────────────────────────────────────────────────────────────────┘
+
+## YAML File Details
+
+### 1. unaids.indicator_renames.yml
+Maps raw indicator IDs to clean short names. Set to `null` to drop:
+
+    "PLWH": "plwh"          # kept
+    "TARGET_IPR": null      # dropped
+
+### 2. unaids.dimensions.yml
+Maps dimension IDs to structured values (sex, age, estimate, group, hepatitis):
+
+    "FEMALES_15_24_HIGH_ESTIMATE":
+        sex: female
+        age: 15-24
+        estimate: high
+
+### 3. unaids.indicators_to_dimensions.yml
+Collapses multiple indicators into one + dimension (GAM data only):
+
+    - name: hiv_prevalence
+      indicators_origin:
+        tg_hiv_prevalence:    {dimension: transgender}
+        msm_hiv_prevalence:   {dimension: men who have sex with men}
+        pwid_hiv_prevalence:  {dimension: people who inject drugs}
+"""
 
 import numpy as np
 import owid.catalog.processing as pr

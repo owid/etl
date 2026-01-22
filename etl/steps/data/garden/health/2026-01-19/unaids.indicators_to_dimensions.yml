@@ -1,3 +1,6 @@
+# Indicator consolidation. Collapses multiple source indicators into one + dimension.
+# E.g., 5 HIV prevalence indicators → 1 hiv_prevalence with group dimension.
+
 gam:
   - name: hiv_prevalence
     long_name: HIV prevalence

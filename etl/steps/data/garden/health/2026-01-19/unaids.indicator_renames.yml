@@ -1,3 +1,6 @@
+# Indicator ID renaming. Maps source IDs to clean short names.
+# Set value to null to drop the indicator.
+
 epi:
   "PLWH": "plwh"
   "NEW_INFECTIONS": "new_infections"
