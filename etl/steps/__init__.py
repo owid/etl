@@ -1252,25 +1252,14 @@ class GraphStep(Step):
 
         source_checksum = self.checksum_input()
 
-        if config.GRAPH:
-            # --graph flag set: upsert to database
-            upsert_graph(
-                slug=self.slug,
-                metadata_file=self.metadata_file,
-                dependencies=dep_uris,
-                source_checksum=source_checksum,
-                graph_push=config.GRAPH_PUSH,
-            )
-        else:
-            # No --graph flag: only save metadata locally (like grapher step without --grapher)
-            # Build minimal config just for storing checksum
-            from etl.grapher.graph import _load_metadata_file
-
-            config_dict = {}
-            if self.metadata_file and self.metadata_file.exists():
-                config_dict = _load_metadata_file(self.metadata_file)
-
-            _save_graph_metadata(self.slug, source_checksum, config_dict, to_db=False)
+        # Upsert graph to database (graph steps require --graph flag to run)
+        upsert_graph(
+            slug=self.slug,
+            metadata_file=self.metadata_file,
+            dependencies=dep_uris,
+            source_checksum=source_checksum,
+            graph_push=config.GRAPH_PUSH,
+        )
 
     def is_dirty(self) -> bool:
         """

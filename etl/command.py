@@ -279,6 +279,7 @@ def main_cli(
         force=force,
         private=private,
         grapher=grapher,
+        graph=graph,
         export=export,
         only=only,
         exact_match=exact_match,
@@ -307,7 +308,7 @@ def main_cli(
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
     """Find and print closest matches for misspelled step names."""
-    print(f"No steps matched `{includes_str}`; check the spelling or try with the `--private` flag.\nClosest matches:")
+    print(f"No steps matched `{includes_str}`; check the spelling, try with the `--private` flag, or the `--graph` flag to run graph steps.\nClosest matches:")
     # NOTE: We could use a better edit distance to find the closest matches.
     for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
         print(match)
@@ -320,6 +321,7 @@ def main(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
+    graph: bool = False,
     export: bool = False,
     only: bool = False,
     exact_match: bool = False,
@@ -346,6 +348,7 @@ def main(
         includes=includes,
         excludes=excludes,
         grapher=grapher,
+        graph=graph,
         export=export,
         private=private,
         only=only,
@@ -383,9 +386,9 @@ def construct_full_dag(dag: DAG) -> DAG:
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # For export:// steps, add the grapher:// steps that are needed to upsert data to DB.
+    # For export:// and graph:// steps, add the grapher:// steps that are needed to upsert data to DB.
     for step in list(dag.keys()):
-        if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+        if step.startswith("export://multidim/") or step.startswith("export://explorers/") or step.startswith("graph://"):
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
                     dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
@@ -404,6 +407,7 @@ def construct_subdag(
     includes: Optional[List[str]] = None,
     excludes: Optional[List[str]] = None,
     grapher: bool = False,
+    graph: bool = False,
     export: bool = False,
     private: bool = False,
     only: bool = False,
@@ -421,8 +425,12 @@ def construct_subdag(
     if not export:
         excludes.append("export://.*")
 
+    # Graph steps
+    if not graph:
+        excludes.append("graph://.*")
+
     # Grapher steps
-    if not grapher and not export:
+    if not grapher and not export and not graph:
         excludes.append("grapher://.*")
 
     # Exclude private steps
