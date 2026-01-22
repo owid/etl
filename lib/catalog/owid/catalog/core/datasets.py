@@ -19,10 +19,10 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from owid.catalog import tables, utils
-from owid.catalog.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
-from owid.catalog.processing_log import disable_processing_log
-from owid.catalog.properties import metadata_property
+from owid.catalog.core import tables, utils
+from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
+from owid.catalog.core.processing_log import disable_processing_log
+from owid.catalog.core.properties import metadata_property
 from owid.repack import to_safe_types
 
 FileFormat = Literal["csv", "feather", "parquet", "json"]
@@ -399,7 +399,8 @@ class Dataset:
             catalog_path: Base path for calculating relative paths. Defaults to "/".
 
         Returns:
-            DataFrame with columns: namespace, dataset, version, table, checksum, is_public, dimensions, path, and channel.
+            DataFrame with columns: namespace, dataset, version, table, checksum, is_public,
+            title, description, dimensions, path, channel, and formats.
 
         Example:
             ```python
@@ -423,6 +424,10 @@ class Dataset:
 
             assert metadata.short_name
             row["table"] = metadata.short_name
+
+            # Content metadata (fallback to dataset-level if table-level not available)
+            row["title"] = metadata.title or self.metadata.title
+            row["description"] = metadata.description or self.metadata.description
 
             row["dimensions"] = json.dumps(metadata.primary_key)
 
@@ -461,11 +466,14 @@ class Dataset:
             pattern = join(self.path, f"*.{format}")
             files.extend(glob(pattern))
 
-        # Exclude metadata files from data files
+        # Exclude metadata and config files from data files
         # - index.json is the dataset metadata file
         # - *.meta.json are table metadata sidecar files
+        # - *.config.json are collection config files (from export steps)
         index_file = join(self.path, "index.json")
-        files = [f for f in files if f != index_file and not f.endswith(".meta.json")]
+        files = [
+            f for f in files if f != index_file and not f.endswith(".meta.json") and not f.endswith(".config.json")
+        ]
 
         return sorted(files)
 

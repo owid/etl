@@ -26,15 +26,15 @@ from rapidfuzz import fuzz
 
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import (
+    DEFAULT_CATALOG_URL,
     INDEX_FORMATS,
-    OWID_CATALOG_URI,
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
     SUPPORTED_FORMATS,
 )
-from owid.catalog.datasets import CHANNEL, Dataset, FileFormat
-from owid.catalog.tables import Table
+from owid.catalog.core.datasets import CHANNEL, Dataset, FileFormat
+from owid.catalog.core.tables import Table
 
 log = structlog.get_logger()
 
@@ -419,7 +419,7 @@ class LocalCatalog(CatalogMixin):
 
         df = pd.concat(frames, ignore_index=True)
 
-        keys = ["table", "dataset", "version", "namespace", "channel", "is_public"]
+        keys = ["table", "dataset", "version", "namespace", "channel", "is_public", "title", "description"]
         columns = keys + [c for c in df.columns if c not in keys]
 
         df.sort_values(keys, inplace=True)  # type: ignore
@@ -439,7 +439,7 @@ class ETLCatalog(CatalogMixin):
     timeout: int
 
     def __init__(
-        self, uri: str = OWID_CATALOG_URI, channels: Iterable[CHANNEL] = ("garden",), timeout: int = 30
+        self, uri: str = DEFAULT_CATALOG_URL, channels: Iterable[CHANNEL] = ("garden",), timeout: int = 30
     ) -> None:
         self.uri = uri
         self.channels = channels

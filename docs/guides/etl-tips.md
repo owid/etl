@@ -11,6 +11,41 @@ icon: lucide/lightbulb
     Contribute by [documenting](../dev/docs/){data-preview} your tricks and tips!.
 
 
+## Browse and search ETL steps interactively
+
+Use `etlr --browse` (or `-b`) to open an interactive step browser with fuzzy search. This is useful when you don't remember the exact step name.
+
+<div style="text-align: center;">
+  <video controls width="100%" style="max-width: 800px;">
+    <source src="../../assets/demo-etlr-b.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+Once you select a step, it will be executed with the flags you specified. For example, to run private steps:
+
+```bash
+# Open the interactive browser for private steps
+etlr --browse --private
+
+# Short form
+etlr -b -p
+```
+
+!!! tip "Also works for snapshots"
+
+    The same browse functionality is available for snapshots using `etls --browse` (or `etls -b`). This lets you interactively search and select from all available snapshots in the `snapshots/` directory.
+
+    ```bash
+    # Browse and run a snapshot
+    etls --browse
+
+    # Browse with dry-run to preview
+    etls -b --dry-run
+    ```
+
+
+
 ## Interpolate values
 Sometimes, you may have empty values in your dataset. In general, a solution for these cases is to use interpolation to fill those gaps based on previous and following values. In `data_helpers.misc` module, you will find the function `interpolate_table` that can be used to interpolate values in a table.
 
@@ -186,3 +221,72 @@ Our population data is built as a combination of multiple origins. When using po
   - Importantly, in these charts, **the metadata of `population#population` is always shown indirectly in our charts, propagated to other indicators**.
 
 In the majority of cases, you may want to use population as an auxiliary indicator, and therefore use (2).
+
+## Reading from zipped snapshots
+
+When a snapshot is a zip/tar archive containing multiple files, use `extracted()` to access its contents.
+
+### Basic usage
+
+```python
+snap = paths.load_snapshot("my_archive.zip")
+
+with snap.extracted() as archive:
+    # List all files in the archive
+    print(archive.files)  # ['data/2020.csv', 'data/2021.csv', 'metadata.json']
+
+    # Read a specific file
+    tb = archive.read("data/2020.csv")
+```
+
+### Finding files with glob patterns
+
+```python
+with snap.extracted() as archive:
+    # Find all CSVs anywhere in the archive
+    csv_files = archive.glob("**/*.csv")
+
+    # Find files in a specific folder
+    data_files = archive.glob("data/*")
+
+    # Read all matching files
+    tables = [archive.read(f) for f in archive.glob("**/*.csv")]
+```
+
+### Checking if a file exists
+
+```python
+with snap.extracted() as archive:
+    if "optional_file.csv" in archive:
+        tb = archive.read("optional_file.csv")
+```
+
+### Error handling
+
+If you try to read a file that doesn't exist, you'll get a helpful error message listing available files:
+
+```
+FileNotFoundError: File 'wrong_name.csv' not found in archive.
+Available files:
+  - data/2020.csv
+  - data/2021.csv
+  - metadata.json
+```
+
+### Accessing raw path for custom operations
+
+For non-tabular data or custom file operations, you can access the underlying path:
+
+```python
+with snap.extracted() as archive:
+    # For custom file operations (e.g., non-tabular data)
+    with open(archive.path / "readme.txt") as f:
+        content = f.read()
+
+    # Or use pathlib operations
+    json_path = archive.path / "config.json"
+    if json_path.exists():
+        import json
+        with open(json_path) as f:
+            config = json.load(f)
+```

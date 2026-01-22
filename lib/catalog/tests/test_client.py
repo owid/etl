@@ -140,7 +140,7 @@ class TestChartsAPISearch:
         results = client.charts.search("population")
 
         df = results.to_frame()
-        assert "slug" in df.columns
+        assert "url" in df.columns
         assert "title" in df.columns
         assert len(df) == len(results)
 
@@ -220,15 +220,6 @@ class TestIndicatorsAPI:
         assert 0 <= first.score <= 1
         assert first.path
 
-    def test_indicator_results_to_catalog_frame(self):
-        client = Client()
-        results = client.indicators.search("co2 emissions")
-
-        frame = results.to_catalog_frame()
-        assert "indicator_title" in frame.columns
-        assert "score" in frame.columns
-        assert "path" in frame.columns
-
     def test_fetch_indicator(self):
         """Test fetching a specific indicator by path returns Table directly."""
         client = Client()
@@ -287,18 +278,6 @@ class TestTablesAPI:
         assert len(results) > 0
         assert all(r.namespace == "un" for r in results)
 
-    def test_table_results_to_catalog_frame(self):
-        client = Client()
-        results = client.tables.search(table="population", namespace="un")
-
-        frame = results.to_catalog_frame()
-        assert "table" in frame.columns
-        assert "namespace" in frame.columns
-        assert "path" in frame.columns
-
-        # Should be loadable
-        assert hasattr(frame, "load")
-
     def test_fetch_table(self):
         """Test fetching table by path returns Table directly."""
         client = Client()
@@ -325,17 +304,6 @@ class TestTablesAPI:
         client = Client()
         with pytest.raises(KeyError, match="No matching table found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
-
-    def test_backwards_compatibility_datasets(self):
-        """Test that client.datasets still works (backwards compatibility)."""
-        client = Client()
-
-        # Should work via datasets attribute
-        results = client.datasets.search(table="population")
-        assert len(results) > 0
-
-        # Verify it's the same as tables
-        assert client.datasets is client.tables
 
     def test_search_with_refresh_index(self):
         """Test that refresh_index parameter forces index re-download."""
@@ -538,12 +506,15 @@ class TestDataclassModels:
             slug="test-chart",
             title="Test Chart",
             url="https://ourworldindata.org/grapher/test-chart",
-            base_url="https://ourworldindata.org/grapher",
+            site_url="https://ourworldindata.org",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
-        assert result.base_url == "https://ourworldindata.org/grapher"
+        assert result.site_url == "https://ourworldindata.org"
+        assert result.grapher_url == "https://ourworldindata.org/grapher"
+        assert result.explorer_url == "https://ourworldindata.org/explorers"
+        assert result.type == "chart"
 
     def test_indicator_result(self):
         result = IndicatorResult(
@@ -566,12 +537,31 @@ class TestDataclassModels:
             namespace="un",
             channel="garden",
             path="garden/un/2024-07-11/un_wpp/population",
+            title="World Population Prospects",
+            description="UN World Population Prospects data",
             catalog_url="https://catalog.ourworldindata.org/",
         )
 
         assert result.table == "population"
         assert result.namespace == "un"
+        assert result.title == "World Population Prospects"
+        assert result.description == "UN World Population Prospects data"
         assert result.catalog_url == "https://catalog.ourworldindata.org/"
+
+    def test_table_result_optional_fields(self):
+        """Test that title and description are optional and default to None."""
+        result = TableResult(
+            table="population",
+            dataset="un_wpp",
+            version="2024-07-11",
+            namespace="un",
+            channel="garden",
+            path="garden/un/2024-07-11/un_wpp/population",
+            catalog_url="https://catalog.ourworldindata.org/",
+        )
+
+        assert result.title is None
+        assert result.description is None
 
 
 class TestDatasetteAPI:
@@ -645,9 +635,6 @@ class TestDatasetteAPI:
 
         assert isinstance(table, DatasetteTable)
         assert table.name == "analytics_popularity"
-        assert "slug" in table.columns
-        assert "type" in table.columns
-        assert "popularity" in table.columns
         assert table.row_count is not None
         assert table.row_count > 0
         assert table.is_view is False

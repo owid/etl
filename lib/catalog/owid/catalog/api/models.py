@@ -5,13 +5,12 @@
 #
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Generic, Iterator, TypeVar
+from pathlib import Path
+from typing import Any, Callable, Generic, Iterator, TypeVar, overload
+from urllib import parse
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
-
-if TYPE_CHECKING:
-    from owid.catalog.api.legacy import CatalogFrame
 
 T = TypeVar("T")
 
@@ -37,6 +36,9 @@ class ResponseSet(BaseModel, Generic[T]):
     total_count: int = 0
     base_url: str = Field(frozen=True)
 
+    # Tweak this to have a more advanced display
+    _ui_advanced: bool = False
+
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
         if not self.results:
@@ -59,8 +61,62 @@ class ResponseSet(BaseModel, Generic[T]):
     def __len__(self) -> int:
         return len(self.results)
 
-    def __getitem__(self, index: int) -> T:
+    @overload
+    def __getitem__(self, index: int) -> T: ...
+
+    @overload
+    def __getitem__(self, index: slice) -> "ResponseSet[T]": ...
+
+    def __getitem__(self, index: int | slice) -> "T | ResponseSet[T]":
+        if isinstance(index, slice):
+            return ResponseSet(
+                results=self.results[index],
+                query=self.query,
+                total_count=len(self.results[index]),
+                base_url=self.base_url,
+                _ui_advanced=self._ui_advanced,
+            )
         return self.results[index]
+
+    # Display settings
+    _MAX_DISPLAY_ROWS: int = 60
+    _HEAD_ROWS: int = 5
+    _TAIL_ROWS: int = 5
+    _MAX_STR_LENGTH: int = 80
+
+    def _truncate_string(self, val: Any, max_len: int) -> Any:
+        """Truncate string values that exceed max length. Skip HTML content."""
+        if isinstance(val, str):
+            # Skip HTML content (contains tags)
+            if "<" in val and ">" in val:
+                return val
+            if len(val) > max_len:
+                return val[: max_len - 3] + "..."
+        return val
+
+    def _truncate_strings_in_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Truncate all string values in DataFrame for display."""
+        df = df.copy()
+        for col in df.columns:
+            if df[col].dtype == object:
+                df[col] = df[col].apply(lambda x: self._truncate_string(x, self._MAX_STR_LENGTH))
+        return df
+
+    def _get_display_frame(self) -> tuple[pd.DataFrame, bool]:
+        """Get DataFrame for display, truncated if needed.
+
+        Returns:
+            Tuple of (display DataFrame, whether it was truncated).
+        """
+        df = self.to_frame()
+
+        if len(df) <= self._MAX_DISPLAY_ROWS:
+            return df, False
+
+        # Truncate: show head and tail
+        head = df.head(self._HEAD_ROWS)
+        tail = df.tail(self._TAIL_ROWS)
+        return pd.concat([head, tail]), True
 
     def __repr__(self) -> str:
         """Display results as a formatted table for better readability."""
@@ -69,14 +125,22 @@ class ResponseSet(BaseModel, Generic[T]):
         if not self.results:
             return f"{type_display}(query={self.query!r}, total_count=0, results=[])"
 
-        # Convert to DataFrame for nice tabular display
-        df = self.to_frame()
+        df, truncated = self._get_display_frame()
 
-        # Limit display to first 10 rows for readability
         if len(df) == 0:
             return f"{type_display}(query={self.query!r}, total_count={self.total_count}, results=[])"
-        else:
-            df_str = str(df)
+
+        df_str = str(df)
+
+        # Insert ellipsis row if truncated
+        if truncated:
+            lines = df_str.split("\n")
+            # Find where to insert "..." (after header + HEAD_ROWS data rows)
+            # Header is first line, then HEAD_ROWS of data
+            insert_pos = 1 + self._HEAD_ROWS
+            ellipsis_line = "..." + " " * (len(lines[0]) - 3) if lines else "..."
+            lines.insert(insert_pos, ellipsis_line)
+            df_str = "\n".join(lines)
 
         # Format as bullet points to show attributes at same level
         # Indent DataFrame lines to align with bullet points
@@ -100,8 +164,55 @@ class ResponseSet(BaseModel, Generic[T]):
         if not self.results:
             return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
 
-        df = self.to_frame()
-        df_html = df._repr_html_()
+        df, truncated = self._get_display_frame()
+
+        # For ChartResult, add thumbnail column and make URL clickable
+        if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
+            df = df.copy()
+
+            # Get slugs from results (order matches df rows)
+            slugs = [getattr(r, "slug", "") for r in self.results]
+            # Handle truncated display (head + tail)
+            if truncated:
+                slugs = slugs[: self._HEAD_ROWS] + slugs[-self._TAIL_ROWS :]
+
+            # Add thumbnail column - clickable to open chart
+            preview_col = pd.Series(
+                [
+                    f'<a href="{x}" target="_blank"><img style="max-height:150px; border-radius:4px;" src="{get_thumbnail_url(x)}"></a>'
+                    if x
+                    else ""
+                    for x in df["url"]
+                ]
+            )
+            df.insert(0, "preview", preview_col)
+
+            # Make URL a clickable link using slug from results
+            df["url"] = [
+                f'<a href="{url}" target="_blank">{slug}</a>' if url else "" for url, slug in zip(df["url"], slugs)
+            ]
+
+        # Insert ellipsis row if truncated
+        if truncated:
+            df = df.reset_index(drop=True)
+            # Create ellipsis row
+            ellipsis_row = pd.DataFrame([{col: "..." for col in df.columns}])
+            # Split at HEAD_ROWS and insert ellipsis
+            head = df.iloc[: self._HEAD_ROWS]
+            tail = df.iloc[self._HEAD_ROWS :]
+            df = pd.concat([head, ellipsis_row, tail], ignore_index=True)
+
+        # Truncate long strings for display (skips HTML content)
+        df = self._truncate_strings_in_df(df)
+
+        # Use pandas Styler for left-alignment on all result types
+        styler = df.style.set_table_styles(
+            [
+                {"selector": "td, th", "props": [("text-align", "left")]},
+            ]
+        )
+
+        df_html = styler.to_html(escape=False)
 
         # Format as bullet points to show attributes at same level
         html = f"""<div>
@@ -183,102 +294,44 @@ class ResponseSet(BaseModel, Generic[T]):
                     row = {
                         "slug": getattr(r, "slug", ""),
                         "title": getattr(r, "title", ""),
-                        "subtitle": getattr(r, "subtitle", ""),
+                        "description": getattr(r, "description", ""),
                         "url": getattr(r, "url", ""),
                         "num_related_articles": getattr(r, "num_related_articles", 0),
                         # Only show count of entities, not full list
                         "num_entities": len(getattr(r, "available_entities", [])),
+                        "popularity": getattr(r, "popularity", 0),
+                        "last_updated": getattr(r, "last_updated", None),
                     }
+
+                    # Simplify if not advanced UI
+                    if not self._ui_advanced:
+                        row = {
+                            # "slug": row["slug"],
+                            "title": row["title"],
+                            "description": row["description"],
+                            "last_updated": row["last_updated"],
+                            "url": row["url"],
+                        }
                 else:
                     row = r.model_dump()
+
+                    # Exclude internal config fields that aren't useful to display
+                    row.pop("catalog_url", None)
+                    row.pop("base_url", None)
+
+                    # Simplify if not advanced UI
+                    if not self._ui_advanced:
+                        row = {
+                            "title": row.get("title") or "",
+                            "description": row.get("description") or "",
+                            "version": row.get("version") or "",
+                            "path": row.get("path") or "",
+                        }
                 rows.append(row)
             else:
                 rows.append(r)
 
         return pd.DataFrame(rows)
-
-    def to_catalog_frame(self) -> "CatalogFrame":
-        """Convert to CatalogFrame for backwards compatibility.
-
-        Only works for TableResult and IndicatorResult types.
-
-        Returns:
-            CatalogFrame that can use .load() method.
-        """
-        from owid.catalog.api.legacy import CatalogFrame as CF
-        from owid.catalog.api.utils import OWID_CATALOG_URI
-        from owid.catalog.core import CatalogPath
-
-        if not self.results:
-            return CF.create_empty()
-
-        # Check result type by name to avoid circular imports
-        first = self.results[0]
-        type_name = type(first).__name__
-
-        if type_name == "TableResult":
-            rows = []
-            for r in self.results:
-                rows.append(
-                    {
-                        "table": getattr(r, "table", ""),
-                        "dataset": getattr(r, "dataset", ""),
-                        "version": getattr(r, "version", ""),
-                        "namespace": getattr(r, "namespace", ""),
-                        "channel": getattr(r, "channel", ""),
-                        "path": getattr(r, "path", ""),
-                        "is_public": getattr(r, "is_public", True),
-                        "dimensions": getattr(r, "dimensions", []),
-                        "format": getattr(r, "formats", ["feather"])[0] if getattr(r, "formats", []) else "feather",
-                    }
-                )
-            frame = CF(rows)
-            frame._base_uri = self.base_url or OWID_CATALOG_URI
-            return frame
-
-        elif type_name == "IndicatorResult":
-            rows = []
-            for r in self.results:
-                path = getattr(r, "path", None)
-                # Parse catalog path using CatalogPath
-                try:
-                    if path is None:
-                        raise ValueError("path is None")
-                    parsed = CatalogPath.from_str(path)
-                    indicator = parsed.variable or ""
-                    channel = parsed.channel
-                    namespace = parsed.namespace
-                    version = parsed.version
-                    dataset = parsed.dataset
-                    table = parsed.table or dataset
-                    # Use table_path property (without variable)
-                    path_part = parsed.table_path or parsed.dataset_path
-                except Exception:
-                    # Fallback if parsing fails
-                    indicator = channel = namespace = version = dataset = table = ""
-                    path_part = path.split("#")[0] if path and "#" in path else path
-
-                rows.append(
-                    {
-                        "indicator_title": getattr(r, "title", ""),
-                        "indicator": indicator,
-                        "score": getattr(r, "score", 0.0),
-                        "table": table,
-                        "dataset": dataset,
-                        "version": version,
-                        "namespace": namespace,
-                        "channel": channel,
-                        "is_public": True,
-                        "path": path_part,
-                        "format": "parquet",
-                    }
-                )
-            frame = CF(rows)
-            frame._base_uri = self.base_url or OWID_CATALOG_URI
-            return frame
-
-        else:
-            raise TypeError(f"Cannot convert {type_name} results to CatalogFrame")
 
     def filter(self, predicate: Callable[[T], bool]) -> "ResponseSet[T]":
         """Filter results by predicate function.
@@ -310,6 +363,7 @@ class ResponseSet(BaseModel, Generic[T]):
             query=self.query,
             total_count=len(filtered_results),
             base_url=self.base_url,
+            _ui_advanced=self._ui_advanced,
         )
 
     def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
@@ -351,6 +405,7 @@ class ResponseSet(BaseModel, Generic[T]):
             query=self.query,
             total_count=self.total_count,
             base_url=self.base_url,
+            _ui_advanced=self._ui_advanced,
         )
 
     def _get_version_string(self, item: T) -> str:
@@ -376,3 +431,16 @@ class ResponseSet(BaseModel, Generic[T]):
             if version:
                 return str(version)
             return ""
+
+
+def get_thumbnail_url(url: str) -> str:
+    """
+    Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
+    Into https://ourworldindata.org/grapher/life-expectancy.png?country=~CHN
+    """
+    parts = parse.urlparse(url)
+    if "/explorers/" in url:
+        url = f"{parts.scheme}://{parts.netloc}/explorers/{Path(parts.path).name}.png?{parts.query}"
+    else:
+        url = f"{parts.scheme}://{parts.netloc}/grapher/{Path(parts.path).name}.png?{parts.query}"
+    return url

@@ -11,8 +11,8 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 DATA_CDC = pd.DataFrame(
     {
-        "country": ["United States"] * 73,
-        "year": list(range(1950, 2023)),
+        "country": ["United States"] * 74,
+        "year": list(range(1950, 2024)),
         "deaths": [
             1904,
             1551,
@@ -87,13 +87,14 @@ DATA_CDC = pd.DataFrame(
             0,
             0,
             0,
+            0,
         ],
         "source": [
             *["https://www.globalhealthchronicles.org/items/show/6303"] * 10,
             *["https://www.jstor.org/stable/44323897"] * 8,
             *["https://wonder.cdc.gov/cmf-icd8.html"] * 11,
             *["https://wonder.cdc.gov/cmf-icd9.html"] * 20,
-            *["https://wonder.cdc.gov/cmf-icd10.html"] * 24,
+            *["https://wonder.cdc.gov/deaths-by-underlying-cause.html"] * 25,
         ],
     }
 )

@@ -21,7 +21,7 @@ from typing import Set, Tuple
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, warnings
+from owid.catalog.core import Table, warnings
 from scipy import stats
 from structlog import get_logger
 

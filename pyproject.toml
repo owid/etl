@@ -73,7 +73,6 @@ dependencies = [
     "pyproj>=3.7.1",
     "pydantic-ai>=1.40.0",
     "logfire[fastapi,httpx]>=4.3.3",
-    "cfgrib>=0.9.15.0",
     "metabase-api>=3.5.2",
     "codespell>=2.4.1",
     "zensical>=0.0.15",
@@ -83,6 +82,7 @@ dependencies = [
     "marshmallow>=3.26.2",
     "brotli>=1.2.0",
     "pyopenssl>=25.3.0",
+    "h5py>=3.15.1",
 ]
 
 [tool.uv.sources]

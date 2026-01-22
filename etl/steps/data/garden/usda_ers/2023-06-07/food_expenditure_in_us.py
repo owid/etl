@@ -3,7 +3,7 @@
 from typing import cast
 
 from owid.catalog import Dataset, DatasetMeta
-from owid.catalog.datasets import DEFAULT_FORMATS
+from owid.catalog.core.datasets import DEFAULT_FORMATS
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 

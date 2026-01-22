@@ -256,3 +256,11 @@ steps:
     - data://garden/cbc_taiwan/2025-12-22/twd_usd_exchange_rate
   data://grapher/tsmc/2025-11-10/monthly_revenue:
     - data://garden/tsmc/2025-11-10/monthly_revenue
+
+  # IFR robot density data
+  data://meadow/ifr/2026-01-14/robot_density:
+    - snapshot://ifr/2026-01-14/robot_density.xlsx
+  data://garden/ifr/2026-01-14/robot_density:
+    - data://meadow/ifr/2026-01-14/robot_density
+  data://grapher/ifr/2026-01-14/robot_density:
+    - data://garden/ifr/2026-01-14/robot_density

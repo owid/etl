@@ -29,7 +29,7 @@ from owid.catalog.api.utils import (
 )
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
-from owid.catalog.tables import Table
+from owid.catalog.core.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -229,6 +229,8 @@ class TableResult(BaseModel):
         version: Version string.
         dataset: Dataset name.
         dimensions: List of dimension columns.
+        title: Human-readable title (from table or dataset metadata).
+        description: Detailed description (from table or dataset metadata).
         is_public: Whether the data is publicly accessible.
         formats: List of available formats.
         popularity: Popularity score (0.0 to 1.0) based on analytics views.
@@ -252,6 +254,8 @@ class TableResult(BaseModel):
 
     # Content metadata
     dimensions: list[str] = Field(default_factory=list)
+    title: str | None = None
+    description: str | None = None
 
     # Technical metadata
     is_public: bool = True
@@ -541,6 +545,8 @@ class TablesAPI:
                     path=row["path"],
                     is_public=row.get("is_public", True),
                     dimensions=list(dimensions) if dimensions is not None else [],
+                    title=row.get("title"),
+                    description=row.get("description"),
                     formats=formats,
                     popularity=popularity.get(slug, 0.0),
                     catalog_url=self.catalog_url,
@@ -574,10 +580,10 @@ class TablesAPI:
             channel: Filter by channel (exact match). Defaults to 'garden' if not specified.
             case: Case-sensitive search (default: False)
             match: How to match table/dataset names (default: "exact"):
+                - "fuzzy": Typo-tolerant similarity matching
                 - "exact": Exact string match
                 - "contains": Substring match
                 - "regex": Regular expression pattern
-                - "fuzzy": Typo-tolerant similarity matching
             fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
                 Only used when match="fuzzy". (default: 70)
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
@@ -662,6 +668,7 @@ class TablesAPI:
             query=query,
             total_count=len(results),
             base_url=self.catalog_url,
+            _ui_advanced=False,
         )
 
     def fetch(

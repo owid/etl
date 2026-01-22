@@ -12,8 +12,8 @@ from typing import Any, Callable, cast
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.meta import GrapherConfig
-from owid.catalog.utils import underscore
+from owid.catalog.core.meta import GrapherConfig
+from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
 
