@@ -136,6 +136,7 @@ tables:
         title: Waste management system level
         unit: "1 (best) - 4 (worst)"
         description_short: Each country is assigned to one of four waste management levels (1–4). Level 1 indicates that most waste is recycled, composted, or incinerated and very little is mismanaged, while Level 4 indicates that little waste is treated and much more is openly dumped or burned in the open air.
+        description_key : *desc_key_final_classification
         display:
           numDecimalPlaces: 0
 
