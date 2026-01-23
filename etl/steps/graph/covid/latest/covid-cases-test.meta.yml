@@ -50,39 +50,39 @@ views:
       metric: absolute
     indicators:
       y:
-        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases
+        - catalogPath: weekly_cases
 
   - dimensions:
       period: weekly
       metric: per_capita
     indicators:
       y:
-        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases_per_million
+        - catalogPath: weekly_cases_per_million
 
   - dimensions:
       period: weekly
       metric: change
     indicators:
       y:
-        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#weekly_pct_growth_cases
+        - catalogPath: weekly_pct_growth_cases
 
   - dimensions:
       period: biweekly
       metric: absolute
     indicators:
       y:
-        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases
+        - catalogPath: biweekly_cases
 
   - dimensions:
       period: biweekly
       metric: per_capita
     indicators:
       y:
-        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases_per_million
+        - catalogPath: biweekly_cases_per_million
 
   - dimensions:
       period: biweekly
       metric: change
     indicators:
       y:
-        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_pct_growth_cases
+        - catalogPath: biweekly_pct_growth_cases

@@ -39,4 +39,4 @@ $schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
 
 dimensions:
   - property: y
-    catalogPath: grapher/gcp/2025-11-13/global_carbon_budget/global_carbon_budget#emissions_total_per_capita
+    catalogPath: emissions_total_per_capita

@@ -27,4 +27,4 @@ $schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
 # Indicators used in this chart
 dimensions:
   - property: y
-    catalogPath: grapher/animal_welfare/2023-09-01/chick_culling_laws/chick_culling_laws#status
+    catalogPath: status

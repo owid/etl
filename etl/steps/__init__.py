@@ -1280,11 +1280,21 @@ class GraphStep(Step):
         """Create a multidimensional collection from YAML config."""
         from etl.collection.core.create import create_collection
         from etl.dag_helpers import load_dag
+        from etl.grapher.graph import _expand_indicator_path
 
         # Load DAG to get dependencies
         dag = load_dag()
         step_name = str(self)
         dep_uris = list(dag.get(step_name, []))
+
+        # Expand short indicator names in views to full catalog paths
+        if "views" in metadata:
+            for view in metadata["views"]:
+                if "indicators" in view:
+                    for prop, indicators in view["indicators"].items():
+                        for i, indicator in enumerate(indicators):
+                            if "catalogPath" in indicator:
+                                indicator["catalogPath"] = _expand_indicator_path(indicator["catalogPath"], dep_uris)
 
         # Create collection
         c = create_collection(

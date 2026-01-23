@@ -4,6 +4,17 @@ Graph step logic for creating and updating charts in the grapher database.
 This module handles the creation and updating of charts (graphs) as part of the ETL pipeline.
 Charts can either inherit metadata from a single indicator or have explicit metadata defined
 in a .meta.yml file.
+
+Key features:
+- Single charts: Use upsert_graph() to create/update individual charts
+- Multidimensional collections: Delegate to etl.collection.core.create.create_collection()
+- Short indicator names: Auto-expand using DAG dependencies (no hardcoded versions)
+- Dynamic metadata: Support yaml_params for runtime value substitution
+
+TODO: Consider refactoring _expand_indicator_path() to share more code with
+      CollectionConfigExpander._expand_indicator_path() from etl/collection/core/expand.py.
+      Current duplication exists because collections work with Table objects while
+      graphs work with URI strings from DAG dependencies.
 """
 
 import json
@@ -109,7 +120,10 @@ def upsert_graph(
             # Extract catalogPath from dimensions
             for dim in metadata["dimensions"]:
                 if "catalogPath" in dim:
-                    indicator_paths.append(dim["catalogPath"])
+                    catalog_path = dim["catalogPath"]
+                    # Expand short indicator names to full paths
+                    catalog_path = _expand_indicator_path(catalog_path, dependencies)
+                    indicator_paths.append(catalog_path)
 
         if not indicator_paths:
             # Fallback: if no dimensions in metadata, try old format from DAG
@@ -398,6 +412,141 @@ def _resolve_indicator_paths(session: Session, catalog_paths: List[str]) -> List
             )
 
     return variable_ids
+
+
+def _expand_indicator_path(catalog_path: str, dependencies: List[str]) -> str:
+    """
+    Expand a short indicator name to a full catalog path using DAG dependencies.
+
+    Automatically determines the minimal specificity needed (matching collections behavior):
+    1. Just indicator name if unambiguous across all dependencies
+    2. table#indicator if table name is needed to disambiguate
+    3. dataset/table#indicator if dataset name is also needed
+    4. Full path channel/namespace/version/dataset/table#indicator as fallback
+
+    Args:
+        catalog_path: Short or full catalog path (indicator, table#indicator, dataset/table#indicator, or full path)
+        dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/covid/latest/cases_deaths"])
+
+    Returns:
+        Full catalog path in format: channel/namespace/version/dataset/table#indicator
+
+    Examples:
+        >>> # If cases_deaths dataset has only one table "cases_deaths" with indicator "weekly_cases"
+        >>> _expand_indicator_path("weekly_cases", ["data://grapher/covid/latest/cases_deaths"])
+        "grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases"
+
+        >>> # If table name differs from dataset name
+        >>> _expand_indicator_path("monthly#price", ["data://grapher/energy/2025/energy_prices"])
+        "grapher/energy/2025/energy_prices/monthly#price"
+
+        >>> # Full paths are returned as-is
+        >>> _expand_indicator_path("grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases", [])
+        "grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases"
+
+    TODO: This function duplicates logic from etl.collection.core.expand.CollectionConfigExpander._expand_indicator_path()
+    and etl.collection.core.create._get_expand_path_mode(). The key difference is:
+    - Collections: Have loaded Table objects with .m.dataset.uri, so they use expand_path_mode ("table", "dataset", "full")
+      to construct paths at runtime based on has_duplicate_table_names() check
+    - Graph steps: Only have dependency URIs from DAG (no loaded tables), so must expand paths at YAML load time
+
+    To unify these approaches:
+    1. Extract common path expansion logic to etl.collection.utils
+    2. Make _get_expand_path_mode() work with just dependency URIs (no need to load tables)
+    3. Both graph steps and collections call the same utility with their respective inputs
+
+    The challenge is that collections determine mode once per collection, while graph steps need to expand
+    each indicator path individually. Consider whether graph steps should also determine mode once upfront.
+    """
+    from etl.collection.utils import get_tables_by_name_mapping
+
+    # If it's already a full path (3+ slashes before #), return as-is
+    if "#" in catalog_path:
+        path_part = catalog_path.split("#")[0]
+        if path_part.count("/") >= 3:
+            return catalog_path
+
+    if not dependencies:
+        raise ValueError(f"Cannot expand indicator path '{catalog_path}' - no dataset dependencies found in DAG")
+
+    # Get mapping of table names to their full URIs from all dependencies
+    table_name_to_uris = get_tables_by_name_mapping(set(dependencies))
+
+    # Parse the catalog_path to extract table_name and indicator
+    if "#" not in catalog_path:
+        # Just indicator name - need to find which table(s) contain it
+        indicator = catalog_path
+        table_name = None
+        # For now, assume first dependency and that table name == dataset name
+        # TODO: Could scan all tables to find the one with this indicator
+        dep_uri = dependencies[0]
+        catalog_base = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+        catalog_base = catalog_base.split("#")[0]  # Remove any trailing #indicator
+        dataset_name = catalog_base.split("/")[-1]
+        return f"{catalog_base}/{dataset_name}#{indicator}"
+
+    # Has # separator
+    path_part, indicator = catalog_path.rsplit("#", 1)
+
+    if "/" in path_part:
+        # Format: dataset/table#indicator or fuller path
+        slash_count = path_part.count("/")
+        if slash_count >= 3:
+            # Full path already
+            return catalog_path
+        elif slash_count == 1:
+            # dataset/table#indicator - need to prepend channel/namespace/version
+            dataset_name, table_name = path_part.split("/", 1)
+            # Find dependency matching this dataset
+            for dep_uri in dependencies:
+                catalog_base = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+                if catalog_base.endswith(f"/{dataset_name}"):
+                    return f"{catalog_base}/{table_name}#{indicator}"
+            # Fallback to first dependency if no match
+            dep_uri = dependencies[0]
+            catalog_base = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+            channel_ns_ver = "/".join(catalog_base.split("/")[:3])
+            return f"{channel_ns_ver}/{path_part}#{indicator}"
+        else:
+            # slash_count == 2: namespace/version/dataset or similar partial path
+            dep_uri = dependencies[0]
+            catalog_base = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+            channel = catalog_base.split("/")[0]
+            return f"{channel}/{path_part}#{indicator}"
+    else:
+        # Format: table#indicator - need to find the full dataset path
+        table_name = path_part
+
+        # Check if this table name exists in our dependencies
+        if table_name in table_name_to_uris:
+            table_uris = table_name_to_uris[table_name]
+            if len(table_uris) == 1:
+                # Unambiguous - use this table's URI
+                table_uri = table_uris[0]
+                # Remove the data:// prefix if present
+                if "://" in table_uri:
+                    table_uri = table_uri.split("://", 1)[1]
+                return f"{table_uri}#{indicator}"
+            else:
+                # Multiple tables with same name - need dataset qualifier
+                # Use first matching one from dependencies order
+                for dep_uri in dependencies:
+                    catalog_base = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+                    for table_uri in table_uris:
+                        table_catalog = table_uri.split("://", 1)[1] if "://" in table_uri else table_uri
+                        if table_catalog.startswith(catalog_base + "/"):
+                            return f"{table_catalog}#{indicator}"
+                # Fallback
+                table_uri = table_uris[0]
+                if "://" in table_uri:
+                    table_uri = table_uri.split("://", 1)[1]
+                return f"{table_uri}#{indicator}"
+        else:
+            # Table name not found in dependencies - assume it's in first dependency
+            dep_uri = dependencies[0]
+            catalog_base = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+            catalog_base = catalog_base.split("#")[0]  # Remove any trailing #indicator
+            return f"{catalog_base}/{table_name}#{indicator}"
 
 
 def _uri_to_catalog_path(uri: str) -> str:
