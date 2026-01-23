@@ -20,6 +20,9 @@ DAG = Dict[str, Set[str]]
 # Popularity cache TTL in seconds (1 hour)
 POPULARITY_CACHE_TTL = 3600
 
+# Maximum number of history entries to cache
+MAX_HISTORY_ENTRIES = 10
+
 
 def get_all_steps(dag: DAG, private: bool = False) -> List[str]:
     """Get all step URIs from the DAG.
@@ -186,6 +189,52 @@ def save_popularity_cache(data: Dict[str, float]) -> None:
         pass  # Silently fail - cache is optional
 
 
+def load_history_cache() -> List[str]:
+    """Load browser history from cache.
+
+    Returns:
+        List of previous search queries (most recent last), limited to MAX_HISTORY_ENTRIES.
+    """
+    from etl import paths
+
+    cache_file = paths.HISTORY_CACHE_FILE
+    if not cache_file.exists():
+        return []
+
+    try:
+        with open(cache_file) as f:
+            cache = json.load(f)
+        history = cache.get("history", [])
+        # Ensure it's a list of strings and limit size
+        if isinstance(history, list):
+            return [h for h in history if isinstance(h, str)][-MAX_HISTORY_ENTRIES:]
+        return []
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def save_history_cache(history: List[str]) -> None:
+    """Save browser history to cache.
+
+    Args:
+        history: List of search queries (most recent last).
+    """
+    from etl import paths
+
+    cache_file = paths.HISTORY_CACHE_FILE
+    try:
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Keep only the last MAX_HISTORY_ENTRIES
+        trimmed_history = history[-MAX_HISTORY_ENTRIES:]
+
+        cache = {"history": trimmed_history}
+        with open(cache_file, "w") as f:
+            json.dump(cache, f)
+    except OSError:
+        pass  # Silently fail - cache is optional
+
+
 def fetch_popularity_data(steps: List[str]) -> Dict[str, float]:
     """Fetch popularity data from Datasette for given steps.
 
@@ -264,7 +313,8 @@ def browse_steps(
     private: bool = False,
     dag_loader: Optional[Callable[[], DAG]] = None,
     dag_path: Optional[Path] = None,
-) -> Tuple[Optional[str], bool]:
+    history: Optional[List[str]] = None,
+) -> Tuple[Optional[str], bool, List[str]]:
     """Interactive step browser using prompt_toolkit.
 
     Args:
@@ -272,12 +322,14 @@ def browse_steps(
         private: Whether to include private steps
         dag_loader: Callable that returns DAG (for async loading)
         dag_path: Path to DAG file (for caching)
+        history: Optional list of previous search queries (most recent last).
+            Use Up/Down when input is empty to navigate history.
 
     Returns:
-        Tuple of (pattern_or_step, is_exact_match):
-        - If user presses Enter: (current_text, False) to run all matches
-        - If user selects a step: (step_uri, True) to run just that step
-        - If user cancels: (None, False)
+        Tuple of (pattern_or_step, is_exact_match, updated_history):
+        - If user presses Enter: (current_text, False, history) to run all matches
+        - If user selects a step: (step_uri, True, history) to run just that step
+        - If user cancels: (None, False, history)
     """
     # Load popularity cache for ranking (fast startup, graceful degradation)
     # Use a mutable dict so background refresh can update it for live ranking updates
@@ -330,6 +382,7 @@ def browse_steps(
         on_items_loaded=on_items_loaded,
         rank_matches=ranker,
         commands=DEFAULT_COMMANDS,
+        history=history,
     )
 
 

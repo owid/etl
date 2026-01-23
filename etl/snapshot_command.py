@@ -166,7 +166,7 @@ def snapshot_cli(
     if browse:
         from etl.browser import browse_snapshots
 
-        result, _is_exact = browse_snapshots()
+        result, _is_exact, _history = browse_snapshots()
         if result is None:
             # User cancelled (Ctrl-C/Escape)
             return

@@ -265,7 +265,7 @@ class FilterLexer(Lexer):
 class BrowserState:
     """State container for the browser application."""
 
-    def __init__(self) -> None:
+    def __init__(self, history: Optional[List[str]] = None) -> None:
         self.selected_index: int = -1  # -1 means no selection (run all matches)
         self.scroll_offset: int = 0  # First visible item index
         self.matches: List[str] = []
@@ -286,6 +286,11 @@ class BrowserState:
         self.parsed_input: Optional["ParsedInput"] = None
         # Filter autocomplete options (cached)
         self.filter_options: Optional["FilterOptions"] = None
+        # History state (shared across browser sessions)
+        self.history: List[str] = history if history is not None else []
+        self.history_index: int = -1  # -1 means not browsing history
+        self.history_temp: str = ""  # Stores current input when entering history mode
+        self._navigating_history: bool = False  # Flag to prevent resetting history on programmatic text changes
 
 
 def filter_items(pattern: str, all_items: List[str]) -> List[str]:
@@ -345,7 +350,8 @@ def browse_items(
     on_items_loaded: Optional[Callable[[List[str]], None]] = None,
     rank_matches: Optional[Ranker] = None,
     commands: Optional[List["Command"]] = None,
-) -> Tuple[Optional[str], bool]:
+    history: Optional[List[str]] = None,
+) -> Tuple[Optional[str], bool, List[str]]:
     """Interactive item browser using prompt_toolkit.
 
     Args:
@@ -362,12 +368,14 @@ def browse_items(
             If None, uses default sort (filter_items ordering).
         commands: Optional list of commands available via / prefix.
             If provided, typing / enters command mode.
+        history: Optional list of previous search queries (most recent last).
+            Use Up/Down when input is empty to navigate history.
 
     Returns:
-        Tuple of (pattern_or_item, is_exact_match):
-        - If user presses Enter: (current_text, False) to run all matches
-        - If user selects an item: (item, True) to run just that item
-        - If user cancels: (None, False)
+        Tuple of (pattern_or_item, is_exact_match, updated_history):
+        - If user presses Enter: (current_text, False, history) to run all matches
+        - If user selects an item: (item, True, history) to run just that item
+        - If user cancels: (None, False, history)
     """
     import threading
 
@@ -381,7 +389,7 @@ def browse_items(
     )
 
     # State for the application
-    state = BrowserState()
+    state = BrowserState(history=history)
     state.available_commands = commands or []
     state.items_loader = items_loader
     state.on_items_loaded = on_items_loaded
@@ -414,6 +422,13 @@ def browse_items(
     # Create the input buffer
     def on_text_changed(buf: Buffer) -> None:
         text = buf.text.strip()
+
+        # Reset history navigation when user types (not when we set text programmatically)
+        if state._navigating_history:
+            state._navigating_history = False
+        else:
+            state.history_index = -1
+            state.history_temp = ""
 
         # Check for command mode (input starts with /)
         if text.startswith("/") and state.available_commands:
@@ -498,14 +513,21 @@ def browse_items(
         text = input_buffer.text.strip()
         if state.selected_index >= 0 and state.matches:
             # User has selected a specific item
-            state.result = state.matches[state.selected_index]
+            selected_item = state.matches[state.selected_index]
+            state.result = selected_item
             state.is_exact = True
-        elif text:
-            # User pressed Enter with text - run all matches
+            # Add selected item to history (the actual step that was executed)
+            if not state.history or state.history[-1] != selected_item:
+                state.history.append(selected_item)
+        elif text and state.matches:
+            # User pressed Enter with text AND matches exist - run all matches
             state.result = text
             state.is_exact = False
+            # Add to history (if not duplicate of last entry)
+            if not state.history or state.history[-1] != text:
+                state.history.append(text)
         else:
-            # Empty input - do nothing
+            # Empty input OR no matches - do nothing, stay in browser
             return
         event.app.exit()
 
@@ -516,13 +538,45 @@ def browse_items(
         event.app.exit()
 
     @kb.add("down")
-    @kb.add("tab")
     def handle_down(event: Any) -> None:
         if state.mode == "command":
             if state.command_matches:
                 max_idx = len(state.command_matches) - 1
                 if state.selected_index < max_idx:
                     state.selected_index += 1
+        elif state.history_index >= 0:
+            # Navigate history forward (toward more recent)
+            if state.history_index < len(state.history) - 1:
+                state.history_index += 1
+                state._navigating_history = True
+                input_buffer.text = state.history[state.history_index]
+            else:
+                # At the end of history, restore original input
+                state.history_index = -1
+                state._navigating_history = True
+                input_buffer.text = state.history_temp
+        elif state.matches:
+            max_idx = len(state.matches) - 1
+            if state.selected_index < max_idx:
+                state.selected_index += 1
+                # Scroll down if selection goes past visible window
+                if state.selected_index >= state.scroll_offset + MAX_DISPLAY_ITEMS:
+                    state.scroll_offset = state.selected_index - MAX_DISPLAY_ITEMS + 1
+
+    @kb.add("tab")
+    def handle_tab(event: Any) -> None:
+        if state.mode == "command":
+            if state.command_matches:
+                max_idx = len(state.command_matches) - 1
+                if state.selected_index < max_idx:
+                    state.selected_index += 1
+        elif state.history_index >= 0:
+            # Exit history mode, keep current text, enable match selection
+            state.history_index = -1
+            # Start selection at first match if matches exist
+            if state.matches:
+                state.selected_index = 0
+                state.scroll_offset = 0
         elif state.matches:
             max_idx = len(state.matches) - 1
             if state.selected_index < max_idx:
@@ -537,6 +591,17 @@ def browse_items(
         if state.mode == "command":
             if state.selected_index > 0:
                 state.selected_index -= 1
+        elif not input_buffer.text.strip() and state.history and state.history_index == -1:
+            # Empty input and not in history mode - enter history mode from the end
+            state.history_temp = input_buffer.text
+            state.history_index = len(state.history) - 1
+            state._navigating_history = True
+            input_buffer.text = state.history[state.history_index]
+        elif state.history_index > 0:
+            # Navigate history backward (toward older)
+            state.history_index -= 1
+            state._navigating_history = True
+            input_buffer.text = state.history[state.history_index]
         elif state.selected_index > -1:
             state.selected_index -= 1
             # Scroll up if selection goes above visible window
@@ -603,7 +668,17 @@ def browse_items(
         # Search mode rendering (existing behavior)
         matches = state.matches
 
-        if text:
+        # History mode: show matches but indicate history navigation is active
+        if state.history_index >= 0:
+            count = len(matches)
+            if count == 0:
+                lines.append(("class:match-count", "  No matches"))
+            else:
+                count_text = f"1 {item_noun}" if count == 1 else f"{count} {item_noun_plural}"
+                lines.append(("class:match-count", f"  {count_text}"))
+            lines.append(("class:hint", f"  History ({state.history_index + 1}/{len(state.history)})"))
+            add_shortcuts([("Tab", "Select"), ("Enter", "Run"), ("^C", "Exit")])
+        elif text:
             count = len(matches)
             if count == 0:
                 lines.append(("class:match-count", "  No matches"))
@@ -618,7 +693,10 @@ def browse_items(
             # Show hint with filter prefixes for discoverability
             filter_hint = " (n: c: v: d:)" if state.all_items else ""
             lines.append(("class:hint", f"  Type to filter {len(state.all_items)} {item_noun_plural}{filter_hint}"))
-            add_shortcuts([("^C", "Exit")])
+            shortcuts = [("^C", "Exit")]
+            if state.history:
+                shortcuts.insert(0, ("↑", "History"))
+            add_shortcuts(shortcuts)
 
         lines.append(("", "\n"))
 
@@ -718,11 +796,11 @@ def browse_items(
         state.cancelled = True
 
     if state.cancelled:
-        return None, False
+        return None, False, state.history
 
     # Check if no items were loaded
     if not state.all_items and not state.loading:
         print(empty_message)
-        return None, False
+        return None, False, state.history
 
-    return state.result, state.is_exact
+    return state.result, state.is_exact, state.history

@@ -83,6 +83,9 @@ SNAPSHOT_CACHE_FILE = CACHE_DIR / "snapshot_browser.json"
 # Cache file for step popularity data (from Datasette analytics)
 POPULARITY_CACHE_FILE = CACHE_DIR / "step_popularity.json"
 
+# Cache file for browser history (stores last N search queries)
+HISTORY_CACHE_FILE = CACHE_DIR / "browser_history.json"
+
 # TODO: Remove this once we fully deprecate owid-content
 # Default path to the explorers folder.
 EXPLORERS_DIR = Path(os.environ.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers"))
