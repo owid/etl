@@ -367,7 +367,8 @@ def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
         metadata = {}
 
         # Copy all fields except database-managed and ETL-managed fields
-        skip_fields = DB_MANAGED_FIELDS | ETL_MANAGED_FIELDS | METADATA_FIELDS - {"$schema"}
+        # Keep $schema but exclude other metadata fields
+        skip_fields = DB_MANAGED_FIELDS | ETL_MANAGED_FIELDS | (METADATA_FIELDS - {"$schema"})
 
         for key, value in config.items():
             if key not in skip_fields and key != "dimensions":
@@ -419,9 +420,6 @@ def _shorten_indicator_path(full_path: str, dependencies: List[str]) -> str:
 
     # Check if this is the only dependency
     if len(dependencies) == 1:
-        dep = dependencies[0]
-        dep_catalog = dep.split("://", 1)[1] if "://" in dep else dep
-
         # If table name == dataset name, we can use just indicator
         if table == dataset:
             return indicator
@@ -829,7 +827,7 @@ def _check_manual_overrides(
                 f"Chart '{chart.slug}' has manual overrides from Admin UI in these fields: {overridden_fields}\n"
                 f"These changes would be lost if you continue.\n"
                 f"Either:\n"
-                f"  1. Use --graph-pull to pull database edits to your .meta.yml file (NOT YET IMPLEMENTED), or\n"
+                f"  1. Use --graph-pull to pull database edits to your .meta.yml file, or\n"
                 f"  2. Manually copy the overrides to your .meta.yml file, or\n"
                 f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
             )
@@ -873,7 +871,7 @@ def _check_manual_overrides(
                     f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
                     f"New ETL values: {[f'{k}={expected_config.get(k)}' for k in db_changed_fields]}\n"
                     f"Either:\n"
-                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file (NOT YET IMPLEMENTED), or\n"
+                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file, or\n"
                     f"  2. Manually update your .meta.yml file to match the database edits, or\n"
                     f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
                 )
@@ -885,7 +883,7 @@ def _check_manual_overrides(
                     f"Last values: {[f'{k}={stored_config.get(k)}' for k in db_changed_fields]}\n"
                     f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
                     f"Either:\n"
-                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file (NOT YET IMPLEMENTED), or\n"
+                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file, or\n"
                     f"  2. Keep the database edits (do nothing and don't run this step), or\n"
                     f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
                 )
