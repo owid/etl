@@ -201,14 +201,10 @@ definitions:
     Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
 
   description_key_welfare_type_poverty: |-
-    <% if welfare_type is defined %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
     The data relates to consumption [per capita](#dod:per-capita).
-    <%- else %>
-    {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
-    <%- endif %>
     <%- else %>
     {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
     <%- endif %>
@@ -1201,6 +1197,7 @@ tables:
         description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1244,6 +1241,7 @@ tables:
         description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1286,6 +1284,7 @@ tables:
         description_short: The S80/S20 ratio is a measure of inequality that divides the share received by the richest 20% by the share of the poorest 20%. Higher values indicate higher inequality.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1318,6 +1317,7 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1348,6 +1348,7 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1380,6 +1381,7 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1407,6 +1409,7 @@ tables:
         description_short: The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1451,6 +1454,7 @@ tables:
         description_short: The polarization index, also known as the Wolfson polarization index, measures the extent to which the distribution of income or consumption is “spread out” and bi-modal. Like the Gini coefficient, the polarization index ranges from 0 (no polarization) to 1 (complete polarization).
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1483,6 +1487,7 @@ tables:
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1513,6 +1518,7 @@ tables:
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1543,6 +1549,7 @@ tables:
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1573,6 +1580,7 @@ tables:
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_share_90_99}
@@ -1607,6 +1615,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main_poverty}
@@ -1656,6 +1665,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main_poverty}
@@ -1708,6 +1718,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_avg}
@@ -1764,6 +1775,7 @@ tables:
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
@@ -1819,6 +1831,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_thr}
@@ -1869,6 +1882,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_thr}
@@ -1901,6 +1915,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_avg}
