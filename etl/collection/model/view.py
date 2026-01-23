@@ -493,7 +493,9 @@ def merge_common_metadata_by_dimension(
                 # Same priority - proceed with existing conflict detection logic
                 if isinstance(existing_val, dict) and isinstance(new_val, dict):
                     # Recurse into nested dict
-                    merge_same_level_dict(existing_val, new_val, conflict_path, source_prev, source_new, current_priority)
+                    merge_same_level_dict(
+                        existing_val, new_val, conflict_path, source_prev, source_new, current_priority
+                    )
                 else:
                     # Check for conflicts on this sub-key
                     if deep_equal(existing_val, new_val):
@@ -549,7 +551,9 @@ def merge_common_metadata_by_dimension(
                     prev_source = key_source[key]
                     if isinstance(existing_val, dict) and isinstance(new_val, dict):
                         # Deep merge dictionaries at the same level, handling sub-conflicts
-                        merge_same_level_dict(existing_val, new_val, (key,), prev_source, entry_source, current_priority)
+                        merge_same_level_dict(
+                            existing_val, new_val, (key,), prev_source, entry_source, current_priority
+                        )
                         # Update the final_result with merged dict (existing_val is mutated in-place)
                         final_result[key] = existing_val
                     else:
