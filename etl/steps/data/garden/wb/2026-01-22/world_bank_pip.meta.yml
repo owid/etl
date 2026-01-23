@@ -244,11 +244,19 @@ definitions:
     $28
     <%- endif %>
   description_key_prosperity_gap: The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
+
+  ipl_for_societal_poverty_line: |-
+    <% if ppp_version == 2017 %>
+    $2.15
+    <%- elif ppp_version == 2021 %>
+    $3
+    <%- endif %>
+
   societal_poverty_line_intercept: |-
     <% if ppp_version == 2017 %>
-    1.15
+    $1.15
     <%- elif ppp_version == 2021 %>
-    1.30
+    $1.30
     <%- endif %>
 
   description_processing_main_base: |-
@@ -1969,8 +1977,8 @@ tables:
           - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_main}
-        # description_from_producer: |-
-        #   The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank's Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> U.S. dollars and defined as max({definitions.poverty_line}, {definitions.societal_poverty_line_intercept} + 0.5*Median). This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
+        description_from_producer: |-
+          The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank's Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> U.S. dollars and defined as `max({definitions.ipl_for_societal_poverty_line}, {definitions.societal_poverty_line_intercept} + 0.5*Median)`. This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.ipl_for_societal_poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
         display:
           name: Share of population in societal poverty
           numDecimalPlaces: 1
