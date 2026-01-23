@@ -300,6 +300,13 @@ definitions:
   description_processing_thr_percentiles: |-
     We calculate missing country and regional values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold. This data is merged with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles).
 
+  numdecimalplaces_period: |-
+    <% if period == "day" %>
+    2
+    <%- else %>
+    0
+    <%- endif %>
+
   welfare_type_verb: |-
     <% if welfare_type == "income" %>
     received
@@ -333,7 +340,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Share of population below <<poverty_line>>
     <%- else %>
-    Poverty: Share of population living on less than {definitions.poverty_line_a_day}
+    Share of population living on less than {definitions.poverty_line_a_day}
     <%- endif %>
 
   headcount_title: |-
@@ -343,7 +350,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Number of people below <<poverty_line>>
     <%- else %>
-    Poverty: Number of people living on less than {definitions.poverty_line_a_day}
+    Number of people living on less than {definitions.poverty_line_a_day}
     <%- endif %>
 
   total_shortfall_title: |-
@@ -1628,7 +1635,7 @@ tables:
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
-          numDecimalPlaces: 2
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           title_public: |-
@@ -1678,7 +1685,7 @@ tables:
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
-          numDecimalPlaces: 2
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           title_public: |-
@@ -1731,7 +1738,7 @@ tables:
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
-          numDecimalPlaces: 2
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           title_public: |-
@@ -1844,7 +1851,7 @@ tables:
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
-          numDecimalPlaces: 2
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           title_public: |-
@@ -1894,7 +1901,7 @@ tables:
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
-          numDecimalPlaces: 2
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           title_public: |-
@@ -1927,7 +1934,7 @@ tables:
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
-          numDecimalPlaces: 2
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           title_public: |-
