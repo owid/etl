@@ -30,7 +30,7 @@ definitions:
             baseColorScheme: Blues
 
     - dimensions:
-        indicator: count_unrounded
+        indicator: share
       config:
         map:
           colorScale:
