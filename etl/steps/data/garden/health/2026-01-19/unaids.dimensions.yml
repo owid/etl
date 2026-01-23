@@ -807,3 +807,98 @@ gam:
   # Others
   "TRADITIONAL":
     group: "traditional"
+kpa:
+  ########################################
+  # ALL
+  ########################################
+  "TOTAL":
+    sex: "total"
+    age: "total"
+    group: "total"
+  # estimates
+  "ESTIMATE":
+    sex: total
+    age: total
+    estimate: central
+  "HIGH_ESTIMATE":
+    estimate: "high"
+  "LOW_ESTIMATE":
+    estimate: "low"
+  # 25+
+  "25_AND_UP":
+    age: 25+
+  # <25
+  "LESS_25":
+    age: "0-25"
+  "MALES":
+    sex: "male"
+    age: "total"
+  "FEMALES":
+    sex: "female"
+    age: "total"
+  # Trans
+  "TRANSGENDER":
+    group: "transgender"
+  "TRANSMAN":
+    group: "transman"
+  "TRANSOTHER":
+    group: "transother"
+  "TRANSWOMAN":
+    group: "transwoman"
+  ########################################
+  # HEPATITIS
+  ########################################
+  # Hepatitis B, total
+  "HEPATITIS_B_TOTAL":
+    sex: "total"
+    age: "total"
+    hepatitis: "B"
+  "HEPATITIS_B_FEMALES":
+    sex: "female"
+    age: "total"
+    hepatitis: "B"
+  "HEPATITIS_B_MALES":
+    sex: "male"
+    age: "total"
+    hepatitis: "B"
+  # Hepatitis C, total
+  "HEPATITIS_C_TOTAL":
+    sex: "total"
+    age: "total"
+    hepatitis: "C"
+  "HEPATITIS_C_FEMALES":
+    sex: "female"
+    age: "total"
+    hepatitis: "C"
+  "HEPATITIS_C_MALES":
+    sex: "male"
+    age: "total"
+    hepatitis: "C"
+  # Hepatitis B, others
+  "HEPATITIS_B_LT_25":
+    sex: "total"
+    age: "0-25"
+    hepatitis: "B"
+  "HEPATITIS_B_GTE_25":
+    sex: "total"
+    age: "25+"
+    hepatitis: "B"
+  "HEPATITIS_B_TRANSGENDER":
+    sex: "total"
+    age: "total"
+    group: transgender
+    hepatitis: "B"
+  # Hepatitis C, others
+  "HEPATITIS_C_LT_25":
+    sex: "total"
+    age: "0-25"
+    hepatitis: "C"
+  "HEPATITIS_C_GTE_25":
+    sex: "total"
+    age: "25+"
+    hepatitis: "C"
+  "HEPATITIS_C_TRANSGENDER":
+    sex: "total"
+    age: "total"
+    group: transgender
+    hepatitis: "C"
