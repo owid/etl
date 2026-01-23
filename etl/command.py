@@ -307,8 +307,6 @@ def main_cli(
 
     # Set GRAPH_PULL from CLI flag (for graph steps)
     if graph_pull:
-        if graph_pull:
-            raise NotImplementedError("--graph-pull is not yet implemented")
         config.GRAPH_PULL = graph_pull
 
     # Set GRAPH from CLI flag (for graph steps)

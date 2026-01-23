@@ -1197,6 +1197,14 @@ class GraphStep(Step):
 
     def run(self) -> None:
         """Run graph step - either Python file or YAML-only."""
+        from etl import config
+
+        # If GRAPH_PULL is enabled, pull from database instead of pushing
+        if config.GRAPH_PULL:
+            self._pull_from_database()
+            return
+
+        # Normal flow: push to database
         # Check if there's a Python file
         py_file = self._python_file
         if py_file:
@@ -1304,6 +1312,26 @@ class GraphStep(Step):
         )
         c.save()
 
+    def _pull_from_database(self) -> None:
+        """Pull chart configuration from database and write to .meta.yml file."""
+        from etl.dag_helpers import load_dag
+        from etl.grapher.graph import pull_graph
+
+        # Get metadata file path (create if doesn't exist)
+        metadata_file = self._step_dir.with_suffix(".meta.yml")
+
+        # Get dependencies from DAG
+        dag = load_dag()
+        step_name = str(self)
+        dep_uris = list(dag.get(step_name, []))
+
+        # Pull from database
+        pull_graph(
+            slug=self.slug,
+            metadata_file=metadata_file,
+            dependencies=dep_uris,
+        )
+
     def _create_single_chart(self, metadata: dict) -> None:
         """Create a single chart from YAML config."""
         from etl import config
@@ -1359,9 +1387,9 @@ class GraphStep(Step):
 
         # 4. If --graph flag is set, also check if database needs updating
         if config.GRAPH:
-            from etl.grapher.graph import _fetch_db_checksum, has_db_divergence
+            from etl.grapher.graph import fetch_graph_db_checksum, has_db_divergence
 
-            db_checksum = _fetch_db_checksum(self.slug)
+            db_checksum = fetch_graph_db_checksum(self.slug)
             if db_checksum != expected_checksum:
                 return True
 

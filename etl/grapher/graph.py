@@ -15,6 +15,9 @@ TODO: Consider refactoring _expand_indicator_path() to share more code with
       CollectionConfigExpander._expand_indicator_path() from etl/collection/core/expand.py.
       Current duplication exists because collections work with Table objects while
       graphs work with URI strings from DAG dependencies.
+
+TODO: Consider loading field categorizations from the grapher schema (GrapherInterface)
+      instead of hardcoding them to avoid maintenance burden and version drift.
 """
 
 import json
@@ -30,9 +33,64 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl import paths
 from etl.config import GRAPHER_USER_ID, OWID_ENV
 from etl.db import get_engine
+from etl.files import ruamel_dump
 from etl.grapher.model import Chart, Variable
 
 log = structlog.get_logger()
+
+
+# Field categorizations for chart config
+# ----------------------------------------
+# These categorize GrapherInterface fields for different purposes:
+# - pull_graph(): Which fields to exclude when pulling from DB to YAML
+# - _check_manual_overrides(): Which fields don't count as "manual edits"
+#
+# Maintaining these manually is brittle but necessary since we need to make decisions
+# about field semantics (e.g., is this field auto-managed? ETL-managed? User content?).
+#
+# TODO: Consider loading these from grapher schema metadata or annotations
+#       instead of hardcoding to reduce maintenance burden.
+# See: owid-grapher/packages/@ourworldindata/types/dist/grapherTypes/GrapherTypes.d.ts
+
+# Fields that are auto-managed by the database
+DB_MANAGED_FIELDS = {
+    "id",
+    "version",
+    "createdAt",
+    "updatedAt",
+    "publishedAt",
+    "lastEditedAt",
+    "lastEditedByUserId",
+    "publishedByUserId",
+}
+
+# Fields managed by ETL (not manual overrides)
+ETL_MANAGED_FIELDS = {
+    "dimensions",  # Variable IDs managed from catalogPath
+    "isInheritanceEnabled",  # Controlled by ETL config
+}
+
+# Schema and metadata fields
+METADATA_FIELDS = {
+    "$schema",
+    "slug",
+    "isPublished",
+    "isIndexable",
+    "relatedQuestions",
+}
+
+# User-editable content fields to check for conflicts
+# These are the fields that users typically edit in the admin UI
+# and that we want to detect when checking for manual overrides
+USER_CONTENT_FIELDS = {
+    "title",
+    "subtitle",
+    "note",
+    "chartTypes",
+    "hasMapTab",
+    "tab",
+    "selectedEntityNames",
+}
 
 
 def calculate_source_checksum(
@@ -234,6 +292,147 @@ def upsert_graph(
         return chart_id
 
 
+def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
+    """
+    Pull chart configuration from the database and write to .meta.yml file.
+
+    This fetches the current chart configuration from the database and converts it back
+    to the .meta.yml format used by graph steps. Useful for syncing changes made via
+    Admin UI back to ETL.
+
+    Note: Currently only supports simple charts (with dimensions), not multidimensional
+    charts (with views).
+
+    Args:
+        slug: Chart slug (must exist in database)
+        metadata_file: Path where .meta.yml will be written
+        dependencies: List of dataset URIs from DAG (for converting variable IDs to short names)
+
+    Raises:
+        ValueError: If chart not found in database or if step doesn't exist in DAG
+    """
+
+    log.info("graph.pull", slug=slug, metadata_file=metadata_file)
+
+    engine = get_engine()
+
+    with Session(engine) as session:
+        # 1. Load chart from database
+        try:
+            chart = Chart.load_chart(session, slug=slug)
+            log.info("graph.chart_found", chart_id=chart.id)
+        except NoResultFound:
+            raise ValueError(
+                f"Chart '{slug}' not found in database. " f"Use Admin UI or create a new graph step to create it first."
+            )
+
+        # 2. Get chart config from database
+        config = dict(chart.config)
+
+        # 3. Convert variable IDs back to short indicator names
+        short_paths = []
+        if "dimensions" in config:
+            variable_ids = [dim["variableId"] for dim in config["dimensions"] if "variableId" in dim]
+
+            if variable_ids:
+                # Load variable catalog paths from database
+                from sqlalchemy import text
+
+                placeholders = ",".join([":id" + str(i) for i in range(len(variable_ids))])
+                query = text(f"""
+                    SELECT id, catalogPath
+                    FROM variables
+                    WHERE id IN ({placeholders})
+                """)
+                params = {f"id{i}": vid for i, vid in enumerate(variable_ids)}
+                result = session.execute(query, params)
+                rows = result.fetchall()
+
+                # Convert to dict
+                var_id_to_path = {row[0]: row[1] for row in rows}
+
+                # Convert full catalog paths to short names
+                for var_id in variable_ids:
+                    full_path = var_id_to_path.get(var_id)
+                    if not full_path:
+                        log.warning("graph.pull.variable_not_found", variable_id=var_id)
+                        short_paths.append(f"<unknown_variable_{var_id}>")
+                        continue
+
+                    # Try to shorten the path using dependencies
+                    short_path = _shorten_indicator_path(full_path, dependencies)
+                    short_paths.append(short_path)
+
+        # 4. Build metadata dict for YAML
+        metadata = {}
+
+        # Copy all fields except database-managed and ETL-managed fields
+        skip_fields = DB_MANAGED_FIELDS | ETL_MANAGED_FIELDS | METADATA_FIELDS - {"$schema"}
+
+        for key, value in config.items():
+            if key not in skip_fields and key != "dimensions":
+                metadata[key] = value
+
+        # 5. Add dimensions section with short indicator names
+        if short_paths:
+            metadata["dimensions"] = [{"property": "y", "catalogPath": path} for path in short_paths]
+
+        # 6. Write to .meta.yml file
+        metadata_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(metadata_file, "w") as f:
+            f.write(ruamel_dump(metadata))
+
+        log.info("graph.pull.success", file=str(metadata_file))
+
+
+def _shorten_indicator_path(full_path: str, dependencies: List[str]) -> str:
+    """
+    Convert a full catalog path to the shortest unambiguous form.
+
+    Args:
+        full_path: Full path like "grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases"
+        dependencies: List of dataset URIs from DAG
+
+    Returns:
+        Shortest unambiguous path (indicator, table#indicator, or dataset/table#indicator)
+
+    Examples:
+        >>> _shorten_indicator_path(
+        ...     "grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases",
+        ...     ["data://grapher/covid/latest/cases_deaths"]
+        ... )
+        "weekly_cases"
+    """
+    if "#" not in full_path:
+        return full_path
+
+    path_part, indicator = full_path.rsplit("#", 1)
+    parts = path_part.split("/")
+
+    if len(parts) < 5:
+        # Not a full path, return as-is
+        return full_path
+
+    # Extract components: grapher/namespace/version/dataset/table
+    table = parts[-1]
+    dataset = parts[-2]
+
+    # Check if this is the only dependency
+    if len(dependencies) == 1:
+        dep = dependencies[0]
+        dep_catalog = dep.split("://", 1)[1] if "://" in dep else dep
+
+        # If table name == dataset name, we can use just indicator
+        if table == dataset:
+            return indicator
+        else:
+            return f"{table}#{indicator}"
+
+    # Multiple dependencies - need to check for ambiguity
+    # For now, use table#indicator format
+    return f"{table}#{indicator}"
+
+
 def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any], to_db: bool = True) -> None:
     """
     Save graph metadata to local index.json file for dirty detection and conflict detection.
@@ -297,9 +496,9 @@ def _load_graph_metadata(slug: str) -> Dict[str, Any]:
         return json.load(f)
 
 
-def _fetch_db_checksum(slug: str) -> Optional[str]:
+def fetch_graph_db_checksum(slug: str) -> Optional[str]:
     """
-    Fetch the checksum of what was last written to the database.
+    Fetch the checksum of what was last written to the database for a chart.
 
     This is stored in the local index.json after each successful upsert with --graph.
     Used to detect if database needs updating when --graph flag is used.
@@ -347,18 +546,8 @@ def has_db_divergence(slug: str) -> bool:
             # For inheritance charts, check patch config
             if chart.chart_config.patch:
                 # Has patch config = has manual overrides
-                SYSTEM_FIELDS = {
-                    "id",
-                    "slug",
-                    "$schema",
-                    "version",
-                    "dimensions",
-                    "isPublished",
-                    "createdAt",
-                    "updatedAt",
-                    "isInheritanceEnabled",
-                }
-                overridden_fields = [f for f in chart.chart_config.patch.keys() if f not in SYSTEM_FIELDS]
+                system_fields = DB_MANAGED_FIELDS | ETL_MANAGED_FIELDS | METADATA_FIELDS
+                overridden_fields = [f for f in chart.chart_config.patch.keys() if f not in system_fields]
                 return len(overridden_fields) > 0
             return False
 
@@ -366,10 +555,8 @@ def has_db_divergence(slug: str) -> bool:
         stored_config = metadata.get("last_config", {})
         current_config = chart.config
 
-        # Compare key fields
-        COMPARABLE_FIELDS = {"title", "subtitle", "note", "chartTypes", "hasMapTab", "tab", "selectedEntityNames"}
-
-        for field in COMPARABLE_FIELDS:
+        # Compare user-editable content fields
+        for field in USER_CONTENT_FIELDS:
             stored_value = stored_config.get(field)
             current_value = current_config.get(field)
 
@@ -630,22 +817,12 @@ def _check_manual_overrides(
     Raises:
         ValueError: If chart has manual overrides and graph_push=False
     """
-    # System fields that change automatically or are expected to differ
-    SYSTEM_FIELDS = {
-        "id",
-        "slug",
-        "$schema",
-        "version",
-        "dimensions",  # We're updating this
-        "isPublished",  # We preserve this
-        "createdAt",
-        "updatedAt",
-        "isInheritanceEnabled",  # We're updating this
-    }
+    # System fields that don't count as "manual overrides"
+    system_fields = DB_MANAGED_FIELDS | ETL_MANAGED_FIELDS | METADATA_FIELDS
 
     # For inheritance-enabled charts, check patch config
     if chart.isInheritanceEnabled and chart.chart_config.patch:
-        overridden_fields = [field for field in chart.chart_config.patch.keys() if field not in SYSTEM_FIELDS]
+        overridden_fields = [field for field in chart.chart_config.patch.keys() if field not in system_fields]
 
         if overridden_fields:
             raise ValueError(
@@ -674,10 +851,8 @@ def _check_manual_overrides(
         current_config = chart.config
 
         # Compare key fields that users might edit manually
-        COMPARABLE_FIELDS = {"title", "subtitle", "note", "chartTypes", "hasMapTab", "tab", "selectedEntityNames"}
-
         db_changed_fields = []
-        for field in COMPARABLE_FIELDS:
+        for field in USER_CONTENT_FIELDS:
             stored_value = stored_config.get(field)
             current_value = current_config.get(field)
 
