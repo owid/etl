@@ -184,7 +184,7 @@ def run() -> None:
     tb, tb_sex_group = extract_tbs(tb)
 
     # Condoms per capita
-    tb_no_dim = add_condoms_per_100k(tb_no_dim, tb_sex_group)
+    tb_no_dim = add_condoms_per_1k(tb_no_dim, tb_sex_group)
 
     # RESHAPE (and check)
     paths.log.info("GAM: Format (and check)")
