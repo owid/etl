@@ -4,14 +4,17 @@
 #
 
 import json
-from typing import Callable, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 from etl.browser.commands import DEFAULT_COMMANDS
 from etl.browser.core import browse_items
 from etl.browser.scoring import create_ranker, extract_version_from_snapshot
 
+if TYPE_CHECKING:
+    from etl.browser.core import Ranker
 
-def get_all_snapshots() -> List[str]:
+
+def get_all_snapshots() -> list[str]:
     """Get all snapshot URIs from the snapshots directory.
 
     Scans snapshots/**/*.dvc and returns URIs in the format:
@@ -34,7 +37,7 @@ def get_all_snapshots() -> List[str]:
     return sorted(snapshots)
 
 
-def load_cached_snapshots() -> Optional[List[str]]:
+def load_cached_snapshots() -> list[str] | None:
     """Load snapshots from cache if valid.
 
     Uses snapshot count as cache key - fast O(1) check.
@@ -57,7 +60,7 @@ def load_cached_snapshots() -> Optional[List[str]]:
         return None
 
 
-def save_snapshot_cache(snapshots: List[str]) -> None:
+def save_snapshot_cache(snapshots: list[str]) -> None:
     """Save snapshots to cache for instant startup next time."""
     from etl import paths
 
@@ -77,7 +80,7 @@ def save_snapshot_cache(snapshots: List[str]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def create_snapshot_ranker() -> Callable[[str, List[str]], List[str]]:
+def create_snapshot_ranker() -> "Ranker":
     """Create a ranker for snapshot browser results.
 
     Uses lexicographic sorting:
@@ -96,7 +99,7 @@ def create_snapshot_ranker() -> Callable[[str, List[str]], List[str]]:
     )
 
 
-def browse_snapshots(history: Optional[List[str]] = None) -> Tuple[Optional[str], bool, List[str], Optional[str]]:
+def browse_snapshots(history: list[str] | None = None) -> tuple[str | None, bool, list[str], str | None]:
     """Interactive snapshot browser using prompt_toolkit.
 
     Args:

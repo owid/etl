@@ -7,15 +7,18 @@ import json
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Callable
 
 from etl.browser.commands import DEFAULT_COMMANDS
 from etl.browser.core import browse_items, filter_items
 from etl.browser.scoring import create_ranker, extract_version_from_uri
 from etl.dag_helpers import graph_nodes
 
+if TYPE_CHECKING:
+    from etl.browser.core import Ranker
+
 # Simple type alias - avoids importing heavy etl.steps module
-DAG = Dict[str, Set[str]]
+DAG = dict[str, set[str]]
 
 # Popularity cache TTL in seconds (1 hour)
 POPULARITY_CACHE_TTL = 3600
@@ -24,7 +27,7 @@ POPULARITY_CACHE_TTL = 3600
 MAX_HISTORY_ENTRIES = 10
 
 
-def get_all_steps(dag: DAG, private: bool = False) -> List[str]:
+def get_all_steps(dag: DAG, private: bool = False) -> list[str]:
     """Get all step URIs from the DAG.
 
     If private=False, filter out private steps.
@@ -57,7 +60,7 @@ def get_dag_max_mtime(dag_path: Path) -> float:
     return max_mtime
 
 
-def load_cached_steps(dag_path: Path, private: bool) -> Optional[List[str]]:
+def load_cached_steps(dag_path: Path, private: bool) -> list[str] | None:
     """Load steps from cache if valid (no DAG files have changed).
 
     Returns cached steps list, or None if cache is invalid/missing.
@@ -88,7 +91,7 @@ def load_cached_steps(dag_path: Path, private: bool) -> Optional[List[str]]:
         return None
 
 
-def save_step_cache(dag_path: Path, private: bool, steps: List[str]) -> None:
+def save_step_cache(dag_path: Path, private: bool, steps: list[str]) -> None:
     """Save steps to cache for instant startup next time."""
     from etl import paths
 
@@ -110,7 +113,7 @@ def save_step_cache(dag_path: Path, private: bool, steps: List[str]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def extract_dataset_slug(uri: str) -> Optional[str]:
+def extract_dataset_slug(uri: str) -> str | None:
     """Extract dataset slug from step URI for popularity lookup.
 
     Converts URI like 'data://grapher/who/2024-01-15/gho' to 'who/2024-01-15/gho'.
@@ -137,7 +140,7 @@ def extract_dataset_slug(uri: str) -> Optional[str]:
     return None
 
 
-def load_popularity_cache() -> Tuple[Dict[str, float], bool]:
+def load_popularity_cache() -> tuple[dict[str, float], bool]:
     """Load popularity data from cache.
 
     Returns:
@@ -171,7 +174,7 @@ def load_popularity_cache() -> Tuple[Dict[str, float], bool]:
         return {}, True
 
 
-def save_popularity_cache(data: Dict[str, float]) -> None:
+def save_popularity_cache(data: dict[str, float]) -> None:
     """Save popularity data to cache."""
     from etl import paths
 
@@ -189,7 +192,7 @@ def save_popularity_cache(data: Dict[str, float]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def load_history_cache() -> List[str]:
+def load_history_cache() -> list[str]:
     """Load browser history from cache.
 
     Returns:
@@ -213,7 +216,7 @@ def load_history_cache() -> List[str]:
         return []
 
 
-def save_history_cache(history: List[str]) -> None:
+def save_history_cache(history: list[str]) -> None:
     """Save browser history to cache.
 
     Args:
@@ -235,7 +238,7 @@ def save_history_cache(history: List[str]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def fetch_popularity_data(steps: List[str]) -> Dict[str, float]:
+def fetch_popularity_data(steps: list[str]) -> dict[str, float]:
     """Fetch popularity data from Datasette for given steps.
 
     Args:
@@ -262,8 +265,8 @@ def fetch_popularity_data(steps: List[str]) -> Dict[str, float]:
 
 
 def refresh_popularity_cache_async(
-    steps: List[str],
-    live_data: Optional[Dict[str, float]] = None,
+    steps: list[str],
+    live_data: dict[str, float] | None = None,
 ) -> None:
     """Refresh popularity cache in background thread.
 
@@ -287,7 +290,7 @@ def refresh_popularity_cache_async(
     thread.start()
 
 
-def create_step_ranker(popularity_data: Dict[str, float]) -> Callable[[str, List[str]], List[str]]:
+def create_step_ranker(popularity_data: dict[str, float]) -> "Ranker":
     """Create a ranker for step browser results.
 
     Uses lexicographic sorting:
@@ -309,12 +312,12 @@ def create_step_ranker(popularity_data: Dict[str, float]) -> Callable[[str, List
 
 
 def browse_steps(
-    dag: Optional[DAG] = None,
+    dag: DAG | None = None,
     private: bool = False,
-    dag_loader: Optional[Callable[[], DAG]] = None,
-    dag_path: Optional[Path] = None,
-    history: Optional[List[str]] = None,
-) -> Tuple[Optional[str], bool, List[str], Optional[str]]:
+    dag_loader: Callable[[], DAG] | None = None,
+    dag_path: Path | None = None,
+    history: list[str] | None = None,
+) -> tuple[str | None, bool, list[str], str | None]:
     """Interactive step browser using prompt_toolkit.
 
     Args:
@@ -335,7 +338,7 @@ def browse_steps(
     # Load popularity cache for ranking (fast startup, graceful degradation)
     # Use a mutable dict so background refresh can update it for live ranking updates
     cached_popularity, is_stale = load_popularity_cache()
-    popularity_data: Dict[str, float] = dict(cached_popularity)
+    popularity_data: dict[str, float] = dict(cached_popularity)
 
     # If dag is provided directly, use it immediately
     if dag is not None:
@@ -350,11 +353,11 @@ def browse_steps(
         # Try loading from cache first (instant startup)
         cached_items = load_cached_steps(dag_path, private) if dag_path else None
 
-        def items_loader() -> List[str]:
+        def items_loader() -> list[str]:
             loaded_dag = dag_loader()
             return get_all_steps(loaded_dag, private=private)
 
-        def on_items_loaded(items: List[str]) -> None:
+        def on_items_loaded(items: list[str]) -> None:
             if dag_path:
                 save_step_cache(dag_path, private, items)
             # Refresh popularity in background if stale (triggered after items load)

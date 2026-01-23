@@ -4,14 +4,11 @@
 #
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Protocol, Tuple
+from typing import TYPE_CHECKING, Callable, Protocol
 
 if TYPE_CHECKING:
     from etl.browser.commands import Command
-    from etl.browser.core import BrowserState
-
-# Type alias for ranker function
-RankerFunc = Callable[[str, List[str]], List[str]]
+    from etl.browser.core import BrowserState, Ranker
 
 
 @dataclass
@@ -31,7 +28,7 @@ class ModeResult:
     """Result from selecting an item in a mode."""
 
     action: str  # "run", "switch_mode", "exit"
-    value: Optional[str] = None  # Selected item or target mode
+    value: str | None = None  # Selected item or target mode
     is_exact: bool = False  # True if exact item selected, False if pattern
 
 
@@ -50,23 +47,23 @@ class BrowserMode(Protocol):
         """Mode configuration."""
         ...
 
-    def get_items_loader(self) -> Callable[[], List[str]]:
+    def get_items_loader(self) -> Callable[[], list[str]]:
         """Return a callable that loads items for this mode."""
         ...
 
-    def get_cached_items(self) -> Optional[List[str]]:
+    def get_cached_items(self) -> list[str] | None:
         """Return cached items if available, None otherwise."""
         ...
 
-    def get_ranker(self) -> Optional[RankerFunc]:
+    def get_ranker(self) -> "Ranker" | None:
         """Return optional ranker for match ordering."""
         ...
 
-    def get_commands(self) -> List["Command"]:
+    def get_commands(self) -> list["Command"]:
         """Return commands available in this mode."""
         ...
 
-    def on_items_loaded(self, items: List[str]) -> None:
+    def on_items_loaded(self, items: list[str]) -> None:
         """Called when items finish loading (for caching)."""
         ...
 
@@ -82,11 +79,11 @@ class BrowserMode(Protocol):
         """
         ...
 
-    def get_history(self) -> List[str]:
+    def get_history(self) -> list[str]:
         """Get browsing history for this mode."""
         ...
 
-    def save_history(self, history: List[str]) -> None:
+    def save_history(self, history: list[str]) -> None:
         """Save browsing history for this mode."""
         ...
 
@@ -98,8 +95,8 @@ class ModeRegistry:
     Manages mode registration and provides mode-switching commands.
     """
 
-    _modes: Dict[str, BrowserMode] = field(default_factory=dict)
-    _default_mode: Optional[str] = None
+    _modes: dict[str, BrowserMode] = field(default_factory=dict)
+    _default_mode: str | None = None
 
     def register(self, mode: BrowserMode, default: bool = False) -> None:
         """Register a browser mode.
@@ -113,33 +110,33 @@ class ModeRegistry:
         if default or self._default_mode is None:
             self._default_mode = name
 
-    def get(self, name: str) -> Optional[BrowserMode]:
+    def get(self, name: str) -> BrowserMode | None:
         """Get a mode by name."""
         return self._modes.get(name)
 
-    def get_default(self) -> Optional[BrowserMode]:
+    def get_default(self) -> BrowserMode | None:
         """Get the default mode."""
         if self._default_mode:
             return self._modes.get(self._default_mode)
         return None
 
     @property
-    def default_mode_name(self) -> Optional[str]:
+    def default_mode_name(self) -> str | None:
         """Get the name of the default mode."""
         return self._default_mode
 
-    def list_modes(self) -> List[Tuple[str, ModeConfig]]:
+    def list_modes(self) -> list[tuple[str, ModeConfig]]:
         """List all registered modes with their configs."""
         return [(name, mode.config) for name, mode in self._modes.items()]
 
-    def get_mode_switch_commands(self) -> List["Command"]:
+    def get_mode_switch_commands(self) -> list["Command"]:
         """Generate commands for switching between modes.
 
         Creates a /{mode_name} command for each registered mode.
         """
         from etl.browser.commands import Command, CommandResult
 
-        commands: List["Command"] = []
+        commands: list["Command"] = []
 
         for name, mode in self._modes.items():
             config = mode.config
@@ -161,7 +158,7 @@ class ModeRegistry:
 
 
 # Global registry instance
-_registry: Optional[ModeRegistry] = None
+_registry: ModeRegistry | None = None
 
 
 def get_registry() -> ModeRegistry:

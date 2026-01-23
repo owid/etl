@@ -3,14 +3,14 @@
 #  Snapshot browser mode for unified browser
 #
 
-from typing import Callable, List, Optional
+from typing import TYPE_CHECKING, Callable
 
 from etl.browser.commands import DEFAULT_COMMANDS, Command
 from etl.browser.modes import ModeConfig, ModeResult
 from etl.browser.modes.base import BaseBrowserMode
 
-# Type alias for ranker function
-RankerFunc = Callable[[str, List[str]], List[str]]
+if TYPE_CHECKING:
+    from etl.browser.core import Ranker
 
 
 class SnapshotMode(BaseBrowserMode):
@@ -32,13 +32,13 @@ class SnapshotMode(BaseBrowserMode):
         )
         super().__init__(config)
 
-    def get_items_loader(self) -> Callable[[], List[str]]:
+    def get_items_loader(self) -> Callable[[], list[str]]:
         """Return callable that loads snapshots from directory."""
         from etl.browser.snapshots import get_all_snapshots
 
         return get_all_snapshots
 
-    def get_cached_items(self) -> Optional[List[str]]:
+    def get_cached_items(self) -> list[str] | None:
         """Return cached snapshots if available."""
         if self._cached_items is not None:
             return self._cached_items
@@ -52,17 +52,17 @@ class SnapshotMode(BaseBrowserMode):
 
         return None
 
-    def get_ranker(self) -> Optional[RankerFunc]:
+    def get_ranker(self) -> "Ranker" | None:
         """Return version-based ranker for snapshots."""
         from etl.browser.snapshots import create_snapshot_ranker
 
         return create_snapshot_ranker()
 
-    def get_commands(self) -> List[Command]:
+    def get_commands(self) -> list[Command]:
         """Return commands available in snapshot mode."""
         return DEFAULT_COMMANDS.copy()
 
-    def on_items_loaded(self, items: List[str]) -> None:
+    def on_items_loaded(self, items: list[str]) -> None:
         """Cache loaded items and save to disk."""
         super().on_items_loaded(items)
 

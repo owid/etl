@@ -4,17 +4,17 @@
 #
 
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Callable, Set
 
 from etl.browser.commands import DEFAULT_COMMANDS, Command
 from etl.browser.modes import ModeConfig, ModeResult
 from etl.browser.modes.base import BaseBrowserMode
 
-# Type alias for ranker function
-RankerFunc = Callable[[str, List[str]], List[str]]
+if TYPE_CHECKING:
+    from etl.browser.core import Ranker
 
 # Simple type alias - avoids importing heavy etl.steps module
-DAG = Dict[str, Set[str]]
+DAG = dict[str, Set[str]]
 
 
 class StepMode(BaseBrowserMode):
@@ -28,10 +28,10 @@ class StepMode(BaseBrowserMode):
 
     def __init__(
         self,
-        dag: Optional[DAG] = None,
+        dag: DAG | None = None,
         private: bool = False,
-        dag_loader: Optional[Callable[[], DAG]] = None,
-        dag_path: Optional[Path] = None,
+        dag_loader: Callable[[], DAG] | None = None,
+        dag_path: Path | None = None,
     ) -> None:
         config = ModeConfig(
             name="steps",
@@ -49,10 +49,10 @@ class StepMode(BaseBrowserMode):
         self._dag_path = dag_path
 
         # Popularity data for ranking (mutable dict for live updates)
-        self._popularity_data: Dict[str, float] = {}
+        self._popularity_data: dict[str, float] = {}
         self._popularity_refresh_started = False
 
-    def get_items_loader(self) -> Callable[[], List[str]]:
+    def get_items_loader(self) -> Callable[[], list[str]]:
         """Return callable that loads steps from DAG."""
         from etl.browser.steps import get_all_steps
 
@@ -68,7 +68,7 @@ class StepMode(BaseBrowserMode):
 
         raise ValueError("Either dag or dag_loader must be provided")
 
-    def get_cached_items(self) -> Optional[List[str]]:
+    def get_cached_items(self) -> list[str] | None:
         """Return cached steps if available."""
         if self._cached_items is not None:
             return self._cached_items
@@ -91,7 +91,7 @@ class StepMode(BaseBrowserMode):
 
         return None
 
-    def _start_popularity_refresh(self, steps: List[str]) -> None:
+    def _start_popularity_refresh(self, steps: list[str]) -> None:
         """Start background popularity data refresh if needed."""
         if self._popularity_refresh_started:
             return
@@ -107,17 +107,17 @@ class StepMode(BaseBrowserMode):
             refresh_popularity_cache_async(steps, live_data=self._popularity_data)
             self._popularity_refresh_started = True
 
-    def get_ranker(self) -> Optional[RankerFunc]:
+    def get_ranker(self) -> "Ranker" | None:
         """Return popularity-based ranker for steps."""
         from etl.browser.steps import create_step_ranker
 
         return create_step_ranker(self._popularity_data)
 
-    def get_commands(self) -> List[Command]:
+    def get_commands(self) -> list[Command]:
         """Return commands available in step mode."""
         return DEFAULT_COMMANDS.copy()
 
-    def on_items_loaded(self, items: List[str]) -> None:
+    def on_items_loaded(self, items: list[str]) -> None:
         """Cache loaded items and save to disk."""
         super().on_items_loaded(items)
 

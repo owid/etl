@@ -4,7 +4,7 @@
 #
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Callable, List, Literal, Optional
+from typing import TYPE_CHECKING, Callable, Literal
 
 if TYPE_CHECKING:
     from etl.browser.core import BrowserState
@@ -15,8 +15,8 @@ class CommandResult:
     """Result of executing a command."""
 
     action: Literal["continue", "exit", "refresh", "switch_mode"]
-    message: Optional[str] = None
-    target_mode: Optional[str] = None  # For switch_mode action
+    message: str | None = None
+    target_mode: str | None = None  # For switch_mode action
 
 
 @dataclass
@@ -26,10 +26,10 @@ class Command:
     name: str
     description: str
     handler: Callable[["BrowserState"], CommandResult]
-    aliases: List[str] = field(default_factory=list)
+    aliases: list[str] = field(default_factory=list)
 
 
-def filter_commands(pattern: str, commands: List[Command]) -> List[Command]:
+def filter_commands(pattern: str, commands: list[Command]) -> list[Command]:
     """Filter commands by name/alias prefix match.
 
     Args:

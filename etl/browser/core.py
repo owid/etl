@@ -4,7 +4,7 @@
 #
 
 import re
-from typing import TYPE_CHECKING, Any, Callable, List, Literal, Optional, Protocol, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Literal, Protocol
 
 from prompt_toolkit import Application
 from prompt_toolkit.document import Document
@@ -129,7 +129,7 @@ class Ranker(Protocol):
     them reordered by relevance. Called after filtering, before display.
     """
 
-    def __call__(self, pattern: str, matches: List[str]) -> List[str]:
+    def __call__(self, pattern: str, matches: list[str]) -> list[str]:
         """Rank matches by relevance to pattern.
 
         Args:
@@ -146,8 +146,8 @@ def highlight_matches(
     item: str,
     pattern: str,
     is_selected: bool,
-    filter_spans: Optional[List[Tuple[int, int]]] = None,
-) -> List[Tuple[str, str]]:
+    filter_spans: list[tuple[int, int]] | None = None,
+) -> list[tuple[str, str]]:
     """Create styled text segments with matching terms and filter matches highlighted.
 
     Args:
@@ -165,7 +165,7 @@ def highlight_matches(
 
     # Collect all highlight spans with their types
     # Type 1 = search match (higher priority), Type 2 = filter match
-    all_spans: List[Tuple[int, int, int]] = []  # (start, end, type)
+    all_spans: list[tuple[int, int, int]] = []  # (start, end, type)
 
     # Add filter match spans
     if filter_spans:
@@ -205,7 +205,7 @@ def highlight_matches(
                 char_styles[i] = span_type
 
     # Build segments from character styles
-    segments: List[Tuple[str, str]] = []
+    segments: list[tuple[str, str]] = []
     if not item:
         return segments
 
@@ -262,40 +262,71 @@ class FilterLexer(Lexer):
         return get_line
 
 
+class BrowserConfig:
+    """Mutable configuration for browser display.
+
+    This allows dynamic updates (e.g., mode switching) without recreating the browser.
+    """
+
+    def __init__(
+        self,
+        prompt: str = "> ",
+        loading_message: str = "Loading...",
+        empty_message: str = "No items found.",
+        item_noun: str = "item",
+        item_noun_plural: str = "items",
+    ) -> None:
+        self.prompt = prompt
+        self.loading_message = loading_message
+        self.empty_message = empty_message
+        self.item_noun = item_noun
+        self.item_noun_plural = item_noun_plural
+
+
+# Type for mode switch callback (receives target mode name and state to update)
+ModeSwitchCallback = Callable[[str, "BrowserState"], None]
+
+
 class BrowserState:
     """State container for the browser application."""
 
-    def __init__(self, history: Optional[List[str]] = None) -> None:
+    def __init__(self, history: list[str] | None = None) -> None:
         self.selected_index: int = -1  # -1 means no selection (run all matches)
         self.scroll_offset: int = 0  # First visible item index
-        self.matches: List[str] = []
-        self.result: Optional[str] = None
+        self.matches: list[str] = []
+        self.result: str | None = None
         self.is_exact: bool = False
         self.cancelled: bool = False
         self.loading: bool = False  # True while items are loading in background
-        self.all_items: List[str] = []  # Populated when loading completes
-        self.app: Optional[Application[None]] = None  # Reference to app for invalidation
+        self.all_items: list[str] = []  # Populated when loading completes
+        self.app: Application[None] | None = None  # Reference to app for invalidation
         # Command mode state
         self.mode: Literal["search", "command"] = "search"
-        self.command_matches: List["Command"] = []
-        self.available_commands: List["Command"] = []
+        self.command_matches: list["Command"] = []
+        self.available_commands: list["Command"] = []
         # Refresh callback for reload functionality
-        self.items_loader: Optional[Callable[[], List[str]]] = None
-        self.on_items_loaded: Optional[Callable[[List[str]], None]] = None
+        self.items_loader: Callable[[], list[str]] | None = None
+        self.on_items_loaded: Callable[[list[str]], None] | None = None
         # Filter parsing state
-        self.parsed_input: Optional["ParsedInput"] = None
+        self.parsed_input: "ParsedInput" | None = None
         # Filter autocomplete options (cached)
-        self.filter_options: Optional["FilterOptions"] = None
+        self.filter_options: "FilterOptions" | None = None
         # History state (shared across browser sessions)
-        self.history: List[str] = history if history is not None else []
+        self.history: list[str] = history if history is not None else []
         self.history_index: int = -1  # -1 means not browsing history
         self.history_temp: str = ""  # Stores current input when entering history mode
         self._navigating_history: bool = False  # Flag to prevent resetting history on programmatic text changes
         # Mode switch state (for unified browser)
-        self.switch_mode_target: Optional[str] = None  # Target mode name when switching
+        self.switch_mode_target: str | None = None  # Target mode name when switching
+        # Mutable display configuration
+        self.config: BrowserConfig = BrowserConfig()
+        # Mode switch callback (for in-place mode switching)
+        self.on_mode_switch: ModeSwitchCallback | None = None
+        # Ranker function (can be updated on mode switch)
+        self.rank_matches: Ranker | None = None
 
 
-def filter_items(pattern: str, all_items: List[str]) -> List[str]:
+def filter_items(pattern: str, all_items: list[str]) -> list[str]:
     """Filter items by pattern using segment matching.
 
     Supports two modes:
@@ -315,7 +346,7 @@ def filter_items(pattern: str, all_items: List[str]) -> List[str]:
         matches = [s for s in all_items if all(term in s.lower() for term in terms_lower)]
 
         # Sort by: number of terms matched at word boundaries, then length
-        def score(s: str) -> Tuple[int, int, str]:
+        def score(s: str) -> tuple[int, int, str]:
             s_lower = s.lower()
             # Count terms that match at segment boundaries (after / or -)
             boundary_matches = sum(
@@ -342,18 +373,19 @@ def filter_items(pattern: str, all_items: List[str]) -> List[str]:
 
 
 def browse_items(
-    items_loader: Callable[[], List[str]],
+    items_loader: Callable[[], list[str]],
     prompt: str = "> ",
     loading_message: str = "Loading...",
     empty_message: str = "No items found.",
     item_noun: str = "item",
     item_noun_plural: str = "items",
-    cached_items: Optional[List[str]] = None,
-    on_items_loaded: Optional[Callable[[List[str]], None]] = None,
-    rank_matches: Optional[Ranker] = None,
-    commands: Optional[List["Command"]] = None,
-    history: Optional[List[str]] = None,
-) -> Tuple[Optional[str], bool, List[str], Optional[str]]:
+    cached_items: list[str] | None = None,
+    on_items_loaded: Callable[[list[str]], None] | None = None,
+    rank_matches: Ranker | None = None,
+    commands: list["Command"] | None = None,
+    history: list[str] | None = None,
+    on_mode_switch: ModeSwitchCallback | None = None,
+) -> tuple[str | None, bool, list[str], str | None]:
     """Interactive item browser using prompt_toolkit.
 
     Args:
@@ -372,13 +404,16 @@ def browse_items(
             If provided, typing / enters command mode.
         history: Optional list of previous search queries (most recent last).
             Use Up/Down when input is empty to navigate history.
+        on_mode_switch: Optional callback for in-place mode switching.
+            If provided, mode switches happen without exiting the browser.
+            Callback receives target mode name and should update state.
 
     Returns:
         Tuple of (pattern_or_item, is_exact_match, updated_history, switch_mode_target):
         - If user presses Enter: (current_text, False, history, None) to run all matches
         - If user selects an item: (item, True, history, None) to run just that item
         - If user cancels: (None, False, history, None)
-        - If mode switch: (None, False, history, target_mode_name)
+        - If mode switch (without callback): (None, False, history, target_mode_name)
     """
     import threading
 
@@ -396,6 +431,15 @@ def browse_items(
     state.available_commands = commands or []
     state.items_loader = items_loader
     state.on_items_loaded = on_items_loaded
+    state.on_mode_switch = on_mode_switch
+    state.rank_matches = rank_matches
+
+    # Initialize mutable config
+    state.config.prompt = prompt
+    state.config.loading_message = loading_message
+    state.config.empty_message = empty_message
+    state.config.item_noun = item_noun
+    state.config.item_noun_plural = item_noun_plural
 
     # If cached_items provided, use them immediately
     if cached_items is not None:
@@ -463,8 +507,8 @@ def browse_items(
             matches = apply_filters(matches, parsed.filters)
 
             # Apply custom ranking
-            if rank_matches is not None and matches:
-                matches = rank_matches(search_pattern, matches)
+            if state.rank_matches is not None and matches:
+                matches = state.rank_matches(search_pattern, matches)
 
             state.matches = matches
             state.selected_index = -1  # Reset selection when text changes
@@ -490,9 +534,32 @@ def browse_items(
                 state.cancelled = True
                 event.app.exit()
             elif result.action == "switch_mode":
-                # Mode switch requested - store target and exit
-                state.switch_mode_target = result.target_mode
-                event.app.exit()
+                if state.on_mode_switch is not None and result.target_mode:
+                    # In-place mode switch - call callback and stay in browser
+                    state.on_mode_switch(result.target_mode, state)
+                    # Reload items for new mode
+                    if state.items_loader is not None:
+                        state.loading = True
+                        state.all_items = []
+                        state.matches = []
+
+                        def reload_for_mode_switch() -> None:
+                            state.all_items = state.items_loader()  # type: ignore[misc]
+                            state.filter_options = extract_filter_options(state.all_items)
+                            state.loading = False
+                            if state.on_items_loaded is not None:
+                                state.on_items_loaded(state.all_items)
+                            if state.app is not None:
+                                state.app.invalidate()
+
+                        thread = threading.Thread(target=reload_for_mode_switch, daemon=True)
+                        thread.start()
+                    # Clear input and go back to search mode
+                    input_buffer.text = ""
+                else:
+                    # No callback - store target and exit (legacy behavior)
+                    state.switch_mode_target = result.target_mode
+                    event.app.exit()
             elif result.action == "refresh":
                 # Reload items
                 if state.items_loader is not None:
@@ -616,22 +683,22 @@ def browse_items(
                 state.scroll_offset = state.selected_index
 
     # Layout components
-    def get_prompt_text() -> List[Tuple[str, str]]:
-        return [("class:prompt", prompt)]
+    def get_prompt_text() -> list[tuple[str, str]]:
+        return [("class:prompt", state.config.prompt)]
 
-    def get_matches_text() -> List[Tuple[str, str]]:
+    def get_matches_text() -> list[tuple[str, str]]:
         text = input_buffer.text.strip()
 
-        lines: List[Tuple[str, str]] = []
+        lines: list[tuple[str, str]] = []
 
         # Show loading state
         if state.loading:
-            lines.append(("class:hint", f"  {loading_message}"))
+            lines.append(("class:hint", f"  {state.config.loading_message}"))
             lines.append(("", "\n"))
             return lines
 
         # Helper to add nano-style shortcuts
-        def add_shortcuts(shortcuts: List[Tuple[str, str]]) -> None:
+        def add_shortcuts(shortcuts: list[tuple[str, str]]) -> None:
             """Add nano-style shortcuts: [(key, description), ...]"""
             for key, desc in shortcuts:
                 lines.append(("", "  "))
@@ -681,7 +748,7 @@ def browse_items(
             if count == 0:
                 lines.append(("class:match-count", "  No matches"))
             else:
-                count_text = f"1 {item_noun}" if count == 1 else f"{count} {item_noun_plural}"
+                count_text = f"1 {state.config.item_noun}" if count == 1 else f"{count} {state.config.item_noun_plural}"
                 lines.append(("class:match-count", f"  {count_text}"))
             lines.append(("class:hint", f"  History ({state.history_index + 1}/{len(state.history)})"))
             add_shortcuts([("Tab", "Select"), ("Enter", "Run"), ("^C", "Exit")])
@@ -691,7 +758,7 @@ def browse_items(
                 lines.append(("class:match-count", "  No matches"))
                 add_shortcuts([("^C", "Exit")])
             else:
-                count_text = f"1 {item_noun}" if count == 1 else f"{count} {item_noun_plural}"
+                count_text = f"1 {state.config.item_noun}" if count == 1 else f"{count} {state.config.item_noun_plural}"
                 lines.append(("class:match-count", f"  {count_text}"))
                 run_desc = "Run all" if state.selected_index < 0 else "Run selected"
                 shortcuts = [("↑↓", "Select"), ("Enter", run_desc), ("^C", "Exit")]
@@ -699,7 +766,9 @@ def browse_items(
         else:
             # Show hint with filter prefixes for discoverability
             filter_hint = " (n: c: v: d:)" if state.all_items else ""
-            lines.append(("class:hint", f"  Type to filter {len(state.all_items)} {item_noun_plural}{filter_hint}"))
+            lines.append(
+                ("class:hint", f"  Type to filter {len(state.all_items)} {state.config.item_noun_plural}{filter_hint}")
+            )
             shortcuts = [("^C", "Exit")]
             if state.history:
                 shortcuts.insert(0, ("↑", "History"))
@@ -811,7 +880,7 @@ def browse_items(
 
     # Check if no items were loaded
     if not state.all_items and not state.loading:
-        print(empty_message)
+        print(state.config.empty_message)
         return None, False, state.history, None
 
     return state.result, state.is_exact, state.history, None
