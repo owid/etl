@@ -1,0 +1,70 @@
+#
+#  commands.py
+#  Command system for browser UI
+#
+
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Callable, List, Literal, Optional
+
+if TYPE_CHECKING:
+    from etl.browser.core import BrowserState
+
+
+@dataclass
+class CommandResult:
+    """Result of executing a command."""
+
+    action: Literal["continue", "exit", "refresh"]
+    message: Optional[str] = None
+
+
+@dataclass
+class Command:
+    """A command that can be executed in the browser."""
+
+    name: str
+    description: str
+    handler: Callable[["BrowserState"], CommandResult]
+    aliases: List[str] = field(default_factory=list)
+
+
+def filter_commands(pattern: str, commands: List[Command]) -> List[Command]:
+    """Filter commands by name/alias prefix match.
+
+    Args:
+        pattern: The pattern to match (without leading /)
+        commands: List of available commands
+
+    Returns:
+        Commands that match the pattern
+    """
+    if not pattern:
+        return commands
+
+    pattern_lower = pattern.lower()
+    matches = []
+    for cmd in commands:
+        names = [cmd.name] + cmd.aliases
+        if any(n.startswith(pattern_lower) for n in names):
+            matches.append(cmd)
+    return matches
+
+
+# Default command handlers
+
+
+def cmd_refresh(state: "BrowserState") -> CommandResult:
+    """Handler for /refresh command."""
+    return CommandResult(action="refresh", message="Refreshing...")
+
+
+def cmd_exit(state: "BrowserState") -> CommandResult:
+    """Handler for /exit command."""
+    return CommandResult(action="exit")
+
+
+# Default commands available in all browsers
+DEFAULT_COMMANDS = [
+    Command("refresh", "Reload cached data", cmd_refresh, aliases=["r"]),
+    Command("exit", "Exit browser", cmd_exit, aliases=["quit", "q"]),
+]
