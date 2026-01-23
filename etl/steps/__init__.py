@@ -1293,6 +1293,7 @@ class GraphStep(Step):
         dep_uris = list(dag.get(step_name, []))
 
         # Expand short indicator names in views to full catalog paths
+        first_indicator_path = None
         if "views" in metadata:
             for view in metadata["views"]:
                 if "indicators" in view:
@@ -1300,12 +1301,39 @@ class GraphStep(Step):
                         for i, indicator in enumerate(indicators):
                             if "catalogPath" in indicator:
                                 indicator["catalogPath"] = _expand_indicator_path(indicator["catalogPath"], dep_uris)
+                                # Capture first indicator path for the collection catalog_path
+                                if first_indicator_path is None:
+                                    first_indicator_path = indicator["catalogPath"]
 
-        # Create collection
+        # Collection slug for multidim (without version)
+        # Must be set explicitly in metadata as 'slug'
+        # Format: namespace/base_dataset#collection_name
+        # Example: covid/covid#covid_deaths
+        if "slug" not in metadata:
+            raise ValueError(
+                f"Multidim graph step {self.path} requires 'slug' in metadata.\n"
+                f"Add to {self.metadata_path}:\n"
+                f"  slug: namespace/base#collection"
+            )
+
+        # Build full catalog_path by inserting version from step path
+        parts = self.path.split("/")
+        if len(parts) >= 3:
+            version = parts[1]
+            slug = metadata["slug"]
+            # Insert version: covid/covid#covid_deaths → covid/latest/covid#covid_deaths
+            if "/" in slug:
+                namespace, rest = slug.split("/", 1)
+                catalog_path = f"{namespace}/{version}/{rest}"
+            else:
+                catalog_path = slug
+        else:
+            catalog_path = metadata["slug"]
+
         c = create_collection(
             config_yaml=metadata,
             dependencies=dep_uris,
-            catalog_path=f"graph/{self.slug}#{self.slug}",
+            catalog_path=catalog_path,
         )
         c.save()
 

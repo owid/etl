@@ -263,13 +263,16 @@ def upsert_graph(
                 dim.pop("catalogPath", None)
                 # Add the resolved variableId
                 dim["variableId"] = vid
-                # Ensure property and display exist
+                # Ensure property exists
                 dim.setdefault("property", "y")
-                dim.setdefault("display", {})
+                # Remove empty display objects (let grapher use defaults)
+                if "display" in dim and not dim["display"]:
+                    dim.pop("display")
                 config["dimensions"].append(dim)
         else:
             # Fallback: create minimal dimensions if no metadata or count mismatch
-            config["dimensions"] = [{"variableId": vid, "property": "y", "display": {}} for vid in variable_ids]
+            # Don't include display at all if using defaults
+            config["dimensions"] = [{"variableId": vid, "property": "y"} for vid in variable_ids]
 
         # 8. Create or update chart via Admin API
         admin_api = AdminAPI(OWID_ENV)
