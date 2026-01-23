@@ -1,7 +1,4 @@
-#
-#  steps.py
-#  Step browser for etlr command
-#
+"""Step browser with popularity ranking and caching."""
 
 import json
 import threading

@@ -1,7 +1,4 @@
-#
-#  snapshots.py
-#  Snapshot browser for etls command
-#
+"""Snapshot browser with version-based ranking."""
 
 import json
 from typing import TYPE_CHECKING

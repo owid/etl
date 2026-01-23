@@ -1,7 +1,4 @@
-#
-#  core.py
-#  Generic browser UI components for interactive selection
-#
+"""Generic browser UI using prompt_toolkit for interactive selection."""
 
 import re
 from typing import TYPE_CHECKING, Any, Callable, Literal, Protocol

@@ -1,7 +1,4 @@
-#
-#  modes/steps.py
-#  Step browser mode for unified browser
-#
+"""StepMode: ETL step browsing with popularity ranking."""
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Set

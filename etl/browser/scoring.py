@@ -1,7 +1,4 @@
-#
-#  scoring.py
-#  Shared scoring utilities for browser ranking
-#
+"""Match scoring and ranking utilities for browser results."""
 
 import re
 from typing import TYPE_CHECKING, Callable

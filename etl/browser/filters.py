@@ -1,7 +1,4 @@
-#
-#  filters.py
-#  Filter parsing and matching for browser UI
-#
+"""Filter parsing for browser (n:namespace, c:channel, v:version, d:dataset)."""
 
 import re
 from dataclasses import dataclass, field

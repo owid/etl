@@ -1,7 +1,4 @@
-#
-#  modes/snapshots.py
-#  Snapshot browser mode for unified browser
-#
+"""SnapshotMode: Snapshot browsing with version-based ranking."""
 
 from typing import TYPE_CHECKING, Callable
 

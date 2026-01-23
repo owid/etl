@@ -1,7 +1,4 @@
-#
-#  commands.py
-#  Command system for browser UI
-#
+"""Slash command system for browser UI (/refresh, /exit, /steps, etc)."""
 
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Literal

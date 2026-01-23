@@ -1,7 +1,4 @@
-#
-#  modes/base.py
-#  Base class for browser modes with shared logic
-#
+"""Base class for browser modes with history and command defaults."""
 
 import json
 from typing import TYPE_CHECKING, Callable

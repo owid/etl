@@ -1,7 +1,4 @@
-#
-#  modes/__init__.py
-#  Browser mode system - protocol and registry for multi-mode browser
-#
+"""BrowserMode protocol and ModeRegistry for multi-mode browser."""
 
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Protocol

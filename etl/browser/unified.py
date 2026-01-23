@@ -1,7 +1,4 @@
-#
-#  unified.py
-#  Unified browser orchestrator for multi-mode ETL browser
-#
+"""Unified browser orchestrator for multi-mode ETL browser."""
 
 from dataclasses import dataclass
 from pathlib import Path
