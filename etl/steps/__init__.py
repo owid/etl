@@ -296,8 +296,8 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
         version = "latest"
         name = root
         identifier = root
-    elif prefix in ["snapshot"]:
-        # Ingestion steps.
+    elif prefix in ["snapshot", "graph"]:
+        # Ingestion steps and graph steps.
         channel = prefix
 
         # Extract attributes from root of the step.
@@ -1243,9 +1243,6 @@ class GraphStep(Step):
 
     def _run_yaml_only(self) -> None:
         """Create graph from YAML metadata - either a single chart or multidimensional collection."""
-        from etl import config
-        from etl.dag_helpers import load_dag
-
         # Load metadata to determine if this is a multidim collection or normal chart
         if not self.metadata_file or not self.metadata_file.exists():
             raise ValueError(f"Metadata file not found for {self}")
