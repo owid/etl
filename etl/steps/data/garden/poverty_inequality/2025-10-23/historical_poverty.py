@@ -1281,9 +1281,11 @@ def prepare_pip_data(tb_pip_inequality: Table, tb_pip_incomes: Table, tb_thousan
         ]
     ]
 
-    tb_pip_incomes = tb_pip_incomes[(tb_pip_incomes["ppp_version"] == PPP_VERSION) & (tb_pip_incomes["decile"].isna())][
-        ["country", "year", "welfare_type", "table", "survey_comparability", "mean"]
-    ]
+    tb_pip_incomes = tb_pip_incomes[
+        (tb_pip_incomes["ppp_version"] == PPP_VERSION)
+        & (tb_pip_incomes["decile"].isna())
+        & (tb_pip_incomes["period"] == "day")
+    ][["country", "year", "welfare_type", "table", "survey_comparability", "mean"]]
 
     # Now merge both tables
     tb_pip = pr.merge(
