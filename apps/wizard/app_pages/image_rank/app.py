@@ -148,14 +148,13 @@ def classify_image_type(filename: str, posts_content: list[str]) -> str:
 @st.cache_data(show_spinner=False, ttl=3600)
 def get_ranked_images(sort_by: str = "views_365d", image_type_filter: str = "all") -> list[dict]:
     """Get all images ranked by pageviews."""
-    # Fetch all images with their post content for classification
-    query = """
+    # First, get all images with their aggregate stats
+    images_query = """
     SELECT
         i.id,
         i.filename,
         i.defaultAlt,
         i.cloudflareId,
-        GROUP_CONCAT(DISTINCT pg.content SEPARATOR '|||') as post_contents,
         COUNT(DISTINCT pg.id) AS post_count,
         COALESCE(SUM(pv.views_7d), 0) AS views_7d,
         COALESCE(SUM(pv.views_365d), 0) AS views_365d
@@ -169,14 +168,33 @@ def get_ranked_images(sort_by: str = "views_365d", image_type_filter: str = "all
     ORDER BY {} DESC
     """.format(sort_by)
 
-    df = read_sql(query)
-    records = df.to_dict("records")
+    images_df = read_sql(images_query)
+    records = images_df.to_dict("records")
+
+    # Get all image-post relationships with content in one query
+    posts_query = """
+    SELECT
+        pxi.imageId,
+        CAST(pg.content AS CHAR(100000)) as content
+    FROM posts_gdocs_x_images pxi
+    JOIN posts_gdocs pg ON pxi.gdocId = pg.id
+    WHERE pg.published = 1
+    """
+    posts_df = read_sql(posts_query)
+
+    # Group posts by image ID
+    posts_by_image = {}
+    for _, row in posts_df.iterrows():
+        image_id = row["imageId"]
+        if image_id not in posts_by_image:
+            posts_by_image[image_id] = []
+        posts_by_image[image_id].append(row["content"])
 
     # Classify each image and filter
     filtered_records = []
     for record in records:
         # Get posts content for this image
-        posts_content = record.get("post_contents", "").split("|||") if record.get("post_contents") else []
+        posts_content = posts_by_image.get(record["id"], [])
 
         # Classify the image
         image_type = classify_image_type(record["filename"], posts_content)
