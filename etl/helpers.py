@@ -866,6 +866,56 @@ class PathFinder:
             explorer=explorer,
         )
 
+    def create_graph(
+        self,
+        yaml_params: dict[str, Any] | None = None,
+    ) -> int:
+        """
+        Create or update a chart in the grapher database.
+
+        This method provides a convenient wrapper around `upsert_graph()` that automatically
+        determines the chart slug, metadata file path, dependencies, and source checksum
+        from the PathFinder context.
+
+        Parameters
+        ----------
+        yaml_params : dict[str, Any] | None, default None
+            Optional dict for string substitution in YAML file.
+            Use placeholders in YAML like {threshold} and pass {"threshold": 4.73}.
+
+        Returns
+        -------
+        int
+            Chart ID in the grapher database
+
+        Examples
+        --------
+        >>> from etl.helpers import PathFinder
+        >>> paths = PathFinder(__file__)
+        >>> # Create chart with metadata from YAML
+        >>> paths.create_graph()
+        >>> # Create chart with dynamic threshold substituted into YAML
+        >>> threshold = calculate_threshold()
+        >>> paths.create_graph(yaml_params={"threshold": threshold})
+        """
+        from etl import config
+        from etl.grapher.graph import calculate_source_checksum, upsert_graph
+
+        # Calculate source checksum from dependencies and metadata file
+        source_checksum = calculate_source_checksum(
+            dependencies=list(self.dependencies),
+            metadata_file=self.metadata_path,
+        )
+
+        return upsert_graph(
+            slug=self.short_name,
+            metadata_file=self.metadata_path,
+            dependencies=list(self.dependencies),
+            source_checksum=source_checksum,
+            graph_push=config.GRAPH_PUSH,
+            yaml_params=yaml_params,
+        )
+
     @deprecated.deprecated(
         reason="We should slowly migrate to YAML-based explorers, and use `paths.create_collection` instead."
     )

@@ -24,12 +24,55 @@ from etl.grapher.model import Chart, Variable
 log = structlog.get_logger()
 
 
+def calculate_source_checksum(
+    dependencies: List[str],
+    metadata_file: Optional[Path],
+) -> str:
+    """
+    Calculate checksum for graph step inputs (dependencies + metadata file).
+
+    This replicates the logic from GraphStep.checksum_input() without requiring
+    a full Step object.
+
+    Args:
+        dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/..."])
+        metadata_file: Optional path to .meta.yml file
+
+    Returns:
+        MD5 checksum hex string
+    """
+    import hashlib
+
+    from owid.catalog import Dataset
+
+    from etl import files
+
+    checksums = {}
+
+    # Include dependency checksums
+    for dep_uri in dependencies:
+        # Convert URI to path (e.g., "data://grapher/..." -> "data/grapher/...")
+        dep_path = dep_uri.split("://", 1)[1] if "://" in dep_uri else dep_uri
+        # Load dataset and get its source_checksum
+        ds = Dataset(f"{paths.DATA_DIR}/{dep_path}")
+        checksums[dep_uri] = ds.metadata.source_checksum
+
+    # Include metadata file checksum if it exists
+    if metadata_file and metadata_file.exists():
+        checksums["metadata_file"] = files.checksum_file(str(metadata_file))
+
+    # Sort and hash
+    in_order = [v for _, v in sorted(checksums.items())]
+    return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
+
+
 def upsert_graph(
     slug: str,
     metadata_file: Optional[Path],
     dependencies: List[str],
     source_checksum: str,
     graph_push: bool = False,
+    yaml_params: Optional[dict] = None,
 ) -> int:
     """
     Create or update a chart in the grapher database.
@@ -40,6 +83,7 @@ def upsert_graph(
         dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/..."])
         source_checksum: Checksum of inputs (metadata file + dependencies) for dirty detection
         graph_push: If True, overwrite manual edits made in Admin UI
+        yaml_params: Optional dict for string substitution in YAML file (e.g., {threshold: 4.73})
 
     Returns:
         Chart ID
@@ -54,7 +98,7 @@ def upsert_graph(
     with Session(engine) as session:
         # 1. Load metadata file if it exists
         if metadata_file and metadata_file.exists():
-            metadata = _load_metadata_file(metadata_file)
+            metadata = _load_metadata_file(metadata_file, yaml_params=yaml_params)
         else:
             metadata = {}
 
@@ -382,18 +426,25 @@ def _uri_to_catalog_path(uri: str) -> str:
     return catalog_path
 
 
-def _load_metadata_file(metadata_file: Path) -> Dict[str, Any]:
+def _load_metadata_file(metadata_file: Path, yaml_params: Optional[dict] = None) -> Dict[str, Any]:
     """
     Load chart metadata from a .meta.yml file.
 
     Args:
         metadata_file: Path to .meta.yml file
+        yaml_params: Optional dict for string substitution in YAML (e.g., {threshold: 4.73})
 
     Returns:
         Dictionary with chart configuration
     """
     with open(metadata_file, "r") as f:
-        metadata = yaml.safe_load(f)
+        content = f.read()
+
+    # Apply string substitution if yaml_params provided
+    if yaml_params:
+        content = content.format(**yaml_params)
+
+    metadata = yaml.safe_load(content)
 
     # Empty files (only comments) are valid - return empty dict
     if not metadata:

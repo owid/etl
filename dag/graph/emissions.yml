@@ -1,0 +1,4 @@
+steps:
+  # TEST: Simple chart with Python script for dynamic threshold calculation
+  graph://emissions/latest/per-capita-co2-vs-average:
+    - data://grapher/gcp/2025-11-13/global_carbon_budget

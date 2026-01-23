@@ -1367,21 +1367,15 @@ class GraphStep(Step):
         Return checksum of all inputs to this graph step.
         Similar to DataStep.checksum_input() but for graph metadata.
         """
-        import hashlib
+        from etl.grapher.graph import calculate_source_checksum
 
-        checksums = {}
+        # Convert Step dependencies to URIs
+        dep_uris = [str(d) for d in self.dependencies]
 
-        # Include dependency checksums
-        for d in self.dependencies:
-            checksums[d.path] = d.checksum_output()
-
-        # Include metadata file checksum if it exists
-        if self.metadata_file and self.metadata_file.exists():
-            checksums["metadata_file"] = files.checksum_file(str(self.metadata_file))
-
-        # Sort and hash
-        in_order = [v for _, v in sorted(checksums.items())]
-        return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
+        return calculate_source_checksum(
+            dependencies=dep_uris,
+            metadata_file=self.metadata_file,
+        )
 
     def checksum_output(self) -> str:
         """Return checksum representing the graph step's state."""
