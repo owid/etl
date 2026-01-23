@@ -184,7 +184,7 @@ def run() -> None:
     tb, tb_sex_group = extract_tbs(tb)
 
     # Condoms per capita
-    tb_no_dim = add_condoms_per_100k(tb_no_dim, tb_sex_group)
+    tb_no_dim = add_condoms_per_1k(tb_no_dim, tb_sex_group)
 
     # RESHAPE (and check)
     paths.log.info("GAM: Format (and check)")
@@ -835,7 +835,7 @@ def extract_tbs(tb):
     return tb, tb_sex_group
 
 
-def add_condoms_per_100k(tb_no_dim, tb_sex_group):
+def add_condoms_per_1k(tb_no_dim, tb_sex_group):
     tb_ = tb_sex_group.loc[
         (tb_sex_group["indicator"] == "condoms_distributed")
         & (tb_sex_group["sex"] == "total")
@@ -843,8 +843,8 @@ def add_condoms_per_100k(tb_no_dim, tb_sex_group):
     ]
     assert not tb_.empty, "Empty datafame!"
     tb_ = paths.regions.add_population(tb_)
-    tb_["value"] = 100_000 * tb_["value"] / tb_["population"]
-    tb_["indicator"] = "condoms_distributed_per_100k"
+    tb_["value"] = 1_000 * tb_["value"] / tb_["population"]
+    tb_["indicator"] = "condoms_distributed_per_1k"
     tb_["sex"] = np.nan
     tb_["group"] = np.nan
     tb_ = tb_.drop(columns=["population"])

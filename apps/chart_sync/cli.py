@@ -63,6 +63,12 @@ log = structlog.get_logger()
     type=bool,
     help="Sync approved charts even when conflicts are detected. Useful when syncing between staging servers.",
 )
+@click.option(
+    "--archive/--no-archive",
+    default=True,
+    type=bool,
+    help="Archive datasets in target that have no charts using their indicators.",
+)
 def cli(
     source: str,
     target: str,
@@ -71,6 +77,7 @@ def cli(
     exclude: Optional[str],
     dry_run: bool,
     ignore_conflicts: bool,
+    archive: bool,
 ) -> None:
     # TODO: keep this docstring in sync with apps/wizard/app_pages/chart_diff/app.py
     """Sync Grapher charts and revisions from an environment to the main environment.
@@ -116,6 +123,19 @@ def cli(
     ```
     etl chart-sync staging-site-my-subbranch staging-site-baseline-branch --ignore-conflicts --dry-run
     ```
+
+    **Example 5:** Archive datasets that have no charts (dry-run)
+
+    ```
+    etl chart-sync staging-site-my-branch .env.prod.write --archive --dry-run
+    ```
+
+    **Considerations on archiving:**
+
+    - Use `--archive` to automatically archive datasets in TARGET that have no charts using their indicators.
+    - Only datasets that were part of the synced charts are considered for archiving.
+    - Datasets are only archived if the corresponding ETL dataset is in the archive DAG (not in the active DAG).
+    - Archived datasets are not deleted, just marked as archived.
     """
     if _is_commit_sha(source):
         repo = GithubApiRepo(repo_name="etl")
@@ -168,6 +188,7 @@ def cli(
             dods_synced = 0
             narrative_charts_synced = 0
             synced_chart_ids: Set[int] = set()  # Track synced chart IDs for narrative chart sync
+            synced_dataset_ids: Set[int] = set()  # Track dataset IDs from synced charts for archiving
 
             # Iterate over all chart diffs
             for diff in chart_diffs:
@@ -228,6 +249,9 @@ def cli(
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
                         synced_chart_ids.add(chart_id)
+                        # Collect dataset IDs from the chart's variables for archiving
+                        source_variables = diff.source_chart.load_chart_variables(source_session)
+                        synced_dataset_ids.update(v.datasetId for v in source_variables.values() if v.datasetId)
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
                             target_api.set_tags(chart_id, source_tags, user_id=user_id)
@@ -256,6 +280,9 @@ def cli(
                     if diff.is_approved:
                         charts_synced += 1
                         synced_chart_ids.add(chart_id)
+                        # Collect dataset IDs from the chart's variables for archiving
+                        source_variables = diff.source_chart.load_chart_variables(source_session)
+                        synced_dataset_ids.update(v.datasetId for v in source_variables.values() if v.datasetId)
                         if not dry_run:
                             resp = target_api.create_chart(migrated_config, user_id=user_id)
                             target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
@@ -291,6 +318,13 @@ def cli(
             # Sync DoDs
             dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
 
+            # Archive datasets without charts if requested
+            datasets_archived = 0
+            if archive and synced_dataset_ids:
+                datasets_archived = _archive_datasets_without_charts(
+                    target_session, target_api, synced_dataset_ids, str(source), dry_run
+                )
+
             # Check for deleted charts and notify
             deleted_charts = get_deleted_charts(source_session, target_session)
             if deleted_charts:
@@ -305,8 +339,10 @@ def cli(
         print(f"[bold green]Narrative charts synced: {narrative_charts_synced}[/bold green]")
     if dods_synced > 0:
         print(f"[bold green]DoDs synced: {dods_synced}[/bold green]")
-    if charts_synced == 0 and narrative_charts_synced == 0 and dods_synced == 0:
-        print("\n[bold green]No charts, narrative charts, or DoDs need to be synced[/bold green]")
+    if datasets_archived > 0:
+        print(f"[bold green]Datasets archived: {datasets_archived}[/bold green]")
+    if charts_synced == 0 and narrative_charts_synced == 0 and dods_synced == 0 and datasets_archived == 0:
+        print("\n[bold green]No charts, narrative charts, DoDs, or datasets need to be synced[/bold green]")
 
 
 def _is_commit_sha(source: str) -> bool:
@@ -383,6 +419,30 @@ The following {chart_word} exist(s) in production but not in staging and may hav
 {chart_list}
 
 chart-sync doesn't delete charts. Make sure to delete them from production if this was intentional.
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_archived_datasets(archived_datasets: list[dict], source: str, dry_run: bool) -> None:
+    """Notify about archived datasets via Slack."""
+    dataset_count = len(archived_datasets)
+    dataset_word = "dataset" if dataset_count == 1 else "datasets"
+
+    # Build list of archived datasets for the message
+    dataset_list = "\n".join(
+        [f"• Dataset {ds['id']}: `{ds['name']}` ({ds['catalogPath'] or 'no catalog path'})" for ds in archived_datasets]
+    )
+
+    message = f"""
+:file_folder: *ETL chart-sync: {dataset_count} {dataset_word.title()} Archived* from `{source}`
+
+The following {dataset_word} had no charts using their indicators and {"was" if dataset_count == 1 else "were"} archived:
+
+{dataset_list}
     """.strip()
 
     print(message)
@@ -580,6 +640,114 @@ def _sync_dods(
                 target_api.create_dod(source_dod.name, source_dod.content, source_dod.lastUpdatedUserId)
 
     return dods_synced
+
+
+def _archive_datasets_without_charts(
+    target_session: Session,
+    target_api: AdminAPI,
+    dataset_ids: Set[int],
+    source: str,
+    dry_run: bool,
+) -> int:
+    """Archive datasets in target that have no charts using their indicators.
+
+    Only archives datasets that:
+    - Are in the provided dataset_ids set (from synced charts)
+    - Are not already archived
+    - Have no charts using any of their variables in TARGET
+    - Have their corresponding ETL dataset in the archive DAG
+    """
+    if not dataset_ids:
+        return 0
+
+    # Load the active and archive DAGs to check if datasets are archived in ETL
+    from etl import paths
+    from etl.dag_helpers import load_dag
+
+    # Load both DAGs - archive DAG includes active steps via includes
+    archive_dag = load_dag(paths.DAG_ARCHIVE_FILE)
+    archive_dag_steps = set(archive_dag.keys())
+    active_dag = load_dag(paths.DAG_FILE)
+    active_dag_steps = set(active_dag.keys())
+
+    datasets_archived = 0
+    archived_datasets_info: list[dict] = []
+
+    # Query to find which of the given datasets have no charts in target
+    # A dataset has no charts if none of its variables appear in chart_dimensions
+    query = """
+    SELECT d.id, d.name, d.catalogPath
+    FROM datasets d
+    WHERE d.id IN :dataset_ids
+    AND d.isArchived = 0
+    AND NOT EXISTS (
+        SELECT 1
+        FROM variables v
+        JOIN chart_dimensions cd ON cd.variableId = v.id
+        WHERE v.datasetId = d.id
+    )
+    ORDER BY d.id
+    """
+
+    from sqlalchemy import text
+
+    result = target_session.execute(text(query), {"dataset_ids": tuple(dataset_ids)})
+    datasets_without_charts = result.fetchall()
+
+    if not datasets_without_charts:
+        log.info("archive_datasets.none_found")
+        return 0
+
+    log.info("archive_datasets.start", n=len(datasets_without_charts))
+
+    for row in datasets_without_charts:
+        dataset_id = row[0]
+        dataset_name = row[1]
+        catalog_path = row[2]
+
+        # Check if the dataset is in the archive DAG
+        # The catalog path format is like "grapher/namespace/version/dataset/table#indicator"
+        # We need to convert it to DAG format: "data://grapher/namespace/version/dataset"
+        if catalog_path:
+            # Extract the dataset path (remove table#indicator part)
+            dataset_path = catalog_path.split("/")[:-1]  # Remove table#indicator
+            dag_step = "data://" + "/".join(dataset_path)
+
+            # Check if this step exists ONLY in the archive DAG (not in active DAG)
+            # The archive DAG includes active steps too via includes, so we need to check
+            # if the step is in archive but would not be in the active-only DAG
+            is_in_archive_only = dag_step in archive_dag_steps and dag_step not in active_dag_steps
+
+            if not is_in_archive_only:
+                log.info(
+                    "archive_datasets.skip_not_in_archive_dag",
+                    dataset_id=dataset_id,
+                    name=dataset_name,
+                    catalog_path=catalog_path,
+                    dag_step=dag_step,
+                )
+                continue
+        else:
+            # No catalog path means we can't verify it's in the archive DAG, skip it
+            log.info(
+                "archive_datasets.skip_no_catalog_path",
+                dataset_id=dataset_id,
+                name=dataset_name,
+            )
+            continue
+
+        log.info("archive_datasets.archive", dataset_id=dataset_id, name=dataset_name, catalog_path=catalog_path)
+        datasets_archived += 1
+        archived_datasets_info.append({"id": dataset_id, "name": dataset_name, "catalogPath": catalog_path})
+
+        if not dry_run:
+            target_api.set_dataset_archived(dataset_id, is_archived=True)
+
+    # Send Slack notification about archived datasets
+    if archived_datasets_info:
+        _notify_slack_archived_datasets(archived_datasets_info, source, dry_run)
+
+    return datasets_archived
 
 
 if __name__ == "__main__":
