@@ -35,3 +35,10 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def calculate_united_kingdom(tb: Table) -> Table:
+    """
+    Calculate data for the UK based on the component countries.
+    """
+    tb_uk = tb[tb["country"].isin(["England & Wales", "Northern Ireland", "Scotland"])]
