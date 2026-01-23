@@ -1,8 +1,8 @@
 steps:
-  # TEST: Replicate export://multidim/covid/latest/covid.cases
-  graph://covid/latest/covid-cases-test:
+  # Replicate covid cases mdim: https://admin.owid.io/admin/grapher/covid%2Flatest%2Fcovid%23covid_cases
+  graph://covid/latest/covid-cases:
     - data://grapher/covid/latest/cases_deaths
 
-  # TEST: Replicate export://multidim/covid/latest/covid.deaths
-  graph://covid/latest/covid-deaths-test:
+  # Replicate covid deaths mdim: https://admin.owid.io/admin/grapher/covid%2Flatest%2Fcovid%23covid_deaths
+  graph://covid/latest/covid-deaths:
     - data://grapher/covid/latest/cases_deaths

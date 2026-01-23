@@ -9,8 +9,8 @@ definitions:
           changeInPrefix: true
 
 title:
-  title: COVID-19 confirmed cases (TEST)
-  title_variant: Graph step test
+  title: COVID-19 confirmed cases
+  title_variant: ""
 
 default_selection:
   - World
