@@ -969,9 +969,8 @@ def _check_dag_completeness(dag: DAG) -> None:
         for dep in deps:
             if re.match(r"^(snapshot|snapshot-private|github|etag)://", dep):
                 pass
-            else:
-                if dep not in dag:
-                    raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
+            elif dep not in dag:
+                raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":
