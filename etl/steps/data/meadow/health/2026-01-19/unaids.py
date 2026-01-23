@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import numpy as np
-
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
