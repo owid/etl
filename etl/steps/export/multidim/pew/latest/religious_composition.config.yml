@@ -28,8 +28,15 @@ definitions:
         map:
           colorScale:
             baseColorScheme: Blues
+
+    - dimensions:
+        indicator: count_unrounded
+      config:
+        map:
+          colorScale:
             binningStrategy: manual
             customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
     - dimensions:
         religion: christians
       config:
@@ -144,7 +151,7 @@ dimensions:
       - slug: "count_unrounded"
         name: "Number of people"
         description: Number of deaths divided by the total population
-      - slug: "share_change_2010_2020"
-        name: "Percentage point change"
-        description: Percentage point change between 2010 and 2020
+      # - slug: "share_change_2010_2020"
+      #   name: "Percentage point change"
+      #   description: Percentage point change between 2010 and 2020
 views: []
