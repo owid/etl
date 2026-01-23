@@ -1,4 +1,5 @@
 steps:
+  # Replicate chart fur-farming-ban: https://admin.owid.io/admin/charts/7146/edit
   graph://animal_welfare/latest/fur-farming-ban:
     - data://grapher/animal_welfare/2024-12-17/fur_laws
 

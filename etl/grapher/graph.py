@@ -253,7 +253,23 @@ def upsert_graph(
             _check_manual_overrides(session, chart, config, is_inheritance_enabled, source_checksum)
 
         # 7. Add dimensions (variable IDs) to config
-        config["dimensions"] = [{"variableId": vid, "property": "y", "display": {}} for vid in variable_ids]
+        # Preserve dimension settings from metadata if they exist
+        if "dimensions" in metadata and len(metadata["dimensions"]) == len(variable_ids):
+            # Merge metadata dimensions with resolved variable IDs
+            config["dimensions"] = []
+            for dim_metadata, vid in zip(metadata["dimensions"], variable_ids):
+                dim = dim_metadata.copy()
+                # Remove catalogPath (it was only for resolving the variable ID)
+                dim.pop("catalogPath", None)
+                # Add the resolved variableId
+                dim["variableId"] = vid
+                # Ensure property and display exist
+                dim.setdefault("property", "y")
+                dim.setdefault("display", {})
+                config["dimensions"].append(dim)
+        else:
+            # Fallback: create minimal dimensions if no metadata or count mismatch
+            config["dimensions"] = [{"variableId": vid, "property": "y", "display": {}} for vid in variable_ids]
 
         # 8. Create or update chart via Admin API
         admin_api = AdminAPI(OWID_ENV)

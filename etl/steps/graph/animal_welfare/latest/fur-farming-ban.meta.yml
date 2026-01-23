@@ -32,3 +32,5 @@ $schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
 dimensions:
   - property: y
     catalogPath: fur_farming_status
+    display:
+      tolerance: 100
