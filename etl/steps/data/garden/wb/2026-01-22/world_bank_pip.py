@@ -222,6 +222,9 @@ def run() -> None:
         add_no_spells=False,
     )
 
+    # Add period dimension (day, month, year) to tb_incomes
+    tb_incomes = add_period_dimension(tb=tb_incomes)
+
     # Define tb_rest_inc_or_cons_smooth as tb_rest and drop table and survey_comparability columns
     tb_rest = tb_rest_inc_or_cons_smooth.drop(columns=["table"], errors="raise")
 
@@ -235,7 +238,7 @@ def run() -> None:
         short_name="inequality",
     )
     tb_incomes = tb_incomes.format(
-        ["country", "year", "ppp_version", "welfare_type", "decile", "table", "survey_comparability"],
+        ["country", "year", "ppp_version", "welfare_type", "decile", "period", "table", "survey_comparability"],
         short_name="incomes",
     )
     tb_cpi = tb_cpi.format(short_name="cpi")
@@ -1561,6 +1564,47 @@ def make_distributional_indicators_long(tb: Table) -> Tuple[Table, Table]:
     )
 
     return tb, tb_incomes
+
+
+def add_period_dimension(tb: Table) -> Table:
+    """
+    Add period dimension to incomes table (day, month, year).
+    Note: In PIP, data comes as per day (different from LIS where it is yearly).
+    """
+    # Define index columns
+    index_cols = ["country", "year", "ppp_version", "welfare_type", "decile", "table", "survey_comparability"]
+
+    # Identify all columns that are not index or share (these need period conversion)
+    periodable_cols = [col for col in tb.columns if col not in index_cols and col != "share"]
+
+    # Separate table between "non-periodicable" and "periodable" indicators
+    tb_period = tb[index_cols + periodable_cols].copy()
+    tb_non_period = tb[index_cols + ["share"]].copy()
+
+    # Create copies for month and year (day is the original data since PIP data is per day)
+    tb_day = tb_period.copy()
+    tb_month = tb_period.copy()
+    tb_year = tb_period.copy()
+
+    # Convert values: data is originally per day, so multiply to get month and year
+    for col in periodable_cols:
+        if col in tb_month.columns:
+            tb_month[col] = tb_month[col] * 30  # Approximate month (30 days)
+        if col in tb_year.columns:
+            tb_year[col] = tb_year[col] * 365  # Year (365 days)
+
+    # Add period labels
+    tb_day["period"] = "day"
+    tb_month["period"] = "month"
+    tb_year["period"] = "year"
+
+    # Add period column as null for non-periodable data (share)
+    tb_non_period["period"] = None
+
+    # Concatenate all tables
+    tb = pr.concat([tb_day, tb_month, tb_year, tb_non_period], ignore_index=True, sort=False)
+
+    return tb
 
 
 def make_relative_poverty_long(tb: Table) -> Table:

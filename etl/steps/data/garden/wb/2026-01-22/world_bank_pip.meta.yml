@@ -386,9 +386,9 @@ definitions:
   threshold_title: |-
     {macros}
     <% if decile == "5" %>
-    Threshold <<welfare_type>> per day marking the <<percentiles_thr(decile) | lower>> (median)
+    Threshold <<welfare_type>> {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> (median)
     <%- else %>
-    Threshold <<welfare_type>> per day marking the <<percentiles_thr(decile) | lower>>
+    Threshold <<welfare_type>> {definitions.per_period} marking the <<percentiles_thr(decile) | lower>>
     <%- endif %>
 
   poverty_line_subtitle: |-
@@ -1603,14 +1603,14 @@ tables:
   incomes:
     variables:
       mean:
-        title: Mean (<<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+        title: Mean ({definitions.per_period}, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          Average <<welfare_type>> of the population.
+          Average <<welfare_type>> of the population {definitions.per_period}.
           <%- else %>
-          Average income or consumption of the population.
+          Average income or consumption of the population {definitions.per_period}.
           <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
@@ -1636,7 +1636,7 @@ tables:
             Mean
             <%- endif %>
           grapher_config:
-            title: Mean <<welfare_type>> per day
+            title: Mean <<welfare_type>> {definitions.per_period}
             subtitle: "{definitions.ppp_adjustment_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
@@ -1653,14 +1653,14 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
-        title: Median (<<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+        title: Median ({definitions.per_period}, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          Value of <<welfare_type>> below which 50% of the population live.
+          Value of <<welfare_type>> {definitions.per_period} below which 50% of the population live.
           <%- else %>
-          Value of income or consumption below which 50% of the population live.
+          Value of income or consumption {definitions.per_period} below which 50% of the population live.
           <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
@@ -1686,7 +1686,7 @@ tables:
             Median
             <%- endif %>
           grapher_config:
-            title: Median <<welfare_type>> per day
+            title: Median <<welfare_type>> {definitions.per_period}
             subtitle: "{definitions.ppp_adjustment_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
@@ -1705,7 +1705,7 @@ tables:
       avg:
         title: |-
           {macros}
-          Average (<<percentiles_avg_share(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+          Average ({definitions.per_period}, <<percentiles_avg_share(decile) | lower>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
@@ -1742,10 +1742,10 @@ tables:
           grapher_config:
             title: |-
               {macros}
-              Mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>>
+              Mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>>
             subtitle: |-
               {macros}
-              The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}
+              The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1763,7 +1763,7 @@ tables:
       share:
         title: |-
           {macros}
-          Share (<<percentiles_avg_share(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+          Share (<<percentiles_avg_share(decile) | lower>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -1819,14 +1819,14 @@ tables:
       thr:
         title: |-
           {macros}
-          Threshold (<<percentiles_thr(decile)>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+          Threshold ({definitions.per_period}, <<percentiles_thr(decile) | lower>>, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
+          The level of <<welfare_type>> {definitions.per_period} below which <<decile>>0% of the population falls.
           <% else %>
-          The level of income or consumption per day below which <<decile>>0% of the population falls.
+          The level of income or consumption {definitions.per_period} below which <<decile>>0% of the population falls.
           <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
@@ -1854,7 +1854,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: "{definitions.threshold_title}"
-            subtitle: The level of <<welfare_type>> per person per day below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
+            subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1870,14 +1870,14 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       top1_thr:
-        title: Threshold (top 1%, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+        title: Threshold ({definitions.per_period}, top 1%, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The level of <<welfare_type>> per day below which 99% of the population falls.
+          The level of <<welfare_type>> {definitions.per_period} below which 99% of the population falls.
           <% else %>
-          The level of income or consumption per day below which 99% of the population falls.
+          The level of income or consumption {definitions.per_period} below which 99% of the population falls.
           <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
@@ -1903,14 +1903,14 @@ tables:
             <%- endif %>
 
       top1_avg:
-        title: Average (top 1%, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
+        title: Average ({definitions.per_period}, top 1%, <<ppp_version>> prices){definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The mean <<welfare_type>> per day within the richest 1% of the population.
+          The mean <<welfare_type>> {definitions.per_period} within the richest 1% of the population.
           <% else %>
-          The mean income or consumption per day within the richest 1% of the population.
+          The mean income or consumption {definitions.per_period} within the richest 1% of the population.
           <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
