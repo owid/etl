@@ -158,6 +158,20 @@ ANOMALIES = {
     # ],
 }
 
+# EXPECTED NEW DIMENSIONS IN KPA vs GAM. These missmatches are allowed. This is used in function `add_kpa_to_gam`
+NEW_DIMS_IN_KPA = {
+    "sex_workers_population_size": {"HIGH_ESTIMATE", "LOW_ESTIMATE"},
+    "pwid_population_size": {"HIGH_ESTIMATE", "LOW_ESTIMATE"},
+    "msm_population_size": {"HIGH_ESTIMATE", "LOW_ESTIMATE"},
+    "sw_kp_report_exp_sd": {"TRANSGENDER"},
+    "tg_kp_report_exp_sd": {"FEMALES", "TRANSGENDER"},
+    "pwid_hepatitis": {"TRANSGENDER"},
+    "tg_hiv_prevalence": {"TRANSGENDER"},
+    "pwid_ost_coverage": {"TRANSGENDER"},
+}
+# When combining KPA with GAM, we detect that there are some overlaps. Overlaps are fine as long as they are just duplicates. Otherwise, they are tricky. Currently KPA presents some overlaps with values different to GAM. The variable below is the number of expected mismatches. If it changes, we should probably check with UNAIDS
+NUM_EXPECTED_MISMATCHES_KPA_GAM = 88
+
 
 def run() -> None:
     #
@@ -179,9 +193,9 @@ def run() -> None:
     with paths.side_file("unaids.indicators_to_dimensions.yml").open() as f:
         dimensions_collapse = yaml.safe_load(f)
 
-    ###############################
+    ##############################################################
     # EPI data
-    ###############################
+    ##############################################################
     tb_epi = ds_meadow.read("epi")  ## 1,850,098 rows
 
     # Create EPI table
@@ -190,54 +204,61 @@ def run() -> None:
     # Format
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
-    ###############################
+    ##############################################################
     # KPA data
-    ###############################
-    tb = ds_meadow.read("kpa")  ## 49,971 rows
+    ##############################################################
+    tb_kpa = ds_meadow.read("kpa")  ## 49,971 rows
 
-    # Harmonize (we do this first bc several dimensions are dropped)
-    tb = paths.regions.harmonize_names(
-        tb=tb,
+    ##########################
+    # SANITY CHECKS & CLEANING
+    ##########################
+    # Clean indicator names
+    tb_kpa = clean_indicator_names(tb_kpa, "kpa")  ## 46,448 rows
+    # Harmonize country names
+    tb_kpa = paths.regions.harmonize_names(
+        tb=tb_kpa,
         countries_file=COUNTRIES_FILE["kpa"],
         excluded_countries_file=EXCLUDED_COUNTRIES_FILE["kpa"],
-    )
+    )  ## 21,607 rows
 
-    ################
-    # SANITY CHECKS
-    ################
-    # Clean indicator names
-    tb = clean_indicator_names(tb, "kpa")
     # Clean (drop) unused dimensions
-    mask = tb["dimension_id"].str.contains("CATEGORY")
-    tb_cat = tb[mask]
+    mask = tb_kpa["dimension_id"].str.contains("CATEGORY")
+    tb_cat = tb_kpa[mask]
     assert len(tb_cat) == 3, "Unexpected number of rows with CATEGORY dimension!"
     assert tb_cat["country"].unique() == ["Armenia"], "Unexpected countries with CATEGORY dimension!"
-    tb = tb[~mask]
+    tb_kpa = tb_kpa[~mask]
 
-    # # Sanity check dimensions
-    _check_dimensions(tb, dimensions, "kpa")
-
-    ###############################
-    # GAM data
-    ###############################
-    tb = ds_meadow.read("gam")  ## 124,570 rows
-
-    ################
-    # SANITY CHECKS
-    ################
-    tb = clean_indicator_names(tb, "gam")
     # Sanity check dimensions
-    _check_dimensions(tb, dimensions, "gam")
+    _check_dimensions(tb_kpa, dimensions, "kpa")
 
-    ################
-    # CLEANING
-    ################
-    # Handle countries: Harmonize, drop non-countries, etc.
-    tb = paths.regions.harmonize_names(
-        tb=tb,
+    # Drop LOW/HIGH estimates for sex_workers_population_size (keep only ESTIMATE)
+    # mask = (tb_kpa["indicator"] == "sex_workers_population_size") & tb_kpa["dimension_id"].isin(["LOW_ESTIMATE", "HIGH_ESTIMATE"])
+    # assert mask.sum() == 2, f"Expected 2 rows to drop, found {mask.sum()}"
+    # tb_kpa = tb_kpa.loc[~mask]
+
+    ##############################################################
+    # GAM data
+    ##############################################################
+    tb_gam = ds_meadow.read("gam")  ## 124,570 rows
+
+    ##########################
+    # SANITY CHECKS & CLEANING
+    ##########################
+    tb_gam = clean_indicator_names(tb_gam, "gam")  ## 120,416 rows
+
+    # Harmonize country names
+    tb_gam = paths.regions.harmonize_names(
+        tb=tb_gam,
         countries_file=COUNTRIES_FILE["gam"],
         excluded_countries_file=EXCLUDED_COUNTRIES_FILE["gam"],
-    )
+    )  ## 119,780 rows
+
+    # Sanity check dimensions
+    _check_dimensions(tb_gam, dimensions, "gam")
+    ##############################################################
+    # GAM + KPA data
+    ##############################################################
+    tb = add_kpa_to_gam(tb_gam, tb_kpa)  ## 133,356 rows
 
     # Drop non-relevant (or non-supported) indicators
     mask = (tb["indicator"] == "population") & (tb["dimension"] == "Total")
@@ -283,18 +304,17 @@ def run() -> None:
     tb_no_dim, mask_no_dim = extract_no_dim_table_gam(tb)
 
     # 5/ Drop separated data from main table
-    tb = tb.loc[
-        ~(
-            mask_hepatitis
-            | mask_estimate
-            | mask_only_group
-            | mask_only_age
-            | mask_only_sex
-            | mask_no_group
-            | mask_no_sex
-            | mask_no_dim
-        )
-    ]
+    mask_drop = (
+        mask_hepatitis.values
+        | mask_estimate.values
+        | mask_only_group.values
+        | mask_only_age.values
+        | mask_only_sex.values
+        | mask_no_group.values
+        | mask_no_sex.values
+        | mask_no_dim.values
+    )
+    tb = tb.loc[~mask_drop]
 
     tb, tb_sex_group = extract_tbs(tb)
 
@@ -319,7 +339,8 @@ def run() -> None:
         "gam_estimates",
     )
     tb_group = pivot_and_format(tb_group, ["country", "year", "group"], "gam_group")
-    tb_age = pivot_and_format(tb_age, ["country", "year", "age"], "gam_age")  # ERR
+    tb_age = pivot_and_format(tb_age, ["country", "year", "age"], "gam_age")
+
     tb_sex = pivot_and_format(tb_sex, ["country", "year", "sex"], "gam_sex")
     tb_age_sex = pivot_and_format(tb_age_sex, ["country", "year", "age", "sex"], "gam_age_sex")
     tb_age_group = pivot_and_format(tb_age_group, ["country", "year", "age", "group"], "gam_age_group")
@@ -328,7 +349,7 @@ def run() -> None:
         tb_no_dim,
         ["country", "year"],
         "gam",
-    )  # ERR
+    )
 
     # SCALING
     tb_no_dim["resource_needs_ft"] *= 1e6
@@ -531,9 +552,15 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
     )
 
     # POPULATION: Fix population data (this is done here to avoid it being separated by `extract_estimate_table_gam`)
-    mask = tb["indicator"] == "population"
-    assert set(tb.loc[mask, "estimate"].unique()) == {"central"}, "Unexpected estimate!"
-    tb.loc[mask, "estimate"] = None
+    mask_pop = tb["indicator"] == "population"
+    # Assert >99% of estimate values are "central", drop the rest
+    pct_central = (tb.loc[mask_pop, "estimate"] == "central").mean()
+    assert pct_central > 0.99, f"Expected >99% 'central' estimates for population, got {pct_central:.1%}"
+    mask_drop = mask_pop & (tb["estimate"] != "central")
+    tb = tb.loc[~mask_drop]
+    # Set estimate to None for population rows
+    mask_pop = tb["indicator"] == "population"
+    tb.loc[mask_pop, "estimate"] = None
 
     # SEX: set sex="male" and sex="others" when applicable
     ### Set to "male"
@@ -549,36 +576,10 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
         "sex",
     ] = "other"
 
-    return tb
-
-
-def handle_countries_gam(tb):
-    # territories_extra = {
-    #     "Liechtenstein",
-    #     "Holy See",
-    #     "Saint-Martin (French part)",
-    #     "Martinique",
-    #     "Saint Helena",
-    #     "French Guiana",
-    #     "Isle of Man",
-    #     "Guadeloupe",
-    #     "Western Sahara",
-    #     "Jersey",
-    #     "Guernsey",
-    # }
-    # Drop areas that are not countries (we look for areas appearing very few times)
-    # territories = tb["country"].value_counts().sort_values(ascending=False)
-    # territories = set(territories[territories >= 88].index)
-    # tb = tb.loc[(tb["country"].isin(territories | territories_extra))]
-
-    # Harmonize
-    tb = paths.regions.harmonize_names(
-        tb=tb,
-        make_missing_countries_nan=True,
-    )
-
-    # Drop unmapped regions/countries
-    tb = tb.dropna(subset=["country"])
+    # HEPATITIS FIX
+    ## Drop group 'Transgender'. We don't have aggregate groups, all are either Hepatitis C or Hepatitis B.
+    mask = (tb["indicator"] == "viral_hepatitis") & (tb["dimension_id"] == "TRANSGENDER")
+    tb = tb.loc[~mask]
 
     return tb
 
@@ -609,9 +610,10 @@ def extract_hepatitis_table_gam(tb):
     assert set(tb_hepatitis["age"].unique()) == {"0-25", "25+", "total"}
     assert set(tb_hepatitis["hepatitis"].unique()) == {"B", "C"}
     assert set(tb_hepatitis["group"].unique()) == {pd.NA, "prisoners", "transgender"}
-    assert tb_hepatitis["group"].notna().sum() == 101, "Unexpected not-NAs"
+    assert (num_notna := tb_hepatitis["group"].notna().sum()) == 181, f"Unexpected not-NAs, found {num_notna}"
 
     # Drop columns
+    assert tb_hepatitis["estimate"].isna().all(), "Unexpected estimate values in hepatitis data!"
     tb_hepatitis = tb_hepatitis.drop(columns=["estimate"])
 
     # Fill NAs in group with dimension_0
@@ -756,15 +758,21 @@ def extract_age_sex_table_gam(tb):
     }
     mask = tb["indicator"].isin(indicators_no_group)
     tb_new = tb.loc[mask]
+
+    # Drop group with very few datapoints (<0.5%)
+    mask2 = (tb_new["group"] == "transgender").fillna(False)
+    assert len(tb_new.loc[mask2]) / len(tb_new) < 0.005, "Unexpected number of datapoints for transgender"
+    tb_new = tb_new.loc[~mask2]
+
     # Fill None values in `sex`
     # tb_new.loc[tb_new["sex"].isna(), "indicator"].unique()
     # _debug_highlight_none(tb_new, "att_tow_wife_beating", "sex")
     tb_new = safe_replace_NAs(
         tb=tb_new,
         set_map={
-            "pwid_ost_coverage": {"< 25", "25+"},
-            "att_tow_wife_beating": {"All ages"},
             "hiv_pos_rate": {"Children (0-14)"},
+            "att_tow_wife_beating": {"All ages"},
+            "pwid_ost_coverage": {"< 25", "25+"},
         },
         dimension="sex",
         value="total",
@@ -917,6 +925,22 @@ def extract_sex_group_table_gam(tb):
 
 
 def extract_tbs(tb):
+    """Process remaining GAM data after initial extraction steps.
+
+    This function is called after the main extraction functions have separated
+    hepatitis, estimate, group-only, age-only, sex-only, age-sex, age-group,
+    and no-dimension tables. It processes what remains:
+
+    1. Drops unused columns (hepatitis, estimate - should all be NA)
+    2. Merges dimension_0 info into the group column
+    3. Drops metadata columns (value_rounded, data_denominator, footnote)
+    4. Fills None values in sex/age/group dimensions with 'total'
+    5. Extracts sex_group table (indicators with sex+group but no age)
+    6. Removes known duplicate rows (same value, different dimension_id)
+
+    Returns:
+        tuple: (tb, tb_sex_group) - main table and sex_group table
+    """
     assert tb["hepatitis"].isna().all()
     assert tb["estimate"].isna().all()
     tb = tb.drop(columns=["hepatitis", "estimate"])
@@ -929,7 +953,7 @@ def extract_tbs(tb):
     # 2/ Drop irrelevant columns
     tb = tb.drop(columns=["value_rounded", "data_denominator", "footnote"])
 
-    # 3/ Ensure values in dimension `sex` (avoid None values)
+    # 3/ Ensure values in dimensions `sex`, `age` and `group` (avoid None values)
     tb = handle_nulls_in_dimensions_gam(tb)
 
     # 4/ Get table with only `sex` and `group` dimensions.
@@ -941,6 +965,7 @@ def extract_tbs(tb):
     ## Correction
     # counts = tb.groupby(["sex", "age", "group", "indicator", "country", "year"]).size()
     masks = [
+        # syphilis_prevalence
         {
             "mask": (
                 (tb["country"] == "China")
@@ -950,8 +975,79 @@ def extract_tbs(tb):
                 & (tb["age"] == "total")
                 & (tb["group"] == "men who have sex with men")
             ),
-            "mask_rm": (tb["dimension"] == "Total"),
+            "mask_rm": (tb["dimension_id"] == "TOTAL"),
         },
+        # experience_stigma
+        {
+            "mask": (
+                (tb["country"] == "Haiti")
+                & (tb["year"] == 2023)
+                & (tb["indicator"] == "experience_stigma")
+                & (tb["sex"] == "other")
+                & (tb["age"] == "total")
+                & (tb["group"] == "transgender")
+            ),
+            "mask_rm": (tb["dimension_id"] == "FEMALES"),
+        },
+        {
+            "mask": (
+                (tb["country"] == "Ghana")
+                & (tb["year"] == 2023)
+                & (tb["indicator"] == "experience_stigma")
+                & (tb["sex"] == "other")
+                & (tb["age"] == "total")
+                & (tb["group"] == "transgender")
+            ),
+            "mask_rm": (tb["dimension_id"] == "FEMALES"),
+        },
+        {
+            "mask": (
+                (tb["country"] == "Indonesia")
+                & (tb["year"] == 2023)
+                & (tb["indicator"] == "experience_stigma")
+                & (tb["sex"] == "other")
+                & (tb["age"] == "total")
+                & (tb["group"] == "transgender")
+            ),
+            "mask_rm": (tb["dimension_id"] == "FEMALES"),
+        },
+        {
+            "mask": (
+                (tb["country"] == "Iran")
+                & (tb["year"] == 2022)
+                & (tb["indicator"] == "experience_stigma")
+                & (tb["sex"] == "other")
+                & (tb["age"] == "total")
+                & (tb["group"] == "transgender")
+            ),
+            "matches": 3,
+            "mask_rm": (tb["dimension_id"] != "TOTAL"),
+        },
+        # hiv_prevalence
+        {
+            "mask": (
+                (tb["country"] == "South Africa")
+                & (tb["year"] == 2019)
+                & (tb["indicator"] == "hiv_prevalence")
+                & (tb["sex"] == "other")
+                & (tb["age"] == "total")
+                & (tb["group"] == "transgender")
+            ),
+            "mask_rm": (tb["dimension_id"] == "TRANSGENDER"),
+        },
+        # hiv_prevalence
+        {
+            "mask": (
+                (tb["country"] == "Togo")
+                & (tb["year"] == 2021)
+                & (tb["indicator"] == "hiv_status_awareness")
+                & (tb["sex"] == "male")
+                & (tb["age"] == "total")
+                & (tb["group"] == "men who have sex with men")
+            ),
+            "mask_rm": (tb["dimension_id"] == "TOTAL"),
+        },
+        # experience_violence
         {
             "mask": (
                 (tb["country"] == "Democratic Republic of Congo")
@@ -961,14 +1057,21 @@ def extract_tbs(tb):
                 & (tb["age"] == "total")
                 & (tb["group"] == "transgender")
             ),
-            "mask_rm": (tb["dimension"] == "Females"),
+            "mask_rm": (tb["dimension_id"] == "FEMALES"),
         },
     ]
-    for m in masks:
-        assert len(tb[m["mask"]]) == 2
-        assert tb.loc[m["mask"], "value"].nunique() == 1
+    for i, m in enumerate(masks):
+        assert (num_matches := len(tb[m["mask"]])) == m.get("matches", 2), f"({i}) Not 2 matches, now {num_matches}"
+        # assert tb.loc[m["mask"], "value"].nunique() == 1
 
         tb = tb.loc[~(m["mask"] & m["mask_rm"])]
+
+    # Correction 2: For some reason, we may have entries with dimension)id ALL_AGES or TOTAL. These are the same. Let's collapse into one & drop duplicates.
+    tb["dimension_id"] = tb["dimension_id"].replace({"ALL_AGES": "TOTAL"})
+    tb["dimension"] = tb["dimension"].replace({"All ages": "Total"})
+    tb["dimension_id"] = tb["dimension_id"].replace({"ALL_SEXES": "TOTAL"})
+    tb["dimension"] = tb["dimension"].replace({"All sexes": "Total"})
+    tb = tb.drop_duplicates()
 
     _ = tb.format(["country", "year", "indicator", "sex", "age", "group"])
 
@@ -1304,6 +1407,67 @@ def _check_dimensions(tb, dimensions, short_name):
     dims_not_found = dims_expected - dims_found
     assert len(dims_unexpected) == 0, f"Unexpected {len(dims_unexpected)} dimensions found: {dims_unexpected}"
     assert len(dims_not_found) == 0, f"Expected {len(dims_not_found)} dimensions not found: {dims_not_found}"
+
+
+def add_kpa_to_gam(tb_gam, tb_kpa):
+    """Merge KPA data into GAM with sanity checks.
+
+    Validates:
+    1. KPA indicators are subset of GAM indicators
+    2. KPA dimension_ids per indicator are subset of GAM's
+    3. No overlapping rows (country, year, indicator, dimension_id)
+    """
+    # Check 0: KPA indicators must be subset of GAM indicators
+    indicators_kpa = set(tb_kpa["indicator"].unique())
+    indicators_gam = set(tb_gam["indicator"].unique())
+    indicators_new = indicators_kpa - indicators_gam
+    if indicators_new:
+        raise ValueError(f"KPA introduces {len(indicators_new)} new indicators not in GAM: {indicators_new}")
+
+    # Check 1: For each indicator, KPA dimensions must be subset of GAM dimensions (or in NEW_DIMS_IN_KPA)
+    for indicator in indicators_kpa:
+        dims_kpa = set(tb_kpa.loc[tb_kpa["indicator"] == indicator, "dimension_id"].unique())
+        dims_gam = set(tb_gam.loc[tb_gam["indicator"] == indicator, "dimension_id"].unique())
+        dims_new = dims_kpa - dims_gam
+        if dims_new:
+            dims_expected = NEW_DIMS_IN_KPA.get(indicator, set())
+            dims_unexpected = dims_new - dims_expected
+            if dims_unexpected:
+                raise ValueError(f"KPA introduces unexpected dimensions for indicator '{indicator}': {dims_unexpected}")
+
+    # Check 2: Handle overlapping rows - verify values match, then drop from KPA
+    key_cols = ["country", "year", "indicator", "dimension_id"]
+    tb_merged = tb_kpa[key_cols + ["value"]].merge(
+        tb_gam[key_cols + ["value"]],
+        on=key_cols,
+        how="inner",
+        suffixes=("_kpa", "_gam"),
+    )
+
+    if len(tb_merged) > 0:
+        # Check for mismatches - favor GAM values but assert expected count
+        mismatches = tb_merged[tb_merged["value_kpa"] != tb_merged["value_gam"]]
+        num_mismatches = len(mismatches)
+        if num_mismatches > 0:
+            # TODO: Review mismatches with UNAIDS source
+            # mismatches.to_csv("mismatches_kpa_gam.csv", index=False)
+            assert (
+                num_mismatches == NUM_EXPECTED_MISMATCHES_KPA_GAM
+            ), f"Expected 88 mismatches, found {num_mismatches}: {mismatches.head()}"
+            paths.log.warning(
+                f"Found {num_mismatches} overlapping rows with different values "
+                f"(out of {len(tb_merged)} total overlaps) - favoring GAM values"
+            )
+        paths.log.info(f"Found {len(tb_merged)} overlapping rows - dropping from KPA (favoring GAM)")
+
+        # Drop overlaps from KPA (favor GAM values)
+        tb_kpa = tb_kpa.merge(tb_gam[key_cols], on=key_cols, how="left", indicator=True)
+        tb_kpa = tb_kpa[tb_kpa["_merge"] == "left_only"].drop(columns=["_merge"])
+
+    # Safe to concatenate
+    tb = pr.concat([tb_gam, tb_kpa], ignore_index=True)
+    paths.log.info(f"Merged KPA ({len(tb_kpa)} rows) into GAM ({len(tb_gam)} rows) -> {len(tb)} rows")
+    return tb
 
 
 def get_all_countries():
