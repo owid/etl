@@ -26,7 +26,7 @@ originUrl: /co2-and-greenhouse-gas-emissions
 chartTypes: []
 hideTimeline: true
 # TODO: Remove the following note if we adopt this graph step; what's described here would happen automatically.
-# internalNotes: After an update, go to "Basic", click on the variable "Annual CO₂ emissions (per capita)" to open it in a separate tab. On the preview, open the chart tab and select the World. Find the value for emissions in the latest year informed. Insert that value here in the "Map" tab, as the upper limit of the first map bracket.
+internalNotes: After an update, go to "Basic", click on the variable "Annual CO₂ emissions (per capita)" to open it in a separate tab. On the preview, open the chart tab and select the World. Find the value for emissions in the latest year informed. Insert that value here in the "Map" tab, as the upper limit of the first map bracket.
 selectedEntityNames:
   - Dominica
   - Paraguay
