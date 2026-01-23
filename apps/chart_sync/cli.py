@@ -134,6 +134,7 @@ def cli(
 
     - Use `--archive` to automatically archive datasets in TARGET that have no charts using their indicators.
     - Only datasets that were part of the synced charts are considered for archiving.
+    - Datasets are only archived if the corresponding ETL dataset is in the archive DAG (not in the active DAG).
     - Archived datasets are not deleted, just marked as archived.
     """
     if _is_commit_sha(source):
@@ -654,9 +655,20 @@ def _archive_datasets_without_charts(
     - Are in the provided dataset_ids set (from synced charts)
     - Are not already archived
     - Have no charts using any of their variables in TARGET
+    - Have their corresponding ETL dataset in the archive DAG
     """
     if not dataset_ids:
         return 0
+
+    # Load the active and archive DAGs to check if datasets are archived in ETL
+    from etl import paths
+    from etl.dag_helpers import load_dag
+
+    # Load both DAGs - archive DAG includes active steps via includes
+    archive_dag = load_dag(paths.DAG_ARCHIVE_FILE)
+    archive_dag_steps = set(archive_dag.keys())
+    active_dag = load_dag(paths.DAG_FILE)
+    active_dag_steps = set(active_dag.keys())
 
     datasets_archived = 0
     archived_datasets_info: list[dict] = []
@@ -692,6 +704,37 @@ def _archive_datasets_without_charts(
         dataset_id = row[0]
         dataset_name = row[1]
         catalog_path = row[2]
+
+        # Check if the dataset is in the archive DAG
+        # The catalog path format is like "grapher/namespace/version/dataset/table#indicator"
+        # We need to convert it to DAG format: "data://grapher/namespace/version/dataset"
+        if catalog_path:
+            # Extract the dataset path (remove table#indicator part)
+            dataset_path = catalog_path.split("/")[:-1]  # Remove table#indicator
+            dag_step = "data://" + "/".join(dataset_path)
+
+            # Check if this step exists ONLY in the archive DAG (not in active DAG)
+            # The archive DAG includes active steps too via includes, so we need to check
+            # if the step is in archive but would not be in the active-only DAG
+            is_in_archive_only = dag_step in archive_dag_steps and dag_step not in active_dag_steps
+
+            if not is_in_archive_only:
+                log.info(
+                    "archive_datasets.skip_not_in_archive_dag",
+                    dataset_id=dataset_id,
+                    name=dataset_name,
+                    catalog_path=catalog_path,
+                    dag_step=dag_step,
+                )
+                continue
+        else:
+            # No catalog path means we can't verify it's in the archive DAG, skip it
+            log.info(
+                "archive_datasets.skip_no_catalog_path",
+                dataset_id=dataset_id,
+                name=dataset_name,
+            )
+            continue
 
         log.info("archive_datasets.archive", dataset_id=dataset_id, name=dataset_name, catalog_path=catalog_path)
         datasets_archived += 1
