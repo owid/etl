@@ -218,11 +218,7 @@ def display_image_row(rank: int, image: dict) -> None:
     filename = image["filename"]
 
     # Map image type to display badge
-    type_badges = {
-        "content": "📝 Content",
-        "featured-thumbnail-rw": "⭐ Featured/Thumbnail/R&W",
-        "other": "❓ Other"
-    }
+    type_badges = {"content": "📝 Content", "featured-thumbnail-rw": "⭐ Featured/Thumbnail/R&W", "other": "❓ Other"}
     badge_str = type_badges.get(image.get("image_type"), "❓ Unknown")
 
     with st.expander(f"**#{rank}** - {filename} | {badge_str}", expanded=True):
