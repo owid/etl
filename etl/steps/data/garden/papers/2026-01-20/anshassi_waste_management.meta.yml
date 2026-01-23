@@ -134,8 +134,8 @@ tables:
     variables:
       final_classification:
         title: Waste management system level
-        unit: "1 (best) - 4 (poorest)"
-        description_short: The quality of waste management services, on a 1-4 scale (where 1 is best). Level 1 countries collect nearly all waste, and divert more than 60% away from landfills to material recovery sites. Level 2 also collect nearly all waste, but divert less than 60% away from landfill. Level 3 have some formal collection system, but most is disposed of in open dumps. Level 4 have little or no formal waste management.
+        unit: "1 (best) - 4 (worst)"
+        description_short: Each country is assigned to one of four waste management levels (1–4). Level 1 indicates that most waste is recycled, composted, or incinerated and very little is mismanaged, while Level 4 indicates that little waste is treated and much more is openly dumped or burned in the open air.
         display:
           numDecimalPlaces: 0
 
