@@ -143,9 +143,7 @@ def get_ranked_images(sort_by: str = "views_365d", image_type_filter: str = "all
     {}
     GROUP BY i.id
     ORDER BY {} DESC
-    """.format(
-        type_filter, sort_by
-    )
+    """.format(type_filter, sort_by)
     df = read_sql(query)
     return df.to_dict("records")
 
@@ -198,7 +196,7 @@ def display_image_row(rank: int, image: dict) -> None:
 
         with col2:
             st.markdown(f"**Alt text:** {image['defaultAlt'] or 'N/A'}")
-            views_per_day = image['views_365d'] / 365
+            views_per_day = image["views_365d"] / 365
             st.markdown(
                 f"**Views (7d):** {int(image['views_7d']):,} | "
                 f"**Views (365d):** {int(image['views_365d']):,} | "
@@ -214,9 +212,7 @@ def display_image_row(rank: int, image: dict) -> None:
                     # Try to get a fragment URL pointing to the image location
                     fragment_url = None
                     if post.get("content"):
-                        fragment_url = find_image_in_content(
-                            post["content"], filename, post["slug"], post["type"]
-                        )
+                        fragment_url = find_image_in_content(post["content"], filename, post["slug"], post["type"])
                     # Fall back to base post URL
                     if not fragment_url:
                         fragment_url = _build_post_url(BASE_SITE_URL, post["slug"], post["type"])
