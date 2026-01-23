@@ -5,7 +5,6 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -21,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("fluid.csv")
+    snap = paths.load_snapshot("fluid.csv")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
@@ -33,8 +32,9 @@ def run(dest_dir: str) -> None:
     # Dropping out these columns as they are awkward types and we don't need to use them
     tb = tb.drop(columns=["comments", "geospread_comments"])
 
-    # Convert trend column to string - it has mixed types (numeric codes and occasional date strings)
+    # Convert columns with mixed types to string
     tb["trend"] = tb["trend"].astype(str)
+    tb["isoyw"] = tb["isoyw"].astype(str)
     tb = tb.rename(columns={"country_area_territory": "country"})
 
     # Convert object columns that should be numeric to numeric
@@ -53,6 +53,7 @@ def run(dest_dir: str) -> None:
         "pneu_case",
         "pneu_inpatients",
         "pneu_pop_cov",
+        "pneu_nb_sites",
     ]
     for col in numeric_cols:
         if col in tb.columns:
