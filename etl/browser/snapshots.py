@@ -96,7 +96,7 @@ def create_snapshot_ranker() -> Callable[[str, List[str]], List[str]]:
     )
 
 
-def browse_snapshots(history: Optional[List[str]] = None) -> Tuple[Optional[str], bool, List[str]]:
+def browse_snapshots(history: Optional[List[str]] = None) -> Tuple[Optional[str], bool, List[str], Optional[str]]:
     """Interactive snapshot browser using prompt_toolkit.
 
     Args:
@@ -104,10 +104,11 @@ def browse_snapshots(history: Optional[List[str]] = None) -> Tuple[Optional[str]
             Use Up/Down when input is empty to navigate history.
 
     Returns:
-        Tuple of (pattern_or_snapshot, is_exact_match, updated_history):
-        - If user presses Enter: (current_text, False, history) to run all matches
-        - If user selects a snapshot: (snapshot_uri, True, history) to run just that snapshot
-        - If user cancels: (None, False, history)
+        Tuple of (pattern_or_snapshot, is_exact_match, updated_history, switch_mode_target):
+        - If user presses Enter: (current_text, False, history, None) to run all matches
+        - If user selects a snapshot: (snapshot_uri, True, history, None) to run just that snapshot
+        - If user cancels: (None, False, history, None)
+        - If mode switch: (None, False, history, target_mode_name)
     """
     # Try loading from cache first
     cached_items = load_cached_snapshots()

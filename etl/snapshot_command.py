@@ -166,9 +166,9 @@ def snapshot_cli(
     if browse:
         from etl.browser import browse_snapshots
 
-        result, _is_exact, _history = browse_snapshots()
+        result, _is_exact, _history, _switch_mode = browse_snapshots()
         if result is None:
-            # User cancelled (Ctrl-C/Escape)
+            # User cancelled (Ctrl-C/Escape) or mode switch (not applicable here)
             return
         dataset_name = result
 

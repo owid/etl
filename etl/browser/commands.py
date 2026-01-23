@@ -14,8 +14,9 @@ if TYPE_CHECKING:
 class CommandResult:
     """Result of executing a command."""
 
-    action: Literal["continue", "exit", "refresh"]
+    action: Literal["continue", "exit", "refresh", "switch_mode"]
     message: Optional[str] = None
+    target_mode: Optional[str] = None  # For switch_mode action
 
 
 @dataclass

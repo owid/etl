@@ -245,7 +245,7 @@ def main_cli(
         history: List[str] = load_history_cache()
 
         while True:
-            result, is_exact, history = browse_steps(
+            result, is_exact, history, _switch_mode = browse_steps(
                 dag_loader=lambda: load_dag(dag_path),
                 private=private,
                 dag_path=dag_path,
@@ -256,7 +256,7 @@ def main_cli(
             save_history_cache(history)
 
             if result is None:
-                # User cancelled (Ctrl-C/Escape)
+                # User cancelled (Ctrl-C/Escape) or mode switch (not applicable here)
                 return
 
             steps = [result]

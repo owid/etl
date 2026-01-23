@@ -239,15 +239,106 @@ for group in GROUPS:
     context_settings=dict(show_default=True),
     cls=LazyGroup,
     lazy_subcommands=lazy_cmds,  # {k: v for group in GROUPS for k, v in group["commands"].items()},
+    invoke_without_command=True,
 )
-def cli() -> None:
+@click.option(
+    "--browse",
+    "-b",
+    is_flag=True,
+    help="Open unified ETL browser to search and select steps or snapshots.",
+)
+@click.pass_context
+def cli(ctx: click.Context, browse: bool) -> None:
     """Run OWID's ETL client.
 
     Create ETL step templates, compare different datasets, generate dependency visualisations, synchronise charts across different servers, import datasets from non-ETL OWID sources, improve your metadata, etc.
 
     **Note: For a UI experience, refer to CLI `etlwiz`.**
+
+    Use `etl --browse` or `etl -b` to open the unified browser for searching steps and snapshots.
     """
-    pass
+    if browse:
+        _run_unified_browser()
+        ctx.exit(0)
+    elif ctx.invoked_subcommand is None:
+        # No subcommand and no --browse flag: show help
+        click.echo(ctx.get_help())
+
+
+def _run_unified_browser() -> None:
+    """Run the unified ETL browser."""
+    from etl import paths
+    from etl.browser import browse_unified
+    from etl.dag_helpers import load_dag
+
+    while True:
+        result, is_exact, mode_name = browse_unified(
+            private=True,  # Default to showing all steps
+            dag_path=paths.DEFAULT_DAG_FILE,
+            dag_loader=lambda: load_dag(paths.DEFAULT_DAG_FILE),
+            initial_mode="steps",
+        )
+
+        if result is None:
+            # User cancelled
+            return
+
+        # Execute based on mode
+        if mode_name == "steps":
+            _execute_step(result, is_exact)
+        elif mode_name == "snapshots":
+            _execute_snapshot(result)
+
+        # Add blank line before returning to browser
+        print()
+
+
+def _execute_step(step: str, is_exact: bool) -> None:
+    """Execute a step from the browser."""
+    import traceback
+
+    from etl import config
+    from etl.command import main
+
+    config.enable_sentry()
+
+    # Prepare kwargs (minimal set for browse mode)
+    kwargs = {
+        "steps": [step],
+        "grapher": step.startswith("grapher://"),
+        "private": True,
+        "exact_match": is_exact,
+    }
+
+    try:
+        main(**kwargs)
+    except Exception as e:
+        traceback.print_exc()
+        print(f"\nError: {e}")
+
+
+def _execute_snapshot(snapshot: str) -> None:
+    """Execute a snapshot from the browser."""
+    import traceback
+
+    from etl.snapshot_command import (
+        check_for_version_ambiguity,
+        find_snapshot_script,
+        run_snapshot_dvc_only,
+        run_snapshot_script,
+    )
+
+    try:
+        check_for_version_ambiguity(snapshot)
+        script_path = find_snapshot_script(snapshot)
+
+        if script_path and script_path.exists():
+            run_snapshot_script(script_path, upload=True, path_to_file=None)
+        else:
+            run_snapshot_dvc_only(snapshot, upload=True, path_to_file=None)
+    except Exception as e:
+        traceback.print_exc()
+        print(f"\nError: {e}")
 
 
 ################################

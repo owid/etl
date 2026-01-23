@@ -291,6 +291,8 @@ class BrowserState:
         self.history_index: int = -1  # -1 means not browsing history
         self.history_temp: str = ""  # Stores current input when entering history mode
         self._navigating_history: bool = False  # Flag to prevent resetting history on programmatic text changes
+        # Mode switch state (for unified browser)
+        self.switch_mode_target: Optional[str] = None  # Target mode name when switching
 
 
 def filter_items(pattern: str, all_items: List[str]) -> List[str]:
@@ -351,7 +353,7 @@ def browse_items(
     rank_matches: Optional[Ranker] = None,
     commands: Optional[List["Command"]] = None,
     history: Optional[List[str]] = None,
-) -> Tuple[Optional[str], bool, List[str]]:
+) -> Tuple[Optional[str], bool, List[str], Optional[str]]:
     """Interactive item browser using prompt_toolkit.
 
     Args:
@@ -372,10 +374,11 @@ def browse_items(
             Use Up/Down when input is empty to navigate history.
 
     Returns:
-        Tuple of (pattern_or_item, is_exact_match, updated_history):
-        - If user presses Enter: (current_text, False, history) to run all matches
-        - If user selects an item: (item, True, history) to run just that item
-        - If user cancels: (None, False, history)
+        Tuple of (pattern_or_item, is_exact_match, updated_history, switch_mode_target):
+        - If user presses Enter: (current_text, False, history, None) to run all matches
+        - If user selects an item: (item, True, history, None) to run just that item
+        - If user cancels: (None, False, history, None)
+        - If mode switch: (None, False, history, target_mode_name)
     """
     import threading
 
@@ -485,6 +488,10 @@ def browse_items(
 
             if result.action == "exit":
                 state.cancelled = True
+                event.app.exit()
+            elif result.action == "switch_mode":
+                # Mode switch requested - store target and exit
+                state.switch_mode_target = result.target_mode
                 event.app.exit()
             elif result.action == "refresh":
                 # Reload items
@@ -796,11 +803,15 @@ def browse_items(
         state.cancelled = True
 
     if state.cancelled:
-        return None, False, state.history
+        return None, False, state.history, None
+
+    # Check for mode switch (unified browser feature)
+    if state.switch_mode_target:
+        return None, False, state.history, state.switch_mode_target
 
     # Check if no items were loaded
     if not state.all_items and not state.loading:
         print(empty_message)
-        return None, False, state.history
+        return None, False, state.history, None
 
-    return state.result, state.is_exact, state.history
+    return state.result, state.is_exact, state.history, None
