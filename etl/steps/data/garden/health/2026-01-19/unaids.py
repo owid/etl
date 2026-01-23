@@ -93,6 +93,17 @@ DIMENSION_COLUMNS = ["sex", "age", "estimate"]
 with paths.side_file("unaids.indicator_renames.yml").open() as f:
     INDICATOR_SHORT_NAME_MAPPING = yaml.safe_load(f)
 
+# HARMONIZING COUNTRY FILES
+# This are the paths for files with country mappings for the different tables building UNAIDS
+COUNTRIES_FILE = {}
+for name in ["epi", "gam", "kpa", "aux"]:
+    COUNTRIES_FILE[name] = paths.directory / f"unaids.countries.{name}.json"
+
+# SANITY CHECKS FOR UNMAPPED COUNTRIES
+EXCLUDED_COUNTRIES_FILE = {}
+for name in ["epi", "gam", "kpa", "aux"]:  # , "gam", "kpa", "aux"]:
+    EXCLUDED_COUNTRIES_FILE[name] = paths.directory / f"unaids.excluded_countries.{name}.json"
+
 
 """
 TODO:
@@ -153,6 +164,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
+    # TODO: harmonize with relevant files
+    # KPA: drop rows with weird dimension id
     ds_meadow = paths.load_dataset("unaids")
     ds_art_old = paths.load_dataset("unaids_deaths_averted_art")
 
@@ -169,24 +182,40 @@ def run() -> None:
     ###############################
     # EPI data
     ###############################
-    # tb_epi = ds_meadow.read("epi")  ## 1,850,098 rows
-    # # Create EPI table
-    # tb_epi = make_table_epi(tb_epi, dimensions, tb_art_old)  # 360,223 rows
+    tb_epi = ds_meadow.read("epi")  ## 1,850,098 rows
 
-    # # Format
-    # tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
+    # Create EPI table
+    tb_epi = make_table_epi(tb_epi, dimensions, tb_art_old)  # 360,223 rows
+
+    # Format
+    tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
     ###############################
     # KPA data
     ###############################
     tb = ds_meadow.read("kpa")  ## 49,971 rows
 
+    # Harmonize (we do this first bc several dimensions are dropped)
+    tb = paths.regions.harmonize_names(
+        tb=tb,
+        countries_file=COUNTRIES_FILE["kpa"],
+        excluded_countries_file=EXCLUDED_COUNTRIES_FILE["kpa"],
+    )
+
     ################
     # SANITY CHECKS
     ################
+    # Clean indicator names
     tb = clean_indicator_names(tb, "kpa")
+    # Clean (drop) unused dimensions
+    mask = tb["dimension_id"].str.contains("CATEGORY")
+    tb_cat = tb[mask]
+    assert len(tb_cat) == 3, "Unexpected number of rows with CATEGORY dimension!"
+    assert tb_cat["country"].unique() == ["Armenia"], "Unexpected countries with CATEGORY dimension!"
+    tb = tb[~mask]
+
     # # Sanity check dimensions
-    # _check_dimensions(tb, dimensions, "kpa")
+    _check_dimensions(tb, dimensions, "kpa")
 
     ###############################
     # GAM data
@@ -204,7 +233,11 @@ def run() -> None:
     # CLEANING
     ################
     # Handle countries: Harmonize, drop non-countries, etc.
-    tb = handle_countries_gam(tb)
+    tb = paths.regions.harmonize_names(
+        tb=tb,
+        countries_file=COUNTRIES_FILE["gam"],
+        excluded_countries_file=EXCLUDED_COUNTRIES_FILE["gam"],
+    )
 
     # Drop non-relevant (or non-supported) indicators
     mask = (tb["indicator"] == "population") & (tb["dimension"] == "Total")
@@ -386,7 +419,9 @@ def make_table_epi(tb, dimensions, tb_aux):
     # Harmonize country names, extract dimensions, pivot table
     ################################################################
     # Harmonize
-    tb = paths.regions.harmonize_names(tb=tb)
+    tb = paths.regions.harmonize_names(
+        tb=tb, countries_file=COUNTRIES_FILE["epi"], excluded_countries_file=EXCLUDED_COUNTRIES_FILE["epi"]
+    )
 
     # Extract dimensions
     tb = expand_raw_dimension(tb, dimensions["epi"], check_na=True)
@@ -423,7 +458,10 @@ def add_old_art_averted_deaths_data(tb, tb_aux):
     dtypes = tb.dtypes.to_dict()
 
     # Process ART prevented deaths table
-    tb_aux = paths.regions.harmonize_names(tb=tb_aux)
+    tb_aux = paths.regions.harmonize_names(
+        tb=tb_aux,
+        countries_file=COUNTRIES_FILE["aux"],
+    )
 
     # Checks
     metric = "deaths_averted_art"
