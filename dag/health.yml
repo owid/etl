@@ -181,6 +181,8 @@ steps:
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
+  data://grapher/health/2026-01-19/unaids:
+    - data://garden/health/2026-01-19/unaids
 
   # OECD Road accidents & passenger travel
   data://meadow/oecd/2024-07-01/road_accidents:
