@@ -180,7 +180,7 @@ def complete_steps(ctx: click.Context, param: click.Argument, incomplete: str) -
 @click.option(
     "--graph-pull",
     is_flag=True,
-    help="Pull database metadata to local .meta.yml file (for graph steps). NOT YET IMPLEMENTED.",
+    help="Pull database metadata to local .meta.yml file (for graph steps).",
 )
 @click.option(
     "--prefer-download",
