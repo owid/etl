@@ -1,42 +1,39 @@
+map:
+  colorScale:
+    baseColorScheme: BinaryMapPaletteE
+    binningStrategy: manual
+    colorSchemeInvert: true
+    customNumericColors:
+      - '#4c6a9c'
+      - '#b35052'
+    customNumericLabels:
+      - Below global equity
+      - Above global equity
+    customNumericValues:
+      - 0
+      - '{global_per_capita_threshold}'
+      - 100000000
+  columnSlug: '1119914'
+  hideTimeline: true
+tab: map
+title: Per capita CO₂ emissions relative to the global average
+yAxis:
+  min: 0
+$schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
+subtitle: This map denotes whether a country's average per capita emissions are above or below the value of global per capita emissions. This is based on territorial emissions, which don't adjust for trade.
+hasMapTab: true
+originUrl: /co2-and-greenhouse-gas-emissions
+chartTypes: []
+hideTimeline: true
+# TODO: Remove the following note if we adopt this graph step; what's described here would happen automatically.
+# internalNotes: After an update, go to "Basic", click on the variable "Annual CO₂ emissions (per capita)" to open it in a separate tab. On the preview, open the chart tab and select the World. Find the value for emissions in the latest year informed. Insert that value here in the "Map" tab, as the upper limit of the first map bracket.
 selectedEntityNames:
   - Dominica
   - Paraguay
   - Costa Rica
-chartTypes: []
-hasMapTab: true
-tab: map
-yAxis:
-  min: 0
-map:
-  hideTimeline: true
-  colorScale:
-    binningStrategy: manual
-    colorSchemeInvert: true
-    baseColorScheme: BinaryMapPaletteE
-    customNumericValues:
-      - 0
-      - "{global_per_capita_threshold}"
-      - 100000000
-    customNumericLabels:
-      - Below global equity
-      - Above global equity
-    customNumericColors:
-      - "#4c6a9c"
-      - "#b35052"
-  columnSlug: "1119914"
 hideAnnotationFieldsInTitle:
   entity: true
   changeInPrefix: true
-hideTimeline: true
-slug: per-capita-co2-vs-average
-title: Per capita CO₂ emissions relative to the global average
-subtitle: This map denotes whether a country's average per capita emissions are
-  above or below the value of global per capita emissions. This is based on
-  territorial emissions, which don't adjust for trade.
-note: The global average threshold is automatically calculated from the latest data.
-originUrl: /co2-and-greenhouse-gas-emissions
-$schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
-
 dimensions:
   - property: y
     catalogPath: emissions_total_per_capita

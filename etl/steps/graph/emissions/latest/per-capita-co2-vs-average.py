@@ -21,6 +21,9 @@ def run() -> None:
     latest_global_per_capita = float(world_data["emissions_total_per_capita"].iloc[0])
     assert latest_global_per_capita > 4, "Unexpected global emissions per capita."
 
+    # Round to 2 decimal places
+    latest_global_per_capita = round(latest_global_per_capita, 2)
+
     # Create chart with dynamic threshold substituted into YAML template
     paths.create_graph(
         yaml_params={
