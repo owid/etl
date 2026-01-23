@@ -1635,8 +1635,7 @@ def separate_rest_of_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
     tb_cpi = (
         tb_non_dimensional[
             (tb_non_dimensional["poverty_line"] == current_ipl)
-            & (tb_non_dimensional["survey_comparability"] == "No spells")
-            & (tb_non_dimensional["filled"])
+            & (~tb_non_dimensional["filled"])  # CPI only exists in original survey data, not filled
         ][["country", "year"] + INDICATORS_CPI]
         .drop_duplicates()
         .reset_index(drop=True)

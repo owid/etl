@@ -17,7 +17,7 @@ def run() -> None:
     tb_poverty = ds_garden.read("poverty", reset_index=False)
     tb_inequality = ds_garden.read("inequality", reset_index=False)
     tb_incomes = ds_garden.read("incomes", reset_index=False)
-    # tb_cpi = ds_garden.read("cpi", reset_index=False)
+    tb_cpi = ds_garden.read("cpi", reset_index=False)
     tb_survey = ds_garden.read("survey_count", reset_index=False)
     tb_rest = ds_garden.read("other_indicators", reset_index=False)
 
@@ -30,7 +30,7 @@ def run() -> None:
             tb_poverty,
             tb_inequality,
             tb_incomes,
-            # tb_cpi,
+            tb_cpi,
             tb_survey,
             tb_rest,
         ],
