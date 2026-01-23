@@ -99,14 +99,38 @@ def _find_context_before_item(body: list, item_index: int) -> tuple[str | None, 
 
 
 @st.cache_data(show_spinner=False, ttl=3600)
-def get_ranked_images(sort_by: str = "views_365d") -> list[dict]:
+def get_ranked_images(sort_by: str = "views_365d", image_type_filter: str = "all") -> list[dict]:
     """Get all images ranked by pageviews."""
+    # Build WHERE clause based on image type filter
+    # Logic matches getImageType() from ImagesIndexPage.tsx
+    type_filter = ""
+    if image_type_filter == "content":
+        # If an image is used in body content, it's in content category
+        type_filter = "AND i.isBodyContent = 1"
+    elif image_type_filter == "featured-thumbnail-rw":
+        # Featured, thumbnails, or R&W (only if NOT in body content)
+        type_filter = """
+        AND i.isBodyContent = 0
+        AND (i.isFeaturedImage = 1 OR LOWER(i.filename) LIKE '%thumbnail%' OR i.isInResearchAndWriting = 1)
+        """
+    elif image_type_filter == "other":
+        # Everything else (fallback): not in body content and not featured/thumbnail/rw
+        type_filter = """
+        AND i.isBodyContent = 0
+        AND i.isFeaturedImage = 0
+        AND LOWER(i.filename) NOT LIKE '%thumbnail%'
+        AND (i.isInResearchAndWriting = 0 OR i.isInResearchAndWriting IS NULL)
+        """
+
     query = """
     SELECT
         i.id,
         i.filename,
         i.defaultAlt,
         i.cloudflareId,
+        i.isFeaturedImage,
+        i.isBodyContent,
+        i.isInResearchAndWriting,
         COUNT(DISTINCT pg.id) AS post_count,
         COALESCE(SUM(pv.views_7d), 0) AS views_7d,
         COALESCE(SUM(pv.views_365d), 0) AS views_365d
@@ -116,10 +140,11 @@ def get_ranked_images(sort_by: str = "views_365d") -> list[dict]:
     LEFT JOIN analytics_pageviews pv ON pv.url = CONCAT('https://ourworldindata.org/', pg.slug)
     WHERE i.cloudflareId IS NOT NULL
     AND i.replacedBy IS NULL
+    {}
     GROUP BY i.id
     ORDER BY {} DESC
     """.format(
-        sort_by
+        type_filter, sort_by
     )
     df = read_sql(query)
     return df.to_dict("records")
@@ -153,7 +178,19 @@ def display_image_row(rank: int, image: dict) -> None:
     thumbnail_url = f"{CLOUDFLARE_IMAGES_URL}/{image['cloudflareId']}/w=400"
     filename = image["filename"]
 
-    with st.expander(f"**#{rank}** - {filename}", expanded=True):
+    # Determine image type badges
+    badges = []
+    if image.get("isBodyContent") == 1:
+        badges.append("📝 Content")
+    if image.get("isFeaturedImage") == 1:
+        badges.append("⭐ Featured")
+    if image.get("isInResearchAndWriting") == 1:
+        badges.append("📚 R&W")
+    if "thumbnail" in filename.lower():
+        badges.append("🖼️ Thumbnail")
+    badge_str = " ".join(badges) if badges else "❓ Other"
+
+    with st.expander(f"**#{rank}** - {filename} | {badge_str}", expanded=True):
         col1, col2 = st.columns([1, 2])
 
         with col1:
@@ -161,7 +198,12 @@ def display_image_row(rank: int, image: dict) -> None:
 
         with col2:
             st.markdown(f"**Alt text:** {image['defaultAlt'] or 'N/A'}")
-            st.markdown(f"**Views (7d):** {int(image['views_7d']):,} | **Views (365d):** {int(image['views_365d']):,}")
+            views_per_day = image['views_365d'] / 365
+            st.markdown(
+                f"**Views (7d):** {int(image['views_7d']):,} | "
+                f"**Views (365d):** {int(image['views_365d']):,} | "
+                f"**Views per day:** {views_per_day:,.1f}"
+            )
 
             # Show posts using this image
             if image["post_count"] > 0:
@@ -190,17 +232,36 @@ def display_image_row(rank: int, image: dict) -> None:
 st.title("Image Rank")
 st.markdown("Images ranked by total pageviews from posts that use them.")
 
-# Sort options
-sort_by = st.radio(
-    "Sort by",
-    options=["views_365d", "views_7d"],
-    format_func=lambda x: "Views (365 days)" if x == "views_365d" else "Views (7 days)",
-    horizontal=True,
-)
+# Filters
+col1, col2 = st.columns(2)
+
+with col1:
+    # Sort options
+    sort_by = st.radio(
+        "Sort by",
+        options=["views_365d", "views_7d"],
+        format_func=lambda x: "Views (365 days)" if x == "views_365d" else "Views (7 days)",
+        horizontal=True,
+    )
+
+with col2:
+    # Image type filter
+    image_type_filter = st.radio(
+        "Image type",
+        options=["all", "content", "featured-thumbnail-rw", "other"],
+        format_func=lambda x: {
+            "all": "All images",
+            "content": "Content",
+            "featured-thumbnail-rw": "Thumbnails or featured images",
+            "other": "Other",
+        }[x],
+        horizontal=True,
+        index=1,  # Default to "content"
+    )
 
 # Load data
 with st.spinner("Loading images..."):
-    images = get_ranked_images(sort_by)
+    images = get_ranked_images(sort_by, image_type_filter)
 
 st.markdown(f"**Total images:** {len(images):,}")
 
