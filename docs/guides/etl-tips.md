@@ -32,6 +32,16 @@ etlr --browse --private
 etlr -b -p
 ```
 
+You can also use **filter prefixes** to narrow results by specific attributes. Filters can be combined with search terms: `n:who v:2024 population` finds WHO steps from 2024 containing "population".
+
+
+| Prefix | Filters by | Example |
+|--------|------------|---------|
+| `n:` | namespace | `n:who` |
+| `c:` | channel | `c:garden` |
+| `v:` | version | `v:2024` |
+| `d:` | dataset | `d:gho` |
+
 !!! tip "Also works for snapshots"
 
     The same browse functionality is available for snapshots using `etls --browse` (or `etls -b`). This lets you interactively search and select from all available snapshots in the `snapshots/` directory.
