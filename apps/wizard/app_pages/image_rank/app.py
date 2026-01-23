@@ -98,39 +98,64 @@ def _find_context_before_item(body: list, item_index: int) -> tuple[str | None, 
     return None, None
 
 
+def classify_image_type(filename: str, posts_content: list[str]) -> str:
+    """Classify image type based on how it's used in posts.
+
+    Logic matches getImageType() from ImagesIndexPage.tsx:
+    - content: appears in body content
+    - featured-thumbnail-rw: featured/thumbnail/R&W (but not in body)
+    - other: everything else
+    """
+    is_body_content = False
+    is_featured = False
+    is_thumbnail = "thumbnail" in filename.lower()
+    is_in_rw = False
+
+    # Check all posts that use this image
+    for content_json in posts_content:
+        try:
+            data = json.loads(content_json)
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        # Check if it's a featured image
+        if data.get("featured-image") == filename:
+            is_featured = True
+
+        # Check if it appears in body content
+        body = data.get("body", [])
+        for item in body:
+            if isinstance(item, dict) and item.get("type") == "image":
+                if item.get("filename") == filename or item.get("smallFilename") == filename:
+                    is_body_content = True
+                    break
+
+        # Check if post type is research-and-writing
+        # (simplified - could check post type from separate field if needed)
+        if data.get("type") == "research-and-writing":
+            is_in_rw = True
+
+    # Apply classification logic (body content takes priority)
+    if is_body_content:
+        return "content"
+
+    if is_featured or is_thumbnail or is_in_rw:
+        return "featured-thumbnail-rw"
+
+    return "other"
+
+
 @st.cache_data(show_spinner=False, ttl=3600)
 def get_ranked_images(sort_by: str = "views_365d", image_type_filter: str = "all") -> list[dict]:
     """Get all images ranked by pageviews."""
-    # Build WHERE clause based on image type filter
-    # Logic matches getImageType() from ImagesIndexPage.tsx
-    type_filter = ""
-    if image_type_filter == "content":
-        # If an image is used in body content, it's in content category
-        type_filter = "AND i.isBodyContent = 1"
-    elif image_type_filter == "featured-thumbnail-rw":
-        # Featured, thumbnails, or R&W (only if NOT in body content)
-        type_filter = """
-        AND i.isBodyContent = 0
-        AND (i.isFeaturedImage = 1 OR LOWER(i.filename) LIKE '%thumbnail%' OR i.isInResearchAndWriting = 1)
-        """
-    elif image_type_filter == "other":
-        # Everything else (fallback): not in body content and not featured/thumbnail/rw
-        type_filter = """
-        AND i.isBodyContent = 0
-        AND i.isFeaturedImage = 0
-        AND LOWER(i.filename) NOT LIKE '%thumbnail%'
-        AND (i.isInResearchAndWriting = 0 OR i.isInResearchAndWriting IS NULL)
-        """
-
+    # Fetch all images with their post content for classification
     query = """
     SELECT
         i.id,
         i.filename,
         i.defaultAlt,
         i.cloudflareId,
-        i.isFeaturedImage,
-        i.isBodyContent,
-        i.isInResearchAndWriting,
+        GROUP_CONCAT(DISTINCT pg.content SEPARATOR '|||') as post_contents,
         COUNT(DISTINCT pg.id) AS post_count,
         COALESCE(SUM(pv.views_7d), 0) AS views_7d,
         COALESCE(SUM(pv.views_365d), 0) AS views_365d
@@ -140,12 +165,28 @@ def get_ranked_images(sort_by: str = "views_365d", image_type_filter: str = "all
     LEFT JOIN analytics_pageviews pv ON pv.url = CONCAT('https://ourworldindata.org/', pg.slug)
     WHERE i.cloudflareId IS NOT NULL
     AND i.replacedBy IS NULL
-    {}
     GROUP BY i.id
     ORDER BY {} DESC
-    """.format(type_filter, sort_by)
+    """.format(sort_by)
+
     df = read_sql(query)
-    return df.to_dict("records")
+    records = df.to_dict("records")
+
+    # Classify each image and filter
+    filtered_records = []
+    for record in records:
+        # Get posts content for this image
+        posts_content = record.get("post_contents", "").split("|||") if record.get("post_contents") else []
+
+        # Classify the image
+        image_type = classify_image_type(record["filename"], posts_content)
+        record["image_type"] = image_type
+
+        # Filter based on selected type
+        if image_type_filter == "all" or image_type == image_type_filter:
+            filtered_records.append(record)
+
+    return filtered_records
 
 
 @st.cache_data(show_spinner=False, ttl=3600)
@@ -176,17 +217,13 @@ def display_image_row(rank: int, image: dict) -> None:
     thumbnail_url = f"{CLOUDFLARE_IMAGES_URL}/{image['cloudflareId']}/w=400"
     filename = image["filename"]
 
-    # Determine image type badges
-    badges = []
-    if image.get("isBodyContent") == 1:
-        badges.append("📝 Content")
-    if image.get("isFeaturedImage") == 1:
-        badges.append("⭐ Featured")
-    if image.get("isInResearchAndWriting") == 1:
-        badges.append("📚 R&W")
-    if "thumbnail" in filename.lower():
-        badges.append("🖼️ Thumbnail")
-    badge_str = " ".join(badges) if badges else "❓ Other"
+    # Map image type to display badge
+    type_badges = {
+        "content": "📝 Content",
+        "featured-thumbnail-rw": "⭐ Featured/Thumbnail/R&W",
+        "other": "❓ Other"
+    }
+    badge_str = type_badges.get(image.get("image_type"), "❓ Unknown")
 
     with st.expander(f"**#{rank}** - {filename} | {badge_str}", expanded=True):
         col1, col2 = st.columns([1, 2])
