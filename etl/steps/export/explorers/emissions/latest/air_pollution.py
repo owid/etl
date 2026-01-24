@@ -216,6 +216,7 @@ def run() -> None:
     # Prepare explorer metadata.
     config = {
         "name": "air-pollution",
+        "originUrl": "https://ourworldindata.org/air-pollution",
         "explorerTitle": "Air Pollution",
         "explorerSubtitle": "Explore historical emissions of air pollutants across the world.",
         "selection": ["China", "India", "United Kingdom", "United States", "World"],

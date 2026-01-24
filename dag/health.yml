@@ -152,22 +152,22 @@ steps:
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
-  # UNAIDS 2025
-  data://meadow/health/2025-12-15/unaids:
-    - snapshot://health/2025-12-15/unaids_epi.zip
-    - snapshot://health/2025-12-15/unaids_gam.zip
-    - snapshot://health/2025-12-15/unaids_kpa.zip
-    - snapshot://health/2025-12-15/unaids_ncpi.zip
-  data://garden/health/2025-12-15/unaids:
-    - data://meadow/health/2025-12-15/unaids
+  # UNAIDS 2026
+  data://meadow/health/2026-01-19/unaids:
+    - snapshot://health/2026-01-19/unaids_epi.zip
+    - snapshot://health/2026-01-19/unaids_gam.zip
+    - snapshot://health/2026-01-19/unaids_kpa.zip
+    - snapshot://health/2026-01-19/unaids_ncpi.zip
+  data://garden/health/2026-01-19/unaids:
+    - data://meadow/health/2026-01-19/unaids
     - data://garden/regions/2023-01-01/regions
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
+  data://grapher/health/2026-01-19/unaids:
+    - data://garden/health/2026-01-19/unaids
   data://meadow/health/2023-08-22/unaids_deaths_averted_art:
     - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
-  data://grapher/health/2025-12-15/unaids:
-    - data://garden/health/2025-12-15/unaids
 
   # OECD Road accidents & passenger travel
   data://meadow/oecd/2024-07-01/road_accidents:

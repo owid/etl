@@ -89,3 +89,14 @@ steps:
     - data://meadow/papers/2025-05-14/davenport_2021
   data://grapher/papers/2025-05-14/davenport_2021:
     - data://garden/papers/2025-05-14/davenport_2021
+
+
+  #
+  # Municipal solid waste management (Anshassi & Townsend, 2025)
+  #
+  data://meadow/papers/2026-01-20/anshassi_waste_management:
+    - snapshot://papers/2026-01-20/anshassi_waste_management.xlsx
+  data://garden/papers/2026-01-20/anshassi_waste_management:
+    - data://meadow/papers/2026-01-20/anshassi_waste_management
+  data://grapher/papers/2026-01-20/anshassi_waste_management:
+    - data://garden/papers/2026-01-20/anshassi_waste_management
