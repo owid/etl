@@ -1,14 +1,55 @@
 """Unified browser orchestrator for multi-mode ETL browser."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
-from etl.browser.core import BrowserState, browse_items
+from etl.browser.core import OWID_YELLOW, BrowserState, browse_items
 from etl.browser.modes import BrowserMode, ModeRegistry, get_registry
 
 if TYPE_CHECKING:
     from etl.browser.commands import Command
+
+# ASCII art title for the browser
+BROWSER_TITLE = r"""
+  ___
+ | _ ) _ _ _____ __ _____ ___ _ _
+ | _ \| '_/ _ \ V  V (_-</ -_) '_|
+ |___/|_| \___/\_/\_//__/\___|_|
+"""
+
+
+def _get_time_greeting() -> str:
+    """Get a casual greeting based on time of day."""
+    hour = datetime.now().hour
+    if hour < 5:
+        return "🌙 Burning the midnight oil?"
+    elif hour < 7:
+        return "🌅 Early bird gets the worm!"
+    elif hour < 12:
+        return "☀️  Good morning!"
+    elif hour < 14:
+        return "🍴 Lunchtime hacking?"
+    elif hour < 17:
+        return "☀️  Good afternoon!"
+    elif hour < 21:
+        return "🌆 Good evening!"
+    else:
+        return "🦉 Night owl mode activated!"
+
+
+def print_browser_intro() -> None:
+    """Print the browser intro/title with greeting."""
+    # ANSI escape for OWID yellow
+    yellow = f"\033[38;2;{int(OWID_YELLOW[1:3], 16)};{int(OWID_YELLOW[3:5], 16)};{int(OWID_YELLOW[5:7], 16)}m"
+    reset = "\033[0m"
+    dim = "\033[2m"
+
+    print(f"{yellow}{BROWSER_TITLE}{reset}")
+    print(f"  {_get_time_greeting()}")
+    print(f"{dim}  Type to search · Tab/arrows to select · /commands for actions{reset}")
+    print()
 
 
 @dataclass
@@ -46,6 +87,8 @@ class UnifiedBrowser:
         self._current_mode_name: str | None = None
         # Per-mode history (in-memory, persisted by modes)
         self._histories: dict[str, list[str]] = {}
+        # Track if intro has been shown
+        self._intro_shown: bool = False
 
     def register_mode(self, mode: BrowserMode, default: bool = False) -> None:
         """Register a browser mode."""
@@ -136,6 +179,11 @@ class UnifiedBrowser:
         Returns:
             UnifiedBrowserResult with the outcome of the session.
         """
+        # Show intro on first run
+        if not self._intro_shown:
+            print_browser_intro()
+            self._intro_shown = True
+
         # Set initial mode
         if initial_mode:
             self._current_mode_name = initial_mode
