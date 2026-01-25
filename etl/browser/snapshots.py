@@ -3,8 +3,6 @@
 import json
 from typing import TYPE_CHECKING
 
-from etl.browser.commands import DEFAULT_COMMANDS
-from etl.browser.core import browse_items
 from etl.browser.scoring import create_ranker, extract_version_from_snapshot
 
 if TYPE_CHECKING:
@@ -51,7 +49,6 @@ def load_cached_snapshots() -> list[str] | None:
             cache = json.load(f)
 
         # Quick validation: just return cached data
-        # The count check happens in browse_snapshots after loading
         return cache.get("snapshots", [])
     except (json.JSONDecodeError, OSError, KeyError):
         return None
@@ -93,39 +90,4 @@ def create_snapshot_ranker() -> "Ranker":
         popularity_data=None,
         slug_extractor=None,
         version_extractor=extract_version_from_snapshot,
-    )
-
-
-def browse_snapshots(history: list[str] | None = None) -> tuple[str | None, bool, list[str], str | None]:
-    """Interactive snapshot browser using prompt_toolkit.
-
-    Args:
-        history: Optional list of previous search queries (most recent last).
-            Use Up/Down when input is empty to navigate history.
-
-    Returns:
-        Tuple of (pattern_or_snapshot, is_exact_match, updated_history, switch_mode_target):
-        - If user presses Enter: (current_text, False, history, None) to run all matches
-        - If user selects a snapshot: (snapshot_uri, True, history, None) to run just that snapshot
-        - If user cancels: (None, False, history, None)
-        - If mode switch: (None, False, history, target_mode_name)
-    """
-    # Try loading from cache first
-    cached_items = load_cached_snapshots()
-
-    # Create ranker for improved match ordering
-    ranker = create_snapshot_ranker()
-
-    return browse_items(
-        items_loader=get_all_snapshots,
-        prompt="snapshot> ",
-        loading_message="Loading snapshots...",
-        empty_message="No snapshots found.",
-        item_noun="snapshot",
-        item_noun_plural="snapshots",
-        cached_items=cached_items,
-        on_items_loaded=save_snapshot_cache,
-        rank_matches=ranker,
-        commands=DEFAULT_COMMANDS,
-        history=history,
     )

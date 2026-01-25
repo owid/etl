@@ -4,10 +4,9 @@ import json
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
-from etl.browser.commands import DEFAULT_COMMANDS
-from etl.browser.core import browse_items, filter_items
+from etl.browser.core import filter_items
 from etl.browser.scoring import create_ranker, extract_version_from_uri
 from etl.dag_helpers import graph_nodes
 
@@ -305,85 +304,6 @@ def create_step_ranker(popularity_data: dict[str, float]) -> "Ranker":
         popularity_data=popularity_data,
         slug_extractor=extract_dataset_slug,
         version_extractor=extract_version_from_uri,
-    )
-
-
-def browse_steps(
-    dag: DAG | None = None,
-    private: bool = False,
-    dag_loader: Callable[[], DAG] | None = None,
-    dag_path: Path | None = None,
-    history: list[str] | None = None,
-) -> tuple[str | None, bool, list[str], str | None]:
-    """Interactive step browser using prompt_toolkit.
-
-    Args:
-        dag: Pre-loaded DAG (if available)
-        private: Whether to include private steps
-        dag_loader: Callable that returns DAG (for async loading)
-        dag_path: Path to DAG file (for caching)
-        history: Optional list of previous search queries (most recent last).
-            Use Up/Down when input is empty to navigate history.
-
-    Returns:
-        Tuple of (pattern_or_step, is_exact_match, updated_history, switch_mode_target):
-        - If user presses Enter: (current_text, False, history, None) to run all matches
-        - If user selects a step: (step_uri, True, history, None) to run just that step
-        - If user cancels: (None, False, history, None)
-        - If mode switch: (None, False, history, target_mode_name)
-    """
-    # Load popularity cache for ranking (fast startup, graceful degradation)
-    # Use a mutable dict so background refresh can update it for live ranking updates
-    cached_popularity, is_stale = load_popularity_cache()
-    popularity_data: dict[str, float] = dict(cached_popularity)
-
-    # If dag is provided directly, use it immediately
-    if dag is not None:
-        cached_items = get_all_steps(dag, private=private)
-        items_loader = lambda: cached_items  # noqa: E731
-        on_items_loaded = None
-
-        # Refresh popularity in background if stale (will update popularity_data in-place)
-        if is_stale:
-            refresh_popularity_cache_async(cached_items, live_data=popularity_data)
-    elif dag_loader is not None:
-        # Try loading from cache first (instant startup)
-        cached_items = load_cached_steps(dag_path, private) if dag_path else None
-
-        def items_loader() -> list[str]:
-            loaded_dag = dag_loader()
-            return get_all_steps(loaded_dag, private=private)
-
-        def on_items_loaded(items: list[str]) -> None:
-            if dag_path:
-                save_step_cache(dag_path, private, items)
-            # Refresh popularity in background if stale (triggered after items load)
-            if is_stale:
-                refresh_popularity_cache_async(items, live_data=popularity_data)
-
-        # If we have cached steps but stale popularity, refresh popularity now
-        # (on_items_loaded won't be called if cached_items is used)
-        if cached_items is not None and is_stale:
-            refresh_popularity_cache_async(cached_items, live_data=popularity_data)
-    else:
-        raise ValueError("Either dag or dag_loader must be provided")
-
-    # Create ranker with mutable popularity_data dict
-    # Ranker reads from this dict each time, so it picks up background updates on next keystroke
-    ranker = create_step_ranker(popularity_data)
-
-    return browse_items(
-        items_loader=items_loader,
-        prompt="steps> ",
-        loading_message="Loading steps...",
-        empty_message="No steps found in DAG.",
-        item_noun="step",
-        item_noun_plural="steps",
-        cached_items=cached_items,
-        on_items_loaded=on_items_loaded,
-        rank_matches=ranker,
-        commands=DEFAULT_COMMANDS,
-        history=history,
     )
 
 
