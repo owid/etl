@@ -37,6 +37,7 @@ class StepMode(BaseBrowserMode):
             prompt="steps> ",
             item_noun="step",
             item_noun_plural="steps",
+            description="Browse and run ETL pipeline steps (data://, grapher://, export://)",
             loading_message="Loading steps...",
             empty_message="No steps found in DAG.",
         )

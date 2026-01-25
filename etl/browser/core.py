@@ -321,6 +321,13 @@ class BrowserState:
         self.on_mode_switch: ModeSwitchCallback | None = None
         # Ranker function (can be updated on mode switch)
         self.rank_matches: Ranker | None = None
+        # Mode descriptions for help display: list of (name, description, is_current)
+        self.mode_descriptions: list[tuple[str, str, bool]] = []
+        # Current mode name (for help display)
+        self.current_mode_name: str = ""
+        # Show help in results area (temporary, clears on typing)
+        self.show_help: bool = False
+        self._showing_help: bool = False  # Flag to prevent clearing help on programmatic text change
 
 
 def filter_items(pattern: str, all_items: list[str]) -> list[str]:
@@ -369,6 +376,43 @@ def filter_items(pattern: str, all_items: list[str]) -> list[str]:
         return matches
 
 
+def _get_help_text(state: BrowserState) -> list[tuple[str, str]]:
+    """Build help information as styled text tuples for display in results area."""
+    lines: list[tuple[str, str]] = []
+
+    lines.append(("", "\n"))
+    lines.append((f"fg:{OWID_YELLOW} bold", "  Modes:"))
+    lines.append(("", "\n"))
+    for name, description, is_current in state.mode_descriptions:
+        marker = " (current)" if is_current else ""
+        lines.append((f"fg:{OWID_GREEN}", f"    /{name}"))
+        lines.append(("", f"{marker}\n"))
+        if description:
+            lines.append(("class:hint", f"      {description}\n"))
+
+    lines.append(("", "\n"))
+    lines.append((f"fg:{OWID_YELLOW} bold", "  Commands:"))
+    lines.append(("", "\n"))
+    for cmd in state.available_commands:
+        # Skip mode-switch commands (already shown in Modes section)
+        mode_names = [name for name, _, _ in state.mode_descriptions]
+        if cmd.name in mode_names:
+            continue
+        aliases = f" ({', '.join(cmd.aliases)})" if cmd.aliases else ""
+        lines.append((f"fg:{OWID_GREEN}", f"    /{cmd.name}"))
+        lines.append(("class:hint", f"{aliases}\n"))
+        lines.append(("class:hint", f"      {cmd.description}\n"))
+
+    lines.append(("", "\n"))
+    lines.append((f"fg:{OWID_YELLOW} bold", "  Search:"))
+    lines.append(("", "\n"))
+    lines.append(("class:hint", "    Type to filter items, use Tab/arrows to select, Enter to run\n"))
+    lines.append(("class:hint", "    Filters: n:namespace c:channel v:version d:dataset\n"))
+    lines.append(("", "\n"))
+
+    return lines
+
+
 def browse_items(
     items_loader: Callable[[], list[str]],
     prompt: str = "> ",
@@ -382,6 +426,8 @@ def browse_items(
     commands: list["Command"] | None = None,
     history: list[str] | None = None,
     on_mode_switch: ModeSwitchCallback | None = None,
+    mode_descriptions: list[tuple[str, str, bool]] | None = None,
+    current_mode_name: str = "",
 ) -> tuple[str | None, bool, list[str], str | None]:
     """Interactive item browser using prompt_toolkit.
 
@@ -430,6 +476,8 @@ def browse_items(
     state.on_items_loaded = on_items_loaded
     state.on_mode_switch = on_mode_switch
     state.rank_matches = rank_matches
+    state.mode_descriptions = mode_descriptions or []
+    state.current_mode_name = current_mode_name
 
     # Initialize mutable config
     state.config.prompt = prompt
@@ -466,6 +514,12 @@ def browse_items(
     # Create the input buffer
     def on_text_changed(buf: Buffer) -> None:
         text = buf.text.strip()
+
+        # Clear help display when user starts typing (not when we set text programmatically)
+        if state._showing_help:
+            state._showing_help = False
+        else:
+            state.show_help = False
 
         # Reset history navigation when user types (not when we set text programmatically)
         if state._navigating_history:
@@ -575,6 +629,12 @@ def browse_items(
                     thread = threading.Thread(target=reload_items, daemon=True)
                     thread.start()
 
+                # Clear input and go back to search mode
+                input_buffer.text = ""
+            elif result.action == "help":
+                # Show help in results area (will clear when user types)
+                state.show_help = True
+                state._showing_help = True  # Prevent clearing on programmatic text change
                 # Clear input and go back to search mode
                 input_buffer.text = ""
             # "continue" action - stay in browser with input cleared
@@ -694,6 +754,10 @@ def browse_items(
             lines.append(("", "\n"))
             return lines
 
+        # Show help text (temporary, clears on typing)
+        if state.show_help:
+            return _get_help_text(state)
+
         # Helper to add nano-style shortcuts
         def add_shortcuts(shortcuts: list[tuple[str, str]]) -> None:
             """Add nano-style shortcuts: [(key, description), ...]"""
@@ -729,9 +793,8 @@ def browse_items(
                 cmd_name = f"/{cmd.name}"
                 lines.extend(highlight_matches(cmd_name, pattern, is_selected))
 
-                # Add description in dimmer style
-                desc_style = "class:item.selected" if is_selected else "class:hint"
-                lines.append((desc_style, f"  {cmd.description}"))
+                # Add description in dimmer style (always dim, only name is highlighted)
+                lines.append(("class:hint", f"  {cmd.description}"))
                 lines.append(("", "\n"))
 
             return lines

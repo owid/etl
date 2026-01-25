@@ -116,16 +116,36 @@ class UnifiedBrowser:
 
     def _get_all_commands(self, mode: BrowserMode) -> list["Command"]:
         """Get all commands for a mode including mode-switch commands."""
+        from etl.browser.commands import Command
+
         # Start with mode-specific commands
         commands = mode.get_commands()
 
-        # Add mode-switch commands (only for modes other than current)
+        # Add all mode-switch commands with updated descriptions
         current_name = mode.config.name
         for switch_cmd in self._registry.get_mode_switch_commands():
-            if switch_cmd.name != current_name:
-                commands.append(switch_cmd)
+            if switch_cmd.name == current_name:
+                # Current mode - show as "(current)"
+                cmd = Command(
+                    name=switch_cmd.name,
+                    description=f"{switch_cmd.name} (current)",
+                    handler=switch_cmd.handler,
+                    aliases=switch_cmd.aliases,
+                )
+            else:
+                # Other modes - show "Switch to X"
+                cmd = switch_cmd
+            commands.append(cmd)
 
         return commands
+
+    def _get_mode_descriptions(self, current_mode_name: str) -> list[tuple[str, str, bool]]:
+        """Get mode descriptions for help display."""
+        descriptions = []
+        for name, config in self._registry.list_modes():
+            is_current = name == current_mode_name
+            descriptions.append((name, config.description, is_current))
+        return descriptions
 
     def _create_mode_switch_callback(self) -> Callable[[str, BrowserState], None]:
         """Create a callback for in-place mode switching.
@@ -162,6 +182,10 @@ class UnifiedBrowser:
 
             # Update commands (include new mode-switch commands)
             state.available_commands = self._get_all_commands(target_mode)
+
+            # Update mode descriptions for help display
+            state.mode_descriptions = self._get_mode_descriptions(target_mode_name)
+            state.current_mode_name = target_mode_name
 
             # Load history for new mode
             state.history = self._get_mode_history(target_mode)
@@ -201,6 +225,9 @@ class UnifiedBrowser:
         # Create mode switch callback for in-place switching
         on_mode_switch = self._create_mode_switch_callback()
 
+        # Get mode descriptions for help display
+        mode_descriptions = self._get_mode_descriptions(self._current_mode_name or "")
+
         # Run the browser with in-place mode switching
         result, is_exact, updated_history, _switch_mode = browse_items(
             items_loader=mode.get_items_loader(),
@@ -215,6 +242,8 @@ class UnifiedBrowser:
             commands=commands,
             history=history,
             on_mode_switch=on_mode_switch,
+            mode_descriptions=mode_descriptions,
+            current_mode_name=self._current_mode_name or "",
         )
 
         # Save history for final mode

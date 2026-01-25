@@ -26,6 +26,7 @@ class SnapshotMode(BaseBrowserMode):
             prompt="snapshot> ",
             item_noun="snapshot",
             item_noun_plural="snapshots",
+            description="Browse snapshot files for data ingestion",
             loading_message="Loading snapshots...",
             empty_message="No snapshots found.",
         )

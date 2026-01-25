@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class CommandResult:
     """Result of executing a command."""
 
-    action: Literal["continue", "exit", "refresh", "switch_mode"]
+    action: Literal["continue", "exit", "refresh", "switch_mode", "help"]
     message: str | None = None
     target_mode: str | None = None  # For switch_mode action
 
@@ -61,8 +61,14 @@ def cmd_exit(state: "BrowserState") -> CommandResult:
     return CommandResult(action="exit")
 
 
+def cmd_help(state: "BrowserState") -> CommandResult:
+    """Handler for /help command."""
+    return CommandResult(action="help")
+
+
 # Default commands available in all browsers
 DEFAULT_COMMANDS = [
+    Command("help", "Show available modes and commands", cmd_help, aliases=["h", "?"]),
     Command("refresh", "Reload cached data", cmd_refresh, aliases=["r"]),
     Command("exit", "Exit browser", cmd_exit, aliases=["quit", "q"]),
 ]

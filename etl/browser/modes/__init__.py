@@ -18,6 +18,7 @@ class ModeConfig:
     prompt: str  # Prompt text (e.g., "etlr> ")
     item_noun: str  # Singular noun (e.g., "step")
     item_noun_plural: str  # Plural noun (e.g., "steps")
+    description: str = ""  # Help text describing the mode
     loading_message: str = "Loading..."
     empty_message: str = "No items found."
 
