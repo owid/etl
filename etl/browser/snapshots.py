@@ -118,7 +118,7 @@ def browse_snapshots(history: list[str] | None = None) -> tuple[str | None, bool
 
     return browse_items(
         items_loader=get_all_snapshots,
-        prompt="etls> ",
+        prompt="snapshot> ",
         loading_message="Loading snapshots...",
         empty_message="No snapshots found.",
         item_noun="snapshot",

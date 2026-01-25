@@ -1,5 +1,7 @@
 """SnapshotMode: Snapshot browsing with version-based ranking."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Callable
 
 from etl.browser.commands import DEFAULT_COMMANDS, Command
@@ -21,7 +23,7 @@ class SnapshotMode(BaseBrowserMode):
     def __init__(self) -> None:
         config = ModeConfig(
             name="snapshots",
-            prompt="etls> ",
+            prompt="snapshot> ",
             item_noun="snapshot",
             item_noun_plural="snapshots",
             loading_message="Loading snapshots...",

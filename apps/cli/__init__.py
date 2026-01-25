@@ -241,28 +241,20 @@ for group in GROUPS:
     lazy_subcommands=lazy_cmds,  # {k: v for group in GROUPS for k, v in group["commands"].items()},
     invoke_without_command=True,
 )
-@click.option(
-    "--browse",
-    "-b",
-    is_flag=True,
-    help="Open unified ETL browser to search and select steps or snapshots.",
-)
 @click.pass_context
-def cli(ctx: click.Context, browse: bool) -> None:
+def cli(ctx: click.Context) -> None:
     """Run OWID's ETL client.
 
     Create ETL step templates, compare different datasets, generate dependency visualisations, synchronise charts across different servers, import datasets from non-ETL OWID sources, improve your metadata, etc.
 
     **Note: For a UI experience, refer to CLI `etlwiz`.**
 
-    Use `etl --browse` or `etl -b` to open the unified browser for searching steps and snapshots.
+    Running `etl` with no subcommand opens the unified browser for searching steps and snapshots.
     """
-    if browse:
+    if ctx.invoked_subcommand is None:
+        # No subcommand: open the unified browser
         _run_unified_browser()
         ctx.exit(0)
-    elif ctx.invoked_subcommand is None:
-        # No subcommand and no --browse flag: show help
-        click.echo(ctx.get_help())
 
 
 def _run_unified_browser() -> None:

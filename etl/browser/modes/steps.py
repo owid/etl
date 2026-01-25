@@ -1,5 +1,7 @@
 """StepMode: ETL step browsing with popularity ranking."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Set
 
@@ -32,7 +34,7 @@ class StepMode(BaseBrowserMode):
     ) -> None:
         config = ModeConfig(
             name="steps",
-            prompt="etlr> ",
+            prompt="steps> ",
             item_noun="step",
             item_noun_plural="steps",
             loading_message="Loading steps...",

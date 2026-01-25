@@ -374,7 +374,7 @@ def browse_steps(
 
     return browse_items(
         items_loader=items_loader,
-        prompt="etlr> ",
+        prompt="steps> ",
         loading_message="Loading steps...",
         empty_message="No steps found in DAG.",
         item_noun="step",

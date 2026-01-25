@@ -175,12 +175,6 @@ def complete_steps(ctx: click.Context, param: click.Argument, incomplete: str) -
     "--subset",
     help="Filter to speed up development - works as regex for both data processing and grapher upload.",
 )
-@click.option(
-    "--browse",
-    "-b",
-    is_flag=True,
-    help="Open interactive step browser to search and select steps.",
-)
 @click.argument(
     "steps",
     nargs=-1,
@@ -208,7 +202,6 @@ def main_cli(
     force_upload: bool = False,
     prefer_download: bool = False,
     subset: Optional[str] = None,
-    browse: bool = False,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -234,112 +227,6 @@ def main_cli(
     """
     _update_open_file_limit()
 
-    # Interactive browse mode: explicit --browse flag
-    # This is a fast path that doesn't need config/files imports
-    # UI shows immediately while DAG loads in background thread
-    if browse:
-        from etl.browser import browse_steps
-        from etl.browser.steps import load_history_cache, save_history_cache
-
-        # Load history from cache (persists across sessions)
-        history: List[str] = load_history_cache()
-
-        while True:
-            result, is_exact, history, _switch_mode = browse_steps(
-                dag_loader=lambda: load_dag(dag_path),
-                private=private,
-                dag_path=dag_path,
-                history=history,
-            )
-
-            # Save updated history to cache
-            save_history_cache(history)
-
-            if result is None:
-                # User cancelled (Ctrl-C/Escape) or mode switch (not applicable here)
-                return
-
-            steps = [result]
-            browse_exact_match = is_exact
-
-            # Import config and files now (deferred to speed up browse mode)
-            # These imports are cached by Python, so they only happen once
-            from etl import config, files
-
-            config.enable_sentry()
-
-            # make everything single threaded, useful for debugging
-            if not use_threads:
-                config.GRAPHER_INSERT_WORKERS = 1
-                config.DIRTY_STEPS_WORKERS = 1
-                workers = 1
-
-            # GRAPHER_INSERT_WORKERS should be split among workers
-            if workers > 1:
-                config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
-
-            # Set INSTANT mode from CLI flag
-            if instant:
-                config.INSTANT = instant
-
-            # Set CONTINUE_ON_FAILURE from CLI flag
-            if continue_on_failure:
-                config.CONTINUE_ON_FAILURE = continue_on_failure
-
-            # Set FORCE_UPLOAD from CLI flag
-            if force_upload:
-                config.FORCE_UPLOAD = force_upload
-
-            # Set PREFER_DOWNLOAD from CLI flag
-            if prefer_download:
-                config.PREFER_DOWNLOAD = prefer_download
-
-            # Set SUBSET from CLI flag
-            if subset:
-                config.SUBSET = subset
-
-            kwargs = dict(
-                includes=steps,
-                dry_run=dry_run,
-                force=force,
-                private=private,
-                grapher=grapher,
-                export=export,
-                only=only,
-                exact_match=browse_exact_match or exact_match,
-                excludes=exclude.split(",") if exclude else None,
-                dag_path=dag_path,
-                workers=workers,
-                strict=strict,
-            )
-
-            try:
-                if ipdb:
-                    from ipdb import launch_ipdb_on_exception
-
-                    config.IPDB_ENABLED = True  # type: ignore[assignment]
-                    config.GRAPHER_INSERT_WORKERS = 1
-                    config.DIRTY_STEPS_WORKERS = 1
-                    kwargs["workers"] = 1
-                    with launch_ipdb_on_exception():
-                        main(**kwargs)  # type: ignore
-                else:
-                    main(**kwargs)  # type: ignore
-            except Exception as e:
-                # Print error but continue to browser
-                import traceback
-
-                traceback.print_exc()
-                print(f"\nError: {e}")
-
-            # Add a blank line before returning to browser for visual separation
-            print()
-
-        # Note: This return is unreachable but makes the control flow clear
-        return
-
-    # Non-browse mode: original behavior
-    # Import config and files now (deferred to speed up browse mode)
     from etl import config, files
 
     config.enable_sentry()

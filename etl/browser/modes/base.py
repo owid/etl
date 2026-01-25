@@ -1,5 +1,7 @@
 """Base class for browser modes with history and command defaults."""
 
+from __future__ import annotations
+
 import json
 from typing import TYPE_CHECKING, Callable
 
