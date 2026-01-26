@@ -1260,7 +1260,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 1]
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 1]
             selectedEntityNames:
               - Afghanistan
               - Iraq
@@ -1314,7 +1314,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [40, 50, 60, 70, 80, 90, 100]
+                customNumericValues: [30, 40, 50, 60, 70, 80, 90, 100]
             selectedEntityNames:
               - Afghanistan
               - Syria
@@ -1365,7 +1365,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [50, 60, 70, 80, 90, 100]
+                customNumericValues: [40, 50, 60, 70, 80, 90, 100]
             selectedEntityNames:
               - Afghanistan
               - Syria
@@ -1414,7 +1414,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 1]
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 1]
             selectedEntityNames:
               - Afghanistan
               - Iraq
@@ -1468,7 +1468,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [20, 20, 30, 40, 50, 60, 70, 1]
+                customNumericValues: [10, 20, 20, 30, 40, 50, 60, 70, 80, 1]
             selectedEntityNames:
               - Afghanistan
               - Syria
@@ -1519,7 +1519,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [20, 30, 40, 50, 60, 70, 1]
+                customNumericValues: [20, 30, 40, 50, 60, 70, 80, 1]
             selectedEntityNames:
               - Afghanistan
               - Syria
@@ -1568,7 +1568,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: "manual"
-                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 1]
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 1]
             selectedEntityNames:
               - Afghanistan
               - Iraq
