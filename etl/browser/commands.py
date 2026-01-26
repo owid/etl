@@ -24,6 +24,7 @@ class Command:
     description: str
     handler: Callable[["BrowserState"], CommandResult]
     aliases: list[str] = field(default_factory=list)
+    group: str = "action"  # "mode" for mode-switch commands, "action" for others
 
 
 def filter_commands(pattern: str, commands: list[Command]) -> list[Command]:

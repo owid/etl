@@ -125,16 +125,23 @@ class UnifiedBrowser:
         current_name = mode.config.name
         for switch_cmd in self._registry.get_mode_switch_commands():
             if switch_cmd.name == current_name:
-                # Current mode - show as "(current)"
+                # Current mode - show as "(current) →"
                 cmd = Command(
                     name=switch_cmd.name,
-                    description=f"{switch_cmd.name} (current)",
+                    description=f"{switch_cmd.name} (current) →",
                     handler=switch_cmd.handler,
                     aliases=switch_cmd.aliases,
+                    group="mode",
                 )
             else:
-                # Other modes - show "Switch to X"
-                cmd = switch_cmd
+                # Other modes - show "Switch to X →"
+                cmd = Command(
+                    name=switch_cmd.name,
+                    description=f"Switch to {switch_cmd.name} →",
+                    handler=switch_cmd.handler,
+                    aliases=switch_cmd.aliases,
+                    group="mode",
+                )
             commands.append(cmd)
 
         return commands
