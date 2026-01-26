@@ -24,7 +24,7 @@ definitions:
     Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
 
   text_macroplastic_definition: &text_macroplastic_definition
-    This pollution refers to macroplastic, meaning physical plastic pieces larger than 5 millimetres.
+    The data covers macroplastics — physical plastic pieces larger than 5 millimeters.
 
   text_pollution_definition: &text_pollution_definition
     Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
@@ -90,61 +90,61 @@ definitions:
     - *text_model_uncertainty
 
   desc_key_plastic_pollution_debris: &desc_key_plastic_pollution_debris
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_plastic_debris_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
+    - *text_spot_model_principles
     - *text_scope_exclusions
     - *text_model_uncertainty
 
   desc_key_plastic_pollution_debris_per_cap: &desc_key_plastic_pollution_debris_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_plastic_debris_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_plastic_pollution_burn: &desc_key_plastic_pollution_burn
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_open_burning_definition
+    - *text_macroplastic_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
     - *text_emission_sources
+    - *text_spot_model_principles
     - *text_scope_exclusions
     - *text_model_uncertainty
 
   desc_key_plastic_pollution_burn_per_cap: &desc_key_plastic_pollution_burn_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_open_burning_definition
+    - *text_macroplastic_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
     - *text_emission_sources
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_plastic_pollution_total: &desc_key_plastic_pollution_total
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
-    - *text_total_pollution_definition
     - *text_pollution_definition
+    - *text_total_pollution_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
+    - *text_spot_model_principles
     - *text_scope_exclusions
     - *text_model_uncertainty
 
   desc_key_plastic_pollution_total_per_cap: &desc_key_plastic_pollution_total_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
-    - *text_total_pollution_definition
     - *text_pollution_definition
+    - *text_total_pollution_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   # Individual pathway descriptions
@@ -164,80 +164,80 @@ definitions:
     This pathway captures macroplastic that escapes during sorting and reprocessing operations, including rejected materials and processing losses.
 
   desc_key_litter_pathway: &desc_key_litter_pathway
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_litter_pathway
+    - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_litter_pathway_per_cap: &desc_key_litter_pathway_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_litter_pathway
+    - *text_macroplastic_definition
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_uncollected_pathway: &desc_key_uncollected_pathway
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_uncollected_pathway
+    - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_uncollected_pathway_per_cap: &desc_key_uncollected_pathway_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_uncollected_pathway
+    - *text_macroplastic_definition
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_collection_pathway: &desc_key_collection_pathway
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_collection_pathway
+    - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_collection_pathway_per_cap: &desc_key_collection_pathway_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_collection_pathway
+    - *text_macroplastic_definition
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_disposal_pathway: &desc_key_disposal_pathway
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_disposal_pathway
+    - *text_macroplastic_definition
     - *text_dumpsite_working_face
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_disposal_pathway_per_cap: &desc_key_disposal_pathway_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_disposal_pathway
+    - *text_macroplastic_definition
     - *text_dumpsite_working_face
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_recycling_pathway: &desc_key_recycling_pathway
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_recycling_pathway
+    - *text_macroplastic_definition
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_recycling_pathway_per_cap: &desc_key_recycling_pathway_per_cap
-    - *text_macroplastic_definition
-    - *text_spot_model_principles
     - *text_pollution_definition
     - *text_recycling_pathway
+    - *text_macroplastic_definition
     - *text_per_capita_calculation
+    - *text_spot_model_principles
     - *text_model_uncertainty
 
 
