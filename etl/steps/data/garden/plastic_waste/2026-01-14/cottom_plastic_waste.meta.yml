@@ -24,7 +24,7 @@ definitions:
     Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
 
   text_macroplastic_definition: &text_macroplastic_definition
-    The data covers macroplastics — physical plastic pieces larger than 5 millimeters.
+   This indicator covers only macroplastics, which are plastic pieces larger than 5 millimetres.
 
   text_pollution_definition: &text_pollution_definition
     Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
