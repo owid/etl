@@ -1471,7 +1471,7 @@ def survey_count(tb: Table) -> Table:
     tb_survey["surveys_past_decade"] = tb_survey["surveys_past_decade"].copy_metadata(tb["headcount"])
 
     # Keep columns needed
-    tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
+    tb_survey = tb_survey.loc[:, ["country", "year", "surveys_past_decade"]]
 
     return tb_survey
 
@@ -1694,7 +1694,7 @@ def separate_rest_of_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
         columns=INDICATORS_INEQUALITY + INDICATORS_CPI + INDICATORS_REST_PPP + INDICATORS_NOT_USED, errors="raise"
     )
 
-    return tb, tb_inequality, tb_cpi, tb_rest
+    return tb, tb_inequality, tb_cpi, tb_rest  # type: ignore
 
 
 def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
@@ -1705,8 +1705,8 @@ def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
     As I am doing it several times in the script, I prefer to create a function for that.
     """
 
-    tb_filled = tb[tb["filled"]].copy()
-    tb_unfilled = tb[~tb["filled"]].copy()
+    tb_filled = tb.loc[tb["filled"]].copy()
+    tb_unfilled = tb.loc[~tb["filled"]].copy()
 
     return tb_filled, tb_unfilled
 
