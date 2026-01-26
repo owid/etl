@@ -300,8 +300,8 @@ def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
     tb = pr.merge(tb, tb_us_cpi_adj, on="year", how="left")
 
     # Adjust outbound expenditure for U.S. CPI
-    if "out_tour_exp_balance_of_payments_travel_vis" in tb.columns:
-        tb["outbound_exp_us_cpi_adj_2021"] = tb["out_tour_exp_balance_of_payments_travel_vis"] / tb["cpi_adj_2021"]
+    if "out_tour_exp_balance_of_payments_total_vis" in tb.columns:
+        tb["outbound_exp_us_cpi_adj_2021"] = tb["out_tour_exp_balance_of_payments_total_vis"] / tb["cpi_adj_2021"]
 
     # Drop the temporary U.S. CPI column
     tb = tb.drop(columns=["cpi_adj_2021"], errors="ignore")
@@ -324,9 +324,9 @@ def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
     # Adjust inbound expenditure for local inflation and PPP
     # Formula: (expenditure_in_usd * exchange_rate / cpi_normalized) / ppp_2021
     # This converts to local currency, adjusts for inflation, and normalizes by PPP
-    if "in_tour_exp_balance_of_payments_travel_vis" in tb.columns:
+    if "in_tour_exp_balance_of_payments_total_vis" in tb.columns:
         tb["inbound_exp_ppp_cpi_adj_2021"] = (
-            100 * (tb["in_tour_exp_balance_of_payments_travel_vis"] * tb["exchange_rate"]) / tb["cpi_normalized_2021"]
+            100 * (tb["in_tour_exp_balance_of_payments_total_vis"] * tb["exchange_rate"]) / tb["cpi_normalized_2021"]
         ) / tb["ppp_2021"]
 
     # Clean up temporary columns
