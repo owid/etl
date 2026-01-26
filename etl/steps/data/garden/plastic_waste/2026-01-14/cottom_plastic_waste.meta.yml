@@ -165,61 +165,61 @@ definitions:
 
   desc_key_litter_pathway: &desc_key_litter_pathway
     - *text_pollution_definition
-    - *text_litter_pathway
     - *text_macroplastic_definition
+    - *text_litter_pathway
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_litter_pathway_per_cap: &desc_key_litter_pathway_per_cap
     - *text_pollution_definition
-    - *text_litter_pathway
     - *text_macroplastic_definition
+    - *text_litter_pathway
     - *text_per_capita_calculation
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_uncollected_pathway: &desc_key_uncollected_pathway
     - *text_pollution_definition
-    - *text_uncollected_pathway
     - *text_macroplastic_definition
+    - *text_uncollected_pathway
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_uncollected_pathway_per_cap: &desc_key_uncollected_pathway_per_cap
     - *text_pollution_definition
-    - *text_uncollected_pathway
     - *text_macroplastic_definition
+    - *text_uncollected_pathway
     - *text_per_capita_calculation
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_collection_pathway: &desc_key_collection_pathway
     - *text_pollution_definition
-    - *text_collection_pathway
     - *text_macroplastic_definition
+    - *text_collection_pathway
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_collection_pathway_per_cap: &desc_key_collection_pathway_per_cap
     - *text_pollution_definition
-    - *text_collection_pathway
     - *text_macroplastic_definition
+    - *text_collection_pathway
     - *text_per_capita_calculation
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_disposal_pathway: &desc_key_disposal_pathway
     - *text_pollution_definition
-    - *text_disposal_pathway
     - *text_macroplastic_definition
+    - *text_disposal_pathway
     - *text_dumpsite_working_face
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_disposal_pathway_per_cap: &desc_key_disposal_pathway_per_cap
     - *text_pollution_definition
-    - *text_disposal_pathway
     - *text_macroplastic_definition
+    - *text_disposal_pathway
     - *text_dumpsite_working_face
     - *text_per_capita_calculation
     - *text_spot_model_principles
@@ -227,15 +227,15 @@ definitions:
 
   desc_key_recycling_pathway: &desc_key_recycling_pathway
     - *text_pollution_definition
-    - *text_recycling_pathway
     - *text_macroplastic_definition
+    - *text_recycling_pathway
     - *text_spot_model_principles
     - *text_model_uncertainty
 
   desc_key_recycling_pathway_per_cap: &desc_key_recycling_pathway_per_cap
     - *text_pollution_definition
-    - *text_recycling_pathway
     - *text_macroplastic_definition
+    - *text_recycling_pathway
     - *text_per_capita_calculation
     - *text_spot_model_principles
     - *text_model_uncertainty
