@@ -512,7 +512,7 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # So we will not attempt to replicate those.
 
     # Let's take the lifecycle emission factors from Ember's methodology:
-    # https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf
+    # https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf
     lifecycle_factors = {"Bioenergy": 230, "Hydro": 24, "Solar": 48, "Other renewables": 38, "Other fossil": 700}
     # In principle, most of them come from the median valeus of Table A.III.2 of
     # https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
