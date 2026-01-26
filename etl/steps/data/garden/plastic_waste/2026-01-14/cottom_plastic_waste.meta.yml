@@ -24,7 +24,7 @@ definitions:
     Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
 
   text_macroplastic_definition: &text_macroplastic_definition
-   This indicator covers only macroplastics, which are plastic pieces larger than 5 millimetres.
+   This data covers only macroplastics, which are plastic pieces larger than 5 millimetres.
 
   text_pollution_definition: &text_pollution_definition
     Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
@@ -91,8 +91,8 @@ definitions:
 
   desc_key_plastic_pollution_debris: &desc_key_plastic_pollution_debris
     - *text_pollution_definition
-    - *text_macroplastic_definition
     - *text_plastic_debris_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
     - *text_spot_model_principles
     - *text_scope_exclusions
@@ -100,8 +100,8 @@ definitions:
 
   desc_key_plastic_pollution_debris_per_cap: &desc_key_plastic_pollution_debris_per_cap
     - *text_pollution_definition
-    - *text_macroplastic_definition
     - *text_plastic_debris_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
     - *text_per_capita_calculation
     - *text_spot_model_principles
@@ -109,8 +109,8 @@ definitions:
 
   desc_key_plastic_pollution_burn: &desc_key_plastic_pollution_burn
     - *text_pollution_definition
-    - *text_macroplastic_definition
     - *text_open_burning_definition
+    - *text_macroplastic_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
     - *text_emission_sources
@@ -140,8 +140,8 @@ definitions:
 
   desc_key_plastic_pollution_total_per_cap: &desc_key_plastic_pollution_total_per_cap
     - *text_pollution_definition
-    - *text_macroplastic_definition
     - *text_total_pollution_definition
+    - *text_macroplastic_definition
     - *text_emission_sources
     - *text_per_capita_calculation
     - *text_spot_model_principles
