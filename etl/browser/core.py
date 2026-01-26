@@ -1,5 +1,7 @@
 """Generic browser UI using prompt_toolkit for interactive selection."""
 
+from __future__ import annotations
+
 import re
 from typing import TYPE_CHECKING, Any, Callable, Literal, Protocol
 
@@ -11,6 +13,7 @@ from prompt_toolkit.lexers import Lexer
 if TYPE_CHECKING:
     from etl.browser.commands import Command
     from etl.browser.filters import FilterOptions, ParsedInput
+    from etl.browser.options import BrowserOption, OptionsState
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
@@ -21,6 +24,7 @@ from prompt_toolkit.styles import Style
 # OWID-styled colors (reused from harmonize.py and apps/pr/cli.py)
 OWID_YELLOW = "#fac800"
 OWID_GREEN = "#54cc90"
+OWID_PURPLE = "#b392f0"  # Soft purple for options
 OWID_GRAY = "#888888"
 OWID_DIM_GRAY = "#666666"  # Even dimmer for navigation hints
 
@@ -41,6 +45,7 @@ BROWSER_STYLE = Style.from_dict(
         "shortcut-desc": f"fg:{OWID_DIM_GRAY}",
         "frame.border": f"fg:{OWID_GRAY}",  # Subtle gray border
         "filter": f"fg:{OWID_GREEN} italic",  # Italic green for filter tokens in input
+        "option": f"fg:{OWID_PURPLE}",  # Purple for recognized option tokens in input
     }
 )
 
@@ -224,33 +229,74 @@ def highlight_matches(
 
 
 class FilterLexer(Lexer):
-    """Lexer that highlights filter tokens (n:value, c:value, etc.) in the input."""
+    """Lexer that highlights filter tokens and option tokens in the input."""
 
     def __init__(self, state: "BrowserState") -> None:
         self.state = state
+
+    def _get_option_spans(self, text: str) -> list[tuple[int, int]]:
+        """Get spans of recognized option tokens to highlight in purple."""
+        from etl.browser.options import parse_option_tokens
+
+        if not self.state.options_state:
+            return []
+
+        spans: list[tuple[int, int]] = []
+        tokens = parse_option_tokens(text)
+
+        for token in tokens:
+            # Check if this is a recognized option
+            opt = self.state.options_state.get_option_by_flag(token.flag_name)
+            if opt is not None:
+                # Find the end of the flag name portion (not including value)
+                # Token starts at @ and flag_name follows
+                flag_end = token.start_pos + 1 + len(token.flag_name)
+                spans.append((token.start_pos, flag_end))
+
+        return spans
 
     def lex_document(self, document: Document) -> Callable[[int], StyleAndTextTuples]:
         """Return a function that returns styled text for a given line."""
 
         def get_line(lineno: int) -> StyleAndTextTuples:
             text = document.lines[lineno] if lineno < len(document.lines) else ""
-            parsed = self.state.parsed_input
 
-            # No filters or not in search mode - return plain text
-            if not parsed or not parsed.filter_spans or self.state.mode != "search":
+            # Collect all highlight spans: options (purple) and filters (green)
+            option_spans = self._get_option_spans(text) if "@" in text else []
+
+            # Search mode with filters - also get filter spans
+            filter_spans: list[tuple[int, int]] = []
+            parsed = self.state.parsed_input
+            if parsed and parsed.filter_spans and self.state.mode == "search":
+                filter_spans = list(parsed.filter_spans)
+
+            # If no highlights, return plain text
+            if not option_spans and not filter_spans:
                 return [("class:input", text)]
 
-            # Build styled fragments with filter tokens highlighted
+            # Merge all spans with their styles (options take precedence)
+            # Build a list of (start, end, style) and sort by start
+            all_spans: list[tuple[int, int, str]] = []
+            for start, end in option_spans:
+                all_spans.append((start, end, "class:option"))
+            for start, end in filter_spans:
+                all_spans.append((start, end, "class:filter"))
+
+            # Sort by start position
+            all_spans.sort(key=lambda x: x[0])
+
+            # Build styled fragments
             fragments: StyleAndTextTuples = []
             pos = 0
-            for start, end in sorted(parsed.filter_spans):
-                # Add text before this filter token
+            for start, end, style in all_spans:
+                if start < pos:
+                    continue  # Skip overlapping spans
                 if pos < start:
                     fragments.append(("class:input", text[pos:start]))
-                # Add the filter token with highlight
-                fragments.append(("class:filter", text[start:end]))
+                fragments.append((style, text[start:end]))
                 pos = end
-            # Add remaining text after last filter
+
+            # Add remaining text
             if pos < len(text):
                 fragments.append(("class:input", text[pos:]))
 
@@ -298,7 +344,7 @@ class BrowserState:
         self.all_items: list[str] = []  # Populated when loading completes
         self.app: Application[None] | None = None  # Reference to app for invalidation
         # Command mode state
-        self.mode: Literal["search", "command"] = "search"
+        self.mode: Literal["search", "command", "options"] = "search"
         self.command_matches: list["Command"] = []
         self.available_commands: list["Command"] = []
         # Refresh callback for reload functionality
@@ -328,6 +374,11 @@ class BrowserState:
         # Show help in results area (temporary, clears on typing)
         self.show_help: bool = False
         self._showing_help: bool = False  # Flag to prevent clearing help on programmatic text change
+        # Options state (for @ mode)
+        self.options_state: "OptionsState | None" = None
+        self.option_matches: list["BrowserOption"] = []  # Filtered options for display
+        self.current_option_token_start: int = 0  # Start position of current token
+        self.current_option_token_end: int = 0  # End position of current token
 
 
 def filter_items(pattern: str, all_items: list[str]) -> list[str]:
@@ -428,7 +479,8 @@ def browse_items(
     on_mode_switch: ModeSwitchCallback | None = None,
     mode_descriptions: list[tuple[str, str, bool]] | None = None,
     current_mode_name: str = "",
-) -> tuple[str | None, bool, list[str], str | None]:
+    options_state: "OptionsState | None" = None,
+) -> tuple[str | None, bool, list[str], str | None, dict[str, Any] | None]:
     """Interactive item browser using prompt_toolkit.
 
     Args:
@@ -450,13 +502,15 @@ def browse_items(
         on_mode_switch: Optional callback for in-place mode switching.
             If provided, mode switches happen without exiting the browser.
             Callback receives target mode name and should update state.
+        options_state: Optional OptionsState for CLI options toggling via @ prefix.
+            If provided, typing @ enters options mode.
 
     Returns:
-        Tuple of (pattern_or_item, is_exact_match, updated_history, switch_mode_target):
-        - If user presses Enter: (current_text, False, history, None) to run all matches
-        - If user selects an item: (item, True, history, None) to run just that item
-        - If user cancels: (None, False, history, None)
-        - If mode switch (without callback): (None, False, history, target_mode_name)
+        Tuple of (pattern_or_item, is_exact_match, updated_history, switch_mode_target, options):
+        - If user presses Enter: (current_text, False, history, None, options) to run all matches
+        - If user selects an item: (item, True, history, None, options) to run just that item
+        - If user cancels: (None, False, history, None, options)
+        - If mode switch (without callback): (None, False, history, target_mode_name, options)
     """
     import threading
 
@@ -468,6 +522,13 @@ def browse_items(
         get_active_filter,
         parse_filters,
     )
+    from etl.browser.options import (
+        filter_options as filter_opts,
+    )
+    from etl.browser.options import (
+        get_current_option_token,
+        parse_option_tokens,
+    )
 
     # State for the application
     state = BrowserState(history=history)
@@ -478,6 +539,7 @@ def browse_items(
     state.rank_matches = rank_matches
     state.mode_descriptions = mode_descriptions or []
     state.current_mode_name = current_mode_name
+    state.options_state = options_state
 
     # Initialize mutable config
     state.config.prompt = prompt
@@ -535,6 +597,53 @@ def browse_items(
             pattern = text[1:]  # Strip leading /
             state.command_matches = filter_commands(pattern, state.available_commands)
             state.selected_index = 0 if state.command_matches else -1
+        # Check for options mode (input contains @ and cursor is actively in an option token)
+        elif "@" in text and state.options_state is not None:
+            cursor_pos = buf.cursor_position
+            pattern, token_start, token_end = get_current_option_token(text, cursor_pos)
+
+            # Only enter options mode if cursor is actively typing an option:
+            # - cursor is right after @ (pattern is empty but we're at @)
+            # - cursor is typing the flag name (no space before cursor within token)
+            in_active_token = False
+            if token_start > 0 or (token_start == 0 and text.startswith("@")):
+                # Check if cursor is right after @ or typing flag name (not after space)
+                text_in_token = text[token_start + 1 : cursor_pos]  # Text after @ up to cursor
+                # Active if: empty (just typed @) or no space in what we've typed
+                in_active_token = " " not in text_in_token
+
+            # Also check if the pattern exactly matches a recognized option (then hide list)
+            is_exact_match = False
+            if in_active_token and pattern:
+                opt = state.options_state.get_option_by_flag(pattern)
+                is_exact_match = opt is not None
+
+            if in_active_token and not is_exact_match:
+                state.mode = "options"
+                state.parsed_input = None  # Clear filter state in options mode
+                state.current_option_token_start = token_start
+                state.current_option_token_end = token_end
+                state.option_matches = filter_opts(pattern, state.options_state.available_options)
+                state.selected_index = 0 if state.option_matches else -1
+            else:
+                # Cursor not in active option token - switch to search mode
+                state.mode = "search"
+                state.option_matches = []
+                state.current_option_token_start = 0
+                state.current_option_token_end = 0
+                # Parse as search (options in text will just be treated as search terms)
+                parsed = parse_filters(text)
+                state.parsed_input = parsed
+                search_pattern = " ".join(parsed.search_terms)
+                if search_pattern:
+                    matches = filter_items(search_pattern, state.all_items)
+                else:
+                    matches = state.all_items[:] if parsed.filters else []
+                matches = apply_filters(matches, parsed.filters)
+                if state.rank_matches is not None and matches:
+                    matches = state.rank_matches(search_pattern, matches)
+                state.matches = matches
+                state.selected_index = -1
         else:
             # Search mode with filter support
             state.mode = "search"
@@ -576,6 +685,43 @@ def browse_items(
 
     @kb.add("enter")
     def handle_enter(event: Any) -> None:
+        text = input_buffer.text.strip()
+
+        # Process @ option tokens if present (regardless of mode)
+        if "@" in text and state.options_state is not None:
+            # Handle special commands
+            if text == "@@":
+                state.options_state.reset()
+                input_buffer.text = ""
+                return
+
+            # Parse all option tokens from input
+            tokens = parse_option_tokens(text)
+            applied_any = False
+
+            if tokens:
+                # Apply all tokens
+                for token in tokens:
+                    opt = state.options_state.get_option_by_flag(token.flag_name)
+                    if opt:
+                        if token.value is not None:
+                            state.options_state.set_value(opt.flag_name, token.value)
+                            applied_any = True
+                        elif opt.is_flag:
+                            state.options_state.toggle_flag(opt.flag_name)
+                            applied_any = True
+
+            # If in options mode with selection but no complete tokens, toggle selected
+            if not applied_any and state.mode == "options" and state.selected_index >= 0 and state.option_matches:
+                opt = state.option_matches[state.selected_index]
+                if opt.is_flag:
+                    state.options_state.toggle_flag(opt.flag_name)
+                    applied_any = True
+
+            if applied_any:
+                input_buffer.text = ""
+                return
+
         # Handle command mode
         if state.mode == "command" and state.selected_index >= 0 and state.command_matches:
             cmd = state.command_matches[state.selected_index]
@@ -675,6 +821,11 @@ def browse_items(
                 max_idx = len(state.command_matches) - 1
                 if state.selected_index < max_idx:
                     state.selected_index += 1
+        elif state.mode == "options":
+            if state.option_matches:
+                max_idx = len(state.option_matches) - 1
+                if state.selected_index < max_idx:
+                    state.selected_index += 1
         elif state.history_index >= 0:
             # Navigate history forward (toward more recent)
             if state.history_index < len(state.history) - 1:
@@ -701,6 +852,18 @@ def browse_items(
                 max_idx = len(state.command_matches) - 1
                 if state.selected_index < max_idx:
                     state.selected_index += 1
+        elif state.mode == "options":
+            if state.option_matches and state.selected_index >= 0:
+                # Autocomplete the selected option name, preserving other tokens
+                opt = state.option_matches[state.selected_index]
+                text = input_buffer.text
+                # Replace current token with completed option
+                before = text[: state.current_option_token_start]
+                after = text[state.current_option_token_end :]
+                new_text = f"{before}@{opt.flag_name} {after}".rstrip()
+                input_buffer.text = new_text
+                # Position cursor after the completed option
+                input_buffer.cursor_position = state.current_option_token_start + len(opt.flag_name) + 2
         elif state.history_index >= 0:
             # Exit history mode, keep current text, enable match selection
             state.history_index = -1
@@ -720,6 +883,9 @@ def browse_items(
     @kb.add("s-tab")
     def handle_up(event: Any) -> None:
         if state.mode == "command":
+            if state.selected_index > 0:
+                state.selected_index -= 1
+        elif state.mode == "options":
             if state.selected_index > 0:
                 state.selected_index -= 1
         elif not input_buffer.text.strip() and state.history and state.history_index == -1:
@@ -822,6 +988,67 @@ def browse_items(
 
             return lines
 
+        # Options mode rendering
+        if state.mode == "options" and state.options_state is not None:
+            opt_matches = state.option_matches
+            count = len(opt_matches)
+
+            if count == 0:
+                lines.append(("class:match-count", "  No options"))
+                add_shortcuts([("^C", "Exit")])
+            else:
+                count_text = "1 option" if count == 1 else f"{count} options"
+                lines.append(("class:match-count", f"  {count_text}"))
+                add_shortcuts([("↑↓", "Select"), ("Enter", "Toggle"), ("^C", "Exit")])
+
+            lines.append(("", "\n"))
+
+            # Show active options status
+            status_text = state.options_state.get_status_text()
+            if status_text:
+                lines.append((f"fg:{OWID_PURPLE}", f"  Active: {status_text}\n"))
+                lines.append(("", "\n"))
+
+            # Display options with current values
+            pattern = text[1:].split()[0] if text[1:].strip() else ""  # Get first word after @
+
+            # Calculate max option name width for alignment
+            max_name_width = max((len(opt.flag_name) for opt in opt_matches), default=0) + 1  # +1 for @
+
+            lines.append(("class:hint", "  Options\n"))
+            for i, opt in enumerate(opt_matches):
+                is_selected = i == state.selected_index
+                prefix_style = "class:item.selected" if is_selected else "class:item"
+                prefix = "  > " if is_selected else "    "
+                lines.append((prefix_style, prefix))
+
+                # Show option name without color highlighting
+                opt_name = f"@{opt.flag_name}"
+                lines.append((prefix_style, opt_name))
+
+                # Show current value
+                effective = state.options_state.get_effective()
+                current_value = effective.get(opt.name, opt.default)
+                if opt.is_flag:
+                    value_str = "ON" if current_value else "OFF"
+                    value_style = f"fg:{OWID_PURPLE}" if current_value else f"fg:{OWID_GRAY}"
+                else:
+                    value_str = str(current_value)
+                    value_style = "class:hint"
+
+                # Pad to align values and descriptions
+                padding = " " * (max_name_width - len(opt_name) + 2)
+                lines.append(("", padding))
+                lines.append((value_style, f"{value_str:>4}"))
+                lines.append(("class:hint", f"    {opt.help}"))
+                lines.append(("", "\n"))
+
+            # Add hint for @@
+            lines.append(("", "\n"))
+            lines.append(("class:hint", "    @@ to reset all options\n"))
+
+            return lines
+
         # Search mode rendering (existing behavior)
         matches = state.matches
 
@@ -846,16 +1073,31 @@ def browse_items(
                 run_desc = "Run all" if state.selected_index < 0 else "Run selected"
                 shortcuts = [("↑↓", "Select"), ("Enter", run_desc), ("^C", "Exit")]
                 add_shortcuts(shortcuts)
+            # Show active options on separate line
+            if state.options_state:
+                status_text = state.options_state.get_status_text()
+                if status_text:
+                    lines.append(("", "\n"))
+                    lines.append((f"fg:{OWID_PURPLE}", f"  {status_text}"))
         else:
             # Show hint with filter prefixes for discoverability
-            filter_hint = " (n: c: v: d:)" if state.all_items else ""
+            filter_hint = " (n: c: v: d: @)" if state.all_items else ""
             lines.append(
-                ("class:hint", f"  Type to filter {len(state.all_items)} {state.config.item_noun_plural}{filter_hint}")
+                (
+                    "class:hint",
+                    f"  Type to filter {len(state.all_items)} {state.config.item_noun_plural}{filter_hint}",
+                )
             )
             shortcuts = [("^C", "Exit")]
             if state.history:
                 shortcuts.insert(0, ("↑", "History"))
             add_shortcuts(shortcuts)
+            # Show active options on separate line
+            if state.options_state:
+                status_text = state.options_state.get_status_text()
+                if status_text:
+                    lines.append(("", "\n"))
+                    lines.append((f"fg:{OWID_PURPLE}", f"  {status_text}"))
 
         lines.append(("", "\n"))
 
@@ -954,16 +1196,22 @@ def browse_items(
     except EOFError:
         state.cancelled = True
 
+    # Helper to get effective options
+    def get_effective_options() -> dict[str, Any] | None:
+        if state.options_state:
+            return state.options_state.get_effective()
+        return None
+
     if state.cancelled:
-        return None, False, state.history, None
+        return None, False, state.history, None, get_effective_options()
 
     # Check for mode switch (unified browser feature)
     if state.switch_mode_target:
-        return None, False, state.history, state.switch_mode_target
+        return None, False, state.history, state.switch_mode_target, get_effective_options()
 
     # Check if no items were loaded
     if not state.all_items and not state.loading:
         print(state.config.empty_message)
-        return None, False, state.history, None
+        return None, False, state.history, None, get_effective_options()
 
-    return state.result, state.is_exact, state.history, None
+    return state.result, state.is_exact, state.history, None, get_effective_options()

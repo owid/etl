@@ -10,6 +10,7 @@ from etl.browser.modes import ModeConfig, ModeResult
 
 if TYPE_CHECKING:
     from etl.browser.core import Ranker
+    from etl.browser.options import BrowserOption
 
 # Maximum number of history entries to cache per mode
 MAX_HISTORY_ENTRIES = 10
@@ -104,3 +105,10 @@ class BaseBrowserMode:
                 json.dump(cache, f)
         except OSError:
             pass  # Silently fail - cache is optional
+
+    def get_options(self) -> list["BrowserOption"]:
+        """Get CLI options available for this mode.
+
+        Override in subclasses to provide mode-specific options.
+        """
+        return []

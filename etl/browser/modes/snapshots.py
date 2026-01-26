@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Callable
 from etl.browser.commands import DEFAULT_COMMANDS, Command
 from etl.browser.modes import ModeConfig, ModeResult
 from etl.browser.modes.base import BaseBrowserMode
+from etl.browser.options import BrowserOption
 
 if TYPE_CHECKING:
     from etl.browser.core import Ranker
@@ -73,3 +74,25 @@ class SnapshotMode(BaseBrowserMode):
     def on_select(self, item: str, is_exact: bool) -> ModeResult:
         """Handle snapshot selection."""
         return ModeResult(action="run", value=item, is_exact=is_exact)
+
+    def get_options(self) -> list[BrowserOption]:
+        """Get CLI options available for snapshot execution.
+
+        Returns key options from `etl snapshot` command that are useful in browser context.
+        """
+        return [
+            BrowserOption(
+                name="dry_run",
+                flag_name="dry-run",
+                is_flag=True,
+                default=False,
+                help="Preview without creating snapshot",
+            ),
+            BrowserOption(
+                name="upload",
+                flag_name="upload",
+                is_flag=True,
+                default=True,
+                help="Upload to snapshot storage",
+            ),
+        ]

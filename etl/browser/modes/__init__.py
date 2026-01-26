@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Callable, Protocol
 if TYPE_CHECKING:
     from etl.browser.commands import Command
     from etl.browser.core import BrowserState, Ranker
+    from etl.browser.options import BrowserOption
 
 
 @dataclass
@@ -85,6 +86,14 @@ class BrowserMode(Protocol):
 
     def save_history(self, history: list[str]) -> None:
         """Save browsing history for this mode."""
+        ...
+
+    def get_options(self) -> list["BrowserOption"]:
+        """Get CLI options available for this mode.
+
+        Returns:
+            List of BrowserOption objects that can be toggled via @ prefix
+        """
         ...
 
 

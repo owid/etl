@@ -264,7 +264,7 @@ def _run_unified_browser() -> None:
     from etl.dag_helpers import load_dag
 
     while True:
-        result, is_exact, mode_name = browse_unified(
+        result, is_exact, mode_name, options = browse_unified(
             private=True,  # Default to showing all steps
             dag_path=paths.DEFAULT_DAG_FILE,
             dag_loader=lambda: load_dag(paths.DEFAULT_DAG_FILE),
@@ -277,15 +277,15 @@ def _run_unified_browser() -> None:
 
         # Execute based on mode
         if mode_name == "steps":
-            _execute_step(result, is_exact)
+            _execute_step(result, is_exact, options)
         elif mode_name == "snapshots":
-            _execute_snapshot(result)
+            _execute_snapshot(result, options)
 
         # Add blank line before returning to browser
         print()
 
 
-def _execute_step(step: str, is_exact: bool) -> None:
+def _execute_step(step: str, is_exact: bool, options: dict | None = None) -> None:
     """Execute a step from the browser."""
     import traceback
 
@@ -294,12 +294,33 @@ def _execute_step(step: str, is_exact: bool) -> None:
 
     config.enable_sentry()
 
-    # Prepare kwargs (minimal set for browse mode)
-    kwargs = {
-        "steps": [step],
+    # Default options for steps
+    default_options = {
+        "dry_run": False,
+        "force": False,
         "grapher": step.startswith("grapher://"),
+        "export": False,
         "private": True,
+        "only": False,
+        "workers": 1,
+    }
+
+    # Merge with user-set options
+    if options:
+        for key in default_options:
+            if key in options:
+                default_options[key] = options[key]
+
+    # Auto-detect grapher if not explicitly set and step is a grapher:// step
+    if step.startswith("grapher://") and not (options and "grapher" in options):
+        default_options["grapher"] = True
+
+    # Prepare kwargs
+    # Note: main() uses 'includes' for the steps list
+    kwargs = {
+        "includes": [step],
         "exact_match": is_exact,
+        **default_options,
     }
 
     try:
@@ -309,9 +330,11 @@ def _execute_step(step: str, is_exact: bool) -> None:
         print(f"\nError: {e}")
 
 
-def _execute_snapshot(snapshot: str) -> None:
+def _execute_snapshot(snapshot: str, options: dict | None = None) -> None:
     """Execute a snapshot from the browser."""
     import traceback
+
+    import structlog
 
     from etl.snapshot_command import (
         check_for_version_ambiguity,
@@ -320,14 +343,44 @@ def _execute_snapshot(snapshot: str) -> None:
         run_snapshot_script,
     )
 
+    log = structlog.get_logger()
+
+    # Default options for snapshots
+    default_options = {
+        "dry_run": False,
+        "upload": True,
+    }
+
+    # Merge with user-set options
+    if options:
+        for key in default_options:
+            if key in options:
+                default_options[key] = options[key]
+
+    dry_run = default_options["dry_run"]
+    upload = default_options["upload"]
+
     try:
         check_for_version_ambiguity(snapshot)
         script_path = find_snapshot_script(snapshot)
 
+        if dry_run:
+            # Dry run mode - just show what would happen
+            if script_path and script_path.exists():
+                from etl import paths
+
+                log.info(
+                    "DRY RUN: Would execute snapshot script", script_path=script_path.relative_to(paths.SNAPSHOTS_DIR)
+                )
+            else:
+                log.info("DRY RUN: Would create snapshot from .dvc file", snapshot=snapshot)
+            log.info("DRY RUN: Upload enabled" if upload else "DRY RUN: Upload disabled")
+            return
+
         if script_path and script_path.exists():
-            run_snapshot_script(script_path, upload=True, path_to_file=None)
+            run_snapshot_script(script_path, upload=upload, path_to_file=None)
         else:
-            run_snapshot_dvc_only(snapshot, upload=True, path_to_file=None)
+            run_snapshot_dvc_only(snapshot, upload=upload, path_to_file=None)
     except Exception as e:
         traceback.print_exc()
         print(f"\nError: {e}")

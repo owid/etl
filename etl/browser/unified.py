@@ -1,15 +1,25 @@
 """Unified browser orchestrator for multi-mode ETL browser."""
 
+import random
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 from etl.browser.core import OWID_YELLOW, BrowserState, browse_items
 from etl.browser.modes import BrowserMode, ModeRegistry, get_registry
+from etl.browser.options import OptionsState
 
 if TYPE_CHECKING:
     from etl.browser.commands import Command
+
+# Farewell messages shown when exiting the browser
+FAREWELL_MESSAGES = [
+    "Happy data wrangling!",
+    "May your pipelines run smoothly!",
+    "Until next time, data explorer!",
+    "Go make the world's data accessible!",
+]
 
 # ASCII art title for the browser
 BROWSER_TITLE = r"""
@@ -52,6 +62,14 @@ def print_browser_intro() -> None:
     print()
 
 
+def print_browser_farewell() -> None:
+    """Print a random farewell message when exiting."""
+    dim = "\033[2m"
+    reset = "\033[0m"
+    message = random.choice(FAREWELL_MESSAGES)
+    print(f"\n{dim}{message}{reset}")
+
+
 @dataclass
 class UnifiedBrowserResult:
     """Result from a unified browser session."""
@@ -60,6 +78,7 @@ class UnifiedBrowserResult:
     action: str  # "run", "exit"
     value: str | None = None  # Selected item or pattern
     is_exact: bool = False  # True if specific item selected
+    options: dict[str, Any] | None = None  # CLI options set via @ mode
 
 
 class UnifiedBrowser:
@@ -199,6 +218,10 @@ class UnifiedBrowser:
             state.history_index = -1
             state.history_temp = ""
 
+            # Initialize options for new mode
+            mode_options = target_mode.get_options()
+            state.options_state = OptionsState(available_options=mode_options)
+
         return on_mode_switch
 
     def run(self, initial_mode: str | None = None) -> UnifiedBrowserResult:
@@ -235,8 +258,12 @@ class UnifiedBrowser:
         # Get mode descriptions for help display
         mode_descriptions = self._get_mode_descriptions(self._current_mode_name or "")
 
+        # Initialize options state for current mode
+        mode_options = mode.get_options()
+        initial_options_state = OptionsState(available_options=mode_options)
+
         # Run the browser with in-place mode switching
-        result, is_exact, updated_history, _switch_mode = browse_items(
+        result, is_exact, updated_history, _switch_mode, effective_options = browse_items(
             items_loader=mode.get_items_loader(),
             prompt=config.prompt,
             loading_message=config.loading_message,
@@ -251,6 +278,7 @@ class UnifiedBrowser:
             on_mode_switch=on_mode_switch,
             mode_descriptions=mode_descriptions,
             current_mode_name=self._current_mode_name or "",
+            options_state=initial_options_state,
         )
 
         # Save history for final mode
@@ -263,7 +291,9 @@ class UnifiedBrowser:
 
         # Handle cancellation
         if result is None:
-            return UnifiedBrowserResult(mode=final_mode_name, action="exit", value=None, is_exact=False)
+            return UnifiedBrowserResult(
+                mode=final_mode_name, action="exit", value=None, is_exact=False, options=effective_options
+            )
 
         # Handle selection - delegate to mode
         if final_mode:
@@ -273,6 +303,7 @@ class UnifiedBrowser:
                 action=mode_result.action,
                 value=mode_result.value,
                 is_exact=mode_result.is_exact,
+                options=effective_options,
             )
 
         return UnifiedBrowserResult(
@@ -280,6 +311,7 @@ class UnifiedBrowser:
             action="run",
             value=result,
             is_exact=is_exact,
+            options=effective_options,
         )
 
 
@@ -323,7 +355,7 @@ def browse_unified(
     dag_path: Path | None = None,
     dag_loader: Callable[[], dict[str, set[str]]] | None = None,
     initial_mode: str = "steps",
-) -> tuple[str | None, bool, str]:
+) -> tuple[str | None, bool, str, dict[str, Any] | None]:
     """Run unified browser session.
 
     Convenience function for running the unified browser.
@@ -335,10 +367,11 @@ def browse_unified(
         initial_mode: Mode to start in ("steps" or "snapshots")
 
     Returns:
-        Tuple of (selected_item, is_exact, mode_name):
+        Tuple of (selected_item, is_exact, mode_name, options):
         - selected_item: The selected item or pattern, None if cancelled
         - is_exact: True if specific item selected
         - mode_name: Name of mode that produced the result
+        - options: CLI options set via @ mode, or None
     """
     browser = create_default_browser(
         private=private,
@@ -349,6 +382,7 @@ def browse_unified(
     result = browser.run(initial_mode=initial_mode)
 
     if result.action == "exit":
-        return None, False, result.mode
+        print_browser_farewell()
+        return None, False, result.mode, result.options
 
-    return result.value, result.is_exact, result.mode
+    return result.value, result.is_exact, result.mode, result.options
