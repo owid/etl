@@ -1858,20 +1858,27 @@ class Regions:
         warn_on_unused_countries: bool = True,
         warn_on_unknown_excluded_countries: bool = True,
         show_full_warning: bool = True,
+        countries_file: Path | str | None = None,
+        excluded_countries_file: Path | str | None = None,
     ) -> Table:
         """Harmonize country names in a table using the countries mapping file."""
-        if self.countries_file is None:
+        if countries_file is None:
+            countries_file = self.countries_file
+        if excluded_countries_file is None:
+            excluded_countries_file = self.excluded_countries_file
+
+        if countries_file is None:
             raise ValueError("The countries_file argument must be defined to use harmonize_countries")
 
-        if not Path(self.countries_file).exists():
+        if not Path(countries_file).exists():
             raise ValueError(
                 "A country mapping must exist before using regions.harmonize_countries. Use regions.harmonizer first."
             )
 
         return harmonize_countries(
             df=tb,
-            countries_file=self.countries_file,
-            excluded_countries_file=self.excluded_countries_file,
+            countries_file=countries_file,
+            excluded_countries_file=excluded_countries_file,
             country_col=country_col,
             warn_on_missing_countries=warn_on_missing_countries,
             make_missing_countries_nan=make_missing_countries_nan,

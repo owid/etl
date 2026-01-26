@@ -10,6 +10,7 @@ config:
     - United States
   wpBlockId: 57755
   isPublished: true
+  originUrl: https://ourworldindata.org/poverty
   # pickerColumnSlugs:
 
 dimensions:

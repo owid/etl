@@ -6,6 +6,7 @@ definitions:
 
 config:
   explorerTitle: Climate Change Impacts
+  originUrl: https://ourworldindata.org/climate-change
   isPublished: true
   entityType: region
   explorerSubtitle: Explore the impacts of global climate change.
