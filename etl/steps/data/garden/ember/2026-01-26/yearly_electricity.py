@@ -212,6 +212,8 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
         "gCO2e per kWh",
     }, error
     assert set(tb_global[(tb_global["category"] == "Power sector emissions")]["unit"]) == {"mtCO2", "gCO2/kWh"}, error
+    tb_europe.loc[tb_europe["unit"] == "MtCO2e", "unit"] = "mtCO2"
+    tb_europe.loc[tb_europe["unit"] == "gCO2e per kWh", "unit"] = "gCO2/kWh"
 
     # Create the gas and other fossil aggregate for European data.
     # NOTE: This can only be created for Electricity generation, not Power sector emissions,
