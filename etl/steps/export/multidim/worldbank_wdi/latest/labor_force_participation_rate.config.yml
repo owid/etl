@@ -1,0 +1,101 @@
+title:
+  title: Labor force participation rate
+  title_variant: ILO
+topic_tags:
+  - Work & Employment
+default_selection:
+  - Afghanistan
+  - Syria
+  - Uzbekistan
+  - United States
+  - Philippines
+  - China
+  - New Zealand
+  - Peru
+  - Uganda
+  - India
+
+dimensions:
+  - name: Age group
+    slug: age_group
+    choices:
+      - slug: 15_plus
+        name: Ages 15 and over
+        description: All adults
+      - slug: "15_64"
+        name: Ages 15 to 64
+        description: Main working-age population
+      - slug: "15_24"
+        name: Ages 15 to 24
+        description: Youth adults
+
+  - name: Sex
+    slug: sex
+    choices:
+      - slug: both
+        name: Both
+      - slug: male
+        name: Male
+      - slug: female
+        name: Female
+      - slug: male_vs_female
+        name: Male vs. female
+        group: Gender comparison
+
+views:
+  - dimensions:
+      age_group: 15_plus
+      sex: both
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_cact_zs
+  - dimensions:
+      age_group: 15_plus
+      sex: male
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_cact_ma_zs
+  - dimensions:
+      age_group: 15_plus
+      sex: female
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_cact_fe_zs
+
+  - dimensions:
+      age_group: "15_64"
+      sex: both
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_acti_zs
+  - dimensions:
+      age_group: "15_64"
+      sex: male
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_acti_ma_zs
+  - dimensions:
+      age_group: "15_64"
+      sex: female
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_acti_fe_zs
+
+  - dimensions:
+      age_group: "15_24"
+      sex: both
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_acti_1524_zs
+  - dimensions:
+      age_group: "15_24"
+      sex: male
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_acti_1524_ma_zs
+  - dimensions:
+      age_group: "15_24"
+      sex: female
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_acti_1524_fe_zs
