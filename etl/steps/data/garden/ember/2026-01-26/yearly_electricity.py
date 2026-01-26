@@ -5,12 +5,8 @@ from typing import Dict
 import owid.catalog.processing as pr
 from owid.catalog import Table, utils
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from structlog import get_logger
 
 from etl.helpers import PathFinder
-
-# Initialize log.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -168,6 +164,8 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
     # - Units differ slightly: for global, emissions and intensity units are called "mtCO2" and "gCO2/kWh", while for European data, units are called "MtCO2e" and "gCO2e per kWh". After inspection of a few countries, the values seem to be in good agreement, so the units are most likely the same. As explained in their methodology, it should refer to CO2 equivalents over a 100 year timescale:
     # https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf
     # - Global data includes data for all European countries from 2000 onwards. European data includes the same data from 2000 onwards, but also data from 1990 to 1999.
+    # - NEW (2026-01-26): European data has duplication in Power sector emissions where aggregate variables (Clean, Fossil, Renewables, Wind and solar, etc.) appear in both 'Fuel' and 'Aggregate fuel' subcategories with identical values. We keep only 'Aggregate fuel'.
+    # - NEW (2026-01-26): European data no longer includes 'Gas and other fossil' aggregate, so we create it by summing Gas + Other fossil.
     tb_global = tb_global.copy()
     tb_europe = tb_europe.copy()
 
@@ -183,11 +181,28 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
         "Onshore wind",
     }, error
 
-    # The simplest solution regarding coal and wind is to rename the subcategory of European data from "Aggregate fuel" to "Fuel".
-    tb_europe.loc[
-        (tb_europe["subcategory"] == "Aggregate fuel") & (tb_europe["variable"].isin(["Coal", "Wind"])),
-        "subcategory",
-    ] = "Fuel"
+    # Remove duplicates in European Power sector emissions data.
+    # NEW in 2026-01-26: European data now only provides aggregate emissions (Clean, Fossil, Renewables, etc.) and no longer includes individual fuel emissions (Bioenergy, Gas, Nuclear, etc.). All aggregate emissions appear in both 'Fuel' and 'Aggregate fuel' subcategories (complete duplication).
+    # We keep only 'Aggregate fuel' subcategory and remove all 'Fuel' rows.
+    europe_emissions = tb_europe[tb_europe["category"] == "Power sector emissions"]
+    fuel_vars = set(europe_emissions[europe_emissions["subcategory"] == "Fuel"]["variable"].unique())
+    agg_vars = set(europe_emissions[europe_emissions["subcategory"] == "Aggregate fuel"]["variable"].unique())
+    overlapping_vars = fuel_vars & agg_vars
+    error = "Expected overlap between 'Fuel' and 'Aggregate fuel' subcategories in European Power sector emissions."
+    assert overlapping_vars, error
+
+    # Remove 'Fuel' subcategory rows for Power sector emissions (they're all duplicates of aggregate fuel')
+    mask_duplicates = (tb_europe["category"] == "Power sector emissions") & (tb_europe["subcategory"] == "Fuel")
+    tb_europe = tb_europe[~mask_duplicates].copy()
+
+    # For both Electricity generation and Power sector emissions, rename the subcategory from "Aggregate fuel" to "Fuel" for Coal and Wind.
+    # This harmonizes with global data structure where Coal and Wind are in "Fuel" subcategory.
+    mask_coal_wind = (
+        (tb_europe["category"].isin(["Electricity generation", "Power sector emissions"]))
+        & (tb_europe["subcategory"] == "Aggregate fuel")
+        & (tb_europe["variable"].isin(["Coal", "Wind"]))
+    )
+    tb_europe.loc[mask_coal_wind, "subcategory"] = "Fuel"
 
     # Harmonize units. Arbitrarily, adopt the global ones.
     # NOTE: All units will be redefined at the end of this step, using the definitions in the accompanying meta.yaml file.
@@ -197,27 +212,49 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
         "gCO2e per kWh",
     }, error
     assert set(tb_global[(tb_global["category"] == "Power sector emissions")]["unit"]) == {"mtCO2", "gCO2/kWh"}, error
-    tb_europe.loc[tb_europe["unit"] == "MtCO2e", "unit"] = "mtCO2"
-    tb_europe.loc[tb_europe["unit"] == "gCO2e per kWh", "unit"] = "gCO2/kWh"
 
     # Create the gas and other fossil aggregate for European data.
+    # NOTE: This can only be created for Electricity generation, not Power sector emissions,
+    # because European emissions data doesn't include individual fuel emissions (Gas, Other fossil, etc.).
     error = "Expected European data to not include 'Gas and other fossil' variable."
     assert not (tb_europe["variable"] == "Gas and other fossil").any(), error
     tb_europe_gas_and_other_fossil = (
-        tb_europe[(tb_europe["variable"].isin(["Gas", "Other fossil"])) & (tb_europe["unit"].isin(["TWh", "mtCO2"]))]
+        tb_europe[
+            (tb_europe["variable"].isin(["Gas", "Other fossil"]))
+            & (tb_europe["category"] == "Electricity generation")
+            & (tb_europe["unit"] == "TWh")
+        ]
         .groupby(["country", "year", "unit", "category"], as_index=False)
         .agg({"value": "sum"})
         .assign(**{"variable": "Gas and other fossil", "subcategory": "Aggregate fuel"})
     )
     tb_europe = pr.concat([tb_europe, tb_europe_gas_and_other_fossil], ignore_index=True)
 
-    # Check that the category-subcategory-variable groups are now identical for global and European data.
+    # Check that the category-subcategory-variable groups are compatible between global and European data.
+    # NEW in 2026-01-26: European data no longer includes individual fuel emissions, only aggregates.
+    # So we need to exclude individual fuel emissions from the global data when comparing.
+    individual_fuel_emissions = ["Bioenergy", "Gas", "Hydro", "Nuclear", "Other fossil", "Other renewables", "Solar"]
+
     set_global = set(
         [
             t["category"] + " - " + t["subcategory"] + " - " + t["variable"]
-            for _, t in tb_global[(tb_global["category"] != "Capacity") & (tb_global["variable"] != "Total emissions")][
-                ["category", "subcategory", "variable"]
-            ]
+            for _, t in tb_global[
+                (tb_global["category"] != "Capacity")
+                & (tb_global["variable"] != "Total emissions")
+                &
+                # Exclude individual fuel emissions from Power sector emissions (not available in European data)
+                ~(
+                    (tb_global["category"] == "Power sector emissions")
+                    & (tb_global["subcategory"] == "Fuel")
+                    & (tb_global["variable"].isin(individual_fuel_emissions))
+                )
+                &
+                # Also exclude "Gas and other fossil" from Power sector emissions (can't be created for European data)
+                ~(
+                    (tb_global["category"] == "Power sector emissions")
+                    & (tb_global["variable"] == "Gas and other fossil")
+                )
+            ][["category", "subcategory", "variable"]]
             .drop_duplicates()
             .iterrows()
         ]
@@ -232,9 +269,26 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
             .iterrows()
         ]
     )
-    assert (
-        set_global == set_europe
-    ), "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
+
+    # Log the differences for debugging if they don't match
+    if set_global != set_europe:
+        diff_global = set_global - set_europe
+        diff_europe = set_europe - set_global
+        error_msg = "After adapting European data, category-subcategory-variables should match, except for:\n"
+        error_msg += "* Capacity and total emissions (only in global)\n"
+        error_msg += "* Hard coal, Lignite, Onshore wind, Offshore wind (only in European)\n"
+        error_msg += "* Individual fuel emissions (Bioenergy, Gas, Hydro, Nuclear, Other fossil, Other renewables, Solar) in Power sector emissions (only in global)\n"
+        if diff_global:
+            error_msg += f"\nIn GLOBAL but NOT in EUROPEAN ({len(diff_global)} items):\n"
+            error_msg += "\n".join(f"  - {item}" for item in sorted(diff_global)[:10])
+            if len(diff_global) > 10:
+                error_msg += f"\n  ... and {len(diff_global) - 10} more"
+        if diff_europe:
+            error_msg += f"\n\nIn EUROPEAN but NOT in GLOBAL ({len(diff_europe)} items):\n"
+            error_msg += "\n".join(f"  - {item}" for item in sorted(diff_europe)[:10])
+            if len(diff_europe) > 10:
+                error_msg += f"\n  ... and {len(diff_europe) - 10} more"
+        raise AssertionError(error_msg)
 
     # Combine the two overlapping datasets, prioritizing European on overlapping rows.
     tb = combine_two_overlapping_dataframes(
