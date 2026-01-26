@@ -638,17 +638,52 @@ definitions:
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
-  map_brackets_avg: &map_brackets_avg <% if decile in ["1", "2", "3", "4"] %>
-    [0, 1, 2, 5, 10, 20, 1]
-    <%- elif decile in ["5", "6", "7", "8"] %>
+  map_brackets_mean_median: &map_brackets_mean_median
+    <% if period == "year" %>
+    [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+    <%- elif period == "month" %>
+    [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
+    <%- elif period == "day" %>
     [0, 1, 2, 5, 10, 20, 50, 1]
-    <%- elif decile in ["9"] %>
-    [0, 1, 2, 5, 10, 20, 50, 100, 1]
-    <%- elif decile in ["10"] %>
-    [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
     <%- endif %>
 
-  map_brackets_share: &map_brackets_share <% if decile in ["1"] %>
+  map_brackets_avg: &map_brackets_avg
+    <% if period == "year" %>
+      <% if decile in ["1"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+      <%- elif decile in ["2"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+      <%- elif decile in ["3", "4"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1]
+      <%- elif decile in ["5", "6", "7", "8", "9"] %>
+      [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+      <%- elif decile in ["10"] %>
+      [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+      <%- endif %>
+    <% elif period == "month" %>
+      <% if decile in ["1"] %>
+      [0, 10, 20, 50, 100, 200, 500, 1]
+      <%- elif decile in ["2", "3", "4"] %>
+      [0, 10, 20, 50, 100, 200, 500, 1000, 1]
+      <%- elif decile in ["5", "6", "7", "8", "9"] %>
+      [0, 100, 200, 500, 1000, 2000, 1]
+      <%- elif decile in ["10"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 1]
+      <%- endif %>
+    <% elif period == "day" %>
+      <% if decile in ["1", "2", "3", "4"] %>
+        [0, 1, 2, 5, 10, 20, 1]
+        <%- elif decile in ["5", "6", "7", "8"] %>
+        [0, 1, 2, 5, 10, 20, 50, 1]
+        <%- elif decile in ["9"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 1]
+        <%- elif decile in ["10"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
+      <%- endif %>
+    <%- endif %>
+
+  map_brackets_share: &map_brackets_share
+    <% if decile in ["1"] %>
     [0, 1, 2, 3, 4, 1]
     <%- elif decile in ["2"] %>
     [0, 1, 2, 3, 4, 5, 1]
@@ -670,12 +705,35 @@ definitions:
     [100, 20, 25, 30, 35, 40, 45, 1]
     <%- endif %>
 
-  map_brackets_thr: &map_brackets_thr <% if decile in ["1", "2", "3"] %>
-    [0, 1, 2, 5, 10, 20, 1]
-    <% elif decile in ["4", "5", "6", "7"] %>
-    [0, 1, 2, 5, 10, 20, 50, 1]
-    <% elif decile in ["8", "9"] %>
-    [0, 1, 2, 5, 10, 20, 50, 100, 1]
+  map_brackets_thr: &map_brackets_thr
+    <% if period == "year" %>
+      <% if decile in ["1", "2"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+      <%- elif decile in ["3", "4"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1]
+      <%- elif decile in ["5", "6", "7", "8"] %>
+      [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+      <%- elif decile in ["9"] %>
+      [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+      <%- endif %>
+    <% elif period == "month" %>
+      <% if decile in ["1", "2", "3"] %>
+      [0, 10, 20, 50, 100, 200, 500, 1000, 1]
+      <%- elif decile in ["4"] %>
+      [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
+      <%- elif decile in ["5", "6", "7", "8"] %>
+      [0, 100, 200, 500, 1000, 2000, 1]
+      <%- elif decile in ["9"] %>
+      [0, 100, 200, 500, 1000, 2000, 5000, 1]
+      <%- endif %>
+    <% elif period == "day" %>
+      <% if decile in ["1", "2", "3"] %>
+      [0, 1, 2, 5, 10, 20, 1]
+      <% elif decile in ["4", "5", "6", "7"] %>
+      [0, 1, 2, 5, 10, 20, 50, 1]
+      <% elif decile in ["8", "9"] %>
+      [0, 1, 2, 5, 10, 20, 50, 100, 1]
+      <%- endif %>
     <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
@@ -1656,7 +1714,7 @@ tables:
               colorScale:
                 baseColorScheme: "BuGn"
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
+                customNumericValues: *map_brackets_mean_median
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
@@ -1706,7 +1764,7 @@ tables:
               colorScale:
                 baseColorScheme: "Blues"
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
+                customNumericValues: *map_brackets_mean_median
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       avg:
