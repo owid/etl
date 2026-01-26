@@ -59,16 +59,16 @@ def run() -> None:
                 # Extract the column name from the catalog path
                 indicator_col = first_indicator_path.split("#")[-1]
 
+            # Define meta object and render jinja templates
+            meta = tb[indicator_col].metadata.render({})
+
             # Remove "Male " from beginning of title. Also capitalize first letter. We need to extract this from the table's metadata (Grapher step)
             # It is only male because of how we grouped the views
             view.config["title"] = (
-                tb[indicator_col].metadata.presentation.grapher_config["title"].replace("Male ", "").capitalize()
-                + ": males vs. females"
+                meta.presentation.grapher_config["title"].replace("Male ", "").capitalize() + ": males vs. females"
             )
-            view.config["subtitle"] = (
-                tb[indicator_col].metadata.presentation.grapher_config["subtitle"].replace("male ", "")
-            )
-            view.metadata["description_short"] = tb[indicator_col].metadata.description_short.replace("male ", "")
+            view.config["subtitle"] = meta.presentation.grapher_config["subtitle"].replace("male ", "")
+            view.metadata["description_short"] = meta.description_short.replace("male ", "")
 
     #
     # Save garden dataset.
