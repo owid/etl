@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -45,9 +46,11 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("unwto")
     ds_population = paths.load_dataset("population")
+    ds_wdi = paths.load_dataset("wdi")
 
     # Read table from meadow dataset
     tb = ds_meadow.read("unwto")
+    tb_wdi = ds_wdi.read("wdi")
 
     #
     # Process data.
@@ -183,6 +186,8 @@ def run() -> None:
         tb = tb.rename(columns=rename_dict)
 
     # Adjust inbound and outbound expenditure for inflation and cost of living
+    tb = adjust_inflation_cost_of_living(tb, tb_wdi)
+
     tb = tb.format(["country", "year"])
 
     #
@@ -245,3 +250,96 @@ def shorten_column_names(columns):
         short_columns.append(short_col)
 
     return short_columns
+
+
+def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
+    """
+    Adjusts the inbound and outbound tourism expenditure for inflation and cost of living.
+
+    - Inbound expenditure is adjusted for local inflation (CPI) and purchasing power parity (PPP).
+    - Outbound expenditure is adjusted for U.S. inflation (CPI).
+
+    All adjustments are normalized to 2021 values.
+
+    Args:
+        tb (Table): The main dataframe containing the tourism data.
+        tb_wdi (Table): The World Bank WDI dataframe containing CPI, exchange rates, and PPP data.
+
+    Returns:
+        Table: The input table with two new columns:
+            - inbound_exp_ppp_cpi_adj_2021: Inbound expenditure adjusted for local inflation and PPP
+            - outbound_exp_us_cpi_adj_2021: Outbound expenditure adjusted for U.S. inflation
+    """
+    # Reset index on WDI data to access country and year columns
+    tb_wdi = tb_wdi.reset_index()
+
+    # Extract the three indicators we need from WDI
+    # pa_nus_atls: Official exchange rate (LCU per US$, period average)
+    # pa_nus_prvt_pp: PPP conversion factor, private consumption (LCU per international $)
+    # fp_cpi_totl: Consumer price index (2010 = 100)
+
+    tb_exchange = tb_wdi[["country", "year", "pa_nus_atls"]].rename(columns={"pa_nus_atls": "exchange_rate"})
+
+    tb_ppp = tb_wdi[["country", "year", "pa_nus_prvt_pp"]].rename(columns={"pa_nus_prvt_pp": "ppp_conversion_factor"})
+
+    tb_cpi = tb_wdi[["country", "year", "fp_cpi_totl"]].rename(columns={"fp_cpi_totl": "cpi"})
+
+    # Get U.S. CPI data for outbound adjustment
+    tb_us_cpi = tb_cpi[tb_cpi["country"] == "United States"].copy()
+
+    # Calculate the U.S. CPI adjustment factor for 2021
+    cpi_2021_us = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "cpi"].values
+    if len(cpi_2021_us) == 0:
+        raise ValueError("No U.S. CPI data found for year 2021")
+    cpi_2021_us = cpi_2021_us[0]
+
+    tb_us_cpi["cpi_adj_2021"] = tb_us_cpi["cpi"] / cpi_2021_us
+    tb_us_cpi_adj = tb_us_cpi[["year", "cpi_adj_2021"]].copy()
+
+    # Merge U.S. CPI adjustment with main table for outbound expenditure adjustment
+    tb = pr.merge(tb, tb_us_cpi_adj, on="year", how="left")
+
+    # Adjust outbound expenditure for U.S. CPI
+    if "out_tour_exp_balance_of_payments_travel_vis" in tb.columns:
+        tb["outbound_exp_us_cpi_adj_2021"] = tb["out_tour_exp_balance_of_payments_travel_vis"] / tb["cpi_adj_2021"]
+
+    # Drop the temporary U.S. CPI column
+    tb = tb.drop(columns=["cpi_adj_2021"], errors="ignore")
+
+    # Merge exchange rates, PPP, and local CPI with main table
+    tb = pr.merge(tb, tb_exchange, on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_ppp, on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_cpi, on=["country", "year"], how="left")
+
+    # Get 2021 reference values for each country
+    tb_2021 = tb[tb["year"] == 2021][["country", "cpi", "ppp_conversion_factor"]].copy()
+    tb_2021 = tb_2021.rename(columns={"cpi": "cpi_2021", "ppp_conversion_factor": "ppp_2021"})
+
+    # Merge 2021 reference values
+    tb = pr.merge(tb, tb_2021, on="country", how="left")
+
+    # Normalize CPI to 2021 = 100
+    tb["cpi_normalized_2021"] = 100 * tb["cpi"] / tb["cpi_2021"]
+
+    # Adjust inbound expenditure for local inflation and PPP
+    # Formula: (expenditure_in_usd * exchange_rate / cpi_normalized) / ppp_2021
+    # This converts to local currency, adjusts for inflation, and normalizes by PPP
+    if "in_tour_exp_balance_of_payments_travel_vis" in tb.columns:
+        tb["inbound_exp_ppp_cpi_adj_2021"] = (
+            100 * (tb["in_tour_exp_balance_of_payments_travel_vis"] * tb["exchange_rate"]) / tb["cpi_normalized_2021"]
+        ) / tb["ppp_2021"]
+
+    # Clean up temporary columns
+    tb = tb.drop(
+        columns=[
+            "exchange_rate",
+            "ppp_conversion_factor",
+            "cpi",
+            "cpi_2021",
+            "ppp_2021",
+            "cpi_normalized_2021",
+        ],
+        errors="ignore",
+    )
+
+    return tb

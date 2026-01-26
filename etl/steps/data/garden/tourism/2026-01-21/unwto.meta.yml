@@ -310,3 +310,32 @@ tables:
           - This metric provides insights into the typical duration of a tourist's visit, which can inform hospitality services, marketing strategies, and resource allocation within the tourism sector.
         display:
           numDecimalPlaces: 1
+
+      inbound_exp_ppp_cpi_adj_2021:
+        title: Inbound tourism expenditure adjusted for inflation and purchasing power (2021 prices)
+        unit: constant 2021 international-$
+        short_unit: $
+        description_short: Inbound tourism expenditure on travel, adjusted for local inflation and purchasing power parity, expressed in 2021 international dollars.
+        description_key:
+          - This indicator adjusts inbound tourism expenditure for both local inflation (using the Consumer Price Index) and differences in cost of living across countries (using Purchasing Power Parity conversion factors).
+          - The adjustment allows for meaningful comparisons of tourism expenditure across countries and over time, accounting for price changes and differences in purchasing power.
+          - Values are normalized to 2021 as the base year, meaning they represent what the expenditure would be worth in 2021 international dollars.
+          - Data sources include UNWTO for tourism expenditure and World Bank World Development Indicators for CPI, exchange rates, and PPP conversion factors.
+        description_processing: |-
+          The adjustment process involves three steps:
+          1. Convert USD expenditure to local currency using official exchange rates (PA.NUS.ATLS)
+          2. Adjust for local inflation by normalizing CPI to 2021 = 100 (using FP.CPI.TOTL)
+          3. Convert to international dollars using PPP conversion factors for private consumption from 2021 (PA.NUS.PRVT.PP)
+
+      outbound_exp_us_cpi_adj_2021:
+        title: Outbound tourism expenditure adjusted for US inflation (2021 prices)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: Outbound tourism expenditure on travel, adjusted for US inflation, expressed in 2021 US dollars.
+        description_key:
+          - This indicator adjusts outbound tourism expenditure for US inflation using the US Consumer Price Index.
+          - The adjustment allows for meaningful comparisons of tourism expenditure over time by removing the effects of inflation.
+          - Values are normalized to 2021 as the base year, meaning they represent what the expenditure would be worth in 2021 US dollars.
+          - Data sources include UNWTO for tourism expenditure and World Bank World Development Indicators for US CPI.
+        description_processing: |-
+          The adjustment divides nominal expenditure by the US CPI adjustment factor (US CPI in year t / US CPI in 2021), using the World Bank's FP.CPI.TOTL indicator for the United States.
