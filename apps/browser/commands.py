@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Literal
 
 if TYPE_CHECKING:
-    from etl.browser.core import BrowserState
+    from apps.browser.core import BrowserState
 
 
 @dataclass

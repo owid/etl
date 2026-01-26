@@ -259,8 +259,8 @@ def cli(ctx: click.Context) -> None:
 
 def _run_unified_browser() -> None:
     """Run the unified ETL browser."""
+    from apps.browser.unified import create_default_browser, print_browser_farewell
     from etl import paths
-    from etl.browser.unified import create_default_browser, print_browser_farewell
     from etl.dag_helpers import load_dag
 
     # Create browser once to persist state (options, history) across runs

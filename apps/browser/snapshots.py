@@ -3,10 +3,10 @@
 import json
 from typing import TYPE_CHECKING
 
-from etl.browser.scoring import create_ranker, extract_version_from_snapshot
+from apps.browser.scoring import create_ranker, extract_version_from_snapshot
 
 if TYPE_CHECKING:
-    from etl.browser.core import Ranker
+    from apps.browser.core import Ranker
 
 
 def get_all_snapshots() -> list[str]:

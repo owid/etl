@@ -4,7 +4,7 @@ import re
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
-    from etl.browser.core import Ranker
+    from apps.browser.core import Ranker
 
 
 def _strip_extension(segment: str) -> str:

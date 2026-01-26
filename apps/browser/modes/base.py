@@ -5,12 +5,12 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Callable
 
-from etl.browser.commands import DEFAULT_COMMANDS, Command
-from etl.browser.modes import ModeConfig, ModeResult
+from apps.browser.commands import DEFAULT_COMMANDS, Command
+from apps.browser.modes import ModeConfig, ModeResult
 
 if TYPE_CHECKING:
-    from etl.browser.core import Ranker
-    from etl.browser.options import BrowserOption
+    from apps.browser.core import Ranker
+    from apps.browser.options import BrowserOption
 
 # Maximum number of history entries to cache per mode
 MAX_HISTORY_ENTRIES = 10

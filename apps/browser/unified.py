@@ -6,12 +6,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 
-from etl.browser.core import OWID_YELLOW, BrowserState, browse_items
-from etl.browser.modes import BrowserMode, ModeRegistry, get_registry
-from etl.browser.options import OptionsState
+from apps.browser.core import OWID_YELLOW, BrowserState, browse_items
+from apps.browser.modes import BrowserMode, ModeRegistry, get_registry
+from apps.browser.options import OptionsState
 
 if TYPE_CHECKING:
-    from etl.browser.commands import Command
+    from apps.browser.commands import Command
 
 # Farewell messages shown when exiting the browser
 FAREWELL_MESSAGES = [
@@ -150,7 +150,7 @@ class UnifiedBrowser:
 
     def _get_all_commands(self, mode: BrowserMode) -> list["Command"]:
         """Get all commands for a mode including mode-switch commands."""
-        from etl.browser.commands import Command
+        from apps.browser.commands import Command
 
         # Start with mode-specific commands
         commands = mode.get_commands()
@@ -343,8 +343,8 @@ def create_default_browser(
     Returns:
         Configured UnifiedBrowser instance
     """
-    from etl.browser.modes.snapshots import SnapshotMode
-    from etl.browser.modes.steps import StepMode
+    from apps.browser.modes.snapshots import SnapshotMode
+    from apps.browser.modes.steps import StepMode
 
     browser = UnifiedBrowser()
 

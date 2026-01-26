@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Protocol
 
 if TYPE_CHECKING:
-    from etl.browser.commands import Command
-    from etl.browser.core import BrowserState, Ranker
-    from etl.browser.options import BrowserOption
+    from apps.browser.commands import Command
+    from apps.browser.core import BrowserState, Ranker
+    from apps.browser.options import BrowserOption
 
 
 @dataclass
@@ -143,7 +143,7 @@ class ModeRegistry:
 
         Creates a /{mode_name} command for each registered mode.
         """
-        from etl.browser.commands import Command, CommandResult
+        from apps.browser.commands import Command, CommandResult
 
         commands: list["Command"] = []
 

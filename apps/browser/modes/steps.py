@@ -5,13 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Set
 
-from etl.browser.commands import DEFAULT_COMMANDS, Command
-from etl.browser.modes import ModeConfig, ModeResult
-from etl.browser.modes.base import BaseBrowserMode
-from etl.browser.options import BrowserOption
+from apps.browser.commands import DEFAULT_COMMANDS, Command
+from apps.browser.modes import ModeConfig, ModeResult
+from apps.browser.modes.base import BaseBrowserMode
+from apps.browser.options import BrowserOption
 
 if TYPE_CHECKING:
-    from etl.browser.core import Ranker
+    from apps.browser.core import Ranker
 
 # Simple type alias - avoids importing heavy etl.steps module
 DAG = dict[str, Set[str]]
@@ -55,7 +55,7 @@ class StepMode(BaseBrowserMode):
 
     def get_items_loader(self) -> Callable[[], list[str]]:
         """Return callable that loads steps from DAG."""
-        from etl.browser.steps import get_all_steps
+        from apps.browser.steps import get_all_steps
 
         if self._dag is not None:
             dag = self._dag
@@ -75,7 +75,7 @@ class StepMode(BaseBrowserMode):
             return self._cached_items
 
         if self._dag_path:
-            from etl.browser.steps import load_cached_steps
+            from apps.browser.steps import load_cached_steps
 
             cached = load_cached_steps(self._dag_path, self._private)
             if cached is not None:
@@ -84,7 +84,7 @@ class StepMode(BaseBrowserMode):
                 return cached
 
         if self._dag is not None:
-            from etl.browser.steps import get_all_steps
+            from apps.browser.steps import get_all_steps
 
             self._cached_items = get_all_steps(self._dag, private=self._private)
             self._start_popularity_refresh(self._cached_items)
@@ -97,7 +97,7 @@ class StepMode(BaseBrowserMode):
         if self._popularity_refresh_started:
             return
 
-        from etl.browser.steps import load_popularity_cache, refresh_popularity_cache_async
+        from apps.browser.steps import load_popularity_cache, refresh_popularity_cache_async
 
         # Load cached popularity data
         cached_popularity, is_stale = load_popularity_cache()
@@ -110,7 +110,7 @@ class StepMode(BaseBrowserMode):
 
     def get_ranker(self) -> "Ranker" | None:
         """Return popularity-based ranker for steps."""
-        from etl.browser.steps import create_step_ranker
+        from apps.browser.steps import create_step_ranker
 
         return create_step_ranker(self._popularity_data)
 
@@ -123,7 +123,7 @@ class StepMode(BaseBrowserMode):
         super().on_items_loaded(items)
 
         if self._dag_path:
-            from etl.browser.steps import save_step_cache
+            from apps.browser.steps import save_step_cache
 
             save_step_cache(self._dag_path, self._private, items)
 

@@ -6,12 +6,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from etl.browser.core import filter_items
-from etl.browser.scoring import create_ranker, extract_version_from_uri
+from apps.browser.core import filter_items
+from apps.browser.scoring import create_ranker, extract_version_from_uri
 from etl.dag_helpers import graph_nodes
 
 if TYPE_CHECKING:
-    from etl.browser.core import Ranker
+    from apps.browser.core import Ranker
 
 # Simple type alias - avoids importing heavy etl.steps module
 DAG = dict[str, set[str]]

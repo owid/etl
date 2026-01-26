@@ -11,9 +11,9 @@ from prompt_toolkit.formatted_text import StyleAndTextTuples
 from prompt_toolkit.lexers import Lexer
 
 if TYPE_CHECKING:
-    from etl.browser.commands import Command
-    from etl.browser.filters import FilterOptions, ParsedInput
-    from etl.browser.options import BrowserOption, OptionsState
+    from apps.browser.commands import Command
+    from apps.browser.filters import FilterOptions, ParsedInput
+    from apps.browser.options import BrowserOption, OptionsState
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
@@ -236,7 +236,7 @@ class FilterLexer(Lexer):
 
     def _get_option_spans(self, text: str) -> list[tuple[int, int]]:
         """Get spans of recognized option tokens to highlight in purple."""
-        from etl.browser.options import parse_option_tokens
+        from apps.browser.options import parse_option_tokens
 
         if not self.state.options_state:
             return []
@@ -514,8 +514,8 @@ def browse_items(
     """
     import threading
 
-    from etl.browser.commands import filter_commands
-    from etl.browser.filters import (
+    from apps.browser.commands import filter_commands
+    from apps.browser.filters import (
         FILTER_PREFIXES,
         apply_filters,
         extract_filter_options,
@@ -523,10 +523,10 @@ def browse_items(
         get_active_filter,
         parse_filters,
     )
-    from etl.browser.options import (
+    from apps.browser.options import (
         filter_options as filter_opts,
     )
-    from etl.browser.options import (
+    from apps.browser.options import (
         get_current_option_token,
         parse_option_tokens,
     )
