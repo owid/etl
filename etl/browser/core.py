@@ -961,11 +961,13 @@ def browse_items(
             # Calculate max command name width for alignment (across all commands)
             max_name_width = max((len(cmd.name) for cmd in cmd_matches), default=0) + 1  # +1 for leading /
 
-            # Group commands: modes first, then actions
-            mode_cmds = [(i, cmd) for i, cmd in enumerate(cmd_matches) if cmd.group == "mode"]
-            action_cmds = [(i, cmd) for i, cmd in enumerate(cmd_matches) if cmd.group != "mode"]
+            # Commands are already sorted: modes first, then actions
+            # Group for display headers
+            mode_cmds = [cmd for cmd in cmd_matches if cmd.group == "mode"]
+            action_cmds = [cmd for cmd in cmd_matches if cmd.group != "mode"]
 
-            def render_command(idx: int, cmd: "Command") -> None:
+            def render_command(cmd: "Command") -> None:
+                idx = cmd_matches.index(cmd)
                 is_selected = idx == state.selected_index
                 prefix_style = "class:item.selected" if is_selected else "class:item"
                 prefix = "  > " if is_selected else "    "
@@ -983,16 +985,16 @@ def browse_items(
             # Render mode commands
             if mode_cmds:
                 lines.append(("class:hint", "  Modes\n"))
-                for idx, cmd in mode_cmds:
-                    render_command(idx, cmd)
+                for cmd in mode_cmds:
+                    render_command(cmd)
 
             # Render action commands
             if action_cmds:
                 if mode_cmds:
                     lines.append(("", "\n"))  # Separator between groups
                 lines.append(("class:hint", "  Actions\n"))
-                for idx, cmd in action_cmds:
-                    render_command(idx, cmd)
+                for cmd in action_cmds:
+                    render_command(cmd)
 
             return lines
 

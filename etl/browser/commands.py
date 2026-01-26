@@ -35,10 +35,11 @@ def filter_commands(pattern: str, commands: list[Command]) -> list[Command]:
         commands: List of available commands
 
     Returns:
-        Commands that match the pattern
+        Commands that match the pattern, sorted with modes first
     """
     if not pattern:
-        return commands
+        # Sort: modes first, then actions (matching visual display order)
+        return sorted(commands, key=lambda c: (0 if c.group == "mode" else 1, c.name))
 
     pattern_lower = pattern.lower()
     matches = []
@@ -46,7 +47,9 @@ def filter_commands(pattern: str, commands: list[Command]) -> list[Command]:
         names = [cmd.name] + cmd.aliases
         if any(n.startswith(pattern_lower) for n in names):
             matches.append(cmd)
-    return matches
+
+    # Sort: modes first, then actions (matching visual display order)
+    return sorted(matches, key=lambda c: (0 if c.group == "mode" else 1, c.name))
 
 
 # Default command handlers

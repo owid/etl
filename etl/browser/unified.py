@@ -106,6 +106,8 @@ class UnifiedBrowser:
         self._current_mode_name: str | None = None
         # Per-mode history (in-memory, persisted by modes)
         self._histories: dict[str, list[str]] = {}
+        # Per-mode options state (persisted across browser runs)
+        self._options_states: dict[str, OptionsState] = {}
         # Track if intro has been shown
         self._intro_shown: bool = False
 
@@ -132,6 +134,19 @@ class UnifiedBrowser:
         mode_name = mode.config.name
         self._histories[mode_name] = history
         mode.save_history(history)
+
+    def _get_mode_options_state(self, mode: BrowserMode) -> OptionsState:
+        """Get options state for a mode, creating if needed."""
+        mode_name = mode.config.name
+        if mode_name not in self._options_states:
+            mode_options = mode.get_options()
+            self._options_states[mode_name] = OptionsState(available_options=mode_options)
+        return self._options_states[mode_name]
+
+    def _save_mode_options_state(self, mode: BrowserMode, options_state: OptionsState) -> None:
+        """Save options state for a mode."""
+        mode_name = mode.config.name
+        self._options_states[mode_name] = options_state
 
     def _get_all_commands(self, mode: BrowserMode) -> list["Command"]:
         """Get all commands for a mode including mode-switch commands."""
@@ -218,9 +233,8 @@ class UnifiedBrowser:
             state.history_index = -1
             state.history_temp = ""
 
-            # Initialize options for new mode
-            mode_options = target_mode.get_options()
-            state.options_state = OptionsState(available_options=mode_options)
+            # Load options state for new mode (persisted across runs)
+            state.options_state = self._get_mode_options_state(target_mode)
 
         return on_mode_switch
 
