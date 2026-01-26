@@ -6,6 +6,7 @@ steps:
   data://garden/tourism/2026-01-21/unwto:
     - data://meadow/tourism/2026-01-21/unwto
     - data://garden/demography/2024-07-15/population
+    - data://garden/worldbank_wdi/2025-09-08/wdi
   data://grapher/tourism/2026-01-21/unwto:
     - data://garden/tourism/2026-01-21/unwto
 
