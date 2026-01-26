@@ -1286,7 +1286,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "" %>
-          <%- set age = "(ages 15-64) " %>
+          <%- set age = "aged 15-64 " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
@@ -1301,7 +1301,7 @@ tables:
             title: Labor force participation rate (ages 15-64)
             subtitle: |-
               <%- set sex = "" %>
-              <%- set age = "(ages 15-64) " %>
+              <%- set age = "aged 15-64 " %>
               {definitions.description_short_labor_force_participation_rate}
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
@@ -1337,7 +1337,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "male " %>
-          <%- set age = "(ages 15-64) " %>
+          <%- set age = "aged 15-64 " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
@@ -1352,7 +1352,7 @@ tables:
             title: Male labor force participation rate (ages 15-64)
             subtitle: |-
               <%- set sex = "male " %>
-              <%- set age = "(ages 15-64) " %>
+              <%- set age = "aged 15-64 " %>
               {definitions.description_short_labor_force_participation_rate}
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
@@ -1386,7 +1386,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "female " %>
-          <%- set age = "(ages 15-64) " %>
+          <%- set age = "aged 15-64 " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_labor_force_participation_1}"
@@ -1401,7 +1401,7 @@ tables:
             title: Female labor force participation rate (ages 15-64)
             subtitle: |-
               <%- set sex = "female " %>
-              <%- set age = "(ages 15-64) " %>
+              <%- set age = "aged 15-64 " %>
               {definitions.description_short_labor_force_participation_rate}
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
