@@ -1,4 +1,4 @@
-"""Garden step for Ireland Data Centres Metered Electricity Consumption.
+"""Garden step for Ireland Data Centers Metered Electricity Consumption.
 
 This step processes the meadow data and creates a table with annual aggregates
 by summing quarterly data for each year.

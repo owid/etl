@@ -1,4 +1,4 @@
-"""Grapher step for Ireland Data Centres Metered Electricity Consumption.
+"""Grapher step for Ireland Data Centers Metered Electricity Consumption.
 
 This step loads the garden dataset and saves it for upload to the MySQL grapher database.
 """
