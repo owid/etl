@@ -225,6 +225,15 @@ INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
+# if set, graph steps push ETL metadata to database, overwriting manual edits
+GRAPH_PUSH = env.get("GRAPH_PUSH") in ("True", "true", "1")
+
+# if set, graph steps pull database metadata to local .meta.yml
+GRAPH_PULL = env.get("GRAPH_PULL") in ("True", "true", "1")
+
+# if set, graph steps will upsert charts to database
+GRAPH = env.get("GRAPH") in ("True", "true", "1")
+
 # if set, export steps will not upload/commit files (e.g. S3, GitHub)
 DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
 
