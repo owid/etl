@@ -344,7 +344,7 @@ class BrowserState:
         self.all_items: list[str] = []  # Populated when loading completes
         self.app: Application[None] | None = None  # Reference to app for invalidation
         # Command mode state
-        self.mode: Literal["search", "command", "options"] = "search"
+        self.mode: Literal["search", "command", "options", "help"] = "search"
         self.command_matches: list["Command"] = []
         self.available_commands: list["Command"] = []
         # Refresh callback for reload functionality
@@ -516,6 +516,7 @@ def browse_items(
 
     from etl.browser.commands import filter_commands
     from etl.browser.filters import (
+        FILTER_PREFIXES,
         apply_filters,
         extract_filter_options,
         find_filter_match_spans,
@@ -590,8 +591,15 @@ def browse_items(
             state.history_index = -1
             state.history_temp = ""
 
+        # Check for help mode (input is just ?)
+        if text.strip() == "?":
+            state.mode = "help"
+            state.parsed_input = None
+            state.command_matches = []
+            state.option_matches = []
+            state.selected_index = -1
         # Check for command mode (input starts with /)
-        if text.startswith("/") and state.available_commands:
+        elif text.startswith("/") and state.available_commands:
             state.mode = "command"
             state.parsed_input = None  # Clear filter state in command mode
             pattern = text[1:]  # Strip leading /
@@ -985,6 +993,46 @@ def browse_items(
                 lines.append(("class:hint", "  Actions\n"))
                 for idx, cmd in action_cmds:
                     render_command(idx, cmd)
+
+            return lines
+
+        # Help mode rendering
+        if state.mode == "help":
+            lines.append(("class:match-count", "  Help"))
+            add_shortcuts([("^C", "Exit")])
+            lines.append(("", "\n\n"))
+
+            # Current mode description
+            for name, description, is_current in state.mode_descriptions:
+                if is_current:
+                    lines.append((f"fg:{OWID_YELLOW} bold", f"  Mode: {name}\n"))
+                    if description:
+                        lines.append(("class:hint", f"    {description}\n"))
+                    break
+
+            # Available options
+            if state.options_state and state.options_state.available_options:
+                lines.append(("", "\n"))
+                lines.append((f"fg:{OWID_YELLOW} bold", "  Options (@):\n"))
+                for opt in state.options_state.available_options:
+                    if opt.is_flag:
+                        lines.append((f"fg:{OWID_PURPLE}", f"    @{opt.flag_name}"))
+                        lines.append(("class:hint", f"  {opt.help}\n"))
+                    else:
+                        lines.append((f"fg:{OWID_PURPLE}", f"    @{opt.flag_name} <value>"))
+                        lines.append(("class:hint", f"  {opt.help} (default: {opt.default})\n"))
+
+            # Available filters (deduplicate by showing only short forms)
+            lines.append(("", "\n"))
+            lines.append((f"fg:{OWID_YELLOW} bold", "  Filters:\n"))
+            # Get unique attributes with their short prefixes
+            short_prefixes = {v: k for k, v in FILTER_PREFIXES.items() if len(k) == 1}
+            for attr, prefix in sorted(short_prefixes.items(), key=lambda x: x[1]):
+                lines.append((f"fg:{OWID_GREEN}", f"    {prefix}:"))
+                lines.append(("class:hint", f"  Filter by {attr}\n"))
+
+            lines.append(("", "\n"))
+            lines.append(("class:hint", "  Type to search, @@ to reset options\n"))
 
             return lines
 
