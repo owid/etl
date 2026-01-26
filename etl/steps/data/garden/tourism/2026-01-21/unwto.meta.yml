@@ -315,7 +315,7 @@ tables:
         title: Inbound tourism expenditure adjusted for inflation and purchasing power (2021 prices)
         unit: constant 2021 international-$
         short_unit: $
-        description_short: Inbound tourism expenditure on travel, adjusted for local inflation and purchasing power parity, expressed in 2021 international dollars.
+        description_short: Total inbound tourism expenditure, adjusted for local inflation and purchasing power parity, expressed in 2021 international dollars.
         description_key:
           - This indicator adjusts inbound tourism expenditure for both local inflation (using the Consumer Price Index) and differences in cost of living across countries (using Purchasing Power Parity conversion factors).
           - The adjustment allows for meaningful comparisons of tourism expenditure across countries and over time, accounting for price changes and differences in purchasing power.
@@ -331,7 +331,7 @@ tables:
         title: Outbound tourism expenditure adjusted for US inflation (2021 prices)
         unit: constant 2021 US$
         short_unit: $
-        description_short: Outbound tourism expenditure on travel, adjusted for US inflation, expressed in 2021 US dollars.
+        description_short: Total outbound tourism expenditure, adjusted for US inflation, expressed in 2021 US dollars.
         description_key:
           - This indicator adjusts outbound tourism expenditure for US inflation using the US Consumer Price Index.
           - The adjustment allows for meaningful comparisons of tourism expenditure over time by removing the effects of inflation.
