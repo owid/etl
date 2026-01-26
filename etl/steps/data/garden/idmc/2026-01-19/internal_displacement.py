@@ -30,10 +30,10 @@ def run() -> None:
 
     tb = geo.add_population_to_table(tb, ds_pop)
 
-    # add total displacements (conflict + disaster), wait for reply before publishing
-    tb["total_displacement"] = tb["conflict_total_displacement"] + tb["disaster_total_displacement"]
+    # add total displacements (conflict + disaster)
+    tb["total_displacement"] = tb["conflict_total_displacement"].fillna(0) + tb["disaster_total_displacement"].fillna(0)
     tb["total_displacement_rounded"] = tb["total_displacement"].apply(round_idmc_style)
-    tb["total_new_displacement"] = tb["conflict_new_displacement"] + tb["disaster_new_displacement"]
+    tb["total_new_displacement"] = tb["conflict_new_displacement"].fillna(0) + tb["disaster_new_displacement"].fillna(0)
     tb["total_new_displacement_rounded"] = tb["total_new_displacement"].apply(round_idmc_style)
 
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
@@ -67,6 +67,7 @@ def round_idmc_style(x):
 
     - Numbers <= 100,000 are rounded to 2 significant digits.
     - Numbers > 100,000 are rounded to the nearest 1,000.
+    Does not work for negative or NaN values.
     """
     if x <= 100000:
         return round(x, -len(str(int(x))) + 2)

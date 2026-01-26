@@ -98,7 +98,7 @@ tables:
       conflict_total_displacement_rounded:
         title: Internally displaced people due to conflict
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced.
         unit: people
         short_unit: ""
         description_from_producer: |-
@@ -116,7 +116,7 @@ tables:
       conflict_total_displacement_rounded_per_thousand:
         title: Internally displaced people due to conflict per 1000 inhabitants
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: |-
           ### Internally displaced people
           {definitions.idmc_definitions.stock_internal_displacement}
@@ -134,7 +134,7 @@ tables:
       disaster_total_displacement_rounded:
         title: Internally displaced people due to disaster
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced.
         unit: people
         short_unit: ""
         description_from_producer: |-
@@ -151,7 +151,7 @@ tables:
       disaster_total_displacement_rounded_per_thousand:
         title: Internally displaced people due to disaster per 1000 inhabitants
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: |-
           ### Internally displaced people
           {definitions.idmc_definitions.stock_internal_displacement}

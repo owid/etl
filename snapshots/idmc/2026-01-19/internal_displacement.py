@@ -10,8 +10,10 @@ import structlog
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
-
+## get IDMC API token from environment variable or fail gracefully
 IDMC_TOKEN = os.getenv("IDMC_API_TOKEN")
+if IDMC_TOKEN is None:
+    raise ValueError("IDMC_API_TOKEN environment variable is not set")
 IDMC_API_BASE_URL = "https://helix-tools-api.idmcdb.org"
 
 LOG = structlog.get_logger()
@@ -45,7 +47,6 @@ def data_from_api(url: str) -> pd.DataFrame:
 
     Args:
         url: The API endpoint URL.
-        filename: The filename to save the data to.
     """
     response = requests.get(url)
     response.raise_for_status()
