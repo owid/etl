@@ -260,26 +260,28 @@ def cli(ctx: click.Context) -> None:
 def _run_unified_browser() -> None:
     """Run the unified ETL browser."""
     from etl import paths
-    from etl.browser import browse_unified
+    from etl.browser.unified import create_default_browser, print_browser_farewell
     from etl.dag_helpers import load_dag
 
-    while True:
-        result, is_exact, mode_name, options = browse_unified(
-            private=True,  # Default to showing all steps
-            dag_path=paths.DEFAULT_DAG_FILE,
-            dag_loader=lambda: load_dag(paths.DEFAULT_DAG_FILE),
-            initial_mode="steps",
-        )
+    # Create browser once to persist state (options, history) across runs
+    browser = create_default_browser(
+        private=True,  # Default to showing all steps
+        dag_path=paths.DEFAULT_DAG_FILE,
+        dag_loader=lambda: load_dag(paths.DEFAULT_DAG_FILE),
+    )
 
-        if result is None:
-            # User cancelled
+    while True:
+        result = browser.run(initial_mode="steps")
+
+        if result.action == "exit":
+            print_browser_farewell()
             return
 
         # Execute based on mode
-        if mode_name == "steps":
-            _execute_step(result, is_exact, options)
-        elif mode_name == "snapshots":
-            _execute_snapshot(result, options)
+        if result.mode == "steps":
+            _execute_step(result.value, result.is_exact, result.options)
+        elif result.mode == "snapshots":
+            _execute_snapshot(result.value, result.options)
 
         # Add blank line before returning to browser
         print()

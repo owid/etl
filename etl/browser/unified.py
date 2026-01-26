@@ -272,9 +272,8 @@ class UnifiedBrowser:
         # Get mode descriptions for help display
         mode_descriptions = self._get_mode_descriptions(self._current_mode_name or "")
 
-        # Initialize options state for current mode
-        mode_options = mode.get_options()
-        initial_options_state = OptionsState(available_options=mode_options)
+        # Get options state for current mode (persisted across runs)
+        initial_options_state = self._get_mode_options_state(mode)
 
         # Run the browser with in-place mode switching
         result, is_exact, updated_history, _switch_mode, effective_options = browse_items(
