@@ -1143,9 +1143,33 @@ tables:
             - Work & Employment
           grapher_config:
             title: Labor force participation rate
+            subtitle: |-
+              <%- set sex = "" %>
+              <%- set age = "(ages 15 and over) " %>
+              {definitions.description_short_labor_force_participation_rate}
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
             variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [20, 30, 40, 50, 60, 70, 80, 90, 100]
+            selectedEntityNames:
+              - Afghanistan
+              - Syria
+              - Uzbekistan
+              - United States
+              - Philippines
+              - China
+              - New Zealand
+              - Peru
+              - Uganda
+              - India
         display:
           name: Labor force participation rate
           numDecimalPlaces: 1
@@ -1171,9 +1195,31 @@ tables:
             - Work & Employment
           grapher_config:
             title: Male labor force participation rate
+            subtitle: |-
+              <%- set sex = "male " %>
+              <%- set age = "(ages 15 and over) " %>
+              {definitions.description_short_labor_force_participation_rate}
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
             variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [40, 50, 60, 70, 80, 90, 100]
+            selectedEntityNames:
+              - Afghanistan
+              - Syria
+              - United States
+              - China
+              - New Zealand
+              - Peru
+              - Uganda
+              - India
         display:
           name: Male labor force participation rate
           numDecimalPlaces: 1
@@ -1199,11 +1245,346 @@ tables:
             - Work & Employment
           grapher_config:
             title: Female labor force participation rate
+            subtitle: |-
+              <%- set sex = "female " %>
+              <%- set age = "(ages 15 and over) " %>
+              {definitions.description_short_labor_force_participation_rate}
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
             variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 1]
+            selectedEntityNames:
+              - Afghanistan
+              - Iraq
+              - Iran
+              - Pakistan
+              - India
+              - Saudi Arabia
+              - Italy
+              - Chile
+              - Spain
+              - New Zealand
+              - Mozambique
+              - United States
+              - Nigeria
         display:
           name: Female labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_zs:
+        title: Labor force participation rate, total (% of total population ages 15-64) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "(ages 15-64) " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Labor force participation rate (ages 15-64)
+            subtitle: |-
+              <%- set sex = "" %>
+              <%- set age = "(ages 15-64) " %>
+              {definitions.description_short_labor_force_participation_rate}
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [40, 50, 60, 70, 80, 90, 100]
+            selectedEntityNames:
+              - Afghanistan
+              - Syria
+              - Uzbekistan
+              - United States
+              - Philippines
+              - China
+              - New Zealand
+              - Peru
+              - Uganda
+              - India
+        display:
+          name: Labor force participation rate (ages 15-64)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_ma_zs:
+        title: Labor force participation rate, male (% of male population ages 15-64) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "(ages 15-64) " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Male labor force participation rate (ages 15-64)
+            subtitle: |-
+              <%- set sex = "male " %>
+              <%- set age = "(ages 15-64) " %>
+              {definitions.description_short_labor_force_participation_rate}
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [50, 60, 70, 80, 90, 100]
+            selectedEntityNames:
+              - Afghanistan
+              - Syria
+              - United States
+              - China
+              - New Zealand
+              - Peru
+              - Uganda
+              - India
+        display:
+          name: Male labor force participation rate (ages 15-64)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_fe_zs:
+        title: Labor force participation rate, female (% of female population ages 15-64) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "(ages 15-64) " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female labor force participation rate (ages 15-64)
+            subtitle: |-
+              <%- set sex = "female " %>
+              <%- set age = "(ages 15-64) " %>
+              {definitions.description_short_labor_force_participation_rate}
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 1]
+            selectedEntityNames:
+              - Afghanistan
+              - Iraq
+              - Iran
+              - Pakistan
+              - India
+              - Saudi Arabia
+              - Italy
+              - Chile
+              - Spain
+              - New Zealand
+              - Mozambique
+              - United States
+              - Nigeria
+        display:
+          name: Female labor force participation rate (ages 15-64)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_1524_zs:
+        title: Labor force participation rate for ages 15-24, total (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "aged 15-24 " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Youth labor force participation rate
+            subtitle: |-
+              <%- set sex = "" %>
+              <%- set age = "aged 15-24 " %>
+              {definitions.description_short_labor_force_participation_rate}
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [20, 20, 30, 40, 50, 60, 70, 1]
+            selectedEntityNames:
+              - Afghanistan
+              - Syria
+              - Uzbekistan
+              - United States
+              - Philippines
+              - China
+              - New Zealand
+              - Peru
+              - Uganda
+              - India
+        display:
+          name: Youth labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_1524_ma_zs:
+        title: Labor force participation rate for ages 15-24, male (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "aged 15-24 " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Male youth labor force participation rate
+            subtitle: |-
+              <%- set sex = "male " %>
+              <%- set age = "aged 15-24 " %>
+              {definitions.description_short_labor_force_participation_rate}
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [20, 30, 40, 50, 60, 70, 1]
+            selectedEntityNames:
+              - Afghanistan
+              - Syria
+              - United States
+              - China
+              - New Zealand
+              - Peru
+              - Uganda
+              - India
+        display:
+          name: Male youth labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_1524_fe_zs:
+        title: Labor force participation rate for ages 15-24, female (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "aged 15-24 " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female youth labor force participation rate
+            subtitle: |-
+              <%- set sex = "female " %>
+              <%- set age = "aged 15-24 " %>
+              {definitions.description_short_labor_force_participation_rate}
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: "manual"
+                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 1]
+            selectedEntityNames:
+              - Afghanistan
+              - Iraq
+              - Iran
+              - Pakistan
+              - India
+              - Saudi Arabia
+              - Italy
+              - Chile
+              - Spain
+              - New Zealand
+              - Mozambique
+              - United States
+              - Nigeria
+        display:
+          name: Female youth labor force participation rate
           numDecimalPlaces: 1
           tolerance: 5
 
