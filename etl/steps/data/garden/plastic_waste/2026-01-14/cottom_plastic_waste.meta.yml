@@ -93,7 +93,6 @@ definitions:
     - *text_pollution_definition
     - *text_macroplastic_definition
     - *text_plastic_debris_definition
-    - *text_emission_sources
     - *text_spot_model_principles
     - *text_scope_exclusions
     - *text_model_uncertainty
@@ -102,7 +101,6 @@ definitions:
     - *text_pollution_definition
     - *text_macroplastic_definition
     - *text_plastic_debris_definition
-    - *text_emission_sources
     - *text_per_capita_calculation
     - *text_spot_model_principles
     - *text_model_uncertainty
@@ -113,7 +111,6 @@ definitions:
     - *text_open_burning_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
-    - *text_emission_sources
     - *text_spot_model_principles
     - *text_scope_exclusions
     - *text_model_uncertainty
@@ -124,7 +121,6 @@ definitions:
     - *text_open_burning_definition
     - *text_controlled_vs_uncontrolled
     - *text_burning_clarification
-    - *text_emission_sources
     - *text_per_capita_calculation
     - *text_spot_model_principles
     - *text_model_uncertainty
