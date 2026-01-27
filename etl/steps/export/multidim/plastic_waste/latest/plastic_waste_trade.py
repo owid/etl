@@ -67,6 +67,10 @@ def run() -> None:
     #
     # Process data.
     #
+    # Filter to only the columns we need for the MDim
+    cols_to_keep = list(DIMENSIONS_DETAILS.keys())
+    tb = tb[cols_to_keep]
+
     # Add dimension metadata to columns based on their measure type
     for col, details in DIMENSIONS_DETAILS.items():
         if col in tb.columns:
