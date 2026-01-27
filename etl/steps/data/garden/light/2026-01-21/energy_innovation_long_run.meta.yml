@@ -95,4 +95,19 @@ tables:
           numDecimalPlaces: 1
           tolerance: 0
 
+  energy_consumption:
+    variables:
+      share_energy_consumption:
+        title: Share of energy consumption for lighting (<<lighting_source>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share that using <<lighting_source>> represents of the total energy consumption for lighting."
+        description_key:
+          - ""
+        processing_level: minor
+        display:
+          name: Share of energy consumption for lighting (<<lighting_source>>)
+          numDecimalPlaces: 1
+          tolerance: 0
+
 

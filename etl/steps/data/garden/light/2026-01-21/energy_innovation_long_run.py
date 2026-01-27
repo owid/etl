@@ -22,6 +22,7 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb_lighting_prices = ds_meadow.read("lighting_prices")
+    tb_energy_consumption = ds_meadow.read("energy_consumption")
 
     # Load earnings from A milllennium of macroeconomic data
     ds_earnings = paths.load_dataset("millennium_macroeconomic_data")
@@ -43,18 +44,22 @@ def run() -> None:
         tb_earnings=tb_earnings,
     )
 
+    # Process energy consumption table to make it long with dimensions.
+    tb_energy_consumption = process_energy_consumption(tb=tb_energy_consumption)
+
     # Improve table format.
     tb_lighting_prices = tb_lighting_prices.format(["country", "year", "lighting_source", "price_year"])
     tb_weeks_of_earnings = tb_weeks_of_earnings.format(
         ["country", "year"], short_name="weeks_of_earnings_needed_for_reading"
     )
+    tb_energy_consumption = tb_energy_consumption.format(["country", "year", "lighting_source"])
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb_lighting_prices, tb_weeks_of_earnings], default_metadata=ds_meadow.metadata
+        tables=[tb_lighting_prices, tb_weeks_of_earnings, tb_energy_consumption], default_metadata=ds_meadow.metadata
     )
 
     # Save garden dataset.
@@ -63,6 +68,7 @@ def run() -> None:
 
 def process_lighting_prices(tb_lighting_prices: Table) -> Table:
     """Process lighting prices table, making it long with dimensions."""
+
     # Make the table long
     tb_lighting_prices = tb_lighting_prices.melt(
         id_vars=["country", "year"],
@@ -148,4 +154,28 @@ def add_rolling_average(tb: Table) -> Table:
     tb["lighting_price_rolling_avg"] = tb.groupby(["country", "lighting_source", "price_year"])[
         "lighting_price"
     ].transform(lambda x: x.rolling(window=5, min_periods=1).mean())
+    return tb
+
+
+def process_energy_consumption(tb: Table) -> Table:
+    """Process energy consumption table, making it long with dimensions."""
+
+    # Make the table long
+    tb = tb.melt(
+        id_vars=["country", "year"],
+        var_name="lighting_source",
+        value_name="share_energy_consumption",
+    )
+
+    # Extract lighting_source and price_year from measure column
+    tb["lighting_source"] = tb["lighting_source"].str.extract(r"energy_consumption_(.+)", expand=False)
+
+    # Replace underscore with space in lighting_source
+    tb["lighting_source"] = tb["lighting_source"].str.replace("_", " ")
+
+    # Multply share_energy_consumption by 100 to convert to percentage
+    tb["share_energy_consumption"] *= 100
+
+    print(tb)
+
     return tb
