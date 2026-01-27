@@ -99,7 +99,6 @@ The dataset is built upon a number of datasets and processing steps:
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/shift/{shift_version}/energy_production_from_fossil_fuels.py)
 - Yearly Electricity Data (Ember):
   - [Source data](https://ember-energy.org/data/yearly-electricity-data/)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ember/{ember_version}/yearly_electricity.csv.dvc)
   - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ember/{ember_version}/yearly_electricity.py)
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ember/{ember_version}/yearly_electricity.py)
 - Energy mix (Our World in Data based on EI's Statistical review of world energy):
