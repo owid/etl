@@ -1,10 +1,10 @@
-#
-#  scoring.py
-#  Shared scoring utilities for browser ranking
-#
+"""Match scoring and ranking utilities for browser results."""
 
 import re
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Callable
+
+if TYPE_CHECKING:
+    from apps.browser.core import Ranker
 
 
 def _strip_extension(segment: str) -> str:
@@ -94,7 +94,7 @@ def score_match(pattern: str, item: str) -> float:
     return sum(scores) / len(scores)
 
 
-def extract_version_from_uri(uri: str) -> Optional[str]:
+def extract_version_from_uri(uri: str) -> str | None:
     """Extract version from a step URI.
 
     Handles formats like:
@@ -128,7 +128,7 @@ def extract_version_from_uri(uri: str) -> Optional[str]:
     return None
 
 
-def extract_version_from_snapshot(snapshot_path: str) -> Optional[str]:
+def extract_version_from_snapshot(snapshot_path: str) -> str | None:
     """Extract version from a snapshot path.
 
     Handles formats like:
@@ -153,10 +153,10 @@ def extract_version_from_snapshot(snapshot_path: str) -> Optional[str]:
 
 
 def create_ranker(
-    popularity_data: Optional[Dict[str, float]] = None,
-    slug_extractor: Optional[Callable[[str], Optional[str]]] = None,
-    version_extractor: Callable[[str], Optional[str]] = extract_version_from_uri,
-) -> Callable[[str, List[str]], List[str]]:
+    popularity_data: dict[str, float] | None = None,
+    slug_extractor: Callable[[str], str | None] | None = None,
+    version_extractor: Callable[[str], str | None] = extract_version_from_uri,
+) -> "Ranker":
     """Create a ranker function for use with browse_items.
 
     Uses lexicographic sorting for deterministic, intuitive results:
@@ -179,7 +179,7 @@ def create_ranker(
         A ranker function that takes (pattern, matches) and returns sorted matches
     """
 
-    def rank_matches(pattern: str, matches: List[str]) -> List[str]:
+    def rank_matches(pattern: str, matches: list[str]) -> list[str]:
         if not matches:
             return matches
 
@@ -213,7 +213,7 @@ def create_ranker(
 
             return total / len(terms) if terms else 0.0
 
-        def sort_key(item: str) -> Tuple[float, float, int, int, str]:
+        def sort_key(item: str) -> tuple[float, float, int, int, str]:
             # Match score (negated for descending sort)
             match_score = -score_match_fast(item)
 

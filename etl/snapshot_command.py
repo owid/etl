@@ -116,14 +116,11 @@ def check_for_version_ambiguity(dataset_name: str) -> None:
 
 
 @click.command("snapshot")
-@click.argument("dataset_name", type=str, metavar="DATASET_PATH", required=False)
-@click.option("--browse", "-b", is_flag=True, help="Interactively browse and select snapshot")
+@click.argument("dataset_name", type=str, metavar="DATASET_PATH")
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", type=str, help="Path to local data file (for manual upload scenarios)")
 @click.option("--dry-run", is_flag=True, help="Preview what would happen without creating/uploading the snapshot")
-def snapshot_cli(
-    dataset_name: Optional[str], browse: bool, upload: bool, path_to_file: Optional[str], dry_run: bool
-) -> None:
+def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str], dry_run: bool) -> None:
     """Create snapshot from a snapshot script or .dvc file.
 
     DATASET_PATH can be provided in several formats:
@@ -143,10 +140,6 @@ def snapshot_cli(
 
     Examples:
 
-        etl snapshot --browse
-        etls --browse
-        etls -b
-
         etl snapshot tourism/2024-08-17/unwto_gdp
         etls tourism/2024-08-17/unwto_gdp
         etls 2024-08-17/unwto_gdp
@@ -162,20 +155,6 @@ def snapshot_cli(
         etl snapshot dataset_name --dry-run
         etls dataset_name --dry-run
     """
-    # Interactive browse mode
-    if browse:
-        from etl.browser import browse_snapshots
-
-        result, _is_exact = browse_snapshots()
-        if result is None:
-            # User cancelled (Ctrl-C/Escape)
-            return
-        dataset_name = result
-
-    # Validate that dataset_name is provided
-    if not dataset_name:
-        raise click.ClickException("DATASET_PATH is required (or use --browse)")
-
     # Check for version ambiguity before proceeding
     check_for_version_ambiguity(dataset_name)
 

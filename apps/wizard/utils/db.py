@@ -240,7 +240,7 @@ class WizardDB:
         query = """
         SELECT *
         FROM information_schema.tables
-        WHERE table_schema = 'owid';
+        WHERE table_schema = DATABASE();
         """
         df = read_sql(query)
         return tb_name in set(df["TABLE_NAME"])
