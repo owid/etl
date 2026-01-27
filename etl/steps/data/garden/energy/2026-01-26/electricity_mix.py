@@ -216,7 +216,7 @@ def combine_ei_and_ember_data(tb_review, tb_ember):
     ei_unique_columns = sorted(set(tb_review.columns) - set(tb_ember.columns))
     combined = combined.merge(tb_review[["country", "year"] + ei_unique_columns], how="outer", on=["country", "year"])
 
-    # Combine EI and Ember data, selecting only pre-2000 EI data and only non-EI specific regions.Prioritize Ember on overlapping values.
+    # Combine EI and Ember data, selecting only pre-2000 EI data and only non-EI specific regions. Prioritize Ember on overlapping values.
     # This will automatically add the USSR data (which is fully contained in pre-2000 EI table).
     ei_countries = [country for country in set(tb_review["country"]) if "(EI)" in country]
     combined = combine_two_overlapping_dataframes(
