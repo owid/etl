@@ -37,7 +37,6 @@ definitions:
   text_exported_waste_caveat: &text_exported_waste_caveat
     These figures do not include plastic waste that is shipped overseas for processing. That exported waste may be at higher risk of entering the ocean if it is not properly managed in the destination country.
 
-
 dataset:
   title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
 
@@ -60,7 +59,7 @@ tables:
           numDecimalPlaces: 2
 
       me_tons_per_year:
-        title: Plastic emitted into ocean via rivers
+        title: Plastic pollution entering the ocean through rivers
         unit: tonnes
         short_unit: t
         description_short: Estimated annual amount of plastic pollution entering the ocean via rivers, measured in tonnes per year. Country totals exclude plastic waste exported overseas, which may be at greater risk of entering the ocean.
@@ -74,7 +73,7 @@ tables:
           numDecimalPlaces: 0
 
       me_tons_per_year_per_capita:
-        title: Plastic emitted into ocean per capita
+        title: Plastic pollution entering the ocean through rivers, per person
         unit: kilograms per person
         short_unit: kg
         description_short: Estimated annual amount of plastic pollution entering the ocean via rivers, measured in kilograms per person per year. Country totals exclude plastic waste exported overseas, which may be at greater risk of entering the ocean.
@@ -90,7 +89,7 @@ tables:
           numDecimalPlaces: 2
 
       me_tons_per_year_share_of_global:
-        title: Share of global plastic emissions
+        title: Share of global plastic pollution entering the ocean through rivers
         unit: "%"
         short_unit: "%"
         description_short: Estimated share of global plastic pollution entering the ocean via rivers. Country totals exclude plastic waste exported overseas, which may be at greater risk of entering the ocean.
