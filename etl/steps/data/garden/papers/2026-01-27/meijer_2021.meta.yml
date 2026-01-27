@@ -47,7 +47,7 @@ tables:
         title: Probability of mismanaged plastic waste reaching the ocean via rivers
         unit: "%"
         short_unit: "%"
-        description_short: Estimated probability that mismanaged plastic waste reaches the ocean via rivers.
+        description_short: *text_mpw_definition
         description_key:
           - *text_modelled_estimate
           - *text_mpw_definition
