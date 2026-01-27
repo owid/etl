@@ -11,7 +11,7 @@ from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, render_yaml_metadata
 
 log = structlog.get_logger()
 
@@ -171,7 +171,10 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow.metadata, long_to_wide=True)
+
+    # Render Jinja templates in metadata (needed because this dataset has no dimensions)
+    render_yaml_metadata(ds_garden)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
