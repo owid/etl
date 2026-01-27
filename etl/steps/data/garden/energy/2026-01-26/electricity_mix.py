@@ -520,22 +520,6 @@ def run() -> None:
     # Add "share" variables.
     combined = add_share_variables(combined=combined)
 
-    ####################################################################################################################
-    # There is a sudden drop in the share of fossil generation in 2023 for low-income countries (and hence a sudden increase in the share of renewables).
-    # This may be due mostly to Syria and North Korea, that have the largest fossil generation among low-income countries, and are not informed in 2023.
-    # For safety, assert that the issue is in the data, and if so, remove the aggregate for all columns (since those countries seem to be missing in almost all columns).
-    check = combined.loc[
-        (combined["country"].isin(["Low-income countries"])) & (combined["year"].isin([2022, 2023])),
-        "fossil_share_of_electricity__pct",
-    ]
-    error = "Low-income countries fossil generation used to drop by 35% from 2022 to 2023 (due to missing data). This issue may have been fixed, so, remove this temporary solution."
-    assert 100 * (check.iloc[-2] - check.iloc[-1]) / check.iloc[-2] > 35, error
-    combined.loc[
-        (combined["country"].isin(["Low-income countries"])) & (combined["year"] == 2023),
-        combined.drop(columns=["country", "year"]).columns,
-    ] = pd.NA
-    ####################################################################################################################
-
     # Format table conveniently.
     combined = combined.format(sort_columns=True, short_name=paths.short_name)
 
