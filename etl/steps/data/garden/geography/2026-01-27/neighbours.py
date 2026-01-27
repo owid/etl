@@ -115,7 +115,7 @@ def prepare_geometries(tb_geo: Table) -> gpd.GeoDataFrame:
     gdf = gpd.GeoDataFrame(tb_geo, geometry="geometry", crs="EPSG:4326")
 
     # Filter to keep only ADM0 (sovereign states) - exclude disputed territories.
-    gdf = gdf[gdf["territory_type"] == "ADM0"].copy()
+    gdf = gdf[(gdf["territory_type"] == "ADM0") | (gdf["country"].isin(["Palestine"]))].copy()
 
     # Remove rows with null geometries.
     gdf = gdf[gdf.geometry.notna()].copy()
