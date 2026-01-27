@@ -71,12 +71,16 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
+    ds_population_wpp = paths.load_dataset("un_wpp")
 
     #
     # Process data.
     #
     tb_meadow = ds_meadow.read("wdi", safe_types=False)
     tb_metadata = ds_meadow.read("wdi_metadata", safe_types=False)
+
+    # Load population table from UN WPP
+    tb_population_wpp = ds_population_wpp.read("population")
 
     tb = geo.harmonize_countries(
         df=tb_meadow,
@@ -127,6 +131,8 @@ def run() -> None:
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
     tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
+
+    tb_garden = add_labor_force_breakdown_data(tb=tb_garden, tb_population_wpp=tb_population_wpp)
 
     # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
     #  I tried to calculate them myself, but some large countries such as India have missing values and
@@ -931,6 +937,98 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
 
         # # Drop columns no longer needed
         tb = tb.drop(columns=[f"{indicator}_absolute_difference"], errors="raise")
+
+    # Set index again
+    tb = tb.format()
+
+    return tb
+
+
+def add_labor_force_breakdown_data(tb: Table, tb_population_wpp: Table) -> Table:
+    """
+    Add labor force breakdown data, combining WDI/ILOSTAT data with UN WPP population data.
+    """
+
+    tb = tb.reset_index()
+    tb_population = tb_population_wpp.copy()
+
+    # Extract only the data we need from the population WPP table
+    tb_population = tb_population[
+        (tb_population["sex"] == "all")
+        & (tb_population["age"].isin(["0-14", "15+", "all"]))
+        & (tb_population["variant"].isin(["estimates", "medium"]))
+    ][["country", "year", "age", "population"]]
+
+    # Make table wide
+    tb_population_wide = tb_population.pivot_table(
+        index=["country", "year"], columns="age", values="population"
+    ).reset_index()
+
+    # For columns not in country, year, copy metadata from tb_population
+    for col in [c for c in tb_population_wide.columns if c not in ["country", "year"]]:
+        tb_population_wide[col].m.origins = tb_population["population"].m.origins
+
+    # Keep relevant columns from WDI
+    tb_labor_force = tb[
+        [
+            "country",
+            "year",
+            "sl_tlf_cact_zs",  # Labor force participation rate
+            "sl_uem_totl_zs",  # Unemployment rate
+            "sl_emp_totl_sp_zs",  # Employment to population ratio
+        ]
+    ].copy()
+
+    # Only show years where we have data for unemployment rate (data starts in 1991, LFPR starts in 1990)
+    tb_labor_force = tb_labor_force[tb_labor_force["sl_uem_totl_zs"].notna()].reset_index(drop=True)
+
+    # Merge population data with labor force data
+    tb_labor_force = pr.merge(
+        tb_labor_force,
+        tb_population_wide,
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Calculate number_employed
+    tb_labor_force["number_employed"] = (tb_labor_force["sl_emp_totl_sp_zs"] / 100 * tb_labor_force["15+"]).round(0)
+
+    # Calculate labor_force
+    tb_labor_force["labor_force"] = (tb_labor_force["sl_tlf_cact_zs"] / 100 * tb_labor_force["15+"]).round(0)
+
+    # Calculate number_unemployed
+    tb_labor_force["number_unemployed"] = (
+        tb_labor_force["sl_uem_totl_zs"] / 100 * tb_labor_force["labor_force"]
+    ).round(0)
+
+    # Calculate number_out_of_labor_force
+    tb_labor_force["number_out_of_labor_force"] = (
+        tb_labor_force["all"] - tb_labor_force["labor_force"] - tb_labor_force["0-14"]
+    ).round(0)
+
+    # Rename 0-14 to number_below_working_age
+    tb_labor_force = tb_labor_force.rename(columns={"0-14": "number_below_working_age"}, errors="raise")
+
+    # Keep only relevant columns
+    tb_labor_force = tb_labor_force[
+        [
+            "country",
+            "year",
+            "number_below_working_age",
+            "labor_force",
+            "number_employed",
+            "number_unemployed",
+            "number_out_of_labor_force",
+        ]
+    ]
+
+    # Merge back to original table
+    tb = pr.merge(
+        tb,
+        tb_labor_force,
+        on=["country", "year"],
+        how="left",
+    )
 
     # Set index again
     tb = tb.format()
