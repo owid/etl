@@ -3937,10 +3937,7 @@ class TestRegionAggregator(unittest.TestCase):
         # 2022: 3 countries >= 3 ✓ and 3/5=60% >= 50% ✓ → should have value
         self.assertEqual(europe_data[europe_data["year"] == 2022]["value"].iloc[0], 510)
 
-        # Case 4: Absolute fails, fraction passes
-        # 2023: 2 countries < 3 ✗ but 2/5=40% < 50% ✗ → should be NaN (both fail actually)
-        # Actually this passes fraction (2/5=40% but we need 50%, so this fails both)
-        # Let me recalculate: 2 countries < 3 ✗, and 2/5=40% < 50% ✗ → both fail
+        # Case 4: Both conditions fail - 2023: 2 countries less than 3 (absolute fails) and 2/5=40% less than 50% (fraction fails) → should be NaN
         self.assertTrue(pd.isna(europe_data[europe_data["year"] == 2023]["value"].iloc[0]))
 
         # Case 5: Both fail
