@@ -1,7 +1,4 @@
-"""Script to create a snapshot of dataset.
-
-Data was transcribed from the CDC National Notifiable Diseases Surveillance System (NNDSS) data and is available at: https://stacks.cdc.gov/gsearch?pid=cdc%3A49375&parentId=cdc%3A49375&genre=Annual%20Reports&start=0
-"""
+"""Script to create a snapshot of dataset."""
 
 from pathlib import Path
 
