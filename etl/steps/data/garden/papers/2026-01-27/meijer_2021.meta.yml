@@ -69,7 +69,7 @@ tables:
         title: Probability of plastic emission into ocean
         unit: "%"
         short_unit: "%"
-        description_short: National average probability that mismanaged plastic waste reaches the ocean via rivers
+        description_short: Estimated probability that mismanaged plastic waste reaches the ocean via rivers.
         description_key: *desc_key_pe
         display:
           numDecimalPlaces: 2
