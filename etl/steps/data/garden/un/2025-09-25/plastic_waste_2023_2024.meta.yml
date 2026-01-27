@@ -33,6 +33,7 @@ tables:
           - *hs_classification
           - *all_transport_modes
           - Data represents the total weight of plastic waste imported from other countries.
+          - *data_caveat
           - *trade_context
         display:
           numDecimalPlaces: 0
@@ -51,6 +52,7 @@ tables:
           - *hs_classification
           - *all_transport_modes
           - Data includes re-exports (when a country imports plastic waste and subsequently exports it).
+          - *data_caveat
           - *trade_context
         display:
           numSignificantFigures: 1
@@ -69,6 +71,7 @@ tables:
           - *hs_classification
           - Data includes only plastic waste transported by air.
           - *air_transport_note
+          - *data_caveat
         display:
           numSignificantFigures: 1
 
@@ -81,6 +84,7 @@ tables:
           - *hs_classification
           - Data includes only plastic waste transported by air.
           - *air_transport_note
+          - *data_caveat
         display:
           numSignificantFigures: 1
 
@@ -95,6 +99,7 @@ tables:
           - *all_transport_modes
           - Calculated by dividing total plastic waste imports by the country's population.
           - *per_capita_explanation
+          - *data_caveat
         description_processing: We calculated this by converting total imports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
           numSignificantFigures: 2
@@ -115,6 +120,7 @@ tables:
           - *all_transport_modes
           - Calculated by dividing total plastic waste exports by the country's population.
           - *per_capita_explanation
+          - *data_caveat
         description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
           numSignificantFigures: 2
@@ -153,7 +159,9 @@ tables:
         description_short: The percentage of global plastic waste imports that a country accounts for.
         description_key:
           - *hs_classification
+          - *all_transport_modes
           - Calculated by dividing a country's imports by the sum of all countries' reported imports in that year.
+          - *data_caveat
         description_processing: We calculated this by dividing each country's total imports by the global sum of imports for that year, then multiplying by 100 to express as a percentage.
         display:
           numSignificantFigures: 2
@@ -166,7 +174,9 @@ tables:
         description_short: The percentage of global plastic waste exports that a country accounts for.
         description_key:
           - *hs_classification
+          - *all_transport_modes
           - Calculated by dividing a country's exports by the sum of all countries' reported exports in that year.
+          - *data_caveat
         description_processing: We calculated this by dividing each country's total exports by the global sum of exports for that year, then multiplying by 100 to express as a percentage.
         display:
           numSignificantFigures: 2
@@ -183,6 +193,7 @@ tables:
           - Calculated as net trade balance (exports minus imports) divided by population.
           - Positive values indicate net exports per capita, while negative values indicate net imports per capita.
           - *per_capita_explanation
+          - *data_caveat
         description_processing: We calculated this by converting net exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
           numSignificantFigures: 2
@@ -203,6 +214,7 @@ tables:
           - Calculated as the proportion of a country's plastic waste exports transported by air freight versus other transport methods.
           - *air_transport_note
           - Data shown only for countries and years where both air transport and total export data are available.
+          - *data_caveat
         description_processing: We calculated this by dividing air exports by total exports for each country and year, then multiplying by 100 to express as a percentage.
         display:
           numSignificantFigures: 2
@@ -218,6 +230,7 @@ tables:
           - Calculated as the proportion of a country's plastic waste imports transported by air freight versus other transport methods.
           - *air_transport_note
           - Data shown only for countries and years where both air transport and total import data are available.
+          - *data_caveat
         description_processing: We calculated this by dividing air imports by total imports for each country and year, then multiplying by 100 to express as a percentage.
         display:
           numSignificantFigures: 2
