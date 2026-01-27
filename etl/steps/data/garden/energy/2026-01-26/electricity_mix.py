@@ -154,6 +154,85 @@ def process_ember_data(tb_ember: Table) -> Table:
     return tb_ember
 
 
+def sanity_check_inputs(tb_review, tb_ember):
+    # There are only 3 countries/regions (besides special EI regions) that are in the EI and not in Ember. They are Curacao, Netherlands Antilles, and USSR.
+    # And the data of the former two is all zero.
+    error = "Unexpected list of countries in EI that are not in Ember."
+    assert set([c for c in tb_review["country"] if "(EI)" not in c]) - set(
+        [c for c in tb_ember["country"] if "(Ember)" not in c]
+    ) == {"Curacao", "Netherlands Antilles", "USSR"}
+    error = "All data for Curacao and Netherlands Antilles was expected to be zero."
+    assert (
+        (
+            tb_review[tb_review["country"].isin(["Curacao", "Netherlands Antilles"])]
+            .fillna(0)
+            .drop(columns=["country", "year"])
+            == 0
+        )
+        .all()
+        .all()
+    ), error
+    # So the only country that we get from the EI is USSR; all other countries are in Ember.
+
+    # There are also 5 columns that are in EI and not in Ember.
+    error = "Unexpected columns found in EI and not found in Ember."
+    assert set(tb_review.columns) - set(tb_ember.columns) == {
+        "biofuels_consumption__twh",
+        "coal_consumption__twh",
+        "gas_consumption__twh",
+        "oil_consumption__twh",
+        "primary_energy_consumption__twh",
+    }, error
+
+    # There are also some columns that are only in Ember and not in EI.
+    error = "Unexpected columns found in Ember and not found in EI."
+    assert set(tb_ember.columns) - set(tb_review.columns) == {
+        "bioenergy_generation__twh",
+        "co2_intensity__gco2_kwh",
+        "other_renewables_excluding_bioenergy_generation__twh",
+        "total_demand__twh",
+        "total_emissions__mtco2",
+        "total_net_imports__twh",
+    }, error
+
+    # The majority of columns are informed in both EI and Ember.
+    # However, Ember's data starts in 1999 (for EU countries) and in 2000 (for the rest), whereas EI data starts earlier (in 1965 or 1985).
+    error = "EI data coverage has changed unexpectedly."
+    ei_coverage = {column: int(tb_review.dropna(subset=column)["year"].min()) for column in tb_review.columns}
+    assert set(ei_coverage.values()) == {1965, 1985}, error
+    error = "Ember data coverage has changed unexpectedly."
+    ember_coverage = {column: int(tb_ember.dropna(subset=column)["year"].min()) for column in tb_ember.columns}
+    assert set(ember_coverage.values()) == {1990, 2000}, error
+
+
+def combine_ei_and_ember_data(tb_review, tb_ember):
+    # Drop Curacao and Netherland Antilles, which have only zeros in the data.
+    tb_review = tb_review[~tb_review["country"].isin(["Curacao", "Netherlands Antilles"])].reset_index(drop=True)
+
+    # Initialize a combined table, which is a copy of Ember's table.
+    combined = tb_ember.copy()
+
+    # Add unique EI columns to Ember (outer merge).
+    ei_unique_columns = sorted(set(tb_review.columns) - set(tb_ember.columns))
+    combined = combined.merge(tb_review[["country", "year"] + ei_unique_columns], how="outer", on=["country", "year"])
+
+    # Combine EI and Ember data, selecting only pre-2000 EI data and only non-EI specific regions.Prioritize Ember on overlapping values.
+    # This will automatically add the USSR data (which is fully contained in pre-2000 EI table).
+    ei_countries = [country for country in set(tb_review["country"]) if "(EI)" in country]
+    combined = combine_two_overlapping_dataframes(
+        df1=combined,
+        df2=tb_review[(tb_review["year"] < 2000) & ~(tb_review["country"].isin(ei_countries))],
+        index_columns=["country", "year"],
+    )
+
+    # Combine them again, for all years and only EI regions.
+    combined = combine_two_overlapping_dataframes(
+        df1=combined, df2=tb_review[(tb_review["country"].isin(ei_countries))], index_columns=["country", "year"]
+    )
+
+    return combined
+
+
 def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
     """Add per capita variables (in kWh per person) to the combined EI and Ember table.
 
@@ -504,8 +583,8 @@ def run() -> None:
     tb_ember.loc[(tb_ember["country"] == "Switzerland") & (tb_ember["year"] > 1999), "coal_generation__twh"] = 0
     ####################################################################################################################
 
-    # Combine both tables, giving priority to Ember data (on overlapping values).
-    combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_review, index_columns=["country", "year"])
+    # Combine EI and Ember data.
+    combined = combine_ei_and_ember_data(tb_review=tb_review, tb_ember=tb_ember)
 
     # Remove combined data for aggregate regions where Ember and the Statistical Review have a strong disagreement.
     # This way we avoid spurious jumps in the combined series.
