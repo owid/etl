@@ -613,6 +613,13 @@ def run() -> None:
         for column in tables[table_name].columns:
             for region in ["Europe", "High-income countries"]:
                 tables[table_name].loc[(region, latest_year), column] = None
+
+    # For some reason, Europe's "other_renewables" also has poor coverage in 2024.
+    error = "Expected poor data coverage of other renewables for Europe in 2024. Data has changed; consider removing this code."
+    _tb = tables["electricity_generation"].dropna(subset="other_renewables__twh").reset_index()
+    assert len(set(_tb[_tb["year"] == 2023]["country"])) > 170, error
+    assert len(set(_tb[_tb["year"] == 2024]["country"])) < 84, error
+    tables["electricity_generation"].loc[("Europe", 2024), ["other_renewables__twh", "other_renewables__pct"]] = None
     ####################################################################################################################
 
     # Combine all tables into one.
