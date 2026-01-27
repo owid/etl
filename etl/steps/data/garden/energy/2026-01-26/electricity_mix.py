@@ -480,7 +480,7 @@ def run() -> None:
         )
         .all()
         .all()
-    )
+    ), error
     affected_columns = ["oil_generation__twh", "gas_generation__twh", "fossil_generation__twh"]
     tb_review.loc[tb_review["country"] == "Oceania", affected_columns] = None
 
