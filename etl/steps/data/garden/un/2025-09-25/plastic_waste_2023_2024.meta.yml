@@ -125,7 +125,7 @@ tables:
         unit: tonnes
         short_unit: t
         processing_level: major
-        description_short: Net plastic waste trade balance (exports minus imports), measured in tonnes per year.
+        description_short: Net plastic waste trade balance is the amount of plastic waste a country exports to other countries minus the amount it imports, measured in tonnes per year.
         description_key:
           - This is calculated as total exports minus total imports of plastic waste (HS 3915).
           - A positive number means the country is a net exporter of plastic waste—it sends more abroad than it receives. A negative number means the country is a net importer of plastic waste—it receives more than it sends.
@@ -172,7 +172,7 @@ tables:
         unit: kilograms
         short_unit: kg
         processing_level: major
-        description_short: Net plastic waste trade balance per person (exports minus imports), measured in kilograms per person per year.
+        description_short: Net plastic waste trade balance per person is the amount of plastic waste a country exports to other countries minus the amount it imports, divided by the population, measured in kilograms per person per year.
         description_key:
           - This is the net trade balance (exports minus imports) divided by population.
           - A positive number means each person in the country is associated with net exports of that many kilograms. A negative number means each person in the country is associated with net imports of that many kilograms.
