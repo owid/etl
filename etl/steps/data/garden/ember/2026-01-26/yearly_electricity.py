@@ -545,6 +545,43 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
         ].empty, error
 
 
+def fix_incomplete_aggregates(tables):
+    # Prior to 2000, only EU countries have data. All other aggregates are incomplete, and show a spurious jump between 1999 and 2000. So, we will remove the data of all aggregates prior to 2000, except EU.
+    # Uncomment to visually inspect this jump:
+    # regions_to_plot = ["Europe", "European Union (27)"]
+    # import plotly.express as px
+    # for table_name in tables:
+    #     t = tables[table_name].reset_index()
+    #     for c in t.drop(columns=["country", "year"]).columns:
+    #         px.line(t[t["country"].isin(regions_to_plot)], x="year", y=c, color="country", markers=True, title=c).show()
+    regions_to_remove = [region for region in REGIONS if region != "European Union (27)"]
+    for table_name in tables:
+        tables[table_name].loc[
+            (tables[table_name].index.get_level_values(0).isin(regions_to_remove))
+            & (tables[table_name].index.get_level_values(1) < 2000),
+            :,
+        ] = None
+
+    # The data for many regions presents a big drop in the latest year, simply because many countries are not informed.
+    # This can even happen in the latest 2 years (e.g. for Africa).
+    # TODO: A better solution for this is to impose a minimum fraction of informed countries in each region. Consider implementing that. For now, remove the last two years (conservative approach).
+    # Assert that this drop exists, and remove the last data point for regions.
+    # NOTE: Again, the EU is complete, so we can keep this region.
+    regions_to_remove = [region for region in REGIONS if region != "European Union (27)"]
+    error = (
+        "Expected a big drop in the last data point for regions (because of limited data availability)."
+        "If that is no longer the case, remove this part of the code and keep the last data points for regions."
+    )
+    assert tables["capacity"].loc["Africa"]["renewables__gw"].diff().iloc[-1] < -29, error
+    for table_name in tables:
+        latest_year = tables[table_name].reset_index()["year"].max()
+        tables[table_name].loc[
+            (tables[table_name].index.get_level_values(0).isin(regions_to_remove))
+            & (tables[table_name].index.get_level_values(1).isin([latest_year, latest_year - 1])),
+            :,
+        ] = None
+
+
 def run() -> None:
     #
     # Load data.
@@ -582,51 +619,12 @@ def run() -> None:
         "lifecycle_emissions": make_wide_table(tb=tb, category="Power sector emissions"),
     }
 
+    # Improve table formats.
     for table_name in tables:
-        # Prepare table's format.
         tables[table_name] = tables[table_name].format(short_name=table_name)
 
-    ####################################################################################################################
-    # The data for many regions presents a big drop in the last year, simply because many countries are not informed.
-    # Assert that this drop exists, and remove the last data point for regions.
-    error = (
-        "Expected a big drop in the last data point for regions (because of limited data availability)."
-        "If that is no longer the case, remove this part of the code and keep the last data points for regions."
-    )
-    assert tables["capacity"].loc["Africa"]["renewables__gw"].diff().iloc[-1] < -29, error
-    for table_name in tables:
-        latest_year = tables[table_name].reset_index()["year"].max()
-        for column in tables[table_name].columns:
-            for region in REGIONS:
-                tables[table_name].loc[(region, latest_year), column] = None
-
-    # Similarly, data prior to 2000 exists only for European countries.
-    # This can cause spurious jump in aggregate data.
-    # For example, there is a spurious jump from 1999 to 2000 for Upper-middle-income countries
-    # (see e.g. "Renewables - TWh"), because prior to 2000 only a few UMI countries have data.
-    # Assert that this jump exists, and remove aggregate data prior to 2000 (except European aggregates).
-    error = (
-        "Expected a big jump (>1000%) (in e.g. renewable generation) between 1999 and 2000 for Upper-middle-income "
-        "countries (because prior to 2000 only Ukraine has data). If that is no longer the case (because not only "
-        "European countries are informed prior to 2000), remove this part of the code."
-    )
-    renewables_umic_1999 = tables["electricity_generation"].loc["Upper-middle-income countries", 1999][
-        "renewables__twh"
-    ]
-    renewables_umic_2000 = tables["electricity_generation"].loc["Upper-middle-income countries", 2000][
-        "renewables__twh"
-    ]
-    assert 100 * (renewables_umic_2000 - renewables_umic_1999) / renewables_umic_1999 > 1000, error
-    # We could still create European aggregates, but certain European countries are also missing data prior to 2000.
-    # It seems safer to make nan all aggregate data in all yearly electricity tables prior to 2000.
-    for table_name in tables:
-        for column in tables[table_name].columns:
-            tables[table_name].loc[
-                (tables[table_name].index.get_level_values(0).isin(REGIONS))
-                & (tables[table_name].index.get_level_values(1) < 2000),
-                :,
-            ] = None
-    ####################################################################################################################
+    # Remove data for aggregate regions with incomplete data.
+    fix_incomplete_aggregates(tables)
 
     # Combine all tables into one.
     tb_combined = combine_yearly_electricity_data(tables=tables)
