@@ -3,7 +3,7 @@ meta:
     producer: Ember
     title: Yearly Electricity Data Europe
     description: |-
-      This dataset contains yearly electricity generation, capacity, emissions, import and demand data for over European countries.
+      This dataset contains yearly electricity generation, capacity, emissions, imports and demand data for European countries.
 
       You can find more about Ember's methodology in [this document](https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf).
     citation_full: |-
