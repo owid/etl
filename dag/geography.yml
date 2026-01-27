@@ -25,5 +25,6 @@ steps:
   data://garden/geography/2026-01-27/neighbours:
     - data://garden/geography/2025-06-26/geoboundaries_cgaz
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
   data://external/owid_grapher/latest/neighbours:
     - data://garden/geography/2026-01-27/neighbours

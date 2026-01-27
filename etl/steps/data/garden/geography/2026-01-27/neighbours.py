@@ -28,6 +28,10 @@ def run() -> None:
     ds_pop = paths.load_dataset("population")
     tb_pop = ds_pop.read("population")
 
+    # Load regions dataset (for continent information)
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions.read("regions")
+
     #
     # Process data.
     #
@@ -57,7 +61,11 @@ def run() -> None:
         ["country", "other_country", "score_neighbour_border", "score_border_distance", "score_neighbour_population"]
     ]
 
-    # Add weighted combined scores
+    # Correct for overseas territories (France/UK/Netherlands in Europe only, US in North America + Russia).
+    # Done after normalization so we work with final score column names, then re-normalize.
+    tb = correct_overseas_territories(tb, tb_regions)
+
+    # Add weighted combined scores (after correction so they use corrected base scores)
     tb.loc[:, "score_neighbour_c1"] = (
         tb.loc[:, "score_neighbour_border"] * 0.7 + tb.loc[:, "score_border_distance"] * 0.3
     )
@@ -93,6 +101,92 @@ def combine_tables(tb_borders, tb):
     # Fill NaN values with 0 for non-neighbours.
     tb["border_share"] = tb["border_share"].fillna(0)
     tb["score_neighbour_population"] = tb["score_neighbour_population"].fillna(0)
+
+    return tb
+
+
+def correct_overseas_territories(tb: Table, tb_regions: Table) -> Table:
+    """Correct border scores for countries with overseas territories.
+
+    Countries like France, UK, and Netherlands have overseas territories that create
+    borders with non-European countries (e.g., France borders Brazil via French Guiana).
+    For regional context purposes, we zero out these border relationships bidirectionally,
+    then re-normalize scores so they still sum to 1 per country.
+
+    Rules:
+    - France, United Kingdom, Netherlands: only count European neighbors (both directions)
+    - United States: only count North American neighbors + Russia (both directions)
+    """
+    import json
+
+    # Score columns to zero out and re-normalize
+    score_columns = [
+        "score_neighbour_border",
+        "score_border_distance",
+        "score_neighbour_population",
+    ]
+
+    # Build country -> continent mapping from regions data
+    tb_regions = tb_regions.reset_index()
+    continents = tb_regions[tb_regions["region_type"] == "continent"][["name", "members"]]
+
+    country_code_to_continent = {}
+    for _, row in continents.iterrows():
+        continent = row["name"]
+        members = json.loads(row["members"]) if isinstance(row["members"], str) else row["members"]
+        if members:
+            for code in members:
+                country_code_to_continent[code] = continent
+
+    # Build country name -> continent mapping
+    countries = tb_regions[tb_regions["region_type"] == "country"][["name", "iso_alpha3"]]
+    name_to_continent = {}
+    for _, row in countries.iterrows():
+        iso = row["iso_alpha3"]
+        if iso in country_code_to_continent:
+            name_to_continent[row["name"]] = country_code_to_continent[iso]
+
+    # Define correction rules
+    european_countries = ["France", "United Kingdom", "Netherlands"]
+    us_allowed_continents = ["North America"]
+    us_allowed_extra = ["Russia"]  # Alaska-Russia proximity
+
+    tb = tb.copy()
+
+    # Apply corrections - zero out all neighbor scores for overseas territories (both directions)
+    for idx, row in tb.iterrows():
+        country = row["country"]
+        other = row["other_country"]
+        country_continent = name_to_continent.get(country, "Unknown")
+        other_continent = name_to_continent.get(other, "Unknown")
+
+        should_zero = False
+
+        # European countries with overseas territories: only European neighbors count
+        # Direction 1: France/UK/Netherlands -> non-European
+        if country in european_countries and other_continent != "Europe":
+            should_zero = True
+        # Direction 2: non-European -> France/UK/Netherlands
+        elif other in european_countries and country_continent != "Europe":
+            should_zero = True
+
+        # US: only North American neighbors + Russia
+        # Direction 1: US -> non-North-American (except Russia)
+        elif country == "United States":
+            if other_continent not in us_allowed_continents and other not in us_allowed_extra:
+                should_zero = True
+        # Direction 2: non-North-American -> US (except Russia)
+        elif other == "United States":
+            if country_continent not in us_allowed_continents and country not in us_allowed_extra:
+                should_zero = True
+
+        if should_zero:
+            for col in score_columns:
+                tb.loc[idx, col] = 0
+
+    # Re-normalize scores so they sum to 1 per country after zeroing
+    for col in score_columns:
+        tb[col] = tb.groupby("country")[col].transform(lambda x: x / x.sum() if x.sum() > 0 else 0)
 
     return tb
 
