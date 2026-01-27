@@ -17,26 +17,26 @@ tables:
   datacenter_construction:
     variables:
       datacenter_construction_spending:
-        title: Money spent on data center construction in the United States
+        title: Monthly spending on data center construction in the United States
         unit: US dollars
         short_unit: $
-        description_short: This includes only the work done on site to construct data center buildings each month, including materials and construction labor. It excludes the cost of IT hardware inside the buildings, like servers and storage, which can account for a large share of total investment. Expressed in nominal US dollars.
+        description_short: This only includes work done on-site to construct data center buildings each month, including materials and construction labor. It excludes the cost of IT hardware inside the buildings, like servers and storage, which can account for a large share of total investment. This data is expressed in US dollars. It is not adjusted for inflation.
         description_key:
           - *desc_key
         processing_level: minor
 
       datacenter_construction_spending_real:
-        title: Money spent on data center construction in the United States (inflation-adjusted)
+        title: Monthly spending on data center construction in the United States (inflation-adjusted)
         unit: constant 2021 US$
         short_unit: $
-        description_short: This includes only the work done on site to construct data center buildings each month, including materials and construction labor. It excludes the cost of IT hardware inside the buildings, like servers and storage, which can account for a large share of total investment. Expressed in US dollars, adjusted for inflation.
+        description_short: This only includes work done on-site to construct data center buildings each month, including materials and construction labor. It excludes the cost of IT hardware inside the buildings, like servers and storage, which can account for a large share of total investment. This data is expressed in US dollars, adjusted for inflation.
         description_key:
           - *desc_key
           - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office building construction. Following guidance from the [Bureau of Economic Analysis (BEA)](https://www.census.gov/construction/c30/definitions.html), we assume data center construction costs are similar to office-type buildings because both use comparable structural components, such as foundations, walls, and HVAC systems.
         description_processing: We used the Producer Price Index (PPI) for new office building construction to adjust for inflation, following guidance from the [Bureau of Economic Analysis (BEA)](https://www.census.gov/construction/c30/definitions.html) that suggests data center construction costs are similar to office buildings due to their comparable structural components.
         presentation:
-          title_public: Investment in the physical construction of US data center buildings
+          title_public: Monthly spending on data center construction in the United States
           grapher_config:
-            note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction.
+            note: This data is expressed in constant 2021 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction.
         processing_level: major
 
