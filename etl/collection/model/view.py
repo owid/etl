@@ -419,6 +419,8 @@ def merge_common_metadata_by_dimension(
     key_source = {}
     # Map of tuple key paths to their source (for nested keys conflict reporting)
     value_source_map = {}
+    # Map of tuple key paths to their priority levels (for nested priority tracking)
+    value_priority_map = {}
     # Dictionary of conflicts: { key_path_tuple: [ {source: ..., value: ...}, ... ] }
     unresolved_conflicts = {}
 
@@ -456,28 +458,49 @@ def merge_common_metadata_by_dimension(
         dims = entry.get("dimensions")
         return str(dims) if dims and len(dims) > 0 else "default"
 
-    # Record the source for all nested keys in a dict (for conflict reporting)
-    def record_source_for_dict(value, path_prefix, source):
+    # Record the source and priority for all nested keys in a dict (for conflict reporting)
+    def record_source_for_dict(value, path_prefix, source, priority):
         if isinstance(value, dict):
             for sub_key, sub_val in value.items():
                 new_path = path_prefix + (sub_key,)
                 value_source_map[new_path] = source
-                record_source_for_dict(sub_val, new_path, source)
+                value_priority_map[new_path] = priority
+                record_source_for_dict(sub_val, new_path, source, priority)
 
     # Merge dictionaries for equal-priority entries, recording conflicts for differing subkeys
-    def merge_same_level_dict(existing_dict, new_dict, parent_path, source_prev, source_new):
+    def merge_same_level_dict(existing_dict, new_dict, parent_path, source_prev, source_new, current_priority):
         for sub_key, new_val in new_dict.items():
             if sub_key in existing_dict:
                 existing_val = existing_dict[sub_key]
+                conflict_path = parent_path + (sub_key,)
+                existing_priority = value_priority_map.get(conflict_path, 0)
+
+                # If current priority > existing priority, this is NOT a conflict - override
+                if current_priority > existing_priority:
+                    if isinstance(existing_val, dict) and isinstance(new_val, dict):
+                        existing_dict[sub_key] = deep_merge(existing_val, new_val)
+                    else:
+                        existing_dict[sub_key] = deepcopy(new_val)
+                    value_source_map[conflict_path] = source_new
+                    value_priority_map[conflict_path] = current_priority
+                    record_source_for_dict(new_val, conflict_path, source_new, current_priority)
+                    # Remove any existing conflicts for this path and its descendants
+                    for path in list(unresolved_conflicts.keys()):
+                        if len(path) >= len(conflict_path) and path[: len(conflict_path)] == conflict_path:
+                            unresolved_conflicts.pop(path, None)
+                    continue
+
+                # Same priority - proceed with existing conflict detection logic
                 if isinstance(existing_val, dict) and isinstance(new_val, dict):
                     # Recurse into nested dict
-                    merge_same_level_dict(existing_val, new_val, parent_path + (sub_key,), source_prev, source_new)
+                    merge_same_level_dict(
+                        existing_val, new_val, conflict_path, source_prev, source_new, current_priority
+                    )
                 else:
                     # Check for conflicts on this sub-key
                     if deep_equal(existing_val, new_val):
                         # Values are identical – no conflict (already in result, nothing to change)
                         continue
-                    conflict_path = parent_path + (sub_key,)
                     # Determine the original source of the existing value (from value_source_map or default to source_prev)
                     existing_source = value_source_map.get(conflict_path, source_prev)
                     new_source = source_new
@@ -500,8 +523,10 @@ def merge_common_metadata_by_dimension(
             else:
                 # New sub-key (no conflict) – add to dictionary
                 existing_dict[sub_key] = deepcopy(new_val)
-                value_source_map[parent_path + (sub_key,)] = source_new
-                record_source_for_dict(new_val, parent_path + (sub_key,), source_new)
+                new_path = parent_path + (sub_key,)
+                value_source_map[new_path] = source_new
+                value_priority_map[new_path] = current_priority
+                record_source_for_dict(new_val, new_path, source_new, current_priority)
         # (Sub-keys present only in existing_dict remain intact with their original source)
 
     # Process each entry in order, and build the config/metadata PRIOR to merging it to view_config
@@ -526,7 +551,9 @@ def merge_common_metadata_by_dimension(
                     prev_source = key_source[key]
                     if isinstance(existing_val, dict) and isinstance(new_val, dict):
                         # Deep merge dictionaries at the same level, handling sub-conflicts
-                        merge_same_level_dict(existing_val, new_val, (key,), prev_source, entry_source)
+                        merge_same_level_dict(
+                            existing_val, new_val, (key,), prev_source, entry_source, current_priority
+                        )
                         # Update the final_result with merged dict (existing_val is mutated in-place)
                         final_result[key] = existing_val
                     else:
@@ -574,14 +601,16 @@ def merge_common_metadata_by_dimension(
                     key_priority[key] = current_priority
                     key_source[key] = entry_source
                     value_source_map[(key,)] = entry_source
-                    record_source_for_dict(new_val, (key,), entry_source)
+                    value_priority_map[(key,)] = current_priority
+                    record_source_for_dict(new_val, (key,), entry_source, current_priority)
             else:
                 # New key (no existing value in result)
                 final_result[key] = deepcopy(new_val)
                 key_priority[key] = current_priority
                 key_source[key] = entry_source
                 value_source_map[(key,)] = entry_source
-                record_source_for_dict(new_val, (key,), entry_source)
+                value_priority_map[(key,)] = current_priority
+                record_source_for_dict(new_val, (key,), entry_source, current_priority)
 
     # Combine `final_result` and `view_config`
     # - final_result: At this point it contains the combined parameters (config or metadata) from `common_params`.
@@ -611,7 +640,8 @@ def merge_common_metadata_by_dimension(
             key_priority[key] = float("inf")
             key_source[key] = "custom"
             value_source_map[(key,)] = "custom"
-            record_source_for_dict(val, (key,), "custom")
+            value_priority_map[(key,)] = float("inf")
+            record_source_for_dict(val, (key,), "custom", float("inf"))
 
     # If any conflicts remain unresolved, raise an error with details
     if unresolved_conflicts:

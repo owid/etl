@@ -2,6 +2,7 @@
 #  helpers.py
 #  etl
 #
+import os
 import re
 import time
 from functools import cache
@@ -203,6 +204,22 @@ def get_metadata_path(dest_dir: str) -> Path:
     else:
         N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     return N.metadata_path
+
+
+def render_yaml_metadata(ds: catalog.Dataset) -> None:
+    """Render Jinja templates in metadata for all tables in a dataset.
+
+    This is useful when metadata YAML files contain Jinja templates that need to be
+    evaluated, but the dataset has no dimensions (so long_to_wide doesn't process them).
+
+    Call this after create_dataset when using Jinja in metadata files for datasets
+    without dimensions.
+    """
+    for table_name in ds.table_names:
+        table = ds[table_name]
+        for col in table.columns:
+            table[col].metadata = table[col].metadata.render({})
+        table._save_metadata(os.path.join(ds.path, table.metadata.checked_name + ".meta.json"))
 
 
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
