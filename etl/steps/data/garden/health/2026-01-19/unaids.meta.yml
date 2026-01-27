@@ -929,7 +929,7 @@ tables:
           - |-
             Condoms are counted only once, even if they pass between distribution channels (for example, from public sector warehouses to NGOs or community workers).
         presentation:
-          title_public: "Condoms distributed per 1,000 population"
+          title_public: "Condoms distributed and sold per 1,000 population"
 
   gam_sex:
     variables:
