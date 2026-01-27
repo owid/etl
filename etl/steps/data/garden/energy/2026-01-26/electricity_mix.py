@@ -538,6 +538,9 @@ def run() -> None:
     tb_review = process_statistical_review_data(tb_review=tb_review)
     tb_ember = process_ember_data(tb_ember=tb_ember)
 
+    # Sanity check inputs.
+    sanity_check_inputs(tb_review=tb_review, tb_ember=tb_ember)
+
     ####################################################################################################################
     # There is a big discrepancy between Oceania's oil generation from the Energy Institute and Ember.
     # Ember's oil generation is significantly larger. The reason seems to be that the Energy Institute's Statistical
