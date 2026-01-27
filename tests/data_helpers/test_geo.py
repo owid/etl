@@ -3809,3 +3809,558 @@ class TestRegionAggregator(unittest.TestCase):
 
         # Manual calculation: France(10*1) + Spain(30*3) / (1+3) = 100/4 = 25.0
         self.assertEqual(europe_lenient["indicator"].iloc[0], 25.0)
+
+    def test_min_num_countries_informed_basic(self):
+        """Test min_num_countries_informed filters aggregates correctly."""
+        # Create data with 5 countries in 2020-2022, but only 2 in 2023
+        # Using mock Europe members: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"] * 3 + ["France", "Italy"],
+                "year": [2020] * 5 + [2021] * 5 + [2022] * 5 + [2023, 2023],
+                "value": [100, 200, 150, 80, 120] * 3 + [140, 240],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with min_num_countries_informed=4: 2023 should be NaN (only 2 countries)
+        result = aggregator.add_aggregates(tb_test, min_num_countries_informed=4, check_for_region_overlaps=False)
+        europe_data = result[result["country"] == "Europe"].sort_values("year")
+
+        # 2020-2022 should have values (5 countries >= 4)
+        self.assertEqual(europe_data[europe_data["year"] == 2020]["value"].iloc[0], 650)
+        self.assertEqual(europe_data[europe_data["year"] == 2021]["value"].iloc[0], 650)
+        self.assertEqual(europe_data[europe_data["year"] == 2022]["value"].iloc[0], 650)
+
+        # 2023 should be NaN (only 2 countries < 4)
+        self.assertTrue(pd.isna(europe_data[europe_data["year"] == 2023]["value"].iloc[0]))
+
+    def test_min_frac_countries_informed_basic(self):
+        """Test min_frac_countries_informed filters based on historical maximum."""
+        # Create data: 5 countries in 2020-2022 (historical max = 5), only 2 in 2023
+        # Using mock Europe members: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"] * 3 + ["France", "Italy"],
+                "year": [2020] * 5 + [2021] * 5 + [2022] * 5 + [2023, 2023],
+                "value": [100, 200, 150, 80, 120] * 3 + [140, 240],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with min_frac_countries_informed=0.6 (60% of 5 = 3 countries)
+        # 2023 has only 2/5 = 40% < 60%, so should be NaN
+        result = aggregator.add_aggregates(tb_test, min_frac_countries_informed=0.6, check_for_region_overlaps=False)
+        europe_data = result[result["country"] == "Europe"].sort_values("year")
+
+        # 2020-2022 should have values
+        self.assertEqual(europe_data[europe_data["year"] == 2020]["value"].iloc[0], 650)
+        # 2023 should be NaN
+        self.assertTrue(pd.isna(europe_data[europe_data["year"] == 2023]["value"].iloc[0]))
+
+        # Test with looser threshold: 0.4 (40% of 5 = 2 countries)
+        # 2023 has 2/5 = 40% = 40%, so should have value
+        result_lenient = aggregator.add_aggregates(
+            tb_test, min_frac_countries_informed=0.4, check_for_region_overlaps=False
+        )
+        europe_lenient = result_lenient[result_lenient["country"] == "Europe"].sort_values("year")
+
+        # 2023 should have value
+        self.assertEqual(europe_lenient[europe_lenient["year"] == 2023]["value"].iloc[0], 380)
+
+    def test_min_num_and_frac_countries_informed_combined(self):
+        """Test both min_num_countries_informed and min_frac_countries_informed together."""
+        # Create data with varying number of countries per year:
+        # 2020: 5 countries (historical max)
+        # 2021: 4 countries
+        # 2022: 3 countries
+        # 2023: 2 countries
+        # 2024: 1 country
+        # Using mock Europe members: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"]  # 2020: 5 countries
+                + ["France", "Italy", "Spain", "Russia"]  # 2021: 4 countries
+                + ["France", "Italy", "Spain"]  # 2022: 3 countries
+                + ["France", "Italy"]  # 2023: 2 countries
+                + ["France"],  # 2024: 1 country
+                "year": [2020] * 5 + [2021] * 4 + [2022] * 3 + [2023] * 2 + [2024],
+                "value": [100, 200, 150, 80, 120, 110, 210, 160, 90, 120, 220, 170, 130, 230, 140],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with min_num_countries_informed=3 and min_frac_countries_informed=0.5
+        # Historical max = 5 countries
+        # Conditions:
+        # - Need at least 3 countries (absolute)
+        # - Need at least 50% of 5 = 2.5 countries (fraction)
+        # Both must be met (AND logic)
+        result = aggregator.add_aggregates(
+            tb_test,
+            min_num_countries_informed=3,
+            min_frac_countries_informed=0.5,
+            check_for_region_overlaps=False,
+        )
+        europe_data = result[result["country"] == "Europe"].sort_values("year")
+
+        # Case 1: Both conditions pass
+        # 2020: 5 countries >= 3 ✓ and 5/5=100% >= 50% ✓ → should have value
+        self.assertEqual(europe_data[europe_data["year"] == 2020]["value"].iloc[0], 650)
+
+        # Case 2: Both conditions pass
+        # 2021: 4 countries >= 3 ✓ and 4/5=80% >= 50% ✓ → should have value
+        self.assertEqual(europe_data[europe_data["year"] == 2021]["value"].iloc[0], 570)
+
+        # Case 3: Both conditions pass (edge case)
+        # 2022: 3 countries >= 3 ✓ and 3/5=60% >= 50% ✓ → should have value
+        self.assertEqual(europe_data[europe_data["year"] == 2022]["value"].iloc[0], 510)
+
+        # Case 4: Absolute fails, fraction passes
+        # 2023: 2 countries < 3 ✗ but 2/5=40% < 50% ✗ → should be NaN (both fail actually)
+        # Actually this passes fraction (2/5=40% but we need 50%, so this fails both)
+        # Let me recalculate: 2 countries < 3 ✗, and 2/5=40% < 50% ✗ → both fail
+        self.assertTrue(pd.isna(europe_data[europe_data["year"] == 2023]["value"].iloc[0]))
+
+        # Case 5: Both fail
+        # 2024: 1 country < 3 ✗ and 1/5=20% < 50% ✗ → should be NaN
+        self.assertTrue(pd.isna(europe_data[europe_data["year"] == 2024]["value"].iloc[0]))
+
+        # Test another scenario with different thresholds to show all combinations
+        # min_num_countries_informed=2 and min_frac_countries_informed=0.7
+        result2 = aggregator.add_aggregates(
+            tb_test,
+            min_num_countries_informed=2,
+            min_frac_countries_informed=0.7,
+            check_for_region_overlaps=False,
+        )
+        europe_data2 = result2[result2["country"] == "Europe"].sort_values("year")
+
+        # 2020: 5 countries >= 2 ✓ and 5/5=100% >= 70% ✓ → both pass
+        self.assertEqual(europe_data2[europe_data2["year"] == 2020]["value"].iloc[0], 650)
+
+        # 2021: 4 countries >= 2 ✓ and 4/5=80% >= 70% ✓ → both pass
+        self.assertEqual(europe_data2[europe_data2["year"] == 2021]["value"].iloc[0], 570)
+
+        # 2022: 3 countries >= 2 ✓ but 3/5=60% < 70% ✗ → absolute passes, fraction fails
+        # Result: should be NaN (both must pass)
+        self.assertTrue(pd.isna(europe_data2[europe_data2["year"] == 2022]["value"].iloc[0]))
+
+        # 2023: 2 countries >= 2 ✓ but 2/5=40% < 70% ✗ → absolute passes, fraction fails
+        # Result: should be NaN
+        self.assertTrue(pd.isna(europe_data2[europe_data2["year"] == 2023]["value"].iloc[0]))
+
+        # 2024: 1 country < 2 ✗ and 1/5=20% < 70% ✗ → both fail
+        self.assertTrue(pd.isna(europe_data2[europe_data2["year"] == 2024]["value"].iloc[0]))
+
+        # Test yet another scenario: fraction passes but absolute fails
+        # min_num_countries_informed=4 and min_frac_countries_informed=0.3
+        result3 = aggregator.add_aggregates(
+            tb_test,
+            min_num_countries_informed=4,
+            min_frac_countries_informed=0.3,
+            check_for_region_overlaps=False,
+        )
+        europe_data3 = result3[result3["country"] == "Europe"].sort_values("year")
+
+        # 2020: 5 countries >= 4 ✓ and 5/5=100% >= 30% ✓ → both pass
+        self.assertEqual(europe_data3[europe_data3["year"] == 2020]["value"].iloc[0], 650)
+
+        # 2021: 4 countries >= 4 ✓ and 4/5=80% >= 30% ✓ → both pass
+        self.assertEqual(europe_data3[europe_data3["year"] == 2021]["value"].iloc[0], 570)
+
+        # 2022: 3 countries < 4 ✗ but 3/5=60% >= 30% ✓ → absolute fails, fraction passes
+        # Result: should be NaN (both must pass)
+        self.assertTrue(pd.isna(europe_data3[europe_data3["year"] == 2022]["value"].iloc[0]))
+
+        # 2023: 2 countries < 4 ✗ but 2/5=40% >= 30% ✓ → absolute fails, fraction passes
+        # Result: should be NaN
+        self.assertTrue(pd.isna(europe_data3[europe_data3["year"] == 2023]["value"].iloc[0]))
+
+    def test_min_countries_informed_multi_column(self):
+        """Test that different columns are filtered independently based on their own coverage."""
+        # electricity: 5 countries historically, drops to 2 in 2023
+        # coal: 3 countries historically, maintains 2 in 2023
+        # Using mock Europe members: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"] * 3 + ["France", "Italy"],
+                "year": [2020] * 5 + [2021] * 5 + [2022] * 5 + [2023, 2023],
+                "electricity": [100, 200, 150, 80, 120] * 3 + [140, 240],
+                "coal": [10, 20, np.nan, np.nan, np.nan]
+                + [12, 22, np.nan, np.nan, np.nan]
+                + [14, 24, 30, np.nan, np.nan]
+                + [18, 28],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"electricity": "sum", "coal": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # With 60% threshold:
+        # electricity: historical max = 5, need 3, have 2 in 2023 → NaN
+        # coal: historical max = 3, need 1.8, have 2 in 2023 → has value
+        result = aggregator.add_aggregates(tb_test, min_frac_countries_informed=0.6, check_for_region_overlaps=False)
+        europe_2023 = result[(result["country"] == "Europe") & (result["year"] == 2023)].iloc[0]
+
+        # electricity should be NaN (2/5 = 40% < 60%)
+        self.assertTrue(pd.isna(europe_2023["electricity"]))
+        # coal should have value (2/3 = 67% >= 60%)
+        self.assertEqual(europe_2023["coal"], 46.0)
+
+    def test_min_countries_informed_multidimensional_index(self):
+        """Test min_countries_informed works with 3+ dimensional indexes."""
+        # Create data with 3 dimensions: country, year, type
+        # Using mock Europe members: France, Italy, Spain
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain"] * 3 + ["France"],
+                "year": [2020, 2020, 2020, 2021, 2021, 2021, 2022, 2022, 2022, 2023],
+                "type": ["A"] * 10,
+                "value": [100, 200, 150] * 3 + [140],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            index_columns=["country", "year", "type"],
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Historical max for type A = 3 countries
+        # 2023 type A has only 1 country (33% < 60%)
+        result = aggregator.add_aggregates(tb_test, min_frac_countries_informed=0.6, check_for_region_overlaps=False)
+        europe_2023_a = result[(result["country"] == "Europe") & (result["year"] == 2023) & (result["type"] == "A")]
+
+        # Should be NaN
+        self.assertTrue(pd.isna(europe_2023_a["value"].iloc[0]))
+
+        # Earlier years should have values
+        europe_2020_a = result[(result["country"] == "Europe") & (result["year"] == 2020) & (result["type"] == "A")]
+        self.assertEqual(europe_2020_a["value"].iloc[0], 450)
+
+    def test_min_countries_informed_with_countries_that_must_have_data(self):
+        """Test that both min_countries_informed and countries_that_must_have_data work together."""
+        # Create data with varying coverage:
+        # 2020: 5 countries (all present, including Russia)
+        # 2021: 3 countries (France, Italy, Spain - missing Russia and Belarus)
+        # 2022: 2 countries (France, Italy - missing Russia)
+        # 2023: 4 countries (all except Spain)
+        # Using mock Europe members: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"]  # 2020: 5 countries
+                + ["France", "Italy", "Spain"]  # 2021: 3 countries (no Russia, no Belarus)
+                + ["France", "Italy"]  # 2022: 2 countries (no Russia)
+                + ["France", "Italy", "Russia", "Belarus"],  # 2023: 4 countries (no Spain)
+                "year": [2020] * 5 + [2021] * 3 + [2022] * 2 + [2023] * 4,
+                "value": [100, 200, 150, 80, 120, 110, 210, 160, 120, 220, 130, 230, 180, 190],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Scenario 1: Both min_frac_countries_informed and countries_that_must_have_data
+        # Historical max = 5 countries
+        result1 = aggregator.add_aggregates(
+            tb_test,
+            min_frac_countries_informed=0.5,  # Need at least 2.5 countries
+            countries_that_must_have_data=["Russia"],  # Russia must be present
+            check_for_region_overlaps=False,
+        )
+        europe_data1 = result1[result1["country"] == "Europe"].sort_values("year")
+
+        # 2020: 5/5=100% >= 50% ✓ and Russia present ✓ → both pass
+        self.assertEqual(europe_data1[europe_data1["year"] == 2020]["value"].iloc[0], 650)
+
+        # 2021: 3/5=60% >= 50% ✓ but Russia missing ✗ → min_frac passes, must_have fails
+        self.assertTrue(pd.isna(europe_data1[europe_data1["year"] == 2021]["value"].iloc[0]))
+
+        # 2022: 2/5=40% < 50% ✗ and Russia missing ✗ → both fail
+        self.assertTrue(pd.isna(europe_data1[europe_data1["year"] == 2022]["value"].iloc[0]))
+
+        # 2023: 4/5=80% >= 50% ✓ and Russia present ✓ → both pass
+        self.assertEqual(europe_data1[europe_data1["year"] == 2023]["value"].iloc[0], 730)
+
+        # Scenario 2: min_num_countries_informed with countries_that_must_have_data
+        result2 = aggregator.add_aggregates(
+            tb_test,
+            min_num_countries_informed=3,  # Need at least 3 countries
+            countries_that_must_have_data=["France"],  # France must be present
+            check_for_region_overlaps=False,
+        )
+        europe_data2 = result2[result2["country"] == "Europe"].sort_values("year")
+
+        # 2020: 5 countries >= 3 ✓ and France present ✓ → both pass
+        self.assertEqual(europe_data2[europe_data2["year"] == 2020]["value"].iloc[0], 650)
+
+        # 2021: 3 countries >= 3 ✓ and France present ✓ → both pass
+        self.assertEqual(europe_data2[europe_data2["year"] == 2021]["value"].iloc[0], 480)
+
+        # 2022: 2 countries < 3 ✗ but France present ✓ → min_num fails, must_have passes
+        self.assertTrue(pd.isna(europe_data2[europe_data2["year"] == 2022]["value"].iloc[0]))
+
+        # 2023: 4 countries >= 3 ✓ and France present ✓ → both pass
+        self.assertEqual(europe_data2[europe_data2["year"] == 2023]["value"].iloc[0], 730)
+
+        # Scenario 3: All three conditions together (min_num + min_frac + countries_that_must_have_data)
+        result3 = aggregator.add_aggregates(
+            tb_test,
+            min_num_countries_informed=3,  # Need at least 3 countries
+            min_frac_countries_informed=0.6,  # Need at least 60% of 5 = 3 countries
+            countries_that_must_have_data=["Russia", "France"],  # Both must be present
+            check_for_region_overlaps=False,
+        )
+        europe_data3 = result3[result3["country"] == "Europe"].sort_values("year")
+
+        # 2020: 5 >= 3 ✓, 5/5=100% >= 60% ✓, Russia+France present ✓ → all pass
+        self.assertEqual(europe_data3[europe_data3["year"] == 2020]["value"].iloc[0], 650)
+
+        # 2021: 3 >= 3 ✓, 3/5=60% >= 60% ✓, but Russia missing ✗ → two pass, one fails
+        self.assertTrue(pd.isna(europe_data3[europe_data3["year"] == 2021]["value"].iloc[0]))
+
+        # 2022: 2 < 3 ✗, 2/5=40% < 60% ✗, Russia missing ✗ → all fail
+        self.assertTrue(pd.isna(europe_data3[europe_data3["year"] == 2022]["value"].iloc[0]))
+
+        # 2023: 4 >= 3 ✓, 4/5=80% >= 60% ✓, Russia+France present ✓ → all pass
+        self.assertEqual(europe_data3[europe_data3["year"] == 2023]["value"].iloc[0], 730)
+
+        # Scenario 4: Test that when only countries_that_must_have_data is used, it works independently
+        result4 = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data=["Spain"],  # Only Spain requirement
+            check_for_region_overlaps=False,
+        )
+        europe_data4 = result4[result4["country"] == "Europe"].sort_values("year")
+
+        # 2020: Spain present ✓
+        self.assertEqual(europe_data4[europe_data4["year"] == 2020]["value"].iloc[0], 650)
+
+        # 2021: Spain present ✓
+        self.assertEqual(europe_data4[europe_data4["year"] == 2021]["value"].iloc[0], 480)
+
+        # 2022: Spain missing ✗
+        self.assertTrue(pd.isna(europe_data4[europe_data4["year"] == 2022]["value"].iloc[0]))
+
+        # 2023: Spain missing ✗
+        self.assertTrue(pd.isna(europe_data4[europe_data4["year"] == 2023]["value"].iloc[0]))
+
+    def test_min_countries_informed_no_filtering_when_none(self):
+        """Test that no filtering occurs when parameters are None."""
+        tb_test = Table(
+            {
+                "country": ["France", "Italy"],
+                "year": [2020, 2020],
+                "value": [100, 200],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # With no parameters, should aggregate normally even with just 2 countries
+        result = aggregator.add_aggregates(tb_test, check_for_region_overlaps=False)
+        europe_data = result[result["country"] == "Europe"]
+
+        self.assertEqual(europe_data["value"].iloc[0], 300)
+
+    def test_min_countries_informed_empty_region(self):
+        """Test behavior when a region has no data."""
+        tb_test = Table(
+            {
+                "country": ["Some Other Country"],
+                "year": [2020],
+                "value": [100],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],  # Europe has no data
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Should handle gracefully and return no data for Europe
+        result = aggregator.add_aggregates(tb_test, min_frac_countries_informed=0.5, check_for_region_overlaps=False)
+
+        # Europe should not be in the result
+        europe_data = result[result["country"] == "Europe"]
+        self.assertTrue(europe_data.empty)
+
+    def test_min_frac_countries_informed_edge_case_zero_historical_max(self):
+        """Test edge case where historical max is 0 (all values are NaN)."""
+        # All values are NaN - historical max would be 0 countries with data
+        # This tests that our code handles this edge case gracefully
+        tb_test = Table(
+            {
+                "country": ["France", "Italy"],
+                "year": [2020, 2020],
+                "value": [np.nan, np.nan],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test 1: With default aggregation (no min_num_values)
+        # groupby_agg returns 0 by default when all values are NaN (pandas behavior)
+        result1 = aggregator.add_aggregates(tb_test, min_frac_countries_informed=0.5, check_for_region_overlaps=False)
+        europe_data1 = result1[result1["country"] == "Europe"]
+        # With default parameters, sum of all NaNs is 0 (pandas default)
+        self.assertEqual(europe_data1["value"].iloc[0], 0.0)
+
+        # Test 2: With min_num_values=1 (more conceptually correct)
+        # This requires at least 1 valid value, so all-NaN should return NaN
+        result2 = aggregator.add_aggregates(
+            tb_test,
+            min_frac_countries_informed=0.5,
+            min_num_values_per_year=1,
+            check_for_region_overlaps=False,
+        )
+        europe_data2 = result2[result2["country"] == "Europe"]
+        # With min_num_values=1, all NaNs should result in NaN aggregate
+        self.assertTrue(pd.isna(europe_data2["value"].iloc[0]))
+
+    def test_min_frac_countries_informed_per_variable(self):
+        """Test that historical_max is calculated per variable, not globally.
+
+        This is a critical test for the bug where historical_max was calculated
+        across ALL variables instead of per (variable, unit, category, subcategory).
+
+        Bug scenario:
+        - Variable A has 10 countries reporting
+        - Variable B has 100 countries reporting
+        - With buggy implementation: historical_max = 110 (global)
+          - Variable A needs 55 countries (50% of 110) → filtered to NaN ❌
+        - With correct implementation: historical_max calculated per variable
+          - Variable A needs 5 countries (50% of 10) → kept ✓
+          - Variable B needs 50 countries (50% of 100) → kept ✓
+        """
+        # Create test data with two variables with very different coverage
+        small_var_countries = [f"SmallCountry{i}" for i in range(10)]
+        large_var_countries = [f"LargeCountry{i}" for i in range(100)]
+
+        data = []
+
+        # Small Variable: 10 countries report in 2020
+        for country in small_var_countries:
+            data.append(
+                {
+                    "country": country,
+                    "year": 2020,
+                    "variable": "Small Variable",
+                    "unit": "TWh",
+                    "category": "Test",
+                    "subcategory": "Test",
+                    "value": 10.0,
+                }
+            )
+
+        # Large Variable: 100 countries report in 2020
+        for country in large_var_countries:
+            data.append(
+                {
+                    "country": country,
+                    "year": 2020,
+                    "variable": "Large Variable",
+                    "unit": "TWh",
+                    "category": "Test",
+                    "subcategory": "Test",
+                    "value": 5.0,
+                }
+            )
+
+        tb_test = Table(pd.DataFrame(data))
+
+        # Create a custom region that includes ALL these countries
+        all_countries = small_var_countries + large_var_countries
+        custom_regions = {
+            "TestRegion": {
+                "additional_members": all_countries,
+            }
+        }
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=custom_regions,
+            index_columns=["country", "year", "variable", "unit", "category", "subcategory"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Apply aggregation with min_frac_countries_informed=0.5
+        result = aggregator.add_aggregates(
+            tb_test,
+            min_frac_countries_informed=0.5,
+            check_for_region_overlaps=False,
+        )
+
+        # Extract TestRegion results
+        region_data = result[result["country"] == "TestRegion"].set_index("variable")
+
+        # Get values for both variables
+        small_val = region_data.loc["Small Variable", "value"] if "Small Variable" in region_data.index else None
+        large_val = region_data.loc["Large Variable", "value"] if "Large Variable" in region_data.index else None
+
+        # CRITICAL ASSERTIONS:
+        # With correct implementation (per-variable historical_max):
+        # - Small Variable: 10 countries, needs 5 (50% of 10), has 10 → should be KEPT
+        # - Large Variable: 100 countries, needs 50 (50% of 100), has 100 → should be KEPT
+
+        # Small Variable should have aggregate = 10 countries * 10.0 = 100.0
+        self.assertIsNotNone(small_val, "Small Variable should not be None")
+        self.assertFalse(pd.isna(small_val), "Small Variable should not be NaN - historical_max should be per-variable")
+        self.assertEqual(small_val, 100.0, "Small Variable aggregate should be 100.0")
+
+        # Large Variable should have aggregate = 100 countries * 5.0 = 500.0
+        self.assertIsNotNone(large_val, "Large Variable should not be None")
+        self.assertFalse(pd.isna(large_val), "Large Variable should not be NaN")
+        self.assertEqual(large_val, 500.0, "Large Variable aggregate should be 500.0")
