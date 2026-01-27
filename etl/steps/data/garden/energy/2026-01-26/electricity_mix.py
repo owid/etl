@@ -160,7 +160,7 @@ def sanity_check_inputs(tb_review, tb_ember):
     error = "Unexpected list of countries in EI that are not in Ember."
     assert set([c for c in tb_review["country"] if "(EI)" not in c]) - set(
         [c for c in tb_ember["country"] if "(Ember)" not in c]
-    ) == {"Curacao", "Netherlands Antilles", "USSR"}
+    ) == {"Curacao", "Netherlands Antilles", "USSR"}, error
     error = "All data for Curacao and Netherlands Antilles was expected to be zero."
     assert (
         (
