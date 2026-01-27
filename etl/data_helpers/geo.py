@@ -2667,18 +2667,28 @@ class RegionAggregator:
                     mask_to_nan = pd.Series([False] * len(df_region_subset), index=df_region_subset.index)
 
                     # Apply absolute minimum if specified for this region.
-                    if min_num_countries_informed is not None and region in min_num_countries_informed:
-                        mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed[region]
+                    if min_num_countries_informed is not None:
+                        if isinstance(min_num_countries_informed, dict) and region in min_num_countries_informed:
+                            mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed[region]
+                        elif not isinstance(min_num_countries_informed, dict):
+                            mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed
 
                     # Apply fraction minimum if specified for this region.
-                    if min_frac_countries_informed is not None and region in min_frac_countries_informed:
+                    if min_frac_countries_informed is not None:
                         # Use per-row historical_max instead of global value.
                         historical_max_col = df_region_subset[f"{column}_historical_max"]
                         # Only apply threshold where historical_max > 0.
-                        min_countries_required = min_frac_countries_informed[region] * historical_max_col
-                        mask_to_nan |= (df_region_subset[f"{column}_count"] < min_countries_required) & (
-                            historical_max_col > 0
-                        )
+                        if isinstance(min_frac_countries_informed, dict) and region in min_frac_countries_informed:
+                            min_countries_required = min_frac_countries_informed[region] * historical_max_col
+                        elif not isinstance(min_frac_countries_informed, dict):
+                            min_countries_required = min_frac_countries_informed * historical_max_col
+                        else:
+                            # Region not in dict, skip this region
+                            min_countries_required = None
+                        if min_countries_required is not None:
+                            mask_to_nan |= (df_region_subset[f"{column}_count"] < min_countries_required) & (
+                                historical_max_col > 0
+                            )
 
                     # Set values to NaN where conditions are not met.
                     # Use the original indices that we stored before merging to avoid index mismatch.
