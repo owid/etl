@@ -5,6 +5,10 @@ definitions:
     presentation:
       topic_tags:
         - Plastic Pollution
+      grapher_config:
+        map:
+          colorScale:
+            baseColorScheme: Reds
 
   text_modelled_estimate: &text_modelled_estimate
     These estimates are produced by a statistical model that combines geographically detailed data with environmental factors, rather than being directly measured for every country and river. The model was calibrated against field observations of floating macroplastics.
@@ -72,9 +76,9 @@ tables:
 
       me_tons_per_year:
         title: Plastic emitted into ocean via rivers
-        unit: metric tons per year
+        unit: tonnes
         short_unit: t
-        description_short: Estimated annual plastic emission into the ocean via rivers
+        description_short: Estimated annual amount of plastic pollution entering the ocean via rivers, measured in tonnes per year. Country totals exclude waste exported overseas, which may be at greater risk of entering the ocean.
         description_key: *desc_key_me
         display:
           numDecimalPlaces: 0
@@ -83,7 +87,7 @@ tables:
         title: Plastic emitted into ocean per capita
         unit: kilograms per person
         short_unit: kg
-        description_short: Annual plastic emission into the ocean per person via rivers
+        description_short: Estimated annual amount of plastic pollution entering the ocean via rivers, measured in kilograms per person per year. Country totals exclude waste exported overseas, which may be at greater risk of entering the ocean.
         processing_level: major
         description_key:
           - *text_modelled_estimate
@@ -98,7 +102,7 @@ tables:
         title: Share of global plastic emissions
         unit: "%"
         short_unit: "%"
-        description_short: Country's share of total global plastic emissions into ocean via rivers
+        description_short: Estimated share of global plastic pollution entering the ocean via rivers. Country totals exclude waste exported overseas, which may be at greater risk of entering the ocean.
         processing_level: major
         description_key:
           - *text_modelled_estimate
