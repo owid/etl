@@ -111,6 +111,16 @@ def push_new_charts() -> None:
         try:
             # Use the CLI function which handles both charts and narrative charts
             cli_upgrade_indicators(dry_run=False)
+        except RuntimeError as e:
+            # Partial failure - some charts updated successfully, but some failed
+            st.warning(
+                "Some charts were updated successfully, but there were errors with others. "
+                "You can proceed to chart-diff to review the successful updates, "
+                "but some charts may need manual attention."
+            )
+            st.exception(e)
+            st_wizard_page_link("anomalist")
+            st_wizard_page_link("chart-diff")
         except Exception as e:
             st.error(
                 "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
