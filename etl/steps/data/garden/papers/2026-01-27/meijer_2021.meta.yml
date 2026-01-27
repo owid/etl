@@ -1,0 +1,62 @@
+
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+dataset:
+  title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
+
+tables:
+  meijer_2021:
+    variables:
+
+      p_e_percent:
+        title: Probability of plastic emission into ocean
+        unit: "%"
+        short_unit: "%"
+        description_short: National average probability that mismanaged plastic waste reaches the ocean
+        description_key:
+          - This is the modeled probability that mismanaged plastic waste (MPW) generated in a country will reach the ocean.
+          - It depends on distance to rivers and coast, precipitation, wind, land cover, terrain, and river characteristics.
+          - Small island nations and countries with dense river networks tend to have higher probabilities.
+        display:
+          numDecimalPlaces: 2
+
+      me_tons_per_year:
+        title: Plastic emitted into ocean via rivers
+        unit: metric tons per year
+        short_unit: t
+        description_short: Estimated annual plastic emission into the ocean
+        description_key:
+          - This is the modeled amount of mismanaged plastic waste that reaches the ocean via rivers.
+          - It equals MPW × P(E), where P(E) is the emission probability.
+        display:
+          numDecimalPlaces: 0
+
+      me_tons_per_year_per_capita:
+        title: Plastic emitted into ocean per capita
+        unit: kilograms per person
+        short_unit: kg
+        description_short: Annual plastic emission into the ocean per person
+        processing_level: major
+        description_key:
+          - This is the per capita amount of plastic waste that reaches the ocean via rivers.
+          - Calculated by dividing total plastic emissions by population.
+        display:
+          numDecimalPlaces: 2
+
+      me_tons_per_year_share_of_global:
+        title: Share of global plastic emissions
+        unit: "%"
+        short_unit: "%"
+        description_short: Country's share of total global plastic emissions into ocean
+        processing_level: major
+        description_key:
+          - This shows what percentage of global riverine plastic emissions comes from this country.
+          - Calculated as the country's emissions divided by the sum of all countries' emissions.
+        display:
+          numDecimalPlaces: 2
+
