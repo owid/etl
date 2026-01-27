@@ -23,7 +23,7 @@ def run() -> None:
     #
     tb = tb[["country", "me_tons_per_year", "p_e_percent"]]
 
-    # Add year column (data represents a snapshot from the study period)
+    # Add year column (2019, as per the original study).
     tb["year"] = 2019
 
     # Harmonize country names.
