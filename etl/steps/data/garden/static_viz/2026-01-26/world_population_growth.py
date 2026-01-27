@@ -17,7 +17,6 @@ def run() -> None:
     # Load historical and projection tables
     tb_historical = ds["historical"]
     tb_projection = ds["projections"]
-
     # Extract World data from historical
     world_hist = tb_historical[tb_historical.index.get_level_values("country") == "World"].reset_index()
     world_proj = tb_projection[tb_projection.index.get_level_values("country") == "World"].reset_index()
@@ -65,7 +64,8 @@ def run() -> None:
     text_grey = "#666666"
 
     # Split for projection shading
-    year_cut = 2023
+    # Determine cutoff year: last year of historical data
+    year_cut = int(world_hist["year"].max())
     tb = tb.sort_values("year")
     hist = tb[tb["year"] <= year_cut].copy()
     proj = tb[tb["year"] >= year_cut].copy()
@@ -106,18 +106,26 @@ def run() -> None:
 
     # Growth-rate axis
     ax2 = ax1.twinx()
-    for s in ["left", "right", "top", "bottom"]:
-        ax2.spines[s].set_visible(False)
-    ax2.tick_params(axis="y", right=False, labelright=False)
 
     tb_growth = tb.dropna(subset=["growth_rate"])
     ax2.plot(tb_growth["year"], tb_growth["growth_rate"], color=color_growth, linewidth=2.5, zorder=10)
 
-    # Allow negatives (needed for -0.1% by 2100)
-    gr_min = float(np.nanmin(tb["growth_rate"]))
-    gr_max = float(np.nanmax(tb["growth_rate"]))
-    pad = 0.2 * (gr_max - gr_min) if gr_max > gr_min else 0.2
-    ax2.set_ylim(gr_min - pad, gr_max + pad)
+    # Match spacing between axes - set fixed range to ensure equal visual spacing
+    # Using 4 tick intervals (0, 0.5, 1.0, 1.5, 2.0) with equal spacing as population axis
+    gr_min = -0.5  # Start at -0.5 to accommodate negative values
+    gr_max = 2.5   # End at 2.5 to give equal spacing above
+    ax2.set_ylim(gr_min, gr_max)
+
+    # Set up right axis with ticks at regular intervals (similar spacing to population axis)
+    ax2.set_yticks([0, 0.5, 1.0, 1.5, 2.0])
+    ax2.tick_params(axis="y", colors=text_grey, labelsize=12, length=0, right=False, labelright=True)
+    ax2.set_ylabel("Annual growth rate (%)", color=text_grey, fontsize=12, labelpad=10)
+
+    # Show only right spine, light grey
+    for s in ["left", "top", "bottom"]:
+        ax2.spines[s].set_visible(False)
+    ax2.spines["right"].set_color(axis_grey)
+    ax2.spines["right"].set_linewidth(1)
 
     # ----- Header (title + OWID-like “legend” under title) -----
     fig.suptitle("World population growth, 1700-2100", x=0.07, y=0.96, ha="left", fontsize=30, fontweight="normal")
@@ -159,7 +167,7 @@ def run() -> None:
             # Format the label
             if threshold < 1.0:
                 # Convert to millions
-                label = f"{int(threshold * 1000)} million\nin {year}"
+                label = f"{int(threshold * 1000)} Million\nin {year}"
             else:
                 # Keep as billions
                 # Format with appropriate decimal places
@@ -228,10 +236,41 @@ def run() -> None:
     )
 
     # ----- Source note (bottom-left, grey) -----
+    # Collect unique origins from all indicators used
+    all_origins = []
+    for col_name in ["population_historical", "growth_rate_historical"]:
+        col = tb_historical[col_name]
+        if hasattr(col.metadata, "origins") and col.metadata.origins:
+            all_origins.extend(col.metadata.origins)
+    for col_name in ["population_projection", "growth_rate_projection"]:
+        col = tb_projection[col_name]
+        if hasattr(col.metadata, "origins") and col.metadata.origins:
+            all_origins.extend(col.metadata.origins)
+
+    # Deduplicate origins
+    unique_origins = {}
+    for origin in all_origins:
+        key = (origin.producer, origin.title, origin.date_published)
+        if key not in unique_origins:
+            unique_origins[key] = origin
+
+    # Build source citation
+    source_parts = []
+    for (producer, title, date_pub), origin in sorted(unique_origins.items()):
+        year = date_pub.split("-")[0] if date_pub else ""
+        if "HYDE" in title:
+            source_parts.append(f"HYDE ({year})")
+        elif "Gapminder" in producer:
+            source_parts.append(f"Gapminder ({year})")
+        elif "United Nations" in producer and "World Population Prospects" in title:
+            source_parts.append(f"UN World Population Prospects ({year})")
+
+    source_text = "Data sources: " + "; ".join(source_parts)
+
     fig.text(
         0.07,
         0.05,
-        "Data sources: Our World in Data based on HYDE, UN, and UN Population Division (2022 Revision)\n"
+        f"{source_text}\n"
         "This is a visualization from OurWorldInData.org, where you find data and research on how the world is changing.",
         fontsize=9,
         color=text_grey,
