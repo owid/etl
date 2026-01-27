@@ -2033,15 +2033,19 @@ class Regions:
             * If a list of countries is passed, it will be automatically converted to a dictionary by mapping each of those countries to the regions that contain it.
             * If None, an aggregate is constructed regardless of the countries missing.
             NOTE: It is safer to list **countries** that must have data (e.g. {"World": ["China"]}), instead of aggregate regions (e.g. {"World": ["Asia"}). The condition will only work as expected if those countries/regions that must have data existed already in the original data.
-        min_num_countries_informed : Optional[int], default: None
-            * If a number is passed, this is the minimum number of countries that must have data (not-nan) in a particular
-            variable, region and year. If that number is not reached, the aggregate will be nan.
+        min_num_countries_informed : Optional[int | dict[str, int]], default: None
+            * If an int is passed, this is the minimum number of countries that must have data (not-nan) in a particular
+            variable, region and year (same threshold for all regions). If that number is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum country counts (e.g., {"Europe": 10, "Africa": 20}).
+            Regions not in the dict will not have this constraint applied.
             * If None, an aggregate is constructed regardless of the number of countries informed.
             * This condition is applied after the aggregation, and works together with min_frac_countries_informed (both must be met).
-        min_frac_countries_informed : Optional[float], default: None
-            * If a number is passed (between 0 and 1), this is the minimum fraction of countries (relative to the total
+        min_frac_countries_informed : Optional[float | dict[str, float]], default: None
+            * If a float is passed (between 0 and 1), this is the minimum fraction of countries (relative to the total
             number of unique countries that have ever had data for this variable in this region across all years) that must
-            have data in a particular variable, region and year. If that fraction is not reached, the aggregate will be nan.
+            have data in a particular variable, region and year (same threshold for all regions). If that fraction is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum fractions (e.g., {"Europe": 0.5, "Africa": 0.3}).
+            Regions not in the dict will not have this constraint applied.
             * If None, an aggregate is constructed regardless of the fraction of countries informed.
             * This condition is applied after the aggregation, and works together with min_num_countries_informed (both must be met).
             Example: If 30 unique countries in Europe have ever reported data for a given indicator (across all years),
@@ -2507,8 +2511,8 @@ class RegionAggregator:
         df_only_regions,
         columns,
         countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
-        min_num_countries_informed: int | None = None,
-        min_frac_countries_informed: float | None = None,
+        min_num_countries_informed: int | dict[str, int] | None = None,
+        min_frac_countries_informed: float | dict[str, float] | None = None,
     ):
         """Impose country-based conditions on region aggregates.
 
@@ -2523,10 +2527,12 @@ class RegionAggregator:
             List of column names to apply conditions to.
         countries_that_must_have_data : dict | list | None
             Specific countries that must have data for the aggregate to be valid.
-        min_num_countries_informed : int | None
-            Minimum number of countries that must have data.
-        min_frac_countries_informed : float | None
+        min_num_countries_informed : int | dict[str, int] | None
+            Minimum number of countries that must have data. Can be an int (same for all regions)
+            or a dict mapping region names to minimum counts.
+        min_frac_countries_informed : float | dict[str, float] | None
             Minimum fraction of countries (among those ever informed for a given variable) that must have data.
+            Can be a float (same for all regions) or a dict mapping region names to minimum fractions.
         """
         # If no conditions specified, return early.
         if (
@@ -2591,6 +2597,12 @@ class RegionAggregator:
 
         # Handle minimum country count conditions.
         if min_num_countries_informed is not None or min_frac_countries_informed is not None:
+            # Convert int/float to dict (same threshold for all regions).
+            if isinstance(min_num_countries_informed, int):
+                min_num_countries_informed = {region: min_num_countries_informed for region in self.regions}
+            if isinstance(min_frac_countries_informed, float):
+                min_frac_countries_informed = {region: min_frac_countries_informed for region in self.regions}
+
             # Count countries with data for each region, column, and grouping.
             for column in columns:
                 if column not in df_only_regions.columns:
@@ -2654,16 +2666,16 @@ class RegionAggregator:
                     # Build mask for rows that don't meet conditions.
                     mask_to_nan = pd.Series([False] * len(df_region_subset), index=df_region_subset.index)
 
-                    # Apply absolute minimum if specified.
-                    if min_num_countries_informed is not None:
-                        mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed
+                    # Apply absolute minimum if specified for this region.
+                    if min_num_countries_informed is not None and region in min_num_countries_informed:
+                        mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed[region]
 
-                    # Apply fraction minimum if specified.
-                    if min_frac_countries_informed is not None:
+                    # Apply fraction minimum if specified for this region.
+                    if min_frac_countries_informed is not None and region in min_frac_countries_informed:
                         # Use per-row historical_max instead of global value.
                         historical_max_col = df_region_subset[f"{column}_historical_max"]
                         # Only apply threshold where historical_max > 0.
-                        min_countries_required = min_frac_countries_informed * historical_max_col
+                        min_countries_required = min_frac_countries_informed[region] * historical_max_col
                         mask_to_nan |= (df_region_subset[f"{column}_count"] < min_countries_required) & (
                             historical_max_col > 0
                         )
@@ -2679,8 +2691,8 @@ class RegionAggregator:
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
-        min_num_countries_informed: int | None = None,
-        min_frac_countries_informed: float | None = None,
+        min_num_countries_informed: int | dict[str, int] | None = None,
+        min_frac_countries_informed: float | dict[str, float] | None = None,
         check_for_region_overlaps: bool = True,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
@@ -2739,15 +2751,19 @@ class RegionAggregator:
             * If a list of countries is passed, it will be automatically converted to a dictionary by mapping each of those countries to the regions that contain it.
             * If None, an aggregate is constructed regardless of the countries missing.
             NOTE: It is safer to list **countries** that must have data (e.g. {"World": ["China"]}), instead of aggregate regions (e.g. {"World": ["Asia"}). The condition will only work as expected if those countries/regions that must have data existed already in the original data.
-        min_num_countries_informed : Optional[int], default: None
-            * If a number is passed, this is the minimum number of countries that must have data (not-nan) in a particular
-            variable, region and year. If that number is not reached, the aggregate will be nan.
+        min_num_countries_informed : Optional[int | dict[str, int]], default: None
+            * If an int is passed, this is the minimum number of countries that must have data (not-nan) in a particular
+            variable, region and year (same threshold for all regions). If that number is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum country counts (e.g., {"Europe": 10, "Africa": 20}).
+            Regions not in the dict will not have this constraint applied.
             * If None, an aggregate is constructed regardless of the number of countries informed.
             * This condition is applied after the aggregation, and works together with min_frac_countries_informed (both must be met).
-        min_frac_countries_informed : Optional[float], default: None
-            * If a number is passed (between 0 and 1), this is the minimum fraction of countries (relative to the total
+        min_frac_countries_informed : Optional[float | dict[str, float]], default: None
+            * If a float is passed (between 0 and 1), this is the minimum fraction of countries (relative to the total
             number of unique countries that have ever had data for this variable in this region across all years) that must
-            have data in a particular variable, region and year. If that fraction is not reached, the aggregate will be nan.
+            have data in a particular variable, region and year (same threshold for all regions). If that fraction is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum fractions (e.g., {"Europe": 0.5, "Africa": 0.3}).
+            Regions not in the dict will not have this constraint applied.
             * If None, an aggregate is constructed regardless of the fraction of countries informed.
             * This condition is applied after the aggregation, and works together with min_num_countries_informed (both must be met).
             Example: If 30 unique countries in Europe have ever reported data for a given indicator (across all years),
