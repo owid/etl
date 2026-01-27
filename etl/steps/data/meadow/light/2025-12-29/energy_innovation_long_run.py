@@ -3,7 +3,6 @@
 from typing import Dict
 
 from owid.catalog import Table
-from pyarrow.tests.test_dataset_encryption import COLUMNS
 
 from etl.helpers import PathFinder
 
