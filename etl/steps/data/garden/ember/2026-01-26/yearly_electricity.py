@@ -603,6 +603,18 @@ def run() -> None:
     # Remove data for aggregate regions with incomplete data.
     fix_incomplete_aggregates(tables)
 
+    ####################################################################################################################
+    # 2026-01-26 Since the EU has data for 2025, but not other European countries, the aggregates for Europe and High-income countries present abrupt jumps between 2024 and 2025.
+    # Hence we remove the data for 2025 for these regions.
+    error = "Expected jump in Europe wind generation (and other variables in the latest year). They have changed. Inspect and consider removing this code."
+    assert tables["electricity_generation"].loc["Europe"]["wind__twh"].diff().iloc[-1] < -14, error
+    for table_name in tables:
+        latest_year = tables[table_name].reset_index()["year"].max()
+        for column in tables[table_name].columns:
+            for region in ["Europe", "High-income countries"]:
+                tables[table_name].loc[(region, latest_year), column] = None
+    ####################################################################################################################
+
     # Combine all tables into one.
     tb_combined = combine_yearly_electricity_data(tables=tables)
 
