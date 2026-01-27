@@ -728,6 +728,9 @@ df_graphers = pd.concat([df_graphers_wid, df_graphers_pip], ignore_index=True)
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
 
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
+
 # Select one default view
 df_graphers.loc[
     (df_graphers["Data Radio"] == "World Inequality Database (Incomes before tax)")

@@ -196,7 +196,7 @@ steps:
     - data://garden/artificial_intelligence/2025-12-09/robotaxis
 
   #
-  # Ireland Data Centres Metered Electricity Consumption
+  # Ireland Data Centers Metered Electricity Consumption
   #
   data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption:
     - snapshot://artificial_intelligence/2025-11-10/ireland_metered_consumption.csv

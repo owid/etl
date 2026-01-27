@@ -221,7 +221,7 @@ def create_grouped_views(collection):
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "choices": {"preprimary", "primary", "lower_secondary", "upper_secondary", "tertiary"},
+                "choices": ["preprimary", "primary", "lower_secondary", "upper_secondary", "tertiary"],
                 "view_config": view_config,
                 "view_metadata": view_metadata,
             },

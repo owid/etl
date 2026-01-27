@@ -1,15 +1,15 @@
-#
-#  snapshots.py
-#  Snapshot browser for etls command
-#
+"""Snapshot browser with version-based ranking."""
 
 import json
-from typing import List, Optional, Tuple
+from typing import TYPE_CHECKING
 
-from etl.browser.core import browse_items
+from apps.browser.scoring import create_ranker, extract_version_from_snapshot
+
+if TYPE_CHECKING:
+    from apps.browser.core import Ranker
 
 
-def get_all_snapshots() -> List[str]:
+def get_all_snapshots() -> list[str]:
     """Get all snapshot URIs from the snapshots directory.
 
     Scans snapshots/**/*.dvc and returns URIs in the format:
@@ -32,7 +32,7 @@ def get_all_snapshots() -> List[str]:
     return sorted(snapshots)
 
 
-def load_cached_snapshots() -> Optional[List[str]]:
+def load_cached_snapshots() -> list[str] | None:
     """Load snapshots from cache if valid.
 
     Uses snapshot count as cache key - fast O(1) check.
@@ -49,13 +49,12 @@ def load_cached_snapshots() -> Optional[List[str]]:
             cache = json.load(f)
 
         # Quick validation: just return cached data
-        # The count check happens in browse_snapshots after loading
         return cache.get("snapshots", [])
     except (json.JSONDecodeError, OSError, KeyError):
         return None
 
 
-def save_snapshot_cache(snapshots: List[str]) -> None:
+def save_snapshot_cache(snapshots: list[str]) -> None:
     """Save snapshots to cache for instant startup next time."""
     from etl import paths
 
@@ -75,25 +74,20 @@ def save_snapshot_cache(snapshots: List[str]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def browse_snapshots() -> Tuple[Optional[str], bool]:
-    """Interactive snapshot browser using prompt_toolkit.
+def create_snapshot_ranker() -> "Ranker":
+    """Create a ranker for snapshot browser results.
+
+    Uses lexicographic sorting:
+    1. Match quality (better matches first)
+    2. Version recency (newer versions first, as tiebreaker)
+
+    No popularity data for snapshots.
 
     Returns:
-        Tuple of (pattern_or_snapshot, is_exact_match):
-        - If user presses Enter: (current_text, False) to run all matches
-        - If user selects a snapshot: (snapshot_uri, True) to run just that snapshot
-        - If user cancels: (None, False)
+        Ranker function for use with browse_items
     """
-    # Try loading from cache first
-    cached_items = load_cached_snapshots()
-
-    return browse_items(
-        items_loader=get_all_snapshots,
-        prompt="etls> ",
-        loading_message="Loading snapshots...",
-        empty_message="No snapshots found.",
-        item_noun="snapshot",
-        item_noun_plural="snapshots",
-        cached_items=cached_items,
-        on_items_loaded=save_snapshot_cache,
+    return create_ranker(
+        popularity_data=None,
+        slug_extractor=None,
+        version_extractor=extract_version_from_snapshot,
     )

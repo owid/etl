@@ -13,36 +13,57 @@ icon: lucide/lightbulb
 
 ## Browse and search ETL steps interactively
 
-Use `etlr --browse` (or `-b`) to open an interactive step browser with fuzzy search. This is useful when you don't remember the exact step name.
-
-<div style="text-align: center;">
-  <video controls width="100%" style="max-width: 800px;">
-    <source src="../../assets/demo-etlr-b.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</div>
-
-Once you select a step, it will be executed with the flags you specified. For example, to run private steps:
+Use `etl` (with no arguments) to open an interactive browser with fuzzy search. This is useful when you don't remember the exact step name.
 
 ```bash
-# Open the interactive browser for private steps
-etlr --browse --private
-
-# Short form
-etlr -b -p
+# Open the interactive browser
+etl
 ```
 
-!!! tip "Also works for snapshots"
+<figure markdown="span">
+    <img src="../../assets/etl-browser.png" alt="ETL Browser" style="width:80%;">
+    <figcaption>The ETL browser with fuzzy search and filter support.</figcaption>
+</figure>
 
-    The same browse functionality is available for snapshots using `etls --browse` (or `etls -b`). This lets you interactively search and select from all available snapshots in the `snapshots/` directory.
+Once you select a step, it will be executed. The browser persists between runs, so your options stay set.
 
-    ```bash
-    # Browse and run a snapshot
-    etls --browse
+### Quick reference
 
-    # Browse with dry-run to preview
-    etls -b --dry-run
-    ```
+| Input | Action |
+|-------|--------|
+| `?` | Show help (mode, options, filters) |
+| `/` | Show commands (mode switching, exit) |
+| `@` | Set options (e.g., `@dry-run`, `@force`) |
+| `@@` | Reset all options to defaults |
+
+### Filter prefixes
+
+Use **filter prefixes** to narrow results by specific attributes. Filters can be combined with search terms: `n:who v:2024 population` finds WHO steps from 2024 containing "population".
+
+| Prefix | Filters by | Example |
+|--------|------------|---------|
+| `n:` | namespace | `n:who` |
+| `c:` | channel | `c:garden` |
+| `v:` | version | `v:2024` |
+| `d:` | dataset | `d:gho` |
+
+### Options
+
+Set CLI options directly in the browser using `@` prefix:
+
+```
+@dry-run          # Toggle dry-run mode
+@force            # Toggle force re-run
+@workers 4        # Set parallel workers
+@dry-run @force   # Set multiple options at once
+@@                # Reset all options
+```
+
+Active options are shown in the status line and persist across step executions.
+
+### Mode switching
+
+Switch between steps and snapshots using `/steps` or `/snapshots` commands.
 
 
 
