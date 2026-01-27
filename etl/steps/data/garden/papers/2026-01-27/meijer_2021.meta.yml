@@ -44,7 +44,7 @@ tables:
   meijer_2021:
     variables:
       p_e_percent:
-        title: Probability of plastic emission into ocean
+        title: Probability of mismanaged plastic waste reaching the ocean via rivers
         unit: "%"
         short_unit: "%"
         description_short: Estimated probability that mismanaged plastic waste reaches the ocean via rivers.
