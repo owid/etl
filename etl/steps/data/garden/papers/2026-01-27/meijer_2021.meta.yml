@@ -6,22 +6,67 @@ definitions:
       topic_tags:
         - Plastic Pollution
 
+  text_modelled_estimate: &text_modelled_estimate
+    These estimates are produced by a statistical model that combines geographically detailed data with environmental factors, rather than being directly measured for every country and river. The model was calibrated against field observations of floating macroplastics.
+
+  text_mpw_definition: &text_mpw_definition
+    Mismanaged plastic waste is plastic that is littered or inadequately disposed of, meaning it is not securely contained in a landfill or properly managed facility and can enter the environment.
+
+  text_scope_macroplastics: &text_scope_macroplastics
+    The model focuses on macroplastics (items typically larger than 0.5 cm) that float on or near the water surface. It does not estimate microplastic transport, riverbed transport, or plastic retained by dams and other river structures.
+
+  text_framework: &text_framework
+    The study combines geographically detailed data on mismanaged plastic waste generation with environmental and geographic factors — including precipitation, wind, land use, terrain slope, distance to rivers, river discharge, and distance to the ocean — to estimate how much plastic reaches the ocean via rivers.
+
+  text_emission_probability: &text_emission_probability
+    "The probability of emission to the ocean is calculated from three components multiplied together: mobilization on land (driven by precipitation and wind), transport from land to a river (influenced by land use, slope, and distance), and transport through the river network to the ocean (influenced by river size and distance to the coast)."
+
+  text_pe_interpretation: &text_pe_interpretation
+    This probability represents the modelled likelihood that mismanaged plastic waste generated at a given location will reach the ocean via rivers within a year, based on local environmental and geographic conditions.
+
+  text_me_definition: &text_me_definition
+    Annual emissions for a river basin are calculated by multiplying the mismanaged plastic waste in each grid cell by its emission probability, then summing across the entire basin.
+
+  text_uncertainty_context: &text_uncertainty_context
+    Modelled emissions for individual rivers can differ substantially from field-based estimates. The study reports that predictions may vary by around a factor of 4 from observations at a 68% confidence level, and by around a factor of 10 at a 95% confidence level.
+
+  text_exported_waste_caveat: &text_exported_waste_caveat
+    These figures do not include plastic waste that is exported overseas for processing, which may be at higher risk of entering the ocean if improperly managed in the destination country.
+
+  text_distribution_context: &text_distribution_context
+    The study finds that plastic emissions are distributed across many more rivers than previously estimated. Small urban rivers in coastal areas with high rainfall tend to have the highest emission probabilities, while large rivers contribute a smaller share than earlier models suggested.
+
+  desc_key_pe: &desc_key_pe
+    - *text_modelled_estimate
+    - *text_mpw_definition
+    - *text_framework
+    - *text_emission_probability
+    - *text_pe_interpretation
+    - *text_scope_macroplastics
+    - *text_exported_waste_caveat
+
+  desc_key_me: &desc_key_me
+    - *text_modelled_estimate
+    - *text_mpw_definition
+    - *text_framework
+    - *text_me_definition
+    - *text_distribution_context
+    - *text_uncertainty_context
+    - *text_scope_macroplastics
+    - *text_exported_waste_caveat
+
 dataset:
   title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
 
 tables:
-  meijer_2021:
+  your_table_name_here:
     variables:
-
       p_e_percent:
         title: Probability of plastic emission into ocean
         unit: "%"
         short_unit: "%"
-        description_short: National average probability that mismanaged plastic waste reaches the ocean
-        description_key:
-          - This is the modeled probability that mismanaged plastic waste (MPW) generated in a country will reach the ocean.
-          - It depends on distance to rivers and coast, precipitation, wind, land cover, terrain, and river characteristics.
-          - Small island nations and countries with dense river networks tend to have higher probabilities.
+        description_short: National average probability that mismanaged plastic waste reaches the ocean via rivers
+        description_key: *desc_key_pe
         display:
           numDecimalPlaces: 2
 
@@ -29,10 +74,8 @@ tables:
         title: Plastic emitted into ocean via rivers
         unit: metric tons per year
         short_unit: t
-        description_short: Estimated annual plastic emission into the ocean
-        description_key:
-          - This is the modeled amount of mismanaged plastic waste that reaches the ocean via rivers.
-          - It equals MPW × P(E), where P(E) is the emission probability.
+        description_short: Estimated annual plastic emission into the ocean via rivers
+        description_key: *desc_key_me
         display:
           numDecimalPlaces: 0
 
@@ -40,11 +83,14 @@ tables:
         title: Plastic emitted into ocean per capita
         unit: kilograms per person
         short_unit: kg
-        description_short: Annual plastic emission into the ocean per person
+        description_short: Annual plastic emission into the ocean per person via rivers
         processing_level: major
         description_key:
-          - This is the per capita amount of plastic waste that reaches the ocean via rivers.
-          - Calculated by dividing total plastic emissions by population.
+          - *text_modelled_estimate
+          - *text_me_definition
+          - This per capita figure is calculated by dividing the country's estimated annual emissions by its population.
+          - *text_scope_macroplastics
+          - *text_exported_waste_caveat
         display:
           numDecimalPlaces: 2
 
@@ -52,11 +98,11 @@ tables:
         title: Share of global plastic emissions
         unit: "%"
         short_unit: "%"
-        description_short: Country's share of total global plastic emissions into ocean
+        description_short: Country's share of total global plastic emissions into ocean via rivers
         processing_level: major
         description_key:
-          - This shows what percentage of global riverine plastic emissions comes from this country.
-          - Calculated as the country's emissions divided by the sum of all countries' emissions.
+          - *text_modelled_estimate
+          - This is calculated as the country's estimated annual emissions divided by the global total in the same year.
+          - *text_exported_waste_caveat
         display:
           numDecimalPlaces: 2
-
