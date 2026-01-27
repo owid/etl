@@ -59,7 +59,7 @@ dataset:
   title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
 
 tables:
-  your_table_name_here:
+  meijer_2021:
     variables:
       p_e_percent:
         title: Probability of plastic emission into ocean
