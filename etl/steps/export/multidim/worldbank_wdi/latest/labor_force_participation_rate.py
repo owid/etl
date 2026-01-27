@@ -59,8 +59,8 @@ def run() -> None:
                 # Extract the column name from the catalog path
                 indicator_col = first_indicator_path.split("#")[-1]
 
-            # Define meta object and render jinja templates
-            meta = tb[indicator_col].metadata.render({})
+            # Define meta object to process it
+            meta = tb[indicator_col].metadata
 
             # Remove "Male " from beginning of title. Also capitalize first letter. We need to extract this from the table's metadata (Grapher step)
             # It is only male because of how we grouped the views
