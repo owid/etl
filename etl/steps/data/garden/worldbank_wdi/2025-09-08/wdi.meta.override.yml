@@ -2298,3 +2298,78 @@ tables:
             - Both available (disagreeing)
             - Only ILO modeled available
             - Only national estimate available
+
+      number_below_working_age:
+        title: Number of people below working age
+        unit: "people"
+        short_unit: ""
+        # description_short: ""
+        # description_key:
+        #   - "{definitions.description_key_number_below_working_age}"
+        presentation:
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Number of people below working age
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      labor_force:
+        title: Labor force
+        unit: "people"
+        short_unit: ""
+        # description_short: ""
+        # description_key:
+        #   - "{definitions.description_key_labor_force}"
+        presentation:
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      number_employed:
+        title: Number of employed people
+        unit: "people"
+        short_unit: ""
+        # description_short: ""
+        # description_key:
+        #   - "{definitions.description_key_number_employed}"
+        presentation:
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Number of employed people
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      number_unemployed:
+        title: Number of unemployed people
+        unit: "people"
+        short_unit: ""
+        # description_short: ""
+        # description_key:
+        #   - "{definitions.description_key_number_unemployed}"
+        presentation:
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Number of unemployed people
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      number_out_of_labor_force:
+        title: Number of people out of the labor force
+        unit: "people"
+        short_unit: ""
+        # description_short: ""
+        # description_key:
+        #   - "{definitions.description_key_number_out_of_labor_force}"
+        presentation:
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Number of people out of the labor force
+          numDecimalPlaces: 0
+          tolerance: 0
