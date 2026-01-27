@@ -1,5 +1,9 @@
 """Load a snapshot and extract Table S8 (Country Statistics) from Meijer et al. (2021)."""
 
+import re
+
+import numpy as np
+import pandas as pd
 import pdfplumber
 from owid.catalog import Table
 from structlog import get_logger
@@ -39,148 +43,164 @@ def run() -> None:
     ds_meadow.save()
 
 
-def extract_table_s8(pdf_path: str) -> Table:
+# numeric tokens like: 28,486 | 1.0E-02 | 2.24% | 80
+_NUM_TOKEN_RE = re.compile(
+    r"""^[-+]?(
+            (\d{1,3}(,\d{3})+|\d+)(\.\d+)?     # 1,234 or 1234.56
+            |
+            \d+(\.\d+)?[eE][-+]?\d+           # 1.0E-02
+        )%?$""",
+    re.VERBOSE,
+)
+
+
+def _is_num_token(tok: str) -> bool:
+    tok = tok.strip()
+    return bool(tok) and bool(_NUM_TOKEN_RE.match(tok))
+
+
+def _count_num_tokens(s: str) -> tuple[int, bool]:
+    toks = s.split()
+    num_count = sum(_is_num_token(t) for t in toks)
+    has_percent = any(t.endswith("%") and _is_num_token(t) for t in toks)
+    return num_count, has_percent
+
+
+def _parse_row(line: str):
     """
-    Extract Table S8 (Country Statistics) from the Meijer et al. (2021) supplementary PDF.
-
-    The table spans pages 25-29 and contains country-level data on plastic emissions.
+    Parse a single row by grabbing the last 9 numeric tokens:
+    area, coast, rainfall, factor(L/A), factor((L/A)*P), P(E)%, MPW, M(E), ratio%
     """
-    # Table S8 spans pages 25-29 (0-indexed: pages 24-28)
-    table_pages = range(24, 29)
+    toks = line.split()
+    vals = []
+    idx = len(toks) - 1
+    while idx >= 0 and len(vals) < 9:
+        if _is_num_token(toks[idx]):
+            vals.append(toks[idx])
+        idx -= 1
+    if len(vals) < 9:
+        return None
 
-    all_rows = []
+    vals = list(reversed(vals))
 
+    # remove the extracted numeric tokens from the right, leaving the country name
+    remaining = toks.copy()
+    for v in reversed(vals):
+        for j in range(len(remaining) - 1, -1, -1):
+            if remaining[j] == v and _is_num_token(remaining[j]):
+                remaining.pop(j)
+                break
+
+    country = " ".join(remaining).strip()
+    if not country:
+        return None
+    return [country] + vals
+
+
+def _to_num(x):
+    s = str(x).replace(",", "").replace("%", "")
+    try:
+        return float(s)
+    except Exception:
+        return np.nan
+
+
+def extract_table_s8(pdf_path: str, start_page: int = 25, end_page: int = 29) -> Table:
+    """
+    Extract Table S8 from the supplementary PDF.
+    Pages are 1-indexed (as in the paper PDF viewer): default pages 25–29.
+
+    Returns a Table with numeric columns.
+    """
+    # pdfplumber pages are 0-indexed
+    page_idxs = range(start_page - 1, end_page)
+
+    # collect and normalize lines across pages
+    lines = []
     with pdfplumber.open(pdf_path) as pdf:
-        for page_num in table_pages:
-            page = pdf.pages[page_num]
-            # Use custom table extraction settings to handle wrapped text better
-            table_settings = {
-                "vertical_strategy": "lines",
-                "horizontal_strategy": "lines",
-                "intersection_tolerance": 3,
-            }
-            tables = page.extract_tables(table_settings=table_settings)
+        for i in page_idxs:
+            txt = pdf.pages[i].extract_text(x_tolerance=2, y_tolerance=2) or ""
+            for raw in txt.splitlines():
+                line = " ".join(raw.strip().split())
+                if line:
+                    lines.append(line)
 
-            if not tables:
-                log.warning(f"No tables found on page {page_num + 1}")
+    rows = []
+    buffer = ""
+    started = False
+
+    for line in lines:
+        # Skip common header/legend lines (we also ignore everything until the first real data row)
+        if (
+            line.startswith("Table S8")
+            or line.startswith("surface area")
+            or line.startswith("ratios")
+            or line.startswith("ratio M")
+            or line.startswith("waste generation")
+            or line.startswith("Country or")
+            or line.startswith("administrative area")
+            or line.startswith("Area [km2]")
+            or line in {"E", "E E", "[E]"}
+        ):
+            continue
+
+        num_count, has_percent = _count_num_tokens(line)
+
+        # Don’t start parsing until we hit the first actual data row (has >= 9 numeric tokens incl. %)
+        if not started:
+            if num_count >= 9 and has_percent:
+                started = True
+            else:
                 continue
 
-            # Usually there's one table per page
-            for table in tables:
-                current_country = None
-                for row in table:
-                    # The PDF has sparse structure with data at specific indices
-                    # Country is at index 1, data columns at indices 4, 7, 10, 13, 16, 19, 22, 25, 28
-                    if len(row) < 29:
-                        continue
+        # If we have a buffered multi-line country row and the new line looks like a fresh full row,
+        # try to finalize the buffer first.
+        if buffer:
+            b_num, b_has_pct = _count_num_tokens(buffer)
+            if num_count >= 9 and has_percent and b_num >= 9 and b_has_pct:
+                r = _parse_row(buffer)
+                if r is not None:
+                    rows.append(r)
+                buffer = ""
 
-                    # Get country name from index 1
-                    country = row[1]
-                    if not country or not country.strip():
-                        continue
+        # Full row => parse directly
+        if num_count >= 9 and has_percent:
+            r = _parse_row(line)
+            if r is not None:
+                rows.append(r)
+            else:
+                buffer = (buffer + " " + line).strip()
+            continue
 
-                    # Skip header rows
-                    country_str = str(country).strip()
-                    if any(keyword in country_str for keyword in ["Country", "Area", "[km", "administrative"]):
-                        continue
+        # Otherwise accumulate continuation lines (multi-line country names, etc.)
+        buffer = (buffer + " " + line).strip()
+        b_num, b_has_pct = _count_num_tokens(buffer)
+        if b_num >= 9 and b_has_pct:
+            r = _parse_row(buffer)
+            if r is not None:
+                rows.append(r)
+                buffer = ""
 
-                    if country_str.startswith("Table"):
-                        continue
-
-                    # Check if this row has numeric data in column 4 (area)
-                    area_value = str(row[4]).strip() if len(row) > 4 and row[4] else ""
-                    # A data row will have either a number or be empty, but not just alphabetic text
-                    has_numeric_data = bool(area_value) and (
-                        area_value.replace(",", "").replace(".", "").isdigit()
-                        or area_value in ["", "NoData", "n/a", "-"]
-                    )
-
-                    if has_numeric_data or not area_value:
-                        # This is a complete data row
-                        if current_country:
-                            # Use the accumulated country name
-                            row = list(row)
-                            row[1] = current_country + " " + country_str
-                            current_country = None
-                        all_rows.append(row)
-                    else:
-                        # This is a wrapped country name, accumulate it
-                        if current_country:
-                            current_country += " " + country_str
-                        else:
-                            current_country = country_str
-
-    log.info(f"Extracted {len(all_rows)} rows from Table S8")
-
-    # Create DataFrame with appropriate column names
-    columns = [
+    cols = [
         "country",
         "area_km2",
         "coast_length_km",
         "rainfall_mm_per_year",
-        "factor_l_a",
-        "factor_l_a_p",
-        "p_e_percent",
-        "mpw_tons_per_year",
-        "me_tons_per_year",
-        "ratio_me_mpw",
+        "factor_L_over_A",
+        "factor_L_over_A_times_P",
+        "P_E_percent",
+        "MPW_tons_per_year",
+        "ME_tons_per_year",
+        "ME_over_MPW_percent",
     ]
+    df = pd.DataFrame(rows, columns=cols)
 
-    # Extract data from the correct column indices
-    # PDF structure: country at index 1, data at indices 4, 7, 10, 13, 16, 19, 22, 25, 28
-    data_indices = [1, 4, 7, 10, 13, 16, 19, 22, 25, 28]
-    valid_rows = []
-    for row in all_rows:
-        extracted_row = [row[i] if i < len(row) else None for i in data_indices]
-        valid_rows.append(extracted_row)
+    # numeric conversion
+    for c in cols[1:]:
+        df[c] = df[c].map(_to_num)
 
-    # Fix known split country names
-    # Some country names are split across rows in the PDF
-    country_name_fixes = {
-        "Congo (Democratic": "Congo (Democratic Republic of the)",
-        "Republic of the)": None,  # Remove - merged with previous
-        "Federated States of": "Federated States of Micronesia",
-        "Micronesia": None,  # Will be removed if it follows "Federated States of"
-        "Saint Vincent and the": "Saint Vincent and the Grenadines",
-        "Grenadines": None,  # Remove - merged with previous
-    }
+    # basic cleanup
+    df["country"] = df["country"].str.replace(r"\s+", " ", regex=True).str.strip()
 
-    # Apply fixes
-    i = 0
-    while i < len(valid_rows):
-        country = str(valid_rows[i][0]).strip()
-        if country in country_name_fixes:
-            replacement = country_name_fixes[country]
-            if replacement:
-                valid_rows[i][0] = replacement
-                # Remove the next row if it's the continuation
-                if i + 1 < len(valid_rows):
-                    next_country = str(valid_rows[i + 1][0]).strip()
-                    if next_country in country_name_fixes and country_name_fixes[next_country] is None:
-                        valid_rows.pop(i + 1)
-                i += 1
-            else:
-                # This row should be removed (it's a continuation)
-                valid_rows.pop(i)
-        else:
-            i += 1
-
-    tb = Table(valid_rows, columns=columns)
-
-    # Clean and convert data types
-    for col in tb.columns:
-        if col != "country":
-            # Remove commas and percentage signs
-            tb[col] = tb[col].astype(str).str.replace(",", "").str.replace("%", "")
-            # Handle scientific notation and special values
-            tb[col] = tb[col].replace({"NoData": None, "n/a": None, "-": None, "": None, "None": None})
-
-    # Convert numeric columns using nullable float type
-    numeric_cols = [col for col in columns if col != "country"]
-    for col in numeric_cols:
-        tb[col] = tb[col].astype("Float64")
-
-    # Clean country names
-    tb["country"] = tb["country"].astype(str).str.strip()
-
+    tb = Table(df)
     return tb
