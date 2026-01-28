@@ -912,7 +912,7 @@ tables:
         title: Condoms distributed and sold per 1,000 population
         unit: "condoms per 1,000 people"
         description_short: |-
-          The number of condoms distributed and sold per 1,000 people in a given year, including free public-sector distribution, subsidized social marketing, and commercial sales.
+          The number of condoms distributed and sold per 1,000 people in a given year, including free public-sector distribution, subsidized from non-governmental organizations, and commercial sales.
         display:
           numDecimalPlaces: 0
         description_from_producer: |-
