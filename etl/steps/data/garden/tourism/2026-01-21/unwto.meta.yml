@@ -409,7 +409,7 @@ tables:
           numDecimalPlaces: 1
 
       inbound_exp_ppp_cpi_adj_2021:
-        title: Inbound tourism expenditure adjusted for inflation and purchasing power (2021 prices)
+        title: International tourist expenditure within the country they visit (in constant 2021 international-$)
         unit: constant 2021 international-$
         short_unit: $
         description_short: This captures spending by foreign visitors on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines. This data is adjusted for inflation and differences in living costs between countries.
@@ -419,14 +419,13 @@ tables:
         description_processing: |-
           We adjusted the data to account for both local inflation and differences in cost of living across countries. First, we converted expenditures from US dollars to local currency using official exchange rates. Then we adjusted for local inflation using each country's Consumer Price Index (CPI), normalized to 2021. Finally, we converted the values to international dollars using purchasing power parity (PPP) conversion factors for private consumption from 2021.
         presentation:
-          title_public: International tourist expenditure within the country they visit (in constant 2021 international-$)
           grapher_config:
             note: This data is expressed in 2021 [international-$](#dod:int_dollar_abbreviation). Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
         display:
           numDecimalPlaces: 0
 
       outbound_exp_us_cpi_adj_2021:
-        title: Outbound tourism expenditure adjusted for US inflation (2021 prices)
+        title: International tourist expenditure by residents traveling abroad (in constant 2021 US$)
         unit: constant 2021 US$
         short_unit: $
         description_short: This captures spending by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines. This data is adjusted for US inflation.
@@ -436,7 +435,6 @@ tables:
         description_processing: |-
           We adjusted the data for US inflation by dividing nominal expenditure values by the US Consumer Price Index (CPI) adjustment factor, with 2021 as the base year. This accounts for changes in the purchasing power of the US dollar over time.
         presentation:
-          title_public: International tourist expenditure by residents traveling abroad (in constant 2021 US$)
           grapher_config:
             note: This data is expressed in constant 2021 US$, adjusted for inflation using the US Consumer Price Index.
         display:
