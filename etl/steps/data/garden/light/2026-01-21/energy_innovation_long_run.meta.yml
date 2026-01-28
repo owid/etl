@@ -7,13 +7,29 @@ definitions:
         - Light at Night
         - Energy
 
+  description_key_price_of_lighting: |-
+    <% if lighting_source == "average" %>
+    This series is constructed as the product of average fuel prices and average lighting efficiencies, weighted by available lighting technologies over time (candles, whale oil, gas, kerosene, and electricity).
+    <%- else %>
+    This series is constructed as the product of fuel prices and lighting efficiencies for <<lighting_source>> lighting technology across time.
+    <%- endif %>
+
+  description_key_price_of_lighting_rolling_avg: |-
+    We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
+
+  description_key_weeks_of_earnings_needed_for_reading: |-
+    We converted historical lighting prices (given as cost per 1 million lumen-hours) into the daily cost of reading light by scaling to 800 lumen-hours. We then expressed this daily cost relative to incomes by dividing it by real average weekly earnings from A Millennium of Macroeconomic Data, matched to the same price terms as the lighting series.
+
+  description_key_days_of_earnings_needed_for_reading: |-
+    Additionally, we converted the resulting value from weeks to days by multiplying the series by 5, assuming a five-day workweek.
+
   description_short_price_of_lighting: |-
     The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1600 lumen. This data is expressed in British pounds, adjusted for inflation.
 
   description_processing_weeks_of_earnings_needed_for_reading: |-
-    To construct this indicator, we converted the lighting price series (originally expressed as the cost per 1 million lumen-hours) into the daily cost of lighting suitable for reading, assuming 800 lumen-hours per day. This was done by dividing the original series by 1,000,000 and multiplying by 800.
+    To construct this indicator, we converted the lighting price series from Fouquet and Pearson (2006) and Fouquet (2026) (originally expressed as the cost per 1 million lumen-hours) into the daily cost of lighting suitable for reading, assuming 800 lumen-hours. This was done by dividing the original series by 1,000,000 and multiplying by 800.
 
-    We then divided this daily lighting cost by a series of real average weekly earnings. The earnings data come from the A Millennium of Macroeconomic Data dataset, extended with average weekly earnings from the UK Office for National Statistics, and are expressed in the same price terms as the lighting data.
+    We then divided this daily lighting cost by a series of real average weekly earnings. The earnings data come from the A Millennium of Macroeconomic Data dataset, and is expressed in the same price terms as the lighting data.
 
   description_short_days_of_earnings_needed_for_reading: |-
     Additionally, we converted weeks to days by multiplying the series by 5, assuming a 5-day workweek.
@@ -34,7 +50,7 @@ tables:
         short_unit: £
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:
-          - ""
+          - "{definitions.description_key_price_of_lighting}"
         presentation:
           grapher_config:
             note: This data is expressed in constant <<price_year>> British pounds.
@@ -49,7 +65,8 @@ tables:
         short_unit: £
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:
-          - ""
+          - "{definitions.description_key_price_of_lighting}"
+          - "{definitions.description_key_price_of_lighting_rolling_avg}"
         processing_level: major
         description_processing: |-
           We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
@@ -69,7 +86,7 @@ tables:
         short_unit: weeks
         description_short: "The number of weeks of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
         description_key:
-          - ""
+          - "{definitions.description_key_weeks_of_earnings_needed_for_reading}"
         processing_level: major
         description_processing: |-
           {definitions.description_processing_weeks_of_earnings_needed_for_reading}
@@ -84,7 +101,8 @@ tables:
         short_unit: days
         description_short: "The number of days of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
         description_key:
-          - ""
+          - "{definitions.description_key_weeks_of_earnings_needed_for_reading}"
+          - "{definitions.description_key_days_of_earnings_needed_for_reading}"
         processing_level: major
         description_processing: |-
           {definitions.description_processing_weeks_of_earnings_needed_for_reading}

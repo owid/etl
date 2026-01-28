@@ -176,6 +176,4 @@ def process_energy_consumption(tb: Table) -> Table:
     # Multply share_energy_consumption by 100 to convert to percentage
     tb["share_energy_consumption"] *= 100
 
-    print(tb)
-
     return tb
