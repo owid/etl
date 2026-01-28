@@ -38,12 +38,12 @@ dimensions:
     choices:
       - slug: both
         name: Total
-      - slug: female
-        name: Female
       - slug: male
         name: Male
+      - slug: female
+        name: Female
       - slug: male_vs_female
-        name: Females and males
+        name: Male and female
         description: Shown separately
 
 views:
