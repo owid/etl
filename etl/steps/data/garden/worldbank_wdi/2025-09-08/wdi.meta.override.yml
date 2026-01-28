@@ -2303,9 +2303,9 @@ tables:
         title: Number of people below working age
         unit: "people"
         short_unit: ""
-        # description_short: ""
-        # description_key:
-        #   - "{definitions.description_key_number_below_working_age}"
+        description_short: Population below working age (under 15 years old).
+        description_key:
+          - This data comes from UN World Population Prospects and it is a combination of population estimates and projections to match International Labour Organization data.
         presentation:
           topic_tags:
             - Work & Employment
@@ -2318,9 +2318,13 @@ tables:
         title: Labor force
         unit: "people"
         short_unit: ""
-        # description_short: ""
-        # description_key:
-        #   - "{definitions.description_key_labor_force}"
+        description_short: Working-age population (ages 15 and over) who are economically active (employed or unemployed).
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          We calculated the labor force as the labor force participation rate (coming from ILO Modelled Estimates via World Bank) multiplied by the population over age 15 (coming from UN World Population Prospects).
         presentation:
           topic_tags:
             - Work & Employment
@@ -2333,9 +2337,13 @@ tables:
         title: Number of employed people
         unit: "people"
         short_unit: ""
-        # description_short: ""
-        # description_key:
-        #   - "{definitions.description_key_number_employed}"
+        description_short: Working-age population (ages 15 and over) who are employed.
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          We calculated the number of employed people as the employment-to-population ratio (coming from ILO Modelled Estimates via World Bank) multiplied by the population over age 15 (coming from UN World Population Prospects).
         presentation:
           topic_tags:
             - Work & Employment
@@ -2348,9 +2356,13 @@ tables:
         title: Number of unemployed people
         unit: "people"
         short_unit: ""
-        # description_short: ""
-        # description_key:
-        #   - "{definitions.description_key_number_unemployed}"
+        description_short: Working-age population (ages 15 and over) who are unemployed.
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          We calculated the number of unemployed people as the unemployment rate (coming from ILO Modelled Estimates via World Bank) multiplied by the labor force. The labor force was calculated as the labor force participation rate (coming from ILO Modelled Estimates via World Bank) multiplied by the population over age 15 (coming from UN World Population Prospects).
         presentation:
           topic_tags:
             - Work & Employment
@@ -2363,9 +2375,13 @@ tables:
         title: Number of people out of the labor force
         unit: "people"
         short_unit: ""
-        # description_short: ""
-        # description_key:
-        #   - "{definitions.description_key_number_out_of_labor_force}"
+        description_short: Working-age population (ages 15 and over) who are not economically active (not employed and not unemployed).
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          We calculated the number of people out of the labor force as the total population (coming from UN World Population Prospects) minus the labor force and the population below working age (also from UN World Population Prospects). The labor force was calculated as the labor force participation rate (coming from ILO Modelled Estimates via World Bank) multiplied by the population over age 15 (coming from UN World Population Prospects).
         presentation:
           topic_tags:
             - Work & Employment
