@@ -90,6 +90,16 @@ etl:
       entrypoint: app_pages/fasttrack/app.py
       icon: ":material/fast_forward:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
+    mdim_creator:
+      title: "MDIM Creator"
+      alias: mdim-creator
+      entrypoint: app_pages/mdim_creator/app.py
+      icon: ":material/grid_view:"
+      image_url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400"
+      description: "Create MDIMs with guided wizard - select data, map dimensions, generate code."
+      disable:
+        "production": True
+        "staging": True
 
 sections:
   - title: "Update"
