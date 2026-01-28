@@ -144,9 +144,10 @@ def process_ember_data(tb_ember: Table) -> Table:
     # In EI data, there is a variable "Geo Biomass Other", which combines all other renewables.
     # In Ember data, "other renewables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
-    tb_ember["other_renewables_including_bioenergy_generation__twh"] = (
-        tb_ember["other_renewables_excluding_bioenergy_generation__twh"] + tb_ember["bioenergy_generation__twh"]
-    )
+    # Instead of simply summing them, we allow one of them to be missing, otherwise, we miss significant data; for example, UK has "Other renewables" data until 2019, and none afterwards.
+    tb_ember["other_renewables_including_bioenergy_generation__twh"] = tb_ember[
+        ["other_renewables_excluding_bioenergy_generation__twh", "bioenergy_generation__twh"]
+    ].sum(axis=1, min_count=1)
 
     # Create a new variable for solar and wind generation.
     tb_ember["solar_and_wind_generation__twh"] = tb_ember["solar_generation__twh"] + tb_ember["wind_generation__twh"]
