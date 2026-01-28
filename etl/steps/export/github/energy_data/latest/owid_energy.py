@@ -131,6 +131,7 @@ Additionally, to construct region aggregates and indicators per capita and per G
 
 - 2026-01-26:
   - Update Ember's yearly electricity data, after they updated their European electricity data.
+  - Fixed a few issues in aggregate regions related to how Ember's data is combined with the Energy Institute's Statistical Review of World Energy.
 - 2026-01-09:
   - Updated Ember's yearly electricity data.
   - Fixed a few small issues (related to "Other *" regions coming from the Energy Institute's Statistical Review of World Energy).

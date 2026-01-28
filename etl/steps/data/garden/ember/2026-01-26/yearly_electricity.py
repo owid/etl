@@ -433,6 +433,9 @@ def add_region_aggregates(tb: Table) -> Table:
         tb=tb,
         index_columns=["country", "year", "variable", "unit", "category", "subcategory"],
         ignore_overlaps_of_zeros=True,
+        min_num_countries_informed=5,
+        min_frac_countries_informed=0.8,
+        min_num_values_per_year=1,
     )
 
     # Recalculate share variables for regions.
@@ -477,7 +480,7 @@ def add_region_aggregates(tb: Table) -> Table:
                 )
             ]
             .groupby(["country", "year"])
-            .agg({"value": "sum"})["value"]
+            .agg({"value": lambda x: x.sum(skipna=False)})["value"]
             - 100
         )
         < 1
@@ -547,37 +550,11 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
 
 def fix_incomplete_aggregates(tables):
     # Prior to 2000, only EU countries have data. All other aggregates are incomplete, and show a spurious jump between 1999 and 2000. So, we will remove the data of all aggregates prior to 2000, except EU.
-    # Uncomment to visually inspect this jump:
-    # regions_to_plot = ["Europe", "European Union (27)"]
-    # import plotly.express as px
-    # for table_name in tables:
-    #     t = tables[table_name].reset_index()
-    #     for c in t.drop(columns=["country", "year"]).columns:
-    #         px.line(t[t["country"].isin(regions_to_plot)], x="year", y=c, color="country", markers=True, title=c).show()
     regions_to_remove = [region for region in REGIONS if region != "European Union (27)"]
     for table_name in tables:
         tables[table_name].loc[
             (tables[table_name].index.get_level_values(0).isin(regions_to_remove))
             & (tables[table_name].index.get_level_values(1) < 2000),
-            :,
-        ] = None
-
-    # The data for many regions presents a big drop in the latest year, simply because many countries are not informed.
-    # This can even happen in the latest 2 years (e.g. for Africa).
-    # TODO: A better solution for this is to impose a minimum fraction of informed countries in each region. Consider implementing that. For now, remove the last two years (conservative approach).
-    # Assert that this drop exists, and remove the last data point for regions.
-    # NOTE: Again, the EU is complete, so we can keep this region.
-    regions_to_remove = [region for region in REGIONS if region != "European Union (27)"]
-    error = (
-        "Expected a big drop in the last data point for regions (because of limited data availability)."
-        "If that is no longer the case, remove this part of the code and keep the last data points for regions."
-    )
-    assert tables["capacity"].loc["Africa"]["renewables__gw"].diff().iloc[-1] < -29, error
-    for table_name in tables:
-        latest_year = tables[table_name].reset_index()["year"].max()
-        tables[table_name].loc[
-            (tables[table_name].index.get_level_values(0).isin(regions_to_remove))
-            & (tables[table_name].index.get_level_values(1).isin([latest_year, latest_year - 1])),
             :,
         ] = None
 
@@ -625,6 +602,25 @@ def run() -> None:
 
     # Remove data for aggregate regions with incomplete data.
     fix_incomplete_aggregates(tables)
+
+    ####################################################################################################################
+    # 2026-01-26 Since the EU has data for 2025, but not other European countries, the aggregates for Europe and High-income countries present abrupt jumps between 2024 and 2025.
+    # Hence we remove the data for 2025 for these regions.
+    error = "Expected jump in Europe wind generation (and other variables in the latest year). They have changed. Inspect and consider removing this code."
+    assert tables["electricity_generation"].loc["Europe"]["wind__twh"].diff().iloc[-1] < -14, error
+    for table_name in tables:
+        latest_year = tables[table_name].reset_index()["year"].max()
+        for column in tables[table_name].columns:
+            for region in ["Europe", "High-income countries"]:
+                tables[table_name].loc[(region, latest_year), column] = None
+
+    # For some reason, Europe's "other_renewables" also has poor coverage in 2024.
+    error = "Expected poor data coverage of other renewables for Europe in 2024. Data has changed; consider removing this code."
+    _tb = tables["electricity_generation"].dropna(subset="other_renewables__twh").reset_index()
+    assert len(set(_tb[_tb["year"] == 2023]["country"])) > 170, error
+    assert len(set(_tb[_tb["year"] == 2024]["country"])) < 84, error
+    tables["electricity_generation"].loc[("Europe", 2024), ["other_renewables__twh", "other_renewables__pct"]] = None
+    ####################################################################################################################
 
     # Combine all tables into one.
     tb_combined = combine_yearly_electricity_data(tables=tables)
