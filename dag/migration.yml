@@ -95,6 +95,17 @@ steps:
   data://grapher/un/2025-07-03/refugee_data:
     - data://garden/un/2025-07-03/refugee_data
 
+
+    # IDMC Internal Displacement Data (2025 update)
+  data://meadow/idmc/2026-01-19/internal_displacement:
+    - snapshot://idmc/2026-01-19/internal_displacement.csv
+  data://garden/idmc/2026-01-19/internal_displacement:
+    - data://meadow/idmc/2026-01-19/internal_displacement
+    - data://garden/demography/2024-07-15/population
+  data://grapher/idmc/2026-01-19/internal_displacement:
+    - data://garden/idmc/2026-01-19/internal_displacement
+
+
   #
   # UNICEF child migration data (up to 2024)
   #
@@ -106,3 +117,4 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/unicef/2026-01-07/child_migration:
     - data://garden/unicef/2026-01-07/child_migration
+
