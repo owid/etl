@@ -25,7 +25,7 @@ dimensions:
         description: "Macroplastic debris that escapes into the environment"
       - slug: "total_by_type"
         name: "Total by type"
-        description: "Total macroplastic pollution"
+        description: "Total macroplastic pollution by type"
   - slug: "emissions_source"
     name: "Pollution source"
     choices:
@@ -47,6 +47,9 @@ dimensions:
       - slug: "rejects"
         name: "Rejects"
         description: "Pollution from sorting and recycling processes"
+      - slug: "total_by_source"
+        name: "Total by source"
+        description: "Total macroplastic pollution by source"
   - slug: "measure"
     name: "Measure"
     choices:
