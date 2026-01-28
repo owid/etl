@@ -414,6 +414,8 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
     Returns:
         Tuple of (success, message)
     """
+    r2_error_msg = None
+
     try:
         # First, prune R2 files for this server
         log.info("Pruning R2 files", server=server_name)
@@ -429,7 +431,8 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         )
 
         if r2_result.returncode != 0:
-            # Log warning but continue with MySQL reset - R2 purge failure shouldn't block DB reset
+            # Store error but continue with MySQL reset - R2 purge failure shouldn't block DB reset
+            r2_error_msg = f"R2 purge failed: {r2_result.stderr}"
             log.warning(
                 "R2 purge failed but continuing with MySQL reset",
                 error=r2_result.stderr,
@@ -483,22 +486,32 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
             log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=mysql_result["stdout"])
             return False, error_msg
 
-        # Check rsync result (non-critical)
+        # Check rsync result
         rsync_result = results["rsync"]
+        errors = []
+
         if rsync_result["returncode"] != 0:
-            log.warning(
-                "rsync failed but MySQL refresh completed successfully",
+            log.error(
+                "rsync failed",
                 error=rsync_result["stderr"],
                 server=server_name,
                 stdout=rsync_result["stdout"],
             )
-            success_msg = f"MySQL database successfully refreshed for {server_name} (rsync from master failed)"
+            errors.append(f"rsync from master failed: {rsync_result['stderr']}")
         else:
             log.info("ETL data successfully synced from master", server=server_name)
-            success_msg = f"MySQL database successfully refreshed and ETL data synced for {server_name}"
 
-        log.info("MySQL reset completed", server=server_name)
-        return True, success_msg
+        # Add R2 error if it occurred
+        if r2_error_msg:
+            errors.append(r2_error_msg)
+
+        # If there are errors, return failure
+        if errors:
+            error_msg = "; ".join(errors)
+            return False, f"MySQL refresh completed but errors occurred: {error_msg}"
+
+        log.info("MySQL reset completed successfully", server=server_name)
+        return True, f"MySQL database successfully refreshed and ETL data synced for {server_name}"
 
     except subprocess.TimeoutExpired:
         error_msg = "Unexpected timeout in MySQL reset"
