@@ -17,8 +17,7 @@ STACKED_VIEW_CONFIG = {
     "hasMapTab": False,
     "tab": "chart",
     "chartTypes": ["StackedDiscreteBar"],
-    "hasRelativeToggle": True,
-    "stackMode": "absolute",
+    "hideRelativeToggle": False,
 }
 
 # Define dimensions for all variables
