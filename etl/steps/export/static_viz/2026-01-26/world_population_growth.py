@@ -30,17 +30,7 @@ def run() -> None:
     tb_full_hist = world_hist[["year", "population_historical", "growth_rate_historical"]].copy()
 
     # Filter historical data to only include specific years before 1950
-    years_before_1950_to_keep = [
-        1700,
-        1750,
-        1800,
-        1850,
-        1900,
-        1910,
-        1920,
-        1930,
-        1940,
-    ]
+    years_before_1950_to_keep = [1700, 1750, 1800, 1850, 1900, 1925]
     tb_hist_filtered = tb_full_hist[
         (tb_full_hist["year"].isin(years_before_1950_to_keep)) | (tb_full_hist["year"] >= 1950)
     ][["year", "population_historical"]].copy()
@@ -84,8 +74,8 @@ def run() -> None:
     tb = tb[(tb["year"] >= 1700) & (tb["year"] <= 2100)].copy()
 
     # Omit growth rates for years marked as "Omitted for smoothing" in the spreadsheet (1750, 1930, 1950)
-    tb.loc[tb["year"].isin([1750, 1930, 1950]), "growth_rate"] = np.nan
-    tb.loc[tb["year"].isin([1750, 1930, 1950]), "note"] = "Growth rate omitted for smoothing"
+    # tb.loc[tb["year"].isin([1750, 1930, 1950]), "growth_rate"] = np.nan
+    # tb.loc[tb["year"].isin([1750, 1930, 1950]), "note"] = "Growth rate omitted for smoothing"
 
     # Convert population to billions
     tb["population_billions"] = tb["population"] / 1e9
@@ -329,6 +319,11 @@ def run() -> None:
 
     ds_export = create_dataset(output_dir, tables=[tb])
     ds_export.save()
+
+    # Save CSV file
+    csv_path = output_dir / "world_population_growth_1700_2100.csv"
+    tb.to_csv(csv_path, index=False)
+    log.info(f"Saved CSV to {csv_path}")
 
     # Save charts AFTER dataset is saved (so they don't get deleted)
     output_path = output_dir / "world_population_growth_1700_2100.svg"
