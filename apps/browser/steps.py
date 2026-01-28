@@ -1,27 +1,29 @@
-#
-#  steps.py
-#  Step browser for etlr command
-#
+"""Step browser with popularity ranking and caching."""
 
 import json
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING
 
-from etl.browser.commands import DEFAULT_COMMANDS
-from etl.browser.core import browse_items, filter_items
-from etl.browser.scoring import create_ranker, extract_version_from_uri
+from apps.browser.core import filter_items
+from apps.browser.scoring import create_ranker, extract_version_from_uri
 from etl.dag_helpers import graph_nodes
 
+if TYPE_CHECKING:
+    from apps.browser.core import Ranker
+
 # Simple type alias - avoids importing heavy etl.steps module
-DAG = Dict[str, Set[str]]
+DAG = dict[str, set[str]]
 
 # Popularity cache TTL in seconds (1 hour)
 POPULARITY_CACHE_TTL = 3600
 
+# Maximum number of history entries to cache
+MAX_HISTORY_ENTRIES = 10
 
-def get_all_steps(dag: DAG, private: bool = False) -> List[str]:
+
+def get_all_steps(dag: DAG, private: bool = False) -> list[str]:
     """Get all step URIs from the DAG.
 
     If private=False, filter out private steps.
@@ -54,7 +56,7 @@ def get_dag_max_mtime(dag_path: Path) -> float:
     return max_mtime
 
 
-def load_cached_steps(dag_path: Path, private: bool) -> Optional[List[str]]:
+def load_cached_steps(dag_path: Path, private: bool) -> list[str] | None:
     """Load steps from cache if valid (no DAG files have changed).
 
     Returns cached steps list, or None if cache is invalid/missing.
@@ -85,7 +87,7 @@ def load_cached_steps(dag_path: Path, private: bool) -> Optional[List[str]]:
         return None
 
 
-def save_step_cache(dag_path: Path, private: bool, steps: List[str]) -> None:
+def save_step_cache(dag_path: Path, private: bool, steps: list[str]) -> None:
     """Save steps to cache for instant startup next time."""
     from etl import paths
 
@@ -107,7 +109,7 @@ def save_step_cache(dag_path: Path, private: bool, steps: List[str]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def extract_dataset_slug(uri: str) -> Optional[str]:
+def extract_dataset_slug(uri: str) -> str | None:
     """Extract dataset slug from step URI for popularity lookup.
 
     Converts URI like 'data://grapher/who/2024-01-15/gho' to 'who/2024-01-15/gho'.
@@ -134,7 +136,7 @@ def extract_dataset_slug(uri: str) -> Optional[str]:
     return None
 
 
-def load_popularity_cache() -> Tuple[Dict[str, float], bool]:
+def load_popularity_cache() -> tuple[dict[str, float], bool]:
     """Load popularity data from cache.
 
     Returns:
@@ -168,7 +170,7 @@ def load_popularity_cache() -> Tuple[Dict[str, float], bool]:
         return {}, True
 
 
-def save_popularity_cache(data: Dict[str, float]) -> None:
+def save_popularity_cache(data: dict[str, float]) -> None:
     """Save popularity data to cache."""
     from etl import paths
 
@@ -186,7 +188,53 @@ def save_popularity_cache(data: Dict[str, float]) -> None:
         pass  # Silently fail - cache is optional
 
 
-def fetch_popularity_data(steps: List[str]) -> Dict[str, float]:
+def load_history_cache() -> list[str]:
+    """Load browser history from cache.
+
+    Returns:
+        List of previous search queries (most recent last), limited to MAX_HISTORY_ENTRIES.
+    """
+    from etl import paths
+
+    cache_file = paths.HISTORY_CACHE_FILE
+    if not cache_file.exists():
+        return []
+
+    try:
+        with open(cache_file) as f:
+            cache = json.load(f)
+        history = cache.get("history", [])
+        # Ensure it's a list of strings and limit size
+        if isinstance(history, list):
+            return [h for h in history if isinstance(h, str)][-MAX_HISTORY_ENTRIES:]
+        return []
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def save_history_cache(history: list[str]) -> None:
+    """Save browser history to cache.
+
+    Args:
+        history: List of search queries (most recent last).
+    """
+    from etl import paths
+
+    cache_file = paths.HISTORY_CACHE_FILE
+    try:
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Keep only the last MAX_HISTORY_ENTRIES
+        trimmed_history = history[-MAX_HISTORY_ENTRIES:]
+
+        cache = {"history": trimmed_history}
+        with open(cache_file, "w") as f:
+            json.dump(cache, f)
+    except OSError:
+        pass  # Silently fail - cache is optional
+
+
+def fetch_popularity_data(steps: list[str]) -> dict[str, float]:
     """Fetch popularity data from Datasette for given steps.
 
     Args:
@@ -213,8 +261,8 @@ def fetch_popularity_data(steps: List[str]) -> Dict[str, float]:
 
 
 def refresh_popularity_cache_async(
-    steps: List[str],
-    live_data: Optional[Dict[str, float]] = None,
+    steps: list[str],
+    live_data: dict[str, float] | None = None,
 ) -> None:
     """Refresh popularity cache in background thread.
 
@@ -238,7 +286,7 @@ def refresh_popularity_cache_async(
     thread.start()
 
 
-def create_step_ranker(popularity_data: Dict[str, float]) -> Callable[[str, List[str]], List[str]]:
+def create_step_ranker(popularity_data: dict[str, float]) -> "Ranker":
     """Create a ranker for step browser results.
 
     Uses lexicographic sorting:
@@ -256,80 +304,6 @@ def create_step_ranker(popularity_data: Dict[str, float]) -> Callable[[str, List
         popularity_data=popularity_data,
         slug_extractor=extract_dataset_slug,
         version_extractor=extract_version_from_uri,
-    )
-
-
-def browse_steps(
-    dag: Optional[DAG] = None,
-    private: bool = False,
-    dag_loader: Optional[Callable[[], DAG]] = None,
-    dag_path: Optional[Path] = None,
-) -> Tuple[Optional[str], bool]:
-    """Interactive step browser using prompt_toolkit.
-
-    Args:
-        dag: Pre-loaded DAG (if available)
-        private: Whether to include private steps
-        dag_loader: Callable that returns DAG (for async loading)
-        dag_path: Path to DAG file (for caching)
-
-    Returns:
-        Tuple of (pattern_or_step, is_exact_match):
-        - If user presses Enter: (current_text, False) to run all matches
-        - If user selects a step: (step_uri, True) to run just that step
-        - If user cancels: (None, False)
-    """
-    # Load popularity cache for ranking (fast startup, graceful degradation)
-    # Use a mutable dict so background refresh can update it for live ranking updates
-    cached_popularity, is_stale = load_popularity_cache()
-    popularity_data: Dict[str, float] = dict(cached_popularity)
-
-    # If dag is provided directly, use it immediately
-    if dag is not None:
-        cached_items = get_all_steps(dag, private=private)
-        items_loader = lambda: cached_items  # noqa: E731
-        on_items_loaded = None
-
-        # Refresh popularity in background if stale (will update popularity_data in-place)
-        if is_stale:
-            refresh_popularity_cache_async(cached_items, live_data=popularity_data)
-    elif dag_loader is not None:
-        # Try loading from cache first (instant startup)
-        cached_items = load_cached_steps(dag_path, private) if dag_path else None
-
-        def items_loader() -> List[str]:
-            loaded_dag = dag_loader()
-            return get_all_steps(loaded_dag, private=private)
-
-        def on_items_loaded(items: List[str]) -> None:
-            if dag_path:
-                save_step_cache(dag_path, private, items)
-            # Refresh popularity in background if stale (triggered after items load)
-            if is_stale:
-                refresh_popularity_cache_async(items, live_data=popularity_data)
-
-        # If we have cached steps but stale popularity, refresh popularity now
-        # (on_items_loaded won't be called if cached_items is used)
-        if cached_items is not None and is_stale:
-            refresh_popularity_cache_async(cached_items, live_data=popularity_data)
-    else:
-        raise ValueError("Either dag or dag_loader must be provided")
-
-    # Create ranker with mutable popularity_data dict
-    # Ranker reads from this dict each time, so it picks up background updates on next keystroke
-    ranker = create_step_ranker(popularity_data)
-
-    return browse_items(
-        items_loader=items_loader,
-        prompt="etlr> ",
-        loading_message="Loading steps...",
-        empty_message="No steps found in DAG.",
-        item_noun="step",
-        item_noun_plural="steps",
-        cached_items=cached_items,
-        on_items_loaded=on_items_loaded,
-        rank_matches=ranker,
-        commands=DEFAULT_COMMANDS,
     )
 
 

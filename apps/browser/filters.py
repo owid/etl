@@ -1,11 +1,7 @@
-#
-#  filters.py
-#  Filter parsing and matching for browser UI
-#
+"""Filter parsing for browser (n:namespace, c:channel, v:version, d:dataset)."""
 
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -16,13 +12,13 @@ class StepPath:
     This is a lightweight alternative to CatalogPath that avoids heavy imports.
     """
 
-    channel: Optional[str] = None
-    namespace: Optional[str] = None
-    version: Optional[str] = None
-    dataset: Optional[str] = None
+    channel: str | None = None
+    namespace: str | None = None
+    version: str | None = None
+    dataset: str | None = None
 
     @classmethod
-    def from_uri(cls, uri: str) -> Optional["StepPath"]:
+    def from_uri(cls, uri: str) -> "StepPath | None":
         """Parse a step URI into components.
 
         Args:
@@ -71,9 +67,9 @@ FILTER_PATTERN = re.compile(r"\b(n|namespace|c|channel|v|version|d|dataset):(\S*
 class ParsedInput:
     """Parsed user input with filters and search terms."""
 
-    filters: Dict[str, str] = field(default_factory=dict)  # {attribute: value}
-    search_terms: List[str] = field(default_factory=list)  # remaining search terms
-    filter_spans: List[Tuple[int, int]] = field(default_factory=list)  # (start, end) for highlighting
+    filters: dict[str, str] = field(default_factory=dict)  # {attribute: value}
+    search_terms: list[str] = field(default_factory=list)  # remaining search terms
+    filter_spans: list[tuple[int, int]] = field(default_factory=list)  # (start, end) for highlighting
 
 
 def parse_filters(text: str) -> ParsedInput:
@@ -92,8 +88,8 @@ def parse_filters(text: str) -> ParsedInput:
         >>> parse_filters("c:garden v:2024 energy")
         ParsedInput(filters={"channel": "garden", "version": "2024"}, search_terms=["energy"], ...)
     """
-    filters: Dict[str, str] = {}
-    filter_spans: List[Tuple[int, int]] = []
+    filters: dict[str, str] = {}
+    filter_spans: list[tuple[int, int]] = []
 
     for match in FILTER_PATTERN.finditer(text):
         prefix = match.group(1).lower()
@@ -112,7 +108,7 @@ def parse_filters(text: str) -> ParsedInput:
     return ParsedInput(filters=filters, search_terms=search_terms, filter_spans=filter_spans)
 
 
-def matches_filters(path: StepPath, filters: Dict[str, str]) -> bool:
+def matches_filters(path: StepPath, filters: dict[str, str]) -> bool:
     """Check if a StepPath matches all filters.
 
     Args:
@@ -143,7 +139,7 @@ def matches_filters(path: StepPath, filters: Dict[str, str]) -> bool:
     return True
 
 
-def get_step_segment_positions(item: str) -> Dict[str, Tuple[int, int]]:
+def get_step_segment_positions(item: str) -> dict[str, tuple[int, int]]:
     """Get start/end positions for each segment of a step URI.
 
     Args:
@@ -164,7 +160,7 @@ def get_step_segment_positions(item: str) -> Dict[str, Tuple[int, int]]:
     if len(parts) < 4:
         return {}
 
-    segments: Dict[str, Tuple[int, int]] = {}
+    segments: dict[str, tuple[int, int]] = {}
     pos = protocol_end
 
     segment_names = ["channel", "namespace", "version", "dataset"]
@@ -178,7 +174,7 @@ def get_step_segment_positions(item: str) -> Dict[str, Tuple[int, int]]:
     return segments
 
 
-def find_filter_match_spans(item: str, filters: Dict[str, str]) -> List[Tuple[int, int]]:
+def find_filter_match_spans(item: str, filters: dict[str, str]) -> list[tuple[int, int]]:
     """Find positions of filter-matched segments in a step URI.
 
     Args:
@@ -195,7 +191,7 @@ def find_filter_match_spans(item: str, filters: Dict[str, str]) -> List[Tuple[in
     if not segments:
         return []
 
-    spans: List[Tuple[int, int]] = []
+    spans: list[tuple[int, int]] = []
 
     for attr, filter_value in filters.items():
         if attr not in segments:
@@ -217,7 +213,7 @@ def find_filter_match_spans(item: str, filters: Dict[str, str]) -> List[Tuple[in
     return spans
 
 
-def apply_filters(items: List[str], filters: Dict[str, str]) -> List[str]:
+def apply_filters(items: list[str], filters: dict[str, str]) -> list[str]:
     """Filter items by step path attributes.
 
     Args:
@@ -247,12 +243,12 @@ def apply_filters(items: List[str], filters: Dict[str, str]) -> List[str]:
 class FilterOptions:
     """Cached unique values for each filterable attribute."""
 
-    channels: List[str] = field(default_factory=list)
-    namespaces: List[str] = field(default_factory=list)
-    versions: List[str] = field(default_factory=list)
-    datasets: List[str] = field(default_factory=list)
+    channels: list[str] = field(default_factory=list)
+    namespaces: list[str] = field(default_factory=list)
+    versions: list[str] = field(default_factory=list)
+    datasets: list[str] = field(default_factory=list)
 
-    def get(self, attr: str) -> List[str]:
+    def get(self, attr: str) -> list[str]:
         """Get options for a given attribute name."""
         mapping = {
             "channel": self.channels,
@@ -263,7 +259,7 @@ class FilterOptions:
         return mapping.get(attr, [])
 
 
-def extract_filter_options(items: List[str]) -> FilterOptions:
+def extract_filter_options(items: list[str]) -> FilterOptions:
     """Extract unique values for each filterable attribute from items.
 
     Args:
@@ -272,10 +268,10 @@ def extract_filter_options(items: List[str]) -> FilterOptions:
     Returns:
         FilterOptions with sorted unique values for each attribute.
     """
-    channels: Dict[str, int] = {}
-    namespaces: Dict[str, int] = {}
-    versions: Dict[str, int] = {}
-    datasets: Dict[str, int] = {}
+    channels: dict[str, int] = {}
+    namespaces: dict[str, int] = {}
+    versions: dict[str, int] = {}
+    datasets: dict[str, int] = {}
 
     for item in items:
         path = StepPath.from_uri(item)
@@ -292,7 +288,7 @@ def extract_filter_options(items: List[str]) -> FilterOptions:
             datasets[path.dataset] = datasets.get(path.dataset, 0) + 1
 
     # Sort by frequency (most common first), then alphabetically
-    def sort_by_freq(d: Dict[str, int]) -> List[str]:
+    def sort_by_freq(d: dict[str, int]) -> list[str]:
         return [k for k, _ in sorted(d.items(), key=lambda x: (-x[1], x[0]))]
 
     return FilterOptions(
@@ -314,7 +310,7 @@ class ActiveFilter:
     end: int  # position in input string
 
 
-def get_active_filter(text: str) -> Optional[ActiveFilter]:
+def get_active_filter(text: str) -> ActiveFilter | None:
     """Detect if user is currently typing a filter value.
 
     Returns information about the active filter if the cursor is at the end

@@ -153,9 +153,9 @@ def generate_title_by_type(view):
 
     # Map measure to title text
     measure_text = {
-        "total": "Plastic waste emissions by type",
-        "per_person": "Plastic waste emissions per person by type",
-    }.get(measure, "Plastic waste emissions by type")
+        "total": "Plastic waste pollution by type",
+        "per_person": "Plastic waste pollution per person by type",
+    }.get(measure, "Plastic waste pollution by type")
 
     # Add source context if not "all"
     if source and source != "all":
@@ -225,11 +225,11 @@ def run() -> None:
         },
         "description_short": "{subtitle}",
         "description_key": [
-            "These emissions refer to macroplastic, meaning physical plastic pieces larger than 5 millimetres.",
-            "Total plastic emissions are the sum of debris (unburned plastic that escapes into the environment as physical items) and plastic burned in open, uncontrolled fires.",
-            "Emissions are plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.",
-            "Emissions are attributed to five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites (open dumps), and rejects from sorting and reprocessing.",
-            "This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include emissions from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.",
+            "Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.",
+            "Total plastic pollution is the sum of debris (unburned plastic that escapes into the environment as physical items) and plastic burned in open, uncontrolled fires.",
+            "The data covers macroplastics — physical plastic pieces larger than 5 millimeters.",
+            "Plastic pollution is attributed to five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites (open dumps), and rejects from sorting and reprocessing.",
+            "This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include pollution from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.",
             "Values are model-based estimates and come with uncertainty. They should be interpreted as approximate estimates rather than exact measurements.",
         ],
     }
