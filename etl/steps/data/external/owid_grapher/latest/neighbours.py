@@ -20,19 +20,19 @@ def run() -> None:
         tb[col] = tb[col].apply(lambda x: x.split(";") if x else [])
 
     # Pick one neighbour list
-    COLUMN = "value_neighbours_balanced"
-    # "value_neighbours_border",  # Neighbors by border share
-    # "value_neighbours_balanced",  # Neighbors by balanced score (1:1 border/distance)
-    # "value_neighbours_distance",  # Neighbors by distance-weighted score (~2:1 distance/border)
-    # "value_neighbours_population",  # Neighbors by population
-    # "value_nearest_borders",  # Nearest countries by distance
+    COLUMN = "neighbours_2"
+    # "neighbours_1",  # Neighbors by border share
+    # "neighbours_2",  # Neighbors by balanced score (1:1 border/distance)
+    # "neighbours_3",  # Neighbors by distance-weighted score (~2:1 distance/border)
+    # "neighbours_4",  # Neighbors by population
+    # "neighbours_10",  # Nearest countries by distance
 
     tb = tb.rename(
         columns={
             "country": "entity",
             COLUMN: "value",
         }
-    )
+    )[["entity", "value"]]
 
     # Set index and name.
     tb = tb.format(["entity"], short_name="neighbours")
