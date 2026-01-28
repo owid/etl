@@ -445,7 +445,7 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         # SSH into the server and run commands in parallel
         # Disable host key checking for staging servers since they're ephemeral
         mysql_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
-        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -az --stats owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
+        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -az --stats -e \"ssh -o StrictHostKeyChecking=no\" owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
 
         log.info("Executing MySQL reset and rsync in parallel", server=server_name)
 
