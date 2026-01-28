@@ -214,6 +214,7 @@ def combine_ei_and_ember_data(tb_review, tb_ember):
     combined = tb_ember.copy()
 
     # Add unique EI columns to Ember (outer merge).
+    # Above, in sanity_check_inputs, we asserted that they are expected to be biofuel, coal, gas and oil consumption, as well as primary energy consumption.
     ei_unique_columns = sorted(set(tb_review.columns) - set(tb_ember.columns))
     combined = combined.merge(tb_review[["country", "year"] + ei_unique_columns], how="outer", on=["country", "year"])
 
