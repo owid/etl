@@ -67,8 +67,8 @@ definitions:
     - This includes what they spend in foreign countries (accommodation, food, transport, entertainment, shopping, cruises) plus what they pay foreign airlines.
     - A country with high outbound expenditure relative to inbound receipts has a tourism trade deficit — more money leaving than entering through tourism.
 
-  desc_key_employee: &desc_key_employee
-    - Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
+  note_employee: &note_employee |-
+    Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -99,7 +99,8 @@ tables:
         title: Employment in the tourism industries
         unit: persons
         description_short: Number of persons employed in tourism industries, including both employees and self-employed individuals.
-        description_key: *desc_key_employee
+        description_key:
+         - *note_employee
         display:
           numDecimalPlaces: 0
 
