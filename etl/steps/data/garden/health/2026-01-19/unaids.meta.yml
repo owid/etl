@@ -909,10 +909,10 @@ tables:
           title_public: "Tuberculosis patients who tested positive for HIV"
 
       condoms_distributed_per_1k:
-        title: Condoms distributed per 1,000 population
+        title: Condoms distributed and sold per 1,000 population
         unit: "condoms per 1,000 people"
         description_short: |-
-          The number of condoms distributed per 1,000 people in a given year, including free public-sector distribution, subsidized social marketing, and commercial sales.
+          The number of condoms distributed and sold per 1,000 people in a given year, including free public-sector distribution, subsidized social marketing, and commercial sales.
         display:
           numDecimalPlaces: 0
         description_from_producer: |-
@@ -929,7 +929,7 @@ tables:
           - |-
             Condoms are counted only once, even if they pass between distribution channels (for example, from public sector warehouses to NGOs or community workers).
         presentation:
-          title_public: "Condoms distributed per 1,000 population"
+          title_public: "Condoms distributed and sold per 1,000 population"
 
   gam_sex:
     variables:
