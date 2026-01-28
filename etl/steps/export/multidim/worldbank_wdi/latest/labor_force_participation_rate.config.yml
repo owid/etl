@@ -13,6 +13,7 @@ default_selection:
   - Syria
   - Uganda
   - United States
+originUrl: ourworldindata.org/work-employment
 
 default_dimensions:
   age_group: 15_plus
@@ -36,14 +37,14 @@ dimensions:
     slug: sex
     choices:
       - slug: both
-        name: Both
-      - slug: male
-        name: Male
+        name: Total
       - slug: female
         name: Female
+      - slug: male
+        name: Male
       - slug: male_vs_female
-        name: Male vs. female
-        group: Comparison by sex
+        name: Females and males
+        description: Shown separately
 
 views:
   - dimensions:
