@@ -144,14 +144,115 @@ def process_ember_data(tb_ember: Table) -> Table:
     # In EI data, there is a variable "Geo Biomass Other", which combines all other renewables.
     # In Ember data, "other renewables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
-    tb_ember["other_renewables_including_bioenergy_generation__twh"] = (
-        tb_ember["other_renewables_excluding_bioenergy_generation__twh"] + tb_ember["bioenergy_generation__twh"]
-    )
+    # Instead of simply summing them, we allow one of them to be missing, otherwise, we miss significant data; for example, UK has "Other renewables" data until 2019, and none afterwards.
+    tb_ember["other_renewables_including_bioenergy_generation__twh"] = tb_ember[
+        ["other_renewables_excluding_bioenergy_generation__twh", "bioenergy_generation__twh"]
+    ].sum(axis=1, min_count=1)
 
     # Create a new variable for solar and wind generation.
     tb_ember["solar_and_wind_generation__twh"] = tb_ember["solar_generation__twh"] + tb_ember["wind_generation__twh"]
 
     return tb_ember
+
+
+def sanity_check_inputs(tb_review, tb_ember):
+    # There are only 3 countries/regions (besides special EI regions) that are in the EI and not in Ember. They are Curacao, Netherlands Antilles, and USSR.
+    # And the data of the former two is all zero.
+    error = "Unexpected list of countries in EI that are not in Ember."
+    assert set([c for c in tb_review["country"] if "(EI)" not in c]) - set(
+        [c for c in tb_ember["country"] if "(Ember)" not in c]
+    ) == {"Curacao", "Netherlands Antilles", "USSR"}, error
+    error = "All data for Curacao and Netherlands Antilles was expected to be zero."
+    assert (
+        (
+            tb_review[tb_review["country"].isin(["Curacao", "Netherlands Antilles"])]
+            .fillna(0)
+            .drop(columns=["country", "year"])
+            == 0
+        )
+        .all()
+        .all()
+    ), error
+    # So the only country that we get from the EI is USSR; all other countries are in Ember.
+
+    # There are also 5 columns that are in EI and not in Ember.
+    error = "Unexpected columns found in EI and not found in Ember."
+    assert set(tb_review.columns) - set(tb_ember.columns) == {
+        "biofuels_consumption__twh",
+        "coal_consumption__twh",
+        "gas_consumption__twh",
+        "oil_consumption__twh",
+        "primary_energy_consumption__twh",
+    }, error
+
+    # There are also some columns that are only in Ember and not in EI.
+    error = "Unexpected columns found in Ember and not found in EI."
+    assert set(tb_ember.columns) - set(tb_review.columns) == {
+        "bioenergy_generation__twh",
+        "co2_intensity__gco2_kwh",
+        "other_renewables_excluding_bioenergy_generation__twh",
+        "total_demand__twh",
+        "total_emissions__mtco2",
+        "total_net_imports__twh",
+    }, error
+
+    # The majority of columns are informed in both EI and Ember.
+    # However, Ember's data starts in 1999 (for EU countries) and in 2000 (for the rest), whereas EI data starts earlier (in 1965 or 1985).
+    error = "EI data coverage has changed unexpectedly."
+    ei_coverage = {column: int(tb_review.dropna(subset=column)["year"].min()) for column in tb_review.columns}
+    assert set(ei_coverage.values()) == {1965, 1985}, error
+    error = "Ember data coverage has changed unexpectedly."
+    ember_coverage = {column: int(tb_ember.dropna(subset=column)["year"].min()) for column in tb_ember.columns}
+    assert set(ember_coverage.values()) == {1990, 2000}, error
+
+
+def combine_ei_and_ember_data(tb_review, tb_ember):
+    # Drop Curacao and Netherland Antilles, which have only zeros in the data.
+    tb_review = tb_review[~tb_review["country"].isin(["Curacao", "Netherlands Antilles"])].reset_index(drop=True)
+
+    # Initialize a combined table, which is a copy of Ember's table.
+    combined = tb_ember.copy()
+
+    # Add unique EI columns to Ember (outer merge).
+    # Above, in sanity_check_inputs, we asserted that they are expected to be biofuel, coal, gas and oil consumption, as well as primary energy consumption.
+    ei_unique_columns = sorted(set(tb_review.columns) - set(tb_ember.columns))
+    combined = combined.merge(tb_review[["country", "year"] + ei_unique_columns], how="outer", on=["country", "year"])
+
+    # Combine EI and Ember data, selecting only pre-2000 EI data and only non-EI specific regions. Prioritize Ember on overlapping values.
+    # This will automatically add the USSR data (which is fully contained in pre-2000 EI table).
+    ei_countries = [country for country in set(tb_review["country"]) if "(EI)" in country]
+    combined = combine_two_overlapping_dataframes(
+        df1=combined,
+        df2=tb_review[(tb_review["year"] < 2000) & ~(tb_review["country"].isin(ei_countries))],
+        index_columns=["country", "year"],
+    )
+
+    # Combine them again, for all years and only EI regions.
+    combined = combine_two_overlapping_dataframes(
+        df1=combined, df2=tb_review[(tb_review["country"].isin(ei_countries))], index_columns=["country", "year"]
+    )
+
+    # In the original Statistical Review data, countries that have no nuclear power had no data for nuclear generation.
+    # Ideally, missing data should mean "unknown", and therefore those missing values should be zero instead of nan.
+    # In the Statistical Review garden step, we filled out those nans with zeros, for country-years that certainly have no nuclear generation.
+    # The same issue occurs with Ember data: countries with no nuclear power have missing data for nuclear generation (e.g. Australia), instead of zeros.
+    # We could copy the function we used in the Statistical Review garden step here.
+    # But, to avoid repeating code, we will take all zeros in nuclear generation from the EI data as a new temporary column; then, we'll fill nans in the combined table with those zeros.
+    # NOTE: We don't need to do this for pre-2000 data, since we already combined Ember with pre-2000 EI data.
+    combined = combined.merge(
+        tb_review[(tb_review["nuclear_generation__twh"] == 0) & (tb_review["year"] >= 2000)][
+            ["country", "year", "nuclear_generation__twh"]
+        ],
+        on=["country", "year"],
+        how="outer",
+        suffixes=("", "_temp"),
+    )
+    combined["nuclear_generation__twh"] = combined["nuclear_generation__twh"].fillna(
+        combined["nuclear_generation__twh_temp"]
+    )
+    combined = combined.drop(columns=["nuclear_generation__twh_temp"])
+
+    return combined
 
 
 def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
@@ -459,6 +560,9 @@ def run() -> None:
     tb_review = process_statistical_review_data(tb_review=tb_review)
     tb_ember = process_ember_data(tb_ember=tb_ember)
 
+    # Sanity check inputs.
+    sanity_check_inputs(tb_review=tb_review, tb_ember=tb_ember)
+
     ####################################################################################################################
     # There is a big discrepancy between Oceania's oil generation from the Energy Institute and Ember.
     # Ember's oil generation is significantly larger. The reason seems to be that the Energy Institute's Statistical
@@ -504,8 +608,8 @@ def run() -> None:
     tb_ember.loc[(tb_ember["country"] == "Switzerland") & (tb_ember["year"] > 1999), "coal_generation__twh"] = 0
     ####################################################################################################################
 
-    # Combine both tables, giving priority to Ember data (on overlapping values).
-    combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_review, index_columns=["country", "year"])
+    # Combine EI and Ember data.
+    combined = combine_ei_and_ember_data(tb_review=tb_review, tb_ember=tb_ember)
 
     # Remove combined data for aggregate regions where Ember and the Statistical Review have a strong disagreement.
     # This way we avoid spurious jumps in the combined series.
@@ -519,22 +623,6 @@ def run() -> None:
 
     # Add "share" variables.
     combined = add_share_variables(combined=combined)
-
-    ####################################################################################################################
-    # There is a sudden drop in the share of fossil generation in 2023 for low-income countries (and hence a sudden increase in the share of renewables).
-    # This may be due mostly to Syria and North Korea, that have the largest fossil generation among low-income countries, and are not informed in 2023.
-    # For safety, assert that the issue is in the data, and if so, remove the aggregate for all columns (since those countries seem to be missing in almost all columns).
-    check = combined.loc[
-        (combined["country"].isin(["Low-income countries"])) & (combined["year"].isin([2022, 2023])),
-        "fossil_share_of_electricity__pct",
-    ]
-    error = "Low-income countries fossil generation used to drop by 35% from 2022 to 2023 (due to missing data). This issue may have been fixed, so, remove this temporary solution."
-    assert 100 * (check.iloc[-2] - check.iloc[-1]) / check.iloc[-2] > 35, error
-    combined.loc[
-        (combined["country"].isin(["Low-income countries"])) & (combined["year"] == 2023),
-        combined.drop(columns=["country", "year"]).columns,
-    ] = pd.NA
-    ####################################################################################################################
 
     # Format table conveniently.
     combined = combined.format(sort_columns=True, short_name=paths.short_name)
