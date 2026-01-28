@@ -82,49 +82,61 @@ tables:
       dom_tour_trips_total_overnight_vis_tourists:
         title: Domestic overnight trips
         unit: trips
-        description_short: Number of domestic trips by visitors who stay overnight.
-        description_key: *descr_key_domestic
+        description_short: Trips by residents within their own country that include at least one overnight stay.
+        description_key:
+          - *descr_key_domestic
+        presentation:
+          title_public: Domestic overnight tourism trips
+          grapher_config:
+            note: Each trip by the same person is counted separately. A domestic trip is travel within one's own country involving an overnight stay.
         display:
           numDecimalPlaces: 0
 
       dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
-        title: Domestic tourists staying in hotels and similar establishments
+        title: Local guests in hotels and similar establishments
         unit: guests
-        description_short: Number of domestic tourists who stay in hotels and similar establishments.
-        description_key: *descr_key_domestic
+        description_short: Domestic visitors who check in to hotels and similar accommodation establishments within their own country.
+        description_key:
+          - *descr_key_domestic
         display:
           numDecimalPlaces: 0
 
       employment_employed_persons_in_the_tour_ind_num:
         title: Employment in the tourism industries
         unit: persons
-        description_short: Number of persons employed in tourism industries, including both employees and self-employed individuals.
+        description_short: People working in tourism-related industries, including both employees and self-employed individuals. People with multiple jobs may be counted in multiple tourism sectors.
         description_key:
-         - *note_employee
+          - *note_employee
         display:
           numDecimalPlaces: 0
 
       in_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
-        title: Inbound tourists staying in hotels and similar establishments
+        title: Foreign guests staying in hotels and similar establishments
         unit: guests
-        description_short: Number of inbound tourists who stay in hotels and similar establishments.
-        description_key: *desc_key_arrivals
+        description_short: International visitors who check in to hotels and similar accommodation establishments.
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_overnight_vis_tourists:
-        title: Inbound arrivals of overnight tourists
+        title: Arrivals of tourists from abroad
         unit: arrivals
         description_short: Trips by people who arrive from abroad and stay overnight.
-        description_key: *desc_key_arrivals
+        description_key:
+          - *desc_key_arrivals
+        presentation:
+          grapher_config:
+            note: Each visit by the same person is counted separately. Before 2006, the US counted same-day trips from Canada only; after 2006, day trips from Mexico were also included.
         display:
           numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_same_day_vis_excur:
-        title: Inbound arrivals of same-day visitors
+        title: Same-day visitors arriving from other countries
         unit: arrivals
-        description_short: Number of trips by visitors who arrive and depart within the same day.
-        description_key: *desc_key_arrivals
+        description_short: Trips by visitors who arrive and depart within the same day. Each visit by the same person is counted separately.
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
@@ -132,7 +144,7 @@ tables:
         title: Inbound tourism expenditure on passenger transport
         unit: US dollars
         short_unit: $
-        description_short: Expenditures by inbound visitors on passenger transport services, including transportation to and from the destination as well as local transport within the destination country.
+        description_short: This captures fares paid to the country's airlines by foreign visitors, including airfares, excess baggage fees, and onboard purchases.
         description_key:
           - *desc_key_inbound_passenger_transport
         display:
@@ -142,7 +154,7 @@ tables:
         title: Inbound tourism expenditure on travel
         unit: US dollars
         short_unit: $
-        description_short: Expenditures by inbound visitors on goods and services acquired for their own use or to give away during their trip, including accommodation, food and beverage, entertainment, shopping, and other personal expenses.
+        description_short: This captures spending by foreign visitors on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
         description_key:
           - *desc_key_inbound_travel
         display:
@@ -152,41 +164,55 @@ tables:
         title: Total inbound tourism expenditure
         unit: US dollars
         short_unit: $
-        description_short: Total expenditures by inbound visitors, including both passenger transport and travel-related expenses.
+        description_short: This captures spending by foreign visitors on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines.
         description_key:
           - *desc_key_inbound_total
+        presentation:
+          title_public: International tourist expenditure within the country they visit
+          grapher_config:
+            note: Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
         display:
           numDecimalPlaces: 0
 
       in_tour_purpose_trips_by_business_overnight_vis_tourists:
-        title: Inbound trips by business overnight tourists
+        title: Arrivals of tourists from abroad for business purposes
         unit: trips
-        description_short: Number of trips by inbound tourists whose main purpose of travel is business-related and who stay overnight.
-        description_key: *descr_key_purpose
+        description_short: International trips where the main purpose is business-related and the visitor stays overnight.
+        description_key:
+          - *descr_key_purpose
+        presentation:
+          grapher_config:
+            note: The main purpose is defined as the purpose without which the trip would not have taken place.
         display:
           numDecimalPlaces: 0
 
       in_tour_purpose_trips_by_personal_overnight_vis_tourists:
-        title: Inbound trips by personal overnight tourists
+        title: Arrivals of tourists from abroad for personal purposes
         unit: trips
-        description_short: Number of trips by inbound tourists whose main purpose of travel is personal (leisure, visiting friends and relatives, health, etc.) and who stay overnight.
-        description_key: *descr_key_purpose
+        description_short: International trips where the main purpose is personal (leisure, visiting friends and relatives, health, etc.) and the visitor stays overnight.
+        description_key:
+          - *descr_key_purpose
+        presentation:
+          grapher_config:
+            note: The main purpose is defined as the purpose without which the trip would not have taken place.
         display:
           numDecimalPlaces: 0
 
       in_tour_purpose_trips_by_total_overnight_vis_tourists:
         title: Inbound trips by total overnight tourists
         unit: trips
-        description_short: Total number of trips by inbound tourists who stay overnight, regardless of the main purpose of travel.
-        description_key: *descr_key_purpose
+        description_short: International trips by tourists who stay overnight, regardless of the main purpose of travel.
+        description_key:
+          - *descr_key_purpose
         display:
           numDecimalPlaces: 0
 
       out_tour_departures_trips_total_overnight_vis_tourists:
         title: International tourist departures
         unit: departures
-        description_short: Number of trips by people who travel abroad and stay overnight.
-        description_key: *desc_key_departures
+        description_short: Trips by residents who travel abroad and stay overnight. Each trip abroad by the same person is counted separately.
+        description_key:
+          - *desc_key_departures
         display:
           numDecimalPlaces: 0
 
@@ -194,8 +220,9 @@ tables:
         title: Outbound tourism expenditure on passenger transport
         unit: US dollars
         short_unit: $
-        description_short: Expenditures by outbound visitors on passenger transport services, including transportation to and from the destination as well as local transport within the destination country.
-        description_key: *desc_key_outbound_passenger_transport
+        description_short: This captures fares paid to foreign airlines by the country's residents, including airfares, excess baggage fees, and onboard purchases.
+        description_key:
+          - *desc_key_outbound_passenger_transport
         display:
           numDecimalPlaces: 0
 
@@ -203,8 +230,9 @@ tables:
         title: Total outbound tourism expenditure
         unit: US dollars
         short_unit: $
-        description_short: Total expenditures by outbound visitors, including both passenger transport and travel-related expenses.
-        description_key: *desc_key_outbound_total
+        description_short: This captures spending by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines.
+        description_key:
+          - *desc_key_outbound_total
         display:
           numDecimalPlaces: 0
 
@@ -212,162 +240,171 @@ tables:
         title: Outbound tourism expenditure on travel
         unit: US dollars
         short_unit: $
-        description_short: Expenditures by outbound visitors on goods and services acquired for their own use or to give away during their trip, including accommodation, food and beverage, entertainment, shopping, and other personal expenses.
-        description_key: *desc_key_outbound_travel
+        description_short: This captures spending by a country's residents abroad on accommodation, food, local transport, entertainment, shopping, and cruise fares.
+        description_key:
+          - *desc_key_outbound_travel
         display:
           numDecimalPlaces: 0
 
       business_personal_ratio:
-        title: Ratio of arrivals for business and professional to personal purposes
+        title: Ratio of business to personal tourism arrivals
         unit: ratio
-        description_key: *descr_key_purpose
+        description_short: The ratio of international arrivals for business purposes to arrivals for personal purposes (leisure, visiting friends/relatives, health, etc.).
+        description_key:
+          - *descr_key_purpose
         display:
           numDecimalPlaces: 1
 
       inbound_tourism_by_region:
         title: International tourist arrivals by region of origin
         unit: arrivals
-        description_short: Trips by people who arrive from abroad and stay overnight.
+        description_short: International tourist arrivals broken down by the region where visitors reside.
         description_key:
           - *desc_key_arrivals
-          - The underlying premise behind this indicator is that the country linked to the arrival should correspond to the individual's country of residence.
-          - However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
+          - The country linked to the arrival should correspond to the individual's country of residence.
+          - However, some countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
         display:
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total:
         title: International tourists visiting from Africa
         unit: arrivals
-        description_short: Number of trips by people who arrive from Africa.
-        description_key: *desc_key_arrivals
+        description_short: International tourists arriving from countries in Africa (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total:
         title: International tourists visiting from the Americas
         unit: arrivals
-        description_short: Number of trips by people who arrive from the Americas.
-        description_key: *desc_key_arrivals
+        description_short: International tourists arriving from countries in the Americas (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total:
         title: International tourists visiting from East Asia and the Pacific
         unit: arrivals
-        description_short: Number of trips by people who arrive from East Asia and the Pacific.
-        description_key: *desc_key_arrivals
+        description_short: International tourists arriving from countries in East Asia and the Pacific (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total:
         title: International tourists visiting from Europe
         unit: arrivals
-        description_short: Number of trips by people who arrive from Europe.
-        description_key: *desc_key_arrivals
+        description_short: International tourists arriving from countries in Europe (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total:
         title: International tourists visiting from the Middle East
         unit: arrivals
-        description_short: Number of trips by people who arrive from the Middle East.
-        description_key: *desc_key_arrivals
+        description_short: International tourists arriving from countries in the Middle East (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total:
         title: International tourists visiting from South Asia
         unit: arrivals
-        description_short: Number of trips by people who arrive from South Asia.
-        description_key: *desc_key_arrivals
+        description_short: International tourists arriving from countries in South Asia (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 0
 
       inbound_outbound_tourism:
         title: Ratio of inbound to outbound tourist trips
         unit: ratio
-        description_short: Tourist trips refer to the number of trips made by individuals traveling abroad and staying overnight. A country with a ratio greater than one has more incoming than outgoing tourists (i.e. has more visitors than locals leaving).
+        description_short: The ratio of international arrivals to international departures (both overnight trips).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_departures
         display:
           numDecimalPlaces: 1
 
       same_day_tourist_ratio:
-        title: Ratio of same-day trips to tourist trips
+        title: Ratio of same-day to overnight tourist arrivals
         unit: ratio
-        description_short: Same-day trips are those by visitors who arrive and depart within the same day. Tourist trips are those by people who stay overnight. A country with a ratio greater than one has more trips by visitors who leave the same day than those that stay overnight.
-        description_key: *desc_key_arrivals
+        description_short: The ratio of same-day visitor arrivals to overnight tourist arrivals.
+        description_key:
+          - *desc_key_arrivals
         display:
           numDecimalPlaces: 1
 
       in_tour_arrivals_trips_total_overnight_vis_tourists_per_1000:
-        title: Inbound arrivals of tourists per 1,000 people
+        title: Arrivals of tourists from abroad per 1,000 people
         unit: arrivals per 1,000 people
-        description_short: Trips by people who arrive from abroad and stay overnight.
+        description_short: International tourist arrivals (overnight) per 1,000 people in the destination country's population.
         description_key:
           - *desc_key_arrivals
-          - Per "1,000 people" in the context of international refers to the calculation of trips per 1,000 individuals within the population of the country.
-          - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
-          - For instance, if there are "10 arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 instances of international arrivals.
-          - This indicator provides an estimate of tourism intensity in the country of reference.
+          - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the destination country.
+          - This enables standardized comparison across different population sizes and provides an estimate of tourism intensity.
+          - For instance, if there are "10 arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international arrivals.
         display:
           numDecimalPlaces: 1
 
       in_tour_arrivals_trips_total_same_day_vis_excur_per_1000:
-        title: Inbound arrivals of same-day visitors per 1,000 people
+        title: Arrivals of same-day visitors from abroad per 1,000 people
         unit: arrivals per 1,000 people
-        description_short: Number of trips by visitors who arrive and depart within the same day.
+        description_short: International same-day visitor arrivals per 1,000 people in the destination country's population.
         description_key:
           - *desc_key_arrivals
-          - Per "1,000 people" in the context of international same-day arrivals refers to the calculation of trips per 1,000 individuals within the population of the country.
-          - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
-          - For instance, if there are "10 same-day arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 instances of international same-day arrivals.
-          - This indicator provides an insight into the level of same-day travel in the country of reference.
+          - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the destination country.
+          - This enables standardized comparison across different population sizes and provides insight into the level of same-day travel.
+          - For instance, if there are "10 same-day arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international same-day arrivals.
         display:
           numDecimalPlaces: 1
 
       out_tour_departures_trips_total_overnight_vis_tourists_per_1000:
         title: International tourist departures per 1,000 people
         unit: departures per 1,000 people
-        description_short: Number of trips by people who travel abroad and stay overnight.
+        description_short: Number of trips by people who travel abroad and stay overnight per 1,000 people in the origin country's population.
         description_key:
           - *desc_key_departures
-          - Per "1,000 people" in the context of international departures refers to the calculation of trips per 1,000 individuals within the population of the country.
-          - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
-          - For instance, if there are "10 departures per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 instances of international departures.
-          - This indicator provides an estimate of outbound tourism intensity in the country of reference.
+          - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the origin country.
+          - This enables standardized comparison across different population sizes and provides an estimate of outbound tourism intensity.
+          - For instance, if there are "10 departures per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international departures.
         display:
           numDecimalPlaces: 1
 
       employment_employed_persons_in_the_tour_ind_num_per_1000:
         title: Employment in the tourism industries per 1,000 people
         unit: persons per 1,000 people
-        description_short: Number of persons employed in tourism industries, including both employees and self-employed individuals.
+        description_short: People working in tourism-related industries, including both employees and self-employed individuals, per 1,000 people in the country's population. People with multiple jobs may be counted in multiple tourism sectors.
         description_key:
           - *note_employee
-          - Per "1,000 people" in the context of employment in the tourism industries refers to the calculation of employed persons per 1,000 individuals within the population of the country.
-          - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
+          - Per "1,000 people" refers to the calculation of employed persons per 1,000 individuals within the population.
+          - This enables standardized comparison across different population sizes and provides an estimate of the significance of the tourism sector in terms of employment.
           - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
-          - This indicator provides an estimate of the significance of the tourism sector in terms of employment within the country of reference.
         display:
           numDecimalPlaces: 1
 
       dom_tour_trips_total_overnight_vis_tourists_per_person:
         title: Domestic overnight trips per person
         unit: trips per person
-        description_short: Number of domestic trips by visitors who stay overnight, per person in the population.
+        description_short: Domestic overnight trips per person in the country's population.
         description_key:
           - A domestic trip refers to the travel of a visitor from the time of leaving their usual residence until they return.
           - When an individual travels domestically multiple times within a year, each journey is counted as a separate trip.
-          - This indicator provides insights into the frequency of domestic overnight travel among the population, which can inform tourism development strategies and policies aimed at promoting local tourism.
+          - This indicator provides insights into the frequency of domestic overnight travel among the population.
         display:
           numDecimalPlaces: 2
 
       tour_ind_cap_accom_short_term_hotels_and_similar_isic_5510_length_of_stay_avg:
-        title: Average length of stay of tourists in hotels and similar establishments
+        title: Average length of stay in hotels and similar establishments
         unit: days
-        description_short: Average number of days tourists stay in hotels and similar establishments.
+        description_short: Average number of days tourists stay in hotels and similar accommodation establishments.
         description_key:
           - The average length of stay is calculated by dividing the total number of overnight stays by the total number of guests.
-          - This metric provides insights into the typical duration of a tourist's visit, which can inform hospitality services, marketing strategies, and resource allocation within the tourism sector.
+          - This metric provides insights into the typical duration of a tourist's visit.
         display:
           numDecimalPlaces: 1
 
@@ -375,12 +412,16 @@ tables:
         title: Inbound tourism expenditure adjusted for inflation and purchasing power (2021 prices)
         unit: constant 2021 international-$
         short_unit: $
-        description_short: Total inbound tourism expenditure, adjusted for local inflation and purchasing power parity, expressed in 2021 international dollars.
+        description_short: This captures spending by foreign visitors on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines. This data is adjusted for inflation and differences in living costs between countries.
         description_key:
           - *desc_key_inbound_total
           - *note_ppp_cpi_adjustment
         description_processing: |-
           We adjusted the data to account for both local inflation and differences in cost of living across countries. First, we converted expenditures from US dollars to local currency using official exchange rates. Then we adjusted for local inflation using each country's Consumer Price Index (CPI), normalized to 2021. Finally, we converted the values to international dollars using purchasing power parity (PPP) conversion factors for private consumption from 2021.
+        presentation:
+          title_public: International tourist expenditure within the country they visit (in constant 2021 international-$)
+          grapher_config:
+            note: This data is expressed in 2021 [international-$](#dod:int_dollar_abbreviation). Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
         display:
           numDecimalPlaces: 0
 
@@ -388,33 +429,39 @@ tables:
         title: Outbound tourism expenditure adjusted for US inflation (2021 prices)
         unit: constant 2021 US$
         short_unit: $
-        description_short: Total outbound tourism expenditure, adjusted for US inflation, expressed in 2021 US dollars.
+        description_short: This captures spending by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines. This data is adjusted for US inflation.
         description_key:
           - *desc_key_outbound_total
           - *note_inflation_adjustment
         description_processing: |-
           We adjusted the data for US inflation by dividing nominal expenditure values by the US Consumer Price Index (CPI) adjustment factor, with 2021 as the base year. This accounts for changes in the purchasing power of the US dollar over time.
+        presentation:
+          title_public: International tourist expenditure by residents traveling abroad (in constant 2021 US$)
+          grapher_config:
+            note: This data is expressed in constant 2021 US$, adjusted for inflation using the US Consumer Price Index.
         display:
           numDecimalPlaces: 0
 
       total_tables:
-        title: Total number of tables
+        title: Number of tourism satellite account tables implemented
         unit: tables
-        description_short: Monitoring is expressed as the number of data tables implemented within the Tourism Satellite Account (TSA) and the System of Environmental and Economic Accounts (SEEA). These tables organize and track key economic and environmental aspects of tourism, such as expenditure, production, employment, and resource flows.
+        description_short: Number of standardized data tables implemented within the Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) to track tourism's economic and environmental impacts. These tables organize and track key economic and environmental aspects of tourism, such as expenditure, production, employment, and resource flows.
         description_key:
-          - The Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) are standardized methods used by countries to measure the economic and environmental impacts of tourism.
-          - TSA tables track economic aspects of tourism, such as tourist spending, the production of tourism-related goods and services, and employment in the tourism sector.
-          - SEEA tables monitor environmental impacts, including the consumption of resources like water and energy, as well as the emission of greenhouse gases and generation of waste by the tourism industry.
-          - National governments or statistical agencies collect and organize data into these tables to understand tourism's influence on the economy and environment.
-          - The number of tables implemented indicates how comprehensively tourism's impacts are being tracked, with more tables providing a more detailed and nuanced understanding.
+          - The Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) are standardized methods used by countries to measure tourism's impacts.
+          - TSA tables track economic aspects such as tourist spending, production of tourism-related goods and services, and employment.
+          - SEEA tables monitor environmental impacts, including consumption of resources like water and energy, and emissions of greenhouse gases and waste.
+          - The number of tables implemented indicates how comprehensively tourism's impacts are being tracked, with more tables providing more detailed understanding.
         display:
           numDecimalPlaces: 0
 
       tourism_share_gdp:
-        title: GDP from tourism as a share of total GDP
+        title: Tourism's share of GDP
         unit: '%'
         short_unit: '%'
+        description_short: The percentage of a country's [GDP](#dod:gdp) that comes directly from tourism, including industries serving visitors and tourism-related consumption.
+        description_key:
+          - Tourism Direct GDP (TDGDP) is the sum of gross value added generated by all industries in response to internal tourism consumption, plus net taxes on products and imports included in this expenditure.
+          - This includes inputs from industries directly related to tourism as well as other sectors that serve visitors.
         description_from_producer: Tourism Direct GDP (TDGDP) is defined as the sum of the part of gross value added (at basic prices) generated by all industries in response to internal tourism consumption plus the amount of net taxes on products and imports included within the value of this expenditure at purchasers' prices.
-        description_short: Tourism's contribution to [GDP](#dod:gdp) includes inputs from industries directly related to tourism as well as other sectors that serve visitors.
         display:
           numDecimalPlaces: 1
