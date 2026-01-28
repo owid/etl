@@ -9,7 +9,7 @@ definitions:
 
   description_key_price_of_lighting: |-
     <% if lighting_source == "average" %>
-    This series is constructed as the product of average fuel prices and average lighting efficiencies, weighted by available lighting technologies over time (candles, whale oil, gas, kerosene, and electricity).
+    This series is constructed as the product of average fuel prices and average lighting efficiencies, weighted by the consumption share of available lighting technologies over time (candles, whale oil, gas, kerosene, and electricity).
     <%- else %>
     This series is constructed as the product of fuel prices and lighting efficiencies for <<lighting_source>> lighting technology across time.
     <%- endif %>
