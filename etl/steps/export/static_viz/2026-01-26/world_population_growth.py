@@ -1,18 +1,23 @@
 """Create world population growth visualization (1700-2100)."""
 
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import structlog
+from owid.catalog import Dataset
 
-from etl.helpers import PathFinder
+from etl import paths as etl_paths
 
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
+# Output directory for export step
+output_dir = etl_paths.EXPORT_DIR / "static_viz/2026-01-26/world_population_growth"
+log = structlog.get_logger()
 
 
 def run() -> None:
     """Create world population growth chart."""
-    # Load the population dataset
-    ds = paths.load_dataset("population", namespace="demography", version="2024-07-15")
+    # Load the population dataset from garden
+    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-15/population")
 
     # Load historical and projection tables
     tb_historical = ds["historical"]
@@ -24,36 +29,66 @@ def run() -> None:
     # Get full historical data to access 10,000 BCE
     tb_full_hist = world_hist[["year", "population_historical", "growth_rate_historical"]].copy()
 
-    # Calculate growth rate for 1700 using 10,000 BCE to 1700
+    # Filter historical data to only include specific years before 1950
+    years_before_1950_to_keep = [
+        1700,
+        1750,
+        1800,
+        1850,
+        1900,
+        1910,
+        1920,
+        1930,
+        1940,
+    ]
+    tb_hist_filtered = tb_full_hist[
+        (tb_full_hist["year"].isin(years_before_1950_to_keep)) | (tb_full_hist["year"] >= 1950)
+    ][["year", "population_historical"]].copy()
+    tb_hist_filtered.columns = ["year", "population"]
+
+    # Compute growth rates from population values for filtered historical data
+    tb_hist_filtered = tb_hist_filtered.sort_values("year").reset_index(drop=True)
+    tb_hist_filtered["growth_rate"] = np.nan
+
+    # Special case: Calculate growth rate for 1700 using 10,000 BCE to 1700
     pop_10000bce = tb_full_hist[tb_full_hist["year"] == -10000]["population_historical"].values
-    pop_1700 = tb_full_hist[tb_full_hist["year"] == 1700]["population_historical"].values
+    pop_1700 = tb_hist_filtered[tb_hist_filtered["year"] == 1700]["population"].values
     if len(pop_10000bce) > 0 and len(pop_1700) > 0:
         growth_rate_1700 = 100 * (np.log(pop_1700[0] / pop_10000bce[0]) / (1700 - (-10000)))
-        paths.log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
-        # Update the growth rate for 1700
-        tb_full_hist.loc[tb_full_hist["year"] == 1700, "growth_rate_historical"] = growth_rate_1700
+        log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
+        tb_hist_filtered.loc[tb_hist_filtered["year"] == 1700, "growth_rate"] = growth_rate_1700
 
-    # Prepare historical data
-    tb_hist = tb_full_hist[["year", "population_historical", "growth_rate_historical"]].copy()
-    tb_hist.columns = ["year", "population", "growth_rate"]
+    # Calculate growth rates for other adjacent years in our filtered data
+    for i in range(1, len(tb_hist_filtered)):
+        year_current = tb_hist_filtered.loc[i, "year"]
+        # Skip if this is 1700 (already calculated above)
+        if year_current == 1700:
+            continue
+        year_prev = tb_hist_filtered.loc[i - 1, "year"]
+        pop_current = tb_hist_filtered.loc[i, "population"]
+        pop_prev = tb_hist_filtered.loc[i - 1, "population"]
+        years_diff = year_current - year_prev
+        if years_diff > 0 and pop_prev > 0:
+            tb_hist_filtered.loc[i, "growth_rate"] = 100 * (np.log(pop_current / pop_prev) / years_diff)
+
+    log.info(f"Filtered historical data to {len(tb_hist_filtered)} years and computed growth rates")
 
     # Prepare projection data
     tb_proj = world_proj[["year", "population_projection", "growth_rate_projection"]].copy()
     tb_proj.columns = ["year", "population", "growth_rate"]
 
-    # Combine historical and projection data
-    import pandas as pd
-
-    tb = pd.concat([tb_hist, tb_proj], ignore_index=True).sort_values("year")
+    # Combine filtered historical and projection data
+    tb = pd.concat([tb_hist_filtered, tb_proj], ignore_index=True).sort_values("year")
 
     # Filter to 1700-2100
     tb = tb[(tb["year"] >= 1700) & (tb["year"] <= 2100)].copy()
 
+    # Omit growth rates for years marked as "Omitted for smoothing" in the spreadsheet (1750, 1930, 1950)
+    tb.loc[tb["year"].isin([1750, 1930, 1950]), "growth_rate"] = np.nan
+    tb.loc[tb["year"].isin([1750, 1930, 1950]), "note"] = "Growth rate omitted for smoothing"
+
     # Convert population to billions
     tb["population_billions"] = tb["population"] / 1e9
-
-    # --- Create the chart (OWID-like styling) ---
-    import matplotlib.patches as patches
 
     # Colors sampled from the original PNG
     color_pop_hist = "#0C988C"
@@ -69,7 +104,6 @@ def run() -> None:
     tb = tb.sort_values("year")
     hist = tb[tb["year"] <= year_cut].copy()
     proj = tb[tb["year"] >= year_cut].copy()
-
     # Figure aspect close to 2048×1500
     fig, ax1 = plt.subplots(figsize=(13.65, 10.0))
 
@@ -113,7 +147,7 @@ def run() -> None:
     # Match spacing between axes - set fixed range to ensure equal visual spacing
     # Using 4 tick intervals (0, 0.5, 1.0, 1.5, 2.0) with equal spacing as population axis
     gr_min = -0.5  # Start at -0.5 to accommodate negative values
-    gr_max = 2.5   # End at 2.5 to give equal spacing above
+    gr_max = 2.5  # End at 2.5 to give equal spacing above
     ax2.set_ylim(gr_min, gr_max)
 
     # Set up right axis with ticks at regular intervals (similar spacing to population axis)
@@ -154,7 +188,7 @@ def run() -> None:
 
     # ----- Milestones (extracted from data) -----
     # Define milestone thresholds in billions
-    milestone_thresholds = [0.6, 1, 2, 2, 5, 8, 9, 10, 10.5]
+    milestone_thresholds = [0.5, 1, 2, 2, 5, 8, 9, 10, 10.5]
     milestones = []
 
     for threshold in milestone_thresholds:
@@ -167,14 +201,14 @@ def run() -> None:
             # Format the label
             if threshold < 1.0:
                 # Convert to millions
-                label = f"{int(threshold * 1000)} Million\nin {year}"
+                label = f"{int(pop * 1000)} Million\nin {year}"
             else:
                 # Keep as billions
                 # Format with appropriate decimal places
-                if threshold == int(threshold):
-                    label = f"{int(threshold)} Billion\nin {year}"
+                if threshold == int(pop):
+                    label = f"{int(pop)} Billion\nin {year}"
                 else:
-                    label = f"{threshold} Billion\nin {year}"
+                    label = f"{pop} Billion\nin {year}"
 
             milestones.append((year, pop, label))
 
@@ -281,25 +315,28 @@ def run() -> None:
     # Layout: reserve space for header + footer
     fig.subplots_adjust(top=0.84, left=0.06, right=0.97, bottom=0.12)
 
-    # Save
-    output_path = paths.directory / "world_population_growth_1700_2100.svg"
-    plt.savefig(output_path, format="svg", dpi=300, bbox_inches="tight")
-    paths.log.info(f"Saved chart to {output_path}")
-
-    output_path_png = paths.directory / "world_population_growth_1700_2100.png"
-    plt.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
-    paths.log.info(f"Saved chart to {output_path_png}")
-
-    plt.close()
+    # Prepare table data
     tb["country"] = "World"
-    # Add note for 1700 explaining how growth rate was calculated
+    # Add notes explaining special cases
     tb["note"] = None
     tb.loc[tb["year"] == 1700, "note"] = (
         f"Growth rate calculated using population between 10,000 BCE and 1700: {growth_rate_1700:.4f}%"
     )
-
     tb = tb.format(["year", "country"], short_name="world_population_growth")
 
-    # Create an empty dataset to satisfy ETL requirements
-    ds_garden = paths.create_dataset(tables=[tb])
-    ds_garden.save()
+    # Create dataset for export step
+    from etl.helpers import create_dataset
+
+    ds_export = create_dataset(output_dir, tables=[tb])
+    ds_export.save()
+
+    # Save charts AFTER dataset is saved (so they don't get deleted)
+    output_path = output_dir / "world_population_growth_1700_2100.svg"
+    plt.savefig(output_path, format="svg", dpi=300, bbox_inches="tight")
+    log.info(f"Saved chart to {output_path}")
+
+    output_path_png = output_dir / "world_population_growth_1700_2100.png"
+    plt.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
+    log.info(f"Saved chart to {output_path_png}")
+
+    plt.close()
