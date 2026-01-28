@@ -230,6 +230,26 @@ def combine_ei_and_ember_data(tb_review, tb_ember):
         df1=combined, df2=tb_review[(tb_review["country"].isin(ei_countries))], index_columns=["country", "year"]
     )
 
+    # In the original Statistical Review data, countries that have no nuclear power had no data for nuclear generation.
+    # Ideally, missing data should mean "unknown", and therefore those missing values should be zero instead of nan.
+    # In the Statistical Review garden step, we filled out those nans with zeros, for country-years that certainly have no nuclear generation.
+    # The same issue occurs with Ember data: countries with no nuclear power have missing data for nuclear generation (e.g. Australia), instead of zeros.
+    # We could copy the function we used in the Statistical Review garden step here.
+    # But, to avoid repeating code, we will take all zeros in nuclear generation from the EI data as a new temporary column; then, we'll fill nans in the combined table with those zeros.
+    # NOTE: We don't need to do this for pre-2000 data, since we already combined Ember with pre-2000 EI data.
+    combined = combined.merge(
+        tb_review[(tb_review["nuclear_generation__twh"] == 0) & (tb_review["year"] >= 2000)][
+            ["country", "year", "nuclear_generation__twh"]
+        ],
+        on=["country", "year"],
+        how="outer",
+        suffixes=("", "_temp"),
+    )
+    combined["nuclear_generation__twh"] = combined["nuclear_generation__twh"].fillna(
+        combined["nuclear_generation__twh_temp"]
+    )
+    combined = combined.drop(columns=["nuclear_generation__twh_temp"])
+
     return combined
 
 
