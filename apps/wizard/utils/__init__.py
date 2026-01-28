@@ -571,8 +571,9 @@ def _get_staging_creation_time(session: Session):
       AND table_name IN ('charts', 'variables', 'datasets', 'chart_dimensions')
     """
     df = read_sql(query_ts, session)
-    assert len(df) == 1 and df["min_create_time"].notna().all(), \
-        "Failed to get staging server creation time. Make sure the staging server was properly set up."
+    assert (
+        len(df) == 1 and df["min_create_time"].notna().all()
+    ), "Failed to get staging server creation time. Make sure the staging server was properly set up."
     create_time = df["min_create_time"].item()
     return create_time
 
