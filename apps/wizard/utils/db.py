@@ -184,8 +184,21 @@ class WizardDB:
         """Add a mapping to TB_VARMAP.
 
         This table should have columns 'id_old' (key), 'id_new' (value), 'timestamp', and 'dataset_id_old' and 'dataset_id_new'.
+
+        If a mapping for an id_old already exists, it will be replaced with the new mapping.
         """
         timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Remove any existing mappings for these id_old values before inserting
+        if mapping and cls.table_exists(TB_VARMAP):
+            id_old_list = list(mapping.keys())
+            placeholders = ", ".join([":id_" + str(i) for i in range(len(id_old_list))])
+            params = {f"id_{i}": id_old for i, id_old in enumerate(id_old_list)}
+            query = f"DELETE FROM {TB_VARMAP} WHERE id_old IN ({placeholders})"
+            engine = get_engine()
+            with Session(engine) as s:
+                s.execute(text(query), params)
+                s.commit()
 
         # Build dataframe
         query_params = [
