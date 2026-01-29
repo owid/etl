@@ -12,19 +12,25 @@ MULTIDIM_CONFIG = {
     "chartTypes": ["StackedDiscreteBar"],
 }
 
+# Indicator name constant
+INDICATOR_NAME = "plastic_emissions_rivers"
+
 # Define dimensions for all variables
 DIMENSIONS_DETAILS = {
     "me_tons_per_year": {
-        "measure": "total",
-        "original_short_name": "plastic_emissions_rivers",
+        "dimensions": {
+            "measure": "total",
+        },
     },
     "me_tons_per_year_per_capita": {
-        "measure": "per_capita",
-        "original_short_name": "plastic_emissions_rivers",
+        "dimensions": {
+            "measure": "per_capita",
+        },
     },
     "me_tons_per_year_share_of_global": {
-        "measure": "share_of_global",
-        "original_short_name": "plastic_emissions_rivers",
+        "dimensions": {
+            "measure": "share_of_global",
+        },
     },
 }
 
@@ -41,7 +47,7 @@ def run() -> None:
 
     # Load grapher dataset
     ds_grapher = paths.load_dataset("meijer_2021")
-    tb = ds_grapher.read("meijer_2021", reset_index=False)
+    tb = ds_grapher.read("meijer_2021", load_data=False)
 
     #
     # Process data.
@@ -49,17 +55,16 @@ def run() -> None:
     # Add dimension metadata to columns based on their measure type
     for col, details in DIMENSIONS_DETAILS.items():
         if col in tb.columns:
-            # Set dimensions (all keys except original_short_name)
-            tb[col].m.dimensions = {k: v for k, v in details.items() if k != "original_short_name"}
-            # Set original_short_name if present
-            if "original_short_name" in details:
-                tb[col].m.original_short_name = details["original_short_name"]
+            # Set dimensions
+            tb[col].m.dimensions = details["dimensions"]
+            # Set original_short_name
+            tb[col].m.original_short_name = INDICATOR_NAME
 
     # Create collection - this will automatically generate views from dimensions
     c = paths.create_collection(
         config=config,
         tb=tb,
-        indicator_names=["plastic_emissions_rivers"],
+        indicator_names=[INDICATOR_NAME],
         dimensions=["measure"],
         common_view_config=MULTIDIM_CONFIG,
     )
