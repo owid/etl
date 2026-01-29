@@ -20,7 +20,7 @@ tables:
         unit: "constant {LATEST_YEAR} US$ per watt"
         short_unit: "$/W"
         description_key:
-          - "Solar photovoltaic (PV) module prices refer to the cost of the solar panel itself, and do not include installation or other system components."
+          - "Solar photovoltaic module prices refer to the cost of the solar panel itself, and do not include installation or other system components."
           - "Prices are compiled from three sources: Nemet (2009) for 1975-2003, Farmer & Lafond (2016) for 2004-2009, and IRENA for 2010 onward."
           - "Due to limited data availability, we use the Global Price Index series reported by IRENA, based on pvXchange benchmark prices for modules sold in Europe."
           - "Historical prices have been adjusted for inflation using the [World Bank's US GDP deflator](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US)."
