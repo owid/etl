@@ -150,7 +150,7 @@ dimensions:
         description: People affiliated to a religion as a percentage of the total population
       - slug: "count_unrounded"
         name: "Number of people"
-        description: Number of deaths divided by the total population
+        description: People affiliated to a religion
       # - slug: "share_change_2010_2020"
       #   name: "Percentage point change"
       #   description: Percentage point change between 2010 and 2020
