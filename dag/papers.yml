@@ -100,3 +100,16 @@ steps:
     - data://meadow/papers/2026-01-20/anshassi_waste_management
   data://grapher/papers/2026-01-20/anshassi_waste_management:
     - data://garden/papers/2026-01-20/anshassi_waste_management
+
+  #
+  # Meijer et al. (2021) - Riverine plastic emissions
+  #
+  data://meadow/papers/2026-01-27/meijer_2021:
+    - snapshot://papers/2026-01-27/meijer_2021.pdf
+  data://garden/papers/2026-01-27/meijer_2021:
+    - data://meadow/papers/2026-01-27/meijer_2021
+    - data://garden/demography/2024-07-15/population
+  data://grapher/papers/2026-01-27/meijer_2021:
+    - data://garden/papers/2026-01-27/meijer_2021
+  export://multidim/plastic_waste/latest/plastic_emissions_oceans:
+    - data://grapher/papers/2026-01-27/meijer_2021
