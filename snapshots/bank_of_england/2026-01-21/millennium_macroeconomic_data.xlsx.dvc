@@ -3,17 +3,19 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "A millenium of macroeconomic data"
+    title: "A millennium of macroeconomic data"
     description: |-
       The dataset contains a broad set of macroeconomic and financial data for the UK stretching back in some cases to the C13th and with one or two benchmark estimates available for 1086, the year of the Domesday Book. The dataset was originally called the 'Three centuries of macroeconomic data' spreadsheet but has now been renamed given its broader coverage. This is an extract of the data that will be published on 2026, consisting in wages and and CPI.
     date_published: "2026-01-01"
-    version_producer: '4'
+    # version_producer: '3.1'
 
     # Citation
     producer: Thomas and Dimsdale
     citation_full: |-
-      Thomas, R. and Dimsdale, N. (2026). "A Millennium of UK Data" (forthcoming). Bank of England.
-    attribution: Thomas and Dimsdale - A millenium of macroeconomic data (2026)
+      - Thomas, R. and Dimsdale, N. (2017). "A Millennium of UK Data". Bank of England.
+      - Office for National Statistics, United Kingdom (2025). CPI index 00: all items 2015=100
+      - Office for National Statistics, United Kingdom (2025). AWE: Whole Economy Level (£): Seasonally Adjusted Total Pay Excluding Arrears
+    attribution: Thomas and Dimsdale (2017); Office for National Statistics, United Kingdom (2025)
     attribution_short: Bank of England
 
     # Files

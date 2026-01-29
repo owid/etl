@@ -8,11 +8,13 @@ definitions:
         - Energy
 
   description_key_price_of_lighting: |-
-    <% if lighting_source == "average" %>
-    This series is constructed as the product of average fuel prices and average lighting efficiencies, weighted by the consumption share of available lighting technologies over time (candles, whale oil, gas, kerosene, and electricity).
-    <%- else %>
-    This series is constructed as the product of fuel prices and lighting efficiencies for <<lighting_source>> lighting technology across time.
-    <%- endif %>
+    To calculate the price of lighting – today or historically – three different prices need to be known: (1) the prices of the relevant energy source, (2) the equipment to provide this light (e.g. a kerosene lamp), (3) how efficiently the available technology at the time can turn the energy into light. The latter is referred to as the _lighting technology efficiency_ in the literature and is measured in units of energy used for each lumen-hour of light generated.
+
+  description_key_price_of_lighting_weights: |-
+    Prices are weighted from the combination of lighting sources at any given period of time. For example, prices of lighting from candles, whale oil, and gas will differ. The average price is, therefore, weighted by the share of each source in total lighting consumption.
+
+  description_key_inflation: |-
+    This data is adjusted for inflation, using long-run consumer price indices from the Bank of England's A Millennium of Macroeconomic Data dataset.
 
   description_key_price_of_lighting_rolling_avg: |-
     We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
@@ -51,6 +53,8 @@ tables:
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:
           - "{definitions.description_key_price_of_lighting}"
+          - "{definitions.description_key_price_of_lighting_weights}"
+          - "{definitions.description_key_inflation}"
         presentation:
           grapher_config:
             note: This data is expressed in constant <<price_year>> British pounds.
@@ -66,6 +70,8 @@ tables:
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:
           - "{definitions.description_key_price_of_lighting}"
+          - "{definitions.description_key_price_of_lighting_weights}"
+          - "{definitions.description_key_inflation}"
           - "{definitions.description_key_price_of_lighting_rolling_avg}"
         processing_level: major
         description_processing: |-
