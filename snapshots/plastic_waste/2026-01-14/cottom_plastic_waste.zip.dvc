@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: A local-to-global emissions inventory of macroplastic pollution
+    description: |-
+      This dataset provides national, regional, and global estimates of plastic waste generation, collection, and emissions from the SPOT (Spatial Plastic Optimization Tool) material flow analysis model. It includes comprehensive metrics on waste generation, collection coverage, disposal methods, and resulting emissions of macroplastics to the environment.
+
+      The data covers waste generation (WG), properly collected waste (PWG), per capita metrics, plastic debris emissions, burn emissions, litter, uncollected waste, collection and disposal emissions, recycling, collection coverage, disposal types (controlled/uncontrolled), management practices, and population without collection services.
+    date_published: "2024-07-19"
+
+    # Citation
+    producer: Cottom et al.
+    citation_full: |-
+      Cottom, J., Cook, E., Veeken, A. et al. A local-to-global emissions inventory of macroplastic pollution. Nature (2024). https://doi.org/10.1038/s41586-024-07758-6
+
+    # Files
+    url_main: https://www.nature.com/articles/s41586-024-07758-6
+    # url_download: https://datadryad.org/downloads/file_stream/3338334
+    # Bot protection on the website means we should manually download the file and upload it to our S3 bucket.
+    # To add the file run: etls cottom_plastic_waste --path-to-file <path_to_downloaded_file>
+    date_accessed: '2026-01-14'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.nature.com/articles/s41586-024-07758-6
+outs:
+  - md5: 09514d217fdd2aed5d4a827fd490c135
+    size: 4153853
+    path: cottom_plastic_waste.zip

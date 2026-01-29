@@ -26,7 +26,7 @@ def run() -> None:
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("world_bank_pip")
-    tb = ds.read("world_bank_pip", load_data=False)
+    tb = ds.read("poverty", load_data=False)
 
     # Remove unwanted dimensions.
     # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.

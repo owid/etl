@@ -1,14 +1,34 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""
+Load World Inequality Database meadow dataset and create a garden dataset.
+
+NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
+    1. Define DEBUG as True.
+    2. (optional) Define LONG_FORMAT as True to see the full tables in the log.
+    3. Run the following command in the terminal:
+        nohup .venv/bin/etlr world_inequality_database > output_wid.log 2>&1 &
+
+"""
 
 from typing import Tuple
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
+from tabulate import tabulate
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Set table format when printing
+TABLEFMT = "pretty"
+
+# Define if sanity checks should run (set to True to see sanity check output)
+DEBUG = False
+
+# Define if I show the full table or just the first 5 rows for assertions (only applies when DEBUG=True)
+LONG_FORMAT = False
 
 # Define welfare types available and their new names
 WELFARE_TYPES = {
@@ -112,6 +132,13 @@ def run() -> None:
 
     # Add period dimension to incomes table
     tb_incomes = add_period_dimension(tb=tb_incomes)
+
+    # Sanity checks
+    sanity_checks(
+        tb_inequality=tb_inequality,
+        tb_incomes=tb_incomes,
+        tb_distribution=tb_distribution,
+    )
 
     # Improve table format.
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "extrapolated"], short_name="inequality")
@@ -371,3 +398,457 @@ def add_relative_poverty(tb_inequality: Table, tb_incomes: Table, tb_distributio
     tb_relative_poverty = pr.concat(tables_relative_poverty, ignore_index=True)
 
     return tb_relative_poverty
+
+
+def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_distribution: Table) -> None:
+    """
+    Perform sanity checks on the data
+    """
+    if not DEBUG:
+        return
+
+    check_between_0_and_1(tb_inequality)
+    check_shares_sum_100(tb_incomes)
+    check_negative_values(tb_inequality, tb_incomes, tb_distribution)
+    check_monotonicity(tb_incomes)
+    check_avg_between_thr(tb_incomes)
+
+
+def check_between_0_and_1(tb_inequality: Table) -> None:
+    """
+    Check that gini indicators are between 0 and 1
+    """
+    tb = tb_inequality.reset_index()
+
+    # Check gini values
+    for welfare_type in WELFARE_TYPES.values():
+        for extrapolated in ["no", "yes"]:
+            mask = (tb["welfare_type"] == welfare_type) & (tb["extrapolated"] == extrapolated)
+            tb_subset = tb[mask].copy()
+
+            # Check gini
+            gini_mask = (tb_subset["gini"] > 1) | (tb_subset["gini"] < 0)
+            any_error = gini_mask.any()
+
+            if any_error and welfare_type not in ["wealth", "after tax disposable"]:
+                tb_error = tb_subset[gini_mask][["country", "year", "gini"]].copy()
+                paths.log.fatal(
+                    f"""{len(tb_error)} gini values for {welfare_type} (extrapolated={extrapolated}) are not between 0 and 1:
+                    {_tabulate(tb_error)}"""
+                )
+            elif any_error and welfare_type in ["wealth", "after tax disposable"]:
+                tb_error = tb_subset[gini_mask][["country", "year", "gini"]].copy()
+                paths.log.warning(
+                    f"""{len(tb_error)} gini values for {welfare_type} (extrapolated={extrapolated}) are not between 0 and 1:
+                    {_tabulate(tb_error)}"""
+                )
+
+
+def check_shares_sum_100(tb_incomes: Table, margin: float = 0.5) -> None:
+    """
+    Check if the sum of decile shares is 100 (with a margin)
+    """
+    tb = tb_incomes.reset_index()
+
+    # Filter to only share values for deciles 1-10 (exclude period dimension, other quantiles, wealth and after tax disposable)
+    deciles = [str(i) for i in range(1, 11)]
+    tb_shares = tb[
+        (tb["quantile"].isin(deciles))
+        & (tb["period"].isnull())
+        & (~tb["welfare_type"].isin(["wealth", "after tax disposable"]))
+    ].copy()
+
+    for welfare_type in WELFARE_TYPES.values():
+        # Skip wealth and after tax disposable
+        if welfare_type in ["wealth", "after tax disposable"]:
+            continue
+
+        for extrapolated in ["no", "yes"]:
+            # Filter by welfare type and extrapolated status
+            mask = (tb_shares["welfare_type"] == welfare_type) & (tb_shares["extrapolated"] == extrapolated)
+            tb_subset = tb_shares[mask].copy()
+
+            # Calculate sum of shares for each country-year
+            tb_sum = (
+                tb_subset.groupby(["country", "year", "welfare_type", "extrapolated"])["share"]
+                .sum()
+                .reset_index(name="sum_check")
+            )
+
+            # Count how many deciles have data for each country-year
+            tb_count = (
+                tb_subset.groupby(["country", "year", "welfare_type", "extrapolated"])["share"]
+                .count()
+                .reset_index(name="count_check")
+            )
+
+            # Merge
+            tb_check = pr.merge(tb_sum, tb_count, on=["country", "year", "welfare_type", "extrapolated"])
+
+            # Only check when all 10 deciles are present
+            error_mask = ((tb_check["sum_check"] >= 100 + margin) | (tb_check["sum_check"] <= 100 - margin)) & (
+                tb_check["count_check"] == 10
+            )
+            any_error = error_mask.any()
+
+            if any_error:
+                tb_error = tb_check[error_mask][["country", "year", "sum_check"]].sort_values(
+                    by="sum_check", ascending=False
+                )
+                paths.log.fatal(
+                    f"""{len(tb_error)} share observations for {welfare_type} (extrapolated={extrapolated}) are not adding up to 100%:
+                    {_tabulate(tb_error, floatfmt=".1f")}"""
+                )
+
+
+def check_negative_values(tb_inequality: Table, tb_incomes: Table, tb_distribution: Table) -> None:
+    """
+    Check if there are negative values in the variables (excluding wealth and after tax disposable)
+    """
+    # 1. Check tb_inequality - all numeric columns (exclude wealth, after tax disposable, and gini)
+    tb = tb_inequality.reset_index()
+    tb_filtered = tb[~tb["welfare_type"].isin(["wealth", "after tax disposable"])].copy()
+
+    # Get all numeric columns excluding index columns and gini
+    # Check if dtype string contains 'float' or 'int' (works with both standard and nullable dtypes)
+    cols_to_check = [
+        col
+        for col in tb_filtered.columns
+        if col not in ["country", "year", "welfare_type", "extrapolated", "gini", "index"]
+        and any(dtype_str in str(tb_filtered[col].dtype).lower() for dtype_str in ["float", "int"])
+    ]
+
+    for col in cols_to_check:
+        mask = tb_filtered[col] < 0
+        any_error = mask.any()
+
+        if any_error:
+            tb_error = tb_filtered[mask][["country", "year", "welfare_type", "extrapolated", col]].copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {col} are negative:
+                {_tabulate(tb_error)}"""
+            )
+
+    # 2. Check tb_incomes (avg, thr, share, mean, median) - exclude wealth and after tax disposable
+    tb = tb_incomes.reset_index()
+    tb_filtered = tb[~tb["welfare_type"].isin(["wealth", "after tax disposable"])].copy()
+
+    # Get all numeric columns excluding index columns
+    cols_to_check = [
+        col
+        for col in tb_filtered.columns
+        if col not in ["country", "year", "welfare_type", "extrapolated", "quantile", "period", "index"]
+        and any(dtype_str in str(tb_filtered[col].dtype).lower() for dtype_str in ["float", "int"])
+    ]
+
+    for col in cols_to_check:
+        mask = tb_filtered[col] < 0
+        any_error = mask.any()
+
+        if any_error:
+            # Include quantile in output if present
+            cols_to_show = ["country", "year", "welfare_type", "extrapolated"]
+            if "quantile" in tb_filtered.columns:
+                cols_to_show.append("quantile")
+            cols_to_show.append(col)
+
+            tb_error = tb_filtered[mask][cols_to_show].copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {col} are negative:
+                {_tabulate(tb_error)}"""
+            )
+
+    # 3. Check tb_distribution (thr, share) - exclude wealth and after tax disposable
+    tb = tb_distribution.reset_index()
+    tb_filtered = tb[~tb["welfare_type"].isin(["wealth", "after tax disposable"])].copy()
+
+    # Get all numeric columns excluding index columns
+    cols_to_check = [
+        col
+        for col in tb_filtered.columns
+        if col not in ["country", "year", "welfare_type", "extrapolated", "p", "percentile", "index"]
+        and any(dtype_str in str(tb_filtered[col].dtype).lower() for dtype_str in ["float", "int"])
+    ]
+
+    for col in cols_to_check:
+        mask = tb_filtered[col] < 0
+        any_error = mask.any()
+
+        if any_error:
+            tb_error = tb_filtered[mask][["country", "year", "welfare_type", "percentile", "extrapolated", col]].copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {col} in distribution are negative:
+                {_tabulate(tb_error)}"""
+            )
+
+
+def check_monotonicity(tb_incomes: Table) -> None:
+    """
+    Check monotonicity for shares, thresholds and averages across deciles
+    """
+    tb = tb_incomes.reset_index()
+
+    for welfare_type in WELFARE_TYPES.values():
+        for extrapolated in ["no", "yes"]:
+            for metric in ["avg", "thr", "share"]:
+                # thr uses quantiles 1-9, avg and share use quantiles 1-10
+                if metric == "thr":
+                    deciles = [str(i) for i in range(1, 10)]
+                else:
+                    deciles = [str(i) for i in range(1, 11)]
+
+                # Filter to the right deciles
+                # For avg and thr, use period="year"; for share, use period=null
+                if metric in ["avg", "thr"]:
+                    tb_deciles = tb[(tb["quantile"].isin(deciles)) & (tb["period"] == "year")].copy()
+                else:  # share
+                    tb_deciles = tb[(tb["quantile"].isin(deciles)) & (tb["period"].isnull())].copy()
+
+                # Filter by welfare type and extrapolated status
+                mask = (tb_deciles["welfare_type"] == welfare_type) & (tb_deciles["extrapolated"] == extrapolated)
+                tb_subset = tb_deciles[mask].copy()
+
+                # Skip if no data for this combination
+                if tb_subset.empty or metric not in tb_subset.columns:
+                    continue
+
+                # Sort by country, year, and quantile (as integers for proper ordering)
+                tb_subset["quantile_int"] = tb_subset["quantile"].astype(int)
+                tb_subset = tb_subset.sort_values(["country", "year", "quantile_int"])
+
+                # First, ensure each country-year has ALL expected rows (not just non-null values)
+                # Count rows per country-year and filter to only those with the expected number
+                expected_row_count = len(deciles)
+                tb_subset["row_count"] = tb_subset.groupby(["country", "year"])["quantile"].transform("count")
+                tb_subset = tb_subset[tb_subset["row_count"] == expected_row_count].copy()
+
+                if tb_subset.empty:
+                    continue
+
+                # Now count non-null values per country-year group to only check complete sets
+                tb_subset["null_count"] = tb_subset.groupby(["country", "year"])[metric].transform(
+                    lambda x: x.isnull().sum()
+                )
+
+                # Only check country-years where ALL deciles have non-null values (like legacy version)
+                tb_complete = tb_subset[tb_subset["null_count"] == 0].copy()
+
+                if tb_complete.empty:
+                    continue
+
+                # Get previous value within each country-year group
+                tb_complete["prev_value"] = tb_complete.groupby(["country", "year"])[metric].shift(1)
+                tb_complete["prev_quantile"] = tb_complete.groupby(["country", "year"])["quantile"].shift(1)
+
+                # Check monotonicity: current value should be >= previous value
+                # Only check where we have both current and previous values
+                tb_complete["is_monotonic"] = (tb_complete[metric] >= tb_complete["prev_value"]) | tb_complete[
+                    "prev_value"
+                ].isnull()
+
+                # Find violations (excluding first decile in each group which has no previous)
+                errors = tb_complete[~tb_complete["is_monotonic"] & tb_complete["prev_value"].notnull()].copy()
+
+                if not errors.empty:
+                    # Format error output
+                    errors["error_desc"] = (
+                        "Decile "
+                        + errors["prev_quantile"]
+                        + " ("
+                        + errors["prev_value"].round(4).astype(str)
+                        + ") -> Decile "
+                        + errors["quantile"]
+                        + " ("
+                        + errors[metric].round(4).astype(str)
+                        + ")"
+                    )
+
+                    tb_error = errors[["country", "year", "error_desc"]].copy()
+                    paths.log.fatal(
+                        f"""{len(tb_error)} observations for {metric} {welfare_type} (extrapolated={extrapolated}) are not monotonically increasing:
+                        {_tabulate(tb_error)}"""
+                    )
+
+
+def check_avg_between_thr(tb_incomes: Table) -> None:
+    """
+    Check that each avg is between the corresponding thr boundaries
+    Note: avg uses quantiles 1-10, thr uses quantiles 1-9
+    avg quantile i should be between thr quantile i and thr quantile (i+1)
+    For avg quantile 9 and 10, lower bound is thr 9, no upper bound
+    """
+    tb = tb_incomes.reset_index()
+
+    for welfare_type in WELFARE_TYPES.values():
+        for extrapolated in ["no", "yes"]:
+            # Get avg data (quantiles 1-10, period="year")
+            avg_deciles = [str(i) for i in range(1, 11)]
+            tb_avg = tb[
+                (tb["quantile"].isin(avg_deciles))
+                & (tb["period"] == "year")
+                & (tb["welfare_type"] == welfare_type)
+                & (tb["extrapolated"] == extrapolated)
+            ].copy()
+
+            # Get thr data (quantiles 1-9, period="year")
+            thr_deciles = [str(i) for i in range(1, 10)]
+            tb_thr = tb[
+                (tb["quantile"].isin(thr_deciles))
+                & (tb["period"] == "year")
+                & (tb["welfare_type"] == welfare_type)
+                & (tb["extrapolated"] == extrapolated)
+            ].copy()
+
+            # Skip if no data
+            if tb_avg.empty or tb_thr.empty or "avg" not in tb_avg.columns or "thr" not in tb_thr.columns:
+                continue
+
+            # First, count rows per country-year to ensure all deciles are present
+            avg_row_counts = tb_avg.groupby(["country", "year"])["quantile"].count().reset_index(name="row_count_avg")
+            thr_row_counts = tb_thr.groupby(["country", "year"])["quantile"].count().reset_index(name="row_count_thr")
+
+            # Filter to country-years with all expected rows
+            complete_avg_rows = avg_row_counts[avg_row_counts["row_count_avg"] == 10][["country", "year"]]
+            complete_thr_rows = thr_row_counts[thr_row_counts["row_count_thr"] == 9][["country", "year"]]
+
+            # Now count non-null values to only check complete sets
+            avg_nulls = (
+                tb_avg.groupby(["country", "year"])["avg"]
+                .apply(lambda x: x.isnull().sum())
+                .reset_index(name="null_count_avg")
+            )
+            thr_nulls = (
+                tb_thr.groupby(["country", "year"])["thr"]
+                .apply(lambda x: x.isnull().sum())
+                .reset_index(name="null_count_thr")
+            )
+
+            # Find country-years with complete data (all deciles present AND non-null)
+            complete_avg = pr.merge(
+                complete_avg_rows,
+                avg_nulls[avg_nulls["null_count_avg"] == 0][["country", "year"]],
+                on=["country", "year"],
+            )
+            complete_thr = pr.merge(
+                complete_thr_rows,
+                thr_nulls[thr_nulls["null_count_thr"] == 0][["country", "year"]],
+                on=["country", "year"],
+            )
+            complete_both = pr.merge(complete_avg, complete_thr, on=["country", "year"])
+
+            if complete_both.empty:
+                continue
+
+            # Filter to only complete country-years
+            tb_avg_complete = pr.merge(tb_avg, complete_both, on=["country", "year"])[
+                ["country", "year", "quantile", "avg"]
+            ]
+            tb_thr_complete = pr.merge(tb_thr, complete_both, on=["country", "year"])[
+                ["country", "year", "quantile", "thr"]
+            ]
+
+            # Create integer quantile for sorting/joining
+            tb_avg_complete["quantile_int"] = tb_avg_complete["quantile"].astype(int)
+            tb_thr_complete["quantile_int"] = tb_thr_complete["quantile"].astype(int)
+
+            # For each avg quantile i (1-10), check boundaries:
+            # Note: Due to quantile mapping offset:
+            #   avg quantile i corresponds to p{(i-1)*10}p{i*10}
+            #   thr quantile j corresponds to p{j*10}p{(j+1)*10}
+            # So avg quantile i should be between thr quantile (i-1) and thr quantile i
+            # But thr quantile 0 is dropped, so:
+            #   avg quantile 1 -> only upper bound: thr quantile 1
+            #   avg quantile 2 -> thr quantile 1 (lower) and thr quantile 2 (upper)
+            #   ...
+            #   avg quantile 9 -> thr quantile 8 (lower) and thr quantile 9 (upper)
+            #   avg quantile 10 -> only lower bound: thr quantile 9
+
+            errors_list = []
+            for avg_q in range(1, 11):
+                tb_avg_q = tb_avg_complete[tb_avg_complete["quantile_int"] == avg_q].copy()
+
+                # Lower bound is thr quantile (avg_q - 1), but thr quantile 0 doesn't exist
+                # So only check lower bound for avg_q >= 2
+                if avg_q >= 2:
+                    thr_lower_q = avg_q - 1
+                    tb_thr_lower = tb_thr_complete[tb_thr_complete["quantile_int"] == thr_lower_q].copy()
+                    tb_thr_lower = tb_thr_lower[["country", "year", "thr"]].rename(columns={"thr": "thr_lower"})
+
+                    # Merge to get lower bound
+                    tb_check = pr.merge(
+                        tb_avg_q,
+                        tb_thr_lower,
+                        on=["country", "year"],
+                    )
+                else:
+                    # For avg quantile 1, no lower bound (thr quantile 0 is dropped)
+                    tb_check = tb_avg_q.copy()
+                    tb_check["thr_lower"] = None
+
+                # Upper bound is thr quantile avg_q (but thr only goes up to 9)
+                if avg_q <= 9:
+                    thr_upper_q = avg_q
+                    tb_thr_upper = tb_thr_complete[tb_thr_complete["quantile_int"] == thr_upper_q].copy()
+                    tb_thr_upper = tb_thr_upper[["country", "year", "thr"]].rename(columns={"thr": "thr_upper"})
+                    tb_check = pr.merge(
+                        tb_check,
+                        tb_thr_upper,
+                        on=["country", "year"],
+                    )
+
+                    # Check validity
+                    if avg_q == 1:
+                        # Only upper bound: avg <= thr_upper
+                        tb_check["is_valid"] = tb_check["avg"] <= tb_check["thr_upper"]
+                    else:
+                        # Both bounds: thr_lower <= avg <= thr_upper
+                        tb_check["is_valid"] = (tb_check["avg"] >= tb_check["thr_lower"]) & (
+                            tb_check["avg"] <= tb_check["thr_upper"]
+                        )
+                else:
+                    # For avg quantile 10, only lower bound: avg >= thr_lower
+                    tb_check["thr_upper"] = None
+                    tb_check["is_valid"] = tb_check["avg"] >= tb_check["thr_lower"]
+
+                # Find violations
+                violations = tb_check[~tb_check["is_valid"]].copy()
+                if not violations.empty:
+                    errors_list.append(violations)
+
+            if errors_list:
+                errors = pr.concat(errors_list, ignore_index=True)
+
+                # Format error output
+                errors["thr_lower_str"] = (
+                    errors["thr_lower"].round(4).astype(str)
+                    if "thr_lower" in errors.columns
+                    else errors["thr"].round(4).astype(str)
+                )
+                errors["thr_upper_str"] = errors["thr_upper"].apply(
+                    lambda x: f"{x:.4f}" if pd.notnull(x) else "N/A (last decile)"
+                )
+
+                errors["error_desc"] = (
+                    "Decile "
+                    + errors["quantile"]
+                    + ": avg="
+                    + errors["avg"].round(4).astype(str)
+                    + ", thr_lower="
+                    + errors["thr_lower_str"]
+                    + ", thr_upper="
+                    + errors["thr_upper_str"]
+                )
+
+                tb_error = errors[["country", "year", "error_desc"]].copy()
+                paths.log.fatal(
+                    f"""{len(tb_error)} observations for avg {welfare_type} (extrapolated={extrapolated}) are not between the corresponding thresholds:
+                    {_tabulate(tb_error)}"""
+                )
+
+
+def _tabulate(tb: Table, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    """Helper function to format tables for display"""
+    if LONG_FORMAT:
+        return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)
+    else:
+        return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)

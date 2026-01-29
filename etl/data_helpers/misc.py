@@ -595,22 +595,26 @@ def compare_tables(
                     # If there are no data points in the old or new tables for this country-column, skip this column.
                     continue
 
-                if metric == "are_equal":
-                    condition = dataframes.are_equal(
-                        df1=_old.to_frame(),
-                        df2=_new.to_frame(),
-                        verbose=False,
-                        absolute_tolerance=absolute_tolerance,
-                        relative_tolerance=relative_tolerance,
-                    )[0]
-                elif metric == "bard_max":
-                    condition = max(bard(a=_old, b=_new, eps=bard_eps)) < bard_max
+                # If the number of data points differs, don't skip (there may be new data to show).
+                if len(_old) != len(_new):
+                    pass
                 else:
-                    condition = metric(_old, _new)  # type: ignore
+                    if metric == "are_equal":
+                        condition = dataframes.are_equal(
+                            df1=_old.to_frame(),
+                            df2=_new.to_frame(),
+                            verbose=False,
+                            absolute_tolerance=absolute_tolerance,
+                            relative_tolerance=relative_tolerance,
+                        )[0]
+                    elif metric == "bard_max":
+                        condition = max(bard(a=_old, b=_new, eps=bard_eps)) < bard_max
+                    else:
+                        condition = metric(_old, _new)  # type: ignore
 
-                if condition:  # type: ignore
-                    # If the old and new tables are equal for this country-column, skip this column.
-                    continue
+                    if condition:  # type: ignore
+                        # If the old and new tables are equal for this country-column, skip this column.
+                        continue
 
             # Prepare plot.
             fig = px.line(

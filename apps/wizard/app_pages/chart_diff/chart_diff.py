@@ -1063,7 +1063,11 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
     """Get charts that exist in target but not in source (deleted charts).
 
     This function matches on chart IDs to identify truly deleted charts,
-    filtering out charts created in target after staging creation time.
+    filtering out charts created in target after staging was created.
+
+    We use two filters to identify charts that existed when staging was created:
+    1. Chart ID must be <= max chart ID on staging (reliable proxy for pre-staging charts)
+    2. Chart createdAt must be < staging creation time (backup filter)
 
     Note: A chart is considered deleted only if its ID doesn't exist at all on staging.
     Charts that exist on staging but with NULL slug (unpublished) are NOT deleted,
@@ -1071,14 +1075,23 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
     """
     staging_creation_time = get_staging_creation_time(source_session)
 
+    # Get max chart ID from staging - charts with higher IDs in production were created after staging
+    max_id_query = text("SELECT MAX(id) FROM charts")
+    max_staging_chart_id = source_session.execute(max_id_query).scalar() or 0
+
     # Get chart info from target that existed before staging was created
+    # Use both max ID filter and createdAt filter for robustness
     query = text("""
     SELECT c.id, cc.slug
     FROM charts c
     JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL AND c.createdAt < :staging_creation_time
+    WHERE cc.slug IS NOT NULL
+      AND c.id <= :max_staging_chart_id
+      AND c.createdAt < :staging_creation_time
     """)
-    result = target_session.execute(query, {"staging_creation_time": staging_creation_time}).fetchall()
+    result = target_session.execute(
+        query, {"staging_creation_time": staging_creation_time, "max_staging_chart_id": max_staging_chart_id}
+    ).fetchall()
     target_charts_pre_staging = {row[0]: row[1] for row in result}  # id -> slug mapping
 
     # Get ALL chart IDs from source (regardless of slug status)

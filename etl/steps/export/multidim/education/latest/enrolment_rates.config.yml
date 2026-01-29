@@ -1,5 +1,5 @@
 title:
-  title: School enrolment rates
+  title: School enrollment rates
   title_variant: by level of education and gender
 topic_tags:
   - Global Education
@@ -13,14 +13,14 @@ dimensions:
     name: Metric
     choices:
       - slug: net_enrolment
-        name: Net enrolment
+        name: Net enrollment
         description: Only includes children within the official age group of the corresponding education level
       - slug: gross_enrolment
-        name: Gross enrolment
+        name: Gross enrollment
         description: Includes children of any age entering that level of education
       - slug: enrolment_type_side_by_side
         name: Both metrics
-        description: Compare net and gross enrolment rates
+        description: Compare net and gross enrollment rates
   - slug: level
     name: Education level
     choices:
@@ -41,7 +41,7 @@ dimensions:
         description: Formal post-secondary learning, ranging from short vocational programs to university degrees
       - slug: level_side_by_side
         name: All levels
-        description: Compare enrolment rates across all education levels
+        description: Compare enrollment rates across all education levels
 
   - slug: sex
     name: Gender
@@ -54,6 +54,6 @@ dimensions:
         name: Boys
       - slug: "sex_side_by_side"
         name: Girls vs. boys
-        description: Compare enrolment rates between girls and boys
+        description: Compare enrollment rates between girls and boys
 
 views: []
