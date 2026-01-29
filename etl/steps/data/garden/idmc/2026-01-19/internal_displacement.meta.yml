@@ -40,8 +40,12 @@ definitions:
       We calculate this by taking the total rounded number of internally displaced people divided by the total population of the country and multiply this by 1,000. For this we use our long-term population data set, which can be explored in the [population data explorer](https://ourworldindata.org/explorers/population-and-demography).
     footnote_displacements: &footnote_displacements |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
-    footnote_na: &footnote_na |-
-      "No data" means the IDMC has not identified any internal displacements or internally displaced people in that country for that year.
+    footnote_zero_displacements: &footnote_zero_displacements |-
+      A value of "0" means IDMC has not recorded any internal displacements this year. This does not mean that IDMC has confirmed that there are no internal displacements, but rather that none are known to IDMC at the time of reporting.
+    footnote_zero_idps: &footnote_zero_idps |-
+      A value of "0" means IDMC has not recorded any internally displaced people (IDPs) in that region. This does not mean that IDMC has confirmed that there are no IDPs, but rather that none are known to IDMC at the time of reporting.
+    idmc_na_processing: &idmc_na_processing |-
+      IDMC uses "N/A" to denote that no displacements or IDPs were recorded for that year. In our dataset, we convert these "N/A" values to 0 to make this more transparent and the data easier to interpret.
     idmc_rounded: &idmc_rounded |-
       IDMC provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
     idmc_criteria: &idmc_criteria |-
@@ -70,11 +74,16 @@ tables:
 
           ### Disaster
           {definitions.idmc_definitions.disaster}
-        description_processing: This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
+        description_processing: |-
+          - This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
+          - {definitions.processing_notes.idmc_na_processing}
         description_key:
           - *stock_data
           - *idmc_criteria
           - *idmc_rounded
+        presentation:
+          grapher_config:
+            note: *footnote_zero_idps
       total_displacement_rounded_per_thousand:
         title: Internally displaced people per 1000 inhabitants
         description_short: |-
@@ -96,7 +105,10 @@ tables:
         description_processing: |-
           - {definitions.processing_notes.population_share}
           - This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
-
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_idps
       conflict_total_displacement_rounded:
         title: Internally displaced people due to conflict
         description_short: |-
@@ -114,7 +126,11 @@ tables:
           - *conflict
           - *idmc_criteria
           - *idmc_rounded
-
+        description_processing: |-
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_idps
       conflict_total_displacement_rounded_per_thousand:
         title: Internally displaced people due to conflict per 1000 inhabitants
         description_short: |-
@@ -133,6 +149,10 @@ tables:
           - *idmc_rounded
         description_processing: |-
           - {definitions.processing_notes.population_share}
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_idps
       disaster_total_displacement_rounded:
         title: Internally displaced people due to disaster
         description_short: |-
@@ -150,6 +170,11 @@ tables:
           - *disaster
           - *idmc_criteria
           - *idmc_rounded
+        description_processing: |-
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_idps
       disaster_total_displacement_rounded_per_thousand:
         title: Internally displaced people due to disaster per 1000 inhabitants
         description_short: |-
@@ -168,7 +193,10 @@ tables:
           - *idmc_rounded
         description_processing: |-
           - {definitions.processing_notes.population_share}
-
+          - This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
+        presentation:
+          grapher_config:
+            note: *footnote_zero_idps
       # internal displacements
       total_new_displacement_rounded:
         title: Total internal displacements
@@ -185,11 +213,16 @@ tables:
 
           ### Disaster
           {definitions.idmc_definitions.disaster}
-        description_processing: This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
+        description_processing: |-
+          - This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
+          - {definitions.processing_notes.idmc_na_processing}
         description_key:
           - *flow_data
           - *idmc_criteria
           - *idmc_rounded
+        presentation:
+          grapher_config:
+            note: *footnote_zero_displacements
       total_new_displacement_rounded_per_thousand:
         title: Internal displacements per 1000 people
         description_short: |-
@@ -213,6 +246,10 @@ tables:
         description_processing: |-
           - {definitions.processing_notes.population_share}
           - This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_displacements
       conflict_new_displacement_rounded:
         title: Internal displacements due to conflict
         description_short: |-
@@ -230,6 +267,11 @@ tables:
           - *conflict
           - *idmc_criteria
           - *idmc_rounded
+        description_processing: |-
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_displacements
       conflict_new_displacement_rounded_per_thousand:
         title: Internal displacements due to conflict per 1000 people
         description_short: |-
@@ -250,6 +292,10 @@ tables:
           - *idmc_rounded
         description_processing: |-
           - {definitions.processing_notes.population_share}
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_displacements
       disaster_new_displacement_rounded:
         title: Internal displacements due to disaster
         description_short: |-
@@ -267,6 +313,11 @@ tables:
           - *disaster
           - *idmc_criteria
           - *idmc_rounded
+        description_processing: |-
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_displacements
       disaster_new_displacement_rounded_per_thousand:
         title: Internal displacements due to disaster per 1000 people
         description_short: |-
@@ -287,7 +338,10 @@ tables:
           - *idmc_rounded
         description_processing: |-
           - {definitions.processing_notes.population_share}
-
+          - {definitions.processing_notes.idmc_na_processing}
+        presentation:
+          grapher_config:
+            note: *footnote_zero_displacements
       # Raw values
       total_displacement:
         title: Internally displaced people (raw values)

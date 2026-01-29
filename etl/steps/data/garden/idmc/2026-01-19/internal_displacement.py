@@ -30,10 +30,16 @@ def run() -> None:
 
     tb = geo.add_population_to_table(tb, ds_pop)
 
+    # fill n/a values with 0, as no displacements were recorded
+    tb["conflict_total_displacement"] = tb["conflict_total_displacement"].fillna(0)
+    tb["conflict_new_displacement"] = tb["conflict_new_displacement"].fillna(0)
+    tb["disaster_total_displacement"] = tb["disaster_total_displacement"].fillna(0)
+    tb["disaster_new_displacement"] = tb["disaster_new_displacement"].fillna(0)
+
     # add total displacements (conflict + disaster)
-    tb["total_displacement"] = tb["conflict_total_displacement"].fillna(0) + tb["disaster_total_displacement"].fillna(0)
+    tb["total_displacement"] = tb["conflict_total_displacement"] + tb["disaster_total_displacement"]
     tb["total_displacement_rounded"] = tb["total_displacement"].apply(round_idmc_style)
-    tb["total_new_displacement"] = tb["conflict_new_displacement"].fillna(0) + tb["disaster_new_displacement"].fillna(0)
+    tb["total_new_displacement"] = tb["conflict_new_displacement"] + tb["disaster_new_displacement"]
     tb["total_new_displacement_rounded"] = tb["total_new_displacement"].apply(round_idmc_style)
 
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
