@@ -50,15 +50,6 @@ steps:
   data://grapher/migration/2024-11-18/migration_between_regions:
     - data://garden/migration/2024-11-18/migration_between_regions
 
-  # Refugee, Asylum and Migration Explorer:
-  export://explorers/migration/2024-08-05/migration:
-    - data://grapher/unicef/2024-07-30/child_migration
-    - data://grapher/un/2024-07-25/refugee_data
-    - data://grapher/un/2025-03-12/migrant_stock
-    - data://grapher/un/2024-07-12/un_wpp_full
-    - data://grapher/worldbank_wdi/2024-05-20/wdi
-    - data://grapher/idmc/2024-08-02/internal_displacement
-
   # UN DESA migrant stock (2024)
   data://meadow/un/2025-03-12/migrant_stock:
     - snapshot://un/2025-03-12/migrant_stock_dest.xlsx
@@ -85,6 +76,7 @@ steps:
     - data://grapher/un/2025-03-18/migration_stock_flows
   export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
+
 
   # UNHCR refugee data (2025)
   data://meadow/un/2025-07-03/refugee_data:
@@ -118,3 +110,12 @@ steps:
   data://grapher/unicef/2026-01-07/child_migration:
     - data://garden/unicef/2026-01-07/child_migration
 
+
+  #Refugee, Asylum and Migration Explorer (2026 Jan update):
+  export://explorers/migration/2026-01-27/migration:
+    - data://grapher/unicef/2026-01-07/child_migration
+    - data://grapher/un/2025-07-03/refugee_data
+    - data://grapher/un/2025-03-12/migrant_stock
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/worldbank_wdi/2025-09-08/wdi
+    - data://grapher/idmc/2026-01-19/internal_displacement
