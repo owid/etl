@@ -30,7 +30,7 @@ tables:
         presentation:
           title_public: Solar photovoltaic module price
           grapher_config:
-            note: "Costs are expressed in constant {LATEST_YEAR} US$ per watt. Global estimates are used before 2010; European market benchmarks thereafter due to data availability."
+            note: "Costs are expressed in constant {LATEST_YEAR} US$ per watt. Global estimates are used before 2010; European market benchmarks thereafter due to limited data availability."
         description_processing: |-
           - Historical photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009), and between 2004 and 2009 from Farmer & Lafond (2016).
           - From 2010 onward, prices come from IRENA's Renewable Power Generation Costs report, based on pvXchange benchmarks for modules sold in Europe, using the 'Thin film a-Si/u-Si or Global Price Index (from Q4 2013)' series.
