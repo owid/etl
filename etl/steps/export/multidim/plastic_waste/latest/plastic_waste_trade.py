@@ -12,40 +12,49 @@ MULTIDIM_CONFIG = {
     "chartTypes": ["LineChart"],
 }
 
+# Indicator name constant
+INDICATOR_NAME = "plastic_waste_trade"
+
 # Define dimensions for all variables
 DIMENSIONS_DETAILS = {
     # Exports
     "export_total_mot": {
-        "metric": "exports",
-        "rate": "total",
-        "original_short_name": "plastic_waste_trade",
+        "dimensions": {
+            "metric": "exports",
+            "rate": "total",
+        },
     },
     "export_total_mot_per_capita": {
-        "metric": "exports",
-        "rate": "per_capita",
-        "original_short_name": "plastic_waste_trade",
+        "dimensions": {
+            "metric": "exports",
+            "rate": "per_capita",
+        },
     },
     # Imports
     "import_total_mot": {
-        "metric": "imports",
-        "rate": "total",
-        "original_short_name": "plastic_waste_trade",
+        "dimensions": {
+            "metric": "imports",
+            "rate": "total",
+        },
     },
     "import_total_mot_per_capita": {
-        "metric": "imports",
-        "rate": "per_capita",
-        "original_short_name": "plastic_waste_trade",
+        "dimensions": {
+            "metric": "imports",
+            "rate": "per_capita",
+        },
     },
     # Net exports
     "net_export": {
-        "metric": "net_exports",
-        "rate": "total",
-        "original_short_name": "plastic_waste_trade",
+        "dimensions": {
+            "metric": "net_exports",
+            "rate": "total",
+        },
     },
     "net_export_per_capita": {
-        "metric": "net_exports",
-        "rate": "per_capita",
-        "original_short_name": "plastic_waste_trade",
+        "dimensions": {
+            "metric": "net_exports",
+            "rate": "per_capita",
+        },
     },
 }
 
@@ -62,7 +71,7 @@ def run() -> None:
 
     # Load grapher dataset
     ds_grapher = paths.load_dataset("plastic_waste_2023_2024")
-    tb = ds_grapher.read("plastic_waste_2023_2024", reset_index=False)
+    tb = ds_grapher.read("plastic_waste_2023_2024", load_data=False)
 
     #
     # Process data.
@@ -74,17 +83,16 @@ def run() -> None:
     # Add dimension metadata to columns based on their measure type
     for col, details in DIMENSIONS_DETAILS.items():
         if col in tb.columns:
-            # Set dimensions (all keys except original_short_name)
-            tb[col].m.dimensions = {k: v for k, v in details.items() if k != "original_short_name"}
-            # Set original_short_name if present
-            if "original_short_name" in details:
-                tb[col].m.original_short_name = details["original_short_name"]
+            # Set dimensions
+            tb[col].m.dimensions = details["dimensions"]
+            # Set original_short_name
+            tb[col].m.original_short_name = INDICATOR_NAME
 
     # Create collection - this will automatically generate views from dimensions
     c = paths.create_collection(
         config=config,
         tb=tb,
-        indicator_names=["plastic_waste_trade"],
+        indicator_names=[INDICATOR_NAME],
         dimensions=["metric", "rate"],
         common_view_config=MULTIDIM_CONFIG,
     )
