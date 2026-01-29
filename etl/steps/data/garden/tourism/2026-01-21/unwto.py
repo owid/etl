@@ -3,11 +3,46 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Prefixes for columns that should not be multiplied by 1000
+PREFIXES_NOT_THOUSANDS = [
+    "inbound_tourism_expenditure",
+    "outbound_tourism_expenditure",
+    "employment_employed_persons",
+    "tourism_industries",
+    "tour_ind_environmen_implementa",
+]
+
+# Common abbreviations for shortening column names
+ABBREVIATIONS = {
+    "inbound": "in",
+    "outbound": "out",
+    "tourism": "tour",
+    "domestic": "dom",
+    "accommodation": "accom",
+    "establishments": "estab",
+    "visitors": "vis",
+    "passengers": "pass",
+    "excursionists": "excur",
+    "overnights": "ovn",
+    "expenditure": "exp",
+    "industries": "ind",
+    "transportation": "trans",
+    "activities": "act",
+    "professional": "prof",
+    "nationals": "nat",
+    "residing": "res",
+    "classified": "class",
+    "available": "avail",
+    "capacity": "cap",
+    "average": "avg",
+    "number": "num",
+    "occupancy": "occ",
+}
 
 # Columns to keep after shortening column names
 COLUMNS_TO_KEEP = [
@@ -45,7 +80,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("unwto")
-    ds_population = paths.load_dataset("population")
     ds_wdi = paths.load_dataset("wdi")
 
     # Read table from meadow dataset
@@ -60,14 +94,7 @@ def run() -> None:
     tb = tb.dropna(axis=1, how="all")
 
     # Find columns that start with the specified prefixes - units are not thousands
-    prefixes_not_thousands = [
-        "inbound_tourism_expenditure",
-        "outbound_tourism_expenditure",
-        "employment_employed_persons",
-        "tourism_industries",
-        "tour_ind_environmen_implementa",
-    ]
-    matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in prefixes_not_thousands)]
+    matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in PREFIXES_NOT_THOUSANDS)]
     # Multiply the all the other columns by 1000 as these are in thousands
     for col in tb.columns:
         if col not in matching_columns + ["country", "year"]:
@@ -82,8 +109,12 @@ def run() -> None:
     # Shortern column names
     tb.columns = shorten_column_names(tb.columns)
 
+    # Check that all expected columns are present
+    missing_columns = [col for col in COLUMNS_TO_KEEP if col not in tb.columns]
+    assert not missing_columns, f"Missing expected columns: {missing_columns}"
+
     # Select only the columns we want to keep (plus country and year)
-    columns_to_select = ["country", "year"] + [col for col in COLUMNS_TO_KEEP if col in tb.columns]
+    columns_to_select = ["country", "year"] + COLUMNS_TO_KEEP
     tb = tb[columns_to_select]
 
     # Calculate the business/personal ratio column
@@ -102,7 +133,7 @@ def run() -> None:
         / tb["in_tour_arrivals_trips_total_overnight_vis_tourists"]
     )
     # Add certain indicators per 1,000 inhabitants
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
     #
     # Calculate per 1,000 inhabitants for some indicators
     #
@@ -128,33 +159,25 @@ def run() -> None:
     #
     # Calculate the inbound tourism by region
     #
-    region_columns = [
-        "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total",
-        "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total",
-        "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total",
-        "in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total",
-        "in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total",
-        "in_tour_regions_trips_region_overnight_vis_tourists_other_not_class_unwto_total",
-        "in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total",
-    ]
+    # Define region columns mapping
+    region_columns_mapping = {
+        "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total": "Africa (UNWTO)",
+        "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total": "Americas (UNWTO)",
+        "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total": "East Asia and the Pacific (UNWTO)",
+        "in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total": "Europe (UNWTO)",
+        "in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total": "Middle East (UNWTO)",
+        "in_tour_regions_trips_region_overnight_vis_tourists_other_not_class_unwto_total": "Other (UNWTO)",
+        "in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total": "South Asia (UNWTO)",
+    }
 
     # Filter to only existing columns
-    existing_region_columns = [col for col in region_columns if col in tb.columns]
+    existing_region_columns = [col for col in region_columns_mapping.keys() if col in tb.columns]
 
     if existing_region_columns:
         tb_regions_sum = tb[existing_region_columns + ["year"]].groupby("year").sum().reset_index()
 
         # Rename the columns
-        rename_mapping = {
-            "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total": "Africa (UNWTO)",
-            "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total": "Americas (UNWTO)",
-            "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total": "East Asia and the Pacific (UNWTO)",
-            "in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total": "Europe (UNWTO)",
-            "in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total": "Middle East (UNWTO)",
-            "in_tour_regions_trips_region_overnight_vis_tourists_other_not_class_unwto_total": "Other (UNWTO)",
-            "in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total": "South Asia (UNWTO)",
-        }
-        tb_regions_sum = tb_regions_sum.rename(columns=rename_mapping)
+        tb_regions_sum = tb_regions_sum.rename(columns=region_columns_mapping)
 
         # Melt the Table so that each region is a row in a country column
         tb_regions_sum = pr.melt(
@@ -167,23 +190,11 @@ def run() -> None:
     # Rename environment and GDP variables to shorter names
     # These have already been processed by shorten_column_names function
     #
-    rename_dict = {}
-
-    # Environment variables (after shortening)
-    if (
-        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"
-        in tb.columns
-    ):
-        rename_dict[
-            "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables"
-        ] = "total_tables"
-
-    # GDP variable (after shortening)
-    if "tour_ind_gdp_direct_as_a_proportion_of_total_pct" in tb.columns:
-        rename_dict["tour_ind_gdp_direct_as_a_proportion_of_total_pct"] = "tourism_share_gdp"
-
-    if rename_dict:
-        tb = tb.rename(columns=rename_dict)
+    rename_dict = {
+        "tour_ind_environmen_implementa_of_standard_accounting_tools_to_monitor_the_economic_and_aspects_num_tables": "total_tables",
+        "tour_ind_gdp_direct_as_a_proportion_of_total_pct": "tourism_share_gdp",
+    }
+    tb = tb.rename(columns=rename_dict, errors="raise")
 
     # Adjust inbound and outbound expenditure for inflation and cost of living
     tb = adjust_inflation_cost_of_living(tb, tb_wdi)
@@ -201,33 +212,20 @@ def run() -> None:
 
 
 def shorten_column_names(columns):
-    # Define common abbreviations and replacements
-    abbr = {
-        "inbound": "in",
-        "outbound": "out",
-        "tourism": "tour",
-        "domestic": "dom",
-        "accommodation": "accom",
-        "establishments": "estab",
-        "visitors": "vis",
-        "passengers": "pass",
-        "excursionists": "excur",
-        "overnights": "ovn",
-        "expenditure": "exp",
-        "industries": "ind",
-        "transportation": "trans",
-        "activities": "act",
-        "professional": "prof",
-        "nationals": "nat",
-        "residing": "res",
-        "classified": "class",
-        "available": "avail",
-        "capacity": "cap",
-        "average": "avg",
-        "number": "num",
-        "occupancy": "occ",
-    }
+    """
+    Shorten long column names using common abbreviations.
 
+    This function takes column names from the UNWTO dataset and abbreviates common tourism terms
+    to make them more manageable while maintaining readability. For example:
+    - "inbound_tourism_accommodation" becomes "in_tour_accom"
+    - "outbound_tourism_expenditure" becomes "out_tour_exp"
+
+    Args:
+        columns: List or iterable of column names to shorten
+
+    Returns:
+        List of shortened column names with duplicate words removed
+    """
     short_columns = []
 
     for col in columns:
@@ -238,7 +236,7 @@ def shorten_column_names(columns):
         short_parts = []
         for part in parts:
             words = part.split("_")
-            short_words = [abbr.get(word, word[:10]) for word in words]
+            short_words = [ABBREVIATIONS.get(word, word[:10]) for word in words]
             short_parts.append("_".join(short_words))
 
         # Join the shortened parts
@@ -277,15 +275,16 @@ def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
     # pa_nus_atls: Official exchange rate (LCU per US$, period average)
     # pa_nus_prvt_pp: PPP conversion factor, private consumption (LCU per international $)
     # fp_cpi_totl: Consumer price index (2010 = 100)
-
-    tb_exchange = tb_wdi[["country", "year", "pa_nus_atls"]].rename(columns={"pa_nus_atls": "exchange_rate"})
-
-    tb_ppp = tb_wdi[["country", "year", "pa_nus_prvt_pp"]].rename(columns={"pa_nus_prvt_pp": "ppp_conversion_factor"})
-
-    tb_cpi = tb_wdi[["country", "year", "fp_cpi_totl"]].rename(columns={"fp_cpi_totl": "cpi"})
+    tb_wdi_filtered = tb_wdi[["country", "year", "pa_nus_atls", "pa_nus_prvt_pp", "fp_cpi_totl"]].rename(
+        columns={
+            "pa_nus_atls": "exchange_rate",
+            "pa_nus_prvt_pp": "ppp_conversion_factor",
+            "fp_cpi_totl": "cpi",
+        }
+    )
 
     # Get U.S. CPI data for outbound adjustment
-    tb_us_cpi = tb_cpi[tb_cpi["country"] == "United States"].copy()
+    tb_us_cpi = tb_wdi_filtered[tb_wdi_filtered["country"] == "United States"][["year", "cpi"]].copy()
 
     # Calculate the U.S. CPI adjustment factor for 2021
     cpi_2021_us = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "cpi"].values
@@ -307,9 +306,7 @@ def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
     tb = tb.drop(columns=["cpi_adj_2021"], errors="ignore")
 
     # Merge exchange rates, PPP, and local CPI with main table
-    tb = pr.merge(tb, tb_exchange, on=["country", "year"], how="left")
-    tb = pr.merge(tb, tb_ppp, on=["country", "year"], how="left")
-    tb = pr.merge(tb, tb_cpi, on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_wdi_filtered, on=["country", "year"], how="left")
 
     # Get 2021 reference values for each country
     tb_2021 = tb[tb["year"] == 2021][["country", "cpi", "ppp_conversion_factor"]].copy()
@@ -318,15 +315,15 @@ def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
     # Merge 2021 reference values
     tb = pr.merge(tb, tb_2021, on="country", how="left")
 
-    # Normalize CPI to 2021 = 100
-    tb["cpi_normalized_2021"] = 100 * tb["cpi"] / tb["cpi_2021"]
+    # Normalize CPI to 2021 = 1
+    tb["cpi_normalized_2021"] = tb["cpi"] / tb["cpi_2021"]
 
     # Adjust inbound expenditure for local inflation and PPP
     # Formula: (expenditure_in_usd * exchange_rate / cpi_normalized) / ppp_2021
     # This converts to local currency, adjusts for inflation, and normalizes by PPP
     if "in_tour_exp_balance_of_payments_total_vis" in tb.columns:
         tb["inbound_exp_ppp_cpi_adj_2021"] = (
-            100 * (tb["in_tour_exp_balance_of_payments_total_vis"] * tb["exchange_rate"]) / tb["cpi_normalized_2021"]
+            (tb["in_tour_exp_balance_of_payments_total_vis"] * tb["exchange_rate"]) / tb["cpi_normalized_2021"]
         ) / tb["ppp_2021"]
 
     # Clean up temporary columns
@@ -339,7 +336,7 @@ def adjust_inflation_cost_of_living(tb: Table, tb_wdi: Table) -> Table:
             "ppp_2021",
             "cpi_normalized_2021",
         ],
-        errors="ignore",
+        errors="raise",
     )
 
     return tb

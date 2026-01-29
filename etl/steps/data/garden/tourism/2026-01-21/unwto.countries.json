@@ -51,7 +51,6 @@
   "Cura\u00e7ao": "Curacao",
   "Cyprus": "Cyprus",
   "Czechia": "Czechia",
-  "C\u00f4te d\u2019Ivoire": "Cote d'Ivoire",
   "Democratic Republic of the Congo": "Democratic Republic of Congo",
   "Denmark": "Denmark",
   "Djibouti": "Djibouti",
@@ -218,5 +217,7 @@
   "China, Macao Special Administrative Region": "Macao",
   "Saba": "Saba",
   "St. Eustatius": "Sint Eustatius",
-  "Taiwan Province of China": "Taiwan"
+  "Taiwan Province of China": "Taiwan",
+  "Bonaire, Sint Eustatius and Saba": "Bonaire Sint Eustatius and Saba",
+  "Cote d'Ivoire": "Cote d'Ivoire"
 }

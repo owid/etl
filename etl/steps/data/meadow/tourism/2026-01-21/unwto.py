@@ -13,7 +13,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("unwto.xlsx")
+    snap = paths.load_snapshot("unwto.zip")
 
     #
     # Process data.
@@ -141,6 +141,15 @@ def run() -> None:
                 # File not found in archive or sheet not found
                 print(f"Warning: Could not process {file_path}: {e}")
                 continue
+
+    # Standardize country names before concatenation
+    # Handle different Unicode representations of Côte d'Ivoire
+    for i, tb_item in enumerate(tbs):
+        tbs[i]["country"] = tb_item["country"].replace({
+            "Côte d'Ivoire": "Cote d'Ivoire",  # U+00F4 (ô)
+            "Côte d'Ivoire": "Cote d'Ivoire",  # U+00F4 (ô)
+            "Côte d\u2019Ivoire": "Cote d'Ivoire",  # Unicode right single quotation mark
+        })
 
     # Concatenate all the processed DataFrames
     tb = pr.concat(tbs, axis=0, ignore_index=True)

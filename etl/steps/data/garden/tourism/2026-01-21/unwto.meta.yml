@@ -25,7 +25,7 @@ definitions:
       Values have been adjusted for US inflation using the Consumer Price Index (CPI) to account for changes in the purchasing power of the US dollar over time. This adjustment was made by deflating nominal expenditure values using the US CPI with 2021 as the base year. The CPI data comes from the World Bank World Development Indicators (FP.CPI.TOTL).
 
   note_ppp_cpi_adjustment: &note_ppp_cpi_adjustment |-
-      Values have been adjusted for both local inflation and differences in cost of living across countries. First, expenditures were converted to local currency using official exchange rates. Second, local CPI was used to adjust for inflation with 2021 as the base year. Finally, PPP conversion factors for private consumption were applied to convert to internationally comparable dollars. This dual adjustment allows for meaningful comparisons both across countries and over time. Data sources include UNWTO for tourism expenditure and World Bank World Development Indicators for CPI, exchange rates, and PPP conversion factors.
+      Values have been adjusted for both local inflation and differences in cost of living across countries. First, expenditures were converted to local currency using official exchange rates. Second, local CPI was used to adjust for inflation with 2021 as the base year. Finally, PPP conversion factors for private consumption were applied to convert to internationally comparable dollars. This dual adjustment allows for meaningful comparisons both across countries and over time. Data sources include UN Tourism for tourism expenditure and World Bank World Development Indicators for CPI, exchange rates, and PPP conversion factors.
 
   # =============================================================================
   # INBOUND TOURISM (Receipts) — Money flowing INTO a country from foreign visitors
@@ -142,7 +142,7 @@ tables:
 
       in_tour_exp_balance_of_payments_passenger_transport_vis:
         title: Inbound tourism expenditure on passenger transport
-        unit: US dollars
+        unit: current US$
         short_unit: $
         description_short: This captures fares paid to the country's airlines by foreign visitors, including airfares, excess baggage fees, and onboard purchases.
         description_key:
@@ -152,7 +152,7 @@ tables:
 
       in_tour_exp_balance_of_payments_travel_vis:
         title: Inbound tourism expenditure on travel
-        unit: US dollars
+        unit: current US$
         short_unit: $
         description_short: This captures spending by foreign visitors on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
         description_key:
@@ -162,7 +162,7 @@ tables:
 
       in_tour_exp_balance_of_payments_total_vis:
         title: Total inbound tourism expenditure
-        unit: US dollars
+        unit: current US$
         short_unit: $
         description_short: This captures spending by foreign visitors on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines.
         description_key:
@@ -218,7 +218,7 @@ tables:
 
       out_tour_exp_balance_of_payments_passenger_transport_vis:
         title: Outbound tourism expenditure on passenger transport
-        unit: US dollars
+        unit: current US$
         short_unit: $
         description_short: This captures fares paid to foreign airlines by the country's residents, including airfares, excess baggage fees, and onboard purchases.
         description_key:
@@ -228,7 +228,7 @@ tables:
 
       out_tour_exp_balance_of_payments_total_vis:
         title: Total outbound tourism expenditure
-        unit: US dollars
+        unit: current US$
         short_unit: $
         description_short: This captures spending by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines.
         description_key:
@@ -238,7 +238,7 @@ tables:
 
       out_tour_exp_balance_of_payments_travel_vis:
         title: Outbound tourism expenditure on travel
-        unit: US dollars
+        unit: current US$
         short_unit: $
         description_short: This captures spending by a country's residents abroad on accommodation, food, local transport, entertainment, shopping, and cruise fares.
         description_key:
@@ -409,8 +409,8 @@ tables:
           numDecimalPlaces: 1
 
       inbound_exp_ppp_cpi_adj_2021:
-        title: International tourist expenditure within the country they visit (in constant 2021 international-$)
-        unit: constant 2021 international-$
+        title: International tourist expenditure within the country they visit (in international-$ in 2021 prices)
+        unit: international-$ in 2021 prices
         short_unit: $
         description_short: This captures spending by foreign visitors on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines. This data is adjusted for inflation and differences in living costs between countries.
         description_key:
