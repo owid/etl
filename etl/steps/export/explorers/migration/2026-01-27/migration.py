@@ -1,5 +1,7 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
+from sqlglot.expressions import table_
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -62,4 +64,9 @@ def run() -> None:
             else:
                 view.config["title"] = tb[col_name].metadata.title  # ty:ignore[invalid-assignment]
             view.config["subtitle"] = tb[col_name].metadata.description_short  # ty:ignore[invalid-assignment]
+            var_pres = tb[col_name].metadata.presentation
+            note = var_pres.grapher_config.get("note") if var_pres is not None else None
+            if note:
+                view.config["note"] = note  # type: ignore[assignment]
+
     c.save()
