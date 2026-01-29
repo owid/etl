@@ -22,7 +22,7 @@ tables:
         description_key:
           - "Solar photovoltaic (PV) module prices refer to the cost of the solar panel itself, and do not include installation or other system components."
           - "Prices are compiled from three sources: Nemet (2009) for 1975-2003, Farmer & Lafond (2016) for 2004-2009, and IRENA for 2010 onward."
-          - "Due to limited data availability, we use IRENA's data on benchmark prices for modules sold in Europe, from pvXchange."
+          - "Due to limited data availability, we use the Global Price Index series reported by IRENA, based on pvXchange benchmark prices for modules sold in Europe."
           - "Historical prices have been adjusted for inflation using the [World Bank's US GDP deflator](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US)."
         display:
           name: Solar PV module cost
@@ -32,7 +32,8 @@ tables:
           grapher_config:
             note: "Costs are expressed in constant {LATEST_YEAR} US$ per watt. Global estimates are used before 2010; European market benchmarks thereafter due to data availability."
         description_processing: |-
-          - Photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009), between 2004 and 2009 from Farmer & Lafond (2016), and since 2010 from IRENA.
+          - Historical photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009), and between 2004 and 2009 from Farmer & Lafond (2016).
+          - From 2010 onward, prices come from IRENA's Renewable Power Generation Costs report, based on pvXchange benchmarks for modules sold in Europe, using the 'Thin film a-Si/u-Si or Global Price Index (from Q4 2013)' series.
           - Prices from Nemet (2009) and Farmer & Lafond (2016) have been converted to {LATEST_YEAR} US$ using the US GDP deflator, to account for the effects of inflation. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US).
       cost_source:
         title: Source for each value of cost data
