@@ -1,5 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+from owid.catalog import Table
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -31,10 +35,7 @@ def run() -> None:
     tb = geo.add_population_to_table(tb, ds_pop)
 
     # fill n/a values with 0, as no displacements were recorded
-    tb["conflict_total_displacement"] = tb["conflict_total_displacement"].fillna(0)
-    tb["conflict_new_displacement"] = tb["conflict_new_displacement"].fillna(0)
-    tb["disaster_total_displacement"] = tb["disaster_total_displacement"].fillna(0)
-    tb["disaster_new_displacement"] = tb["disaster_new_displacement"].fillna(0)
+    tb = na_to_zero(tb)
 
     # add total displacements (conflict + disaster)
     tb["total_displacement"] = tb["conflict_total_displacement"] + tb["disaster_total_displacement"]
@@ -79,3 +80,33 @@ def round_idmc_style(x):
         return round(x, -len(str(int(x))) + 2)
     else:
         return round(x, -3)
+
+
+def na_to_zero(tb):
+    """Fill all NaN values with 0. If a country year combination has no row (and no NaN value), create one with 0 values."""
+    tb_countries = tb["country"].unique()
+    tb_years = tb["year"].unique()
+    all_combinations = [(country, year) for country in tb_countries for year in tb_years]
+
+    # fill n/a values with 0, as no displacements were recorded
+    tb["conflict_total_displacement"] = tb["conflict_total_displacement"].fillna(0)
+    tb["conflict_new_displacement"] = tb["conflict_new_displacement"].fillna(0)
+    tb["disaster_total_displacement"] = tb["disaster_total_displacement"].fillna(0)
+    tb["disaster_new_displacement"] = tb["disaster_new_displacement"].fillna(0)
+
+    new_rows = []
+    for country, year in all_combinations:
+        if not ((tb["country"] == country) & (tb["year"] == year)).any():
+            new_row = {
+                "country": country,
+                "year": year,
+                "conflict_total_displacement": 0,
+                "conflict_new_displacement": 0,
+                "disaster_total_displacement": 0,
+                "disaster_new_displacement": 0,
+            }
+            new_rows.append(new_row)
+    if new_rows:
+        tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
+        tb = pr.concat([tb, tb_new], ignore_index=True)
+    return tb
