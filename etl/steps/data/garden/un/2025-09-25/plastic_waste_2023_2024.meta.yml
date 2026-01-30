@@ -103,7 +103,7 @@ tables:
         description_processing: We calculated this by converting total imports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
           roundingMode: significantFigures
-          numSignificantFigures: 1
+          numSignificantFigures: 2
         presentation:
           grapher_config:
             map:
@@ -125,7 +125,7 @@ tables:
         description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
             roundingMode: significantFigures
-            numSignificantFigures: 1
+            numSignificantFigures: 2
         presentation:
           grapher_config:
             map:
@@ -203,7 +203,7 @@ tables:
         description_processing: We calculated this by converting net exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
           roundingMode: significantFigures
-          numSignificantFigures: 1
+          numSignificantFigures: 2
         presentation:
           grapher_config:
             map:
