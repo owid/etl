@@ -78,6 +78,7 @@ tables:
         unit: kilograms per person
         short_unit: kg
         description_short: Estimated quantity of plastic pollution entering the ocean via rivers, in kilograms per person per year.
+        description_key:
           - *text_modelled_estimate
           - *text_me_definition
           - This per capita figure is calculated by dividing the country's estimated emissions by its population.
