@@ -175,6 +175,10 @@ def get_changed_files(
         # If not specified, use "master" branch.
         base_branch = "master"
 
+    # If comparing branch to itself, return empty dict
+    if current_branch == base_branch:
+        return {}
+
     # Fetch the latest changes from the remote repository
     if fetch:
         repo.remotes.origin.fetch()
