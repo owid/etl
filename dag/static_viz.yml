@@ -1,0 +1,4 @@
+steps:
+  # World population growth visualization
+  export://static_viz/population/2026-01-26/world_population_growth:
+    - data://garden/demography/2024-07-15/population

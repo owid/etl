@@ -805,3 +805,4 @@ include:
   - dag/growth.yml
   - dag/labor.yml
   - dag/economics.yml
+  - dag/static_viz.yml
