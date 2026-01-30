@@ -761,6 +761,17 @@ steps:
   data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
     - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity
 
+
+  #
+  # CORE Econ - Unemployment rate and unemployment benefit replacement rate
+  #
+  data://meadow/core_econ/2026-01-30/unemployment_rate_benefits:
+    - snapshot://core_econ/2026-01-30/unemployment_rate_benefits.csv
+  data://garden/core_econ/2026-01-30/unemployment_rate_benefits:
+    - data://meadow/core_econ/2026-01-30/unemployment_rate_benefits
+  data://grapher/core_econ/2026-01-30/unemployment_rate_benefits:
+    - data://garden/core_econ/2026-01-30/unemployment_rate_benefits
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
