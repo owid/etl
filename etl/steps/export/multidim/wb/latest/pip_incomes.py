@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -11,14 +12,19 @@ PPP_YEAR = 2021
 # Define indicators to use
 INDICATORS = ["mean", "median", "avg", "thr", "share"]
 
-"decile", "period", "table", "survey_comparability"
-
-# Define dimensions
+# Define dimensions for main views
 DIMENSIONS_CONFIG = {
     "decile": "*",
     "period": "*",
     "table": ["Income or consumption consolidated"],
     "survey_comparability": ["No spells"],
+}
+
+# Define dimensions for spell views (survey_comparability computed dynamically)
+DIMENSIONS_CONFIG_SPELLS = {
+    "decile": "*",
+    "period": "*",
+    "table": ["Income or consumption consolidated"],
 }
 
 
@@ -50,6 +56,19 @@ def run() -> None:
                 tb[column].metadata.dimensions.pop(dimension)
     tb = tb[columns_to_keep]
 
+    # Get all survey_comparability values except "No spells" for spell views
+    survey_comp_values = set()
+    for col in tb.columns:
+        if "survey_comparability" in tb[col].metadata.dimensions:
+            survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
+    survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
+
+    # Build dimensions config for spell views
+    dimensions_spells = {
+        **DIMENSIONS_CONFIG_SPELLS,
+        "survey_comparability": survey_comp_spells,
+    }
+
     #
     # Create collection object
     #
@@ -61,6 +80,15 @@ def run() -> None:
         dimensions=DIMENSIONS_CONFIG,
     )
 
+    # Create a different collection object for spell views
+    c_spells = paths.create_collection(
+        config=config,
+        short_name="pip_incomes_spells",
+        tb=tb,
+        indicator_names=INDICATORS,
+        dimensions=dimensions_spells,
+    )
+
     #
     # (optional) Edit views
     #
@@ -68,6 +96,11 @@ def run() -> None:
         # if view.dimension["sex"] == "male":
         #     view.config["title"] = "Something else"
         pass
+
+    #
+    # Combine collections
+    #
+    c = combine_collections(collections=[c, c_spells], collection_name="pip_incomes")
 
     #
     # Save garden dataset.
