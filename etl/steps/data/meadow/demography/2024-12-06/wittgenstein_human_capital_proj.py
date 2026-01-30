@@ -93,14 +93,14 @@ def run() -> None:
     snap = paths.load_snapshot("wittgenstein_human_capital.zip")
 
     # Load data from snapshot. {"1": [tb1, tb2, ...], "2": [tb1, tb2, ...], ...}
-    # ~ 1:20 minutes (2 minutes if all scenarios are used)
+    # ~ 30 seconds
     tbs_scenario = read_data_from_snap(snap, SCENARIOS_EXPECTED)
 
     #
     # Process data.
     #
     # Consolidate individual scenario tables: {"main": [tb_main1, tb_main2, ...], "by_sex": [tb_sex1, tb_sex2, ...], ...}
-    # ~ 3 minutes (4:30 if all scenarios are used)
+    # ~ 2 minutes [without parallel: ~ 3 minutes (4:30 if all scenarios are used)]
     # dix = {k: v for k, v in tbs_scenario.items() if k == "1"}
     # tbs_scenario_ = make_scenario_tables(dix)
     tbs_scenario = make_scenario_tables(
@@ -112,7 +112,7 @@ def run() -> None:
     )
 
     # Concatenate: [table_main, table_sex, ...]
-    # ~ 2 minutes
+    # ~ 19 seconds
     tables = concatenate_tables(tbs_scenario)
 
     #
