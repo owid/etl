@@ -48,11 +48,11 @@ def data_from_api(url: str) -> pd.DataFrame:
     Args:
         url: The API endpoint URL.
     """
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     response.raise_for_status()
     data = response.json()
     while data.get("next"):
-        response = requests.get(data["next"])
+        response = requests.get(data["next"], timeout=60)
         response.raise_for_status()
         next_data = response.json()
         data["results"].extend(next_data["results"])
