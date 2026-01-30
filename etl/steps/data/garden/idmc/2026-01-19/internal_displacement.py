@@ -102,14 +102,25 @@ def na_to_zero(tb):
     new_rows = []
     for country, year in all_combinations:
         if not ((tb["country"] == country) & (tb["year"] == year)).any():
-            new_row = {
-                "country": country,
-                "year": year,
-                "conflict_total_displacement_rounded": 0,
-                "conflict_new_displacement_rounded": 0,
-                "disaster_total_displacement_rounded": 0,
-                "disaster_new_displacement_rounded": 0,
-            }
+            if year == 2008:
+                # 2008 only has natural disaster displacements
+                new_row = {
+                    "country": country,
+                    "year": year,
+                    "disaster_total_displacement_rounded": 0,
+                    "disaster_new_displacement_rounded": 0,
+                }
+            elif year > 2008:
+                new_row = {
+                    "country": country,
+                    "year": year,
+                    "conflict_total_displacement_rounded": 0,
+                    "conflict_new_displacement_rounded": 0,
+                    "disaster_total_displacement_rounded": 0,
+                    "disaster_new_displacement_rounded": 0,
+                }
+            else:
+                raise ValueError(f"Year {year} is before 2008, which is not expected in the dataset.")
             new_rows.append(new_row)
     if new_rows:
         tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
