@@ -64,6 +64,16 @@ def run() -> None:
     tb["total_new_displacement"] = tb[C_N_D] + tb[D_N_D]
     tb["total_new_displacement_rounded"] = tb["total_new_displacement"].apply(round_idmc_style)
 
+    # fill n/a values with 0 in the new total columns
+    # stock IDPs starting in 2019 (natural disaster IDPs added in 2019)
+    tb.loc[tb["year"] >= 2019, "total_new_displacement_rounded"] = tb.loc[
+        tb["year"] >= 2019, "total_new_displacement_rounded"
+    ].fillna(0)
+    # new displacements starting in 2009 (conflict displacements added in 2009)
+    tb.loc[tb["year"] >= 2009, "total_new_displacement_rounded"] = tb.loc[
+        tb["year"] >= 2009, "total_new_displacement_rounded"
+    ].fillna(0)
+
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
 
     tb = calculate_shares(tb, columns_to_calculate)
