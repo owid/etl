@@ -1,6 +1,5 @@
-from etl.collection import combine_config_dimensions, expand_config
+"""Load a meadow dataset and create a garden dataset."""
 
-# from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -9,24 +8,30 @@ paths = PathFinder(__file__)
 # Define PPP year
 PPP_YEAR = 2021
 
-# NOTE: Update lines when prices change
+# Define indicators to use
+INDICATORS = ["mean", "median", "avg", "thr", "share"]
+
+"decile", "period", "table", "survey_comparability"
+
+# Define dimensions
 DIMENSIONS_CONFIG = {
-    "poverty_line": ["100", "300", "420", "830", "1000", "2000", "3000", "4000"],
+    "decile": "*",
+    "period": "*",
     "table": ["Income or consumption consolidated"],
-    # "welfare_type": "*",
-    # "decile": "*",
     "survey_comparability": ["No spells"],
 }
 
 
-# etlr multidim
 def run() -> None:
-    # Load configuration from adjacent yaml file.
+    #
+    # Load inputs.
+    #
+    # Default collection config
     config = paths.load_collection_config()
 
-    # load table using load_data=False which only loads metadata significantly speeds this up
+    # Load grapher dataset.
     ds = paths.load_dataset("world_bank_pip")
-    tb = ds.read("poverty", load_data=False)
+    tb = ds.read("incomes", load_data=False)
 
     # Remove unwanted dimensions.
     # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.
@@ -45,32 +50,26 @@ def run() -> None:
                 tb[column].metadata.dimensions.pop(dimension)
     tb = tb[columns_to_keep]
 
-    # Bake config automatically from table
-    config_new = expand_config(
-        tb,  # type: ignore
-        indicator_names=[
-            "headcount_ratio",
-            "headcount",
-            # "total_shortfall",
-            # "avg_shortfall",
-            # "income_gap_ratio",
-            # "poverty_gap_index",
-        ],
+    #
+    # Create collection object
+    #
+    c = paths.create_collection(
+        config=config,
+        short_name="pip_incomes",
+        tb=tb,
+        indicator_names=INDICATORS,
         dimensions=DIMENSIONS_CONFIG,
     )
 
-    # Combine both sources
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] += config_new["views"]
+    #
+    # (optional) Edit views
+    #
+    for view in c.views:
+        # if view.dimension["sex"] == "male":
+        #     view.config["title"] = "Something else"
+        pass
 
-    # Create mdim
-    c = paths.create_collection(
-        config=config,
-        short_name="poverty",
-    )
-
-    # Save & upload
+    #
+    # Save garden dataset.
+    #
     c.save()
