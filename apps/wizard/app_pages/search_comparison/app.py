@@ -122,6 +122,27 @@ def fetch_answer_stream(query: str) -> Generator[str, None, None]:
         yield f"\n\n*Error: {e}*"
 
 
+def fetch_topics(query: str, limit: int = 3, mode: str = "semantic") -> tuple[dict, float]:
+    """Fetch recommended topics from AI search API.
+
+    Args:
+        query: Search query string
+        limit: Maximum number of topics to return
+        mode: Either "semantic" for vector search or "llm" for LLM-based recommendations
+    """
+    start = time.time()
+    try:
+        response = requests.get(
+            f"{API_BASE}/api/ai-search/topics",
+            params={"q": query, "limit": limit, "mode": mode},
+            timeout=30,
+        )
+        response.raise_for_status()
+        return response.json(), time.time() - start
+    except requests.RequestException as e:
+        return {"error": str(e), "hits": []}, time.time() - start
+
+
 def get_rank_change_indicator(current_rank: int, other_rank: int | None) -> str:
     """Get an indicator showing rank change between search results."""
     if other_rank is None:
@@ -228,19 +249,34 @@ def main():
         )
 
     # Quick actions and options
-    with st_horizontal():
-        st.markdown("**Try:**")
-        if st.button("🎲 Random query", help="Pick a random query from real user searches (weighted by popularity)"):
-            st.session_state["_set_random_query"] = get_random_search_query(require_hits=True)
-            st.rerun()
-        if st.button("🔍 Zero Algolia results", help="Pick a query that returned zero results in Algolia"):
-            st.session_state["_set_random_query"] = get_random_search_query(require_hits=False)
-            st.rerun()
-        enable_ai_answer = url_persist(st.checkbox)(
-            key="ai_answer",
-            label="AI Answer",
-            value=True,
-        )
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        with st_horizontal():
+            st.markdown("**Try:**")
+            if st.button("🎲 Random query", help="Pick a random query from real user searches (weighted by popularity)"):
+                st.session_state["_set_random_query"] = get_random_search_query(require_hits=True)
+                st.rerun()
+            if st.button("🔍 Zero Algolia results", help="Pick a query that returned zero results in Algolia"):
+                st.session_state["_set_random_query"] = get_random_search_query(require_hits=False)
+                st.rerun()
+
+    with col2:
+        with st_horizontal():
+            enable_ai_answer = url_persist(st.checkbox)(
+                key="ai_answer",
+                label="AI Answer",
+                value=False,
+            )
+            topic_threshold = st.number_input(
+                "Topic threshold",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.65,
+                step=0.05,
+                help="Minimum relevance score for topic recommendations",
+                key="topic_threshold",
+            )
 
     if not query:
         st.info("Enter a search query above to compare results.")
@@ -276,6 +312,53 @@ def main():
 
     semantic_slug_to_rank = build_slug_to_rank(semantic_hits)
     algolia_slug_to_rank = build_slug_to_rank(algolia_hits)
+
+    # Fetch and display recommended topics - both modes for comparison
+    st.subheader("📚 Recommended Topics")
+
+    # Fetch both LLM and semantic topics
+    topics_llm, topics_llm_time = fetch_topics(query, limit=5, mode="llm")
+    topics_semantic, topics_semantic_time = fetch_topics(query, limit=5, mode="semantic")
+
+    # LLM Topics
+    st.markdown("**🤖 LLM Recommendations**")
+    if "error" not in topics_llm and topics_llm.get("hits"):
+        filtered_llm = [t for t in topics_llm["hits"] if t.get("score", 0) >= topic_threshold]
+        if filtered_llm:
+            topic_cols = st.columns(min(len(filtered_llm), 5))
+            for idx, topic in enumerate(filtered_llm):
+                with topic_cols[idx]:
+                    with st.container(border=True):
+                        score = topic.get("score", 0)
+                        st.markdown(
+                            f"[**{topic['name']}**]({topic['url']})",
+                            help=f"Relevance score: {score:.3f}"
+                        )
+                        st.caption(topic.get("excerpt", "")[:100] + "...")
+        else:
+            st.info("No LLM topics above threshold")
+    else:
+        st.error(f"LLM Error: {topics_llm.get('error', 'Unknown error')}")
+
+    # Semantic Topics
+    st.markdown("**🔍 Semantic (Vector Search)**")
+    if "error" not in topics_semantic and topics_semantic.get("hits"):
+        filtered_semantic = [t for t in topics_semantic["hits"] if t.get("score", 0) >= topic_threshold]
+        if filtered_semantic:
+            topic_cols = st.columns(min(len(filtered_semantic), 5))
+            for idx, topic in enumerate(filtered_semantic):
+                with topic_cols[idx]:
+                    with st.container(border=True):
+                        score = topic.get("score", 0)
+                        st.markdown(
+                            f"[**{topic['name']}**]({topic['url']})",
+                            help=f"Relevance score: {score:.3f}"
+                        )
+                        st.caption(topic.get("excerpt", "")[:100] + "...")
+        else:
+            st.info("No semantic topics above threshold")
+    else:
+        st.error(f"Semantic Error: {topics_semantic.get('error', 'Unknown error')}")
 
     # Create placeholder for AI answer at the top (will be filled after charts render)
     if enable_ai_answer:

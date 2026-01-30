@@ -92,7 +92,10 @@ def get_random_search_query(
         df = df[df["n_hits"] == 0]
 
     # Exclude queries containing URLs (user typos)
-    df = df[~df["query"].str.contains("ourworldindata.org", case=False, na=False)]
+    df = df[~df["query"].str.contains("ourworldindata", case=False, na=False)]
+
+    # Exclude queries starting with `/` (URL paths)
+    df = df[~df["query"].str.startswith("/", na=False)]
 
     if len(df) == 0:
         return "climate change"  # Fallback
