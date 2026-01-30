@@ -26,7 +26,7 @@ definitions:
     Additionally, we converted the resulting value from weeks to days by multiplying the series by 5, assuming a five-day workweek.
 
   description_short_price_of_lighting: |-
-    The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1600 lumen. This data is expressed in British pounds, adjusted for inflation.
+    The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1600 lumen.
 
   description_processing_weeks_of_earnings_needed_for_reading: |-
     To construct this indicator, we converted the lighting price series from Fouquet and Pearson (2006) and Fouquet (2026) (originally expressed as the cost per 1 million lumen-hours) into the daily cost of lighting suitable for reading, assuming 800 lumen-hours. This was done by dividing the original series by 1,000,000 and multiplying by 800.
@@ -57,7 +57,7 @@ tables:
           - "{definitions.description_key_inflation}"
         presentation:
           grapher_config:
-            note: This data is expressed in constant <<price_year>> British pounds.
+            note: This data is expressed in constant <<price_year>> British pounds, which means it is adjusted for inflation.
         display:
           name: Price of lighting (<<lighting_source>>)
           numDecimalPlaces: 2
@@ -78,7 +78,7 @@ tables:
           We calculated a 5-year rolling average to smooth out short-term fluctuations and highlight longer-term trends in the price of lighting.
         presentation:
           grapher_config:
-            note: This data is expressed in constant <<price_year>> British pounds. Shown is a 5-year rolling average.
+            note: This data is expressed in constant <<price_year>> British pounds, which means it is adjusted for inflation. Shown is a 5-year rolling average.
         display:
           name: Price of lighting (<<lighting_source>>)
           numDecimalPlaces: 2
