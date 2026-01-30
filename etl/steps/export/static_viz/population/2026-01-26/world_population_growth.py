@@ -3,8 +3,10 @@
 This code generates a chart showing world population and growth rates from 1700 to 2100, combining historical data with UN projections.
 """
 
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import matplotlib
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,12 +18,88 @@ from owid.catalog import processing as pr
 from etl import paths as etl_paths
 from etl.helpers import create_dataset
 
+# Configure matplotlib to use SVG text elements instead of paths
+matplotlib.rcParams['svg.fonttype'] = 'none'
+
 # Paths for this export step
 CURRENT_DIR = Path(__file__).parent
 OUTPUT_DIR = etl_paths.EXPORT_DIR / "static_viz/2026-01-26/world_population_growth"
 SHORT_NAME = "world_population_growth"
 
 log = structlog.get_logger()
+
+
+def optimize_svg_for_figma(svg_path: Path) -> None:
+    """Optimize SVG for easier editing in Figma.
+
+    Groups text elements with similar IDs and adds layer names for better organization.
+    Removes unnecessary metadata and cleans up the structure.
+
+    Args:
+        svg_path: Path to the SVG file to optimize
+    """
+    # Register SVG namespace to preserve it
+    ET.register_namespace("", "http://www.w3.org/2000/svg")
+    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+
+    tree = ET.parse(svg_path)
+    root = tree.getroot()
+
+    # Define SVG namespace for ElementTree operations
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+
+    # Find the main group containing all matplotlib content
+    main_group = root.find("./svg:g[@id='figure_1']", ns)
+    if main_group is None:
+        # If no figure_1 group, find first g element
+        main_group = root.find(".//svg:g", ns)
+
+    if main_group is None:
+        log.warning("Could not find main group in SVG, skipping optimization")
+        return
+
+    # Find all text elements
+    text_elements = list(main_group.findall(".//svg:text", ns))
+
+    # Create organized groups for different text types
+    title_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="title-group")
+    legend_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="legend-group")
+    milestone_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="milestone-labels")
+    growth_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="growth-rate-labels")
+    axes_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="axis-labels")
+    source_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="source-text")
+
+    # Categorize and move text elements
+    for text in text_elements:
+        text_content = "".join(text.itertext()).lower()
+
+        # Find parent element
+        for parent in main_group.iter():
+            if text in list(parent):
+                parent.remove(text)
+                break
+
+        # Categorize based on content
+        if "world population growth" in text_content:
+            title_group.append(text)
+        elif "annual growth" in text_content or ("world population" in text_content and "billion" not in text_content):
+            legend_group.append(text)
+        elif "billion" in text_content or "million" in text_content:
+            milestone_group.append(text)
+        elif "%" in text_content and "bce" not in text_content and "sources" not in text_content:
+            growth_group.append(text)
+        elif "data source" in text_content or "ourworldindata" in text_content:
+            source_group.append(text)
+        else:
+            axes_group.append(text)
+
+    # Remove empty groups
+    for group in [title_group, legend_group, milestone_group, growth_group, axes_group, source_group]:
+        if len(group) == 0:
+            main_group.remove(group)
+
+    # Write optimized SVG
+    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
 
 
 def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
@@ -448,8 +526,17 @@ def run() -> None:
 
     # Save chart outputs
     output_path = CURRENT_DIR / "world_population_growth_1700_2100.svg"
-    fig.savefig(output_path, format="svg", dpi=300, bbox_inches="tight")
-    log.info(f"Saved chart to {output_path}")
+    fig.savefig(
+        output_path,
+        format="svg",
+        dpi=300,
+        bbox_inches="tight",
+        metadata={'Date': None},  # Remove timestamp for cleaner diffs
+    )
+
+    # Optimize SVG for Figma editing
+    optimize_svg_for_figma(output_path)
+    log.info(f"Saved and optimized chart to {output_path}")
 
     output_path_png = CURRENT_DIR / "world_population_growth_1700_2100.png"
     fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
