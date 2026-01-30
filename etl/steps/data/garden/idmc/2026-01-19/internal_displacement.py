@@ -10,6 +10,21 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# shorten column names (keep originals as they come from IDMC like this):
+D_T_D_R = "disaster_total_displacement_rounded"
+D_T_D = "disaster_total_displacement"
+D_N_D_R = "disaster_new_displacement_rounded"
+D_N_D = "disaster_new_displacement"
+C_T_D_R = "conflict_total_displacement_rounded"
+C_T_D = "conflict_total_displacement"
+C_N_D_R = "conflict_new_displacement_rounded"
+C_N_D = "conflict_new_displacement"
+
+
+def return_if_na(col, na_col, tb):
+    """return the table filtered for rows where na_col is na and col is not na"""
+    return tb[tb[na_col].isna() & tb[col].notna()]
+
 
 def run() -> None:
     #
@@ -34,13 +49,19 @@ def run() -> None:
 
     tb = geo.add_population_to_table(tb, ds_pop)
 
+    # fill rounded columns with non-rounded values where rounded values are na
+    tb[C_T_D_R] = tb[C_T_D_R].fillna(tb[C_T_D])
+    tb[C_N_D_R] = tb[C_N_D_R].fillna(tb[C_N_D])
+    tb[D_T_D_R] = tb[D_T_D_R].fillna(tb[D_T_D])
+    tb[D_N_D_R] = tb[D_N_D_R].fillna(tb[D_N_D])
+
     # fill n/a values with 0, as no displacements were recorded
     tb = na_to_zero(tb)
 
     # add total displacements (conflict + disaster)
-    tb["total_displacement"] = tb["conflict_total_displacement"] + tb["disaster_total_displacement"]
+    tb["total_displacement"] = tb[C_T_D] + tb[D_T_D]
     tb["total_displacement_rounded"] = tb["total_displacement"].apply(round_idmc_style)
-    tb["total_new_displacement"] = tb["conflict_new_displacement"] + tb["disaster_new_displacement"]
+    tb["total_new_displacement"] = tb[C_N_D] + tb[D_N_D]
     tb["total_new_displacement_rounded"] = tb["total_new_displacement"].apply(round_idmc_style)
 
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
@@ -83,22 +104,23 @@ def round_idmc_style(x):
 
 
 def na_to_zero(tb):
-    """Fill all NaN values with 0. If a country year combination has no row (and no NaN value), create one with 0 values."""
+    """Fill all NaN values with 0. If a country year combination has no row (and no NaN value), create one with 0 values.
+    Start of data collection:
+    - 2008: natural disaster displacements
+    - 2009: conflict displacements + conflict IDPs
+    - 2019: disaster IDPs
+    """
     tb_countries = tb["country"].unique()
     tb_years = tb["year"].unique()
     all_combinations = [(country, year) for country in tb_countries for year in tb_years]
 
-    # fill n/a values with 0, as no displacements were recorded
-    displacement_columns = [
-        "conflict_total_displacement_rounded",
-        "conflict_new_displacement_rounded",
-        "disaster_total_displacement_rounded",
-        "disaster_new_displacement_rounded",
-    ]
+    # first, fill existing NaN values with 0 for years where data is expected to exist
+    tb.loc[tb["year"] >= 2008, D_N_D_R] = tb.loc[tb["year"] >= 2008, D_N_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_T_D_R] = tb.loc[tb["year"] >= 2009, C_T_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_N_D_R] = tb.loc[tb["year"] >= 2009, C_N_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
 
-    for col in displacement_columns:
-        tb[col] = tb[col].fillna(0)
-
+    # then, create rows for country-year combinations that are missing
     new_rows = []
     for country, year in all_combinations:
         if not ((tb["country"] == country) & (tb["year"] == year)).any():
@@ -107,10 +129,19 @@ def na_to_zero(tb):
                 new_row = {
                     "country": country,
                     "year": year,
-                    "disaster_total_displacement_rounded": 0,
                     "disaster_new_displacement_rounded": 0,
                 }
-            elif year > 2008:
+            # 2009-2018 has both conflict and disaster displacements and conflict IDPs
+            elif year >= 2009 and year < 2019:
+                new_row = {
+                    "country": country,
+                    "year": year,
+                    "conflict_total_displacement_rounded": 0,
+                    "conflict_new_displacement_rounded": 0,
+                    "disaster_new_displacement_rounded": 0,
+                }
+            # 2019 and onwards has all data
+            elif year >= 2019:
                 new_row = {
                     "country": country,
                     "year": year,
