@@ -8,7 +8,7 @@ The output table has index columns: country, year, scenario, sex, age, education
 When values are aggregates, dimensions are set to "total".
 """
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 from .shared import concatenate_tables, make_scenario_tables, read_data_from_snap
 
@@ -84,7 +84,7 @@ TABLES_COMPOSITION = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """Overall, this step could take 6:30 minutes on my machine (lucas)."""
     #
     # Load inputs.
@@ -119,8 +119,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
+    ds_meadow = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=snap.metadata,
