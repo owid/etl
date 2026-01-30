@@ -135,7 +135,7 @@ tables:
         unit: tonnes
         short_unit: t
         processing_level: major
-        description_short: Net plastic waste trade balance, calculated as exports minus imports, measured in tonnes per year.
+        description_short: Net plastic waste trade, calculated as exports minus imports, measured in tonnes per year. A positive number means a country is a net exporter of plastics; a negative number means it's a net importer.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -149,7 +149,8 @@ tables:
           grapher_config:
             map:
               colorScale:
-                baseColorScheme: YlOrRd
+                baseColorScheme: RdYlBu
+                colorSchemeInvert: True
 
       import_share:
         title: Share of global plastic waste imports
@@ -186,7 +187,7 @@ tables:
         unit: kilograms
         short_unit: kg
         processing_level: major
-        description_short: Net plastic waste trade balance per person, calculated as exports minus imports divided by population, measured in kilograms per person per year.
+        description_short: Net plastic waste trade, calculated as exports minus imports, measured in kilograms per person per year. A positive number means a country is a net exporter of plastics; a negative number means it's a net importer.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -201,7 +202,8 @@ tables:
           grapher_config:
             map:
               colorScale:
-                baseColorScheme: YlOrRd
+                baseColorScheme: RdYlBu
+                colorSchemeInvert: True
 
       export_share_transported_by_air:
         title: Share of plastic waste exports by air
