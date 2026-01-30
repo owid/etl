@@ -467,9 +467,9 @@ tables:
         short_unit: '%'
         unit: '% of GNI'
       dc_oda_totl_kd:
-        title: Net ODA provided, total (constant 2021 US$)
+        title: Net ODA provided, total (constant 2023 US$)
         short_unit: $
-        unit: constant 2021 US$
+        unit: constant 2023 US$
       dt_dod_dect_cd:
         title: External debt stocks, total (DOD, current US$)
         short_unit: $
@@ -527,7 +527,7 @@ tables:
         short_unit: $
         unit: current US$
       dt_dod_pvlx_ex_zs:
-        title: Present value of external debt (% of exports of goods, services and income)
+        title: Present value of external debt (% of exports of goods, services and primary income)
         short_unit: '%'
         unit: '% of exports of goods, services and income'
       dt_nfl_blat_cd:
@@ -679,15 +679,15 @@ tables:
         short_unit: $
         unit: current US$
       dt_oda_alld_kd:
-        title: Net official development assistance and official aid received (constant 2021 US$)
+        title: Net official development assistance and official aid received (constant 2023 US$)
         short_unit: $
-        unit: constant 2021 US$
+        unit: constant 2023 US$
       dt_oda_oatl_cd:
         title: Net official aid received (current US$)
         short_unit: $
         unit: current US$
       dt_oda_oatl_kd:
-        title: Net official aid received (constant 2021 US$)
+        title: Net official aid received (constant 2023 US$)
       dt_oda_odat_cd:
         title: Net official development assistance received (current US$)
         short_unit: $
@@ -701,7 +701,7 @@ tables:
         short_unit: '%'
         unit: '% of GNI'
       dt_oda_odat_kd:
-        title: Net official development assistance received (constant 2021 US$)
+        title: Net official development assistance received (constant 2023 US$)
       dt_oda_odat_mp_zs:
         title: Net ODA received (% of imports of goods, services and primary income)
         short_unit: '%'
@@ -767,8 +767,8 @@ tables:
         presentation:
           title_public: Share of population with access to clean fuels and technologies for cooking
       eg_egy_prim_pp_kd:
-        title: Energy intensity level of primary energy (MJ/$2017 PPP GDP)
-        unit: "megajoules per international-$ in 2017 prices"
+        title: Energy intensity level of primary energy (MJ/$2021 PPP GDP)
+        unit: "megajoules per international-$ in 2021 prices"
         short_unit: MJ/$
       eg_elc_accs_ru_zs:
         title: Access to electricity, rural (% of rural population)
@@ -1358,7 +1358,7 @@ tables:
         short_unit: '%'
         unit: '% of firms'
       ic_frm_bkwc_zs:
-        title: Firms using banks to finance working capital (% of firms)
+        title: 'Firms using banks to finance working capital (% of firms)'
         short_unit: '%'
         unit: '% of firms'
       ic_frm_bnks_zs:
@@ -1673,9 +1673,9 @@ tables:
         short_unit: '%'
         unit: '% of GDP'
       ne_con_prvt_cd:
-        title: Household and NPISHs Final consumption expenditure (current US$)
+        title: Households and NPISHs Final consumption expenditure (current US$)
       ne_con_prvt_cn:
-        title: Household and NPISHs Final consumption expenditure (current LCU)
+        title: Households and NPISHs Final consumption expenditure (current LCU)
       ne_con_prvt_cn_ad:
         title: 'Households and NPISHs final consumption expenditure: linked series (current LCU)'
       ne_con_prvt_kd:
@@ -1683,7 +1683,7 @@ tables:
       ne_con_prvt_kd_zg:
         title: Households and NPISHs Final consumption expenditure (annual % growth)
       ne_con_prvt_kn:
-        title: Household and NPISHs Final consumption expenditure (constant LCU)
+        title: Households and NPISHs Final consumption expenditure (constant LCU)
       ne_con_prvt_pc_kd:
         title: Households and NPISHs Final consumption expenditure per capita (constant 2015 US$)
       ne_con_prvt_pc_kd_zg:
@@ -3028,7 +3028,7 @@ tables:
         short_unit: '%'
         unit: '% of 24 hour day'
       sg_tim_uwrk_ma:
-        title: Proportion of time spent on unpaid domestic and care work, male (% of 24 hour day)
+        title: 'Proportion of time spent on unpaid domestic and care work, male (% of 24 hour day)'
         short_unit: '%'
         unit: '% of 24 hour day'
       sg_vaw_1549_zs:
@@ -3420,7 +3420,7 @@ tables:
         short_unit: '%'
         unit: '% of children under 5'
       sh_sta_owgh_me_zs:
-        title: Prevalence of overweight (modeled estimate, % of children under 5)
+        title: Prevalence of overweight, weight for height (modeled estimate, % of children under 5)
       sh_sta_owgh_zs:
         title: Prevalence of overweight, weight for height (% of children under 5)
         short_unit: '%'
@@ -3730,7 +3730,7 @@ tables:
         title: Self-employed, total (% of total employment) (modeled ILO estimate)
         unit: modeled ILO estimate
       sl_emp_smgt_fe_zs:
-        title: Female share of employment in senior and middle management (%)
+        title: 'Female share of employment in senior and middle management (%)'
         short_unit: '%'
         unit: '%'
       sl_emp_totl_sp_fe_ne_zs:
@@ -5047,7 +5047,7 @@ tables:
       en_ghg_tot_zg_ar5:
         title: Total greenhouse gas emissions excluding LULUCF (% change from 1990)
       en_ghg_all_pc_ce_ar5:
-        title: Total greenhouse gas emissions per capita excluding LULUCF (t CO2e/capita)
+        title: Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)
       en_ghg_n2o_fe_mt_ce_ar5:
         title: Nitrous oxide (N2O) emissions from Fugitive Emissions (Energy) (Mt CO2e)
       en_ghg_ch4_ag_mt_ce_ar5:
@@ -5061,7 +5061,7 @@ tables:
       en_ghg_ch4_mt_ce_ar5:
         title: Methane (CH4) emissions (total) excluding LULUCF (Mt CO2e)
       en_ghg_co2_rt_gdp_pp_kd:
-        title: Carbon intensity of GDP (kg CO2e per 2021 PPP $)
+        title: Carbon intensity of GDP (kg CO2e per 2021 PPP $ of GDP)
       en_ghg_ch4_ic_mt_ce_ar5:
         title: Methane (CH4) emissions from Industrial Combustion (Energy) (Mt CO2e)
       en_ghg_n2o_pi_mt_ce_ar5:
@@ -5073,9 +5073,9 @@ tables:
       en_ghg_n2o_mt_ce_ar5:
         title: Nitrous oxide (N2O) emissions (total) excluding LULUCF (Mt CO2e)
       en_ghg_co2_rt_gdp_kd:
-        title: Carbon intensity of GDP (kg CO2e per constant 2021 US$ of GDP)
+        title: Carbon intensity of GDP (kg CO2e per constant 2015 US$ of GDP)
       en_ghg_fgas_ip_mt_ce_ar5:
-        title: Fluorinated greenhouse gases (F-gases) emissions from Industrial Processes (Mt CO2e)
+        title: F-gases emissions from Industrial Processes (Mt CO2e)
       eg_elc_accs_zs_without:
         title: Access to electricity (% of population with no access)
       eg_cft_accs_zs_without:
@@ -5111,7 +5111,7 @@ tables:
       ic_bre_p2_ps:
         title: 'B-READY: Pillar 2: Public Services'
       sh_sta_owgh_me_fe_zs:
-        title: Prevalence of overweight, female (modeled estimate, % of children under 5)
+        title: Prevalence of overweight, weight for height, female (modeled estimate, % of children under 5)
       ic_bre_bl_os:
         title: 'B-READY: Business Location: Overall Score'
       ic_bre_be_p2:
@@ -5159,7 +5159,7 @@ tables:
       sm_pop_opip_eo:
         title: Other people in need of international protection by country or territory of origin
       sh_sta_owgh_me_ma_zs:
-        title: Prevalence of overweight, male (modeled estimate, % of children under 5)
+        title: Prevalence of overweight, weight for height, male (modeled estimate, % of children under 5)
       ic_bre_us_p1:
         title: 'B-READY: Utility Services Pillar 1: Quality of Regulations on Utility Services'
       ic_bre_it_p1:
@@ -5238,23 +5238,23 @@ tables:
         title: Firms filling taxes electronically (% of firms)
       dt_nfl_unid_cd:
         title: Net official flows from UN agencies, UNIDIR (current US$)
-      sh_uhc_fh40:
-        title: SH_UHC_FH40
-      sh_uhc_fh40_further:
-        title: SH_UHC_FH40_FURTHER
       sh_uhc_fh40_impov:
-        title: SH_UHC_FH40_IMPOV
+        title: Proportion of population facing impoverishing out-of-pocket health expenditure, based on the societal poverty line (%)
       sh_uhc_fh40_large:
-        title: SH_UHC_FH40_LARGE
+        title: Proportion of population facing large (but non-impoverishing) out-of-pocket health expenditure (%)
+      sh_uhc_fh40:
+        title: Proportion of population facing financial hardship due to out-of-pocket health expenditure (%)
       sh_uhc_fh40_pushed:
-        title: SH_UHC_FH40_PUSHED
-      sh_uhc_sci:
-        title: SH_UHC_SCI
-      sh_uhc_sci_capacity:
-        title: SH_UHC_SCI_CAPACITY
-      sh_uhc_sci_id:
-        title: SH_UHC_SCI_ID
+        title: Proportion of population pushed into poverty (based on the societal poverty line) due to out-of-pocket health expenditure (%)
+      sh_uhc_fh40_further:
+        title: Proportion of population further impoverished due to out-of-pocket health expenditure, based on the societal poverty line (%)
       sh_uhc_sci_ncd:
-        title: SH_UHC_SCI_NCD
+        title: UHC service coverage sub-index on non-communicable diseases
+      sh_uhc_sci:
+        title: UHC service coverage index
+      sh_uhc_sci_id:
+        title: UHC service coverage sub-index on infectious diseases
       sh_uhc_sci_rmnch:
-        title: SH_UHC_SCI_RMNCH
+        title: UHC service coverage sub-index on reproductive, maternal, newborn and child health
+      sh_uhc_sci_capacity:
+        title: UHC service coverage sub-index on service capacity and access
