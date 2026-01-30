@@ -11,13 +11,13 @@ definitions:
     unit: people
     short_unit: ""
   idmc_definitions:
-    stock_internal_displacement: &stock_internal_displacement |-
+    stock_internal_displacement: |-
       The total number of IDPs at a given time is referred to as a “stock” metric. It represents a static snapshot of the number of IDPs in a given location at a specific point in time.
 
       For example, “Ten thousand people were still displaced at the end of the month” indicates how many people were displaced at a specific point in time (“at the end of the month”).
 
       These numbers report on the total number of IDPs, or stock, at the end of a given year. Population movements such as internal displacements or births among IDP communities may increase it, while returns, cross-border flight and other outflows may decrease it.
-    internal_displacements: &internal_displacements |-
+    internal_displacements: |-
       An internal displacement refers to each new forced movement of a person within the borders of the country of their habitual residence recorded during the year.
 
       The total number of movements that has occurred over a period of time is considered a “flow” and the most common type of this metric is called “internal displacements”. We attempt to generate an estimate of internal displacements by event, be it for conflict or violence or disaster.
@@ -36,15 +36,15 @@ definitions:
       This data represents the total number of internally displaced people living in a region at the end of the year.
     flow_data: &flow_data |-
       This data represents the total number of internal displacements that occurred during the year. A displacement occurs every time a person is forced to leave their home but remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
-    population_share: &population_share |-
+    population_share: |-
       We calculate this by taking the total rounded number of internally displaced people divided by the total population of the country and multiply this by 1,000. For this we use our long-term population data set, which can be explored in the [population data explorer](https://ourworldindata.org/explorers/population-and-demography).
-    footnote_displacements: &footnote_displacements |-
+    footnote_displacements: |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     footnote_zero_displacements: &footnote_zero_displacements |-
       Here, "0" means IDMC has not recorded any internal displacements this year. This does not mean that IDMC has confirmed that there are no internal displacements, but rather that none are known to IDMC at the time of reporting.
     footnote_zero_idps: &footnote_zero_idps |-
       Here, "0" means IDMC has not recorded any internally displaced people (IDPs) in that region. This does not mean that IDMC has confirmed that there are no IDPs, but rather that none are known to IDMC at the time of reporting.
-    idmc_na_processing: &idmc_na_processing |-
+    idmc_na_processing: |-
       IDMC uses "N/A" to denote that no displacements or IDPs were recorded for that year. In our dataset, we convert these "N/A" values to 0 to make this more transparent and the data easier to interpret.
     idmc_rounded: &idmc_rounded |-
       IDMC provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.

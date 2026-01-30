@@ -89,10 +89,15 @@ def na_to_zero(tb):
     all_combinations = [(country, year) for country in tb_countries for year in tb_years]
 
     # fill n/a values with 0, as no displacements were recorded
-    tb["conflict_total_displacement"] = tb["conflict_total_displacement"].fillna(0)
-    tb["conflict_new_displacement"] = tb["conflict_new_displacement"].fillna(0)
-    tb["disaster_total_displacement"] = tb["disaster_total_displacement"].fillna(0)
-    tb["disaster_new_displacement"] = tb["disaster_new_displacement"].fillna(0)
+    displacement_columns = [
+        "conflict_total_displacement_rounded",
+        "conflict_new_displacement_rounded",
+        "disaster_total_displacement_rounded",
+        "disaster_new_displacement_rounded",
+    ]
+
+    for col in displacement_columns:
+        tb[col] = tb[col].fillna(0)
 
     new_rows = []
     for country, year in all_combinations:
@@ -100,13 +105,14 @@ def na_to_zero(tb):
             new_row = {
                 "country": country,
                 "year": year,
-                "conflict_total_displacement": 0,
-                "conflict_new_displacement": 0,
-                "disaster_total_displacement": 0,
-                "disaster_new_displacement": 0,
+                "conflict_total_displacement_rounded": 0,
+                "conflict_new_displacement_rounded": 0,
+                "disaster_total_displacement_rounded": 0,
+                "disaster_new_displacement_rounded": 0,
             }
             new_rows.append(new_row)
     if new_rows:
         tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
         tb = pr.concat([tb, tb_new], ignore_index=True)
+        print(tb_new)
     return tb
