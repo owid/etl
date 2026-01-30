@@ -100,7 +100,7 @@ steps:
     - snapshot://fasttrack/latest/iucn_number_evaluated.csv
 
     # Light prices
-data://grapher/fasttrack/latest/price_for_light:
+  data://grapher/fasttrack/latest/price_for_light:
     - snapshot://fasttrack/latest/price_for_light.csv
 
     # PIP filled
