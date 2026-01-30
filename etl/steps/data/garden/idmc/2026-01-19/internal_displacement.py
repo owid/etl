@@ -125,5 +125,4 @@ def na_to_zero(tb):
     if new_rows:
         tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
         tb = pr.concat([tb, tb_new], ignore_index=True)
-        print(tb_new)
     return tb
