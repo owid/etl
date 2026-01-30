@@ -70,8 +70,8 @@ def run() -> None:
         tb["year"] >= 2019, "total_displacement_rounded"
     ].fillna(0)
     # new displacements starting in 2009 (conflict displacements added in 2009)
-    tb.loc[tb["year"] >= 2009, "total_displacement_rounded"] = tb.loc[
-        tb["year"] >= 2009, "total_displacement_rounded"
+    tb.loc[tb["year"] >= 2009, "total_new_displacement_rounded"] = tb.loc[
+        tb["year"] >= 2009, "total_new_displacement_rounded"
     ].fillna(0)
 
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
