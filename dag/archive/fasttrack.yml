@@ -98,3 +98,11 @@ steps:
     - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
   data://grapher/fasttrack/latest/iucn_number_evaluated:
     - snapshot://fasttrack/latest/iucn_number_evaluated.csv
+
+    # Light prices
+data://grapher/fasttrack/latest/price_for_light:
+    - snapshot://fasttrack/latest/price_for_light.csv
+
+    # PIP filled
+  data://grapher/fasttrack/latest/world_bank_pip_filled:
+    - snapshot://fasttrack/latest/world_bank_pip_filled.csv
