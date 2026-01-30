@@ -217,7 +217,6 @@
   "Venezuela, RB": "Venezuela",
   "West Bank and Gaza": "Palestine",
   "Yemen, Rep.": "Yemen",
-
   "East Asia & Pacific": "East Asia and Pacific (WB)",
   "Europe & Central Asia": "Europe and Central Asia (WB)",
   "Latin America & Caribbean": "Latin America and Caribbean (WB)",
@@ -225,11 +224,10 @@
   "North America": "North America (WB)",
   "South Asia": "South Asia (WB)",
   "Sub-Saharan Africa": "Sub-Saharan Africa (WB)",
-
   "Low income": "Low-income countries",
   "Lower middle income": "Lower-middle-income countries",
   "Upper middle income": "Upper-middle-income countries",
   "High income": "High-income countries",
-
-  "European Union": "European Union (27)"
+  "European Union": "European Union (27)",
+  "Somalia, Fed. Rep.": "Somalia"
 }

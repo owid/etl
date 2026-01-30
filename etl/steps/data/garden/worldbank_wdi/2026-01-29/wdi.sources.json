@@ -1990,6 +1990,11 @@
     "dataPublisherSource": ""
   },
   {
+    "rawName": "Global Health Workforce Statistics, World Health Organization (WHO)",
+    "name": "World Health Organization (Global Health Workforce Statistics), via World Bank",
+    "dataPublisherSource": "Global Health Workforce Statistics - World Health Organization"
+  },
+  {
     "rawName": "Staff estimates, World Bank (WB);\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD);\nWorld Economic Outlook database, International Monetary Fund (IMF)",
     "name": "World Bank, OECD, and IMF",
     "dataPublisherSource": ""
@@ -2218,6 +2223,11 @@
     "rawName": "World Health Organization Global Health Expenditure database (http://apps.who.int/nha/database). The data was retrieved on April 4, 2025.",
     "name": "World Health Organization Global Health Expenditure Database, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Global Health Expenditure Database, updated December 12th, 2025, World Health Organization (WHO), uri: https://apps.who.int/nha/database",
+    "name": "World Health Organization (Global Health Expenditure Database), via World Bank",
+    "dataPublisherSource": "Global Health Expenditure Database - World Health Organization"
   },
   {
     "rawName": "World Intellectual Property Organization (WIPO), WIPO Patent Report: Statistics on Worldwide Patent Activity. The International Bureau of WIPO assumes no responsibility with respect to the transformation of these data. Data last retrieved January 2021.",
@@ -2778,5 +2788,65 @@
     "rawName": "Maternal Mortality Estimation Inter-Agency Group (MMEIG), World Health Organization (WHO), note: The country data compiled, adjusted and used in the estimation model by the Maternal Mortality Estimation Inter-Agency Group (MMEIG). The country data were compiled from the following sources:  civil registration and vital statistics; specialized studies on maternal mortality; population based surveys and censuses; other available data sources including data from surveillance sites.;\nUN Children's Fund (UNICEF), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nUN Population Fund (UNFPA), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nWorld Bank Group (WBG), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nUnited Nations (UN), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nPAHO, note: Core Indicators Portal;\nICF, note: The DHS Program, Demographic and Health Surveys",
     "name": "UN Maternal Mortality Estimation Inter-Agency Group (MMEIG), via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 17, 2026",
+    "name": "International Labour Organization (ILO Modelled Estimates), via World Bank",
+    "dataPublisherSource": "ILO Modelled Estimates database (ILOEST) - International Labour Organization"
+  },
+  {
+    "rawName": "Labour Force Statistics database (LFS), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 17, 2026",
+    "name": "International Labour Organization (Labour Force Statistics), via World Bank",
+    "dataPublisherSource": "Labour Force Statistics database (LFS) - International Labour Organization"
+  },
+  {
+    "rawName": "Labour Market-related SDG Indicators database (ILOSDG), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 17, 2026",
+    "name": "International Labour Organization (Labour Market SDG Indicators), via World Bank",
+    "dataPublisherSource": "Labour Market-related SDG Indicators database (ILOSDG) - International Labour Organization"
+  },
+  {
+    "rawName": "Staff estimates, World Bank (WB), International Labour Organization (ILO)",
+    "name": "World Bank and International Labour Organization",
+    "dataPublisherSource": "World Bank, International Labour Organization"
+  },
+  {
+    "rawName": "Education and Mismatch Indicators database (EMI), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 17, 2026",
+    "name": "International Labour Organization (Education and Mismatch Indicators), via World Bank",
+    "dataPublisherSource": "Education and Mismatch Indicators database (EMI) - International Labour Organization"
+  },
+  {
+    "rawName": "Wages and Working Time Statistics database (COND), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: January 17, 2026",
+    "name": "International Labour Organization (Wages and Working Time Statistics), via World Bank",
+    "dataPublisherSource": "Wages and Working Time Statistics database (COND) - International Labour Organization"
+  },
+  {
+    "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO) [WHO];\nWorld Bank (WB) [WB], note: Universal Health Coverage Dataset",
+    "name": "World Health Organization and World Bank (Universal Health Coverage Dataset), via World Bank",
+    "dataPublisherSource": "Universal Health Coverage Dataset - World Health Organization, World Bank"
+  },
+  {
+    "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO) [WHO];\nWorld Bank (WB) [WB], note: World Health Organization ( WHO )",
+    "name": "World Health Organization and World Bank (Universal Health Coverage Dataset), via World Bank",
+    "dataPublisherSource": "Universal Health Coverage Dataset - World Health Organization, World Bank"
+  },
+  {
+    "rawName": "Labour Force Statistics database (LFS), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: estimates based on external database, date accessed:  January 17, 2026",
+    "name": "International Labour Organization (Labour Force Statistics), via World Bank",
+    "dataPublisherSource": "Labour Force Statistics database (LFS) - International Labour Organization"
+  },
+  {
+    "rawName": "ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: estimates based on external database, date accessed:  January 17, 2026",
+    "name": "International Labour Organization (ILO Modelled Estimates), via World Bank",
+    "dataPublisherSource": "ILO Modelled Estimates database (ILOEST) - International Labour Organization"
+  },
+  {
+    "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO) [WHO], uri: https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-index-of-service-coverage",
+    "name": "World Health Organization (Universal Health Coverage Dataset), via World Bank",
+    "dataPublisherSource": "Universal Health Coverage Dataset - World Health Organization"
+  },
+  {
+    "rawName": "ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: estimates based on external database, date accessed: January 17, 2026",
+    "name": "International Labour Organization (ILO Modelled Estimates), via World Bank",
+    "dataPublisherSource": "ILO Modelled Estimates database (ILOEST) - International Labour Organization"
   }
 ]

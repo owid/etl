@@ -1393,10 +1393,6 @@ tables:
         title: Firms formally registered when operations started (% of firms)
         short_unit: '%'
         unit: '% of firms'
-      ic_frm_infm_zs:
-        title: Firms that do not report all sales for tax purposes (% of firms)
-        short_unit: '%'
-        unit: '% of firms'
       ic_frm_metg_zs:
         title: Firms visited or required meetings with tax officials (% of firms)
         short_unit: '%'
@@ -3510,24 +3506,6 @@ tables:
       sh_tbs_incd:
         title: Incidence of tuberculosis (per 100,000 people)
         unit: per 100,000 people
-      sh_uhc_nop1_zs:
-        title: Proportion of population pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
-        short_unit: '%'
-        unit: '%'
-      sh_uhc_nop2_zs:
-        title: Proportion of population pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
-        short_unit: '%'
-        unit: '%'
-      sh_uhc_oopc_10_zs:
-        title: Proportion of population spending more than 10% of household consumption or income on out-of-pocket health care expenditure (%)
-        short_unit: '%'
-        unit: '%'
-      sh_uhc_oopc_25_zs:
-        title: Proportion of population spending more than 25% of household consumption or income on out-of-pocket health care expenditure (%)
-        short_unit: '%'
-        unit: '%'
-      sh_uhc_srvs_cv_xd:
-        title: UHC service coverage index
       sh_vac_ttns_zs:
         title: Newborns protected against tetanus (%)
         short_unit: '%'
@@ -4960,20 +4938,6 @@ tables:
         title: Female primary school age children out-of-school (%)
       se_lpv_prim_sd_ma:
         title: Male primary school age children out-of-school (%)
-      sh_uhc_fbp1_zs:
-        title: Proportion of population pushed further below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
-      sh_uhc_fbp2_zs:
-        title: Proportion of population pushed further below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
-      sh_uhc_fbpr_zs:
-        title: Proportion of population pushed further below the 60% median consumption poverty line by out-of-pocket health care expenditure (%)
-      sh_uhc_nopr_zs:
-        title: Proportion of population pushed below the 60% median consumption poverty line by out-of-pocket health expenditure (%)
-      sh_uhc_tot1_zs:
-        title: Proportion of population pushed or further pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
-      sh_uhc_tot2_zs:
-        title: Proportion of population pushed or further pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
-      sh_uhc_totr_zs:
-        title: Proportion of population pushed or further pushed below the 60% median consumption poverty line by out-of-pocket health expenditure (%)
       va_est:
         title: 'Voice and Accountability: Estimate'
       va_no_src:
@@ -5272,3 +5236,25 @@ tables:
         title: Firms monitoring own CO2 emissions (% of firms)
       ic_frm_taxe_zs:
         title: Firms filling taxes electronically (% of firms)
+      dt_nfl_unid_cd:
+        title: Net official flows from UN agencies, UNIDIR (current US$)
+      sh_uhc_fh40:
+        title: SH_UHC_FH40
+      sh_uhc_fh40_further:
+        title: SH_UHC_FH40_FURTHER
+      sh_uhc_fh40_impov:
+        title: SH_UHC_FH40_IMPOV
+      sh_uhc_fh40_large:
+        title: SH_UHC_FH40_LARGE
+      sh_uhc_fh40_pushed:
+        title: SH_UHC_FH40_PUSHED
+      sh_uhc_sci:
+        title: SH_UHC_SCI
+      sh_uhc_sci_capacity:
+        title: SH_UHC_SCI_CAPACITY
+      sh_uhc_sci_id:
+        title: SH_UHC_SCI_ID
+      sh_uhc_sci_ncd:
+        title: SH_UHC_SCI_NCD
+      sh_uhc_sci_rmnch:
+        title: SH_UHC_SCI_RMNCH
