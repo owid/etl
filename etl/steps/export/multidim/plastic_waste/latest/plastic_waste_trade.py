@@ -9,7 +9,7 @@ paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
-    "chartTypes": ["LineChart"],
+    "chartTypes": ["LineChart", "DiscreteBar"],
 }
 
 # Indicator name constant
