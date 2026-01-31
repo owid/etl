@@ -16,7 +16,7 @@ tables:
   epoch_benchmark_data:
     variables:
       mean_score:
-        title: Model's mean accuracy on FrontierMath benchmark
+        title: Share of FrontierMath problems solved correctly
         unit: "%"
         short_unit: "%"
         description_short: FrontierMath benchmark evaluates models on 300 difficult, research-level problems in advanced mathematics (Tiers 1–3), which can take expert mathematicians hours or days to work through.
