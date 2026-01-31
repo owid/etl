@@ -180,7 +180,7 @@ tables:
       in_tour_arrivals_trips_total_overnight_vis_tourists_per_1000:
         title: Arrivals of tourists from abroad per 1,000 people
         unit: arrivals per 1,000 people
-        description_short: Number of international tourist arrivals (overnight) per 1,000 people in the destination country's population.
+        description_short: Number of trips by visitors who arrive from abroad and stay overnight, per 1,000 people in the destination country's population.
         description_key:
           - *desc_key_arrivals
           - *desc_key_per_1000_arrivals
