@@ -45,8 +45,25 @@ definitions:
     - However, some countries deviate from UN Tourism recommendations and classify their nationals residing abroad as a distinct category, rather than as residents of those countries.
 
   # --- Per capita metrics ---
-  desc_key_per_1000: &desc_key_per_1000
-    - This metric enables standardized comparison across countries with different population sizes.
+  desc_key_per_1000_arrivals: &desc_key_per_1000_arrivals
+    - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the destination country.
+    - This enables standardized comparison across different population sizes and provides an estimate of tourism intensity.
+    - For instance, if there are "10 arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international arrivals.
+
+  desc_key_per_1000_same_day: &desc_key_per_1000_same_day
+    - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the destination country.
+    - This enables standardized comparison across different population sizes and provides insight into the level of same-day travel.
+    - For instance, if there are "10 same-day arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international same-day arrivals.
+
+  desc_key_per_1000_departures: &desc_key_per_1000_departures
+    - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the origin country.
+    - This enables standardized comparison across different population sizes and provides an estimate of outbound tourism intensity.
+    - For instance, if there are "10 departures per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international departures.
+
+  desc_key_per_1000_employment: &desc_key_per_1000_employment
+    - Per "1,000 people" refers to the calculation of employed persons per 1,000 individuals within the population.
+    - This enables standardized comparison across different population sizes and provides an estimate of the significance of the tourism sector in terms of employment.
+    - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
 
   # --- Employment ---
   desc_key_employment: &desc_key_employment
@@ -135,7 +152,7 @@ tables:
         description_key:
           - *desc_key_domestic
           - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
-          - *desc_key_per_1000
+          - This enables standardized comparison across different population sizes and provides an estimate of domestic tourism intensity.
         display:
           numDecimalPlaces: 2
 
@@ -167,7 +184,7 @@ tables:
         description_short: Number of international tourist arrivals (overnight) per 1,000 people in the destination country's population.
         description_key:
           - *desc_key_arrivals
-          - *desc_key_per_1000
+          - *desc_key_per_1000_arrivals
         display:
           numDecimalPlaces: 1
 
@@ -184,7 +201,7 @@ tables:
         description_short: Number of international same-day visitor arrivals per 1,000 people in the destination country's population.
         description_key:
           - *desc_key_arrivals
-          - *desc_key_per_1000
+          - *desc_key_per_1000_same_day
         display:
           numDecimalPlaces: 1
 
@@ -204,7 +221,7 @@ tables:
         unit: trips
         description_short: Number of international trips where the main purpose is business-related and the visitor stays overnight.
         description_key:
-          - *desc_counting
+          - *desc_key_arrivals
           - *desc_key_purpose
         presentation:
           grapher_config:
@@ -215,7 +232,7 @@ tables:
         unit: trips
         description_short: Number of international trips where the main purpose is personal (leisure, visiting friends and relatives, health, etc.) and the visitor stays overnight.
         description_key:
-          - *desc_counting
+          - *desc_key_arrivals
           - *desc_key_purpose
         presentation:
           grapher_config:
@@ -226,7 +243,7 @@ tables:
         unit: trips
         description_short: Number of international trips by tourists who stay overnight, regardless of the main purpose of travel.
         description_key:
-          - *desc_counting
+          - *desc_key_arrivals
           - *desc_key_purpose
 
       # =========================================================================
@@ -247,6 +264,7 @@ tables:
         description_short: Number of international tourists arriving from countries in Africa (overnight visitors).
         description_key:
           - *desc_key_arrivals
+          - *desc_key_region_origin
 
       in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total:
         title: International tourists visiting from the Americas
@@ -254,6 +272,7 @@ tables:
         description_short: Number of international tourists arriving from countries in the Americas (overnight visitors).
         description_key:
           - *desc_key_arrivals
+          - *desc_key_region_origin
 
       in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total:
         title: International tourists visiting from East Asia and the Pacific
@@ -261,6 +280,7 @@ tables:
         description_short: Number of international tourists arriving from countries in East Asia and the Pacific (overnight visitors).
         description_key:
           - *desc_key_arrivals
+          - *desc_key_region_origin
 
       in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total:
         title: International tourists visiting from Europe
@@ -268,6 +288,7 @@ tables:
         description_short: Number of international tourists arriving from countries in Europe (overnight visitors).
         description_key:
           - *desc_key_arrivals
+          - *desc_key_region_origin
 
       in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total:
         title: International tourists visiting from the Middle East
@@ -275,6 +296,7 @@ tables:
         description_short: Number of international tourists arriving from countries in the Middle East (overnight visitors).
         description_key:
           - *desc_key_arrivals
+          - *desc_key_region_origin
 
       in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total:
         title: International tourists visiting from South Asia
@@ -282,6 +304,7 @@ tables:
         description_short: Number of international tourists arriving from countries in South Asia (overnight visitors).
         description_key:
           - *desc_key_arrivals
+          - *desc_key_region_origin
 
       # =========================================================================
       # INBOUND TOURISM — EXPENDITURE (RECEIPTS)
@@ -346,7 +369,7 @@ tables:
         description_short: Number of trips by residents who travel abroad and stay overnight, per 1,000 people in the origin country's population.
         description_key:
           - *desc_key_departures
-          - *desc_key_per_1000
+          - *desc_key_per_1000_departures
         display:
           numDecimalPlaces: 1
 
@@ -459,7 +482,7 @@ tables:
         description_short: Number of people working in tourism-related industries per 1,000 people in the country's population.
         description_key:
           - *desc_key_employment
-          - *desc_key_per_1000
+          - *desc_key_per_1000_employment
         display:
           numDecimalPlaces: 1
 
