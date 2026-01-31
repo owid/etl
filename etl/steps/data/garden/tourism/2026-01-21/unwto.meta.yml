@@ -101,7 +101,7 @@ definitions:
     Values have been adjusted for US inflation using the Consumer Price Index (CPI) with 2021 as the base year. CPI data comes from the World Bank World Development Indicators (FP.CPI.TOTL).
 
   note_ppp_cpi_adjustment: &note_ppp_cpi_adjustment |-
-    Values have been adjusted for both local inflation and differences in cost of living across countries. Expenditures were converted to local currency using official exchange rates, adjusted for local inflation (2021 base year), and converted to international dollars using PPP conversion factors. Data sources include UN Tourism for expenditure and World Bank for CPI, exchange rates, and PPP conversion factors.
+    Values have been adjusted for both local inflation and differences in cost of living across countries. Expenditures were converted from current US dollars to local currency using World Bank exchange rates, inflation-adjusted to a 2021 base year, and converted to international dollars using PPP factors. As UN Tourism does not report the exchange rates used to convert from local currency to nominal US dollars, our reliance on World Bank exchange rates may introduce uncertainty, especially where exchange rates are volatile.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
