@@ -108,7 +108,6 @@ definitions:
   desc_key_outbound_total: &desc_key_outbound_total
     - Total international tourism expenditure measures all the money a country's residents spend abroad as tourists.
     - This includes spending in foreign countries (accommodation, food, transport, entertainment, shopping, cruises) plus fares paid to foreign airlines.
-    - A country with high outbound expenditure relative to inbound receipts has a tourism trade deficit.
 
   # =============================================================================
   # INFLATION ADJUSTMENT NOTES
