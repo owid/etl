@@ -19,7 +19,7 @@ from etl import paths as etl_paths
 from etl.helpers import create_dataset
 
 # Configure matplotlib to use SVG text elements instead of paths
-matplotlib.rcParams['svg.fonttype'] = 'none'
+matplotlib.rcParams["svg.fonttype"] = "none"
 
 # Paths for this export step
 CURRENT_DIR = Path(__file__).parent
@@ -408,7 +408,7 @@ def run() -> None:
 
     Growth rates are selectively displayed to create a smooth visualization:
     - 100-year intervals before 1800
-    - 50-year intervals 1800-1900
+    - 100-year intervals 1800-1900
     - 5-year intervals 1900-1950
     - Annual values from 1950 onwards
 
@@ -488,10 +488,10 @@ def run() -> None:
         log.warning(f"Potential gap at historical/projection boundary (year {year_cut})")
 
     # Omit growth rates for years that don't match the R filtering pattern:
-    # Keep only: 100-year intervals (1700-1800), 50-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
+    # Keep only: 100-year intervals (1700-1800), 100-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
     filter_mask = (
         ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
-        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 50 == 0))
+        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
         | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
         | (tb["year"] >= 1950)
     )
@@ -531,7 +531,7 @@ def run() -> None:
         format="svg",
         dpi=300,
         bbox_inches="tight",
-        metadata={'Date': None},  # Remove timestamp for cleaner diffs
+        metadata={"Date": None},  # Remove timestamp for cleaner diffs
     )
 
     # Optimize SVG for Figma editing
