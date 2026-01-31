@@ -18,7 +18,9 @@ definitions:
   # --- Arrivals and departures ---
   desc_key_arrivals: &desc_key_arrivals
     - *desc_counting
-    - If a person travels to multiple countries during a single trip, their arrival in each country is recorded individually.
+    - When an individual visits a country multiple times within a year, each visit is counted as a separate arrival.
+    - Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually.
+    - As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
 
   desc_key_arrivals_us_note: &desc_key_arrivals_us_note
     - Before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.
@@ -39,7 +41,7 @@ definitions:
 
   # --- Region of origin ---
   desc_key_region_origin: &desc_key_region_origin
-    - The country linked to the arrival should correspond to the visitor's country of residence.
+    - The country linked to the departure should correspond to the visitor's country of residence.
     - However, some countries deviate from UN Tourism recommendations and classify their nationals residing abroad as a distinct category, rather than as residents of those countries.
 
   # --- Per capita metrics ---
@@ -398,6 +400,8 @@ tables:
         unit: ratio
         description_short: Ratio of international arrivals for business purposes to arrivals for personal purposes (leisure, visiting friends and relatives, health, etc.).
         description_key:
+          - A value greater than 1 means more business travelers than personal travelers; a value less than 1 means the opposite.
+          - For example, a ratio of 0.25 means there is one business traveler for every four personal travelers.
           - *desc_key_purpose
         display:
           numDecimalPlaces: 1
@@ -407,8 +411,9 @@ tables:
         unit: ratio
         description_short: Ratio of international arrivals to international departures (both overnight trips).
         description_key:
-          - *desc_key_arrivals
-          - *desc_key_departures
+          - A value greater than 1 means a country receives more tourists than it sends abroad; a value less than 1 means the opposite.
+          - For example, a ratio of 2 means two tourists arrive for every one resident who travels abroad.
+          - This ratio provides insight into whether a country is a net importer or exporter of tourists.
         display:
           numDecimalPlaces: 1
 
@@ -417,7 +422,9 @@ tables:
         unit: ratio
         description_short: Ratio of same-day visitor arrivals to overnight tourist arrivals.
         description_key:
-          - *desc_key_arrivals
+          - A value greater than 1 means more same-day visitors than overnight tourists; a value less than 1 means the opposite.
+          - For example, a ratio of 0.5 means there is one same-day visitor for every two overnight tourists.
+          - High values are typical for countries with many land borders or those that serve as day-trip destinations from neighboring countries.
         display:
           numDecimalPlaces: 1
 
