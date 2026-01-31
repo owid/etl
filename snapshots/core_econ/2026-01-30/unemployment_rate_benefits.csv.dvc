@@ -1,0 +1,32 @@
+# NOTE: The data was provided by CORE Econ via email on 24 Jan 2026.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "CORE Econ - Unemployment rate and unemployment benefit replacement rates from OECD"
+    description: |-
+      Unemployment rate and unemployment benefit replacement rates processed by CORE Econ, from OECD data.
+
+      The data is averaged between 2000 and 2020 for unemployment rates, and between 2001 and 2020 for unemployment benefit replacement rates.
+    date_published: "2026-01-01"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2026). OECD Data Explorer, https://data-explorer.oecd.org/.
+    attribution_short: OECD
+
+    # Files
+    url_main: https://data-explorer.oecd.org/
+    date_accessed: '2026-01-30'
+
+    # License
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: c216a56ae0c1bcdd9c77ccd694e93c51
+    size: 961
+    path: unemployment_rate_benefits.csv

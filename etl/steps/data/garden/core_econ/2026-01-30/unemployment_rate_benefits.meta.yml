@@ -1,0 +1,36 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  unemployment_rate_benefits:
+    variables:
+      unemployment_rate:
+        title: Unemployment rate
+        unit: "%"
+        short_unit: "%"
+        description_short: Average unemployment rate between 2000 and 2020.
+        display:
+          name: Unemployment rate (2000-2020 average)
+          numDecimalPlaces: 1
+          tolerance: 0
+      replacement_rate:
+        title: Unemployment benefit replacement rate
+        unit: "%"
+        short_unit: "%"
+        description_short: Average net unemployment benefit replacement rate between 2001 and 2020.
+        display:
+          name: Net unemployment benefit replacement rate (2001-2020 average)
+          numDecimalPlaces: 1
+          tolerance: 0
+

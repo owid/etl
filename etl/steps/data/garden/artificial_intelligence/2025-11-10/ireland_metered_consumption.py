@@ -4,13 +4,13 @@ This step processes the meadow data and creates a table with annual aggregates
 by summing quarterly data for each year.
 """
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """Create garden dataset from meadow dataset."""
 
     # Load inputs
@@ -46,8 +46,7 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["country", "year"])
 
     # Save outputs
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,

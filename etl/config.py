@@ -550,6 +550,17 @@ class OWIDEnv:
         return self.data_api_url + "/v1/indicators"
 
     @property
+    def catalog_url(self) -> str:
+        """Get catalog url."""
+        if self.env_remote == "production":
+            return "https://catalog.ourworldindata.org"
+        elif self.env_remote == "staging":
+            return f"http://{self.conf.DB_HOST}:8881"
+        else:
+            # For local dev, use production catalog
+            return "https://catalog.ourworldindata.org"
+
+    @property
     def wizard_url(self) -> str:
         """Get wizard url."""
         if self.env_local == "dev":
