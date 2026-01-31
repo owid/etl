@@ -19,13 +19,16 @@ from etl.config import ENV_FILE_PROD, OWID_ENV, OWIDEnv
 log = get_logger()
 
 
-def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | None = None, verbose: bool = False):
+def approve_identical_chart_diffs(
+    dry_run: bool = True, chart_ids: list[int] | None = None, verbose: bool = False, use_rounding: bool = True
+):
     """Core function to approve chart diffs with identical configurations.
 
     Args:
         dry_run: If True, only shows what would be approved without making changes
         chart_ids: Optional list of specific chart IDs to check. If None, checks all pending charts.
         verbose: If True, shows detailed diff for charts with different configs
+        use_rounding: If True, round numeric values to meaningful precision before comparing
 
     Returns:
         Tuple of (approved_count, checked_count)
@@ -45,6 +48,7 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
         config=True,
         metadata=False,
         data=False,
+        skip_analytics=True,
     )
 
     if df.empty:
@@ -74,7 +78,7 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
 
     def fetch_config(chart_id: int, env: OWIDEnv) -> tuple[int, dict]:
         """Fetch config for a single chart"""
-        return chart_id, get_chart_config_with_hashes(chart_id, env)
+        return chart_id, get_chart_config_with_hashes(chart_id, env, round_values=use_rounding)
 
     log.info("Fetching configs from staging environment")
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -119,7 +123,7 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
                 approved_count += 1
             else:
                 # Get chart diff and approve immediately
-                diffs = chart_diff_loader.get_diffs(chart_ids=[chart_id], sync=True)
+                diffs = chart_diff_loader.get_diffs(chart_ids=[chart_id], sync=True, skip_analytics=True)
                 if diffs:
                     with Session(OWID_ENV.engine) as session:
                         diffs[0].approve(session)
@@ -178,10 +182,17 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
     default=False,
     help="Show detailed config differences for charts that differ between environments.",
 )
+@click.option(
+    "--no-rounding",
+    is_flag=True,
+    default=False,
+    help="Disable intelligent rounding before comparing data (require exact match).",
+)
 def cli(
     dry_run: bool,
     chart_id: tuple[int, ...],
     verbose: bool,
+    no_rounding: bool,
 ) -> None:
     """Automatically approve chart diffs with identical data. This is done by taking their configs and replacing variable IDs with hashes of their data.
 
@@ -194,7 +205,7 @@ def cli(
     4. Reports results
     """
     chart_ids = list(chart_id) if chart_id else None
-    approve_identical_chart_diffs(dry_run=dry_run, chart_ids=chart_ids, verbose=verbose)
+    approve_identical_chart_diffs(dry_run=dry_run, chart_ids=chart_ids, verbose=verbose, use_rounding=not no_rounding)
 
 
 if __name__ == "__main__":
