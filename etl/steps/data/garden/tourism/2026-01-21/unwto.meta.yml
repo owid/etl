@@ -421,7 +421,7 @@ tables:
       business_personal_ratio:
         title: Ratio of business to personal tourism arrivals
         unit: ratio
-        description_short: Ratio of international arrivals for business purposes to arrivals for personal purposes (leisure, visiting friends and relatives, health, etc.).
+        description_short: A country with a ratio greater than one indicates a higher number of arrivals for business and professional purposes compared to personal purposes.
         description_key:
           - A value greater than 1 means more business travelers than personal travelers; a value less than 1 means the opposite.
           - For example, a ratio of 0.25 means there is one business traveler for every four personal travelers.
@@ -432,7 +432,7 @@ tables:
       inbound_outbound_tourism:
         title: Ratio of inbound to outbound tourist trips
         unit: ratio
-        description_short: Ratio of international arrivals to international departures (both overnight trips).
+        description_short: Tourist trips refer to the number of trips made by individuals traveling abroad and staying overnight. A country with a ratio greater than one has more incoming than outgoing tourists (i.e. has more visitors than locals leaving).
         description_key:
           - A value greater than 1 means a country receives more tourists than it sends abroad; a value less than 1 means the opposite.
           - For example, a ratio of 2 means two tourists arrive for every one resident who travels abroad.
@@ -443,7 +443,7 @@ tables:
       same_day_tourist_ratio:
         title: Ratio of same-day to overnight tourist arrivals
         unit: ratio
-        description_short: Ratio of same-day visitor arrivals to overnight tourist arrivals.
+        description_short: Same-day trips are those by visitors who arrive and depart within the same day. Tourist trips are those by people who stay overnight. A country with a ratio greater than one has more trips by visitors who leave the same day than those that stay overnight.
         description_key:
           - A value greater than 1 means more same-day visitors than overnight tourists; a value less than 1 means the opposite.
           - For example, a ratio of 0.5 means there is one same-day visitor for every two overnight tourists.
