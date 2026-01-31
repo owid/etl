@@ -24,12 +24,9 @@ tables:
           - This indicator shows the share of FrontierMath problems that AI models solve correctly, based on Epoch AI's evaluation.
           - FrontierMath is a set of 350 original math problems written by experts, covering many areas of advanced mathematics. Many problems are difficult enough that human specialists might need hours or days to solve them.
           - The benchmark has four difficulty tiers. This indicator shows accuracy on Tiers 1–3 (300 problems). Tier 4 contains 50 exceptionally difficult problems and is not included here.
+          - "Scoring is all-or-nothing: models get 1 point for a correct final answer and 0 for anything else, with no partial credit. Models submit their answers as Python code and can use Python while working on problems. This means scores reflect math ability with access to computational tools, not just pen-and-paper reasoning."
           - Only 12 problems are publicly available, mainly so researchers can inspect how evaluations work, not to report scores.
-          - "Scoring is all-or-nothing: models get 1 point for a correct final answer and 0 for anything else, with no partial credit."
-          - Models submit their answers as Python code and can use Python while working on problems. This means scores reflect math ability with access to computational tools, not just pen-and-paper reasoning.
-          - "Models face two constraints: a cap on how much text they can generate while working (up to one million tokens), and a 30-second time limit for running their final code."
           - FrontierMath was developed by Epoch AI with funding from OpenAI, whose GPT models are among those evaluated on this benchmark. OpenAI has exclusive access to a subset of the problems. Epoch provides a [conflict of interest statement](https://epoch.ai/frontiermath#:~:text=Conflict%20of%20interest%20statement) with more details.
-
         description_from_producer: |-
           [FrontierMath](https://epoch.ai/frontiermath) is a benchmark of hundreds of original, exceptionally challenging mathematics problems crafted and vetted by expert mathematicians. The questions cover most major branches of modern mathematics – from computationally intensive problems in number theory and real analysis to abstract questions in algebraic geometry and category theory. Solving a typical problem requires multiple hours of effort from a researcher in the relevant branch of mathematics, and for the upper end questions, multiple days.
 
