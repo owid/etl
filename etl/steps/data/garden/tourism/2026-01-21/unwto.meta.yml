@@ -88,7 +88,6 @@ definitions:
   desc_key_inbound_total: &desc_key_inbound_total
     - Total international tourism receipts measure all the money a country earns from foreign visitors.
     - This includes spending within the country (accommodation, food, transport, entertainment, shopping, cruises) plus fares paid to the country's airlines.
-    - These receipts represent an important source of foreign currency earnings for many economies.
     - All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
 
   # =============================================================================
@@ -108,6 +107,7 @@ definitions:
   desc_key_outbound_total: &desc_key_outbound_total
     - Total international tourism expenditure measures all the money a country's residents spend abroad as tourists.
     - This includes spending in foreign countries (accommodation, food, transport, entertainment, shopping, cruises) plus fares paid to foreign airlines.
+    - All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
 
   # =============================================================================
   # INFLATION ADJUSTMENT NOTES
