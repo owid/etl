@@ -134,6 +134,7 @@ tables:
         description_short: Number of trips by individuals who travel within their own country and spend at least one night at their destination, per person in the country's population.
         description_key:
           - *desc_key_domestic
+          - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
           - *desc_key_per_1000
         display:
           numDecimalPlaces: 2
