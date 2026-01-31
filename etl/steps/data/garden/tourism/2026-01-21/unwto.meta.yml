@@ -342,7 +342,7 @@ tables:
         title: International tourist expenditure within the country they visit (in international-$ in 2021 prices)
         unit: international-$ in 2021 prices
         short_unit: $
-        description_short: Money earned from foreign visitors spending on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines. Adjusted for inflation and differences in living costs between countries.
+        description_short: Money earned from foreign visitors spending on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines. This data is adjusted for inflation and differences in living costs between countries.
         description_key:
           - *desc_key_inbound_total
           - *note_ppp_cpi_adjustment
@@ -350,7 +350,7 @@ tables:
           We adjusted the data to account for both local inflation and differences in cost of living across countries. First, we converted expenditures from US dollars to local currency using official exchange rates. Then we adjusted for local inflation using each country's Consumer Price Index (CPI), normalized to 2021. Finally, we converted the values to international dollars using purchasing power parity (PPP) conversion factors for private consumption from 2021.
         presentation:
           grapher_config:
-            note: This data is expressed in 2021 [international-$](#dod:int_dollar_abbreviation). All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
 
       # =========================================================================
       # OUTBOUND TOURISM — DEPARTURES
@@ -405,7 +405,7 @@ tables:
         title: International tourist expenditure by residents traveling abroad (in constant 2021 US$)
         unit: constant 2021 US$
         short_unit: $
-        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines. Adjusted for US inflation.
+        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines. This data is expressed in in constant 2021 US$. It is adjusted for inflation but does not account for differences in living costs between countries.
         description_key:
           - *desc_key_outbound_total
           - *note_us_cpi_adjustment
