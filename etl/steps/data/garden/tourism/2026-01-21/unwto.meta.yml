@@ -131,7 +131,7 @@ tables:
       dom_tour_trips_total_overnight_vis_tourists_per_person:
         title: Domestic overnight trips per person
         unit: trips per person
-        description_short: Number of domestic overnight trips per person in the country's population.
+        description_short: Number of trips by individuals who travel within their own country and spend at least one night at their destination, per person in the country's population.
         description_key:
           - *desc_key_domestic
           - *desc_key_per_1000
