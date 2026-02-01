@@ -101,9 +101,10 @@ def approve_identical_chart_diffs(
             chart_id, config = future.result()
             configs_prod[chart_id] = config
 
-    # Check each chart for identical configs and approve immediately
+    # Check each chart for identical configs and collect ones to approve
     approved_count = 0
     checked_count = 0
+    charts_to_approve = []
 
     for chart_id in chart_ids_to_check:
         checked_count += 1
@@ -134,15 +135,7 @@ def approve_identical_chart_diffs(
                 log.info("✅ Would approve chart (dry run)", chart_id=chart_id)
                 approved_count += 1
             else:
-                # Get chart diff and approve immediately
-                diffs = chart_diff_loader.get_diffs(chart_ids=[chart_id], sync=True, skip_analytics=True)
-                if diffs:
-                    with Session(OWID_ENV.engine) as session:
-                        diffs[0].approve(session)
-                        log.info("✅ Chart approved", chart_id=chart_id)
-                        approved_count += 1
-                else:
-                    log.warning("⚠️ No diff found for chart", chart_id=chart_id)
+                charts_to_approve.append(chart_id)
         else:
             log.info("⏭️ Configs differ - skipping", chart_id=chart_id)
             if verbose:
@@ -165,6 +158,16 @@ def approve_identical_chart_diffs(
                     print(f"{'='*80}")
                     print("".join(diff_lines))
                     print(f"{'='*80}\n")
+
+    # Batch approve all charts at once
+    if charts_to_approve:
+        log.info(f"Approving {len(charts_to_approve)} charts in batch")
+        diffs = chart_diff_loader.get_diffs(chart_ids=charts_to_approve, sync=True, skip_analytics=True)
+        with Session(OWID_ENV.engine) as session:
+            for diff in diffs:
+                diff.approve(session)
+                log.info("✅ Chart approved", chart_id=diff.chart_id)
+                approved_count += 1
 
     if dry_run:
         log.info(f"DRY RUN completed: {approved_count} charts would be approved out of {checked_count} checked")
