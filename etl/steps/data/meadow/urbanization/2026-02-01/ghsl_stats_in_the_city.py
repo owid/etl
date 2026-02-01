@@ -1,8 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import os
-import zipfile
-
 import numpy as np
 import owid.catalog.processing as pr
 
