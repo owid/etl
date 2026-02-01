@@ -74,7 +74,29 @@ def _round_values_intelligently(values: list[float]) -> list[float]:
     return [round(v, decimals) if v is not None and isinstance(v, (int, float)) else v for v in values]
 
 
-def get_chart_config_with_hashes(chart_id: int, env: OWIDEnv, round_values: bool = True) -> Dict[str, Any]:
+def get_variable_max_year(variable_id: int, env: OWIDEnv) -> int | None:
+    """Get the maximum year from a variable's data.
+
+    Args:
+        variable_id: Variable ID to fetch data for
+        env: OWID environment configuration
+
+    Returns:
+        Maximum year in the data, or None if no data
+    """
+    url = env.indicator_data_url(variable_id)
+    response = requests.get(url)
+    response.raise_for_status()
+    data = response.json()
+
+    if "years" in data and data["years"]:
+        return max(data["years"])
+    return None
+
+
+def get_chart_config_with_hashes(
+    chart_id: int, env: OWIDEnv, round_values: bool = True, use_max_year_hash: bool = False
+) -> Dict[str, Any]:
     """
     Get chart config by ID and replace variableId values with hashes of their API data.
 
@@ -82,6 +104,7 @@ def get_chart_config_with_hashes(chart_id: int, env: OWIDEnv, round_values: bool
         chart_id: Chart ID to fetch
         env: OWID environment configuration
         round_values: If True, round numeric values to meaningful precision before hashing
+        use_max_year_hash: If True, use only max year for hashing instead of full data
 
     Returns:
         Chart config dictionary with variableId values replaced by hashes
@@ -122,7 +145,11 @@ def get_chart_config_with_hashes(chart_id: int, env: OWIDEnv, round_values: bool
             for key, value in obj.items():
                 if key == "variableId" and isinstance(value, int):
                     # Get hash for this variable ID
-                    new_obj[key] = get_variable_data_hash(value, env, round_values=round_values)
+                    if use_max_year_hash:
+                        max_year = get_variable_max_year(value, env)
+                        new_obj[key] = str(max_year) if max_year is not None else "None"
+                    else:
+                        new_obj[key] = get_variable_data_hash(value, env, round_values=round_values)
                 else:
                     new_obj[key] = replace_variable_ids(value)
             return new_obj
