@@ -85,7 +85,6 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb)
-    tb = tb.drop(columns=["city"])
 
     # Map units and short units to the table
     tb["unit"] = tb["indicator"].map(UNITS)
