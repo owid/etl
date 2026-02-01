@@ -172,7 +172,7 @@ def run() -> None:
                 id_vars=["city", "country", "ID_UC_G0"],
                 value_vars=pop_columns,
                 var_name="pop_col",
-                value_name="population"
+                value_name="population",
             )
             # Extract year from population column name (e.g., "GH_POP_TOT_2025" -> "2025")
             tb_pop_long["year"] = tb_pop_long["pop_col"].str.extract(r"(\d{4})$")[0]
@@ -212,9 +212,7 @@ def run() -> None:
 
     # For non-Share indicators: calculate simple mean
     tb_non_share = tb[~tb["is_share"]].copy()
-    tb_non_share_agg = tb_non_share.groupby(["country", "year", "indicator"], as_index=False).agg(
-        {"value": "mean"}
-    )
+    tb_non_share_agg = tb_non_share.groupby(["country", "year", "indicator"], as_index=False).agg({"value": "mean"})
 
     # Combine both aggregated datasets
     tb = pr.concat([tb_share_agg, tb_non_share_agg], ignore_index=True)
@@ -232,9 +230,7 @@ def run() -> None:
         "Water bodies",
     ]
     # Calculate the sum of LCZ values for each country and year
-    lcz_sums = (
-        tb[tb["indicator"].isin(lcz_indicators)].groupby(["country", "year"], as_index=False)["value"].sum()
-    )
+    lcz_sums = tb[tb["indicator"].isin(lcz_indicators)].groupby(["country", "year"], as_index=False)["value"].sum()
     lcz_sums = lcz_sums.rename(columns={"value": "lcz_sum"})
     lcz_sums["value"] = 100 - lcz_sums["lcz_sum"]
     lcz_sums["indicator"] = "Unknown"
