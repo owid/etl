@@ -128,10 +128,10 @@ def run() -> None:
     city_country = ["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0"]
 
     with snap.extracted() as archive:
-        tb = archive.read("GHS_UCDB_GLOBE_R2024A.xlsx", sheet_name="GENERAL_CHARACTERISTICS")
-
-        # Select the top 100 cities with the largest population in GC_POP_TOT_2025
-        tb_capitals = tb[tb["GC_UCM_CAP"] == 1][["GC_UCN_MAI_2025", "GC_CNT_GAD_2025"]].copy()
+        # Get population data from GHSL sheet for all years
+        tb_ghsl = archive.read("GHS_UCDB_GLOBE_R2024A.xlsx", sheet_name="GHSL")
+        pop_columns = [col for col in tb_ghsl.columns if col.startswith("GH_POP_TOT_")]
+        tb_population = tb_ghsl[["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0"] + pop_columns].copy()
 
         for sheet, column_prefixes in SHEETS_AND_COLUMNS.items():
             tb = archive.read("GHS_UCDB_GLOBE_R2024A.xlsx", sheet_name=sheet)
@@ -141,15 +141,17 @@ def run() -> None:
             selected_columns += [col for col in city_country if col in tb.columns]
             tb = tb[selected_columns]
 
-            # Merge to filter rows that match capitals
-            tb = pr.merge(tb_capitals, tb, on=["GC_UCN_MAI_2025", "GC_CNT_GAD_2025"], how="inner")
-            tb = tb.drop("ID_UC_G0", axis=1)
+            # Merge with population data to get all urban centers with their populations
+            tb = pr.merge(tb, tb_population, on=["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0"], how="inner")
             tb = tb.rename(columns={"GC_UCN_MAI_2025": "city", "GC_CNT_GAD_2025": "country"})
             # Identify columns that need to be melted (those with prefixes in the mapping)
             value_vars = [col for col in tb.columns if any(col.startswith(prefix) for prefix in COLUMN_MAPPING.keys())]
 
+            # Keep ID_UC_G0 and population columns as id_vars for now
+            id_vars = ["city", "country", "ID_UC_G0"] + pop_columns
+
             # Melt the dataframe
-            tb = tb.melt(id_vars=["city", "country"], value_vars=value_vars, var_name="indicator", value_name="value")
+            tb = tb.melt(id_vars=id_vars, value_vars=value_vars, var_name="indicator", value_name="value")
 
             # Replace "-" with NaN and convert to numeric
             tb["value"] = tb["value"].replace("-", np.nan)
@@ -162,6 +164,29 @@ def run() -> None:
             tb["indicator"] = tb["indicator"].str[:-4]  # Removing the year
             # Replace indicator names with their mapped full names
             tb["indicator"] = tb["indicator"].map(COLUMN_MAPPING)
+
+            # Match population to the year of the indicator
+            # Use melt to reshape population columns, then merge
+            tb_pop_long = tb[["city", "country", "ID_UC_G0"] + pop_columns].drop_duplicates()
+            tb_pop_long = tb_pop_long.melt(
+                id_vars=["city", "country", "ID_UC_G0"],
+                value_vars=pop_columns,
+                var_name="pop_col",
+                value_name="population"
+            )
+            # Extract year from population column name (e.g., "GH_POP_TOT_2025" -> "2025")
+            tb_pop_long["year"] = tb_pop_long["pop_col"].str.extract(r"(\d{4})$")[0]
+            tb_pop_long = tb_pop_long.drop(columns=["pop_col"])
+
+            # Drop population columns from main table
+            tb = tb.drop(columns=pop_columns)
+
+            # Merge population based on city, country, ID_UC_G0, and year
+            tb = pr.merge(tb, tb_pop_long, on=["city", "country", "ID_UC_G0", "year"], how="left")
+
+            # Drop ID_UC_G0 as it's no longer needed
+            tb = tb.drop(columns=["ID_UC_G0"])
+
             extracted_data.append(tb)
 
     tb = pr.concat(extracted_data)
@@ -171,13 +196,30 @@ def run() -> None:
     # Simplify LCZ categories
     tb["indicator"] = tb["indicator"].map(LCZ_CATEGORY_MAPPING).fillna(tb["indicator"])
 
-    # Aggregate the data by simplified categories
-    tb = (
-        tb.groupby(["country", "city", "year", "indicator"], as_index=False).agg(
-            {"value": "sum"}
-        )  # Aggregate by summing the values
+    # Aggregate to country level using different methods for Share vs non-Share indicators
+    # First, identify which indicators contain "Share"
+    tb["is_share"] = tb["indicator"].str.contains("Share", case=False, na=False)
+
+    # For Share indicators: calculate population-weighted average
+    tb_share = tb[tb["is_share"]].copy()
+    tb_share["weighted_value"] = tb_share["value"] * tb_share["population"]
+
+    tb_share_agg = tb_share.groupby(["country", "year", "indicator"], as_index=False).agg(
+        {"weighted_value": "sum", "population": "sum"}
     )
-    # Calculate the "Unknown" indicator
+    tb_share_agg["value"] = tb_share_agg["weighted_value"] / tb_share_agg["population"]
+    tb_share_agg = tb_share_agg[["country", "year", "indicator", "value"]]
+
+    # For non-Share indicators: calculate simple mean
+    tb_non_share = tb[~tb["is_share"]].copy()
+    tb_non_share_agg = tb_non_share.groupby(["country", "year", "indicator"], as_index=False).agg(
+        {"value": "mean"}
+    )
+
+    # Combine both aggregated datasets
+    tb = pr.concat([tb_share_agg, tb_non_share_agg], ignore_index=True)
+
+    # Calculate the "Unknown" indicator for LCZ categories
     lcz_indicators = [
         "Tightly built city areas",
         "Buildings surrounded by green areas",
@@ -189,9 +231,9 @@ def run() -> None:
         "Rocky or sandy land",
         "Water bodies",
     ]
-    # Calculate the sum of LCZ values for each city and year
+    # Calculate the sum of LCZ values for each country and year
     lcz_sums = (
-        tb[tb["indicator"].isin(lcz_indicators)].groupby(["country", "city", "year"], as_index=False)["value"].sum()
+        tb[tb["indicator"].isin(lcz_indicators)].groupby(["country", "year"], as_index=False)["value"].sum()
     )
     lcz_sums = lcz_sums.rename(columns={"value": "lcz_sum"})
     lcz_sums["value"] = 100 - lcz_sums["lcz_sum"]
@@ -204,7 +246,7 @@ def run() -> None:
     tb = pr.concat([tb, lcz_sums], ignore_index=True)
 
     # Improve tables format.
-    tb = tb.format(["country", "city", "year", "indicator"])
+    tb = tb.format(["country", "year", "indicator"])
 
     #
     # Save outputs.
