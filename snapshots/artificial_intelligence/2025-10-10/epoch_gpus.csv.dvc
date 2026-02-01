@@ -8,7 +8,7 @@ meta:
     title: Machine Learning Hardware
     description: |-
       This dataset contains detailed information about machine learning hardware, including GPUs, NPUs, and other specialized AI chips. It includes technical specifications such as computational performance across different precision levels (FP64, FP32, FP16, INT8, etc.), memory configurations, release dates, pricing, and manufacturing details.
-    date_published: "2025-10-10"
+    date_published: "2026-03-31"
 
     # Citation
     producer: Epoch AI
