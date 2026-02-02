@@ -484,6 +484,9 @@ tables:
           - *desc_key_per_1000_employment
         display:
           numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
 
       # =========================================================================
       # ECONOMIC IMPACT
