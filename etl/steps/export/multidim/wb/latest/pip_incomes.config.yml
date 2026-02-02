@@ -59,7 +59,7 @@ dimensions:
       - slug: all
         name: All deciles
       - slug: nan
-        name: "-"
+        name: ""
 
   - name: Period
     slug: period
