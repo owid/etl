@@ -44,3 +44,18 @@ steps:
   #
   data://grapher/survey/2026-02-02/dietary_choices_uk:
     - data://garden/survey/2026-02-02/dietary_choices_uk
+  #
+  # YouGov - Dietary choices of Americans.
+  #
+  data://meadow/survey/2026-02-02/dietary_choices_us:
+    - snapshot://survey/2026-02-02/dietary_choices_us.xlsx
+  #
+  # YouGov - Dietary choices of Americans.
+  #
+  data://garden/survey/2026-02-02/dietary_choices_us:
+    - data://meadow/survey/2026-02-02/dietary_choices_us
+  #
+  # YouGov - Dietary choices of Americans.
+  #
+  data://grapher/survey/2026-02-02/dietary_choices_us:
+    - data://garden/survey/2026-02-02/dietary_choices_us

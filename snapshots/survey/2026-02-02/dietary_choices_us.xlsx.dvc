@@ -1,0 +1,26 @@
+meta:
+  origin:
+    producer: YouGov
+    title: Dietary choices of Americans
+    description: |-
+      This dataset contains the result of YouGov surveys asking the question: "Which of these best describes your diet?". The available responses were:
+      - Meat eater: eat meat and/or poultry.
+      - Flexitarian: mainly vegetarian, but occasionally eat meat or fish.
+      - Pescetarian: eat fish but do not eat meat or poultry.
+      - Vegetarian: do not eat any meat, poultry, game, fish, or shellfish.
+      - Plant-based / Vegan: do not eat dairy products, eggs, or any other animal product.
+      - None of these.
+    citation_full: YouGov (2026) - Dietary choices of Americans (e.g. vegetarian, flexitarian, meat-eater etc)?
+    attribution_short: YouGov
+    url_main: https://today.yougov.com/topics/consumer/trackers/dietary-choices-of-americans
+    url_download: https://today.yougov.com/_pubapis/v5/us/trackers/dietary-choices-of-americans/download/
+    date_accessed: '2026-02-02'
+    # NOTE: The publication date can be assumed to be the latest date in the "All adults" sheet of the data file.
+    date_published: '2025-12-04'
+    license:
+      name: CC BY-NC 4.0
+      url: https://yougov.com/about/terms/public-data-license
+outs:
+  - md5: ecbbcc3311a7af20094d86819d834d96
+    size: 32354
+    path: dietary_choices_us.xlsx
