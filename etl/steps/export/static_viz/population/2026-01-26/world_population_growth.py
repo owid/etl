@@ -84,19 +84,32 @@ def optimize_svg_for_figma(svg_path: Path) -> None:
 
     # Semantic groups in render order (bottom to top)
     group_order = [
-        "grid-lines", "axes-spines", "population-fill", "growth-line",
-        "population-outline", "markers", "projection-bracket", "legend-shapes",
-        "title", "legend-labels", "axis-labels", "data-labels", "source"
+        "grid-lines",
+        "axes-spines",
+        "population-fill",
+        "growth-line",
+        "population-outline",
+        "markers",
+        "projection-bracket",
+        "legend-shapes",
+        "title",
+        "legend-labels",
+        "axis-labels",
+        "data-labels",
+        "source",
     ]
 
     groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
 
     # Collect and categorize all visual elements
     for elem in main_group.iter():
-        if elem.tag in ["{http://www.w3.org/2000/svg}path", "{http://www.w3.org/2000/svg}line",
-                        "{http://www.w3.org/2000/svg}rect", "{http://www.w3.org/2000/svg}text",
-                        "{http://www.w3.org/2000/svg}use"]:
-
+        if elem.tag in [
+            "{http://www.w3.org/2000/svg}path",
+            "{http://www.w3.org/2000/svg}line",
+            "{http://www.w3.org/2000/svg}rect",
+            "{http://www.w3.org/2000/svg}text",
+            "{http://www.w3.org/2000/svg}use",
+        ]:
             # Make a copy to avoid modifying during iteration
             elem_copy = ET.Element(elem.tag, elem.attrib)
             elem_copy.text = elem.text
