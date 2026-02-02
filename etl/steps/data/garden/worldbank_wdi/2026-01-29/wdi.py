@@ -227,6 +227,11 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
         "bm_trf_pwkr_cd_dt": "sum",
     }
 
+    # Keep only the columns needed for aggregation to avoid warnings about
+    # existing regional data for columns without aggregation methods
+    cols_for_aggregation = ["country", "year"] + list(agg.keys())
+    regions_tb = regions_tb[cols_for_aggregation]
+
     # add regions to table
     regions_tb = geo.add_regions_to_table(
         regions_tb,
