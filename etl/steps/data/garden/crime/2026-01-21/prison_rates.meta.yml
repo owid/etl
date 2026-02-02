@@ -19,7 +19,10 @@ tables:
         unit: prisoners
       prison_population_rate:
         title: Prison population rate
+        description_short: Prison population (including pre-trial detainees and remand prisoners), per 100,000 population.
         unit: prisoners per 100,000 people
+        display:
+          numDecimalPlaces: 0
       pretrial_detainees_pct:
         title: Share of prisoners that are pre-trial detainees
         unit: "%"
@@ -49,3 +52,13 @@ tables:
         description_short: The occupancy level of prisons, based on the official capacity.
         unit: "%"
         short_unit: "%"
+      pretrial_remand_number:
+        title: Number of pre-trial/remand prisoners in the prison population
+        unit: prisoners
+      pretrial_remand_pct:
+        title: Percentage of the prison population that are pre-trial or remand prisoners
+        unit: "%"
+        short_unit: "%"
+      pretrial_remand_rate:
+        title: Pre-trial/remand rate per 100,000 of national population)
+        unit: prisoners per 100,000 people

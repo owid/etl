@@ -224,6 +224,7 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
     # Check percentage columns
     percentage_cols = [
         "pretrial_detainees_pct",
+        "pretrial_remand_pct",
         "female_prisoners_pct",
         "juvenile_prisoners_pct",
         "foreign_prisoners_pct",
@@ -279,6 +280,43 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
                     f"⚠️  WARNING [{country_name}]: Found {len(zero_capacity)} rows with prison population but zero official capacity"
                 )
 
+    # Check pre-trial/remand number
+    if "pretrial_remand_number" in df.columns:
+        pretrial_num = df["pretrial_remand_number"].dropna()
+        if not pretrial_num.empty:
+            # Check for negative values
+            negative = pretrial_num[pretrial_num < 0]
+            if not negative.empty:
+                print(f"⚠️  WARNING [{country_name}]: Found {len(negative)} negative pre-trial/remand number values")
+
+            # Check if pre-trial number exceeds total prison population
+            if "prison_population_total" in df.columns:
+                check_df = df.dropna(subset=["pretrial_remand_number", "prison_population_total"])
+                if not check_df.empty:
+                    exceeds = check_df[
+                        check_df["pretrial_remand_number"] > check_df["prison_population_total"]
+                    ]
+                    if not exceeds.empty:
+                        print(
+                            f"⚠️  WARNING [{country_name}]: Found {len(exceeds)} rows where pre-trial number exceeds total prison population"
+                        )
+
+    # Check pre-trial/remand rate (per 100k)
+    if "pretrial_remand_rate" in df.columns:
+        pretrial_rate = df["pretrial_remand_rate"].dropna()
+        if not pretrial_rate.empty:
+            # Check for negative values
+            negative = pretrial_rate[pretrial_rate < 0]
+            if not negative.empty:
+                print(f"⚠️  WARNING [{country_name}]: Found {len(negative)} negative pre-trial/remand rate values")
+
+            # Check for unreasonably high rates (> 500 per 100k)
+            very_high = pretrial_rate[pretrial_rate > 500]
+            if not very_high.empty:
+                print(
+                    f"⚠️  WARNING [{country_name}]: Found {len(very_high)} pre-trial/remand rate values > 500 per 100k: {very_high.tolist()}"
+                )
+
 
 # --- main ------------------------------------------------------------------
 
@@ -329,6 +367,163 @@ def _clean_trend_table(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df.drop_duplicates().reset_index(drop=True)
+
+
+def _clean_pretrial_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Clean and normalize a pre-trial/remand imprisonment table."""
+    df = df.copy()
+    df.columns = [str(c).strip() for c in df.columns]
+
+    # Clean year column
+    if "Year" in df.columns:
+        df["Year"] = pd.to_numeric(df["Year"], errors="coerce")
+        df = df.dropna(subset=["Year"]).sort_values("Year")
+
+    # Clean numeric columns
+    numeric_cols = {
+        "Number in pre-trial/remand imprisonment": "pretrial_remand_number",
+        "Percentage of total prison population": "pretrial_remand_pct",
+        "Pre-trial/remand population rate (per 100,000 of national population)": "pretrial_remand_rate",
+    }
+
+    for orig_col, new_col in numeric_cols.items():
+        if orig_col in df.columns:
+            # Clean the column values
+            df[orig_col] = (
+                df[orig_col]
+                .astype(str)
+                .str.replace(r"^\s*(c\.|circa)\s*", "", regex=True)  # remove leading "c." / "circa"
+                .str.replace(",", "", regex=False)
+                .str.replace(" ", "", regex=False)
+                .str.replace("%", "", regex=False)  # remove percentage signs
+                .str.strip()
+            )
+            df[orig_col] = pd.to_numeric(df[orig_col], errors="coerce")
+
+    # Rename columns to match snapshot naming convention
+    df = df.rename(
+        columns={
+            "Year": "year",
+            **numeric_cols,
+        }
+    )
+
+    return df.drop_duplicates().reset_index(drop=True)
+
+
+def _extract_pretrial_table(soup: BeautifulSoup, country_name: str) -> pd.DataFrame:
+    """
+    Extract pre-trial/remand imprisonment table from country page.
+
+    These tables have a special format where multiple values are in one cell separated by <br/> tags.
+    Example structure:
+      Year | Number | Percentage | Rate
+      2000<br/>2005 | 349,800<br/>463,200 | 18.1%<br/>21.1% | 123<br/>156
+    """
+    # Find tables that contain "pre-trial/remand" text
+    tables = soup.find_all("table")
+
+    for table in tables:
+        # Check if this table contains pre-trial/remand header
+        table_text = table.get_text()
+        if "pre-trial/remand" not in table_text.lower():
+            continue
+
+        # Get all rows
+        rows = table.find_all("tr")
+        if len(rows) < 2:  # Need at least header + data
+            continue
+
+        # Check if first row has the expected headers
+        header_row = rows[0]
+        header_text = header_row.get_text().lower()
+        if "year" not in header_text or "number in" not in header_text:
+            continue
+
+        # Extract data from subsequent rows
+        # Each cell may contain multiple values separated by <br/>
+        all_years = []
+        all_numbers = []
+        all_percentages = []
+        all_rates = []
+
+        for row in rows[1:]:  # Skip header
+            cells = row.find_all(["td", "th"])
+            if len(cells) < 3:  # Need at least 3 columns
+                continue
+
+            # Extract text from each cell, splitting by <br/>
+            cell_values = []
+            for cell in cells:
+                # Get text with br tags preserved as separators
+                text_parts = []
+                for content in cell.descendants:
+                    if isinstance(content, str):
+                        text = content.strip()
+                        if text:
+                            text_parts.append(text)
+                cell_values.append(text_parts)
+
+            # Determine the maximum number of values in any cell (this is the number of rows)
+            max_len = max(len(vals) for vals in cell_values) if cell_values else 0
+
+            # Pad shorter lists and combine values
+            for i in range(max_len):
+                if len(cell_values) >= 1 and i < len(cell_values[0]):
+                    all_years.append(cell_values[0][i])
+                if len(cell_values) >= 2 and i < len(cell_values[1]):
+                    all_numbers.append(cell_values[1][i])
+                if len(cell_values) >= 3 and i < len(cell_values[2]):
+                    all_percentages.append(cell_values[2][i])
+                if len(cell_values) >= 4 and i < len(cell_values[3]):
+                    all_rates.append(cell_values[3][i])
+
+        # If we found data, create a DataFrame
+        if all_years:
+            # Make all lists the same length
+            max_len = max(len(all_years), len(all_numbers), len(all_percentages), len(all_rates))
+
+            # Pad shorter lists with None
+            while len(all_years) < max_len:
+                all_years.append(None)
+            while len(all_numbers) < max_len:
+                all_numbers.append(None)
+            while len(all_percentages) < max_len:
+                all_percentages.append(None)
+            while len(all_rates) < max_len:
+                all_rates.append(None)
+
+            df = pd.DataFrame({
+                "year": all_years,
+                "pretrial_remand_number": all_numbers,
+                "pretrial_remand_pct": all_percentages,
+                "pretrial_remand_rate": all_rates,
+            })
+
+            # Clean the data
+            df["year"] = pd.to_numeric(df["year"], errors="coerce")
+
+            # Clean numeric columns (remove commas, spaces, percentages)
+            for col in ["pretrial_remand_number", "pretrial_remand_pct", "pretrial_remand_rate"]:
+                if col in df.columns:
+                    df[col] = (
+                        df[col]
+                        .astype(str)
+                        .str.replace(",", "", regex=False)
+                        .str.replace(" ", "", regex=False)
+                        .str.replace("%", "", regex=False)
+                        .str.replace("c.", "", regex=False)
+                        .str.strip()
+                    )
+                    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+            df["country"] = country_name
+            df = df.dropna(subset=["year"]).drop_duplicates()
+
+            return df
+
+    # Return empty DataFrame if no table found
+    return pd.DataFrame()
 
 
 def fetch_wpb_country(country_slug: str, country_name: str):
@@ -449,11 +644,21 @@ def fetch_wpb_country(country_slug: str, country_name: str):
     # Concatenate all trend dataframes
     trend_df = pd.concat(trend_dfs, ignore_index=True) if trend_dfs else pd.DataFrame()
 
-    # Combine snapshot and trend data
+    # Extract pre-trial/remand imprisonment table from the full page
+    # These tables have a special format where multiple values are in one cell separated by <br/>
+    pretrial_df = _extract_pretrial_table(soup, country_name)
+
+    # Merge all data sources
+    # Start with trend data or snapshot
     if not trend_df.empty:
         combined_df = pd.concat([trend_df, snapshot_df], ignore_index=True)
     else:
         combined_df = snapshot_df
+
+    # Merge pre-trial data if available
+    if not pretrial_df.empty and not combined_df.empty:
+        # Merge on country and year
+        combined_df = pd.merge(combined_df, pretrial_df, on=["country", "year"], how="outer")
 
     # Sort by country and year
     if "year" in combined_df.columns:
