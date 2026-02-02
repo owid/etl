@@ -212,6 +212,26 @@ def _replace_entity_placeholders_for_slug(text: str) -> str:
     return text.replace("$entityName", "Spain").replace("$entityCode", "ESP")
 
 
+def _url_matches_chart_slug(url: str, chart_slug: str) -> bool:
+    """Check if URL matches the exact chart slug (not just a prefix).
+
+    The slug must be followed by end of path, query string, or nothing.
+    This prevents '/grapher/foo' from matching '/grapher/foo-bar'.
+    """
+    pattern = f"/grapher/{chart_slug}"
+    if pattern not in url:
+        return False
+    # Find where the pattern ends
+    idx = url.find(pattern)
+    end_idx = idx + len(pattern)
+    # Check what follows the slug
+    if end_idx >= len(url):
+        return True  # Slug is at the end
+    next_char = url[end_idx]
+    # Valid terminators: query string, fragment, or path separator
+    return next_char in ("?", "#", "/")
+
+
 def find_context_before_chart(body: list, chart_index: int) -> tuple[str | None, str | None]:
     """Find heading or text content before a chart in the body.
 
@@ -288,7 +308,7 @@ def find_chart_citations_in_content(
     for i, item in enumerate(body):
         if isinstance(item, dict) and item.get("type") == "chart":
             url = item.get("url", "")
-            if f"/grapher/{chart_slug}" in url:
+            if _url_matches_chart_slug(url, chart_slug):
                 # Find heading or text before chart
                 context, heading_slug = find_context_before_chart(body, i)
                 if heading_slug:
@@ -320,7 +340,7 @@ def find_chart_citations_in_content(
                     for item in value:
                         if isinstance(item, dict) and item.get("spanType") == "span-link":
                             url = item.get("url", "")
-                            if f"/grapher/{chart_slug}" in url:
+                            if _url_matches_chart_slug(url, chart_slug):
                                 link_text = extract_text_from_value(item.get("children", []))
                                 if url not in seen_urls:
                                     seen_urls.add(url)

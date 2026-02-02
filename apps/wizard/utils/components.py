@@ -538,6 +538,15 @@ def url_persist(component: Any) -> Any:
           key="abc",
           ...
         )
+
+    Important notes:
+        - Boolean values (checkbox/toggle) are stored as "True"/"False" strings in URL
+        - The component parses these strings back to booleans when rendered
+        - If you need to check the value before the component renders (e.g., in filtering logic),
+          check st.session_state first, then fall back to parsing st.query_params manually:
+            value = st.session_state.get("key")
+            if value is None:
+                value = st.query_params.get("key") != "False"
     """
 
     def _persist(*args, **kwargs):
