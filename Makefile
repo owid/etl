@@ -83,7 +83,7 @@ test-all:
 
 format-all:
 	@echo '================ etl ================='
-	@make test
+	@make format
 	@for lib in $(LIBS); do \
 		echo "================ $$lib ================="; \
 		(cd $$lib && make format); \
