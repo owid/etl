@@ -12,14 +12,14 @@ tables:
     variables:
       computational_capacity_fastest_supercomputer:
         title: Computational capacity of the fastest supercomputer
-        description_short: The number of [floating-point operations](#dod:flop) carried out per second by the fastest supercomputer in any given year. This is expressed in gigaFLOPS, equivalent to 10⁹ floating-point operations per second.
+        description_short: The number of [floating-point operations](#dod:flop) carried out per second by the fastest supercomputer in any given year. This is expressed in gigaflops, equivalent to 10⁹ floating-point operations per second.
         unit: gigaflops per second
-        short_unit: GFLOPS/s
+        short_unit: Gflop/s
         processing_level: major
         description_key:
           - Computational capacity is measured with the [Linpack benchmark](https://www.netlib.org/utk/people/JackDongarra/PAPERS/hpl.pdf), which tests how fast a computer can solve a large, dense set of linear equations.
           - This indicator shows the highest sustained Linpack speed achieved by the fastest supercomputer each year, as recorded by the [TOP500](https://top500.org/) project.
-          - One gigaflop per second (GFLOPS/s) equals one billion [floating-point operations](#dod:flop) per second.
+          - One gigaflop per second (Gflop/s) equals one billion [floating-point operations](#dod:flop) per second.
           - The Linpack benchmark tests only one type of computation, so it doesn't capture overall system performance. Real-world applications often perform differently than this benchmark suggests.
         description_from_producer: |-
           The Top500 list the 500 fastest computer system being used today. In 1993 the collection was started and has been updated every 6 months since then. The report lists the sites that have the 500 most powerful computer systems installed. The best Linpack benchmark performance achieved is used as a performance measure in ranking the computers. The TOP500 list has been updated twice a year since June 1993.
