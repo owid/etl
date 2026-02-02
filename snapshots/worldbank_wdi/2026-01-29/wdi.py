@@ -1,5 +1,11 @@
 """Imports World Bank World Development Indicators to Snapshot.
 
+## Known data quality issues
+
+- `GC.TAX.TOTL.GD.ZS` (Tax revenue % of GDP): Values are corrupted - they are ~1e9 times smaller than they should be
+  (e.g., US shows 1e-08 instead of ~11%). This affects the derived indicator `omm_tax_rev_percap`. The issue is in the
+  raw World Bank data, not our processing. Previous version (2024-05-20) had correct values.
+  Reported to World Bank: [TODO: add ticket number when reported]
 
 It downloads both data and metadata in a single file, although metadata can also be retrieved via the API.
 The WDI release notes (available at https://datatopics.worldbank.org/world-development-indicators/release-note-toc.html)
