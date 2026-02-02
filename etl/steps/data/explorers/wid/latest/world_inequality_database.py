@@ -4,15 +4,15 @@ World Inequality Database explorer data step.
 Loads the latest WID data from garden and stores a table (as a csv file).
 """
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load garden dataset.
-    ds_garden = paths.load_dataset("world_inequality_database")
+    ds_garden = paths.load_dataset("world_inequality_database_legacy")
 
     # Read table from garden dataset.
     tb_garden = ds_garden["world_inequality_database"]
@@ -27,5 +27,5 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden.dropna(how="all", subset=[x for x in tb_garden.columns if x not in ["country", "year"]])
 
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, formats=["csv"])
+    ds_explorer = paths.create_dataset(tables=[tb_garden], default_metadata=ds_garden.metadata, formats=["csv"])
     ds_explorer.save()

@@ -126,6 +126,13 @@ definitions:
     Inequality is measured here in terms of income before taxes and benefits.
     <%- endif %>
 
+  numdecimalplaces_period: |-
+    <% if period == "day" %>
+    2
+    <%- else %>
+    0
+    <%- endif %>
+
   # For Grapher configuration
 
   headcount_ratio_title: |-
@@ -621,7 +628,7 @@ definitions:
       <%- elif decile in [8] %>
       [100, 8, 9, 10, 11, 12, 13, 1]
       <%- elif decile in [9] %>
-      [100, 10, 12, 14, 16, 17, 1]
+      [100, 10, 12, 14, 16, 1]
       <%- elif decile in [10] %>
       [100, 30, 35, 40, 45, 50, 1]
       <%- endif %>
@@ -980,7 +987,7 @@ tables:
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Mean income ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:
@@ -1014,7 +1021,7 @@ tables:
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Median income ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:
@@ -1053,7 +1060,7 @@ tables:
           name: |-
             {macros}
             Average (<<percentiles_avg_share(decile)>>) ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:
@@ -1134,7 +1141,7 @@ tables:
           name: |-
             {macros}
             Threshold (<<percentiles_thr(decile)>>) ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:

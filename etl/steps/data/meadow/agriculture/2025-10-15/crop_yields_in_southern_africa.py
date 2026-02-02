@@ -15,10 +15,10 @@ def run() -> None:
 
     # Load data from snapshot.
     path_to_files = "southern-africa-trends/data/fig1/"
-    with snap.open_archive():
-        tb_modis = snap.read_from_archive(f"{path_to_files}CountryYearMeanGCVI.csv")
-        tb_sif = snap.read_from_archive(f"{path_to_files}sifMaxCountryMean.csv")
-        tb_fao = snap.read_from_archive(f"{path_to_files}FAOSTAT_data_en_12-8-2023.csv")
+    with snap.extracted() as archive:
+        tb_modis = archive.read(f"{path_to_files}CountryYearMeanGCVI.csv")
+        tb_sif = archive.read(f"{path_to_files}sifMaxCountryMean.csv")
+        tb_fao = archive.read(f"{path_to_files}FAOSTAT_data_en_12-8-2023.csv")
 
     #
     # Process data.

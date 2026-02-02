@@ -95,3 +95,18 @@ steps:
     - data://garden/un/2023-10-09/plastic_waste
   data://grapher/un/2025-09-25/plastic_waste_2023_2024:
     - data://garden/un/2025-09-25/plastic_waste_2023_2024
+  export://multidim/plastic_waste/latest/plastic_waste_trade:
+    - data://grapher/un/2025-09-25/plastic_waste_2023_2024
+
+  # Nature plastic waste emissions inventory (Cottom et al. 2024)
+  data://meadow/plastic_waste/2026-01-14/cottom_plastic_waste:
+    - snapshot://plastic_waste/2026-01-14/cottom_plastic_waste.zip
+  data://garden/plastic_waste/2026-01-14/cottom_plastic_waste:
+    - data://meadow/plastic_waste/2026-01-14/cottom_plastic_waste
+    - data://garden/demography/2024-07-15/population
+  data://grapher/plastic_waste/2026-01-14/cottom_plastic_waste:
+    - data://garden/plastic_waste/2026-01-14/cottom_plastic_waste
+  export://multidim/plastic_waste/latest/mismanaged_plastic_waste:
+    - data://grapher/plastic_waste/2026-01-14/cottom_plastic_waste
+  export://multidim/plastic_waste/latest/plastic_waste_generation:
+    - data://grapher/plastic_waste/2026-01-14/cottom_plastic_waste

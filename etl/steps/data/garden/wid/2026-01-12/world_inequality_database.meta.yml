@@ -1,0 +1,1029 @@
+# NOTE: To learn more about the fields, hover over their names.
+macros: |-
+  <% macro quantiles_thr(quantile) %>
+  <% if quantile == "1" %>
+  Poorest decile
+  <%- elif quantile == "2" %>
+  2nd decile
+  <%- elif quantile == "3" %>
+  3rd decile
+  <%- elif quantile in ["4", "5", "6", "7", "8"] %>
+  <<quantile>>th decile
+  <%- elif quantile == "9" %>
+  Richest decile
+  <%- elif quantile in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+  <<quantile>>
+  <%- endif %>
+  <% endmacro %>
+
+  <% macro quantiles_avg_share(quantile) %>
+  <% if quantile == "1" %>
+  Poorest decile
+  <%- elif quantile == "2" %>
+  2nd decile
+  <%- elif quantile == "3" %>
+  3rd decile
+  <%- elif quantile in ["4", "5", "6", "7", "8", "9"] %>
+  <<quantile>>th decile
+  <%- elif quantile == "10" %>
+  Richest decile
+  <%- elif quantile in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+  <<quantile>>
+  <%- endif %>
+  <% endmacro %>
+
+  <% macro quantiles_avg_share_tenth_population(quantile) %>
+  <% if quantile not in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+   (tenth of the population)
+  <%- endif %>
+  <% endmacro %>
+
+  <% macro quantiles_thr_percentage(quantile) %>
+  <% if quantile not in ["Richest 1%", "Richest 0.1%", "Richest 0.01%", "Richest 0.001%"] %>
+  <<quantile>>0
+  <%- elif quantile == "Richest 1%" %>
+  99
+  <%- elif quantile == "Richest 0.1%" %>
+  99.9
+  <%- elif quantile == "Richest 0.01%" %>
+  99.99
+  <%- elif quantile == "Richest 0.001%" %>
+  99.999
+  <%- endif %>
+  <% endmacro %>
+
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      {definitions.description_processing_general}
+
+      {definitions.description_processing_extrapolated}
+    presentation:
+      attribution_short: WID
+      title_variant: "{definitions.title_variant_extrapolated}"
+      topic_tags:
+        - Economic Inequality
+    display: &common_display
+      tolerance: 5
+
+  # NOTE: Change this if needed in the future
+  ppp_year: 2023
+
+  title_extrapolated: |-
+    <% if extrapolated == "yes" %>
+     - Extrapolated
+    <%- endif %>
+
+  title_variant_extrapolated: |-
+    <% if extrapolated == "yes" %>
+    with extrapolations
+    <%- endif %>
+
+  per_period: |-
+    <% if period in ["day", "month", "year"] %>
+    per <<period>>
+    <%- endif %>
+
+  verb_welfare_type: |-
+    <% if welfare_type != "wealth" %>
+    received
+    <%- else %>
+    owned
+    <%- endif %>
+
+  concept_welfare_type: |-
+    <% if welfare_type != "wealth" %>
+    income
+    <%- else %>
+    wealth
+    <%- endif %>
+
+  concept_welfare_type_capitalized: |-
+    <% if welfare_type != "wealth" %>
+    Income
+    <%- else %>
+    Wealth
+    <%- endif %>
+
+  concept_welfare_type_for_title:
+    <% if welfare_type != "wealth" %>
+     (<<welfare_type>>)
+    <%- endif %>
+
+  description_short_welfare_type_inequality: |-
+    <% if welfare_type == "before tax" %>
+    Inequality is measured here in terms of income before taxes and benefits.
+    <%- elif welfare_type in ["after tax", "after tax disposable"] %>
+    Inequality is measured here in terms of income after taxes and benefits.
+    <%- elif welfare_type == "wealth" %>
+    Inequality is measured here in terms of net wealth.
+    <%- endif %>
+
+  description_key_welfare_type: |-
+    <% if welfare_type == "before tax" %>
+    Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.
+    <%- elif welfare_type == "after tax" %>
+    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
+    <%- elif welfare_type == "after tax disposable" %>
+    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.
+    <%- elif welfare_type == "wealth" %>
+    This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
+    <%- endif %>
+
+  description_key_ppp: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+
+  description_key_methodology_1: |-
+    <% if welfare_type != "wealth" %>
+    The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+    <%- else %>
+    The data is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
+    <%- endif %>
+
+  description_key_methodology_2: |-
+    <% if welfare_type != "wealth" %>
+    These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).
+    <%- else %>
+    Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).
+    <%- endif %>
+
+  description_key_relative_poverty: |-
+    This is a measure of _relative_ poverty – it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
+
+  description_processing_general: |-
+    We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
+
+  description_processing_relative_poverty: |-
+    This data has been estimated by calculating the <<poverty_line>>, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold.
+
+  description_processing_extrapolated: |-
+    <% if extrapolated == "yes" %>
+    Interpolations and extrapolations are included by not using the option `exclude` in the Stata command.
+    <%- else %>
+    Interpolations and extrapolations are excluded by using the option `exclude` in the Stata command.
+    <%- endif %>
+
+  numdecimalplaces_period: |-
+    <% if period == "day" %>
+    2
+    <%- else %>
+    0
+    <%- endif %>
+
+  title_threshold: |-
+    {macros}
+    <% if quantile == "p50p60" %>
+    Threshold {definitions.concept_welfare_type} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>> (median){definitions.concept_welfare_type_for_title}
+    <%- else %>
+    Threshold {definitions.concept_welfare_type} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>>{definitions.concept_welfare_type_for_title}
+    <%- endif %>
+
+  subtitle_welfare_type: |-
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    Income here is measured after taxes and benefits.
+    <%- elif welfare_type == "before tax" %>
+    Income here is measured before taxes and benefits.
+    <%- elif welfare_type == "wealth" %>
+    Wealth is defined as the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.
+    <%- endif %>
+
+  subtitle_ppp: |-
+    This data is adjusted for inflation and differences in living costs between countries.
+
+  note_ppp: |-
+    This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices.
+
+  note_before_tax: |-
+    <% if welfare_type == "before tax" %>
+    Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.
+    <%- endif %>
+
+  note_ppp_before_tax: |-
+    <% if welfare_type == "before tax" %>
+    {definitions.note_ppp} {definitions.note_before_tax}
+    <%- else %>
+    {definitions.note_ppp}
+    <%- endif %>
+
+  map_brackets_gini: &map_brackets_gini
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.1]
+    <%- elif welfare_type == "before tax" %>
+    [1, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.1]
+    <%- endif %>
+
+  map_brackets_palma_ratio: &map_brackets_palma_ratio
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 1, 2, 3, 4, 5, 6, 7, 1]
+    <%- elif welfare_type == "before tax" %>
+    [0, 2, 4, 6, 8, 10, 12, 14, 16, 1]
+    <%- endif %>
+
+  map_brackets_share_bottom_50: &map_brackets_share_bottom_50
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+    [100, 10, 15, 20, 25, 30, 1]
+    <%- elif welfare_type == "before tax" %>
+    [100, 10, 15, 20, 25, 1]
+    <%- endif %>
+
+  map_brackets_relative_poverty: &map_brackets_relative_poverty |-
+    <% if poverty_line in ["40% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
+    <%- elif poverty_line in ["50% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
+    <%- elif poverty_line in ["60% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
+    [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- elif poverty_line in ["40% of the median"] and welfare_type == "before tax" %>
+    [0, 5, 10, 15, 20, 25, 30, 1]
+    <%- elif poverty_line in ["50% of the median"] and welfare_type == "before tax" %>
+    [1000, 20, 25, 30, 35, 1]
+    <%- elif poverty_line in ["60% of the median"] and welfare_type == "before tax" %>
+    [1000, 20, 25, 30, 35, 40, 1]
+    <%- endif %>
+
+  map_brackets_mean_median: &map_brackets_mean_median
+    <% if period == "year" %>
+    [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+    <%- elif period == "month" %>
+    [0, 100, 200, 500, 1000, 2000, 5000, 1]
+    <%- elif period == "day" %>
+    [0, 10, 20, 50, 100, 200, 1]
+    <%- endif %>
+
+  map_brackets_avg: &map_brackets_avg
+    <% if period == "year" %>
+      <% if welfare_type in ["after tax", "after tax disposable"] %>
+        <% if quantile in ["1"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
+        <%- elif quantile in ["2"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["10"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 100_000, 200_000, 500_000, 1_000_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "before tax" %>
+        <% if quantile in ["1"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
+        <%- elif quantile in ["2", "3"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["4", "5", "6", "7", "8"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["10"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000,1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "month" %>
+      <% if welfare_type in ["after tax", "after tax disposable"] %>
+        <% if quantile in ["1"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
+        <%- elif quantile in ["2", "3"] %>
+        [0, 100, 200, 500, 1000, 2000, 1]
+        <%- elif quantile in ["4", "5", "6", "7"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif quantile in ["8", "9"] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["10"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "before tax" %>
+        <% if quantile in ["1"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 1]
+        <%- elif quantile in ["2"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
+        <%- elif quantile in ["3", "4", "5", "6"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif quantile in ["7", "8"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["10"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "day" %>
+      <% if welfare_type in ["after tax", "after tax disposable"] %>
+        <% if quantile in ["1"] %>
+        [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 1]
+        <%- elif quantile in ["2"] %>
+        [0, 10, 20, 50, 100, 1]
+        <%- elif quantile in ["3", "4", "5", "6", "7", "8", "9"] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- elif quantile in ["10"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 100, 200, 500, 1000, 2000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "before tax" %>
+        <% if quantile in ["1"] %>
+        [0, 0.1, 0.2, 0.5, 1, 2, 5, 1]
+        <%- elif quantile in ["2", "3"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 1]
+        <%- elif quantile in ["4", "5", "6", "7", "8", "9"] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- elif quantile in ["10"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <%- endif %>
+
+  map_brackets_share: &map_brackets_share
+    <% if welfare_type in ["after tax", "after tax disposable"] %>
+      <% if quantile in ["1"] %>
+      [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 1]
+      <%- elif quantile in ["2"] %>
+      [0, 1, 2, 3, 4, 5, 6, 1]
+      <%- elif quantile in ["3"] %>
+      [0, 1, 2, 3, 4, 5, 6, 7, 1]
+      <%- elif quantile in ["4"] %>
+      [100, 2, 3, 4, 5, 6, 7, 8, 1]
+      <%- elif quantile in ["5"] %>
+      [100, 3, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif quantile in ["6"] %>
+      [100, 4, 5, 6, 7, 8, 9, 10, 1]
+      <%- elif quantile in ["7"] %>
+      [100, 5, 6, 7, 8, 9, 10, 11, 1]
+      <%- elif quantile in ["8"] %>
+      [100, 8, 9, 10, 11, 12, 1]
+      <%- elif quantile in ["9"] %>
+      [100, 10, 12, 14, 16, 1]
+      <%- elif quantile in ["10"] %>
+      [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
+      <%- elif quantile in ["Richest 1%"] %>
+      [0, 5, 10, 15, 20, 1]
+      <%- elif quantile in ["Richest 0.1%"] %>
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
+      <%- endif %>
+    <% elif welfare_type == "before tax" %>
+      <% if quantile in ["1"] %>
+      [0, 0.5, 1, 1.5, 2, 2.5, 3, 1]
+      <%- elif quantile in ["2"] %>
+      [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 1]
+      <%- elif quantile in ["3"] %>
+      [100, 2, 3, 4, 5, 1]
+      <%- elif quantile in ["4"] %>
+      [100, 2, 3, 4, 5, 6, 1]
+      <%- elif quantile in ["5"] %>
+      [100, 3, 4, 5, 6, 7, 8, 1]
+      <%- elif quantile in ["6"] %>
+      [100, 3, 4, 5, 6, 7, 8, 9, 1]
+      <%- elif quantile in ["7"] %>
+      [100, 6, 7, 8, 9, 10, 1]
+      <%- elif quantile in ["8"] %>
+      [100, 8, 9, 10, 11, 12, 1]
+      <%- elif quantile in ["9"] %>
+      [100, 10, 12, 14, 16, 1]
+      <%- elif quantile in ["10"] %>
+      [100, 30, 35, 40, 45, 50, 55, 60, 1]
+      <%- elif quantile in ["Richest 1%"] %>
+      [0, 5, 10, 15, 20, 25, 1]
+      <%- elif quantile in ["Richest 0.1%"] %>
+      [0, 2, 4 , 6, 8, 10, 12, 1]
+      <%- endif %>
+    <%- endif %>
+
+  map_brackets_thr: &map_brackets_thr
+    <% if period == "year" %>
+      <% if welfare_type in ["after tax", "after tax disposable"] %>
+        <% if quantile in ["1"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["2", "3", "4"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif quantile in ["5", "6", "7", "8"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100_000, 200_000, 500_000, 1_000_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "before tax" %>
+        <% if quantile in ["1"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["2", "3", "4", "5"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
+        <%- elif quantile in ["6", "7"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["8"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "month" %>
+      <% if welfare_type in ["after tax", "after tax disposable"] %>
+        <% if quantile in ["1"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
+        <%- elif quantile in ["2", "3", "4", "5", "6"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif quantile in ["7", "8"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 1]
+        <%- endif %>
+      <% elif welfare_type == "before tax" %>
+        <% if quantile in ["1"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1000, 1]
+        <%- elif quantile in ["2", "3", "4", "5", "6"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- elif quantile in ["7", "8"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 1000, 2000, 5000, 10_000, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
+        <%- endif %>
+      <%- endif %>
+    <% elif period == "day" %>
+      <% if welfare_type in ["after tax", "after tax disposable"] %>
+        <% if quantile in ["1"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 1]
+        <%- elif quantile in ["2", "3", "4", "5", "6", "7"] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- elif quantile in ["8", "9"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- endif %>
+      <% elif welfare_type == "before tax" %>
+        <% if quantile in ["1"] %>
+        [0, 1, 2, 5, 10, 20, 50, 1]
+        <%- elif quantile in ["2"] %>
+        [0, 1, 2, 5, 10, 20, 50, 100, 1]
+        <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %>
+        [0, 10, 20, 50, 100, 200, 1]
+        <%- elif quantile in ["9"] %>
+        [0, 10, 20, 50, 100, 200, 500, 1]
+        <%- elif quantile in ["Richest 1%"] %>
+        [0, 100, 200, 500, 1000, 1]
+        <%- elif quantile in ["Richest 0.1%"] %>
+        [0, 100, 200, 500, 1000, 2000, 5000, 1]
+        <%- endif %>
+      <%- endif %>
+    <%- endif %>
+
+  entity_names_inequality: &entity_names_inequality
+    - Chile
+    - Brazil
+    - South Africa
+    - United States
+    - France
+    - China
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  inequality:
+    variables:
+      gini:
+        title: Gini coefficient (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Gini coefficient (<<welfare_type>>)
+          numDecimalPlaces: 2
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Gini coefficient (<<welfare_type>>)
+            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Oranges"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_gini
+            selectedEntityNames: *entity_names_inequality
+
+      palma_ratio:
+        title: Palma ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The Palma ratio is a measure of inequality that divides the share {definitions.verb_welfare_type} by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Palma ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Palma ratio (<<welfare_type>>)
+            subtitle: The Palma ratio is a measure of inequality that divides the share {definitions.verb_welfare_type} by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_palma_ratio
+            selectedEntityNames: *entity_names_inequality
+
+      p50_p10_ratio:
+        title: P50/P10 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median {definitions.concept_welfare_type} is two times higher than that of someone just falling in the poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: P50/P10 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p90_p10_ratio:
+        title: P90/P10 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: P90 and P10 are the levels of {definitions.concept_welfare_type} below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: P90/P10 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p90_p50_ratio:
+        title: P90/P50 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median {definitions.concept_welfare_type}.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: P90/P50 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s80_s20_ratio:
+        title: S80/S20 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The S80/S20 ratio measures the share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 20% of the population divided by the share {definitions.verb_welfare_type} by the poorest 20%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: S80/S20 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s90_s10_ratio:
+        title: S90/S10 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The S90/S10 ratio measures the share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population divided by the share {definitions.verb_welfare_type} by the poorest 10%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: S90/S10 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s90_s50_ratio:
+        title: S90/S50 ratio (<<welfare_type>>){definitions.title_extrapolated}
+        unit: ""
+        short_unit: ""
+        description_short: The S90/S50 ratio measures the share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population divided by the share {definitions.verb_welfare_type} by the richest 50%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: S90/S50 ratio (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_bottom_50:
+        title: Share (bottom 50%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (bottom 50%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the poorest 50%{definitions.concept_welfare_type_for_title}"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Blues"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_share_bottom_50
+            selectedEntityNames: *entity_names_inequality
+
+
+      share_middle_40:
+        title: Share (middle 40%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the middle 40% of the population. The middle 40% is the share of the population whose {definitions.concept_welfare_type} lies between the poorest 50% and the richest 10%. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (middle 40%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_top_90_99:
+        title: Share (90-99th percentiles, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (90-99th percentiles, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_top_10:
+        title: Share (top 10%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (top 10%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the richest 10%{definitions.concept_welfare_type_for_title}"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: <% set quantile = "10" %> {definitions.map_brackets_share}
+            selectedEntityNames: *entity_names_inequality
+
+      share_top_1:
+        title: Share (top 1%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (top 1%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the richest 1%{definitions.concept_welfare_type_for_title}"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: <% set quantile = "Richest 1%" %> {definitions.map_brackets_share}
+            selectedEntityNames: *entity_names_inequality
+
+      share_top_0_1:
+        title: Share (top 0.1%, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Share (top 0.1%, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.concept_welfare_type_capitalized} share of the richest 0.1%{definitions.concept_welfare_type_for_title}"
+            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: <% set quantile = "Richest 0.1%" %> {definitions.map_brackets_share}
+            selectedEntityNames: *entity_names_inequality
+
+  relative_poverty:
+    variables:
+      headcount_ratio:
+        title: Share in relative poverty (<<poverty_line>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage living with {definitions.concept_welfare_type} below <<poverty_line>> {definitions.concept_welfare_type}. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+
+          {definitions.description_processing_general}
+
+          {definitions.description_processing_extrapolated}
+        display:
+          name: Share below <<poverty_line>> (<<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Relative poverty: Share of the population below <<poverty_line>> (<<welfare_type>>)"
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at <<poverty_line>> {definitions.concept_welfare_type}. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_relative_poverty
+            selectedEntityNames: *entity_names_inequality
+
+  incomes:
+    variables:
+      mean:
+        title: Mean ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: Average {definitions.concept_welfare_type} {definitions.per_period}. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Mean (<<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Mean {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}"
+            subtitle: |-
+              {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+            note: "{definitions.note_ppp_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "BuGn"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_mean_median
+            selectedEntityNames: *entity_names_inequality
+
+      median:
+        title: Median ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: Value of {definitions.concept_welfare_type} {definitions.per_period} below which 50% of the population live. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: Median (<<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Median {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}"
+            subtitle: |-
+              {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+            note: "{definitions.note_ppp_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Blues"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_mean_median
+            selectedEntityNames: *entity_names_inequality
+
+      avg:
+        title: |-
+          {macros}
+          Average ({definitions.per_period}, <<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: |-
+          {macros}
+          The mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: |-
+            {macros}
+            Average (<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: |-
+              {macros}
+              Mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
+            subtitle: |-
+              {macros}
+              The mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+            note: "{definitions.note_ppp_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Greens"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_avg
+            selectedEntityNames: *entity_names_inequality
+
+      share:
+        title: |-
+          {macros}
+          Share (<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          {macros}
+          The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: |-
+            {macros}
+            Share (<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: |-
+              {macros}
+              {definitions.concept_welfare_type_capitalized} share of the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
+            subtitle: |-
+              {macros}
+              The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+            note: "{definitions.note_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_share
+            selectedEntityNames: *entity_names_inequality
+
+      thr:
+        title: |-
+          {macros}
+          Threshold ({definitions.per_period}, <<quantiles_thr(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+        unit: "international-$ in {definitions.ppp_year} prices"
+        short_unit: "$"
+        description_short: |-
+          {macros}
+          The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_methodology_2}"
+        display:
+          name: |-
+            {macros}
+            Threshold (<<quantiles_thr(quantile) | lower>>, <<welfare_type>>)
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: |-
+              {definitions.title_threshold}
+            subtitle: |-
+              {macros}
+              The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+            note: "{definitions.note_ppp_before_tax}"
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Purples"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_thr
+            selectedEntityNames: *entity_names_inequality

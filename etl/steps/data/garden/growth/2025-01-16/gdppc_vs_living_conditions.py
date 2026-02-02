@@ -51,8 +51,8 @@ COLUMNS_AND_CATEGORIES = {
     "gho_clean_fuel_cooking": {"residence_area_type": "Total"},
     "pip": {
         "ppp_version": 2021,
-        "poverty_line": "No poverty line",
         "welfare_type": "income or consumption",
+        "period": "day",
         "table": "Income or consumption consolidated",
         "survey_comparability": "No spells",
     },
@@ -110,7 +110,7 @@ def run() -> None:
     tb_gho_clean_fuel_cooking = ds_gho.read(
         "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"
     )
-    tb_pip = ds_pip.read("world_bank_pip")
+    tb_pip = ds_pip.read("incomes")
     tb_undp_hdr = ds_undp_hdr.read("undp_hdr_sex")
     tb_ihme_gbd = ds_ihme_gbd.read("gbd_risk")
 

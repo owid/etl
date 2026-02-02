@@ -12,7 +12,6 @@ import structlog
 from click.core import Command
 
 from etl import paths
-from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
@@ -346,6 +345,9 @@ def _call_snapshot_function(
 
 def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
     """Run snapshot creation when only .dvc file exists."""
+    # Defer heavy import until needed
+    from etl.snapshot import Snapshot
+
     dataset_name = _normalize_dataset_name(dataset_name)
     dvc_files = _find_files_by_pattern(dataset_name, ".*.dvc")
 

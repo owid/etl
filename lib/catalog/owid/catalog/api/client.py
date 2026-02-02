@@ -5,9 +5,9 @@ from owid.catalog.api.search import SiteSearchAPI
 from owid.catalog.api.tables import TablesAPI
 from owid.catalog.api.utils import (
     DEFAULT_CATALOG_URL,
-    DEFAULT_GRAPHER_URL,
     DEFAULT_INDICATORS_SEARCH_URL,
     DEFAULT_SITE_SEARCH_URL,
+    DEFAULT_SITE_URL,
 )
 
 
@@ -59,7 +59,7 @@ class Client:
         self,
         timeout: int = 30,
         catalog_url: str = DEFAULT_CATALOG_URL,
-        grapher_url: str = DEFAULT_GRAPHER_URL,
+        site_url: str = DEFAULT_SITE_URL,
         indicators_search_url: str = DEFAULT_INDICATORS_SEARCH_URL,
         site_search_url: str = DEFAULT_SITE_SEARCH_URL,
     ) -> None:
@@ -68,16 +68,27 @@ class Client:
         Args:
             timeout: HTTP request timeout in seconds. Default 30.
             catalog_url: Base URL for the catalog. Default: https://catalog.ourworldindata.org/
-            grapher_url: Base URL for the Grapher. Default: https://ourworldindata.org/grapher
+            site_url: Base URL for the OWID website. Default: https://ourworldindata.org
             indicators_search_url: URL for indicators search API. Default: https://search.owid.io/indicators
             site_search_url: URL for site search API. Default: https://ourworldindata.org/api/search
         """
         self.timeout = timeout
+        self._site_url = site_url
         self._datasette = DatasetteAPI(timeout=timeout)
-        self.charts = ChartsAPI(self, base_url=grapher_url)
+        self.charts = ChartsAPI(self, site_url=site_url)
         self.indicators = IndicatorsAPI(self, search_url=indicators_search_url, catalog_url=catalog_url)
         self.tables = TablesAPI(self, catalog_url=catalog_url)
-        self._site_search = SiteSearchAPI(self, base_url=site_search_url, grapher_url=grapher_url)
+        self._site_search = SiteSearchAPI(self, base_url=site_search_url, site_url=site_url)
+
+    @property
+    def grapher_url(self) -> str:
+        """Base URL for the Grapher (derived from site_url)."""
+        return f"{self._site_url}/grapher"
+
+    @property
+    def explorer_url(self) -> str:
+        """Base URL for explorers (derived from site_url)."""
+        return f"{self._site_url}/explorers"
 
     def __repr__(self) -> str:
         return "Client(charts=..., indicators=..., tables=...)"

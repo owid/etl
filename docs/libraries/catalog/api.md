@@ -26,10 +26,13 @@ For convenience, the library provides functions for the most common use cases:
 
 ```python
 from owid.catalog import search, fetch
-# Search and fetch
+
+# Search for charts (default)
 results = search("population")
 tb = results[0].fetch()
-# Direct fetch
+
+# Direct fetch (by chart slug or table path)
+tb = fetch("life-expectancy")
 tb = fetch("garden/un/2024-07-12/un_wpp/population")
 ```
 

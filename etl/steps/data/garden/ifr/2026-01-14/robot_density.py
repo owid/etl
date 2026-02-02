@@ -22,6 +22,8 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
+    tb["robot_density"] = tb["robot_density"] / 10
+
     # Improve table format.
     tb = tb.format(["country", "year"])
 

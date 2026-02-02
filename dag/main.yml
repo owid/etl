@@ -13,7 +13,7 @@ steps:
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
-    - data://grapher/ggdc/2024-04-26/maddison_project_database
+    - data://grapher/worldbank_wdi/2025-09-08/wdi
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -668,6 +668,7 @@ steps:
     - data://meadow/worldbank_wdi/2025-09-08/wdi
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
     - snapshot://worldbank_wdi/2025-09-08/wdi.zip
 
   data://grapher/worldbank_wdi/2025-09-08/wdi:
@@ -748,7 +749,6 @@ steps:
   data://grapher/oecd/2025-12-23/official_development_assistance:
     - data://garden/oecd/2025-12-23/official_development_assistance
 
-
   #
   # CORE Econ - Growth rate of GDP per capita and productivity
   #
@@ -760,16 +760,26 @@ steps:
   data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
     - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity
 
-  
   #
-  # TODO: add step name (just something recognizable)
+  # World Prison Brief
   #
   data://meadow/crime/2026-01-21/prison_rates:
     - snapshot://crime/2026-01-20/prison_rates.csv
   data://garden/crime/2026-01-21/prison_rates:
     - data://meadow/crime/2026-01-21/prison_rates
+    - data://garden/demography/2024-07-15/population
   data://grapher/crime/2026-01-21/prison_rates:
     - data://garden/crime/2026-01-21/prison_rates
+
+  #
+  # CORE Econ - Unemployment rate and unemployment benefit replacement rate
+  #
+  data://meadow/core_econ/2026-01-30/unemployment_rate_benefits:
+    - snapshot://core_econ/2026-01-30/unemployment_rate_benefits.csv
+  data://garden/core_econ/2026-01-30/unemployment_rate_benefits:
+    - data://meadow/core_econ/2026-01-30/unemployment_rate_benefits
+  data://grapher/core_econ/2026-01-30/unemployment_rate_benefits:
+    - data://garden/core_econ/2026-01-30/unemployment_rate_benefits
 
 include:
   - dag/open_numbers.yml
@@ -815,3 +825,4 @@ include:
   - dag/growth.yml
   - dag/labor.yml
   - dag/economics.yml
+  - dag/static_viz.yml

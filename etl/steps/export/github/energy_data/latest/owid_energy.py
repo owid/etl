@@ -99,7 +99,6 @@ The dataset is built upon a number of datasets and processing steps:
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/shift/{shift_version}/energy_production_from_fossil_fuels.py)
 - Yearly Electricity Data (Ember):
   - [Source data](https://ember-energy.org/data/yearly-electricity-data/)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ember/{ember_version}/yearly_electricity.py)
   - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ember/{ember_version}/yearly_electricity.py)
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ember/{ember_version}/yearly_electricity.py)
 - Energy mix (Our World in Data based on EI's Statistical review of world energy):
@@ -130,6 +129,9 @@ Additionally, to construct region aggregates and indicators per capita and per G
 
 ## Changelog
 
+- 2026-01-26:
+  - Update Ember's yearly electricity data, after they updated their European electricity data.
+  - Fixed a few issues in aggregate regions related to how Ember's data is combined with the Energy Institute's Statistical Review of World Energy.
 - 2026-01-09:
   - Updated Ember's yearly electricity data.
   - Fixed a few small issues (related to "Other *" regions coming from the Energy Institute's Statistical Review of World Energy).
