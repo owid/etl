@@ -500,7 +500,8 @@ def _extract_pretrial_table(soup: BeautifulSoup, country_name: str) -> pd.DataFr
                 "pretrial_remand_rate": all_rates,
             })
 
-            # Clean the data
+            # Clean the data - handle year formats like "2000/01" by taking the first year
+            df["year"] = df["year"].astype(str).str.split("/").str[0]
             df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
             # Clean numeric columns (remove commas, spaces, percentages)

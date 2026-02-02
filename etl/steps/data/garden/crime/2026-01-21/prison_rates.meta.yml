@@ -25,6 +25,8 @@ tables:
           numDecimalPlaces: 0
       pretrial_detainees_pct:
         title: Share of prisoners that are pre-trial detainees
+        description_short: Pre-trial detainees and remand prisoners as a percentage of the total prison population.
+        description_processing: This variable combines data from the main statistics table and time-series data from the further information section. Where time-series data is available, it is used in preference to the main table snapshot.
         unit: "%"
         short_unit: "%"
       female_prisoners_pct:
@@ -55,10 +57,6 @@ tables:
       pretrial_remand_number:
         title: Number of pre-trial/remand prisoners in the prison population
         unit: prisoners
-      pretrial_remand_pct:
-        title: Percentage of the prison population that are pre-trial or remand prisoners
-        unit: "%"
-        short_unit: "%"
       pretrial_remand_rate:
-        title: Pre-trial/remand rate per 100,000 of national population)
+        title: Pre-trial or remand prisoners per 100,000 of population
         unit: prisoners per 100,000 people

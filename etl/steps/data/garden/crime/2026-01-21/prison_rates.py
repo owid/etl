@@ -25,6 +25,13 @@ def run() -> None:
     #
     # Process data.
     #
+    # Merge pretrial_detainees_pct and pretrial_remand_pct into a single variable
+    # Use pretrial_remand_pct (time-series from further information tab) when available,
+    # otherwise fall back to pretrial_detainees_pct (from main table)
+    tb["pretrial_detainees_pct"] = tb["pretrial_remand_pct"].fillna(tb["pretrial_detainees_pct"])
+    # Drop the now-redundant pretrial_remand_pct column
+    tb = tb.drop(columns=["pretrial_remand_pct"])
+
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
     # Add UK aggregate
