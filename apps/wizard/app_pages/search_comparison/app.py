@@ -163,6 +163,21 @@ def fetch_topics(query: str, limit: int = 3, mode: str = "semantic") -> tuple[di
         return {"error": str(e), "hits": []}, time.time() - start
 
 
+def fetch_query_rewrite(query: str) -> tuple[dict, float]:
+    """Fetch rewritten query keywords from AI search API."""
+    start = time.time()
+    try:
+        response = requests.get(
+            f"{API_BASE}/api/ai-search/rewrite",
+            params={"q": query},
+            timeout=30,
+        )
+        response.raise_for_status()
+        return response.json(), time.time() - start
+    except requests.RequestException as e:
+        return {"error": str(e), "keywords": []}, time.time() - start
+
+
 def get_rank_change_indicator(current_rank: int, other_rank: int | None) -> str:
     """Get an indicator showing rank change between search results."""
     if other_rank is None:
@@ -346,9 +361,12 @@ def main():
         st.warning("Please enter at least 2 characters.")
         return
 
+    # Handle URL encoding issue where space may be decoded as +
+    is_algolia = left_source in ("Algolia (Keyword)", "Algolia+(Keyword)")
+
     # Fetch results from all APIs in parallel
     with st.spinner("Searching..."):
-        with ThreadPoolExecutor(max_workers=4) as executor:
+        with ThreadPoolExecutor(max_workers=5) as executor:
             # Submit all tasks in parallel
             right_future = executor.submit(
                 fetch_semantic_search,
@@ -360,20 +378,20 @@ def main():
                 enable_llm_rerank,
                 llm_model,
             )
-            if left_source == "Algolia (Keyword)":
+            if is_algolia:
                 left_future = executor.submit(fetch_algolia_search, query, hits_per_page)
-                left_search_type = "algolia"
             else:
                 left_future = executor.submit(fetch_semantic_search, query, hits_per_page, include_explorers)
-                left_search_type = "semantic"
             topics_llm_future = executor.submit(fetch_topics, query, 5, "llm")
             topics_semantic_future = executor.submit(fetch_topics, query, 5, "semantic")
+            rewrite_future = executor.submit(fetch_query_rewrite, query)
 
             # Collect results
             right_data, right_time = right_future.result()
             left_data, left_time = left_future.result()
             topics_llm, topics_llm_time = topics_llm_future.result()
             topics_semantic, topics_semantic_time = topics_semantic_future.result()
+            rewrite_data, rewrite_time = rewrite_future.result()
 
     # Get hits and build rank mappings
     right_hits = right_data.get("hits", [])
@@ -381,7 +399,7 @@ def main():
     max_hits = max(len(right_hits), len(left_hits))
 
     # Fetch pageviews and FM ranks for left results if Algolia (they don't include these)
-    if left_search_type == "algolia":
+    if is_algolia:
         left_slugs = tuple(h.get("slug") for h in left_hits if h.get("slug"))
         if left_slugs:
             pageviews = get_pageviews_for_slugs(left_slugs)
@@ -397,6 +415,12 @@ def main():
 
     right_slug_to_rank = build_slug_to_rank(right_hits)
     left_slug_to_rank = build_slug_to_rank(left_hits)
+
+    # Display suggested keywords from query rewrite (clickable links)
+    keywords = rewrite_data.get("keywords", [])
+    if keywords:
+        keyword_links = [f"[{kw}](https://ourworldindata.org/search?q={kw.replace(' ', '+')})" for kw in keywords]
+        st.markdown(f"**🔑 Suggested keywords:** {' · '.join(keyword_links)}")
 
     # Display recommended topics - both modes for comparison
     st.subheader("📚 Recommended Topics")
@@ -441,7 +465,7 @@ def main():
         ai_answer_placeholder = st.empty()
 
     # Headers - left column (Algolia or Semantic base), right column (Semantic with options)
-    left_header = "🔤 Algolia (Keyword)" if left_search_type == "algolia" else "🧠 Semantic (base)"
+    left_header = "🔤 Algolia (Keyword)" if is_algolia else "🧠 Semantic (base)"
     right_header = "🧠 Semantic (AI)"
     if enable_rerank or enable_rewrite or enable_llm_rerank:
         options = []
@@ -478,7 +502,7 @@ def main():
                 hit = left_hits[i]
                 slug = hit.get("slug")
                 other_rank = right_slug_to_rank.get(slug)
-                display_hit(hit, i + 1, left_search_type, other_rank)
+                display_hit(hit, i + 1, "algolia" if is_algolia else "semantic", other_rank)
 
         with col_right:
             if i < len(right_hits):
