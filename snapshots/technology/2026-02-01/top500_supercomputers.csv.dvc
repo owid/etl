@@ -9,20 +9,19 @@ meta:
     date_published: "2025"
 
     # Citation
-    producer: TOP500
+    producer: Dongarra et al.
     citation_full: |-
-      TOP500 Supercomputer Lists, 1993-2025
+      “Performance of Various Computers Using Standard Linear Equations Software”, Jack Dongarra, University of Tennessee, Knoxville TN, 37996, Computer Science Technical Report Number CS - 89 – 85, today’s date, url:http://www.netlib.org/benchmark/performance.ps."
     attribution_short: TOP500
 
     # Files
     url_main: https://www.top500.org/
-    url_download: https://www.top500.org/lists/top500/
     date_accessed: 2026-02-01
 
     # License
     license:
-      name: CC BY 4.0
-      url: https://www.top500.org/about/terms-of-use/
+      name: © TOP500.org 1993-2025
+      url: https://www.top500.org/
 outs:
   - md5: ada83e54f9bd5c9df32e416d5c69761a
     size: 11500709
