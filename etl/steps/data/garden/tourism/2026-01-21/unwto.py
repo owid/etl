@@ -199,6 +199,17 @@ def run() -> None:
     # Adjust inbound and outbound expenditure for inflation and cost of living
     tb = adjust_inflation_cost_of_living(tb, tb_wdi)
 
+    # Calculate share of GDP for inbound travel expenditure
+    gdp_data = ds_wdi.read("wdi")[["country", "year", "ny_gdp_mktp_cd"]].copy()
+    tb = pr.merge(tb, gdp_data, on=["country", "year"], how="left")
+
+    if "in_tour_exp_balance_of_payments_travel_vis" in tb.columns and "ny_gdp_mktp_cd" in tb.columns:
+        tb["in_tour_exp_travel_share_gdp"] = (
+            tb["in_tour_exp_balance_of_payments_travel_vis"] / tb["ny_gdp_mktp_cd"]
+        ) * 100
+
+    tb = tb.drop(columns=["ny_gdp_mktp_cd"])
+
     tb = tb.format(["country", "year"])
 
     #

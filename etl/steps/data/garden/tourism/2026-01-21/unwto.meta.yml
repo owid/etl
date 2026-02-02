@@ -317,6 +317,17 @@ tables:
         description_key:
           - *desc_key_inbound_travel
 
+      in_tour_exp_travel_share_gdp:
+        title: Inbound tourism expenditure on travel as a share of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Money earned from foreign visitors spending on accommodation, food, local transport, entertainment, shopping, and cruise fares as a percentage of the country's [GDP](#dod:gdp).
+        description_key:
+          - *desc_key_inbound_travel
+          - This indicator shows the economic significance of inbound tourism travel expenditure relative to the total size of the economy.
+        display:
+          numDecimalPlaces: 2
+
       in_tour_exp_balance_of_payments_passenger_transport_vis:
         title: Inbound tourism expenditure on passenger transport
         unit: current US$
