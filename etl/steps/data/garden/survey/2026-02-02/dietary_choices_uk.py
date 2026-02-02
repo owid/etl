@@ -28,7 +28,7 @@ def run_sanity_checks(tb: Table) -> None:
 
     error = "Base and unweighted base, on a given date, should add up to the same number (or at least within 1%)."
     _tb = tb.groupby(["date"]).agg({"base": "sum", "base_unweighted": "sum"})
-    assert ((100 * abs(_tb["base"] - _tb["base_unweighted"]) / _tb["base_unweighted"]) < 1).all()
+    assert ((100 * abs(_tb["base"] - _tb["base_unweighted"]) / _tb["base_unweighted"]) < 1).all(), error
 
 
 def run() -> None:
