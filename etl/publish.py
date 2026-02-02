@@ -203,7 +203,9 @@ def sync_folder(
     existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
     existing_private: Dict[str, Optional[str]] = {}
     if private_bucket and not public:
-        existing_private = {o["Key"]: object_md5(s3, private_bucket, o["Key"], o) for o in walk_s3(s3, private_bucket, dest_path)}
+        existing_private = {
+            o["Key"]: object_md5(s3, private_bucket, o["Key"], o) for o in walk_s3(s3, private_bucket, dest_path)
+        }
 
     # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
     # have huge number of tables, upload them in parallel
