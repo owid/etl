@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -16,15 +15,8 @@ INDICATORS = ["mean", "median", "avg", "thr", "share"]
 DIMENSIONS_CONFIG = {
     "decile": "*",
     "period": "*",
-    "table": ["Income or consumption consolidated"],
-    "survey_comparability": ["No spells"],
-}
-
-# Define dimensions for spell views (survey_comparability computed dynamically)
-DIMENSIONS_CONFIG_SPELLS = {
-    "decile": "*",
-    "period": "*",
-    "table": ["Income or consumption consolidated"],
+    "table": ["Income or consumption consolidated", "Income with spells", "Consumption with spells"],
+    "survey_comparability": "*",
 }
 
 
@@ -63,12 +55,6 @@ def run() -> None:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
-    # Build dimensions config for spell views
-    dimensions_spells = {
-        **DIMENSIONS_CONFIG_SPELLS,
-        "survey_comparability": survey_comp_spells,
-    }
-
     #
     # Create collection object
     #
@@ -80,13 +66,43 @@ def run() -> None:
         dimensions=DIMENSIONS_CONFIG,
     )
 
-    # Create a different collection object for spell views
-    c_spells = paths.create_collection(
-        config=config,
-        short_name="pip_incomes_spells",
-        tb=tb,
-        indicator_names=INDICATORS,
-        dimensions=dimensions_spells,
+    # First, group survey_comparability (this must happen first)
+    c.group_views(
+        groups=[
+            {
+                "dimension": "survey_comparability",
+                "choices": survey_comp_spells,
+                "choice_new_slug": "Spells",
+                "replace": True,
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                },
+            },
+        ],
+    )
+
+    # Then, group the table dimension
+    c.group_views(
+        groups=[
+            {
+                "dimension": "table",
+                "choices": ["Income with spells", "Consumption with spells"],
+                "choice_new_slug": "Income or consumption consolidated",
+                "replace": True,
+                "overwrite_dimension_choice": True,
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                },
+            },
+        ],
     )
 
     #
@@ -96,11 +112,6 @@ def run() -> None:
         # if view.dimension["sex"] == "male":
         #     view.config["title"] = "Something else"
         pass
-
-    #
-    # Combine collections
-    #
-    c = combine_collections(collections=[c, c_spells], collection_name="pip_incomes")
 
     #
     # Save garden dataset.

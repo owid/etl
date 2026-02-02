@@ -3,6 +3,15 @@ title:
   title_variant: World Bank
 default_selection:
   - World
+  - United States
+  - South Korea
+  - Spain
+  - China
+  - Mauritania
+  - Ghana
+  - India
+  - Ethiopia
+  - Democratic Republic of Congo
 
 dimensions:
   - name: Metric

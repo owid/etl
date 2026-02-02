@@ -796,7 +796,7 @@ class Collection(MDIMBase):
                 dimension = group["dimension"]
                 choices = _ensure_choices(group, dimension)
                 # Remove views with old choices
-                new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
+                self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
                 # Remove unused choices
                 self.prune_dimension_choices()
 
