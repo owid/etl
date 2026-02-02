@@ -18,8 +18,8 @@ meta:
     # NOTE: The publication date can be assumed to be the latest date in the "All adults" sheet of the data file.
     date_published: '2026-01-01'
     license:
-      name: Copyright © 2025 YouGov PLC
-      url: https://yougov.co.uk/about/terms
+      name: CC BY-NC 4.0
+      url: https://yougov.co.uk/about/public-data-license
 outs:
   - md5: f706ac3fb4a8821a3eccc508398c9ded
     size: 25900

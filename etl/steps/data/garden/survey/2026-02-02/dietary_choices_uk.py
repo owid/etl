@@ -4,6 +4,8 @@ from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
+from owid.datautils.dataframes import map_series
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
@@ -46,7 +48,7 @@ def run() -> None:
     tb = tb.rename(columns={"which_of_these_best_describes_your_diet": "diet"}, errors="raise")
 
     # Rename diets.
-    tb["diet"] = tb["diet"].map(COLUMNS)
+    tb["diet"] = map_series(tb["diet"], mapping=COLUMNS, warn_on_missing_mappings=True, warn_on_unused_mappings=True, show_full_warning=True)
 
     # Transform the table to long format.
     tb = tb.melt(id_vars=["diet", "group"], var_name="date", value_name="value")
