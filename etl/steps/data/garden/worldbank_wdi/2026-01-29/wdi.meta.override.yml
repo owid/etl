@@ -580,7 +580,6 @@ tables:
             title: Share of the population using the Internet
             subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
             timelineMinTime: 1990
-            sourceDesc: International Telecommunication Union (via World Bank)
             originUrl: https://ourworldindata.org/internet
             hideAnnotationFieldsInTitle:
               time: true
@@ -625,7 +624,7 @@ tables:
               - North America (WB)
               - Sub-Saharan Africa (WB)
               - East Asia and Pacific (WB)
-              - Middle East and North Africa (WB)
+              - Middle East, North Africa, Afghanistan and Pakistan (WB)
               - Europe and Central Asia (WB)
               - Latin America and Caribbean (WB)
               - World
