@@ -82,11 +82,7 @@ def run() -> None:
     # Load population table from UN WPP
     tb_population_wpp = ds_population_wpp.read("population")
 
-    tb = geo.harmonize_countries(
-        df=tb_meadow,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-    ).set_index(["country", "year"], verify_integrity=True)  # type: ignore
+    tb = paths.regions.harmonize_names(tb=tb_meadow).format()
 
     tb_cust = mk_custom_entities(tb)
     assert all([col in tb.columns for col in tb_cust.columns])
