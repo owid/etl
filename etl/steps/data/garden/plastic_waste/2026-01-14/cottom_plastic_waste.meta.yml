@@ -356,7 +356,8 @@ tables:
         description_short: Estimated amount of municipal solid waste generated in a year from households and similar sources, such as shops and offices.
         description_key: *desc_key_msw_generation
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
 
       wg_per_cap:
         title: Waste generation per capita
@@ -377,7 +378,8 @@ tables:
               colorScale:
                 baseColorScheme: Reds
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
 
       pwg_per_cap:
         title: Plastic waste generation per capita
@@ -398,7 +400,8 @@ tables:
         description_short: Estimated amount of plastic waste that ends up in the environment as unburned debris (physical plastic pieces) per year from municipal sources such as households, shops, and offices, after escaping waste management.
         description_key: *desc_key_plastic_pollution_debris
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Debris pollution
         presentation:
           title_public: Plastic pollution in a form of debris
@@ -413,7 +416,8 @@ tables:
         description_short: Estimated amount of plastic waste burned in open, uncontrolled fires per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_pollution_burn
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Open burning pollution
         presentation:
           title_public: Plastic pollution from open burning
@@ -428,7 +432,8 @@ tables:
         description_short: Estimated total amount of plastic waste released to the environment each year through debris and open burning from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_pollution_total
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Total plastic pollution
         presentation:
           title_public: Total plastic pollution
@@ -522,7 +527,8 @@ tables:
         description_short: Estimated amount of plastic waste emitted via littering per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_litter_pathway
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Littering
         presentation:
           title_public: Plastic pollution from littering
@@ -537,7 +543,8 @@ tables:
         description_short: Estimated amount of plastic waste emitted from uncollected waste per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_uncollected_pathway
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Uncollected waste
         presentation:
           title_public: Plastic pollution from uncollected waste
@@ -552,7 +559,8 @@ tables:
         description_short: Estimated amount of plastic waste emitted from losses during collection and transport per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_collection_pathway
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Collection and transport
         presentation:
           title_public: Plastic pollution during collection and transport
@@ -567,7 +575,8 @@ tables:
         description_short: Estimated amount of plastic waste emitted from uncontrolled disposal sites (open dumps) per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_disposal_pathway
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Disposal sites
         presentation:
           title_public: Plastic pollution from disposal sites
@@ -582,7 +591,8 @@ tables:
         description_short: Estimated amount of plastic waste emitted from sorting and reprocessing losses per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_recycling_pathway
         display:
-          numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
           name: Rejects
         presentation:
           title_public: Plastic pollution from rejects of recycling
