@@ -15,3 +15,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
+outs:
+  - md5: c8e8d4ccdbb6750e2948ff5fa6f03fb8
+    size: 1698
+    path: ilostat_dictionary_sex.parquet
