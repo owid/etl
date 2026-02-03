@@ -34,13 +34,14 @@ def _extract_metadata(model_version: str) -> tuple[str, str, str, bool]:
     if "/" in model_version:
         model_version = model_version.split("/")[-1]
 
-    # Extract performance suffix (_high, _medium, _low)
+    # Extract performance suffix (_high, _medium, _low, _xhigh, etc.)
     perf_suffix = ""
     if "_" in model_version:
         parts = model_version.rsplit("_", 1)
-        if parts[1] in {"high", "medium", "low"}:
+        suffix_word = parts[1].lower()
+        if suffix_word in {"high", "medium", "low", "xhigh", "xlow"}:
             model_version = parts[0]
-            perf_suffix = f" ({parts[1]})"
+            perf_suffix = f", {parts[1]}"
 
     # Extract date
     date_str = ""
@@ -84,17 +85,18 @@ def _format_gpt(model_version: str) -> str:
     """Format GPT model names."""
     match = PATTERNS["gpt_version"].match(model_version)
     if match:
-        variant = f"-{match.group(2)}" if match.group(2) else ""
-        return f"GPT-{match.group(1)}{variant}"
+        variant = f" {match.group(2)}" if match.group(2) else ""
+        return f"GPT {match.group(1)}{variant}"
     match = PATTERNS["gpt_fallback"].match(model_version)
-    return f"GPT-{match.group(1)}" if match else model_version
+    return f"GPT {match.group(1)}" if match else model_version
 
 
 def _format_grok(model_version: str) -> str:
     """Format Grok model names."""
     match = PATTERNS["grok"].match(model_version)
     if match:
-        variants = "".join(f"-{g}" for g in match.groups()[1:] if g)
+        # Filter out date-like patterns (4-8 digit numbers)
+        variants = "".join(f" {g}" for g in match.groups()[1:] if g and not (g.isdigit() and 4 <= len(g) <= 8))
         return f"Grok {match.group(1)}{variants}"
     return model_version
 
@@ -126,17 +128,23 @@ def _format_generic(pattern_name: str, prefix: str, model_version: str) -> str:
         return prefix
 
     if pattern_name == "gemini":
-        variants = "".join(f"-{g.title()}" if i == 1 else f"-{g}" for i, g in enumerate(groups[1:], 1))
+        variants = "".join(f" {g.title()}" if i == 1 else f" {g}" for i, g in enumerate(groups[1:], 1))
         return f"{prefix} {groups[0]}{variants}"
     elif pattern_name in {"qwen", "llama"}:
         version = groups[0] if len(groups) > 0 else ""
-        variant = groups[1].replace("-", " ").title() if len(groups) > 1 else ""
+        if len(groups) > 1:
+            # Filter out date-like patterns (4-8 digit numbers at the end)
+            variant_parts = groups[1].split("-")
+            variant_parts = [p for p in variant_parts if not (p.isdigit() and 4 <= len(p) <= 8)]
+            variant = " ".join(variant_parts).title()
+        else:
+            variant = ""
         return f"{prefix}{version} {variant}".strip()
     elif pattern_name in {"deepseek", "kimi"}:
         variant = groups[0].replace("-", " ").title() if groups else ""
         return f"{prefix} {variant}".strip() if variant else prefix
     elif pattern_name == "o_model":
-        variant = f"-{groups[1]}" if len(groups) > 1 else ""
+        variant = f" {groups[1]}" if len(groups) > 1 else ""
         return f"{groups[0]}{variant}"
     elif pattern_name == "glm":
         return f"{prefix} {groups[0]}"
@@ -187,9 +195,9 @@ def format_model_name(model_version: str) -> str:
 
     # Combine date and suffixes
     if has_date:
-        final_name = f"{model_name}{date_str[:-1]}{suffix_str})"
+        final_name = f"{model_name}{date_str}{suffix_str}"
     elif suffix_str:
-        final_name = f"{model_name} ({suffix_str.lstrip(', ')})"
+        final_name = f"{model_name}{suffix_str}"
     else:
         final_name = model_name
 
