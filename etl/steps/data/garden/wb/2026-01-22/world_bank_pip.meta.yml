@@ -201,12 +201,16 @@ definitions:
     Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
 
   description_key_welfare_type_poverty: |-
+    <% if survey_comparability == "No spells" %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
     The data relates to consumption [per capita](#dod:per-capita).
     <%- else %>
     {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
+    <%- endif %>
+    <%- else %>
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). This chart shows the original data with *all* available income and consumption measures separately.
     <%- endif %>
 
   description_key_welfare_type: |-
@@ -1776,9 +1780,9 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The mean income or consumption per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean income or consumption per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
@@ -1792,7 +1796,7 @@ tables:
           name: |-
             {macros}
             <% if survey_comparability == "No spells" %>
-            Average (<<percentiles_avg_share(decile)>>)
+            Average (<<percentiles_avg_share(decile) | lower>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
