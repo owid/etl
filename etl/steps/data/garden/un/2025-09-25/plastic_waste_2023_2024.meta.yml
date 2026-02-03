@@ -35,13 +35,14 @@ tables:
           - Data represents the total weight of plastic waste imported from other countries.
           - *data_caveat
           - *trade_context
-        display:
-          numDecimalPlaces: 0
         presentation:
           grapher_config:
             map:
               colorScale:
                 baseColorScheme: Reds
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
 
       export_total_mot:
         title: Plastic waste exports
@@ -54,14 +55,15 @@ tables:
           - Data includes re-exports (when a country imports plastic waste and subsequently exports it).
           - *data_caveat
           - *trade_context
-        display:
-          numDecimalPlaces: 0
         presentation:
           grapher_config:
             map:
               colorScale:
                 baseColorScheme: Oranges
-
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+          
       import_air:
         title: Plastic waste imports by air
         unit: tonnes
@@ -72,8 +74,7 @@ tables:
           - Data includes only plastic waste transported by air.
           - *air_transport_note
           - *data_caveat
-        display:
-          numDecimalPlaces: 1
+
 
       export_air:
         title: Plastic waste exports by air
@@ -85,8 +86,6 @@ tables:
           - Data includes only plastic waste transported by air.
           - *air_transport_note
           - *data_caveat
-        display:
-          numDecimalPlaces: 1
 
       import_total_mot_per_capita:
         title: Plastic waste imports per capita
@@ -102,6 +101,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by converting total imports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
+          tolerance: 5
           roundingMode: significantFigures
           numSignificantFigures: 2
         presentation:
@@ -124,6 +124,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
+            tolerance: 5
             roundingMode: significantFigures
             numSignificantFigures: 2
         presentation:
@@ -146,6 +147,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by subtracting total imports from total exports for each country and year.
         display:
+          tolerance: 5
           roundingMode: significantFigures
           numSignificantFigures: 1
         presentation:
@@ -168,6 +170,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by dividing each country's total imports by the global sum of imports for that year, then multiplying by 100 to express as a percentage.
         display:
+          tolerance: 5
           roundingMode: significantFigures
           numSignificantFigures: 1
 
@@ -184,6 +187,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by dividing each country's total exports by the global sum of exports for that year, then multiplying by 100 to express as a percentage.
         display:
+          tolerance: 5
           roundingMode: significantFigures
           numSignificantFigures: 1
 
@@ -202,6 +206,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by converting net exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
+          tolerance: 5
           roundingMode: significantFigures
           numSignificantFigures: 2
         presentation:
@@ -227,6 +232,7 @@ tables:
         display:
           roundingMode: significantFigures
           numSignificantFigures: 1
+          tolerance: 5
 
       import_share_transported_by_air:
         title: Share of plastic waste imports by air
@@ -244,3 +250,4 @@ tables:
         display:
           roundingMode: significantFigures
           numSignificantFigures: 1
+          tolerance: 5
