@@ -393,8 +393,7 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 0
 
       plas_debris_em:
         title: Plastic pollution in a form of debris
