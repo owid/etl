@@ -846,7 +846,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
-            subtitle: "{definitions.poverty_line_subtitle}"
+            subtitle: "{definitions.poverty_line_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_for_absolute_or_relative_poverty}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -941,7 +941,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.headcount_title}"
-            subtitle: "{definitions.poverty_line_subtitle}"
+            subtitle: "{definitions.poverty_line_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_for_absolute_or_relative_poverty}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1036,7 +1036,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.total_shortfall_title}"
-            subtitle: "{definitions.total_shortfall_subtitle}"
+            subtitle: "{definitions.total_shortfall_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_total_shortfall}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1089,7 +1089,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.avg_shortfall_title}"
-            subtitle: "{definitions.avg_shortfall_subtitle}"
+            subtitle: "{definitions.avg_shortfall_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp_longer}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1136,7 +1136,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.income_gap_ratio_title}"
-            subtitle: "{definitions.income_gap_ratio_subtitle}"
+            subtitle: "{definitions.income_gap_ratio_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp_longer}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1184,7 +1184,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.poverty_gap_index_title}"
-            subtitle: "{definitions.poverty_gap_index_subtitle}"
+            subtitle: "{definitions.poverty_gap_index_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp_longer}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1296,7 +1296,7 @@ tables:
             - Economic Inequality
           grapher_config:
             title: "Gini coefficient"
-            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}
+            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}{definitions.spells_subtitle}
             note: ""
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1339,7 +1339,7 @@ tables:
           grapher_config:
             title: "Palma ratio"
             subtitle: |-
-              The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.note_without_ppp}
+              The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.note_without_ppp}{definitions.spells_subtitle}
             note: ""
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1509,7 +1509,7 @@ tables:
           grapher_config:
             title: "Mean log deviation"
             subtitle: |-
-              The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
+              The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.{definitions.spells_subtitle}
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1712,7 +1712,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: Mean <<welfare_type>> {definitions.per_period}
-            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
+            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1762,7 +1762,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: Median <<welfare_type>> {definitions.per_period}
-            subtitle: "{definitions.ppp_adjustment_subtitle}"
+            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1820,7 +1820,7 @@ tables:
               Mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>>
             subtitle: |-
               {macros}
-              The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}
+              The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1878,7 +1878,7 @@ tables:
               <<welfare_type.capitalize()>> share of the <<percentiles_avg_share(decile) | lower>>
             subtitle: |-
               {macros}
-              The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+              The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1929,7 +1929,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: "{definitions.threshold_title}"
-            subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
+            subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
