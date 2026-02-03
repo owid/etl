@@ -214,7 +214,7 @@ definitions:
     <%- endif %>
 
   description_key_welfare_type: |-
-    <% if welfare_type is defined %>
+    <% if welfare_type is defined and survey_comparability is defined and survey_comparability == "No spells" %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
