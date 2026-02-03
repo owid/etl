@@ -208,33 +208,30 @@ def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
     Returns:
         List of tuples: (year, population_billions, label_text)
     """
-    # Population milestones to mark on the chart (based on the image)
-    milestone_thresholds = [0.6, 0.99, 1.65, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     milestones = []
 
+    # First, add specific years: 1700, 1800, 1900
+    specific_years = [1700, 1800, 1900]
+    for year in specific_years:
+        year_data = tb[tb["year"] == year]
+        if not year_data.empty:
+            pop = float(year_data.iloc[0]["population_billions"])
+            # Format the label
+            if pop < 1.0:
+                label = f"{int(pop * 1000)} million in {year}"
+            else:
+                label = f"{pop:.2f} billion in {year}"
+            milestones.append((year, pop, label))
+
+    # Then add population milestones from 2 to 10 billion
+    milestone_thresholds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
     for threshold in milestone_thresholds:
         # Find the year when population first crosses this threshold
         crossing_data = tb[tb["population_billions"] >= threshold]
         if not crossing_data.empty:
             year = int(crossing_data.iloc[0]["year"])
             pop = float(crossing_data.iloc[0]["population_billions"])
-
-            # Format the label based on the chart
-            if pop < 1.0:
-                # Special cases from the chart
-                if abs(pop - 0.6) < 0.05:
-                    label = f"600 million in {year}"
-                elif abs(pop - 0.99) < 0.05:
-                    label = f"990 million in {year}"
-                else:
-                    label = f"{int(pop * 1000)} million in {year}"
-            else:
-                # Billions
-                if abs(pop - round(pop)) < 0.1:
-                    label = f"{int(round(pop))} billion in {year}"
-                else:
-                    label = f"{pop:.2f} billion in {year}"
-
+            label = f"{int(round(pop))} billion in {year}"
             milestones.append((year, pop, label))
 
     return milestones
@@ -307,7 +304,7 @@ def create_visualization(
     proj = tb[tb["year"] >= year_cut].copy()
 
     # Figure aspect similar to the original
-    fig, ax = plt.subplots(figsize=(18, 10))
+    fig, ax = plt.subplots(figsize=(10, 18))
 
     # Make background transparent
     fig.patch.set_alpha(0)
@@ -481,7 +478,7 @@ def create_visualization(
     if life_expectancy_before_1800 is not None:
         ax.text(
             -1000,
-            -1.0,
+            -0.4,
             f"Global life expectancy before\n1800 was less than {int(life_expectancy_before_1800)} years",
             fontsize=10,
             color="#18a0a8",
@@ -493,7 +490,7 @@ def create_visualization(
     if life_expectancy_2023 is not None:
         ax.text(
             2100,
-            -1.0,
+            -0.4,
             f"Global life expectancy\nin 2023: {int(life_expectancy_2023)} years",
             fontsize=10,
             color="#18a0a8",
