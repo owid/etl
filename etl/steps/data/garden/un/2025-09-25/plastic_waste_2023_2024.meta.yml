@@ -7,8 +7,7 @@ definitions:
         - Plastic Pollution
     display:
       tolerance: 5
-      roundingMode: significantFigures
-      numSignificantFigures: 3
+
   # Reusable description components
   hs_classification: &hs_classification "Data covers plastic waste classified under HS code 3915 ('waste, parings and scrap, of plastics') in UN Comtrade trade statistics. This includes waste from different polymer types such as polyethylene (PE), polystyrene (PS), and polyvinyl chloride (PVC)."
   all_transport_modes: &all_transport_modes "Data includes all transport methods: air, sea, road, rail, inland waterways, and cases where the transport mode was not specified."
@@ -41,6 +40,9 @@ tables:
             map:
               colorScale:
                 baseColorScheme: Reds
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
 
       export_total_mot:
         title: Plastic waste exports
@@ -58,7 +60,10 @@ tables:
             map:
               colorScale:
                 baseColorScheme: Oranges
-
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+          
       import_air:
         title: Plastic waste imports by air
         unit: tonnes
