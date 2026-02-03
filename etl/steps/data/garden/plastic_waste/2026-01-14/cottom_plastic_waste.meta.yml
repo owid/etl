@@ -511,6 +511,23 @@ tables:
               colorScale:
                 baseColorScheme: Reds
 
+      plas_em_share_global:
+        title: Share of global plastic pollution
+        <<: *unit_percent
+        description_short: Share of global macroplastic pollution attributed to each country or region.
+        description_key: *desc_key_plastic_pollution_shares_total
+        description_processing: *processing_share_global
+        processing_level: major
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+          name: Share of global plastic pollution
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+
       plas_em_per_cap:
         title: Total plastic pollution per capita
         <<: *unit_kg_per_person
@@ -785,14 +802,4 @@ tables:
         description_key: *desc_key_no_collection_share
         display:
           numDecimalPlaces: 1
-
-      plas_em_share_global:
-        title: Share of global plastic pollution
-        <<: *unit_percent
-        description_short: Share of global macroplastic pollution attributed to each country or region.
-        description_key: *desc_key_plastic_pollution_shares_total
-        description_processing: *processing_share_global
-        processing_level: major
-        display:
-          numDecimalPlaces: 2
 
