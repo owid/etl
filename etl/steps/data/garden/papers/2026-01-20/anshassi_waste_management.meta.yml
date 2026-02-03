@@ -246,7 +246,7 @@ tables:
           - *text_gap_filling
         display:
           roundingMode: significantFigures
-          numSignificantFigures: 3
+          numSignificantFigures: 2
 
       composition_composite:
         title: Share of compostable waste in municipal solid waste
@@ -261,7 +261,7 @@ tables:
         processing_level: major
         display:
           roundingMode: significantFigures
-          numSignificantFigures: 3
+          numSignificantFigures: 2
 
       share_compostable_waste_composted:
         title: Share of compostable waste that is composted
@@ -277,4 +277,4 @@ tables:
         processing_level: major
         display:
           roundingMode: significantFigures
-          numSignificantFigures: 3
+          numSignificantFigures: 2
