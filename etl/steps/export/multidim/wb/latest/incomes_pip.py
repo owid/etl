@@ -75,7 +75,7 @@ def run() -> None:
                 "choice_new_slug": "Spells",
                 "replace": True,
                 "view_config": {
-                    "hideRelativeToggle": False,
+                    "hideRelativeToggle": True,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
@@ -95,7 +95,7 @@ def run() -> None:
                 "replace": True,
                 "overwrite_dimension_choice": True,
                 "view_config": {
-                    "hideRelativeToggle": False,
+                    "hideRelativeToggle": True,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",

@@ -271,19 +271,23 @@ definitions:
     The original data with *all* available income and consumption measures is shown separately in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).
 
   description_processing_main_poverty: |-
-    <% if survey_comparability is not defined or survey_comparability != "No spells" or welfare_type == "income or consumption" %>
+    <% if survey_comparability is not defined or survey_comparability == "No spells" %>
+    <% if welfare_type == "income or consumption" %>
     {definitions.description_processing_main_base}
 
     {definitions.description_processing_main_poverty_explorer}
     <%- elif welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
     <%- endif %>
+    <%- endif %>
 
   description_processing_main: |-
-    <% if (survey_comparability is not defined or survey_comparability != "No spells") or welfare_type == "income or consumption" %>
+    <% if survey_comparability is not defined or survey_comparability == "No spells" %>
+    <% if welfare_type == "income or consumption" %>
     {definitions.description_processing_main_base}
     <%- elif welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
+    <%- endif %>
     <%- endif %>
 
   description_processing_surveys_past_decade: |-

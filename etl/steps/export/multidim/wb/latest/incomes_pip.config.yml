@@ -2,7 +2,6 @@ title:
   title: Incomes across the distribution
   title_variant: World Bank
 default_selection:
-  - World
   - United States
   - South Korea
   - Spain
@@ -19,10 +18,10 @@ dimensions:
     choices:
       - slug: mean
         name: Mean income or consumption
-        # description: The share of the population living below the selected poverty line
+        # description:
       - slug: median
         name: Median income or consumption
-        # description: The number of people living below the selected poverty line
+        # description:
       - slug: avg
         name: Mean income or consumption, by decile
         # description:
