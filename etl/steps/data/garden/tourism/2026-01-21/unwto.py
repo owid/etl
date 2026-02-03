@@ -208,6 +208,11 @@ def run() -> None:
             tb["in_tour_exp_balance_of_payments_travel_vis"] / tb["ny_gdp_mktp_cd"]
         ) * 100
 
+    if "out_tour_exp_balance_of_payments_total_vis" in tb.columns and "ny_gdp_mktp_cd" in tb.columns:
+        tb["out_tour_exp_total_share_gdp"] = (
+            tb["out_tour_exp_balance_of_payments_total_vis"] / tb["ny_gdp_mktp_cd"]
+        ) * 100
+
     tb = tb.drop(columns=["ny_gdp_mktp_cd"])
 
     tb = tb.format(["country", "year"])

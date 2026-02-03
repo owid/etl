@@ -411,6 +411,17 @@ tables:
         description_key:
           - *desc_key_outbound_total
 
+      out_tour_exp_total_share_gdp:
+        title: Total outbound tourism expenditure as a share of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines, as a percentage of the country's [GDP](#dod:gdp).
+        description_key:
+          - *desc_key_outbound_total
+          - This indicator shows the economic significance of outbound tourism expenditure relative to the total size of the economy.
+        display:
+          numDecimalPlaces: 2
+
       outbound_exp_us_cpi_adj_2021:
         title: International tourist expenditure by residents traveling abroad (in constant 2021 US$)
         unit: constant 2021 US$
