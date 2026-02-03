@@ -447,8 +447,7 @@ tables:
         description_short: Estimated amount of plastic waste that ends up in the environment as unburned debris (physical plastic pieces) per person per year from municipal sources such as households, shops, and offices, after escaping waste management.
         description_key: *desc_key_plastic_pollution_debris_per_cap
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 2
           name: Debris pollution per capita
         presentation:
           title_public: Plastic pollution in a form of debris per capita
@@ -463,8 +462,7 @@ tables:
         description_short: Estimated amount of plastic waste burned in open, uncontrolled fires per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_pollution_burn_per_cap
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 2
           name: Open burning pollution per capita
         presentation:
           title_public: Plastic pollution from open burning per capita
