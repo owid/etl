@@ -200,6 +200,9 @@ definitions:
   description_key_welfare_type_poverty_explorer: |-
     Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
 
+  description_key_welfare_type_spells: |-
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). This chart shows the original data with *all* available income and consumption measures separately.
+
   description_key_welfare_type_poverty: |-
     <% if survey_comparability == "No spells" %>
     <% if welfare_type == "income" %>
@@ -210,7 +213,7 @@ definitions:
     {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
     <%- endif %>
     <%- else %>
-    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). This chart shows the original data with *all* available income and consumption measures separately.
+    {definitions.description_key_welfare_type_spells}
     <%- endif %>
 
   description_key_welfare_type: |-
@@ -223,7 +226,7 @@ definitions:
     {definitions.description_key_welfare_type_base}
     <%- endif %>
     <%- else %>
-    {definitions.description_key_welfare_type_base}
+    {definitions.description_key_welfare_type_spells}
     <%- endif %>
 
   description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
