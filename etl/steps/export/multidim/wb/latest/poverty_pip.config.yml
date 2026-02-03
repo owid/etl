@@ -41,8 +41,6 @@ definitions:
   lmic_poverty_line_subtitle: The poverty line of $4.20 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
   umic_poverty_line_subtitle: The poverty line of $8.30 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
 
-  spells_subtitle: The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
-
   ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
   ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
 
