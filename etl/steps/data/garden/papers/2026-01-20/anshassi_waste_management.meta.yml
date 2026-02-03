@@ -234,3 +234,44 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 1
+
+      composition_food_waste_organic:
+        title: Food and organic waste composition
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of municipal solid waste that is food waste and other organic materials.
+        description_key:
+          - *text_msw_definition
+          - *text_data_sources
+          - *text_gap_filling
+        display:
+          numDecimalPlaces: 1
+
+      composition_composite:
+        title: Compostable waste composition
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of municipal solid waste that is compostable (food waste, yard waste, and garden waste combined).
+        description_key:
+          - *text_msw_definition
+          - *text_data_sources
+          - *text_gap_filling
+        description_processing: We calculate this as the sum of food waste organic and yard/garden/green waste composition shares.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      share_compostable_waste_composted:
+        title: Share of compostable waste that is composted
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of compostable waste (food and yard waste) that is treated through composting.
+        description_key:
+          - *text_msw_definition
+          - *text_composting_definition
+          - *text_data_sources
+          - *text_gap_filling
+        description_processing: We calculate this as the share of total waste that is composted divided by the share of total waste that is compostable (food waste organic plus yard/garden/green waste).
+        processing_level: major
+        display:
+          numDecimalPlaces: 1

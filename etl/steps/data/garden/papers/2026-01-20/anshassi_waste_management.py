@@ -78,6 +78,9 @@ def run() -> None:
     # Recycling (only in collected waste)
     tb["recycling"] = collected_fraction * tb["collected_recycling"]
 
+    tb["composition_composite"] = tb["composition_food_waste_organic"] + tb["composition_yard_garden_green_waste"]
+
+    tb["share_compostable_waste_composted"] = tb["composting"] / tb["composition_composite"]
     # Select final columns for output
     columns_to_keep = [
         "country",
@@ -91,6 +94,9 @@ def run() -> None:
         "mswi_incineration",
         "composting",
         "recycling",
+        "composition_composite",
+        "share_compostable_waste_composted",
+        "composition_food_waste_organic",
     ]
 
     tb = tb[columns_to_keep]

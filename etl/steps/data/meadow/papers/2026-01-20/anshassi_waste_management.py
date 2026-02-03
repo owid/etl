@@ -14,8 +14,24 @@ def run() -> None:
     # Read the specific sheet with multi-level headers
     tb = snap.read(sheet_name="Country MSW Data 2", header=[0, 1])
 
-    # Flatten the multi-level column names
+    # Read composition data
+    tb_composition = snap.read(sheet_name="Country MSW Composition Data", header=[0, 1])
+
+    # Flatten the multi-level column names for main table
     tb.columns = ["_".join(col).strip() if col[1] not in ["", col[0]] else col[1] for col in tb.columns]
+
+    # Flatten composition table column names and select only needed columns
+    tb_composition.columns = ["_".join(col).strip() if col[1] not in ["", col[0]] else col[1] for col in tb_composition.columns]
+
+    # Keep only country and the two final composition columns
+    tb_composition = tb_composition[["Unnamed: 0_level_0_Country", "Final Composition (%)_Food Waste Organic", "Final Composition (%)_Yard Garden Green Waste"]]
+
+    # Rename composition columns
+    tb_composition = tb_composition.rename(columns={
+        "Unnamed: 0_level_0_Country": "country",
+        "Final Composition (%)_Food Waste Organic": "composition_food_waste_organic",
+        "Final Composition (%)_Yard Garden Green Waste": "composition_yard_garden_green_waste"
+    })
 
     # Rename columns for clarity
     column_mapping = {
@@ -40,6 +56,9 @@ def run() -> None:
 
     tb = tb.rename(columns=column_mapping)
 
+    # Merge composition data with main table
+    tb = tb.merge(tb_composition, on="country", how="left")
+
     # Select only the columns we need
     columns_to_keep = [
         "country",
@@ -57,6 +76,8 @@ def run() -> None:
         "uncollected_controlled_landfill",
         "uncollected_sanitary_landfill",
         "uncollected_open_air_burning",
+        "composition_food_waste_organic",
+        "composition_yard_garden_green_waste",
     ]
 
     tb = tb[columns_to_keep]
