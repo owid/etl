@@ -318,18 +318,6 @@ def main():
                 label="Include explorers",
                 value=False,
             )
-            enable_rerank = url_persist(st.checkbox)(
-                key="rerank",
-                label="Rerank",
-                value=False,
-                help="Enable reranking with BGE reranker model",
-            )
-            enable_rewrite = url_persist(st.checkbox)(
-                key="rewrite",
-                label="Query rewrite",
-                value=False,
-                help="Enable query rewriting for better retrieval",
-            )
             enable_llm_rerank = url_persist(st.checkbox)(
                 key="llm_rerank",
                 label="LLM rerank",
@@ -366,15 +354,15 @@ def main():
 
     # Fetch results from all APIs in parallel
     with st.spinner("Searching..."):
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=4) as executor:
             # Submit all tasks in parallel
             right_future = executor.submit(
                 fetch_semantic_search,
                 query,
                 hits_per_page,
                 include_explorers,
-                enable_rerank,
-                enable_rewrite,
+                False,  # rerank
+                False,  # rewrite
                 enable_llm_rerank,
                 llm_model,
             )
@@ -383,14 +371,12 @@ def main():
             else:
                 left_future = executor.submit(fetch_semantic_search, query, hits_per_page, include_explorers)
             topics_llm_future = executor.submit(fetch_topics, query, 5, "llm")
-            topics_semantic_future = executor.submit(fetch_topics, query, 5, "semantic")
             rewrite_future = executor.submit(fetch_query_rewrite, query)
 
             # Collect results
             right_data, right_time = right_future.result()
             left_data, left_time = left_future.result()
             topics_llm, topics_llm_time = topics_llm_future.result()
-            topics_semantic, topics_semantic_time = topics_semantic_future.result()
             rewrite_data, rewrite_time = rewrite_future.result()
 
     # Get hits and build rank mappings
@@ -416,48 +402,20 @@ def main():
     right_slug_to_rank = build_slug_to_rank(right_hits)
     left_slug_to_rank = build_slug_to_rank(left_hits)
 
-    # Display suggested keywords from query rewrite (clickable links)
+    # Display suggested keywords and topics in a bordered container
     keywords = rewrite_data.get("keywords", [])
-    if keywords:
-        keyword_links = [f"[{kw}](https://ourworldindata.org/search?q={kw.replace(' ', '+')})" for kw in keywords]
-        st.markdown(f"**🔑 Suggested keywords:** {' · '.join(keyword_links)}")
-
-    # Display recommended topics - both modes for comparison
-    st.subheader("📚 Recommended Topics")
-
-    # LLM Topics
-    st.markdown("**🤖 LLM Recommendations**")
+    topics = []
     if "error" not in topics_llm and topics_llm.get("hits"):
-        filtered_llm = [t for t in topics_llm["hits"] if t.get("score", 0) >= topic_threshold]
-        if filtered_llm:
-            topic_cols = st.columns(min(len(filtered_llm), 5))
-            for idx, topic in enumerate(filtered_llm):
-                with topic_cols[idx]:
-                    with st.container(border=True):
-                        score = topic.get("score", 0)
-                        st.markdown(f"[**{topic['name']}**]({topic['url']})", help=f"Relevance score: {score:.3f}")
-                        st.caption(topic.get("excerpt", "")[:100] + "...")
-        else:
-            st.info("No LLM topics above threshold")
-    else:
-        st.error(f"LLM Error: {topics_llm.get('error', 'Unknown error')}")
+        topics = [t for t in topics_llm["hits"] if t.get("score", 0) >= topic_threshold]
 
-    # Semantic Topics
-    st.markdown("**🔍 Semantic (Vector Search)**")
-    if "error" not in topics_semantic and topics_semantic.get("hits"):
-        filtered_semantic = [t for t in topics_semantic["hits"] if t.get("score", 0) >= topic_threshold]
-        if filtered_semantic:
-            topic_cols = st.columns(min(len(filtered_semantic), 5))
-            for idx, topic in enumerate(filtered_semantic):
-                with topic_cols[idx]:
-                    with st.container(border=True):
-                        score = topic.get("score", 0)
-                        st.markdown(f"[**{topic['name']}**]({topic['url']})", help=f"Relevance score: {score:.3f}")
-                        st.caption(topic.get("excerpt", "")[:100] + "...")
-        else:
-            st.info("No semantic topics above threshold")
-    else:
-        st.error(f"Semantic Error: {topics_semantic.get('error', 'Unknown error')}")
+    if keywords or topics:
+        with st.container(border=True):
+            if keywords:
+                keyword_links = [f"[{kw}](https://ourworldindata.org/search?q={kw.replace(' ', '+')})" for kw in keywords]
+                st.markdown(f"🔑 **Suggested keywords:** {' · '.join(keyword_links)}")
+            if topics:
+                topic_links = [f"[{t['name']}]({t['url']})" for t in topics]
+                st.markdown(f"📚 **Recommended topics:** {' · '.join(topic_links)}")
 
     # Create placeholder for AI answer at the top (will be filled after charts render)
     if enable_ai_answer:
@@ -467,15 +425,8 @@ def main():
     # Headers - left column (Algolia or Semantic base), right column (Semantic with options)
     left_header = "🔤 Algolia (Keyword)" if is_algolia else "🧠 Semantic (base)"
     right_header = "🧠 Semantic (AI)"
-    if enable_rerank or enable_rewrite or enable_llm_rerank:
-        options = []
-        if enable_rerank:
-            options.append("rerank")
-        if enable_rewrite:
-            options.append("rewrite")
-        if enable_llm_rerank:
-            options.append("LLM rerank")
-        right_header += f" + {', '.join(options)}"
+    if enable_llm_rerank:
+        right_header += " + LLM rerank"
 
     col_left, col_right = st.columns(2)
     with col_left:
