@@ -87,8 +87,7 @@ tables:
           - *text_uncertainty_context
           - *text_exported_waste_caveat
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 1
 
       me_tons_per_year_share_of_global:
         title: Share of global plastic pollution entering the ocean through rivers
@@ -104,5 +103,4 @@ tables:
           - *text_uncertainty_context
           - *text_exported_waste_caveat
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 1
