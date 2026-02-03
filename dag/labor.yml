@@ -3,23 +3,23 @@ steps:
   #
   # ILOSTAT
   #
-  data://meadow/un/2025-12-16/ilostat:
-    - snapshot://un/2025-12-16/ilostat_dictionary_note_source.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_note_classif.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_obs_status.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_ref_area.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_indicator.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_note_indicator.parquet
-    - snapshot://un/2025-12-16/ilostat_table_of_contents_country.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_classif2.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_sex.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_classif1.parquet
-    - snapshot://un/2025-12-16/ilostat.parquet
-    - snapshot://un/2025-12-16/ilostat_dictionary_source.parquet
-  data://garden/un/2025-12-16/ilostat:
-    - data://meadow/un/2025-12-16/ilostat
-  data://grapher/un/2025-12-16/ilostat:
-    - data://garden/un/2025-12-16/ilostat
+  data://meadow/un/2026-02-03/ilostat:
+    - snapshot://un/2026-02-03/ilostat_dictionary_sex.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_note_classif.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_classif1.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_ref_area.parquet
+    - snapshot://un/2026-02-03/ilostat.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_obs_status.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_note_source.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_source.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_indicator.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_classif2.parquet
+    - snapshot://un/2026-02-03/ilostat_table_of_contents_country.parquet
+    - snapshot://un/2026-02-03/ilostat_dictionary_note_indicator.parquet
+  data://garden/un/2026-02-03/ilostat:
+    - data://meadow/un/2026-02-03/ilostat
+  data://grapher/un/2026-02-03/ilostat:
+    - data://garden/un/2026-02-03/ilostat
 
   #
   # ILOSTAT national vs. modeled comparison (from WDI)
