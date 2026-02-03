@@ -1,4 +1,11 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""
+Load a meadow dataset and create a garden dataset.
+
+NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
+    1. Define DEBUG as True.
+    2. Run the following command in the terminal:
+        nohup .venv/bin/etlr ilostat > output_ilostat.log 2>&1 &
+"""
 
 import html2text
 import owid.catalog.processing as pr
@@ -10,6 +17,9 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Set DEBUG mode
+DEBUG = False
 
 # Initialize logger.
 log = get_logger()
@@ -37,10 +47,44 @@ COLUMNS_TO_KEEP = [
     "obs_status",
 ]
 
+# Define columns with obs_status
+OBS_STATUS_COLUMNS = [
+    "unemployment_rate_by_sex_and_age",
+    "labour_force_participation_rate_by_sex_and_age",
+]
+
+# Define ILOEST estimates to drop projections
+ILOEST_INDICATORS = [
+    "labour_force_by_sex_and_age",
+    "labour_force_participation_rate_by_sex_and_age",
+    "employment_by_sex_and_status_in_employment",
+    "unemployment_rate_by_sex_and_age",
+]
+
+# Define indicators that should be between 0 and 100 (percentage indicators)
+PERCENTAGE_INDICATORS_TO_CHECK = [
+    "female_share_of_low_pay_earners",
+    "sdg_1_1_1_working_poverty_rate",
+    "sdg_1_3_1_population_covered_by_social_protection",
+    "sdg_5_5_2_women_in_senior_middle_management",
+    "sdg_5_5_2_women_in_management",
+    "sdg_8_3_1_informal_employment",
+    "sdg_8_5_2_unemployment_rate",
+    "sdg_8_5_2_unemployment_rate_by_disability_status",
+    "sdg_8_6_1_youth_neet",
+    "sdg_8_7_1_children_engaged_in_economic_activity",
+    "sdg_8_7_1_children_engaged_in_economic_activity_and_household_chores",
+    "sdg_10_4_1_labour_income_share",
+    "share_of_children_in_child_labour_by_sex_and_age",
+    "labour_force_participation_rate_by_sex_and_age",
+    "unemployment_rate_by_sex_and_age",
+    "informal_employment_rate_by_sex",
+]
+
 # Redefine column categories from the original dataset
 COLUMN_CATEGORIES = {
     "indicator": {
-        "SDG indicator 1.1.1 - Working poverty rate (percentage of employed living below US$2.15 PPP) (%)": "sdg_1_1_1_working_poverty_rate",
+        "SDG indicator 1.1.1 - Working poverty rate (percentage of employed living below US$3 PPP) (%)": "sdg_1_1_1_working_poverty_rate",
         "SDG indicator 1.3.1 - Proportion of population covered by social protection floors/systems (%)": "sdg_1_3_1_population_covered_by_social_protection",
         "SDG indicator 5.5.2 - Proportion of women in senior and middle management positions (%)": "sdg_5_5_2_women_in_senior_middle_management",
         "SDG indicator 5.5.2 - Proportion of women in managerial positions (%)": "sdg_5_5_2_women_in_management",
@@ -166,20 +210,6 @@ COLUMN_CATEGORIES = {
     },
 }
 
-# Define columns with obs_status
-OBS_STATUS_COLUMNS = [
-    "unemployment_rate_by_sex_and_age",
-    "labour_force_participation_rate_by_sex_and_age",
-]
-
-# Define ILOEST estimates to drop projections
-ILOEST_INDICATORS = [
-    "labour_force_by_sex_and_age",
-    "labour_force_participation_rate_by_sex_and_age",
-    "employment_by_sex_and_status_in_employment",
-    "unemployment_rate_by_sex_and_age",
-]
-
 
 def run() -> None:
     #
@@ -236,6 +266,9 @@ def run() -> None:
 
     # Calculate share of employment by status (ICSE-93)
     tb = calculate_employment_status_shares(tb=tb)
+
+    # Sanity check for percentage indicators (should be between 0 and 100)
+    tb = check_percentage_indicators(tb=tb)
 
     # Add 'Modeled' category to obs_status based on the presence of data in the corresponding indicator
     tb = add_modeled_category_to_obs_status(tb=tb)
@@ -300,10 +333,11 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
         pct_u = (tb[column] == "U").sum() / len(tb[column]) * 100
         message = f"{pct_u:.2f}% of the observations are 'U', unreliable"
         if pct_u > UNRELIABLE_THRESHOLD:
-            if "Unreliable" in COLUMN_CATEGORIES[column].keys():
-                log.warning(f"{message}, but we are keeping them")
-            else:
-                log.warning(f"{message}, and we are dropping them")
+            if DEBUG:
+                if "Unreliable" in COLUMN_CATEGORIES[column].keys():
+                    log.warning(f"{message}, but we are keeping them")
+                else:
+                    log.warning(f"{message}, and we are dropping them")
 
     # Assert that there is info for every column
     assert set(
@@ -430,10 +464,11 @@ def remove_outliers_in_data(tb: Table) -> Table:
 
         # Check if there are any values in mask
         if mask.any():
-            log.info(
-                f"Removing {mask.sum()} outlier(s) in indicator {indicator} outside range {thresholds}.\n"
-                f"Examples of outliers: {tb_outliers.head(5)}"
-            )
+            if DEBUG:
+                log.info(
+                    f"Removing {mask.sum()} outlier(s) in indicator {indicator} outside range {thresholds}.\n"
+                    f"Examples of outliers: {tb_outliers.head(5)}"
+                )
             # tb_outliers.to_csv("outliers_ilostat.csv", index=False)
             tb.loc[mask, indicator] = pd.NA
 
@@ -482,6 +517,36 @@ def calculate_employment_status_shares(tb: Table) -> Table:
 
     # Drop the temporary total_employment column
     tb = tb.drop(columns=["total_employment"], errors="raise")
+
+    return tb
+
+
+def check_percentage_indicators(tb: Table) -> Table:
+    """
+    Check that percentage indicators are within the range 0-100.
+    Logs a warning for each indicator that has values outside this range and sets them to NA.
+    """
+    tb = tb.copy()
+
+    for indicator in PERCENTAGE_INDICATORS_TO_CHECK:
+        if indicator not in tb.columns:
+            log.warning(f"Indicator {indicator} not found in table columns for percentage check.")
+            continue
+
+        # Check for values outside 0-100 range
+        mask_invalid = (tb[indicator] < 0) | (tb[indicator] > 100)
+        invalid_count = mask_invalid.sum()
+
+        if invalid_count > 0:
+            if DEBUG:
+                tb_invalid = tb.loc[mask_invalid, ["country", "year", "sex", "classif1", indicator]].copy()
+                log.warning(
+                    f"Sanity check failed for {indicator}: {invalid_count} value(s) outside 0-100 range.\n"
+                    f"Examples: {tb_invalid.head(5).to_string()}"
+                )
+            # tb_invalid.to_csv(f"invalid_percentage_values_ilostat_{indicator}.csv", index=False)
+            # Set invalid values to NA
+            tb.loc[mask_invalid, indicator] = pd.NA
 
     return tb
 
