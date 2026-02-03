@@ -63,7 +63,6 @@ ILOEST_INDICATORS = [
 
 # Define indicators that should be between 0 and 100 (percentage indicators)
 PERCENTAGE_INDICATORS_TO_CHECK = [
-    "female_share_of_low_pay_earners",
     "sdg_1_1_1_working_poverty_rate",
     "sdg_1_3_1_population_covered_by_social_protection",
     "sdg_5_5_2_women_in_senior_middle_management",
@@ -76,6 +75,7 @@ PERCENTAGE_INDICATORS_TO_CHECK = [
     "sdg_8_7_1_children_engaged_in_economic_activity_and_household_chores",
     "sdg_10_4_1_labour_income_share",
     "share_of_children_in_child_labour_by_sex_and_age",
+    "female_share_of_low_pay_earners",
     "labour_force_participation_rate_by_sex_and_age",
     "unemployment_rate_by_sex_and_age",
     "informal_employment_rate_by_sex",
