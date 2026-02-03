@@ -96,6 +96,7 @@ PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
+R2_BUCKET_PRIVATE = "owid-catalog-private"
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
 R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"

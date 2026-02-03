@@ -1,0 +1,30 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Technological Change
+
+dataset:
+  update_period_days: 365
+
+tables:
+  top500_supercomputers:
+    variables:
+      computational_capacity_fastest_supercomputer:
+        title: Computational capacity of the fastest supercomputer
+        description_short: The number of [floating-point operations](#dod:flop) carried out per second by the fastest supercomputer in any given year. This is expressed in gigaflops, equivalent to 10⁹ floating-point operations per second.
+        unit: gigaflops per second
+        short_unit: Gflop/s
+        processing_level: major
+        description_key:
+          - Computational capacity is measured with the [Linpack benchmark](https://www.netlib.org/utk/people/JackDongarra/PAPERS/hpl.pdf), which tests how fast a computer can solve a large, dense set of linear equations.
+          - This indicator shows the highest sustained Linpack speed achieved by the fastest supercomputer each year, as recorded by the [TOP500](https://top500.org/) project.
+          - One gigaflop per second (Gflop/s) equals one billion [floating-point operations](#dod:flop) per second.
+          - The Linpack benchmark tests only one type of computation, so it doesn't capture overall system performance. Real-world applications often perform differently than this benchmark suggests.
+        description_from_producer: |-
+          The Top500 list the 500 fastest computer system being used today. In 1993 the collection was started and has been updated every 6 months since then. The report lists the sites that have the 500 most powerful computer systems installed. The best Linpack benchmark performance achieved is used as a performance measure in ranking the computers. The TOP500 list has been updated twice a year since June 1993.
+
+          "The Linpack Benchmark is a measure of a computer’s floating-point rate of execution. It is determined by running a computer program that solves a dense system of linear equations. The paper “The LINPACK Benchmark: Past, Present, and Future” by Jack Dongarra, Piotr Luszczek, and Antoine Petitet provides a look at the details of the benchmark and provides performance data in graphics form for a number of machines on basic operations. A copy of the paper is available at http://www.netlib.org/utk/people/JackDongarra/PAPERS/hpl.pdf"
+        description_processing: Data is aggregated from all TOP500 lists published between 1993 and 2025. For each year, we select the maximum Rmax value across all lists published in that year. Performance values are converted from teraflops per second (TFlop/s) to gigaflops per second (GFlop/s) by multiplying by 1000.
+        display:
+          numDecimalPlaces: 0
