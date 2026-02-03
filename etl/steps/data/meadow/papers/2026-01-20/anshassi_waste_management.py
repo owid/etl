@@ -21,17 +21,27 @@ def run() -> None:
     tb.columns = ["_".join(col).strip() if col[1] not in ["", col[0]] else col[1] for col in tb.columns]
 
     # Flatten composition table column names and select only needed columns
-    tb_composition.columns = ["_".join(col).strip() if col[1] not in ["", col[0]] else col[1] for col in tb_composition.columns]
+    tb_composition.columns = [
+        "_".join(col).strip() if col[1] not in ["", col[0]] else col[1] for col in tb_composition.columns
+    ]
 
     # Keep only country and the two final composition columns
-    tb_composition = tb_composition[["Unnamed: 0_level_0_Country", "Final Composition (%)_Food Waste Organic", "Final Composition (%)_Yard Garden Green Waste"]]
+    tb_composition = tb_composition[
+        [
+            "Unnamed: 0_level_0_Country",
+            "Final Composition (%)_Food Waste Organic",
+            "Final Composition (%)_Yard Garden Green Waste",
+        ]
+    ]
 
     # Rename composition columns
-    tb_composition = tb_composition.rename(columns={
-        "Unnamed: 0_level_0_Country": "country",
-        "Final Composition (%)_Food Waste Organic": "composition_food_waste_organic",
-        "Final Composition (%)_Yard Garden Green Waste": "composition_yard_garden_green_waste"
-    })
+    tb_composition = tb_composition.rename(
+        columns={
+            "Unnamed: 0_level_0_Country": "country",
+            "Final Composition (%)_Food Waste Organic": "composition_food_waste_organic",
+            "Final Composition (%)_Yard Garden Green Waste": "composition_yard_garden_green_waste",
+        }
+    )
 
     # Rename columns for clarity
     column_mapping = {
