@@ -96,8 +96,8 @@ for survey in range(len(survey_type)):
     j += 1
 
     # Gini coefficient
-    df_tables.loc[j, "name"] = f"Gini coefficient"
-    df_tables.loc[j, "slug"] = f"gini"
+    df_tables.loc[j, "name"] = "Gini coefficient"
+    df_tables.loc[j, "slug"] = "gini"
     df_tables.loc[j, "description"] = new_line.join(
         [
             "The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.",
@@ -118,7 +118,7 @@ for survey in range(len(survey_type)):
 
     # Share of the top 10%
     df_tables.loc[j, "name"] = f"{survey_type.text[survey].capitalize()} share of the richest 10%"
-    df_tables.loc[j, "slug"] = f"decile10_share"
+    df_tables.loc[j, "slug"] = "decile10_share"
     df_tables.loc[j, "description"] = new_line.join(
         [
             f"The {survey_type.text[survey]} of the richest decile (tenth of the population) as a share of total {survey_type.text[survey]}.",
@@ -138,8 +138,8 @@ for survey in range(len(survey_type)):
     j += 1
 
     # Palma ratio
-    df_tables.loc[j, "name"] = f"Palma ratio"
-    df_tables.loc[j, "slug"] = f"palma_ratio"
+    df_tables.loc[j, "name"] = "Palma ratio"
+    df_tables.loc[j, "slug"] = "palma_ratio"
     df_tables.loc[j, "description"] = new_line.join(
         [
             "The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.",
@@ -159,8 +159,8 @@ for survey in range(len(survey_type)):
     j += 1
 
     # Headcount ratio (rel)
-    df_tables.loc[j, "name"] = f"Share in relative poverty"
-    df_tables.loc[j, "slug"] = f"headcount_ratio_50_median"
+    df_tables.loc[j, "name"] = "Share in relative poverty"
+    df_tables.loc[j, "slug"] = "headcount_ratio_50_median"
     df_tables.loc[j, "description"] = new_line.join(
         [
             f"The share of population with {survey_type.text_ineq[survey]} below 50% of the median. Relative poverty reflects the extent of inequality within the bottom of the distribution.",
@@ -181,8 +181,8 @@ for survey in range(len(survey_type)):
     j += 1
 
     # MLD
-    df_tables.loc[j, "name"] = f"Mean Log Deviation"
-    df_tables.loc[j, "slug"] = f"mld"
+    df_tables.loc[j, "name"] = "Mean Log Deviation"
+    df_tables.loc[j, "slug"] = "mld"
     df_tables.loc[j, "description"] = new_line.join(
         [
             "The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal. The measure is also referred to as 'Theil L' or 'GE(0)', in reference to the wider families of inequality measures to which the MLD belongs.",
@@ -288,8 +288,8 @@ j = 0
 
 for survey in range(len(survey_type)):
     # Gini coefficient
-    df_graphers.loc[j, "title"] = f"Gini coefficient"
-    df_graphers.loc[j, "ySlugs"] = f"gini"
+    df_graphers.loc[j, "title"] = "Gini coefficient"
+    df_graphers.loc[j, "ySlugs"] = "gini"
     df_graphers.loc[j, "Indicator Dropdown"] = "Gini coefficient"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
@@ -307,7 +307,7 @@ for survey in range(len(survey_type)):
 
     # Share of the top 10%
     df_graphers.loc[j, "title"] = f"{survey_type.text[survey].capitalize()} share of the richest 10%"
-    df_graphers.loc[j, "ySlugs"] = f"decile10_share"
+    df_graphers.loc[j, "ySlugs"] = "decile10_share"
     df_graphers.loc[j, "Indicator Dropdown"] = "Share of the richest 10%"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
@@ -326,8 +326,8 @@ for survey in range(len(survey_type)):
     j += 1
 
     # Palma ratio
-    df_graphers.loc[j, "title"] = f"Palma ratio"
-    df_graphers.loc[j, "ySlugs"] = f"palma_ratio"
+    df_graphers.loc[j, "title"] = "Palma ratio"
+    df_graphers.loc[j, "ySlugs"] = "palma_ratio"
     df_graphers.loc[j, "Indicator Dropdown"] = "Palma ratio"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
@@ -344,9 +344,9 @@ for survey in range(len(survey_type)):
     j += 1
 
     # Headcount ratio (rel)
-    df_graphers.loc[j, "title"] = f"Share of people in relative poverty"
-    df_graphers.loc[j, "ySlugs"] = f"headcount_ratio_50_median"
-    df_graphers.loc[j, "Indicator Dropdown"] = f"Share in relative poverty"
+    df_graphers.loc[j, "title"] = "Share of people in relative poverty"
+    df_graphers.loc[j, "ySlugs"] = "headcount_ratio_50_median"
+    df_graphers.loc[j, "Indicator Dropdown"] = "Share in relative poverty"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
     df_graphers.loc[j, "subtitle"] = (
@@ -364,13 +364,13 @@ for survey in range(len(survey_type)):
     j += 1
 
     # MLD
-    df_graphers.loc[j, "title"] = f"Mean log deviation"
-    df_graphers.loc[j, "ySlugs"] = f"mld"
+    df_graphers.loc[j, "title"] = "Mean log deviation"
+    df_graphers.loc[j, "ySlugs"] = "mld"
     df_graphers.loc[j, "Indicator Dropdown"] = "Mean log deviation"
     df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
     df_graphers.loc[j, "subtitle"] = (
-        f"The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal."
+        "The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal."
     )
     df_graphers.loc[j, "note"] = (
         f"Depending on the country and year, the data relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
@@ -433,6 +433,9 @@ df_graphers = pd.concat([df_graphers, df_graphers_spells], ignore_index=True)
 # Add related question link
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
+
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
 
 # When the "Depending on" footnote is introduced, it generates unwanted texts as:
 # "Depending on the country and year, the data relates to income measured after taxes and benefits [per capita](#dod:per-capita)."

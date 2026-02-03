@@ -214,8 +214,6 @@ steps:
     - snapshot://fasttrack/latest/lives_saved_measles_vaccination_who.csv
   data://grapher/fasttrack/latest/cdc_measles:
     - snapshot://fasttrack/latest/cdc_measles.csv
-  data://grapher/fasttrack/latest/world_bank_pip_filled:
-    - snapshot://fasttrack/latest/world_bank_pip_filled.csv
   data://grapher/fasttrack/latest/financial_inclusion_table:
     - snapshot://fasttrack/latest/financial_inclusion_table.csv
   data://grapher/fasttrack/latest/extended_financial_inclusion_table:
@@ -236,27 +234,27 @@ steps:
     - snapshot://fasttrack/latest/annual_number_dhs_surveys_by_type.csv
   data://grapher/fasttrack/latest/countries_dhs_surveys_ongoing_before_termination:
     - snapshot://fasttrack/latest/countries_dhs_surveys_ongoing_before_termination.csv
-  data://grapher/fasttrack/latest/material_footprint_end_use_eu: !!set
-    ? snapshot://fasttrack/latest/material_footprint_end_use_eu.csv
+  data://grapher/fasttrack/latest/material_footprint_end_use_eu:
+    - snapshot://fasttrack/latest/material_footprint_end_use_eu.csv
   data://grapher/fasttrack/latest/draft_joe_ipl_data:
     - snapshot://fasttrack/latest/draft_joe_ipl_data.csv
   data://grapher/fasttrack/latest/guinea_worm_cases:
     - snapshot://fasttrack/latest/guinea_worm_cases.csv
-  data://grapher/fasttrack/latest/breakdown_material_footprint_eu: !!set
-    ? snapshot://fasttrack/latest/breakdown_material_footprint_eu.csv
-  data://grapher/fasttrack/latest/wolbachia_dengue_indonesia_rct: !!set
-    ? snapshot://fasttrack/latest/wolbachia_dengue_indonesia_rct.csv
-  data://grapher/fasttrack/latest/smokers_vapers_great_britain: !!set
-    ? snapshot://fasttrack/latest/smokers_vapers_great_britain.csv
-  data://grapher/fasttrack/latest/majorpowerdeaths: !!set
-    ? snapshot://fasttrack/latest/majorpowerdeaths.csv
-  data://grapher/fasttrack/latest/smoking_young_people_england: !!set
-    ? snapshot://fasttrack/latest/smoking_young_people_england.csv
-  data://grapher/fasttrack/latest/religiosity_united_states_gallup: !!set
-    ? snapshot://fasttrack/latest/religiosity_united_states_gallup.csv
-  data-private://grapher/fasttrack/latest/cleaned_traced_news_sentiment: !!set
-    ? snapshot-private://fasttrack/latest/cleaned_traced_news_sentiment.csv
-  data-private://grapher/fasttrack/latest/end_of_slavery: !!set
-    ? snapshot-private://fasttrack/latest/end_of_slavery.csv
-  data://grapher/fasttrack/latest/price_for_light: !!set
-    snapshot://fasttrack/latest/price_for_light.csv:
+  data://grapher/fasttrack/latest/breakdown_material_footprint_eu:
+    - snapshot://fasttrack/latest/breakdown_material_footprint_eu.csv
+  data://grapher/fasttrack/latest/wolbachia_dengue_indonesia_rct:
+    - snapshot://fasttrack/latest/wolbachia_dengue_indonesia_rct.csv
+  data://grapher/fasttrack/latest/smokers_vapers_great_britain:
+    - snapshot://fasttrack/latest/smokers_vapers_great_britain.csv
+  data://grapher/fasttrack/latest/majorpowerdeaths:
+    - snapshot://fasttrack/latest/majorpowerdeaths.csv
+  data://grapher/fasttrack/latest/smoking_young_people_england:
+    - snapshot://fasttrack/latest/smoking_young_people_england.csv
+  data://grapher/fasttrack/latest/religiosity_united_states_gallup:
+    - snapshot://fasttrack/latest/religiosity_united_states_gallup.csv
+  data-private://grapher/fasttrack/latest/cleaned_traced_news_sentiment:
+    - snapshot-private://fasttrack/latest/cleaned_traced_news_sentiment.csv
+  data-private://grapher/fasttrack/latest/end_of_slavery:
+    - snapshot-private://fasttrack/latest/end_of_slavery.csv
+  data://grapher/fasttrack/latest/residential_electricity_consumption:
+    - snapshot://fasttrack/latest/residential_electricity_consumption.csv

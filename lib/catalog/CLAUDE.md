@@ -10,7 +10,7 @@ The library provides pandas-enhanced data structures with rich metadata support:
 - **Dataset**: Container for multiple tables with shared metadata
 - **Table**: pandas.DataFrame subclass with column-level metadata
 - **Variable**: pandas.Series subclass with variable-specific metadata
-- **RemoteCatalog/LocalCatalog**: APIs for querying and loading datasets
+- **Client**: APIs for querying and loading data from tables, indicators and charts.
 
 This library is part of the larger `etl` repository under `lib/catalog/` and is installed as an editable package called `owid-catalog`.
 
@@ -93,18 +93,84 @@ Dataset (folder with index.json)
         └── metadata: VariableMeta (unit, description, sources, etc.)
 ```
 
-### Key Modules
+### Package Structure
 
-- **`catalogs.py`**: Catalog querying interface (LocalCatalog, RemoteCatalog)
-- **`datasets.py`**: Dataset container and serialization logic
+```
+owid/catalog/
+├── core/                   # Core data structures
+│   ├── tables.py           # Table class (DataFrame with metadata)
+│   ├── indicators.py       # Variable/Indicator class (Series with metadata)
+│   ├── datasets.py         # Dataset container and serialization
+│   ├── meta.py             # Metadata dataclasses
+│   ├── processing.py       # Metadata-preserving pandas operations
+│   ├── processing_log.py   # Processing log for tracking transformations
+│   ├── yaml_metadata.py    # YAML metadata file handling
+│   └── utils.py            # Utility functions
+├── api/                    # Remote data access APIs
+│   ├── client.py           # Unified Client class
+│   ├── tables.py           # TablesAPI - query ETL catalog tables
+│   ├── charts.py           # ChartsAPI - fetch chart data
+│   ├── indicators.py       # IndicatorsAPI - query indicators
+│   ├── quick.py            # Quick functions: fetch(), search()
+│   └── legacy.py           # Legacy catalog interfaces
+├── s3_utils.py             # S3 access utilities
+└── (stub files)            # Backwards compatibility imports
+```
+
+### Core Modules (`owid.catalog.core`)
+
 - **`tables.py`**: Table class with metadata-aware operations
-- **`variables.py`**: Variable (Series) class with metadata
+- **`indicators.py`**: Variable/Indicator class (pandas.Series with metadata)
+- **`datasets.py`**: Dataset container and serialization logic
 - **`meta.py`**: All metadata dataclasses (DatasetMeta, TableMeta, VariableMeta, Source, Origin, License)
 - **`processing.py`**: Pandas-like functions that propagate metadata (concat, merge, melt, pivot)
-- **`processing_log.py`**: Processing log for tracking data transformations
-- **`yaml_metadata.py`**: YAML metadata file handling with dynamic templates
-- **`charts.py`**: API for fetching chart data from ourworldindata.org
-- **`utils.py`**: Utility functions for metadata handling
+
+### API Module (`owid.catalog.api`)
+
+The API module provides remote access to OWID data:
+
+- **`Client`**: Unified client with `.tables`, `.charts`, `.indicators` sub-APIs
+- **`fetch()`**: Quick function to load data by path (auto-detects type)
+- **`search()`**: Quick function to search for tables/indicators/charts
+
+```python
+from owid.catalog import search, fetch
+
+# Search for charts (default)
+results = search("population")
+print(results[0].slug)
+tb = results[0].fetch()  # fetch data directly from result
+
+# Search for tables
+results = search("population", kind="table")
+print(results[0].path)
+
+# Search for indicators
+results = search("life expectancy", kind="indicator")
+
+# Fetch data by path (auto-detects type)
+tb = fetch("life-expectancy")  # chart (by slug)
+tb = fetch("grapher/demography/2024-12-03/population/population")  # table
+tb = fetch("grapher/demography/2024-12-03/population/population#population")  # indicator
+
+# Or use Client for more control
+from owid.catalog import Client
+client = Client()
+results = client.tables.search(namespace="un", version="2024-07-12")
+tb = client.charts.fetch("life-expectancy")
+```
+
+### Backwards Compatibility
+
+Stub files at the top level (`meta.py`, `tables.py`, `utils.py`, `processing.py`) re-export from `core/`. The recommended approach is to import from the package root:
+
+```python
+from owid.catalog import Table, Dataset, Variable
+from owid.catalog import processing as pr
+from owid.catalog import Client
+```
+
+**Note:** `Variable` and `Indicator` are aliases for the same class.
 
 ### Metadata System
 

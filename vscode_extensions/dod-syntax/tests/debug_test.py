@@ -2,34 +2,38 @@
 
 # Test the string detection logic with actual content from the migration file
 
+
 def isInPythonString(text, position):
     beforeText = text[:position]
     stringRegex_pattern = r'r?(\'\'\'|"""|\'|")'
-    
+
     import re
+
     matches = list(re.finditer(stringRegex_pattern, beforeText))
-    
+
     inString = False
-    stringDelimiter = ''
-    
+    stringDelimiter = ""
+
     for match in matches:
         delimiter = match.group(1)
-        
+
         if not inString:
             inString = True
             stringDelimiter = delimiter
         elif delimiter == stringDelimiter:
             inString = False
-            stringDelimiter = ''
-    
+            stringDelimiter = ""
+
     return inString
+
 
 # Test with the actual content from the migration file
 test_line = '        "description": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country).",'
 
 # Find DOD references
 import re
-dod_regex = r'\[([^\]]+)\]\(#dod:([^)]+)\)'
+
+dod_regex = r"\[([^\]]+)\]\(#dod:([^)]+)\)"
 matches = list(re.finditer(dod_regex, test_line))
 
 print(f"Line: {test_line}")
@@ -40,11 +44,11 @@ for i, match in enumerate(matches):
     title = match.group(1)
     key = match.group(2)
     is_in_string = isInPythonString(test_line, start_pos)
-    
+
     print(f"  {i+1}. [{title}](#dod:{key}) at position {start_pos}")
     print(f"     In string: {is_in_string}")
     print(f"     Text before: '{test_line[:start_pos]}'")
-    
+
     # Check what delimiters we find
     beforeText = test_line[:start_pos]
     stringRegex_pattern = r'r?(\'\'\'|"""|\'|")'

@@ -9,7 +9,11 @@ import streamlit as st
 from structlog import get_logger
 
 import etl.grapher.model as gm
-from apps.indicator_upgrade.upgrade import push_new_charts_cli
+from apps.indicator_upgrade.upgrade import (
+    cli_upgrade_indicators,
+    get_affected_narrative_charts_cli,
+    push_new_narrative_charts_cli,
+)
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
@@ -46,13 +50,23 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
             charts = []
 
     ########################################################
-    # 2/ Preview submission
+    # 2/ Get affected narrative charts
     ########################################################
-    # 2.1/ Display details
+    narrative_charts = get_affected_narrative_charts_cli(charts) if charts else []
+    num_narrative_charts = len(narrative_charts)
+
+    ########################################################
+    # 3/ Preview submission
+    ########################################################
+    # 3.1/ Display details
     if (num_charts := len(charts)) > 0:
         with st.container(border=True):
             ## Number of charts being updated and variable mapping
-            with st.popover(f"{num_charts} charts affected!"):
+            if num_narrative_charts > 0:
+                popover_label = f"{num_charts} charts & {num_narrative_charts} narrative charts affected!"
+            else:
+                popover_label = f"{num_charts} charts affected!"
+            with st.popover(popover_label):
                 # Build Series with slugs
                 slugs = pd.DataFrame(
                     {
@@ -91,24 +105,78 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     return charts
 
 
-def push_new_charts(charts: List[gm.Chart]) -> None:
-    """Updating charts in the database using parallelized processing."""
-    with st.spinner("Updating charts in parallel..."):
+def push_new_charts() -> None:
+    """Updating charts and narrative charts in the database."""
+    with st.spinner("Updating charts and narrative charts..."):
         try:
-            # Use the parallelized CLI function
-            indicator_mapping = st.session_state.indicator_mapping
-            push_new_charts_cli(charts, indicator_mapping, dry_run=False)
+            # Use the CLI function which handles both charts and narrative charts
+            result = cli_upgrade_indicators(dry_run=False)
+
+            if not result["success"]:
+                # Partial failure - some charts updated successfully, but some failed
+                chart_errors = result["chart_errors"]
+                narrative_chart_errors = result["narrative_chart_errors"]
+                total_errors = len(chart_errors) + len(narrative_chart_errors)
+
+                st.warning(
+                    f"⚠️ Indicator upgrade completed with {total_errors} errors. "
+                    "Some charts were updated successfully, but there were errors with others. "
+                    "You can proceed to chart-diff to review the successful updates, "
+                    "but some charts may need manual attention."
+                )
+
+                # Display chart errors
+                if chart_errors:
+                    with st.expander(f"❌ Chart Errors ({len(chart_errors)})", expanded=True):
+                        error_data = []
+                        for err in chart_errors:
+                            chart_url = OWID_ENV.chart_site(err["chart_slug"])
+                            error_data.append(
+                                {
+                                    "Chart ID": err["chart_id"],
+                                    "Chart URL": chart_url,
+                                    "Error": err["error"],
+                                }
+                            )
+                        st.dataframe(
+                            pd.DataFrame(error_data),
+                            column_config={
+                                "Chart URL": st.column_config.LinkColumn(
+                                    "Chart URL",
+                                    display_text=r"https?://.*?/grapher/(.*)",
+                                ),
+                            },
+                            hide_index=True,
+                        )
+
+                # Display narrative chart errors
+                if narrative_chart_errors:
+                    with st.expander(f"❌ Narrative Chart Errors ({len(narrative_chart_errors)})", expanded=True):
+                        error_data = []
+                        for err in narrative_chart_errors:
+                            error_data.append(
+                                {
+                                    "Narrative Chart ID": err["narrative_chart_id"],
+                                    "Name": err["name"],
+                                    "Error": err["error"],
+                                }
+                            )
+                        st.dataframe(pd.DataFrame(error_data), hide_index=True)
+
+                st_wizard_page_link("anomalist")
+                st_wizard_page_link("chart-diff")
+            else:
+                st.success(
+                    "✅ The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
+                )
+                st_wizard_page_link("anomalist")
+                st_wizard_page_link("chart-diff")
+
         except Exception as e:
             st.error(
-                "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
+                "❌ Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
             )
             st.exception(e)
-        else:
-            st.success(
-                "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
-            )
-            st_wizard_page_link("anomalist")
-            st_wizard_page_link("chart-diff")
 
 
 def save_variable_mapping(
@@ -130,10 +198,17 @@ def undo_indicator_upgrade(indicator_mapping):
             mapping_inverted,
         )
 
+        # Get affected narrative charts (children of affected charts)
+        narrative_charts = get_affected_narrative_charts_cli(charts)
+
         # TODO: instead of pushing new charts, we should revert the changes!
         # To do this, we should have kept a copy or reference to the original revision.
         # Idea: when 'push_new_charts' is called, store in a table the original revision of the chart.
-        push_new_charts(charts)
+        push_new_charts()
+
+        # Undo narrative chart upgrades
+        if narrative_charts:
+            push_new_narrative_charts_cli(narrative_charts, mapping_inverted, dry_run=False)
 
         # Reset variable mapping
         WizardDB.delete_variable_mapping()

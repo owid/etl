@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 import streamlit as st
 import structlog
-from owid.catalog import find
+from owid.catalog import Client
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
@@ -61,10 +61,9 @@ def load_variables_display_in_dataset(
     )
 
     def _display_slug(o) -> str:
-        p = o.catalogPath
         if only_slug:
-            return p.rsplit("/", 1)[-1] if isinstance(p, str) else ""
-        return p
+            return o.catalog_path.table_variable or ""
+        return o.catalogPath or ""
 
     indicators_display = {i.id: _display_slug(i) for i in indicators}
 
@@ -73,10 +72,9 @@ def load_variables_display_in_dataset(
 
 @st.cache_data
 def get_variable_uris(indicators: List[Variable], only_slug: Optional[bool] = False) -> List[str]:
-    options = [o.catalogPath for o in indicators]
     if only_slug:
-        options = [o.rsplit("/", 1)[-1] if isinstance(o, str) else "" for o in options]
-    return options  # type: ignore
+        return [o.catalog_path.table_variable or "" for o in indicators]
+    return [o.catalogPath or "" for o in indicators]
 
 
 @st.cache_data
@@ -183,16 +181,14 @@ def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, An
 
 @st.cache_data(show_spinner=False)
 def load_latest_population():
-    # NOTE: The "channels" parameter of the find function is not working well.
-    candidates = find("population", channels=("grapher",), dataset="population", namespace="demography").sort_values(
-        "version", ascending=False
+    candidates = Client().tables.search(table="population", namespace="demography", dataset="population")
+
+    # Pick highest version available
+    population = candidates.latest(by="version").fetch()
+
+    population = population.reset_index()[["country", "year", "population"]].rename(
+        columns={"country": "entity_name"}, errors="raise"
     )
-    population = (
-        candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
-        .iloc[0]
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    ).rename(columns={"country": "entity_name"}, errors="raise")
 
     return population
 

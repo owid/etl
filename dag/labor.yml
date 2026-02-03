@@ -26,3 +26,9 @@ steps:
   #
   export://multidim/worldbank_wdi/latest/ilostat_comparison:
     - data://grapher/worldbank_wdi/2025-09-08/wdi
+
+  #
+  # Labor force participation rate MDim from WDI-ILOSTAT (modeled data)
+  #
+  export://multidim/worldbank_wdi/latest/labor_force_participation_rate:
+    - data://grapher/worldbank_wdi/2025-09-08/wdi

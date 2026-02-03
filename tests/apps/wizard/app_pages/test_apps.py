@@ -40,7 +40,7 @@ def set_config():
         branch_name = os.environ["BUILDKITE_BRANCH"]
         env_config = config.OWIDEnv(
             config.Config(
-                GRAPHER_USER_ID=1,
+                GRAPHER_USER_ID=config.ETL_GRAPHER_USER_ID,
                 DB_USER="owid",
                 DB_NAME="owid",
                 DB_PASS="",
@@ -259,5 +259,14 @@ def test_app_explorer():
 @pytest.mark.usefixtures("set_config")
 def test_app_chart_animation():
     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_animation.py"), default_timeout=DEFAULT_TIMEOUT).run()
+
+    # Allow RuntimeError for missing ffmpeg
+    if at.exception:
+        msg = at.exception[0].message
+        allowed = [
+            "No ffmpeg exe could be found",
+        ]
+        if any(text in msg for text in allowed):
+            return
 
     assert not at.exception

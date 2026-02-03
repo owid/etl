@@ -6,19 +6,14 @@ from typing import Any, Dict, Optional
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-import requests
 import structlog
-from joblib import Memory
 from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
-from etl.paths import CACHE_DIR
+from etl.helpers import PathFinder, render_yaml_metadata
 
 log = structlog.get_logger()
-
-memory = Memory(CACHE_DIR, verbose=0)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -76,12 +71,16 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
+    ds_population_wpp = paths.load_dataset("un_wpp")
 
     #
     # Process data.
     #
     tb_meadow = ds_meadow.read("wdi", safe_types=False)
     tb_metadata = ds_meadow.read("wdi_metadata", safe_types=False)
+
+    # Load population table from UN WPP
+    tb_population_wpp = ds_population_wpp.read("population")
 
     tb = geo.harmonize_countries(
         df=tb_meadow,
@@ -133,6 +132,8 @@ def run() -> None:
 
     tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
 
+    tb_garden = add_labor_force_breakdown_data(tb=tb_garden, tb_population_wpp=tb_population_wpp)
+
     # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
     #  I tried to calculate them myself, but some large countries such as India have missing values and
     #  the time-series looks jagged. It's better to wait for the next WDI release and hope
@@ -176,7 +177,10 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow.metadata, long_to_wide=True)
+
+    # Render Jinja templates in metadata (needed because this dataset has no dimensions)
+    render_yaml_metadata(ds_garden)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -531,31 +535,6 @@ def mk_custom_entities(df: Table) -> pd.DataFrame:
     return df_cust
 
 
-@memory.cache
-def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
-    indicator_code = indicator_code.replace("_", ".").upper()
-    api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
-    log.info("wdi.fetch_metadata", indicator_code=indicator_code)
-    js = requests.get(api_url).json()
-
-    # Metadata not available for indicators such as PER.SI.ALLSI.COV.Q3.TOT
-    if len(js) < 2:
-        raise ValueError(f"Metadata not available for indicator {indicator_code}")
-
-    d = js[1]
-    assert len(d) == 1
-    d = d[0]
-
-    # There might be more fields, but we don't use them
-    return {
-        "indicator_code": indicator_code,
-        "indicator_name": d.pop("name"),
-        "unit": d.pop("unit"),
-        "source": d.pop("sourceOrganization"),
-        "topic": d.pop("topics")[0].get("value"),
-    }
-
-
 def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.DataFrame:
     # Exclude metadata not in indicator_codes
     df_vars = df_vars[df_vars["series_code"].isin(indicator_codes)].copy()
@@ -570,26 +549,7 @@ def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.Dat
 
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
 
-    # Fetch missing indicator metadata
-    indicators_without_meta = set(indicator_codes) - set(df_vars["indicator_code"])
-
-    # Add indicators without sources
-    indicators_without_meta |= set(df_vars.loc[df_vars.source.isnull(), "indicator_code"])
-
-    # Add indicators without names
-    indicators_without_meta |= set(df_vars.loc[df_vars.indicator_name.isnull(), "indicator_code"])
-
-    # Fetch metadata for missing indicators
-    # NOTE: this should be ideally in the snapshot, but there are only a few indicators like this so it's
-    #   not worth it
-    log.info("wdi.missing_metadata", n_indicators=len(indicators_without_meta))
-    if indicators_without_meta:
-        df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
-        # Merge missing metadata
-        df_vars = pd.concat([df_vars[~df_vars.indicator_code.isin(df_missing.indicator_code)], df_missing])
-    # If no missing indicators, no need to merge anything
-
-    # Final checks
+    # Check for missing metadata
     missing_indicator_codes = set(indicator_codes) - set(df_vars["indicator_code"])
     if missing_indicator_codes:
         raise ValueError(f"Missing metadata in WDISeries.csv for the following indicators: {missing_indicator_codes}")
@@ -946,21 +906,21 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         # If neither is available, set as NaN
         tb[f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
         tb.loc[tb[ind_national].notna() & tb[ind_modeled].isna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
-            "Survey only"
+            "Only national estimate available"
         )
         tb.loc[tb[ind_national].isna() & tb[ind_modeled].notna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
-            "Modeled only"
+            "Only ILO modeled available"
         )
         tb.loc[
             tb[f"{indicator}_absolute_difference"] < MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE,
             f"{indicator}_ilo_modeling_comparison_absolute",
-        ] = "Both matching"
+        ] = "Both available (agreeing)"
         tb.loc[
             (tb[f"{indicator}_absolute_difference"] >= MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE)
             & tb[ind_national].notna()
             & tb[ind_modeled].notna(),
             f"{indicator}_ilo_modeling_comparison_absolute",
-        ] = "Both not matching"
+        ] = "Both available (disagreeing)"
 
         # Copy metadata from the modeled indicator to the new comparison indicator
         tb[f"{indicator}_ilo_modeling_comparison_absolute"] = tb[
@@ -977,6 +937,98 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
 
         # # Drop columns no longer needed
         tb = tb.drop(columns=[f"{indicator}_absolute_difference"], errors="raise")
+
+    # Set index again
+    tb = tb.format()
+
+    return tb
+
+
+def add_labor_force_breakdown_data(tb: Table, tb_population_wpp: Table) -> Table:
+    """
+    Add labor force breakdown data, combining WDI/ILOSTAT data with UN WPP population data.
+    """
+
+    tb = tb.reset_index()
+    tb_population = tb_population_wpp.copy()
+
+    # Extract only the data we need from the population WPP table
+    tb_population = tb_population[
+        (tb_population["sex"] == "all")
+        & (tb_population["age"].isin(["0-14", "15+", "all"]))
+        & (tb_population["variant"].isin(["estimates", "medium"]))
+    ][["country", "year", "age", "population"]]
+
+    # Make table wide
+    tb_population_wide = tb_population.pivot_table(
+        index=["country", "year"], columns="age", values="population"
+    ).reset_index()
+
+    # For columns not in country, year, copy metadata from tb_population
+    for col in [c for c in tb_population_wide.columns if c not in ["country", "year"]]:
+        tb_population_wide[col].m.origins = tb_population["population"].m.origins
+
+    # Keep relevant columns from WDI
+    tb_labor_force = tb[
+        [
+            "country",
+            "year",
+            "sl_tlf_cact_zs",  # Labor force participation rate
+            "sl_uem_totl_zs",  # Unemployment rate
+            "sl_emp_totl_sp_zs",  # Employment to population ratio
+        ]
+    ].copy()
+
+    # Only show years where we have data for unemployment rate (data starts in 1991, LFPR starts in 1990)
+    tb_labor_force = tb_labor_force[tb_labor_force["sl_uem_totl_zs"].notna()].reset_index(drop=True)
+
+    # Merge population data with labor force data
+    tb_labor_force = pr.merge(
+        tb_labor_force,
+        tb_population_wide,
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Calculate number_employed
+    tb_labor_force["number_employed"] = (tb_labor_force["sl_emp_totl_sp_zs"] / 100 * tb_labor_force["15+"]).round(0)
+
+    # Calculate labor_force
+    tb_labor_force["labor_force"] = (tb_labor_force["sl_tlf_cact_zs"] / 100 * tb_labor_force["15+"]).round(0)
+
+    # Calculate number_unemployed
+    tb_labor_force["number_unemployed"] = (
+        tb_labor_force["sl_uem_totl_zs"] / 100 * tb_labor_force["labor_force"]
+    ).round(0)
+
+    # Calculate number_out_of_labor_force
+    tb_labor_force["number_out_of_labor_force"] = (
+        tb_labor_force["all"] - tb_labor_force["labor_force"] - tb_labor_force["0-14"]
+    ).round(0)
+
+    # Rename 0-14 to number_below_working_age
+    tb_labor_force = tb_labor_force.rename(columns={"0-14": "number_below_working_age"}, errors="raise")
+
+    # Keep only relevant columns
+    tb_labor_force = tb_labor_force[
+        [
+            "country",
+            "year",
+            "number_below_working_age",
+            "labor_force",
+            "number_employed",
+            "number_unemployed",
+            "number_out_of_labor_force",
+        ]
+    ]
+
+    # Merge back to original table
+    tb = pr.merge(
+        tb,
+        tb_labor_force,
+        on=["country", "year"],
+        how="left",
+    )
 
     # Set index again
     tb = tb.format()

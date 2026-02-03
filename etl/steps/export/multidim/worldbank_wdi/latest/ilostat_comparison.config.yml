@@ -10,6 +10,7 @@ default_selection:
   - Rwanda
   - Angola
   - Mali
+originUrl: ourworldindata.org/work-employment
 
 default_dimensions:
   indicator: unemployment_rate
@@ -23,7 +24,7 @@ definitions:
     Share of the working-age population who are employed.
 
   description_short_modeled_vs_national: |-
-    [National estimates](#dod:ilo-national-estimates) are based on each country's own data collection and definitions, while [modeled estimates](#dod:ilo-modelled-estimates) are produced by the ILO using statistical methods to improve comparability across countries and over time.
+    [National estimates](#dod:ilo-national-estimates) are based on each country's own data collection and definitions, while [modeled estimates](#dod:ilo-modelled-estimates) are produced by the International Labour Organization (ILO) using statistical methods to improve comparability across countries and over time.
 
   description_key_labor_force_participation_1: |-
     The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
@@ -70,11 +71,11 @@ views:
       y:
         - catalogPath: wdi#sl_uem_totl_ne_zs
           display:
-            name: Unemployment rate, national
+            name: National estimates
             plotMarkersOnlyInLineChart: true
         - catalogPath: wdi#sl_uem_totl_zs
           display:
-            name: Unemployment rate, modeled
+            name: Modeled estimates by the ILO
     config:
       title: "Unemployment rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_unemployment_rate} {definitions.description_short_modeled_vs_national}"
@@ -98,11 +99,11 @@ views:
       y:
         - catalogPath: wdi#sl_tlf_cact_ne_zs
           display:
-            name: Labor force participation rate, national
+            name: National estimates
             plotMarkersOnlyInLineChart: true
         - catalogPath: wdi#sl_tlf_cact_zs
           display:
-            name: Labor force participation rate, modeled
+            name: Modeled estimates by the ILO
     config:
       title: "Labor force participation rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_labor_force_participation_rate} {definitions.description_short_modeled_vs_national}"
@@ -127,11 +128,11 @@ views:
       y:
         - catalogPath: wdi#sl_emp_totl_sp_ne_zs
           display:
-            name: Employment-to-population ratio, national
+            name: National estimates
             plotMarkersOnlyInLineChart: true
         - catalogPath: wdi#sl_emp_totl_sp_zs
           display:
-            name: Employment-to-population ratio, modeled
+            name: Modeled estimates by the ILO
     config:
       title: "Employment-to-population ratios: modeled vs. national estimates"
       subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"

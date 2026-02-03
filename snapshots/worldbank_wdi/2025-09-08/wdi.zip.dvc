@@ -15,6 +15,6 @@ meta:
       name: CC BY 4.0
       url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
 outs:
-  - md5: c6b833803b7fcec6667ed0d99838210e
-    size: 303235719
+  - md5: f4933090eef3e999cf24fc310c9c3acc
+    size: 295242822
     path: wdi.zip

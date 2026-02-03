@@ -1,4 +1,4 @@
-from owid.catalog import jinja, meta
+from owid.catalog.core import jinja, meta
 
 
 def test_expand_jinja():

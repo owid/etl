@@ -16,7 +16,7 @@ from typing import Any, Dict
 
 import requests
 
-from .openapi_to_markdown import generate_markdown
+from .openapi_to_markdown import generate_markdown  # type: ignore
 
 
 def load_openapi_spec_from_url(url: str = "https://search.owid.io/openapi.json") -> Dict[str, Any]:

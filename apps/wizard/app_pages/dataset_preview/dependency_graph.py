@@ -125,7 +125,7 @@ def generate_graph(
 
         # Change if step is private
         if attributes["kind"] == "private":
-            kwargs["label"] = "🔒 " + kwargs.get("label", "")
+            kwargs["label"] = "🔒 " + str(kwargs.get("label", ""))
 
         node = Node(
             id=parent,

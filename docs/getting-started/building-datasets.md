@@ -241,8 +241,9 @@ VariableMeta(title='Day of the year with peak cherry blossom', description=None,
 Note that you can also read datasets using our catalog [python API](../api/index.md){data-preview}:
 
 ```pycon
->>> from owid import catalog
->>> tb = catalog.find_latest("cherry_blossom")
+>>> from owid.catalog.api import Client
+>>> client = Client()
+>>> client.tables.fetch("garden/biodiversity/2025-04-07/cherry_blossom/cherry_blossom")
               full_flowering_date  average_20_years
 country year
 Japan   812                    92               NaN

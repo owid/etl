@@ -29,36 +29,92 @@ definitions:
           colorScale:
             baseColorScheme: Blues
 
-    # - dimensions:
-    #     indicator: share_change_2010_2020
-    #   config:
-    #     chartTypes: []
-    #     hasMapTab: true
-    #     map:
-    #       colorScale:
-    #         baseColorScheme: RdBu
-    #         binningStrategy: manual
-    #         customNumericValues:
-    #           - 1
-    #           - -10
-    #           - -5
-    #           - -2
-    #           - -1
-    #           # - 0
-    #           - 1
-    #           - 2
-    #           - 5
-    #           - 10
-    #           - -1
+    - dimensions:
+        indicator: share
+      config:
+        map:
+          colorScale:
+            binningStrategy: manual
+            customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+    - dimensions:
+        religion: christians
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Blues
+    - dimensions:
+        religion: muslims
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Greens
+    - dimensions:
+        religion: hindus
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Oranges
+    - dimensions:
+        religion: buddhists
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Purples
+    - dimensions:
+        religion: jews
+      config:
+        map:
+          colorScale:
+            baseColorScheme: SingleColorGradientDenim
+            colorSchemeInvert: true
+            customNumericColors:
+              - "#e9effc"
+            customNumericColorsActive: true
+    - dimensions:
+        religion: other_religions
+      config:
+        map:
+          colorScale:
+            customNumericColors:
+              - "#FBF3E9"
+              - "#F3E4D1"
+              - "#EAD3B5"
+              - "#E0C29A"
+              - "#D5B07F"
+              - "#CA9E65"
+              - "#A56F45"
+              - "#8E5E3A"
+              - "#74492D"
+              - "#56321A"
+            customNumericColorsActive: true
+    - dimensions:
+        religion: religiously_unaffiliated
+      config:
+        map:
+          colorScale:
+            colorSchemeInvert: true
+            customNumericColors:
+              - "#E9FBFB"
+              - "#D3F6F6"
+              - "#BDEFEF"
+              - "#A7E7E7"
+              - "#91DEDE"
+              - "#72D0D0"
+              - "#4AB0B0"
+              - "#2B8F8F"
+              - "#156B6B"
+              - "#003A3A"
+            customNumericColorsActive: true
 
 dimensions:
   - slug: religion
     name: Religion
     choices:
-      - slug: "religion_distrib"
-        name: "Religious composition"
-        group: "Aggregates"
-        description: Distribution of population by religion
+      # - slug: "religion_distrib"
+      #   name: "Religious composition"
+      #   group: "Aggregates"
+      #   description: Distribution of population by religion
       - slug: "any_religion"
         name: "Any religion"
         group: "Aggregates"
@@ -94,8 +150,8 @@ dimensions:
         description: People affiliated to a religion as a percentage of the total population
       - slug: "count_unrounded"
         name: "Number of people"
-        description: Number of deaths divided by the total population
-      - slug: "share_change_2010_2020"
-        name: "Percentage point change"
-        description: Percentage point change between 2010 and 2020
+        description: People affiliated to a religion
+      # - slug: "share_change_2010_2020"
+      #   name: "Percentage point change"
+      #   description: Percentage point change between 2010 and 2020
 views: []

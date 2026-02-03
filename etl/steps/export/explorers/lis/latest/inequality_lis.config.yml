@@ -1,0 +1,47 @@
+config:
+  explorerTitle: "Inequality - Luxembourg Income Study"
+  explorerSubtitle: "Explore Luxembourg Income Study data on inequality."
+  selection:
+    - Brazil
+    - Chile
+    - China
+    - France
+    - South Africa
+    - United States
+  wpBlockId: 57755
+  isPublished: true
+  originUrl: https://ourworldindata.org/economic-inequality
+  # pickerColumnSlugs:
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: gini
+        name: Gini coefficient
+      - slug: share_top_10
+        name: Share of the richest 10%
+      - slug: share_bottom_50
+        name: Share of the poorest 50%
+      - slug: palma_ratio
+        name: Palma ratio
+      - slug: share_below_50pct_median
+        name: Share in relative poverty
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: "dhi"
+        name: "After tax"
+      - slug: "mi"
+        name: "Before tax"
+      - slug: "after_vs_before_tax"
+        name: "After vs. before tax"
+  - name: Adjust for cost sharing within households (equivalized income)
+    slug: equivalence_scale
+    choices:
+      - slug: "per capita"
+        name: "Per capita"
+      - slug: "square root"
+        name: "Equivalized"
+
+views: []

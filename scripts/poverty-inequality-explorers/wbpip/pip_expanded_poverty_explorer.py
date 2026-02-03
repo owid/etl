@@ -629,7 +629,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = (
-            f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
+            "The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
         )
         df_graphers.loc[j, "note"] = (
             f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
@@ -904,7 +904,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "Household survey data type Dropdown"] = f"{survey_type.dropdown_option[survey]}"
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = (
-            f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
+            "The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
         )
         df_graphers.loc[j, "note"] = (
             f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
@@ -983,6 +983,9 @@ df_graphers = pd.concat([df_graphers, df_graphers_spells], ignore_index=True)
 # Add related question link
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
+
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/poverty"
 
 # When the "Depending on" footnote is introduced, it generates unwanted texts as:
 # "Depending on the country and year, the data relates to income measured after taxes and benefits [per capita](#dod:per-capita)."

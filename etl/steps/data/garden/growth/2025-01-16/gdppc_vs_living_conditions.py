@@ -51,8 +51,8 @@ COLUMNS_AND_CATEGORIES = {
     "gho_clean_fuel_cooking": {"residence_area_type": "Total"},
     "pip": {
         "ppp_version": 2021,
-        "poverty_line": "No poverty line",
         "welfare_type": "income or consumption",
+        "period": "day",
         "table": "Income or consumption consolidated",
         "survey_comparability": "No spells",
     },
@@ -76,7 +76,7 @@ def run() -> None:
     ds_un_wpp = paths.load_dataset("un_wpp")
     ds_igme = paths.load_dataset("igme")
     ds_maternal_mortality = paths.load_dataset("maternal_mortality")
-    ds_wash = paths.load_dataset("who")
+    ds_wash = paths.load_dataset("household")
     ds_unwto = paths.load_dataset("unwto")
     ds_pwt = paths.load_dataset("penn_world_table")
     ds_harmonized_scores = paths.load_dataset("harmonized_scores")
@@ -97,7 +97,7 @@ def run() -> None:
     tb_igme_stillbirth = ds_igme.read("igme")
     tb_igme_youth_mortality = ds_igme.read("igme_under_fifteen_mortality")
     tb_maternal_mortality = ds_maternal_mortality.read("maternal_mortality")
-    tb_wash = ds_wash.read("who")
+    tb_wash = ds_wash.read("household")
     tb_unwto = ds_unwto.read("unwto")
     tb_pwt = ds_pwt.read("penn_world_table")
     tb_harmonized_scores = ds_harmonized_scores.read("harmonized_scores")
@@ -110,7 +110,7 @@ def run() -> None:
     tb_gho_clean_fuel_cooking = ds_gho.read(
         "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"
     )
-    tb_pip = ds_pip.read("world_bank_pip")
+    tb_pip = ds_pip.read("incomes")
     tb_undp_hdr = ds_undp_hdr.read("undp_hdr_sex")
     tb_ihme_gbd = ds_ihme_gbd.read("gbd_risk")
 

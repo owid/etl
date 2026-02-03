@@ -1,7 +1,7 @@
 import copy
 import datetime as dt
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set
 
 import click
 import pandas as pd
@@ -63,6 +63,12 @@ log = structlog.get_logger()
     type=bool,
     help="Sync approved charts even when conflicts are detected. Useful when syncing between staging servers.",
 )
+@click.option(
+    "--archive/--no-archive",
+    default=True,
+    type=bool,
+    help="Archive datasets in target that have no charts using their indicators.",
+)
 def cli(
     source: str,
     target: str,
@@ -71,6 +77,7 @@ def cli(
     exclude: Optional[str],
     dry_run: bool,
     ignore_conflicts: bool,
+    archive: bool,
 ) -> None:
     # TODO: keep this docstring in sync with apps/wizard/app_pages/chart_diff/app.py
     """Sync Grapher charts and revisions from an environment to the main environment.
@@ -116,13 +123,27 @@ def cli(
     ```
     etl chart-sync staging-site-my-subbranch staging-site-baseline-branch --ignore-conflicts --dry-run
     ```
+
+    **Example 5:** Archive datasets that have no charts (dry-run)
+
+    ```
+    etl chart-sync staging-site-my-branch .env.prod.write --archive --dry-run
+    ```
+
+    **Considerations on archiving:**
+
+    - Use `--archive` to automatically archive datasets in TARGET that have no charts using their indicators.
+    - Only datasets that were part of the synced charts are considered for archiving.
+    - Datasets are only archived if the corresponding ETL dataset is in the archive DAG (not in the active DAG).
+    - Archived datasets are not deleted, just marked as archived.
     """
     if _is_commit_sha(source):
         repo = GithubApiRepo(repo_name="etl")
         source = repo.get_git_branch_from_commit_sha(source)
         log.info("chart_sync.use_branch", branch=source)
 
-    source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
+    source_env = OWIDEnv.from_staging_or_env_file(source)
+    source_engine = source_env.get_engine()
     target_env = OWIDEnv.from_staging_or_env_file(target)
     target_engine = target_env.get_engine()
 
@@ -135,7 +156,9 @@ def cli(
 
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
-    target_api: AdminAPI = AdminAPI(target_env) if not dry_run else None  # type: ignore
+    # We need source_api to fetch narrative chart merged configs, and target_api to update
+    source_api = AdminAPI(source_env)
+    target_api = AdminAPI(target_env)
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
@@ -163,6 +186,9 @@ def cli(
 
             charts_synced = 0
             dods_synced = 0
+            narrative_charts_synced = 0
+            synced_chart_ids: Set[int] = set()  # Track synced chart IDs for narrative chart sync
+            synced_dataset_ids: Set[int] = set()  # Track dataset IDs from synced charts for archiving
 
             # Iterate over all chart diffs
             for diff in chart_diffs:
@@ -222,6 +248,11 @@ def cli(
                     if diff.is_approved:
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
+                        synced_chart_ids.add(chart_id)
+                        # Collect dataset IDs from the TARGET chart's variables for archiving
+                        # We want to archive old datasets that are being replaced by new ones
+                        target_variables = diff.target_chart.load_chart_variables(target_session)
+                        synced_dataset_ids.update(v.datasetId for v in target_variables.values() if v.datasetId)
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
                             target_api.set_tags(chart_id, source_tags, user_id=user_id)
@@ -249,6 +280,8 @@ def cli(
                     # New chart has been approved
                     if diff.is_approved:
                         charts_synced += 1
+                        synced_chart_ids.add(chart_id)
+                        # Note: New charts don't have old datasets to archive, so no dataset IDs collected
                         if not dry_run:
                             resp = target_api.create_chart(migrated_config, user_id=user_id)
                             target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
@@ -276,8 +309,20 @@ def cli(
                     else:
                         raise ValueError("Invalid chart diff state")
 
+            # Sync narrative charts for the synced parent charts
+            narrative_charts_synced = _sync_narrative_charts(
+                synced_chart_ids, source_session, target_session, source_api, target_api, dry_run
+            )
+
             # Sync DoDs
             dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
+
+            # Archive datasets without charts if requested
+            datasets_archived = 0
+            if archive and synced_dataset_ids:
+                datasets_archived = _archive_datasets_without_charts(
+                    target_session, target_api, synced_dataset_ids, str(source), dry_run
+                )
 
             # Check for deleted charts and notify
             deleted_charts = get_deleted_charts(source_session, target_session)
@@ -289,10 +334,14 @@ def cli(
 
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
+    if narrative_charts_synced > 0:
+        print(f"[bold green]Narrative charts synced: {narrative_charts_synced}[/bold green]")
     if dods_synced > 0:
         print(f"[bold green]DoDs synced: {dods_synced}[/bold green]")
-    if charts_synced == 0 and dods_synced == 0:
-        print("\n[bold green]No charts or DoDs need to be synced[/bold green]")
+    if datasets_archived > 0:
+        print(f"[bold green]Datasets archived: {datasets_archived}[/bold green]")
+    if charts_synced == 0 and narrative_charts_synced == 0 and dods_synced == 0 and datasets_archived == 0:
+        print("\n[bold green]No charts, narrative charts, DoDs, or datasets need to be synced[/bold green]")
 
 
 def _is_commit_sha(source: str) -> bool:
@@ -377,6 +426,30 @@ chart-sync doesn't delete charts. Make sure to delete them from production if th
         send_slack_message(channel="#data-architecture-github", message=message)
 
 
+def _notify_slack_archived_datasets(archived_datasets: list[dict], source: str, dry_run: bool) -> None:
+    """Notify about archived datasets via Slack."""
+    dataset_count = len(archived_datasets)
+    dataset_word = "dataset" if dataset_count == 1 else "datasets"
+
+    # Build list of archived datasets for the message
+    dataset_list = "\n".join(
+        [f"• Dataset {ds['id']}: `{ds['name']}` ({ds['catalogPath'] or 'no catalog path'})" for ds in archived_datasets]
+    )
+
+    message = f"""
+:file_folder: *ETL chart-sync: {dataset_count} {dataset_word.title()} Archived* from `{source}`
+
+The following {dataset_word} had no charts using their indicators and {"was" if dataset_count == 1 else "were"} archived:
+
+{dataset_list}
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
 def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optional[str], exclude: Optional[str]):
     source_variables = chart.load_chart_variables(session)
 
@@ -412,6 +485,95 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
+
+
+def _sync_narrative_charts(
+    synced_chart_ids: Set[int],
+    source_session: Session,
+    target_session: Session,
+    source_api: AdminAPI,
+    target_api: AdminAPI,
+    dry_run: bool,
+) -> int:
+    """Sync narrative charts for the given synced parent chart IDs.
+
+    When a chart is synced, we also sync all its child narrative charts.
+    Narrative charts are matched by ID between environments.
+
+    The sync process:
+    1. Fetch the merged config from source via Admin API
+    2. Remap variable IDs from source to target using catalog paths
+    3. PUT the migrated merged config to target - backend recalculates the patch
+    """
+    if not synced_chart_ids:
+        return 0
+
+    narrative_charts_synced = 0
+
+    # Get all narrative charts that have the synced charts as parents
+    source_narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
+        source_session, synced_chart_ids
+    )
+
+    if not source_narrative_charts:
+        return 0
+
+    log.info(
+        "narrative_chart_sync.start",
+        n=len(source_narrative_charts),
+        narrative_chart_ids=[nc.id for nc in source_narrative_charts],
+    )
+
+    for source_nc in source_narrative_charts:
+        # Check if narrative chart exists in target by ID
+        target_nc = target_session.get(gm.NarrativeChart, source_nc.id)
+
+        if not target_nc:
+            # Narrative chart doesn't exist in target - this is expected if it's new
+            # We cannot create narrative charts via API currently, just log a warning
+            log.warning(
+                "narrative_chart_sync.new_chart_skipped",
+                name=source_nc.name,
+                narrative_chart_id=source_nc.id,
+                reason="creating new narrative charts not supported yet",
+            )
+            continue
+
+        # Fetch full config from source API (full config = parent + patch merged)
+        source_response = source_api.get_narrative_chart(source_nc.id)
+        source_full_config = source_response["configFull"]
+
+        # Migrate the full config (remap variable IDs from source to target)
+        migrated_config = source_nc.migrate_merged_config(source_full_config, source_session, target_session)
+
+        # For comparison, get target's full config via API
+        target_response = target_api.get_narrative_chart(target_nc.id)
+        target_full_config = target_response["configFull"]
+
+        if migrated_config == target_full_config:
+            log.info(
+                "narrative_chart_sync.skip",
+                name=source_nc.name,
+                reason="identical config already exists",
+            )
+            continue
+
+        log.info(
+            "narrative_chart_sync.update",
+            name=source_nc.name,
+            narrative_chart_id=source_nc.id,
+        )
+        narrative_charts_synced += 1
+
+        if not dry_run:
+            # PUT the full migrated config - backend will recalculate the patch
+            target_api.update_narrative_chart(
+                target_nc.id,
+                migrated_config,
+                user_id=source_nc.lastEditedByUserId,
+            )
+
+    return narrative_charts_synced
 
 
 def _sync_dods(
@@ -477,6 +639,85 @@ def _sync_dods(
                 target_api.create_dod(source_dod.name, source_dod.content, source_dod.lastUpdatedUserId)
 
     return dods_synced
+
+
+def _archive_datasets_without_charts(
+    target_session: Session,
+    target_api: AdminAPI,
+    dataset_ids: Set[int],
+    source: str,
+    dry_run: bool,
+) -> int:
+    """Archive datasets in target that have no charts using their indicators.
+
+    Only archives datasets that:
+    - Are in the provided dataset_ids set (from synced charts)
+    - Are not already archived
+    - Have no charts using any of their variables in TARGET
+    - Have their corresponding ETL dataset in the archive DAG
+    """
+    if not dataset_ids:
+        return 0
+
+    # Load the active and archive DAGs to check if datasets are archived in ETL
+    from etl import paths
+    from etl.dag_helpers import load_dag
+
+    # Load both DAGs - archive DAG includes active steps via includes
+    archive_dag = load_dag(paths.DAG_ARCHIVE_FILE)
+    archive_dag_steps = set(archive_dag.keys())
+    active_dag = load_dag(paths.DAG_FILE)
+    active_dag_steps = set(active_dag.keys())
+
+    datasets_archived = 0
+    archived_datasets_info: list[dict] = []
+
+    # Find datasets that have no charts using their indicators
+    datasets_without_charts = gm.Dataset.load_datasets_without_charts(target_session, list(dataset_ids))
+
+    if not datasets_without_charts:
+        log.info("archive_datasets.none_found")
+        return 0
+
+    log.info("archive_datasets.start", n=len(datasets_without_charts))
+
+    for dataset in datasets_without_charts:
+        # Check if the dataset is in the archive DAG using step_uri property
+        step_uri = dataset.step_uri
+        if step_uri:
+            # Check if this step exists ONLY in the archive DAG (not in active DAG)
+            is_in_archive_only = step_uri in archive_dag_steps and step_uri not in active_dag_steps
+
+            if not is_in_archive_only:
+                log.info(
+                    "archive_datasets.skip_not_in_archive_dag",
+                    dataset_id=dataset.id,
+                    name=dataset.name,
+                    catalog_path=dataset.catalogPath,
+                    step_uri=step_uri,
+                )
+                continue
+        else:
+            # No catalog path means we can't verify it's in the archive DAG, skip it
+            log.info(
+                "archive_datasets.skip_no_catalog_path",
+                dataset_id=dataset.id,
+                name=dataset.name,
+            )
+            continue
+
+        log.info("archive_datasets.archive", dataset_id=dataset.id, name=dataset.name, catalog_path=dataset.catalogPath)
+        datasets_archived += 1
+        archived_datasets_info.append({"id": dataset.id, "name": dataset.name, "catalogPath": dataset.catalogPath})
+
+        if not dry_run:
+            target_api.set_dataset_archived(dataset.id, is_archived=True)
+
+    # Send Slack notification about archived datasets
+    if archived_datasets_info:
+        _notify_slack_archived_datasets(archived_datasets_info, source, dry_run)
+
+    return datasets_archived
 
 
 if __name__ == "__main__":

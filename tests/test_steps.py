@@ -69,11 +69,11 @@ def test_data_step_becomes_dirty_when_pandas_version_changes():
             d.run()
             assert not d.is_dirty()
 
-            pd.__version__ += ".test"  # type: ignore
+            pd.__version__ += ".test"
             assert d.is_dirty()
 
     finally:
-        pd.__version__ = pandas_version  # type: ignore
+        pd.__version__ = pandas_version
 
 
 @contextmanager
@@ -186,7 +186,7 @@ def test_dependency_filtering_empty_includes_with_excludes():
     assert result == expected
 
 
-class DummyStep(Step):  # type: ignore
+class DummyStep(Step):
     def __init__(self, name: str):
         self.path = name
 
@@ -207,13 +207,13 @@ def test_data_step_private():
 
 def test_select_dirty_steps():
     """select_dirty_steps should only select dirty steps, this can be tricky when using threads"""
-    steps = [DummyStep(f"{i}") for i in range(20)]  # type: ignore
+    steps = [DummyStep(f"{i}") for i in range(20)]
     for s in steps:
         if random.random() < 0.5:
             s.is_dirty = lambda: False  # type: ignore
         else:
             s.is_dirty = lambda: True  # type: ignore
-    assert all([s.is_dirty() for s in select_dirty_steps(steps, 10)])  # type: ignore
+    assert all([s.is_dirty() for s in select_dirty_steps(steps, 10)])
 
 
 def test_get_etag():
@@ -239,7 +239,7 @@ def test_SnapshotStep_checksum_output(tmp_path):
         assert step.checksum_output() == "1867a4e329be8bb3c12a727513b931e8"
 
         # change metadata
-        meta["origin"]["producer"] = "B"
+        meta["origin"]["producer"] = "B"  # type: ignore[index]
         with open(snapshot_dvc, "w") as f:
             json.dump(meta, f)
 

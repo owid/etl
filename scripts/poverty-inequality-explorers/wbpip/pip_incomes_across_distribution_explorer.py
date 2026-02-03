@@ -101,7 +101,7 @@ for survey in range(len(survey_type)):
     # Raw variables to not break aggregations
     # mean
     df_tables.loc[j, "name"] = f"Mean {survey_type.text[survey]} per day"
-    df_tables.loc[j, "slug"] = f"mean"
+    df_tables.loc[j, "slug"] = "mean"
     df_tables.loc[j, "description"] = new_line.join(
         [
             f"The mean level of {survey_type.text[survey]} per person per day.",
@@ -122,7 +122,7 @@ for survey in range(len(survey_type)):
 
     # median
     df_tables.loc[j, "name"] = f"Median {survey_type.text[survey]} per day"
-    df_tables.loc[j, "slug"] = f"median"
+    df_tables.loc[j, "slug"] = "median"
     df_tables.loc[j, "description"] = new_line.join(
         [
             f"The level of {survey_type.text[survey]} per person per day below which half of the population falls.",
@@ -613,7 +613,7 @@ for survey in range(len(survey_type)):
     # shares - multiple deciles
     df_graphers.loc[j, "title"] = f"{survey_type.text[survey].capitalize()} share for each decile"
     df_graphers.loc[j, "ySlugs"] = (
-        f"decile1_share decile2_share decile3_share decile4_share decile5_share decile6_share decile7_share decile8_share decile9_share decile10_share"
+        "decile1_share decile2_share decile3_share decile4_share decile5_share decile6_share decile7_share decile8_share decile9_share decile10_share"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Decile shares"
     df_graphers.loc[j, "Decile Dropdown"] = "All deciles"
@@ -705,6 +705,9 @@ df_graphers = pd.concat([df_graphers, df_graphers_spells], ignore_index=True)
 # Add related question link
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
+
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
 
 # When the "Depending on" footnote is introduced, it generates unwanted texts as:
 # "Depending on the country and year, the data relates to income measured after taxes and benefits [per capita](#dod:per-capita)."

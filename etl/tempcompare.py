@@ -9,7 +9,7 @@ from pandas.api.types import (
     union_categoricals,
 )
 
-# ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
+# ######## Note - this file will be moved to owid-catalog before the branch is merged ##############
 
 
 def get_list_description_with_max_length(items: List[Any], max_items: int = 20) -> str:

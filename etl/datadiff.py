@@ -13,8 +13,9 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, VariableMeta, find
-from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
+from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, fetch
+from owid.catalog.api.legacy import CHANNEL, ETLCatalog, LocalCatalog
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -104,12 +105,12 @@ class DatasetDiff:
         def _snippet_dataset(ds: Dataset, table_name: str) -> str:
             m = ds.metadata
             if isinstance(ds, RemoteDataset):
-                return f'RemoteCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
+                return f'ETLCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
             else:
                 return f'Dataset(DATA_DIR / "{m.uri}")["{table_name}"]'
 
         code = f"""
-from owid.catalog import RemoteCatalog, Dataset
+from owid.catalog import ETLCatalog, Dataset
 from etl.paths import DATA_DIR
 
 ta = {_snippet_dataset(ds_a, table_name)}
@@ -294,20 +295,9 @@ class RemoteDataset:
         self.table_names = table_names
 
     def __getitem__(self, name: str) -> Table:
-        tables = find(
-            table=name,
-            namespace=self.metadata.namespace,
-            version=str(self.metadata.version),
-            dataset=self.metadata.short_name,
-            channels=[self.metadata.channel],  # type: ignore
-        )
-
-        tables = tables[tables.channel == self.metadata.channel]  # type: ignore
-
-        # find matches substrings, we have to further filter it
-        tables = tables[tables.table == name]
-
-        return tables.load()
+        tb_uri = f"{self.metadata.channel}/{self.metadata.namespace}/{self.metadata.version}/{self.metadata.short_name}/{name}"
+        tb = fetch(tb_uri)
+        return tb
 
 
 @click.command(name="diff", help=__doc__)
@@ -883,7 +873,7 @@ def _local_catalog_datasets(
 
 
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
-    uri = f"{OWID_CATALOG_URI}{path}/index.json"
+    uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
     js = requests.get(uri).json()
     # drop origins for backward compatibility
     js.pop("origins", None)
@@ -896,7 +886,7 @@ def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
 
 def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: Optional[str]) -> Dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of remote catalog."""
-    rc = RemoteCatalog(channels=channels)
+    rc = ETLCatalog(channels=channels)
     frame = rc.frame
 
     frame["ds_paths"] = frame["path"].map(os.path.dirname)

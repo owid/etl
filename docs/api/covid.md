@@ -108,13 +108,14 @@ Where:
 Run:
 
 ```python
-from owid import catalog
+from owid.catalog import search
 
-# Preview list of available datasets (each row = dataset)
-catalogs.find(namespace="covid")
+# Search for COVID tables (namespace filter requires kind="table")
+results = search(namespace="covid", kind="table")
+results
 
-# You can load any dataset (using the row of the above-returned table)
-tb = catalogs.find(namespace="covid").iloc[3].load()
+# You can load any table (using the row of the above-returned results)
+tb = results[0].fetch()
 ```
 
 ### Load data
@@ -144,11 +145,8 @@ Use a `URI` from the table below[^1].
 and run the following code:
 
 ```python
-from owid import catalog
-
-rc = catalog.RemoteCatalog()
-uri = "..."
-df = rc[uri]
+from owid.catalog import fetch
+tb = fetch("garden/covid/latest/cases_deaths/cases_deaths")
 ```
 
 ### Access metadata
@@ -157,9 +155,9 @@ Objects `df` are not pure pandas DataFrames, but rather `owid.catalog.Table` dat
 
 ```python
 # Table metadata
-df.metadata
+tb.metadata
 # Column (or indicator) metadata
-df[column_name].metadata
+tb[column_name].metadata
 ```
 
 !!! info "Learn more about our catalog package in the [catalog reference](../architecture/metadata/)."

@@ -97,33 +97,36 @@ nav = [
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
-    { "Our libraries" = [
+    { "Libraries" = [
         { "Python" = [
             "libraries/index.md",
-            { "owid.catalog" = "libraries/catalog.md" },
+            { "owid.catalog" = [
+                "libraries/catalog/index.md",
+                { "APIs" = "libraries/catalog/api.md" },
+                { "Data processing" = "libraries/catalog/structures.md" },
+                { "Library maintenance" = "libraries/catalog/maintenance.md" },
+            ] },
             { "owid-grapher-py" = "libraries/grapher-py.md" },
             { "owid.repack" = "libraries/repack.md" },
             { "owid.datautils" = "libraries/datautils.md" },
         ] },
     ] },
-    { "API and catalog" = [
+    { "APIs" = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
-        { "Search API" = "api/search-api.md" },
+        { "Tables API" = "api/catalog-api.md" },
         { "Indicators API" = "api/semantic-search-api.md" },
-        { "Catalog API" = "api/catalog-api.md" },
+        { "Search API" = "api/search-api.md" },
         # { "Example API usage" = "api/example-usage.md" },
         # { "Content database" = "api/datasette.md" },
-        { "Maintenance" = "api/maintenance.md" },
         { "COVID-19" = "api/covid/" },
     ] },
     { "Technical publications" = [
         "analyses/index.md",
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
-        # { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
-        # { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
-        # { "Our COVID work" = "api/covid.md" },
+        { "Food supply of world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         { "Our COVID work" = "api/covid.md" },
+        # { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
     ] },
 ]
 
@@ -195,11 +198,11 @@ link = "https://linkedin.com/company/ourworldindata"
 
 # Theme configuration
 [project.theme]
-variant = "modern"                    # Use "classic" for Material for MkDocs appearance
+variant = "modern"             # Use "classic" for Material for MkDocs appearance
 language = "en"
 custom_dir = "docs/overrides/"
 logo = "assets/site-logo.svg"
-favicon = "assets/images/favicon.png"
+favicon = "assets/favicon.png"
 
 features = [
     # "content.action.edit",         # Edit this page
@@ -347,12 +350,12 @@ paths = ["lib/catalog", "lib/datautils", "lib/repack"]
 docstring_style = "google"
 inherited_members = true          # false
 merge_init_into_class = true
-parameter_headings = true
+parameter_headings = false
 members_order = "source"
 filters = ["!^_", "^__"]
 heading_level = 2
 separate_signature = true
-docstring_section_style = "spacy"
+docstring_section_style = "list"
 backlinks = "tree"
 show_root_heading = true
 show_root_full_path = true

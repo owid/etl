@@ -41,7 +41,7 @@ class Explorer(Collection):
             raise ValueError("Missing 'config' key in the dictionary.")
 
         # Now that data is in the expected shape, let the parent class handle the rest
-        return super().from_dict(data)
+        return super().from_dict(data)  # type: ignore[return-value]
 
     def __post_init__(self):
         """We set it here because of simplicity.

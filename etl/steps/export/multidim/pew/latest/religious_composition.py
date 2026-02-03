@@ -50,7 +50,20 @@ def run() -> None:
         # dimensions={},
     )
 
-    # Comparable view
+    # Add religious composition views
+    # Currently disabled (as suggested in https://github.com/owid/owid-issues/issues/2172#issuecomment-3734443465)
+    # If you want to enable it again, also uncomment the relevant lines in the config YAML file (under dimension.choices)
+    # c = add_religious_composition(c)
+
+    #
+    # Save garden dataset.
+    #
+    c.save()
+
+
+def add_religious_composition(c):
+    """Add religious composition views to collection c."""
+    # Group views to create religious composition aggregate view
     c.group_views(
         groups=[
             {
@@ -88,15 +101,7 @@ def run() -> None:
         },
     )
 
-    # c.drop_views(
-    #     dimensions={
-    #         "religion": "religion_distrib",
-    #         "indicator": "share_change_2010_2020",
-    #     },
-    # )
-    #
-    # (optional) Edit views
-    #
+    # Edit views to add display info
     for view in c.views:
         if view.matches(religion="religion_distrib"):
             assert view.indicators.y is not None
@@ -115,7 +120,4 @@ def run() -> None:
                             display["color"] = color
                 y.display = display
 
-    #
-    # Save garden dataset.
-    #
-    c.save()
+    return c
