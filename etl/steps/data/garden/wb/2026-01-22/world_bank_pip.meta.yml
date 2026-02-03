@@ -1806,7 +1806,7 @@ tables:
           title_public: |-
             {macros}
             <% if survey_comparability != "No spells" %>
-            Average (<<percentiles_avg_share(decile)>>)
+            Average (<<percentiles_avg_share(decile) | lower>>)
             <%- endif %>
           grapher_config:
             title: |-
@@ -1838,9 +1838,9 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The share of income or consumption by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The share of income or consumption by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
@@ -1854,7 +1854,7 @@ tables:
           name: |-
             {macros}
             <% if survey_comparability == "No spells" %>
-            Share (<<percentiles_avg_share(decile)>>)
+            Share (<<percentiles_avg_share(decile) | lower>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1864,7 +1864,7 @@ tables:
           title_public: |-
             {macros}
             <% if survey_comparability != "No spells" %>
-            Share (<<percentiles_avg_share(decile)>>)
+            Share (<<percentiles_avg_share(decile) | lower>>)
             <%- endif %>
           grapher_config:
             title: |-
@@ -1909,7 +1909,7 @@ tables:
           name: |-
             {macros}
             <% if survey_comparability == "No spells" %>
-            Threshold (<<percentiles_thr(decile)>>)
+            Threshold (<<percentiles_thr(decile) | lower>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1919,7 +1919,7 @@ tables:
           title_public: |-
             {macros}
             <% if survey_comparability != "No spells" %>
-            Threshold (<<percentiles_thr(decile)>>)
+            Threshold (<<percentiles_thr(decile) | lower>>)
             <%- endif %>
           grapher_config:
             title: "{definitions.threshold_title}"
