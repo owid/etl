@@ -9,13 +9,17 @@ paths = PathFinder(__file__)
 # Define PPP year
 PPP_YEAR = 2021
 
+# Define indicators to use
+INDICATORS = [
+    "headcount_ratio",
+    "headcount",
+]
+
 # NOTE: Update lines when prices change
 DIMENSIONS_CONFIG = {
     "poverty_line": ["100", "300", "420", "830", "1000", "2000", "3000", "4000"],
-    "table": ["Income or consumption consolidated"],
-    # "welfare_type": "*",
-    # "decile": "*",
-    "survey_comparability": ["No spells"],
+    "table": ["Income or consumption consolidated", "Income with spells", "Consumption with spells"],
+    "survey_comparability": "*",
 }
 
 
@@ -45,17 +49,17 @@ def run() -> None:
                 tb[column].metadata.dimensions.pop(dimension)
     tb = tb[columns_to_keep]
 
+    # Get all survey_comparability values except "No spells" for spell views
+    survey_comp_values = set()
+    for col in tb.columns:
+        if "survey_comparability" in tb[col].metadata.dimensions:
+            survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
+    survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
+
     # Bake config automatically from table
     config_new = expand_config(
         tb,  # type: ignore
-        indicator_names=[
-            "headcount_ratio",
-            "headcount",
-            # "total_shortfall",
-            # "avg_shortfall",
-            # "income_gap_ratio",
-            # "poverty_gap_index",
-        ],
+        indicator_names=INDICATORS,
         dimensions=DIMENSIONS_CONFIG,
     )
 
@@ -69,7 +73,46 @@ def run() -> None:
     # Create mdim
     c = paths.create_collection(
         config=config,
-        short_name="poverty",
+        short_name="poverty_pip",
+    )
+
+    # First, group survey_comparability (this must happen first)
+    c.group_views(
+        groups=[
+            {
+                "dimension": "survey_comparability",
+                "choices": survey_comp_spells,
+                "choice_new_slug": "Spells",
+                "replace": True,
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                },
+            },
+        ],
+    )
+
+    # Then, group the table dimension
+    c.group_views(
+        groups=[
+            {
+                "dimension": "table",
+                "choices": ["Income with spells", "Consumption with spells"],
+                "choice_new_slug": "Income or consumption consolidated",
+                "replace": True,
+                "overwrite_dimension_choice": True,
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                },
+            },
+        ],
     )
 
     # Save & upload

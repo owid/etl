@@ -16,7 +16,6 @@ default_selection:
 default_dimensions:
   indicator: headcount_ratio
   poverty_line: "300"
-  table: Income or consumption consolidated
   survey_comparability: No spells
 
 definitions:
@@ -78,14 +77,6 @@ dimensions:
       - slug: headcount
         name: Number in poverty
         description: The number of people living below the selected poverty line
-      # - slug: total_shortfall
-      #   name: Total shortfall from poverty line
-      # - slug: avg_shortfall
-      #   name: Average shortfall ($ per day)
-      # - slug: income_gap_ratio
-      #   name: Average shortfall (% of poverty line)
-      # - slug: poverty_gap_index
-      #   name: Poverty gap index
   - name: Poverty line
     slug: poverty_line
     description: In international dollars
