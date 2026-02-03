@@ -245,8 +245,7 @@ tables:
           - *text_data_sources
           - *text_gap_filling
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
 
       composition_composite:
         title: Share of compostable waste in municipal solid waste
@@ -260,8 +259,7 @@ tables:
         description_processing: We calculate this as the sum of food waste organic and yard/garden/green waste composition shares.
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
 
       share_compostable_waste_composted:
         title: Share of compostable waste that is composted
@@ -276,5 +274,4 @@ tables:
         description_processing: We calculate this as the share of total waste that is composted divided by the share of total waste that is compostable (food waste organic plus yard/garden/green waste).
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
