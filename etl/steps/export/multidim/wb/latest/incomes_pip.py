@@ -108,25 +108,25 @@ def run() -> None:
         ],
     )
 
-    for view in c.views:
-        # Initialize config and metadata if they're None
-        if view.config is None:
-            view.config = {}
-        if view.metadata is None:
-            view.metadata = {}
+    # for view in c.views:
+    #     # Initialize config and metadata if they're None
+    #     if view.config is None:
+    #         view.config = {}
+    #     if view.metadata is None:
+    #         view.metadata = {}
 
-        if view.dimensions["survey_comparability"] == "Spells":
-            # Get the catalog path of the first indicator
-            if view.indicators.y:
-                first_indicator_path = view.indicators.y[0].catalogPath
-                # Extract the column name from the catalog path
-                indicator_col = first_indicator_path.split("#")[-1]
+    #     if view.dimensions["survey_comparability"] == "Spells":
+    #         # Get the catalog path of the first indicator
+    #         if view.indicators.y:
+    #             first_indicator_path = view.indicators.y[0].catalogPath
+    #             # Extract the column name from the catalog path
+    #             indicator_col = first_indicator_path.split("#")[-1]
 
-            # Define meta object to process it
-            meta = tb[indicator_col].metadata
+    #         # Define meta object to process it
+    #         meta = tb[indicator_col].metadata
 
-            # Add SPELLS SUBTITLE to the view's subtitle
-            view.config["subtitle"] = f'{meta.presentation.grapher_config["subtitle"]} {SPELLS_SUBTITLE}'
+    #         # Add SPELLS SUBTITLE to the view's subtitle
+    #         view.config["subtitle"] = f'{meta.presentation.grapher_config["subtitle"]} {SPELLS_SUBTITLE}'
 
     #
     # Save garden dataset.

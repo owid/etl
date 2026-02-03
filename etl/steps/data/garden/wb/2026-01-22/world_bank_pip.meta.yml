@@ -464,6 +464,11 @@ definitions:
   poverty_gap_index_subtitle: |-
     The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
 
+  spells_subtitle: |-
+    <% if survey_comparability is defined and survey_comparability != "No spells" %>
+     The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
+    <%- endif %>
+
   note_ppp: |-
     <% if welfare_type == "income or consumption" or (survey_comparability is defined and survey_comparability != "No spells") %>
     {definitions.ppp_adjustment_note} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
@@ -1707,7 +1712,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: Mean <<welfare_type>> {definitions.per_period}
-            subtitle: "{definitions.ppp_adjustment_subtitle}"
+            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
