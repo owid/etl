@@ -438,20 +438,6 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     # Firstly, remove "Other * (EI)" regions. They come from the Statistical Review, to include data that is not accounted for in any country. They needed to be included to able to create region aggregates. But Ember doesn't have these regions. If we keep them, they lead to inconsistencies, e.g. electricity shares larger than 100%.
     combined = combined[~combined["country"].str.contains(r"Other.*\(EI\)", regex=True)].reset_index(drop=True)
 
-    # In Ember's data, we removed data for aggregate regions (e.g. income groups) for the latest year.
-    # We did that because the latest year is not informed for all countries, and aggregate regions therefore often present a significant (spurious) dip.
-    # This issue does not happen in the Statistical Review, which has data for aggregate regions in the latest year.
-    # But now, when combining both, the difference between data from the Statistical Review and Ember is notorious for aggregate regions.
-
-    # Remove data for aggregate regions for the latest year (which was removed from Ember data, as explained above).
-    for region in geo.REGIONS:
-        for col in combined.drop(columns=["country", "year"]).columns:
-            combined.loc[(combined["country"] == region) & (combined["year"] == combined["year"].max()), col] = np.nan
-
-    # Note that this issue does not only affect the latest year, but is also noticeable in the intersection between Statistical Review and Ember data (on year 1990 for EU countries, and 2000 for all other countries).
-    # One solution to this problem would be to simply stick to one of the two sources (namely Ember, which tends to be more complete on the years where it is informed), but then we would lose a significant amount of data (all data prior to 2000 from the Statistical Review).
-    # Instead, we remove data prior to 2000 and for latest year only for specific indicators where the discrepancy is particularly significant.
-
     # Define the maximum median relative error between Statistical Review and Ember (for a given region and indicator).
     # If the error is larger than this, we will only take Ember data.
     maximum_median_error = 0.2
