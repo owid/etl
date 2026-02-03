@@ -324,7 +324,8 @@ tables:
         description_short: Money earned from foreign visitors spending on accommodation, food, local transport, entertainment, shopping, and cruise fares as a percentage of the country's [GDP](#dod:gdp).
         description_key:
           - *desc_key_inbound_travel
-          - This indicator shows the economic significance of inbound tourism travel expenditure relative to the total size of the economy.
+          - A high percentage means that the country earns a large amount from foreign visitors relative to the size of the economy. A low percentage means inbound tourism spending makes up a smaller share of GDP.
+          - In small countries with a lot of tourism, this ratio can look very large. This is because this indicator compares total international tourist spending to the overall size of the economy, [GDP](#dod:gdp). It is not the same as the tourism sector's contribution to GDP, which is shown in this other chart[https://ourworldindata.org/grapher/tourism-gdp-proportion-of-total-gdp].
         display:
           numDecimalPlaces: 2
 
@@ -418,7 +419,7 @@ tables:
         description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines, as a percentage of the country's [GDP](#dod:gdp).
         description_key:
           - *desc_key_outbound_total
-          - This indicator shows the economic significance of outbound tourism expenditure relative to the total size of the economy.
+          - A high percentage means that residents spend a large amount abroad relative to the size of the economy. A low percentage means they spend relatively little.
         display:
           numDecimalPlaces: 2
 
