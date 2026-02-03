@@ -187,7 +187,7 @@ steps:
     - data://meadow/poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al
 
   #
-  # TODO: add step name (just something recognizable)
+  # WB PIP incomes MDim
   #
-  export://multidim/wb/latest/pip_incomes:
+  export://multidim/wb/latest/incomes_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip

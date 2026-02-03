@@ -60,7 +60,7 @@ def run() -> None:
     #
     c = paths.create_collection(
         config=config,
-        short_name="pip_incomes",
+        short_name="incomes_pip",
         tb=tb,
         indicator_names=INDICATORS,
         dimensions=DIMENSIONS_CONFIG,
