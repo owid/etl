@@ -23,6 +23,6 @@ meta:
       name: Copernicus License
       url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
 outs:
-  - md5: fa3caf5c05573d2b364fc2b53be8bcf9
-    size: 1731213594
+  - md5: 9391aa37deb06023713bba5f659ea791
+    size: 1411315996
     path: surface_temperature.zip
