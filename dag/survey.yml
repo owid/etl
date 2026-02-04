@@ -1,20 +1,5 @@
 steps:
   #
-  # YouGov - Dietary choices of Brits.
-  #
-  data://meadow/survey/2025-03-04/dietary_choices_uk:
-    - snapshot://survey/2025-03-04/dietary_choices_uk.xlsx
-  #
-  # YouGov - Dietary choices of Brits.
-  #
-  data://garden/survey/2025-03-04/dietary_choices_uk:
-    - data://meadow/survey/2025-03-04/dietary_choices_uk
-  #
-  # YouGov - Dietary choices of Brits.
-  #
-  data://grapher/survey/2025-03-04/dietary_choices_uk:
-    - data://garden/survey/2025-03-04/dietary_choices_uk
-  #
   # Bryant Research - Acceptability of UK Farming Practices.
   #
   data-private://meadow/survey/2025-09-12/acceptability_of_uk_farming_practices:
@@ -44,3 +29,18 @@ steps:
   #
   data://grapher/survey/2026-01-13/acceptability_of_us_farming_practices:
     - data://garden/survey/2026-01-13/acceptability_of_us_farming_practices
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://meadow/survey/2026-02-02/dietary_choices_uk:
+    - snapshot://survey/2026-02-02/dietary_choices_uk.xlsx
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://garden/survey/2026-02-02/dietary_choices_uk:
+    - data://meadow/survey/2026-02-02/dietary_choices_uk
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://grapher/survey/2026-02-02/dietary_choices_uk:
+    - data://garden/survey/2026-02-02/dietary_choices_uk

@@ -182,6 +182,28 @@ def filter_chart_diffs():
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
             }
+        # Check if we should hide narrative charts
+        # First check session state (set by url_persist after toggle renders)
+        # Fall back to checking query params directly for fresh page loads
+        show_narrative = st.session_state.get("show-narrative-charts")
+        if show_narrative is None:
+            # Parse from query params (url_persist stores "True" or "False" as strings)
+            show_narrative = st.query_params.get("show-narrative-charts") != "False"
+
+        if not show_narrative:
+            # Get parent chart IDs from narrative_charts table
+            with Session(SOURCE_ENGINE) as session:
+                narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
+                    session, set(st.session_state.chart_diffs_filtered.keys())
+                )
+                narrative_parent_chart_ids = {nc.parentChartId for nc in narrative_charts}
+                # Filter out charts that are parents of narrative charts
+                st.session_state.chart_diffs_filtered = {
+                    k: v
+                    for k, v in st.session_state.chart_diffs_filtered.items()
+                    if v.chart_id not in narrative_parent_chart_ids
+                }
+
         if "modified_or_new" in st.query_params:
             modified_or_new = st.query_params.get_all("modified_or_new")
             st.session_state.chart_diffs_filtered = {
@@ -398,6 +420,18 @@ def _show_options_filters():
         on_change=show_all,  # type: ignore
         help="Show all charts. This option ignores all the filters.\n\nIf you want to apply any filter, uncheck this option.",
     )
+    url_persist(st.toggle)(
+        "**Show** narrative charts",
+        key="show-narrative-charts",
+        value=True,
+        help="Show charts that are used as parents in narrative charts. By default, narrative charts are shown.",
+    )
+    url_persist(st.toggle)(
+        "Show **article citations**",
+        key="show-article-citations",
+        value=True,
+        help="Show which articles cite each chart with links to the citation location.",
+    )
     with st.form("chart-diff-filters"):
         default = [change for change in st.query_params.get_all("change_type")]
         if not default:
@@ -487,12 +521,6 @@ def _show_options_display():
             "Use **vertical arrangement** for chart diffs",
             key="arrange-charts-vertically",
             on_change=arrange_charts,  # type: ignore
-        )
-        st.toggle(
-            "Show **article citations**",
-            key="show-article-citations",
-            value=True,
-            help="Show which articles cite each chart with links to the citation location.",
         )
 
 
