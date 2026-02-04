@@ -151,7 +151,12 @@ def run_updates(
 
         # Try to execute snapshot and print error output if it fails.
         try:
-            subprocess.run(["python", snapshot_script, "--upload"], check=True, capture_output=True, text=True)
+            subprocess.run(
+                [str(BASE_DIR / ".venv/bin/etls"), str(snapshot_script), "--upload"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
         except subprocess.CalledProcessError as e:
             log.error(f"Snapshot script failed: {snapshot_script}\nstdout:\n{e.stdout}\nstderr:\n{e.stderr}")
             raise
