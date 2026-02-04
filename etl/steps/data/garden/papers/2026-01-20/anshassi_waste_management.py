@@ -80,7 +80,7 @@ def run() -> None:
 
     tb["composition_composite"] = tb["composition_food_waste_organic"] + tb["composition_yard_garden_green_waste"]
 
-    tb["share_compostable_waste_composted"] = tb["composting"] / tb["composition_composite"]
+    tb["share_compostable_waste_composted"] = (tb["composting"] / tb["composition_composite"]) * 100
     # Select final columns for output
     columns_to_keep = [
         "country",
