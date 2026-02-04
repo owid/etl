@@ -152,7 +152,7 @@ def run_updates(
         # Try to execute snapshot and print error output if it fails.
         try:
             subprocess.run(
-                [str(BASE_DIR / ".venv/bin/etls"), str(snapshot_script), "--upload"],
+                [str(BASE_DIR / ".venv/bin/etls"), str(snapshot_script.relative_to(SNAPSHOTS_DIR)), "--upload"],
                 check=True,
                 capture_output=True,
                 text=True,
