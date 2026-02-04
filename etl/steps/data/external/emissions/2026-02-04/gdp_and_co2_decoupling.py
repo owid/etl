@@ -10,6 +10,8 @@ https://ourworldindata.org/cdn-cgi/imagedelivery/qLq-8BTgXU8yG0N6HnOy8g/f5db1a91
 
 """
 
+from pathlib import Path
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -98,7 +100,9 @@ def create_changes_table(tb: Table, min_window: int = 1) -> Table:
     return pr.concat(results, ignore_index=True)
 
 
-def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min):
+def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min, output_folder=None):
+    from pathlib import Path
+
     import plotly.express as px
 
     # Find list of countries that achieved decoupling in the selected window of years.
@@ -147,6 +151,10 @@ def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min):
         tb_plot_base[column].metadata.unit = None
         tb_plot_base[column].metadata.short_unit = None
 
+    # Create output folder if saving.
+    if output_folder is not None:
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+
     for country in countries_decoupled:
         tb_country = tb_plot_base[tb_plot_base["country"] == country].reset_index(drop=True)
         if tb_country.empty:
@@ -156,16 +164,22 @@ def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min):
         gdp_change = float(final_row["GDP per capita"].iloc[0])
         co2_change = float(final_row["Consumption-based CO2 per capita"].iloc[0])
         tb_plot = tb_country.melt(id_vars=["country", "year"], var_name="Indicator", value_name="value")
-        px.line(
+        fig = px.line(
             tb_plot,
             x="year",
             y="value",
             color="Indicator",
             title=f"{country} (GDP: {gdp_change:+.1f}%, CO2: {co2_change:+.1f}%)",
-        ).show()
+        )
+        if output_folder is not None:
+            # Sanitize country name for filename.
+            safe_name = country.replace("/", "_").replace(" ", "_")
+            fig.write_image(Path(output_folder) / f"{safe_name}.png")
+        else:
+            fig.show()
 
 
-def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=6):
+def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=6, output_file=None):
     """Create a grid of slope charts showing decoupling for each country.
 
     Similar to the OWID static chart style with blue GDP lines going up and red CO2 lines going down.
@@ -179,7 +193,12 @@ def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=
         & (tb_change["year_max"] == year_max)
         & (tb_change["gdp_per_capita_change"] > pct_change_min)
         & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
-    ].copy()
+    ].reset_index(drop=True)
+    # To avoid spurious warnings about mixing units, remove them.
+    for column in ["gdp_per_capita_change", "consumption_emissions_per_capita_change"]:
+        tb_decoupled[column].metadata.unit = None
+        tb_decoupled[column].metadata.short_unit = None
+
     tb_decoupled["decoupling_score"] = (
         tb_decoupled["gdp_per_capita_change"] - tb_decoupled["consumption_emissions_per_capita_change"]
     )
@@ -260,7 +279,10 @@ def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=
     fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
     fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=True, zerolinecolor="lightgray", range=y_range)
 
-    fig.show()
+    if output_file is not None:
+        fig.write_image(output_file)
+    else:
+        fig.show()
 
     return fig
 
@@ -337,17 +359,26 @@ def run() -> None:
 
     # Given that there's not much difference, and to make the narrative simpler, we pick 2013-2023.
     year_min_best = 2013
-    # year_min_best = 2003
     year_max_best = 2023
 
     # Plot the grid of slope charts of all decoupled countries.
+    output_file = Path.home() / f"Downloads/grid-{year_min_best}-{year_max_best}.png"
     plot_slope_chart_grid(
-        tb_change=tb_change, year_min=year_min_best, year_max=year_max_best, pct_change_min=PCT_CHANGE_MIN
+        tb_change=tb_change,
+        year_min=year_min_best,
+        year_max=year_max_best,
+        pct_change_min=PCT_CHANGE_MIN,
+        output_file=output_file,
     )
 
     # Plot each decoupled country's full change curves individually.
+    output_folder = Path.home() / f"Downloads/decoupling/countries-{year_min_best}-{year_max_best}/"
     plot_decoupled_countries(
-        tb_change=tb_change, year_min=year_min_best, year_max=year_max_best, pct_change_min=PCT_CHANGE_MIN
+        tb_change=tb_change,
+        year_min=year_min_best,
+        year_max=year_max_best,
+        pct_change_min=PCT_CHANGE_MIN,
+        output_folder=output_folder,
     )
 
     ####################################################################################################################
