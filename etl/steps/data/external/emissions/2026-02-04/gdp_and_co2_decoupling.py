@@ -1,29 +1,22 @@
-"""This step takes the Global Carbon Budget and GDP data from World Bank's World Development Indicators, and creates a
-dataset with the changes in emissions and GDP over time.
+"""This step takes the Global Carbon Budget and GDP data from World Bank's World Development Indicators, and creates a dataset with the changes in emissions and GDP over time.
 
-We already have an interactive chart showing similar data,
-for per capita GDP and per capita, consumption-based CO2 emissions:
+We already have an interactive chart showing similar data, for per capita GDP and per capita, consumption-based CO2 emissions:
 https://ourworldindata.org/grapher/co2-emissions-and-gdp
 
 The data in the current step is not used by any grapher step, but will be used by the following static chart:
 
 The data from this step is used in this static chart:
-https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+https://ourworldindata.org/cdn-cgi/imagedelivery/qLq-8BTgXU8yG0N6HnOy8g/f5db1a91-6bde-4430-3c09-e61fd8df9a00/w=2614
 
 """
 
-from structlog import get_logger
+import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
-log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# First and final years whose (per capita) GDP and emissions will be compared.
-START_YEAR = 2006
-END_YEAR = 2021
 
 # Columns to select from WDI, and how to rename them.
 COLUMNS_WDI = {
@@ -46,6 +39,126 @@ COLUMNS_GCB = {
     # 'emissions_total_including_land_use_change': "",
     # 'emissions_total_including_land_use_change_per_capita': "",
 }
+
+# Minimum percentage change (increase for GDP and decrease in CO2 emissions) for decoupling.
+PCT_CHANGE_MIN = 5
+
+
+def create_changes_table(tb: Table, min_window: int = 1) -> Table:
+    """Create a table with percent changes in GDP and emissions for all country-window combinations."""
+    # Remove the last year if it only has World data.
+    if set(tb[tb["year"] == tb["year"].max()]["country"]) == {"World"}:
+        tb = tb[tb["year"] < tb["year"].max()].reset_index(drop=True)
+
+    years = sorted(tb["year"].unique())
+    max_window = int(tb["year"].max() - tb["year"].min())
+
+    results = []
+    for window_size in range(min_window, max_window + 1):
+        for year_min in years:
+            year_max = year_min + window_size
+            if year_max not in years:
+                continue
+
+            tb_start = tb[tb["year"] == year_min][["country", "gdp_per_capita", "consumption_emissions_per_capita"]]
+            tb_end = tb[tb["year"] == year_max][["country", "gdp_per_capita", "consumption_emissions_per_capita"]]
+
+            tb_merged = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
+
+            tb_merged["year_min"] = year_min
+            tb_merged["year_max"] = year_max
+            tb_merged["n_years"] = year_max - year_min
+            tb_merged["gdp_per_capita_change"] = (
+                (tb_merged["gdp_per_capita_end"] - tb_merged["gdp_per_capita_start"])
+                / tb_merged["gdp_per_capita_start"]
+                * 100
+            )
+            tb_merged["consumption_emissions_per_capita_change"] = (
+                (
+                    tb_merged["consumption_emissions_per_capita_end"]
+                    - tb_merged["consumption_emissions_per_capita_start"]
+                )
+                / tb_merged["consumption_emissions_per_capita_start"]
+                * 100
+            )
+
+            results.append(
+                tb_merged[
+                    [
+                        "country",
+                        "year_min",
+                        "year_max",
+                        "n_years",
+                        "gdp_per_capita_change",
+                        "consumption_emissions_per_capita_change",
+                    ]
+                ]
+            )
+
+    return pr.concat(results, ignore_index=True)
+
+
+def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min):
+    import plotly.express as px
+
+    # Find list of countries that achieved decoupling in the selected window of years.
+    countries_decoupled = sorted(
+        tb_change[
+            (tb_change["year_min"] == year_min)
+            & (tb_change["year_max"] == year_max)
+            & (tb_change["gdp_per_capita_change"] > pct_change_min)
+            & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
+        ]["country"].unique()
+    )
+
+    # Filter tb_change for the time series: fixed year_min, varying year_max from year_min to year_max.
+    tb_plot_base = tb_change[
+        (tb_change["country"].isin(countries_decoupled))
+        & (tb_change["year_min"] == year_min)
+        & (tb_change["year_max"] <= year_max)
+    ][["country", "year_max", "gdp_per_capita_change", "consumption_emissions_per_capita_change"]].copy()
+
+    tb_plot_base = tb_plot_base.rename(
+        columns={
+            "year_max": "year",
+            "gdp_per_capita_change": "GDP per capita",
+            "consumption_emissions_per_capita_change": "Consumption-based CO2 per capita",
+        }
+    )
+
+    # Add baseline point at year_min with 0% change.
+    tb_plot_base = pr.concat(
+        [
+            Table(
+                {
+                    "country": countries_decoupled,
+                    "year": year_min,
+                    "GDP per capita": 0,
+                    "Consumption-based CO2 per capita": 0,
+                }
+            ),
+            tb_plot_base,
+        ],
+        ignore_index=True,
+    )
+
+    # To avoid spurious warnings about mixing units, remove them.
+    for column in ["GDP per capita", "Consumption-based CO2 per capita"]:
+        tb_plot_base[column].metadata.unit = None
+        tb_plot_base[column].metadata.short_unit = None
+
+    for country in countries_decoupled:
+        tb_country = tb_plot_base[tb_plot_base["country"] == country].reset_index(drop=True)
+        if tb_country.empty:
+            continue
+        tb_plot = tb_country.melt(id_vars=["country", "year"], var_name="Indicator", value_name="value")
+        px.line(
+            tb_plot,
+            x="year",
+            y="value",
+            color="Indicator",
+            title=f"{country} ({year_min}-{year_max})",
+        ).show()
 
 
 def run() -> None:
@@ -70,89 +183,66 @@ def run() -> None:
     tb_wdi = tb_wdi[list(COLUMNS_WDI)].rename(columns=COLUMNS_WDI, errors="raise")
 
     # Combine both tables.
-    tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="outer", short_name=paths.short_name)
+    tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="inner", short_name=paths.short_name)
 
-    # Define list of non-index columns.
-    data_columns = [column for column in tb.columns if column not in ["country", "year"]]
-
-    # Remove empty rows.
-    tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
-
-    # Select years between START_YEAR and END_YEAR.
-    tb_start = tb[(tb["year"] == START_YEAR)].reset_index(drop=True)
-
-    # Select data for all countries at the final year.
-    tb_end = tb[tb["year"] == END_YEAR].reset_index(drop=True)
-
-    # Add columns for data on the final year to the main table.
-    tb = tb_start.merge(tb_end, on="country", how="left", suffixes=("_start_year", "_final_year"))
-
-    # Add percent changes.
-    for column in data_columns:
-        tb[f"{column}_change"] = (
-            (tb[f"{column}_final_year"] - tb[f"{column}_start_year"]) / tb[f"{column}_start_year"] * 100
-        )
-
-    # Remove unnecessary columns.
-    tb = tb.drop(columns=[column for column in tb.columns if "year" in column])
-
-    # Drop rows that miss any of the main columns.
+    # Remove rows with any missing value (we need both GDP and emissions).
     tb = tb.dropna(how="any").reset_index(drop=True)
 
+    # Create a table with all possible combinations of minimum and maximum year, and the change in GDP and emissions of each country.
+    tb_change = create_changes_table(tb=tb, min_window=1)
+
+    ####################################################################################################################
+    # Visual analysis to pick the best minimum and maximum years.
+
+    # Let's select those countries and windows where GDP increased more than 5%, and emissions decreased more than 5%.
+    tb_count = (
+        tb_change[
+            (tb_change["gdp_per_capita_change"] > PCT_CHANGE_MIN)
+            & (tb_change["consumption_emissions_per_capita_change"] < -PCT_CHANGE_MIN)
+        ]
+        .reset_index()
+        .groupby(["year_min", "year_max", "n_years"], as_index=False)
+        .agg({"index": "count"})
+        .rename(columns={"index": "n_countries_decoupled"})
+    )
+    # Visually check which window has the maximum number of decoupled countries.
+    import plotly.express as px
+
+    px.line(tb_count, x="year_min", y="n_countries_decoupled", color="year_max").update_yaxes(range=[0, None])
+    px.line(tb_count, x="n_years", y="n_countries_decoupled", color="year_max").update_yaxes(range=[0, None])
+
+    # We see that the window with the maximum number of countries achieving decoupling is:
+    # tb_count.sort_values("n_countries_decoupled", ascending=False).head(10)
+    # The optimal windows are:
+    # - 2012-2023: 47 countries.
+    # - 2013-2023: 46 countries.
+    # NOTE: Currently, the optimal window happens to be in the latest year.
+    # If that was not the case, we'd select only the best window imposing that year_max is the latest year.
+
+    # Given that there's not much difference, and to make the narrative simpler, we pick 2013-2023.
+    year_min_best = 2013
+    year_max_best = 2023
+
+    ####################################################################################################################
+
+    plot_decoupled_countries(
+        tb_change=tb_change, year_min=year_min_best, year_max=year_max_best, pct_change_min=PCT_CHANGE_MIN
+    )
+
+    # Create a simple table with the selected window of years.
+    tb_window = tb_change[
+        (tb_change["year_min"] == year_min_best) & (tb_change["year_max"] == year_max_best)
+    ].reset_index(drop=True)
+
+    # Remove unnecessary columns.
+    tb_window = tb_window.drop(columns=["year_min", "year_max"], errors="raise")
+
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(["country"])
+    tb_window = tb_window.format(["country"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], formats=["csv"])
+    ds_garden = paths.create_dataset(tables=[tb_window], formats=["csv"])
     ds_garden.save()
-
-
-# To quickly inspect the decoupling of GDP per capita vs consumption-based emissions per capita, use this function.
-# def plot_decoupling(tb, countries=None):
-#     import plotly.express as px
-#     import owid.catalog.processing as pr
-#     from tqdm.auto import tqdm
-
-#     column = "gdp_per_capita_change"
-#     emissions_column = "consumption_emissions_per_capita_change"
-#     _tb = tb.reset_index().astype({"country": str})[["country", column, emissions_column]]
-#     _tb["year"] = START_YEAR
-#     if countries is None:
-#         countries = sorted(set(_tb["country"]))
-#     for country in tqdm(countries):
-#         tb_old = _tb[_tb["country"] == country].reset_index(drop=True)
-#         if (tb_old[emissions_column].isna().all()) or (tb_old[column].isna().all()):
-#             continue
-#         title = tb_old[column].metadata.title or column
-#         tb_new = tb_old.copy()
-#         tb_new["year"] = END_YEAR
-#         tb_old[column] = 0
-#         tb_old[emissions_column] = 0
-#         tb_plot = pr.concat([tb_old, tb_new], ignore_index=True)
-#         tb_plot = tb_plot.melt(id_vars=["country", "year"], var_name="Indicator")
-#         plot = px.line(tb_plot, x="year", y="value", color="Indicator", title=f"{country} - {title}")
-#         plot.show()
-
-# List of countries currently considered for the static chart:
-# countries = ["Ireland", "Finland", "Sweden", "Denmark", "Netherlands", "Estonia", "United States", "Canada", "Germany",
-# "Belgium", "New Zealand", "Israel", "Japan", "Singapore", "Dominican Republic", "Hungary", "Australia", "Zimbabwe",
-# "Ukraine", "Bulgaria", "Switzerland", "Hong Kong", "Slovakia", "Romania", "Czechia", "Nicaragua", "Nigeria",
-# "Azerbaijan", "Slovenia", "Croatia"]
-# Check that the chosen countries still fulfil the expected conditions.
-# print("Countries in the list where GDP has increased less than 5% or emissions have decreased less than 5%:")
-# for c in countries:
-#     if not tb.loc[c]["consumption_emissions_per_capita_change"] < -5:
-#         print("emissions", c, tb.loc[c]["consumption_emissions_per_capita_change"])
-#     if not tb.loc[c]["gdp_per_capita_change"] > 5:
-#         print("gdp", c, tb.loc[c]["gdp_per_capita_change"])
-
-# If not, print other countries that do fulfil the conditions and are not in the chart.
-# other_countries = sorted(set(tb.index) - set(countries))
-# for c in other_countries:
-#     if (tb.loc[c]["consumption_emissions_per_capita_change"] < -5) and (tb.loc[c]["gdp_per_capita_change"] > 5):
-#         print(c, f' -> GDP: {tb.loc[c]["gdp_per_capita_change"]: .1f}%, Emissions: {tb.loc[c]["consumption_emissions_per_capita_change"]:.1f}%')
-
-# plot_decoupling(tb, countries=countries)
