@@ -133,24 +133,8 @@ def run() -> None:
             break
 
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
-    def keep_decile_view(v):
-        decile = v.dimensions.get("decile")
-        indicator = v.dimensions.get("indicator")
-        # Keep nan decile (for mean/median which don't have decile data)
-        if decile in ["nan", "all"]:
-            return True
-        # Keep deciles 1 and 10 for all indicators
-        if decile in ["1", "10"]:
-            return True
-        # Keep deciles 5 and 9 only for thr indicator
-        if decile in ["5", "9"] and indicator == "thr":
-            return True
-        return False
-
-    c.views = [v for v in c.views if keep_decile_view(v)]
-
-    # Remove grouped decile views for Spells (we don't want those)
-    c.views = [v for v in c.views if not v.matches(decile="all", survey_comparability="Spells")]
+    # Also remove grouped decile views for Spells (we don't want those)
+    c.views = [v for v in c.views if _keep_decile_view(v) and not v.matches(decile="all", survey_comparability="Spells")]
 
     # Update chart type for share indicator grouped views to StackedArea
     for view in c.views:
@@ -159,7 +143,73 @@ def run() -> None:
                 view.config = {}
             view.config["chartTypes"] = ["StackedArea"]
 
+    # Build mapping of catalogPath to display name from table metadata
+    indicator_titles = _build_indicator_titles(tb)
+
+    # For "all" decile views, clean up indicator display names and sort by decile
+    for view in c.views:
+        if view.matches(decile="all") and view.indicators.y:
+
+            # Sort indicators by decile number
+            # For share: richest to poorest; for others: poorest to richest
+            reverse_order = view.matches(indicator="share")
+            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
+
+            # Set display names extracted from original indicator titles
+            for ind in view.indicators.y:
+                name = _get_display_name_from_metadata(ind, indicator_titles)
+                if name:
+                    ind.display = {"name": name}
+
     #
     # Save garden dataset.
     #
     c.save()
+
+
+def _keep_decile_view(v):
+    """Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only."""
+    decile = v.dimensions.get("decile")
+    indicator = v.dimensions.get("indicator")
+    # Keep nan decile (for mean/median which don't have decile data)
+    if decile in ["nan", "all"]:
+        return True
+    # Keep deciles 1 and 10 for all indicators
+    if decile in ["1", "10"]:
+        return True
+    # Keep deciles 5 and 9 only for thr indicator
+    if decile in ["5", "9"] and indicator == "thr":
+        return True
+    return False
+
+
+def _build_indicator_titles(tb):
+    """Build mapping of column names to display names from table metadata."""
+    indicator_titles = {}
+    for col in tb.columns:
+        if col not in ["country", "year"]:
+            display_name = tb[col].metadata.display.get("name", "") if tb[col].metadata.display else ""
+            if display_name:
+                indicator_titles[col] = display_name
+    return indicator_titles
+
+
+def _get_decile_number(ind):
+    """Extract decile number from indicator catalogPath."""
+    # Check in reverse order to avoid decile_1 matching decile_10
+    for i in range(10, 0, -1):
+        if f"decile_{i}__" in ind.catalogPath or ind.catalogPath.endswith(f"decile_{i}"):
+            return i
+    return 0
+
+
+def _get_display_name_from_metadata(ind, indicator_titles):
+    """Get display name from original indicator metadata, extracting text between parentheses."""
+    col_name = ind.catalogPath.split("#")[-1] if "#" in ind.catalogPath else None
+    if col_name and col_name in indicator_titles:
+        text = indicator_titles[col_name]
+        start, end = text.find("("), text.find(")")
+        if start != -1 and end != -1:
+            extracted = text[start + 1 : end]
+            return extracted[0].upper() + extracted[1:] if extracted else extracted
+    return None

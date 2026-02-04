@@ -12,6 +12,12 @@ default_selection:
   - Ethiopia
   - Democratic Republic of Congo
 
+default_dimensions:
+  indicator: thr
+  decile: all
+  period: month
+  survey_comparability: No spells
+
 dimensions:
   - name: Metric
     slug: indicator
@@ -43,6 +49,8 @@ dimensions:
         name: "Richest 10% "
       - slug: "10"
         name: "Richest 10%"
+      - slug: "10_40_50"
+        name: Richest 10%, middle 40%, poorest 50%
       - slug: all
         name: All deciles
       - slug: nan
@@ -70,4 +78,40 @@ dimensions:
       - slug: Spells
         name: Show
         description: Better for understanding trends within individual countries
-views: []
+views:
+  - dimensions:
+      indicator: share
+      decile: "10_40_50"
+      period: nan
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: inequality#bottom50_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#middle40_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Middle 40%"
+        - catalogPath: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Richest 10%"
+    # config:
+    #   title: Share of the population living below a range of poverty lines
+    #   subtitle: "{definitions.ppp_adjustment_subtitle}"
+    #   note: "{definitions.ppp_adjustment_welfare_type_note}"
+    #   hasMapTab: false
+    #   chartTypes: ["LineChart"]
+    #   selectedFacetStrategy: entity
+    #   yAxis:
+    #     max: 100
+    # metadata:
+    #   description_key:
+    #     - "{definitions.description_key_extreme_poverty}"
+    #     - "{definitions.description_key_extreme_poverty_additional}"
+    #     - "{definitions.description_key_lmic_poverty_line}"
+    #     - "{definitions.description_key_umic_poverty_line}"
+    #     - "{definitions.description_key_ppp}"
+    #     - "{definitions.description_key_not_market_income}"
+    #     - "{definitions.description_key_nowcasts}"
+    #     - "{definitions.description_key_welfare_type}"
+    #   description_short: "{definitions.ppp_adjustment_subtitle}"
