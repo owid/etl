@@ -1622,6 +1622,7 @@ def test_group_views_replace_combines_indicators():
     combined_view = collection.views[0]
     assert combined_view.dimensions["source"] == "combined_sources"
 
+    assert combined_view.indicators.y is not None
     indicator_paths = [ind.catalogPath for ind in combined_view.indicators.y]
     assert "table#indicator_a" in indicator_paths
     assert "table#indicator_b" in indicator_paths
