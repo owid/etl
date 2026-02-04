@@ -123,7 +123,8 @@ ESSENTIAL_CHARACTERISTIC_OF_DEMOCRACY_QUESTIONS = [
     "people_obey_their_rulers",
 ]
 
-RELIGION_HOW_OFTEN_QUESTIONS = ["attend_religious_services", "pray"]
+RELIGION_HOW_OFTEN_SERVICES_QUESTIONS = ["attend_religious_services"]
+RELIGION_HOW_OFTEN_PRAY_QUESTIONS = ["pray"]
 
 IMPORTANCE_OF_GOD_QUESTIONS = ["god"]
 
@@ -364,9 +365,20 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     # For religion how often questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=RELIGION_HOW_OFTEN_QUESTIONS,
+        questions=RELIGION_HOW_OFTEN_SERVICES_QUESTIONS,
         answers=[
             "up_to_once_month",
+            "special_holydays",
+            "once_year",
+            "less_than_once_year",
+        ],
+    )
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=RELIGION_HOW_OFTEN_PRAY_QUESTIONS,
+        answers=[
+            "up_to_sev_week",
+            "only_services",
             "special_holydays",
             "once_year",
             "less_than_once_year",
@@ -630,9 +642,23 @@ def sanity_checks(tb: Table) -> Table:
     # For religion how often questions
     tb = check_sum_100(
         tb=tb,
-        questions=RELIGION_HOW_OFTEN_QUESTIONS,
+        questions=RELIGION_HOW_OFTEN_SERVICES_QUESTIONS,
         answers=[
             "up_to_once_month",
+            "special_holydays",
+            "once_year",
+            "less_than_once_year",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+    tb = check_sum_100(
+        tb=tb,
+        questions=RELIGION_HOW_OFTEN_PRAY_QUESTIONS,
+        answers=[
+            "up_to_sev_week",
+            "only_services",
             "special_holydays",
             "once_year",
             "less_than_once_year",

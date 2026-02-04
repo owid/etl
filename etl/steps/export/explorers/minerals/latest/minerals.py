@@ -160,6 +160,7 @@ def run(dest_dir: str) -> None:
     # Prepare explorer metadata.
     config = {
         "explorerTitle": "Minerals",
+        "originUrl": "https://ourworldindata.org/metals-minerals",
         "explorerSubtitle": "Explore the production, reserves and value of minerals.",
         "selection": ["World", "Australia", "Chile", "China", "United States"],
         "isPublished": True,

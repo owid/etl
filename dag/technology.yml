@@ -35,3 +35,12 @@ steps:
     - data://meadow/research_development/2025-10-27/patents
   data://grapher/research_development/2025-10-27/patents:
     - data://garden/research_development/2025-10-27/patents
+
+
+  # TOP500 Supercomputers
+  data://meadow/technology/2026-02-01/top500_supercomputers:
+    - snapshot://technology/2026-02-01/top500_supercomputers.csv
+  data://garden/technology/2026-02-01/top500_supercomputers:
+    - data://meadow/technology/2026-02-01/top500_supercomputers
+  data://grapher/technology/2026-02-01/top500_supercomputers:
+    - data://garden/technology/2026-02-01/top500_supercomputers

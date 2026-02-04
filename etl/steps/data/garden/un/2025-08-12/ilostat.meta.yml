@@ -79,13 +79,19 @@ definitions:
 
   description_short_status_in_employment: |-
     <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
-      employees
+    employees
     <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
-      employers
+    employers
     <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
-      own-account workers
+    own-account workers
     <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
-      contributing family workers
+    contributing family workers
+    <%- elif classif1 == "Status in employment (ICSE-93): Total" %>
+    self-employed and employees
+    <%- elif classif1 == "Status in employment (aggregate): Self-employed" %>
+    self-employed
+    <%- elif classif1 == "Status in employment (aggregate): Total" %>
+    self-employed and employees
     <%- endif %>
 
   description_key_labor_force_participation_1: |-
@@ -100,13 +106,13 @@ definitions:
     Employees are defined as workers in paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which gives them remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93_short}
   description_key_status_in_employment: |-
     <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
-      {definitions.description_key_employees}
+    {definitions.description_key_employees}
     <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
-      Employers are defined as workers in self-employment jobs who have engaged one or more persons to work for them as employees. {definitions.icse_93_short}
+    Employers are defined as workers in self-employment jobs who have engaged one or more persons to work for them as employees. {definitions.icse_93_short}
     <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
-      Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. {definitions.icse_93_short}
+    Independent own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. {definitions.icse_93_short}
     <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
-      Contributing family workers are defined as workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93_short}
+    Contributing family workers are defined as workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93_short}
     <%- endif %>
   description_key_informal_employment_1: |-
     Informal employment encompasses all work activities done without formal arrangements (in law or in practice). Informality is a characteristic of the job, not the worker. These are often jobs without basic social or legal protection and employment benefits. It excludes illegal and illicit activities.
@@ -121,42 +127,42 @@ definitions:
 
   description_key_child_labor: |-
     <% if classif1 == "Age (child labour): 5-11" %>
-      Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
     <%- elif classif1 == "Age (child labour): 12-14" %>
-      Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
     <%- elif classif1 == "Age (child labour): 15-17" %>
-      Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
     <%- elif classif1 == "Age (child labour): 5-17" %>
-      Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
     <%- endif %>
   description_key_child_labor_economic_activity: |-
     <% if classif1 == "Age (child labour): 5-11" %>
-      Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity during the reference week.
+    Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity during the reference week.
     <%- elif classif1 == "Age (child labour): 12-14" %>
-      Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity during the reference week.
+    Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity during the reference week.
     <%- elif classif1 == "Age (child labour): 15-17" %>
-      Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
     <%- elif classif1 == "Age (child labour): 5-17" %>
-      Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
     <%- endif %>
   description_key_low_pay_earners: |-
     Workers are considered _low pay_ if their hourly earnings at all jobs are less than two-thirds of median hourly earnings.
   description_key_occupation: |-
     <% if classif1 == "Occupation (Skill level): Low" %>
-      The skill level of occupations classified as _Low_ (level 1) refers to the performance of simple and routine tasks which may require the use of hand-held tools and considerable physical effort. Examples typically include cleaners and helpers, industry laborers, and other similar roles. {definitions.isco_08}
+    The skill level of occupations classified as _Low_ (level 1) refers to the performance of simple and routine tasks which may require the use of hand-held tools and considerable physical effort. Examples typically include cleaners and helpers, industry laborers, and other similar roles. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): Medium" %>
-      The skill level of occupations classified as _Medium_ (level 2) includes workers in clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
+    The skill level of occupations classified as _Medium_ (level 2) includes workers in clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): High" %>
-      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, technicians, and associate professionals. {definitions.isco_08}
+    The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, technicians, and associate professionals. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): Not elsewhere classified" %>
-      The skill level of occupations classified as _Not elsewhere classified_ includes armed forces occupations and occupations not classified in any of the skill levels 1 to 4. {definitions.isco_08}
+    The skill level of occupations classified as _Not elsewhere classified_ includes armed forces occupations and occupations not classified in any of the skill levels 1 to 4. {definitions.isco_08}
     <%- endif %>
   description_key_earnings: |-
     This data includes remuneration in cash and as benefits in kind paid to employees at regular intervals. It excludes employers' contributions paid to social security and pensions schemes, the benefits received by employees under these schemes, as well as severance and termination pay.
   description_key_international_dollars: |-
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
   description_key_iloest_modelled_data: |-
-    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+    This data comes from the ILO Modelled Estimates series. The [The International Labour Organization (ILO)](#dod:ilo) combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_ilo_national_estimates: |-
     This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
   description_key_13th_icls: |-
@@ -173,23 +179,23 @@ definitions:
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
   description_key_social_protection: |-
     <% if classif1 == "Contingency: Population covered by at least one social protection benefit" %>
-      This indicator is calculated as the ratio of the population receiving cash benefits under at least one of multiple contingencies/social protection functions or actively contributing to at least one social security scheme to the total population. The different benefits are aimed at children, unemployed persons, older persons, persons with disabilities, pregnant women, newborns, work-injury victims and the poor and the vulnerable.
+    This indicator is calculated as the ratio of the population receiving cash benefits under at least one of multiple contingencies/social protection functions or actively contributing to at least one social security scheme to the total population. The different benefits are aimed at children, unemployed persons, older persons, persons with disabilities, pregnant women, newborns, work-injury victims and the poor and the vulnerable.
     <%- elif classif1 == "Contingency: Children/households receiving child/family cash benefits" %>
-      This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
+    This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
     <%- elif classif1 == "Contingency: Employed covered in the event of work injury" %>
-      This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
+    This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
     <%- elif classif1 == "Contingency: Mothers with newborns receiving maternity benefits" %>
-      This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
+    This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
     <%- elif classif1 == "Contingency: Persons above retirement age receiving a pension" %>
-      This indicator is calculated as the ratio of persons above statutory retirement age receiving an old-age pension to persons above statutory retirement age (including contributory and non-contributory).
+    This indicator is calculated as the ratio of persons above statutory retirement age receiving an old-age pension to persons above statutory retirement age (including contributory and non-contributory).
     <%- elif classif1 == "Contingency: Poor persons covered by social protection systems" %>
-      This indicator is calculated as the ratio of social assistance recipients to the population living below the national poverty line.
+    This indicator is calculated as the ratio of social assistance recipients to the population living below the national poverty line.
     <%- elif classif1 == "Contingency: Unemployed receiving unemployment benefits" %>
-      This indicator is calculated as the ratio of recipients of unemployment cash benefits to the number of unemployed persons.
+    This indicator is calculated as the ratio of recipients of unemployment cash benefits to the number of unemployed persons.
     <%- elif classif1 == "Contingency: Vulnerable persons covered by social assistance" %>
-      This indicator is calculated as the ratio of social assistance recipients to the total number of vulnerable persons. The latter are calculated by subtracting from total population all people of working age who are contributing to a social insurance scheme or receiving contributory benefits, and all persons above retirement age receiving contributory benefits.
+    This indicator is calculated as the ratio of social assistance recipients to the total number of vulnerable persons. The latter are calculated by subtracting from total population all people of working age who are contributing to a social insurance scheme or receiving contributory benefits, and all persons above retirement age receiving contributory benefits.
     <%- elif classif1 == "Contingency: Persons with severe disabilities collecting disability social protection benefits" %>
-      This indicator is calculated as the ratio of persons receiving disability cash benefits to persons with severe disabilities. The latter is calculated as the product of prevalence of disability ratios (published for each country group by the World Health Organization) and each country’s population.
+    This indicator is calculated as the ratio of persons receiving disability cash benefits to persons with severe disabilities. The latter is calculated as the product of prevalence of disability ratios (published for each country group by the World Health Organization) and each country’s population.
     <%- endif %>
   description_key_women_in_management: |-
     Employment in management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to total management (category 1 of ISCO-08 or ISCO-88).
@@ -197,6 +203,8 @@ definitions:
     Employment in senior and middle management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to major group 1 of ISCO-08 or ISCO-88, excluding sub-major groups 14 in ISCO-08 and 13 in ISCO-88.
   description_key_disability_status: |-
     Disability, as defined in the [International Classification of Functioning, Disability and Health (ICF)](https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health), is used as an umbrella term, covering impairments, activity limitations, and participation restrictions. For measurement purposes, a person with disability is defined as a person who is limited in the kind or amount of activities that he or she can do because of ongoing difficulties due to a long-term physical condition, mental condition or health problem.
+  description_key_neet: |-
+    This indicator, also known as the NEET rate, reflects how well young people are integrating into education and the labor market. High NEET rates indicate that many young people are missing opportunities to build skills, gain work experience, and earn income, with potentially long-term consequences for their employment prospects, earnings, and well-being.
   description_key_occupational_injury: |-
     An occupational injury is defined as any personal injury, disease or death resulting from an occupational accident. An occupational accident is an unexpected and unplanned occurrence, including acts of violence, arising out of or in connection with work which results in one or more workers incurring a personal injury, disease or death.
   description_key_fatal_occupational_injury: |-
@@ -224,6 +232,12 @@ definitions:
   description_processing_obs_status: |-
     We modified the observation status (`obs_status`) variable to show the data is modeled whenever the original observation status was missing and there is a non-missing value for the corresponding ILO Modelled Estimates indicator.
 
+  description_processing_share_employment_status: |-
+    We calculated this indicator by dividing the number of people in a specific employment status by the total number of employed people, then multiplying by 100 to express it as a percentage.
+
+  note_national_estimates: |-
+    Figures refer to [national estimates](#dod:ilo-national-estimates) and may not be fully comparable across countries.
+
   # Common sort values for ordinal obs_status variables
   sort_obs_status: &sort_obs_status
     - Survey data (national)
@@ -250,7 +264,7 @@ tables:
         title: Employment - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
-        description_short: Number of {definitions.sex_plural} in employment, working as {definitions.description_short_status_in_employment}.
+        description_short: Number of{definitions.sex_plural} in employment, working as {definitions.description_short_status_in_employment}.
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_status_in_employment}"
@@ -262,6 +276,27 @@ tables:
         display:
           name: Employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
+          <<: *common_display
+
+      share_employment_by_sex_and_status_in_employment:
+        title: Share of employment - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of{definitions.sex_plural} in employment working as {definitions.description_short_status_in_employment}, as a percentage of total{definitions.sex} employment.
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_share_employment_status}
+
+          {definitions.description_processing_projections}"
+        display:
+          name: Share of employment - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
           <<: *common_display
 
       informal_employment_rate_by_sex:
@@ -570,7 +605,11 @@ tables:
         title: SDG 8.6.1 Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
         unit: "%"
         short_unit: "%"
-        description_short: Number of young persons not in education, employment or training as a percentage of the total youth population
+        description_short: Percentage of people aged 15–24 who are not in education (formal education or short courses), employment (worked in paid work or self-employment), or training (non-academic skill-building activities). {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_neet}"
+          - "{definitions.description_key_ilo_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:

@@ -19,10 +19,14 @@ intended to represent the income inequality within a nation or any other group o
 """
 
 # This should be highlighted (single-quoted raw string)
-description3 = r'The [Poverty headcount](#dod:poverty_headcount) shows the percentage of people living below the poverty line.'
+description3 = (
+    r"The [Poverty headcount](#dod:poverty_headcount) shows the percentage of people living below the poverty line."
+)
 
 # This should ALSO be highlighted (single-quoted regular string)
-description4 = 'The [Poverty headcount](#dod:poverty_headcount) shows the percentage of people living below the poverty line.'
+description4 = (
+    "The [Poverty headcount](#dod:poverty_headcount) shows the percentage of people living below the poverty line."
+)
 
 # This should NOT be highlighted (not in a string)
 # description5 = [Invalid DOD](#dod:invalid)  # This would be invalid Python syntax

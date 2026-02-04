@@ -28,24 +28,26 @@ test-default: check-formatting check-linting check-typing unittest
 	fi
 	touch .sanity-check
 
-install-uv-default:
+check-uv-default:
 	@if ! command -v uv >/dev/null 2>&1; then \
-		echo '==> UV not found. Installing...'; \
-		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+		echo 'ERROR: uv is not installed.'; \
+		echo 'Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh'; \
+		echo 'Or see: https://docs.astral.sh/uv/getting-started/installation/'; \
+		exit 1; \
 	fi
 
-.venv-default: install-uv .sanity-check
+.venv-default: check-uv .sanity-check
 	@echo '==> Installing packages'
 	@if [ -n "$(PYTHON_VERSION)" ]; then \
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
-		[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras; \
+		UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras --group dev; \
 	else \
-		[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && uv sync --all-extras; \
+		uv sync --all-extras --group dev; \
 	fi
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'
-	@git fetch -q origin master
+	@git fetch -q origin master &
 	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
 	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git diff --name-only && git ls-files --others --exclude-standard | grep '\.py'); \
 	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}' | grep -v '{}'); \
@@ -53,7 +55,7 @@ check-default:
 	if [ "$$FILE_COUNT" -le 10 ] && [ "$$FILE_COUNT" -gt 0 ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
-		echo "$$CHANGED_PY_FILES" | xargs pyright; \
+		echo "$$CHANGED_PY_FILES" | xargs .venv/bin/ty check; \
 	else \
 		echo "Too many files, checking all files instead."; \
 		make lint; \
@@ -75,7 +77,7 @@ check-formatting-default: .venv
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	. .venv/bin/activate && .venv/bin/pyright $(SRC)
+	.venv/bin/ty check $(SRC)
 
 unittest-default: .venv
 	@echo '==> Running unit tests'

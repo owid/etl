@@ -15,7 +15,7 @@ from etl.analytics.config import (
     POST_TYPE_TO_URL,
 )
 from etl.analytics.datasette import read_datasette
-from etl.analytics.metabase import read_metabase
+from etl.analytics.metabase import read_semantic_layer
 from etl.analytics.utils import _safe_concat, log
 from etl.config import FORCE_DATASETTE, OWID_ENV
 
@@ -35,7 +35,7 @@ def read_analytics(sql: str, force_datasette: bool = FORCE_DATASETTE):
             "Missing Metabase credentials. Add them to your .env file to avoid this warning. For now, Datasette will be used."
         )
         return read_datasette(sql=sql)
-    return read_metabase(sql=sql)
+    return read_semantic_layer(sql=sql)
 
 
 def get_number_of_days(

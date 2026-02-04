@@ -5,6 +5,7 @@ import pprint
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+import git
 import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
@@ -347,6 +348,7 @@ class ChartDiff:
         target_session: Session,
         estimate_relevance: bool = True,
         ignore_conflicts: bool = False,
+        skip_analytics: bool = False,
     ) -> List["ChartDiff"]:
         """Get chart diffs from chart ids.
 
@@ -381,14 +383,20 @@ class ChartDiff:
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
-        # Get chart views
-        chart_views_all = get_chart_views_cached(chart_ids)
+        # Get chart views, anomalies, and articles (skip if not needed for performance)
+        if skip_analytics:
+            chart_views_all = {}
+            chart_anomalies_all = {}
+            article_refs_all = {}
+        else:
+            # Get chart views
+            chart_views_all = get_chart_views_cached(chart_ids)
 
-        # Anomalies
-        chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
+            # Anomalies
+            chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
 
-        # Articles
-        article_refs_all = get_chart_in_article_views_cached(chart_ids)
+            # Articles
+            article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
         # Get approvals
         df_approvals_all = read_sql(
@@ -741,6 +749,7 @@ class ChartDiffsLoader:
         source_session: Optional[Session] = None,
         target_session: Optional[Session] = None,
         ignore_conflicts: bool = False,
+        skip_analytics: bool = False,
     ) -> List[ChartDiff]:
         """Optimised version of get_diffs."""
         if chart_ids:
@@ -756,6 +765,7 @@ class ChartDiffsLoader:
                 source_session=source_session,
                 target_session=target_session,
                 ignore_conflicts=ignore_conflicts,
+                skip_analytics=skip_analytics,
             )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
@@ -764,6 +774,7 @@ class ChartDiffsLoader:
                     source_session=source_session,
                     target_session=target_session,
                     ignore_conflicts=ignore_conflicts,
+                    skip_analytics=skip_analytics,
                 )
 
         self._diffs = chart_diffs
@@ -840,13 +851,18 @@ def _modified_data_metadata_on_staging(
         return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
 
     # Get all changed files and their catalog paths, including downstream dependencies.
-    files_changed = get_changed_files()
-    catalog_paths = get_all_changed_catalog_paths(files_changed)
+    # This is used to filter out spurious changes from lagging behind master.
+    try:
+        files_changed = get_changed_files()
+        catalog_paths = get_all_changed_catalog_paths(files_changed)
 
-    # Exclude variables that haven't been changed by updating the files. This is to prevent showing
-    # spurious changes from lagging behind master.
-    dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
-    source_df = source_df[dataset_paths.isin(catalog_paths)]
+        # Exclude variables that haven't been changed by updating the files. This is to prevent showing
+        # spurious changes from lagging behind master.
+        dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
+        source_df = source_df[dataset_paths.isin(catalog_paths)]
+    except git.exc.GitCommandError as e:
+        # If git merge-base fails (e.g., exit code -11), skip filtering and show a warning
+        log.warning(f"Could not get changed files from git, skipping spurious change filtering: {e}")
 
     # no charts, return empty dataframe
     if source_df.empty:
@@ -1057,26 +1073,42 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
     """Get charts that exist in target but not in source (deleted charts).
 
     This function matches on chart IDs to identify truly deleted charts,
-    filtering out charts created in target after staging creation time.
+    filtering out charts created in target after staging was created.
+
+    We use two filters to identify charts that existed when staging was created:
+    1. Chart ID must be <= max chart ID on staging (reliable proxy for pre-staging charts)
+    2. Chart createdAt must be < staging creation time (backup filter)
+
+    Note: A chart is considered deleted only if its ID doesn't exist at all on staging.
+    Charts that exist on staging but with NULL slug (unpublished) are NOT deleted,
+    even if they have a slug on production (published after staging was created).
     """
     staging_creation_time = get_staging_creation_time(source_session)
 
+    # Get max chart ID from staging - charts with higher IDs in production were created after staging
+    max_id_query = text("SELECT MAX(id) FROM charts")
+    max_staging_chart_id = source_session.execute(max_id_query).scalar() or 0
+
     # Get chart info from target that existed before staging was created
+    # Use both max ID filter and createdAt filter for robustness
     query = text("""
     SELECT c.id, cc.slug
     FROM charts c
     JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL AND c.createdAt < :staging_creation_time
+    WHERE cc.slug IS NOT NULL
+      AND c.id <= :max_staging_chart_id
+      AND c.createdAt < :staging_creation_time
     """)
-    result = target_session.execute(query, {"staging_creation_time": staging_creation_time}).fetchall()
+    result = target_session.execute(
+        query, {"staging_creation_time": staging_creation_time, "max_staging_chart_id": max_staging_chart_id}
+    ).fetchall()
     target_charts_pre_staging = {row[0]: row[1] for row in result}  # id -> slug mapping
 
-    # Get chart IDs from source
+    # Get ALL chart IDs from source (regardless of slug status)
+    # A chart is only truly deleted if the ID doesn't exist at all on staging
     source_query = text("""
     SELECT c.id
     FROM charts c
-    JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL
     """)
     source_result = source_session.execute(source_query).fetchall()
     source_chart_ids = set(row[0] for row in source_result)

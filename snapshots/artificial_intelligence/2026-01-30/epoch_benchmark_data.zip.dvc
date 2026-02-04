@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+autoupdate:
+  name: Epoch
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Epoch AI Benchmark Data
+    description: |-
+      Comprehensive collection of AI benchmark datasets from Epoch AI, including FrontierMath and other performance benchmarks.
+    date_published: 2026-01-26
+
+    # Citation
+    producer: Epoch AI
+    citation_full: |-
+      Epoch AI, ‘AI Benchmarking Hub’. Published online at epoch.ai. Retrieved from ‘https://epoch.ai/benchmarks’ [online resource]. Accessed 30 Jan 2026.
+
+    # Files
+    url_main: https://epoch.ai/benchmarks
+    url_download: https://epoch.ai/data/benchmark_data.zip
+    date_accessed: 2026-01-30
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://epoch.ai/about
+outs:
+  - md5: 8a8d43b848044425584597644935840a
+    size: 294232
+    path: benchmark_data.zip

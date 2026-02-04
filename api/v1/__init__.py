@@ -9,6 +9,7 @@ from git import PushInfo
 from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from owid.catalog.core import CatalogPath
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
@@ -161,9 +162,10 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
 
 
 def _trigger_etl(db_indicator: gm.Variable, dry_run: bool) -> None:
+    assert db_indicator.catalogPath is not None
     config.SUBSET = f"^{db_indicator.shortName}$"
     etl_main(
-        includes=[str(db_indicator.catalogPath).rsplit("/", 1)[0]],
+        includes=[CatalogPath.from_str(db_indicator.catalogPath).dataset_path],
         grapher=True,
         workers=1,
         dry_run=dry_run,
@@ -205,7 +207,7 @@ def _update_indicator_in_r2(db_indicator: gm.Variable, indicator: Indicator) -> 
     # download JSON file and update it
     indicator_dict = requests.get(db_indicator.s3_metadata_path(typ="http")).json()
 
-    _deep_update(indicator_dict, indicator.dict(exclude_none=True))
+    _deep_update(indicator_dict, indicator.dict(exclude_none=True))  # type: ignore
 
     indicator_dict = utils.prune_none(indicator_dict)
 

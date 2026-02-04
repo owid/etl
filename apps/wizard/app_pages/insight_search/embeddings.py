@@ -86,7 +86,7 @@ def get_embeddings(
             # Start the multiprocessing pool
             pool = model.start_multi_process_pool(target_devices=workers * [DEVICE])
             # Encode sentences using multiprocessing
-            batch_embeddings = model.encode_multi_process(
+            batch_embeddings = model.encode_multi_process(  # type: ignore
                 missing_texts,
                 pool,
                 batch_size=batch_size,

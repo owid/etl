@@ -12,6 +12,7 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
 
     This decorator automatically downloads remote files to temporary storage before calling
     the decorated function, making any file-processing function work transparently with:
+
     - Local file paths (unchanged behavior)
     - HTTP/HTTPS URLs (downloaded via web request)
     - S3 paths (downloaded via S3 client)
@@ -21,6 +22,7 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
                       uses the first positional argument.
 
     Example:
+        ```python
         @enable_file_download(path_arg_name="file_path")
         def load_data(file_path):
             with open(file_path, 'r') as f:
@@ -30,6 +32,7 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
         load_data("/local/file.txt")                    # Local file
         load_data("https://example.com/data.txt")       # HTTP download
         load_data("s3://bucket/data.txt")               # S3 download
+        ```
 
     Warning:
         Downloads entire files to temporary storage on every call. For large files

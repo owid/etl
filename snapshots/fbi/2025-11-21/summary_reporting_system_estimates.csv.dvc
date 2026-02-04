@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Summary Reporting System (SRS) Estimates"
+    description: |-
+      This dataset contains estimated data at the state and national level and was derived from the Summary Reporting System (SRS). These data reflect the estimates the FBI has traditionally included in its annual publications. Download this dataset to see the FBI's estimated crime totals for the nation and all 50 states, 1979 to current year available.
+    date_published: "2025-08-05"
+
+    # Citation
+    producer: FBI
+    citation_full: |-
+      Federal Bureau of Investigation (2025). Estimated crime totals for the nation and all 50 states, 1979–2024. Summary Reporting System (SRS) Estimates.
+    attribution_short: FBI
+
+    # Files
+    url_main: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads
+    date_accessed: '2025-11-21'
+
+    # License
+    license:
+      name: U.S. Public Domain
+outs:
+  - md5: 173d7373100d8131656ec4adfd34e6ed
+    size: 211770
+    path: summary_reporting_system_estimates.csv

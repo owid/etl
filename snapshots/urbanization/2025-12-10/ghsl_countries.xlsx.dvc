@@ -1,0 +1,43 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Human Settlement Layer Dataset
+    description: |-
+      The dataset includes population projections by degree of urbanisation and at the city level.
+
+      For every country and territory in the world, the authors estimated their population from 1950 to 2100 in cities, towns and semi-dense areas, and rural areas. It relies on the UN-endorsed Degree of Urbanisation methodology. As a result, the definitions used in each country are fully harmonised; while national definitions vary considerably.
+
+      The long time series consists of three parts:
+
+      - From 1950 to 1970, it is based on backcasting by blending data using national definitions of urban and rural areas with data using the Degree of Urbanisation.
+      - From 1975 to 2020, it is based on the Global Human Settlement Layer (GHSL), because it has the longest time series and uses a transparent and reproducible method.
+      - From 2020 to 2100, it relies on a new model, "Cities and Rural Integrated Spatial Projections" (CRISP).
+
+      The CRISP model estimates population and built-up area change for a global grid of 1 km2 cells in an evidence-based, three-step process. First, the authors estimate population and built-up area change for roughly 1000 functional areas based on past trends and national population projections. Second, they allocate new built-up area to grid cells considering distance to settlements, roads, water, current share of built-up area and other characteristics. Finally, they add population to newly built-up areas and more suitable locations and reduce it in less suitable locations to capture internal migration and natural population decline.
+
+      Beyond population, the dataset also delivers maps showing the evolving spatial extent of cities, towns and rural areas. For every city in the world, it also provides updated boundaries, land area and built-up area at five-year intervals from 1975 to 2100.
+    date_published: "2025"
+    title_snapshot: Global Human Settlement Layer Dataset - Countries
+
+    # Citation
+    producer: European Commission, Joint Research Centre (JRC)
+    citation_full: |-
+      Schiavina, Marcello; Alessandrini, Alfredo; Melchiorri, Michele; Jacobs-Crisioni, Chris; Dijkstra Lewis, (2025): GHS-WUP-COUNTRY-STATS R2025A – GHS-WUP country statistics by Degree of Urbanisation classes, multitemporal (1950-2100). European Commission, Joint Research Centre (JRC). PID: http://data.europa.eu/89h/ee52f334-aaee-4b9e-aa00-d38ecf6c11a9 , doi: 10.2905/ee52f334-aaee-4b9e-aa00-d38ecf6c11a9
+
+      Jacobs-Crisioni, C., Schiavina, M., Alessandrini, A., Dijkstra, L. (2025) Population by degree of urbanization and by urban agglomeration from 1950 to 2100: Analyses supporting the United Nations World Urbanization Prospects report. Publications Office of the European Union, Luxembourg, 2025, JRC144219
+
+    # Files
+    url_main: https://human-settlement.emergency.copernicus.eu/ghs_wup2025.php
+    url_download: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_WUP_COUNTRY_STATS_GLOBE_R2025A/V1-0/GHS_WUP_COUNTRY_STATS_GLOBE_R2025A_V1_0.zip
+    date_accessed: '2025-12-10'
+
+    # License
+    license:
+      name: European Union, 1995-2025
+      url: https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php
+outs:
+  - md5: 1fd17f4585ca314d1fc763c38da3fe18
+    size: 4285510
+    path: ghsl_countries.xlsx

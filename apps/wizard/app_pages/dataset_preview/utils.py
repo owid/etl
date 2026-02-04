@@ -4,6 +4,7 @@ from typing import Any, Dict
 import pandas as pd
 import streamlit as st
 from owid import catalog
+from owid.catalog.core import CatalogPath
 
 from apps.wizard.utils import TTL_DEFAULT
 from apps.wizard.utils.components import st_cache_data
@@ -12,7 +13,6 @@ from etl.db import read_sql
 from etl.grapher.model import Dataset
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids
 from etl.paths import DATA_DIR
-from etl.steps import extract_step_attributes
 
 # CONFIG
 # st.set_page_config(
@@ -221,15 +221,12 @@ def show_table_explorers(df):
 @st.cache_data
 def load_dataset_from_etl(dataset_uri: str) -> catalog.Dataset | None:
     """Get dataset."""
-    attributes = extract_step_attributes(dataset_uri)
-    dataset_path = (
-        DATA_DIR / f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
-    )
+    p = CatalogPath.from_str(dataset_uri)
     dataset = None
     try:
-        dataset = catalog.Dataset(dataset_path)
+        dataset = catalog.Dataset(DATA_DIR / p)
     except Exception:
-        st.warning(f"Dataset not found. You may want to run `etl {attributes['step']}` first")
+        st.warning(f"Dataset not found. You may want to run `etl {p.step_uri}` first")
     return dataset
 
 
@@ -306,7 +303,7 @@ class IndicatorWithDimensions(IndicatorArray):
             short_name_ = indicator.dimensions["originalShortName"]
             assert isinstance(indicator.catalogPath, str), f"`catalogPath` is empty for variable {indicator.id}"
             # Extract table URI
-            table_ = indicator.catalogPath.split("#")[0]
+            table_ = indicator.catalog_path.table_path
 
             if short_name is None:
                 short_name = short_name_

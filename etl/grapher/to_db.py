@@ -15,14 +15,15 @@ import os
 import warnings
 from dataclasses import dataclass
 from threading import Lock
-from typing import Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
-from owid.catalog.meta import update_variable_metadata
-from owid.catalog.utils import hash_any
+from owid.catalog.core.meta import update_variable_metadata
+from owid.catalog.core.paths import CatalogPath
+from owid.catalog.core.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
@@ -206,13 +207,13 @@ def _check_upserted_variable(variable: Variable) -> None:
     assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
 
 
-def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[str, dict]:
+def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[int | str, Any]:
     q = """
     select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
     """
     return (
         read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")
-    )  # type: ignore
+    )
 
 
 def upsert_table(
@@ -293,7 +294,7 @@ def upsert_table(
         session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable=catalog_path.split("#")[1])
+            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).variable)
 
 
 def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:
@@ -428,8 +429,8 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
             .where(gm.Dataset.id == dataset_id)  # type: ignore
             .values(
                 sourceChecksum=checksum,
-                dataEditedAt=datetime.datetime.utcnow(),
-                metadataEditedAt=datetime.datetime.utcnow(),
+                dataEditedAt=datetime.datetime.now(datetime.timezone.utc),
+                metadataEditedAt=datetime.datetime.now(datetime.timezone.utc),
             )
         )
         session.execute(q)

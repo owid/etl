@@ -249,6 +249,10 @@ def create_grouped_views(collection):
                 }
             )
 
+        # Add missingDataStrategy for level_side_by_side views
+        if view.matches(level="level_side_by_side"):
+            config["missingDataStrategy"] = "show"
+
         return config
 
     collection.group_views(
@@ -297,6 +301,8 @@ def generate_title_by_dimensions(view):
     else:
         if view.matches(level="level_side_by_side"):
             return f"Number of {gender_term} of official age for each level of education who are not in school"
+        elif view.matches(sex="sex_side_by_side"):
+            return f"Number of girls and boys who are not in {title_term} school"
         else:
             return f"Number of {gender_term} who are not in {title_term} school"
 
@@ -344,6 +350,11 @@ def generate_subtitle_by_dimensions(view):
                 f"{gender_term.title()} of official age for each level of education not enrolled at that level of education, "
                 f"expressed as a percentage of the total population of {gender_term} in that age group."
             )
+        elif view.matches(sex="sex_side_by_side"):
+            return (
+                f"Share of girls and boys {age_range} not enrolled in {scope} education, "
+                f"expressed as a percentage of the total population of girls and boys in that age group."
+            )
         else:
             return (
                 f"{gender_term.title()} {age_range} not enrolled in {scope} education, "
@@ -354,6 +365,8 @@ def generate_subtitle_by_dimensions(view):
     else:
         if view.matches(level="level_side_by_side"):
             return f"{gender_term.title()} of official age for each level of education not enrolled in that level of education or higher."
+        elif view.matches(sex="sex_side_by_side"):
+            return f"Number of girls and boys {age_range} not enrolled in {scope} education or higher."
         else:
             return f"{gender_term.title()} {age_range} not enrolled in {scope} education or higher."
 

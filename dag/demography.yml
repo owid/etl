@@ -133,6 +133,14 @@ steps:
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper
 
+  #
+  # Population of the Republic of Ireland territory between 1841 and 2006 (Central Statistics Office of Ireland)
+  #
+  data://meadow/demography/2025-12-10/population_ireland:
+    - snapshot://demography/2025-12-10/population_ireland.csv
+  data://garden/demography/2025-12-10/population_ireland:
+    - data://meadow/demography/2025-12-10/population_ireland
+
   ########################################################################
   # Life expectancy                                                      #
   ########################################################################

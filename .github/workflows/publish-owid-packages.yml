@@ -82,22 +82,24 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Check if version was bumped
+    - name: Check if version needs publishing
       if: matrix.should_run == 'true'
       run: |
-        CURRENT_VERSION=$(grep '^version = ' ${{ matrix.path }}/pyproject.toml | head -1)
-        PREVIOUS_VERSION=$(git show HEAD~1:${{ matrix.path }}/pyproject.toml | grep '^version = ' | head -1)
+        # Extract current version from pyproject.toml
+        CURRENT_VERSION=$(grep '^version = ' ${{ matrix.path }}/pyproject.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
 
-        echo "Current version: $CURRENT_VERSION"
-        echo "Previous version: $PREVIOUS_VERSION"
+        echo "Current version in pyproject.toml: $CURRENT_VERSION"
 
-        if [ "$CURRENT_VERSION" = "$PREVIOUS_VERSION" ]; then
-          echo "❌ Version was not bumped in ${{ matrix.path }}/pyproject.toml"
+        # Check if this version already exists on PyPI
+        PYPI_RESPONSE=$(curl -s "https://pypi.org/pypi/${{ matrix.name }}/${CURRENT_VERSION}/json" -w "%{http_code}" -o /tmp/pypi_response.json)
+
+        if [ "$PYPI_RESPONSE" = "200" ]; then
+          echo "❌ Version $CURRENT_VERSION of ${{ matrix.name }} already exists on PyPI"
           echo "Please increment the version before publishing."
           exit 1
         fi
 
-        echo "✅ Version was bumped, proceeding with publish"
+        echo "✅ Version $CURRENT_VERSION not found on PyPI, proceeding with publish"
 
     - name: Set up Python
       if: matrix.should_run == 'true'

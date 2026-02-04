@@ -2,6 +2,7 @@
 #  helpers.py
 #  etl
 #
+import os
 import re
 import time
 from functools import cache
@@ -13,9 +14,9 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table
-from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
-from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
-from owid.catalog.tables import (
+from owid.catalog.core.datasets import DEFAULT_FORMATS, FileFormat
+from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS
+from owid.catalog.core.tables import (
     combine_tables_description,
     combine_tables_title,
     combine_tables_update_period_days,
@@ -203,6 +204,22 @@ def get_metadata_path(dest_dir: str) -> Path:
     else:
         N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     return N.metadata_path
+
+
+def render_yaml_metadata(ds: catalog.Dataset) -> None:
+    """Render Jinja templates in metadata for all tables in a dataset.
+
+    This is useful when metadata YAML files contain Jinja templates that need to be
+    evaluated, but the dataset has no dimensions (so long_to_wide doesn't process them).
+
+    Call this after create_dataset when using Jinja in metadata files for datasets
+    without dimensions.
+    """
+    for table_name in ds.table_names:
+        table = ds[table_name]
+        for col in table.columns:
+            table[col].metadata = table[col].metadata.render({})
+        table._save_metadata(os.path.join(ds.path, table.metadata.checked_name + ".meta.json"))
 
 
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
@@ -439,7 +456,7 @@ class PathFinder:
         )
 
     @staticmethod
-    def _get_attributes_from_step_name(step_name: str) -> dict[str, str]:
+    def _get_attributes_from_step_name(step_name: str) -> dict[str, str | bool]:
         """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
         if channel_type.startswith(("snapshot",)):
@@ -577,7 +594,7 @@ class PathFinder:
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
-        elif (step_type == "export") and (dependency["channel"] in "multidim"):
+        elif (step_type == "export") and (dependency["channel"] == "multidim"):
             collection_path = (
                 paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )

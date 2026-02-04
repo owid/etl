@@ -235,6 +235,9 @@ def run() -> None:
     # Remove outliers in specific indicators
     tb = remove_outliers_in_data(tb=tb)
 
+    # Calculate share of employment by status (ICSE-93)
+    tb = calculate_employment_status_shares(tb=tb)
+
     # Add 'Modeled' category to obs_status based on the presence of data in the corresponding indicator
     tb = add_modeled_category_to_obs_status(tb=tb)
 
@@ -421,6 +424,52 @@ def remove_outliers_in_data(tb: Table) -> Table:
         # Replace out-of-range values with missing (pd.NA)
         mask = (tb[indicator] < thresholds[0]) | (tb[indicator] > thresholds[1])
         tb.loc[mask, indicator] = pd.NA
+
+    return tb
+
+
+def calculate_employment_status_shares(tb: Table) -> Table:
+    """
+    Calculate the share of employment by status (ICSE-93) from employment_by_sex_and_status_in_employment.
+    For each ICSE-93 category (1, 2, 3, 5), calculates the percentage relative to the total.
+    """
+    tb = tb.copy()
+
+    # Define the ICSE-93 categories to calculate shares for
+    icse_categories = [
+        "Status in employment (ICSE-93): 1. Employees",
+        "Status in employment (ICSE-93): 2. Employers",
+        "Status in employment (ICSE-93): 3. Own-account workers",
+        "Status in employment (ICSE-93): 5. Contributing family workers",
+    ]
+
+    # Filter for employment by status data
+    mask_employment = tb["employment_by_sex_and_status_in_employment"].notna()
+
+    # Get total employment for each country-year-sex combination
+    mask_total = tb["classif1"] == "Status in employment (ICSE-93): Total"
+    tb_total = tb.loc[
+        mask_employment & mask_total, ["country", "year", "sex", "employment_by_sex_and_status_in_employment"]
+    ].copy()
+    tb_total = tb_total.rename(columns={"employment_by_sex_and_status_in_employment": "total_employment"})
+
+    # Merge total back to the main table
+    tb = pr.merge(tb, tb_total, on=["country", "year", "sex"], how="left")
+
+    # Calculate shares for the specific ICSE-93 categories
+    mask_categories = tb["classif1"].isin(icse_categories) & mask_employment
+    tb.loc[mask_categories, "share_employment_by_sex_and_status_in_employment"] = (
+        tb.loc[mask_categories, "employment_by_sex_and_status_in_employment"]
+        / tb.loc[mask_categories, "total_employment"]
+    ) * 100
+
+    # Copy metadata
+    tb["share_employment_by_sex_and_status_in_employment"] = tb[
+        "share_employment_by_sex_and_status_in_employment"
+    ].copy_metadata(tb["employment_by_sex_and_status_in_employment"])
+
+    # Drop the temporary total_employment column
+    tb = tb.drop(columns=["total_employment"], errors="raise")
 
     return tb
 

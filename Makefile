@@ -32,6 +32,7 @@ help:
 	@echo '  make api-search   	Start the Search API on port 8084'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
+	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
@@ -82,7 +83,7 @@ test-all:
 
 format-all:
 	@echo '================ etl ================='
-	@make test
+	@make format
 	@for lib in $(LIBS); do \
 		echo "================ $$lib ================="; \
 		(cd $$lib && make format); \
@@ -96,6 +97,10 @@ unittest: .venv
 	.venv/bin/pytest -m "not integration" tests
 
 test: check-formatting check-linting check-typing unittest version-tracker
+
+check-typing: .venv
+	@echo '==> Checking types'
+	.venv/bin/ty check $(SRC) --exclude "etl/steps/**" --exclude "snapshots/**"
 
 test-integration: .venv
 	@echo '==> Running integration tests'
@@ -164,6 +169,16 @@ deploy:
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
 	.venv/bin/etl d version-tracker
+
+query:
+	@if [ -z "$(SQL)" ]; then \
+		echo "Usage: make query SQL=\"SELECT ...\""; \
+		exit 1; \
+	fi
+	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
+	NORMALIZED=$$(echo "$$BRANCH" | sed 's/[\/\._]/-/g' | sed 's/^staging-site-//' | cut -c1-28 | sed 's/-*$$//'); \
+	HOST="staging-site-$$NORMALIZED"; \
+	mysql -h "$$HOST" -u owid --port 3306 -D owid -e "$(SQL)"
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'

@@ -639,6 +639,31 @@ steps:
   data://grapher/news/2024-05-08/guardian_mentions:
     - data://garden/news/2024-05-08/guardian_mentions
 
+    # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2025-02-19/official_development_assistance:
+    - snapshot://oecd/2025-02-19/official_development_assistance_crs.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac5.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac1.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac2a.zip
+
+  data://garden/oecd/2025-02-19/official_development_assistance:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/oecd/2025-02-19/official_development_assistance
+
+  data://grapher/oecd/2025-02-19/official_development_assistance:
+    - data://garden/oecd/2025-02-19/official_development_assistance
+
+
+    ### WHO/UNICEF WASH JMP
+  data://meadow/wash/2024-01-06/who:
+    - snapshot://wash/2024-02-04/who.csv
+    - snapshot://wash/2024-02-04/who_regions.csv
+  data://garden/wash/2024-01-06/who:
+    - data://meadow/wash/2024-01-06/who
+    - data://garden/demography/2023-03-31/population
+  data://grapher/wash/2024-01-06/who:
+    - data://garden/wash/2024-01-06/who
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -670,3 +695,7 @@ include:
   - dag/archive/forests.yml
   - dag/archive/families.yml
   - dag/archive/natural_disasters.yml
+  - dag/archive/minerals.yml
+  - dag/archive/chartbook.yml
+  - dag/archive/corruption.yml
+  - dag/archive/geography.yml
