@@ -45,6 +45,10 @@ COLUMNS_GCB = {
 # Minimum percentage change (increase for GDP and decrease in CO2 emissions) for decoupling.
 PCT_CHANGE_MIN = 5
 
+# Trailing running average (in years) applied to GDPpc and CO2pc levels before computing changes.
+# Set to 1 to disable smoothing.
+RUNNING_AVERAGE_YEARS = 3
+
 
 def create_changes_table(tb: Table, min_window: int = 1) -> Table:
     """Create a table with percent changes in GDP and emissions for all country-window combinations."""
@@ -100,6 +104,44 @@ def create_changes_table(tb: Table, min_window: int = 1) -> Table:
     return pr.concat(results, ignore_index=True)
 
 
+def apply_rolling_averages(tb):
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+    tb["gdp_per_capita"] = (
+        tb["gdp_per_capita"]
+        .groupby(tb["country"], sort=False)
+        .rolling(RUNNING_AVERAGE_YEARS, min_periods=1)
+        .mean()
+        .values
+    )
+    tb["consumption_emissions_per_capita"] = (
+        tb["consumption_emissions_per_capita"]
+        .groupby(tb["country"], sort=False)
+        .rolling(RUNNING_AVERAGE_YEARS, min_periods=1)
+        .mean()
+        .values
+    )
+
+    return tb
+
+
+def detect_decoupled_countries(
+    tb_change: Table, year_min: int, year_max: int, pct_change_min: float = PCT_CHANGE_MIN
+) -> set[str]:
+    """Return countries that meet the decoupling criterion for a given window.
+
+    A country is considered decoupled if GDP per capita increased by more than `PCT_CHANGE_MIN` and
+    consumption-based CO2 emissions per capita decreased by more than `PCT_CHANGE_MIN` between
+    `year_min` and `year_max`.
+    """
+    tb_sel = tb_change[
+        (tb_change["year_min"] == year_min)
+        & (tb_change["year_max"] == year_max)
+        & (tb_change["gdp_per_capita_change"] > pct_change_min)
+        & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
+    ]
+    return set(tb_sel["country"].unique())
+
+
 def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min, output_folder=None):
     from pathlib import Path
 
@@ -107,12 +149,9 @@ def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min, outp
 
     # Find list of countries that achieved decoupling in the selected window of years.
     countries_decoupled = sorted(
-        tb_change[
-            (tb_change["year_min"] == year_min)
-            & (tb_change["year_max"] == year_max)
-            & (tb_change["gdp_per_capita_change"] > pct_change_min)
-            & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
-        ]["country"].unique()
+        detect_decoupled_countries(
+            tb_change=tb_change, year_min=year_min, year_max=year_max, pct_change_min=pct_change_min
+        )
     )
 
     # Filter tb_change for the time series: fixed year_min, varying year_max from year_min to year_max.
@@ -170,7 +209,7 @@ def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min, outp
             y="value",
             color="Indicator",
             title=f"{country} (GDP: {gdp_change:+.1f}%, CO2: {co2_change:+.1f}%)",
-        )
+        ).update_yaxes(range=[-50, 50])
         if output_folder is not None:
             # Sanitize country name for filename.
             safe_name = country.replace("/", "_").replace(" ", "_")
@@ -188,11 +227,13 @@ def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=
     from plotly.subplots import make_subplots
 
     # Find decoupled countries and sort by total decoupling magnitude (GDP increase + CO2 decrease).
+    countries_decoupled = detect_decoupled_countries(
+        tb_change=tb_change, year_min=year_min, year_max=year_max, pct_change_min=pct_change_min
+    )
     tb_decoupled = tb_change[
         (tb_change["year_min"] == year_min)
         & (tb_change["year_max"] == year_max)
-        & (tb_change["gdp_per_capita_change"] > pct_change_min)
-        & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
+        & (tb_change["country"].isin(countries_decoupled))
     ].reset_index(drop=True)
     # To avoid spurious warnings about mixing units, remove them.
     for column in ["gdp_per_capita_change", "consumption_emissions_per_capita_change"]:
@@ -287,6 +328,57 @@ def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=
     return fig
 
 
+def time_window_analysis(tb_change):
+    # Select those countries and windows where GDP increased more than 5%, and emissions decreased more than 5%.
+    tb_count = (
+        tb_change[
+            (tb_change["gdp_per_capita_change"] > PCT_CHANGE_MIN)
+            & (tb_change["consumption_emissions_per_capita_change"] < -PCT_CHANGE_MIN)
+        ]
+        .reset_index()
+        .groupby(["year_min", "year_max", "n_years"], as_index=False)
+        .agg({"index": "count"})
+        .rename(columns={"index": "n_countries_decoupled"})
+    )
+    # Visually check which window has the maximum number of decoupled countries.
+    import plotly.express as px
+
+    px.line(tb_count, x="year_min", y="n_countries_decoupled", color="year_max").update_yaxes(range=[0, None])
+    px.line(tb_count, x="n_years", y="n_countries_decoupled", color="year_max").update_yaxes(range=[0, None])
+
+    # We see that the window with the maximum number of countries achieving decoupling is:
+    # tb_count.sort_values("n_countries_decoupled", ascending=False).head(10)
+    # The optimal windows are:
+    # - 2012-2023: 45 countries.
+    # - 2013-2023: 43 countries.
+    # NOTE: Currently, the optimal window happens to be in the latest year.
+    # But, we are only interested in changes with respecto to the latest year anyway.
+    year_max_best = tb_change["year_max"].max()
+    # For the lower end of the window, it could be a 20, 15, or 10 year window.
+    # Even though we get more countries decoupled for 10 years, it may be too short.
+    year_min_best = 2013
+
+    # Plot the grid of slope charts of all decoupled countries.
+    output_file = Path.home() / f"Downloads/smooth-grid-{year_min_best}-{year_max_best}.png"
+    plot_slope_chart_grid(
+        tb_change=tb_change,
+        year_min=year_min_best,
+        year_max=year_max_best,
+        pct_change_min=PCT_CHANGE_MIN,
+        output_file=output_file,
+    )
+
+    # Plot each decoupled country's full change curves individually.
+    output_folder = Path.home() / f"Downloads/decoupling/smooth-countries-{year_min_best}-{year_max_best}/"
+    plot_decoupled_countries(
+        tb_change=tb_change,
+        year_min=year_min_best,
+        year_max=year_max_best,
+        pct_change_min=PCT_CHANGE_MIN,
+        output_folder=output_folder,
+    )
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -326,62 +418,17 @@ def run() -> None:
     # Remove regions from the list of countries.
     tb = tb[~tb["country"].isin(paths.regions.regions_all)].reset_index(drop=True)
 
+    # Smooth GDP and emissions curves (rolling average).
+    if RUNNING_AVERAGE_YEARS > 1:
+        tb = apply_rolling_averages(tb=tb)
+
     # Create a table with all possible combinations of minimum and maximum year, and the change in GDP and emissions of each country.
     tb_change = create_changes_table(tb=tb, min_window=1)
 
-    ####################################################################################################################
-    # Visual analysis to pick the best minimum and maximum years.
-
-    # Let's select those countries and windows where GDP increased more than 5%, and emissions decreased more than 5%.
-    tb_count = (
-        tb_change[
-            (tb_change["gdp_per_capita_change"] > PCT_CHANGE_MIN)
-            & (tb_change["consumption_emissions_per_capita_change"] < -PCT_CHANGE_MIN)
-        ]
-        .reset_index()
-        .groupby(["year_min", "year_max", "n_years"], as_index=False)
-        .agg({"index": "count"})
-        .rename(columns={"index": "n_countries_decoupled"})
-    )
-    # Visually check which window has the maximum number of decoupled countries.
-    import plotly.express as px
-
-    px.line(tb_count, x="year_min", y="n_countries_decoupled", color="year_max").update_yaxes(range=[0, None])
-    px.line(tb_count, x="n_years", y="n_countries_decoupled", color="year_max").update_yaxes(range=[0, None])
-
-    # We see that the window with the maximum number of countries achieving decoupling is:
-    # tb_count.sort_values("n_countries_decoupled", ascending=False).head(10)
-    # The optimal windows are:
-    # - 2012-2023: 45 countries.
-    # - 2013-2023: 43 countries.
-    # NOTE: Currently, the optimal window happens to be in the latest year.
-    # If that was not the case, we'd select only the best window imposing that year_max is the latest year.
-
-    # Given that there's not much difference, and to make the narrative simpler, we pick 2013-2023.
-    year_min_best = 2013
-    year_max_best = 2023
-
-    # Plot the grid of slope charts of all decoupled countries.
-    output_file = Path.home() / f"Downloads/grid-{year_min_best}-{year_max_best}.png"
-    plot_slope_chart_grid(
-        tb_change=tb_change,
-        year_min=year_min_best,
-        year_max=year_max_best,
-        pct_change_min=PCT_CHANGE_MIN,
-        output_file=output_file,
-    )
-
-    # Plot each decoupled country's full change curves individually.
-    output_folder = Path.home() / f"Downloads/decoupling/countries-{year_min_best}-{year_max_best}/"
-    plot_decoupled_countries(
-        tb_change=tb_change,
-        year_min=year_min_best,
-        year_max=year_max_best,
-        pct_change_min=PCT_CHANGE_MIN,
-        output_folder=output_folder,
-    )
-
-    ####################################################################################################################
+    # Analysis to pick the best minimum and maximum years.
+    # time_window_analysis(tb_change=tb_change)
+    year_max_best = tb_change["year_max"].max()
+    year_min_best = year_max_best - 10
 
     # Create a simple table with the selected window of years.
     tb_window = tb_change[
