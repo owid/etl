@@ -8,9 +8,7 @@ The output table has index columns: country, year, scenario, sex, age, education
 When values are aggregates, dimensions are set to "total".
 """
 
-import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
 import owid.catalog.processing as pr
 import pyreadr
@@ -37,24 +35,43 @@ REPLACE_SEX = {
 }
 
 
+def _process_single_scenario(args):
+    """Process a single scenario. Top-level function for multiprocessing."""
+    scenario, tbs, tables_combine_edu, tables_concat, tables_drop, tables_composition = args
+    result = make_tables_from_scenario(
+        tbs=tbs,
+        scenario_num=scenario,
+        tables_combine_edu=tables_combine_edu,
+        tables_concat=tables_concat,
+        tables_drop=tables_drop,
+        tables_composition=tables_composition,
+    )
+    return (scenario, result)
+
+
 def make_scenario_tables(tbs_scenario, tables_combine_edu, tables_concat, tables_drop, tables_composition):
     """Create main table from all scenarios.
 
     Index: country, year, scenario, age, sex, education.
+    Uses parallel processing across scenarios.
     """
-    # Obtain tables
+    paths.log.info(f"Processing {len(tbs_scenario)} scenarios in parallel...")
+
+    # Prepare arguments for each scenario
+    scenario_args = [
+        (scenario, tbs, tables_combine_edu, tables_concat, tables_drop, tables_composition)
+        for scenario, tbs in tbs_scenario.items()
+    ]
+
+    # Process scenarios in parallel
     tbs_base = []
-    for scenario, tbs in tbs_scenario.items():
-        paths.log.info(f"> scenario {scenario}")
-        tb = make_tables_from_scenario(
-            tbs=tbs,
-            scenario_num=scenario,
-            tables_combine_edu=tables_combine_edu,
-            tables_concat=tables_concat,
-            tables_drop=tables_drop,
-            tables_composition=tables_composition,
-        )
-        tbs_base.append(tb)
+    with ProcessPoolExecutor() as executor:
+        futures = {executor.submit(_process_single_scenario, args): args[0] for args in scenario_args}
+        for future in as_completed(futures):
+            scenario = futures[future]
+            paths.log.info(f"> scenario {scenario} completed")
+            _, result = future.result()
+            tbs_base.append(result)
 
     # Re-shape table structure
     tbs_ = {group: [] for group in tables_composition}
@@ -311,52 +328,66 @@ def merge_tables_opt(tables, **kwargs):
     return merged_tb
 
 
+def _read_single_file(args):
+    """Read a single file from the archive. Top-level function for multiprocessing."""
+    file_path, filename, scenario = args
+
+    if filename.endswith(".rds"):
+        data = pyreadr.read_r(file_path)
+        assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
+        df = data[None]
+        tb = Table(df)
+        short_name = filename.replace(".rds", "")
+    elif filename.endswith(".csv.gz"):
+        scenario = scenario.replace("ssp", "")
+        tb = pr.read_csv(file_path)
+        short_name = filename.replace(".csv.gz", "")
+    else:
+        raise ValueError(f"Unexpected file format: {filename}!")
+
+    tb = tb.rename(columns=COLUMNS_RENAME)
+    return (scenario, short_name, tb)
+
+
 def read_data_from_snap(snap, scenarios_expected):
     """Read snapshot.
 
     Snapshot is a ZIP file that contains numerous RDS files.
+    Uses parallel processing (multiprocessing) for faster loading.
     """
-    tbs_scenario = {}
-    with snap.extract_to_tempdir() as tmp:
-        files = os.listdir(tmp)
-        for i, f in enumerate(files):
-            if i % 10 == 0:
-                paths.log.info(f"Processing file {i}/{len(files)}: {f}")
-            # Add relevant columns
+    with snap.extracted() as archive:
+        # Filter files to process
+        files_to_process = []
+        for f in archive.files:
             scenario = f.split("_")[0]
             assert scenario in scenarios_expected, f"Unexpected scenario: {scenario}"
-            if scenario in {"22", "23"}:
-                continue
-            filename = f.split("_")[1]
-            # Read RDS file
-            path = tmp / Path(f)
-            if f.endswith(".rds"):
-                data = pyreadr.read_r(path)
-                assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
-                df = data[None]
-                # Map to table
-                tb = Table(df)
+            if scenario not in {"22", "23"}:
+                file_path = str(archive.path / f)
+                filename = f.split("_")[1]
+                files_to_process.append((file_path, filename, scenario))
+
+        paths.log.info(f"Processing {len(files_to_process)} files in parallel...")
+
+        # Process files in parallel using ProcessPoolExecutor (bypasses GIL)
+        tbs_scenario = {}
+        with ProcessPoolExecutor() as executor:
+            futures = {executor.submit(_read_single_file, args): args for args in files_to_process}
+            for i, future in enumerate(as_completed(futures)):
+                if i % 50 == 0:
+                    paths.log.info(f"Completed {i}/{len(files_to_process)} files")
+                scenario, short_name, tb = future.result()
+                # Add metadata after multiprocessing (metadata objects aren't picklable)
                 tb = _add_table_and_variables_metadata_to_table(
                     table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
                 )
-                tb.metadata.short_name = filename.replace(".rds", "")
-            elif f.endswith(".csv.gz"):
-                scenario = scenario.replace("ssp", "")
-                tb = pr.read_csv(
-                    path,
-                    metadata=snap.to_table_metadata(),
-                    origin=snap.metadata.origin,
-                )
-                tb.metadata.short_name = filename.replace(".csv.gz", "")
-            else:
-                raise ValueError(f"Unexpected file format: {f}!")
-            # Rename columns
-            tb = tb.rename(columns=COLUMNS_RENAME)
-            # Add to main list
-            if scenario in tbs_scenario.keys():
-                tbs_scenario[scenario].append(tb)
-            else:
-                tbs_scenario[scenario] = [tb]
+                tb.metadata.short_name = short_name
+                if scenario in tbs_scenario:
+                    tbs_scenario[scenario].append(tb)
+                else:
+                    tbs_scenario[scenario] = [tb]
+
+        paths.log.info(f"Completed all {len(files_to_process)} files")
+
     return tbs_scenario
 
 
