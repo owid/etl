@@ -105,6 +105,60 @@ def run() -> None:
         ],
     )
 
+    # Group all deciles together (only for avg, thr, share - not mean/median)
+    decile_choices = c.get_choice_names("decile")
+    decile_values = [slug for slug, name in decile_choices.items() if name and slug != "all"]
+    c.group_views(
+        groups=[
+            {
+                "dimension": "decile",
+                "choices": decile_values,
+                "choice_new_slug": "all",
+                "view_config": {
+                    "hideRelativeToggle": True,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                },
+            },
+        ],
+    )
+
+    # Fix the "all" choice name (group_views sets it to the slug since it wasn't in the dimension)
+    decile_dim = c.get_dimension("decile")
+    for choice in decile_dim.choices:
+        if choice.slug == "all":
+            choice.name = "All deciles"
+            break
+
+    # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
+    def keep_decile_view(v):
+        decile = v.dimensions.get("decile")
+        indicator = v.dimensions.get("indicator")
+        # Keep nan decile (for mean/median which don't have decile data)
+        if decile in ["nan", "all"]:
+            return True
+        # Keep deciles 1 and 10 for all indicators
+        if decile in ["1", "10"]:
+            return True
+        # Keep deciles 5 and 9 only for thr indicator
+        if decile in ["5", "9"] and indicator == "thr":
+            return True
+        return False
+
+    c.views = [v for v in c.views if keep_decile_view(v)]
+
+    # Remove grouped decile views for Spells (we don't want those)
+    c.views = [v for v in c.views if not v.matches(decile="all", survey_comparability="Spells")]
+
+    # Update chart type for share indicator grouped views to StackedArea
+    for view in c.views:
+        if view.matches(decile="all", indicator="share"):
+            if view.config is None:
+                view.config = {}
+            view.config["chartTypes"] = ["StackedArea"]
+
     #
     # Save garden dataset.
     #

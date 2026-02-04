@@ -1719,7 +1719,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: Mean <<welfare_type>> {definitions.per_period}
-            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}{definitions.spells_subtitle}"
+            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"

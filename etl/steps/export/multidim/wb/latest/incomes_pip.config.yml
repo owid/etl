@@ -36,25 +36,13 @@ dimensions:
     slug: decile
     choices:
       - slug: "1"
-        name: "1 (poorest)"
-      - slug: "2"
-        name: "2"
-      - slug: "3"
-        name: "3"
-      - slug: "4"
-        name: "4"
+        name: "Poorest 10%"
       - slug: "5"
-        name: "5"
-      - slug: "6"
-        name: "6"
-      - slug: "7"
-        name: "7"
-      - slug: "8"
-        name: "8"
+        name: "Median"
       - slug: "9"
-        name: "9"
+        name: "Richest 10% "
       - slug: "10"
-        name: "10 (richest)"
+        name: "Richest 10%"
       - slug: all
         name: All deciles
       - slug: nan
