@@ -124,6 +124,12 @@ def apply_rolling_averages(tb):
     return tb
 
 
+def decoupling_mask(tb_change: Table, pct_change_min: float) -> "pr.Series":
+    return (tb_change["gdp_per_capita_change"] > pct_change_min) & (
+        tb_change["consumption_emissions_per_capita_change"] < -pct_change_min
+    )
+
+
 def detect_decoupled_countries(
     tb_change: Table, year_min: int, year_max: int, pct_change_min: float = PCT_CHANGE_MIN
 ) -> set[str]:
@@ -136,8 +142,7 @@ def detect_decoupled_countries(
     tb_sel = tb_change[
         (tb_change["year_min"] == year_min)
         & (tb_change["year_max"] == year_max)
-        & (tb_change["gdp_per_capita_change"] > pct_change_min)
-        & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
+        & decoupling_mask(tb_change=tb_change, pct_change_min=pct_change_min)
     ]
     return set(tb_sel["country"].unique())
 
@@ -331,10 +336,7 @@ def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=
 def time_window_analysis(tb_change):
     # Select those countries and windows where GDP increased more than 5%, and emissions decreased more than 5%.
     tb_count = (
-        tb_change[
-            (tb_change["gdp_per_capita_change"] > PCT_CHANGE_MIN)
-            & (tb_change["consumption_emissions_per_capita_change"] < -PCT_CHANGE_MIN)
-        ]
+        tb_change[decoupling_mask(tb_change=tb_change, pct_change_min=PCT_CHANGE_MIN)]
         .reset_index()
         .groupby(["year_min", "year_max", "n_years"], as_index=False)
         .agg({"index": "count"})
