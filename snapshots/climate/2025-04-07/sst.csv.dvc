@@ -25,6 +25,6 @@ meta:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
 outs:
-  - md5: 27564bbef66dc9ee8358940fc39c2e77
-    size: 44086
+  - md5: e802393ec4e0a53549785ec15211133e
+    size: 44153
     path: sst.csv
