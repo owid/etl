@@ -146,12 +146,6 @@ steps:
     - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget
   #
-  # Decoupling of GDP and CO2.
-  #
-  data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
-    - data://garden/worldbank_wdi/2025-09-08/wdi
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-  #
   # GCP - Global Carbon Budget.
   #
   data://grapher/gcp/2025-11-13/global_carbon_budget:
@@ -207,3 +201,9 @@ steps:
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://external/emissions/2026-02-04/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2026-01-29/wdi
+    - data://garden/gcp/2025-11-13/global_carbon_budget
