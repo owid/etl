@@ -207,3 +207,4 @@ steps:
   data://external/emissions/2026-02-04/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2026-01-29/wdi
     - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/regions/2023-01-01/regions

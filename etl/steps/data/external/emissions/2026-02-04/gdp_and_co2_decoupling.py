@@ -151,14 +151,118 @@ def plot_decoupled_countries(tb_change, year_min, year_max, pct_change_min):
         tb_country = tb_plot_base[tb_plot_base["country"] == country].reset_index(drop=True)
         if tb_country.empty:
             continue
+        # Get final percentage changes for the title.
+        final_row = tb_country[tb_country["year"] == year_max]
+        gdp_change = float(final_row["GDP per capita"].iloc[0])
+        co2_change = float(final_row["Consumption-based CO2 per capita"].iloc[0])
         tb_plot = tb_country.melt(id_vars=["country", "year"], var_name="Indicator", value_name="value")
         px.line(
             tb_plot,
             x="year",
             y="value",
             color="Indicator",
-            title=f"{country} ({year_min}-{year_max})",
+            title=f"{country} (GDP: {gdp_change:+.1f}%, CO2: {co2_change:+.1f}%)",
         ).show()
+
+
+def plot_slope_chart_grid(tb_change, year_min, year_max, pct_change_min, n_cols=6):
+    """Create a grid of slope charts showing decoupling for each country.
+
+    Similar to the OWID static chart style with blue GDP lines going up and red CO2 lines going down.
+    """
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    # Find decoupled countries and sort by total decoupling magnitude (GDP increase + CO2 decrease).
+    tb_decoupled = tb_change[
+        (tb_change["year_min"] == year_min)
+        & (tb_change["year_max"] == year_max)
+        & (tb_change["gdp_per_capita_change"] > pct_change_min)
+        & (tb_change["consumption_emissions_per_capita_change"] < -pct_change_min)
+    ].copy()
+    tb_decoupled["decoupling_score"] = (
+        tb_decoupled["gdp_per_capita_change"] - tb_decoupled["consumption_emissions_per_capita_change"]
+    )
+    tb_decoupled = tb_decoupled.sort_values("decoupling_score", ascending=False)
+
+    countries = list(tb_decoupled["country"])
+    n_countries = len(countries)
+    n_rows = (n_countries + n_cols - 1) // n_cols
+
+    # Calculate global y-axis range for consistent scaling across all subplots.
+    y_max = tb_decoupled["gdp_per_capita_change"].max()
+    y_min = tb_decoupled["consumption_emissions_per_capita_change"].min()
+    # Add some padding.
+    y_range = [y_min * 1.15, y_max * 1.15]
+
+    # Create subplots grid.
+    fig = make_subplots(
+        rows=n_rows,
+        cols=n_cols,
+        subplot_titles=countries,
+        vertical_spacing=0.08,
+        horizontal_spacing=0.04,
+    )
+
+    # Colors matching the OWID style.
+    gdp_color = "#3366cc"  # Blue
+    co2_color = "#cc3333"  # Red
+
+    for i, country in enumerate(countries):
+        row = i // n_cols + 1
+        col = i % n_cols + 1
+
+        country_data = tb_decoupled[tb_decoupled["country"] == country].iloc[0]
+        gdp_change = float(country_data["gdp_per_capita_change"])
+        co2_change = float(country_data["consumption_emissions_per_capita_change"])
+
+        # GDP line (0 to gdp_change).
+        fig.add_trace(
+            go.Scatter(
+                x=[year_min, year_max],
+                y=[0, gdp_change],
+                mode="lines+text",
+                line=dict(color=gdp_color, width=2),
+                text=["", f"{gdp_change:+.0f}%"],
+                textposition="middle right",
+                textfont=dict(color=gdp_color, size=10),
+                showlegend=False,
+            ),
+            row=row,
+            col=col,
+        )
+
+        # CO2 line (0 to co2_change).
+        fig.add_trace(
+            go.Scatter(
+                x=[year_min, year_max],
+                y=[0, co2_change],
+                mode="lines+text",
+                line=dict(color=co2_color, width=2),
+                text=["", f"{co2_change:+.0f}%"],
+                textposition="middle right",
+                textfont=dict(color=co2_color, size=10),
+                showlegend=False,
+            ),
+            row=row,
+            col=col,
+        )
+
+    # Update layout.
+    fig.update_layout(
+        height=200 * n_rows,
+        width=180 * n_cols,
+        title_text=f"Countries that achieved economic growth while reducing CO₂ emissions, {year_min}-{year_max}",
+        showlegend=False,
+    )
+
+    # Hide axes for cleaner look, and apply consistent y-axis range.
+    fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
+    fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=True, zerolinecolor="lightgray", range=y_range)
+
+    fig.show()
+
+    return fig
 
 
 def run() -> None:
@@ -185,8 +289,20 @@ def run() -> None:
     # Combine both tables.
     tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="inner", short_name=paths.short_name)
 
+    ####################################################################################################################
+    # I noticed two abrupt peaks in Honduras emissions in 2008 and 2013 (which do not appear in territorial emissions).
+    # I'll remove those years (so that Honduras is not selected if the start year is 2008 or 2013, which distorts the percentage change).
+    error = "Expected two abrupt peaks in emissions in Honduras. This may have been fixed."
+    _tb = tb[(tb["country"] == "Honduras")].sort_values("year")[["year", "consumption_emissions_per_capita"]].dropna()
+    assert set(_tb[_tb["consumption_emissions_per_capita"].pct_change().abs() > 1]["year"]) == {2008, 2013}, error
+    tb.loc[(tb["country"] == "Honduras") & (tb["year"].isin([2008, 2013])), "consumption_emissions_per_capita"] = None
+    ####################################################################################################################
+
     # Remove rows with any missing value (we need both GDP and emissions).
     tb = tb.dropna(how="any").reset_index(drop=True)
+
+    # Remove regions from the list of countries.
+    tb = tb[~tb["country"].isin(paths.regions.regions_all)].reset_index(drop=True)
 
     # Create a table with all possible combinations of minimum and maximum year, and the change in GDP and emissions of each country.
     tb_change = create_changes_table(tb=tb, min_window=1)
@@ -214,20 +330,27 @@ def run() -> None:
     # We see that the window with the maximum number of countries achieving decoupling is:
     # tb_count.sort_values("n_countries_decoupled", ascending=False).head(10)
     # The optimal windows are:
-    # - 2012-2023: 47 countries.
-    # - 2013-2023: 46 countries.
+    # - 2012-2023: 45 countries.
+    # - 2013-2023: 43 countries.
     # NOTE: Currently, the optimal window happens to be in the latest year.
     # If that was not the case, we'd select only the best window imposing that year_max is the latest year.
 
     # Given that there's not much difference, and to make the narrative simpler, we pick 2013-2023.
     year_min_best = 2013
+    # year_min_best = 2003
     year_max_best = 2023
 
-    ####################################################################################################################
+    # Plot the grid of slope charts of all decoupled countries.
+    plot_slope_chart_grid(
+        tb_change=tb_change, year_min=year_min_best, year_max=year_max_best, pct_change_min=PCT_CHANGE_MIN
+    )
 
+    # Plot each decoupled country's full change curves individually.
     plot_decoupled_countries(
         tb_change=tb_change, year_min=year_min_best, year_max=year_max_best, pct_change_min=PCT_CHANGE_MIN
     )
+
+    ####################################################################################################################
 
     # Create a simple table with the selected window of years.
     tb_window = tb_change[
