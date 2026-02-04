@@ -16,7 +16,7 @@ tables:
   epoch_benchmark_data:
     variables:
       mean_score:
-        title: Share of expert-level FrontierMath problems solved correctly by AI models
+        title: Share of FrontierMath problems solved correctly by AI models
         unit: "%"
         short_unit: "%"
         description_short: FrontierMath benchmark evaluates models on 300 difficult, research-level problems in advanced mathematics (Tiers 1–3), which can take expert mathematicians hours or days to work through.
@@ -26,12 +26,12 @@ tables:
           - The benchmark has four difficulty tiers. This indicator shows accuracy on Tiers 1–3 (300 problems). Tier 4 contains 50 exceptionally difficult problems and is not included here.
           - "Scoring is all-or-nothing: models get 1 point for a correct final answer and 0 for anything else, with no partial credit. Models submit their answers as Python code and can use Python while working on problems. This means scores reflect math ability with access to computational tools, not just pen-and-paper reasoning."
           - Only 12 problems are publicly available, mainly so researchers can inspect how evaluations work, not to report scores.
-          - FrontierMath was developed by Epoch AI with funding from OpenAI, whose GPT models are among those evaluated on this benchmark. OpenAI has exclusive access to a subset of the problems. Epoch provides a [conflict of interest statement](https://epoch.ai/frontiermath#:~:text=Conflict%20of%20interest%20statement) with more details.
+          - FrontierMath was developed by Epoch AI with funding from OpenAI, whose GPT models are among those evaluated on this benchmark. OpenAI has exclusive access to a subset of the problems.
         description_from_producer: |-
           [FrontierMath](https://epoch.ai/frontiermath) is a benchmark of hundreds of original, exceptionally challenging mathematics problems crafted and vetted by expert mathematicians. The questions cover most major branches of modern mathematics – from computationally intensive problems in number theory and real analysis to abstract questions in algebraic geometry and category theory. Solving a typical problem requires multiple hours of effort from a researcher in the relevant branch of mathematics, and for the upper end questions, multiple days.
 
           The full FrontierMath dataset contains 350 problems. This is split into a base set of 300 problems, which we call Tiers 1-3, and an expansion set of 50 exceptionally difficult problems, which we call Tier 4. We have made 10 problems from Tiers 1-3 public, calling this frontiermath-2025-02-28-public. The remaining 290 problems make up frontiermath-2025-02-28-private. Similarly, we have made 2 problems from Tier 4 public, calling this frontiermath-tier-4-2025-07-01-public, while the remaining 48 problems make up frontiermath-tier-4-2025-07-01-private. Unless explicitly mentioned otherwise, all the numbers on this hub correspond to evaluations on the private sets. You can find more information about the public problems [here](https://epoch.ai/frontiermath/tiers-1-4/benchmark-problems).
 
-          FrontierMath was developed with funding from OpenAI, who has exclusive access to a subset of the benchmark. See Epoch AI's [conflict of interest statement](https://epoch.ai/frontiermath#:~:text=Conflict%20of%20interest%20statement) for details.
+          FrontierMath was developed with funding from OpenAI, who has exclusive access to a subset of the benchmark.
         display:
           numDecimalPlaces: 1
