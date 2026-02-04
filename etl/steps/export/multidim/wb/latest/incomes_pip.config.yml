@@ -83,6 +83,7 @@ views:
       indicator: share
       decile: "10_40_50"
       period: nan
+      table: Income or consumption consolidated
       survey_comparability: No spells
     indicators:
       y:
@@ -95,15 +96,14 @@ views:
         - catalogPath: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Richest 10%"
-    # config:
-    #   title: Share of the population living below a range of poverty lines
-    #   subtitle: "{definitions.ppp_adjustment_subtitle}"
-    #   note: "{definitions.ppp_adjustment_welfare_type_note}"
-    #   hasMapTab: false
-    #   chartTypes: ["LineChart"]
-    #   selectedFacetStrategy: entity
-    #   yAxis:
-    #     max: 100
+    config:
+      title: Distribution of income across richer and poorer groups
+      subtitle: The share of income received by different income groups. Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+      # note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
     # metadata:
     #   description_key:
     #     - "{definitions.description_key_extreme_poverty}"

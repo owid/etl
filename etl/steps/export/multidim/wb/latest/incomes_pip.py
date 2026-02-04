@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -55,15 +56,26 @@ def run() -> None:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
+    # Bake config automatically from table
+    config_new = expand_config(
+        tb,  # type: ignore
+        indicator_names=INDICATORS,
+        dimensions=DIMENSIONS_CONFIG,
+    )
+
+    # Combine both sources (YAML dimensions + auto-generated dimensions)
+    config["dimensions"] = combine_config_dimensions(
+        config_dimensions=config_new["dimensions"],
+        config_dimensions_yaml=config.get("dimensions", {}),
+    )
+    config["views"] += config_new["views"]
+
     #
     # Create collection object
     #
     c = paths.create_collection(
         config=config,
         short_name="incomes_pip",
-        tb=tb,
-        indicator_names=INDICATORS,
-        dimensions=DIMENSIONS_CONFIG,
     )
 
     # First, group survey_comparability (this must happen first)
@@ -107,7 +119,7 @@ def run() -> None:
 
     # Group all deciles together (only for avg, thr, share - not mean/median)
     decile_choices = c.get_choice_names("decile")
-    decile_values = [slug for slug, name in decile_choices.items() if name and slug != "all"]
+    decile_values = [slug for slug, name in decile_choices.items() if name and slug not in ("all", "10_40_50")]
     c.group_views(
         groups=[
             {
@@ -168,7 +180,7 @@ def run() -> None:
 
 
 def _keep_decile_view(v):
-    """Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only."""
+    """Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only, plus 10_40_50 for share."""
     decile = v.dimensions.get("decile")
     indicator = v.dimensions.get("indicator")
     # Keep nan decile (for mean/median which don't have decile data)
@@ -179,6 +191,9 @@ def _keep_decile_view(v):
         return True
     # Keep deciles 5 and 9 only for thr indicator
     if decile in ["5", "9"] and indicator == "thr":
+        return True
+    # Keep 10_40_50 only for share indicator
+    if decile == "10_40_50" and indicator == "share":
         return True
     return False
 
