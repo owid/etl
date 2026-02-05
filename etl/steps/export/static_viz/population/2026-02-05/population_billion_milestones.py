@@ -4,7 +4,6 @@ This code generates a bar chart showing the decreasing time intervals between
 population milestones from 1 billion to 10 billion.
 """
 
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import matplotlib
@@ -179,8 +178,6 @@ def create_visualization(
     x_positions = [m["milestone"] for m in milestones]
     # Use display_duration for bar height (capped for first bar)
     durations = [m["display_duration"] for m in milestones]
-    # Keep actual durations for labels
-    actual_durations = [m["duration"] for m in milestones]
 
     # Create bars
     bars = ax.bar(x_positions, durations, width=0.7, color=bar_color, edgecolor="none")
