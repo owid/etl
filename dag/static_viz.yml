@@ -2,3 +2,7 @@ steps:
   # World population growth visualization
   export://static_viz/population/2026-01-26/world_population_growth:
     - data://garden/demography/2024-07-15/population
+
+  # Population billion milestones visualization
+  export://static_viz/population/2026-02-05/population_billion_milestones:
+    - data://garden/demography/2024-07-15/population
