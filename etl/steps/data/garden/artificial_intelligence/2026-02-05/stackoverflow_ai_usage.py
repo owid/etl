@@ -20,7 +20,7 @@ paths = PathFinder(__file__)
 
 # Rename raw response labels to clean column names immediately after loading.
 RESPONSE_TO_COLUMN = {
-    "Yes": "yes",
+    "Yes": "yes_overall",
     "No, but I plan to soon": "no_but_plan_to_soon",
     "No, and I don't plan to": "no_and_dont_plan_to",
     "Yes, I use AI tools daily": "yes_daily",
@@ -54,13 +54,13 @@ def run() -> None:
     # Keep all original rows (including granular 2025 frequency rows).
     # Add a single collapsed "yes" row for 2025 for cross-year comparability.
     collapsed_row = tb_2025_yes.iloc[[0]].copy().reset_index(drop=True)
-    collapsed_row.loc[0, "response"] = "yes"
+    collapsed_row.loc[0, "response"] = "yes_overall"
     collapsed_row.loc[0, "share_pct"] = yes_2025_pct
     tb = pr.concat([tb, collapsed_row])
 
     # Add 2020 rows with share_pct = 0 for all cross-year responses
     # (AI-tool usage question was not asked before 2023, so the share is 0).
-    CROSS_YEAR_RESPONSES = ["yes", "no_but_plan_to_soon", "no_and_dont_plan_to"]
+    CROSS_YEAR_RESPONSES = ["yes_overall", "no_but_plan_to_soon", "no_and_dont_plan_to"]
     tb_2020 = Table(
         {
             "year": 2020,
@@ -77,10 +77,7 @@ def run() -> None:
     tb = tb.drop(columns=["n_total_responses"])
 
     # Pivot so each response becomes its own column.
-    tb = tb.pivot(index="year", columns="response", values="share_pct").reset_index()
-
-    # Add country dimension set to "World".
-    tb["country"] = "World"
+    tb = tb.pivot(columns="response", values="share_pct", index="year").assign(country="World").reset_index()
 
     tb = tb.format(["year", "country"])
     #

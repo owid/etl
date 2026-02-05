@@ -16,7 +16,7 @@ dataset:
 tables:
   stackoverflow_ai_usage:
     variables:
-      yes:
+      yes_overall:
         title: Share of developers using AI tools
         unit: "%"
         short_unit: "%"
