@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Artificial Intelligence
       grapher_config:
-            note: Based on survey responses from 26,004 to 67,237 professional developers, depending on the year. We set a baseline at 0% in 2020, as the first mainstream AI coding assistants were not available to developers until 2021.
+        note: Based on survey responses from 26,004 to 67,237 professional developers, depending on the year. We set a baseline at 0% in 2020, as the first mainstream AI coding assistants were not available to developers until 2021.
     display:
       numDecimalPlaces: 1
 
