@@ -432,7 +432,7 @@ tables:
           - *desc_key_per_1000_departures
         display:
           tolerance: 2
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       # =========================================================================
       # OUTBOUND TOURISM — EXPENDITURE
@@ -589,7 +589,7 @@ tables:
             note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
         display:
           tolerance: 2
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
       # =========================================================================
       # ECONOMIC IMPACT
       # =========================================================================
