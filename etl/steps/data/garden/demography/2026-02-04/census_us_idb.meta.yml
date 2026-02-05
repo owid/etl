@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 313
+
+tables:
+  census_us_idb:
+    variables:
+      pop:
+        title: "Population"
+        description_short: "Total country population at midyear."
+        unit: "people"
+      tfr:
+        title: "Total fertility rate"
+        description_short: "Total fertility rate: Average number of children females would have by age 49 if the year's age-specific fertility rates remained constant"
+        unit: "live births per woman"
+      e0:
+        title: Life expectancy at birth
+        description_short: |-
+          Life expectancy at birth, both sexes: Average number of years newborns would live if the year's age-specific mortality rates remained constant
+        unit: "years"
+      nim:
+        title: Net migration
+        description_short: |-
+          Net international migrants, both sexes: Difference between the number of immigrants entering and emigrants leaving a country in a year
+        unit: "migrants"
