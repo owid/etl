@@ -121,20 +121,12 @@ def create_changes_table(tb: Table, min_window: int = 1) -> Table:
 
 def apply_rolling_averages(tb):
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
-    tb["gdp_per_capita"] = (
-        tb["gdp_per_capita"]
-        .groupby(tb["country"], sort=False)
-        .rolling(RUNNING_AVERAGE_YEARS, min_periods=1)
-        .mean()
-        .values
+    tb["gdp_per_capita"] = tb.groupby("country", sort=False)["gdp_per_capita"].transform(
+        lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean()
     )
-    tb["consumption_emissions_per_capita"] = (
-        tb["consumption_emissions_per_capita"]
-        .groupby(tb["country"], sort=False)
-        .rolling(RUNNING_AVERAGE_YEARS, min_periods=1)
-        .mean()
-        .values
-    )
+    tb["consumption_emissions_per_capita"] = tb.groupby("country", sort=False)[
+        "consumption_emissions_per_capita"
+    ].transform(lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean())
 
     return tb
 
@@ -614,7 +606,7 @@ def run() -> None:
     ].reset_index(drop=True)
 
     # Remove unnecessary columns.
-    tb_window = tb_window.drop(columns=["year_min", "year_max"], errors="raise")
+    tb_window = tb_window.drop(columns=["year_min", "year_max", "n_years"], errors="raise")
 
     # Set an appropriate index and sort conveniently.
     tb_window = tb_window.format(["country"])
