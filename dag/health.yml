@@ -1408,3 +1408,14 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2026-02-05/budget:
     - data://garden/tuberculosis/2026-02-05/budget
+  # Tuberculosis laboratories - WHO
+  data://meadow/tuberculosis/2026-02-05/laboratories:
+    - snapshot://tuberculosis/2026-02-05/laboratories.csv
+  data://garden/tuberculosis/2026-02-05/laboratories:
+    - data://meadow/tuberculosis/2026-02-05/laboratories
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/tuberculosis/2026-02-05/laboratories:
+    - data://garden/tuberculosis/2026-02-05/laboratories
