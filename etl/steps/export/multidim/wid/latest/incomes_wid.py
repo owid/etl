@@ -285,9 +285,7 @@ def run() -> None:
                 view.indicators.size = Indicator(
                     catalogPath="grapher/demography/2024-07-15/population/historical#population_historical"
                 )
-                view.indicators.color = Indicator(
-                    catalogPath="grapher/regions/2023-01-01/regions/regions#owid_region"
-                )
+                view.indicators.color = Indicator(catalogPath="grapher/regions/2023-01-01/regions/regions#owid_region")
 
             # Get metadata from after_tax indicator for title/subtitle
             if after_tax_ind:
@@ -299,6 +297,14 @@ def run() -> None:
                     # Extract and modify title
                     title = grapher_config.get("title", "")
                     title = title.replace("after tax", "before vs. after tax")
+
+                    # Extract and modify subtitle (remove welfare type phrase)
+                    subtitle = grapher_config.get("subtitle", "")
+                    subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
+
+                    # Extract and modify description_short (remove welfare type phrase)
+                    description_short = meta.description_short or ""
+                    description_short = description_short.replace(" Income here is measured after taxes and benefits.", "")
 
                     # Determine axis min based on quantile
                     quantile = view.dimensions.get("quantile")
@@ -312,12 +318,16 @@ def run() -> None:
                     # Set config
                     view.config = {
                         "title": title,
-                        "subtitle": "Comparing the share of income before and after taxes and benefits.",
+                        "subtitle": subtitle,
                         "hideRelativeToggle": True,
                         "hasMapTab": False,
                         "tab": "chart",
                         "chartTypes": ["ScatterPlot"],
-                        "comparisonLines": [{"yEquals": "x"}, {"yEquals": "0.75*x", "label": "25% reduction"}, {"yEquals": "0.5*x", "label": "50% reduction"}],
+                        "comparisonLines": [
+                            {"yEquals": "x"},
+                            {"yEquals": "0.75*x", "label": "25% reduction"},
+                            {"yEquals": "0.5*x", "label": "50% reduction"},
+                        ],
                         "matchingEntitiesOnly": True,
                         "minTime": "latest",
                         "xAxis": {"min": axis_min},
@@ -326,7 +336,7 @@ def run() -> None:
 
                     # Set metadata
                     view.metadata = {
-                        "description_short": "Comparing the share of income before and after taxes and benefits.",
+                        "description_short": description_short,
                     }
 
     #
