@@ -55,6 +55,8 @@ dimensions:
         name: Richest 10%, middle 40%, poorest 50% (bar chart)
       - slug: all
         name: All deciles
+      - slug: all_bar
+        name: All deciles (bar chart)
       - slug: nan
         name: ""
 
