@@ -1372,3 +1372,11 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+  # Tuberculosis expenditure - WHO
+  data://meadow/tuberculosis/2026-02-05/expenditure:
+    - snapshot://tuberculosis/2026-02-05/expenditure.csv
+  data://garden/tuberculosis/2026-02-05/expenditure:
+    - data://meadow/tuberculosis/2026-02-05/expenditure
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+  data://grapher/tuberculosis/2026-02-05/expenditure:
+    - data://garden/tuberculosis/2026-02-05/expenditure
