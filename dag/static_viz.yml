@@ -5,4 +5,5 @@ steps:
 
   # Time it took for the world population to double
   export://static_viz/population/2026-02-03/pop_doubling:
+    - data://garden/demography/2024-07-18/population_doubling_times
     - data://garden/demography/2024-07-15/population

@@ -1,16 +1,10 @@
 """Recreate 'Time it took for the world population to double' chart.
 
 Generates a line chart plotting the number of years it took world population
-to double, at each milestone doubling event, using historical data and
-UN projections from the garden/demography population dataset.
-
-Milestone doublings are defined by (from_pop, to_pop) pairs at round population
-thresholds (e.g. 0.5 → 1 billion).  For each pair the script interpolates the
-exact years at which each threshold was crossed, then plots
-(year_reached, years_to_double) as a connected line with square markers.
-
-All boundary years (historical end, projection end) and the source citation are
-inferred directly from the dataset rather than being hard-coded.
+to double, at each milestone doubling event.  Doubling times are loaded from
+the pre-computed garden dataset ``demography/2024-07-18/population_doubling_times``.
+Boundary years (historical end, projection end) and the source citation are
+inferred from the garden ``demography/2024-07-15/population`` dataset.
 """
 
 import xml.etree.ElementTree as ET
@@ -18,11 +12,9 @@ from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table
-from scipy.interpolate import interp1d
 
 from etl import paths as etl_paths
 
@@ -30,25 +22,8 @@ from etl import paths as etl_paths
 matplotlib.rcParams["svg.fonttype"] = "none"
 
 CURRENT_DIR = Path(__file__).parent
-SHORT_NAME = "pop_doubling"
 
 log = structlog.get_logger()
-
-# ---------------------------------------------------------------------------
-# Milestone definitions  (from_billions, to_billions)
-# Sorted by from_pop so that year_reached is chronological on the x-axis.
-# ---------------------------------------------------------------------------
-DOUBLING_PAIRS: list[tuple[float, float]] = [
-    (0.25, 0.50),
-    (0.50, 1.0),
-    (1.0, 2.0),
-    (1.5, 3.0),
-    (2.0, 4.0),
-    (2.5, 5.0),
-    (4.0, 8.0),
-    (5.0, 10.0),
-]
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -101,12 +76,10 @@ def _fmt_pop(val: float) -> str:
 # ---------------------------------------------------------------------------
 
 
-def load_world_population() -> tuple[pd.DataFrame, int, int, Table, Table]:
-    """Load and merge historical + projection population for World.
+def load_world_population() -> tuple[int, int, Table, Table]:
+    """Load historical + projection population for World (boundary years & origins).
 
     Returns:
-        combined        – DataFrame with ['year', 'population'], sorted, deduped
-                          (historical takes priority where they overlap).
         hist_last_year  – last year present in the historical series
         proj_last_year  – last year present in the projections series
         tb_hist_raw     – raw historical Table (for origins metadata)
@@ -120,71 +93,41 @@ def load_world_population() -> tuple[pd.DataFrame, int, int, Table, Table]:
     tb_hist = tb_hist_raw.reset_index()
     tb_proj = tb_proj_raw.reset_index()
 
-    world_hist = tb_hist[tb_hist["country"] == "World"][["year", "population_historical"]].copy()
-    world_hist.columns = ["year", "population"]
-
-    world_proj = tb_proj[tb_proj["country"] == "World"][["year", "population_projection"]].copy()
-    world_proj.columns = ["year", "population"]
+    world_hist = tb_hist[tb_hist["country"] == "World"]
+    world_proj = tb_proj[tb_proj["country"] == "World"]
 
     # Boundary years – inferred from the data
     hist_last_year = int(world_hist["year"].max())
     proj_last_year = int(world_proj["year"].max())
 
-    # Concat; historical rows come first so drop_duplicates keeps them
-    combined = pd.concat([world_hist, world_proj]).drop_duplicates("year").sort_values("year").reset_index(drop=True)
-
-    return combined, hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw
+    return hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw
 
 
 # ---------------------------------------------------------------------------
-# Computation
+# Data loading – doubling times
 # ---------------------------------------------------------------------------
 
 
-def compute_doublings(combined: pd.DataFrame) -> pd.DataFrame:
-    """Interpolate the year each population threshold was crossed and compute doubling durations.
+def load_doubling_times() -> pd.DataFrame:
+    """Load pre-computed doubling times from the garden dataset.
 
-    Args:
-        combined: DataFrame with 'year' and 'population' columns (sorted, unique years).
-
-    Returns:
-        DataFrame with columns:
-            year_reached   – (int)   year the *target* population was first reached
-            doubling_years – (int)   number of years from source to target
-            from_b         – (float) source population in billions
-            to_b           – (float) target population in billions
+    Returns a DataFrame with columns:
+        year_reached   – year the target population was first reached
+        doubling_years – number of years from half-target to target
+        from_b         – source population in billions (target / 2)
+        to_b           – target population in billions
     """
-    years = combined["year"].values.astype(float)
-    pops = combined["population"].values.astype(float)
+    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-18/population_doubling_times")
+    tb = ds["population_doubling_times"].reset_index()
 
-    # Inverse interpolation: population → year  (population is monotonically increasing)
-    f_pop_to_year = interp1d(pops, years, kind="linear", bounds_error=False)
+    # population_target is in absolute numbers; convert to billions
+    tb["to_b"] = tb["population_target"] / 1e9
+    tb["from_b"] = tb["to_b"] / 2
 
-    rows = []
-    for from_b, to_b in DOUBLING_PAIRS:
-        from_p, to_p = from_b * 1e9, to_b * 1e9
+    tb = tb.rename(columns={"year": "year_reached", "num_years_to_double": "doubling_years"})
+    tb = tb[["year_reached", "doubling_years", "from_b", "to_b"]].sort_values("year_reached").reset_index(drop=True)
 
-        if to_p > pops.max():
-            log.warning(f"Target {to_b}B exceeds max population in dataset ({pops.max()/1e9:.2f}B) – skipping")
-            continue
-
-        yr_from = float(f_pop_to_year(from_p))
-        yr_to = float(f_pop_to_year(to_p))
-
-        if np.isnan(yr_from) or np.isnan(yr_to):
-            log.warning(f"Could not interpolate years for {from_b}B → {to_b}B – skipping")
-            continue
-
-        rows.append(
-            {
-                "year_reached": int(round(yr_to)),
-                "doubling_years": int(round(yr_to - yr_from)),
-                "from_b": from_b,
-                "to_b": to_b,
-            }
-        )
-
-    return pd.DataFrame(rows)
+    return pd.DataFrame(tb)
 
 
 # ---------------------------------------------------------------------------
@@ -591,13 +534,13 @@ def optimize_svg_for_figma(svg_path: Path) -> None:
 
 
 def run() -> None:
-    """Entry point: load data, compute doublings, render and save chart."""
-    combined, hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw = load_world_population()
+    """Entry point: load data, render and save chart."""
+    hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw = load_world_population()
 
     log.info(f"Data boundaries – historical last year: {hist_last_year}, " f"projections last year: {proj_last_year}")
 
-    df = compute_doublings(combined)
-    log.info(f"Computed {len(df)} population doubling milestones")
+    df = load_doubling_times()
+    log.info(f"Loaded {len(df)} population doubling milestones")
     log.info(df.to_string(index=False))
 
     source_citation = build_source_citation(tb_hist_raw, tb_proj_raw)
