@@ -360,8 +360,7 @@ def create_visualization(
     fig.text(
         0.06,
         0.015,
-        f"{source_citation}\n"
-        "The interactive data visualization is available at OurWorldInData.org.",
+        f"{source_citation}\n" "The interactive data visualization is available at OurWorldInData.org.",
         ha="left",
         va="bottom",
         fontsize=9,
@@ -595,10 +594,7 @@ def run() -> None:
     """Entry point: load data, compute doublings, render and save chart."""
     combined, hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw = load_world_population()
 
-    log.info(
-        f"Data boundaries – historical last year: {hist_last_year}, "
-        f"projections last year: {proj_last_year}"
-    )
+    log.info(f"Data boundaries – historical last year: {hist_last_year}, " f"projections last year: {proj_last_year}")
 
     df = compute_doublings(combined)
     log.info(f"Computed {len(df)} population doubling milestones")
