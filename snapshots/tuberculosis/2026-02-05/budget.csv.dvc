@@ -14,3 +14,7 @@ meta:
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/data-policy
+outs:
+  - md5: 4bc23c0ea4f910ca8b2a5e0282812e60
+    size: 286552
+    path: budget.csv
