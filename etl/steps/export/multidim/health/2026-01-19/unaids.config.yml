@@ -1,0 +1,47 @@
+title:
+  title: Global AIDS Update
+default_selection:
+  - World
+topic_tags:
+  - Uncategorized
+dimensions:
+  - slug: age
+    name: Age
+    choices:
+      - slug: 0-14
+        name: 0-14
+      - slug: 0-17
+        name: 0-17
+      - slug: 10-19
+        name: 10-19
+      - slug: 15+
+        name: 15+
+      - slug: 15-24
+        name: 15-24
+      - slug: 15-49
+        name: 15-49
+      - slug: 50+
+        name: 50+
+      - slug: total
+        name: Total
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: female
+        name: Female
+      - slug: male
+        name: Male
+      - slug: total
+        name: Total
+  - slug: estimate
+    name: Estimate
+    choices:
+      - slug: central
+        name: Central
+      - slug: high
+        name: High
+      - slug: low
+        name: Low
+      - slug: program
+        name: Program
+views: []
