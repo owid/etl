@@ -765,13 +765,14 @@ steps:
   #
   # CORE Econ - Unemployment rate and unemployment benefit replacement rate
   #
-  # World Development Indicators - WDI
   data://meadow/core_econ/2026-01-30/unemployment_rate_benefits:
     - snapshot://core_econ/2026-01-30/unemployment_rate_benefits.csv
   data://garden/core_econ/2026-01-30/unemployment_rate_benefits:
     - data://meadow/core_econ/2026-01-30/unemployment_rate_benefits
   data://grapher/core_econ/2026-01-30/unemployment_rate_benefits:
     - data://garden/core_econ/2026-01-30/unemployment_rate_benefits
+
+  # World Development Indicators - WDI
   data://meadow/worldbank_wdi/2026-01-29/wdi:
     - snapshot://worldbank_wdi/2026-01-29/wdi.zip
   data://garden/worldbank_wdi/2026-01-29/wdi:
