@@ -24,10 +24,11 @@ paths = PathFinder(__file__)
 COLUMNS_WDI = {
     "country": "country",
     "year": "year",
-    # GDP, PPP (constant 2017 international $)
-    # "ny_gdp_mktp_pp_kd": "gdp",
-    # GDP per capita, PPP (constant 2017 international $)
+    # GDP per capita, PPP (constant 2021 international $).
     "ny_gdp_pcap_pp_kd": "gdp_per_capita",
+    # GNI per capita, PPP (constant 2021 international $).
+    # NOTE: This will be used specifically for Ireland.
+    "ny_gnp_pcap_pp_kd": "gni_per_capita",
 }
 
 # Columns to select from GCB, and how to rename them.
@@ -457,8 +458,8 @@ def further_visual_inspection(tb_change, countries_decoupled):
         output_folder=output_folder,
     )
 
-    # After visually inspecting the long-term trends of all selected countries (see time_window_analysis), I think the decoupling in some of those countries is unclear.
-    # They will be taken out of the final list in run().
+    # After visually inspecting the long-term trends of all selected countries (see time_window_analysis), I think the decoupling in some of those countries is unclear, namely:
+    # "Mozambique", "Botswana", "Mongolia", "Russia", "Singapore", "Switzerland","Uruguay".
 
 
 def compare_old_and_new_countries(tb_change, countries_decoupled):
@@ -508,25 +509,6 @@ def compare_old_and_new_countries(tb_change, countries_decoupled):
     )
 
 
-def plot_final_selection(tb_change, countries_decoupled, year_min, year_max):
-    output_folder = OUTPUT_FOLDER / f"selected-smooth-countries-{year_min}-{year_max}"
-    plot_decoupled_countries(
-        tb_change=tb_change,
-        countries=countries_decoupled,
-        year_min=year_min,
-        year_max=year_max,
-        output_folder=output_folder,
-    )
-    output_file = OUTPUT_FOLDER / f"selected-smooth-grid-{year_min}-{year_max}.png"
-    plot_slope_chart_grid(
-        tb_change=tb_change,
-        countries_decoupled=countries_decoupled,
-        year_min=year_min,
-        year_max=year_max,
-        output_file=output_file,
-    )
-
-
 def run() -> None:
     #
     # Load inputs.
@@ -547,6 +529,13 @@ def run() -> None:
 
     # Select and rename the required variables from WDI.
     tb_wdi = tb_wdi[list(COLUMNS_WDI)].rename(columns=COLUMNS_WDI, errors="raise")
+
+    # Use GNI instead of GDP for Ireland.
+    # NOTE: For simplicity, we keep calling it GDP, but the chart will have this clarification.
+    tb_wdi.loc[tb_wdi["country"] == "Ireland", "gdp_per_capita"] = tb_wdi.loc[
+        tb_wdi["country"] == "Ireland", "gni_per_capita"
+    ]
+    tb_wdi = tb_wdi.drop(columns=["gni_per_capita"], errors="raise")
 
     # Combine both tables.
     tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="inner", short_name=paths.short_name)
@@ -581,22 +570,9 @@ def run() -> None:
 
     # Further visual inspection to get the final list of selected countries.
     # further_visual_inspection(tb_change=tb_change, countries_decoupled=countries_decoupled)
-    # We remove some unclear cases from the list:
-    countries_decoupled = countries_decoupled - {
-        "Mozambique",
-        "Botswana",
-        "Mongolia",
-        "Russia",
-        "Singapore",
-        "Switzerland",
-        "Uruguay",
-    }
 
     # Compare old and new list of decoupled countries.
     # compare_old_and_new_countries(tb_change=tb_change, countries_decoupled=countries_decoupled)
-
-    # Create the final list of selected countries, and the grid.
-    # plot_final_selection(tb_change=tb_change, countries_decoupled=countries_decoupled, year_min=year_min_best, year_max=year_max_best)
 
     # Create a simple table with the selected window of years for the selected countries.
     tb_window = tb_change[
