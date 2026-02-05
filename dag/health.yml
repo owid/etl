@@ -1383,3 +1383,8 @@ steps:
   # Tuberculosis outcomes - WHO
   data://meadow/tuberculosis/2026-02-05/outcomes:
     - snapshot://tuberculosis/2026-02-05/outcomes.csv
+  data://garden/tuberculosis/2026-02-05/outcomes:
+    - data://meadow/tuberculosis/2026-02-05/outcomes
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+  data://grapher/tuberculosis/2026-02-05/outcomes:
+    - data://garden/tuberculosis/2026-02-05/outcomes
