@@ -65,6 +65,10 @@ definitions:
     - This enables standardized comparison across different population sizes and provides an estimate of the significance of the tourism sector in terms of employment.
     - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
 
+  # --- Visitor-type note (receipts / expenditure) ---
+  note_all_visitor_types: &note_all_visitor_types |-
+    Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+
   # --- Employment ---
   desc_key_employment: &desc_key_employment
     - Includes employees and the self-employed.
@@ -310,50 +314,64 @@ tables:
       # =========================================================================
 
       in_tour_exp_balance_of_payments_travel_vis:
-        title: Inbound tourism expenditure on travel
+        title: Spending by international visitors while visiting a country on travel
         unit: current US$
         short_unit: $
-        description_short: Money earned from foreign visitors spending on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
         description_key:
           - *desc_key_inbound_travel
-
-      in_tour_exp_travel_share_gdp:
-        title: Inbound tourism expenditure on travel as a share of GDP
-        unit: "%"
-        short_unit: "%"
-        description_short: Money earned from foreign visitors spending on accommodation, food, local transport, entertainment, shopping, and cruise fares as a percentage of the country's [GDP](#dod:gdp).
-        description_key:
-          - *desc_key_inbound_travel
-          - A high percentage means that the country earns a large amount from foreign visitors relative to the size of the economy. A low percentage means it earns relatively little.
-          - In small countries with a lot of tourism, this ratio can look very large. This is because this indicator compares total international tourist spending to the overall size of the economy, [GDP](#dod:gdp). It is not the same as the tourism sector's contribution to GDP, which is shown in this other chart[https://ourworldindata.org/grapher/tourism-gdp-proportion-of-total-gdp].
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
 
       in_tour_exp_balance_of_payments_passenger_transport_vis:
-        title: Inbound tourism expenditure on passenger transport
+        title: Spending by international visitors while visiting a country on passenger transport
         unit: current US$
         short_unit: $
-        description_short: Money earned from fares paid to the country's airlines by foreign visitors, including airfares, excess baggage fees, and onboard purchases.
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
         description_key:
           - *desc_key_inbound_passenger_transport
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
 
       in_tour_exp_balance_of_payments_total_vis:
-        title: Total inbound tourism expenditure
+        title: Spending by international visitors while visiting a country
         unit: current US$
         short_unit: $
-        description_short: Money earned from foreign visitors spending on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines.
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, local transport, entertainment, shopping, and fares paid to the country’s own airlines. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
         description_key:
           - *desc_key_inbound_total
         presentation:
-          title_public: International tourist expenditure within the country they visit
           grapher_config:
-            note: All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      in_tour_exp_total_share_gdp:
+        title: Spending by international visitors while visiting a country as a share of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, transport, entertainment, shopping, and fares paid to the country’s own airlines, as a share of, as a share of [GDP](#dod:gdp).
+        description_key:
+          - *desc_key_inbound_total
+          - A high percentage means that the country earns a large amount from foreign visitors relative to the size of the economy. A low percentage means it earns relatively little.
+          - In small countries with a lot of tourism, this ratio can look very large. This is because this indicator compares total international tourist spending to the overall size of the economy, [GDP](#dod:gdp). It is not the same as the tourism sector's contribution to GDP, which is shown in this [other chart](https://ourworldindata.org/grapher/tourism-gdp-proportion-of-total-gdp).
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 2
 
       inbound_exp_ppp_cpi_adj_2021:
-        title: International tourist expenditure within the country they visit (in international-$ in 2021 prices)
+        title: Spending by international visitors while visiting a country (in international-$ in 2021 prices)
         unit: international-$ in 2021 prices
         short_unit: $
-        description_short: Money earned from foreign visitors spending on accommodation, food, transport, entertainment, and shopping, plus fares paid to the country's own airlines. This data is adjusted for inflation and differences in living costs between countries.
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, transport, entertainment, shopping, and fares paid to the country’s own airlines. This data is adjusted for inflation and differences in living costs between countries.
         description_key:
           - *desc_key_inbound_total
           - *note_ppp_cpi_adjustment
@@ -361,7 +379,9 @@ tables:
           We adjusted the data to account for both local inflation and differences in cost of living across countries. First, we converted expenditures from US dollars to local currency using official exchange rates. Then we adjusted for local inflation using each country's Consumer Price Index (CPI), normalized to 2021. Finally, we converted the values to international dollars using purchasing power parity (PPP) conversion factors for private consumption from 2021.
         presentation:
           grapher_config:
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+        display:
+          numDecimalPlaces: 0
 
       # =========================================================================
       # OUTBOUND TOURISM — DEPARTURES
@@ -389,45 +409,63 @@ tables:
       # =========================================================================
 
       out_tour_exp_balance_of_payments_travel_vis:
-        title: Outbound tourism expenditure on travel
+        title: Spending by a country’s residents while travelling abroad on travel (current US$)
         unit: current US$
         short_unit: $
-        description_short: Money spent by a country's residents abroad on accommodation, food, local transport, entertainment, shopping, and cruise fares.
+        description_short: Money spent by a country's residents abroad on accommodation, food, local transport, entertainment, shopping, and cruise fares. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
         description_key:
           - *desc_key_outbound_travel
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
 
       out_tour_exp_balance_of_payments_passenger_transport_vis:
-        title: Outbound tourism expenditure on passenger transport
+        title: Spending by a country’s residents while travelling abroad on passenger transport (current US$)
         unit: current US$
         short_unit: $
-        description_short: Money spent on fares paid to foreign airlines by the country's residents, including airfares, excess baggage fees, and onboard purchases.
+        description_short: Money spent on fares paid to foreign airlines by the country's residents, including airfares, excess baggage fees, and onboard purchases. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
         description_key:
           - *desc_key_outbound_passenger_transport
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
 
       out_tour_exp_balance_of_payments_total_vis:
-        title: Total outbound tourism expenditure
+        title: Spending by a country’s residents while travelling abroad (current US$)
         unit: current US$
         short_unit: $
-        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines.
+        description_short: Money spent by a country’s residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
         description_key:
           - *desc_key_outbound_total
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
 
       out_tour_exp_total_share_gdp:
-        title: Total outbound tourism expenditure as a share of GDP
+        title: Spending by a country’s residents while travelling abroad as a share of GDP
         unit: "%"
         short_unit: "%"
         description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines, as a percentage of the country's [GDP](#dod:gdp).
         description_key:
           - *desc_key_outbound_total
           - A high percentage means that residents spend a large amount abroad relative to the size of the economy. A low percentage means they spend relatively little.
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
         display:
           numDecimalPlaces: 2
 
       outbound_exp_us_cpi_adj_2021:
-        title: International tourist expenditure by residents traveling abroad (in constant 2021 US$)
+        title: Spending by a country’s residents while travelling abroad (in constant 2021 US$)
         unit: constant 2021 US$
         short_unit: $
-        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, and shopping, plus fares paid to foreign airlines. This data is expressed in in constant 2021 US$. It is adjusted for inflation but does not account for differences in living costs between countries.
+        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines. This data is expressed in in constant 2021 US$. It is adjusted for inflation but does not account for differences in living costs between countries.
         description_key:
           - *desc_key_outbound_total
           - *note_us_cpi_adjustment
@@ -435,7 +473,9 @@ tables:
           We adjusted the data for US inflation by dividing nominal expenditure values by the US Consumer Price Index (CPI) adjustment factor, with 2021 as the base year. This accounts for changes in the purchasing power of the US dollar over time.
         presentation:
           grapher_config:
-            note: This data is expressed in constant 2021 US$, adjusted for inflation using the US Consumer Price Index.
+            note: This data is expressed in constant 2021 US$, adjusted for inflation using the US Consumer Price Index. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+        display:
+          numDecimalPlaces: 0
 
       # =========================================================================
       # RATIOS AND COMPARATIVE METRICS
