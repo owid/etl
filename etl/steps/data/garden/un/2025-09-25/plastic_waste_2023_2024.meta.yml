@@ -63,7 +63,7 @@ tables:
         display:
           numDecimalPlaces: 0
           tolerance: 5
-          
+
       import_air:
         title: Plastic waste imports by air
         unit: tonnes
@@ -102,8 +102,7 @@ tables:
         description_processing: We calculated this by converting total imports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
           tolerance: 5
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
         presentation:
           grapher_config:
             map:
@@ -125,8 +124,7 @@ tables:
         description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
             tolerance: 5
-            roundingMode: significantFigures
-            numSignificantFigures: 2
+            numDecimalPlaces: 1
         presentation:
           grapher_config:
             map:
@@ -148,8 +146,7 @@ tables:
         description_processing: We calculated this by subtracting total imports from total exports for each country and year.
         display:
           tolerance: 5
-          roundingMode: significantFigures
-          numSignificantFigures: 1
+          numDecimalPlaces: 0
         presentation:
           grapher_config:
             map:
@@ -171,8 +168,7 @@ tables:
         description_processing: We calculated this by dividing each country's total imports by the global sum of imports for that year, then multiplying by 100 to express as a percentage.
         display:
           tolerance: 5
-          roundingMode: significantFigures
-          numSignificantFigures: 1
+          numDecimalPlaces: 1
 
       export_share:
         title: Share of global plastic waste exports
@@ -188,8 +184,7 @@ tables:
         description_processing: We calculated this by dividing each country's total exports by the global sum of exports for that year, then multiplying by 100 to express as a percentage.
         display:
           tolerance: 5
-          roundingMode: significantFigures
-          numSignificantFigures: 1
+          numDecimalPlaces: 1
 
       net_export_per_capita:
         title: Net plastic waste exports per capita
@@ -206,9 +201,8 @@ tables:
           - *data_caveat
         description_processing: We calculated this by converting net exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
+          numDecimalPlaces: 1
           tolerance: 5
-          roundingMode: significantFigures
-          numSignificantFigures: 2
         presentation:
           grapher_config:
             map:
@@ -230,8 +224,7 @@ tables:
           - *data_caveat
         description_processing: We calculated this by dividing air exports by total exports for each country and year, then multiplying by 100 to express as a percentage.
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 1
+          numDecimalPlaces: 1
           tolerance: 5
 
       import_share_transported_by_air:
@@ -248,6 +241,5 @@ tables:
           - *data_caveat
         description_processing: We calculated this by dividing air imports by total imports for each country and year, then multiplying by 100 to express as a percentage.
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 1
+          numDecimalPlaces: 1
           tolerance: 5
