@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 SNAPSHOT_FILES = {
     "ihme_2020_fertility.zip": "IHME_POP_2017_2100_TFR_Y2020M05D01.CSV",
     "ihme_2020_migration.zip": "IHME_POP_2017_2100_MIGRATION_Y2020M05D01.CSV",
-    "ihme_2020_population.zip": "IHME_POP_2017_2100_POP_REFERENCE_Y2020M05D01.CSV",
+    "ihme_2020_population.zip": "IHME_POP_2017_2100_POP_BOTH_SEX_ALL_AGE_Y2020M05D01.CSV",
     "ihme_2020_life_expectancy.zip": "IHME_POP_2017_2100_LIFE_EXPECTANCY_Y2020M05D01.CSV",
     "ihme_2020_population_retro.zip": "IHME_POP_2017_2100_POP_PAST_Y2020M05D01.CSV",
 }
