@@ -43,7 +43,7 @@ def run() -> None:
 
         # Replace unknown scenario with "reference" scenario.
         if "scenario_name" in tb.columns:
-            tb["scenario_name"] = tb["scenario_name"].fillna("Reference")
+            tb["scenario_name"] = tb["scenario_name"].fillna("estimates_past")
 
         # Drop duplicates
         tb = tb.drop(columns=["location_id"])
