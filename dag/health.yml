@@ -1380,3 +1380,6 @@ steps:
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
   data://grapher/tuberculosis/2026-02-05/expenditure:
     - data://garden/tuberculosis/2026-02-05/expenditure
+  # Tuberculosis outcomes - WHO
+  data://meadow/tuberculosis/2026-02-05/outcomes:
+    - snapshot://tuberculosis/2026-02-05/outcomes.csv
