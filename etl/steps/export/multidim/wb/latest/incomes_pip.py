@@ -121,7 +121,7 @@ def run() -> None:
 
     # Group all deciles together (only for avg, thr, share - not mean/median)
     decile_choices = c.get_choice_names("decile")
-    decile_values = [slug for slug, name in decile_choices.items() if name and slug not in ("all", "10_40_50")]
+    decile_values = [slug for slug, name in decile_choices.items() if name and slug not in ("all", "10_40_50", "10_40_50_bar")]
     c.group_views(
         groups=[
             {
@@ -218,8 +218,8 @@ def _keep_decile_view(v):
     # Keep deciles 5 and 9 only for thr indicator
     if decile in ["5", "9"] and indicator == "thr":
         return True
-    # Keep 10_40_50 only for share indicator
-    if decile == "10_40_50" and indicator == "share":
+    # Keep 10_40_50 and 10_40_50_bar only for share indicator
+    if decile in ["10_40_50", "10_40_50_bar"] and indicator == "share":
         return True
     return False
 

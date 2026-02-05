@@ -51,6 +51,8 @@ dimensions:
         name: "Richest 10%"
       - slug: "10_40_50"
         name: Richest 10%, middle 40%, poorest 50%
+      - slug: "10_40_50_bar"
+        name: Richest 10%, middle 40%, poorest 50% (bar chart)
       - slug: all
         name: All deciles
       - slug: nan
@@ -104,5 +106,36 @@ views:
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."
+
+  - dimensions:
+      indicator: share
+      decile: "10_40_50_bar"
+      period: nan
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: inequality#bottom50_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#middle40_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Middle 40%"
+        - catalogPath: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Richest 10%"
+    config:
+      title: Distribution of income across richer and poorer groups
+      subtitle: The share of income received by different income groups.
+      note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+      sortBy: column
+      sortColumnSlug: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideTotalValueLabel: true
     metadata:
       description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."
