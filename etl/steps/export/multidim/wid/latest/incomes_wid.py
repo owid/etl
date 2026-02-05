@@ -12,12 +12,10 @@ PPP_YEAR = 2021
 # Define indicators to use
 INDICATORS = ["share"]
 
-# Define dimensions for main views
+# Define dimensions for main views (period and extrapolated are filtered out, not user-selectable)
 DIMENSIONS_CONFIG = {
     "welfare_type": ["before tax", "after tax"],
     "quantile": "*",
-    "period": "*",
-    "extrapolated": "no",
 }
 
 
@@ -32,13 +30,18 @@ def run() -> None:
     ds = paths.load_dataset("world_inequality_database")
     tb = ds.read("incomes", load_data=False)
 
-    # Remove unwanted dimensions.
-    # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.
+    # Filter columns to only keep extrapolated=no, then remove that dimension from metadata.
+    # Also keep only specific periods and remove that dimension too.
+    columns_to_keep = []
     for column in tb.drop(columns=["country", "year"]).columns:
-        # Remove dimensions that are not needed.
-        for dimension in ["period", "extrapolated"]:
-            if dimension in tb[column].metadata.dimensions:
-                tb[column].metadata.dimensions.pop(dimension)
+        dims = tb[column].metadata.dimensions
+        if dims and dims.get("extrapolated") == "no":
+            columns_to_keep.append(column)
+            # Remove dimensions that are not needed (they're now fixed values)
+            for dimension in ["period", "extrapolated"]:
+                if dimension in dims:
+                    dims.pop(dimension)
+    tb = tb[columns_to_keep]
 
     # Bake config automatically from table
     config_new = expand_config(
@@ -62,9 +65,8 @@ def run() -> None:
         short_name="incomes_wid",
     )
 
-    # Group all deciles together (only for avg, thr, share - not mean/median)
-    decile_choices = c.get_choice_names("quantile")
-    decile_values = [slug for slug, name in decile_choices.items() if name and slug not in ("all", "10_40_50")]
+    # Group deciles 1-10 together into an "all" view
+    decile_values = [str(i) for i in range(1, 11)]
     c.group_views(
         groups=[
             {
@@ -98,13 +100,11 @@ def run() -> None:
     # Build mapping of catalogPath to display name from table metadata
     indicator_display_names = _build_indicator_display_names(tb)
 
-    # For "all" decile views, clean up indicator display names, sort by decile, and set titles
+    # For "all" decile views (not 10_40_50), clean up indicator display names, sort by decile, and set titles
     for view in c.views:
-        if view.matches(quantile="all") and view.indicators.y:
-            # Sort indicators by decile number
-            # For share: richest to poorest; for others: poorest to richest
-            reverse_order = view.matches(indicator="share")
-            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
+        if view.dimensions.get("quantile") == "all" and view.indicators.y:
+            # Sort indicators by decile number (richest to poorest)
+            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=True)
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
@@ -140,10 +140,10 @@ def _build_indicator_display_names(tb):
 
 
 def _get_decile_number(ind):
-    """Extract decile number from indicator catalogPath."""
-    # Check in reverse order to avoid decile_1 matching decile_10
+    """Extract decile/quantile number from indicator catalogPath."""
+    # Check in reverse order to avoid quantile_1 matching quantile_10
     for i in range(10, 0, -1):
-        if f"decile_{i}__" in ind.catalogPath or ind.catalogPath.endswith(f"decile_{i}"):
+        if f"quantile_{i}__" in ind.catalogPath or ind.catalogPath.endswith(f"quantile_{i}"):
             return i
     return 0
 
@@ -156,5 +156,10 @@ def _get_display_name_from_metadata(ind, indicator_titles):
         start, end = text.find("("), text.find(")")
         if start != -1 and end != -1:
             extracted = text[start + 1 : end]
+            # Remove welfare type suffix if present
+            for suffix in [", before tax", ", after tax"]:
+                if extracted.endswith(suffix):
+                    extracted = extracted[: -len(suffix)]
+                    break
             return extracted[0].upper() + extracted[1:] if extracted else extracted
     return None

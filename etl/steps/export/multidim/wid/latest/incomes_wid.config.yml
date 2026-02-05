@@ -44,18 +44,18 @@ views:
       welfare_type: before tax
     indicators:
       y:
-        - catalogPath: inequality#share_bottom_50__welfare_type_before_tax__extrapolated_no
-          display:
-            name: "Poorest 50%"
-        - catalogPath: inequality#share_middle_40__welfare_type_before_tax__extrapolated_no
-          display:
-            name: "Middle 40%"
-        - catalogPath: inequality#share_top_90_99__welfare_type_before_tax__extrapolated_no
-          display:
-            name: "Next 9%"
         - catalogPath: inequality#share_top_1__welfare_type_before_tax__extrapolated_no
           display:
             name: "Richest 1%"
+        - catalogPath: inequality#share_top_90_99__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Next 9%"
+        - catalogPath: inequality#share_middle_40__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_bottom_50__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Poorest 50%"
     config:
       title: Distribution of income across richer and poorer groups (before tax)
       subtitle: The share of income received by different income groups. Income here is measured before taxes and benefits.
@@ -72,18 +72,18 @@ views:
       welfare_type: after tax
     indicators:
       y:
-        - catalogPath: inequality#share_bottom_50__welfare_type_after_tax__extrapolated_no
-          display:
-            name: "Poorest 50%"
-        - catalogPath: inequality#share_middle_40__welfare_type_after_tax__extrapolated_no
-          display:
-            name: "Middle 40%"
-        - catalogPath: inequality#share_top_90_99__welfare_type_after_tax__extrapolated_no
-          display:
-            name: "Next 9%"
         - catalogPath: inequality#share_top_1__welfare_type_after_tax__extrapolated_no
           display:
             name: "Richest 1%"
+        - catalogPath: inequality#share_top_90_99__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Next 9%"
+        - catalogPath: inequality#share_middle_40__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_bottom_50__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Poorest 50%"
     config:
       title: Distribution of income across richer and poorer groups (after tax)
       subtitle: The share of income received by different income groups. Income here is measured after taxes and benefits.
