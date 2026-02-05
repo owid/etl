@@ -15,6 +15,8 @@ steps:
     - data://garden/wb/2026-01-22/world_bank_pip
   export://multidim/wb/latest/poverty_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/incomes_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
   # Legacy PIP pipeline
   data://garden/wb/2025-10-09/world_bank_pip_legacy:
     - data://meadow/wb/2025-10-09/world_bank_pip
@@ -43,6 +45,8 @@ steps:
     - data://meadow/wid/2026-01-02/world_inequality_database
   data://grapher/wid/2026-01-12/world_inequality_database:
     - data://garden/wid/2026-01-12/world_inequality_database
+  export://multidim/wid/latest/incomes_wid:
+    - data://grapher/wid/2026-01-12/world_inequality_database
 
     # Legacy WID pipeline
   data://garden/wid/2026-01-02/world_inequality_database_legacy:
@@ -185,9 +189,3 @@ steps:
     - snapshot://poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al.xlsx
   data://garden/poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al:
     - data://meadow/poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al
-
-  #
-  # WB PIP incomes MDim
-  #
-  export://multidim/wb/latest/incomes_pip:
-    - data://grapher/wb/2026-01-22/world_bank_pip

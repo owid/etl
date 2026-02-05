@@ -160,7 +160,7 @@ def run() -> None:
             view.config["chartTypes"] = ["StackedArea"]
 
     # Build mapping of catalogPath to display name from table metadata
-    indicator_titles = _build_indicator_titles(tb)
+    indicator_display_names = _build_indicator_display_names(tb)
 
     # For "all" decile views, clean up indicator display names, sort by decile, and set titles
     for view in c.views:
@@ -172,7 +172,7 @@ def run() -> None:
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
-                name = _get_display_name_from_metadata(ind, indicator_titles)
+                name = _get_display_name_from_metadata(ind, indicator_display_names)
                 if name:
                     ind.display = {"name": name}
 
@@ -193,7 +193,9 @@ def run() -> None:
                 view.metadata = {"description_short": subtitle}
             elif view.matches(indicator="share"):
                 view.config["title"] = "Income or consumption share for each decile"
-                subtitle = "The share of after tax income or consumption received by each decile (tenth of the population)."
+                subtitle = (
+                    "The share of after tax income or consumption received by each decile (tenth of the population)."
+                )
                 view.config["subtitle"] = subtitle
                 view.metadata = {"description_short": subtitle}
 
@@ -222,15 +224,15 @@ def _keep_decile_view(v):
     return False
 
 
-def _build_indicator_titles(tb):
+def _build_indicator_display_names(tb):
     """Build mapping of column names to display names from table metadata."""
-    indicator_titles = {}
+    indicator_display_names = {}
     for col in tb.columns:
         if col not in ["country", "year"]:
             display_name = tb[col].metadata.display.get("name", "") if tb[col].metadata.display else ""
             if display_name:
-                indicator_titles[col] = display_name
-    return indicator_titles
+                indicator_display_names[col] = display_name
+    return indicator_display_names
 
 
 def _get_decile_number(ind):
