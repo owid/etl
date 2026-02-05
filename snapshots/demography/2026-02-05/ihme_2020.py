@@ -1,4 +1,18 @@
-"""Script to create a snapshot of dataset."""
+"""Files for this snapshot have been downloaded manually from the IHME website.
+Some of the files include retrospective estimates and forecasts together, some are split, some just provide forecasts, etc.
+
+INSTRUCTIONS:
+1. Go to https://ghdx.healthdata.org/record/ihme-data/global-population-forecasts-2017-2100
+2. Register / Log In
+3. Click on "Files" tab, and download relevant files, which as of February 2026 are:
+    - Population forecast, all scenarios, all ages and both sexes: 2018-2100 [CSV]
+    - Population estimates: 1950-2017 - Data and Codebook [CSV]
+    - Total fertility rate (TFR) retrospective estimates and forecasts, all scenarios: 1950-2100 [CSV]
+    - Life expectancy retrospective estimates and forecasts, all scenarios: 1990-2100 - Data and Codebook [CSV]
+    - Migration forecast: 2018-2100 - Data and Codebook [CSV]
+
+EXTRA: Refer to their "Data Release Information Sheet" pdf file to learn more about the data (https://ghdx.healthdata.org/sites/default/files/record-attached-files/IHME_POP_2017_2100_INFO_SHEET_Y2020M05D01.PDF)
+"""
 
 import click
 
