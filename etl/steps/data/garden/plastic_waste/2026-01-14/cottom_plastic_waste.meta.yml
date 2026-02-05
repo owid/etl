@@ -365,8 +365,7 @@ tables:
         description_short: Estimated amount of municipal solid waste generated per person in a year from households and similar sources, such as shops and offices.
         description_key: *desc_key_msw_generation_per_cap
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
 
       pwg:
         title: Plastic waste generation
@@ -393,7 +392,7 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       plas_debris_em:
         title: Plastic pollution in a form of debris
@@ -448,8 +447,7 @@ tables:
         description_short: Estimated amount of plastic waste that ends up in the environment as unburned debris (physical plastic pieces) per person per year from municipal sources such as households, shops, and offices, after escaping waste management.
         description_key: *desc_key_plastic_pollution_debris_per_cap
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Debris pollution per capita
         presentation:
           title_public: Plastic pollution in a form of debris per capita
@@ -464,8 +462,7 @@ tables:
         description_short: Estimated amount of plastic waste burned in open, uncontrolled fires per person per year from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_pollution_burn_per_cap
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Open burning pollution per capita
         presentation:
           title_public: Plastic pollution from open burning per capita
@@ -482,8 +479,7 @@ tables:
         description_processing: *processing_share_global_burn
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Share of global open burning pollution
         presentation:
           title_public: Share of global plastic pollution from open burning
@@ -500,8 +496,7 @@ tables:
         description_processing: *processing_share_global_debris
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Share of global debris pollution
         presentation:
           title_public: Share of global plastic pollution in a form of debris
@@ -518,8 +513,7 @@ tables:
         description_processing: *processing_share_global
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Share of global plastic pollution
         presentation:
           grapher_config:
@@ -533,8 +527,7 @@ tables:
         description_short: Estimated total amount of plastic waste released to the environment per person each year through debris and open burning from municipal sources such as households, shops, and offices.
         description_key: *desc_key_plastic_pollution_total_per_cap
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Total plastic pollution per capita
         presentation:
           title_public: Total plastic pollution per capita
@@ -631,8 +624,7 @@ tables:
         description_processing: *processing_per_cap_litter
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Littering
         presentation:
           title_public: Plastic pollution from littering per capita
@@ -649,8 +641,7 @@ tables:
         description_processing: *processing_per_cap_uncollected
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Uncollected waste
         presentation:
           title_public: Plastic pollution from uncollected waste per capita
@@ -667,8 +658,7 @@ tables:
         description_processing: *processing_per_cap_collection
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Collection and transport
         presentation:
           title_public: Plastic pollution from collection and transport per capita
@@ -685,8 +675,7 @@ tables:
         description_processing: *processing_per_cap_disposal
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Disposal sites
         presentation:
           title_public: Plastic pollution from disposal per capita
@@ -703,8 +692,7 @@ tables:
         description_processing: *processing_per_cap_recycling
         processing_level: major
         display:
-          roundingMode: significantFigures
-          numSignificantFigures: 2
+          numDecimalPlaces: 1
           name: Rejects
         presentation:
           title_public: Plastic pollution from rejects of recycling per capita
