@@ -20,6 +20,8 @@ DIMENSIONS_CONFIG = {
     "survey_comparability": "*",
 }
 
+PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
+
 
 def run() -> None:
     #
@@ -146,7 +148,9 @@ def run() -> None:
 
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
     # Also remove grouped decile views for Spells (we don't want those)
-    c.views = [v for v in c.views if _keep_decile_view(v) and not v.matches(decile="all", survey_comparability="Spells")]
+    c.views = [
+        v for v in c.views if _keep_decile_view(v) and not v.matches(decile="all", survey_comparability="Spells")
+    ]
 
     # Update chart type for share indicator grouped views to StackedArea
     for view in c.views:
@@ -158,10 +162,9 @@ def run() -> None:
     # Build mapping of catalogPath to display name from table metadata
     indicator_titles = _build_indicator_titles(tb)
 
-    # For "all" decile views, clean up indicator display names and sort by decile
+    # For "all" decile views, clean up indicator display names, sort by decile, and set titles
     for view in c.views:
         if view.matches(decile="all") and view.indicators.y:
-
             # Sort indicators by decile number
             # For share: richest to poorest; for others: poorest to richest
             reverse_order = view.matches(indicator="share")
@@ -172,6 +175,27 @@ def run() -> None:
                 name = _get_display_name_from_metadata(ind, indicator_titles)
                 if name:
                     ind.display = {"name": name}
+
+            # Set titles and subtitles based on indicator type
+            period = view.dimensions.get("period")
+            if view.config is None:
+                view.config = {}
+
+            if view.matches(indicator="thr"):
+                view.config["title"] = f"Threshold income or consumption per {period} for each decile"
+                subtitle = f"The level of after tax income or consumption per person per {period} below which 10%, 20%, 30%, etc. of the population falls. {PPP_ADJUSTMENT_SUBTITLE}"
+                view.config["subtitle"] = subtitle
+                view.metadata = {"description_short": subtitle}
+            elif view.matches(indicator="avg"):
+                view.config["title"] = f"Mean income or consumption per {period} within each decile"
+                subtitle = f"The mean after tax income or consumption per person per {period} within each decile (tenth of the population). {PPP_ADJUSTMENT_SUBTITLE}"
+                view.config["subtitle"] = subtitle
+                view.metadata = {"description_short": subtitle}
+            elif view.matches(indicator="share"):
+                view.config["title"] = "Income or consumption share for each decile"
+                subtitle = "The share of after tax income or consumption received by each decile (tenth of the population)."
+                view.config["subtitle"] = subtitle
+                view.metadata = {"description_short": subtitle}
 
     #
     # Save garden dataset.

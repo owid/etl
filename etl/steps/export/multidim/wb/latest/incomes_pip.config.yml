@@ -98,20 +98,11 @@ views:
             name: "Richest 10%"
     config:
       title: Distribution of income across richer and poorer groups
-      subtitle: The share of income received by different income groups. Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
-      # note: "{definitions.ppp_adjustment_welfare_type_note}"
+      subtitle: The share of income received by different income groups.
+      note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
-    # metadata:
-    #   description_key:
-    #     - "{definitions.description_key_extreme_poverty}"
-    #     - "{definitions.description_key_extreme_poverty_additional}"
-    #     - "{definitions.description_key_lmic_poverty_line}"
-    #     - "{definitions.description_key_umic_poverty_line}"
-    #     - "{definitions.description_key_ppp}"
-    #     - "{definitions.description_key_not_market_income}"
-    #     - "{definitions.description_key_nowcasts}"
-    #     - "{definitions.description_key_welfare_type}"
-    #   description_short: "{definitions.ppp_adjustment_subtitle}"
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."
