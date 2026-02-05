@@ -115,7 +115,10 @@ def run() -> None:
 
     # Filter quantile views: keep only specific quantiles
     c.views = [
-        v for v in c.views if v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"]
+        v
+        for v in c.views
+        if v.dimensions.get("quantile")
+        in ["Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"]
     ]
 
     # Build mapping of catalogPath to display name from table metadata
@@ -202,9 +205,7 @@ def run() -> None:
 
                 # Extract and modify description_short (remove welfare type phrase)
                 description_short = meta.description_short or ""
-                description_short = description_short.replace(
-                    " Income here is measured before taxes and benefits.", ""
-                )
+                description_short = description_short.replace(" Income here is measured before taxes and benefits.", "")
 
                 # Get description_key and remove first element
                 description_key = list(meta.description_key) if meta.description_key else []
@@ -235,6 +236,98 @@ def run() -> None:
                     ind.display = {"name": "Before tax"}
                 elif "after_tax" in ind.catalogPath:
                     ind.display = {"name": "After tax"}
+
+    # Group welfare_type (before vs after tax) as scatter plot for specific quantiles
+    c.group_views(
+        groups=[
+            {
+                "dimension": "welfare_type",
+                "choices": ["before tax", "after tax"],
+                "choice_new_slug": "before_vs_after_scatter",
+                "view_config": {
+                    "hideRelativeToggle": True,
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["ScatterPlot"],
+                },
+            },
+        ],
+    )
+
+    # Remove grouped scatter views for quantiles we don't want (keep only Richest 0.1%, Richest 1%, 10)
+    c.views = [
+        v
+        for v in c.views
+        if v.dimensions.get("welfare_type") != "before_vs_after_scatter"
+        or v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10"]
+    ]
+
+    # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
+    for view in c.views:
+        if view.dimensions.get("welfare_type") == "before_vs_after_scatter" and view.indicators.y:
+            # Find before_tax and after_tax indicators
+            before_tax_ind = None
+            after_tax_ind = None
+            for ind in view.indicators.y:
+                if "before_tax" in ind.catalogPath:
+                    before_tax_ind = ind
+                elif "after_tax" in ind.catalogPath:
+                    after_tax_ind = ind
+
+            # Set x to before_tax, y to after_tax, size to population, color to region
+            if before_tax_ind and after_tax_ind:
+                from etl.collection.model.view import Indicator
+
+                before_tax_ind.display = {"name": "Before tax"}
+                after_tax_ind.display = {"name": "After tax"}
+                view.indicators.x = before_tax_ind
+                view.indicators.y = [after_tax_ind]
+                view.indicators.size = Indicator(
+                    catalogPath="grapher/demography/2024-07-15/population/historical#population_historical"
+                )
+                view.indicators.color = Indicator(
+                    catalogPath="grapher/regions/2023-01-01/regions/regions#owid_region"
+                )
+
+            # Get metadata from after_tax indicator for title/subtitle
+            if after_tax_ind:
+                col_name = after_tax_ind.catalogPath.split("#")[-1] if "#" in after_tax_ind.catalogPath else None
+                if col_name and col_name in tb.columns:
+                    meta = tb[col_name].metadata
+                    grapher_config = meta.presentation.grapher_config if meta.presentation else {}
+
+                    # Extract and modify title
+                    title = grapher_config.get("title", "")
+                    title = title.replace("after tax", "before vs. after tax")
+
+                    # Determine axis min based on quantile
+                    quantile = view.dimensions.get("quantile")
+                    axis_min_map = {
+                        "Richest 0.1%": 0,
+                        "Richest 1%": 5,
+                        "10": 20,
+                    }
+                    axis_min = axis_min_map.get(quantile, 0)
+
+                    # Set config
+                    view.config = {
+                        "title": title,
+                        "subtitle": "Comparing the share of income before and after taxes and benefits.",
+                        "hideRelativeToggle": True,
+                        "hasMapTab": False,
+                        "tab": "chart",
+                        "chartTypes": ["ScatterPlot"],
+                        "comparisonLines": [{"yEquals": "x"}, {"yEquals": "0.75*x", "label": "25% reduction"}, {"yEquals": "0.5*x", "label": "50% reduction"}],
+                        "matchingEntitiesOnly": True,
+                        "minTime": "latest",
+                        "xAxis": {"min": axis_min},
+                        "yAxis": {"min": axis_min},
+                    }
+
+                    # Set metadata
+                    view.metadata = {
+                        "description_short": "Comparing the share of income before and after taxes and benefits.",
+                    }
 
     #
     # Save garden dataset.

@@ -41,6 +41,8 @@ dimensions:
         name: After tax
       - slug: before_vs_after
         name: Before vs. after tax
+      - slug: before_vs_after_scatter
+        name: Before vs. after tax (scatter)
 
 views:
   - dimensions:
