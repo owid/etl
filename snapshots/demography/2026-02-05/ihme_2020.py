@@ -50,7 +50,6 @@ python snapshots/demography/2026-02-05/ihme_2020.py \
         "migration": path_to_migration,
     }
 
-    print(1)
     # Process only files with provided paths
     for name, path_to_file in file_paths.items():
         if path_to_file is None:
