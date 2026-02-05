@@ -87,15 +87,15 @@ views:
       survey_comparability: No spells
     indicators:
       y:
-        - catalogPath: inequality#bottom50_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
-          display:
-            name: "Poorest 50%"
-        - catalogPath: inequality#middle40_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
-          display:
-            name: "Middle 40%"
         - catalogPath: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Richest 10%"
+        - catalogPath: inequality#middle40_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#bottom50_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Poorest 50%"
     config:
       title: Distribution of income across richer and poorer groups
       subtitle: The share of income received by different income groups.
