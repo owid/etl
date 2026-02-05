@@ -122,6 +122,87 @@ def run() -> None:
             view.config["subtitle"] = subtitle
             view.metadata = {"description_short": subtitle}
 
+    # Group welfare_type (before vs after tax) for specific quantiles only
+    c.group_views(
+        groups=[
+            {
+                "dimension": "welfare_type",
+                "choices": ["before tax", "after tax"],
+                "choice_new_slug": "before_vs_after",
+                "view_config": {
+                    "hideRelativeToggle": True,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                },
+            },
+        ],
+    )
+
+    # Remove grouped welfare_type views for quantiles we don't want grouped (keep only Richest 0.1%, Richest 1%, 10)
+    c.views = [
+        v
+        for v in c.views
+        if v.dimensions.get("welfare_type") != "before_vs_after"
+        or v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10"]
+    ]
+
+    # Customize grouped welfare_type views (before_vs_after)
+    for view in c.views:
+        if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
+            # Get metadata from first indicator
+            first_ind = view.indicators.y[0]
+            col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
+
+            if col_name and col_name in tb.columns:
+                meta = tb[col_name].metadata
+                grapher_config = meta.presentation.grapher_config if meta.presentation else {}
+
+                # Extract and modify title
+                title = grapher_config.get("title", "")
+                title = title.replace("before tax", "before vs. after tax")
+
+                # Extract and modify subtitle (remove welfare type phrase)
+                subtitle = grapher_config.get("subtitle", "")
+                subtitle = subtitle.replace(" Income here is measured before taxes and benefits.", "")
+
+                # Extract and modify description_short (remove welfare type phrase)
+                description_short = meta.description_short or ""
+                description_short = description_short.replace(
+                    " Income here is measured before taxes and benefits.", ""
+                )
+
+                # Get description_key and remove first element
+                description_key = list(meta.description_key) if meta.description_key else []
+                if description_key:
+                    description_key = description_key[1:]
+
+                # Set config
+                view.config = {
+                    "title": title,
+                    "subtitle": subtitle,
+                    "note": "",
+                    "hideRelativeToggle": True,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                }
+
+                # Set metadata
+                view.metadata = {
+                    "description_short": description_short,
+                    "description_key": description_key,
+                }
+
+            # Set display names based on indicator (before tax or after tax)
+            for ind in view.indicators.y:
+                if "before_tax" in ind.catalogPath:
+                    ind.display = {"name": "Before tax"}
+                elif "after_tax" in ind.catalogPath:
+                    ind.display = {"name": "After tax"}
+
     #
     # Save garden dataset.
     #
