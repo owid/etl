@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 from .shared import add_dim_15plus, add_dim_some_education, add_prop, make_table
 
@@ -8,7 +8,7 @@ from .shared import add_dim_15plus, add_dim_some_education, add_prop, make_table
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -125,8 +125,7 @@ def run(dest_dir: str) -> None:
         tb_sex_age_edu.format(["country", "scenario", "sex", "age", "education", "year"], short_name="by_sex_age_edu"),
     ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
