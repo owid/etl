@@ -416,7 +416,7 @@ tables:
       out_tour_departures_trips_total_overnight_vis_tourists:
         title: International tourist departures
         unit: departures
-        description_short: Number of trips by residents who travel abroad and stay overnight.
+        description_short: Number of trips by country's residents who travel abroad and stay overnight.
         description_key:
           - *desc_key_departures
         display:
@@ -426,7 +426,7 @@ tables:
       out_tour_departures_trips_total_overnight_vis_tourists_per_1000:
         title: International tourist departures per 1,000 people
         unit: departures per 1,000 people
-        description_short: Number of trips by residents who travel abroad and stay overnight, per 1,000 people in the origin country's population.
+        description_short: Number of trips by country's residents who travel abroad and stay overnight, per 1,000 people in the origin country's population.
         description_key:
           - *desc_key_departures
           - *desc_key_per_1000_departures
