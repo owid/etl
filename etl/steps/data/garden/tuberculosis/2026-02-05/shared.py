@@ -7,11 +7,13 @@ def add_variable_description_from_producer(tb: Table, dd: Table) -> Table:
     """
     columns = tb.columns.difference(["country", "year"])
     for col in columns:
-        description_from_producer = dd.loc[dd.variable_name == col, "definition"].values[0]
+        matching_rows = dd.loc[dd.variable_name == col, "definition"].values
+        if len(matching_rows) == 0:
+            print(f"Column '{col}' not found in dd.variable_name")
+            continue
+        description_from_producer = matching_rows[0]
         if "_" in description_from_producer:
             tb[col].metadata.description_from_producer = ""
-        else:
-            tb[col].metadata.description_from_producer = description_from_producer
     return tb
 
 
