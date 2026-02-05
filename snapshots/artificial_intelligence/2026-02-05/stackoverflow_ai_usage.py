@@ -38,7 +38,6 @@ SURVEY_URLS = {
 PROF_DEV_ID = "sentiment-and-usage-ai-sel-prof"
 
 
-
 def _scrape_2023(soup: BeautifulSoup) -> tuple[list[dict], int]:
     """Parse the 2023 survey page (HTML table with data-percentage attributes)."""
     fig = soup.find("figure", id=lambda x: x and PROF_DEV_ID in x)
