@@ -79,32 +79,65 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["StackedArea"],
+                    "baseColorScheme": "OwidCategoricalE",
                 },
             },
         ],
     )
 
-    # Fix the "all" choice name (group_views sets it to the slug since it wasn't in the dimension)
+    # Group deciles 1-10 together as bar chart
+    c.group_views(
+        groups=[
+            {
+                "dimension": "quantile",
+                "choices": decile_values,
+                "choice_new_slug": "all_bar",
+                "view_config": {
+                    "hideRelativeToggle": True,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["StackedDiscreteBar"],
+                    "hideTotalValueLabel": True,
+                    "baseColorScheme": "OwidCategoricalE",
+                },
+            },
+        ],
+    )
+
+    # Fix the "all" and "all_bar" choice names (group_views sets it to the slug since it wasn't in the dimension)
     decile_dim = c.get_dimension("quantile")
     for choice in decile_dim.choices:
         if choice.slug == "all":
             choice.name = "All deciles"
-            break
+        elif choice.slug == "all_bar":
+            choice.name = "All deciles (bar chart)"
 
-    # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
-    # Also remove grouped decile views for Spells (we don't want those)
+    # Filter quantile views: keep only specific quantiles
     c.views = [
-        v for v in c.views if v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10", "10_40_50", "all"]
+        v for v in c.views if v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"]
     ]
 
     # Build mapping of catalogPath to display name from table metadata
     indicator_display_names = _build_indicator_display_names(tb)
 
-    # For "all" decile views (not 10_40_50), clean up indicator display names, sort by decile, and set titles
+    # For "all" and "all_bar" decile views, clean up indicator display names, sort by decile, and set titles
     for view in c.views:
-        if view.dimensions.get("quantile") == "all" and view.indicators.y:
-            # Sort indicators by decile number (richest to poorest)
-            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=True)
+        quantile = view.dimensions.get("quantile")
+        if quantile in ["all", "all_bar"] and view.indicators.y:
+            # Sort indicators by decile number
+            # For all: richest to poorest; for all_bar: poorest to richest
+            reverse_order = quantile == "all"
+            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
+
+            # For all_bar views, set sortBy to column and sortColumnSlug to decile 10 indicator
+            if quantile == "all_bar":
+                decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
+                if decile_10_ind:
+                    if view.config is None:
+                        view.config = {}
+                    view.config["sortBy"] = "column"
+                    view.config["sortColumnSlug"] = decile_10_ind.catalogPath
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
