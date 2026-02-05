@@ -24,7 +24,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Keep relevant countries
-    # https://api.census.gov/data/timeseries/idb/5year/variables.html
+    # https://api.census.gov/data/timeseries/idb/5  year/variables.html
     cols_index = ["country", "year"]
     cols_indicators = [
         "pop",

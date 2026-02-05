@@ -1,33 +1,74 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  others:
+    key_regions: |-
+      Regional aggregates (e.g. continents) are calculated by summing population values across member countries. For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data)
   common:
     presentation:
       topic_tags:
         - Population Growth
+      grapher_config:
+        hasMapTab: true
+      attribution_short: US Census Bureau
+    processing_level: minor
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: International Data Base (IDB)
+  description: |-
+    The U.S. Census Bureau's International Data Base (IDB) provides demographic and socioeconomic statistics for countries and areas of the world with populations of 5,000 or more. The database contains statistical tables of demographic data including population, mortality, fertility, and net migration by country and year.
+
+    This dataset includes key demographic indicators at 5-year intervals, providing comprehensive coverage of global population dynamics.
   update_period_days: 313
 
 tables:
   census_us_idb:
     variables:
       pop:
-        title: "Population"
-        description_short: "Total country population at midyear."
-        unit: "people"
+        title: Population
+        description_short: Total population at midyear.
+        description_key:
+          - "{definitions.others.key_regions}"
+        unit: people
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+
       tfr:
-        title: "Total fertility rate"
-        description_short: "Total fertility rate: Average number of children females would have by age 49 if the year's age-specific fertility rates remained constant"
-        unit: "live births per woman"
+        title: Total fertility rate
+        description_short: |-
+          The average number of children a woman would have by age 49 if current age-specific fertility rates remained constant.
+        description_key:
+          - The TFT assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
+          - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
+          - A TFR of 2.1 is generally considered the [replacement level](https://ourworldindata.org/grapher/replacement-fertility-rate) in developed countries, meaning the population would remain stable without migration.
+          - "{definitions.others.key_regions}"
+        unit: live births per woman
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+
       e0:
         title: Life expectancy at birth
-        description_short: |-
-          Life expectancy at birth, both sexes: Average number of years newborns would live if the year's age-specific mortality rates remained constant
-        unit: "years"
+        description_short: The average number of years a newborn would live if current age-specific mortality rates remained constant throughout their lifetime.
+        description_key:
+          - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+          - For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+          - "{definitions.others.key_regions}"
+        unit: years
+        short_unit: years
+        display:
+          numDecimalPlaces: 1
+
       nim:
-        title: Net migration
-        description_short: |-
-          Net international migrants, both sexes: Difference between the number of immigrants entering and emigrants leaving a country in a year
-        unit: "migrants"
+        title: Net international migration
+        description_short: The net number of international migrants (immigrants minus emigrants) in a given year.
+        description_key:
+          - Net international migration is the difference between the number of people entering a country (immigrants) and the number of people leaving (emigrants) during the year.
+          - Positive values indicate net immigration (more people entering than leaving), while negative values indicate net emigration.
+          - "{definitions.others.key_regions}"
+        unit: migrants
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
