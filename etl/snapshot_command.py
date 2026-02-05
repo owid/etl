@@ -211,7 +211,7 @@ def _find_files_by_pattern(dataset_name: str, extension: str) -> list[Path]:
 
     if len(path_parts) == 3:
         # Full path: namespace/version/short_name
-        # Use glob to support wildcard patterns in extension (e.g., '.*.dvc')
+        # Use glob to support patterns like ".*.dvc" for files like "name.zip.dvc"
         pattern = f"{dataset_name}{extension}"
         return list(paths.SNAPSHOTS_DIR.glob(pattern))
 

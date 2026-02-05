@@ -1,4 +1,11 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+Data from Wittgenstein Centre is made available via their Explorer: https://dataexplorer.wittgensteincentre.org/wcde-v3/
+
+For bulk download of all data files, we rely on direct URLs to their data server. These URLs are not very well documented publicly, but one can figure out based on the R-package https://guyabel.github.io/wcde/.
+
+Indicators available are listed in https://guyabel.github.io/wcde/reference/get_wcde.html#details
+"""
 
 import os
 import shutil
@@ -196,7 +203,3 @@ def get_data_historical(folder: str):
 
     # Zip file
     shutil.make_archive(folder, "zip", folder)
-
-
-if __name__ == "__main__":
-    main()
