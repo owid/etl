@@ -145,7 +145,7 @@ tables:
         description_key:
           - *desc_key_domestic
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       dom_tour_trips_total_overnight_vis_tourists_per_person:
@@ -157,7 +157,7 @@ tables:
           - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
           - This enables standardized comparison across different population sizes and provides an estimate of domestic tourism intensity.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
 
       dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
@@ -165,7 +165,7 @@ tables:
         unit: guests
         description_short: Number of domestic visitors who check in to hotels and similar accommodation establishments within their own country.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       # =========================================================================
@@ -180,7 +180,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_arrivals_us_note
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_overnight_vis_tourists_per_1000:
@@ -191,7 +191,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_per_1000_arrivals
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_same_day_vis_excur:
@@ -201,7 +201,7 @@ tables:
         description_key:
           - *desc_key_arrivals
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_same_day_vis_excur_per_1000:
@@ -212,7 +212,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_per_1000_same_day
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
@@ -220,7 +220,7 @@ tables:
         unit: guests
         description_short: Number of international visitors who check in to hotels and similar accommodation establishments.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       # =========================================================================
@@ -238,7 +238,7 @@ tables:
           grapher_config:
             note: *note_purpose
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_purpose_trips_by_personal_overnight_vis_tourists:
@@ -252,7 +252,7 @@ tables:
           grapher_config:
             note: *note_purpose
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       # =========================================================================
@@ -267,7 +267,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total:
@@ -278,7 +278,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
       in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total:
         title: International tourists visiting from the Americas
@@ -288,7 +288,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total:
@@ -299,7 +299,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total:
@@ -310,7 +310,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total:
@@ -321,7 +321,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total:
@@ -332,7 +332,7 @@ tables:
           - *desc_key_arrivals
           - *desc_key_region_origin
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       # =========================================================================
@@ -420,7 +420,7 @@ tables:
         description_key:
           - *desc_key_departures
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       out_tour_departures_trips_total_overnight_vis_tourists_per_1000:
@@ -431,7 +431,7 @@ tables:
           - *desc_key_departures
           - *desc_key_per_1000_departures
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
 
       # =========================================================================
@@ -520,7 +520,7 @@ tables:
           - For example, a ratio of 0.25 means there is one business traveler for every four personal travelers.
           - *desc_key_purpose
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
 
       inbound_outbound_tourism:
@@ -532,7 +532,7 @@ tables:
           - For example, a ratio of 2 means two tourists arrive for every one resident who travels abroad.
           - This ratio provides insight into whether a country is a net importer or exporter of tourists.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
 
       same_day_tourist_ratio:
@@ -544,7 +544,7 @@ tables:
           - For example, a ratio of 0.5 means there is one same-day visitor for every two overnight tourists.
           - High values are typical for countries with many land borders or those that serve as day-trip destinations from neighboring countries.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
 
       # =========================================================================
@@ -574,7 +574,7 @@ tables:
           grapher_config:
             note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 0
 
       employment_employed_persons_in_the_tour_ind_num_per_1000:
@@ -588,7 +588,7 @@ tables:
           grapher_config:
             note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
       # =========================================================================
       # ECONOMIC IMPACT
@@ -608,7 +608,7 @@ tables:
           - This indicator is used in the Sustainable Development Goals (SDG 8.9.1) to track progress in promoting sustainable tourism.
         description_from_producer: Tourism Direct GDP (TDGDP) is defined as the sum of the part of gross value added (at basic prices) generated by all industries in response to internal tourism consumption plus the amount of net taxes on products and imports included within the value of this expenditure at purchasers' prices.
         display:
-          tolerance: 3
+          tolerance: 2
           numDecimalPlaces: 1
 
       total_tables:
