@@ -1,0 +1,26 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+dataset:
+  update_period_days: 365
+
+tables:
+  stackoverflow_ai_usage:
+    variables:
+      share_pct:
+        title: Share of developers using AI tools
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of professional developers who gave each response to the question "Do you currently use AI tools in your development process?" in the annual Stack Overflow Developer Survey.
+        description_key:
+          - This indicator shows how professional developers responded to a question about AI tool usage in the Stack Overflow Developer Survey, conducted annually since 2023.
+          - Respondents are self-selected professional developers who chose to participate in the survey. Results may not be representative of all developers worldwide.
+          - In 2025, Stack Overflow changed the question to ask about usage frequency (daily, weekly, or monthly/infrequently) rather than a simple yes/no. A collapsed "Yes" row is included for cross-year comparability.
+          - The granular 2025 frequency rows ("Yes, daily", "Yes, weekly", "Yes, monthly or infrequently") are also included for those interested in usage intensity.
+          - The number of respondendents per year ranges from {response_range}.
+        display:
+          numDecimalPlaces: 1
