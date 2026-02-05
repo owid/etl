@@ -24,13 +24,17 @@ dimensions:
       - slug: "10"
         name: Richest 10%
       - slug: "10_40_50"
-        name: Richest 10%, middle 40%, poorest 50%
+        name: Richest and poorest groups
+        group: Compare different deciles/quantiles
       - slug: "10_40_50_bar"
-        name: Richest 10%, middle 40%, poorest 50% (bar chart)
+        name: Richest and poorest groups (bar chart)
+        group: Compare different deciles/quantiles
       - slug: all
         name: All deciles
+        group: Compare different deciles/quantiles
       - slug: all_bar
         name: All deciles (bar chart)
+        group: Compare different deciles/quantiles
 
   - name: Income measure
     slug: welfare_type
@@ -41,8 +45,10 @@ dimensions:
         name: After tax
       - slug: before_vs_after
         name: Before vs. after tax
+        group: Compare incomes before and after taxes and benefits
       - slug: before_vs_after_scatter
         name: Before vs. after tax (scatter)
+        group: Compare incomes before and after taxes and benefits
 
 views:
   - dimensions:

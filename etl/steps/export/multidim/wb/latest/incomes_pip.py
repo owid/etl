@@ -160,13 +160,15 @@ def run() -> None:
         ],
     )
 
-    # Fix the "all" and "all_bar" choice names (group_views sets it to the slug since it wasn't in the dimension)
+    # Fix the "all" and "all_bar" choice names and set groups (group_views sets it to the slug since it wasn't in the dimension)
     decile_dim = c.get_dimension("decile")
     for choice in decile_dim.choices:
         if choice.slug == "all":
             choice.name = "All deciles"
+            choice.group = "Compare different deciles"
         elif choice.slug == "all_bar":
             choice.name = "All deciles (bar chart)"
+            choice.group = "Compare different deciles"
 
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
     # Also remove grouped decile views for Spells (we don't want those)
