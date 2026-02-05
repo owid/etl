@@ -384,5 +384,7 @@ steps:
     - snapshot://demography/2026-02-04/census_us_idb.zip
   data://garden/demography/2026-02-04/census_us_idb:
     - data://meadow/demography/2026-02-04/census_us_idb
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2026-02-04/census_us_idb:
     - data://garden/demography/2026-02-04/census_us_idb

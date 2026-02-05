@@ -26,18 +26,32 @@ def run() -> None:
     # Keep relevant countries
     # https://api.census.gov/data/timeseries/idb/5year/variables.html
     cols_index = ["country", "year"]
-    cols = [
+    cols_indicators = [
         "pop",
         "tfr",
         "e0",
         "nim",
-    ] + cols_index
-    # Improve table format.
-    tb = tb[cols].format(["country", "year"])
+    ]
+    cols = cols_indicators + cols_index
+    tb = tb[cols].dropna(subset=cols_indicators, how="all")
+
+    # Add region aggregates for World and continents
+    aggregations = {
+        "pop": "sum",
+        "nim": "sum",
+    }
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        aggregations=aggregations,
+        min_frac_countries_informed=0.7,
+        countries_that_must_have_data={"World": ["China", "India", "Indonesia", "United States"]},
+    )
 
     #
     # Save outputs.
     #
+    # Format table
+    tb = tb[cols].format(["country", "year"])
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
