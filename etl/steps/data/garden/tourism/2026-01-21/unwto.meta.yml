@@ -431,6 +431,7 @@ tables:
           - *desc_key_departures
           - *desc_key_per_1000_departures
         display:
+          tolerance: 3
           numDecimalPlaces: 1
 
       # =========================================================================
