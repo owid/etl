@@ -41,8 +41,8 @@ tables:
               colorScale:
                 baseColorScheme: Reds
         display:
-          numDecimalPlaces: 0
-          tolerance: 5
+          roundingMode: significantFigures
+          numSignificantFigures: 3
 
       export_total_mot:
         title: Plastic waste exports
@@ -61,8 +61,8 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
         display:
-          numDecimalPlaces: 0
-          tolerance: 5
+          roundingMode: significantFigures
+          numSignificantFigures: 3
 
       import_air:
         title: Plastic waste imports by air
@@ -74,7 +74,6 @@ tables:
           - Data includes only plastic waste transported by air.
           - *air_transport_note
           - *data_caveat
-
 
       export_air:
         title: Plastic waste exports by air
