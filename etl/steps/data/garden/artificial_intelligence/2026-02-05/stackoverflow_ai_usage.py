@@ -5,6 +5,9 @@ Normalises the response labels across years so that the "Yes" category is compar
 - 2025: "Yes" was split into daily / weekly / monthly or infrequently.
   These are collapsed back into a single "Yes" row (share_pct summed)
   while the granular frequency rows are kept as separate entries.
+
+The table is then pivoted so that each response becomes its own column,
+and a "country" dimension is added (set to "World" for all rows).
 """
 
 import owid.catalog.processing as pr
@@ -15,12 +18,18 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Mapping from 2025 granular labels to the collapsed "Yes" category.
-YES_FREQUENCY_LABELS = {
-    "Yes, I use AI tools daily",
-    "Yes, I use AI tools weekly",
-    "Yes, I use AI tools monthly or infrequently",
+# Rename raw response labels to clean column names immediately after loading.
+RESPONSE_TO_COLUMN = {
+    "Yes": "yes",
+    "No, but I plan to soon": "no_but_plan_to_soon",
+    "No, and I don't plan to": "no_and_dont_plan_to",
+    "Yes, I use AI tools daily": "yes_daily",
+    "Yes, I use AI tools weekly": "yes_weekly",
+    "Yes, I use AI tools monthly or infrequently": "yes_monthly_or_infrequently",
 }
+
+# 2025 granular frequency labels (already renamed).
+YES_FREQUENCY_LABELS = {"yes_daily", "yes_weekly", "yes_monthly_or_infrequently"}
 
 
 def run() -> None:
@@ -34,20 +43,24 @@ def run() -> None:
     #
     # Process data.
     #
-    # Build a collapsed "Yes" row for 2025 by summing the frequency sub-categories.
+
+    # Rename raw response labels to clean column names right away.
+    tb["response"] = tb["response"].map(RESPONSE_TO_COLUMN)
+
+    # Build a collapsed "yes" row for 2025 by summing the frequency sub-categories.
     tb_2025_yes = tb[tb["response"].isin(YES_FREQUENCY_LABELS)].copy()
     yes_2025_pct = round(tb_2025_yes["share_pct"].sum(), 1)
 
     # Keep all original rows (including granular 2025 frequency rows).
-    # Add a single collapsed "Yes" row for 2025 for cross-year comparability.
+    # Add a single collapsed "yes" row for 2025 for cross-year comparability.
     collapsed_row = tb_2025_yes.iloc[[0]].copy().reset_index(drop=True)
-    collapsed_row.loc[0, "response"] = "Yes"
+    collapsed_row.loc[0, "response"] = "yes"
     collapsed_row.loc[0, "share_pct"] = yes_2025_pct
     tb = pr.concat([tb, collapsed_row])
 
     # Add 2020 rows with share_pct = 0 for all cross-year responses
     # (AI-tool usage question was not asked before 2023, so the share is 0).
-    CROSS_YEAR_RESPONSES = ["Yes", "No, but I plan to soon", "No, and I don't plan to"]
+    CROSS_YEAR_RESPONSES = ["yes", "no_but_plan_to_soon", "no_and_dont_plan_to"]
     tb_2020 = Table(
         {
             "year": 2020,
@@ -59,22 +72,22 @@ def run() -> None:
     )
     tb = pr.concat([tb, tb_2020])
 
-    # Sort for readability: year, then Yes first, then alphabetical.
-    response_order = {"Yes": 0, "No, but I plan to soon": 1, "No, and I don't plan to": 2}
-    tb["_sort_key"] = tb["response"].map(response_order).fillna(3)
-    tb = tb.sort_values(["year", "_sort_key", "response"]).drop(columns=["_sort_key"]).reset_index(drop=True)
+    # Compute response_range before dropping n_total_responses.
     response_range = f"{tb['n_total_responses'].max()} to {tb['n_total_responses'].min()}"
     tb = tb.drop(columns=["n_total_responses"])
 
-    tb = tb.format(["year", "response"])
+    # Pivot so each response becomes its own column.
+    tb = tb.pivot(index="year", columns="response", values="share_pct").reset_index()
 
+    # Add country dimension set to "World".
+    tb["country"] = "World"
+
+    tb = tb.format(["year", "country"])
     #
     # Save outputs.
     #
     ds_garden = paths.create_dataset(
         tables=[tb],
-        check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
         yaml_params={"response_range": response_range},
     )
     ds_garden.save()

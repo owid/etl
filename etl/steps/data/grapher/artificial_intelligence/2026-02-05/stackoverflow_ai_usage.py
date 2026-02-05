@@ -17,9 +17,6 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Grapher expects a "country" dimension — map "response" to it so each
-    # response category becomes a separate line/bar in the chart.
-    tb = tb.rename_index_names({"response": "country"})
 
     ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
     ds_grapher.save()
