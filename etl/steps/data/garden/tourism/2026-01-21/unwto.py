@@ -57,7 +57,6 @@ COLUMNS_TO_KEEP = [
     "in_tour_exp_balance_of_payments_travel_vis",
     "in_tour_purpose_trips_by_business_overnight_vis_tourists",
     "in_tour_purpose_trips_by_personal_overnight_vis_tourists",
-    "in_tour_purpose_trips_by_total_overnight_vis_tourists",
     "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total",
     "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total",
     "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total",

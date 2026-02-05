@@ -4,8 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Tourism
-    display:
-      numDecimalPlaces: 0
 
   # =============================================================================
   # REUSABLE DESCRIPTION KEY BLOCKS
@@ -68,6 +66,9 @@ definitions:
   # --- Visitor-type note (receipts / expenditure) ---
   note_all_visitor_types: &note_all_visitor_types |-
     Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+
+  note_purpose: &note_purpose |-
+    The main purpose is defined as the purpose without which the trip would not have taken place.
 
   # --- Employment ---
   desc_key_employment: &desc_key_employment
@@ -138,18 +139,17 @@ tables:
       # =========================================================================
 
       dom_tour_trips_total_overnight_vis_tourists:
-        title: Domestic overnight trips
+        title: Trips by domestic tourists
         unit: trips
-        description_short: Number of trips by residents within their own country that include at least one overnight stay.
+        description_short: Number of trips by individuals who travel within their own country and spend at least one night at their destination.
         description_key:
           - *desc_key_domestic
-        presentation:
-          title_public: Domestic overnight tourism trips
-          grapher_config:
-            note: *desc_counting
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       dom_tour_trips_total_overnight_vis_tourists_per_person:
-        title: Domestic overnight trips per person
+        title: Trips by domestic tourists per person
         unit: trips per person
         description_short: Number of trips by individuals who travel within their own country and spend at least one night at their destination, per person in the country's population.
         description_key:
@@ -157,14 +157,16 @@ tables:
           - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
           - This enables standardized comparison across different population sizes and provides an estimate of domestic tourism intensity.
         display:
-          numDecimalPlaces: 2
+          tolerance: 3
+          numDecimalPlaces: 1
 
       dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
         title: Local guests in hotels and similar establishments
         unit: guests
         description_short: Number of domestic visitors who check in to hotels and similar accommodation establishments within their own country.
-        description_key:
-          - *desc_key_domestic
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       # =========================================================================
       # INBOUND TOURISM — ARRIVALS
@@ -177,9 +179,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_arrivals_us_note
-        presentation:
-          grapher_config:
-            note: Before 2006, the US counted same-day trips from Canada only; after 2006, day trips from Mexico were also included.
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_overnight_vis_tourists_per_1000:
         title: Arrivals of tourists from abroad per 1,000 people
@@ -189,31 +191,37 @@ tables:
           - *desc_key_arrivals
           - *desc_key_per_1000_arrivals
         display:
-          numDecimalPlaces: 1
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_same_day_vis_excur:
-        title: Same-day visitors arriving from other countries
+        title: Arrivals of same-day visitors from abroad
         unit: arrivals
         description_short: Number of trips by visitors who arrive from abroad and depart within the same day.
         description_key:
           - *desc_key_arrivals
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_arrivals_trips_total_same_day_vis_excur_per_1000:
         title: Arrivals of same-day visitors from abroad per 1,000 people
         unit: arrivals per 1,000 people
-        description_short: Number of international same-day visitor arrivals per 1,000 people in the destination country's population.
+        description_short: Number of trips by visitors who arrive from abroad and depart within the same day, per 1,000 people in the destination country’s population.
         description_key:
           - *desc_key_arrivals
           - *desc_key_per_1000_same_day
         display:
-          numDecimalPlaces: 1
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
         title: Foreign guests staying in hotels and similar establishments
         unit: guests
         description_short: Number of international visitors who check in to hotels and similar accommodation establishments.
-        description_key:
-          - *desc_key_arrivals
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       # =========================================================================
       # INBOUND TOURISM — PURPOSE OF VISIT
@@ -228,7 +236,10 @@ tables:
           - *desc_key_purpose
         presentation:
           grapher_config:
-            note: The main purpose is defined as the purpose without which the trip would not have taken place.
+            note: *note_purpose
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_purpose_trips_by_personal_overnight_vis_tourists:
         title: Arrivals of tourists from abroad for personal purposes
@@ -239,15 +250,10 @@ tables:
           - *desc_key_purpose
         presentation:
           grapher_config:
-            note: The main purpose is defined as the purpose without which the trip would not have taken place.
-
-      in_tour_purpose_trips_by_total_overnight_vis_tourists:
-        title: Inbound trips by total overnight tourists
-        unit: trips
-        description_short: Number of international trips by tourists who stay overnight, regardless of the main purpose of travel.
-        description_key:
-          - *desc_key_arrivals
-          - *desc_key_purpose
+            note: *note_purpose
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       # =========================================================================
       # INBOUND TOURISM — REGION OF ORIGIN
@@ -260,6 +266,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total:
         title: International tourists visiting from Africa
@@ -268,7 +277,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
-
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
       in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total:
         title: International tourists visiting from the Americas
         unit: arrivals
@@ -276,6 +287,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total:
         title: International tourists visiting from East Asia and the Pacific
@@ -284,6 +298,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total:
         title: International tourists visiting from Europe
@@ -292,6 +309,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total:
         title: International tourists visiting from the Middle East
@@ -300,6 +320,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total:
         title: International tourists visiting from South Asia
@@ -308,6 +331,9 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       # =========================================================================
       # INBOUND TOURISM — EXPENDITURE (RECEIPTS)
@@ -393,6 +419,9 @@ tables:
         description_short: Number of trips by residents who travel abroad and stay overnight.
         description_key:
           - *desc_key_departures
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       out_tour_departures_trips_total_overnight_vis_tourists_per_1000:
         title: International tourist departures per 1,000 people
@@ -490,6 +519,7 @@ tables:
           - For example, a ratio of 0.25 means there is one business traveler for every four personal travelers.
           - *desc_key_purpose
         display:
+          tolerance: 3
           numDecimalPlaces: 1
 
       inbound_outbound_tourism:
@@ -501,6 +531,7 @@ tables:
           - For example, a ratio of 2 means two tourists arrive for every one resident who travels abroad.
           - This ratio provides insight into whether a country is a net importer or exporter of tourists.
         display:
+          tolerance: 3
           numDecimalPlaces: 1
 
       same_day_tourist_ratio:
@@ -512,6 +543,7 @@ tables:
           - For example, a ratio of 0.5 means there is one same-day visitor for every two overnight tourists.
           - High values are typical for countries with many land borders or those that serve as day-trip destinations from neighboring countries.
         display:
+          tolerance: 3
           numDecimalPlaces: 1
 
       # =========================================================================
@@ -533,10 +565,16 @@ tables:
 
       employment_employed_persons_in_the_tour_ind_num:
         title: Employment in the tourism industries
-        unit: persons
+        unit: people
         description_short: Number of people working in tourism-related industries, including both employees and self-employed individuals.
         description_key:
           - *desc_key_employment
+        presentation:
+          grapher_config:
+            note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
+        display:
+          tolerance: 3
+          numDecimalPlaces: 0
 
       employment_employed_persons_in_the_tour_ind_num_per_1000:
         title: Employment in the tourism industries per 1,000 people
@@ -545,12 +583,12 @@ tables:
         description_key:
           - *desc_key_employment
           - *desc_key_per_1000_employment
-        display:
-          numDecimalPlaces: 1
         presentation:
           grapher_config:
             note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
-
+        display:
+          tolerance: 3
+          numDecimalPlaces: 1
       # =========================================================================
       # ECONOMIC IMPACT
       # =========================================================================
@@ -569,6 +607,7 @@ tables:
           - This indicator is used in the Sustainable Development Goals (SDG 8.9.1) to track progress in promoting sustainable tourism.
         description_from_producer: Tourism Direct GDP (TDGDP) is defined as the sum of the part of gross value added (at basic prices) generated by all industries in response to internal tourism consumption plus the amount of net taxes on products and imports included within the value of this expenditure at purchasers' prices.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       total_tables:
@@ -580,3 +619,5 @@ tables:
           - TSA tables track economic aspects such as tourist spending, production of tourism-related goods and services, and employment.
           - SEEA tables monitor environmental impacts, including consumption of resources like water and energy, and emissions of greenhouse gases and waste.
           - The number of tables implemented indicates how comprehensively tourism's impacts are being tracked.
+        display:
+          numDecimalPlaces: 0
