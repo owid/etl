@@ -16,6 +16,39 @@ etl chart-sync my-branch my-branch-public
 If your charts don't appear on `https://staging-site-my-branch-public.tail6e23.ts.net/grapher/xyz`, try triggering manual deploy. -->
 
 
+### Sharing articles (Google Docs)
+
+To share a draft article with external reviewers:
+
+1. **Create a staging server from GitHub**:
+    - Go to the [ETL repository on GitHub](https://github.com/owid/etl)
+    - Click the branch dropdown (shows "master") and type a new branch name (e.g., `my-article-preview`)
+    - Click "Create branch: my-article-preview from master"
+    - Go to [Pull Requests](https://github.com/owid/etl/pulls) and click "New pull request"
+    - Set the compare branch to your new branch and click "Create pull request"
+    - Wait a few minutes for OWIDbot to post links including a "Site preview" URL like `https://<branch>.owid.pages.dev/`
+
+2. **Add the `staging-bake` label** to your PR. This ensures the preview site stays up to date when you republish.
+
+3. **Publish your article on the staging server**:
+    - Go to the staging admin: `http://staging-site-<branch>/admin/gdocs/<your-gdoc-id>/preview`
+    - Click "Publish" (or "Republish" if updating)
+
+4. **Share the public preview URL** with your external reviewer:
+    - Format: `https://<branch>.owid.pages.dev/<article-slug>`
+    - Example: `https://work-and-employment.owid.pages.dev/work-employment`
+
+5. **Iterate**: When you make changes, republish from the staging admin and the public preview will update automatically (thanks to the `staging-bake` label).
+
+!!! warning "Common mistakes"
+
+    - **Using the wrong admin**: Make sure you publish from the staging server admin (`http://staging-site-<branch>/admin/...`), not from `admin.owid.io`. Changes on production admin won't appear on your staging preview.
+    - **Forgetting the `staging-bake` label**: Without this label, republishing won't update the Cloudflare preview.
+
+!!! tip "When you're done"
+
+    Close the PR or let someone know when you no longer need the preview. The staging server will be stopped and destroyed after 3 days of the PR being closed.
+
 ### Sharing explorers
 
 To share explorers with the public, follow these steps:
