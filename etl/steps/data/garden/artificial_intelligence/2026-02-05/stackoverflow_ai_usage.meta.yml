@@ -1,14 +1,21 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Artificial Intelligence
+      grapher_config:
+            note: Based on survey responses from 26,004 to 67,237 professional developers, depending on the year. We set a baseline at 0% in 2020, as the first mainstream AI coding assistants were not available to developers until 2021.
+    display:
+      numDecimalPlaces: 1
+
     description_key:
       - This indicator shows how professional developers responded to a question about AI tool usage in the Stack Overflow Developer Survey, conducted annually since 2023.
       - Respondents are self-selected professional developers who chose to participate in the survey. Results may not be representative of all developers worldwide.
       - In 2025, Stack Overflow changed the question to ask about usage frequency (daily, weekly, or monthly/infrequently) rather than a simple yes/no. A collapsed "Yes" value is included for cross-year comparability.
       - The number of respondents per year ranges from {response_range}.
+    description_processing: We set the baseline at 0% in 2020, as the first mainstream AI coding assistants were not available to developers until 2021.
 
 dataset:
   update_period_days: 365
@@ -17,49 +24,38 @@ tables:
   stackoverflow_ai_usage:
     variables:
       yes_overall:
-        title: Share of developers using AI tools
+        title: Share of professional software developers using AI tools
         unit: "%"
         short_unit: "%"
-        description_short: Share of developers who said "Yes" to using AI tools in their development process.
-        display:
-          numDecimalPlaces: 1
+        description_short: Share of positive responses among professional developers to the question, "Do you currently use AI tools in your development process?"
 
       no_but_plan_to_soon:
         title: Share of developers planning to use AI tools soon
         unit: "%"
         short_unit: "%"
-        description_short: Share of developers who said they do not currently use AI tools but plan to soon.
-        display:
-          numDecimalPlaces: 1
+        description_short: Share of responses among professional developers to the question, "Do you currently use AI tools in your development process?", who said they do not currently use AI tools but plan to soon.
 
       no_and_dont_plan_to:
         title: Share of developers with no plans to use AI tools
         unit: "%"
         short_unit: "%"
-        description_short: Share of developers who said they do not use AI tools and do not plan to.
-        display:
-          numDecimalPlaces: 1
+        description_short: Share of responses among professional developers to the question, "Do you currently use AI tools in your development process?", who said they do not use AI tools and do not plan to.
 
       yes_daily:
         title: Share of developers using AI tools daily
         unit: "%"
         short_unit: "%"
-        description_short: Share of developers who said they use AI tools daily. Only available from 2025.
-        display:
-          numDecimalPlaces: 1
+        description_short: Share of responses among professional developers to the question, "Do you currently use AI tools in your development process?", who said they use AI tools daily. Only available from 2025.
 
       yes_weekly:
         title: Share of developers using AI tools weekly
         unit: "%"
         short_unit: "%"
-        description_short: Share of developers who said they use AI tools weekly. Only available from 2025.
-        display:
-          numDecimalPlaces: 1
+        description_short: Share of responses among professional developers to the question, "Do you currently use AI tools in your development process?", who said they use AI tools weekly. Only available from 2025.
 
       yes_monthly_or_infrequently:
         title: Share of developers using AI tools monthly or infrequently
         unit: "%"
         short_unit: "%"
-        description_short: Share of developers who said they use AI tools monthly or infrequently. Only available from 2025.
-        display:
-          numDecimalPlaces: 1
+        description_short: Share of responses among professional developers to the question, "Do you currently use AI tools in your development process?", who said they use AI tools monthly or infrequently. Only available from 2025.
+

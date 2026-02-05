@@ -72,8 +72,8 @@ def run() -> None:
     )
     tb = pr.concat([tb, tb_2020])
 
-    # Compute response_range before dropping n_total_responses.
-    response_range = f"{tb['n_total_responses'].max()} to {tb['n_total_responses'].min()}"
+    # Compute response_range before dropping n_total_responses (exclude 2020 values).
+    response_range = f"{tb[tb['year'] != 2020]['n_total_responses'].min():,.0f} to {tb[tb['year'] != 2020]['n_total_responses'].max():,.0f}"
     tb = tb.drop(columns=["n_total_responses"])
 
     # Pivot so each response becomes its own column.
