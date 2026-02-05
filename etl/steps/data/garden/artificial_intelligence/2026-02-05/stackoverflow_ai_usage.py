@@ -8,6 +8,7 @@ Normalises the response labels across years so that the "Yes" category is compar
 """
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
@@ -43,6 +44,20 @@ def run() -> None:
     collapsed_row.loc[0, "response"] = "Yes"
     collapsed_row.loc[0, "share_pct"] = yes_2025_pct
     tb = pr.concat([tb, collapsed_row])
+
+    # Add 2020 rows with share_pct = 0 for all cross-year responses
+    # (AI-tool usage question was not asked before 2023, so the share is 0).
+    CROSS_YEAR_RESPONSES = ["Yes", "No, but I plan to soon", "No, and I don't plan to"]
+    tb_2020 = Table(
+        {
+            "year": 2020,
+            "response": CROSS_YEAR_RESPONSES,
+            "share_pct": 0.0,
+            "n_total_responses": 0,
+        },
+        like=tb,
+    )
+    tb = pr.concat([tb, tb_2020])
 
     # Sort for readability: year, then Yes first, then alphabetical.
     response_order = {"Yes": 0, "No, but I plan to soon": 1, "No, and I don't plan to": 2}
