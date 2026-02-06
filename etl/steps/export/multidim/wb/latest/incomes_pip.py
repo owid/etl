@@ -175,15 +175,16 @@ def run() -> None:
 
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
     # Also remove grouped decile views for Spells (we don't want those)
-    c.views = [
-        v
-        for v in c.views
-        if _keep_decile_view(v)
-        and not (
-            v.matches(decile="all", survey_comparability="Spells")
-            or v.matches(decile="all_bar", survey_comparability="Spells")
-        )
-    ]
+    non_share = [i for i in c.dimension_choices["indicator"] if i != "share"]
+    non_thr = [i for i in c.dimension_choices["indicator"] if i != "thr"]
+    c.drop_views(
+        [
+            {"decile": ["2", "3", "4", "6", "7", "8"]},
+            {"decile": ["all_bar", "10_40_50", "10_40_50_bar"], "indicator": non_share},
+            {"decile": ["5", "9"], "indicator": non_thr},
+            {"decile": ["all", "all_bar"], "survey_comparability": "Spells"},
+        ]
+    )
 
     # Update chart type for share indicator grouped views to StackedArea
     for view in c.views:
@@ -249,27 +250,6 @@ def run() -> None:
     #
     c.save()
 
-
-def _keep_decile_view(v):
-    """Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only, plus 10_40_50 for share."""
-    decile = v.dimensions.get("decile")
-    indicator = v.dimensions.get("indicator")
-    # Keep nan decile (for mean/median which don't have decile data)
-    if decile in ["nan", "all"]:
-        return True
-    # Keep all_bar only for share indicator
-    if decile == "all_bar" and indicator == "share":
-        return True
-    # Keep deciles 1 and 10 for all indicators
-    if decile in ["1", "10"]:
-        return True
-    # Keep deciles 5 and 9 only for thr indicator
-    if decile in ["5", "9"] and indicator == "thr":
-        return True
-    # Keep 10_40_50 and 10_40_50_bar only for share indicator
-    if decile in ["10_40_50", "10_40_50_bar"] and indicator == "share":
-        return True
-    return False
 
 
 def _build_indicator_display_names(tb):

@@ -114,12 +114,8 @@ def run() -> None:
             choice.name = "All deciles (bar chart)"
 
     # Filter quantile views: keep only specific quantiles
-    c.views = [
-        v
-        for v in c.views
-        if v.dimensions.get("quantile")
-        in ["Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"]
-    ]
+    keep_quantiles = {"Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"}
+    c.drop_views({"quantile": [q for q in c.dimension_choices["quantile"] if q not in keep_quantiles]})
 
     # Build mapping of catalogPath to display name from table metadata
     indicator_display_names = _build_indicator_display_names(tb)

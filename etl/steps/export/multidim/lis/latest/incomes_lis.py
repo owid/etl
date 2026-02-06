@@ -112,7 +112,15 @@ def run() -> None:
             choice.group = "Compare different deciles"
 
     # Filter decile views: keep only relevant deciles per indicator
-    c.views = [v for v in c.views if _keep_decile_view(v)]
+    non_share = [i for i in c.dimension_choices["indicator"] if i != "share"]
+    non_thr = [i for i in c.dimension_choices["indicator"] if i != "thr"]
+    c.drop_views(
+        [
+            {"decile": ["2", "3", "4", "6", "7", "8"]},
+            {"decile": ["all_bar", "10_40_50", "10_40_50_bar"], "indicator": non_share},
+            {"decile": ["5", "9"], "indicator": non_thr},
+        ]
+    )
 
     # Update chart type for share "all" views to StackedArea
     for view in c.views:
@@ -135,9 +143,7 @@ def run() -> None:
 
             # For all_bar: set sortBy
             if view.matches(decile="all_bar"):
-                decile_10_ind = next(
-                    (ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None
-                )
+                decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
                 if decile_10_ind:
                     if view.config is None:
                         view.config = {}
@@ -196,8 +202,7 @@ def run() -> None:
     c.views = [
         v
         for v in c.views
-        if v.dimensions.get("welfare_type") != "before_vs_after"
-        or v.dimensions.get("decile") not in ["all", "all_bar"]
+        if v.dimensions.get("welfare_type") != "before_vs_after" or v.dimensions.get("decile") not in ["all", "all_bar"]
     ]
 
     # Customize before_vs_after views
@@ -220,9 +225,7 @@ def run() -> None:
 
                 # Get description_key and remove the welfare type item
                 description_key = list(meta.description_key) if meta.description_key else []
-                description_key = [
-                    k for k in description_key if "post-tax" not in k and "pre-tax" not in k
-                ]
+                description_key = [k for k in description_key if "post-tax" not in k and "pre-tax" not in k]
 
                 # Set config
                 view.config = {
@@ -251,28 +254,6 @@ def run() -> None:
                     ind.display = {"name": "Before tax"}
 
     c.save()
-
-
-def _keep_decile_view(v):
-    """Filter decile views: keep only relevant deciles per indicator."""
-    decile = str(v.dimensions.get("decile"))
-    indicator = v.dimensions.get("indicator")
-    # Keep nan decile (for mean/median which don't have decile data)
-    if decile in ["nan", "all"]:
-        return True
-    # Keep all_bar only for share indicator
-    if decile == "all_bar" and indicator == "share":
-        return True
-    # Keep deciles 1 and 10 for all indicators
-    if decile in ["1", "10"]:
-        return True
-    # Keep deciles 5 and 9 only for thr indicator
-    if decile in ["5", "9"] and indicator == "thr":
-        return True
-    # Keep 10_40_50 and 10_40_50_bar only for share indicator (defined in YAML)
-    if decile in ["10_40_50", "10_40_50_bar"] and indicator == "share":
-        return True
-    return False
 
 
 def _build_indicator_display_names(tb):
