@@ -4,55 +4,79 @@ definitions:
     presentation:
       topic_tags:
         - Population Growth
-
+      attribution_short: IHME
+    description_key:
+      - This data combines IHME's past estimates with their reference scenario projections.
+      - Projections are based on forecasts of key drivers including education of females and access to modern reproductive health services.
+    processing_level: minor
+    description_processing: |-
+      You can learn more about the methodology in [this article](https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30677-2/fulltext). For technical details, refer to IHME's code used to produce the forecasts, which is available on [GitHub](https://github.com/ihmeuw/fhs_2019_population_paper/tree/v1.0/open_source)
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
 tables:
   ihme_2020:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      population:
+        title: Population
+        unit: people
+        short_unit: ""
+        description_short: |-
+          Estimated total population of a country or region.
+        description_key:
+          - This indicator reflects the mean estimate, and relies on IHME's "reference" scenario for data after 2018 (included).
+          - The "reference" scenario is the baseline forecast obtained when projecting forward using IHME's main statistical models and the continuation of recent, location-specific trends in the key drivers.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_variant: IHME
+          topic_tags:
+            - Population Growth
 
+      tfr:
+        title: Total fertility rate
+        unit: live births per woman
+        short_unit: ""
+        description_short: |-
+          The average number of live births a woman would have over her lifetime if she experienced current age-specific fertility rates.
+        description_key:
+          - This indicator reflects the mean estimate, and relies on IHME's "reference" scenario for data after 2018 (included).
+          - The "reference" scenario is the baseline forecast obtained when projecting forward using IHME's main statistical models and the continuation of recent, location-specific trends in the key drivers.
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          title_variant: IHME
+          topic_tags:
+            - Fertility Rate
+
+      life_expectancy:
+        title: Life expectancy at birth
+        unit: years
+        short_unit: years
+        description_short: The average number of years a newborn would be expected to live if current age-specific mortality rates applied throughout their lifetime.
+        description_key:
+          - This indicator reflects the mean estimate, and relies on IHME's "reference" scenario for data after 2018 (included).
+          - The "reference" scenario is the baseline forecast obtained when projecting forward using IHME's main statistical models and the continuation of recent, location-specific trends in the key drivers.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_variant: IHME
+          topic_tags:
+            - Life Expectancy
+
+      net_migration:
+        title: Net migration
+        unit: migrants
+        short_unit: ""
+        description_short: The number of immigrants minus the number of emigrants over a given period.
+        description_key:
+          - Migration is forecasted once (with uncertainty) and then used as an input in all population projections; In other words, IHME's scenarios always use the same migration estimates. As a result, migration forecasts may have large uncertainty intervals.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_variant: IHME
+          topic_tags:
+            - Population Growth

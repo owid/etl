@@ -87,10 +87,43 @@ def run() -> None:
     tb_le = paths.regions.harmonize_names(tb=tb_le)
     tb_mig = paths.regions.harmonize_names(tb=tb_mig)
 
-    # TODO: combine tables, keep relevant dimensions, etc.
+    # Build population table
+    tb_pop = pr.concat(
+        [
+            tb_pop.loc[tb_pop["scenario"] == "reference", ["country", "year", "population"]],
+            tb_pop_past.loc[
+                (tb_pop_past["sex"] == "total") & (tb_pop_past["age"] == "total"), ["country", "year", "population"]
+            ],
+        ],
+        ignore_index=True,
+    )
+    tb_pop["population"] = (
+        tb_pop["population"].round().astype("Int64")
+    )  # Round population to integer and convert to Int64 dtype
+
+    # Build TFR table
+    tb_tfr = tb_tfr.loc[tb_tfr["scenario"].isin(["reference", "estimates_part"]), ["country", "year", "tfr"]]
+
+    # Build LE table
+    tb_le = tb_le.loc[
+        tb_le["scenario"].isin(["reference", "estimates_part"]) & (tb_le["sex"] == "total"),
+        ["country", "year", "life_expectancy"],
+    ]
+
+    # Combine tables
+    tb = pr.multi_merge(
+        [
+            tb_pop,
+            tb_tfr,
+            tb_le,
+            tb_mig,
+        ],
+        on=["country", "year"],
+        how="outer",
+    )
 
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="ihme_2020")
 
     #
     # Save outputs.
