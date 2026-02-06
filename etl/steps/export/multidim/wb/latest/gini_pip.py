@@ -67,7 +67,6 @@ def run() -> None:
                 "choices": ["Income with spells", "Consumption with spells"],
                 "choice_new_slug": "Income or consumption consolidated",
                 "replace": True,
-                "overwrite_dimension_choice": True,
                 "view_config": {
                     "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",

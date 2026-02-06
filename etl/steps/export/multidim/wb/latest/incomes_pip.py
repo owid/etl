@@ -107,7 +107,6 @@ def run() -> None:
                 "choices": ["Income with spells", "Consumption with spells"],
                 "choice_new_slug": "Income or consumption consolidated",
                 "replace": True,
-                "overwrite_dimension_choice": True,
                 "view_config": {
                     "hideRelativeToggle": True,
                     "selectedFacetStrategy": "entity",
@@ -121,7 +120,11 @@ def run() -> None:
 
     # Group all deciles together (only for avg, thr, share - not mean/median)
     decile_choices = c.get_choice_names("decile")
-    decile_values = [slug for slug, name in decile_choices.items() if name and slug not in ("all", "all_bar", "10_40_50", "10_40_50_bar")]
+    decile_values = [
+        slug
+        for slug, name in decile_choices.items()
+        if name and slug not in ("all", "all_bar", "10_40_50", "10_40_50_bar")
+    ]
     c.group_views(
         groups=[
             {
@@ -173,7 +176,13 @@ def run() -> None:
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
     # Also remove grouped decile views for Spells (we don't want those)
     c.views = [
-        v for v in c.views if _keep_decile_view(v) and not (v.matches(decile="all", survey_comparability="Spells") or v.matches(decile="all_bar", survey_comparability="Spells"))
+        v
+        for v in c.views
+        if _keep_decile_view(v)
+        and not (
+            v.matches(decile="all", survey_comparability="Spells")
+            or v.matches(decile="all_bar", survey_comparability="Spells")
+        )
     ]
 
     # Update chart type for share indicator grouped views to StackedArea
