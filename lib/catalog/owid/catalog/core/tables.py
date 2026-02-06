@@ -2582,7 +2582,7 @@ def read_feather(
 
 
 def read_excel(
-    io: str | Path,
+    io: str | Path | IO[AnyStr],
     *args,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
@@ -2806,6 +2806,8 @@ def read(
         file_extension = str(filepath_or_buffer).split(".")[-1].lower()
 
     if file_extension == "zip":
+        if not isinstance(filepath_or_buffer, (str, Path)):
+            raise TypeError("Zip files must be read from a file path, not a buffer")
         return read_zip(
             filepath_or_buffer,
             *args,
