@@ -8,7 +8,6 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "remote-setup",
         "hooks": [
           {
             "type": "command",
