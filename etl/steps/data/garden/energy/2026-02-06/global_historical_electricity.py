@@ -30,6 +30,9 @@ def run() -> None:
         # Rename share column conveniently.
         tb = tb.rename(columns={column: f"{column.replace('__', '_')}_share"}, errors="raise")
 
+    # Rename total production column.
+    tb = tb.rename(columns={"electricity_production": "total_production"}, errors="raise")
+
     # Add a country column.
     tb["country"] = "World"
 

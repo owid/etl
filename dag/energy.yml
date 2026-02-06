@@ -418,7 +418,12 @@ steps:
   data://garden/energy/2026-02-06/global_historical_electricity:
     - data://meadow/energy/2026-02-06/global_historical_electricity
   #
-  # Energy: global historical electricity from Pinto et al. (2023).
+  # Energy: global historical electricity scaling.
   #
-  data://grapher/energy/2026-02-06/global_historical_electricity:
+  data://garden/energy/2026-02-06/global_historical_electricity_scaling:
     - data://garden/energy/2026-02-06/global_historical_electricity
+  #
+  # Energy: global historical electricity scaling.
+  #
+  data://grapher/energy/2026-02-06/global_historical_electricity_scaling:
+    - data://garden/energy/2026-02-06/global_historical_electricity_scaling
