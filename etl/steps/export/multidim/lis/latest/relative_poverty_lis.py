@@ -1,4 +1,4 @@
-"""Multidim export for LIS Gini coefficient."""
+"""Multidim export for LIS relative poverty indicators."""
 
 from etl.helpers import PathFinder
 
@@ -6,10 +6,11 @@ paths = PathFinder(__file__)
 
 
 # Define indicators to use
-INDICATORS = ["gini"]
+INDICATORS = ["headcount_ratio", "headcount"]
 
 # Define dimensions for main views
 DIMENSIONS_CONFIG = {
+    "poverty_line": ["40% of the median", "50% of the median", "60% of the median"],
     "welfare_type": "*",
     "equivalence_scale": ["square root"],
 }
@@ -19,11 +20,11 @@ def run() -> None:
     config = paths.load_collection_config()
 
     ds = paths.load_dataset("luxembourg_income_study")
-    tb = ds.read("inequality", load_data=False)
+    tb = ds.read("poverty", load_data=False)
 
     c = paths.create_collection(
         config=config,
-        short_name="gini_lis",
+        short_name="relative_poverty_lis",
         tb=tb,
         indicator_names=INDICATORS,
         dimensions=DIMENSIONS_CONFIG,
@@ -60,19 +61,17 @@ def run() -> None:
                 grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
                 # Extract and modify title
-                title = grapher_config.get("title", "Gini coefficient")
+                title = grapher_config.get("title", "")
                 title = title.replace("after tax", "before vs. after tax")
 
                 # Extract and modify subtitle (remove welfare type phrase)
                 subtitle = grapher_config.get("subtitle", "")
-                subtitle = subtitle.replace(
-                    " Inequality is measured here in terms of income after taxes and benefits.", ""
-                )
+                subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
 
-                # Get description_key and remove first element
+                # Get description_key and remove second element (welfare type description)
                 description_key = list(meta.description_key) if meta.description_key else []
-                if description_key:
-                    description_key = description_key[1:]
+                if len(description_key) > 1:
+                    description_key.pop(1)
 
                 # Set config
                 view.config = {
