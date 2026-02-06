@@ -4,5 +4,18 @@
       "WebFetch(domain:github.com)",
       "Bash(find:*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "remote-setup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/remote_setup.sh"
+          }
+        ]
+      }
+    ]
   }
 }
