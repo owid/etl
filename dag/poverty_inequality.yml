@@ -53,6 +53,10 @@ steps:
     - data://grapher/wid/2026-01-12/world_inequality_database
     - data://grapher/demography/2024-07-15/population
     - data://grapher/regions/2023-01-01/regions
+  export://multidim/wid/latest/gini_wid:
+    - data://grapher/wid/2026-01-12/world_inequality_database
+  export://multidim/wid/latest/palma_ratio_wid:
+    - data://grapher/wid/2026-01-12/world_inequality_database
 
     # Legacy WID pipeline
   data://garden/wid/2026-01-02/world_inequality_database_legacy:
