@@ -32,8 +32,8 @@ log = structlog.get_logger()
 def optimize_svg_for_figma(svg_path: Path) -> None:
     """Optimize SVG for easier editing in Figma.
 
-    Groups text elements with similar IDs and adds layer names for better organization.
-    Removes unnecessary metadata and cleans up the structure.
+    Flattens matplotlib's nested group structure and creates semantic groups
+    based on visual purpose.
 
     Args:
         svg_path: Path to the SVG file to optimize
@@ -51,52 +51,150 @@ def optimize_svg_for_figma(svg_path: Path) -> None:
     # Find the main group containing all matplotlib content
     main_group = root.find("./svg:g[@id='figure_1']", ns)
     if main_group is None:
-        # If no figure_1 group, find first g element
-        main_group = root.find(".//svg:g", ns)
-
-    if main_group is None:
-        log.warning("Could not find main group in SVG, skipping optimization")
+        log.warning("Could not find figure_1 group in SVG, skipping optimization")
         return
 
-    # Find all text elements
-    text_elements = list(main_group.findall(".//svg:text", ns))
+    # Remove large white background elements first (before reorganizing)
+    for elem in list(main_group.findall(".//svg:rect", ns)) + list(main_group.findall(".//svg:path", ns)):
+        fill = elem.get("fill", "")
+        style = elem.get("style", "")
+        is_white = fill in ("#ffffff", "white", "#FFFFFF") or "#ffffff" in style.lower()
 
-    # Create organized groups for different text types
-    title_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="title-group")
-    legend_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="legend-group")
-    milestone_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="milestone-labels")
-    growth_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="growth-rate-labels")
-    axes_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="axis-labels")
-    source_group = ET.SubElement(main_group, "{http://www.w3.org/2000/svg}g", id="source-text")
+        if is_white:
+            d_attr = elem.get("d", "")
+            width_attr = elem.get("width", "0")
+            height_attr = elem.get("height", "0")
+            try:
+                if elem.tag == "{http://www.w3.org/2000/svg}rect":
+                    w, h = float(width_attr), float(height_attr)
+                    is_large = w > 100 and h > 100
+                else:
+                    is_large = any(x in d_attr for x in ["L 1009", "L 958", "L 894"])
+            except (ValueError, AttributeError):
+                is_large = False
 
-    # Categorize and move text elements
-    for text in text_elements:
-        text_content = "".join(text.itertext()).lower()
+            if is_large:
+                for parent in root.iter():
+                    if elem in list(parent):
+                        parent.remove(elem)
+                        break
 
-        # Find parent element
-        for parent in main_group.iter():
-            if text in list(parent):
-                parent.remove(text)
-                break
+    # Create new flat structure
+    new_structure = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
 
-        # Categorize based on content
-        if "world population growth" in text_content:
-            title_group.append(text)
-        elif "annual growth" in text_content or ("world population" in text_content and "billion" not in text_content):
-            legend_group.append(text)
-        elif "billion" in text_content or "million" in text_content:
-            milestone_group.append(text)
-        elif "%" in text_content and "bce" not in text_content and "sources" not in text_content:
-            growth_group.append(text)
-        elif "data source" in text_content or "ourworldindata" in text_content:
-            source_group.append(text)
-        else:
-            axes_group.append(text)
+    # Semantic groups in render order (bottom to top)
+    group_order = [
+        "grid-lines",
+        "axes-spines",
+        "population-fill",
+        "growth-line",
+        "population-outline",
+        "markers",
+        "projection-bracket",
+        "legend-shapes",
+        "title",
+        "legend-labels",
+        "axis-labels",
+        "data-labels",
+        "source",
+    ]
+
+    groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
+
+    # Collect and categorize all visual elements
+    for elem in main_group.iter():
+        if elem.tag in [
+            "{http://www.w3.org/2000/svg}path",
+            "{http://www.w3.org/2000/svg}line",
+            "{http://www.w3.org/2000/svg}rect",
+            "{http://www.w3.org/2000/svg}text",
+            "{http://www.w3.org/2000/svg}use",
+        ]:
+            # Make a copy to avoid modifying during iteration
+            elem_copy = ET.Element(elem.tag, elem.attrib)
+            elem_copy.text = elem.text
+            elem_copy.tail = None
+            for child in elem:
+                elem_copy.append(child)
+
+            # Categorize
+            target_group = None
+            fill = elem.get("fill", "")
+            stroke = elem.get("stroke", "")
+            style = elem.get("style", "")
+            href = elem.get("{http://www.w3.org/1999/xlink}href", "")
+
+            if elem.tag == "{http://www.w3.org/2000/svg}text":
+                text_content = "".join(elem.itertext()).lower()
+                if "world population growth" in text_content:
+                    target_group = "title"
+                elif "annual growth" in text_content or "world population" in text_content:
+                    target_group = "legend-labels"
+                elif "data source" in text_content or "ourworldindata" in text_content:
+                    target_group = "source"
+                elif "billion" in text_content or "million" in text_content or "%" in text_content:
+                    target_group = "data-labels"
+                else:
+                    target_group = "axis-labels"
+            elif elem.tag == "{http://www.w3.org/2000/svg}path":
+                if "#0c988c" in fill.lower() or "#17a899" in fill.lower():
+                    target_group = "population-fill"
+                elif "#b4358c" in stroke.lower() or "b4358c" in style.lower():
+                    target_group = "growth-line"
+                elif stroke in ("black", "#000000") or "#000000" in stroke:
+                    target_group = "population-outline"
+                elif "#eeeeee" in stroke.lower() or "fill:none" in style:
+                    target_group = "grid-lines"
+                elif len(elem.get("d", "")) < 200:  # Small path = marker
+                    target_group = "markers"
+                else:
+                    target_group = "grid-lines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}line":
+                if "#999999" in stroke.lower():
+                    target_group = "projection-bracket"
+                elif "#b4358c" in stroke.lower():
+                    target_group = "legend-shapes"
+                elif "#eeeeee" in stroke.lower():
+                    target_group = "grid-lines"
+                else:
+                    target_group = "axes-spines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}rect":
+                if "#17a899" in fill.lower():
+                    target_group = "legend-shapes"
+                else:
+                    target_group = "grid-lines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}use":
+                # Categorize based on href
+                if "#m" in href:  # references to path definitions
+                    # Check parent group ID to determine purpose
+                    parent_id = ""
+                    for parent in main_group.iter():
+                        if elem in list(parent):
+                            parent_id = parent.get("id", "")
+                            break
+                    if "Fill" in parent_id:
+                        fill_style = elem.get("style", "")
+                        if "#0c988c" in fill_style.lower():
+                            target_group = "population-fill"
+                        else:
+                            target_group = "population-fill"
+                    elif "line2d" in parent_id:
+                        target_group = "markers"
+                    else:
+                        target_group = "markers"
+
+            if target_group:
+                groups[target_group].append(elem_copy)
 
     # Remove empty groups
-    for group in [title_group, legend_group, milestone_group, growth_group, axes_group, source_group]:
-        if len(group) == 0:
-            main_group.remove(group)
+    for gid in list(group_order):
+        if len(groups[gid]) == 0:
+            new_structure.remove(groups[gid])
+
+    # Replace main_group content with new structure
+    main_group.clear()
+    for child in new_structure:
+        main_group.append(child)
 
     # Write optimized SVG
     tree.write(svg_path, encoding="utf-8", xml_declaration=True)

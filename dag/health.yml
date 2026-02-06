@@ -1372,3 +1372,72 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+  # Tuberculosis expenditure - WHO
+  data://meadow/tuberculosis/2026-02-05/expenditure:
+    - snapshot://tuberculosis/2026-02-05/expenditure.csv
+  data://garden/tuberculosis/2026-02-05/expenditure:
+    - data://meadow/tuberculosis/2026-02-05/expenditure
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+  data://grapher/tuberculosis/2026-02-05/expenditure:
+    - data://garden/tuberculosis/2026-02-05/expenditure
+  # Tuberculosis outcomes - WHO
+  data://meadow/tuberculosis/2026-02-05/outcomes:
+    - snapshot://tuberculosis/2026-02-05/outcomes.csv
+  data://garden/tuberculosis/2026-02-05/outcomes:
+    - data://meadow/tuberculosis/2026-02-05/outcomes
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+  data://grapher/tuberculosis/2026-02-05/outcomes:
+    - data://garden/tuberculosis/2026-02-05/outcomes
+  # Tuberculosis resistance surveillance - WHO
+  data://meadow/tuberculosis/2026-02-05/drug_resistance_surveillance:
+    - snapshot://tuberculosis/2026-02-05/drug_resistance_surveillance.csv
+  data://garden/tuberculosis/2026-02-05/drug_resistance_surveillance:
+    - data://meadow/tuberculosis/2026-02-05/drug_resistance_surveillance
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/tuberculosis/2026-02-05/drug_resistance_surveillance:
+    - data://garden/tuberculosis/2026-02-05/drug_resistance_surveillance
+  # Tuberculosis budget - WHO
+  data://meadow/tuberculosis/2026-02-05/budget:
+    - snapshot://tuberculosis/2026-02-05/budget.csv
+  data://garden/tuberculosis/2026-02-05/budget:
+    - data://meadow/tuberculosis/2026-02-05/budget
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/tuberculosis/2026-02-05/budget:
+    - data://garden/tuberculosis/2026-02-05/budget
+  # Tuberculosis laboratories - WHO
+  data://meadow/tuberculosis/2026-02-05/laboratories:
+    - snapshot://tuberculosis/2026-02-05/laboratories.csv
+  data://garden/tuberculosis/2026-02-05/laboratories:
+    - data://meadow/tuberculosis/2026-02-05/laboratories
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/tuberculosis/2026-02-05/laboratories:
+    - data://garden/tuberculosis/2026-02-05/laboratories
+  # Tuberculosis burden estimates - WHO
+  data://meadow/tuberculosis/2026-02-05/burden_estimates:
+    - snapshot://tuberculosis/2026-02-05/burden_estimates.csv
+  data://garden/tuberculosis/2026-02-05/burden_estimates:
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/tuberculosis/2026-02-05/burden_estimates
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/tuberculosis/2026-02-05/burden_estimates:
+    - data://garden/tuberculosis/2026-02-05/burden_estimates
+  # Tuberculosis burden disaggregated - WHO
+  data://meadow/tuberculosis/2026-02-05/burden_disaggregated:
+    - snapshot://tuberculosis/2026-02-05/burden_disaggregated.csv
+  data://garden/tuberculosis/2026-02-05/burden_disaggregated:
+    - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/tuberculosis/2026-02-05/burden_disaggregated
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/tuberculosis/2026-02-05/burden_disaggregated:
+    - data://garden/tuberculosis/2026-02-05/burden_disaggregated

@@ -207,8 +207,14 @@ def push_new_charts_cli(
     return errors
 
 
-def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX_WORKERS) -> None:
-    """Main CLI function to upgrade indicators using existing variable mapping in DB."""
+def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX_WORKERS) -> Dict:
+    """Main CLI function to upgrade indicators using existing variable mapping in DB.
+
+    Returns a dictionary with:
+        - 'success': bool indicating if all updates succeeded
+        - 'chart_errors': list of chart error dicts
+        - 'narrative_chart_errors': list of narrative chart error dicts
+    """
     log.info("Starting indicator upgrade from existing variable mapping in database")
 
     # 1. Load variable mapping from database
@@ -217,7 +223,7 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
     if not indicator_mapping:
         log.error("No variable mappings found in database. Cannot proceed.")
         log.error("Use the Streamlit UI to create a variable mapping first, or manually add one to the database.")
-        return
+        return {"success": False, "chart_errors": [], "narrative_chart_errors": []}
 
     log.info(f"Found {len(indicator_mapping)} variable mappings:")
     log.info(f"{pd.DataFrame(list(indicator_mapping.items()), columns=['old_id', 'new_id'])}")
@@ -227,7 +233,7 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
 
     if not charts:
         log.warning("No charts affected by this mapping")
-        return
+        return {"success": True, "chart_errors": [], "narrative_chart_errors": []}
 
     # 3. Show affected charts
     log.info("Affected charts:")
@@ -252,6 +258,7 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
     # 7. Report final status
     if dry_run:
         log.info("DRY RUN completed - no changes made")
+        return {"success": True, "chart_errors": [], "narrative_chart_errors": []}
     else:
         total_errors = len(chart_errors) + len(narrative_chart_errors)
         if total_errors > 0:
@@ -264,9 +271,10 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
                 log.error(f"  Narrative chart errors ({len(narrative_chart_errors)}):")
                 for err in narrative_chart_errors:
                     log.error(f"    - Narrative chart {err['narrative_chart_id']} ({err['name']}): {err['error']}")
-            raise RuntimeError(f"Indicator upgrade completed with {total_errors} errors. See logs above for details.")
+            return {"success": False, "chart_errors": chart_errors, "narrative_chart_errors": narrative_chart_errors}
         else:
             log.info("Indicator upgrade completed successfully!")
+            return {"success": True, "chart_errors": [], "narrative_chart_errors": []}
 
 
 @click.command()
@@ -278,7 +286,11 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
 )
 def main(dry_run: bool, max_workers: int):
     """CLI tool for upgrading chart indicators using existing variable mapping in database."""
-    cli_upgrade_indicators(dry_run=dry_run, max_workers=max_workers)
+    result = cli_upgrade_indicators(dry_run=dry_run, max_workers=max_workers)
+    if not result["success"]:
+        raise RuntimeError(
+            f"Indicator upgrade completed with {len(result['chart_errors']) + len(result['narrative_chart_errors'])} errors. See logs above for details."
+        )
 
 
 if __name__ == "__main__":

@@ -261,11 +261,16 @@ def _load_chart_table_data(
         df = pd.read_csv(io.StringIO(resp.text), nrows=0)
 
     # Normalize column names (handle both old capitalized and new lowercase API responses)
-    df = df.rename(columns={
-        "Entity": "entities", "entity": "entities",
-        "Year": "years", "year": "years",
-        "Day": "years", "day": "years",
-    })
+    df = df.rename(
+        columns={
+            "Entity": "entities",
+            "entity": "entities",
+            "Year": "years",
+            "year": "years",
+            "Day": "years",
+            "day": "years",
+        }
+    )
     if "Code" in df.columns:
         df = df.drop(columns=["Code"])
     if "code" in df.columns:

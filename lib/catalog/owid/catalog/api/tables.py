@@ -24,6 +24,7 @@ from owid.catalog.api.utils import (
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
+    S3_OWID_URI_PRIVATE,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
 )
@@ -41,15 +42,22 @@ if TYPE_CHECKING:
 
 
 def _download_private_file_s3(uri: str, tmpdir: str) -> str:
-    """Download private files from S3 to temporary directory."""
+    """Download private files from S3 to temporary directory.
+
+    For private datasets:
+    - Metadata files (.meta.json) are stored in the public bucket for discoverability
+    - Data files are stored in the private bucket and require R2 credentials
+    """
     parsed = urlparse(uri)
     base, ext = os.path.splitext(parsed.path)
+    # Metadata stays in public bucket for discoverability
     s3_utils.download(
         S3_OWID_URI + base + ".meta.json",
         tmpdir + "/data.meta.json",
     )
+    # Data files are in private bucket
     s3_utils.download(
-        S3_OWID_URI + base + ext,
+        S3_OWID_URI_PRIVATE + base + ext,
         tmpdir + "/data" + ext,
     )
     return tmpdir + "/data" + ext

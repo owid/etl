@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 # Constants
 OWID_CATALOG_VERSION = 3
 S3_OWID_URI = "s3://owid-catalog"
+S3_OWID_URI_PRIVATE = "s3://owid-catalog-private"
 PREFERRED_FORMAT: FileFormat = "feather"
 SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
 INDEX_FORMATS: list[FileFormat] = ["feather"]
