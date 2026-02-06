@@ -7,10 +7,10 @@ import json
 import time
 import types
 import zipfile
-from io import BytesIO
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator
 from functools import wraps
+from io import BytesIO
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
@@ -2806,7 +2806,15 @@ def read(
         file_extension = str(filepath_or_buffer).split(".")[-1].lower()
 
     if file_extension == "zip":
-        return read_zip(filepath_or_buffer, *args, metadata=metadata, origin=origin, filename=filename, underscore=underscore, **kwargs)
+        return read_zip(
+            filepath_or_buffer,
+            *args,
+            metadata=metadata,
+            origin=origin,
+            filename=filename,
+            underscore=underscore,
+            **kwargs,
+        )
 
     reader = EXTENSION_TO_READER.get(file_extension)
     if reader is None:
@@ -2857,7 +2865,9 @@ def read_zip(
         with zf.open(filename) as f:
             content = BytesIO(f.read())
 
-        return read(content, *args, file_extension=ext, metadata=metadata, origin=origin, underscore=underscore, **kwargs)
+        return read(
+            content, *args, file_extension=ext, metadata=metadata, origin=origin, underscore=underscore, **kwargs
+        )
 
 
 def read_custom(
