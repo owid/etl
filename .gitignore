@@ -37,6 +37,7 @@ playground.ipynb
 docs/_build
 docs/.vscode
 
+ai/
 *.xlsx
 *.zip
 *.dta

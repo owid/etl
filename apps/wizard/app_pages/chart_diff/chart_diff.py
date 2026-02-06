@@ -348,6 +348,7 @@ class ChartDiff:
         target_session: Session,
         estimate_relevance: bool = True,
         ignore_conflicts: bool = False,
+        skip_analytics: bool = False,
     ) -> List["ChartDiff"]:
         """Get chart diffs from chart ids.
 
@@ -382,14 +383,20 @@ class ChartDiff:
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
-        # Get chart views
-        chart_views_all = get_chart_views_cached(chart_ids)
+        # Get chart views, anomalies, and articles (skip if not needed for performance)
+        if skip_analytics:
+            chart_views_all = {}
+            chart_anomalies_all = {}
+            article_refs_all = {}
+        else:
+            # Get chart views
+            chart_views_all = get_chart_views_cached(chart_ids)
 
-        # Anomalies
-        chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
+            # Anomalies
+            chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
 
-        # Articles
-        article_refs_all = get_chart_in_article_views_cached(chart_ids)
+            # Articles
+            article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
         # Get approvals
         df_approvals_all = read_sql(
@@ -742,6 +749,7 @@ class ChartDiffsLoader:
         source_session: Optional[Session] = None,
         target_session: Optional[Session] = None,
         ignore_conflicts: bool = False,
+        skip_analytics: bool = False,
     ) -> List[ChartDiff]:
         """Optimised version of get_diffs."""
         if chart_ids:
@@ -757,6 +765,7 @@ class ChartDiffsLoader:
                 source_session=source_session,
                 target_session=target_session,
                 ignore_conflicts=ignore_conflicts,
+                skip_analytics=skip_analytics,
             )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
@@ -765,6 +774,7 @@ class ChartDiffsLoader:
                     source_session=source_session,
                     target_session=target_session,
                     ignore_conflicts=ignore_conflicts,
+                    skip_analytics=skip_analytics,
                 )
 
         self._diffs = chart_diffs

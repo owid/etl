@@ -1,8 +1,16 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+NOTES (January 2026):
+- tb_proj: Contains data from 2020 onwards
+- tb_hist: Contains historical data (starting 1950/1955), and often also data after 2020. We deal with this when we run .drop_duplicates() after concatenation.
+"""
+
+from typing import List
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 from .shared import get_index_columns
 
@@ -21,6 +29,10 @@ TABLE_COLUMN_DIFFERENCES = {
         "missing_in_proj": {"macb"},
     },
 }
+# Tables where we merge extra columns from historical data (columns that only exist in hist)
+TABLES_MERGE_FROM_HIST = {
+    "by_sex_age": ["net"],  # net only exists in historical
+}
 DTYPES = {
     "sex": "category",
     "age": "category",
@@ -31,7 +43,41 @@ DTYPES = {
 }
 
 
-def run(dest_dir: str) -> None:
+def combine_tables_with_extra_hist_cols(
+    tb_proj: Table, tb_hist: Table, extra_cols: List[str], index_cols: List[str]
+) -> Table:
+    """Combine tables, adding extra columns from historical via merge.
+
+    This handles the case where historical data has columns that projections don't.
+    We merge on index columns to add the historical-only columns.
+
+    Args:
+        tb_proj: Projection table (has priority for common columns)
+        tb_hist: Historical table (source for extra columns)
+        extra_cols: List of column names to add from historical
+        index_cols: Index columns for merging
+
+    Returns:
+        Combined table with extra columns from historical
+    """
+    # Get common columns (excluding extra_cols that only exist in hist)
+    columns_common = tb_proj.columns.intersection(tb_hist.columns)
+
+    # Step 1: Concatenate common columns (proj first for priority)
+    tb = pr.concat([tb_proj[columns_common], tb_hist[columns_common]], ignore_index=True)
+    tb = tb.drop_duplicates(subset=index_cols, keep="first")
+
+    # Step 2: Merge in extra columns from historical
+    # Select only index + extra columns from historical, drop NAs in extra cols
+    tb_hist_extra = tb_hist[index_cols + extra_cols].dropna(subset=extra_cols)
+
+    # Merge
+    tb = tb.merge(tb_hist_extra, on=index_cols, how="left")
+
+    return tb
+
+
+def run() -> None:
     #
     # Load inputs.
     #
@@ -64,15 +110,18 @@ def run(dest_dir: str) -> None:
         # Check
         sanity_checks(tb_proj, tb_hist)
 
-        # Keep only the columns that are present in both datasets
-        columns_common = tb_proj.columns.intersection(tb_hist.columns)
+        # Get index columns
+        index = get_index_columns(tb_proj)
 
-        # Concatenate
-        tb = pr.concat([tb_proj[columns_common], tb_hist[columns_common]], ignore_index=True)
-
-        # Remove duplicates
-        index = get_index_columns(tb)
-        tb = tb.drop_duplicates(subset=index, keep="first")
+        if key in TABLES_MERGE_FROM_HIST:
+            # Special case: merge extra columns from historical
+            extra_cols = TABLES_MERGE_FROM_HIST[key]
+            tb = combine_tables_with_extra_hist_cols(tb_proj, tb_hist, extra_cols, index)
+        else:
+            # Standard case: intersection of columns
+            columns_common = tb_proj.columns.intersection(tb_hist.columns)
+            tb = pr.concat([tb_proj[columns_common], tb_hist[columns_common]], ignore_index=True)
+            tb = tb.drop_duplicates(subset=index, keep="first")
 
         # Format
         tb = tb.format(index, short_name=key)
@@ -87,8 +136,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
     )
@@ -125,3 +173,11 @@ def sanity_checks(tb_proj, tb_hist):
             f"Table {key}: Mismatch in columns between historical and projection. "
             f"Projection columns: {tb_proj.columns.tolist()}, Historical columns: {tb_hist.columns.tolist()}"
         )
+
+    # Validate columns for TABLES_MERGE_FROM_HIST exist in historical
+    if key in TABLES_MERGE_FROM_HIST:
+        extra_cols = TABLES_MERGE_FROM_HIST[key]
+        for col in extra_cols:
+            assert (
+                col in tb_hist.columns
+            ), f"Table {key}: Expected column '{col}' in historical for merge, but not found"

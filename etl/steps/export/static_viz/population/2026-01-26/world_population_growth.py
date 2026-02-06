@@ -3,8 +3,10 @@
 This code generates a chart showing world population and growth rates from 1700 to 2100, combining historical data with UN projections.
 """
 
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import matplotlib
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,12 +18,186 @@ from owid.catalog import processing as pr
 from etl import paths as etl_paths
 from etl.helpers import create_dataset
 
+# Configure matplotlib to use SVG text elements instead of paths
+matplotlib.rcParams["svg.fonttype"] = "none"
+
 # Paths for this export step
 CURRENT_DIR = Path(__file__).parent
 OUTPUT_DIR = etl_paths.EXPORT_DIR / "static_viz/2026-01-26/world_population_growth"
 SHORT_NAME = "world_population_growth"
 
 log = structlog.get_logger()
+
+
+def optimize_svg_for_figma(svg_path: Path) -> None:
+    """Optimize SVG for easier editing in Figma.
+
+    Flattens matplotlib's nested group structure and creates semantic groups
+    based on visual purpose.
+
+    Args:
+        svg_path: Path to the SVG file to optimize
+    """
+    # Register SVG namespace to preserve it
+    ET.register_namespace("", "http://www.w3.org/2000/svg")
+    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+
+    tree = ET.parse(svg_path)
+    root = tree.getroot()
+
+    # Define SVG namespace for ElementTree operations
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+
+    # Find the main group containing all matplotlib content
+    main_group = root.find("./svg:g[@id='figure_1']", ns)
+    if main_group is None:
+        log.warning("Could not find figure_1 group in SVG, skipping optimization")
+        return
+
+    # Remove large white background elements first (before reorganizing)
+    for elem in list(main_group.findall(".//svg:rect", ns)) + list(main_group.findall(".//svg:path", ns)):
+        fill = elem.get("fill", "")
+        style = elem.get("style", "")
+        is_white = fill in ("#ffffff", "white", "#FFFFFF") or "#ffffff" in style.lower()
+
+        if is_white:
+            d_attr = elem.get("d", "")
+            width_attr = elem.get("width", "0")
+            height_attr = elem.get("height", "0")
+            try:
+                if elem.tag == "{http://www.w3.org/2000/svg}rect":
+                    w, h = float(width_attr), float(height_attr)
+                    is_large = w > 100 and h > 100
+                else:
+                    is_large = any(x in d_attr for x in ["L 1009", "L 958", "L 894"])
+            except (ValueError, AttributeError):
+                is_large = False
+
+            if is_large:
+                for parent in root.iter():
+                    if elem in list(parent):
+                        parent.remove(elem)
+                        break
+
+    # Create new flat structure
+    new_structure = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
+
+    # Semantic groups in render order (bottom to top)
+    group_order = [
+        "grid-lines",
+        "axes-spines",
+        "population-fill",
+        "growth-line",
+        "population-outline",
+        "markers",
+        "projection-bracket",
+        "legend-shapes",
+        "title",
+        "legend-labels",
+        "axis-labels",
+        "data-labels",
+        "source",
+    ]
+
+    groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
+
+    # Collect and categorize all visual elements
+    for elem in main_group.iter():
+        if elem.tag in [
+            "{http://www.w3.org/2000/svg}path",
+            "{http://www.w3.org/2000/svg}line",
+            "{http://www.w3.org/2000/svg}rect",
+            "{http://www.w3.org/2000/svg}text",
+            "{http://www.w3.org/2000/svg}use",
+        ]:
+            # Make a copy to avoid modifying during iteration
+            elem_copy = ET.Element(elem.tag, elem.attrib)
+            elem_copy.text = elem.text
+            elem_copy.tail = None
+            for child in elem:
+                elem_copy.append(child)
+
+            # Categorize
+            target_group = None
+            fill = elem.get("fill", "")
+            stroke = elem.get("stroke", "")
+            style = elem.get("style", "")
+            href = elem.get("{http://www.w3.org/1999/xlink}href", "")
+
+            if elem.tag == "{http://www.w3.org/2000/svg}text":
+                text_content = "".join(elem.itertext()).lower()
+                if "world population growth" in text_content:
+                    target_group = "title"
+                elif "annual growth" in text_content or "world population" in text_content:
+                    target_group = "legend-labels"
+                elif "data source" in text_content or "ourworldindata" in text_content:
+                    target_group = "source"
+                elif "billion" in text_content or "million" in text_content or "%" in text_content:
+                    target_group = "data-labels"
+                else:
+                    target_group = "axis-labels"
+            elif elem.tag == "{http://www.w3.org/2000/svg}path":
+                if "#0c988c" in fill.lower() or "#17a899" in fill.lower():
+                    target_group = "population-fill"
+                elif "#b4358c" in stroke.lower() or "b4358c" in style.lower():
+                    target_group = "growth-line"
+                elif stroke in ("black", "#000000") or "#000000" in stroke:
+                    target_group = "population-outline"
+                elif "#eeeeee" in stroke.lower() or "fill:none" in style:
+                    target_group = "grid-lines"
+                elif len(elem.get("d", "")) < 200:  # Small path = marker
+                    target_group = "markers"
+                else:
+                    target_group = "grid-lines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}line":
+                if "#999999" in stroke.lower():
+                    target_group = "projection-bracket"
+                elif "#b4358c" in stroke.lower():
+                    target_group = "legend-shapes"
+                elif "#eeeeee" in stroke.lower():
+                    target_group = "grid-lines"
+                else:
+                    target_group = "axes-spines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}rect":
+                if "#17a899" in fill.lower():
+                    target_group = "legend-shapes"
+                else:
+                    target_group = "grid-lines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}use":
+                # Categorize based on href
+                if "#m" in href:  # references to path definitions
+                    # Check parent group ID to determine purpose
+                    parent_id = ""
+                    for parent in main_group.iter():
+                        if elem in list(parent):
+                            parent_id = parent.get("id", "")
+                            break
+                    if "Fill" in parent_id:
+                        fill_style = elem.get("style", "")
+                        if "#0c988c" in fill_style.lower():
+                            target_group = "population-fill"
+                        else:
+                            target_group = "population-fill"
+                    elif "line2d" in parent_id:
+                        target_group = "markers"
+                    else:
+                        target_group = "markers"
+
+            if target_group:
+                groups[target_group].append(elem_copy)
+
+    # Remove empty groups
+    for gid in list(group_order):
+        if len(groups[gid]) == 0:
+            new_structure.remove(groups[gid])
+
+    # Replace main_group content with new structure
+    main_group.clear()
+    for child in new_structure:
+        main_group.append(child)
+
+    # Write optimized SVG
+    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
 
 
 def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
@@ -330,7 +506,7 @@ def run() -> None:
 
     Growth rates are selectively displayed to create a smooth visualization:
     - 100-year intervals before 1800
-    - 50-year intervals 1800-1900
+    - 100-year intervals 1800-1900
     - 5-year intervals 1900-1950
     - Annual values from 1950 onwards
 
@@ -410,10 +586,10 @@ def run() -> None:
         log.warning(f"Potential gap at historical/projection boundary (year {year_cut})")
 
     # Omit growth rates for years that don't match the R filtering pattern:
-    # Keep only: 100-year intervals (1700-1800), 50-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
+    # Keep only: 100-year intervals (1700-1800), 100-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
     filter_mask = (
         ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
-        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 50 == 0))
+        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
         | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
         | (tb["year"] >= 1950)
     )
@@ -448,8 +624,17 @@ def run() -> None:
 
     # Save chart outputs
     output_path = CURRENT_DIR / "world_population_growth_1700_2100.svg"
-    fig.savefig(output_path, format="svg", dpi=300, bbox_inches="tight")
-    log.info(f"Saved chart to {output_path}")
+    fig.savefig(
+        output_path,
+        format="svg",
+        dpi=300,
+        bbox_inches="tight",
+        metadata={"Date": None},  # Remove timestamp for cleaner diffs
+    )
+
+    # Optimize SVG for Figma editing
+    optimize_svg_for_figma(output_path)
+    log.info(f"Saved and optimized chart to {output_path}")
 
     output_path_png = CURRENT_DIR / "world_population_growth_1700_2100.png"
     fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")

@@ -434,6 +434,27 @@ tables:
           topic_tags:
             - Global Education
 
+      net:
+        title: |-
+          <% set title = "Net migration" %>
+          {definitions.others.title_sex_age}
+        unit: "people"
+        description_short: |-
+          <%- if (age == "total") and (sex == "total") %>
+          The number of immigrants minus the number of emigrants over the last five-year period.
+          <%- elif (age != "total") and (sex == "total") %>
+          The number of immigrants minus the number of emigrants over the last five-year period (aged <<age>>).
+          <%- elif (age == "total") and (sex != "total") %>
+          The number of immigrants minus the number of emigrants over the last five-year period (<<sex>>s).
+          <%- else %>
+          The number of immigrants minus the number of emigrants over the last five-year period (aged <<age>>, <<sex>>s).
+          <%- endif %>
+        description_processing: |-
+          This indicator is sourced from the historical estimates dataset, which includes both historical data and projections.
+        presentation:
+          topic_tags:
+            - Migration
+
   by_age_edu:
     common:
       description_key:

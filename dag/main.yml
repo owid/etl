@@ -772,6 +772,19 @@ steps:
   data://grapher/core_econ/2026-01-30/unemployment_rate_benefits:
     - data://garden/core_econ/2026-01-30/unemployment_rate_benefits
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2026-01-29/wdi:
+    - snapshot://worldbank_wdi/2026-01-29/wdi.zip
+  data://garden/worldbank_wdi/2026-01-29/wdi:
+    - data://garden/un/2024-07-12/un_wpp
+    - snapshot://worldbank_wdi/2026-01-29/wdi.zip
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/worldbank_wdi/2026-01-29/wdi
+  data://grapher/worldbank_wdi/2026-01-29/wdi:
+    - data://garden/worldbank_wdi/2026-01-29/wdi
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
