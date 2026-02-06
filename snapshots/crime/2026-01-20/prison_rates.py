@@ -293,9 +293,7 @@ def _validate_data(df: pd.DataFrame, country_name: str) -> None:
             if "prison_population_total" in df.columns:
                 check_df = df.dropna(subset=["pretrial_remand_number", "prison_population_total"])
                 if not check_df.empty:
-                    exceeds = check_df[
-                        check_df["pretrial_remand_number"] > check_df["prison_population_total"]
-                    ]
+                    exceeds = check_df[check_df["pretrial_remand_number"] > check_df["prison_population_total"]]
                     if not exceeds.empty:
                         print(
                             f"⚠️  WARNING [{country_name}]: Found {len(exceeds)} rows where pre-trial number exceeds total prison population"
@@ -493,19 +491,23 @@ def _extract_pretrial_table(soup: BeautifulSoup, country_name: str) -> pd.DataFr
             while len(all_rates) < max_len:
                 all_rates.append(None)
 
-            df = pd.DataFrame({
-                "year": all_years,
-                "pretrial_remand_number": all_numbers,
-                "pretrial_remand_pct": all_percentages,
-                "pretrial_remand_rate": all_rates,
-            })
+            df = pd.DataFrame(
+                {
+                    "year": all_years,
+                    "pretrial_remand_number": all_numbers,
+                    "pretrial_remand_pct": all_percentages,
+                    "pretrial_remand_rate": all_rates,
+                }
+            )
 
             # Clean the data - handle year formats like "2022/2023" by taking the latter year
             df["year"] = df["year"].astype(str).str.split("/").str[-1]
             # Remove any non-numeric characters (like asterisks)
             df["year"] = df["year"].str.replace(r"[^\d]", "", regex=True)
             # Handle 2-digit years (e.g., "2000/01" -> "01" should become 2001)
-            df["year"] = df["year"].apply(lambda x: int(x) if len(str(x)) == 4 else (2000 + int(x) if int(x) <= 99 else int(x)))
+            df["year"] = df["year"].apply(
+                lambda x: int(x) if len(str(x)) == 4 else (2000 + int(x) if int(x) <= 99 else int(x))
+            )
             df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
             # Clean numeric columns (remove commas, spaces, percentages)
