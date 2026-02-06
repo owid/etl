@@ -12,6 +12,37 @@ if [ "$CLAUDE_CODE_REMOTE" != "true" ]; then
   exit 0
 fi
 
+# Install gh CLI if not available
+echo ""
+if ! command -v gh &> /dev/null; then
+  echo "📦 Installing gh CLI..."
+  GH_START=$(date +%s)
+
+  GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")
+  if [ -n "$GH_VERSION" ]; then
+    mkdir -p "$HOME/.local/bin"
+    curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+    tar -xzf /tmp/gh.tar.gz -C /tmp/
+    cp "/tmp/gh_${GH_VERSION}_linux_amd64/bin/gh" "$HOME/.local/bin/gh"
+    chmod +x "$HOME/.local/bin/gh"
+    rm -rf /tmp/gh.tar.gz "/tmp/gh_${GH_VERSION}_linux_amd64"
+    export PATH="$HOME/.local/bin:$PATH"
+
+    # Persist PATH for subsequent commands
+    if [ -n "$CLAUDE_ENV_FILE" ]; then
+      echo "PATH=$HOME/.local/bin:\$PATH" >> "$CLAUDE_ENV_FILE"
+    fi
+
+    GH_END=$(date +%s)
+    GH_DURATION=$((GH_END - GH_START))
+    echo "✅ gh CLI $(gh --version | head -1) installed (${GH_DURATION}s)"
+  else
+    echo "⚠️  Could not determine gh CLI version, skipping"
+  fi
+else
+  echo "✓ gh CLI already available ($(gh --version | head -1))"
+fi
+
 # Use make .venv to set up the environment
 echo ""
 echo "📦 Running make .venv to install dependencies..."
