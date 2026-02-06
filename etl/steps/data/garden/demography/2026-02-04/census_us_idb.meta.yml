@@ -48,6 +48,9 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Fertility Rate
 
       e0:
         title: Life expectancy at birth
@@ -60,6 +63,9 @@ tables:
         short_unit: years
         display:
           numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Life Expectancy
 
       nim:
         title: Net international migration
@@ -72,3 +78,6 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Migration
