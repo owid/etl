@@ -165,12 +165,7 @@ def run() -> None:
     )
 
     # Remove grouped welfare_type views for quantiles we don't want grouped (keep only Richest 0.1%, Richest 1%, 10)
-    c.views = [
-        v
-        for v in c.views
-        if v.dimensions.get("welfare_type") != "before_vs_after"
-        or v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10"]
-    ]
+    c.drop_views({"welfare_type": ["before_vs_after"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]})
 
     # Customize grouped welfare_type views (before_vs_after)
     for view in c.views:
@@ -243,12 +238,7 @@ def run() -> None:
     )
 
     # Remove grouped scatter views for quantiles we don't want (keep only Richest 0.1%, Richest 1%, 10)
-    c.views = [
-        v
-        for v in c.views
-        if v.dimensions.get("welfare_type") != "before_vs_after_scatter"
-        or v.dimensions.get("quantile") in ["Richest 0.1%", "Richest 1%", "10"]
-    ]
+    c.drop_views({"welfare_type": ["before_vs_after_scatter"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]})
 
     # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
     for view in c.views:

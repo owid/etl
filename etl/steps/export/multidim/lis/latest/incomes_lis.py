@@ -188,12 +188,10 @@ def run() -> None:
         ],
     )
 
-    # Remove before_vs_after for grouped decile views (all, all_bar) — too many indicators
-    c.views = [
-        v
-        for v in c.views
-        if v.dimensions.get("welfare_type") != "before_vs_after" or v.dimensions.get("decile") not in ["all", "all_bar"]
-    ]
+    # Remove before_vs_after for grouped decile views — too many indicators
+    c.drop_views(
+        [{"welfare_type": ["before_vs_after"], "decile": ["all", "all_bar", "10_40_50", "10_40_50_bar"]}]
+    )
 
     # Customize before_vs_after views
     for view in c.views:
