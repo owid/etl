@@ -24,7 +24,6 @@ from owid.catalog.core.tables import (
     read_rda_multiple,
     read_rds,
     read_stata,
-    read_zip,
     to_datetime,
     to_numeric,
 )
@@ -55,7 +54,6 @@ __all__ = [
     "read_df",
     "read_custom",
     "read_parquet",
-    "read_zip",
     "to_datetime",
     "to_numeric",
 ]

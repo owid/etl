@@ -6,11 +6,9 @@ from __future__ import annotations
 import json
 import time
 import types
-import zipfile
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator
 from functools import wraps
-from io import BytesIO
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
@@ -2783,7 +2781,6 @@ def read(
     file_extension: str | None = None,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
-    filename: str | None = None,
     underscore: bool = False,
     **kwargs,
 ) -> Table:
@@ -2795,81 +2792,24 @@ def read(
         file_extension: File extension (without dot). If None, inferred from filepath.
         metadata: Table metadata.
         origin: Origin of the table data.
-        filename: For zip files, the file to read within the archive.
         underscore: True to make all column names snake case.
         **kwargs: Additional keyword arguments passed to the format-specific reader.
 
     Returns:
         Table with data and metadata.
+
+    Note:
+        For reading ZIP files, use Snapshot.extracted() context manager instead.
+        See etl/snapshot.py for the recommended approach to handling archives.
     """
     if file_extension is None:
         file_extension = str(filepath_or_buffer).split(".")[-1].lower()
-
-    if file_extension == "zip":
-        if not isinstance(filepath_or_buffer, (str, Path)):
-            raise TypeError("Zip files must be read from a file path, not a buffer")
-        return read_zip(
-            filepath_or_buffer,
-            *args,
-            metadata=metadata,
-            origin=origin,
-            filename=filename,
-            underscore=underscore,
-            **kwargs,
-        )
 
     reader = EXTENSION_TO_READER.get(file_extension)
     if reader is None:
         raise ValueError(f"Unknown extension: {file_extension}")
 
     return reader(filepath_or_buffer, *args, metadata=metadata, origin=origin, underscore=underscore, **kwargs)
-
-
-def read_zip(
-    filepath: str | Path,
-    *args,
-    metadata: TableMeta | None = None,
-    origin: Origin | None = None,
-    filename: str | None = None,
-    underscore: bool = False,
-    **kwargs,
-) -> Table:
-    """Read a file from a zip archive.
-
-    Args:
-        filepath: Path to the zip file.
-        *args: Additional positional arguments passed to the format-specific reader.
-        metadata: Table metadata.
-        origin: Origin of the table data.
-        filename: File to read within the zip. If None and zip contains one file,
-            that file is read. If None and multiple files, raises ValueError.
-        underscore: True to make all column names snake case.
-        **kwargs: Additional keyword arguments passed to the format-specific reader.
-
-    Returns:
-        Table with data and metadata.
-    """
-    with zipfile.ZipFile(filepath, "r") as zf:
-        files = [f for f in zf.namelist() if not f.endswith("/")]
-
-        if filename is None:
-            if len(files) == 0:
-                raise ValueError(f"No files found in zip archive: {filepath}")
-            elif len(files) != 1:
-                raise ValueError(f"Multiple files in zip. Specify 'filename'. Available: {sorted(files)}")
-            filename = files[0]
-
-        if filename not in files:
-            raise FileNotFoundError(f"File '{filename}' not found in archive. Available: {sorted(files)}")
-
-        ext = filename.split(".")[-1].lower()
-
-        with zf.open(filename) as f:
-            content = BytesIO(f.read())
-
-        return read(
-            content, *args, file_extension=ext, metadata=metadata, origin=origin, underscore=underscore, **kwargs
-        )
 
 
 def read_custom(
