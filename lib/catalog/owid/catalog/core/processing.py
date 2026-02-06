@@ -8,6 +8,7 @@ from owid.catalog.core.tables import (
     merge,
     multi_merge,
     pivot,
+    read,
     read_csv,
     read_custom,
     read_df,
@@ -23,6 +24,7 @@ from owid.catalog.core.tables import (
     read_rda_multiple,
     read_rds,
     read_stata,
+    read_zip,
     to_datetime,
     to_numeric,
 )
@@ -37,6 +39,7 @@ __all__ = [
     "merge",
     "multi_merge",
     "pivot",
+    "read",
     "read_csv",
     "read_feather",
     "read_excel",
@@ -52,6 +55,7 @@ __all__ = [
     "read_df",
     "read_custom",
     "read_parquet",
+    "read_zip",
     "to_datetime",
     "to_numeric",
 ]
