@@ -24,20 +24,24 @@ def run() -> None:
         ["country", "year"] + [column for column in tb.columns if "production" in column]
     ]
 
+    # For convenience, make a "country" column for sources.
+    tb = tb.rename(
+        columns={
+            column: column.replace("_production", "").replace("_", " ").capitalize()
+            for column in tb.columns
+            if column not in ["country", "year"]
+        },
+        errors="raise",
+    )
+    tb = tb.drop(columns=["country"]).melt(id_vars=["year"], var_name="country", value_name="production")
+
     # Improve table format.
     tb = tb.format()
 
     ####################################################################################################################
     # Fill out required metadata.
     # TODO: Fill out yaml meta files properly instead of this.
-    for column in tb.columns:
-        if column == "total_production":
-            title = "Total electricity production"
-        else:
-            title = f"Electricity production by {column.replace('_production', '').replace('_', ' ')}"
-        tb[column].metadata.title = title
-        tb[column].metadata.unit = "terawatt-hours"
-        tb[column].metadata.short_unit = "TWh"
+    tb["production"].metadata.title = "Global electricity production"
     ####################################################################################################################
 
     #
