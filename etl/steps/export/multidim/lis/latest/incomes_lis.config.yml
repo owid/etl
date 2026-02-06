@@ -4,14 +4,11 @@ title:
 
 default_selection:
   - United States
-  - Canada
-  - Australia
+  - United Kingdom
   - Germany
-  - Sweden
-  - France
-  - Mexico
-  - Russia
-  - Israel
+  - Canada
+  - Japan
+  - Brazil
 
 default_dimensions:
   indicator: thr

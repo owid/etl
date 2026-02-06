@@ -101,16 +101,6 @@ def run() -> None:
         ],
     )
 
-    # Fix choice names and set groups
-    decile_dim = c.get_dimension("decile")
-    for choice in decile_dim.choices:
-        if choice.slug == "all":
-            choice.name = "All deciles"
-            choice.group = "Compare different deciles"
-        elif choice.slug == "all_bar":
-            choice.name = "All deciles (bar chart)"
-            choice.group = "Compare different deciles"
-
     # Filter decile views: keep only relevant deciles per indicator
     non_share = [i for i in c.dimension_choices["indicator"] if i != "share"]
     non_thr = [i for i in c.dimension_choices["indicator"] if i != "thr"]

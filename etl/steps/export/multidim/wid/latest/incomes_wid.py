@@ -105,14 +105,6 @@ def run() -> None:
         ],
     )
 
-    # Fix the "all" and "all_bar" choice names (group_views sets it to the slug since it wasn't in the dimension)
-    decile_dim = c.get_dimension("quantile")
-    for choice in decile_dim.choices:
-        if choice.slug == "all":
-            choice.name = "All deciles"
-        elif choice.slug == "all_bar":
-            choice.name = "All deciles (bar chart)"
-
     # Filter quantile views: keep only specific quantiles
     keep_quantiles = {"Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"}
     c.drop_views({"quantile": [q for q in c.dimension_choices["quantile"] if q not in keep_quantiles]})
@@ -300,7 +292,9 @@ def run() -> None:
 
                     # Extract and modify description_short (remove welfare type phrase)
                     description_short = meta.description_short or ""
-                    description_short = description_short.replace(" Income here is measured after taxes and benefits.", "")
+                    description_short = description_short.replace(
+                        " Income here is measured after taxes and benefits.", ""
+                    )
 
                     # Determine axis min based on quantile
                     quantile = view.dimensions.get("quantile")
