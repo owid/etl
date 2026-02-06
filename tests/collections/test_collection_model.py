@@ -1862,3 +1862,99 @@ def test_group_views_replace_sequential_calls():
     # Age has young, old, and all_ages
     age_choices = {view.dimensions["age"] for view in collection.views}
     assert age_choices == {"young", "old", "all_ages"}
+
+
+def test_group_views_replace_does_not_prune_other_dimensions():
+    """
+    Test that group_views with replace=True only prunes choices from the
+    dimension being grouped, not from other dimensions.
+
+    Regression test: choices defined in config but not yet used in views
+    (e.g. "all" decile meant for a later group_views call) should not be
+    removed when replace=True is used on a different dimension.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(
+                slug="survey_comparability",
+                name="Survey comparability",
+                choices=[
+                    DimensionChoice(slug="no_spells", name="No spells"),
+                    DimensionChoice(slug="spell_a", name="Spell A"),
+                    DimensionChoice(slug="spell_b", name="Spell B"),
+                ],
+            ),
+            Dimension(
+                slug="decile",
+                name="Decile",
+                choices=[
+                    DimensionChoice(slug="1", name="Poorest 10%"),
+                    DimensionChoice(slug="10", name="Richest 10%"),
+                    # These choices have no views yet -- they'll be created by a later group_views call
+                    DimensionChoice(slug="all", name="All deciles"),
+                    DimensionChoice(slug="all_bar", name="All deciles (bar chart)"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"survey_comparability": "no_spells", "decile": "1"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_a", "decile": "1"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_b", "decile": "1"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "no_spells", "decile": "10"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind4")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_a", "decile": "10"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind5")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_b", "decile": "10"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind6")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    decile_choices_before = {c.slug for c in collection.dimensions[1].choices}
+    assert "all" in decile_choices_before
+    assert "all_bar" in decile_choices_before
+
+    # Group survey_comparability with replace=True (this should NOT affect decile choices)
+    collection.group_views(
+        [
+            {
+                "dimension": "survey_comparability",
+                "choices": ["spell_a", "spell_b"],
+                "choice_new_slug": "spells",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # Verify survey_comparability was grouped correctly
+    survey_choices = {c.slug for c in collection.dimensions[0].choices}
+    assert "spell_a" not in survey_choices
+    assert "spell_b" not in survey_choices
+    assert "no_spells" in survey_choices
+    assert "spells" in survey_choices
+
+    # Key assertion: decile choices that had no views should still be preserved
+    decile_choices_after = {c.slug for c in collection.dimensions[1].choices}
+    assert "all" in decile_choices_after, "Choice 'all' was incorrectly pruned from decile dimension"
+    assert "all_bar" in decile_choices_after, "Choice 'all_bar' was incorrectly pruned from decile dimension"
+    assert "1" in decile_choices_after
+    assert "10" in decile_choices_after
