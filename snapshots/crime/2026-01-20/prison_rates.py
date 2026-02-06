@@ -502,6 +502,8 @@ def _extract_pretrial_table(soup: BeautifulSoup, country_name: str) -> pd.DataFr
 
             # Clean the data - handle year formats like "2022/2023" by taking the latter year
             df["year"] = df["year"].astype(str).str.split("/").str[-1]
+            # Remove any non-numeric characters (like asterisks)
+            df["year"] = df["year"].str.replace(r"[^\d]", "", regex=True)
             # Handle 2-digit years (e.g., "2000/01" -> "01" should become 2001)
             df["year"] = df["year"].apply(lambda x: int(x) if len(str(x)) == 4 else (2000 + int(x) if int(x) <= 99 else int(x)))
             df["year"] = pd.to_numeric(df["year"], errors="coerce")
