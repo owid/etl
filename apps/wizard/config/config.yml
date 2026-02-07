@@ -179,6 +179,13 @@ sections:
     description: |-
       Browse our content.
     apps:
+      - title: "Search Comparison"
+        alias: search-comparison
+        description: "Compare Algolia vs semantic search"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/search_comparison/app.py
+        icon: ":material/compare:"
+        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
       # This app is causing a segmentation fault (I couldn't figure out why).
       # Given that we have the data insights admin search, this app may not be needed anymore.
       # - title: "Insight search"
