@@ -26,6 +26,8 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_cause_dalys"].reset_index()
+    # Drop population_group_name as it only contains 'All Population'
+    tb = tb.drop(columns=["population_group_name"])
     ds_regions = paths.load_dataset("regions")
     #
     # Process data.
