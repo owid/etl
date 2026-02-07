@@ -9,6 +9,7 @@ from pathlib import Path
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -26,6 +27,9 @@ SHORT_NAME = "population_billion_milestones"
 
 log = structlog.get_logger()
 
+POPULATION_TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+POPULATION_TARGETS = [x * 1e9 for x in POPULATION_TARGETS]
+
 
 def find_population_milestones(tb: Table) -> list[dict]:
     """Find years when population crossed each billion milestone.
@@ -36,34 +40,34 @@ def find_population_milestones(tb: Table) -> list[dict]:
     Returns:
         List of dicts with milestone, year_start, year_end, duration info
     """
+    # Linearly interpolate population
+    tb = interpolate_population(tb)
+
+    # Round population values to significant (resolution of 1e8), e.g. 521,324,321 -> 5e8
+    tb = round_population_values(tb)
+
+    # Keep only population of interest values
+    tb = tb.loc[tb["population_target"].isin(POPULATION_TARGETS)]
+    # Keep one row for each population rounded. That's when the 'target' is reached.
+    tb = get_target_years(tb)
+
+    # Sort by population target to ensure correct ordering
+    tb = tb.sort_values("population_target").reset_index(drop=True)
+
+    # Build milestones list
     milestones = []
 
-    # Dynamically determine billion thresholds based on data
-    max_pop = tb["population"].max()
-    max_billion = int(np.ceil(max_pop / 1e9))
-    billion_marks = list(range(1, max_billion + 1))
-
-    for i, target_billion in enumerate(billion_marks):
-        target_pop = target_billion * 1e9
-
-        # Find first year when population >= target
-        crossing = tb[tb["population"] >= target_pop]
-        if crossing.empty:
-            continue
-
-        year_reached = int(crossing.iloc[0]["year"])
+    for i in range(len(tb)):
+        year_reached = int(tb.loc[i, "year"])
+        target_pop = tb.loc[i, "population_target"]
+        target_billion = int(target_pop / 1e9)
 
         # For the first billion, use earliest data year
         if i == 0:
             year_start = int(tb["year"].min())
         else:
             # Use the year when previous billion was reached
-            prev_billion = billion_marks[i - 1] * 1e9
-            prev_crossing = tb[tb["population"] >= prev_billion]
-            if not prev_crossing.empty:
-                year_start = int(prev_crossing.iloc[0]["year"])
-            else:
-                year_start = year_reached
+            year_start = int(tb.loc[i - 1, "year"])
 
         duration = year_reached - year_start
 
@@ -85,6 +89,72 @@ def find_population_milestones(tb: Table) -> list[dict]:
         )
 
     return milestones
+
+
+def round_population_values(tb: Table) -> Table:
+    """Round population values to significant figures."""
+    msk = tb["population"] <= 1e9
+    tb.loc[msk, "population_target"] = tb.loc[msk, "population"].round(-7)
+    tb.loc[-msk, "population_target"] = tb.loc[-msk, "population"].round(-8)
+    return tb
+
+
+def interpolate_population(tb: Table) -> Table:
+    """Interpolate population values for missing years.
+
+    tb should be of Nx2 dimensions, 2 being the number of culumns: year, population.
+    """
+    # Create new index ([start_year, end_year])
+    idx = pd.RangeIndex(tb.year.min(), tb.year.max() + 1, name="year")
+    tb = tb.set_index(["year"]).reindex(idx)
+    # Interpolate population values
+    tb["population"] = tb["population"].interpolate(method="index")
+    tb = tb.reset_index()
+    return tb
+
+
+def get_target_years(tb: Table) -> Table:
+    """Get years of interest.
+
+    Multiple population values are rounded to the same value. We want to keep only the row for the year when the population target was reached.
+    How? We obtain rows where target population was reached (e.g target-crossing)
+    """
+
+    ## 1. Calculate the sign of the population error
+    tb["population_error"] = tb["population"] - tb["population_target"]
+    ## 2. Check if the sign of the population error changes (from negative to positive)
+    ## Keep start and end year of target-crossing
+    ## Tag target-crossing with a number (so that we know that the start- and end-years belong to the same target-crossing)
+    tb["target_crossing"] = np.sign(tb["population_error"]).diff().fillna(0) > 0
+    tb["target_crossing"] = np.where(tb["target_crossing"], tb["target_crossing"].cumsum(), 0)
+    tb["target_crossing"] = tb["target_crossing"] + tb["target_crossing"].shift(-1).fillna(0)
+
+    ## 2b. Sometimes there is no 'crossing' due to resolution (single year jump)
+    # Find targets where all rows have target_crossing == 0
+    targets_with_no_crossing = []
+    for target in tb["population_target"].unique():
+        target_rows = tb[tb["population_target"] == target]
+        if (target_rows["target_crossing"] == 0).all():
+            targets_with_no_crossing.append(target)
+
+    # For these targets, assign a unique crossing ID to each row
+    if targets_with_no_crossing:
+        max_crossing_id = tb["target_crossing"].max() if tb["target_crossing"].max() > 0 else 0
+        for target in targets_with_no_crossing:
+            mask = tb["population_target"] == target
+            tb.loc[mask, "target_crossing"] = max_crossing_id + 1
+            max_crossing_id += 1
+
+    tb = tb[tb["target_crossing"] > 0]
+
+    ## 3. Keep start OR end year of target-crossing, based on which is closed to target
+    tb["population_error_abs"] = tb["population_error"].abs()
+    tb = tb.sort_values("population_error_abs").drop_duplicates(subset=["target_crossing"])
+
+    ## 4. Keep relevant columns
+    tb = tb.loc[:, ["year", "population", "population_target"]]
+
+    return tb
 
 
 def build_source_citation(tb_historical, tb_projection) -> str:
@@ -225,37 +295,37 @@ def create_visualization(
         duration = milestone["duration"]  # Use actual duration for label
         year_range = f"{milestone['year_start']}-{milestone['year_end']}"
 
-        # Main duration label on top of bar
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            bar.get_height() + 3,
-            f"{duration} years",
-            ha="center",
-            va="bottom",
-            fontsize=13,
-            fontweight="bold",
-            color=text_color,
-        )
-
-        # Year range below duration
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            bar.get_height() - 5,
-            year_range,
-            ha="center",
-            va="top",
-            fontsize=11,
-            color=text_color,
-        )
-
-        # Special annotation for first billion
+        # Special annotation for first billion (skip duration labels)
         if milestone["milestone"] == 1:
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                bar.get_height() * 0.7,
+                bar.get_height() * 0.5,
                 f"All of human\nhistory up\nto {milestone['year_end']}",
                 ha="center",
                 va="center",
+                fontsize=11,
+                color=text_color,
+            )
+        else:
+            # Main duration label on top of bar
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 3,
+                f"{duration} years",
+                ha="center",
+                va="bottom",
+                fontsize=13,
+                fontweight="bold",
+                color=text_color,
+            )
+
+            # Year range below duration
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() - 5,
+                year_range,
+                ha="center",
+                va="top",
                 fontsize=11,
                 color=text_color,
             )
@@ -372,7 +442,6 @@ def run() -> None:
 
     # Combine
     tb = pr.concat([hist_data, proj_data], ignore_index=True).sort_values("year").drop_duplicates(subset=["year"])
-
     # Find milestones
     milestones = find_population_milestones(tb)
 
