@@ -1,0 +1,195 @@
+title:
+  title: Incomes across the distribution
+  title_variant: Luxembourg Income Study
+
+default_selection:
+  - United States
+  - United Kingdom
+  - Germany
+  - Canada
+  - Japan
+  - Brazil
+
+default_dimensions:
+  indicator: thr
+  decile: all
+  welfare_type: dhi
+  period: month
+
+dimensions:
+  - name: Metric
+    slug: indicator
+    choices:
+      - slug: mean
+        name: Mean income
+      - slug: median
+        name: Median income
+      - slug: avg
+        name: Mean income, by decile
+      - slug: thr
+        name: Decile thresholds
+      - slug: share
+        name: Decile shares
+
+  - name: Decile
+    slug: decile
+    choices:
+      - slug: "1"
+        name: "Poorest 10%"
+      - slug: "5"
+        name: "Median"
+      - slug: "9"
+        name: "Richest 10% "
+      - slug: "10"
+        name: "Richest 10%"
+      - slug: "10_40_50"
+        name: Richest and poorest groups
+        group: Compare different deciles
+      - slug: "10_40_50_bar"
+        name: Richest and poorest groups (bar chart)
+        group: Compare different deciles
+      - slug: all
+        name: All deciles
+        group: Compare different deciles
+      - slug: all_bar
+        name: All deciles (bar chart)
+        group: Compare different deciles
+      - slug: nan
+        name: ""
+
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: dhi
+        name: After tax
+      - slug: mi
+        name: Before tax
+      - slug: before_vs_after
+        name: Before vs. after tax
+
+  - name: Period
+    slug: period
+    choices:
+      - slug: "day"
+        name: "Day"
+      - slug: "month"
+        name: "Month"
+      - slug: "year"
+        name: "Year"
+      - slug: "nan"
+        name: ""
+
+views:
+  - dimensions:
+      indicator: share
+      decile: "10_40_50"
+      period: nan
+      welfare_type: dhi
+    indicators:
+      y:
+        - catalogPath: inequality#share_top_10__welfare_type_dhi__equivalence_scale_square_root
+          display:
+            name: "Richest 10%"
+        - catalogPath: inequality#share_middle_40__welfare_type_dhi__equivalence_scale_square_root
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_bottom_50__welfare_type_dhi__equivalence_scale_square_root
+          display:
+            name: "Poorest 50%"
+    config:
+      title: Distribution of income across richer and poorer groups (after tax)
+      subtitle: The share of income received by different income groups. Income here is measured after taxes and benefits.
+      note: ""
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured after taxes and benefits."
+
+  - dimensions:
+      indicator: share
+      decile: "10_40_50"
+      period: nan
+      welfare_type: mi
+    indicators:
+      y:
+        - catalogPath: inequality#share_top_10__welfare_type_mi__equivalence_scale_square_root
+          display:
+            name: "Richest 10%"
+        - catalogPath: inequality#share_middle_40__welfare_type_mi__equivalence_scale_square_root
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_bottom_50__welfare_type_mi__equivalence_scale_square_root
+          display:
+            name: "Poorest 50%"
+    config:
+      title: Distribution of income across richer and poorer groups (before tax)
+      subtitle: The share of income received by different income groups. Income here is measured before taxes and benefits.
+      note: ""
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured before taxes and benefits."
+
+  - dimensions:
+      indicator: share
+      decile: "10_40_50_bar"
+      period: nan
+      welfare_type: dhi
+    indicators:
+      y:
+        - catalogPath: inequality#share_bottom_50__welfare_type_dhi__equivalence_scale_square_root
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#share_middle_40__welfare_type_dhi__equivalence_scale_square_root
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_top_10__welfare_type_dhi__equivalence_scale_square_root
+          display:
+            name: "Richest 10%"
+    config:
+      title: Distribution of income across richer and poorer groups (after tax)
+      subtitle: The share of income received by different income groups. Income here is measured after taxes and benefits.
+      note: ""
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: inequality#share_top_10__welfare_type_dhi__equivalence_scale_square_root
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured after taxes and benefits."
+
+  - dimensions:
+      indicator: share
+      decile: "10_40_50_bar"
+      period: nan
+      welfare_type: mi
+    indicators:
+      y:
+        - catalogPath: inequality#share_bottom_50__welfare_type_mi__equivalence_scale_square_root
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#share_middle_40__welfare_type_mi__equivalence_scale_square_root
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_top_10__welfare_type_mi__equivalence_scale_square_root
+          display:
+            name: "Richest 10%"
+    config:
+      title: Distribution of income across richer and poorer groups (before tax)
+      subtitle: The share of income received by different income groups. Income here is measured before taxes and benefits.
+      note: ""
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: inequality#share_top_10__welfare_type_mi__equivalence_scale_square_root
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured before taxes and benefits."

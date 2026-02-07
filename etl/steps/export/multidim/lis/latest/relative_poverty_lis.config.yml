@@ -1,0 +1,49 @@
+title:
+  title: Relative poverty indicators
+  title_variant: Luxembourg Income Study
+
+default_selection:
+  - United States
+  - United Kingdom
+  - Germany
+  - Canada
+  - Japan
+  - Brazil
+
+default_dimensions:
+  indicator: headcount_ratio
+  poverty_line: 60% of the median
+  welfare_type: dhi
+
+dimensions:
+  - name: Metric
+    slug: indicator
+    choices:
+      - slug: headcount_ratio
+        name: Share in poverty
+        description: The share of the population living below the selected poverty line
+      - slug: headcount
+        name: Number in poverty
+        description: The number of people living below the selected poverty line
+
+  - name: Poverty line
+    slug: poverty_line
+    choices:
+      - slug: 40% of the median
+        name: 40% of median income
+      - slug: 50% of the median
+        name: 50% of median income
+      - slug: 60% of the median
+        name: 60% of median income
+
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: dhi
+        name: After tax
+      - slug: mi
+        name: Before tax
+      - slug: before_vs_after
+        name: Before vs. after tax
+
+views: []
