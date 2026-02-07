@@ -258,3 +258,9 @@ steps:
     - data://meadow/emissions/2023-10-24/emission_factors
   data://grapher/emissions/2023-10-24/emission_factors:
     - data://garden/emissions/2023-10-24/emission_factors
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+    - data://garden/gcp/2025-11-13/global_carbon_budget
