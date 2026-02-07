@@ -2580,7 +2580,7 @@ def read_feather(
 
 
 def read_excel(
-    io: str | Path,
+    io: str | Path | IO[AnyStr],
     *args,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
@@ -2755,6 +2755,61 @@ def read_parquet(
     table = Table(pd.read_parquet(path=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
+
+
+EXTENSION_TO_READER = {
+    "csv": read_csv,
+    "xlsx": read_excel,
+    "xls": read_excel,
+    "xlsm": read_excel,
+    "xlsb": read_excel,
+    "odf": read_excel,
+    "ods": read_excel,
+    "odt": read_excel,
+    "json": read_json,
+    "parquet": read_parquet,
+    "feather": read_feather,
+    "dta": read_stata,
+    "rds": read_rds,
+    "rda": read_rda,
+}
+
+
+def read(
+    filepath_or_buffer: str | Path | IO[AnyStr],
+    *args,
+    file_extension: str | None = None,
+    metadata: TableMeta | None = None,
+    origin: Origin | None = None,
+    underscore: bool = False,
+    **kwargs,
+) -> Table:
+    """Read a file based on extension, dispatching to the appropriate reader.
+
+    Args:
+        filepath_or_buffer: Path to the file or file-like object to read.
+        *args: Additional positional arguments passed to the format-specific reader.
+        file_extension: File extension (without dot). If None, inferred from filepath.
+        metadata: Table metadata.
+        origin: Origin of the table data.
+        underscore: True to make all column names snake case.
+        **kwargs: Additional keyword arguments passed to the format-specific reader.
+
+    Returns:
+        Table with data and metadata.
+
+    Note:
+        For reading ZIP files, use Snapshot.extracted() context manager instead.
+        See etl/snapshot.py for the recommended approach to handling archives.
+    """
+    if file_extension is None:
+        file_extension = str(filepath_or_buffer).split(".")[-1].lower()
+
+    reader = EXTENSION_TO_READER.get(file_extension)
+    if reader is None:
+        raise ValueError(f"Unknown extension: {file_extension}")
+
+    return reader(filepath_or_buffer, *args, metadata=metadata, origin=origin, underscore=underscore, **kwargs)
 
 
 def read_custom(
