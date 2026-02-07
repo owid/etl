@@ -1271,3 +1271,690 @@ def test_validate_indicators_are_from_dependencies_empty_indicators():
     # Should pass validation
     result = collection.validate_indicators_are_from_dependencies(indicators)
     assert result is True
+
+
+# =============================================================================
+# Tests for Collection.group_views with replace=True
+# =============================================================================
+
+
+def test_group_views_replace_removes_original_views():
+    """
+    Test Collection.group_views with replace=True removes original views.
+
+    When replace=True, the views with the original grouped choices should be removed,
+    leaving only the newly created grouped views.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["sex", "age"],
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+            Dimension(
+                slug="age",
+                name="Age",
+                choices=[
+                    DimensionChoice(slug="young", name="Young"),
+                    DimensionChoice(slug="old", name="Old"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male", "age": "young"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "young"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"sex": "male", "age": "old"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "old"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind4")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before grouping: 4 views (2 sex choices x 2 age choices)
+    assert len(collection.views) == 4
+
+    # Group views with replace=True - should remove male/female views and add combined
+    collection.group_views(
+        [
+            {
+                "dimension": "sex",
+                "choices": ["male", "female"],
+                "choice_new_slug": "combined",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,  # Keep dimension even with one choice
+    )
+
+    # After grouping: only 2 views remain (the combined views for each age)
+    assert len(collection.views) == 2
+
+    # All remaining views should have sex="combined"
+    for view in collection.views:
+        assert view.dimensions["sex"] == "combined"
+
+    # Views should be for different age groups
+    ages = {view.dimensions["age"] for view in collection.views}
+    assert ages == {"young", "old"}
+
+
+def test_group_views_replace_prunes_choices():
+    """
+    Test Collection.group_views with replace=True prunes unused choices from dimension.
+
+    When replace=True, the original choices that were grouped should be removed
+    from the dimension's choices list.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["metric"],
+        dimensions=[
+            Dimension(
+                slug="metric",
+                name="Metric",
+                choices=[
+                    DimensionChoice(slug="cases", name="Cases"),
+                    DimensionChoice(slug="deaths", name="Deaths"),
+                    DimensionChoice(slug="recovered", name="Recovered"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"metric": "cases"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"metric": "deaths"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"metric": "recovered"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before grouping: 3 choices
+    assert len(collection.dimensions[0].choices) == 3
+
+    # Group cases and deaths with replace=True
+    collection.group_views(
+        [
+            {
+                "dimension": "metric",
+                "choices": ["cases", "deaths"],
+                "choice_new_slug": "cases_and_deaths",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # After grouping: cases and deaths should be removed, only recovered and combined remain
+    choice_slugs = [c.slug for c in collection.dimensions[0].choices]
+    assert "cases" not in choice_slugs
+    assert "deaths" not in choice_slugs
+    assert "recovered" in choice_slugs
+    assert "cases_and_deaths" in choice_slugs
+    assert len(choice_slugs) == 2
+
+
+def test_group_views_replace_false_keeps_original_views():
+    """
+    Test Collection.group_views with replace=False (default) keeps original views.
+
+    When replace=False, both the original views and the new grouped views should exist.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["category"],
+        dimensions=[
+            Dimension(
+                slug="category",
+                name="Category",
+                choices=[
+                    DimensionChoice(slug="a", name="A"),
+                    DimensionChoice(slug="b", name="B"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"category": "a"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"category": "b"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before grouping: 2 views
+    assert len(collection.views) == 2
+
+    # Group views with replace=False (default)
+    collection.group_views(
+        [
+            {
+                "dimension": "category",
+                "choices": ["a", "b"],
+                "choice_new_slug": "all",
+                "replace": False,  # Explicitly false
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # After grouping: 3 views (original a, original b, and combined)
+    assert len(collection.views) == 3
+
+    # Check all choices are present
+    categories = {view.dimensions["category"] for view in collection.views}
+    assert categories == {"a", "b", "all"}
+
+
+def test_group_views_replace_with_multiple_groups():
+    """
+    Test Collection.group_views with replace=True for multiple groups.
+
+    When multiple groups are processed together, ALL groups create their views based on
+    the ORIGINAL views. Then, the replace logic runs for all groups with replace=True.
+    This means views from a second group may be removed if they have dimension values
+    that a first group with replace=True is removing.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["sex", "age"],
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+            Dimension(
+                slug="age",
+                name="Age",
+                choices=[
+                    DimensionChoice(slug="young", name="Young"),
+                    DimensionChoice(slug="old", name="Old"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male", "age": "young"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "young"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"sex": "male", "age": "old"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "old"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind4")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before grouping: 4 views
+    assert len(collection.views) == 4
+
+    # Group both dimensions: sex with replace=True, age with replace=False
+    # Note: The age grouping creates views based on original views (with sex=male/female),
+    # but these get removed by the sex grouping's replace=True logic.
+    collection.group_views(
+        [
+            {
+                "dimension": "sex",
+                "choices": ["male", "female"],
+                "choice_new_slug": "both_sexes",
+                "replace": True,  # Remove original sex views
+            },
+            {
+                "dimension": "age",
+                "choices": ["young", "old"],
+                "choice_new_slug": "all_ages",
+                "replace": False,  # Keep original age views
+            },
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # The sex grouping creates views with sex="both_sexes" for each age (2 views)
+    # The age grouping creates views with age="all_ages" for each sex (2 views with sex=male/female)
+    # Then replace=True for sex removes all views where sex is "male" or "female"
+    # This removes: original 4 views + the 2 age-grouped views (which had sex=male/female)
+    # Remaining: only the sex-grouped views (sex="both_sexes")
+    assert len(collection.views) == 2
+
+    # Verify sex dimension only has "both_sexes"
+    sex_choices = {view.dimensions["sex"] for view in collection.views}
+    assert sex_choices == {"both_sexes"}
+
+    # Verify age dimension only has young and old (all_ages views were removed)
+    age_choices = {view.dimensions["age"] for view in collection.views}
+    assert age_choices == {"young", "old"}
+
+
+def test_group_views_replace_combines_indicators():
+    """
+    Test that replace=True properly combines indicators from original views.
+
+    The grouped view should contain all y indicators from the original views.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["source"],
+        dimensions=[
+            Dimension(
+                slug="source",
+                name="Source",
+                choices=[
+                    DimensionChoice(slug="source_a", name="Source A"),
+                    DimensionChoice(slug="source_b", name="Source B"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"source": "source_a"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#indicator_a")]),
+            ),
+            View(
+                dimensions={"source": "source_b"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#indicator_b")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Group with replace=True
+    collection.group_views(
+        [
+            {
+                "dimension": "source",
+                "choices": ["source_a", "source_b"],
+                "choice_new_slug": "combined_sources",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # Only 1 view should remain
+    assert len(collection.views) == 1
+
+    # The combined view should have both indicators
+    combined_view = collection.views[0]
+    assert combined_view.dimensions["source"] == "combined_sources"
+
+    assert combined_view.indicators.y is not None
+    indicator_paths = [ind.catalogPath for ind in combined_view.indicators.y]
+    assert "table#indicator_a" in indicator_paths
+    assert "table#indicator_b" in indicator_paths
+    assert len(indicator_paths) == 2
+
+
+def test_group_views_replace_dimension_pruned_when_single_choice():
+    """
+    Test that with replace=True and drop_dimensions_if_single_choice=True,
+    the dimension is removed if only one choice remains.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["type", "region"],
+        dimensions=[
+            Dimension(
+                slug="type",
+                name="Type",
+                choices=[
+                    DimensionChoice(slug="type_a", name="Type A"),
+                    DimensionChoice(slug="type_b", name="Type B"),
+                ],
+            ),
+            Dimension(
+                slug="region",
+                name="Region",
+                choices=[
+                    DimensionChoice(slug="north", name="North"),
+                    DimensionChoice(slug="south", name="South"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"type": "type_a", "region": "north"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"type": "type_b", "region": "north"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"type": "type_a", "region": "south"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+            View(
+                dimensions={"type": "type_b", "region": "south"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind4")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before: 2 dimensions
+    assert len(collection.dimensions) == 2
+
+    # Group type dimension with replace=True and allow pruning (default)
+    collection.group_views(
+        [
+            {
+                "dimension": "type",
+                "choices": ["type_a", "type_b"],
+                "choice_new_slug": "all_types",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=True,  # Default behavior
+    )
+
+    # Type dimension should be removed (only 1 choice: all_types)
+    assert len(collection.dimensions) == 1
+    assert collection.dimensions[0].slug == "region"
+
+    # Views should not have "type" dimension anymore
+    for view in collection.views:
+        assert "type" not in view.dimensions
+        assert "region" in view.dimensions
+
+
+def test_group_views_replace_with_partial_choices():
+    """
+    Test Collection.group_views with replace=True grouping only some choices.
+
+    When only some choices are grouped with replace=True, the ungrouped choices
+    should remain as separate views.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["status"],
+        dimensions=[
+            Dimension(
+                slug="status",
+                name="Status",
+                choices=[
+                    DimensionChoice(slug="active", name="Active"),
+                    DimensionChoice(slug="pending", name="Pending"),
+                    DimensionChoice(slug="archived", name="Archived"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"status": "active"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"status": "pending"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"status": "archived"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before: 3 views
+    assert len(collection.views) == 3
+
+    # Group only active and pending, leaving archived
+    collection.group_views(
+        [
+            {
+                "dimension": "status",
+                "choices": ["active", "pending"],
+                "choice_new_slug": "current",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # After: 2 views (current + archived)
+    assert len(collection.views) == 2
+
+    # Check status values
+    status_values = {view.dimensions["status"] for view in collection.views}
+    assert status_values == {"current", "archived"}
+    assert "active" not in status_values
+    assert "pending" not in status_values
+
+
+def test_group_views_replace_sequential_calls():
+    """
+    Test using replace=True in sequential group_views calls.
+
+    When you need to group multiple dimensions and use the grouped results
+    of one dimension in another grouping, call group_views separately.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["sex", "age"],
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+            Dimension(
+                slug="age",
+                name="Age",
+                choices=[
+                    DimensionChoice(slug="young", name="Young"),
+                    DimensionChoice(slug="old", name="Old"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male", "age": "young"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "young"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"sex": "male", "age": "old"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "old"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind4")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Before grouping: 4 views
+    assert len(collection.views) == 4
+
+    # First: group sex dimension with replace=True
+    collection.group_views(
+        [
+            {
+                "dimension": "sex",
+                "choices": ["male", "female"],
+                "choice_new_slug": "both_sexes",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # After first grouping: 2 views (both_sexes x young/old)
+    assert len(collection.views) == 2
+    for view in collection.views:
+        assert view.dimensions["sex"] == "both_sexes"
+
+    # Second: group age dimension with replace=False (keeping young/old, adding all_ages)
+    collection.group_views(
+        [
+            {
+                "dimension": "age",
+                "choices": ["young", "old"],
+                "choice_new_slug": "all_ages",
+                "replace": False,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # After second grouping: 3 views (both_sexes x young/old/all_ages)
+    assert len(collection.views) == 3
+
+    # All views have sex="both_sexes"
+    sex_choices = {view.dimensions["sex"] for view in collection.views}
+    assert sex_choices == {"both_sexes"}
+
+    # Age has young, old, and all_ages
+    age_choices = {view.dimensions["age"] for view in collection.views}
+    assert age_choices == {"young", "old", "all_ages"}
+
+
+def test_group_views_replace_does_not_prune_other_dimensions():
+    """
+    Test that group_views with replace=True only prunes choices from the
+    dimension being grouped, not from other dimensions.
+
+    Regression test: choices defined in config but not yet used in views
+    (e.g. "all" decile meant for a later group_views call) should not be
+    removed when replace=True is used on a different dimension.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(
+                slug="survey_comparability",
+                name="Survey comparability",
+                choices=[
+                    DimensionChoice(slug="no_spells", name="No spells"),
+                    DimensionChoice(slug="spell_a", name="Spell A"),
+                    DimensionChoice(slug="spell_b", name="Spell B"),
+                ],
+            ),
+            Dimension(
+                slug="decile",
+                name="Decile",
+                choices=[
+                    DimensionChoice(slug="1", name="Poorest 10%"),
+                    DimensionChoice(slug="10", name="Richest 10%"),
+                    # These choices have no views yet -- they'll be created by a later group_views call
+                    DimensionChoice(slug="all", name="All deciles"),
+                    DimensionChoice(slug="all_bar", name="All deciles (bar chart)"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"survey_comparability": "no_spells", "decile": "1"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind1")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_a", "decile": "1"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind2")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_b", "decile": "1"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind3")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "no_spells", "decile": "10"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind4")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_a", "decile": "10"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind5")]),
+            ),
+            View(
+                dimensions={"survey_comparability": "spell_b", "decile": "10"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind6")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    decile_choices_before = {c.slug for c in collection.dimensions[1].choices}
+    assert "all" in decile_choices_before
+    assert "all_bar" in decile_choices_before
+
+    # Group survey_comparability with replace=True (this should NOT affect decile choices)
+    collection.group_views(
+        [
+            {
+                "dimension": "survey_comparability",
+                "choices": ["spell_a", "spell_b"],
+                "choice_new_slug": "spells",
+                "replace": True,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # Verify survey_comparability was grouped correctly
+    survey_choices = {c.slug for c in collection.dimensions[0].choices}
+    assert "spell_a" not in survey_choices
+    assert "spell_b" not in survey_choices
+    assert "no_spells" in survey_choices
+    assert "spells" in survey_choices
+
+    # Key assertion: decile choices that had no views should still be preserved
+    decile_choices_after = {c.slug for c in collection.dimensions[1].choices}
+    assert "all" in decile_choices_after, "Choice 'all' was incorrectly pruned from decile dimension"
+    assert "all_bar" in decile_choices_after, "Choice 'all_bar' was incorrectly pruned from decile dimension"
+    assert "1" in decile_choices_after
+    assert "10" in decile_choices_after
