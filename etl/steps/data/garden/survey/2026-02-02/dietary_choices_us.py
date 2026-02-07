@@ -15,7 +15,7 @@ COLUMNS = {
     "Meat eater (eat meat and/or poultry)": "meat_eater",
     "None of these": "none",
     "Pescetarian (eat fish but do not eat meat or poultry)": "pescetarian",
-    "Plant-based / Vegan (do not eat dairy products, eggs, or any other animal product)": "vegan",
+    "Plant-based/Vegan (do not eat dairy products, eggs, or any other animal product)": "vegan",
     "Vegetarian (do not eat any meat, poultry, game, fish or shellfish)": "vegetarian",
 }
 
@@ -37,8 +37,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("dietary_choices_uk")
-    tb = ds_meadow.read("dietary_choices_uk")
+    ds_meadow = paths.load_dataset("dietary_choices_us")
+    tb = ds_meadow.read("dietary_choices_us")
 
     #
     # Process data.
