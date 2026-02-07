@@ -529,13 +529,20 @@ class Collection(MDIMBase):
                     if dim.slug in view.dimensions:
                         del view.dimensions[dim.slug]
 
-    def prune_dimension_choices(self):
-        """Remove all dimension choices that are not used in any view."""
+    def prune_dimension_choices(self, dimension_slugs: list[str] | None = None):
+        """Remove all dimension choices that are not used in any view.
+
+        Args:
+            dimension_slugs: If provided, only prune choices for these dimensions.
+                If None, prune choices for all dimensions.
+        """
         all_occurrences = self.dimension_choices_in_use()
 
         # Remove those not in use
         for dim in self.dimensions:
-            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
+            if dimension_slugs is not None and dim.slug not in dimension_slugs:
+                continue
+            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences.get(dim.slug, set())]
 
     @property
     def dimension_slugs(self):
@@ -796,9 +803,9 @@ class Collection(MDIMBase):
                 dimension = group["dimension"]
                 choices = _ensure_choices(group, dimension)
                 # Remove views with old choices
-                new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
-                # Remove unused choices
-                self.prune_dimension_choices()
+                self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
+                # Remove unused choices (only for the dimension being replaced, not all dimensions)
+                self.prune_dimension_choices(dimension_slugs=[dimension])
 
         # Drop dimension if it has only one choice in use
         if drop_dimensions_if_single_choice:

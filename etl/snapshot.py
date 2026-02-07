@@ -938,24 +938,25 @@ def read_table_from_snapshot(
     if read_function is not None:
         tb = pr.read_custom(read_function, *args, **kwargs)
     else:
-        if file_extension == "csv":
-            tb = pr.read_csv(*args, **kwargs)
-        elif file_extension == "feather":
-            tb = pr.read_feather(*args, **kwargs)
-        elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-            tb = pr.read_excel(*args, **kwargs)
-        elif file_extension == "json":
-            tb = pr.read_json(*args, **kwargs)
-        elif file_extension == "dta":
-            tb = pr.read_stata(*args, **kwargs)
-        elif file_extension == "rds":
-            tb = pr.read_rds(*args, **kwargs)
-        elif file_extension == "rda":
-            tb = pr.read_rda(*args, **kwargs)
-        elif file_extension == "parquet":
-            tb = pr.read_parquet(*args, **kwargs)
-        else:
-            raise ValueError(f"Unknown extension {file_extension}")
+        match file_extension.lower():
+            case "csv":
+                tb = pr.read_csv(*args, **kwargs)
+            case "feather":
+                tb = pr.read_feather(*args, **kwargs)
+            case "xlsx" | "xls" | "xlsm" | "xlsb" | "odf" | "ods" | "odt":
+                tb = pr.read_excel(*args, **kwargs)
+            case "json":
+                tb = pr.read_json(*args, **kwargs)
+            case "dta":
+                tb = pr.read_stata(*args, **kwargs)
+            case "rds":
+                tb = pr.read_rds(*args, **kwargs)
+            case "rda":
+                tb = pr.read_rda(*args, **kwargs)
+            case "parquet":
+                tb = pr.read_parquet(*args, **kwargs)
+            case _:
+                raise ValueError(f"Unknown extension {file_extension}")
 
     if safe_types:
         tb = cast(Table, to_safe_types(tb))
