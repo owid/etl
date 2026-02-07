@@ -107,6 +107,12 @@ def add_regions_to_number(
             age_group_mapping=age_group_mapping,
         )
     assert tb_number["value"].notna().all(), "Values are missing in the Number table, check configuration"
+
+    # Convert categorical columns to string to avoid TypeError in geo.add_regions_to_table
+    categorical_cols = tb_number.select_dtypes(include=['category']).columns.tolist()
+    for col in categorical_cols:
+        tb_number[col] = tb_number[col].astype(str)
+
     # Add region aggregates - for Number
     tb_number = geo.add_regions_to_table(
         tb_number,
@@ -115,6 +121,11 @@ def add_regions_to_number(
         ds_regions=ds_regions,
         min_num_values_per_year=1,
     )
+
+    # Convert back to category if needed
+    for col in categorical_cols:
+        tb_number[col] = tb_number[col].astype('category')
+
     return tb_number
 
 

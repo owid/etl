@@ -32,7 +32,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = paths.regions.harmonize_names(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb=tb)
     # Add regional aggregates
     tb = add_regional_aggregates(
         tb=tb,
