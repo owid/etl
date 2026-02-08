@@ -13,7 +13,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("gbd_cause_deaths.feather")
+    snap = paths.load_snapshot("gbd_treemap.feather")
 
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
