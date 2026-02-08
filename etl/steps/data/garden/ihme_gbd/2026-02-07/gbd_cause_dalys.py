@@ -52,7 +52,7 @@ def run() -> None:
     tb_dalys = tb_dalys.drop(columns="measure")
 
     # Format the tables
-    tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
+    tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
 
     #
     # Save outputs.
