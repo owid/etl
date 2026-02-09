@@ -1,8 +1,6 @@
 """WIP: Currently integrating Draft charts into pipeline
 
 NEXT STEPS:
-    - QA #lucas-playground with Ed. Daily frequency is fine?
-    - We currently allow for re-suggestions if suggested more than 1 year ago. Check with Ed.
     - We should detect when a chart is being "re-suggested", and include the thread that last-suggested it. For this we need more permissions for our bot
         1. Go to https://api.slack.com/apps
         2. Select your app
@@ -124,6 +122,10 @@ def get_all_charts_to_review():
     # Split into published and draft
     df_published = df.loc[df["is_published"]].sort_values(["views_365d", "views_14d", "views_7d"], ascending=True)
     df_draft = df.loc[~df["is_published"]].sort_values("last_edited_at", ascending=True)
+
+    # Skip core-econ charts from public charts
+    mask_core_econ = df_published["tags"].str.contains("core-econ")
+    df_published = df_published.loc[~mask_core_econ]
 
     return df_published, df_draft
 
