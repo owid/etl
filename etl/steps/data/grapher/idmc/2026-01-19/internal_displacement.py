@@ -10,7 +10,7 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
+    # Load garden dataset
     ds_garden = paths.load_dataset("internal_displacement")
 
     # Read table from garden dataset.
