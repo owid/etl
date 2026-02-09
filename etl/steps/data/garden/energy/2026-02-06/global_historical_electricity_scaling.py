@@ -1,9 +1,14 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create a garden dataset on scaling of electricity production."""
+
+import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Minimum production threshold (in TWh) to consider a source.
+PRODUCTION_THRESHOLD = 100
 
 
 def run() -> None:
@@ -19,38 +24,53 @@ def run() -> None:
     #
     # Process data.
     #
-    # Create a new table of years since producing 100TWh.
-    production_start = 100
-    year_column = f"years_since_{production_start}_twh"
-    tb_scaling = (
-        tb[tb["total_production"] >= production_start][["country", "total_production"]]
-        .reset_index(drop=True)
-        .reset_index()
-        .rename(columns={"index": year_column}, errors="raise")
-    )
-    columns_sources = [column for column in tb.columns if "production" in column if column != "total_production"]
-    for column in columns_sources:
-        mask = tb[column] >= production_start
-        tb_source_production = (
-            tb[mask][["year", column]]
-            .reset_index(drop=True)
-            .reset_index()
-            .rename(columns={"index": year_column}, errors="raise")
-            .rename(columns={"year": column.replace("_production", "_year")})
-        )
-        tb_scaling = tb_scaling.merge(tb_source_production, on=year_column, how="outer")
+    # Gather all production and share data since generating over 100TWh for each source.
+    tables = []
+    for column_production in sorted([col for col in tb.columns if col.endswith("_production")]):
+        source = column_production.replace("_production", "")
+        column_share = f"{source}_share"
 
-    # Drop unnecessary columns (for sources that have never reached 100TWh of production).
-    tb_scaling = tb_scaling.dropna(axis=1, how="all")
+        # Filter to rows where production >= threshold.
+        mask = tb[column_production] >= PRODUCTION_THRESHOLD
+        if mask.sum() == 0:
+            continue
+
+        tb_source = tb[mask].reset_index(drop=True).reset_index()
+        tb_source = tb_source.rename(
+            columns={"index": "year", "year": "year_since_100_twh", column_production: "production_since_100_twh"},
+            errors="raise",
+        )
+
+        # Add share column: 100% for total (which doesn't have a share column), from data for all other sources.
+        if source == "total":
+            assert column_share not in tb_source.columns
+            tb_source["share_since_100_twh"] = 100
+        else:
+            tb_source = tb_source.rename(columns={column_share: "share_since_100_twh"}, errors="raise")
+
+        # Add a source column.
+        tb_source["source"] = source
+
+        # Select only the relevant columns.
+        tables.append(
+            tb_source[
+                ["country", "source", "year", "year_since_100_twh", "production_since_100_twh", "share_since_100_twh"]
+            ]
+        )
+
+    tb_scaling = pr.concat(tables, ignore_index=True)
+
+    # Add a country column.
+    tb_scaling["country"] = "World"
 
     # Improve table format.
-    tb_scaling = tb_scaling.format(keys=["country", year_column], short_name=paths.short_name)
+    tb_scaling = tb_scaling.format(["country", "source", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
-    # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb_scaling], default_metadata=ds_garden.metadata)
+    # Initialize a new garden dataset.
+    ds_scaling = paths.create_dataset(tables=[tb_scaling], default_metadata=ds_garden.metadata)
 
-    # Save grapher dataset.
-    ds_grapher.save()
+    # Save garden dataset.
+    ds_scaling.save()
