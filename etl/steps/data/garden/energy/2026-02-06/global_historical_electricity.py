@@ -1,6 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+
 from etl.helpers import PathFinder
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -28,7 +31,7 @@ COLUMNS_EMBER = {
     "generation__gas__twh": "gas_production",
     "generation__wind__twh": "wind_production",
     "generation__hydro__twh": "hydro_production",
-    # TODO: Check how to map other renwables from both datasets. For now, ignore them.
+    # TODO: Check how to map other renewables from both datasets. For now, ignore them.
     # 'generation__bioenergy__pct': 'bioenergy__pct',
     # 'generation__other_renewables__twh': 'other_renewables__twh',
     # 'generation__hydro__bioenergy_and_other_renewables__twh': 'hydro__bioenergy_and_other_renewables__twh',
@@ -36,6 +39,32 @@ COLUMNS_EMBER = {
     # 'generation__bioenergy__twh': 'bioenergy__twh',
     # 'generation__hydro__bioenergy_and_other_renewables__pct': 'hydro__bioenergy_and_other_renewables__pct',
 }
+
+
+def sanity_check_data_overlap(tb, tb_latest, index_columns: list[str], *, tolerance: float = 0.05) -> None:
+    tb = tb.copy()
+    tb_latest = tb_latest.copy()
+    index_columns = ["country", "year"]
+    common_columns = sorted((set(tb.columns) & set(tb_latest.columns)) - set(index_columns))
+    for column in common_columns:
+        tb_compared = tb[index_columns + [column]].merge(
+            tb_latest[index_columns + [column]], on=index_columns, how="inner", suffixes=("_old", "_new")
+        )
+        tb_compared["pct_change"] = (
+            100 * abs(tb_compared[f"{column}_old"] - tb_compared[f"{column}_new"]) / tb_compared[f"{column}_old"]
+        )
+        # Check that the differences are smaller than 10% (skipping rows where energy production is small).
+        error = f"Difference between Pinto and Ember data is larger than expected for: {column}"
+        assert (tb_compared[tb_compared[f"{column}_old"] > 20]["pct_change"] < 10).all(), error
+
+    # Uncomment to visually compare all indicators from both origins.
+    # import owid.catalog.processing as pr
+    # import plotly.express as px
+    # tb["source"] = "Pinto et al."
+    # tb_latest["source"] = "Ember"
+    # tb_compared = pr.concat([tb, tb_latest], ignore_index=True)
+    # for column in [column for column in tb_compared.columns if column not in index_columns if column != "source"]:
+    #     px.line(tb_compared, x="year", y=column, color="source", markers=True).show()
 
 
 def run() -> None:
@@ -84,29 +113,14 @@ def run() -> None:
         tb[f"solar_{column_suffix}"] = tb[f"solar_photovoltaic_{column_suffix}"] + tb[f"solar_thermal_{column_suffix}"]
         tb = tb.drop(columns=[f"solar_photovoltaic_{column_suffix}", f"solar_thermal_{column_suffix}"], errors="raise")
 
-    #
-    # "Other Fossil generation includes generation from oil and petroleum products, as well as manufactured gases and waste."
-
     # Select and rename columns from Ember conveniently.
     tb_latest = tb_latest[list(COLUMNS_EMBER)].rename(columns=COLUMNS_EMBER, errors="raise")
     # Select only global data from Ember.
     tb_latest = tb_latest[tb_latest["country"] == "World"].reset_index(drop=True)
 
-    ####################################################################################################################
-    # TODO: Add assertion to check that, where they overlap, they agree within a few percent. Then pack into a function.
-    # Compare production shares of both datasets and assert that they agree reasonably well.
-    # import owid.catalog.processing as pr
-    # tb_compared = pr.concat([tb.assign(**{"source": "Pinto et al."}), tb_latest.assign(**{"source": "Ember"})], ignore_index=True)
-    # import plotly.express as px
-    # # for column in [column for column in tb_latest.columns if column.endswith("_share")]:
-    # for column in [column for column in tb_latest.columns if column not in ["country", "year"]]:
-    #     px.line(tb_compared, x="year", y=column, color="source", markers=True).show()
-    ####################################################################################################################
-
     # Combine global historical data from Pinto et al. (2023) with Ember's global data.
-    from owid.datautils.dataframes import combine_two_overlapping_dataframes
-
     # Where there's overlap, prioritize Ember's recent data.
+    sanity_check_data_overlap(tb, tb_latest, index_columns=["country", "year"])
     tb = combine_two_overlapping_dataframes(df1=tb_latest, df2=tb, index_columns=["country", "year"])
 
     # Improve table format.
