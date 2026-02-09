@@ -3,14 +3,18 @@ theme: default
 title: 'R&D: LLMs for Search'
 author: OWID
 date: 2026-02-09
+layout: cover
 ---
 
-# R&D: LLMs for Search
+# LLMs for Search
 
-Exploring AI-powered approaches to improve search functionality
+**Improving search with AI**
 
-<div class="text-sm opacity-75 mt-8">
-OWID Research & Development
+<div class="absolute bottom-10 left-10">
+  <div class="text-sm opacity-75">
+    OWID Research & Development<br/>
+    February 2026
+  </div>
 </div>
 
 ---
@@ -38,7 +42,15 @@ OWID Research & Development
 
 **What's possible with AI-powered search**
 
-![Google AI Mode on OWID](google-ai-mode.png)
+<div class="grid grid-cols-2 gap-8 mt-4">
+
+<div>
+
+![Google AI Mode on OWID](./google-ai-mode.png)
+
+</div>
+
+<div>
 
 Google's AI mode demonstrates:
 - Natural language understanding of queries
@@ -47,6 +59,10 @@ Google's AI mode demonstrates:
 - Better results than traditional keyword search
 
 **This sets our aspiration**
+
+</div>
+
+</div>
 
 ---
 layout: section
@@ -139,6 +155,8 @@ layout: section
 - ~10-50ms latency
 
 ---
+zoom: 0.95
+---
 
 # Semantic Search (~2018)
 
@@ -179,6 +197,8 @@ layout: section
 - ~$20/month (requires switch from Algolia to Typesense)
 - ~100-300ms latency
 
+---
+zoom: 0.95
 ---
 
 # Agentic RAG (~2023)
@@ -248,6 +268,8 @@ layout: section
 # Pitches
 
 ---
+zoom: 0.8
+---
 
 # Pitch 1: The 'Zero Result' Safety Net
 
@@ -271,6 +293,8 @@ layout: section
 - ~$20/month
 - ~100-300ms latency
 
+---
+zoom: 0.8
 ---
 
 # Pitch 2: Suggested Keywords
@@ -296,6 +320,8 @@ layout: section
 - Included in semantic search costs (~$10-15/month)
 - ~50-100ms latency
 
+---
+zoom: 0.75
 ---
 
 # Pitch 3: Suggested Topics
@@ -323,6 +349,8 @@ layout: section
 - ~50ms latency
 
 ---
+zoom: 0.85
+---
 
 # Pitch 4: Semantic Search on Cloudflare
 
@@ -345,6 +373,8 @@ layout: section
 
 **Cost/Latency**: Included in Cloudflare pricing, ~100-200ms
 
+---
+zoom: 0.78
 ---
 
 # Pitch 5: Agentic Search
@@ -376,6 +406,8 @@ layout: section
 
 # Outputs
 
+---
+zoom: 0.85
 ---
 
 # Outputs
@@ -451,6 +483,8 @@ layout: section
 # Challenges
 
 ---
+zoom: 0.83
+---
 
 # Problematic Queries
 
@@ -480,6 +514,8 @@ layout: center
 
 # Conclusions & Path Forward
 
+---
+zoom: 0.82
 ---
 
 # Next Steps
