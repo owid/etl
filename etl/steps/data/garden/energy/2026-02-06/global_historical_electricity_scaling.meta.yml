@@ -4,6 +4,9 @@ definitions:
     presentation:
       topic_tags:
         - Energy
+    description_processing: |-
+      - We combine historical estimates from Pinto et al. (2023) with Ember's Yearly electricity data. Where data from both sources is available, data from Ember is prioritized.
+      - For each electricity source, we identify the first year in which global electricity production surpassed 100 TWh, and track the evolution of global electricity production from that year onward.
 
 
 # Learn more about the available fields:
@@ -17,13 +20,24 @@ tables:
   global_historical_electricity_scaling:
     variables:
       year_since_100_twh:
-        title: Actual year when production threshold was reached
+        title: Calendar year since an electricity source surpassed 100 TWh of global electricity production
         unit: ""
+        short_unit: ""
       production_since_100_twh:
-        title: Electricity production since reaching 100 TWh
+        title: Global electricity production since an electricity source surpassed 100 TWh
         unit: terawatt-hours
         short_unit: TWh
+        description_short: |-
+          Measured in [terawatt-hours](#dod:watt-hours).
+        description_key:
+          - Each electricity source is tracked from the first year in which its global electricity production surpassed 100 TWh. For example, wind power surpassed 100 TWh in 2005, and hence the first data point (on year zero) corresponds to wind power's global electricity production in 2005; the next data point is wind power's production in 2006, and so on.
+          - This means that year zero corresponds to different calendar years for different electricity sources. For example, year zero corresponds to 2005 for wind power, but to 2013 for solar power.
       share_since_100_twh:
-        title: Share of electricity production since reaching 100 TWh
+        title: Share of electricity production since an electricity source surpassed 100 TWh
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Measured as a percentage of total global electricity production.
+        description_key:
+          - Each electricity source is tracked from the first year in which its global electricity production surpassed 100 TWh. For example, wind power surpassed 100 TWh in 2005, and hence the first data point (on year zero) corresponds to wind power's share of global electricity production in 2005; the next data point is the share in 2006, and so on.
+          - This means that year zero corresponds to different calendar years for different electricity sources. For example, year zero corresponds to 2005 for wind power, but to 2013 for solar power.

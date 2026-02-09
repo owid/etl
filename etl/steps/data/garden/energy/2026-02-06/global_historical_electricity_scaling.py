@@ -70,7 +70,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_scaling = paths.create_dataset(tables=[tb_scaling], default_metadata=ds_garden.metadata)
+    ds_scaling = paths.create_dataset(tables=[tb_scaling])
 
     # Save garden dataset.
     ds_scaling.save()
