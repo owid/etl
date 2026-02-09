@@ -46,6 +46,8 @@ def run() -> None:
     )
 
     assert all(tb["measure"] == "Deaths")
+    # Drop the measure column
+    tb = tb.drop(columns="measure")
     # Add all forms of violence together - for Deaths only
     tb = add_all_forms_of_violence(tb)
     # Create a category for all infectious diseases - for Deaths only
