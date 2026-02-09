@@ -39,6 +39,8 @@ BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/1456dce768cd3527
 NUMBER_OF_FILES = 59
 BASE_URL_TWO = "https://dl.healthdata.org/gbd-api-2023-collaborator/aecd1b5cba732c9d0cb8cec8a99f7aac_files/IHME-GBD_2023_DATA-aecd1b5c-"
 NUMBER_OF_FILES_TWO = 25
+BASE_URL_THREE = "https://dl.healthdata.org/gbd-api-2023-collaborator/f9c21cfdaeff025ee6d8ac61cad12339_files/IHME-GBD_2023_DATA-f9c21cfd-"
+NUMBER_OF_FILES_THREE = 3
 
 
 @click.command()
@@ -48,14 +50,19 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause_dalys.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
-    for file_number in range(1, NUMBER_OF_FILES + NUMBER_OF_FILES_TWO + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES + NUMBER_OF_FILES_TWO}")
+    for file_number in range(1, NUMBER_OF_FILES + NUMBER_OF_FILES_TWO + NUMBER_OF_FILES_THREE + 1):
+        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES + NUMBER_OF_FILES_TWO+ NUMBER_OF_FILES_THREE}")
         if file_number <= NUMBER_OF_FILES:
             df = download_data(file_number, base_url=BASE_URL)
-        else:
+        elif file_number <= NUMBER_OF_FILES + NUMBER_OF_FILES_TWO:
             # Downloading the second batch of files
             file_number_two = file_number - NUMBER_OF_FILES
             df = download_data(file_number_two, base_url=BASE_URL_TWO)
+        else:
+            # Downloading the third batch of files
+            file_number_three = file_number - (NUMBER_OF_FILES + NUMBER_OF_FILES_TWO)
+            df = download_data(file_number_three, base_url=BASE_URL_THREE)
+
         log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
         dfs.append(df)
 
