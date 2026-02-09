@@ -14,6 +14,41 @@ OWID Research & Development
 </div>
 
 ---
+
+# Why Now?
+
+**The opportunity and the challenge**
+
+- **LLMs are changing UX expectations**
+  - Google AI mode shows what's possible
+  - Simple search bars may not be enough in the AI age
+
+- **Current system is failing users**
+  - 21% of queries return zero results
+  - Straightforward queries like "public school funding" fail
+
+- **Reputation considerations**
+  - Test AI on structured data (our strength)
+  - Avoid ChatGPT/MCP pitfalls (hallucinations, unreliability)
+  - Users trust us for accurate data, not generative text
+
+---
+
+# Our North Star: Google AI Mode
+
+**What's possible with AI-powered search**
+
+![Google AI Mode on OWID](google-ai-mode.png)
+
+Google's AI mode demonstrates:
+- Natural language understanding of queries
+- Contextual summaries with source citations
+- **<1s latency** even with LLM reasoning
+- Better results than traditional keyword search
+
+**This sets our aspiration**
+
+---
 layout: section
 ---
 
@@ -35,16 +70,19 @@ Users express intent in natural language, but keyword search doesn't match anyth
 
 # Problem 2: Zero Search Results
 
-Queries return no results even when relevant content exists
+**21% of queries return no results** even when relevant content exists
 
-**Example**: "public school funding" → zero results
+**Real examples that fail:**
+- "public school funding"
+- "road traffic deaths age"
+- "average hours of work per week"
 
-- **Vocabulary mismatch**: User says "CO2 emissions", dataset uses "carbon dioxide"
+**Why this happens:**
+- **Vocabulary mismatch**: "CO2 emissions" vs "carbon dioxide"
 - **Spelling variations**: "labour" vs "labor", "urbanisation" vs "urbanization"
 - **Phrasing differences**: "GDP per capita" vs "GDP per person"
-- **Partial matches**: User query too specific or uses wrong terminology
 
-**Impact**: Users think content doesn't exist, abandon search
+**Impact**: Users think content doesn't exist → **immediate frustration** → abandon search
 
 ---
 
@@ -52,12 +90,15 @@ Queries return no results even when relevant content exists
 
 Search returns results that technically match but aren't what the user wants
 
-- **Example**: Query "population"
-  - Returns: "Mpox: Cumulative confirmed cases per million people" as first result
-  - User wants: General population data, not disease statistics
+**Real examples of mismatched results:**
+- "population" → returns Mpox disease statistics
+- "populism" → returns population data
+- "money" → returns military expenditures
+- "physical exercise" → returns child labor topics
 
-- **Problem**: Keyword matching ignores semantic relationships
-- **Result**: Low-quality results ranked highly, relevant content buried
+**The problem**: Keyword matching ignores semantic relationships
+
+**The result**: Low-quality results ranked highly, relevant content buried
 
 ---
 layout: section
@@ -107,6 +148,7 @@ layout: section
 - Understands meaning, not just words
 - Handles synonyms and related concepts
 - Better for natural language queries
+- **Multilingual**: 33% of users have non-English language
 
 **Cons:**
 - Can miss exact keyword matches
@@ -171,6 +213,82 @@ layout: section
 - Challenge: Keeping data fresh and handling updates
 
 ---
+
+# Vocabulary: The Foundation
+
+**Bridging user language to our taxonomy**
+
+<div class="grid grid-cols-2 gap-8">
+
+<div>
+
+**Keyword Search**
+- Inverted index (A-B-C)
+- Exact match required
+- Limited synonym support
+
+**Limitations:**
+- "public school funding" → no results
+- "road traffic deaths age" → no results
+- Phrase matching is brittle
+
+</div>
+
+<div>
+
+**Semantic Search**
+- Embeddings/vectors
+- Maps "solar power" → "renewable energy"
+- Understands related concepts
+
+**Benefits:**
+- Handles synonyms naturally
+- Works across languages (33% of users non-English)
+- Bridges vocabulary gaps
+
+</div>
+
+</div>
+
+---
+
+# The Trade-off Matrix
+
+**Cost & Latency vs. Context Awareness & Intelligence**
+
+<div class="relative" style="height: 400px;">
+
+<div class="absolute" style="left: 10%; bottom: 10%;">
+  <strong>Keyword (Algolia)</strong><br/>
+  Free • 10-50ms<br/>
+  <span class="text-sm opacity-75">Low intelligence</span>
+</div>
+
+<div class="absolute" style="left: 40%; bottom: 35%;">
+  <strong>Semantic Search</strong><br/>
+  $10-15/mo • 50-200ms<br/>
+  <span class="text-sm opacity-75">Moderate intelligence</span>
+</div>
+
+<div class="absolute" style="left: 50%; bottom: 50%; border: 3px dashed orange; padding: 1rem; border-radius: 8px;">
+  <strong>Hybrid Search</strong><br/>
+  $20/mo • 100-300ms<br/>
+  <span class="text-sm opacity-75">✨ Production Sweet Spot</span>
+</div>
+
+<div class="absolute" style="right: 10%; top: 10%;">
+  <strong>Agentic RAG</strong><br/>
+  $200/mo • 1-5s<br/>
+  <span class="text-sm opacity-75">🎯 Research Prototype</span>
+</div>
+
+</div>
+
+<div class="text-center mt-4 text-sm opacity-75">
+← Lower Cost/Latency — — — — Higher Cost/Latency →
+</div>
+
+---
 layout: section
 ---
 
@@ -178,7 +296,7 @@ layout: section
 
 ---
 
-# Pitch 1: Fixing Zero Searches with Hybrid Search
+# Pitch 1: The 'Zero Result' Safety Net
 
 **Problem**: Users get no results even when relevant content exists
 
@@ -202,7 +320,7 @@ layout: section
 
 ---
 
-# Pitch 2: Suggested Searches (Using Vocabulary)
+# Pitch 2: Query Expansion Guide
 
 **Problem**: Users don't know what terms to search for
 
@@ -252,9 +370,9 @@ layout: section
 
 ---
 
-# Pitch 4: Semantic Search + Query Rewriting + Reranking
+# Pitch 4: The Production Sweet Spot
 
-**Approach**: Cloudflare AI Search with specialized models
+**Approach**: Semantic search + query rewriting + reranking via Cloudflare AI Search
 
 **Components**:
 1. Query rewriting (expand/normalize)
@@ -275,7 +393,7 @@ layout: section
 
 ---
 
-# Pitch 5: Agentic Search
+# Pitch 5: The 'North Star' Prototype
 
 **Approach**: LLM agent orchestrates the entire search process
 
@@ -329,6 +447,50 @@ layout: section
 - `/api/ai-search/recommend?q=population`
 
 ---
+
+# Risks & Guardrails
+
+<div class="grid grid-cols-2 gap-8">
+
+<div>
+
+## ⚠️ Reputational Risks
+
+- **Chatbot hallucinations**
+  - Users trust us for accurate data
+  - Not generative text
+
+- **Jailbreak vulnerability**
+  - LLMs can be manipulated
+  - Need robust safeguards
+
+- **User expectations**
+  - We're known for data quality
+  - Can't afford AI mistakes
+
+</div>
+
+<div>
+
+## 🛡️ The "Narrow Solution" Strategy
+
+- **Respond with Charts, not Chat**
+  - Show actual data visualizations
+  - Not generated summaries
+
+- **LLM for Retrieval, not Generation**
+  - Use AI to find content
+  - Don't create new content
+
+- **Results Trace to Database**
+  - Every result links to source
+  - Fully auditable
+
+</div>
+
+</div>
+
+---
 layout: section
 ---
 
@@ -350,27 +512,66 @@ Example categories:
 - Queries with implicit context
 
 ---
+layout: center
+---
 
-# Need for a Benchmark?
+# Conclusions & Path Forward
 
-Should we create a standardized benchmark for evaluating search quality?
+---
 
-**Why benchmark?**
-- Qualitative analysis has limits
-- Hyperparameter changes can vastly affect results
-- Need objective comparison of approaches
-- Track improvements over time
-- Catch regressions
+# Next Steps
 
-**Proposed approach:**
-1. Take real search results
-2. Generate representative queries for each topic (LLM)
-   - Both keyword and natural language queries
-3. Judge relevance automatically (LLM)
-4. Human review of judgments
+<div class="grid grid-cols-2 gap-12">
 
-**What to measure?**
-- Precision/recall on curated query set
-- Zero-result rate
-- User satisfaction scores
-- Latency and cost metrics
+<div>
+
+## ✅ Immediate Wins
+
+**Can implement now, low risk**
+
+- **Query Expansion Suggestions**
+  - Guide users to better searches
+  - Build vocabulary index from our content
+  - Works on top of existing Algolia
+  - Immediate UX improvement
+
+- **Suggested Topics**
+  - Show related topics on zero results
+  - Leverage our excellent topic pages
+  - Turns failures into discoveries
+  - Low cost, high impact
+
+</div>
+
+<div>
+
+## 🔬 Further Exploration
+
+**Worth investigating**
+
+- **Hybrid Search**
+  - Could fix 21% zero-result problem
+  - Requires migration from Algolia
+  - Need to assess implementation complexity
+
+- **Agentic Prototype**
+  - Test capabilities and limitations
+  - Understand cost/benefit tradeoffs
+  - Learn what's possible with LLMs
+  - Guide future strategy
+
+</div>
+
+</div>
+
+---
+layout: center
+---
+# Discussion
+
+**Questions? Feedback? Priorities?**
+
+<div class="text-sm opacity-75 mt-8">
+The 'zero result' problem is solvable today.<br/>
+True 'answer' capabilities define the future.
+</div>
