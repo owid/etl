@@ -49,7 +49,7 @@ def run() -> None:
             tb_source = tb_source.rename(columns={column_share: "share_since_100_twh"}, errors="raise")
 
         # Add a source column.
-        tb_source["source"] = source
+        tb_source["source"] = source.replace("_", " ").capitalize()
 
         # Select only the relevant columns.
         tables.append(

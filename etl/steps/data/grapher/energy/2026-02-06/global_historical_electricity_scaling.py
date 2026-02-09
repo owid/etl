@@ -19,30 +19,11 @@ def run() -> None:
     #
     # Process data.
     #
-    # Select and rename columns conveniently.
-    tb = tb.rename(columns={"years_since_100_twh": "year"}, errors="raise")[
-        ["country", "year"] + [column for column in tb.columns if "production" in column]
-    ]
-
-    # For convenience, make a "country" column for sources.
-    tb = tb.rename(
-        columns={
-            column: column.replace("_production", "").replace("_", " ").capitalize()
-            for column in tb.columns
-            if column not in ["country", "year"]
-        },
-        errors="raise",
-    )
-    tb = tb.drop(columns=["country"]).melt(id_vars=["year"], var_name="country", value_name="production")
+    # Use sources as entities (replacing the "World" country column).
+    tb = tb.drop(columns=["country"]).rename(columns={"source": "country"}, errors="raise")
 
     # Improve table format.
-    tb = tb.format()
-
-    ####################################################################################################################
-    # Fill out required metadata.
-    # TODO: Fill out yaml meta files properly instead of this.
-    tb["production"].metadata.title = "Global electricity production"
-    ####################################################################################################################
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
