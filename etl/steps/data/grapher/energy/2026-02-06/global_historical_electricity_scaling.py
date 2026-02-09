@@ -2,8 +2,29 @@
 
 from etl.helpers import PathFinder
 
+from owid.datautils.dataframes import map_series
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Sources to include, and how to rename them.
+SOURCES = {
+    "Coal": "Coal",
+    "Bioenergy": "Bioenergy",
+    "Gas": "Gas",
+    "Hydro": "Hydro",
+    "Nuclear": "Nuclear",
+    "Other fossil": "Oil",
+    "Solar": "Solar",
+    "Total": "Total",
+    "Wind": "Wind",
+    # 'Clean': 'Clean',
+    # 'Fossil': 'Fossil',
+    # 'Gas and other fossil': 'Gas and other fossil',
+    # 'Hydro bioenergy and other renewables': 'Hydro bioenergy and other renewables',
+    # 'Renewables': 'Renewables',
+    # 'Wind and solar': 'Wind and solar',
+}
 
 
 def run() -> None:
@@ -19,6 +40,12 @@ def run() -> None:
     #
     # Process data.
     #
+    # Select and rename sources.
+    tb = tb[tb["source"].isin(list(SOURCES))].reset_index(drop=True)
+    tb["source"] = map_series(
+        tb["source"], mapping=SOURCES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    )
+
     # Use sources as entities (replacing the "World" country column).
     tb = tb.drop(columns=["country"]).rename(columns={"source": "country"}, errors="raise")
 
