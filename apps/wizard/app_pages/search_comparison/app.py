@@ -3,6 +3,7 @@
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from typing import Generator
 
 import requests
@@ -12,6 +13,40 @@ from apps.wizard.app_pages.search_comparison.random_queries import get_random_se
 from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
 from etl.config import ENV_IS_REMOTE, OWID_ENV, STAGING
 from etl.db import read_sql
+
+
+# Search source types
+class SearchSource:
+    ALGOLIA = "Algolia (Keyword)"
+    SEMANTIC = "Semantic (AI)"
+    AGENT = "Agent"
+
+
+@dataclass
+class SearchOptions:
+    """Options for a search source."""
+
+    # Semantic options
+    llm_rerank: bool = False
+    llm_model: str = "small"
+    include_explorers: bool = False
+
+    # Agent options
+    agent_model: str = "gemini-2.5-flash-lite"
+    agent_search: str = "keyword"
+    agent_type: str = "all"  # all, chart, explorer, or multiDim
+
+
+AGENT_MODELS = [
+    # Gemini models
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash",
+    "gemini-3-flash",
+    # OpenAI models
+    "openai",
+]
+
+AGENT_SEARCH_MODES = ["keyword", "semantic"]
 
 # Page config must be first Streamlit command
 st.set_page_config(
@@ -178,6 +213,44 @@ def fetch_query_rewrite(query: str) -> tuple[dict, float]:
         return {"error": str(e), "keywords": []}, time.time() - start
 
 
+def fetch_agent_search(
+    query: str,
+    hits_per_page: int,
+    model: str = "gemini-2.5-flash-lite",
+    search: str = "keyword",
+    type_filter: str = "chart",
+) -> tuple[dict, float]:
+    """Fetch results from Agent recommend endpoint."""
+    start = time.time()
+    try:
+        params = {"q": query, "model": model, "search": search}
+        if type_filter and type_filter != "all":
+            params["type"] = type_filter
+        response = requests.get(
+            f"{API_BASE}/api/ai-search/recommend",
+            params=params,
+            timeout=60,  # Agent may take longer
+        )
+        response.raise_for_status()
+        data = response.json()
+        # Normalize response format to match other endpoints
+        recommendations = data.get("recommendations", [])[:hits_per_page]
+        # Add URL if missing and convert to hits format
+        hits = []
+        for rec in recommendations:
+            hit = {
+                "title": rec.get("title", ""),
+                "subtitle": rec.get("subtitle", ""),
+                "slug": rec.get("slug", ""),
+                "url": rec.get("url", f"{API_BASE}/grapher/{rec.get('slug', '')}"),
+                "type": rec.get("type", "chart"),
+            }
+            hits.append(hit)
+        return {"hits": hits, "nbHits": len(hits), "model": data.get("model")}, time.time() - start
+    except requests.RequestException as e:
+        return {"error": str(e), "hits": []}, time.time() - start
+
+
 def get_rank_change_indicator(current_rank: int, other_rank: int | None) -> str:
     """Get an indicator showing rank change between search results."""
     if other_rank is None:
@@ -250,12 +323,113 @@ def build_slug_to_rank(hits: list[dict]) -> dict[str, int]:
     return {hit["slug"]: i + 1 for i, hit in enumerate(hits) if hit.get("slug")}
 
 
+def render_source_options(side: str, source: str) -> SearchOptions:
+    """Render options for a search source and return the options object."""
+    options = SearchOptions()
+
+    if source == SearchSource.SEMANTIC:
+        with st_horizontal():
+            options.llm_rerank = url_persist(st.checkbox)(
+                key=f"{side}_llm_rerank",
+                label="LLM rerank",
+                value=False,
+            )
+            options.llm_model = url_persist(st.selectbox)(
+                key=f"{side}_llm_model",
+                label="Model",
+                options=["small", "large"],
+                index=0,
+            )
+            options.include_explorers = url_persist(st.checkbox)(
+                key=f"{side}_include_explorers",
+                label="Explorers",
+                value=False,
+            )
+    elif source == SearchSource.AGENT:
+        with st_horizontal():
+            options.agent_model = url_persist(st.selectbox)(
+                key=f"{side}_agent_model",
+                label="Model",
+                options=AGENT_MODELS,
+            )
+            options.agent_search = url_persist(st.selectbox)(
+                key=f"{side}_agent_search",
+                label="Search",
+                options=AGENT_SEARCH_MODES,
+            )
+            options.agent_type = url_persist(st.selectbox)(
+                key=f"{side}_agent_type",
+                label="Type",
+                options=["all", "chart", "explorer", "multiDim"],
+                help="Filter results by type",
+            )
+    # Algolia has no options
+
+    return options
+
+
+def fetch_for_source(
+    source: str,
+    query: str,
+    hits_per_page: int,
+    options: SearchOptions,
+) -> tuple[dict, float]:
+    """Fetch results based on the selected source and options."""
+    if source == SearchSource.ALGOLIA:
+        return fetch_algolia_search(query, hits_per_page)
+    elif source == SearchSource.SEMANTIC:
+        return fetch_semantic_search(
+            query,
+            hits_per_page,
+            options.include_explorers,
+            False,  # rerank
+            False,  # rewrite
+            options.llm_rerank,
+            options.llm_model,
+        )
+    elif source == SearchSource.AGENT:
+        return fetch_agent_search(
+            query,
+            hits_per_page,
+            options.agent_model,
+            options.agent_search,
+            options.agent_type,
+        )
+    else:
+        return {"error": f"Unknown source: {source}", "hits": []}, 0.0
+
+
+def get_source_header(source: str, options: SearchOptions) -> str:
+    """Get the header text for a search source."""
+    if source == SearchSource.ALGOLIA:
+        return "🔤 Algolia (Keyword)"
+    elif source == SearchSource.SEMANTIC:
+        header = "🧠 Semantic (AI)"
+        if options.llm_rerank:
+            header += f" + LLM ({options.llm_model})"
+        return header
+    elif source == SearchSource.AGENT:
+        return f"🤖 Agent ({options.agent_model})"
+    return source
+
+
+def get_search_type(source: str) -> str:
+    """Get the search type string for display purposes."""
+    if source == SearchSource.ALGOLIA:
+        return "algolia"
+    elif source == SearchSource.SEMANTIC:
+        return "semantic"
+    elif source == SearchSource.AGENT:
+        return "agent"
+    return "unknown"
+
+
 def main():
     st_title_with_expert("Search Comparison", icon=":material/compare:")
 
     st.markdown(
-        "Compare **Algolia keyword search** with **semantic (AI) search** side-by-side. "
-        "Enter a query to see how results differ between the two approaches."
+        "Compare different search approaches side-by-side: **Algolia keyword search**, "
+        "**semantic (AI) search**, and **Agent-based recommendations**."
     )
 
     # Handle random query selection (must be before widget creation)
@@ -267,21 +441,13 @@ def main():
         st.query_params["query"] = new_query
         st.rerun()
 
-    # Query input - wide text input
-    col_query, col_base, col_results = st.columns([4, 1, 1])
+    # Query input and global options
+    col_query, col_results = st.columns([5, 1])
     with col_query:
         query = url_persist(st.text_input)(
             key="query",
             label="Search query",
             placeholder="Enter search query (e.g., gdp, climate change, life expectancy)",
-        )
-    with col_base:
-        left_source = url_persist(st.selectbox)(
-            key="left_source",
-            label="Compare with",
-            options=["Algolia (Keyword)", "Semantic (AI)"],
-            index=0,
-            help="Choose baseline for left column comparison",
         )
     with col_results:
         hits_per_page = st.selectbox(
@@ -291,8 +457,8 @@ def main():
             key="hits_per_page",
         )
 
-    # Quick actions and options
-    col1, col2 = st.columns([1, 3])
+    # Quick actions and global options
+    col1, col2 = st.columns([1, 2])
 
     with col1:
         with st_horizontal():
@@ -313,24 +479,6 @@ def main():
                 label="AI Answer",
                 value=False,
             )
-            include_explorers = url_persist(st.checkbox)(
-                key="include_explorers",
-                label="Include explorers",
-                value=False,
-            )
-            enable_llm_rerank = url_persist(st.checkbox)(
-                key="llm_rerank",
-                label="LLM rerank",
-                value=False,
-                help="Enable LLM-based reranking",
-            )
-            llm_model = url_persist(st.selectbox)(
-                key="llm_model",
-                label="LLM model",
-                options=["small", "large"],
-                index=0,
-                help="Model size for LLM reranking",
-            )
             topic_threshold = st.number_input(
                 "Topic threshold",
                 min_value=0.0,
@@ -349,60 +497,14 @@ def main():
         st.warning("Please enter at least 2 characters.")
         return
 
-    # Handle URL encoding issue where space may be decoded as +
-    is_algolia = left_source in ("Algolia (Keyword)", "Algolia+(Keyword)")
+    # Fetch topics and keywords early (in parallel)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        topics_llm_future = executor.submit(fetch_topics, query, 5, "llm")
+        rewrite_future = executor.submit(fetch_query_rewrite, query)
+        topics_llm, _topics_llm_time = topics_llm_future.result()
+        rewrite_data, _rewrite_time = rewrite_future.result()
 
-    # Fetch results from all APIs in parallel
-    with st.spinner("Searching..."):
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            # Submit all tasks in parallel
-            right_future = executor.submit(
-                fetch_semantic_search,
-                query,
-                hits_per_page,
-                include_explorers,
-                False,  # rerank
-                False,  # rewrite
-                enable_llm_rerank,
-                llm_model,
-            )
-            if is_algolia:
-                left_future = executor.submit(fetch_algolia_search, query, hits_per_page)
-            else:
-                left_future = executor.submit(fetch_semantic_search, query, hits_per_page, include_explorers)
-            topics_llm_future = executor.submit(fetch_topics, query, 5, "llm")
-            rewrite_future = executor.submit(fetch_query_rewrite, query)
-
-            # Collect results
-            right_data, right_time = right_future.result()
-            left_data, left_time = left_future.result()
-            topics_llm, topics_llm_time = topics_llm_future.result()
-            rewrite_data, rewrite_time = rewrite_future.result()
-
-    # Get hits and build rank mappings
-    right_hits = right_data.get("hits", [])
-    left_hits = left_data.get("hits", [])
-    max_hits = max(len(right_hits), len(left_hits))
-
-    # Fetch pageviews and FM ranks for left results if Algolia (they don't include these)
-    if is_algolia:
-        left_slugs = tuple(h.get("slug") for h in left_hits if h.get("slug"))
-        if left_slugs:
-            pageviews = get_pageviews_for_slugs(left_slugs)
-            fm_ranks = get_fm_ranks_for_slugs(left_slugs)
-            # Enrich left hits with pageview and FM rank data
-            for hit in left_hits:
-                slug = hit.get("slug")
-                if slug:
-                    if slug in pageviews:
-                        hit["views_365d"] = pageviews[slug]
-                    if slug in fm_ranks:
-                        hit["fmRank"] = fm_ranks[slug]
-
-    right_slug_to_rank = build_slug_to_rank(right_hits)
-    left_slug_to_rank = build_slug_to_rank(left_hits)
-
-    # Display suggested keywords and topics in a bordered container
+    # Display suggested keywords and topics
     keywords = rewrite_data.get("keywords", [])
     topics = []
     if "error" not in topics_llm and topics_llm.get("hits"):
@@ -417,23 +519,85 @@ def main():
                 topic_links = [f"[{t['name']}]({t['url']})" for t in topics]
                 st.markdown(f"📚 **Recommended topics:** {' · '.join(topic_links)}")
 
+    # Source selectors for left and right panels
+    st.markdown("---")
+    all_sources = [SearchSource.ALGOLIA, SearchSource.SEMANTIC, SearchSource.AGENT]
+
+    col_left, col_right = st.columns(2)
+
+    with col_left:
+        left_source = url_persist(st.selectbox)(
+            key="left_source",
+            label="Left panel",
+            options=all_sources,
+        )
+        left_options = render_source_options("left", left_source)
+
+    with col_right:
+        # Default to Semantic (second option) if no URL param
+        if "right_source" not in st.query_params:
+            st.query_params["right_source"] = SearchSource.SEMANTIC
+        right_source = url_persist(st.selectbox)(
+            key="right_source",
+            label="Right panel",
+            options=all_sources,
+        )
+        right_options = render_source_options("right", right_source)
+
+    # Fetch search results from both panels in parallel
+    with st.spinner("Searching..."):
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            left_future = executor.submit(
+                fetch_for_source, left_source, query, hits_per_page, left_options
+            )
+            right_future = executor.submit(
+                fetch_for_source, right_source, query, hits_per_page, right_options
+            )
+            left_data, left_time = left_future.result()
+            right_data, right_time = right_future.result()
+
+    # Get hits and build rank mappings
+    left_hits = left_data.get("hits", [])
+    right_hits = right_data.get("hits", [])
+    max_hits = max(len(right_hits), len(left_hits))
+
+    # Fetch pageviews and FM ranks for results that don't include them (Algolia, Agent)
+    def enrich_hits_with_stats(hits: list[dict], source: str) -> None:
+        """Enrich hits with pageviews and FM ranks if the source doesn't provide them."""
+        if source in (SearchSource.ALGOLIA, SearchSource.AGENT):
+            slugs = tuple(h.get("slug") for h in hits if h.get("slug"))
+            if slugs:
+                pageviews = get_pageviews_for_slugs(slugs)
+                fm_ranks = get_fm_ranks_for_slugs(slugs)
+                for hit in hits:
+                    slug = hit.get("slug")
+                    if slug:
+                        if slug in pageviews:
+                            hit["views_365d"] = pageviews[slug]
+                        if slug in fm_ranks:
+                            hit["fmRank"] = fm_ranks[slug]
+
+    enrich_hits_with_stats(left_hits, left_source)
+    enrich_hits_with_stats(right_hits, right_source)
+
+    left_slug_to_rank = build_slug_to_rank(left_hits)
+    right_slug_to_rank = build_slug_to_rank(right_hits)
+
     # Create placeholder for AI answer at the top (will be filled after charts render)
     if enable_ai_answer:
         st.subheader("🤖 AI Answer")
         ai_answer_placeholder = st.empty()
 
-    # Headers - left column (Algolia or Semantic base), right column (Semantic with options)
-    left_header = "🔤 Algolia (Keyword)" if is_algolia else "🧠 Semantic (base)"
-    right_header = "🧠 Semantic (AI)"
-    if enable_llm_rerank:
-        right_header += " + LLM rerank"
+    # Headers with source info
+    left_header = get_source_header(left_source, left_options)
+    right_header = get_source_header(right_source, right_options)
 
     col_left, col_right = st.columns(2)
     with col_left:
         st.subheader(left_header)
         if "error" not in left_data:
             total = left_data.get("nbHits", len(left_hits))
-            st.info(f"**{total:,}** total results ({left_time:.2f}s)")
+            st.info(f"**{total:,}** results ({left_time:.2f}s)")
         else:
             st.error(f"API Error: {left_data['error']}")
     with col_right:
@@ -442,9 +606,12 @@ def main():
             st.error(f"API Error: {right_data['error']}")
         else:
             total = right_data.get("nbHits", len(right_hits))
-            st.info(f"**{total:,}** total results ({right_time:.2f}s)")
+            st.info(f"**{total:,}** results ({right_time:.2f}s)")
 
     # Results row by row
+    left_search_type = get_search_type(left_source)
+    right_search_type = get_search_type(right_source)
+
     for i in range(max_hits):
         col_left, col_right = st.columns(2)
 
@@ -453,14 +620,14 @@ def main():
                 hit = left_hits[i]
                 slug = hit.get("slug")
                 other_rank = right_slug_to_rank.get(slug)
-                display_hit(hit, i + 1, "algolia" if is_algolia else "semantic", other_rank)
+                display_hit(hit, i + 1, left_search_type, other_rank)
 
         with col_right:
             if i < len(right_hits):
                 hit = right_hits[i]
                 slug = hit.get("slug")
                 other_rank = left_slug_to_rank.get(slug)
-                display_hit(hit, i + 1, "semantic", other_rank)
+                display_hit(hit, i + 1, right_search_type, other_rank)
 
     # Now stream the AI answer into the placeholder (charts are already rendered)
     if enable_ai_answer:
