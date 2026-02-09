@@ -4,6 +4,7 @@ This code generates a bar chart showing the decreasing time intervals between
 population milestones from 1 billion to 10 billion.
 """
 
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import matplotlib
@@ -29,6 +30,150 @@ log = structlog.get_logger()
 
 POPULATION_TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 POPULATION_TARGETS = [x * 1e9 for x in POPULATION_TARGETS]
+
+
+def optimize_svg_for_figma(svg_path: Path) -> None:
+    """Optimize SVG for easier editing in Figma.
+
+    Flattens matplotlib's nested group structure, removes white backgrounds,
+    and creates semantic groups based on visual purpose.
+
+    Args:
+        svg_path: Path to the SVG file to optimize
+    """
+    # Register SVG namespace to preserve it
+    ET.register_namespace("", "http://www.w3.org/2000/svg")
+    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+
+    tree = ET.parse(svg_path)
+    root = tree.getroot()
+
+    # Define SVG namespace for ElementTree operations
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+
+    # Find the main group containing all matplotlib content
+    main_group = root.find("./svg:g[@id='figure_1']", ns)
+    if main_group is None:
+        log.warning("Could not find figure_1 group in SVG, skipping optimization")
+        return
+
+    # Remove large white background elements first (before reorganizing)
+    for elem in list(main_group.findall(".//svg:rect", ns)) + list(main_group.findall(".//svg:path", ns)):
+        fill = elem.get("fill", "")
+        style = elem.get("style", "")
+        is_white = (
+            fill in ("#ffffff", "white", "#FFFFFF")
+            or "#ffffff" in style.lower()
+            or "fill: #ffffff" in style.lower()
+        )
+
+        if is_white:
+            d_attr = elem.get("d", "")
+            width_attr = elem.get("width", "0")
+            height_attr = elem.get("height", "0")
+            try:
+                if elem.tag == "{http://www.w3.org/2000/svg}rect":
+                    w, h = float(width_attr), float(height_attr)
+                    is_large = w > 50 and h > 50
+                else:
+                    # Check if path looks like a background (has large coordinates)
+                    is_large = (
+                        any(x in d_attr for x in ["L 1009", "L 958", "L 894", "L 1152", "L 1116", " z "])
+                        and len(d_attr) < 200
+                    )
+            except (ValueError, AttributeError):
+                is_large = False
+
+            if is_large:
+                for parent in root.iter():
+                    if elem in list(parent):
+                        parent.remove(elem)
+                        break
+
+    # Create new flat structure
+    new_structure = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
+
+    # Semantic groups in render order (bottom to top)
+    group_order = [
+        "grid-lines",
+        "bars",
+        "bar-labels",
+        "axis-labels",
+        "title",
+        "annotations",
+        "source",
+    ]
+
+    groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
+
+    # Collect and categorize all visual elements
+    for elem in main_group.iter():
+        if elem.tag in [
+            "{http://www.w3.org/2000/svg}path",
+            "{http://www.w3.org/2000/svg}line",
+            "{http://www.w3.org/2000/svg}rect",
+            "{http://www.w3.org/2000/svg}text",
+        ]:
+            # Make a copy to avoid modifying during iteration
+            elem_copy = ET.Element(elem.tag, elem.attrib)
+            elem_copy.text = elem.text
+            elem_copy.tail = None
+            for child in elem:
+                elem_copy.append(child)
+
+            # Categorize
+            target_group = None
+            fill = elem.get("fill", "")
+            stroke = elem.get("stroke", "")
+            style = elem.get("style", "")
+
+            if elem.tag == "{http://www.w3.org/2000/svg}text":
+                text_content = "".join(elem.itertext()).lower()
+                if "time for the world population" in text_content:
+                    target_group = "title"
+                elif "note:" in text_content or "data source" in text_content or "ourworldindata" in text_content:
+                    target_group = "source"
+                elif "years" in text_content or "-" in text_content:
+                    target_group = "bar-labels"
+                elif "all of human" in text_content or "un projection" in text_content or "latest un" in text_content:
+                    target_group = "annotations"
+                else:
+                    target_group = "axis-labels"
+            elif elem.tag == "{http://www.w3.org/2000/svg}rect":
+                if "#8193a8" in fill.lower():  # Bar color
+                    target_group = "bars"
+                else:
+                    target_group = "grid-lines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}line":
+                if "#eeeeee" in stroke.lower():
+                    target_group = "grid-lines"
+                elif "#666666" in stroke.lower() or "#666" in stroke.lower():
+                    target_group = "annotations"
+                else:
+                    target_group = "grid-lines"
+            elif elem.tag == "{http://www.w3.org/2000/svg}path":
+                if "#eeeeee" in stroke.lower() or "fill:none" in style:
+                    target_group = "grid-lines"
+                elif "#666666" in stroke.lower() or "#666" in stroke.lower():
+                    target_group = "annotations"
+                else:
+                    target_group = "grid-lines"
+
+            if target_group:
+                groups[target_group].append(elem_copy)
+
+    # Remove empty groups
+    for gid in list(group_order):
+        if len(groups[gid]) == 0:
+            new_structure.remove(groups[gid])
+
+    # Replace main_group content with new structure
+    main_group.clear()
+    for child in new_structure:
+        main_group.append(child)
+
+    # Write optimized SVG
+    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
 
 
 def find_population_milestones(tb: Table) -> list[dict]:
@@ -469,6 +614,10 @@ def run() -> None:
         metadata={"Date": None},
     )
     log.info(f"Saved chart to {output_path_svg}")
+
+    # Optimize SVG for Figma
+    optimize_svg_for_figma(output_path_svg)
+    log.info("Optimized SVG for Figma")
 
     output_path_png = CURRENT_DIR / "population_billion_milestones.png"
     fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
