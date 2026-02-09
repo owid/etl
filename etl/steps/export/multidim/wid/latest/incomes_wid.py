@@ -238,7 +238,9 @@ def run() -> None:
     )
 
     # Remove grouped scatter views for quantiles we don't want (keep only Richest 0.1%, Richest 1%, 10)
-    c.drop_views({"welfare_type": ["before_vs_after_scatter"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]})
+    c.drop_views(
+        {"welfare_type": ["before_vs_after_scatter"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]}
+    )
 
     # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
     for view in c.views:
