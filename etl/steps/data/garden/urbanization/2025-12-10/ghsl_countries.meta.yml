@@ -137,6 +137,11 @@ tables:
             <% elif location_type == "urban_total" and metric == 'density' and data_type == 'projections' %>
             Projected population density in urban areas
 
+            <% elif location_type == "urban_total" and metric == 'urban_share_growth_rate' and data_type == 'estimates' %>
+            Annual growth rate of urban population share
+            <% elif location_type == "urban_total" and metric == 'urban_share_growth_rate' and data_type == 'projections' %>
+            Annual growth rate of urban population share (projected)
+
             <% endif %>
           unit:
             <% if metric == 'area' or metric == 'built_up_area' %>
@@ -147,6 +152,8 @@ tables:
             %
             <% elif metric == 'density' %>
             people per km²
+            <% elif metric == 'urban_share_growth_rate' %>
+            percentage points per year
             <%- endif -%>
 
           short_unit:
@@ -156,12 +163,16 @@ tables:
             %
             <% elif metric == 'density' %>
             per km²
+            <% elif metric == 'urban_share_growth_rate' %>
+            pp/year
             <%- endif -%>
           description_processing:
             <% if metric == 'share' or metric == 'popshare' %>
             The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns, rural areas) by the overall total, providing a percentage representation for each category.
            <% elif metric == 'density' %>
             Population density was calculated by dividing the population of cities by the total area it covers, providing a measure of the number of people living in each km².
+           <% elif metric == 'urban_share_growth_rate' %>
+            The annual growth rate represents the year-over-year change in the urban population share, measured in percentage points per year.
            <%- endif -%>
           display:
             numDecimalPlaces:
@@ -173,4 +184,6 @@ tables:
                 1
                 <% elif metric == 'density' %>
                 0
+                <% elif metric == 'urban_share_growth_rate' %>
+                2
                 <%- endif -%>

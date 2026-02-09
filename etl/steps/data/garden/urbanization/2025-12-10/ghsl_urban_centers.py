@@ -49,7 +49,7 @@ def run() -> None:
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
 
-    # Load total population from ghsl_countries for share calculations.
+    # Load total and urban population from ghsl_countries for share calculations.
     ds_countries = paths.load_dataset("ghsl_countries")
     tb_countries = ds_countries.read("ghsl_countries").reset_index()
     # Get total population by combining all three location types.
@@ -58,9 +58,12 @@ def run() -> None:
         & (tb_countries["location_type"].isin(["urban_centre", "urban_cluster", "rural_total"]))
         & (tb_countries["data_type"].isin(["estimates", "projections"]))
     ].copy()
-    tb_total_pop = tb_total_pop.pivot_table(index=["country", "year"], columns="location_type", values="value").reset_index()
+    tb_total_pop = tb_total_pop.pivot_table(
+        index=["country", "year"], columns="location_type", values="value"
+    ).reset_index()
     tb_total_pop["total_population"] = tb_total_pop[["urban_centre", "urban_cluster", "rural_total"]].sum(axis=1)
-    tb_total_pop = tb_total_pop[["country", "year", "total_population"]]
+    tb_total_pop["urban_population"] = tb_total_pop[["urban_centre", "urban_cluster"]].sum(axis=1)
+    tb_total_pop = tb_total_pop[["country", "year", "total_population", "urban_population"]]
 
     #
     # Process data.
@@ -92,6 +95,23 @@ def run() -> None:
         min_num_values_per_year=1,
     )
 
+    # Calculate share of urban population living in largest city (capital).
+    # Merge with urban population data.
+    tb_capitals_share = pr.merge(
+        tb_capitals[["country", "year", "urban_pop"]],
+        tb_total_pop[["country", "year", "urban_population"]],
+        on=["country", "year"],
+        how="left",
+    )
+    tb_capitals_share["urban_pop_share_largest_city"] = (
+        tb_capitals_share["urban_pop"] / tb_capitals_share["urban_population"]
+    ) * 100
+    # Keep only the share column.
+    tb_capitals_share = tb_capitals_share[["country", "year", "urban_pop_share_largest_city"]]
+
+    # Merge share back to capitals table.
+    tb_capitals = pr.merge(tb_capitals, tb_capitals_share, on=["country", "year"], how="left")
+
     # Create top 100 only table.
     tb_top_100 = tb[has_top_100_data].copy()
     tb_top_100 = tb_top_100[["country", "year", "urban_pop_top_100", "urban_density_top_100"]]
@@ -113,7 +133,9 @@ def run() -> None:
     )
 
     # Merge with total population to calculate shares.
-    tb_city_sizes = pr.merge(tb_city_sizes, tb_total_pop, on=["country", "year"], how="left")
+    tb_city_sizes = pr.merge(
+        tb_city_sizes, tb_total_pop[["country", "year", "total_population"]], on=["country", "year"], how="left"
+    )
 
     # Calculate shares as percentage of total population.
     for size_name in CITY_SIZE_CUTOFFS.keys():
@@ -124,6 +146,25 @@ def run() -> None:
     # Rename absolute population columns to be more descriptive.
     for size_name in CITY_SIZE_CUTOFFS.keys():
         tb_city_sizes = tb_city_sizes.rename(columns={f"pop_{size_name}": f"pop_citysize_{size_name}"})
+
+    # Calculate population in cities >= 300k (300k_1m + 1m_5m + above_5m).
+    tb_city_sizes["pop_citysize_above_300k"] = (
+        tb_city_sizes["pop_citysize_300k_1m"]
+        + tb_city_sizes["pop_citysize_1m_5m"]
+        + tb_city_sizes["pop_citysize_above_5m"]
+    )
+
+    # Calculate share of population in cities >= 300k.
+    tb_city_sizes["popshare_citysize_above_300k"] = (
+        tb_city_sizes["pop_citysize_above_300k"] / tb_city_sizes["total_population"]
+    ) * 100
+
+    # Calculate annual growth rate of population in cities >= 300k.
+    # Sort by country and year to ensure correct calculation.
+    tb_city_sizes = tb_city_sizes.sort_values(["country", "year"])
+    tb_city_sizes["pop_citysize_above_300k_growth_rate"] = (
+        tb_city_sizes.groupby("country", group_keys=False)["pop_citysize_above_300k"].pct_change() * 100
+    )
 
     # Drop total population.
     tb_city_sizes = tb_city_sizes.drop(columns=["total_population"])
@@ -137,10 +178,20 @@ def run() -> None:
     future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     # For each column, split it into two (projections and estimates).
-    columns_to_split = ["urban_pop", "urban_density", "urban_density_top_100", "urban_pop_top_100"]
+    columns_to_split = [
+        "urban_pop",
+        "urban_density",
+        "urban_density_top_100",
+        "urban_pop_top_100",
+        "urban_pop_share_largest_city",
+    ]
     # Add city size population and share columns.
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     columns_to_split.extend([f"popshare_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
+    # Add aggregate columns for cities >= 300k.
+    columns_to_split.extend(
+        ["pop_citysize_above_300k", "popshare_citysize_above_300k", "pop_citysize_above_300k_growth_rate"]
+    )
 
     for col in columns_to_split:
         if col in tb.columns:
