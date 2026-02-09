@@ -52,11 +52,9 @@ Queries return no results even when relevant content exists
 
 Search returns results that technically match but aren't what the user wants
 
-TODO: WHen user searches for "population", we show "Mpox: Cumulative confirmed cases per million people" as the first result
-
-- **Example**: Query "Monkeypox from population"
-  - Returns: General population statistics
-  - User wants: Monkeypox prevalence in populations
+- **Example**: Query "population"
+  - Returns: "Mpox: Cumulative confirmed cases per million people" as first result
+  - User wants: General population data, not disease statistics
 
 - **Problem**: Keyword matching ignores semantic relationships
 - **Result**: Low-quality results ranked highly, relevant content buried
@@ -164,14 +162,13 @@ layout: section
 
 # Future Directions
 
-TODO: this slide is crap, just say that we might fit all our data into LLM context window (and cache to save money) and search from there
+**Context Window Search**: Fit all our data into LLM context window
 
-
-- **Multimodal search**: Search across text, charts, images
-- **Reinforcement learning**: Learn from user interactions
-- **Personalized search**: Adapt to user preferences and history
-- **Real-time learning**: Update models with new content automatically
-- **Explainable AI**: Show why results were returned
+- Load entire dataset metadata into context
+- Use prompt caching to reduce costs
+- Search directly within the LLM
+- Potentially better understanding of relationships and context
+- Challenge: Keeping data fresh and handling updates
 
 ---
 layout: section
@@ -233,13 +230,15 @@ layout: section
 
 **Problem**: Users may not know what topics are available
 
-TODO: implementation is trivial, we just show LLM our 100+ topics and ask for recommendations
-
 **Solution**: Context-aware topic recommendations
 - Show related topics based on current query
 - Display when search returns zero results
 - Showcase our topic searches (which are really good!)
 - Show featured metrics
+
+**Implementation**:
+- Trivial: Show LLM our 100+ topics and ask for recommendations
+- LLM selects most relevant topics for the query
 
 **Benefits**:
 - Increase content discovery
@@ -294,7 +293,7 @@ TODO: implementation is trivial, we just show LLM our 100+ topics and ask for re
 - Can handle edge cases
 
 **Cons**:
-- Expensive (~$200/month)  TODO: with gemini-flash-2.5-lite
+- Expensive (~$200/month with Gemini Flash 2.5 Lite)
 - Unreliable (JSON response issues)
 - Non-deterministic (inconsistent results)
 - High latency (~1-5s)
@@ -309,22 +308,25 @@ layout: section
 
 # Outputs
 
-TODO: add those as outputs
-- "Search comparison" tool in Wizard for side-by-side qualitative comparison, link http://staging-site-ai-search-api/etl/wizard/search-comparison
-- Suggested topics and suggested searches as API endpoints as Cloudflare workers, e.g. curl -s "http://localhost:8788/api/ai-search/topics?q=poverty&limit=3" | jq
-- Query rewriting -> Semantic search -> Reranking as API endpoint, e.g. http http://localhost:8788/api/ai-search/charts\?q\=train\&hitsPerPage\=10\&type\=chart\&llmRerank\=true\&llmModel\=large
-- Agentic search as API endpoint, e.g. http "http://localhost:8788/api/ai-search/recommend" q=="population"
-
 **From this R&D cycle**
 
-*Screenshots and results to be added here*
+**1. Search Comparison Tool**
+- Side-by-side qualitative comparison in Wizard
+- [/etl/wizard/search-comparison](http://staging-site-ai-search-api/etl/wizard/search-comparison)
 
-Possible content:
-- Screenshots of different search approaches
-- A/B test results
-- User satisfaction metrics
-- Example queries and results
-- Performance comparisons
+**2. API Endpoints (Cloudflare Workers)**
+
+*Suggested topics:*
+- `/api/ai-search/topics?q=population`
+
+*Suggested searches:*
+- `/api/ai-search/searches?q=population`
+
+**3. Semantic Search with Reranking**
+- `/api/ai-search/charts?q=population`
+
+**4. Agentic Search**
+- `/api/ai-search/recommend?q=population`
 
 ---
 layout: section
@@ -351,25 +353,24 @@ Example categories:
 
 # Need for a Benchmark?
 
-TODO:
-- qualitative analysis has its limits, changing hyperaparameters can lead to a vastly different set of results
-- we could take real search results and create representative queries for each topic by LLM (generate both keyword and natural language queries), then judge the relevance by LLM (and finally review by humans)
-
 Should we create a standardized benchmark for evaluating search quality?
 
 **Why benchmark?**
-- Objective comparison of approaches
+- Qualitative analysis has limits
+- Hyperparameter changes can vastly affect results
+- Need objective comparison of approaches
 - Track improvements over time
 - Catch regressions
-- Guide optimization efforts
+
+**Proposed approach:**
+1. Take real search results
+2. Generate representative queries for each topic (LLM)
+   - Both keyword and natural language queries
+3. Judge relevance automatically (LLM)
+4. Human review of judgments
 
 **What to measure?**
 - Precision/recall on curated query set
 - Zero-result rate
 - User satisfaction scores
 - Latency and cost metrics
-
-**Open questions?**
-- What queries to include?
-- How to label relevance?
-- How often to run?
