@@ -8,6 +8,14 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# City size cutoffs (in population).
+CITY_SIZE_CUTOFFS = {
+    "below_300k": (0, 300000),
+    "300k_1m": (300000, 1000000),
+    "1m_5m": (1000000, 5000000),
+    "above_5m": (5000000, float("inf")),
+}
+
 
 def run() -> None:
     #
@@ -93,11 +101,40 @@ def run() -> None:
     tb_top["country"] = tb_top["urban_center_name"] + " (" + tb_top["country"] + ")"
     tb_top = tb_top.drop(columns=["urban_center_name"])
 
-    # Merge capital and top 100 tables.
+    # Create city size aggregates.
+    # Use the full city data (tb variable from earlier, before filtering for capitals/top 100).
+    tb_all_cities = snap.read(safe_types=False, sheet_name="UC_STATS")
+    tb_all_cities = tb_all_cities.rename(
+        columns={
+            "UNLocName": "country",
+            "Year": "year",
+            "POP": "urban_pop",
+        }
+    )[["country", "year", "urban_pop"]]
+
+    # Drop missing population values.
+    tb_all_cities = tb_all_cities.dropna(subset=["urban_pop"])
+    tb_all_cities = tb_all_cities[tb_all_cities["urban_pop"] > 0]
+
+    # Create columns for each city size category.
+    for size_name, (min_pop, max_pop) in CITY_SIZE_CUTOFFS.items():
+        mask = (tb_all_cities["urban_pop"] >= min_pop) & (tb_all_cities["urban_pop"] < max_pop)
+        tb_all_cities[f"pop_{size_name}"] = tb_all_cities["urban_pop"].where(mask, 0)
+
+    # Aggregate by country and year.
+    agg_dict = {f"pop_{size_name}": "sum" for size_name in CITY_SIZE_CUTOFFS.keys()}
+    tb_city_sizes = tb_all_cities.groupby(["country", "year"], as_index=False)[list(agg_dict.keys())].sum()
+
+    # Merge capital, top 100, and city size tables.
     tb = pr.merge(tb_capitals, tb_top, on=["country", "year"], how="outer")
+    tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
 
     # Ensure metadata is propagated.
-    for col in ["urban_pop", "urban_density", "urban_density_top_100", "urban_pop_top_100"]:
+    metadata_cols = ["urban_pop", "urban_density", "urban_density_top_100", "urban_pop_top_100"]
+    # Add city size columns.
+    metadata_cols.extend([f"pop_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
+
+    for col in metadata_cols:
         if col in tb.columns:
             tb[col].metadata.origins = tb["country"].metadata.origins
 
