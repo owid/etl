@@ -201,7 +201,7 @@ definitions:
     Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
 
   description_key_welfare_type_spells: |-
-    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). This chart shows the original data with *all* available income and consumption measures separately.
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). This chart shows the data with income and consumption measures separately.
 
   description_key_welfare_type_poverty: |-
     <% if survey_comparability == "No spells" %>
