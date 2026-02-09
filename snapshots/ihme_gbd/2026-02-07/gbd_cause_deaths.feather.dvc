@@ -22,6 +22,6 @@ meta:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: d4f68e4b164d7a0a6c2c338d55276d66
-    size: 548103434
+  - md5: c4e5f51a4bcc2004c11ddf9a3733543f
+    size: 781075946
     path: gbd_cause_deaths.feather

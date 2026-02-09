@@ -7,8 +7,8 @@ Important - You need and account to access the data.
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Cause of death or injury'
 * In Measure select 'Deaths'
-* In Metric select 'Number' and 'Rate'
-* In Impairment select 'Select all causes'
+* In Metric select 'Number', 'Percent and 'Rate'
+* In Cause select 'Select all causes'
 * In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select 'All ages', 'Age-standardized', '<5 years', '5-14 years', '15-49 years', '50-69 years', '70+ years'
 * In Sex select 'Both'
@@ -37,6 +37,9 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
 BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/178d50d9d169b74c922690f320c61f0a_files/IHME-GBD_2023_DATA-178d50d9-"
 NUMBER_OF_FILES = 68
+# The download had to be broken down into two parts due to the number of files, the request was failing when trying to request the full dataset
+BASE_URL_TWO = "https://dl.healthdata.org/gbd-api-2023-collaborator/8fcc2fc172242b753401d0cbec450ea8_files/IHME-GBD_2023_DATA-8fcc2fc1-"
+NUMBER_OF_FILES_TWO = 29
 
 
 @click.command()
@@ -46,9 +49,14 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause_deaths.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
-    for file_number in range(1, NUMBER_OF_FILES + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
-        df = download_data(file_number, base_url=BASE_URL)
+    for file_number in range(1, NUMBER_OF_FILES + NUMBER_OF_FILES_TWO + 1):
+        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES + NUMBER_OF_FILES_TWO}")
+        if file_number <= NUMBER_OF_FILES:
+            df = download_data(file_number, base_url=BASE_URL)
+        else:
+            # Downloading the second batch of files
+            file_number_two = file_number - NUMBER_OF_FILES
+            df = download_data(file_number_two, base_url=BASE_URL_TWO)
         log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
         dfs.append(df)
 
