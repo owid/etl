@@ -366,7 +366,7 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
-    def regions(self):
+    def regions(self) -> Regions:
         """Get Regions helper for the specific use of an ETL step."""
         if not hasattr(self, "_regions"):
             try:
