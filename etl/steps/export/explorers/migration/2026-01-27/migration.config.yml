@@ -34,7 +34,7 @@ config:
 
 dimensions:
   - slug: metric
-    name: Metric Dropdown
+    name: Metric
     choices:
       - slug: international_emigrants
         name: International emigrants
@@ -73,7 +73,7 @@ dimensions:
     presentation:
       type: dropdown
   - slug: period_radio
-    name: Period Radio
+    name: Period
     choices:
       - slug: total_number
         name: Total number
@@ -82,7 +82,7 @@ dimensions:
     presentation:
       type: radio
   - slug: sub_metric_radio
-    name: Sub-Metric Radio
+    name: Sub-Metric
     choices:
       - slug: total
         name: Total
@@ -91,7 +91,7 @@ dimensions:
     presentation:
       type: radio
   - slug: age_radio
-    name: Age Radio
+    name: Age
     choices:
       - slug: all_ages
         name: All ages
@@ -99,15 +99,6 @@ dimensions:
         name: Under 18
       - slug: under_15
         name: Under 15
-    presentation:
-      type: radio
-  - slug: processing_radio
-    name: Processing Radio
-    choices:
-      - slug: raw_data
-        name: Raw data
-      - slug: five_year_average
-        name: Five-year average
     presentation:
       type: radio
 
@@ -120,7 +111,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#refugees_under_18_asylum
@@ -133,7 +123,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#refugees_under_18_origin
@@ -146,7 +135,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#refugees_under_18_asylum_per_1000
@@ -159,7 +147,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#refugees_under_18_origin_per_1000
@@ -172,7 +159,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_conflict_violence
@@ -185,7 +171,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_disaster
@@ -198,7 +183,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_total
@@ -211,7 +195,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_conflict_violence
@@ -224,7 +207,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_disaster
@@ -237,7 +219,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_total
@@ -250,7 +231,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_conflict_violence_per_1000
@@ -263,7 +243,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_disaster_per_1000
@@ -276,7 +255,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_total_per_1000
@@ -289,7 +267,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_conflict_violence_per_1000
@@ -302,7 +279,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_disaster_per_1000
@@ -315,7 +291,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: under_18
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_total_per_1000
@@ -330,7 +305,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees
@@ -343,7 +317,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers
@@ -356,7 +329,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees
@@ -369,7 +341,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers
@@ -382,7 +353,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps
@@ -395,7 +365,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps_per_100k
@@ -408,7 +377,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_refugees
@@ -421,7 +389,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#returned_refugees
@@ -434,7 +401,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless
@@ -447,7 +413,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless_per_100k
@@ -460,7 +425,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees_per_1000
@@ -473,7 +437,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees_per_1000
@@ -486,7 +449,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers_per_100k
@@ -499,7 +461,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
@@ -514,7 +475,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: migrant_stock#immigrants_all
@@ -527,7 +487,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: migrant_stock#emigrants_all
@@ -540,7 +499,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: migrant_stock#immigrant_share_of_dest_population_all
@@ -553,7 +511,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: migrant_stock#emigrants_share_of_total_population
@@ -568,7 +525,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: un_wpp/migration#net_migration__sex_all__age_all__variant_estimates
@@ -584,7 +540,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: un_wpp/migration#net_migration_rate__sex_all__age_all__variant_estimates
@@ -602,7 +557,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: wdi#si_rmt_cost_ib_zs
@@ -618,7 +572,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: wdi#si_rmt_cost_ob_zs
@@ -634,7 +587,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
@@ -653,7 +605,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded
@@ -666,7 +617,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded
@@ -679,7 +629,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded
@@ -692,7 +641,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded
@@ -705,7 +653,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded
@@ -718,7 +665,6 @@ views:
       period_radio: total_number
       sub_metric_radio: total
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded
@@ -731,7 +677,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
@@ -744,7 +689,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
@@ -757,7 +701,6 @@ views:
       period_radio: total_number
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
@@ -770,7 +713,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
@@ -783,7 +725,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
@@ -796,7 +737,6 @@ views:
       period_radio: annual_change
       sub_metric_radio: per_capita_share
       age_radio: all_ages
-      processing_radio: raw_data
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
