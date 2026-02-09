@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -24,7 +26,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Keep relevant countries
-    # https://api.census.gov/data/timeseries/idb/5  year/variables.html
+    # https://api.census.gov/data/timeseries/idb/5year/variables.html
     cols_index = ["country", "year"]
     cols_indicators = [
         "pop",
@@ -36,6 +38,15 @@ def run() -> None:
     tb = tb[cols].dropna(subset=cols_indicators, how="all")
 
     # Add region aggregates for World and continents
+    REGIONS = [
+        "World",
+        "Africa",
+        "North America",
+        "South America",
+        "Asia",
+        "Europe",
+        "Oceania",
+    ]
     aggregations = {
         "pop": "sum",
         "nim": "sum",
@@ -43,9 +54,11 @@ def run() -> None:
     tb = paths.regions.add_aggregates(
         tb=tb,
         aggregations=aggregations,
+        regions=REGIONS,
         min_frac_countries_informed=0.7,
         countries_that_must_have_data={"World": ["China", "India", "Indonesia", "United States"]},
     )
+    tb.loc[tb["country"] == "World", "nim"] = np.nan
 
     #
     # Save outputs.
