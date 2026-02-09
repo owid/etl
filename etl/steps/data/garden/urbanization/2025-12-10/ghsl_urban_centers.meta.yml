@@ -408,6 +408,24 @@ tables:
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
 
+     # Share of urban population in largest city
+     urban_pop_share_largest_city_estimates:
+        title: Share of urban population living in the largest city
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the urban population living in the country's largest city (typically the capital).
+        display:
+          numDecimalPlaces: 1
+
+     urban_pop_share_largest_city_projections:
+        title: Share of urban population living in the largest city (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the urban population living in the country's largest city (typically the capital).
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
      # City size - absolute population
      pop_citysize_below_300k_estimates:
         title: Population living in cities with less than 300,000 people
@@ -536,4 +554,54 @@ tables:
         description_short: Percentage of the total population living in urban centers with more than 5 million people (megacities).
         display:
           numDecimalPlaces: 1
+          isProjection: true
+
+     # Aggregates for cities >= 300k
+     pop_citysize_above_300k_estimates:
+        title: Population living in cities with 300,000 or more people
+        unit: people
+        description_short: Total population living in urban centers with 300,000 or more people.
+        display:
+          numDecimalPlaces: 0
+
+     pop_citysize_above_300k_projections:
+        title: Population living in cities with 300,000 or more people (projected)
+        unit: people
+        description_short: Total population living in urban centers with 300,000 or more people.
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+     popshare_citysize_above_300k_estimates:
+        title: Share of population living in cities with 300,000 or more people
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with 300,000 or more people.
+        display:
+          numDecimalPlaces: 1
+
+     popshare_citysize_above_300k_projections:
+        title: Share of population living in cities with 300,000 or more people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with 300,000 or more people.
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+     pop_citysize_above_300k_growth_rate_estimates:
+        title: Annual growth rate of population in cities with 300,000 or more people
+        unit: "%"
+        short_unit: "%"
+        description_short: Annual percentage change in the population living in urban centers with 300,000 or more people.
+        display:
+          numDecimalPlaces: 2
+
+     pop_citysize_above_300k_growth_rate_projections:
+        title: Annual growth rate of population in cities with 300,000 or more people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Annual percentage change in the population living in urban centers with 300,000 or more people.
+        display:
+          numDecimalPlaces: 2
           isProjection: true
