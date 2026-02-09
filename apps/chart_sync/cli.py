@@ -249,9 +249,10 @@ def cli(
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
                         synced_chart_ids.add(chart_id)
-                        # Collect dataset IDs from the chart's variables for archiving
-                        source_variables = diff.source_chart.load_chart_variables(source_session)
-                        synced_dataset_ids.update(v.datasetId for v in source_variables.values() if v.datasetId)
+                        # Collect dataset IDs from the TARGET chart's variables for archiving
+                        # We want to archive old datasets that are being replaced by new ones
+                        target_variables = diff.target_chart.load_chart_variables(target_session)
+                        synced_dataset_ids.update(v.datasetId for v in target_variables.values() if v.datasetId)
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
                             target_api.set_tags(chart_id, source_tags, user_id=user_id)
@@ -280,9 +281,7 @@ def cli(
                     if diff.is_approved:
                         charts_synced += 1
                         synced_chart_ids.add(chart_id)
-                        # Collect dataset IDs from the chart's variables for archiving
-                        source_variables = diff.source_chart.load_chart_variables(source_session)
-                        synced_dataset_ids.update(v.datasetId for v in source_variables.values() if v.datasetId)
+                        # Note: New charts don't have old datasets to archive, so no dataset IDs collected
                         if not dry_run:
                             resp = target_api.create_chart(migrated_config, user_id=user_id)
                             target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
@@ -673,26 +672,8 @@ def _archive_datasets_without_charts(
     datasets_archived = 0
     archived_datasets_info: list[dict] = []
 
-    # Query to find which of the given datasets have no charts in target
-    # A dataset has no charts if none of its variables appear in chart_dimensions
-    query = """
-    SELECT d.id, d.name, d.catalogPath
-    FROM datasets d
-    WHERE d.id IN :dataset_ids
-    AND d.isArchived = 0
-    AND NOT EXISTS (
-        SELECT 1
-        FROM variables v
-        JOIN chart_dimensions cd ON cd.variableId = v.id
-        WHERE v.datasetId = d.id
-    )
-    ORDER BY d.id
-    """
-
-    from sqlalchemy import text
-
-    result = target_session.execute(text(query), {"dataset_ids": tuple(dataset_ids)})
-    datasets_without_charts = result.fetchall()
+    # Find datasets that have no charts using their indicators
+    datasets_without_charts = gm.Dataset.load_datasets_without_charts(target_session, list(dataset_ids))
 
     if not datasets_without_charts:
         log.info("archive_datasets.none_found")
@@ -700,48 +681,37 @@ def _archive_datasets_without_charts(
 
     log.info("archive_datasets.start", n=len(datasets_without_charts))
 
-    for row in datasets_without_charts:
-        dataset_id = row[0]
-        dataset_name = row[1]
-        catalog_path = row[2]
-
-        # Check if the dataset is in the archive DAG
-        # The catalog path format is like "grapher/namespace/version/dataset/table#indicator"
-        # We need to convert it to DAG format: "data://grapher/namespace/version/dataset"
-        if catalog_path:
-            # Extract the dataset path (remove table#indicator part)
-            dataset_path = catalog_path.split("/")[:-1]  # Remove table#indicator
-            dag_step = "data://" + "/".join(dataset_path)
-
+    for dataset in datasets_without_charts:
+        # Check if the dataset is in the archive DAG using step_uri property
+        step_uri = dataset.step_uri
+        if step_uri:
             # Check if this step exists ONLY in the archive DAG (not in active DAG)
-            # The archive DAG includes active steps too via includes, so we need to check
-            # if the step is in archive but would not be in the active-only DAG
-            is_in_archive_only = dag_step in archive_dag_steps and dag_step not in active_dag_steps
+            is_in_archive_only = step_uri in archive_dag_steps and step_uri not in active_dag_steps
 
             if not is_in_archive_only:
                 log.info(
                     "archive_datasets.skip_not_in_archive_dag",
-                    dataset_id=dataset_id,
-                    name=dataset_name,
-                    catalog_path=catalog_path,
-                    dag_step=dag_step,
+                    dataset_id=dataset.id,
+                    name=dataset.name,
+                    catalog_path=dataset.catalogPath,
+                    step_uri=step_uri,
                 )
                 continue
         else:
             # No catalog path means we can't verify it's in the archive DAG, skip it
             log.info(
                 "archive_datasets.skip_no_catalog_path",
-                dataset_id=dataset_id,
-                name=dataset_name,
+                dataset_id=dataset.id,
+                name=dataset.name,
             )
             continue
 
-        log.info("archive_datasets.archive", dataset_id=dataset_id, name=dataset_name, catalog_path=catalog_path)
+        log.info("archive_datasets.archive", dataset_id=dataset.id, name=dataset.name, catalog_path=dataset.catalogPath)
         datasets_archived += 1
-        archived_datasets_info.append({"id": dataset_id, "name": dataset_name, "catalogPath": catalog_path})
+        archived_datasets_info.append({"id": dataset.id, "name": dataset.name, "catalogPath": dataset.catalogPath})
 
         if not dry_run:
-            target_api.set_dataset_archived(dataset_id, is_archived=True)
+            target_api.set_dataset_archived(dataset.id, is_archived=True)
 
     # Send Slack notification about archived datasets
     if archived_datasets_info:

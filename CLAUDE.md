@@ -132,6 +132,13 @@ df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 
 Get `--help` for details on any command.
 
+### Fast File Searching
+
+Use `rg` (ripgrep) instead of `find -exec grep` - it's ~100x faster:
+```bash
+rg -l "pattern" -g "*.py" -g "!.venv"
+```
+
 ## Package Management
 
 Use `uv` (not pip):

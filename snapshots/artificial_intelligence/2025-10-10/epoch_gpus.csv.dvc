@@ -1,5 +1,7 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+autoupdate:
+  name: Epoch
 meta:
   origin:
     # Data product / Snapshot

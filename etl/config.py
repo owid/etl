@@ -96,6 +96,7 @@ PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
+R2_BUCKET_PRIVATE = "owid-catalog-private"
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
 R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
@@ -548,6 +549,17 @@ class OWIDEnv:
     def indicators_url(self) -> str:
         """Get indicators url."""
         return self.data_api_url + "/v1/indicators"
+
+    @property
+    def catalog_url(self) -> str:
+        """Get catalog url."""
+        if self.env_remote == "production":
+            return "https://catalog.ourworldindata.org"
+        elif self.env_remote == "staging":
+            return f"http://{self.conf.DB_HOST}:8881"
+        else:
+            # For local dev, use production catalog
+            return "https://catalog.ourworldindata.org"
 
     @property
     def wizard_url(self) -> str:

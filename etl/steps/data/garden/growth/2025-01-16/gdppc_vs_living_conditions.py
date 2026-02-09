@@ -168,8 +168,11 @@ def run() -> None:
     )
 
     # UNWTO
-    tb_unwto = tb_unwto[["country", "year", "out_tour_departures_ovn_vis_tourists_per_1000"]].rename(
-        columns={"out_tour_departures_ovn_vis_tourists_per_1000": "tourist_departures_per_1000_people"}, errors="raise"
+    tb_unwto = tb_unwto[["country", "year", "out_tour_departures_trips_total_overnight_vis_tourists_per_1000"]].rename(
+        columns={
+            "out_tour_departures_trips_total_overnight_vis_tourists_per_1000": "tourist_departures_per_1000_people"
+        },
+        errors="raise",
     )
 
     # Penn World Table

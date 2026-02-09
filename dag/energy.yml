@@ -285,17 +285,17 @@ steps:
   data://grapher/lazard/2025-09-17/levelized_cost_of_energy:
     - data://garden/lazard/2025-09-17/levelized_cost_of_energy
   #
-  # Rupert Way - Historical energy costs (private dataset for internal research).
+  # Rupert Way - Historical energy costs.
   #
   data-private://meadow/energy/2025-09-18/historical_energy_costs:
     - snapshot-private://energy/2025-09-18/historical_energy_costs.xlsx
   #
-  # Rupert Way - Historical energy costs (private dataset for internal research).
+  # Rupert Way - Historical energy costs.
   #
   data-private://garden/energy/2025-09-18/historical_energy_costs:
     - data-private://meadow/energy/2025-09-18/historical_energy_costs
   #
-  # Rupert Way - Historical energy costs (private dataset for internal research).
+  # Rupert Way - Historical energy costs.
   #
   data-private://grapher/energy/2025-09-18/historical_energy_costs:
     - data-private://garden/energy/2025-09-18/historical_energy_costs
@@ -330,6 +330,25 @@ steps:
   #
   data-private://grapher/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
     - data-private://garden/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices
+
+  #
+  # Energy innovation in the long run (Fouquet 2026)
+  #
+  data://meadow/light/2025-12-29/energy_innovation_long_run:
+    - snapshot://light/2025-12-29/energy_innovation_long_run.xlsx
+  data://garden/light/2025-12-29/energy_innovation_long_run:
+    - data://meadow/light/2025-12-29/energy_innovation_long_run
+    - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
+    - data://garden/ons/2025-12-31/cpi_uk
+    - data://garden/ons/2025-12-31/average_weekly_earnings_uk
+  data://grapher/light/2025-12-29/energy_innovation_long_run:
+    - data://garden/light/2025-12-29/energy_innovation_long_run
+
+  data://garden/light/2026-01-21/energy_innovation_long_run:
+    - data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data
+    - data://meadow/light/2025-12-29/energy_innovation_long_run
+  data://grapher/light/2026-01-21/energy_innovation_long_run:
+    - data://garden/light/2026-01-21/energy_innovation_long_run
   #
   # Energy - OWID Energy dataset.
   #

@@ -8,3 +8,18 @@ steps:
     - data://meadow/survey/2024-04-01/dietary_choices_uk
   data://grapher/survey/2024-04-01/dietary_choices_uk:
     - data://garden/survey/2024-04-01/dietary_choices_uk
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://meadow/survey/2025-03-04/dietary_choices_uk:
+    - snapshot://survey/2025-03-04/dietary_choices_uk.xlsx
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://garden/survey/2025-03-04/dietary_choices_uk:
+    - data://meadow/survey/2025-03-04/dietary_choices_uk
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://grapher/survey/2025-03-04/dietary_choices_uk:
+    - data://garden/survey/2025-03-04/dietary_choices_uk
