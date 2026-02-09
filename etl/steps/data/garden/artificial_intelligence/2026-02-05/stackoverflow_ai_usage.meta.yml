@@ -11,9 +11,9 @@ definitions:
       numDecimalPlaces: 1
 
     description_key:
-      - This indicator shows how professional developers responded to a question about AI tool usage in the Stack Overflow Developer Survey, conducted annually since 2023.
+      - This indicator shows how professional developers responded to a question about AI tool usage in the annual Stack Overflow Developer Survey.
       - Respondents are self-selected professional developers who chose to participate in the survey. Results may not be representative of all developers worldwide.
-      - In 2025, Stack Overflow changed the question to ask about usage frequency (daily, weekly, or monthly/infrequently) rather than a simple yes/no. A collapsed "Yes" value is included for cross-year comparability.
+      - In 2025, Stack Overflow changed the question to ask about usage frequency (daily, weekly, or monthly/infrequently) rather than a simple yes/no. We collapse these into a "Yes" value for cross-year comparability.
       - The number of respondents per year ranges from {response_range}.
     description_processing: We set the baseline at 0% in 2020, as the first mainstream AI coding assistants were not available to developers until 2021.
 
@@ -27,7 +27,7 @@ tables:
         title: Share of professional software developers using AI tools
         unit: "%"
         short_unit: "%"
-        description_short: Share of positive responses among professional developers to the question, "Do you currently use AI tools in your development process?"
+        description_short: Share of positive responses among professional developers to the question, "Do you currently use AI tools in your development process?".
 
       no_but_plan_to_soon:
         title: Share of developers planning to use AI tools soon
@@ -58,4 +58,3 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Share of responses among professional developers to the question, "Do you currently use AI tools in your development process?", who said they use AI tools monthly or infrequently. Only available from 2025.
-
