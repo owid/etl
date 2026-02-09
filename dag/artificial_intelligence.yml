@@ -8,6 +8,14 @@ steps:
   data://grapher/artificial_intelligence/2026-01-30/frontiermath:
     - data://garden/artificial_intelligence/2026-01-30/frontiermath
 
+  # Stack Overflow Developer Survey – AI tool usage
+  data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
+    - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
+  data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
+    - data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage
+  data://grapher/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
+    - data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage
+
   # Main EPOCH dataset
   data://meadow/artificial_intelligence/2025-03-12/epoch:
     - snapshot://artificial_intelligence/2025-03-12/epoch.csv
