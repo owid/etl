@@ -202,17 +202,6 @@ layout: section
 
 ---
 
-# Future Directions
-
-**Context Window Search**: Fit all our data into LLM context window
-
-- Load entire dataset metadata into context
-- Use prompt caching to reduce costs
-- Search directly within the LLM
-- Potentially better understanding of relationships and context
-- Challenge: Keeping data fresh and handling updates
-
----
 
 # Vocabulary: The Foundation
 
@@ -252,42 +241,6 @@ layout: section
 
 ---
 
-# The Trade-off Matrix
-
-**Cost & Latency vs. Context Awareness & Intelligence**
-
-<div class="relative" style="height: 400px;">
-
-<div class="absolute" style="left: 10%; bottom: 10%;">
-  <strong>Keyword (Algolia)</strong><br/>
-  Free • 10-50ms<br/>
-  <span class="text-sm opacity-75">Low intelligence</span>
-</div>
-
-<div class="absolute" style="left: 40%; bottom: 35%;">
-  <strong>Semantic Search</strong><br/>
-  $10-15/mo • 50-200ms<br/>
-  <span class="text-sm opacity-75">Moderate intelligence</span>
-</div>
-
-<div class="absolute" style="left: 50%; bottom: 50%; border: 3px dashed orange; padding: 1rem; border-radius: 8px;">
-  <strong>Hybrid Search</strong><br/>
-  $20/mo • 100-300ms<br/>
-  <span class="text-sm opacity-75">✨ Production Sweet Spot</span>
-</div>
-
-<div class="absolute" style="right: 10%; top: 10%;">
-  <strong>Agentic RAG</strong><br/>
-  $200/mo • 1-5s<br/>
-  <span class="text-sm opacity-75">🎯 Research Prototype</span>
-</div>
-
-</div>
-
-<div class="text-center mt-4 text-sm opacity-75">
-← Lower Cost/Latency — — — — Higher Cost/Latency →
-</div>
-
 ---
 layout: section
 ---
@@ -320,18 +273,19 @@ layout: section
 
 ---
 
-# Pitch 2: Query Expansion Guide
+# Pitch 2: Suggested Keywords
 
 **Problem**: Users don't know what terms to search for
 
-**Solution**: Auto-suggest based on controlled vocabulary
-- Real-time suggestions as user types
-- Powered by vocabulary mappings
-- Show popular/related searches
+**Solution**: Show related search keywords as user types
+- Real-time keyword suggestions
+- Based on vocabulary from our charts/articles
+- Help users refine their queries
 
 **Implementation**:
-- Build vocabulary index from our charts/articles
-- Semantically search the vocabulary index
+- Build vocabulary index from our content
+- Semantic search over the vocabulary
+- Display relevant keywords dynamically
 
 **Benefits**:
 - Guide users to successful queries
@@ -370,7 +324,7 @@ layout: section
 
 ---
 
-# Pitch 4: The Production Sweet Spot
+# Pitch 4: Semantic Search on Cloudflare
 
 **Approach**: Semantic search + query rewriting + reranking via Cloudflare AI Search
 
@@ -393,7 +347,7 @@ layout: section
 
 ---
 
-# Pitch 5: The 'North Star' Prototype
+# Pitch 5: Agentic Search
 
 **Approach**: LLM agent orchestrates the entire search process
 
@@ -500,16 +454,25 @@ layout: section
 
 # Problematic Queries
 
-Examples of queries that are particularly challenging
+**Real examples from testing that highlight system limitations**
 
-*Add specific problematic queries from your testing*
+**Zero Results (should find content):**
+- "public school funding"
+- "road traffic deaths age"
+- "average hours of work per week"
 
-Example categories:
-- Ambiguous queries
-- Multi-intent queries
-- Highly specific technical terms
-- Queries requiring multiple datasets
-- Queries with implicit context
+**Vocabulary Mismatch:**
+- "poland modern economic miracle" → needs "GDP growth" understanding
+- "is Italy richer then France?" → needs "GDP per capita" concept
+
+**Natural Language Understanding:**
+- "How has life expectancy changed over time?" → needs time-series intent
+- "physical exercise" → returns child labor topics
+
+**Ambiguous/Multi-intent:**
+- "population" → shows Mpox statistics instead of demographics
+- "populism" → returns population data
+- "money" → shows military expenditures
 
 ---
 layout: center
@@ -559,6 +522,11 @@ layout: center
   - Understand cost/benefit tradeoffs
   - Learn what's possible with LLMs
   - Guide future strategy
+
+- **Context Window Search**
+  - Load entire dataset metadata into LLM context
+  - Prompt caching to reduce costs
+  - Direct search within the LLM
 
 </div>
 
