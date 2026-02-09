@@ -45,27 +45,22 @@ def run() -> None:
         run_percent=True,
     )
 
-    # Split into two tables: one for deaths, one for DALYs
-    tb_deaths = tb[tb["measure"] == "Deaths"].copy()
-
-    # Drop the measure column
-    tb_deaths = tb_deaths.drop(columns="measure")
-
+    assert all(tb["measure"] == "Deaths")
     # Add all forms of violence together - for Deaths only
-    tb_deaths = add_all_forms_of_violence(tb_deaths)
+    tb = add_all_forms_of_violence(tb)
     # Create a category for all infectious diseases - for Deaths only
-    tb_deaths = add_infectious_diseases(tb_deaths)
+    tb = add_infectious_diseases(tb)
     # Aggregate all cancers which cause less than 200,000 deaths a year - for Deaths only
-    tb_deaths = add_cancer_other_aggregates(tb_deaths)
+    tb = add_cancer_other_aggregates(tb)
     # Format the tables
-    tb_deaths = tb_deaths.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
+    tb = tb.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb_deaths],
+        tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         # Table has optimal types already and repacking can be time consuming.

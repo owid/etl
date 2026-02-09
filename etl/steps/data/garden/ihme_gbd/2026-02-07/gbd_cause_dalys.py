@@ -42,24 +42,22 @@ def run() -> None:
         age_group_mapping=AGE_GROUPS_RANGES,
         run_percent=True,
     )
-
-    # Split into two tables: one for deaths, one for DALYs
-    tb_dalys = tb[tb["measure"] == "DALYs (Disability-Adjusted Life Years)"].copy()
+    assert all(tb["measure"] == "DALYs (Disability-Adjusted Life Years)")
     # Shorten the metric name for DALYs
-    tb_dalys["measure"] = "DALYs"
+    tb["measure"] = "DALYs"
 
     # Drop the measure column
-    tb_dalys = tb_dalys.drop(columns="measure")
+    tb = tb.drop(columns="measure")
 
     # Format the tables
-    tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
+    tb = tb.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb_dalys],
+        tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         # Table has optimal types already and repacking can be time consuming.

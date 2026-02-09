@@ -3,11 +3,42 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# The list of causes as they are found in the GBD that are needed for the treemap
+GBD_CAUSES = [
+    "Cardiovascular diseases",
+    "Chronic respiratory diseases",
+    "Conflict and terrorism",
+    "Diabetes and kidney diseases",
+    "Diarrheal diseases",
+    "Enteric infections",
+    "Falls",
+    "HIV/AIDS",
+    "HIV/AIDS and sexually transmitted infections",
+    "Interpersonal violence",
+    "Malaria",
+    "Maternal disorders",
+    "Mental disorders",
+    "Musculoskeletal disorders",
+    "Neglected tropical diseases and malaria",
+    "Neonatal disorders",
+    "Neoplasms",
+    "Neurological disorders",
+    "Nutritional deficiencies",
+    "Other infectious diseases",
+    "Other non-communicable diseases",
+    "Respiratory infections and tuberculosis",
+    "Self-harm",
+    "Skin and subcutaneous diseases",
+    "Substance use disorders",
+    "Transport injuries",
+    "Tuberculosis",
+]
+
 
 cause_renaming_dict = {
     "Cardiovascular diseases": "Heart diseases",
@@ -53,16 +84,18 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("gbd_treemap")
-
+    # ds_meadow = paths.load_dataset("gbd_cause_deaths")
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_treemap"].reset_index()
+    # tb = ds_meadow["gbd_cause_deaths"].reset_index()
+    # Filter out just the useful parts
+    # tb = tb[(tb["metric"] == "Number") & (tb["cause"].isin(GBD_CAUSES))]
+    # tb = tb.drop(columns=["population_group_name", "measure"])
+    tb = tb.drop(columns=["measure"])
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Drop the measure column
-    tb = tb.drop(columns="measure")
+    tb = paths.regions.harmonize_names(tb)
 
     # Reaggregate causes
     tb = reaggregate_causes(tb)
