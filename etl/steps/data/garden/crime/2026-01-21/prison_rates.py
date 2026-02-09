@@ -19,7 +19,7 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
     # Read table from meadow dataset.
     tb = ds_meadow.read("prison_rates")
-    # Don't keep this
+    # Drop rows without a year, since they cannot be used in time-series analysis or aggregated by year.
     tb = tb.dropna(subset="year")
 
     #

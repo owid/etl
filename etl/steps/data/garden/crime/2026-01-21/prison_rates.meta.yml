@@ -59,13 +59,13 @@ tables:
           numDecimalPlaces: 0
       official_capacity:
         title: Prison capacity
-        description_short: The occupancy level of prisons is based on the official capacity. Values of above 100% indicate that the number of prisoners exceeds the official capacity of prisons in the country.
+        description_short: Total official capacity of prisons, measured as the number of places available for prisoners.
         unit: places
         display:
           numDecimalPlaces: 0
       occupancy_level_pct:
         title: Prison capacity percent
-        description_short: The occupancy level of prisons, based on the official capacity.
+        description_short: Occupancy level of prisons, based on the official capacity; values above 100% indicate that the prison population exceeds official capacity and reflects overcrowding.
         unit: "%"
         short_unit: "%"
         display:

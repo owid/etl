@@ -46,7 +46,7 @@ def get_country_names() -> List[dict]:
     for name in df["Title"].dropna():
         slug = (
             name.lower()
-            .replace(r"[()/:,&.'']", "")
+
             .replace("(", "")
             .replace(")", "")
             .replace("/", "")
@@ -367,47 +367,6 @@ def _clean_trend_table(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop_duplicates().reset_index(drop=True)
 
 
-def _clean_pretrial_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Clean and normalize a pre-trial/remand imprisonment table."""
-    df = df.copy()
-    df.columns = [str(c).strip() for c in df.columns]
-
-    # Clean year column
-    if "Year" in df.columns:
-        df["Year"] = pd.to_numeric(df["Year"], errors="coerce")
-        df = df.dropna(subset=["Year"]).sort_values("Year")
-
-    # Clean numeric columns
-    numeric_cols = {
-        "Number in pre-trial/remand imprisonment": "pretrial_remand_number",
-        "Percentage of total prison population": "pretrial_remand_pct",
-        "Pre-trial/remand population rate (per 100,000 of national population)": "pretrial_remand_rate",
-    }
-
-    for orig_col, new_col in numeric_cols.items():
-        if orig_col in df.columns:
-            # Clean the column values
-            df[orig_col] = (
-                df[orig_col]
-                .astype(str)
-                .str.replace(r"^\s*(c\.|circa)\s*", "", regex=True)  # remove leading "c." / "circa"
-                .str.replace(",", "", regex=False)
-                .str.replace(" ", "", regex=False)
-                .str.replace("%", "", regex=False)  # remove percentage signs
-                .str.strip()
-            )
-            df[orig_col] = pd.to_numeric(df[orig_col], errors="coerce")
-
-    # Rename columns to match snapshot naming convention
-    df = df.rename(
-        columns={
-            "Year": "year",
-            **numeric_cols,
-        }
-    )
-
-    return df.drop_duplicates().reset_index(drop=True)
-
 
 def _extract_pretrial_table(soup: BeautifulSoup, country_name: str) -> pd.DataFrame:
     """
@@ -598,7 +557,8 @@ def fetch_wpb_country(country_slug: str, country_name: str):
         if match:
             year_2digit = int(match.group(1))
             # Convert 2-digit year to 4-digit (assuming 20xx for values <= current year % 100, else 19xx)
-            return 2000 + year_2digit if year_2digit <= 99 else 1900 + year_2digit
+            current_year_2digit = datetime.now().year % 100
+            return 2000 + year_2digit if year_2digit <= current_year_2digit else 1900 + year_2digit
         return None
 
     snapshot_df = pd.DataFrame(
