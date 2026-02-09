@@ -407,3 +407,133 @@ tables:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
+
+     # City size - absolute population
+     pop_citysize_below_300k_estimates:
+        title: Population living in cities with less than 300,000 people
+        unit: people
+        description_short: Total population living in urban centers with fewer than 300,000 people.
+        display:
+          numDecimalPlaces: 0
+
+     pop_citysize_below_300k_projections:
+        title: Population living in cities with less than 300,000 people (projected)
+        unit: people
+        description_short: Total population living in urban centers with fewer than 300,000 people.
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+     pop_citysize_300k_1m_estimates:
+        title: Population living in cities with 300,000 to 1 million people
+        unit: people
+        description_short: Total population living in urban centers with 300,000 to 1 million people.
+        display:
+          numDecimalPlaces: 0
+
+     pop_citysize_300k_1m_projections:
+        title: Population living in cities with 300,000 to 1 million people (projected)
+        unit: people
+        description_short: Total population living in urban centers with 300,000 to 1 million people.
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+     pop_citysize_1m_5m_estimates:
+        title: Population living in cities with 1 to 5 million people
+        unit: people
+        description_short: Total population living in urban centers with 1 to 5 million people.
+        display:
+          numDecimalPlaces: 0
+
+     pop_citysize_1m_5m_projections:
+        title: Population living in cities with 1 to 5 million people (projected)
+        unit: people
+        description_short: Total population living in urban centers with 1 to 5 million people.
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+     pop_citysize_above_5m_estimates:
+        title: Population living in cities with more than 5 million people
+        unit: people
+        description_short: Total population living in urban centers with more than 5 million people (megacities).
+        display:
+          numDecimalPlaces: 0
+
+     pop_citysize_above_5m_projections:
+        title: Population living in cities with more than 5 million people (projected)
+        unit: people
+        description_short: Total population living in urban centers with more than 5 million people (megacities).
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+     # City size - population shares
+     popshare_citysize_below_300k_estimates:
+        title: Share of population living in cities with less than 300,000 people
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with fewer than 300,000 people.
+        display:
+          numDecimalPlaces: 1
+
+     popshare_citysize_below_300k_projections:
+        title: Share of population living in cities with less than 300,000 people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with fewer than 300,000 people.
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+     popshare_citysize_300k_1m_estimates:
+        title: Share of population living in cities with 300,000 to 1 million people
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with 300,000 to 1 million people.
+        display:
+          numDecimalPlaces: 1
+
+     popshare_citysize_300k_1m_projections:
+        title: Share of population living in cities with 300,000 to 1 million people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with 300,000 to 1 million people.
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+     popshare_citysize_1m_5m_estimates:
+        title: Share of population living in cities with 1 to 5 million people
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with 1 to 5 million people.
+        display:
+          numDecimalPlaces: 1
+
+     popshare_citysize_1m_5m_projections:
+        title: Share of population living in cities with 1 to 5 million people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with 1 to 5 million people.
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+     popshare_citysize_above_5m_estimates:
+        title: Share of population living in cities with more than 5 million people
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with more than 5 million people (megacities).
+        display:
+          numDecimalPlaces: 1
+
+     popshare_citysize_above_5m_projections:
+        title: Share of population living in cities with more than 5 million people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in urban centers with more than 5 million people (megacities).
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
