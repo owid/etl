@@ -46,7 +46,6 @@ def get_country_names() -> List[dict]:
     for name in df["Title"].dropna():
         slug = (
             name.lower()
-
             .replace("(", "")
             .replace(")", "")
             .replace("/", "")
@@ -365,7 +364,6 @@ def _clean_trend_table(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df.drop_duplicates().reset_index(drop=True)
-
 
 
 def _extract_pretrial_table(soup: BeautifulSoup, country_name: str) -> pd.DataFrame:
