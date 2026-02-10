@@ -74,7 +74,7 @@ ADDITIONAL_MAPPINGS = {
 }
 
 
-def sanity_check_data_overlap(tb, tb_latest, index_columns: list[str], *, plot=False) -> None:
+def sanity_check_data_overlap(tb, tb_latest, plot=False) -> None:
     tb = tb.copy()
     tb_latest = tb_latest.copy()
     index_columns = ["country", "year"]
@@ -170,7 +170,7 @@ def run() -> None:
 
     # Compare Pinto's and Ember's data for different sources.
     # Turn plot=True for visual inspection.
-    sanity_check_data_overlap(tb, tb_latest, index_columns=["country", "year"], plot=False)
+    sanity_check_data_overlap(tb, tb_latest, plot=False)
 
     # Combine global historical data from Pinto with Ember's global data.
     # Where there's overlap, prioritize Ember's recent data.
