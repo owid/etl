@@ -1246,7 +1246,7 @@ steps:
 
     # GBD 2023 data for bespoke treemap project
   data://meadow/ihme_gbd/2025-10-13/gbd_treemap:
-    - snapshot://ihme_gbd/2025-10-13/gbd_treemap.feather
+    - snapshot-private://ihme_gbd/2025-10-13/gbd_treemap.feather
   data://garden/ihme_gbd/2025-10-13/gbd_treemap:
     - data://meadow/ihme_gbd/2025-10-13/gbd_treemap
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_cause_deaths

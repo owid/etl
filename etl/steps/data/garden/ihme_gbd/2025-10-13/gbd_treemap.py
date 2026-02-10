@@ -8,37 +8,6 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# The list of causes as they are found in the GBD that are needed for the treemap
-GBD_CAUSES = [
-    "Cardiovascular diseases",
-    "Chronic respiratory diseases",
-    "Conflict and terrorism",
-    "Diabetes and kidney diseases",
-    "Diarrheal diseases",
-    "Enteric infections",
-    "Falls",
-    "HIV/AIDS",
-    "HIV/AIDS and sexually transmitted infections",
-    "Interpersonal violence",
-    "Malaria",
-    "Maternal disorders",
-    "Mental disorders",
-    "Musculoskeletal disorders",
-    "Neglected tropical diseases and malaria",
-    "Neonatal disorders",
-    "Neoplasms",
-    "Neurological disorders",
-    "Nutritional deficiencies",
-    "Other infectious diseases",
-    "Other non-communicable diseases",
-    "Respiratory infections and tuberculosis",
-    "Self-harm",
-    "Skin and subcutaneous diseases",
-    "Substance use disorders",
-    "Transport injuries",
-    "Tuberculosis",
-]
-
 
 cause_renaming_dict = {
     "Cardiovascular diseases": "Heart diseases",
@@ -84,13 +53,8 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("gbd_treemap")
-    # ds_meadow = paths.load_dataset("gbd_cause_deaths")
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_treemap"].reset_index()
-    # tb = ds_meadow["gbd_cause_deaths"].reset_index()
-    # Filter out just the useful parts
-    # tb = tb[(tb["metric"] == "Number") & (tb["cause"].isin(GBD_CAUSES))]
-    # tb = tb.drop(columns=["population_group_name", "measure"])
     tb = tb.drop(columns=["measure"])
     #
     # Process data.
@@ -101,12 +65,7 @@ def run() -> None:
     tb = reaggregate_causes(tb)
     # Rename causes
     tb = rename_causes(tb=tb, cause_renaming_dict=cause_renaming_dict, broad_cause_dict=broad_cause_dict)
-    # Check for duplicates
-    # index_cols = ["country", "age", "cause", "metric", "year"]
-    # duplicates = tb[tb.duplicated(subset=index_cols, keep=False)]
-    # if len(duplicates) > 0:
-    #    print(f"\nFound {len(duplicates)} duplicate rows:")
-    #    print(duplicates.sort_values(index_cols))
+    tb = tb.drop(columns=["population_group_name"])
     # Format the tables
     tb = tb.format(["country", "year", "broad_cause", "cause", "metric", "age", "sex"], short_name="gbd_treemap")
 
@@ -320,8 +279,8 @@ def pull_out_cause(
         tb_residual["residual_value"] = tb_residual["residual_value"] - tb_residual["value"].fillna(0)
         tb_residual = tb_residual.drop(columns=["value"])
 
-    # Validate that residual values are non-negative
-    negative_residuals = tb_residual[tb_residual["residual_value"] < 0]
+    # Validate that residual values are non-negative, use round to omit very small negatives
+    negative_residuals = tb_residual[tb_residual["residual_value"].round(0) < 0]
     if len(negative_residuals) > 0:
         causes_str = "', '".join(pull_out_causes)
         raise ValueError(
