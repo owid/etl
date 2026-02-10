@@ -37,9 +37,15 @@ tables:
         description_short: |-
           The average number of children a woman would have by age 49 if current age-specific fertility rates remained constant.
         description_key:
-          - The TFT assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
+          - The TFR assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
           - A TFR of 2.1 is generally considered the [replacement level](https://ourworldindata.org/grapher/replacement-fertility-rate) in developed countries, meaning the population would remain stable without migration.
+          - Regional aggregates (e.g. continents) are computed from age-specific birth and female population data, not by averaging country-level TFRs.
+        description_processing: |-
+          Regional aggregates (e.g. continents) are computed from age-specific birth and female population data, not by averaging country-level TFRs.
+
+          For each 5-year age group (15–19 to 45–49), we sum births and female population across countries in the region, then compute TFR = 5 × Σ(births_age / fpop_age). For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data).
+
         unit: live births per woman
         short_unit: ""
         display:
