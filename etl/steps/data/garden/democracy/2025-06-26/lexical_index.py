@@ -98,6 +98,10 @@ def run() -> None:
     #
     # Process data.
     #
+    # Harmonize country names
+    ## Harmonize country names
+    tb = paths.regions.harmonize_names(tb)
+
     # Initial cleaning
     tb = preprocess(tb)
 
@@ -110,17 +114,24 @@ def run() -> None:
     # Create variable for universal suffrage
     tb = add_universal_suffrage(tb)
 
+    # Add "Elections for chief executive and legislature"
+    tb["exe_leg_elec_lied"] = ((tb["exelec_lied"] == 1) & (tb["legelec_lied"] == 1)).astype("Int64")
+
     # Dtypes
-    tb["age_electdem_lied"] = tb["age_electdem_lied"].astype("string")
-    tb["age_polyarchy_lied"] = tb["age_polyarchy_lied"].astype("string")
+    tb = tb.astype(
+        {
+            "age_electdem_lied": "string",
+            "age_polyarchy_lied": "string",
+        }
+    )
 
     # Checks on countries
     assert set(
         tb.loc[tb["country"].str.contains("Germany") & (tb["year"] < 1990) & (tb["year"] > 1944), "country"]
-    ) == {"East Germany", "West Germany"}, "Other versions of Germany!"
+    ) == {"East Germany", "West Germany"}, "Other versions of Germany between 1944-1990!"
     assert set(
         tb.loc[tb["country"].str.contains("Germany") & ((tb["year"] >= 1990) | (tb["year"] <= 1944)), "country"]
-    ) == {"Germany"}, "Other versions of Germany!"
+    ) == {"Germany"}, "Other versions of Germany in ≤1944 or ≥1990!"
 
     # Impute values
     col_flag_imputed = "values_imputed"
@@ -160,11 +171,6 @@ def preprocess(tb: Table) -> Table:
 
     Includes: removing NaNs, fixing bugs, sanity checks, renaming and selecting relevant columns.
     """
-    ## Harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
     # Rename columns of interest
     tb = rename_columns(tb)
 
@@ -200,7 +206,7 @@ def preprocess(tb: Table) -> Table:
             # Democratic transition
             "democratic_transition",
             "transition_type",
-            # DEmocratic breakdown
+            # Democratic breakdown
             "democratic_breakdown",
             "breakdown_type",
         ],

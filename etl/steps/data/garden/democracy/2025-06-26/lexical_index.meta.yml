@@ -42,6 +42,16 @@ tables:
 
           Equivalent indicator: `legislative_elections`
 
+      exe_leg_elec_lied:
+        title: Elections for chief executive and legislature
+        unit: ""
+        description_short: |-
+          The variable indicates whether some citizens elect a legislature which does issue some laws, but does not perform executive functions.
+        description_processing: |-
+          Takes on the value of 1 if indicators "Legislative elections" and "Elections for chief executive" have the value of 1, otherwise 0.
+        description_from_producer: |-
+          Estimated from indicators: `legislative_elections` and `executive_elections`
+
       opposition_lied:
         title: Political opposition
         unit: ""
