@@ -258,3 +258,21 @@ steps:
     - data://meadow/emissions/2023-10-24/emission_factors
   data://grapher/emissions/2023-10-24/emission_factors:
     - data://garden/emissions/2023-10-24/emission_factors
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://meadow/climate_watch/2025-09-19/emissions_by_sector:
+    - snapshot://climate_watch/2025-09-19/emissions_by_sector.gz
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://garden/climate_watch/2025-09-19/emissions_by_sector:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/climate_watch/2025-09-19/emissions_by_sector
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://grapher/climate_watch/2025-09-19/emissions_by_sector:
+    - data://garden/climate_watch/2025-09-19/emissions_by_sector
