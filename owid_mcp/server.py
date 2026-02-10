@@ -84,6 +84,7 @@ mcp = FastMCP(
         ]
     ),
     lifespan=lifespan,
+    stateless_http=True,
 )
 
 
@@ -138,4 +139,4 @@ mcp.add_middleware(
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)
+    mcp.run(transport="http", host="0.0.0.0", port=8080)
