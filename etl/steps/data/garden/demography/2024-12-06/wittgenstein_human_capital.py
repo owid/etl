@@ -7,15 +7,25 @@ NOTES (January 2026):
 
 from typing import List
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
+from shared import get_index_columns
 
 from etl.helpers import PathFinder
 
-from .shared import get_index_columns
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Regions to add as aggregates
+REGIONS = [
+    "Africa",
+    "North America",
+    "South America",
+    "Asia",
+    "Europe",
+    "Oceania",
+]
 # Not all columns are present in historical and projections datasets. This dictionary contains the expected differences.
 TABLE_COLUMN_DIFFERENCES = {
     "by_edu": {
@@ -95,7 +105,8 @@ def run() -> None:
     #
     assert tbs_proj.keys() == tbs_hist.keys(), "Mismatch in tables between historical and projection datasets"
 
-    tables = []
+    # Build all tables (without formatting, so we can do cross-table TFR computation)
+    tables_raw = {}
     for key in tbs_proj.keys():
         paths.log.info(f"Building {key}")
 
@@ -123,15 +134,47 @@ def run() -> None:
             tb = pr.concat([tb_proj[columns_common], tb_hist[columns_common]], ignore_index=True)
             tb = tb.drop_duplicates(subset=index, keep="first")
 
-        # Format
+        # Harmonize country names
+        tb = paths.regions.harmonize_names(tb=tb)
+
+        # Add region aggregates where applicable
+        if key == "by_sex_age_edu":
+            tb = paths.regions.add_aggregates(
+                tb=tb,
+                aggregations={"pop": "sum"},
+                index_columns=["country", "year", "scenario", "sex", "age", "education"],
+                regions=REGIONS,
+                min_frac_countries_informed=0.7,
+            )
+        elif key == "by_sex_age":
+            tb = paths.regions.add_aggregates(
+                tb=tb,
+                aggregations={"net": "sum"},
+                index_columns=["country", "year", "scenario", "sex", "age"],
+                regions=REGIONS,
+                min_frac_countries_informed=0.7,
+            )
+            # World net migration is meaningless (closed system)
+            tb.loc[tb["country"] == "World", "net"] = np.nan
+
+        tables_raw[key] = tb
+
+    # Compute regional TFR from ASFR + female pop (cross-table)
+    paths.log.info("Computing regional TFR from ASFR + female pop")
+    tables_raw = _compute_regional_tfr(tables_raw)
+
+    # Format all tables
+    tables = []
+    for key, tb in tables_raw.items():
+        index = get_index_columns(tb)
         tb = tb.format(index, short_name=key)
 
         # Reduce origins
         for col in tb.columns:
             tb[col].metadata.origins = [tb[col].metadata.origins[0]]
 
-        # Add to list
         tables.append(tb)
+
     #
     # Save outputs.
     #
@@ -143,6 +186,60 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def _compute_regional_tfr(tables_raw: dict[str, Table]) -> dict:
+    """Compute regional TFR from ASFR and female population data (cross-table).
+
+    TFR is a rate and cannot be summed or averaged. We reconstruct it from:
+    TFR_region = 5 × Σ_age( Σ_countries(ASFR × fpop) / Σ_countries(fpop) ) / 1000
+
+    ASFR lives in by_age_edu, female pop in by_sex_age_edu. We merge, compute births, aggregate to regions, then derive TFR. add_aggregates handles filtering to member countries only, so source-level regions (World, UNSD) are automatically excluded.
+    """
+    # Get ASFR (only rows with data, i.e. reproductive ages)
+    tb_asfr = (
+        tables_raw["by_age_edu"]
+        .loc[:, ["country", "year", "scenario", "age", "education", "asfr"]]
+        .dropna(subset=["asfr"])
+        .copy()
+    )
+
+    # Get female pop, filter to reproductive ages
+    tb_fpop = tables_raw["by_sex_age_edu"]
+    tb_fpop = tb_fpop.loc[
+        tb_fpop["sex"] == "female", ["country", "year", "scenario", "age", "education", "pop"]
+    ].rename(columns={"pop": "fpop"})
+
+    # Merge and compute births (ASFR is per 1000 women)
+    tb_temp = tb_asfr.merge(tb_fpop, on=["country", "year", "scenario", "age", "education"], how="inner")
+    tb_temp["births"] = tb_temp["asfr"] * tb_temp["fpop"] / 1000
+    tb_temp = tb_temp.loc[:, ["country", "year", "scenario", "age", "education", "births", "fpop"]]
+
+    # Aggregate births and fpop to regions, keep only regional data
+    tb_temp = paths.regions.add_aggregates(
+        tb=tb_temp,
+        aggregations={"births": "sum", "fpop": "sum"},
+        index_columns=["country", "year", "scenario", "age", "education"],
+        regions=REGIONS,
+        min_frac_countries_informed=0.7,
+    )
+    tb_regional = tb_temp.loc[tb_temp["country"].isin(REGIONS)].copy()
+
+    # Compute regional TFR: sum age-specific rates across age groups, multiply by 5
+    tb_regional["rate"] = tb_regional["births"] / tb_regional["fpop"]
+    tb_regional_tfr = (
+        tb_regional.groupby(["country", "year", "scenario", "education"], observed=True)["rate"].sum().reset_index()
+    )
+    tb_regional_tfr["tfr"] = 5 * tb_regional_tfr["rate"]
+    tb_regional_tfr = tb_regional_tfr.drop(columns=["rate"])
+    tb_regional_tfr["tfr"] = tb_regional_tfr["tfr"].copy_metadata(tables_raw["by_edu"]["tfr"])
+
+    # Add regional TFR to by_edu table
+    tb_edu = tables_raw["by_edu"]
+    assert not tb_edu["country"].isin(REGIONS).any(), "by_edu already contains region rows, but shouldn't"
+    tables_raw["by_edu"] = pr.concat([tb_edu, tb_regional_tfr], ignore_index=True)
+
+    return tables_raw
 
 
 def sanity_checks(tb_proj, tb_hist):

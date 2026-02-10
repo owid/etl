@@ -391,6 +391,13 @@ tables:
           <%- else %>
           The average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
           <%- endif %>
+        description_key:
+          - Regional aggregates (e.g. continents) are computed from age-specific birth and female population data, not by averaging country-level TFRs.
+        description_processing: |-
+          Regional aggregates (e.g. continents) are computed from age-specific fertility rates (ASFR) and female population counts.
+
+          For each 5-year age group (15-19 to 45-49), we multiply ASFR by female population to estimate births, then sum births and female population across countries in the region. The regional TFR is then: `TFR = 5 × Σ(births_age / fpop_age)`. For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data).
+        processing_level: major
         presentation:
           topic_tags:
             - Fertility Rate
@@ -449,6 +456,9 @@ tables:
           <%- else %>
           The number of immigrants minus the number of emigrants over the last five-year period (aged <<age>>, <<sex>>s).
           <%- endif %>
+        description_key:
+          - "{definitions.others.dim_ssp}"
+          - Regional aggregates (e.g. continents) are calculated by summing migration values across member countries. For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data).
         description_processing: |-
           This indicator is sourced from the historical estimates dataset, which includes both historical data and projections.
         presentation:
@@ -523,6 +533,9 @@ tables:
            with <%- if (education == "no_education") %>no education<%- else %><<education>> education<%- endif %>
           <%- endif %>
            in a country or region.
+        description_key:
+          - "{definitions.others.dim_ssp}"
+          - Regional aggregates (e.g. continents) are calculated by summing population values across member countries. For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data).
         presentation:
           topic_tags:
             - Population Growth
