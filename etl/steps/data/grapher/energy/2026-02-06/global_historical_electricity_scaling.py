@@ -1,8 +1,8 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder
-
 from owid.datautils.dataframes import map_series
+
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

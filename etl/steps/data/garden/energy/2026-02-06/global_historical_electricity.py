@@ -1,7 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
+
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -38,8 +39,6 @@ COLUMNS_EMBER = {
     "generation__hydro__bioenergy_and_other_renewables__pct": "hydro_bioenergy_and_other_renewables_share",
     "generation__gas_and_other_fossil__twh": "gas_and_other_fossil_production",
     "generation__gas_and_other_fossil__pct": "gas_and_other_fossil_share",
-    "generation__other_fossil__twh": "other_fossil_production",
-    "generation__other_fossil__pct": "other_fossil_share",
     "generation__wind_and_solar__twh": "wind_and_solar_production",
     "generation__wind_and_solar__pct": "wind_and_solar_share",
     "generation__renewables__twh": "renewables_production",
