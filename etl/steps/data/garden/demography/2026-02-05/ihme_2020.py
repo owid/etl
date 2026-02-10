@@ -78,6 +78,9 @@ def run() -> None:
     tb_mig = ds_meadow.read("migration")  # country, year, scenario, val-upper-lower
     tb_mig = prepare_mig(tb_mig, "net_migration")
 
+    # Prepare live births table
+    # tb_births = ds_meadow.read("live_births")  # country,
+
     #
     # Process data.
     #
