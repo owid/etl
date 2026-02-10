@@ -253,7 +253,7 @@ tables:
         description_key: *key_poly
 
       turnover_event:
-        title: Turnover event
+        title: Electoral turnover event
         description_short: |-
           Binary flag set to 1 in a country-year when partisan control of government alternates to an opposition party/coalition/candidate as a result of an election.
         description_key:
@@ -265,7 +265,7 @@ tables:
         unit: ""
 
       turnover_period:
-        title: Turnover period
+        title: Electoral turnover period
         description_short: |-
           Flags every year that forms part of the spell beginning with the *first* electoral turnover event and ending when the multi-party electoral regime is interrupted.
         description_key:
@@ -278,7 +278,7 @@ tables:
         unit: ""
 
       two_turnover_period:
-        title: Two-turnover period
+        title: Two-electoral-turnover period
         description_short: |-
           Flags every year in the spell that starts with the *second* electoral turnover event and continues until the multi-party electoral regime is interrupted.
         description_key:
@@ -466,11 +466,11 @@ tables:
       num_turnover_event:
         title: |-
           <%- if category == '-1' -%>
-          Number of countries with turnover event status
+          Number of countries with electoral turnover event status
           <%- elif category == 'no' -%>
-          Number of countries that did NOT experience a turnover event
+          Number of countries that did NOT experience an electoral turnover event
           <%- else -%>
-          Number of countries that experienced a turnover event
+          Number of countries that experienced an electoral turnover event
           <%- endif -%>
         # description_short:
         unit: "countries"
@@ -478,7 +478,7 @@ tables:
       num_turnover_period:
         title: |-
           <%- if category == '-1' -%>
-          Number of countries with unknown turnover period status
+          Number of countries with unknown electoral turnover period status
           <%- elif category == 'no' -%>
           Number of countries not in an electoral turnover period
           <%- else -%>
@@ -489,7 +489,7 @@ tables:
       num_recent_turnover_event_lied:
         title: |-
           <%- if category == '-1' -%>
-          Number of countries with unknown recent turnover status
+          Number of countries with unknown recent electoral turnover status
           <%- elif category == 'no' -%>
           Number of countries without recent electoral turnover
           <%- else -%>
@@ -652,11 +652,11 @@ tables:
       pop_turnover_event:
         title: |-
           <%- if category == '-1' -%>
-          People living in countries with turnover event status
+          People living in countries with electoral turnover event status
           <%- elif category == 'no' -%>
-          People living in countries that did NOT experience a turnover event
+          People living in countries that did NOT experience an electoral turnover event
           <%- else -%>
-          People living in countries that experienced a turnover event
+          People living in countries that experienced an electoral turnover event
           <%- endif -%>
         # description_short:
         unit: "people"
@@ -664,7 +664,7 @@ tables:
       pop_turnover_period:
         title: |-
           <%- if category == '-1' -%>
-          People living in countries with unknown turnover period status
+          People living in countries with unknown electoral turnover period status
           <%- elif category == 'no' -%>
           People living in countries not in an electoral turnover period
           <%- else -%>
@@ -675,7 +675,7 @@ tables:
       pop_recent_turnover_event_lied:
         title: |-
           <%- if category == '-1' -%>
-          People living in countries with unknown recent turnover status
+          People living in countries with unknown recent electoral turnover status
           <%- elif category == 'no' -%>
           People living in countries without recent electoral turnover
           <%- else -%>
