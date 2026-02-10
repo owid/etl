@@ -215,6 +215,7 @@ def run() -> None:
     ds_garden_child = paths.load_dataset("gbd_child_treemap")
 
     tb = ds_garden["gbd_treemap"].reset_index()
+    tb = tb[tb["age"] != "<5 years"]
     tb_child = ds_garden_child["gbd_child_treemap"].reset_index()
     tb = pr.concat([tb, tb_child], ignore_index=True)
 
