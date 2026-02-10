@@ -46,7 +46,7 @@ tables:
         title: Elections for chief executive and legislature
         unit: ""
         description_short: |-
-          The variable indicates whether some citizens elect a legislature which does issue some laws, but does not perform executive functions.
+          The variable indicates whether some citizens elect both the chief executive and the legislature.
         description_processing: |-
           Takes on the value of 1 if indicators "Legislative elections" and "Elections for chief executive" have the value of 1, otherwise 0.
         description_from_producer: |-
@@ -170,6 +170,14 @@ tables:
         description_processing: |-
           It combines the indicators `male_suffrage` and `female_suffrage` in Skaaning et al. (2015).
 
+      suffrage_in_practice_lied:
+        title: Universal right to vote in practice
+        unit: ""
+        description_short: |-
+          Indicates whether virtually all adult citizens have the right to vote and elections for both the chief executive and the legislature are held.
+        description_processing: |-
+          Takes on the value of 1 if both men and women have the right to vote (universal suffrage) and there are elections for both the chief executive and the legislature (`exe_leg_elec_lied` = 1); 0 otherwise. It differs from the "universal suffrage" indicator in that it also considers whether elections for the chief executive and the legislature are actually held.
+
       democracy_lied:
         title: "Electoral democracy"
         unit: ""
@@ -280,6 +288,18 @@ tables:
         description_processing: |-
           Indicates whether a particular country-year is part of a period between a second electoral government alternation (as indicated by a turnover event, see below) in a multi-party electoral regime and an interruption of the same multi-party electoral regime (as indicated by a score of 0 on executive elections or multi-party_legislative_elections, see above). If two turnover events happens later in the same polity under a new multi_party electoral regime, a new two-turnover period begins. 1=present, 0=absent.
         unit: ""
+
+      recent_turnover_event_lied:
+        title: Recent electoral turnover
+        unit: ""
+        description_short: |-
+          Indicates whether the country experienced an electoral turnover event within the last 12 years.
+        description_key:
+          - An electoral turnover is when partisan control of government alternates to the opposition as a result of an election.
+          - The indicator equals 1 if a turnover event occurred in the current year or any of the preceding 11 years (12-year window).
+          - "Values are binary: 1 = recent turnover, 0 = no recent turnover."
+        description_processing: |-
+          Derived from the `turnover_event` indicator. For each country, if `turnover_event` = 1 in year Y, then `recent_turnover_event_lied` = 1 for years Y through Y+11. If multiple turnover events occur, their windows overlap.
 
       democratic_breakdown:
         title: Democratic breakdown
@@ -421,6 +441,28 @@ tables:
         # description_short:
         unit: "countries"
 
+      num_exe_leg_elec_lied:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown elections status (executive and legislature)
+          <%- elif category == 'no' -%>
+          Number of countries that don't have elections for both the chief executive and the legislature
+          <%- else -%>
+          Number of countries that have elections for the chief executive and the legislature
+          <%- endif -%>
+        unit: "countries"
+
+      num_suffrage_in_practice_lied:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown universal voting rights in practice
+          <%- elif category == 'no' -%>
+          Number of countries that don't have universal voting rights in practice
+          <%- else -%>
+          Number of countries with universal voting rights in practice
+          <%- endif -%>
+        unit: "countries"
+
       num_turnover_event:
         title: |-
           <%- if category == '-1' -%>
@@ -431,6 +473,28 @@ tables:
           Number of countries that experienced a turnover event
           <%- endif -%>
         # description_short:
+        unit: "countries"
+
+      num_turnover_period:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown turnover period status
+          <%- elif category == 'no' -%>
+          Number of countries not in an electoral turnover period
+          <%- else -%>
+          Number of countries in an electoral turnover period
+          <%- endif -%>
+        unit: "countries"
+
+      num_recent_turnover_event_lied:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown recent turnover status
+          <%- elif category == 'no' -%>
+          Number of countries without recent electoral turnover
+          <%- else -%>
+          Number of countries with recent electoral turnover
+          <%- endif -%>
         unit: "countries"
 
       num_transition_type:
@@ -563,6 +627,28 @@ tables:
         # description_short:
         unit: "people"
 
+      pop_exe_leg_elec_lied:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown elections status (executive and legislature)
+          <%- elif category == 'no' -%>
+          People living in countries that don't have elections for both the chief executive and the legislature
+          <%- else -%>
+          People living in countries that have elections for the chief executive and the legislature
+          <%- endif -%>
+        unit: "people"
+
+      pop_suffrage_in_practice_lied:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown universal voting rights in practice
+          <%- elif category == 'no' -%>
+          People living in countries that don't have universal voting rights in practice
+          <%- else -%>
+          People living in countries with universal voting rights in practice
+          <%- endif -%>
+        unit: "people"
+
       pop_turnover_event:
         title: |-
           <%- if category == '-1' -%>
@@ -573,6 +659,28 @@ tables:
           People living in countries that experienced a turnover event
           <%- endif -%>
         # description_short:
+        unit: "people"
+
+      pop_turnover_period:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown turnover period status
+          <%- elif category == 'no' -%>
+          People living in countries not in an electoral turnover period
+          <%- else -%>
+          People living in countries in an electoral turnover period
+          <%- endif -%>
+        unit: "people"
+
+      pop_recent_turnover_event_lied:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown recent turnover status
+          <%- elif category == 'no' -%>
+          People living in countries without recent electoral turnover
+          <%- else -%>
+          People living in countries with recent electoral turnover
+          <%- endif -%>
         unit: "people"
 
       pop_transition_type:

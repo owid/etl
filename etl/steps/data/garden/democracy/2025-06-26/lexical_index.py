@@ -115,7 +115,13 @@ def run() -> None:
     tb = add_universal_suffrage(tb)
 
     # Add "Elections for chief executive and legislature"
-    tb["exe_leg_elec_lied"] = ((tb["exelec_lied"] == 1) & (tb["legelec_lied"] == 1)).astype("Int64")
+    tb = add_exe_leg_elections(tb)
+
+    # Add "Universal right to vote in practice"
+    tb = add_suffrage_in_practice(tb)
+
+    # Add "Recent electoral turnover"
+    tb = add_recent_turnover(tb)
 
     # Dtypes
     tb = tb.astype(
@@ -294,6 +300,50 @@ def add_universal_suffrage(tb: Table) -> Table:
     return tb
 
 
+def add_exe_leg_elections(tb: Table) -> Table:
+    """Add indicator for elections for both chief executive and legislature.
+
+    Takes on the value of 1 if both exelec_lied and legelec_lied are 1, otherwise 0.
+    """
+    tb["exe_leg_elec_lied"] = ((tb["exelec_lied"] == 1) & (tb["legelec_lied"] == 1)).astype("Int64")
+    tb["exe_leg_elec_lied"].metadata = tb["exelec_lied"].metadata
+    return tb
+
+
+def add_suffrage_in_practice(tb: Table) -> Table:
+    """Add universal right to vote in practice.
+
+    1 if universal suffrage (men + women) AND elections for both executive and legislature; 0 otherwise.
+    Differs from suffrage_lied in that it also considers whether elections are actually held.
+    """
+    tb["suffrage_in_practice_lied"] = ((tb["suffrage_lied"] == 2) & (tb["exe_leg_elec_lied"] == 1)).astype("Int64")
+    tb["suffrage_in_practice_lied"].metadata = tb["suffrage_lied"].metadata
+    return tb
+
+
+def add_recent_turnover(tb: Table) -> Table:
+    """Add recent electoral turnover indicator.
+
+    A country-year gets a value of 1 if a turnover_event occurred within the last 12 years
+    (including the event year itself). For example, if turnover_event=1 in 2008, then
+    recent_turnover_event_lied=1 from 2008 to 2019.
+    """
+    tb["recent_turnover_event_lied"] = 0
+
+    for _, group in tb.groupby("country"):
+        turnover_years = group.loc[group["turnover_event"] == 1, "year"].values
+        if len(turnover_years) == 0:
+            continue
+        mask = tb["country"] == group["country"].iloc[0]
+        for y in turnover_years:
+            year_mask = mask & (tb["year"] >= y) & (tb["year"] < y + 12)
+            tb.loc[year_mask, "recent_turnover_event_lied"] = 1
+
+    tb["recent_turnover_event_lied"] = tb["recent_turnover_event_lied"].astype("Int64")
+    tb["recent_turnover_event_lied"].metadata = tb["turnover_event"].metadata
+    return tb
+
+
 def get_region_aggregates(
     tb: Table,
     ds_regions: Dataset,
@@ -360,7 +410,39 @@ def get_region_aggregates(
             "has_na": False,
         },
         {
+            "name": "exe_leg_elec_lied",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "suffrage_in_practice_lied",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
             "name": "turnover_event",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "turnover_period",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "recent_turnover_event_lied",
             "values_expected": {
                 "0": "no",
                 "1": "yes",
