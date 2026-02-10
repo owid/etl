@@ -6,7 +6,7 @@ meta:
     # Data product / Snapshot
     title: Global Burden of Disease - Deaths
     description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the death and DALY counts and rates for 371 diseases and injuries.
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains death counts and rates for 371 diseases and injuries.
     date_published: "2025-10-20"
     # Citation
     producer: "IHME, Global Burden of Disease"
