@@ -1,4 +1,5 @@
 meta:
+  is_public: false
   origin:
     producer: IHME, Global Burden of Disease
     title: Global Burden of Disease - Treemap data for under fives
