@@ -89,11 +89,15 @@ def create_table_for_gas(tb: Table, gas: str) -> Table:
         column: "sum" for column in tb_gas.columns if column not in ["country", "year", "efficiency_factor"]
     }
     tb_gas = paths.regions.add_aggregates(
-        tb=tb_gas, aggregations=aggregations, min_frac_countries_informed=0.7, min_num_values_per_year=1
+        tb=tb_gas,
+        aggregations=aggregations,
+        regions=REGIONS,
+        min_frac_countries_informed=0.7,
+        min_num_values_per_year=1,
     )
 
     # Add population to data.
-    tb_gas = paths.regions.add_per_capita(tb=tb_gas, suffix=PER_CAPITA_SUFFIX)
+    tb_gas = paths.regions.add_per_capita(tb=tb_gas, regions=REGIONS, suffix=PER_CAPITA_SUFFIX)
 
     # List columns with emissions data.
     emissions_columns = [column for column in tb_gas.columns if column not in ["country", "year"]]
