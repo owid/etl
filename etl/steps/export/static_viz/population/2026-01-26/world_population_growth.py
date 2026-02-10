@@ -12,18 +12,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import structlog
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl import paths as etl_paths
-from etl.helpers import create_dataset
+from etl.helpers import PathFinder, create_dataset
 
 # Configure matplotlib to use SVG text elements instead of paths
 matplotlib.rcParams["svg.fonttype"] = "none"
 
 # Paths for this export step
+paths = PathFinder(__file__)
 CURRENT_DIR = Path(__file__).parent
-OUTPUT_DIR = etl_paths.EXPORT_DIR / "static_viz/2026-01-26/world_population_growth"
+OUTPUT_DIR = paths.dest_dir
 SHORT_NAME = "world_population_growth"
 
 log = structlog.get_logger()
@@ -515,7 +515,7 @@ def run() -> None:
     - Dataset with population and growth rate data
     """
     # Load the population dataset from grapher
-    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-15/population")
+    ds = paths.load_dataset("population")
 
     # Load historical and projection tables
     tb_historical = ds["historical"]
