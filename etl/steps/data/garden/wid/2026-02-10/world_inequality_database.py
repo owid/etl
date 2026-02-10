@@ -25,10 +25,10 @@ paths = PathFinder(__file__)
 TABLEFMT = "pretty"
 
 # Define if sanity checks should run (set to True to see sanity check output)
-DEBUG = True
+DEBUG = False
 
 # Define if I show the full table or just the first 5 rows for assertions (only applies when DEBUG=True)
-LONG_FORMAT = True
+LONG_FORMAT = False
 
 # Define welfare types available and their new names
 WELFARE_TYPES = {
