@@ -388,7 +388,7 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2026-02-04/census_us_idb:
     - data://garden/demography/2026-02-04/census_us_idb
-  
+
   #
   # TODO: add step name (just something recognizable)
   #
@@ -398,6 +398,9 @@ steps:
     - snapshot://demography/2026-02-05/ihme_2020_population.zip
     - snapshot://demography/2026-02-05/ihme_2020_life_expectancy.zip
     - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+    - snapshot://demography/2026-02-05/ihme_2020_live_births.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_ref.zip
   data://garden/demography/2026-02-05/ihme_2020:
     - data://meadow/demography/2026-02-05/ihme_2020
   data://grapher/demography/2026-02-05/ihme_2020:
