@@ -4,8 +4,6 @@ We already have an interactive chart showing similar data, for per capita GDP an
 https://ourworldindata.org/grapher/co2-emissions-and-gdp
 
 The data in the current step is not used by any grapher step, but will be used by the following static chart:
-
-The data from this step is used in this static chart:
 https://ourworldindata.org/cdn-cgi/imagedelivery/qLq-8BTgXU8yG0N6HnOy8g/f5db1a91-6bde-4430-3c09-e61fd8df9a00/w=2614
 
 """
@@ -13,7 +11,7 @@ https://ourworldindata.org/cdn-cgi/imagedelivery/qLq-8BTgXU8yG0N6HnOy8g/f5db1a91
 from pathlib import Path
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Table, Variable
 
 from etl.helpers import PathFinder
 
@@ -55,7 +53,7 @@ RUNNING_AVERAGE_YEARS = 3
 OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-05_decoupling_analysis/"
 
 
-def fix_abrupt_changes_in_honduras(tb):
+def fix_abrupt_changes_in_honduras(tb: Table) -> Table:
     # I noticed two abrupt peaks in Honduras emissions in 2008 and 2013 (which do not appear in territorial emissions).
     # I'll remove those years (so that Honduras is not selected if the start year is 2008 or 2013, which distorts the percentage change).
     error = "Expected two abrupt peaks in emissions in Honduras. This may have been fixed."
@@ -120,7 +118,7 @@ def create_changes_table(tb: Table, min_window: int = 1) -> Table:
     return pr.concat(results, ignore_index=True)
 
 
-def apply_rolling_averages(tb):
+def apply_rolling_averages(tb: Table) -> Table:
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     tb["gdp_per_capita"] = tb.groupby("country", sort=False)["gdp_per_capita"].transform(
         lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean()
@@ -132,7 +130,7 @@ def apply_rolling_averages(tb):
     return tb
 
 
-def decoupling_mask(tb_change: Table, pct_change_min: float) -> "pr.Series":
+def decoupling_mask(tb_change: Table, pct_change_min: float) -> Variable:
     return (tb_change["gdp_per_capita_change"] > pct_change_min) & (
         tb_change["consumption_emissions_per_capita_change"] < -pct_change_min
     )
@@ -155,9 +153,15 @@ def detect_decoupled_countries(
     return set(tb_sel["country"].unique())
 
 
-def plot_decoupled_countries(tb_change, countries, year_min, year_max, y_min=-50, y_max=50, output_folder=None):
-    from pathlib import Path
-
+def plot_decoupled_countries(
+    tb_change: Table,
+    countries: set[str],
+    year_min: int,
+    year_max: int,
+    y_min: float = -50,
+    y_max: float = 50,
+    output_folder: Path | None = None,
+) -> None:
     import plotly.express as px
 
     countries_decoupled = sorted(countries)
@@ -230,7 +234,14 @@ def plot_decoupled_countries(tb_change, countries, year_min, year_max, y_min=-50
             fig.show()
 
 
-def plot_slope_chart_grid(tb_change, countries_decoupled, year_min, year_max, n_cols=6, output_file=None):
+def plot_slope_chart_grid(
+    tb_change: Table,
+    countries_decoupled,
+    year_min: int,
+    year_max: int,
+    n_cols: int = 6,
+    output_file: Path | None = None,
+) -> None:
     """Create a grid of slope charts showing decoupling for each country."""
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
@@ -332,10 +343,8 @@ def plot_slope_chart_grid(tb_change, countries_decoupled, year_min, year_max, n_
     else:
         fig.show()
 
-    return fig
 
-
-def time_window_analysis(tb_change):
+def time_window_analysis(tb_change: Table) -> None:
     import plotly.express as px
 
     # Select those countries and windows where GDP increased more than 5%, and emissions decreased more than 5%.
@@ -438,7 +447,7 @@ def time_window_analysis(tb_change):
         )
 
 
-def further_visual_inspection(tb_change, countries_decoupled):
+def further_visual_inspection(tb_change: Table, countries_decoupled: set[str]) -> None:
     output_folder = OUTPUT_FOLDER / f"smooth-countries-{2013}-{2023}-full-picture/"
     plot_decoupled_countries(
         tb_change=tb_change,
@@ -449,7 +458,7 @@ def further_visual_inspection(tb_change, countries_decoupled):
         y_max=150,
         output_folder=output_folder,
     )
-    # User a larger y-range for specific countries.
+    # Use a larger y-range for specific countries.
     plot_decoupled_countries(
         tb_change=tb_change,
         countries=["Mongolia", "Botswana"],
@@ -464,7 +473,7 @@ def further_visual_inspection(tb_change, countries_decoupled):
     # "Mozambique", "Botswana", "Mongolia", "Russia", "Singapore", "Switzerland","Uruguay".
 
 
-def compare_old_and_new_countries(tb_change, countries_decoupled):
+def compare_old_and_new_countries(tb_change: Table, countries_decoupled: set[str]) -> None:
     # Compare old and new list of countries that achieved decoupling.
     old = {
         "Ireland",
