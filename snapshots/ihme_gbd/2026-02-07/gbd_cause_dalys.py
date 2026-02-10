@@ -14,7 +14,7 @@ Important - You need and account to access the data.
 * In Sex select 'Both'
 * In Year select 'Select all'
 
-The data will then be requested and a download link will be sent to you with a number of zip files containing the data (approx < 10 files).
+The data will then be requested and a download link will be sent to you with a number of zip files containing the data.
 
 We will download and combine the files in the following script.
 """

@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Global Health
         - Causes of Death
-    processing_level: minor
+    processing_level: major
   description_key: |-
     <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
   annotation: |-
