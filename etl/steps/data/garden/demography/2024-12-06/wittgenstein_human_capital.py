@@ -10,9 +10,10 @@ from typing import List
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from shared import get_index_columns
 
 from etl.helpers import PathFinder
+
+from .shared import get_index_columns
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
