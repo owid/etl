@@ -207,3 +207,21 @@ steps:
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://meadow/climate_watch/2026-02-10/emissions_by_sector:
+    - snapshot://climate_watch/2026-02-10/emissions_by_sector.gz
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://garden/climate_watch/2026-02-10/emissions_by_sector:
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/climate_watch/2026-02-10/emissions_by_sector
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://grapher/climate_watch/2026-02-10/emissions_by_sector:
+    - data://garden/climate_watch/2026-02-10/emissions_by_sector
