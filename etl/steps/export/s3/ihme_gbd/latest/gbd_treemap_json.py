@@ -221,7 +221,7 @@ def run() -> None:
 
     # Filter data for Number metric only (keep all sexes)
     tb_filtered = tb.loc[tb["metric"] == "Number"].copy()
-
+    # test
     tb_filtered.set_index(["country", "year", "age", "sex", "broad_cause", "cause", "metric"], verify_integrity=True)
 
     #
