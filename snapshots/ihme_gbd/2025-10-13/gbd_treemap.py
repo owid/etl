@@ -39,7 +39,7 @@ Important - You need and account to access the data.
     Transport injuries
     Tuberculosis
     Unintentional injuries
-* In Location select: 'Global', 'China', 'United States', 'Central African Republic', 'Brazil', 'France'
+* In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select: 'All ages', < 5 years, 5-14 years, 15-49 years, 50-69 years, 70+ years
 * In Sex select 'Both', 'Female', 'Male'
 * In Year select all years

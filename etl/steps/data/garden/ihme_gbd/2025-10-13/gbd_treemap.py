@@ -112,8 +112,6 @@ def reaggregate_causes(tb: Table) -> Table:
     )
     tb = pull_out_cause(tb, pull_out_cause="Falls", aggregate_cause="Unintentional injuries")
 
-    # We have both maternal disorders and neonatal disorders in the data so we can remove their combined grouping
-    tb = tb[tb["cause"] != "Maternal and neonatal disorders"]
     tb = combine_causes(
         tb=tb,
         causes_to_combine=[
