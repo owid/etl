@@ -10,7 +10,6 @@ paths = PathFinder(__file__)
 
 cause_renaming_dict = {
     "Adverse effects of medical treatment": "Medical accidents",
-    "Self-harm and interpersonal violence": "Conflict, terrorism, and homicide",  # Self-harm is null for children
     "Congenital heart anomalies": "Heart abnormalities",
     "Digestive congenital anomalies": "Digestive defects",
     "Fire, heat, and hot substances": "Fire & temperature",
@@ -31,7 +30,7 @@ cause_renaming_dict = {
 
 broad_cause_dict = {
     "Cancers": "Non-communicable diseases",
-    "Conflict, terrorism, and homicide": "Injuries",
+    "Conflict and terrorism": "Injuries",  # Including police conflict and executions
     "Diarrheal diseases": "Infectious diseases",
     "Digestive defects": "Birth disorders",
     "Drowning": "Injuries",
@@ -153,12 +152,17 @@ def reaggregate_causes(tb: Table) -> Table:
             "Pulmonary aspiration and foreign body in airway",
             "Fire, heat, and hot substances",
             "Falls",
-            # "Poisonings",
             "Adverse effects of medical treatment",
-            # "Animal contact",
         ],
         aggregate_cause="Unintentional injuries",
         residual_name="Other injuries",
+    )
+
+    tb = pull_out_cause(
+        tb,
+        pull_out_cause=["Interpersonal violence"],
+        aggregate_cause="Self-harm and interpersonal violence",
+        residual_name="Conflict and terrorism",
     )
     tb = combine_causes(
         tb=tb,
