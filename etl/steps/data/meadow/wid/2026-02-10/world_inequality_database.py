@@ -10,72 +10,62 @@ paths = PathFinder(__file__)
 
 # Define missing values (because of the country NA, Namibia)
 NA_VALUES = [
-    "-1.#IND",
-    "1.#QNAN",
-    "1.#IND",
-    "-1.#QNAN",
-    "#N/A N/A",
-    "#N/A",
-    "N/A",
-    "n/a",
-    "",
-    "#NA",
-    "NULL",
-    "null",
-    "NaN",
-    "-NaN",
-    "nan",
-    "-nan",
+    # "-1.#IND",
+    # "1.#QNAN",
+    # "1.#IND",
+    # "-1.#QNAN",
+    # "#N/A N/A",
+    # "#N/A",
+    # "N/A",
+    # "n/a",
+    # "",
+    # "#NA",
+    # "NULL",
+    # "null",
+    # "NaN",
+    # "-NaN",
+    # "nan",
+    # "-nan",
     "",
 ]
 
 # List of countries/regions not included in the ISO2 standard, but added by WID
 # NOTE: I am excluding subnational data from China and "Other" regions, because they have issues
-ISO2_MISSING = {
-    # "CN-RU": "China (rural)",
-    # "CN-UR": "China (urban)",
+CODES_MISSING = {
     "DD": "East Germany",
     "KS": "Kosovo",
-    # "OA": "Other Russia and Central Asia (WID)",
-    # "OB": "Other East Asia (WID)",
-    # "OC": "Other Western Europe (WID)",
-    # "OD": "Other Latin America (WID)",
-    # "OE": "Other MENA (WID)",
-    # "OH": "Other North America and Oceania (WID)",
-    # "OI": "Other South & South-East Asia (WID)",
-    # "OJ": "Other Sub-Saharan Africa (WID)",
-    "QB": "Africa (WID)",
-    "QD": "Asia (WID)",
-    "QE": "Europe (WID)",
-    "QF": "Oceania (WID)",
-    "QJ": "Central Asia (WID)",
-    "QK": "East Africa (WID)",
-    "QL": "East Asia (WID)",
-    "QM": "Eastern Europe (WID)",
-    "QN": "Middle Africa (WID)",
-    "QO": "North Africa (WID)",
-    "QP": "North America (WID)",
-    "QS": "South-East Asia (WID)",
-    "QT": "South Africa region (WID)",
-    "QU": "South Asia (WID)",
-    "QV": "West Africa (WID)",
-    "QW": "West Asia (WID)",
-    "QX": "Western Europe (WID)",
-    "QY": "European Union (WID)",
-    "WO": "World",
-    "XA": "Asia (excluding Middle East) (WID)",
-    "XB": "North America and Oceania (WID)",
-    "XF": "Sub-Saharan Africa (WID)",
-    "XL": "Latin America (WID)",
-    "XM": "Middle East (WID)",
-    "XN": "MENA (WID)",
-    "XR": "Russia and Central Asia (WID)",
-    "XS": "South & South-East Asia (WID)",
+    "QB-PPP": "Africa (WID)",
+    "QD-PPP": "Asia (WID)",
+    "QE-PPP": "Europe (WID)",
+    "QF-PPP": "Oceania (WID)",
+    "QJ-PPP": "Central Asia (WID)",
+    "QK-PPP": "East Africa (WID)",
+    "QL-PPP": "East Asia (WID)",
+    "QM-PPP": "Eastern Europe (WID)",
+    "QN-PPP": "Middle Africa (WID)",
+    "QO-PPP": "North Africa (WID)",
+    "QP-PPP": "North America (WID)",
+    "QS-PPP": "South-East Asia (WID)",
+    "QT-PPP": "South Africa region (WID)",
+    "QU-PPP": "South Asia (WID)",
+    "QV-PPP": "West Africa (WID)",
+    "QW-PPP": "West Asia (WID)",
+    "QX-PPP": "Western Europe (WID)",
+    "QY-PPP": "European Union (WID)",
+    "WO-PPP": "World",
+    "XA-PPP": "Asia (excluding Middle East) (WID)",
+    "XB-PPP": "North America and Oceania (WID)",
+    "XF-PPP": "Sub-Saharan Africa (WID)",
+    "XL-PPP": "Latin America (WID)",
+    "XM-PPP": "Middle East (WID)",
+    "XN-PPP": "MENA (WID)",
+    "XR-PPP": "Russia and Central Asia (WID)",
+    "XS-PPP": "South & South-East Asia (WID)",
     "ZZ": "Zanzibar",
 }
 
 # Market exchange rates regions (we are not using them)
-ISO2_MISSING_MER = {
+CODES_EXCLUDED = {
     "OA-MER": "Other Russia and Central Asia (at market exchange rate) (WID)",
     "OB-MER": "Other East Asia (at market exchange rate) (WID)",
     "OC-MER": "Other Western Europe (at market exchange rate) (WID)",
@@ -84,6 +74,8 @@ ISO2_MISSING_MER = {
     "OH-MER": "Other North America and Oceania (at market exchange rate) (WID)",
     "OI-MER": "Other South & South-East Asia (at market exchange rate) (WID)",
     "OJ-MER": "Other Sub-Saharan Africa (at market exchange rate) (WID)",
+    "OK-MER": "Other North America (at market exchange rate) (WID)",
+    "OL-MER": "Other Oceania (at market exchange rate) (WID)",
     "QB-MER": "Africa (at market exchange rate) (WID)",
     "QD-MER": "Asia (at market exchange rate) (WID)",
     "QE-MER": "Europe (at market exchange rate) (WID)",
@@ -111,7 +103,79 @@ ISO2_MISSING_MER = {
     "XN-MER": "MENA (at market exchange rate) (WID)",
     "XR-MER": "Russia and Central Asia (at market exchange rate) (WID)",
     "XS-MER": "South & South-East Asia (at market exchange rate) (WID)",
+    "OA-PPP": "Other Russia and Central Asia (WID)",
+    "OB-PPP": "Other East Asia (WID)",
+    "OC-PPP": "Other Western Europe (WID)",
+    "OD-PPP": "Other Latin America (WID)",
+    "OE-PPP": "Other MENA (WID)",
+    "OH-PPP": "Other North America and Oceania (WID)",
+    "OI-PPP": "Other South & South-East Asia (WID)",
+    "OJ-PPP": "Other Sub-Saharan Africa (WID)",
+    "OK-PPP": "Other North America (WID)",
+    "OL-PPP": "Other Oceania (WID)",
+    "CN-RU": "China (rural)",
+    "CN-UR": "China (urban)",
+    "DE-BD": "Baden",
+    "DE-BY": "Bavaria",
+    "DE-HB": "Bremen",
+    "DE-HE": "Hesse",
+    "DE-HH": "Hamburg",
+    "DE-PR": "Prussia",
+    "DE-SN": "Saxony",
+    "DE-WU": "Wurttemberg",
+    "US-AK": "Alaska",
+    "US-AL": "Alabama",
+    "US-AR": "Arkansas",
+    "US-AZ": "Arizona",
+    "US-CA": "California",
+    "US-CO": "Colorado",
+    "US-CT": "Connecticut",
+    "US-DC": "District of Columbia",
+    "US-DE": "Delaware",
+    "US-FL": "Florida",
+    "US-GA": "Georgia",
+    "US-HI": "Hawaii",
+    "US-IA": "Iowa",
+    "US-ID": "Idaho",
+    "US-IL": "Illinois",
+    "US-IN": "Indiana",
+    "US-KS": "Kansas",
+    "US-KY": "Kentucky",
+    "US-LA": "Louisiana",
+    "US-MA": "Massachusetts",
+    "US-MD": "Maryland",
+    "US-ME": "Maine",
+    "US-MI": "Michigan",
+    "US-MN": "Minnesota",
+    "US-MO": "Missouri",
+    "US-MS": "Mississippi",
+    "US-MT": "Montana",
+    "US-NC": "North Carolina",
+    "US-ND": "North Dakota",
+    "US-NE": "Nebraska",
+    "US-NH": "New Hampshire",
+    "US-NJ": "New Jersey",
+    "US-NM": "New Mexico",
+    "US-NV": "Nevada",
+    "US-NY": "New York",
+    "US-OH": "Ohio",
+    "US-OK": "Oklahoma",
+    "US-OR": "Oregon",
+    "US-PA": "Pennsylvania",
+    "US-RI": "Rhode Island",
+    "US-SC": "South Carolina",
+    "US-SD": "South Dakota",
+    "US-TN": "Tennessee",
+    "US-TX": "Texas",
+    "US-UT": "Utah",
+    "US-VA": "Virginia",
+    "US-VT": "Vermont",
+    "US-WA": "Washington",
+    "US-WI": "Wisconsin",
+    "US-WV": "West Virginia",
+    "US-WY": "Wyoming",
 }
+
 
 # Create a dictionary with the names of the snapshots and their id variables
 SNAPSHOTS_DICT = {
@@ -150,8 +214,12 @@ def run() -> None:
         # Process data.
         #
         # Harmonize countries
-        tb = harmonize_countries(tb, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
-        tb_extrapolations = harmonize_countries(tb_extrapolations, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
+        tb = harmonize_countries(
+            tb=tb, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
+        )
+        tb_extrapolations = harmonize_countries(
+            tb=tb_extrapolations, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
+        )
 
         # Set index and sort
         tb = tb.format(tb_ids, short_name=tb_name)
@@ -165,7 +233,9 @@ def run() -> None:
     tb_fiscal = snap_fiscal.read(keep_default_na=False, na_values=NA_VALUES)
 
     # Harmonize countries
-    tb_fiscal = harmonize_countries(tb_fiscal, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
+    tb_fiscal = harmonize_countries(
+        tb=tb_fiscal, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
+    )
     tb_fiscal = tb_fiscal.format(short_name="world_inequality_database_fiscal")
 
     # Create a new meadow dataset with the same metadata as the snapshot.
@@ -178,7 +248,7 @@ def run() -> None:
 
 
 # Country harmonization function, using both the reference country/regional OWID dataset and WID's `iso2_missing` list
-def harmonize_countries(tb: Table, tb_regions: Table, iso2_missing: dict, iso_2_missing_mer: dict) -> Table:
+def harmonize_countries(tb: Table, tb_regions: Table, codes_missing: dict, codes_excluded: dict) -> Table:
     # Merge dataset and country dictionary to get the name of the country
     tb = pr.merge(tb, tb_regions[["name", "iso_alpha2"]], left_on="country", right_on="iso_alpha2", how="left")
 
@@ -190,13 +260,13 @@ def harmonize_countries(tb: Table, tb_regions: Table, iso2_missing: dict, iso_2_
     tb["country"] = tb["country"].astype(str)
 
     # Replace missing items
-    for x, y in iso2_missing.items():
+    for x, y in codes_missing.items():
         tb.loc[tb["country"] == x, "name"] = y
 
     # Create list of unmatched entitites
     missing_list = list(tb[tb["name"] == "nan"]["country"].unique())
-    # Substract iso2_missing_mer from missing_list
-    missing_list = [x for x in missing_list if x not in iso_2_missing_mer.keys()]
+    # Substract excluded from missing_list
+    missing_list = [x for x in missing_list if x not in codes_excluded.keys()]
     missing_count = len(missing_list)
 
     # Warns if there are still entities missing
