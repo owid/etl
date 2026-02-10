@@ -13,7 +13,7 @@ from etl.google import read_gbq
 
 
 @memory.cache
-def _fetch_search_queries(start_date: str, end_date: str) -> pd.DataFrame:
+def fetch_search_queries(start_date: str, end_date: str) -> pd.DataFrame:
     """Fetch search query data from BigQuery (cached)."""
     query = f"""
         SELECT
@@ -29,7 +29,14 @@ def _fetch_search_queries(start_date: str, end_date: str) -> pd.DataFrame:
     return read_gbq(query, project_id="owid-analytics")
 
 
-def _remove_prefix_queries(df: pd.DataFrame) -> pd.DataFrame:
+def clean_queries(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter out junk queries (URLs, path-like strings)."""
+    df = df[~df["query"].str.contains("ourworldindata", case=False, na=False)]
+    df = df[~df["query"].str.startswith("/", na=False)]
+    return df
+
+
+def remove_prefix_queries(df: pd.DataFrame) -> pd.DataFrame:
     """Remove queries that are prefixes of more popular queries.
 
     E.g., if "tobacco" has 100 searches and "tobac" has 5, drop "tobac".
@@ -85,24 +92,20 @@ def get_random_search_query(
     start_date = end_date - timedelta(days=days)
 
     # Fetch data (cached)
-    df = _fetch_search_queries(start_date.isoformat(), end_date.isoformat())
+    df = fetch_search_queries(start_date.isoformat(), end_date.isoformat())
 
     # Filter by hits
     if not require_hits:
         df = df[df["n_hits"] == 0]
 
-    # Exclude queries containing URLs (user typos)
-    df = df[~df["query"].str.contains("ourworldindata", case=False, na=False)]
-
-    # Exclude queries starting with `/` (URL paths)
-    df = df[~df["query"].str.startswith("/", na=False)]
+    df = clean_queries(df)
 
     if len(df) == 0:
         return "climate change"  # Fallback
 
     # Remove prefix queries (e.g., "tobac" when "tobacco" exists)
     if filter_prefixes:
-        df = _remove_prefix_queries(df)
+        df = remove_prefix_queries(df)
 
     if len(df) == 0:
         return "climate change"  # Fallback
