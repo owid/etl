@@ -437,7 +437,7 @@ def check_between_0_and_1(tb_inequality: Table) -> None:
                     {_tabulate(tb_error)}"""
                 )
             elif any_error and welfare_type in ["wealth", "after tax disposable"]:
-                tb_error = tb_subset[gini_mask][["country", "year", "gini"]].copy()
+                tb_error = tb_subset[gini_mask][["country", "year", "gini"]].reset_index(drop=True)
                 paths.log.warning(
                     f"""{len(tb_error)} gini values for {welfare_type} (extrapolated={extrapolated}) are not between 0 and 1:
                     {_tabulate(tb_error)}"""
@@ -663,7 +663,7 @@ def check_monotonicity(tb_incomes: Table) -> None:
                         + ")"
                     )
 
-                    tb_error = errors[["country", "year", "error_desc"]].copy()
+                    tb_error = errors[["country", "year", "error_desc"]].reset_index(drop=True)
                     paths.log.fatal(
                         f"""{len(tb_error)} observations for {metric} {welfare_type} (extrapolated={extrapolated}) are not monotonically increasing:
                         {_tabulate(tb_error)}"""
@@ -831,10 +831,10 @@ def check_avg_between_thr(tb_incomes: Table) -> None:
                 errors["error_desc"] = (
                     "Decile "
                     + errors["quantile"]
-                    + ": avg="
-                    + errors["avg"].round(4).astype(str)
-                    + ", thr_lower="
+                    + ": thr_lower="
                     + errors["thr_lower_str"]
+                    + ", avg="
+                    + errors["avg"].round(4).astype(str)
                     + ", thr_upper="
                     + errors["thr_upper_str"]
                 )
