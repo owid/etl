@@ -8,7 +8,7 @@ meta:
       Share of professional developers who use AI tools in their development process,
       based on the annual Stack Overflow Developer Survey (2023–2025). The 2025 survey
       changed the question to include usage frequency (daily, weekly, monthly or infrequently).
-    date_published: "2023-2025"
+    date_published: "2025"
 
     # Citation
     producer: Stack Overflow
