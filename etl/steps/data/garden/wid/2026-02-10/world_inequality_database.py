@@ -25,10 +25,10 @@ paths = PathFinder(__file__)
 TABLEFMT = "pretty"
 
 # Define if sanity checks should run (set to True to see sanity check output)
-DEBUG = False
+DEBUG = True
 
 # Define if I show the full table or just the first 5 rows for assertions (only applies when DEBUG=True)
-LONG_FORMAT = False
+LONG_FORMAT = True
 
 # Define welfare types available and their new names
 WELFARE_TYPES = {
@@ -471,6 +471,8 @@ def check_gini_before_after_tax(tb_inequality: Table) -> None:
         mask = tb_merged["gini_after"] >= tb_merged["gini_before"]
         if mask.any():
             tb_error = tb_merged[mask][["country", "year", "gini_before", "gini_after"]].copy()
+            tb_error["gini_before"] = tb_error["gini_before"].round(4)
+            tb_error["gini_after"] = tb_error["gini_after"].round(4)
             tb_error["diff"] = (tb_error["gini_after"] - tb_error["gini_before"]).round(4)
             tb_error = tb_error.sort_values("diff", ascending=False).reset_index(drop=True)
             paths.log.warning(
