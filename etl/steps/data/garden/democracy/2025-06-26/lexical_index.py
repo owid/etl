@@ -6,7 +6,6 @@ from typing import cast
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_age_groups,
