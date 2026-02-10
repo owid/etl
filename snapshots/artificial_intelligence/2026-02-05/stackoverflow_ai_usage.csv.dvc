@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Stack Overflow Developer Survey – AI Tool Usage
+    description: |-
+      Share of professional developers who use AI tools in their development process,
+      based on the annual Stack Overflow Developer Survey (2023–2025). The 2025 survey
+      changed the question to include usage frequency (daily, weekly, monthly or infrequently).
+    date_published: "2025"
+
+    # Citation
+    producer: Stack Overflow
+    citation_full: |-
+      Stack Overflow Developer Survey, https://survey.stackoverflow.co/
+    attribution_short: Stack Overflow
+
+    # Files
+    url_main: https://survey.stackoverflow.co/
+    date_accessed: '2026-02-05'
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 3e1b743b2d39bb5146ffac58f772aeb2
+    size: 484
+    path: stackoverflow_ai_usage.csv
