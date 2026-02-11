@@ -29,6 +29,7 @@ tables:
         description_key:
           - This indicator reflects the mean estimate, and relies on IHME's "reference" scenario for data after 2018 (included).
           - The "reference" scenario is the baseline forecast obtained when projecting forward using IHME's main statistical models and the continuation of recent, location-specific trends in the key drivers.
+          - Regional aggregates (e.g. continents) are calculated by summing population values across member countries. For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data)
         display:
           numDecimalPlaces: 0
         presentation:
@@ -74,6 +75,7 @@ tables:
         description_short: The number of immigrants minus the number of emigrants over a given period.
         description_key:
           - Migration is forecasted once (with uncertainty) and then used as an input in all population projections; In other words, IHME's scenarios always use the same migration estimates. As a result, migration forecasts may have large uncertainty intervals.
+          - Regional aggregates (e.g. continents) are calculated by summing migration values across member countries. For these, we use [OWID's region definitions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data)
         display:
           numDecimalPlaces: 0
         presentation:
