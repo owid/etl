@@ -156,6 +156,13 @@ def migrate(
         if force or pb.needs_update():
             pb.upload(upload, dry_run, engine)
 
+    if dry_run:
+        lg.info("migrate.dry_run", namespace=namespace, version=version, short_name=short_name)
+        print(
+            f"\n[bold yellow]Dry run:[/bold yellow] Would create ETL steps for [bold]{namespace}/{version}/{short_name}[/bold]"
+        )
+        return
+
     # load both snapshots and recreate Dataset from it
     _generate_metadata_yaml(namespace, version, short_name, pb.short_name)
 
@@ -165,7 +172,7 @@ def migrate(
     # add steps to DAG
     _add_to_migrated_dag(namespace, version, short_name)
 
-    if run and not dry_run:
+    if run:
         _run_full_pipeline(dataset_id, namespace, version, short_name, engine)
     else:
         # Print instructions for manual execution
