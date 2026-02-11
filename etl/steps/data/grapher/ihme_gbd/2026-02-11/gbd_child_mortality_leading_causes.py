@@ -11,16 +11,14 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("leading_causes_deaths")
-
+    ds_garden = paths.load_dataset("gbd_child_mortality_leading_causes")
     # Read table from garden dataset.
-    all_tb = [ds_garden[tb_name] for tb_name in ds_garden.table_names]
-    #
-    # Save outputs.
+    tb = ds_garden.read("gbd_cause_deaths", reset_index=False)
+    # Save outputs .
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = paths.create_dataset(
-        tables=all_tb,
+        tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
     )
