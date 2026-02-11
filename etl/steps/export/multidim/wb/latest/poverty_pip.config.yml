@@ -13,14 +13,16 @@ default_selection:
   - Romania
   - Indonesia
 
-originUrl: ourworldindata.org/poverty
-
 default_dimensions:
   indicator: headcount_ratio
   poverty_line: "300"
   survey_comparability: No spells
 
 definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/poverty
+
   # Detailed colors:
   color_0_to_100: &color_0_to_100 "#D73027"
   color_100_to_300: &color_100_to_300 "#F46D43"
@@ -79,14 +81,14 @@ dimensions:
         description: The number of people living below the selected poverty line
   - name: Poverty line
     slug: poverty_line
-    description: In international dollars
+    description: In international dollars, adjusted for inflation and differences in living costs between countries.
     choices:
       - slug: "100"
         name: $1 a day
         group: Individual poverty lines
       - slug: "300"
         name: $3 a day
-        description: The international poverty line used to measure extreme poverty
+        description: The International Poverty Line set by the World Bank to measure extreme poverty
         group: Individual poverty lines
       - slug: "420"
         name: $4.20 a day
@@ -98,16 +100,21 @@ dimensions:
         group: Individual poverty lines
       - slug: "1000"
         name: $10 a day
+        description: Around $300 per month
         group: Individual poverty lines
       - slug: "2000"
         name: $20 a day
+        description: Around $600 per month
         group: Individual poverty lines
       - slug: "3000"
         name: $30 a day
+        description: Around $900 per month
         group: Individual poverty lines
       - slug: "4000"
         name: $40 a day
+        description: Around $1200 per month
         group: Individual poverty lines
+
       - slug: line_chart
         name: Line chart
         description: See how poverty has changed over time using four different poverty lines
@@ -120,18 +127,19 @@ dimensions:
         name: Bar chart
         description: Compare the distribution of incomes in different countries
         group: Visualize multiple poverty lines
+
       - slug: line_chart_more_lines
-        name: Line chart (more lines)
+        name: Line chart (multiple levels)
         description: See how poverty has changed over time using eight different poverty lines
-        group: Visualize multiple poverty lines (more lines)
+        group: Visualize multiple poverty lines (in more levels)
       - slug: area_chart_more_lines
-        name: Area chart (more lines)
+        name: Area chart (multiple levels)
         description: A more fine-grained breakdown of the distribution of incomes over time
-        group: Visualize multiple poverty lines (more lines)
+        group: Visualize multiple poverty lines (in more levels)
       - slug: bar_chart_more_lines
-        name: Bar chart (more lines)
+        name: Bar chart (multiple levels)
         description: A more fine-grained comparison of the distribution of incomes in different countries
-        group: Visualize multiple poverty lines (more lines)
+        group: Visualize multiple poverty lines (in more levels)
   - name: Breaks in data
     slug: survey_comparability
     description: The data provider reports where trends in countries are affected by changes in methodology. These breaks can be shown in the chart.
@@ -154,16 +162,16 @@ views:
       y:
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $3 a day"
+            name: "Below $3 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $4.20 a day"
+            name: "Below $4.20 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $8.30 a day"
+            name: "Below $8.30 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $30 a day"
+            name: "Below $30 a day"
     config:
       title: Share of the population living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
@@ -295,28 +303,28 @@ views:
       y:
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $1 a day"
+            name: "Below $1 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $3 a day"
+            name: "Below $3 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $4.20 a day"
+            name: "Below $4.20 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $8.30 a day"
+            name: "Below $8.30 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $10 a day"
+            name: "Below $10 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $20 a day"
+            name: "Below $20 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $30 a day"
+            name: "Below $30 a day"
         - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $40 a day"
+            name: "Below $40 a day"
     config:
       title: Share of the population living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
@@ -478,16 +486,16 @@ views:
       y:
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $3 a day"
+            name: "Below $3 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $4.20 a day"
+            name: "Below $4.20 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $8.30 a day"
+            name: "Below $8.30 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $30 a day"
+            name: "Below $30 a day"
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
@@ -616,28 +624,28 @@ views:
       y:
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $1 a day"
+            name: "Below $1 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $3 a day"
+            name: "Below $3 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $4.20 a day"
+            name: "Below $4.20 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $8.30 a day"
+            name: "Below $8.30 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $10 a day"
+            name: "Below $10 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $20 a day"
+            name: "Below $20 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $30 a day"
+            name: "Below $30 a day"
         - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Number below $40 a day"
+            name: "Below $40 a day"
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
