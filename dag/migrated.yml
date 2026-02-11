@@ -29,3 +29,7 @@ steps:
   data://garden/trade/latest/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data: !!set
     ? snapshot://trade/latest/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data.feather
     :
+  data://grapher/plastic_pollution/2021-04-30/plastic_ocean_pollution__meijer_et_al__2021: !!set
+    ? data://garden/plastic_pollution/2021-04-30/plastic_ocean_pollution__meijer_et_al__2021
+  data://garden/plastic_pollution/2021-04-30/plastic_ocean_pollution__meijer_et_al__2021: !!set
+    snapshot://plastic_pollution/2021-04-30/plastic_ocean_pollution__meijer_et_al__2021.feather:

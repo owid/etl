@@ -236,7 +236,7 @@ def process_poverty(tb: Table, absolute: bool) -> Table:
     for col in tb_pivot.columns:
         tb_pivot[col].m.origins = tb["value"].m.origins
 
-    return tb_pivot
+    return Table(tb_pivot)
 
 
 def process_inequality(tb: Table) -> Table:
@@ -266,7 +266,7 @@ def process_inequality(tb: Table) -> Table:
     for col in tb_pivot.columns:
         tb_pivot[col].m.origins = tb["value"].m.origins
 
-    return tb_pivot
+    return Table(tb_pivot)
 
 
 def process_incomes(tb: Table) -> Table:
