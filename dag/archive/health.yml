@@ -610,6 +610,8 @@ steps:
     - data-private://garden/ihme_gbd/2024-09-16/gbd_cancers_deaths
 
   # IHME GBD Leading cause of deaths - update
+  data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
+    - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
   data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
     - data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy
