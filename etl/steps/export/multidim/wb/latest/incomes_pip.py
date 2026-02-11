@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -58,26 +57,15 @@ def run() -> None:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
-    # Bake config automatically from table
-    config_new = expand_config(
-        tb,  # type: ignore
-        indicator_names=INDICATORS,
-        dimensions=DIMENSIONS_CONFIG,
-    )
-
-    # Combine both sources (YAML dimensions + auto-generated dimensions)
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] += config_new["views"]
-
     #
     # Create collection object
     #
     c = paths.create_collection(
         config=config,
         short_name="incomes_pip",
+        tb=tb,
+        indicator_names=INDICATORS,
+        dimensions=DIMENSIONS_CONFIG,
     )
 
     # First, group survey_comparability (this must happen first)

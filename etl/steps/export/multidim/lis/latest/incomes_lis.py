@@ -1,6 +1,5 @@
 """Multidim export for LIS incomes across the distribution."""
 
-from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -36,24 +35,13 @@ def run() -> None:
                 dims["decile"] = str(int(dims["decile"]))
     tb = tb[columns_to_keep]
 
-    # Auto-generate config from table
-    config_new = expand_config(
-        tb,  # type: ignore
-        indicator_names=INDICATORS,
-        dimensions=DIMENSIONS_CONFIG,
-    )
-
-    # Combine YAML + auto-generated dimensions
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] += config_new["views"]
-
     # Create collection
     c = paths.create_collection(
         config=config,
         short_name="incomes_lis",
+        tb=tb,
+        indicator_names=INDICATORS,
+        dimensions=DIMENSIONS_CONFIG,
     )
 
     # Group all deciles together

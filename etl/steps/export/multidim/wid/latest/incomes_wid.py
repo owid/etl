@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -43,26 +42,15 @@ def run() -> None:
                     dims.pop(dimension)
     tb = tb[columns_to_keep]
 
-    # Bake config automatically from table
-    config_new = expand_config(
-        tb,  # type: ignore
-        indicator_names=INDICATORS,
-        dimensions=DIMENSIONS_CONFIG,
-    )
-
-    # Combine both sources (YAML dimensions + auto-generated dimensions)
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] += config_new["views"]
-
     #
     # Create collection object
     #
     c = paths.create_collection(
         config=config,
         short_name="incomes_wid",
+        tb=tb,
+        indicator_names=INDICATORS,
+        dimensions=DIMENSIONS_CONFIG,
     )
 
     # Group deciles 1-10 together into an "all" view
