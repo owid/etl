@@ -1,0 +1,91 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Mental Health
+    processing_level: major
+
+macros: |-
+  <% macro title(metric, age, cause, sex) %>
+      <% if age == 'Age-standardized' %>
+          <% if metric == "Number" %>
+              <% set base = "Age-standardized current number of " ~ sex ~ " with " ~ cause %>
+          <% else %>
+              <% set base = "Age-standardized current cases of " ~ sex ~ " with " ~ cause %>
+          <% endif %>
+      <% elif age == 'All ages' %>
+          <% set base = "Total current number of " ~ sex ~ " with " ~ cause %>
+      <% else %>
+          <% set base = "Current cases of " ~ cause ~ ", among " ~ sex ~ " aged " ~ age %>
+      <% endif %>
+
+      <% if metric == "Rate" %>
+          <% set suffix = ", per 100,000 people" %>
+      <% elif metric == "Share" %>
+          <% set suffix = ", per 100 people" %>
+      <% else %>
+          <% set suffix = "" %>
+      <% endif %>
+
+      << base ~ suffix >>
+  <% endmacro %>
+
+
+  <% macro description_short(metric, age, cause, sex) %>
+      <% if age != 'Age-standardized' and age != 'All ages' %>
+          <% if metric == "Number" %>
+              The estimated prevalence of << cause >> in << sex >> aged << age >>.
+          <% elif metric == "Rate" %>
+              The estimated prevalence of << cause >> in << sex >> aged << age >>, per 100,000 people.
+          <% elif metric == "Share" %>
+              The estimated prevalence of << cause >> in << sex >> aged << age >>, per 100 people.
+          <% endif %>
+      <% elif age == 'Age-standardized' %>
+          <% if metric == "Number" %>
+              The estimated age-standardized prevalence of << sex >> with << cause >>.
+          <% elif metric == "Rate" %>
+              The estimated age-standardized prevalence of << sex >> with << cause >>, per 100,000 people.
+          <% elif metric == "Share" %>
+              The estimated age-standardized prevalence of << sex >> with << cause >>, per 100 people.
+          <% endif %>
+      <% elif age == 'All ages' %>
+          <% if metric == "Number" %>
+              The estimated prevalence of << cause >> in << sex >>.
+          <% elif metric == "Rate" %>
+              The estimated prevalence of << cause >> in << sex >>, per 100,000 people.
+          <% elif metric == "Share" %>
+              The estimated prevalence of << cause >> in << sex >>, per 100 people.
+          <% endif %>
+      <% endif %>
+  <% endmacro %>
+
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+tables:
+  gbd_mental_health:
+    variables:
+      value:
+        title: |-
+          {macros}
+          << title(metric, age, format_cause(cause), format_sex(sex)) >>
+        unit: |-
+          <% if metric == "Number" %>
+            cases
+          <%- elif metric == "Rate" %>
+            cases per 100,000 people
+          <%- elif metric == "Share" %>
+            %
+          <%- endif %>
+        short_unit: |-
+          {definitions.short_unit}
+        description_short: |-
+          {macros}
+          << description_short(metric, age, format_cause(cause), format_sex(sex)) >>
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<% endif %>
