@@ -62,8 +62,13 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": lambda view: ["StackedArea"] if view.matches(indicator="share") else ["LineChart"],
                     "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
                 },
             },
             {
@@ -78,9 +83,18 @@ def run() -> None:
                     "chartTypes": ["StackedDiscreteBar"],
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
                 },
             },
         ],
+        params={
+            "title": _get_grouped_decile_title,
+            "subtitle": _get_grouped_decile_subtitle,
+        },
     )
 
     # Filter decile views: keep only relevant deciles per indicator
@@ -94,17 +108,10 @@ def run() -> None:
         ]
     )
 
-    # Update chart type for share "all" views to StackedArea
-    for view in c.views:
-        if view.matches(decile="all", indicator="share"):
-            if view.config is None:
-                view.config = {}
-            view.config["chartTypes"] = ["StackedArea"]
-
     # Build indicator display names from metadata
     indicator_display_names = _build_indicator_display_names(tb)
 
-    # Customize grouped decile views (all, all_bar)
+    # Customize grouped decile views: sort indicators and set display names
     for view in c.views:
         if (view.matches(decile="all") or view.matches(decile="all_bar")) and view.indicators.y:
             # Sort indicators by decile number
@@ -113,7 +120,7 @@ def run() -> None:
                 reverse_order = not reverse_order
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
 
-            # For all_bar: set sortBy
+            # For all_bar: set sortBy (depends on sorted indicator order)
             if view.matches(decile="all_bar"):
                 decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
                 if decile_10_ind:
@@ -127,29 +134,6 @@ def run() -> None:
                 name = _get_display_name_from_metadata(ind, indicator_display_names)
                 if name:
                     ind.display = {"name": name}
-
-            # Set titles/subtitles
-            period = view.dimensions.get("period")
-            welfare_type = view.dimensions.get("welfare_type")
-            wt_label = "after tax" if welfare_type == "dhi" else "before tax"
-            if view.config is None:
-                view.config = {}
-
-            if view.matches(indicator="thr"):
-                view.config["title"] = f"Threshold income per {period} for each decile ({wt_label})"
-                subtitle = f"The level of income per person per {period} below which 10%, 20%, 30%, etc. of the population falls. Income here is measured {wt_label}es and benefits. {PPP_ADJUSTMENT_SUBTITLE}"
-                view.config["subtitle"] = subtitle
-                view.metadata = {"description_short": subtitle}
-            elif view.matches(indicator="avg"):
-                view.config["title"] = f"Mean income per {period} within each decile ({wt_label})"
-                subtitle = f"The mean income per person per {period} within each decile (tenth of the population). Income here is measured {wt_label}es and benefits. {PPP_ADJUSTMENT_SUBTITLE}"
-                view.config["subtitle"] = subtitle
-                view.metadata = {"description_short": subtitle}
-            elif view.matches(indicator="share"):
-                view.config["title"] = f"Income share for each decile ({wt_label})"
-                subtitle = f"The share of income received by each decile (tenth of the population). Income here is measured {wt_label}es and benefits."
-                view.config["subtitle"] = subtitle
-                view.metadata = {"description_short": subtitle}
 
     # Group welfare_type (before vs after tax)
     c.group_views(
@@ -165,50 +149,28 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["LineChart"],
                     "missingDataStrategy": "hide",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                    "note": "",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
+                    "description_key": lambda view: _get_before_vs_after_metadata(tb, view)["description_key"],
                 },
             },
         ],
+        params={
+            "title": lambda view: _get_before_vs_after_metadata(tb, view)["title"],
+            "subtitle": lambda view: _get_before_vs_after_metadata(tb, view)["subtitle"],
+        },
     )
 
     # Remove before_vs_after for grouped decile views — too many indicators
     c.drop_views([{"welfare_type": ["before_vs_after"], "decile": ["all", "all_bar", "10_40_50", "10_40_50_bar"]}])
 
-    # Customize before_vs_after views
+    # Set display names for before_vs_after views
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
-            first_ind = view.indicators.y[0]
-            col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
-
-            if col_name and col_name in tb.columns:
-                meta = tb[col_name].metadata
-                grapher_config = meta.presentation.grapher_config if meta.presentation else {}
-
-                # Extract and modify title
-                title = grapher_config.get("title", "")
-                title = title.replace("after tax", "before vs. after tax")
-
-                # Extract and modify subtitle (remove welfare type phrase)
-                subtitle = grapher_config.get("subtitle", "")
-                subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
-
-                # Get description_key and remove the welfare type item
-                description_key = list(meta.description_key) if meta.description_key else []
-                description_key = [k for k in description_key if "post-tax" not in k and "pre-tax" not in k]
-
-                # Update config with title, subtitle, and note (other config set by group_views)
-                if view.config is None:
-                    view.config = {}
-                view.config["title"] = title
-                view.config["subtitle"] = subtitle
-                view.config["note"] = ""
-
-                # Set metadata
-                view.metadata = {
-                    "description_short": subtitle,
-                    "description_key": description_key,
-                }
-
-            # Set display names for each indicator
             for ind in view.indicators.y:
                 if "_dhi_" in ind.catalogPath:
                     ind.display = {"name": "After tax"}
@@ -216,6 +178,59 @@ def run() -> None:
                     ind.display = {"name": "Before tax"}
 
     c.save()
+
+
+def _get_grouped_decile_title(view):
+    """Return title for grouped decile views based on indicator type."""
+    period = view.dimensions.get("period")
+    wt_label = "after tax" if view.dimensions.get("welfare_type") == "dhi" else "before tax"
+    titles = {
+        "thr": f"Threshold income per {period} for each decile ({wt_label})",
+        "avg": f"Mean income per {period} within each decile ({wt_label})",
+        "share": f"Income share for each decile ({wt_label})",
+    }
+    return titles.get(view.dimensions.get("indicator"), "")
+
+
+def _get_grouped_decile_subtitle(view):
+    """Return subtitle for grouped decile views based on indicator type."""
+    period = view.dimensions.get("period")
+    wt_label = "after tax" if view.dimensions.get("welfare_type") == "dhi" else "before tax"
+    subtitles = {
+        "thr": f"The level of income per person per {period} below which 10%, 20%, 30%, etc. of the population falls. Income here is measured {wt_label}es and benefits. {PPP_ADJUSTMENT_SUBTITLE}",
+        "avg": f"The mean income per person per {period} within each decile (tenth of the population). Income here is measured {wt_label}es and benefits. {PPP_ADJUSTMENT_SUBTITLE}",
+        "share": f"The share of income received by each decile (tenth of the population). Income here is measured {wt_label}es and benefits.",
+    }
+    return subtitles.get(view.dimensions.get("indicator"), "")
+
+
+def _get_before_vs_after_metadata(tb, view):
+    """Extract and transform metadata from grapher_config for before_vs_after views.
+
+    Returns a dict with 'title', 'subtitle', and 'description_key'.
+    """
+    if not view.indicators.y:
+        return {"title": "", "subtitle": "", "description_key": []}
+
+    first_ind = view.indicators.y[0]
+    col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
+
+    if col_name and col_name in tb.columns:
+        meta = tb[col_name].metadata
+        grapher_config = meta.presentation.grapher_config if meta.presentation else {}
+
+        title = grapher_config.get("title", "")
+        title = title.replace("after tax", "before vs. after tax")
+
+        subtitle = grapher_config.get("subtitle", "")
+        subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
+
+        description_key = list(meta.description_key) if meta.description_key else []
+        description_key = [k for k in description_key if "post-tax" not in k and "pre-tax" not in k]
+
+        return {"title": title, "subtitle": subtitle, "description_key": description_key}
+
+    return {"title": "", "subtitle": "", "description_key": []}
 
 
 def _build_indicator_display_names(tb):
