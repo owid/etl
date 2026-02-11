@@ -16,7 +16,10 @@ default_dimensions:
   welfare_type: dhi
   period: month
 
-originUrl: ourworldindata.org/economic-inequality
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/economic-inequality
 
 dimensions:
   - name: Metric

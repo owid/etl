@@ -15,7 +15,10 @@ default_selection:
 default_dimensions:
   welfare_type: before tax
 
-originUrl: ourworldindata.org/economic-inequality
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/economic-inequality
 
 dimensions:
   - name: Income measure
