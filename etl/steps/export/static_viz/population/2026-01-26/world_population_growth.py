@@ -3,201 +3,16 @@
 This code generates a chart showing world population and growth rates from 1700 to 2100, combining historical data with UN projections.
 """
 
-import xml.etree.ElementTree as ET
-from pathlib import Path
-
-import matplotlib
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import structlog
-from owid.catalog import Dataset, Table
-from owid.catalog import processing as pr
+from owid.catalog import Table
 
-from etl import paths as etl_paths
-from etl.helpers import create_dataset
+from etl.helpers import PathFinder
 
-# Configure matplotlib to use SVG text elements instead of paths
-matplotlib.rcParams["svg.fonttype"] = "none"
-
-# Paths for this export step
-CURRENT_DIR = Path(__file__).parent
-OUTPUT_DIR = etl_paths.EXPORT_DIR / "static_viz/2026-01-26/world_population_growth"
-SHORT_NAME = "world_population_growth"
-
-log = structlog.get_logger()
-
-
-def optimize_svg_for_figma(svg_path: Path) -> None:
-    """Optimize SVG for easier editing in Figma.
-
-    Flattens matplotlib's nested group structure and creates semantic groups
-    based on visual purpose.
-
-    Args:
-        svg_path: Path to the SVG file to optimize
-    """
-    # Register SVG namespace to preserve it
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
-
-    tree = ET.parse(svg_path)
-    root = tree.getroot()
-
-    # Define SVG namespace for ElementTree operations
-    ns = {"svg": "http://www.w3.org/2000/svg"}
-
-    # Find the main group containing all matplotlib content
-    main_group = root.find("./svg:g[@id='figure_1']", ns)
-    if main_group is None:
-        log.warning("Could not find figure_1 group in SVG, skipping optimization")
-        return
-
-    # Remove large white background elements first (before reorganizing)
-    for elem in list(main_group.findall(".//svg:rect", ns)) + list(main_group.findall(".//svg:path", ns)):
-        fill = elem.get("fill", "")
-        style = elem.get("style", "")
-        is_white = fill in ("#ffffff", "white", "#FFFFFF") or "#ffffff" in style.lower()
-
-        if is_white:
-            d_attr = elem.get("d", "")
-            width_attr = elem.get("width", "0")
-            height_attr = elem.get("height", "0")
-            try:
-                if elem.tag == "{http://www.w3.org/2000/svg}rect":
-                    w, h = float(width_attr), float(height_attr)
-                    is_large = w > 100 and h > 100
-                else:
-                    is_large = any(x in d_attr for x in ["L 1009", "L 958", "L 894"])
-            except (ValueError, AttributeError):
-                is_large = False
-
-            if is_large:
-                for parent in root.iter():
-                    if elem in list(parent):
-                        parent.remove(elem)
-                        break
-
-    # Create new flat structure
-    new_structure = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
-
-    # Semantic groups in render order (bottom to top)
-    group_order = [
-        "grid-lines",
-        "axes-spines",
-        "population-fill",
-        "growth-line",
-        "population-outline",
-        "markers",
-        "projection-bracket",
-        "legend-shapes",
-        "title",
-        "legend-labels",
-        "axis-labels",
-        "data-labels",
-        "source",
-    ]
-
-    groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
-
-    # Collect and categorize all visual elements
-    for elem in main_group.iter():
-        if elem.tag in [
-            "{http://www.w3.org/2000/svg}path",
-            "{http://www.w3.org/2000/svg}line",
-            "{http://www.w3.org/2000/svg}rect",
-            "{http://www.w3.org/2000/svg}text",
-            "{http://www.w3.org/2000/svg}use",
-        ]:
-            # Make a copy to avoid modifying during iteration
-            elem_copy = ET.Element(elem.tag, elem.attrib)
-            elem_copy.text = elem.text
-            elem_copy.tail = None
-            for child in elem:
-                elem_copy.append(child)
-
-            # Categorize
-            target_group = None
-            fill = elem.get("fill", "")
-            stroke = elem.get("stroke", "")
-            style = elem.get("style", "")
-            href = elem.get("{http://www.w3.org/1999/xlink}href", "")
-
-            if elem.tag == "{http://www.w3.org/2000/svg}text":
-                text_content = "".join(elem.itertext()).lower()
-                if "world population growth" in text_content:
-                    target_group = "title"
-                elif "annual growth" in text_content or "world population" in text_content:
-                    target_group = "legend-labels"
-                elif "data source" in text_content or "ourworldindata" in text_content:
-                    target_group = "source"
-                elif "billion" in text_content or "million" in text_content or "%" in text_content:
-                    target_group = "data-labels"
-                else:
-                    target_group = "axis-labels"
-            elif elem.tag == "{http://www.w3.org/2000/svg}path":
-                if "#0c988c" in fill.lower() or "#17a899" in fill.lower():
-                    target_group = "population-fill"
-                elif "#b4358c" in stroke.lower() or "b4358c" in style.lower():
-                    target_group = "growth-line"
-                elif stroke in ("black", "#000000") or "#000000" in stroke:
-                    target_group = "population-outline"
-                elif "#eeeeee" in stroke.lower() or "fill:none" in style:
-                    target_group = "grid-lines"
-                elif len(elem.get("d", "")) < 200:  # Small path = marker
-                    target_group = "markers"
-                else:
-                    target_group = "grid-lines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}line":
-                if "#999999" in stroke.lower():
-                    target_group = "projection-bracket"
-                elif "#b4358c" in stroke.lower():
-                    target_group = "legend-shapes"
-                elif "#eeeeee" in stroke.lower():
-                    target_group = "grid-lines"
-                else:
-                    target_group = "axes-spines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}rect":
-                if "#17a899" in fill.lower():
-                    target_group = "legend-shapes"
-                else:
-                    target_group = "grid-lines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}use":
-                # Categorize based on href
-                if "#m" in href:  # references to path definitions
-                    # Check parent group ID to determine purpose
-                    parent_id = ""
-                    for parent in main_group.iter():
-                        if elem in list(parent):
-                            parent_id = parent.get("id", "")
-                            break
-                    if "Fill" in parent_id:
-                        fill_style = elem.get("style", "")
-                        if "#0c988c" in fill_style.lower():
-                            target_group = "population-fill"
-                        else:
-                            target_group = "population-fill"
-                    elif "line2d" in parent_id:
-                        target_group = "markers"
-                    else:
-                        target_group = "markers"
-
-            if target_group:
-                groups[target_group].append(elem_copy)
-
-    # Remove empty groups
-    for gid in list(group_order):
-        if len(groups[gid]) == 0:
-            new_structure.remove(groups[gid])
-
-    # Replace main_group content with new structure
-    main_group.clear()
-    for child in new_structure:
-        main_group.append(child)
-
-    # Write optimized SVG
-    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
+# Initialize paths
+paths = PathFinder(__file__)
 
 
 def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
@@ -236,28 +51,18 @@ def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
     return milestones
 
 
-def build_source_citation(tb_historical: Table, tb_projection: Table) -> str:
+def build_source_citation(tb: Table) -> str:
     """Build source citation text from table metadata.
 
     Args:
-        tb_historical: Historical population table with metadata
-        tb_projection: Projection population table with metadata
+        tb: Population table with metadata
 
     Returns:
         Formatted source citation string
     """
-    # Collect unique origins from all indicators used
-    all_origins = []
-    col = tb_historical["population_historical"]
-    if hasattr(col.metadata, "origins") and col.metadata.origins:
-        all_origins.extend(col.metadata.origins)
-    col = tb_projection["population_projection"]
-    if hasattr(col.metadata, "origins") and col.metadata.origins:
-        all_origins.extend(col.metadata.origins)
 
-    # Deduplicate origins
     unique_origins = {}
-    for origin in all_origins:
+    for origin in tb["population"].metadata.origins:
         key = (origin.attribution_short, origin.title, origin.date_published)
         if key not in unique_origins:
             unique_origins[key] = origin
@@ -272,8 +77,6 @@ def build_source_citation(tb_historical: Table, tb_projection: Table) -> str:
 
 def create_visualization(
     tb: Table,
-    tb_historical: Table,
-    tb_projection: Table,
     year_cut: int,
     growth_rate_1700: float | None,
     filter_mask: pd.Series,
@@ -281,9 +84,7 @@ def create_visualization(
     """Create the population growth visualization figure.
 
     Args:
-        tb: Complete table with year, population, growth_rate
-        tb_historical: Historical population table with metadata
-        tb_projection: Projection population table with metadata
+        tb: Complete table with year, population, growth_rate and metadata
         year_cut: Year where historical data ends and projections begin
         growth_rate_1700: Special growth rate for 1700 (10,000 BCE baseline)
         filter_mask: Boolean mask for years where growth rate should be displayed
@@ -475,7 +276,7 @@ def create_visualization(
     )
 
     # ----- Source note (bottom-left, grey) -----
-    source_text = build_source_citation(tb_historical, tb_projection)
+    source_text = build_source_citation(tb)
 
     fig.text(
         0.07,
@@ -514,62 +315,43 @@ def run() -> None:
     - SVG and PNG charts
     - Dataset with population and growth rate data
     """
-    # Load the population dataset from grapher
-    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-15/population")
+    # Load the population dataset using PathFinder
+    ds_pop = paths.load_dataset("population")
 
-    # Load historical and projection tables
-    tb_historical = ds["historical"]
-    tb_projection = ds["projections"]
-    # Extract World data from historical
-    world_hist = tb_historical[tb_historical.index.get_level_values("country") == "World"].reset_index()
-    world_proj = tb_projection[tb_projection.index.get_level_values("country") == "World"].reset_index()
+    # Load population table
+    tb = ds_pop.read("population")
+    tb = tb.loc[tb["country"] == "World", ["year", "population"]].copy().reset_index(drop=True)
+    tb = tb.sort_values("year").reset_index(drop=True)
 
-    # Get full historical data to access 10,000 BCE
-    tb_full_hist = world_hist[["year", "population_historical", "growth_rate_historical"]].copy()
+    # Calculate growth rates using adjacent years
+    tb["year_prev"] = tb["year"].shift(1)
+    tb["pop_prev"] = tb["population"].shift(1)
+    tb["years_diff"] = tb["year"] - tb["year_prev"]
 
-    tb_hist_filtered = tb_full_hist[["year", "population_historical"]].copy()
-    tb_hist_filtered.columns = ["year", "population"]
-    tb_hist_filtered = tb_hist_filtered.sort_values("year").reset_index(drop=True)
+    # Vectorized growth rate calculation
+    mask = (tb["years_diff"] > 0) & (tb["pop_prev"] > 0)
+    tb["growth_rate"] = np.nan
+    tb.loc[mask, "growth_rate"] = 100 * (
+        np.log(tb.loc[mask, "population"] / tb.loc[mask, "pop_prev"]) / tb.loc[mask, "years_diff"]
+    )
 
-    # Calculate growth rate for 1700 using 10,000 BCE as baseline
+    # Calculate special growth rate for 1700 using 10,000 BCE as baseline
     growth_rate_1700 = None
-    pop_10000bce_data = tb_full_hist[tb_full_hist["year"] == -10000]["population_historical"]
-    pop_1700_data = tb_hist_filtered[tb_hist_filtered["year"] == 1700]["population"]
+    pop_10000bce_data = tb[tb["year"] == -10000]["population"]
+    pop_1700_data = tb[tb["year"] == 1700]["population"]
 
     if not pop_10000bce_data.empty and not pop_1700_data.empty:
         pop_10000bce = pop_10000bce_data.iloc[0]
         pop_1700 = pop_1700_data.iloc[0]
         growth_rate_1700 = 100 * (np.log(pop_1700 / pop_10000bce) / (1700 - (-10000)))
-        log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
+        paths.log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
+        # Override 1700 growth rate with long-term baseline
+        tb.loc[tb["year"] == 1700, "growth_rate"] = growth_rate_1700
     else:
-        log.warning("Could not calculate growth rate for 1700: missing 10,000 BCE or 1700 data")
-
-    # Vectorized growth rate calculation for adjacent years
-    tb_hist_filtered["year_prev"] = tb_hist_filtered["year"].shift(1)
-    tb_hist_filtered["pop_prev"] = tb_hist_filtered["population"].shift(1)
-    tb_hist_filtered["years_diff"] = tb_hist_filtered["year"] - tb_hist_filtered["year_prev"]
-
-    # Calculate growth rates (only where valid)
-    mask = (tb_hist_filtered["years_diff"] > 0) & (tb_hist_filtered["pop_prev"] > 0)
-    tb_hist_filtered["growth_rate"] = np.nan
-    tb_hist_filtered.loc[mask, "growth_rate"] = 100 * (
-        np.log(tb_hist_filtered.loc[mask, "population"] / tb_hist_filtered.loc[mask, "pop_prev"])
-        / tb_hist_filtered.loc[mask, "years_diff"]
-    )
-
-    # Override 1700 with the special calculation if available
-    if growth_rate_1700 is not None:
-        tb_hist_filtered.loc[tb_hist_filtered["year"] == 1700, "growth_rate"] = growth_rate_1700
+        paths.log.warning("Could not calculate growth rate for 1700: missing 10,000 BCE or 1700 data")
 
     # Clean up temporary columns
-    tb_hist_filtered = tb_hist_filtered.drop(columns=["year_prev", "pop_prev", "years_diff"])
-
-    # Prepare projection data
-    tb_proj = world_proj[["year", "population_projection", "growth_rate_projection"]].copy()
-    tb_proj.columns = ["year", "population", "growth_rate"]
-
-    # Combine filtered historical and projection data
-    tb = pr.concat([tb_hist_filtered, tb_proj], ignore_index=True).sort_values("year")
+    tb = tb.drop(columns=["year_prev", "pop_prev", "years_diff"])
 
     # Filter to 1700-2100
     tb = tb[(tb["year"] >= 1700) & (tb["year"] <= 2100)].copy()
@@ -578,12 +360,19 @@ def run() -> None:
     expected_years = [1700, 2023, 2100]
     missing_years = [year for year in expected_years if year not in tb["year"].values]
     if missing_years:
-        log.warning(f"Missing expected years in data: {missing_years}")
+        paths.log.warning(f"Missing expected years in data: {missing_years}")
 
-    # Validate no gaps between historical and projection
-    year_cut = int(world_hist["year"].max())
-    if year_cut not in tb["year"].values or (year_cut + 1) not in tb["year"].values:
-        log.warning(f"Potential gap at historical/projection boundary (year {year_cut})")
+    # Determine year_cut (last historical year before projections start)
+    # Find the minimum year in the projections table to identify where projections begin
+    tb_proj = ds_pop.read("projections")
+    tb_proj_world = tb_proj.loc[tb_proj["country"] == "World"]
+    if not tb_proj_world.empty:
+        year_cut = int(tb_proj_world["year"].min()) - 1  # Last historical year is one before first projection
+    else:
+        # Fallback: assume 2023 is the cutoff
+        year_cut = 2023
+
+    paths.log.info(f"Using year_cut={year_cut} (projections start at {year_cut + 1})")
 
     # Omit growth rates for years that don't match the R filtering pattern:
     # Keep only: 100-year intervals (1700-1800), 100-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
@@ -598,32 +387,11 @@ def run() -> None:
     # Convert population to billions
     tb["population_billions"] = tb["population"] / 1e9
 
-    # Determine cutoff year: last year of historical data
-    year_cut = int(world_hist["year"].max())
-
-    # Prepare table data before creating visualization
-    tb_viz = tb.copy()
-    tb["country"] = "World"
-    # Add notes explaining special cases
-    tb["note"] = None
-    if growth_rate_1700 is not None:
-        tb.loc[tb["year"] == 1700, "note"] = (
-            f"Growth rate calculated using population between 10,000 BCE and 1700: {growth_rate_1700:.4f}%"
-        )
-    tb.loc[~filter_mask, "note"] = "Growth rate omitted for smooth visualization"
-
-    tb = tb.format(["year", "country"], short_name=SHORT_NAME)
-
-    tb["note"].metadata.origins = tb["population"].metadata.origins
-    # Create and save dataset
-    ds_export = create_dataset(OUTPUT_DIR, tables=[tb])
-    ds_export.save()
-
     # Create visualization (all figure operations grouped in function)
-    fig = create_visualization(tb_viz, tb_historical, tb_projection, year_cut, growth_rate_1700, filter_mask)
+    fig = create_visualization(tb, year_cut, growth_rate_1700, filter_mask)
 
     # Save chart outputs
-    output_path = CURRENT_DIR / "world_population_growth_1700_2100.svg"
+    output_path = paths.directory / "world_population_growth_1700_2100.svg"
     fig.savefig(
         output_path,
         format="svg",
@@ -633,11 +401,10 @@ def run() -> None:
     )
 
     # Optimize SVG for Figma editing
-    optimize_svg_for_figma(output_path)
-    log.info(f"Saved and optimized chart to {output_path}")
+    paths.log.info(f"Saved chart to {output_path}")
 
-    output_path_png = CURRENT_DIR / "world_population_growth_1700_2100.png"
+    output_path_png = paths.directory / "world_population_growth_1700_2100.png"
     fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
-    log.info(f"Saved chart to {output_path_png}")
+    paths.log.info(f"Saved chart to {output_path_png}")
 
     plt.close(fig)

@@ -5,5 +5,5 @@ steps:
 
   # World population long-run visualization (10,000 BCE - 2100)
   export://static_viz/population/2026-02-02/world_population_long_run:
-    - data://garden/demography/2024-07-15/population
-    - data://garden/demography/2025-10-22/life_expectancy
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/demography/2025-10-22/life_expectancy

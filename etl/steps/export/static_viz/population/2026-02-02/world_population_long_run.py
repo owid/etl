@@ -3,200 +3,14 @@
 This code generates a chart showing world population from 10,000 BCE to 2100, combining historical data with UN projections.
 """
 
-import xml.etree.ElementTree as ET
-from pathlib import Path
-
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import structlog
-from owid.catalog import Dataset, Table
-from owid.catalog import processing as pr
+from owid.catalog import Table
 
-from etl import paths as etl_paths
-from etl.helpers import create_dataset
+from etl.helpers import PathFinder
 
-# Configure matplotlib to use SVG text elements instead of paths
-matplotlib.rcParams["svg.fonttype"] = "none"
-
-# Paths for this export step
-CURRENT_DIR = Path(__file__).parent
-OUTPUT_DIR = etl_paths.EXPORT_DIR / "static_viz/2026-02-02/world_population_long_run"
-SHORT_NAME = "world_population_long_run"
-
-log = structlog.get_logger()
-
-
-def optimize_svg_for_figma(svg_path: Path) -> None:
-    """Optimize SVG for easier editing in Figma.
-
-    Flattens matplotlib's nested group structure and creates semantic groups
-    based on visual purpose.
-
-    Args:
-        svg_path: Path to the SVG file to optimize
-    """
-    # Register SVG namespace to preserve it
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
-
-    tree = ET.parse(svg_path)
-    root = tree.getroot()
-
-    # Define SVG namespace for ElementTree operations
-    ns = {"svg": "http://www.w3.org/2000/svg"}
-
-    # Find the main group containing all matplotlib content
-    main_group = root.find("./svg:g[@id='figure_1']", ns)
-    if main_group is None:
-        log.warning("Could not find figure_1 group in SVG, skipping optimization")
-        return
-
-    # Remove large white background elements first (before reorganizing)
-    for elem in list(main_group.findall(".//svg:rect", ns)) + list(main_group.findall(".//svg:path", ns)):
-        fill = elem.get("fill", "")
-        style = elem.get("style", "")
-        is_white = fill in ("#ffffff", "white", "#FFFFFF") or "#ffffff" in style.lower()
-
-        if is_white:
-            d_attr = elem.get("d", "")
-            width_attr = elem.get("width", "0")
-            height_attr = elem.get("height", "0")
-            try:
-                if elem.tag == "{http://www.w3.org/2000/svg}rect":
-                    w, h = float(width_attr), float(height_attr)
-                    is_large = w > 100 and h > 100
-                else:
-                    is_large = any(x in d_attr for x in ["L 1009", "L 958", "L 894"])
-            except (ValueError, AttributeError):
-                is_large = False
-
-            if is_large:
-                for parent in root.iter():
-                    if elem in list(parent):
-                        parent.remove(elem)
-                        break
-
-    # Create new flat structure
-    new_structure = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
-
-    # Semantic groups in render order (bottom to top)
-    group_order = [
-        "grid-lines",
-        "axes-spines",
-        "historical-fill",
-        "projection-fill",
-        "population-outline",
-        "markers",
-        "title",
-        "axis-labels",
-        "data-labels",
-        "annotations",
-        "source",
-    ]
-
-    groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
-
-    # Collect and categorize all visual elements
-    for elem in main_group.iter():
-        if elem.tag in [
-            "{http://www.w3.org/2000/svg}path",
-            "{http://www.w3.org/2000/svg}line",
-            "{http://www.w3.org/2000/svg}rect",
-            "{http://www.w3.org/2000/svg}text",
-            "{http://www.w3.org/2000/svg}use",
-        ]:
-            # Make a copy to avoid modifying during iteration
-            elem_copy = ET.Element(elem.tag, elem.attrib)
-            elem_copy.text = elem.text
-            elem_copy.tail = None
-            for child in elem:
-                elem_copy.append(child)
-
-            # Categorize
-            target_group = None
-            fill = elem.get("fill", "")
-            stroke = elem.get("stroke", "")
-            style = elem.get("style", "")
-
-            if elem.tag == "{http://www.w3.org/2000/svg}text":
-                text_content = "".join(elem.itertext()).lower()
-                if "size of the world population" in text_content or "long-run" in text_content:
-                    target_group = "title"
-                elif "data source" in text_content or "ourworldindata" in text_content or "licensed" in text_content:
-                    target_group = "source"
-                elif any(
-                    x in text_content
-                    for x in [
-                        "billion",
-                        "million",
-                        "1700",
-                        "1800",
-                        "1900",
-                        "1928",
-                        "1960",
-                        "1974",
-                        "1987",
-                        "1999",
-                        "2011",
-                        "2023",
-                        "2036",
-                        "2058",
-                    ]
-                ):
-                    target_group = "data-labels"
-                elif any(
-                    x in text_content
-                    for x in [
-                        "10,000 bce",
-                        "black death",
-                        "growth rate",
-                        "projection",
-                        "life expectancy",
-                        "year 0",
-                    ]
-                ):
-                    target_group = "annotations"
-                else:
-                    target_group = "axis-labels"
-            elif elem.tag == "{http://www.w3.org/2000/svg}path":
-                if "#804d7f" in fill.lower() or "#9467bd" in fill.lower():
-                    target_group = "historical-fill"
-                elif "#c588c1" in fill.lower() or "#ce93d8" in fill.lower():
-                    target_group = "projection-fill"
-                elif stroke in ("black", "#000000") or "#000000" in stroke:
-                    target_group = "population-outline"
-                elif "#eeeeee" in stroke.lower() or "fill:none" in style:
-                    target_group = "grid-lines"
-                elif len(elem.get("d", "")) < 200:  # Small path = marker
-                    target_group = "markers"
-                else:
-                    target_group = "grid-lines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}line":
-                if "#eeeeee" in stroke.lower():
-                    target_group = "grid-lines"
-                else:
-                    target_group = "axes-spines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}rect":
-                target_group = "grid-lines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}use":
-                target_group = "markers"
-
-            if target_group:
-                groups[target_group].append(elem_copy)
-
-    # Remove empty groups
-    for gid in list(group_order):
-        if len(groups[gid]) == 0:
-            new_structure.remove(groups[gid])
-
-    # Replace main_group content with new structure
-    main_group.clear()
-    for child in new_structure:
-        main_group.append(child)
-
-    # Write optimized SVG
-    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
+# Initialize paths
+paths = PathFinder(__file__)
 
 
 def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
@@ -213,7 +27,7 @@ def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
     # First, add specific years: 1700, 1800, 1900
     specific_years = [1700, 1800, 1900]
     for year in specific_years:
-        year_data = tb[tb["year"] == year]
+        year_data = tb.loc[tb["year"] == year]
         if not year_data.empty:
             pop = float(year_data.iloc[0]["population_billions"])
             # Format the label
@@ -227,7 +41,7 @@ def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
     milestone_thresholds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
     for threshold in milestone_thresholds:
         # Find the year when population first crosses this threshold
-        crossing_data = tb[tb["population_billions"] >= threshold]
+        crossing_data = tb.loc[tb["population_billions"] >= threshold]
         if not crossing_data.empty:
             year = int(crossing_data.iloc[0]["year"])
             pop = float(crossing_data.iloc[0]["population_billions"])
@@ -237,28 +51,18 @@ def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
     return milestones
 
 
-def build_source_citation(tb_historical: Table, tb_projection: Table) -> str:
+def build_source_citation(tb: Table) -> str:
     """Build source citation text from table metadata.
 
     Args:
-        tb_historical: Historical population table with metadata
-        tb_projection: Projection population table with metadata
+        tb: Population table with metadata
 
     Returns:
         Formatted source citation string
     """
-    # Collect unique origins from all indicators used
-    all_origins = []
-    col = tb_historical["population_historical"]
-    if hasattr(col.metadata, "origins") and col.metadata.origins:
-        all_origins.extend(col.metadata.origins)
-    col = tb_projection["population_projection"]
-    if hasattr(col.metadata, "origins") and col.metadata.origins:
-        all_origins.extend(col.metadata.origins)
 
-    # Deduplicate origins
     unique_origins = {}
-    for origin in all_origins:
+    for origin in tb["population"].metadata.origins:
         key = (origin.attribution_short, origin.title, origin.date_published)
         if key not in unique_origins:
             unique_origins[key] = origin
@@ -267,14 +71,12 @@ def build_source_citation(tb_historical: Table, tb_projection: Table) -> str:
     source_parts = []
     for (producer, title, date_pub), origin in sorted(unique_origins.items()):
         year = date_pub.split("-")[0] if date_pub else ""
-        source_parts.append(f"{producer} ({year})" if year else producer)
-    return "Data sources: ".join(source_parts) + "."
+        source_parts.append(f"{producer} ({year})")
+    return "Data sources: " + "; ".join(source_parts)
 
 
 def create_visualization(
     tb: Table,
-    tb_historical: Table,
-    tb_projection: Table,
     year_cut: int,
     life_expectancy_before_1800: float | None = None,
     life_expectancy_2023: float | None = None,
@@ -283,8 +85,6 @@ def create_visualization(
 
     Args:
         tb: Complete table with year, population_billions
-        tb_historical: Historical population table with metadata
-        tb_projection: Projection population table with metadata
         year_cut: Year where historical data ends and projections begin
 
     Returns:
@@ -300,8 +100,8 @@ def create_visualization(
 
     # Split for projection shading
     tb = tb.sort_values("year")
-    hist = tb[tb["year"] <= year_cut].copy()
-    proj = tb[tb["year"] >= year_cut].copy()
+    hist = tb.loc[tb["year"] <= year_cut].copy()
+    proj = tb.loc[tb["year"] >= year_cut].copy()
 
     # Figure aspect similar to the original
     fig, ax = plt.subplots(figsize=(10, 18))
@@ -364,23 +164,15 @@ def create_visualization(
         ax.plot(year, pop, "o", color="#804D7F", markersize=6, zorder=20)
         # Adjust label position based on year
         if year < 1500:
-            ha = "center"
-            va = "bottom"
-            y_offset = 0.3
-            x_offset = 0
-            ax.text(
-                year + x_offset, pop + y_offset, label, ha=ha, va=va, fontsize=10.5, color=text_dark, weight="normal"
-            )
-
+            # Early years: label above the marker
+            ax.text(year, pop + 0.3, label, ha="center", va="bottom", fontsize=10.5, color=text_dark, weight="normal")
         else:
-            ha = "left"
-            va = "center"
-            y_offset = 0
-            ax.text(2110, pop + y_offset, label, ha=ha, va=va, fontsize=10.5, color=text_dark, weight="normal")
+            # Recent years: label on the right side
+            ax.text(2110, pop, label, ha="left", va="center", fontsize=10.5, color=text_dark, weight="normal")
 
     # Annotations (calculated from data)
     # Population in 10,000 BCE
-    pop_10000bce_data = tb[tb["year"] == -10000]
+    pop_10000bce_data = tb.loc[tb["year"] == -10000]
     if not pop_10000bce_data.empty:
         pop_10000bce = pop_10000bce_data.iloc[0]["population"]
         pop_10000bce_millions = int(pop_10000bce / 1e6)
@@ -395,7 +187,7 @@ def create_visualization(
         )
 
     # Calculate average growth rate from 10,000 BCE to 1700
-    pop_1700_data = tb[tb["year"] == 1700]
+    pop_1700_data = tb.loc[tb["year"] == 1700]
     if not pop_10000bce_data.empty and not pop_1700_data.empty:
         pop_10000bce = pop_10000bce_data.iloc[0]["population"]
         pop_1700 = pop_1700_data.iloc[0]["population"]
@@ -412,7 +204,7 @@ def create_visualization(
         )
 
     # Population in year 0
-    pop_year0_data = tb[tb["year"] == 0]
+    pop_year0_data = tb.loc[tb["year"] == 0]
     if not pop_year0_data.empty:
         pop_year0 = pop_year0_data.iloc[0]["population"]
         pop_year0_millions = int(pop_year0 / 1e6)
@@ -438,7 +230,7 @@ def create_visualization(
     )
 
     # Projection annotation (right side) - calculate peak from projection data
-    proj_data = tb[tb["year"] > year_cut]
+    proj_data = tb.loc[tb["year"] > year_cut]
     if not proj_data.empty:
         peak_idx = proj_data["population_billions"].idxmax()
         peak_year = int(proj_data.loc[peak_idx, "year"])
@@ -500,7 +292,7 @@ def create_visualization(
         )
 
     # Source note (bottom-left, grey)
-    source_text = build_source_citation(tb_historical, tb_projection)
+    source_text = build_source_citation(tb)
 
     fig.text(
         0.07,
@@ -537,79 +329,47 @@ def run() -> None:
 
     Output:
     - SVG and PNG charts
-    - Dataset with population data
     """
-    # Load the population dataset from grapher
-    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-15/population")
+    # Load population dataset using PathFinder
+    ds_pop = paths.load_dataset("population")
 
-    # Load historical and projection tables
-    tb_historical = ds["historical"]
-    tb_projection = ds["projections"]
+    # Load population table (contains all data from -10000 to 2100)
+    tb = ds_pop.read("population")
+    tb = tb.loc[tb["country"] == "World", ["year", "population"]].copy()
 
-    # Extract World data from historical
-    world_hist = tb_historical[tb_historical.index.get_level_values("country") == "World"].reset_index()
-    world_proj = tb_projection[tb_projection.index.get_level_values("country") == "World"].reset_index()
-    ds_life_exp = Dataset(etl_paths.DATA_DIR / "garden/demography/2025-10-22/life_expectancy")
+    # Filter to 10,000 BCE - 2100 CE first
+    tb = tb.loc[(tb["year"] >= -10000) & (tb["year"] <= 2100)].copy()
+    tb["population_billions"] = tb["population"] / 1e9
+
+    # Load historical and projection tables (needed for metadata and year_cut)
+    tb_historical = ds_pop.read("historical")
+    year_cut = int(tb_historical["year"].max())
 
     # Load life expectancy data (if available)
     life_expectancy_2023 = None
     life_expectancy_before_1800 = None
     try:
-        ds_life_exp = Dataset(etl_paths.DATA_DIR / "garden/demography/2025-10-22/life_expectancy")
-        tb_life_exp = ds_life_exp["life_expectancy_at_birth"]
-        world_life_exp = tb_life_exp[tb_life_exp.index.get_level_values("country") == "World"].reset_index()
+        ds_life_exp = paths.load_dataset("life_expectancy")
+        tb_life_exp = ds_life_exp.read("life_expectancy_at_birth")
+        world_life_exp = tb_life_exp.loc[tb_life_exp["country"] == "World"].reset_index()
 
         # Get life expectancy for 2023
-        if 2023 in world_life_exp["year"].values:
-            life_exp_2023_data = world_life_exp[world_life_exp["year"] == 2023]
-            if not life_exp_2023_data.empty and "life_expectancy_0" in life_exp_2023_data.columns:
-                life_expectancy_2023 = float(life_exp_2023_data["life_expectancy_0"].iloc[0])
+        life_exp_2023_data = world_life_exp.loc[world_life_exp["year"] == 2023]
+        if not life_exp_2023_data.empty:
+            life_expectancy_2023 = float(life_exp_2023_data["life_expectancy_0"].iloc[0])
 
-        # Get life expectancy before 1800 (use average or max from available data before 1800)
-        pre_1800_data = world_life_exp[world_life_exp["year"] < 1800]
-        if not pre_1800_data.empty and "life_expectancy_0" in pre_1800_data.columns:
-            # Use max value before 1800 to show "less than X years"
+        # Get life expectancy before 1800 (use max from available data before 1800)
+        pre_1800_data = world_life_exp.loc[world_life_exp["year"] < 1800]
+        if not pre_1800_data.empty:
             life_expectancy_before_1800 = float(pre_1800_data["life_expectancy_0"].max())
     except FileNotFoundError:
-        log.warning("Life expectancy dataset not found. Try rerunning the life_expectancy etl step.")
-
-    # Get full historical data including 10,000 BCE
-    tb_hist = world_hist[["year", "population_historical"]].copy()
-    tb_hist.columns = ["year", "population"]
-    tb_hist = tb_hist.sort_values("year").reset_index(drop=True)
-
-    # Prepare projection data
-    tb_proj = world_proj[["year", "population_projection"]].copy()
-    tb_proj.columns = ["year", "population"]
-
-    # Combine historical and projection data
-    tb = pr.concat([tb_hist, tb_proj], ignore_index=True).sort_values("year")
-
-    # Filter to 10,000 BCE - 2100 CE
-    tb = tb[(tb["year"] >= -10000) & (tb["year"] <= 2100)].copy()
-
-    # Convert population to billions
-    tb["population_billions"] = tb["population"] / 1e9
-
-    # Determine cutoff year: last year of historical data
-    year_cut = int(world_hist["year"].max())
-
-    # Prepare table for export
-    tb_export = tb.copy()
-    tb_export["country"] = "World"
-    tb_export = tb_export.format(["year", "country"], short_name=SHORT_NAME)
-
-    # Create and save dataset
-    ds_export = create_dataset(OUTPUT_DIR, tables=[tb_export])
-    ds_export.save()
+        paths.log.warning("Life expectancy dataset not found. Try rerunning the life_expectancy etl step.")
 
     # Create visualization
-    fig = create_visualization(
-        tb, tb_historical, tb_projection, year_cut, life_expectancy_before_1800, life_expectancy_2023
-    )
+    fig = create_visualization(tb, year_cut, life_expectancy_before_1800, life_expectancy_2023)
 
     # Save chart outputs
-    output_path = CURRENT_DIR / "world_population_10000bce_2100.svg"
+    output_path = paths.directory / "world_population_10000bce_2100.svg"
     fig.savefig(
         output_path,
         format="svg",
@@ -619,12 +379,11 @@ def run() -> None:
     )
 
     # Optimize SVG for Figma editing
-    optimize_svg_for_figma(output_path)
-    log.info(f"Saved and optimized chart to {output_path}")
+    paths.log.info(f"Saved chart to {output_path}")
 
-    output_path_png = CURRENT_DIR / "world_population_10000bce_2100.png"
+    output_path_png = paths.directory / "world_population_10000bce_2100.png"
     fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight", transparent=True)
-    log.info(f"Saved chart to {output_path_png}")
+    paths.log.info(f"Saved chart to {output_path_png}")
 
     plt.close(fig)
 
