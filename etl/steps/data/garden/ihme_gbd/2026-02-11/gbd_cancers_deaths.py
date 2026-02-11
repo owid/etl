@@ -1,11 +1,58 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def _validate_cancer_totals(tb_cancers: Table, tb_original: Table) -> None:
+    """
+    Validate that individual cancer deaths sum to total neoplasms deaths.
+
+    Parameters
+    ----------
+    tb_cancers : Table
+        Table with individual cancer causes (after aggregation).
+    tb_original : Table
+        Original table with all causes including "Neoplasms" total.
+    """
+    # Filter original table for Neoplasms total (metric already filtered to "Number")
+    tb_neoplasms = tb_original[(tb_original["cause"] == "Neoplasms") & (tb_original["metric"] == "Number")].copy()
+    tb_neoplasms = tb_neoplasms[["country", "year", "age", "value"]].rename(columns={"value": "neoplasms_total"})
+
+    # Sum individual cancers by country, year, age
+    tb_cancer_sum = tb_cancers.groupby(["country", "year", "age"], observed=True)["value"].sum().reset_index()
+    tb_cancer_sum = tb_cancer_sum.rename(columns={"value": "cancer_sum"})
+
+    # Merge to compare
+    comparison = tb_neoplasms.merge(tb_cancer_sum, on=["country", "year", "age"], how="inner")
+
+    # Calculate relative difference
+    comparison["relative_diff"] = (
+        abs(comparison["cancer_sum"] - comparison["neoplasms_total"]) / comparison["neoplasms_total"]
+    )
+
+    # Check if any discrepancies exceed 1% threshold
+    threshold = 0.01
+    discrepancies = comparison[comparison["relative_diff"] > threshold]
+
+    if not discrepancies.empty:
+        paths.log.warning(
+            f"Found {len(discrepancies)} cases where individual cancer deaths differ from total neoplasms by >1%"
+        )
+        # Show a few examples
+        sample = discrepancies.nlargest(5, "relative_diff")[
+            ["country", "year", "age", "neoplasms_total", "cancer_sum", "relative_diff"]
+        ]
+        paths.log.warning(f"Top discrepancies:\n{sample.to_string()}")
+    else:
+        paths.log.info(
+            f"Validation passed: Individual cancer deaths sum to total neoplasms within {threshold*100}% tolerance"
+        )
 
 
 def run() -> None:
@@ -25,27 +72,32 @@ def run() -> None:
 
     # List of cancers
     cancers = [
-        "Eye cancer",
-        "Soft tissue and other extraosseous sarcomas",
-        "Malignant neoplasm of bone and articular cartilage",
-        "Neuroblastoma and other peripheral nervous cell tumors",
-        "Breast cancer",
-        "Cervical cancer",
-        "Uterine cancer",
-        "Prostate cancer",
-        "Colon and rectum cancer",
         "Lip and oral cavity cancer",
         "Nasopharynx cancer",
         "Other pharynx cancer",
+        "Esophageal cancer",
+        "Stomach cancer",
+        "Colon and rectum cancer",
+        "Liver cancer",
         "Gallbladder and biliary tract cancer",
         "Pancreatic cancer",
+        "Larynx cancer",
+        "Tracheal, bronchus, and lung cancer",
         "Malignant skin melanoma",
         "Non-melanoma skin cancer",
+        "Soft tissue and other extraosseous sarcomas",
+        "Malignant neoplasm of bone and articular cartilage",
+        "Breast cancer",
+        "Cervical cancer",
+        "Uterine cancer",
         "Ovarian cancer",
+        "Prostate cancer",
         "Testicular cancer",
         "Kidney cancer",
         "Bladder cancer",
         "Brain and central nervous system cancer",
+        "Eye cancer",
+        "Neuroblastoma and other peripheral nervous cell tumors",
         "Thyroid cancer",
         "Mesothelioma",
         "Hodgkin lymphoma",
@@ -54,11 +106,6 @@ def run() -> None:
         "Leukemia",
         "Other malignant neoplasms",
         "Other neoplasms",
-        "Esophageal cancer",
-        "Stomach cancer",
-        "Liver cancer",
-        "Larynx cancer",
-        "Tracheal, bronchus, and lung cancer",
     ]
 
     # Cancers that are already called 'Other cancers' in the dataset, so we'll combine these in to avoid confusing labelling on the chart
@@ -90,7 +137,11 @@ def run() -> None:
     # Concatenate the new "Other cancers (OWID)" row to the original DataFrame
     tb = pr.concat([tb, tb_cancer], ignore_index=True)
 
+    # Validate that individual cancers sum to total neoplasms
+    _validate_cancer_totals(tb, ds_garden["gbd_cause_deaths"].reset_index())
+
     # Calculate the total number of cancer deaths for each year
+    # total_cancer_deaths = tb[tb['cause'] == 'Neoplasms']
     total_cancer_deaths = tb.groupby(["country", "year", "age"])["value"].sum().reset_index()
     total_cancer_deaths = total_cancer_deaths.rename(columns={"value": "total_cancer_deaths"})
 
