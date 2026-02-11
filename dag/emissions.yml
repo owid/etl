@@ -207,3 +207,13 @@ steps:
   #
   data://grapher/climate_watch/2026-02-10/emissions_by_sector:
     - data://garden/climate_watch/2026-02-10/emissions_by_sector
+  #
+  # Emissions - Greenhouse gas emissions by custom sector.
+  #
+  data://garden/emissions/2026-02-11/emissions_by_custom_sector:
+    - data://garden/climate_watch/2026-02-10/emissions_by_sector
+  #
+  # Emissions - Greenhouse gas emissions by custom sector.
+  #
+  data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
+    - data://garden/emissions/2026-02-11/emissions_by_custom_sector

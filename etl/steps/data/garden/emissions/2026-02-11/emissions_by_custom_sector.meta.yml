@@ -1,0 +1,24 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - CO2 & Greenhouse Gas Emissions
+    processing_level: major
+    display:
+      numSignificantFigures: 3
+
+dataset:
+  update_period_days: 365
+
+tables:
+  emissions_by_custom_sector:
+    title: Emissions by custom sector
+    variables:
+      co2_emissions:
+        title: Global carbon dioxide emissions by human activity
+        unit: "tonnes"
+        short_unit: "t"
+      ghg_emissions:
+        title: Global greenhouse gas emissions by human activity
+        unit: "tonnes of CO₂ equivalent"
+        short_unit: "t CO₂e"
