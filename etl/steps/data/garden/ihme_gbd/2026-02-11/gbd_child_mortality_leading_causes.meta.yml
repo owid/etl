@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+    processing_level: minor
+
+  description_key: |-
+    - Lower respiratory infections are defined in the study as pneumonia or bronchiolitis.
+
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+  title: Leading causes of child mortality in children under 5
+tables:
+  gbd_cause_deaths:
+    variables:
+      cause:
+        title: |-
+          Leading cause of child mortality among children under 5
+        unit: ''
+        description_short: |-
+          Leading cause of child mortality based on the estimated number of deaths among children aged less than five.
