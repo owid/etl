@@ -20,6 +20,13 @@ steps:
   export://multidim/wb/latest/gini_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
   export://multidim/wb/latest/palma_ratio_pip:
+  export://multidim/wb/latest/poverty_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/incomes_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/gini_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/palma_ratio_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
   # Legacy PIP pipeline
   data://garden/wb/2025-10-09/world_bank_pip_legacy:
@@ -82,6 +89,12 @@ steps:
   export://explorers/lis/latest/inequality_lis:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
   export://explorers/lis/latest/incomes_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://multidim/lis/latest/gini_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://multidim/lis/latest/relative_poverty_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://multidim/lis/latest/incomes_lis:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
   export://multidim/lis/latest/gini_lis:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
