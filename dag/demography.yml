@@ -348,6 +348,8 @@ steps:
   data://garden/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital_historical
     - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
 
@@ -376,3 +378,34 @@ steps:
     - data://garden/pew/2025-10-31/religious_composition
   export://multidim/pew/latest/religious_composition:
     - data://grapher/pew/2025-10-31/religious_composition
+
+  #
+  # International Database (US Census Bureau)
+  #
+  data://meadow/demography/2026-02-04/census_us_idb:
+    - snapshot://demography/2026-02-04/census_us_idb.zip
+  data://garden/demography/2026-02-04/census_us_idb:
+    - data://meadow/demography/2026-02-04/census_us_idb
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/demography/2026-02-04/census_us_idb:
+    - data://garden/demography/2026-02-04/census_us_idb
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/demography/2026-02-05/ihme_2020:
+    - snapshot://demography/2026-02-05/ihme_2020_fertility.zip
+    - snapshot://demography/2026-02-05/ihme_2020_migration.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population.zip
+    - snapshot://demography/2026-02-05/ihme_2020_life_expectancy.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+    - snapshot://demography/2026-02-05/ihme_2020_live_births.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_ref.zip
+  data://garden/demography/2026-02-05/ihme_2020:
+    - data://meadow/demography/2026-02-05/ihme_2020
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/demography/2026-02-05/ihme_2020:
+    - data://garden/demography/2026-02-05/ihme_2020

@@ -356,6 +356,7 @@ def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_poverty: Table) ->
         return
 
     check_between_0_and_1(tb_inequality)
+    check_gini_before_after_tax(tb_inequality)
     check_shares_sum_100(tb_incomes)
     check_negative_values(tb_inequality, tb_incomes)
     check_monotonicity(tb_incomes)
@@ -386,6 +387,42 @@ def check_between_0_and_1(tb_inequality: Table) -> None:
                     f"""{len(tb_error)} gini values for {welfare_type} ({equivalence_scale}) are not between 0 and 1:
                     {_tabulate(tb_error)}"""
                 )
+
+
+def check_gini_before_after_tax(tb_inequality: Table) -> None:
+    """
+    Check that Gini after tax (dhi) is lower than Gini before tax (mi).
+    Only compares country-year pairs where both welfare types have data.
+    """
+    tb = tb_inequality.reset_index()
+
+    for equivalence_scale in tb["equivalence_scale"].unique():
+        tb_before = tb[(tb["welfare_type"] == "mi") & (tb["equivalence_scale"] == equivalence_scale)][
+            ["country", "year", "gini"]
+        ].rename(columns={"gini": "gini_before"})
+
+        tb_after = tb[(tb["welfare_type"] == "dhi") & (tb["equivalence_scale"] == equivalence_scale)][
+            ["country", "year", "gini"]
+        ].rename(columns={"gini": "gini_after"})
+
+        # Inner merge keeps only country-years with both welfare types
+        tb_merged = pr.merge(tb_before, tb_after, on=["country", "year"], how="inner")
+
+        # Drop rows where either gini is null
+        tb_merged = tb_merged.dropna(subset=["gini_before", "gini_after"])
+
+        # Find violations: after tax gini should be strictly lower than before tax
+        mask = tb_merged["gini_after"] >= tb_merged["gini_before"]
+        if mask.any():
+            tb_error = tb_merged[mask][["country", "year", "gini_before", "gini_after"]].copy()
+            tb_error["gini_before"] = tb_error["gini_before"].round(4)
+            tb_error["gini_after"] = tb_error["gini_after"].round(4)
+            tb_error["diff"] = (tb_error["gini_after"] - tb_error["gini_before"]).round(4)
+            tb_error = tb_error.sort_values("diff", ascending=False).reset_index(drop=True)
+            paths.log.warning(
+                f"""{len(tb_error)} observations ({equivalence_scale}) where Gini after tax >= Gini before tax:
+                {_tabulate(tb_error, floatfmt=".4f")}"""
+            )
 
 
 def check_shares_sum_100(tb_incomes: Table, margin: float = 0.5) -> None:
