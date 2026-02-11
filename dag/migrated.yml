@@ -23,4 +23,9 @@ steps:
   data://grapher/papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017: !!set
     ? data://garden/papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017
   data://garden/papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017: !!set
-    snapshot://papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017.feather:
+    ? snapshot://papers/2017-04-24/historical_employment_and_output_by_sector__owid__2017.feather
+  data://grapher/trade/latest/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data: !!set
+    ? data://garden/trade/latest/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data
+  data://garden/trade/latest/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data: !!set
+    ? snapshot://trade/latest/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data.feather
+    :
