@@ -4,6 +4,12 @@ definitions:
       topic_tags:
         - Mental Health
     processing_level: major
+  short_unit: |-
+    <% if metric == "Number" %>
+    <%- elif metric == "Rate" %>
+    <%- elif metric == "Share" %>
+    %
+    <%- endif %>
 
 macros: |-
   <% macro title(metric, age, cause, sex) %>

@@ -38,6 +38,7 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_mental_health"].reset_index()
+    tb = tb.drop(columns=["population_group_name"])
     tb = paths.regions.harmonize_names(tb)
 
     tb = add_regional_aggregates(
