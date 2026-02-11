@@ -25,7 +25,7 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # Keep relevant countries
+    # Keep relevant columns
     # https://api.census.gov/data/timeseries/idb/5year/variables.html
     cols_index = ["country", "year"]
     cols_indicators = [
@@ -34,7 +34,13 @@ def run() -> None:
         "e0",
         "nim",
     ]
-    cols = cols_indicators + cols_index
+    # Age-specific columns needed for computing regional TFR from scratch
+    AGE_GROUPS = [f"{i}_{i+4}" for i in range(15, 50, 5)]
+    cols_births = [f"births{ag}" for ag in AGE_GROUPS]
+    cols_fpop = [f"fpop{ag}" for ag in AGE_GROUPS]
+    cols_asfr = cols_births + cols_fpop
+
+    cols = cols_indicators + cols_asfr + cols_index
     tb = tb[cols].dropna(subset=cols_indicators, how="all")
 
     # Add region aggregates for World and continents
@@ -50,6 +56,7 @@ def run() -> None:
     aggregations = {
         "pop": "sum",
         "nim": "sum",
+        **{col: "sum" for col in cols_asfr},
     }
     tb = paths.regions.add_aggregates(
         tb=tb,
@@ -60,11 +67,20 @@ def run() -> None:
     )
     tb.loc[tb["country"] == "World", "nim"] = np.nan
 
+    # Compute TFR for regions from age-specific births and female population
+    is_region = tb["country"].isin(REGIONS)
+    asfr_sum = sum(tb[f"births{ag}"] / tb[f"fpop{ag}"] for ag in AGE_GROUPS)
+    tb.loc[is_region, "tfr"] = (5 * asfr_sum).loc[is_region]
+
+    # Drop intermediate age-specific columns
+    tb = tb.drop(columns=cols_asfr)
+
     #
     # Save outputs.
     #
+    cols_final = cols_indicators + cols_index
     # Format table
-    tb = tb[cols].format(["country", "year"])
+    tb = tb[cols_final].format(["country", "year"])
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 

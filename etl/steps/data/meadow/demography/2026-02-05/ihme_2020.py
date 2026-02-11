@@ -13,6 +13,8 @@ SNAPSHOT_FILES = {
     "ihme_2020_population.zip": "IHME_POP_2017_2100_POP_BOTH_SEX_ALL_AGE_Y2020M05D01.CSV",
     "ihme_2020_life_expectancy.zip": "IHME_POP_2017_2100_LIFE_EXPECTANCY_Y2020M05D01.CSV",
     "ihme_2020_population_retro.zip": "IHME_POP_2017_2100_POP_PAST_Y2020M05D01.CSV",
+    "ihme_2020_live_births.zip": "IHME_POP_2017_2100_LIVE_BIRTHS_Y2020M05D01.CSV",
+    "ihme_2020_population_ref.zip": "IHME_POP_2017_2100_POP_REFERENCE_Y2020M05D01.CSV",
 }
 
 
