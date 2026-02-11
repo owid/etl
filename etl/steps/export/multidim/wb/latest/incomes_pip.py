@@ -124,8 +124,13 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": lambda view: ["StackedArea"] if view.matches(indicator="share") else ["LineChart"],
                     "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
                 },
             },
             {
@@ -140,9 +145,18 @@ def run() -> None:
                     "chartTypes": ["StackedDiscreteBar"],
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
                 },
             },
         ],
+        params={
+            "title": _get_grouped_decile_title,
+            "subtitle": _get_grouped_decile_subtitle,
+        },
     )
 
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
@@ -158,17 +172,10 @@ def run() -> None:
         ]
     )
 
-    # Update chart type for share indicator grouped views to StackedArea
-    for view in c.views:
-        if view.matches(decile="all", indicator="share"):
-            if view.config is None:
-                view.config = {}
-            view.config["chartTypes"] = ["StackedArea"]
-
     # Build mapping of catalogPath to display name from table metadata
     indicator_display_names = _build_indicator_display_names(tb)
 
-    # For "all" and "all_bar" decile views, clean up indicator display names, sort by decile, and set titles
+    # Customize grouped decile views: sort indicators and set display names
     for view in c.views:
         if (view.matches(decile="all") or view.matches(decile="all_bar")) and view.indicators.y:
             # Sort indicators by decile number
@@ -194,33 +201,32 @@ def run() -> None:
                 if name:
                     ind.display = {"name": name}
 
-            # Set titles and subtitles based on indicator type
-            period = view.dimensions.get("period")
-            if view.config is None:
-                view.config = {}
-
-            if view.matches(indicator="thr"):
-                view.config["title"] = f"Threshold income or consumption per {period} for each decile"
-                subtitle = f"The level of after tax income or consumption per person per {period} below which 10%, 20%, 30%, etc. of the population falls. {PPP_ADJUSTMENT_SUBTITLE}"
-                view.config["subtitle"] = subtitle
-                view.metadata = {"description_short": subtitle}
-            elif view.matches(indicator="avg"):
-                view.config["title"] = f"Mean income or consumption per {period} within each decile"
-                subtitle = f"The mean after tax income or consumption per person per {period} within each decile (tenth of the population). {PPP_ADJUSTMENT_SUBTITLE}"
-                view.config["subtitle"] = subtitle
-                view.metadata = {"description_short": subtitle}
-            elif view.matches(indicator="share"):
-                view.config["title"] = "Income or consumption share for each decile"
-                subtitle = (
-                    "The share of after tax income or consumption received by each decile (tenth of the population)."
-                )
-                view.config["subtitle"] = subtitle
-                view.metadata = {"description_short": subtitle}
-
     #
     # Save garden dataset.
     #
     c.save()
+
+
+def _get_grouped_decile_title(view):
+    """Return title for grouped decile views based on indicator type."""
+    period = view.dimensions.get("period")
+    titles = {
+        "thr": f"Threshold income or consumption per {period} for each decile",
+        "avg": f"Mean income or consumption per {period} within each decile",
+        "share": "Income or consumption share for each decile",
+    }
+    return titles.get(view.dimensions.get("indicator"), "")
+
+
+def _get_grouped_decile_subtitle(view):
+    """Return subtitle for grouped decile views based on indicator type."""
+    period = view.dimensions.get("period")
+    subtitles = {
+        "thr": f"The level of after tax income or consumption per person per {period} below which 10%, 20%, 30%, etc. of the population falls. {PPP_ADJUSTMENT_SUBTITLE}",
+        "avg": f"The mean after tax income or consumption per person per {period} within each decile (tenth of the population). {PPP_ADJUSTMENT_SUBTITLE}",
+        "share": "The share of after tax income or consumption received by each decile (tenth of the population).",
+    }
+    return subtitles.get(view.dimensions.get("indicator"), "")
 
 
 def _build_indicator_display_names(tb):

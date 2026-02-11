@@ -53,7 +53,7 @@ def run() -> None:
         dimensions=DIMENSIONS_CONFIG,
     )
 
-    # Group deciles 1-10 together into an "all" view
+    # Group deciles 1-10 together
     decile_values = [str(i) for i in range(1, 11)]
     c.group_views(
         groups=[
@@ -68,14 +68,11 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["StackedArea"],
                     "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
                 },
+                "view_metadata": {"description_short": "{subtitle}"},
             },
-        ],
-    )
-
-    # Group deciles 1-10 together as bar chart
-    c.group_views(
-        groups=[
             {
                 "dimension": "quantile",
                 "choices": decile_values,
@@ -88,9 +85,16 @@ def run() -> None:
                     "chartTypes": ["StackedDiscreteBar"],
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
                 },
+                "view_metadata": {"description_short": "{subtitle}"},
             },
         ],
+        params={
+            "title": _get_grouped_quantile_title,
+            "subtitle": _get_grouped_quantile_subtitle,
+        },
     )
 
     # Filter quantile views: keep only specific quantiles
@@ -100,7 +104,7 @@ def run() -> None:
     # Build mapping of catalogPath to display name from table metadata
     indicator_display_names = _build_indicator_display_names(tb)
 
-    # For "all" and "all_bar" decile views, clean up indicator display names, sort by decile, and set titles
+    # Customize grouped quantile views: sort indicators and set display names
     for view in c.views:
         quantile = view.dimensions.get("quantile")
         if quantile in ["all", "all_bar"] and view.indicators.y:
@@ -124,16 +128,6 @@ def run() -> None:
                 if name:
                     ind.display = {"name": name}
 
-            # Set titles and subtitles based on indicator type
-            welfare_type = view.dimensions.get("welfare_type")
-            if view.config is None:
-                view.config = {}
-
-            view.config["title"] = f"Income share for each decile ({welfare_type})"
-            subtitle = f"The share of income received by each decile (tenth of the population). Income here is measured {welfare_type}es and benefits."
-            view.config["subtitle"] = subtitle
-            view.metadata = {"description_short": subtitle}
-
     # Group welfare_type (before vs after tax) for specific quantiles only
     c.group_views(
         groups=[
@@ -142,66 +136,33 @@ def run() -> None:
                 "choices": ["before tax", "after tax"],
                 "choice_new_slug": "before_vs_after",
                 "view_config": {
-                    "hideRelativeToggle": True,
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["LineChart"],
-                },
-            },
-        ],
-    )
-
-    # Remove grouped welfare_type views for quantiles we don't want grouped (keep only Richest 0.1%, Richest 1%, 10)
-    c.drop_views({"welfare_type": ["before_vs_after"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]})
-
-    # Customize grouped welfare_type views (before_vs_after)
-    for view in c.views:
-        if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
-            # Get metadata from first indicator
-            first_ind = view.indicators.y[0]
-            col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
-
-            if col_name and col_name in tb.columns:
-                meta = tb[col_name].metadata
-                grapher_config = meta.presentation.grapher_config if meta.presentation else {}
-
-                # Extract and modify title
-                title = grapher_config.get("title", "")
-                title = title.replace("before tax", "before vs. after tax")
-
-                # Extract and modify subtitle (remove welfare type phrase)
-                subtitle = grapher_config.get("subtitle", "")
-                subtitle = subtitle.replace(" Income here is measured before taxes and benefits.", "")
-
-                # Extract and modify description_short (remove welfare type phrase)
-                description_short = meta.description_short or ""
-                description_short = description_short.replace(" Income here is measured before taxes and benefits.", "")
-
-                # Get description_key and remove first element
-                description_key = list(meta.description_key) if meta.description_key else []
-                if description_key:
-                    description_key = description_key[1:]
-
-                # Set config
-                view.config = {
-                    "title": title,
-                    "subtitle": subtitle,
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
                     "note": "",
                     "hideRelativeToggle": True,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["LineChart"],
-                }
+                },
+                "view_metadata": {
+                    "description_short": lambda view: _get_before_vs_after_metadata(tb, view)["description_short"],
+                    "description_key": lambda view: _get_before_vs_after_metadata(tb, view)["description_key"],
+                },
+            },
+        ],
+        params={
+            "title": lambda view: _get_before_vs_after_metadata(tb, view)["title"],
+            "subtitle": lambda view: _get_before_vs_after_metadata(tb, view)["subtitle"],
+        },
+    )
 
-                # Set metadata
-                view.metadata = {
-                    "description_short": description_short,
-                    "description_key": description_key,
-                }
+    # Remove grouped welfare_type views for quantiles we don't want grouped (keep only Richest 0.1%, Richest 1%, 10)
+    c.drop_views({"welfare_type": ["before_vs_after"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]})
 
-            # Set display names based on indicator (before tax or after tax)
+    # Set display names for before_vs_after views
+    for view in c.views:
+        if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
             for ind in view.indicators.y:
                 if "before_tax" in ind.catalogPath:
                     ind.display = {"name": "Before tax"}
@@ -313,6 +274,53 @@ def run() -> None:
     # Save garden dataset.
     #
     c.save()
+
+
+def _get_grouped_quantile_title(view):
+    """Return title for grouped quantile views."""
+    welfare_type = view.dimensions.get("welfare_type")
+    return f"Income share for each decile ({welfare_type})"
+
+
+def _get_grouped_quantile_subtitle(view):
+    """Return subtitle for grouped quantile views."""
+    welfare_type = view.dimensions.get("welfare_type")
+    return f"The share of income received by each decile (tenth of the population). Income here is measured {welfare_type}es and benefits."
+
+
+def _get_before_vs_after_metadata(tb, view):
+    """Extract and transform metadata from grapher_config for before_vs_after views."""
+    if not view.indicators.y:
+        return {"title": "", "subtitle": "", "description_short": "", "description_key": []}
+
+    first_ind = view.indicators.y[0]
+    col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
+
+    if col_name and col_name in tb.columns:
+        meta = tb[col_name].metadata
+        grapher_config = meta.presentation.grapher_config if meta.presentation else {}
+
+        title = grapher_config.get("title", "")
+        title = title.replace("before tax", "before vs. after tax")
+
+        subtitle = grapher_config.get("subtitle", "")
+        subtitle = subtitle.replace(" Income here is measured before taxes and benefits.", "")
+
+        description_short = meta.description_short or ""
+        description_short = description_short.replace(" Income here is measured before taxes and benefits.", "")
+
+        description_key = list(meta.description_key) if meta.description_key else []
+        if description_key:
+            description_key = description_key[1:]
+
+        return {
+            "title": title,
+            "subtitle": subtitle,
+            "description_short": description_short,
+            "description_key": description_key,
+        }
+
+    return {"title": "", "subtitle": "", "description_short": "", "description_key": []}
 
 
 def _build_indicator_display_names(tb):

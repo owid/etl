@@ -43,50 +43,24 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["LineChart"],
                     "missingDataStrategy": "hide",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
+                    "description_key": lambda view: _get_before_vs_after_metadata(tb, view)["description_key"],
                 },
             },
         ],
+        params={
+            "title": lambda view: _get_before_vs_after_metadata(tb, view)["title"],
+            "subtitle": lambda view: _get_before_vs_after_metadata(tb, view)["subtitle"],
+        },
     )
 
-    # Customize grouped welfare_type views (before_vs_after)
+    # Set display names for before_vs_after views
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
-            # Get metadata from first indicator
-            first_ind = view.indicators.y[0]
-            col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
-
-            if col_name and col_name in tb.columns:
-                meta = tb[col_name].metadata
-                grapher_config = meta.presentation.grapher_config if meta.presentation else {}
-
-                # Extract and modify title
-                title = grapher_config.get("title", "Gini coefficient")
-                title = title.replace("after tax", "before vs. after tax")
-
-                # Extract and modify subtitle (remove welfare type phrase)
-                subtitle = grapher_config.get("subtitle", "")
-                subtitle = subtitle.replace(
-                    " Inequality is measured here in terms of income after taxes and benefits.", ""
-                )
-
-                # Get description_key and remove first element
-                description_key = list(meta.description_key) if meta.description_key else []
-                if description_key:
-                    description_key = description_key[1:]
-
-                # Update config with title and subtitle (other config set by group_views)
-                if view.config is None:
-                    view.config = {}
-                view.config["title"] = title
-                view.config["subtitle"] = subtitle
-
-                # Set metadata
-                view.metadata = {
-                    "description_short": subtitle,
-                    "description_key": description_key,
-                }
-
-            # Set display names for each indicator
             for ind in view.indicators.y:
                 if "_dhi_" in ind.catalogPath:
                     ind.display = {"name": "After tax"}
@@ -94,3 +68,30 @@ def run() -> None:
                     ind.display = {"name": "Before tax"}
 
     c.save()
+
+
+def _get_before_vs_after_metadata(tb, view):
+    """Extract and transform metadata from grapher_config for before_vs_after views."""
+    if not view.indicators.y:
+        return {"title": "", "subtitle": "", "description_key": []}
+
+    first_ind = view.indicators.y[0]
+    col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
+
+    if col_name and col_name in tb.columns:
+        meta = tb[col_name].metadata
+        grapher_config = meta.presentation.grapher_config if meta.presentation else {}
+
+        title = grapher_config.get("title", "Gini coefficient")
+        title = title.replace("after tax", "before vs. after tax")
+
+        subtitle = grapher_config.get("subtitle", "")
+        subtitle = subtitle.replace(" Inequality is measured here in terms of income after taxes and benefits.", "")
+
+        description_key = list(meta.description_key) if meta.description_key else []
+        if description_key:
+            description_key = description_key[1:]
+
+        return {"title": title, "subtitle": subtitle, "description_key": description_key}
+
+    return {"title": "", "subtitle": "", "description_key": []}
