@@ -37,7 +37,7 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        # if view.dimension["sex"] == "male":
+        # if view.dimensions["sex"] == "male":
         #     view.config["title"] = "Something else"
         pass
 

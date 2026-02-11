@@ -1,0 +1,29 @@
+title:
+  title: Gini coefficient
+  title_variant: World Inequality Database
+topic_tags:
+  - Economic Inequality
+
+default_selection:
+  - Chile
+  - Brazil
+  - South Africa
+  - United States
+  - France
+  - China
+
+default_dimensions:
+  welfare_type: before tax
+
+dimensions:
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: before tax
+        name: Before tax
+      - slug: after tax
+        name: After tax
+      - slug: before_vs_after
+        name: Before vs. after tax
+
+views: []
