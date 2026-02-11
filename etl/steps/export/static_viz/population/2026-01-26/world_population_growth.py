@@ -3,6 +3,7 @@
 This code generates a chart showing world population and growth rates from 1700 to 2100, combining historical data with UN projections.
 """
 
+import matplotlib
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,6 +11,9 @@ import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
+
+# Set matplotlib to use SVG backend with deterministic output (must be before creating figures)
+matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
 
 # Initialize paths
 paths = PathFinder(__file__)
