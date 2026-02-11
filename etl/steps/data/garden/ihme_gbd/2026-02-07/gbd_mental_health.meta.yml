@@ -94,4 +94,4 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
-            <% if metric == 'Number' %>0<% else %>1<% endif %>
+            <% if metric == 'Number' %>0<% else %>2<% endif %>
