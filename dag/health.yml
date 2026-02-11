@@ -13,13 +13,16 @@ steps:
     - data://garden/health/2025-04-18/deaths_karlinsky
 
   # IHME GBD Leading cause of deaths - update
-  data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
-    - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
-  data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths:
-    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
-    - data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy
-  data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
-    - data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths
+  #data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
+  # - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
+
+  data-private://meadow/ihme_gbd/2026-02-07/cause_hierarchy:
+    - snapshot-private://ihme_gbd/2026-02-07/cause_hierarchy.xlsx
+  data-private://garden/ihme_gbd/2026-02-11/leading_causes_deaths:
+    - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
+    - data-private://meadow/ihme_gbd/2026-02-07/cause_hierarchy
+  data-private://grapher/ihme_gbd/2026-02-11/leading_causes_deaths:
+    - data-private://garden/ihme_gbd/2026-02-11/leading_causes_deaths
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
