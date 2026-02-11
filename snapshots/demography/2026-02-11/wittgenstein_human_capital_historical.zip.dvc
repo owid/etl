@@ -18,6 +18,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/deed.en
 outs:
-  - md5: 1f7c21f4c9f8cf47930677512e501e35
-    size: 211409403
+  - md5: d85ace9fdf12d275e5c8d9f09431a867
+    size: 318304437
     path: wittgenstein_human_capital_historical.zip
