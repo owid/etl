@@ -11,12 +11,12 @@ meta:
       International Labour Organization. (2026). ILO modelled estimates database, ILOSTAT [database]. Available from https://ilostat.ilo.org/data/.
     attribution_short: ILO
     url_main: https://ilostat.ilo.org/
-    date_accessed: '2026-02-03'
-    date_published: '2026-02-03'
+    date_accessed: '2026-02-11'
+    date_published: '2026-02-11'
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
 outs:
-  - md5: 30ced0cc252b24840ed0c4469d51bda4
-    size: 32738
+  - md5: 7ff02fcbdca7864397964b0138eb318b
+    size: 32420
     path: ilostat_table_of_contents_country.parquet
