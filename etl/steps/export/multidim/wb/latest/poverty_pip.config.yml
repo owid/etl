@@ -1,0 +1,783 @@
+title:
+  title: Poverty indicators
+  title_variant: World Bank
+topic_tags:
+  - Poverty
+default_selection:
+  - Mozambique
+  - Zambia
+  - Kenya
+  - Nigeria
+  - Bangladesh
+  - Bolivia
+  - Romania
+  - Indonesia
+
+default_dimensions:
+  indicator: headcount_ratio
+  poverty_line: "300"
+  survey_comparability: No spells
+
+definitions:
+  # Detailed colors:
+  color_0_to_100: &color_0_to_100 "#D73027"
+  color_100_to_300: &color_100_to_300 "#F46D43"
+  color_300_to_420: &color_300_to_420 "#FDAE61"
+  color_420_to_830: &color_420_to_830 "#FEE090"
+  color_830_to_1000: &color_830_to_1000 "#FFFFBF"
+  color_1000_to_2000: &color_1000_to_2000 "#E0F3F8"
+  color_2000_to_3000: &color_2000_to_3000 "#ABD9E9"
+  color_3000_to_4000: &color_3000_to_4000 "#74ADD1"
+  color_4000_to_inf: &color_4000_to_inf "#4575B4"
+
+  # Simplified colors:
+  color_0_to_300_simplified: &color_0_to_300_simplified "#D7191C"
+  color_300_to_420_simplified: &color_300_to_420_simplified "#FDAE61"
+  color_420_to_830_simplified: &color_420_to_830_simplified "#FFFFBF"
+  color_830_to_1000_simplified: &color_830_to_1000_simplified "#ABD9E9"
+  color_1000_to_inf_simplified: &color_1000_to_inf_simplified "#2C7BB6"
+
+  extreme_poverty_subtitle: Extreme poverty is defined as living below the [International Poverty Line](#dod:international-poverty-line) of $3 per day.
+  lmic_poverty_line_subtitle: The poverty line of $4.20 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
+  umic_poverty_line_subtitle: The poverty line of $8.30 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
+
+  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
+  ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+
+  description_key_extreme_poverty: The World Bank defines extreme poverty as living on less than $3 per day. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
+  description_key_lmic_poverty_line: A poverty line of $4.20 per day represents definitions of national poverty lines in lower-middle-income countries.
+  description_key_umic_poverty_line: A poverty line of $8.30 per day represents definitions of national poverty lines in upper-middle-income countries.
+
+  description_key_extreme_poverty_additional: |-
+    Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
+
+  description_key_ppp: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+
+  description_key_welfare_type_beginning: |-
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+
+  description_key_welfare_type: |-
+    {definitions.description_key_welfare_type_beginning} For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
+
+  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
+
+  description_key_nowcasts: Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+
+
+dimensions:
+  - name: Metric
+    slug: indicator
+    choices:
+      - slug: headcount_ratio
+        name: Share in poverty
+        description: The share of the population living below the selected poverty line
+      - slug: headcount
+        name: Number in poverty
+        description: The number of people living below the selected poverty line
+  - name: Poverty line
+    slug: poverty_line
+    description: In international dollars
+    choices:
+      - slug: "100"
+        name: $1 a day
+        group: Individual poverty lines
+      - slug: "300"
+        name: $3 a day
+        description: The international poverty line used to measure extreme poverty
+        group: Individual poverty lines
+      - slug: "420"
+        name: $4.20 a day
+        description: Set by the World Bank to reflect national definitions in lower-middle income countries
+        group: Individual poverty lines
+      - slug: "830"
+        name: $8.30 a day
+        description: Set by the World Bank to reflect national definitions in upper-middle income countries
+        group: Individual poverty lines
+      - slug: "1000"
+        name: $10 a day
+        group: Individual poverty lines
+      - slug: "2000"
+        name: $20 a day
+        group: Individual poverty lines
+      - slug: "3000"
+        name: $30 a day
+        group: Individual poverty lines
+      - slug: "4000"
+        name: $40 a day
+        group: Individual poverty lines
+      - slug: line_chart
+        name: Line chart
+        description: See how poverty has changed over time using four different poverty lines
+        group: Visualize multiple poverty lines
+      - slug: area_chart
+        name: Area chart
+        description: See how the distribution of incomes has changed over time
+        group: Visualize multiple poverty lines
+      - slug: bar_chart
+        name: Bar chart
+        description: Compare the distribution of incomes in different countries
+        group: Visualize multiple poverty lines
+      - slug: line_chart_more_lines
+        name: Line chart (more lines)
+        description: See how poverty has changed over time using eight different poverty lines
+        group: Visualize multiple poverty lines (more lines)
+      - slug: area_chart_more_lines
+        name: Area chart (more lines)
+        description: A more fine-grained breakdown of the distribution of incomes over time
+        group: Visualize multiple poverty lines (more lines)
+      - slug: bar_chart_more_lines
+        name: Bar chart (more lines)
+        description: A more fine-grained comparison of the distribution of incomes in different countries
+        group: Visualize multiple poverty lines (more lines)
+  - name: Breaks in data
+    slug: survey_comparability
+    description: The data provider reports where trends in countries are affected by changes in methodology. These breaks can be shown in the chart.
+    choices:
+      - slug: No spells
+        name: Don't show
+        description: Better for making broad comparisons across several countries
+      - slug: Spells
+        name: Show
+        description: Better for understanding trends within individual countries
+
+views:
+  # MULTIPLE LINES SIMPLE
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: line_chart
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $3 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $4.20 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $8.30 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $30 a day"
+    config:
+      title: Share of the population living below a range of poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        max: 100
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # AREA CHART
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: area_chart
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_ratio_above__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $10 a day"
+            color: *color_1000_to_inf_simplified
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+            color: *color_830_to_1000_simplified
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+            color: *color_420_to_830_simplified
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+            color: *color_300_to_420_simplified
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $3 a day"
+            color: *color_0_to_300_simplified
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      hideRelativeToggle: true
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # BAR CHART
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: bar_chart
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $3 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+        - catalogPath: poverty#headcount_ratio_above__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $10 a day"
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      sortBy: column
+      sortColumnSlug: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideRelativeToggle: false
+      stackMode: absolute
+      hideTotalValueLabel: true
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # MULTIPLE LINES MORE LINES
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: line_chart_more_lines
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $1 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $3 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $4.20 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $8.30 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $10 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $20 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $30 a day"
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $40 a day"
+    config:
+      title: Share of the population living below a range of poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        max: 100
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # AREA CHART MORE LINES
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: area_chart_more_lines
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_ratio_above__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $40 a day"
+            color: *color_4000_to_inf
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_3000_and_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$30-$40 a day"
+            color: *color_3000_to_4000
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_2000_and_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$20-$30 a day"
+            color: *color_2000_to_3000
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_1000_and_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$10-$20 a day"
+            color: *color_1000_to_2000
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+            color: *color_830_to_1000
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+            color: *color_420_to_830
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+            color: *color_300_to_420
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_100_and_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$1-$3 a day"
+            color: *color_100_to_300
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $1 a day"
+            color: *color_0_to_100
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      hideRelativeToggle: true
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # BAR CHART MORE LINES
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: bar_chart_more_lines
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $1 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_100_and_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$1-$3 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_1000_and_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$10-$20 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_2000_and_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$20-$30 a day"
+        - catalogPath: poverty#headcount_ratio_between__ppp_version_2021__poverty_line_3000_and_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$30-$40 a day"
+        - catalogPath: poverty#headcount_ratio_above__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $40 a day"
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      sortBy: column
+      sortColumnSlug: poverty#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideRelativeToggle: false
+      stackMode: absolute
+      hideTotalValueLabel: true
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+
+  # FOR HEADCOUNT
+  # MULTIPLE LINES SIMPLE
+  - dimensions:
+      indicator: headcount
+      poverty_line: line_chart
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $3 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $4.20 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $8.30 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $30 a day"
+    config:
+      title: Number of people living below a range of poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # AREA CHART
+  - dimensions:
+      indicator: headcount
+      poverty_line: area_chart
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_above__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $10 a day"
+            color: *color_1000_to_inf_simplified
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+            color: *color_830_to_1000_simplified
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+            color: *color_420_to_830_simplified
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+            color: *color_300_to_420_simplified
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $3 a day"
+            color: *color_0_to_300_simplified
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      hideRelativeToggle: false
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # BAR CHART
+  - dimensions:
+      indicator: headcount
+      poverty_line: bar_chart
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $3 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+        - catalogPath: poverty#headcount_above__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $10 a day"
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      sortBy: total
+      hideRelativeToggle: false
+      stackMode: absolute
+      hideTotalValueLabel: false
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # MULTIPLE LINES MORE LINES
+  - dimensions:
+      indicator: headcount
+      poverty_line: line_chart_more_lines
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $1 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $3 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $4.20 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $8.30 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $10 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $20 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $30 a day"
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Number below $40 a day"
+    config:
+      title: Number of people living below a range of poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # AREA CHART MORE LINES
+  - dimensions:
+      indicator: headcount
+      poverty_line: area_chart_more_lines
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount_above__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $40 a day"
+            color: *color_4000_to_inf
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_3000_and_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$30-$40 a day"
+            color: *color_3000_to_4000
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_2000_and_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$20-$30 a day"
+            color: *color_2000_to_3000
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_1000_and_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$10-$20 a day"
+            color: *color_1000_to_2000
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+            color: *color_830_to_1000
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+            color: *color_420_to_830
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+            color: *color_300_to_420
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_100_and_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$1-$3 a day"
+            color: *color_100_to_300
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $1 a day"
+            color: *color_0_to_100
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      hideRelativeToggle: false
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  # BAR CHART MORE LINES
+  - dimensions:
+      indicator: headcount
+      poverty_line: bar_chart_more_lines
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: poverty#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Below $1 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_100_and_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$1-$3 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_300_and_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3-$4.20 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_420_and_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$4.20-$8.30 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_830_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$8.30-$10 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_1000_and_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$10-$20 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_2000_and_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$20-$30 a day"
+        - catalogPath: poverty#headcount_between__ppp_version_2021__poverty_line_3000_and_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$30-$40 a day"
+        - catalogPath: poverty#headcount_above__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $40 a day"
+    config:
+      title: Distribution of the population between different poverty lines
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+      sortBy: total
+      hideRelativeToggle: false
+      stackMode: absolute
+      hideTotalValueLabel: false
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"

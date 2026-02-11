@@ -10,6 +10,8 @@ INSTRUCTIONS:
     - Total fertility rate (TFR) retrospective estimates and forecasts, all scenarios: 1950-2100 [CSV]
     - Life expectancy retrospective estimates and forecasts, all scenarios: 1990-2100 - Data and Codebook [CSV]
     - Migration forecast: 2018-2100 - Data and Codebook [CSV]
+    - Live births retrospective estimates and forecasts, all scenarios: 1950-2100 [CSV]
+    - Population forecast, reference scenario only, all ages and both sexes: 2018-2100 [CSV]
 
 EXTRA: Refer to their "Data Release Information Sheet" pdf file to learn more about the data (https://ghdx.healthdata.org/sites/default/files/record-attached-files/IHME_POP_2017_2100_INFO_SHEET_Y2020M05D01.PDF)
 """
@@ -28,6 +30,8 @@ paths = PathFinder(__file__)
 @click.option("--path-to-fertility", type=str, default=None, help="Path to fertility data file")
 @click.option("--path-to-life-expectancy", type=str, default=None, help="Path to life_expectancy data file")
 @click.option("--path-to-migration", type=str, default=None, help="Path to migration data file")
+@click.option("--path-to-births", type=str, default=None, help="Path to live_births data file")
+@click.option("--path-to-population-ref", type=str, default=None, help="Path to population_ref data file")
 def run(
     upload: bool = True,
     path_to_population: str | None = None,
@@ -35,6 +39,8 @@ def run(
     path_to_fertility: str | None = None,
     path_to_life_expectancy: str | None = None,
     path_to_migration: str | None = None,
+    path_to_births: str | None = None,
+    path_to_population_ref: str | None = None,
 ) -> None:
     """Create a new snapshot.
 
@@ -45,7 +51,9 @@ python snapshots/demography/2026-02-05/ihme_2020.py \
     --path-to-population-retro $IHME_DIR/population_retro.zip \
     --path-to-fertility $IHME_DIR/fertility.zip \
     --path-to-life-expectancy $IHME_DIR/life_expectancy.zip \
-    --path-to-migration $IHME_DIR/migration.zip
+    --path-to-migration $IHME_DIR/migration.zip \
+    --path-to-births $IHME_DIR/births.zip \
+    --path-to-population-ref $IHME_DIR/population_ref.zip
 
     Args:
         upload: Whether to upload the snapshot to S3.
@@ -54,6 +62,8 @@ python snapshots/demography/2026-02-05/ihme_2020.py \
         path_to_fertility: Path to local fertility data file.
         path_to_life_expectancy: Path to local life_expectancy data file.
         path_to_migration: Path to local migration data file.
+        path_to_births: Path to local live_births data file.
+        path_to_population_ref: Path to local population_ref data file.
     """
     # Map file names to their paths
     file_paths = {
@@ -62,6 +72,8 @@ python snapshots/demography/2026-02-05/ihme_2020.py \
         "fertility": path_to_fertility,
         "life_expectancy": path_to_life_expectancy,
         "migration": path_to_migration,
+        "live_births": path_to_births,
+        "population_ref": path_to_population_ref,
     }
 
     # Process only files with provided paths

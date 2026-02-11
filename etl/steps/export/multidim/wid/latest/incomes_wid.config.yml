@@ -1,0 +1,170 @@
+title:
+  title: Incomes of the richest
+  title_variant: World Inequality Database
+default_selection:
+  - Chile
+  - Brazil
+  - South Africa
+  - United States
+  - France
+  - China
+
+default_dimensions:
+  quantile: Richest 1%
+  welfare_type: before tax
+
+dimensions:
+  - name: Decile/quantile
+    slug: quantile
+    choices:
+      - slug: Richest 0.1%
+        name: Richest 0.1%
+      - slug: Richest 1%
+        name: Richest 1%
+      - slug: "10"
+        name: Richest 10%
+      - slug: "10_40_50"
+        name: Richest and poorest groups
+        group: Compare different deciles/quantiles
+      - slug: "10_40_50_bar"
+        name: Richest and poorest groups (bar chart)
+        group: Compare different deciles/quantiles
+      - slug: all
+        name: All deciles
+        group: Compare different deciles/quantiles
+      - slug: all_bar
+        name: All deciles (bar chart)
+        group: Compare different deciles/quantiles
+
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: before tax
+        name: Before tax
+      - slug: after tax
+        name: After tax
+      - slug: before_vs_after
+        name: Before vs. after tax
+        group: Compare incomes before and after taxes and benefits
+      - slug: before_vs_after_scatter
+        name: Before vs. after tax (scatter)
+        group: Compare incomes before and after taxes and benefits
+
+views:
+  - dimensions:
+      quantile: "10_40_50"
+      welfare_type: before tax
+    indicators:
+      y:
+        - catalogPath: inequality#share_top_1__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Richest 1%"
+        - catalogPath: inequality#share_top_90_99__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Next 9%"
+        - catalogPath: inequality#share_middle_40__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_bottom_50__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Poorest 50%"
+    config:
+      title: Distribution of income across richer and poorer groups (before tax)
+      subtitle: The share of income received by different income groups. Income here is measured before taxes and benefits.
+      note: Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 1%, the next 9%, the poorest 50% and the 40% in the middle. Income here is measured before taxes and benefits."
+
+  - dimensions:
+      quantile: "10_40_50"
+      welfare_type: after tax
+    indicators:
+      y:
+        - catalogPath: inequality#share_top_1__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Richest 1%"
+        - catalogPath: inequality#share_top_90_99__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Next 9%"
+        - catalogPath: inequality#share_middle_40__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_bottom_50__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Poorest 50%"
+    config:
+      title: Distribution of income across richer and poorer groups (after tax)
+      subtitle: The share of income received by different income groups. Income here is measured after taxes and benefits.
+      note: ""
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 1%, the next 9%, the poorest 50% and the 40% in the middle. Income here is measured after taxes and benefits."
+
+  - dimensions:
+      quantile: "10_40_50_bar"
+      welfare_type: before tax
+    indicators:
+      y:
+        - catalogPath: inequality#share_bottom_50__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#share_middle_40__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_top_90_99__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Next 9%"
+        - catalogPath: inequality#share_top_1__welfare_type_before_tax__extrapolated_no
+          display:
+            name: "Richest 1%"
+    config:
+      title: Distribution of income across richer and poorer groups (before tax)
+      subtitle: The share of income received by different income groups. Income here is measured before taxes and benefits.
+      note: Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: inequality#share_top_1__welfare_type_before_tax__extrapolated_no
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 1%, the next 9%, the poorest 50% and the 40% in the middle. Income here is measured before taxes and benefits."
+
+  - dimensions:
+      quantile: "10_40_50_bar"
+      welfare_type: after tax
+    indicators:
+      y:
+        - catalogPath: inequality#share_bottom_50__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#share_middle_40__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#share_top_90_99__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Next 9%"
+        - catalogPath: inequality#share_top_1__welfare_type_after_tax__extrapolated_no
+          display:
+            name: "Richest 1%"
+    config:
+      title: Distribution of income across richer and poorer groups (after tax)
+      subtitle: The share of income received by different income groups. Income here is measured after taxes and benefits.
+      note: ""
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: inequality#share_top_1__welfare_type_after_tax__extrapolated_no
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 1%, the next 9%, the poorest 50% and the 40% in the middle. Income here is measured after taxes and benefits."

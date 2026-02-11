@@ -57,7 +57,7 @@ def add_regions_to_percent(tb_number: Table, regions: List[str], index_cols: Lis
     all_causes = tb_number[tb_number["cause"] == "All causes"]
     all_causes = all_causes.rename(columns={"value": "all_causes"}).drop(columns=["cause"])
     # Merge it back in to the main dataset
-    cols = index_cols.remove("cause")
+    cols = [col for col in index_cols if col != "cause"]
     tb_percent = tb_percent.merge(all_causes, on=cols)
     # Use the all causes as denominator of all other causes
     tb_percent["share"] = tb_percent["value"] / tb_percent["all_causes"] * 100
