@@ -13,6 +13,8 @@ default_selection:
   - Romania
   - Indonesia
 
+originUrl: ourworldindata.org/poverty
+
 default_dimensions:
   indicator: headcount_ratio
   poverty_line: "300"

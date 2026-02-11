@@ -13,6 +13,8 @@ default_dimensions:
   quantile: Richest 1%
   welfare_type: before tax
 
+originUrl: ourworldindata.org/economic-inequality
+
 dimensions:
   - name: Decile/quantile
     slug: quantile

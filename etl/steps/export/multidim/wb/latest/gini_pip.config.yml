@@ -15,6 +15,8 @@ default_selection:
 default_dimensions:
   survey_comparability: No spells
 
+originUrl: ourworldindata.org/economic-inequality
+
 dimensions:
   - name: Breaks in data
     slug: survey_comparability

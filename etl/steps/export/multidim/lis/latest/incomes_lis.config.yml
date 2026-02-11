@@ -16,6 +16,8 @@ default_dimensions:
   welfare_type: dhi
   period: month
 
+originUrl: ourworldindata.org/economic-inequality
+
 dimensions:
   - name: Metric
     slug: indicator

@@ -13,6 +13,8 @@ default_selection:
 default_dimensions:
   welfare_type: dhi
 
+originUrl: ourworldindata.org/economic-inequality
+
 dimensions:
   - name: Income measure
     slug: welfare_type
