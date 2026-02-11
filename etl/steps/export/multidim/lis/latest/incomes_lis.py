@@ -78,12 +78,6 @@ def run() -> None:
                     "baseColorScheme": "OwidCategoricalE",
                 },
             },
-        ],
-    )
-
-    # Group all deciles as bar chart
-    c.group_views(
-        groups=[
             {
                 "dimension": "decile",
                 "choices": decile_values,
@@ -213,18 +207,12 @@ def run() -> None:
                 description_key = list(meta.description_key) if meta.description_key else []
                 description_key = [k for k in description_key if "post-tax" not in k and "pre-tax" not in k]
 
-                # Set config
-                view.config = {
-                    "title": title,
-                    "subtitle": subtitle,
-                    "note": "",
-                    "hideRelativeToggle": True,
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["LineChart"],
-                    "missingDataStrategy": "hide",
-                }
+                # Update config with title, subtitle, and note (other config set by group_views)
+                if view.config is None:
+                    view.config = {}
+                view.config["title"] = title
+                view.config["subtitle"] = subtitle
+                view.config["note"] = ""
 
                 # Set metadata
                 view.metadata = {

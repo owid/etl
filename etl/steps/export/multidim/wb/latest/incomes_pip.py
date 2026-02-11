@@ -140,12 +140,6 @@ def run() -> None:
                     "baseColorScheme": "OwidCategoricalE",
                 },
             },
-        ],
-    )
-
-    # Group all deciles together as bar chart
-    c.group_views(
-        groups=[
             {
                 "dimension": "decile",
                 "choices": decile_values,

@@ -74,17 +74,11 @@ def run() -> None:
                 if description_key:
                     description_key = description_key[1:]
 
-                # Set config
-                view.config = {
-                    "title": title,
-                    "subtitle": subtitle,
-                    "hideRelativeToggle": True,
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["LineChart"],
-                    "missingDataStrategy": "hide",
-                }
+                # Update config with title and subtitle (other config set by group_views)
+                if view.config is None:
+                    view.config = {}
+                view.config["title"] = title
+                view.config["subtitle"] = subtitle
 
                 # Set metadata
                 view.metadata = {
