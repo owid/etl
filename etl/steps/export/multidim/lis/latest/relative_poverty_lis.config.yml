@@ -21,7 +21,7 @@ definitions:
         originUrl: ourworldindata.org/poverty
 
 dimensions:
-  - name: Metric
+  - name: Indicator
     slug: indicator
     choices:
       - slug: headcount_ratio

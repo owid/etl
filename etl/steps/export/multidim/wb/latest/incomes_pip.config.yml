@@ -24,7 +24,7 @@ definitions:
         originUrl: ourworldindata.org/economic-inequality
 
 dimensions:
-  - name: Metric
+  - name: Indicator
     slug: indicator
     choices:
       - slug: mean
