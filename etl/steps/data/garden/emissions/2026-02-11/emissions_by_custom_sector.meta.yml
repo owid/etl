@@ -22,3 +22,11 @@ tables:
         title: Global greenhouse gas emissions by human activity
         unit: "tonnes of CO₂ equivalent"
         short_unit: "t CO₂e"
+      co2_emissions_corrected:
+        title: Global carbon dioxide emissions by human activity (corrected)
+        unit: "tonnes"
+        short_unit: "t"
+      ghg_emissions_corrected:
+        title: Global greenhouse gas emissions by human activity (corrected)
+        unit: "tonnes of CO₂ equivalent"
+        short_unit: "t CO₂e"

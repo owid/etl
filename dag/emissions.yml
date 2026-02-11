@@ -212,6 +212,7 @@ steps:
   #
   data://garden/emissions/2026-02-11/emissions_by_custom_sector:
     - data://garden/climate_watch/2026-02-10/emissions_by_sector
+    - data://garden/ember/2026-01-26/yearly_electricity
   #
   # Emissions - Greenhouse gas emissions by custom sector.
   #

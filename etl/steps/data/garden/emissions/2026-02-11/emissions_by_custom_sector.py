@@ -24,6 +24,8 @@ Then, figure out a reasonable mapping of subsectors onto my custom categories.
 
 """
 
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -85,6 +87,92 @@ def sanity_check_inputs(tb_ghg, tb_co2):
         # px.line(_tb[["year", "sum", "total_including_lucf"]].melt(id_vars=["year"]), x="year", y="value", color="variable", title=gas, markers=True).show()
 
 
+def separate_electricity_and_heat(tb, tb_ember):
+    # Select electricity (which includes some heat) and heat sectors.
+    tb_electricity_and_heat = tb[tb["sector"] == "Electricity"].reset_index(drop=True)
+    tb_heat = tb[tb["sector"] == "Keeping warm and cool"].reset_index(drop=True)
+
+    # TODO: Note that Ember's emissions are lifecycle emissions. Consider calculating direct emissions by converting total generation of coal, gas and oil into CO2 emissions, with some conversion factors.
+    # I could get emission factors from the existing garden step, and multiply them by total generation from coal gas and oil; for now I could use these factors here:
+    # GHG per kWh (direct, in CO2e; CO2 + CH4 + N2O):
+    # •	Coal: ~1035 gCO2e/kWh
+    # •	Oil: ~857 gCO2e/kWh
+    # •	Gas: ~452 gCO2e/kWh
+    tb_ember = tb_ember[tb_ember["country"] == "World"][
+        ["year", "emissions__lifecycle__total_emissions__mtco2"]
+    ].rename(columns={"emissions__lifecycle__total_emissions__mtco2": "emissions_electricity"})
+    # Convert from million tonnes to tonnes of CO2.
+    tb_ember["emissions_electricity"] *= 1e6
+    # Add Ember's emissions to the original electricity and heat emissions table.
+    tb_electricity_and_heat = tb_electricity_and_heat.merge(tb_ember, on="year", how="inner")
+    # NOTE: Ember's emissions are GHG emissions in CO2 equivalents. However, non-CO2 emissions of electricity and heat are probably less than ~1%, so we can safely assume that roughly all electricity and heat emissions are CO2 emissions.
+    # This assumption can be easily confirmed by looking at the current Climate Watch data.
+    assert (
+        (
+            100
+            * (tb_electricity_and_heat["ghg_emissions"] - tb_electricity_and_heat["co2_emissions"])
+            / tb_electricity_and_heat["ghg_emissions"]
+        )
+        < 1
+    ).all()
+
+    # Uncomment to plot GHG, CO2 electricity and heat emissions from Climate Watch, and Ember's emissions.
+    # import plotly.express as px
+    # px.line(tb_electricity_and_heat.drop(columns=["country", "sector"]).melt(id_vars="year"), x="year", y="value", color="variable", markers=True).update_yaxes(range=[0, None])
+
+    # Calculate additional CO2 and GHG emissions related to heat.
+    additional_heat = tb_electricity_and_heat.copy()
+    with pr.ignore_warnings():
+        additional_heat["ghg_emissions"] -= tb_electricity_and_heat["emissions_electricity"]
+        additional_heat["co2_emissions"] -= tb_electricity_and_heat["emissions_electricity"]
+    additional_heat = additional_heat.drop(columns=["country", "sector", "emissions_electricity"])
+
+    # Create a new pair of series of CO2 and GHG emissions from only electricity (from Ember).
+    tb_electricity = tb_electricity_and_heat[["country", "year", "sector", "emissions_electricity"]].rename(
+        columns={"emissions_electricity": "ghg_emissions"}
+    )
+    tb_electricity["co2_emissions"] = tb_electricity["ghg_emissions"].copy()
+
+    # Create a new "Keeping warm and cool" series that includes the heat removed from the electricity and heat sector.
+    tb_heat = tb_heat.merge(additional_heat, on=["year"], how="inner", suffixes=("", "_additional"))
+
+    # Uncomment to plot GHG, CO2 heat emissions from Climate Watch, and derived additional heat emissions.
+    # import plotly.express as px
+    # px.line(tb_heat.drop(columns=["country", "sector"]).melt(id_vars="year"), x="year", y="value", color="variable", markers=True).update_yaxes(range=[0, None])
+
+    tb_heat["ghg_emissions"] += tb_heat["ghg_emissions_additional"]
+    tb_heat["co2_emissions"] += tb_heat["co2_emissions_additional"]
+    tb_heat = tb_heat.drop(columns=["ghg_emissions_additional", "co2_emissions_additional"], errors="raise")
+
+    # Replace "Electricity" and "Keeping warm and cool") with the new estimates.
+    with pr.ignore_warnings():
+        tb_corrected = pr.concat(
+            [tb[~tb["sector"].isin(["Electricity", "Keeping warm and cool"])], tb_electricity, tb_heat],
+            ignore_index=True,
+        )
+
+    # Fix metadata.
+    for column in ["co2_emissions", "ghg_emissions"]:
+        tb_corrected[column].metadata.unit = tb[column].metadata.unit
+        tb_corrected[column].metadata.short_unit = tb[column].metadata.short_unit
+
+    # Now electricity and heat sectors have data only since 2000. Drop previous years, to avoid incomplete data.
+    assert tb_corrected[tb_corrected["sector"] == "Electricity"]["year"].min() == 2000
+    tb_corrected = tb_corrected[tb_corrected["year"] >= 2000].reset_index(drop=True)
+
+    # Sort conveniently.
+    tb_corrected = tb_corrected.sort_values(["country", "year", "sector"]).reset_index(drop=True)
+
+    # Uncomment to plot the old and new electricity and heat emissions.
+    # tb_comparison = tb.copy()
+    # tb_comparison["sector"] += " old"
+    # tb_comparison = pr.concat([tb_comparison, tb_corrected], ignore_index=True)
+    # px.line(tb_comparison, x="year", y="ghg_emissions", color="sector", markers=True)
+    # px.line(tb_comparison, x="year", y="co2_emissions", color="sector", markers=True)
+
+    return tb_corrected
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -93,6 +181,10 @@ def run() -> None:
     ds = paths.load_dataset("emissions_by_sector")
     tb_co2 = ds.read("carbon_dioxide_emissions_by_sector")
     tb_ghg = ds.read("greenhouse_gas_emissions_by_sector")
+
+    # Load Ember's yearly electricity and read its main table.
+    ds_ember = paths.load_dataset("yearly_electricity")
+    tb_ember = ds_ember.read("yearly_electricity")
 
     #
     # Process data.
@@ -136,17 +228,23 @@ def run() -> None:
     # Combine both tables.
     tb = tb_ghg.merge(tb_co2, on=["country", "year", "sector"], how="outer")
 
+    # Create a new corrected table, where heat has been moved from the "Electricity" sector to the "Keeping warm and cool" sector.
+    tb_corrected = separate_electricity_and_heat(tb=tb, tb_ember=tb_ember)
+
+    # Combine original and corrected data.
+    tb = tb.merge(tb_corrected, on=["country", "year", "sector"], how="outer", suffixes=("", "_corrected"))
+
     # Add an explanation to the metadata of which subsectors are included in each category.
     # TODO: Update this description.
-    description_processing = "Each category is made up of the following emission subcategories, based on IPCC definitions (as reported by World Resources Institute):"
+    description_processing = "Each category is made up of the following emission subcategories, based on IPCC definitions (as reported by Climate Watch):"
     for sector, subsectors in SECTOR_MAPPING.items():
         _subsectors = (
             ", ".join([s.replace("fugitive", "fugitive emissions").replace("_", " ") for s in subsectors]) + "."
         )
         description_processing += f"\n- {sector}: {_subsectors}"
-    print(description_processing)
-    tb["co2_emissions"].metadata.description_processing = description_processing
-    tb["ghg_emissions"].metadata.description_processing = description_processing
+    for column in ["co2_emissions", "ghg_emissions", "co2_emissions_corrected", "ghg_emissions_corrected"]:
+        tb[column].metadata.description_processing = description_processing
+        tb[column].metadata.description_processing = description_processing
 
     # Improve table format.
     tb = tb.format(keys=["country", "year", "sector"], short_name=paths.short_name)
