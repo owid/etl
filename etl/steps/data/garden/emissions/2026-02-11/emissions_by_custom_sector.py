@@ -92,15 +92,44 @@ def separate_electricity_and_heat(tb, tb_ember):
     tb_electricity_and_heat = tb[tb["sector"] == "Electricity"].reset_index(drop=True)
     tb_heat = tb[tb["sector"] == "Keeping warm and cool"].reset_index(drop=True)
 
-    # TODO: Note that Ember's emissions are lifecycle emissions. Consider calculating direct emissions by converting total generation of coal, gas and oil into CO2 emissions, with some conversion factors.
-    # I could get emission factors from the existing garden step, and multiply them by total generation from coal gas and oil; for now I could use these factors here:
-    # GHG per kWh (direct, in CO2e; CO2 + CH4 + N2O):
-    # •	Coal: ~1035 gCO2e/kWh
-    # •	Oil: ~857 gCO2e/kWh
-    # •	Gas: ~452 gCO2e/kWh
-    tb_ember = tb_ember[tb_ember["country"] == "World"][
-        ["year", "emissions__lifecycle__total_emissions__mtco2"]
-    ].rename(columns={"emissions__lifecycle__total_emissions__mtco2": "emissions_electricity"})
+    # Get total emissions of electricity production from Ember.
+    # tb_ember = tb_ember[tb_ember["country"] == "World"][
+    #     ["year", "emissions__lifecycle__total_emissions__mtco2"]
+    # ].rename(columns={"emissions__lifecycle__total_emissions__mtco2": "emissions_electricity"})
+    # NOTE: Ember's emissions are given as lifecycle emissions, which we can't use directly here.
+    # Instead, we'll calculate direct emissions ourselves, by converting total generation of coal, gas, and other fossil, into CO2 emissions, with some conversion factors.
+    COLUMNS_EMBER = {
+        "country": "country",
+        "year": "year",
+        "generation__coal__twh": "coal_generation",
+        "generation__gas__twh": "gas_generation",
+        "generation__other_fossil__twh": "oil_generation",
+        # Just for sanity checking, keep original lifecycle emissions.
+        "emissions__lifecycle__total_emissions__mtco2": "lifecycle_emissions",
+    }
+    tb_ember = tb_ember[tb_ember["country"] == "World"][list(COLUMNS_EMBER)].rename(
+        columns=COLUMNS_EMBER, errors="raise"
+    )
+    # TODO: Instead of hardcoding these factors, I could get emission factors from the existing garden step.
+    tb_ember["coal_emissions"] = tb_ember["coal_generation"] * 1035
+    tb_ember["gas_emissions"] = tb_ember["gas_generation"] * 452
+    tb_ember["oil_emissions"] = tb_ember["oil_generation"] * 857
+    tb_ember["emissions_electricity"] = tb_ember[["coal_emissions", "gas_emissions", "oil_emissions"]].sum(axis=1)
+    # TODO: Plot calculated and original emissions.
+    tb_ember = tb_ember.drop(
+        columns=[
+            "country",
+            "coal_emissions",
+            "gas_emissions",
+            "oil_emissions",
+            "coal_generation",
+            "gas_generation",
+            "oil_generation",
+            "lifecycle_emissions",
+        ],
+        errors="raise",
+    )
+
     # Convert from million tonnes to tonnes of CO2.
     tb_ember["emissions_electricity"] *= 1e6
     # Add Ember's emissions to the original electricity and heat emissions table.
