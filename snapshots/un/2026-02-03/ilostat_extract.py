@@ -59,33 +59,33 @@ TIMEOUT = 500
 
 # Indicators to extract
 INDICATORS = [
-    "SDG_0111_SEX_AGE_RT",
-    "SDG_0131_SEX_SOC_RT",
-    "SDG_0552_NOC_RT",
-    "SDG_T552_NOC_RT",
-    "SDG_0821_NOC_RT",
-    "SDG_0831_SEX_ECO_RT",
-    "SDG_0851_SEX_OCU_NB",
-    "SDG_0852_SEX_AGE_RT",
-    "SDG_0852_SEX_DSB_RT",
-    "SDG_0861_SEX_RT",
-    "SDG_B871_SEX_AGE_RT",
-    "SDG_A871_SEX_AGE_RT",
-    "SDG_N881_SEX_MIG_RT",
-    "SDG_F881_SEX_MIG_RT",
-    "SDG_0882_NOC_RT",
-    "SDG_08B1_NOC_NB",
-    "SDG_0922_NOC_RT",
-    "SDG_1041_NOC_RT",
-    "EAR_4HRL_SEX_CUR_NB",
-    "EAR_XFLS_NOC_RT",
-    "EAR_GGAP_OCU_RT",
-    "EAP_2EAP_SEX_AGE_NB",
-    "EAP_2WAP_SEX_AGE_RT",
-    "EMP_2EMP_SEX_STE_NB",
-    "EMP_2IFL_SEX_RT",
-    "UNE_2EAP_SEX_AGE_RT",
-    "CLD_XCHL_SEX_AGE_RT",
+    "SDG_0111_SEX_AGE_RT",  # SDG indicator 1.1.1 - Working poverty rate (percentage of employed living below US$3 PPP) (%)
+    "SDG_0131_SEX_SOC_RT",  # SDG indicator 1.3.1 - Proportion of population covered by social protection floors/systems (%)
+    "SDG_0552_NOC_RT",  # SDG indicator 5.5.2 - Proportion of women in senior and middle management positions (%)
+    "SDG_T552_NOC_RT",  # SDG indicator 5.5.2 - Proportion of women in managerial positions (%)
+    "SDG_0821_NOC_RT",  # SDG indicator 8.2.1 - Annual growth rate of output per worker (GDP constant 2021 international $ at PPP) (%)
+    "SDG_0831_SEX_ECO_RT",  # SDG indicator 8.3.1 - Proportion of informal employment in total employment
+    "SDG_0851_SEX_OCU_NB",  # SDG indicator 8.5.1 - Average hourly earnings of employees
+    "SDG_0852_SEX_AGE_RT",  # SDG indicator 8.5.2 - Unemployment rate (%)
+    "SDG_0852_SEX_DSB_RT",  # SDG indicator 8.5.2 - Unemployment rate by disability status (%)
+    "SDG_0861_SEX_RT",  # SDG indicator 8.6.1 - Proportion of youth (aged 15-24 years) not in education, employment or training
+    "SDG_B871_SEX_AGE_RT",  # SDG indicator 8.7.1 - Proportion of children engaged in economic activity and household chores
+    "SDG_A871_SEX_AGE_RT",  # SDG indicator 8.7.1 - Proportion of children engaged in economic activity (%)
+    "SDG_N881_SEX_MIG_RT",  # SDG indicator 8.8.1 - Non-fatal occupational injuries per 100'000 workers
+    "SDG_F881_SEX_MIG_RT",  # SDG indicator 8.8.1 - Fatal occupational injuries per 100'000 workers
+    "SDG_0882_NOC_RT",  # SDG indicator 8.8.2 - Level of national compliance with labour rights (freedom of association and collective bargaining)
+    "SDG_08B1_NOC_NB",  # SDG indicator 8.b.1: Existence of a developed and operationalized national strategy for youth employment
+    "SDG_0922_NOC_RT",  # SDG indicator 9.2.2 - Manufacturing employment as a proportion of total employment (%)
+    "SDG_1041_NOC_RT",  # SDG indicator 10.4.1 - Labour income share as a percent of GDP (%)
+    "EAR_4HRL_SEX_CUR_NB",  # Average hourly earnings of employees by sex and currency
+    "EAR_XFLS_NOC_RT",  # Female share of low pay earners (%)
+    "EAR_GGAP_OCU_RT",  # Gender wage gap by occupation (%)
+    "EAP_2EAP_SEX_AGE_NB",  # Labour force by sex and age -- ILO modelled estimates
+    "EAP_2WAP_SEX_AGE_RT",  # Labour force participation rate by sex and age -- ILO modelled estimates
+    "EMP_2EMP_SEX_STE_NB",  # Employment by sex and status in employment -- ILO modelled estimates (thousands)
+    "EMP_2IFL_SEX_RT",  # Informal employment rate by sex -- ILO modelled estimates
+    "UNE_2EAP_SEX_AGE_RT",  # Unemployment rate by sex and age -- ILO modelled estimates (%)
+    "CLD_XCHL_SEX_AGE_RT",  # Share of children in child labour by sex and age (%)
 ]
 
 # Dictionaries to extract

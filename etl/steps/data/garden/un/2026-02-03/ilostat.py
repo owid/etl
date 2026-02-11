@@ -102,7 +102,7 @@ COLUMN_CATEGORIES = {
         "SDG indicator 8.b.1: Existence of a developed and operationalized national strategy for youth employment": "sdg_8_b_1_national_strategy_youth_employment",
         "SDG indicator 9.2.2 - Manufacturing employment as a proportion of total employment (%)": "sdg_9_2_2_manufacturing_employment",
         "SDG indicator 10.4.1 - Labour income share as a percent of GDP (%)": "sdg_10_4_1_labour_income_share",
-        "Average hourly earnings of employees by sex": "average_hourly_earnings_employees_by_sex",
+        "Average hourly earnings of employees by sex and currency": "average_hourly_earnings_employees_by_sex",
         "Gender wage gap by occupation (%)": "gender_wage_gap_by_occupation",
         "Share of children in child labour by sex and age (%)": "share_of_children_in_child_labour_by_sex_and_age",
         "Female share of low pay earners (%)": "female_share_of_low_pay_earners",
