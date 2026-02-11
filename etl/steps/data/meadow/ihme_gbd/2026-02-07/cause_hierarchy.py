@@ -8,10 +8,10 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load snapshot.
-    snap = paths.load_snapshot("cause_hierarchy.xlsx")
+    snap = paths.load_snapshot("cause_hierarchy.csv")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Cause Hierarchy", underscore=True)
+    tb = snap.read(underscore=True)
     tb = tb.format(["cause_name"])
     # Save outputs.
     #

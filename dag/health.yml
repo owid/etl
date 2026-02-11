@@ -17,7 +17,7 @@ steps:
   # - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
 
   data-private://meadow/ihme_gbd/2026-02-07/cause_hierarchy:
-    - snapshot-private://ihme_gbd/2026-02-07/cause_hierarchy.xlsx
+    - snapshot-private://ihme_gbd/2026-02-07/cause_hierarchy.csv
   data-private://garden/ihme_gbd/2026-02-11/leading_causes_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
     - data-private://meadow/ihme_gbd/2026-02-07/cause_hierarchy
