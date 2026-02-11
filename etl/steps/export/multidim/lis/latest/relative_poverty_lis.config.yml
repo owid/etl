@@ -15,8 +15,13 @@ default_dimensions:
   poverty_line: 60% of the median
   welfare_type: dhi
 
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/poverty
+
 dimensions:
-  - name: Metric
+  - name: Indicator
     slug: indicator
     choices:
       - slug: headcount_ratio

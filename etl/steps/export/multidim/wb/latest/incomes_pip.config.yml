@@ -18,8 +18,13 @@ default_dimensions:
   period: month
   survey_comparability: No spells
 
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/economic-inequality
+
 dimensions:
-  - name: Metric
+  - name: Indicator
     slug: indicator
     choices:
       - slug: mean
