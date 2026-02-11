@@ -36,22 +36,113 @@ YEAR = 2021
 
 
 # Custom remapping of Climate Watch subsectors into our custom categories.
+# See WRI's documentation for the meaning of each sector:
+# https://wri-sites.s3.us-east-1.amazonaws.com/climatewatch.org/www.climatewatch.org/climate-watch/wri_metadata/CW_GHG_Method_Note.pdf
+# Also see distribution of subsectors (as of 2026-02-11, the latest data is still for 2021!):
+# https://www.wri.org/data/world-greenhouse-gas-emissions-sector-2021-sunburst-chart
 SECTOR_MAPPING = {
     "Growing food": [
+        # Agriculture sector contains emissions from following activities:
+        # - CH4 emissions from Enteric fermentation (livestock)
+        # - CH4 and N2O emissions from Manure management (livestock)
+        # - CH4 emissions from Rice cultivation
+        # - N2O emissions from Agriculture soils
+        # - Crop residues
+        # - Drained organic soils
+        # - Manure applied to soils
+        # - Manure left on pasture
+        # - Synthetic fertilizers
+        # - CH4 and N2O emissions from Other agricultural sources (burning of crop residues and savanna)
+        # Please note that emissions associated with agriculture related energy use are reported under Energy sector, and thus not included here.
         "agriculture",
+        # Land-Use Change and Forestry sector contains emissions from following activities:
+        # - CO2 emissions from Forest land and Net forest conversion (forestland converted to cropland and grassland)
+        # - CO2 emissions from Drained organic soils
+        # - CO2 and CH4 emissions from Fires in organic soils
+        # - CH4 and N2O emissions from Forest fires
+        # Please note that the forest land emissions data reflects emissions from changes in forest land area between reported years of Forest Resource Assessment (FRA) submitted by countries. The data is published every 5 years, and emissions values are estimated by interpolating data over those 5-year periods.
+        # Please note recent change of FAO's approach for reporting emissions from fires in organic soils (part of the “Burning Biomass”): only values from Southern-east Asia countries are included in country, regional and global aggregates (of burning biomass and subsequently land use total).
         "land_use_change_and_forestry",
+        # Other fuel combustion subsector contains emissions from following activities:
+        # - CO2, CH4, and N2O emissions from Agriculture/forestry, fishing, and other fuel consumption
+        # Other fuel consumption includes emissions from military fuel use.
+        "other_fuel_combustion",
+        # Waste sector contains emissions from following activities:
+        # - CH4 from Landfills (including industrial and municipal solid waste)
+        # - CH4 and N2O from Wastewater treatment (rural and urban)
+        # - CH4 and N2O from Other waste sources
+        "waste",
     ],
     "Getting around": [
+        # Transportation subsector contains CO2, CH4 and N2O emissions from following activities:
+        # - Road
+        # - Rail
+        # - Domestic aviation
+        # - Pipeline transport
+        # - Domestic navigation
+        # - Non-specified transport (all emissions from transport not specified elsewhere)
+        # Please note that transport emissions for world total includes international marine bunkers and international aviation bunkers, which are not included in transportation at a national or regional level.
         "transport",
+        # Bunker fuels contain CO2 emissions from international marine and aviation bunkers. The split of domestic and international are determined by the departure and landing locations, and not by the nationality of the ship/airline.
+        # Bunker Fuels are shown as a sector, but excluded from national totals for Energy (including energy subsector Transport) and Total GHG emissions, in accordance with IPCC Guidelines. In other words, except at World level, Total GHG emissions (and accordingly Energy sector, and Transport sub-sector emissions) do not include bunker fuel emissions.
         "aviation_and_shipping",
     ],
     "Keeping warm and cool": [
+        # Building subsector contains CO2, CH4 and N2O emissions from following activities:
+        # - Residential
+        # - Commercial and public services
+        # Please note that only on-site fuel combustion is covered here. Emissions associated with use of electricity are reported under electricity/heat.
         "buildings",
     ],
     "Electricity": [
+        # Electricity/heat subsector contains CO2, CH4 and N2O emissions from following activities:
+        # - Main activity producer of electricity and heat (electricity plants, combined heat
+        # and power plants, heat plants)
+        # - Unallocated autoproducers
+        # - Other energy industry own use
+        # Please note that part of the emissions might be reallocated to industrial processes and product use category under the 2006 IPCC GLs.
         "electricity_and_heat",
     ],
-    "Making things": ["manufacturing_and_construction", "industry", "fugitive", "other_fuel_combustion", "waste"],
+    "Making things": [
+        # Manufacturing/Construction subsector contains CO2, CH4 and N2O emissions from following activities:
+        # - Mining and quarrying
+        # - Construction
+        # - Manufacturing
+        # - Iron and Steel
+        # - Chemical and petrochemical
+        # - Non-ferrous metals
+        # - Non-metallic minerals
+        # - Transport equipment
+        # - Machinery
+        # - Food and tobacco
+        # - Paper, pulp and printing
+        # - Wood and wood products
+        # - Textile and leather
+        # - Non-specified industry
+        # Please note that part of the emissions might be reallocated to industrial processes and product use category under the 2006 IPCC GLs.
+        "manufacturing_and_construction",
+        # Industry sector contains emissions from following activities:
+        # - CO2 emissions from Cement Manufacture
+        # - N2O emissions from Adipic and Nitric Acid Production
+        # - F-Gases from Electronics Manufacturing (semiconductor, flat panel display (FPD) and photovoltaic (PV))
+        # - SF6 from Electric Power Systems
+        # - PFCs and SF6 from Metal Production (PFCs as by-product of aluminum production, SF6 from magnesium
+        # production)
+        # - HFCs from Uses of Substitutes for Ozone-Depleting Substances (ODS)
+        # - HFCs from HCFC-22 Production
+        # - N2O and CH4 emissions from Other Industrial activities (non-agriculture)
+        # Please note that for the purpose of Climate Watch dataset, all fluorinated gases are reported as aggregated F-gas.
+        "industry",
+        # Fugitive Emissions subsector contains fugitive CO2 and CH4 emissions from following activities:
+        # - CO2 from Flaring
+        # - CH4 from Coal mining
+        # - CH4 from Natural gas and oil systems
+        # - Production
+        # - Faring and venting
+        # - Transmission and distribution
+        # - CH4 and N2O from Other energy sources (solid fuels, oil and natural gas, incineration and open burning of waste)
+        "fugitive",
+    ],
 }
 
 # Create a list of expected sectors to be found in the data.
@@ -107,16 +198,23 @@ def separate_electricity_and_heat(tb, tb_ember):
         # Just for sanity checking, keep original lifecycle emissions.
         "emissions__lifecycle__total_emissions__mtco2": "lifecycle_emissions",
     }
-    tb_ember = tb_ember[tb_ember["country"] == "World"][list(COLUMNS_EMBER)].rename(
+    tb_emissions = tb_ember[tb_ember["country"] == "World"][list(COLUMNS_EMBER)].rename(
         columns=COLUMNS_EMBER, errors="raise"
     )
     # TODO: Instead of hardcoding these factors, I could get emission factors from the existing garden step.
-    tb_ember["coal_emissions"] = tb_ember["coal_generation"] * 1035
-    tb_ember["gas_emissions"] = tb_ember["gas_generation"] * 452
-    tb_ember["oil_emissions"] = tb_ember["oil_generation"] * 857
-    tb_ember["emissions_electricity"] = tb_ember[["coal_emissions", "gas_emissions", "oil_emissions"]].sum(axis=1)
+    # Emission factors are given in g/kWh, which is the same as t/GWh; they need to be multiplied by 1e3 to convert to t/TWh (since generation is in TWh).
+    tb_emissions["coal_emissions"] = tb_emissions["coal_generation"] * 760 * 1e3
+    tb_emissions["gas_emissions"] = tb_emissions["gas_generation"] * 370 * 1e3
+    tb_emissions["oil_emissions"] = tb_emissions["oil_generation"] * 279 * 1e3
+    tb_emissions["emissions_electricity"] = tb_emissions[["coal_emissions", "gas_emissions", "oil_emissions"]].sum(
+        axis=1
+    )
+    # Convert from million tonnes to tonnes of CO2.
+    tb_emissions["lifecycle_emissions"] *= 1e6
+    # Uncomment to compare Ember's original (lifecycle) emissions with the ones we just calculated.
+    # px.line(tb_emissions[["year", "lifecycle_emissions", "emissions_electricity"]].melt(id_vars=["year"]), x="year", y="value", color="variable", markers=True).update_yaxes(range=[0, None])
     # TODO: Plot calculated and original emissions.
-    tb_ember = tb_ember.drop(
+    tb_emissions = tb_emissions.drop(
         columns=[
             "country",
             "coal_emissions",
@@ -130,10 +228,8 @@ def separate_electricity_and_heat(tb, tb_ember):
         errors="raise",
     )
 
-    # Convert from million tonnes to tonnes of CO2.
-    tb_ember["emissions_electricity"] *= 1e6
     # Add Ember's emissions to the original electricity and heat emissions table.
-    tb_electricity_and_heat = tb_electricity_and_heat.merge(tb_ember, on="year", how="inner")
+    tb_electricity_and_heat = tb_electricity_and_heat.merge(tb_emissions, on="year", how="inner")
     # NOTE: Ember's emissions are GHG emissions in CO2 equivalents. However, non-CO2 emissions of electricity and heat are probably less than ~1%, so we can safely assume that roughly all electricity and heat emissions are CO2 emissions.
     # This assumption can be easily confirmed by looking at the current Climate Watch data.
     assert (
