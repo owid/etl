@@ -25,7 +25,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("gbd_risk_deaths")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("gbd_risk", reset_index=True)
+    tb = ds_meadow.read("gbd_risk_deaths", reset_index=True)
     ds_regions = paths.load_dataset("regions")
     #
     # Process data.
