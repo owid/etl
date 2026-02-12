@@ -7,54 +7,51 @@ Boundary years (historical end, projection end) and the source citation are
 inferred from the garden ``demography/2024-07-15/population`` dataset.
 """
 
-import xml.etree.ElementTree as ET
-from pathlib import Path
-
 import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd
-import structlog
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl import paths as etl_paths
+from etl.helpers import PathFinder
 
 # Use non-path text so SVGs stay editable in Figma
 matplotlib.rcParams["svg.fonttype"] = "none"
 
-CURRENT_DIR = Path(__file__).parent
+paths = PathFinder(__file__)
 
-log = structlog.get_logger()
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+def run() -> None:
+    """Load data, render and save chart."""
+    tb_hist_raw, tb_proj_raw = load_world_population()
+
+    tb = load_doubling_times()
+    paths.log.info(f"Loaded {len(tb)} population doubling milestones")
+    paths.log.info(tb.to_string(index=False))
+
+    source_citation = build_source_citation(tb_hist_raw, tb_proj_raw)
+    paths.log.info(f"Source citation: {source_citation}")
+
+    fig = create_visualization(tb, tb_hist_raw, tb_proj_raw, source_citation)
+
+    # Save chart in multiple formats
+    paths.export_fig(fig, "pop_doubling", ["png", "svg"], dpi=300, bbox_inches="tight")
+
+    plt.close(fig)
 
 
 def build_source_citation(tb_historical: Table, tb_projection: Table) -> str:
-    """Build source citation from column-level origins metadata.
-
-    Mirrors the approach used in world_population_growth.py – collects origins
-    from the two key population columns and deduplicates them.
-    """
-    all_origins = []
-    for col_name, tb in [("population_historical", tb_historical), ("population_projection", tb_projection)]:
-        col = tb[col_name]
-        if hasattr(col.metadata, "origins") and col.metadata.origins:
-            all_origins.extend(col.metadata.origins)
-
-    # Deduplicate by (producer, title, date)
-    unique_origins: dict[tuple, object] = {}
-    for origin in all_origins:
-        key = (origin.attribution_short, origin.title, origin.date_published)
-        if key not in unique_origins:
-            unique_origins[key] = origin
-
+    # Track seen origins to avoid duplicates
+    seen_origins = set()
     source_parts = []
-    for (producer, _title, date_pub), _origin in sorted(unique_origins.items()):
-        year = date_pub.split("-")[0] if date_pub else ""
-        source_parts.append(f"{producer} ({year})")
-
-    return "Data sources: " + "; ".join(source_parts)
+    # Iterate over variables and extract their origins, deduplicating by (producer, title, date)
+    variables = [tb_historical["population_historical"], tb_projection["population_projection"]]
+    for var in variables:
+        for origin in var.metadata.origins:
+            key = (origin.attribution_short, origin.title, origin.date_published)
+            if key not in seen_origins:
+                seen_origins.add(key)
+                year = origin.date_published.split("-")[0] if origin.date_published else ""
+                source_parts.append(f"{origin.attribution_short} ({year})")
+    return "Data sources: " + "; ".join(sorted(source_parts))
 
 
 def _nice_x_ticks(year_min: int, year_max: int) -> list[int]:
@@ -76,31 +73,19 @@ def _fmt_pop(val: float) -> str:
 # ---------------------------------------------------------------------------
 
 
-def load_world_population() -> tuple[int, int, Table, Table]:
-    """Load historical + projection population for World (boundary years & origins).
+def load_world_population() -> tuple[Table, Table]:
+    """Load historical + projection population for World (origins metadata).
 
     Returns:
-        hist_last_year  – last year present in the historical series
-        proj_last_year  – last year present in the projections series
         tb_hist_raw     – raw historical Table (for origins metadata)
         tb_proj_raw     – raw projections Table (for origins metadata)
     """
-    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-15/population")
+    ds = paths.load_dataset("population")
 
-    tb_hist_raw = ds["historical"]
-    tb_proj_raw = ds["projections"]
+    tb_hist_raw = ds.read("historical")
+    tb_proj_raw = ds.read("projections")
 
-    tb_hist = tb_hist_raw.reset_index()
-    tb_proj = tb_proj_raw.reset_index()
-
-    world_hist = tb_hist[tb_hist["country"] == "World"]
-    world_proj = tb_proj[tb_proj["country"] == "World"]
-
-    # Boundary years – inferred from the data
-    hist_last_year = int(world_hist["year"].max())
-    proj_last_year = int(world_proj["year"].max())
-
-    return hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw
+    return tb_hist_raw, tb_proj_raw
 
 
 # ---------------------------------------------------------------------------
@@ -108,17 +93,17 @@ def load_world_population() -> tuple[int, int, Table, Table]:
 # ---------------------------------------------------------------------------
 
 
-def load_doubling_times() -> pd.DataFrame:
+def load_doubling_times() -> Table:
     """Load pre-computed doubling times from the garden dataset.
 
-    Returns a DataFrame with columns:
+    Returns a Table with columns:
         year_reached   – year the target population was first reached
         doubling_years – number of years from half-target to target
         from_b         – source population in billions (target / 2)
         to_b           – target population in billions
     """
-    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-18/population_doubling_times")
-    tb = ds["population_doubling_times"].reset_index()
+    ds = paths.load_dataset("population_doubling_times")
+    tb = ds.read("population_doubling_times")
 
     # population_target is in absolute numbers; convert to billions
     tb["to_b"] = tb["population_target"] / 1e9
@@ -127,7 +112,7 @@ def load_doubling_times() -> pd.DataFrame:
     tb = tb.rename(columns={"year": "year_reached", "num_years_to_double": "doubling_years"})
     tb = tb[["year_reached", "doubling_years", "from_b", "to_b"]].sort_values("year_reached").reset_index(drop=True)
 
-    return pd.DataFrame(tb)
+    return tb
 
 
 # ---------------------------------------------------------------------------
@@ -136,9 +121,9 @@ def load_doubling_times() -> pd.DataFrame:
 
 
 def create_visualization(
-    df: pd.DataFrame,
-    hist_last_year: int,
-    proj_last_year: int,
+    tb: Table,
+    tb_hist_raw: Table,
+    tb_proj_raw: Table,
     source_citation: str,
 ) -> plt.Figure:
     """Build the chart.
@@ -156,6 +141,16 @@ def create_visualization(
     - A dashed vertical line at hist_last_year separates historical from
       projected data
     """
+    # Infer boundary years from the raw population tables
+    # Tables are already reset (no index), so filter by column
+    world_hist = tb_hist_raw[tb_hist_raw["country"] == "World"]
+    world_proj = tb_proj_raw[tb_proj_raw["country"] == "World"]
+
+    hist_last_year = int(world_hist["year"].max())
+    proj_last_year = int(world_proj["year"].max())
+
+    paths.log.info(f"Data boundaries – historical last year: {hist_last_year}, projections last year: {proj_last_year}")
+
     # --- colours & sizes ---
     line_color = "#0c4387"
     text_color = "#333333"
@@ -177,8 +172,8 @@ def create_visualization(
     ax.spines["bottom"].set_linewidth(0.8)
 
     # --- axes limits & ticks (derived from data) ---
-    max_dy = int(df["doubling_years"].max())
-    first_year = int(df["year_reached"].min())
+    max_dy = int(tb["doubling_years"].max())
+    first_year = int(tb["year_reached"].min())
 
     x_ticks = _nice_x_ticks(first_year, proj_last_year)
     ax.set_xlim(x_ticks[0] - 10, x_ticks[-1] + 50)
@@ -199,15 +194,15 @@ def create_visualization(
     ax.axvline(hist_last_year, color=projection_line_color, linewidth=1, linestyle="--", zorder=1)
 
     # --- main line + markers ---
-    x = df["year_reached"].values
-    y = df["doubling_years"].values
+    x = tb["year_reached"].values
+    y = tb["doubling_years"].values
     ax.plot(x, y, color=line_color, linewidth=2.2, marker="s", markersize=7, markerfacecolor=line_color, zorder=2)
 
     # --- identify the cluster (doubling_years < 100) and build fan geometry ---
-    cluster_mask = df["doubling_years"] < 100
+    cluster_mask = tb["doubling_years"] < 100
     n_cluster = int(cluster_mask.sum())
 
-    cluster_df = df[cluster_mask].copy()
+    cluster_df = tb[cluster_mask].copy()
     cluster_df["label_rank"] = cluster_df["doubling_years"].rank(method="first").astype(int) - 1  # 0-based
 
     cluster_label_x = 2060  # x position where all fan labels start
@@ -226,7 +221,7 @@ def create_visualization(
     # ---------------------------------------------------------------------------
     # Label loop
     # ---------------------------------------------------------------------------
-    for i, row in df.iterrows():
+    for i, row in tb.iterrows():
         yr = int(row["year_reached"])
         dy = int(row["doubling_years"])
         from_b = row["from_b"]
@@ -313,252 +308,3 @@ def create_visualization(
     fig.subplots_adjust(top=0.82, left=0.07, right=0.92, bottom=0.09)
 
     return fig
-
-
-# ---------------------------------------------------------------------------
-# SVG post-processing
-# ---------------------------------------------------------------------------
-
-
-def optimize_svg_for_figma(svg_path: Path) -> None:
-    """Flatten matplotlib's nested <g> structure into semantic groups for Figma.
-
-    The output groups (in render order, bottom → top) are:
-
-        grid-lines          – horizontal grid lines & the dashed projection vline
-        axes-spines         – bottom spine
-        data-line           – the main dark-blue connected line
-        markers             – square marker symbols (path defs + <use> elements)
-        annotations         – callout boxes, fan leader-lines, and year labels
-        title               – suptitle
-        subtitle            – the historical/projection subtitle
-        axis-labels         – x- and y-tick labels
-        data-labels         – inline doubling-time labels
-        source              – source footer text
-    """
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
-    ET.register_namespace("dc", "http://purl.org/dc/elements/1.1/")
-    ET.register_namespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-    ET.register_namespace("cc", "http://creativecommons.org/ns#")
-
-    tree = ET.parse(svg_path)
-    root = tree.getroot()
-    ns = {"svg": "http://www.w3.org/2000/svg"}
-
-    # Locate the top-level matplotlib group (figure_1)
-    main_group = root.find("./svg:g[@id='figure_1']", ns)
-    if main_group is None:
-        log.warning("Could not find figure_1 group in SVG – skipping Figma optimisation")
-        return
-
-    # ── colours used by pop_doubling ──────────────────────────────────────
-    LINE_COLOR = "#0c4387"  # main data line & markers
-    GRID_COLOR = "#e8e8e8"  # horizontal grid lines
-    PROJ_VLINE_COLOR = "#bbbbbb"  # dashed projection separator / leader lines
-    SPINE_COLOR = "#999999"  # bottom spine
-
-    # ── semantic group order (render bottom → top) ────────────────────────
-    GROUP_ORDER = [
-        "grid-lines",
-        "axes-spines",
-        "data-line",
-        "markers",
-        "annotations",
-        "title",
-        "subtitle",
-        "axis-labels",
-        "data-labels",
-        "source",
-    ]
-
-    # ── helper: extract style values ───────────────────────────────────────
-    def _get(elem: ET.Element, attr: str) -> str:
-        """Return the attribute value, lower-cased, or empty string."""
-        return (elem.get(attr) or "").lower()
-
-    def _d_len(elem: ET.Element) -> int:
-        return len(elem.get("d") or "")
-
-    # ── remove white background rects/paths ───────────────────────────────
-    # matplotlib emits figure and axes backgrounds as plain white <path>
-    # elements with no stroke.  Annotation callout boxes are also white but
-    # have a visible stroke (e.g. #cccccc), so we keep those.
-    for elem in list(main_group.iter()):
-        fill = _get(elem, "fill")
-        style = _get(elem, "style")
-        is_white = fill in ("#ffffff", "white") or "#ffffff" in style
-
-        if not is_white:
-            continue
-        if elem.tag not in (
-            "{http://www.w3.org/2000/svg}rect",
-            "{http://www.w3.org/2000/svg}path",
-        ):
-            continue
-
-        # Keep white elements that have a stroke (e.g. callout boxes)
-        has_stroke = "stroke:" in style and "stroke: none" not in style
-        if has_stroke:
-            continue
-
-        # find parent and remove
-        for parent in main_group.iter():
-            if elem in list(parent):
-                parent.remove(elem)
-                break
-
-    # ── build new flat structure ───────────────────────────────────────────
-    container = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
-    groups = {gid: ET.SubElement(container, "{http://www.w3.org/2000/svg}g", id=gid) for gid in GROUP_ORDER}
-
-    # Track path <defs> that define marker shapes so we can move them too
-    marker_def_ids: set[str] = set()
-
-    # ── first pass: collect marker path-def ids from <defs> children ───────
-    # matplotlib puts marker path defs directly inside nested groups; we
-    # identify them by short path length and the line colour in their style.
-    for elem in main_group.iter("{http://www.w3.org/2000/svg}path"):
-        eid = elem.get("id") or ""
-        if eid and _d_len(elem) < 120 and (LINE_COLOR in _get(elem, "style") or "stroke" in _get(elem, "style")):
-            marker_def_ids.add(eid)
-
-    # ── categorise every visual element ────────────────────────────────────
-    for elem in main_group.iter():
-        tag = elem.tag
-        if tag not in (
-            "{http://www.w3.org/2000/svg}path",
-            "{http://www.w3.org/2000/svg}line",
-            "{http://www.w3.org/2000/svg}rect",
-            "{http://www.w3.org/2000/svg}text",
-            "{http://www.w3.org/2000/svg}use",
-        ):
-            continue
-
-        # shallow copy (preserve children for <text> with <tspan>)
-        copy = ET.Element(tag, elem.attrib)
-        copy.text = elem.text
-        copy.tail = None
-        for child in elem:
-            child_copy = ET.Element(child.tag, child.attrib)
-            child_copy.text = child.text
-            child_copy.tail = child.tail
-            copy.append(child_copy)
-
-        target: str | None = None
-        fill = _get(elem, "fill")
-        stroke = _get(elem, "stroke")
-        style = _get(elem, "style")
-        eid = elem.get("id") or ""
-
-        # ── <text> ──────────────────────────────────────────────────────
-        if tag == "{http://www.w3.org/2000/svg}text":
-            txt = "".join(elem.itertext()).strip().lower()
-
-            if "time it took" in txt:
-                target = "title"
-            elif "historical estimates" in txt or "un projections" in txt:
-                target = "subtitle"
-            elif "data source" in txt or "ourworldindata" in txt or "interactive" in txt:
-                target = "source"
-            elif "years" in txt and ("billion" in txt or "to" in txt):
-                # inline doubling labels like "132 years (1 to 2 billion)"
-                target = "data-labels"
-            elif "it took" in txt:
-                # first-point callout box text
-                target = "annotations"
-            else:
-                # everything else: axis tick labels
-                target = "axis-labels"
-
-        # ── <path> ──────────────────────────────────────────────────────
-        elif tag == "{http://www.w3.org/2000/svg}path":
-            if eid in marker_def_ids:
-                target = "markers"
-            elif LINE_COLOR in style or LINE_COLOR in stroke:
-                # main connected line (long path) vs marker defs (short)
-                target = "data-line" if _d_len(elem) > 120 else "markers"
-            elif GRID_COLOR in stroke or GRID_COLOR in style:
-                target = "grid-lines"
-            elif PROJ_VLINE_COLOR in stroke or PROJ_VLINE_COLOR in style:
-                # dashed projection vline or annotation leader lines
-                target = "grid-lines" if _d_len(elem) > 200 else "annotations"
-            elif SPINE_COLOR in stroke or SPINE_COLOR in style:
-                target = "axes-spines"
-            elif _d_len(elem) < 120:
-                target = "markers"
-            else:
-                target = "grid-lines"  # fallback
-
-        # ── <line> ──────────────────────────────────────────────────────
-        elif tag == "{http://www.w3.org/2000/svg}line":
-            if GRID_COLOR in stroke:
-                target = "grid-lines"
-            elif PROJ_VLINE_COLOR in stroke:
-                target = "annotations"
-            else:
-                target = "axes-spines"
-
-        # ── <rect> ──────────────────────────────────────────────────────
-        elif tag == "{http://www.w3.org/2000/svg}rect":
-            # annotation callout boxes have a border colour ~#cccccc
-            if "cccccc" in fill or "cccccc" in style or "edgecolor" in style:
-                target = "annotations"
-            else:
-                target = "grid-lines"
-
-        # ── <use> (marker instances) ────────────────────────────────────
-        elif tag == "{http://www.w3.org/2000/svg}use":
-            target = "markers"
-
-        if target:
-            groups[target].append(copy)
-
-    # ── strip empty groups ─────────────────────────────────────────────────
-    for gid in list(GROUP_ORDER):
-        if len(groups[gid]) == 0:
-            container.remove(groups[gid])
-
-    # ── replace main_group children with the new flat structure ────────────
-    main_group.clear()
-    main_group.set("id", "figure_1")
-    for child in container:
-        main_group.append(child)
-
-    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
-
-
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
-
-
-def run() -> None:
-    """Entry point: load data, render and save chart."""
-    hist_last_year, proj_last_year, tb_hist_raw, tb_proj_raw = load_world_population()
-
-    log.info(f"Data boundaries – historical last year: {hist_last_year}, " f"projections last year: {proj_last_year}")
-
-    df = load_doubling_times()
-    log.info(f"Loaded {len(df)} population doubling milestones")
-    log.info(df.to_string(index=False))
-
-    source_citation = build_source_citation(tb_hist_raw, tb_proj_raw)
-    log.info(f"Source citation: {source_citation}")
-
-    fig = create_visualization(df, hist_last_year, proj_last_year, source_citation)
-
-    # --- save PNG ---
-    png_path = CURRENT_DIR / "pop_doubling.png"
-    fig.savefig(png_path, format="png", dpi=300, bbox_inches="tight")
-    log.info(f"Saved chart to {png_path}")
-
-    # --- save SVG ---
-    svg_path = CURRENT_DIR / "pop_doubling.svg"
-    fig.savefig(svg_path, format="svg", dpi=300, bbox_inches="tight", metadata={"Date": None})
-
-    # Flatten nested matplotlib groups into semantic layers for Figma
-    optimize_svg_for_figma(svg_path)
-    log.info(f"Saved and optimised chart to {svg_path}")
-
-    plt.close(fig)
