@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.collection.model.view import Indicator
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -213,8 +214,6 @@ def run() -> None:
     # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after_scatter" and view.indicators.y:
-            from etl.collection.model.view import Indicator
-
             before_tax_ind = None
             after_tax_ind = None
             for ind in view.indicators.y:
