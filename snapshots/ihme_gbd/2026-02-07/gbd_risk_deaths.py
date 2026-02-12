@@ -6,7 +6,7 @@ Important - You need and account to access the data.
 
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Risk factor'
-* In Measure select 'Deaths' and 'DALYs'
+* In Measure select 'Deaths'
 * In Metric select 'Number', 'Percent' and 'Rate'
 * In Cause select:
 #    - Total All Causes
@@ -47,15 +47,15 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = ""
-NUMBER_OF_FILES = 91
+BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/117fb2831b7a80ac6fe1ad63efcf272c_files/IHME-GBD_2023_DATA-117fb283-"
+NUMBER_OF_FILES = 47
 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_risk.feather")
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_risk_deaths.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
     for file_number in range(1, NUMBER_OF_FILES + 1):
