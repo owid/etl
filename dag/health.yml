@@ -1419,3 +1419,12 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
+  # GBD 2023 - GBD Risk Factor - DALYs
+  data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_dalys:
+    - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_dalys.feather
+  data-private://garden/ihme_gbd/2026-02-07/gbd_risk_dalys:
+    - data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_dalys
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2024-07-12/un_wpp
+  data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_dalys:
+    - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_dalys
