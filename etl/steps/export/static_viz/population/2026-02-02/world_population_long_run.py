@@ -371,21 +371,7 @@ def run() -> None:
     fig = create_visualization(tb, year_cut, life_expectancy_before_1800, life_expectancy_2023)
 
     # Save chart outputs
-    output_path = paths.directory / "world_population_10000bce_2100.svg"
-    fig.savefig(
-        output_path,
-        format="svg",
-        dpi=300,
-        bbox_inches="tight",
-        metadata={"Date": None},  # Remove timestamp for cleaner diffs
-    )
-
-    # Optimize SVG for Figma editing
-    paths.log.info(f"Saved chart to {output_path}")
-
-    output_path_png = paths.directory / "world_population_10000bce_2100.png"
-    fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight", transparent=True)
-    paths.log.info(f"Saved chart to {output_path_png}")
+    paths.export_fig(fig, "world_population_10000bce_2100", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True)
 
     plt.close(fig)
 

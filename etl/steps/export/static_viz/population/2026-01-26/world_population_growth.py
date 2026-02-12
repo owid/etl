@@ -115,21 +115,7 @@ def run() -> None:
     fig = create_visualization(tb, year_cut, growth_rate_1700, filter_mask)
 
     # Save chart outputs
-    output_path = paths.directory / "world_population_growth_1700_2100.svg"
-    fig.savefig(
-        output_path,
-        format="svg",
-        dpi=300,
-        bbox_inches="tight",
-        transparent=True,
-    )
-
-    # Optimize SVG for Figma editing
-    paths.log.info(f"Saved chart to {output_path}")
-
-    output_path_png = paths.directory / "world_population_growth_1700_2100.png"
-    fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
-    paths.log.info(f"Saved chart to {output_path_png}")
+    paths.export_fig(fig, "world_population_growth_1700_2100", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True)
 
     plt.close(fig)
 
