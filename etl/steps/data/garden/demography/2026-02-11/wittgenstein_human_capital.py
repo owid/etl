@@ -13,7 +13,7 @@ from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
-from shared import get_index_columns
+from .shared import get_index_columns
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
