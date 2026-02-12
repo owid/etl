@@ -1,0 +1,58 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+    processing_level: major
+
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+
+tables:
+  gbd_risk_deaths:
+    variables:
+      value:
+        title: |-
+          {macros}
+          <% if measure == 'Deaths'%>
+            << format_title(metric, age, format_cause(cause),  'Deaths',rei) >>
+          <% else %>
+            << format_title(metric, age, format_cause(cause),  'DALYs',rei) >>
+          <%- endif -%>
+        unit: |-
+          <% if measure == 'Deaths'%>
+            <% if metric == "Number" %>
+            deaths
+            <% elif metric == "Rate" %>
+            deaths per 100,000 people
+            <% elif metric == "Percent" %>
+            %
+            <%- endif -%>
+          <% else %>
+            <% if metric == "Number" %>
+            DALYs
+            <% elif metric == "Rate" %>
+            DALYs per 100,000 people
+            <% elif metric == "Percent" %>
+            share of total DALYs
+            <%- endif -%>
+          <%- endif -%>
+        short_unit: |-
+          {definitions.short_unit}
+        description_short: |-
+          {macros}
+          <% if measure == 'Deaths'%>
+            << format_description_short(metric, age, format_cause(cause), rei, "deaths") >>
+          <% else %>
+            << format_description_short(metric, age, format_cause(cause), rei, "[Disability Adjusted Life Years (DALYs)](#dod:dalys)") >>
+          <%- endif -%>
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
