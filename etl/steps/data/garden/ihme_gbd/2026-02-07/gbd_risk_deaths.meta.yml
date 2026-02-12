@@ -45,9 +45,9 @@ tables:
         description_short: |-
           {macros}
           <% if measure == 'Deaths'%>
-            << format_description_short(metric, age, format_cause(cause), rei, "deaths") >>
+            << format_description_short(metric, age, format_cause(cause), "deaths", rei) >>
           <% else %>
-            << format_description_short(metric, age, format_cause(cause), rei, "[Disability Adjusted Life Years (DALYs)](#dod:dalys)") >>
+            << format_description_short(metric, age, format_cause(cause), "[Disability Adjusted Life Years (DALYs)](#dod:dalys)", rei) >>
           <%- endif -%>
         presentation:
           grapher_config:
