@@ -13,6 +13,9 @@ DIMENSIONS_CONFIG = {
     "welfare_type": ["before tax", "after tax"],
 }
 
+# Define if data is extrapolated or not
+EXTRAPOLATED = "no"
+
 
 def run() -> None:
     config = paths.load_collection_config()
@@ -24,7 +27,7 @@ def run() -> None:
     columns_to_keep = []
     for column in tb.drop(columns=["country", "year"]).columns:
         dims = tb[column].metadata.dimensions
-        if dims and dims.get("extrapolated") == "no":
+        if dims and dims.get("extrapolated") == EXTRAPOLATED:
             columns_to_keep.append(column)
             dims.pop("extrapolated")
     tb = tb[columns_to_keep]

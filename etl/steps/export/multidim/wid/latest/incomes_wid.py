@@ -18,6 +18,9 @@ DIMENSIONS_CONFIG = {
     "quantile": "*",
 }
 
+# Define if data is extrapolated or not
+EXTRAPOLATED = "no"
+
 
 def run() -> None:
     #
@@ -35,7 +38,7 @@ def run() -> None:
     columns_to_keep = []
     for column in tb.drop(columns=["country", "year"]).columns:
         dims = tb[column].metadata.dimensions
-        if dims and dims.get("extrapolated") == "no":
+        if dims and dims.get("extrapolated") == EXTRAPOLATED:
             columns_to_keep.append(column)
             # Remove dimensions that are not needed (they're now fixed values)
             for dimension in ["period", "extrapolated"]:
