@@ -1,0 +1,42 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cancer
+        - Causes of Death
+    processing_level: minor
+    description_processing: |-
+      <% if cause == "Other cancers (OWID)"%>
+      Data for "Other cancers (OWID)" was calculated by summing deaths from all cancers that caused fewer than 200,000 deaths in the most recent year of data.
+      <%- endif -%>
+
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+  title: Global Burden of Disease (GBD) - Causes of Death - Cancer
+tables:
+  gbd_cancers_deaths:
+    variables:
+
+      share_of_cancer_deaths:
+        title: |-
+          <% if age != 'All ages' %>
+          Share of cancer deaths of individuals aged << age >> from << cause.lower() >>
+          <% elif age == 'All ages' %>
+          Share of cancer deaths that are from << cause.lower() >>
+          <%- endif -%>
+
+        description_short: |-
+          <% if age != 'All ages' %>
+            Share of cancer deaths of individuals aged << age >> from << cause.lower() >>
+          <% elif age == 'All ages' %>
+            Share of cancer deaths that are from << cause.lower() >>
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+
+
+        display:
+          numDecimalPlaces: 1
+          name: << cause >>
