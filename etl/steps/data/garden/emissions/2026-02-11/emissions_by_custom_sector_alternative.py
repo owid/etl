@@ -168,18 +168,18 @@ SECTOR_TITLES = {
 }
 SECTORS = sorted(SECTOR_TITLES)
 SECTOR_UN_MAPPING = {
-    "industry": ["Electricity - Consumption by manufacturing, construction and non-fuel industry"],
-    "agriculture": ["Electricity - Consumption in agriculture, forestry and fishing"],
-    "transport": ["Electricity - Consumption by transport"],
+    "industry": ["Consumption by manufacturing, construction and non-fuel industry"],
+    "agriculture": ["Consumption by agriculture, forestry and fishing"],
+    "transport": ["Consumption by transport"],
     "buildings": [
-        "Electricity - Consumption by households",
-        "Electricity - Consumption by commercial and public services",
+        "Consumption by households",
+        "Consumption by commerce and public services",
     ],
-    "other": ["Electricity - Consumption not elsewhere specified (other)"],
+    "other": ["Consumption not elsewhere specified (other)"],
 }
 SECTORS_UN = sum(SECTOR_UN_MAPPING.values(), [])
 
-COLUMN_UN_FINAL_ENERGY = "Electricity - Final energy consumption"
+COLUMN_UN_FINAL_ENERGY = "Final energy consumption"
 
 
 def sanity_check_inputs(tb_ghg):
@@ -215,14 +215,9 @@ def run() -> None:
     ds = paths.load_dataset("emissions_by_sector")
     tb_ghg = ds.read("greenhouse_gas_emissions_by_sector")
 
-    # Load UN energy data.
-    ####################################################################################################################
-    # TODO: Add full data to ETL!! Currently, this file is just an incomplete download of the first 100000 rows (which goes to about "J" in countries sorted alphabetically).
-    #  For now use a local file.
-    from owid.catalog import Table
-
-    tb_un = Table(pd.read_csv(Path.home() / "Downloads/UNdata_Export_20260212_130649684.txt", sep=";"))
-    ####################################################################################################################
+    # Load UN energy statistics database, and read its main table.
+    ds_un = paths.load_dataset("energy_statistics_database")
+    tb_un = ds_un.read("energy_statistics_database")
 
     #
     # Process data.
@@ -250,17 +245,21 @@ def run() -> None:
     # For convenience, transpose table.
     tb_ghg = tb_ghg.melt(id_vars=["country", "year"], value_name="ghg_emissions", var_name="sector")
 
-    # Select and rename UN data.
-    tb_un = tb_un[list(COLUMNS_UN)].rename(columns=COLUMNS_UN, errors="raise")
-    tb_un = tb_un[tb_un["sector"].isin([COLUMN_UN_FINAL_ENERGY] + SECTORS_UN)].reset_index(drop=True)
-
-    # Remove empty rows (e.g. footnotes) and ensure year is integer.
-    tb_un = tb_un.dropna(subset=["value"]).reset_index(drop=True).astype({"year": int})
+    # Select relevant UN commodity.
+    tb_un = tb_un[(tb_un["commodity"] == "Total Electricity")].drop(columns=["commodity"]).reset_index(drop=True)
+    error = "Expected UN energy sectors not found."
+    assert set(SECTORS_UN) < set(tb_un["transaction"]), error
+    # Select relevant UN transactions.
+    tb_un = (
+        tb_un[(tb_un["transaction"].isin([COLUMN_UN_FINAL_ENERGY] + SECTORS_UN))]
+        .rename(columns={"transaction": "sector"}, errors="raise")
+        .reset_index(drop=True)
+    )
 
     # Sanity checks.
     # TODO: Make a function.
     error = "Unexpected units."
-    assert set(tb_un["unit"]) == {"Kilowatt-hours, million"}, error
+    assert set(tb_un["unit"]) == {"Gigawatt-hours"}, error
     # Ensure the total final energy consumption equals the sum of all sectors.
     tb_un_sum = tb_un[tb_un["sector"].isin(SECTORS_UN)].groupby("year", as_index=False).agg({"value": "sum"})
     tb_un_total = tb_un[tb_un["sector"] == COLUMN_UN_FINAL_ENERGY].groupby("year", as_index=False).agg({"value": "sum"})
@@ -271,7 +270,7 @@ def run() -> None:
     # import plotly.express as px
     # px.line(pd.concat([tb_un_total.assign(**{"source": "total"}), tb_un_sum.assign(**{"source": "sum"})]), x="year", y="value", color="source", markers=True)
 
-    # For convenience, adapt units, originally given in millions of kWh (which is equivalent to GWh), to be TWh.
+    # For convenience, adapt units, from GWh to TWh.
     tb_un["value"] *= 1e-3
     tb_un = tb_un.drop(columns=["unit"], errors="raise")
 

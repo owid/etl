@@ -223,6 +223,7 @@ steps:
   #
   data://garden/emissions/2026-02-11/emissions_by_custom_sector_alternative:
     - data://garden/climate_watch/2026-02-10/emissions_by_sector
+    - data://garden/un/2026-02-11/energy_statistics_database
   #
   # Emissions - Greenhouse gas emissions by custom sector (alternative version).
   #
