@@ -1,11 +1,15 @@
-"""Render a graph step .chart.yml as a standalone HTML file.
+"""Render a graph step .chart.yml as a standalone HTML file or PNG image.
 
 Usage:
     .venv/bin/python scripts/render_chart.py etl/steps/graph/animal_welfare/latest/banning-of-chick-culling.chart.yml
+    .venv/bin/python scripts/render_chart.py etl/steps/graph/animal_welfare/latest/banning-of-chick-culling.chart.yml --png
     .venv/bin/python scripts/render_chart.py etl/steps/graph/animal_welfare/latest/banning-of-chick-culling.chart.yml -o my_chart.html
 """
 
+import asyncio
+import base64
 import json
+import tempfile
 from pathlib import Path
 
 import click
@@ -20,11 +24,21 @@ STEPS_DIR = BASE_DIR / "etl" / "steps" / "graph"
 EXCLUDE_CONFIG_KEYS = {"dimensions", "$schema", "originUrl"}
 
 
-def generate_chart_html(csv_data: str, column_defs: list, grapher_config: dict) -> str:
+def generate_chart_html(csv_data: str, column_defs: list, grapher_config: dict, *, expose_state: bool = False) -> str:
     """Generate a standalone HTML page that renders an OWID Grapher chart.
 
     Adapted from owid-grapher-py's _generate_chart_html().
+
+    Args:
+        expose_state: If True, expose grapherState globally and signal readiness
+            for headless export via playwright.
     """
+    expose_js = ""
+    if expose_state:
+        expose_js = """
+      window.grapherState = grapherState;
+      window.grapherReady = true;"""
+
     return f"""<!DOCTYPE html>
 <html>
   <head>
@@ -67,7 +81,7 @@ def generate_chart_html(csv_data: str, column_defs: list, grapher_config: dict) 
       }});
 
       const reactRoot = createRoot(container);
-      reactRoot.render(React.createElement(Grapher, {{ grapherState }}));
+      reactRoot.render(React.createElement(Grapher, {{ grapherState }}));{expose_js}
     </script>
   </body>
 </html>"""
@@ -124,8 +138,58 @@ def guess_column_type(series) -> str:
     return "Numeric"
 
 
-def render_chart(chart_yml: Path) -> str:
-    """Load config + data for a .chart.yml and return rendered HTML."""
+async def _export_png_async(html: str, output: Path, timeout: int = 30000) -> None:
+    """Render HTML to PNG using playwright (headless Chromium).
+
+    Adapted from owid-grapher-py's export.py.
+    """
+    from playwright.async_api import async_playwright
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
+        f.write(html)
+        html_path = f.name
+
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+            await page.goto(f"file://{html_path}")
+            await page.wait_for_function("window.grapherReady === true", timeout=timeout)
+            await page.wait_for_function("document.fonts.ready.then(() => true)", timeout=timeout)
+
+            result = await page.evaluate("""
+                async () => {
+                    const { blob } = await window.grapherState.rasterize({
+                        includeDetails: false
+                    });
+                    const reader = new FileReader();
+                    const b64 = await new Promise((resolve, reject) => {
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                    return { png: b64 };
+                }
+            """)
+
+            await browser.close()
+
+        output.write_bytes(base64.b64decode(result["png"]))
+    finally:
+        Path(html_path).unlink(missing_ok=True)
+
+
+def export_png(html: str, output: Path) -> None:
+    """Export chart HTML to PNG. Requires playwright."""
+    asyncio.run(_export_png_async(html, output))
+
+
+def render_chart(chart_yml: Path, *, expose_state: bool = False) -> str:
+    """Load config + data for a .chart.yml and return rendered HTML.
+
+    Args:
+        expose_state: Pass through to generate_chart_html for PNG export support.
+    """
     config = ruamel_load(chart_yml)
 
     # Resolve DAG dependencies
@@ -185,23 +249,36 @@ def render_chart(chart_yml: Path) -> str:
     grapher_config["selectedEntityNames"] = tb["entityName"].tolist()
     grapher_config["hideLogo"] = True
 
-    return generate_chart_html(csv_data, column_defs, grapher_config)
+    return generate_chart_html(csv_data, column_defs, grapher_config, expose_state=expose_state)
 
 
 @click.command()
 @click.argument("chart_yml", type=click.Path(exists=True, path_type=Path))
-@click.option("-o", "--output", type=click.Path(path_type=Path), default=None, help="Output HTML path (default: ai/<slug>.html)")
-def main(chart_yml: Path, output: Path | None):
-    """Render a graph step .chart.yml as a standalone HTML file."""
+@click.option("-o", "--output", type=click.Path(path_type=Path), default=None, help="Output path (default: ai/<slug>.html or .png)")
+@click.option("--png", is_flag=True, default=False, help="Export as PNG (requires: uv add --dev playwright && .venv/bin/playwright install chromium)")
+def main(chart_yml: Path, output: Path | None, png: bool):
+    """Render a graph step .chart.yml as a standalone HTML file or PNG image."""
     chart_yml = chart_yml.resolve()
 
     if output is None:
         slug = chart_yml.stem.replace(".chart", "")
-        output = BASE_DIR / "ai" / f"{slug}.html"
+        ext = ".png" if png else ".html"
+        output = BASE_DIR / "ai" / f"{slug}{ext}"
 
-    html = render_chart(chart_yml)
-    output.write_text(html)
-    click.echo(f"Chart saved to {output}")
+    if png:
+        try:
+            html = render_chart(chart_yml, expose_state=True)
+            export_png(html, output)
+            click.echo(f"PNG saved to {output}")
+        except ImportError:
+            raise click.ClickException(
+                "Playwright is required for PNG export. Install it with:\n"
+                "  uv add --dev playwright && .venv/bin/playwright install chromium"
+            )
+    else:
+        html = render_chart(chart_yml)
+        output.write_text(html)
+        click.echo(f"Chart saved to {output}")
 
 
 if __name__ == "__main__":
