@@ -18,6 +18,11 @@ from etl.steps.data.garden.democracy.shared import (
     make_table_with_dummies,
 )
 
+
+class RegionMemberUnknownError(ValueError):
+    pass
+
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 PATH_IMPUTE = paths.directory / "lexical_index.countries_impute.yml"
@@ -56,6 +61,7 @@ REGIONS = {
     "North America": {
         "additional_members": [
             "United Provinces of Central America",
+            "Newfoundland",
         ]
     },
     "South America": {
@@ -67,6 +73,8 @@ REGIONS = {
         "additional_members": [
             "Brunswick",
             "Hamburg",
+            "Hanover",
+            "Mecklenburg Schwerin",
             "Hesse-Darmstadt",
             "Hesse-Kassel",
             "Nassau",
@@ -146,6 +154,8 @@ def run() -> None:
     tb_regions = tb.loc[~tb[col_flag_imputed]].drop(columns=[col_flag_imputed]).copy()
     tb_regions = get_region_aggregates(tb_regions, ds_regions, ds_population)
 
+    verify_regional_aggregates(tb_regions)
+
     # Drop is imputed flag
     tb = tb.drop(columns=[col_flag_imputed])
 
@@ -169,6 +179,60 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def verify_regional_aggregates(tb_regions: Table) -> None:
+    """Verify that the sum of regions matches the World row."""
+    mask = tb_regions["country"] == "World"
+    tb_s = tb_regions.loc[~mask].drop(columns="country")
+    tb_s = tb_s.groupby(["year", "category"], as_index=False).sum().sort_values(["year", "category"])
+    tb_w = tb_regions.loc[mask].drop(columns="country")
+    tb_w = tb_w.groupby(["year", "category"], as_index=False).sum().sort_values(["year", "category"])
+    keys = ["year", "category"]
+    num_cols = [c for c in tb_s.columns if c.startswith("num_")]
+    pop_cols = [c for c in tb_s.columns if c.startswith("pop_")]
+
+    # num_ columns: exact match
+    diff_num = compare_tables(tb_s[keys + num_cols], tb_w[keys + num_cols])
+    if diff_num.any():
+        print(f"WARNING: Exact mismatches (num_):\n{diff_num[diff_num > 0]}")
+    else:
+        print("num_ columns: regions match World totals.")
+
+    # pop_ columns: allow 1% relative tolerance
+    diff_pop = compare_tables(tb_s[keys + pop_cols], tb_w[keys + pop_cols], rtol=1e-15)
+    if diff_pop.any():
+        print(f"WARNING: Mismatches beyond 1% tolerance (pop_):\n{diff_pop[diff_pop > 0]}")
+    else:
+        print("pop_ columns: regions match World totals (within 1%).")
+
+
+def compare_tables(
+    tb_a: Table,
+    tb_b: Table,
+    keys: list[str] = ["year", "category"],
+    rtol: float = 0.0,
+) -> "pd.Series":
+    """Compare two tables on shared keys and return mismatch counts per column.
+
+    If rtol > 0, values are considered matching when their relative difference is within rtol.
+    """
+    import numpy as np
+    import pandas as pd
+
+    merged = tb_a.merge(tb_b, on=keys, suffixes=("_a", "_b"))
+    value_cols = [c for c in tb_a.columns if c not in keys]
+
+    counts = {}
+    for col in value_cols:
+        a, b = merged[f"{col}_a"], merged[f"{col}_b"]
+        if rtol > 0:
+            denom = np.maximum(np.abs(a), np.abs(b)).replace(0, np.nan)
+            counts[col] = int((np.abs(a - b) / denom > rtol).sum())
+        else:
+            counts[col] = int((a != b).sum())
+
+    return pd.Series(counts, dtype=int)
 
 
 def preprocess(tb: Table) -> Table:
@@ -484,6 +548,20 @@ def get_region_aggregates(
         )
 
     indicator_names = [indicator["name"] for indicator in indicators]
+
+    # 0) Detect unknown countries
+    # Inspect the countries in the data and see if they can be mapped to regions. If not, raise error.
+    region_members = paths.regions.get_regions(REGIONS.keys())
+    region_members = [country for region in region_members.values() for country in region["members"]]
+    countries_mappable_to_regions = set(region_members) | set(
+        [country for region in REGIONS.values() for country in region.get("additional_members", [])]
+    )
+    countries_in_data = set(tb["country"].unique())
+    countries_unmappable = countries_in_data - countries_mappable_to_regions
+    if countries_unmappable:
+        raise RegionMemberUnknownError(
+            f"WARNING: The following countries cannot be mapped to regions. Please add them to REGIONS variable: {countries_unmappable}"
+        )
 
     # 1) numbers
     ## Make dummies
