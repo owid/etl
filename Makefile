@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp vsce-compile vsce-sync
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp vsce-compile vsce-sync refresh-chart-schema
 
 include default.mk
 
@@ -203,7 +203,7 @@ install-vscode-extensions:
 	@echo '==> Checking and installing required VS Code extensions'
 	@if command -v code > /dev/null; then \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices chart-preview"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
 			if ! code --list-extensions | grep -q "$$EXT"; then \
@@ -229,7 +229,7 @@ install-vscode-extensions:
 vsce-sync:
 	@echo '==> Reinstalling all custom VS Code extensions'
 	@if command -v code > /dev/null; then \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices chart-preview"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$CUSTOM_EXTENSIONS; do \
 			VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
@@ -243,6 +243,10 @@ vsce-sync:
 	else \
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
 	fi
+
+refresh-chart-schema: .venv
+	@echo '==> Refreshing chart.yml schema from upstream grapher schema'
+	.venv/bin/python scripts/generate_chart_schema.py
 
 vscode-exclude-archived: .venv
 	@echo '==> Excluding archived steps from VSCode user settings'

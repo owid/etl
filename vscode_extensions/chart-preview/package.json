@@ -1,0 +1,58 @@
+{
+  "name": "chart-preview",
+  "publisher": "owid",
+  "displayName": "Chart Preview",
+  "description": "Live preview panel for .chart.yml files using OWID Grapher",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owid/etl"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Visualization"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "chart-preview.open",
+        "title": "Open Chart Preview",
+        "icon": "$(open-preview)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "chart-preview.open",
+          "when": "resourceFilename =~ /\\.chart\\.yml$/",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Chart Preview",
+      "properties": {
+        "chart-preview.pythonPath": {
+          "type": "string",
+          "default": ".venv/bin/python",
+          "description": "Path to the Python binary (relative to workspace root)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "@types/node": "20.x",
+    "esbuild": "^0.27.0",
+    "typescript": "^5.6.2"
+  }
+}
