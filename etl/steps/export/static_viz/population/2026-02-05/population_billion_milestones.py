@@ -4,176 +4,86 @@ This code generates a bar chart showing the decreasing time intervals between
 population milestones from 1 billion to 10 billion.
 """
 
-import xml.etree.ElementTree as ET
-from pathlib import Path
-
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import structlog
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl import paths as etl_paths
-from etl.helpers import create_dataset
+from etl.helpers import PathFinder
 
 # Configure matplotlib to use SVG text elements instead of paths
 matplotlib.rcParams["svg.fonttype"] = "none"
 
-# Paths for this export step
-CURRENT_DIR = Path(__file__).parent
-OUTPUT_DIR = etl_paths.EXPORT_DIR / "static_viz/2026-02-05/population_billion_milestones"
-SHORT_NAME = "population_billion_milestones"
-
-log = structlog.get_logger()
+paths = PathFinder(__file__)
 
 POPULATION_TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 POPULATION_TARGETS = [x * 1e9 for x in POPULATION_TARGETS]
 
 
-def optimize_svg_for_figma(svg_path: Path) -> None:
-    """Optimize SVG for easier editing in Figma.
+def run() -> None:
+    """Create population billion milestone visualization.
 
-    Flattens matplotlib's nested group structure, removes white backgrounds,
-    and creates semantic groups based on visual purpose.
+    Generates a bar chart showing the decreasing time intervals between
+    consecutive billion-person population milestones.
 
-    Args:
-        svg_path: Path to the SVG file to optimize
+    Output:
+    - SVG and PNG charts
+    - Dataset with milestone data
     """
-    # Register SVG namespace to preserve it
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+    # Load the population dataset
+    ds = paths.load_dataset("population")
 
-    tree = ET.parse(svg_path)
-    root = tree.getroot()
+    # Load historical and projection tables
+    tb_historical = ds.read("historical")
+    tb_projection = ds.read("projections")
 
-    # Define SVG namespace for ElementTree operations
-    ns = {"svg": "http://www.w3.org/2000/svg"}
+    # Extract World data (tables are already reset, no index)
+    world_hist = tb_historical[tb_historical["country"] == "World"]
+    world_proj = tb_projection[tb_projection["country"] == "World"]
 
-    # Find the main group containing all matplotlib content
-    main_group = root.find("./svg:g[@id='figure_1']", ns)
-    if main_group is None:
-        log.warning("Could not find figure_1 group in SVG, skipping optimization")
-        return
+    # Combine historical and projection data
+    hist_data = world_hist[["year", "population_historical"]].copy()
+    hist_data.columns = ["year", "population"]
 
-    # Remove large white background elements first (before reorganizing)
-    for elem in list(main_group.findall(".//svg:rect", ns)) + list(main_group.findall(".//svg:path", ns)):
-        fill = elem.get("fill", "")
-        style = elem.get("style", "")
-        is_white = (
-            fill in ("#ffffff", "white", "#FFFFFF")
-            or "#ffffff" in style.lower()
-            or "fill: #ffffff" in style.lower()
-        )
+    proj_data = world_proj[["year", "population_projection"]].copy()
+    proj_data.columns = ["year", "population"]
 
-        if is_white:
-            d_attr = elem.get("d", "")
-            width_attr = elem.get("width", "0")
-            height_attr = elem.get("height", "0")
-            try:
-                if elem.tag == "{http://www.w3.org/2000/svg}rect":
-                    w, h = float(width_attr), float(height_attr)
-                    is_large = w > 50 and h > 50
-                else:
-                    # Check if path looks like a background (has large coordinates)
-                    is_large = (
-                        any(x in d_attr for x in ["L 1009", "L 958", "L 894", "L 1152", "L 1116", " z "])
-                        and len(d_attr) < 200
-                    )
-            except (ValueError, AttributeError):
-                is_large = False
+    # Combine
+    tb = pr.concat([hist_data, proj_data], ignore_index=True).sort_values("year").drop_duplicates(subset=["year"])
+    # Find milestones
+    milestones = find_population_milestones(tb)
 
-            if is_large:
-                for parent in root.iter():
-                    if elem in list(parent):
-                        parent.remove(elem)
-                        break
+    # Build source citation from metadata
+    source_text = build_source_citation(tb_historical, tb_projection)
 
-    # Create new flat structure
-    new_structure = ET.Element("{http://www.w3.org/2000/svg}g", id="chart-content")
+    # Find peak population from projections
+    peak_pop, peak_year = find_peak_population(tb_projection)
 
-    # Semantic groups in render order (bottom to top)
-    group_order = [
-        "grid-lines",
-        "bars",
-        "bar-labels",
-        "axis-labels",
-        "title",
-        "annotations",
-        "source",
-    ]
+    # Get historical cutoff year
+    historical_cutoff_year = int(world_hist["year"].max())
 
-    groups = {gid: ET.SubElement(new_structure, "{http://www.w3.org/2000/svg}g", id=gid) for gid in group_order}
+    # Create visualization
+    fig = create_visualization(
+        milestones, tb_historical, tb_projection, source_text, peak_pop, peak_year, historical_cutoff_year
+    )
 
-    # Collect and categorize all visual elements
-    for elem in main_group.iter():
-        if elem.tag in [
-            "{http://www.w3.org/2000/svg}path",
-            "{http://www.w3.org/2000/svg}line",
-            "{http://www.w3.org/2000/svg}rect",
-            "{http://www.w3.org/2000/svg}text",
-        ]:
-            # Make a copy to avoid modifying during iteration
-            elem_copy = ET.Element(elem.tag, elem.attrib)
-            elem_copy.text = elem.text
-            elem_copy.tail = None
-            for child in elem:
-                elem_copy.append(child)
+    # Save outputs
+    paths.export_fig(fig, "population_billion_milestones", ["svg", "png"], dpi=300, bbox_inches="tight")
+    paths.log.info("Optimized SVG for Figma")
 
-            # Categorize
-            target_group = None
-            fill = elem.get("fill", "")
-            stroke = elem.get("stroke", "")
-            style = elem.get("style", "")
+    # Export data
+    milestones_table = Table(milestones)
+    milestones_table["country"] = "World"
+    milestones_table = milestones_table.format(["milestone", "country"], short_name=paths.short_name)
 
-            if elem.tag == "{http://www.w3.org/2000/svg}text":
-                text_content = "".join(elem.itertext()).lower()
-                if "time for the world population" in text_content:
-                    target_group = "title"
-                elif "note:" in text_content or "data source" in text_content or "ourworldindata" in text_content:
-                    target_group = "source"
-                elif "years" in text_content or "-" in text_content:
-                    target_group = "bar-labels"
-                elif "all of human" in text_content or "un projection" in text_content or "latest un" in text_content:
-                    target_group = "annotations"
-                else:
-                    target_group = "axis-labels"
-            elif elem.tag == "{http://www.w3.org/2000/svg}rect":
-                if "#8193a8" in fill.lower():  # Bar color
-                    target_group = "bars"
-                else:
-                    target_group = "grid-lines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}line":
-                if "#eeeeee" in stroke.lower():
-                    target_group = "grid-lines"
-                elif "#666666" in stroke.lower() or "#666" in stroke.lower():
-                    target_group = "annotations"
-                else:
-                    target_group = "grid-lines"
-            elif elem.tag == "{http://www.w3.org/2000/svg}path":
-                if "#eeeeee" in stroke.lower() or "fill:none" in style:
-                    target_group = "grid-lines"
-                elif "#666666" in stroke.lower() or "#666" in stroke.lower():
-                    target_group = "annotations"
-                else:
-                    target_group = "grid-lines"
+    # Create dataset
+    ds_export = paths.create_dataset(tables=[milestones_table])
+    ds_export.save()
 
-            if target_group:
-                groups[target_group].append(elem_copy)
-
-    # Remove empty groups
-    for gid in list(group_order):
-        if len(groups[gid]) == 0:
-            new_structure.remove(groups[gid])
-
-    # Replace main_group content with new structure
-    main_group.clear()
-    for child in new_structure:
-        main_group.append(child)
-
-    # Write optimized SVG
-    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
+    plt.close(fig)
+    paths.log.info("Visualization complete")
 
 
 def find_population_milestones(tb: Table) -> list[dict]:
@@ -350,7 +260,7 @@ def find_peak_population(tb_projection) -> tuple[float, int]:
     Returns:
         Tuple of (peak_population_billions, peak_year)
     """
-    world_proj = tb_projection[tb_projection.index.get_level_values("country") == "World"].reset_index()
+    world_proj = tb_projection[tb_projection["country"] == "World"]
     if "population_projection" in world_proj.columns and not world_proj.empty:
         peak_idx = world_proj["population_projection"].idxmax()
         peak_pop = world_proj.loc[peak_idx, "population_projection"] / 1e9
@@ -555,86 +465,3 @@ def create_visualization(
     fig.subplots_adjust(top=0.90, left=0.06, right=0.94, bottom=0.12)
 
     return fig
-
-
-def run() -> None:
-    """Create population billion milestone visualization.
-
-    Generates a bar chart showing the decreasing time intervals between
-    consecutive billion-person population milestones.
-
-    Output:
-    - SVG and PNG charts
-    - Dataset with milestone data
-    """
-    # Load the population dataset
-    ds = Dataset(etl_paths.DATA_DIR / "garden/demography/2024-07-15/population")
-
-    # Load historical and projection tables
-    tb_historical = ds["historical"]
-    tb_projection = ds["projections"]
-
-    # Extract World data
-    world_hist = tb_historical[tb_historical.index.get_level_values("country") == "World"].reset_index()
-    world_proj = tb_projection[tb_projection.index.get_level_values("country") == "World"].reset_index()
-
-    # Combine historical and projection data
-    hist_data = world_hist[["year", "population_historical"]].copy()
-    hist_data.columns = ["year", "population"]
-
-    proj_data = world_proj[["year", "population_projection"]].copy()
-    proj_data.columns = ["year", "population"]
-
-    # Combine
-    tb = pr.concat([hist_data, proj_data], ignore_index=True).sort_values("year").drop_duplicates(subset=["year"])
-    # Find milestones
-    milestones = find_population_milestones(tb)
-
-    # Build source citation from metadata
-    source_text = build_source_citation(tb_historical, tb_projection)
-
-    # Find peak population from projections
-    peak_pop, peak_year = find_peak_population(tb_projection)
-
-    # Get historical cutoff year
-    historical_cutoff_year = int(world_hist["year"].max())
-
-    # Create visualization
-    fig = create_visualization(
-        milestones, tb_historical, tb_projection, source_text, peak_pop, peak_year, historical_cutoff_year
-    )
-
-    # Save outputs
-    output_path_svg = CURRENT_DIR / "population_billion_milestones.svg"
-    fig.savefig(
-        output_path_svg,
-        format="svg",
-        dpi=300,
-        bbox_inches="tight",
-        metadata={"Date": None},
-    )
-    log.info(f"Saved chart to {output_path_svg}")
-
-    # Optimize SVG for Figma
-    optimize_svg_for_figma(output_path_svg)
-    log.info("Optimized SVG for Figma")
-
-    output_path_png = CURRENT_DIR / "population_billion_milestones.png"
-    fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
-    log.info(f"Saved chart to {output_path_png}")
-
-    # Export data
-    milestones_table = Table(milestones)
-    milestones_table["country"] = "World"
-    milestones_table = milestones_table.format(["milestone", "country"], short_name=SHORT_NAME)
-
-    # Create dataset
-    ds_export = create_dataset(OUTPUT_DIR, tables=[milestones_table])
-    ds_export.save()
-
-    plt.close(fig)
-    log.info("Visualization complete")
-
-
-if __name__ == "__main__":
-    run()
