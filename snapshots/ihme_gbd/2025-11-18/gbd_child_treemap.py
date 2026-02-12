@@ -8,8 +8,54 @@ Important - You need and account to access the data.
 * In 'GBD Estimate' select 'Cause of death or injury'
 * In Measure select 'Deaths'
 * In Metric select 'Number'
-* In Cause select: "Neonatal preterm birth","Neonatal encephalopathy due to birth asphyxia and trauma","Neonatal sepsis and other neonatal infections","Hemolytic disease and other neonatal jaundice","Other neonatal disorders","Nutritional deficiencies","Tuberculosis","HIV/AIDS","Diarrheal diseases","Pertussis","Measles","Non-communicable diseases","Neoplasms","Sexually transmitted infections excluding HIV","Neurological disorders","Neglected tropical diseases and malaria","Malaria","Chronic respiratory diseases","Cardiovascular diseases","Digestive diseases","Falls","Drowning","Fire, heat, and hot substances","Poisonings","Adverse effects of medical treatment","Animal contact","Pulmonary aspiration and foreign body in airway","Self-harm and interpersonal violence","Musculoskeletal disorders","Other non-communicable diseases","Conflict and terrorism","Respiratory infections and tuberculosis","Enteric infections","Neural tube defects","Congenital heart anomalies","Digestive congenital anomalies","Skin and subcutaneous diseases","Sudden infant death syndrome","Transport injuries","Invasive Non-typhoidal Salmonella (iNTS)","Other infectious diseases","Substance use disorders","Diabetes and kidney diseases","Unintentional injuries", "Meningitis
-* In Location select 'Global', 'China', 'United States', 'Central African Republic', 'Brazil', 'France'
+* In Cause select:
+Adverse effects of medical treatment
+Animal contact
+Cardiovascular diseases
+Chronic respiratory diseases
+Conflict and terrorism
+Congenital heart anomalies
+Diabetes and kidney diseases
+Diarrheal diseases
+Digestive congenital anomalies
+Digestive diseases
+Drowning
+Enteric infections
+Falls
+Fire, heat, and hot substances
+Hemolytic disease and other neonatal jaundice
+HIV/AIDS
+Invasive Non-typhoidal Salmonella (iNTS)
+Malaria
+Measles
+Meningitis
+Musculoskeletal disorders
+Neglected tropical diseases and malaria
+Neonatal encephalopathy due to birth asphyxia and trauma
+Neonatal preterm birth
+Neonatal sepsis and other neonatal infections
+Neoplasms
+Neural tube defects
+Neurological disorders
+Non-communicable diseases
+Nutritional deficiencies
+Other infectious diseases
+Other neonatal disorders
+Other non-communicable diseases
+Pertussis
+Poisonings
+Pulmonary aspiration and foreign body in airway
+Respiratory infections and tuberculosis
+Self-harm and interpersonal violence
+Sexually transmitted infections excluding HIV
+Skin and subcutaneous diseases
+Substance use disorders
+Sudden infant death syndrome
+Transport injuries
+Tuberculosis
+Unintentional injuries
+
+* In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select 'All ages',
 * In Sex select 'Both'
 * In Year select all years
@@ -38,8 +84,8 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2023-public/3af7337c447b7346a2751e2511ad72da_files/IHME-GBD_2023_DATA-3af7337c-"
-NUMBER_OF_FILES = 1
+BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/7abd70a1d746a8ac9e366151d37a0d1f_files/IHME-GBD_2023_DATA-7abd70a1-"
+NUMBER_OF_FILES = 3
 
 
 @click.command()
@@ -104,7 +150,3 @@ def download_data(file_number: int, base_url: str) -> pd.DataFrame:
     df = repack_frame(df)
 
     return df
-
-
-if __name__ == "__main__":
-    main()

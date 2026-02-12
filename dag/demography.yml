@@ -331,25 +331,25 @@ steps:
   # OTHERS
   ########################################################################
   # Wittgenstein Centre (Projections)
-  data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
-    - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
-  data://garden/demography/2024-12-06/wittgenstein_human_capital_proj:
-    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj
-  # data://grapher/demography/2024-12-06/wittgenstein_human_capital_proj:
-  #   - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
+  data://meadow/demography/2026-02-11/wittgenstein_human_capital_proj:
+    - snapshot://demography/2026-02-11/wittgenstein_human_capital.zip
+  data://garden/demography/2026-02-11/wittgenstein_human_capital_proj:
+    - data://meadow/demography/2026-02-11/wittgenstein_human_capital_proj
 
   # Wittgenstein Centre (Historical)
-  data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical:
-    - snapshot://demography/2024-12-06/wittgenstein_human_capital_historical.zip
-  data://garden/demography/2024-12-06/wittgenstein_human_capital_historical:
-    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical
+  data://meadow/demography/2026-02-11/wittgenstein_human_capital_historical:
+    - snapshot://demography/2026-02-11/wittgenstein_human_capital_historical.zip
+  data://garden/demography/2026-02-11/wittgenstein_human_capital_historical:
+    - data://meadow/demography/2026-02-11/wittgenstein_human_capital_historical
 
   # Wittgenstein Centre (Projections + Historical)
-  data://garden/demography/2024-12-06/wittgenstein_human_capital:
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital_historical
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
-  data://grapher/demography/2024-12-06/wittgenstein_human_capital:
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital
+  data://garden/demography/2026-02-11/wittgenstein_human_capital:
+    - data://garden/demography/2026-02-11/wittgenstein_human_capital_historical
+    - data://garden/demography/2026-02-11/wittgenstein_human_capital_proj
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/demography/2026-02-11/wittgenstein_human_capital:
+    - data://garden/demography/2026-02-11/wittgenstein_human_capital
 
   #
   # US State Population
@@ -388,3 +388,46 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2026-02-04/census_us_idb:
     - data://garden/demography/2026-02-04/census_us_idb
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/demography/2026-02-05/ihme_2020:
+    - snapshot://demography/2026-02-05/ihme_2020_fertility.zip
+    - snapshot://demography/2026-02-05/ihme_2020_migration.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population.zip
+    - snapshot://demography/2026-02-05/ihme_2020_life_expectancy.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+    - snapshot://demography/2026-02-05/ihme_2020_live_births.zip
+    - snapshot://demography/2026-02-05/ihme_2020_population_ref.zip
+  data://garden/demography/2026-02-05/ihme_2020:
+    - data://meadow/demography/2026-02-05/ihme_2020
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/demography/2026-02-05/ihme_2020:
+    - data://garden/demography/2026-02-05/ihme_2020
+
+  ########################################################################
+  # OTHERS (legacy, used downstream -- regularly check)
+  ########################################################################
+  # Wittgenstein Centre (Projections)
+  data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
+    - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
+  data://garden/demography/2024-12-06/wittgenstein_human_capital_proj:
+    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj
+
+  # Wittgenstein Centre (Historical)
+  data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical:
+    - snapshot://demography/2024-12-06/wittgenstein_human_capital_historical.zip
+  data://garden/demography/2024-12-06/wittgenstein_human_capital_historical:
+    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical
+
+  # Wittgenstein Centre (Projections + Historical)
+  data://garden/demography/2024-12-06/wittgenstein_human_capital:
+    - data://garden/demography/2024-12-06/wittgenstein_human_capital_historical
+    - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/demography/2024-12-06/wittgenstein_human_capital:
+    - data://garden/demography/2024-12-06/wittgenstein_human_capital
