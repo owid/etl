@@ -9,6 +9,7 @@ meta:
 
       This new version includes population projections by levels of educational attainment from 2020 to 2100 for 200 countries according to seven scenarios (SSP1-5, SSP2-Zero Migration and SSP2-Double Migration). The reconstruction will become available in the course of 2024.
     title_snapshot: Human Capital, Wittgenstein Centre (Historical data)
+    version_producer: "3.2"
     citation_full: |-
       K.C., S., Dhakad, M., Potancokova, M., Adhikari, S., Yildiz, D., Mamolo, M., Sobotka, T., Zeman, K., Abel, G., Lutz, W., and Goujon, A. (2024). Updating the Shared Socioeconomic Pathways (SSPs) Global Population and Human Capital Projections. IIASA Working Paper. Laxenburg, Austria: WP-24-003. https://pure.iiasa.ac.at/19487. Available at: http://www.wittgensteincentre.org/dataexplorer.
     url_main: https://dataexplorer.wittgensteincentre.org/wcde-v3/
