@@ -17,6 +17,9 @@ from owid.catalog.core.tables import _add_table_and_variables_metadata_to_table
 
 from etl.helpers import PathFinder
 
+# Cap parallelism to avoid memory exhaustion from nested ProcessPoolExecutor/ThreadPoolExecutor usage.
+MAX_WORKERS = 3
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
@@ -65,7 +68,7 @@ def make_scenario_tables(tbs_scenario, tables_combine_edu, tables_concat, tables
 
     # Process scenarios in parallel
     tbs_base = []
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = {executor.submit(_process_single_scenario, args): args[0] for args in scenario_args}
         for future in as_completed(futures):
             scenario = futures[future]
@@ -304,7 +307,7 @@ def merge_tables_opt(tables, **kwargs):
         return left.merge(right, **kwargs)
 
     # Divide tables into pairs to merge in parallel
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         while len(tables) > 1:
             # Pair tables and merge them in parallel
             future_to_merge = {
@@ -370,7 +373,7 @@ def read_data_from_snap(snap, scenarios_expected):
 
         # Process files in parallel using ProcessPoolExecutor (bypasses GIL)
         tbs_scenario = {}
-        with ProcessPoolExecutor() as executor:
+        with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
             futures = {executor.submit(_read_single_file, args): args for args in files_to_process}
             for i, future in enumerate(as_completed(futures)):
                 if i % 50 == 0:
