@@ -3,7 +3,6 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -11,13 +10,9 @@ paths = PathFinder(__file__)
 
 cause_renaming_dict = {
     "Adverse effects of medical treatment": "Medical accidents",
-    # "Animal contact": "Animal attacks",
-    "Self-harm and interpersonal violence": "Conflict, terrorism, and homicide",  # Self-harm is null for children
     "Congenital heart anomalies": "Heart abnormalities",
     "Digestive congenital anomalies": "Digestive defects",
     "Fire, heat, and hot substances": "Fire & temperature",
-    # "Hemolytic disease and other neonatal jaundice": "Hemolytic disorders",
-    # "Invasive Non-typhoidal Salmonella (iNTS)": "Invasive non-typhoidal salmonella",
     "Interpersonal violence": "Homicide",
     "Neonatal encephalopathy due to birth asphyxia and trauma": "Neonatal asphyxia (suffocation) and trauma",
     "Neonatal preterm birth": "Preterm birth",
@@ -34,9 +29,8 @@ cause_renaming_dict = {
 }
 
 broad_cause_dict = {
-    # "Animal attacks": "Injuries",
     "Cancers": "Non-communicable diseases",
-    "Conflict, terrorism, and homicide": "Injuries",
+    "Conflict and terrorism": "Injuries",  # Including police conflict and executions
     "Diarrheal diseases": "Infectious diseases",
     "Digestive defects": "Birth disorders",
     "Drowning": "Injuries",
@@ -46,7 +40,6 @@ broad_cause_dict = {
     "Heart abnormalities": "Birth disorders",
     "Hemolytic disorders": "Birth disorders",
     "Homicide": "Injuries",
-    # "Invasive non-typhoidal salmonella": "Infectious diseases",
     "Malaria": "Infectious diseases",
     "Malnutrition": "Non-communicable diseases",
     "Measles": "Infectious diseases",
@@ -59,7 +52,6 @@ broad_cause_dict = {
     "Other infectious diseases": "Infectious diseases",
     "Other injuries": "Injuries",
     "Other non-communicable diseases": "Non-communicable diseases",
-    # "Poisonings": "Injuries",
     "Preterm birth": "Birth disorders",
     "Suffocation by objects": "Injuries",
     "Respiratory infections": "Infectious diseases",
@@ -67,7 +59,6 @@ broad_cause_dict = {
     "Syphilis and other STDs": "Infectious diseases",
     "Transport accidents": "Injuries",
     "Tuberculosis": "Infectious diseases",
-    # "Violence": "Injuries",
     "Whooping cough": "Infectious diseases",
 }
 
@@ -84,10 +75,10 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
 
     # Drop the measure column
-    tb = tb.drop(columns="measure")
+    tb = tb.drop(columns=["measure", "population_group_name"])
     tb = tb[~tb["cause"].isin(["Animal contact", "Poisonings"])]
     # Drop the really high level causes
     tb = tb[
@@ -99,6 +90,7 @@ def run() -> None:
                 "Injuries",
                 "Invasive Non-typhoidal Salmonella (iNTS)",
                 "Conflict and terrorism",
+                "HIV/AIDS and sexually transmitted infections",
             ]
         )
     ]
@@ -160,12 +152,17 @@ def reaggregate_causes(tb: Table) -> Table:
             "Pulmonary aspiration and foreign body in airway",
             "Fire, heat, and hot substances",
             "Falls",
-            # "Poisonings",
             "Adverse effects of medical treatment",
-            # "Animal contact",
         ],
         aggregate_cause="Unintentional injuries",
         residual_name="Other injuries",
+    )
+
+    tb = pull_out_cause(
+        tb,
+        pull_out_cause=["Interpersonal violence"],
+        aggregate_cause="Self-harm and interpersonal violence",
+        residual_name="Conflict and terrorism",
     )
     tb = combine_causes(
         tb=tb,
@@ -216,6 +213,7 @@ def rename_causes(tb: Table, cause_renaming_dict: dict[str, str], broad_cause_di
     tb["cause"] = tb["cause"].replace(cause_renaming_dict, regex=False)
     tb["broad_cause"] = tb["cause"].map(broad_cause_dict)
     assert tb["broad_cause"].isnull().sum() == 0, "Some broad causes were not mapped correctly."
+
     return tb
 
 
