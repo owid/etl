@@ -22,7 +22,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("gbd_risk")
+    ds_meadow = paths.load_dataset("gbd_risk_deaths")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("gbd_risk", reset_index=True)
