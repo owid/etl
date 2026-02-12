@@ -140,7 +140,7 @@ definitions:
     <% if poverty_line in poverty_line_ipl %>
     Share of population living in extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty: Share of population below <<poverty_line>> ({definitions.welfare_type})
+    Share of population below <<poverty_line>> ({definitions.welfare_type})
     <%- else %>
     Poverty: Share of population living on less than {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
@@ -150,7 +150,7 @@ definitions:
     <% if poverty_line in poverty_line_ipl %>
     Number of people living in extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty: Number of people below <<poverty_line>> ({definitions.welfare_type})
+    Number of people below <<poverty_line>> ({definitions.welfare_type})
     <%- else %>
     Poverty: Number of people living on less than {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
