@@ -1,26 +1,28 @@
 """
-TODO: Update this docstring.
-We need to have the share of emissions for the following custom list of broad sectors. Unfortunately, I haven't found a perfect mapping onto those categories from publicly available data.
+We want to create a visualization showing the share of emissions that are produced by a custom list of sectors, namely:
+- Growing food
+- Getting around
+- Keeping warm and cool
+- Electricity
+- Making things
+
+Unfortunately, the most useful data to be able to create these custom categories is the IEA, which is under a heavy paywall. I haven't found a perfect mapping onto those categories from publicly available data.
 
 Climate Watch (where we get our data for emissions by sector) has the following sectors:
-Agriculture
-Building
-Bunker Fuels
-Electricity/Heat
-Fugitive Emissions
-Industrial Processes
-Land-Use Change and Forestry
-Manufacturing/Construction
-Other Fuel Combustion
-Transportation
-Waste
+- Agriculture
+- Building
+- Bunker Fuels
+- Electricity/Heat
+- Fugitive Emissions
+- Industrial Processes
+- Land-Use Change and Forestry
+- Manufacturing/Construction
+- Other Fuel Combustion
+- Transportation
+- Waste
 
-These don't map well to our desired categories (especially Electricity/Heat).
-
-Climate Watch's data does have more granularity than this, but they don't provide access to the more granular data. What I will do is manually extract the percentages from this page:
-https://www.wri.org/data/world-greenhouse-gas-emissions-sector-2021-sunburst-chart
-which refers to 2021 (even though they have data for 2022, they haven't updated these visualizations yet).
-Then, figure out a reasonable mapping of subsectors onto my custom categories.
+These don't map perfectly well to our desired categories (especially Electricity/Heat); but an approximate mapping is possible.
+Climate Watch's original data does have more granularity than this, but they don't provide access to the more granular data (because it indeed comes from IEA).
 
 """
 
@@ -184,10 +186,11 @@ def separate_electricity_and_heat(tb, tb_ember):
     tb_heat = tb[tb["sector"] == "Keeping warm and cool"].reset_index(drop=True)
 
     # Get total emissions of electricity production from Ember.
+    # I could get them directly from their yearly electricity data.
     # tb_ember = tb_ember[tb_ember["country"] == "World"][
     #     ["year", "emissions__lifecycle__total_emissions__mtco2"]
     # ].rename(columns={"emissions__lifecycle__total_emissions__mtco2": "emissions_electricity"})
-    # NOTE: Ember's emissions are given as lifecycle emissions, which we can't use directly here.
+    # However, Ember's emissions are given as lifecycle emissions, which we can't use here.
     # Instead, we'll calculate direct emissions ourselves, by converting total generation of coal, gas, and other fossil, into CO2 emissions, with some conversion factors.
     COLUMNS_EMBER = {
         "country": "country",
@@ -201,7 +204,7 @@ def separate_electricity_and_heat(tb, tb_ember):
     tb_emissions = tb_ember[tb_ember["country"] == "World"][list(COLUMNS_EMBER)].rename(
         columns=COLUMNS_EMBER, errors="raise"
     )
-    # TODO: Instead of hardcoding these factors, I could get emission factors from the existing garden step.
+    # NOTE: Instead of hardcoding these factors, I could get emission factors from the existing garden step.
     # Emission factors are given in g/kWh, which is the same as t/GWh; they need to be multiplied by 1e3 to convert to t/TWh (since generation is in TWh).
     tb_emissions["coal_emissions"] = tb_emissions["coal_generation"] * 760 * 1e3
     tb_emissions["gas_emissions"] = tb_emissions["gas_generation"] * 370 * 1e3
@@ -213,7 +216,7 @@ def separate_electricity_and_heat(tb, tb_ember):
     tb_emissions["lifecycle_emissions"] *= 1e6
     # Uncomment to compare Ember's original (lifecycle) emissions with the ones we just calculated.
     # px.line(tb_emissions[["year", "lifecycle_emissions", "emissions_electricity"]].melt(id_vars=["year"]), x="year", y="value", color="variable", markers=True).update_yaxes(range=[0, None])
-    # TODO: Plot calculated and original emissions.
+    # Remove unnecessary columns.
     tb_emissions = tb_emissions.drop(
         columns=[
             "country",
@@ -360,7 +363,6 @@ def run() -> None:
     tb = tb.merge(tb_corrected, on=["country", "year", "sector"], how="outer", suffixes=("", "_corrected"))
 
     # Add an explanation to the metadata of which subsectors are included in each category.
-    # TODO: Update this description.
     description_processing = "Each category is made up of the following emission subcategories, based on IPCC definitions (as reported by Climate Watch):"
     for sector, subsectors in SECTOR_MAPPING.items():
         _subsectors = (
