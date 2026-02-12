@@ -15,6 +15,8 @@ from etl.helpers import PathFinder
 
 # Use non-path text so SVGs stay editable in Figma
 matplotlib.rcParams["svg.fonttype"] = "none"
+# Set deterministic hash for reproducible SVG output
+matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
 
 paths = PathFinder(__file__)
 
