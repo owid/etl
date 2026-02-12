@@ -19,6 +19,121 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
 paths = PathFinder(__file__)
 
 
+def run() -> None:
+    """Create world population growth visualization chart and export data.
+
+    Generates a dual-axis chart showing:
+    - World population 1700-2100 (area fill)
+    - Annual growth rate 1700-2100 (line)
+
+    The growth rate for 1700 is special: calculated using 10,000 BCE as baseline
+    to show long-term historical context. Other growth rates use adjacent years.
+
+    Growth rates are selectively displayed to create a smooth visualization:
+    - 100-year intervals before 1800
+    - 100-year intervals 1800-1900
+    - 5-year intervals 1900-1950
+    - Annual values from 1950 onwards
+
+    Output:
+    - SVG and PNG charts
+    - Dataset with population and growth rate data
+    """
+    # Load the population dataset using PathFinder
+    ds_pop = paths.load_dataset("population")
+
+    # Load population table
+    tb = ds_pop.read("population")
+    tb = tb.loc[tb["country"] == "World", ["year", "population"]].copy().reset_index(drop=True)
+    tb = tb.sort_values("year").reset_index(drop=True)
+
+    # Calculate growth rates using adjacent years
+    tb["year_prev"] = tb["year"].shift(1)
+    tb["pop_prev"] = tb["population"].shift(1)
+    tb["years_diff"] = tb["year"] - tb["year_prev"]
+
+    # Vectorized growth rate calculation
+    mask = (tb["years_diff"] > 0) & (tb["pop_prev"] > 0)
+    tb["growth_rate"] = np.nan
+    tb.loc[mask, "growth_rate"] = 100 * (
+        np.log(tb.loc[mask, "population"] / tb.loc[mask, "pop_prev"]) / tb.loc[mask, "years_diff"]
+    )
+
+    # Calculate special growth rate for 1700 using 10,000 BCE as baseline
+    growth_rate_1700 = None
+    pop_10000bce_data = tb[tb["year"] == -10000]["population"]
+    pop_1700_data = tb[tb["year"] == 1700]["population"]
+
+    if not pop_10000bce_data.empty and not pop_1700_data.empty:
+        pop_10000bce = pop_10000bce_data.iloc[0]
+        pop_1700 = pop_1700_data.iloc[0]
+        growth_rate_1700 = 100 * (np.log(pop_1700 / pop_10000bce) / (1700 - (-10000)))
+        paths.log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
+        # Override 1700 growth rate with long-term baseline
+        tb.loc[tb["year"] == 1700, "growth_rate"] = growth_rate_1700
+    else:
+        paths.log.warning("Could not calculate growth rate for 1700: missing 10,000 BCE or 1700 data")
+
+    # Clean up temporary columns
+    tb = tb.drop(columns=["year_prev", "pop_prev", "years_diff"])
+
+    # Filter to 1700-2100
+    tb = tb[(tb["year"] >= 1700) & (tb["year"] <= 2100)].copy()
+
+    # Validate expected years exist
+    expected_years = [1700, 2023, 2100]
+    missing_years = [year for year in expected_years if year not in tb["year"].values]
+    if missing_years:
+        paths.log.warning(f"Missing expected years in data: {missing_years}")
+
+    # Determine year_cut (last historical year before projections start)
+    # Find the minimum year in the projections table to identify where projections begin
+    tb_proj = ds_pop.read("projections")
+    tb_proj_world = tb_proj.loc[tb_proj["country"] == "World"]
+    if not tb_proj_world.empty:
+        year_cut = int(tb_proj_world["year"].min()) - 1  # Last historical year is one before first projection
+    else:
+        # Fallback: assume 2023 is the cutoff
+        year_cut = 2023
+
+    paths.log.info(f"Using year_cut={year_cut} (projections start at {year_cut + 1})")
+
+    # Omit growth rates for years that don't match the filtering pattern:
+    # Keep only: 100-year intervals (1700-1800), 100-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
+    filter_mask = (
+        ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
+        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
+        | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
+        | (tb["year"] >= 1950)
+    )
+    tb.loc[~filter_mask, "growth_rate"] = np.nan
+
+    # Convert population to billions
+    tb["population_billions"] = tb["population"] / 1e9
+
+    # Create visualization (all figure operations grouped in function)
+    fig = create_visualization(tb, year_cut, growth_rate_1700, filter_mask)
+
+    # Save chart outputs
+    output_path = paths.directory / "world_population_growth_1700_2100.svg"
+    fig.savefig(
+        output_path,
+        format="svg",
+        dpi=300,
+        bbox_inches="tight",
+        transparent=True,
+    )
+
+    # Optimize SVG for Figma editing
+    paths.log.info(f"Saved chart to {output_path}")
+
+    output_path_png = paths.directory / "world_population_growth_1700_2100.png"
+    fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
+    paths.log.info(f"Saved chart to {output_path_png}")
+
+    plt.close(fig)
+
+
 def calculate_milestones(tb: Table) -> list[tuple[int, float, str]]:
     """Calculate population milestones from data.
 
@@ -297,118 +412,3 @@ def create_visualization(
     fig.subplots_adjust(top=0.84, left=0.06, right=0.97, bottom=0.16)
 
     return fig
-
-
-def run() -> None:
-    """Create world population growth visualization chart and export data.
-
-    Generates a dual-axis chart showing:
-    - World population 1700-2100 (area fill)
-    - Annual growth rate 1700-2100 (line)
-
-    The growth rate for 1700 is special: calculated using 10,000 BCE as baseline
-    to show long-term historical context. Other growth rates use adjacent years.
-
-    Growth rates are selectively displayed to create a smooth visualization:
-    - 100-year intervals before 1800
-    - 100-year intervals 1800-1900
-    - 5-year intervals 1900-1950
-    - Annual values from 1950 onwards
-
-    Output:
-    - SVG and PNG charts
-    - Dataset with population and growth rate data
-    """
-    # Load the population dataset using PathFinder
-    ds_pop = paths.load_dataset("population")
-
-    # Load population table
-    tb = ds_pop.read("population")
-    tb = tb.loc[tb["country"] == "World", ["year", "population"]].copy().reset_index(drop=True)
-    tb = tb.sort_values("year").reset_index(drop=True)
-
-    # Calculate growth rates using adjacent years
-    tb["year_prev"] = tb["year"].shift(1)
-    tb["pop_prev"] = tb["population"].shift(1)
-    tb["years_diff"] = tb["year"] - tb["year_prev"]
-
-    # Vectorized growth rate calculation
-    mask = (tb["years_diff"] > 0) & (tb["pop_prev"] > 0)
-    tb["growth_rate"] = np.nan
-    tb.loc[mask, "growth_rate"] = 100 * (
-        np.log(tb.loc[mask, "population"] / tb.loc[mask, "pop_prev"]) / tb.loc[mask, "years_diff"]
-    )
-
-    # Calculate special growth rate for 1700 using 10,000 BCE as baseline
-    growth_rate_1700 = None
-    pop_10000bce_data = tb[tb["year"] == -10000]["population"]
-    pop_1700_data = tb[tb["year"] == 1700]["population"]
-
-    if not pop_10000bce_data.empty and not pop_1700_data.empty:
-        pop_10000bce = pop_10000bce_data.iloc[0]
-        pop_1700 = pop_1700_data.iloc[0]
-        growth_rate_1700 = 100 * (np.log(pop_1700 / pop_10000bce) / (1700 - (-10000)))
-        paths.log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
-        # Override 1700 growth rate with long-term baseline
-        tb.loc[tb["year"] == 1700, "growth_rate"] = growth_rate_1700
-    else:
-        paths.log.warning("Could not calculate growth rate for 1700: missing 10,000 BCE or 1700 data")
-
-    # Clean up temporary columns
-    tb = tb.drop(columns=["year_prev", "pop_prev", "years_diff"])
-
-    # Filter to 1700-2100
-    tb = tb[(tb["year"] >= 1700) & (tb["year"] <= 2100)].copy()
-
-    # Validate expected years exist
-    expected_years = [1700, 2023, 2100]
-    missing_years = [year for year in expected_years if year not in tb["year"].values]
-    if missing_years:
-        paths.log.warning(f"Missing expected years in data: {missing_years}")
-
-    # Determine year_cut (last historical year before projections start)
-    # Find the minimum year in the projections table to identify where projections begin
-    tb_proj = ds_pop.read("projections")
-    tb_proj_world = tb_proj.loc[tb_proj["country"] == "World"]
-    if not tb_proj_world.empty:
-        year_cut = int(tb_proj_world["year"].min()) - 1  # Last historical year is one before first projection
-    else:
-        # Fallback: assume 2023 is the cutoff
-        year_cut = 2023
-
-    paths.log.info(f"Using year_cut={year_cut} (projections start at {year_cut + 1})")
-
-    # Omit growth rates for years that don't match the R filtering pattern:
-    # Keep only: 100-year intervals (1700-1800), 100-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
-    filter_mask = (
-        ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
-        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
-        | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
-        | (tb["year"] >= 1950)
-    )
-    tb.loc[~filter_mask, "growth_rate"] = np.nan
-
-    # Convert population to billions
-    tb["population_billions"] = tb["population"] / 1e9
-
-    # Create visualization (all figure operations grouped in function)
-    fig = create_visualization(tb, year_cut, growth_rate_1700, filter_mask)
-
-    # Save chart outputs
-    output_path = paths.directory / "world_population_growth_1700_2100.svg"
-    fig.savefig(
-        output_path,
-        format="svg",
-        dpi=300,
-        bbox_inches="tight",
-        metadata={"Date": None},  # Remove timestamp for cleaner diffs
-    )
-
-    # Optimize SVG for Figma editing
-    paths.log.info(f"Saved chart to {output_path}")
-
-    output_path_png = paths.directory / "world_population_growth_1700_2100.png"
-    fig.savefig(output_path_png, format="png", dpi=300, bbox_inches="tight")
-    paths.log.info(f"Saved chart to {output_path_png}")
-
-    plt.close(fig)

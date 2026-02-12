@@ -326,10 +326,8 @@ def create_visualization(
 
 
 def run() -> None:
-    """Create world population long-run visualization chart and export data.
-
-    Generates a chart showing world population from 10,000 BCE to 2100,
-    combining HYDE historical estimates with UN projections.
+    """Create world population long-run visualization chart.
+    Generates a chart showing world population from 10,000 BCE to 2100.
 
     Output:
     - SVG and PNG charts
