@@ -206,6 +206,7 @@ class Dataset:
         safe_types: bool = True,
         reset_metadata: Literal["keep", "keep_origins", "reset"] = "keep",
         load_data: bool = True,
+        columns: list[str] | None = None,
     ) -> tables.Table:
         """Read a table from the dataset with performance options.
 
@@ -226,6 +227,10 @@ class Dataset:
                 - "reset": Reset all variable metadata
             load_data: If False, only load metadata without actual data. Useful
                 when you only need to inspect metadata. Default is True.
+            columns: If specified, only load these columns from the file. This is
+                significantly faster for wide tables (e.g. 10k columns) when you
+                only need a few. Metadata for all columns is still loaded from the
+                sidecar .meta.json. Default is None (load all columns).
 
         Returns:
             The loaded table with data and metadata.
@@ -254,6 +259,11 @@ class Dataset:
             ```python
             >>> meta_only = ds.read(load_data=False)
             ```
+
+            Load only specific columns (fast for wide tables)
+            ```python
+            >>> subset = ds.read("wide_table", columns=["country", "year", "gdp"])
+            ```
         """
         if name is None:
             if len(self.table_names) == 1:
@@ -265,7 +275,9 @@ class Dataset:
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                t = tables.Table.read(path, primary_key=[] if reset_index else None, load_data=load_data)
+                t = tables.Table.read(
+                    path, primary_key=[] if reset_index else None, load_data=load_data, columns=columns
+                )
                 t.metadata.dataset = self.metadata
                 if safe_types and load_data:
                     t = cast(tables.Table, to_safe_types(t))

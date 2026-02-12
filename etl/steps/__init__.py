@@ -1152,7 +1152,7 @@ class GraphStep(Step):
 
     Graph steps create or update charts based on indicator dependencies.
     Single-indicator graphs can inherit metadata from the indicator's grapher_config.
-    Multi-indicator graphs require explicit metadata in a .meta.yml file.
+    Multi-indicator graphs require explicit metadata in a .chart.yml file.
 
     Example:
         graph://fur-farming-ban

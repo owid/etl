@@ -331,6 +331,11 @@ class PathFinder:
         return self.directory / (self.short_name + ".meta.yml")
 
     @property
+    def chart_path(self) -> Path:
+        """Path to .chart.yml file for graph steps."""
+        return self.directory / (self.short_name + ".chart.yml")
+
+    @property
     def collection_path(self) -> Path:
         """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
@@ -901,15 +906,15 @@ class PathFinder:
         from etl import config
         from etl.grapher.graph import calculate_source_checksum, upsert_graph
 
-        # Calculate source checksum from dependencies and metadata file
+        # Calculate source checksum from dependencies and chart file
         source_checksum = calculate_source_checksum(
             dependencies=list(self.dependencies),
-            metadata_file=self.metadata_path,
+            metadata_file=self.chart_path,
         )
 
         return upsert_graph(
             slug=self.short_name,
-            metadata_file=self.metadata_path,
+            metadata_file=self.chart_path,
             dependencies=list(self.dependencies),
             source_checksum=source_checksum,
             graph_push=config.GRAPH_PUSH,
