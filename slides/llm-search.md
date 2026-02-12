@@ -271,27 +271,25 @@ layout: section
 zoom: 0.8
 ---
 
-# Pitch 1: The 'Zero Result' Safety Net
+# Pitch 1: Hybrid Search with Typesense
 
-**Problem**: Users get no results even when relevant content exists
+**Problem**: 21% of queries return zero results, Algolia only does keyword matching
 
-**Solution**: Deploy hybrid search (keyword + semantic)
-- Keyword search catches exact matches
-- Semantic search catches related concepts
-- Reranking combines signals
+**Solution**: Migrate to Typesense with built-in hybrid search
+- Native keyword + semantic search in one engine
+- Reranking combines both signals automatically
+- Open-source, self-hosted — full control
 
-**Implementation**:
-- Switch from Algolia to Typesense
+**Why Typesense**:
+- Hybrid search out of the box (no glue code)
 - Matthieu had a prototype in the pipeline
+- ~$20/month hosting vs Algolia's growing costs
 
-**Benefits**:
-- Dramatically reduce zero-result queries
-- Better handling of vocabulary mismatches
-- Improved user satisfaction
+**Trade-off**:
+- Requires Algolia migration (might lose analytics history)
+- Need to rebuild integrations
 
-**Cost/Latency**:
-- ~$20/month
-- ~100-300ms latency
+**Cost/Latency**: ~$20/month, ~100-300ms
 
 ---
 zoom: 0.8
@@ -374,10 +372,61 @@ zoom: 0.85
 **Cost/Latency**: Included in Cloudflare pricing, ~100-200ms
 
 ---
+zoom: 0.8
+---
+
+# Pitch 5: Algolia + Cloudflare Semantic Hybrid
+
+**If Algolia migration is too costly** — a lighter alternative to Pitch 1
+
+**Approach**: Keep Algolia as primary, hydrate results with Cloudflare semantic search
+- Keyword results from Algolia (fast, existing infrastructure)
+- Semantic results from Cloudflare (fills zero-result gaps)
+- Merge and deduplicate results
+
+**Pros**:
+- No Algolia migration needed — keep analytics and integrations
+- Solves the zero-result problem (80% of the benefit)
+- Incremental improvement, low risk
+- We can monitor click-through rates of keyword vs semantic results
+
+**Cons**:
+- Latency mismatch: Algolia ~10-50ms vs semantic ~100-200ms
+- Need to merge results sensibly
+- UX challenge: results arriving at different speeds
+- Two systems to maintain
+
+**Cost/Latency**: ~$10-15/mo for Cloudflare embeddings, mixed latency
+
+---
+zoom: 0.8
+---
+
+# Pitch 6: Google Vertex AI Search
+
+**Approach**: Fully managed enterprise search with semantic understanding
+
+**What it does**:
+- Hybrid retrieval (lexical + semantic) with Google's ranking
+- Structured data support with facets and filtering
+- Optional generative answers with citations
+- Learns from click-through data over time
+
+**Pros**:
+- Best-in-class retrieval quality (Google's search expertise)
+- Handles structured metadata well (charts, topics, countries)
+- Minimal ML expertise needed
+
+**Cons**:
+- Very expensive: **~$1,800/mo** (Standard) to **$4,800/mo** (Enterprise)
+- Vendor lock-in to Google Cloud
+- Overkill for our corpus size (~thousands of charts, not millions)
+
+---
 zoom: 0.78
 ---
 
-# Pitch 5: Agentic Search
+# Pitch 7: Agentic Search
 
 **Approach**: LLM agent orchestrates the entire search process
 
@@ -528,17 +577,15 @@ zoom: 0.82
 
 **Can implement now, low risk**
 
-- **Query Expansion Suggestions**
-  - Guide users to better searches
-  - Build vocabulary index from our content
-  - Works on top of existing Algolia
-  - Immediate UX improvement
+- **Hybrid Search (Typesense)**
+  - Fixes the 21% zero-result problem
+  - Built-in keyword + semantic search
+  - ~$20/month, prototype exists
 
-- **Suggested Topics**
+- **Suggested Keywords & Topics**
+  - Guide users to better searches
   - Show related topics on zero results
-  - Leverage our excellent topic pages
-  - Turns failures into discoveries
-  - Low cost, high impact
+  - Works on top of any search backend
 
 </div>
 
@@ -548,16 +595,10 @@ zoom: 0.82
 
 **Worth investigating**
 
-- **Hybrid Search**
-  - Could fix 21% zero-result problem
-  - Requires migration from Algolia
-  - Need to assess implementation complexity
-
 - **Agentic Prototype**
   - Test capabilities and limitations
   - Understand cost/benefit tradeoffs
   - Learn what's possible with LLMs
-  - Guide future strategy
 
 - **Context Window Search**
   - Load entire dataset metadata into LLM context
