@@ -11,10 +11,8 @@ INDICATORS = ["gini"]
 # Define dimensions for main views
 DIMENSIONS_CONFIG = {
     "welfare_type": ["before tax", "after tax"],
+    "extrapolated": ["no"],
 }
-
-# Define if data is extrapolated or not
-EXTRAPOLATED = "no"
 
 
 def run() -> None:
@@ -22,15 +20,6 @@ def run() -> None:
 
     ds = paths.load_dataset("world_inequality_database")
     tb = ds.read("inequality", load_data=False)
-
-    # Filter columns to only keep extrapolated=no, then remove that dimension from metadata.
-    columns_to_keep = []
-    for column in tb.drop(columns=["country", "year"]).columns:
-        dims = tb[column].metadata.dimensions
-        if dims and dims.get("extrapolated") == EXTRAPOLATED:
-            columns_to_keep.append(column)
-            dims.pop("extrapolated")
-    tb = tb[columns_to_keep]
 
     c = paths.create_collection(
         config=config,
