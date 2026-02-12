@@ -4,7 +4,6 @@ import os
 
 from shared import add_regional_aggregates, add_share_population
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
