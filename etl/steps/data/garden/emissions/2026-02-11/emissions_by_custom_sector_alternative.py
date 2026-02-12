@@ -281,6 +281,7 @@ def run() -> None:
     tb_un = tb_un.groupby(["year", "sector"], as_index=False).agg({"value": "sum"})
 
     # Create shares of final electricity consumption by custom sectors.
+    # TODO: Fix missing origins in the following operation.
     tb_un = tb_un.rename(columns={"value": ""}).pivot(index=["year"], columns=["sector"], join_column_levels_with="")
     tb_un = tb_un.rename(columns={COLUMN_UN_FINAL_ENERGY: "total"}, errors="raise")
     for sector, subsectors in SECTOR_UN_MAPPING.items():
