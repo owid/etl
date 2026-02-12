@@ -71,7 +71,7 @@ def run() -> None:
     tb = tb.drop(columns=["value"])
 
     # Format the table
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="gbd_cause_deaths")
 
     #
     # Save outputs.
