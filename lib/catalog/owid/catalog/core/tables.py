@@ -715,7 +715,9 @@ class Table(pd.DataFrame):
                 tb.set_index(primary_key, inplace=True)
 
     @classmethod
-    def read_feather(cls, path: str | Path, load_data: bool = True, **kwargs) -> Table:
+    def read_feather(
+        cls, path: str | Path, load_data: bool = True, columns: list[str] | None = None, **kwargs
+    ) -> Table:
         """Read table from Feather file with accompanying metadata.
 
         Loads a table from a Feather file and its associated .meta.json metadata file.
@@ -725,6 +727,9 @@ class Table(pd.DataFrame):
             path: Path or URL to the Feather file (must end with .feather).
             load_data: If True, load the actual data. If False, only load metadata
                 and column structure (useful for inspecting large files).
+            columns: If specified, only load these columns from the file. This is
+                significantly faster for wide tables (e.g. 10k columns) when you
+                only need a few. Metadata for all columns is still loaded.
             **kwargs: Additional arguments passed to the internal metadata loader.
 
         Returns:
@@ -738,6 +743,7 @@ class Table(pd.DataFrame):
             table = Table.read_feather("data.feather")
             table = Table.read_feather("https://example.com/data.feather")
             metadata_only = Table.read_feather("data.feather", load_data=False)
+            subset = Table.read_feather("data.feather", columns=["country", "year", "gdp"])
             ```
         """
         if isinstance(path, Path):
@@ -749,16 +755,16 @@ class Table(pd.DataFrame):
         # load the data and add metadata
         if not load_data:
             metadata = cls._read_metadata(path)
-            columns = list(metadata["fields"].keys())
-            df = Table(pd.DataFrame(columns=columns))
+            cols = list(metadata["fields"].keys())
+            df = Table(pd.DataFrame(columns=cols))
         else:
-            df = Table(pd.read_feather(path))
+            df = Table(pd.read_feather(path, columns=columns))
 
         cls._add_metadata(df, path, **kwargs)
         return df
 
     @classmethod
-    def read_parquet(cls, path: str | Path, **kwargs) -> Table:
+    def read_parquet(cls, path: str | Path, columns: list[str] | None = None, **kwargs) -> Table:
         """Read table from Parquet file with accompanying metadata.
 
         Loads a table from a Parquet file and its associated .meta.json metadata file.
@@ -766,6 +772,9 @@ class Table(pd.DataFrame):
 
         Args:
             path: Path or URL to the Parquet file (must end with .parquet).
+            columns: If specified, only load these columns from the file. This is
+                significantly faster for wide tables when you only need a few.
+                Metadata for all columns is still loaded.
             **kwargs: Additional arguments passed to the internal metadata loader.
 
         Returns:
@@ -778,6 +787,7 @@ class Table(pd.DataFrame):
             ```python
             table = Table.read_parquet("data.parquet")
             table = Table.read_parquet("https://example.com/data.parquet")
+            subset = Table.read_parquet("data.parquet", columns=["country", "year", "gdp"])
             ```
         """
         if isinstance(path, Path):
@@ -787,7 +797,7 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".parquet": {path}')
 
         # load the data and add metadata
-        df = Table(pd.read_parquet(path))
+        df = Table(pd.read_parquet(path, columns=columns))
         cls._add_metadata(df, path, **kwargs)
         return df
 

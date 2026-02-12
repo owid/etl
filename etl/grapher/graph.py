@@ -3,7 +3,7 @@ Graph step logic for creating and updating charts in the grapher database.
 
 This module handles the creation and updating of charts (graphs) as part of the ETL pipeline.
 Charts can either inherit metadata from a single indicator or have explicit metadata defined
-in a .meta.yml file.
+in a .chart.yml file.
 
 Key features:
 - Single charts: Use upsert_graph() to create/update individual charts
@@ -105,7 +105,7 @@ def calculate_source_checksum(
 
     Args:
         dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/..."])
-        metadata_file: Optional path to .meta.yml file
+        metadata_file: Optional path to .chart.yml file
 
     Returns:
         MD5 checksum hex string
@@ -148,7 +148,7 @@ def upsert_graph(
 
     Args:
         slug: Chart slug (e.g., "fur-farming-ban")
-        metadata_file: Optional path to .meta.yml file with chart metadata
+        metadata_file: Optional path to .chart.yml file with chart metadata
         dependencies: List of dataset URIs from DAG (e.g., ["data://grapher/..."])
         source_checksum: Checksum of inputs (metadata file + dependencies) for dirty detection
         graph_push: If True, overwrite manual edits made in Admin UI
@@ -313,10 +313,10 @@ def upsert_graph(
 
 def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
     """
-    Pull chart configuration from the database and write to .meta.yml file.
+    Pull chart configuration from the database and write to .chart.yml file.
 
     This fetches the current chart configuration from the database and converts it back
-    to the .meta.yml format used by graph steps. Useful for syncing changes made via
+    to the .chart.yml format used by graph steps. Useful for syncing changes made via
     Admin UI back to ETL.
 
     Note: Currently only supports simple charts (with dimensions), not multidimensional
@@ -324,7 +324,7 @@ def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
 
     Args:
         slug: Chart slug (must exist in database)
-        metadata_file: Path where .meta.yml will be written
+        metadata_file: Path where .chart.yml will be written
         dependencies: List of dataset URIs from DAG (for converting variable IDs to short names)
 
     Raises:
@@ -397,7 +397,7 @@ def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
         if short_paths:
             metadata["dimensions"] = [{"property": "y", "catalogPath": path} for path in short_paths]
 
-        # 6. Write to .meta.yml file
+        # 6. Write to .chart.yml file
         metadata_file.parent.mkdir(parents=True, exist_ok=True)
         with open(metadata_file, "w") as f:
             f.write(ruamel_dump(metadata))
@@ -781,10 +781,10 @@ def _uri_to_catalog_path(uri: str) -> str:
 
 def _load_metadata_file(metadata_file: Path, yaml_params: Optional[dict] = None) -> Dict[str, Any]:
     """
-    Load chart metadata from a .meta.yml file.
+    Load chart metadata from a .chart.yml file.
 
     Args:
-        metadata_file: Path to .meta.yml file
+        metadata_file: Path to .chart.yml file
         yaml_params: Optional dict for string substitution in YAML (e.g., {threshold: 4.73})
 
     Returns:
@@ -822,7 +822,7 @@ def _check_manual_overrides(
     1. ETL metadata has changed (current_checksum != stored_checksum)
     2. Database config has diverged from what ETL last wrote
 
-    This prevents false positives when you update .meta.yml but DB hasn't been touched.
+    This prevents false positives when you update .chart.yml but DB hasn't been touched.
 
     Args:
         session: Database session
@@ -846,8 +846,8 @@ def _check_manual_overrides(
                 f"Chart '{chart.slug}' has manual overrides from Admin UI in these fields: {overridden_fields}\n"
                 f"These changes would be lost if you continue.\n"
                 f"Either:\n"
-                f"  1. Use --graph-pull to pull database edits to your .meta.yml file, or\n"
-                f"  2. Manually copy the overrides to your .meta.yml file, or\n"
+                f"  1. Use --graph-pull to pull database edits to your .chart.yml file, or\n"
+                f"  2. Manually copy the overrides to your .chart.yml file, or\n"
                 f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
             )
 
@@ -890,8 +890,8 @@ def _check_manual_overrides(
                     f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
                     f"New ETL values: {[f'{k}={expected_config.get(k)}' for k in db_changed_fields]}\n"
                     f"Either:\n"
-                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file, or\n"
-                    f"  2. Manually update your .meta.yml file to match the database edits, or\n"
+                    f"  1. Use --graph-pull to pull database edits to your .chart.yml file, or\n"
+                    f"  2. Manually update your .chart.yml file to match the database edits, or\n"
                     f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
                 )
             else:
@@ -902,7 +902,7 @@ def _check_manual_overrides(
                     f"Last values: {[f'{k}={stored_config.get(k)}' for k in db_changed_fields]}\n"
                     f"Current DB values: {[f'{k}={current_config.get(k)}' for k in db_changed_fields]}\n"
                     f"Either:\n"
-                    f"  1. Use --graph-pull to pull database edits to your .meta.yml file, or\n"
+                    f"  1. Use --graph-pull to pull database edits to your .chart.yml file, or\n"
                     f"  2. Keep the database edits (do nothing and don't run this step), or\n"
                     f"  3. Use --graph-push to overwrite database with ETL metadata (WARNING: loses manual edits)"
                 )
