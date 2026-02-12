@@ -3,6 +3,10 @@ steps:
   export://static_viz/population/2026-01-26/world_population_growth:
     - data://garden/demography/2024-07-15/population
 
+  # Time it took for the world population to double
+  export://static_viz/population/2026-02-03/pop_doubling:
+    - data://garden/demography/2024-07-18/population_doubling_times
+    - data://garden/demography/2024-07-15/population
   # Population billion milestones visualization
   export://static_viz/population/2026-02-05/population_billion_milestones:
     - data://garden/demography/2024-07-15/population
