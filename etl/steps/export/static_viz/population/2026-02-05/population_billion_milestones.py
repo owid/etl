@@ -15,6 +15,8 @@ from etl.helpers import PathFinder
 
 # Configure matplotlib to use SVG text elements instead of paths
 matplotlib.rcParams["svg.fonttype"] = "none"
+# Set deterministic hash for reproducible SVG output
+matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
 
 paths = PathFinder(__file__)
 
