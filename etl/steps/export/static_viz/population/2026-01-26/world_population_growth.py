@@ -115,7 +115,9 @@ def run() -> None:
     fig = create_visualization(tb, year_cut, growth_rate_1700, filter_mask)
 
     # Save chart outputs
-    paths.export_fig(fig, "world_population_growth_1700_2100", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True)
+    paths.export_fig(
+        fig, "world_population_growth_1700_2100", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True
+    )
 
     plt.close(fig)
 

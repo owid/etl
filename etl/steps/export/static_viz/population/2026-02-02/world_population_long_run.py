@@ -371,7 +371,9 @@ def run() -> None:
     fig = create_visualization(tb, year_cut, life_expectancy_before_1800, life_expectancy_2023)
 
     # Save chart outputs
-    paths.export_fig(fig, "world_population_10000bce_2100", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True)
+    paths.export_fig(
+        fig, "world_population_10000bce_2100", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True
+    )
 
     plt.close(fig)
 
