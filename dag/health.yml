@@ -460,17 +460,7 @@ steps:
   #  export://multidim/health/latest/causes_of_death:
   #    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
 
-  # GBD 2021 - GBD Risk Factors cancer specific
-  data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer:
-    - snapshot-private://ihme_gbd/2024-08-26/gbd_risk_cancer.feather
-  data-private://garden/ihme_gbd/2024-08-26/gbd_risk_cancer:
-    - data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
-  data-private://grapher/ihme_gbd/2024-08-26/gbd_risk_cancer:
-    - data-private://garden/ihme_gbd/2024-08-26/gbd_risk_cancer
-
-      # GBD data on share of deaths from total cancers
+  # GBD data on share of deaths from total cancers
   data-private://garden/ihme_gbd/2026-02-11/gbd_cancers_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
   data-private://grapher/ihme_gbd/2026-02-11/gbd_cancers_deaths:
@@ -1384,3 +1374,13 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_dalys:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_dalys
+
+  # GBD 2021 - GBD Risk Factors cancer specific
+  data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_cancer:
+    - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_cancer.feather
+  data-private://garden/ihme_gbd/2026-02-07/gbd_risk_cancer:
+    - data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_cancer
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2024-07-12/un_wpp
+  data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_cancer:
+    - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_cancer
