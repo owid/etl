@@ -407,3 +407,24 @@ steps:
   #
   data://grapher/energy/2026-01-26/uk_historical_electricity:
     - data://garden/energy/2026-01-26/uk_historical_electricity
+  #
+  # Energy: global historical electricity from Pinto et al. (2023).
+  #
+  data://meadow/energy/2026-02-06/global_historical_electricity:
+    - snapshot://energy/2026-02-06/global_historical_electricity.zip
+  #
+  # Energy: global historical electricity from Pinto et al. (2023).
+  #
+  data://garden/energy/2026-02-06/global_historical_electricity:
+    - data://meadow/energy/2026-02-06/global_historical_electricity
+    - data://garden/ember/2026-01-26/yearly_electricity
+  #
+  # Energy: global historical electricity scaling.
+  #
+  data://garden/energy/2026-02-06/global_historical_electricity_scaling:
+    - data://garden/energy/2026-02-06/global_historical_electricity
+  #
+  # Energy: global historical electricity scaling.
+  #
+  data://grapher/energy/2026-02-06/global_historical_electricity_scaling:
+    - data://garden/energy/2026-02-06/global_historical_electricity_scaling
