@@ -108,6 +108,10 @@ definitions:
         - CH₄ and N₂O from Other energy sources (solid fuels, oil and natural gas, incineration and open burning of waste).
     unit: "tonnes of CO₂ equivalent"
     short_unit: "t CO₂e"
+    presentation:
+      grapher_config:
+        note: |-
+          "Other emissions" are those that cannot be allocated to any specific sector; including waste in landfills, fugitive emissions, and other fuel combustion emissions.
 
 
 dataset:
