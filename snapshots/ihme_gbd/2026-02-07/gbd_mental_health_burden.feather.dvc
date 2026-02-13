@@ -21,3 +21,7 @@ meta:
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: db3290ac88eeeff227a66f85b01f33cb
+    size: 2164330
+    path: gbd_mental_health_burden.feather
