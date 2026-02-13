@@ -10,7 +10,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -20,7 +20,7 @@ COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
 COLUMNS_INDEX_MONTH = COLUMNS_INDEX + ["month"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -141,8 +141,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -233,13 +232,13 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     tb_sex["age"] = tb_sex["age"].astype("string")
     # Separate january and july data
     msk_jan = tb["month"] == "January"
-    tb_jan = tb[msk_jan]
-    tb = tb[~msk_jan]
+    tb_jan = tb.loc[msk_jan]
+    tb = tb.loc[~msk_jan]
     tb = tb.drop(columns=["month"])
     tb_jan = tb_jan.drop(columns=["month"])
     # Remove january data for sex ratio
     tb_sex_msk = tb_sex["month"] == "January"
-    tb_sex = tb_sex[~tb_sex_msk]
+    tb_sex = tb_sex.loc[~tb_sex_msk]
     tb_sex = tb_sex.drop(columns=["month"])
 
     return tb_jan, tb, tb_sex
