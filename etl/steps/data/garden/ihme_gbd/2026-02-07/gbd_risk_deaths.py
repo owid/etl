@@ -43,7 +43,7 @@ def run() -> None:
     )
 
     # Format the tables
-    tb = tb.format(["country", "year", "metric", "measure", "rei", "age", "cause"])
+    tb = tb.format(["country", "year", "metric", "measure", "rei", "age", "cause"], short_name="gbd_risk_deaths")
 
     #
     # Save outputs.
