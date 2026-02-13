@@ -1,0 +1,39 @@
+definitions:
+  # Mapping from sector slugs to display names (braces doubled to escape YAML template processing).
+  sector_name: |-
+    << {{
+      "industry": "Making things",
+      "agriculture": "Growing food",
+      "buildings": "Keeping warm and cool",
+      "transport": "Getting around",
+      "other": "Other emissions",
+      "electricity": "Electricity",
+    }}[sector] >>
+  sector_name_lower: |-
+    << {{
+      "industry": "industry",
+      "agriculture": "agriculture, forestry, and land use",
+      "buildings": "buildings",
+      "transport": "transport",
+      "other": "other activities",
+      "electricity": "electricity",
+    }}[sector] >>
+  common:
+    display:
+      name: "{definitions.sector_name}"
+
+tables:
+  emissions_by_custom_sector_alternative:
+    variables:
+      ghg_emissions:
+        title: "Greenhouse gas emissions from {definitions.sector_name_lower}"
+        presentation:
+          title_public: "Greenhouse gas emissions from {definitions.sector_name_lower}"
+      ghg_emissions_direct:
+        title: "Direct greenhouse gas emissions from {definitions.sector_name_lower}"
+        presentation:
+          title_public: "Direct greenhouse gas emissions from {definitions.sector_name_lower}"
+      ghg_emissions_indirect:
+        title: "Indirect greenhouse gas emissions from {definitions.sector_name_lower}"
+        presentation:
+          title_public: "Indirect greenhouse gas emissions from {definitions.sector_name_lower}"

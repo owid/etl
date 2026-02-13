@@ -1,12 +1,12 @@
 """
 This step creates a dataset where we categorize greenhouse-gas emissions based on the end use of human activities.
 
-We adopt categories that follow the list of sectors created by the IPCC (AR6 WG3), and rename them in simple terms:
-- Growing food (IPCC's Agriculture, forestry and other land use).
-- Getting around (IPCC's Transport).
-- Powering and heating buildings (IPCC's Buildings).
-- Making things (IPCC's Industry).
-- Other emissions (IPCC's Other energy).
+We adopt categories that follow the list of sectors created by the IPCC (AR6 WG3):
+- agriculture (IPCC's Agriculture, forestry and other land use).
+- transport (IPCC's Transport).
+- buildings (IPCC's Buildings).
+- industry (IPCC's Industry).
+- other (IPCC's Other energy).
 
 We don't have access to this data; the closest is under a heavy paywall by the IEA.
 So we build this dataset using the following method:
@@ -47,7 +47,6 @@ https://www.ipcc.ch/report/ar6/wg3/downloads/figures/IPCC_AR6_WGIII_Figure_2_12.
 
 """
 
-from owid.datautils.dataframes import map_series
 import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder
@@ -171,19 +170,6 @@ SECTOR_CW_MAPPING = {
 # List of expected sectors to be found in the Climate Watch data.
 SECTORS_CW = sum(SECTOR_CW_MAPPING.values(), [])
 
-# Custom names for final sectors (as well as intermediate electricity sector).
-SECTOR_TITLES = {
-    "industry": "Making things",
-    "agriculture": "Growing food",
-    "buildings": "Powering and heating buildings",
-    "transport": "Getting around",
-    "other": "Other emissions",
-    "electricity": "Electricity",
-}
-
-# List of final sectors (including intermediate electricity sector).
-SECTORS = sorted(SECTOR_TITLES)
-
 # Mapping of UNdata Energy Statistics Database sectors of final electricity consumption and our list of final sectors.
 SECTOR_UN_MAPPING = {
     "industry": ["Consumption by manufacturing, construction and non-fuel industry"],
@@ -208,9 +194,11 @@ def sanity_check_inputs(tb_ghg):
     columns_sectors = [
         column for column in tb_ghg.columns if "per_capita" not in column if column not in ["country", "year"]
     ]
-    # Remove energy sector, since it's a group of subsectors; idem for total columns.
+    # Remove energy sector, since it's a group of subsectors; idem for bunker fuels and total columns.
     columns_sectors = [
-        column for column in columns_sectors if column not in ["energy", "total_excluding_lucf", "total_including_lucf"]
+        column
+        for column in columns_sectors
+        if column not in ["energy", "aviation_and_shipping", "total_excluding_lucf", "total_including_lucf"]
     ]
     error = "Unexpected list of sectors."
     assert set(columns_sectors) == set(SECTORS_CW), error
@@ -356,14 +344,9 @@ def run() -> None:
 
     # Sanity check outputs.
     # TODO: Make a function.
-    assert set(tb.dropna(subset="ghg_emissions_direct")["sector"]) == set(SECTORS)
-    assert set(tb.dropna(subset="ghg_emissions_indirect")["sector"]) == set(SECTORS) - set(["electricity"])
-    assert set(tb.dropna(subset="ghg_emissions")["sector"]) == set(SECTORS) - set(["electricity"])
-
-    # Rename sectors using the custom titles.
-    tb["sector"] = map_series(
-        tb["sector"], mapping=SECTOR_TITLES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
+    assert set(tb.dropna(subset="ghg_emissions_direct")["sector"]) == set(SECTOR_UN_MAPPING) | set(["electricity"])
+    assert set(tb.dropna(subset="ghg_emissions_indirect")["sector"]) == set(SECTOR_UN_MAPPING)
+    assert set(tb.dropna(subset="ghg_emissions")["sector"]) == set(SECTOR_UN_MAPPING)
 
     # Add an explanation to the metadata of which subsectors are included in each category.
     description_processing = "Each category is made up of the following emission subcategories, based on IPCC definitions (as reported by Climate Watch):"
