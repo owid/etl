@@ -3,6 +3,7 @@
 import ast
 from typing import cast
 
+import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
 
