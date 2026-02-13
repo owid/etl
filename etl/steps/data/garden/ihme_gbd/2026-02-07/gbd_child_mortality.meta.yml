@@ -15,9 +15,9 @@ definitions:
 macros: |-
   <% macro title(metric, age, cause, sex, unit) %>
       <% if metric == "Number" %>
-          << unit >> from << cause >>, among << sex >> aged << age >>
+          << unit|capitalize >> from << cause >>, among << sex >> aged << age >>
       <% elif metric == "Rate" %>
-          << unit >> from << cause >>, among << sex >> aged << age >> per 100,000 people
+          << unit|capitalize >> from << cause >>, among << sex >> aged << age >> per 100,000 people
       <% elif metric == "Percent" %>
           <% if unit|lower == "deaths" %>
               Share of total deaths among << sex >> aged << age >> from << cause >>
