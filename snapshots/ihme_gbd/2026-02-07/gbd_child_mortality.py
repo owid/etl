@@ -54,7 +54,7 @@ log = get_logger()
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
 BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/952c1b3a5eed6ecd0afecb8f85b98ebc_files/IHME-GBD_2023_DATA-952c1b3a-"
-NUMBER_OF_FILES =
+NUMBER_OF_FILES = 64
 
 
 @click.command()
@@ -75,7 +75,3 @@ def main(upload: bool) -> None:
 
     log.info("Uploading final file", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
     snap.create_snapshot(upload=upload, data=df)
-
-
-if __name__ == "__main__":
-    main()
