@@ -34,8 +34,8 @@ from etl.snapshot import Snapshot
 log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/971ffb43e0ba70362811a88fcc5aff70_files/IHME-GBD_2023_DATA-971ffb43-"
-NUMBER_OF_FILES = 7
+BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/85a127b7d6c3a13ad54a3584b58bbf98_files/IHME-GBD_2023_DATA-85a127b7-"
+NUMBER_OF_FILES = 23
 
 
 @click.command()
