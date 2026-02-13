@@ -334,16 +334,16 @@ steps:
   data-private://grapher/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes:
     - data-private://garden/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes
 
-  # GBD 2021 - GBD Health-adjusted Life Expectancy and Life Expectancy
-  data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy:
-    - snapshot-private://ihme_gbd/2024-07-02/gbd_life_expectancy.zip
-  data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
-    - snapshot-private://ihme_gbd/2024-07-02/gbd_healthy_life_expectancy.zip
-  data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
-    - data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy
-    - data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
-  data-private://grapher/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
-    - data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
+  # GBD 2023 - GBD Health-adjusted Life Expectancy and Life Expectancy
+  data-private://meadow/ihme_gbd/2026-02-07/gbd_life_expectancy:
+    - snapshot-private://ihme_gbd/2026-02-07/gbd_life_expectancy.zip
+  data-private://meadow/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy:
+    - snapshot-private://ihme_gbd/2026-02-07/gbd_healthy_life_expectancy.zip
+  data-private://garden/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy:
+    - data-private://meadow/ihme_gbd/2026-02-07/gbd_life_expectancy
+    - data-private://meadow/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy
+  data-private://grapher/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy:
+    - data-private://garden/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy
 
   # WHO Avian Influenza H5N1
   data://meadow/who/latest/avian_influenza_ah5n1:
