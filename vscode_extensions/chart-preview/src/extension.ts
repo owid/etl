@@ -341,6 +341,8 @@ function startWatchProcess(
 	let firstRunDone = false;
 	let cycleStart = Date.now();
 	let stepsRunning = false;  // true after "--- Running", false after step OK
+	let detectingDirty = false;  // true after "Detecting which steps", false after OK
+	let pendingReloadTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const doReload = () => {
 		const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
@@ -383,6 +385,7 @@ function startWatchProcess(
 		if (text.includes('Detecting which steps need rebuilding')) {
 			cycleStart = Date.now();
 			stepsRunning = false;
+			detectingDirty = true;
 			if (firstRunDone) {
 				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
 			}
@@ -390,20 +393,36 @@ function startWatchProcess(
 
 		if (text.includes('--- Running')) {
 			stepsRunning = true;
+			detectingDirty = false;
+			// Cancel pending reload — steps are about to run
+			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
 			if (firstRunDone) {
 				panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
 			}
 		}
 
-		// "All datasets up to date" — nothing changed, reload anyway on first run
+		// "All datasets up to date" — nothing changed
 		if (text.includes('All datasets up to date!')) {
 			stepsRunning = false;
+			detectingDirty = false;
+			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
 			doReload();
+		}
+
+		// OK after dirty detection — might mean "all up to date" (watch mode doesn't
+		// always print "All datasets up to date!"). Schedule a reload after a short
+		// delay; cancel if "--- Running" arrives before the timer fires.
+		if (detectingDirty && !stepsRunning && /OK \(\d/.test(text)) {
+			detectingDirty = false;
+			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); }
+			pendingReloadTimer = setTimeout(() => { pendingReloadTimer = null; doReload(); }, 500);
 		}
 
 		// OK after steps ran — this is the real completion
 		if (stepsRunning && /OK \(\d/.test(text)) {
 			stepsRunning = false;
+			detectingDirty = false;
+			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
 			doReload();
 		}
 
