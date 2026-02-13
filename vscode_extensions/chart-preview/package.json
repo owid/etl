@@ -40,11 +40,6 @@
           "type": "string",
           "default": ".venv/bin/etlr",
           "description": "Path to the etlr binary (relative to workspace root)"
-        },
-        "chart-preview.pythonPath": {
-          "type": "string",
-          "default": ".venv/bin/python",
-          "description": "Path to the Python binary (relative to workspace root)"
         }
       }
     }

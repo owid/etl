@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { readFile } from 'fs/promises';
 import { ChildProcess, spawn } from 'child_process';
 
 const panels = new Map<string, vscode.WebviewPanel>();
@@ -61,14 +62,20 @@ function getContainerName(branch: string): string {
 
 /**
  * Extract graph step URI and slug from a .chart.yml file path.
- * e.g. .../etl/steps/graph/animal_welfare/latest/fur-farming-ban.chart.yml
- *   -> { stepUri: "graph://animal_welfare/latest/fur-farming-ban", slug: "fur-farming-ban" }
+ * Reads the YAML file to get the actual slug (important for mdim charts
+ * where the slug like "covid/covid#covid_cases" differs from the filename).
+ * Falls back to the filename if no slug field is found.
  */
-function parseChartYml(filePath: string, wsRoot: string): { stepUri: string; slug: string } {
+async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUri: string; slug: string }> {
 	const graphDir = path.join(wsRoot, 'etl', 'steps', 'graph');
 	const rel = path.relative(graphDir, filePath);
 	const stepPath = rel.replace('.chart.yml', '');
-	const slug = path.basename(stepPath);
+
+	// Read YAML and extract top-level slug field
+	const content = await readFile(filePath, 'utf8');
+	const match = content.match(/^slug:\s*(.+)$/m);
+	const slug = match ? match[1].trim() : path.basename(stepPath);
+
 	return { stepUri: `graph://${stepPath}`, slug };
 }
 
@@ -88,8 +95,13 @@ function chartIframeDoc(grapherSrc: string, containerName: string): string {
 	return `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta http-equiv="Content-Security-Policy" content="${csp}"/><style>html,body{height:100%;margin:0;padding:0}figure{width:100%;height:600px;margin:0;border:0}</style></head><body><figure data-grapher-src="${grapherSrc}"></figure><script src="http://${containerName}/assets/embedCharts.js"><\/script></body></html>`;
 }
 
-function generateEmbedHtml(grapherSrc: string, containerName: string, info: InfoBarData): string {
-	const srcdoc = chartIframeDoc(grapherSrc, containerName).replace(/"/g, '&quot;');
+function generateEmbedHtml(grapherSrc: string, containerName: string, info: InfoBarData, isMdim: boolean): string {
+	// For mdim charts, load the page directly in an iframe (embed mechanism doesn't support mdim).
+	// For regular charts, use the embed mechanism with data-grapher-src.
+	const iframeTag = isMdim
+		? `<iframe id="chart-frame" src="${grapherSrc}"></iframe>`
+		: `<iframe id="chart-frame" srcdoc="${chartIframeDoc(grapherSrc, containerName).replace(/"/g, '&quot;')}"></iframe>`;
+
 	return `<!DOCTYPE html>
 <html>
 <head>
@@ -127,9 +139,10 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
         <div class="row"><span class="label">Status</span> <span id="status" class="status-ok">${info.status}</span></div>
         <div class="row"><span class="label">Latency</span> <span id="latency">${info.latency || '-'}</span></div>
     </div>
-    <iframe id="chart-frame" srcdoc="${srcdoc}"></iframe>
+    ${iframeTag}
     <script>
         const containerName = '${containerName}';
+        const isMdim = ${isMdim};
         window.addEventListener('message', (e) => {
             const msg = e.data;
             if (msg.type === 'status') {
@@ -142,9 +155,13 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
             }
             if (msg.type === 'reload') {
                 const frame = document.getElementById('chart-frame');
-                const csp = "default-src * \\'unsafe-inline\\' \\'unsafe-eval\\' data: blob:;";
-                const doc = '<!DOCTYPE html><html><head><meta charset="utf-8"/><meta http-equiv="Content-Security-Policy" content="' + csp + '"/><style>html,body{height:100%;margin:0;padding:0}figure{width:100%;height:600px;margin:0;border:0}</style></head><body><figure data-grapher-src="' + msg.src + '"></figure><script src="http://' + containerName + '/assets/embedCharts.js"><\\/script></body></html>';
-                frame.srcdoc = doc;
+                if (isMdim) {
+                    frame.src = msg.src;
+                } else {
+                    const csp = "default-src * \\'unsafe-inline\\' \\'unsafe-eval\\' data: blob:;";
+                    const doc = '<!DOCTYPE html><html><head><meta charset="utf-8"/><meta http-equiv="Content-Security-Policy" content="' + csp + '"/><style>html,body{height:100%;margin:0;padding:0}figure{width:100%;height:600px;margin:0;border:0}</style></head><body><figure data-grapher-src="' + msg.src + '"></figure><script src="http://' + containerName + '/assets/embedCharts.js"><\\/script></body></html>';
+                    frame.srcdoc = doc;
+                }
             }
         });
     </script>
@@ -255,8 +272,13 @@ async function openPreview(filePath: string) {
 	try {
 		const branch = await getGitBranch(wsRoot);
 		const containerName = getContainerName(branch);
-		const { stepUri, slug } = parseChartYml(filePath, wsRoot);
-		const stagingUrl = `http://${containerName}/grapher/${slug}`;
+		const { stepUri, slug } = await parseChartYml(filePath, wsRoot);
+		const isMdim = slug.includes('#');
+		const encodedSlug = encodeURIComponent(slug);
+		// Mdim charts are served at /admin/grapher/{encoded_slug}, regular at /grapher/{slug}
+		const stagingUrl = isMdim
+			? `http://${containerName}/admin/grapher/${encodedSlug}`
+			: `http://${containerName}/grapher/${slug}`;
 
 		const panel = vscode.window.createWebviewPanel(
 			'chartPreview',
@@ -279,7 +301,7 @@ async function openPreview(filePath: string) {
 
 		panel.webview.html = getLoadingHtml(command);
 
-		startWatchProcess(filePath, panel, wsRoot, stepUri, stagingUrl, containerName);
+		startWatchProcess(filePath, panel, wsRoot, stepUri, stagingUrl, containerName, isMdim);
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err);
 		vscode.window.showErrorMessage(`Chart preview failed: ${msg}`);
@@ -293,6 +315,7 @@ function startWatchProcess(
 	stepUri: string,
 	stagingUrl: string,
 	containerName: string,
+	isMdim: boolean,
 ) {
 	killWatchProcess(filePath);
 
@@ -326,7 +349,7 @@ function startWatchProcess(
 
 		if (!firstRunDone) {
 			const bustUrl = `${stagingUrl}?_t=${Date.now()}`;
-			panel.webview.html = generateEmbedHtml(bustUrl, containerName, info);
+			panel.webview.html = generateEmbedHtml(bustUrl, containerName, info, isMdim);
 			firstRunDone = true;
 		} else {
 			panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });

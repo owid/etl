@@ -228,7 +228,7 @@ FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 # if set, graph steps push ETL metadata to database, overwriting manual edits
 GRAPH_PUSH = env.get("GRAPH_PUSH") in ("True", "true", "1")
 
-# if set, graph steps pull database metadata to local .meta.yml
+# if set, graph steps pull database metadata to local .chart.yml
 GRAPH_PULL = env.get("GRAPH_PULL") in ("True", "true", "1")
 
 # if set, graph steps will upsert charts to database

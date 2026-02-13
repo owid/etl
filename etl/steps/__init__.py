@@ -1152,7 +1152,7 @@ class GraphStep(Step):
 
     Graph steps create or update charts based on indicator dependencies.
     Single-indicator graphs can inherit metadata from the indicator's grapher_config.
-    Multi-indicator graphs require explicit metadata in a .meta.yml file.
+    Multi-indicator graphs require explicit metadata in a .chart.yml file.
 
     Example:
         graph://fur-farming-ban
@@ -1181,8 +1181,8 @@ class GraphStep(Step):
 
     @property
     def metadata_file(self) -> Optional[Path]:
-        """Path to .meta.yml file."""
-        meta_file = self._step_dir.with_suffix(".meta.yml")
+        """Path to .chart.yml file."""
+        meta_file = self._step_dir.with_suffix(".chart.yml")
         return meta_file if meta_file.exists() else None
 
     @property
@@ -1338,12 +1338,12 @@ class GraphStep(Step):
         c.save()
 
     def _pull_from_database(self) -> None:
-        """Pull chart configuration from database and write to .meta.yml file."""
+        """Pull chart configuration from database and write to .chart.yml file."""
         from etl.dag_helpers import load_dag
         from etl.grapher.graph import pull_graph
 
         # Get metadata file path (create if doesn't exist)
-        metadata_file = self._step_dir.with_suffix(".meta.yml")
+        metadata_file = self._step_dir.with_suffix(".chart.yml")
 
         # Get dependencies from DAG
         dag = load_dag()
