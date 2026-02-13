@@ -114,7 +114,7 @@ def run() -> None:
     tb_fertility = set_variant_to_estimates(tb_fertility)
     tb_fertility = estimate_tfr_owid_regions(tb_fertility, tb_births, tb_population)
 
-    tb_fertility = tb_fertility.format(COLUMNS_INDEX)
+    tb_fertility = tb_fertility.format(COLUMNS_INDEX, short_name="fertility_rate")
 
     # FERTILITY BY AGE (distribution) #
     tb_fertility_births_single = process_fertility_births_single(tb_fertility_births_single)
