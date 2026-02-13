@@ -43,7 +43,7 @@ def run() -> None:
     if len(tb["sex"].unique() == 1):
         tb = tb.drop(columns="sex")
     # Split up the causes of blindness
-    tb = other_vision_loss_minus_some_causes(tb)
+    # tb = other_vision_loss_minus_some_causes(tb)
     # Add region aggregates.
     tb = add_regional_aggregates(
         tb, ds_regions, ds_population, index_cols=["country", "year", "metric", "cause", "impairment", "age"]
