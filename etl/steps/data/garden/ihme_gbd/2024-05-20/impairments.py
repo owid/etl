@@ -7,7 +7,7 @@ from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.data_helpers.population import add_population
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -22,7 +22,7 @@ AGE_GROUPS_RANGES = {
 }
 
 
-def run() -> None:
+def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
@@ -37,7 +37,9 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = paths.regions.harmonize_names(tb)
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     # Dropping sex column as we only have values for both sexes
     if len(tb["sex"].unique() == 1):
         tb = tb.drop(columns="sex")
@@ -55,7 +57,8 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(
+    ds_garden = create_dataset(
+        dest_dir,
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,

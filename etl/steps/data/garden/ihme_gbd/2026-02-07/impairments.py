@@ -104,21 +104,34 @@ def other_vision_loss_minus_some_causes(tb: Table) -> Table:
     tb_other_vision_loss = tb[
         (tb["cause"] == "Other vision loss") & (tb["metric"] == "Number") & (tb["impairment"] == "Blindness")
     ].copy()
+    print(f"DEBUG: tb_other_vision_loss has {len(tb_other_vision_loss)} rows")
+
     # Get the trachoma, malaria and onchocerciasis data
     tb[["cause", "metric", "impairment"]] = tb[["cause", "metric", "impairment"]].astype(str)
     msk = (tb["cause"].isin(causes_to_subtract)) & (tb["metric"] == "Number") & (tb["impairment"] == "Blindness")
     tb_trachoma = tb[msk].copy()
+    print(f"DEBUG: tb_trachoma (before groupby) has {len(tb_trachoma)} rows")
+
     tb_trachoma = tb_trachoma.groupby(["country", "year", "metric", "impairment", "age"])["value"].sum().reset_index()
     tb_trachoma["cause"] = "Trachoma, malaria and onchocerciasis"
+    print(f"DEBUG: tb_trachoma (after groupby) has {len(tb_trachoma)} rows")
 
     tb_combine = tb_other_vision_loss.merge(
         tb_trachoma, on=["country", "year", "metric", "impairment", "age"], suffixes=("", "_trachoma")
     )
+    print(f"DEBUG: tb_combine (after merge) has {len(tb_combine)} rows")
+
     tb_combine["value"] = tb_combine["value"] - tb_combine["value_trachoma"]
     tb_combine["cause"] = "Other vision loss minus trachoma, malaria and onchocerciasis"
 
     tb_combine = tb_combine.drop(columns=["value_trachoma", "cause_trachoma"])
 
+    print(f"DEBUG: Original tb has {len(tb)} rows, tb_combine has {len(tb_combine)} rows")
+    print(f"DEBUG: Unique causes in tb_combine: {tb_combine['cause'].unique()}")
+
     tb = pr.concat([tb, tb_combine], ignore_index=True)
+
+    print(f"DEBUG: After concat, tb has {len(tb)} rows")
+    print(f"DEBUG: Unique causes after concat: {tb['cause'].unique()}")
 
     return tb
