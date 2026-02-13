@@ -1,44 +1,63 @@
 """
-We want to create a visualization showing the share of emissions that are produced by a custom list of sectors, namely:
-- Growing food
-- Getting around
-- Keeping warm and cool
-- Electricity
-- Making things
+This step creates a dataset where we categorize greenhouse-gas emissions based on the end use of human activities.
 
-Unfortunately, the most useful data to be able to create these custom categories is the IEA, which is under a heavy paywall. I haven't found a perfect mapping onto those categories from publicly available data.
+We adopt categories that follow the list of sectors created by the IPCC (AR6 WG3), and rename them in simple terms:
+- Growing food (IPCC's Agriculture, forestry and other land use).
+- Getting around (IPCC's Transport).
+- Powering and heating buildings (IPCC's Buildings).
+- Making things (IPCC's Industry).
+- Other emissions (IPCC's Other energy).
 
-Climate Watch (where we get our data for emissions by sector) has the following sectors:
-- Agriculture
-- Building
-- Bunker Fuels
-- Electricity/Heat
-- Fugitive Emissions
-- Industrial Processes
-- Land-Use Change and Forestry
-- Manufacturing/Construction
-- Other Fuel Combustion
-- Transportation
-- Waste
+We don't have access to this data; the closest is under a heavy paywall by the IEA.
+So we build this dataset using the following method:
 
-These don't map perfectly well to our desired categories (especially Electricity/Heat); but an approximate mapping is possible.
-Climate Watch's original data does have more granularity than this, but they don't provide access to the more granular data (because it indeed comes from IEA).
+1. Load WRI's Climate Watch data, which provides GHG emissions for the following sectors:
+    - Agriculture
+    - Building
+    - Bunker Fuels
+    - Electricity/Heat
+    - Fugitive Emissions
+    - Industrial Processes
+    - Land-Use Change and Forestry
+    - Manufacturing/Construction
+    - Other Fuel Combustion
+    - Transportation
+    - Waste
+
+2. Aggregate these "direct" emissions onto intermediate sectors using the following mapping:
+    Agriculture: Agriculture + Land-Use Change and Forestry
+    Transport: Transport + Bunker Fuels
+    Buildings: Buildings
+    Electricity: Electricity/Heat
+    Industry: Manufacturing/Construction + Industrial Processes
+    Other: Other Fuel Combustion + Waste + Fugitive Emissions
+
+3. Load UNdata's Energy Statistics Database, which includes data on final electricity consumption by those intermediate sectors.
+
+4. Calculate the share of electricity that is devoted to each of the other intermediate sectors. For example, we find the percentage of final electricity that is used in buildings, in industry, etc.
+
+5. Multiply electricity emissions by those shares, to obtain the "indirect" emissions of each sector. For example, we find the amount of emissions involved in the production of electricity that is used in buildings, in industry, etc.
+
+6. Add direct and indirect emissions of each sector. This way, we end up with the total (direct + indirect) emissions of Agriculture, Transport, Buildings, Industry, and Other.
+
+7. Finally, for convenience, we rename those sectors to use the simple terms mentioned above (e.g. Growing food, Getting around, etc.).
+
+This IPCC chart helps understand the logic behind this method:
+https://www.ipcc.ch/report/ar6/wg3/downloads/figures/IPCC_AR6_WGIII_Figure_2_12.png
 
 """
 
-import owid.catalog.processing as pr
+from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
-from pathlib import Path
-import pandas as pd
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Custom remapping of Climate Watch subsectors into our custom categories.
-# See WRI's documentation for the meaning of each sector:
+# Custom remapping of Climate Watch subsectors into intermediate sectors.
+# We added (in comments) the description of each sector, taken from WRI's documentation:
 # https://wri-sites.s3.us-east-1.amazonaws.com/climatewatch.org/www.climatewatch.org/climate-watch/wri_metadata/CW_GHG_Method_Note.pdf
-# Also see distribution of subsectors (as of 2026-02-11, the latest data is still for 2021!):
+# You can also see the distribution of subsectors (as of 2026-02-11, the latest data is still for 2021) here:
 # https://www.wri.org/data/world-greenhouse-gas-emissions-sector-2021-sunburst-chart
 SECTOR_CW_MAPPING = {
     "agriculture": [
@@ -147,17 +166,10 @@ SECTOR_CW_MAPPING = {
     ],
 }
 
-# Create a list of expected sectors to be found in the Climate Watch data.
+# List of expected sectors to be found in the Climate Watch data.
 SECTORS_CW = sum(SECTOR_CW_MAPPING.values(), [])
 
-COLUMNS_UN = {
-    "Country or Area": "country",
-    "Year": "year",
-    "Commodity - Transaction": "sector",
-    "Unit": "unit",
-    "Quantity": "value",
-}
-
+# Custom names for final sectors (as well as intermediate electricity sector).
 SECTOR_TITLES = {
     "industry": "Making things",
     "agriculture": "Growing food",
@@ -166,7 +178,11 @@ SECTOR_TITLES = {
     "other": "Other emissions",
     "electricity": "Electricity",
 }
+
+# List of final sectors (including intermediate electricity sector).
 SECTORS = sorted(SECTOR_TITLES)
+
+# Mapping of UNdata Energy Statistics Database sectors of final electricity consumption and our list of final sectors.
 SECTOR_UN_MAPPING = {
     "industry": ["Consumption by manufacturing, construction and non-fuel industry"],
     "agriculture": ["Consumption by agriculture, forestry and fishing"],
@@ -177,8 +193,11 @@ SECTOR_UN_MAPPING = {
     ],
     "other": ["Consumption not elsewhere specified (other)"],
 }
+
+# List of UNdata sectors.
 SECTORS_UN = sum(SECTOR_UN_MAPPING.values(), [])
 
+# Name of UNdata sector for final energy consumption (we check that it coincides with the sum of final electricity consumption sectors).
 COLUMN_UN_FINAL_ENERGY = "Final energy consumption"
 
 
@@ -322,8 +341,6 @@ def run() -> None:
     assert set(tb.dropna(subset="ghg_emissions")["sector"]) == set(SECTORS) - set(["electricity"])
 
     # Rename sectors using the custom titles.
-    from owid.datautils.dataframes import map_series
-
     tb["sector"] = map_series(
         tb["sector"], mapping=SECTOR_TITLES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
     )
