@@ -106,6 +106,8 @@ definitions:
         - Faring and venting.
         - Transmission and distribution.
         - CH₄ and N₂O from Other energy sources (solid fuels, oil and natural gas, incineration and open burning of waste).
+    unit: "tonnes of CO₂ equivalent"
+    short_unit: "t CO₂e"
 
 
 dataset:
@@ -113,17 +115,11 @@ dataset:
 
 tables:
   emissions_by_custom_sector_alternative:
-    title: Emissions by custom sector including indirect emissions
+    title: Emissions by human activity including indirect emissions from electricity
     variables:
       ghg_emissions:
-        title: Global greenhouse gas emissions by human activity (direct and indirect emissions)
-        unit: "tonnes of CO₂ equivalent"
-        short_unit: "t CO₂e"
+        title: Greenhouse gas emissions by human activity (direct and indirect emissions)
       ghg_emissions_direct:
-        title: Global greenhouse gas emissions by human activity (direct emissions)
-        unit: "tonnes of CO₂ equivalent"
-        short_unit: "t CO₂e"
+        title: Greenhouse gas emissions by human activity (direct emissions)
       ghg_emissions_indirect:
-        title: Global greenhouse gas emissions by human activity (indirect emissions)
-        unit: "tonnes of CO₂ equivalent"
-        short_unit: "t CO₂e"
+        title: Greenhouse gas emissions by human activity (indirect emissions)

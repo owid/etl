@@ -12,16 +12,7 @@ def run() -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("emissions_by_custom_sector_alternative")
-    tb = ds_garden.read("emissions_by_custom_sector_alternative")
-
-    #
-    # Prepare data.
-    #
-    # Adapt to grapher format.
-    tb = tb.drop(columns=["country"]).rename(columns={"sector": "country"}, errors="raise")
-
-    # Improve format.
-    tb = tb.format()
+    tb = ds_garden.read("emissions_by_custom_sector_alternative", reset_index=False)
 
     #
     # Save outputs.

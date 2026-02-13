@@ -48,6 +48,7 @@ https://www.ipcc.ch/report/ar6/wg3/downloads/figures/IPCC_AR6_WGIII_Figure_2_12.
 """
 
 from owid.datautils.dataframes import map_series
+import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder
 
@@ -214,16 +215,15 @@ def sanity_check_inputs(tb_ghg):
     assert set(columns_sectors) == set(SECTORS_CW), error
 
     # Ensure that the sum of all sector emissions yields the total of emissions (within a few percent).
-    tb_ghg["sum"] = tb_ghg[columns_sectors].sum(axis=1)
+    _tb = tb_ghg[tb_ghg["country"] == "World"].reset_index(drop=True)
+    _tb["sum"] = _tb[columns_sectors].sum(axis=1)
     # NOTE: It seems that the sum is systematically a few percent higher than the total.
     # This may be a problem in the original data (possibly due to rounding).
     error = "Sum of emissions differs from total more than a few percent"
-    assert (
-        (100 * abs(tb_ghg["sum"] - tb_ghg["total_including_lucf"]) / tb_ghg["total_including_lucf"]) < 4
-    ).all(), error
+    assert ((100 * abs(_tb["sum"] - _tb["total_including_lucf"]) / _tb["total_including_lucf"]) < 4).all(), error
     # Uncomment to compare visually.
     # import plotly.express as px
-    # px.line(tb_ghg[["year", "sum", "total_including_lucf"]].melt(id_vars=["year"]), x="year", y="value", color="variable", markers=True).show()
+    # px.line(_tb[["year", "sum", "total_including_lucf"]].melt(id_vars=["year"]), x="year", y="value", color="variable", markers=True).update_yaxes(range=[0, None]).show()
 
 
 def run() -> None:
@@ -242,7 +242,7 @@ def run() -> None:
     # Process data.
     #
     # Select only global data.
-    tb_ghg = tb_ghg[tb_ghg["country"] == "World"].reset_index(drop=True)
+    # tb_ghg = tb_ghg[tb_ghg["country"] == "World"].reset_index(drop=True)
 
     # Rename columns in Climate Watch table, for convenience.
     tb_ghg = tb_ghg.rename(
@@ -295,29 +295,48 @@ def run() -> None:
 
     # TODO: The final year is clearly incomplete (it drops suddenly). Assert this drop in the data and then remove the latest year.
     tb_un = tb_un[tb_un["year"] < tb_un["year"].max()].reset_index(drop=True)
-    # TODO: Instead of selecting global emissions and global shares and then combining, it would be more accurate to calculate shares at the country level, get their emissions, and then add them up. But this involves harmonization and a few more subtleties.
-    # For now, work at the global level.
-    tb_un = tb_un.groupby(["year", "sector"], as_index=False).agg({"value": "sum"})
 
     # Create shares of final electricity consumption by custom sectors.
     # TODO: Fix missing origins in the following operation.
-    tb_un = tb_un.rename(columns={"value": ""}).pivot(index=["year"], columns=["sector"], join_column_levels_with="")
+    tb_un = tb_un.rename(columns={"value": ""}).pivot(
+        index=["country", "year"], columns=["sector"], join_column_levels_with=""
+    )
     tb_un = tb_un.rename(columns={COLUMN_UN_FINAL_ENERGY: "total"}, errors="raise")
     for sector, subsectors in SECTOR_UN_MAPPING.items():
         tb_un[sector] = tb_un[subsectors].sum(axis=1) / tb_un["total"]
     # Keep only new aggregate sector columns.
-    tb_un = tb_un[["year"] + list(SECTOR_UN_MAPPING)].assign(**{"country": "World"})
+    tb_un = tb_un[["country", "year"] + list(SECTOR_UN_MAPPING)]
 
     # For convenience, transpose table.
     tb_un = tb_un.melt(id_vars=["country", "year"], value_name="electricity_share", var_name="sector")
+
+    # TODO: Make a function.
+    # UNdata has data for Switzerland-Liechtenstein, as well as for Liechtenstein.
+    # However, the latter country only has data for sector "other", and the full electricity share goes there.
+    error = "Expected Switzerland to be missing in UNdata (since it contains Switzerland-Liechtenstein)."
+    assert set(tb_ghg["country"]) - set(tb_un["country"]) == {"Switzerland"}, error
+    error = "Expected Liechtenstein to only have data for 'other' sector, with the full share of electricity."
+    liech_nonzero = tb_un[(tb_un["country"] == "Liechtenstein") & (tb_un["electricity_share"] > 0)]
+    assert (liech_nonzero["sector"] == "other").all() and (liech_nonzero["electricity_share"] == 1).all(), error
+    # I don't understand the details of this split.
+    # For the purpose of this step (where we calculate shares of electrycity) for now we can simply assume that the shares of final electricity consumption of both countries are the same.
+    # So, I'll drop Liechtenstein data, then rename "Switzerland-Liechtenstein" -> "Switzerland", and then repeat Switzerland's data, and assign it to Liechtenstein.
+    tb_un.loc[tb_un["country"] == "Switzerland-Liechtenstein", "country"] = "Switzerland"
+    tb_un = pr.concat(
+        [
+            tb_un[tb_un["country"] != "Liechtenstein"],
+            tb_un[tb_un["country"] == "Switzerland"].assign(**{"country": "Liechtenstein"}),
+        ],
+        ignore_index=True,
+    )
 
     # Combine both tables.
     tb = tb_ghg.merge(tb_un, on=["country", "year", "sector"], how="outer")
 
     # Add total emissions from electricity as a new column.
     tb = tb.merge(
-        tb[tb["sector"] == "electricity"][["year", "ghg_emissions"]],
-        on=["year"],
+        tb[tb["sector"] == "electricity"][["country", "year", "ghg_emissions"]],
+        on=["country", "year"],
         how="left",
         suffixes=("", "_electricity_total"),
     )
