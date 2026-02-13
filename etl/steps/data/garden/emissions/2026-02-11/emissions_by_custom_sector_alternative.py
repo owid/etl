@@ -96,7 +96,8 @@ SECTOR_CW_MAPPING = {
         "transport",
         # Bunker fuels contain CO2 emissions from international marine and aviation bunkers. The split of domestic and international are determined by the departure and landing locations, and not by the nationality of the ship/airline.
         # Bunker Fuels are shown as a sector, but excluded from national totals for Energy (including energy subsector Transport) and Total GHG emissions, in accordance with IPCC Guidelines. In other words, except at World level, Total GHG emissions (and accordingly Energy sector, and Transport sub-sector emissions) do not include bunker fuel emissions.
-        "aviation_and_shipping",
+        # NOTE: We should not add aviation and shipping to transport. It is already included in World's transport, and it should be ignored at the country level.
+        # "aviation_and_shipping",
     ],
     "buildings": [
         # Building subsector contains CO2, CH4 and N2O emissions from following activities:
