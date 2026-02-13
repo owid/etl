@@ -15,10 +15,14 @@ meta:
     attribution_short: "IHME-GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
-    url_download: https://dl.healthdata.org:443/gbd-api-2021-public/2e73124b9e47e12c1a01e41e4049a923_files/IHME-GBD_2021_DATA-2e73124b-1.zip
+    url_download: https://dl.healthdata.org/gbd-api-2023-collaborator/f34fa8ea423eb533d824bc276374add0_files/IHME-GBD_2023_DATA-f34fa8ea-1.zip
     date_accessed: "2026-02-07"
 
     # License
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: 866ec6e04533c6a94bde86b445248cb5
+    size: 242153
+    path: gbd_life_expectancy.zip
