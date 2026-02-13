@@ -17,8 +17,8 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("gbd_mental_health_burden")
     # Read table from meadow dataset.
-    tb = tb.drop(columns=["population_group_name"])
     tb = ds_meadow["gbd_mental_health_burden"].reset_index()
+    tb = tb.drop(columns=["population_group_name"])
     tb = paths.regions.harmonize_names(tb)
 
     # Add a share of the population column
