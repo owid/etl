@@ -103,6 +103,32 @@ MT_TO_T = 1e6
 # Convert million tonnes to kilograms (for per capita indicators).
 MT_TO_KG = 1e9
 
+# Sectors that should add up to "Energy emissions".
+SECTORS_ENERGY = [
+    "Buildings emissions",
+    "Electricity and heat emissions",
+    "Fugitive emissions",
+    "Manufacturing and construction emissions",
+    "Other fuel combustion emissions",
+    "Transport emissions",
+]
+# Sectors that should add up to "Total emissions excluding LUCF".
+# Note: bunker fuels should not be included in totals. They are included as part of Transport for World,
+# but for individual countries, they are not included either in Transport, or in Totals.
+SECTORS_TOTAL_EXCL_LUCF = [
+    "Agriculture emissions",
+    "Buildings emissions",
+    "Electricity and heat emissions",
+    "Fugitive emissions",
+    "Industry emissions",
+    "Manufacturing and construction emissions",
+    "Other fuel combustion emissions",
+    "Transport emissions",
+    "Waste emissions",
+]
+# Sectors that should add up to "Total emissions including LUCF".
+SECTORS_TOTAL_INCL_LUCF = SECTORS_TOTAL_EXCL_LUCF + ["Land-use change and forestry emissions"]
+
 # List of countries for which the sum of sectorial emissions don't add up to the total.
 # The sum of their emissions from energy sectors do not add up to the Energy emissions either.
 EXPECTED_COUNTRIES_WITH_ISSUES = ["Andorra", "East Timor", "Liechtenstein"]
@@ -181,92 +207,17 @@ def create_table_for_gas(tb: Table, gas: str) -> Table:
     return tb_gas
 
 
-def sanity_check_outputs(tb):
-    # For World, transport includes bunker fuels (for individual countries, it does not).
-    _tb = tb[
-        (tb["country"] == "World") & (tb["sector"].isin(["Transport emissions", "Aviation and shipping emissions"]))
-    ].pivot(index=["country", "year", "gas"], columns=["sector"], join_column_levels_with="_")
-    assert _tb[_tb["value_Transport emissions"] < _tb["value_Aviation and shipping emissions"]].empty, error
-    error = "For World, transport should always be larger than bunker fuels."
+def _check_sectors_sum_to_total(tb, sectors_group, sector_total, check_label):
+    """Check that the sum of a group of sectors matches a total sector, for each gas and country.
 
-    # Check that Total * are the sum of all individual sectors.
-    sector_lucf = "Land-use change and forestry emissions"
-    sector_total_excl_lucf = "Total emissions excluding LUCF"
-    sector_total_incl_lucf = "Total emissions including LUCF"
-    # List of sectors that should add up to total excluding LULUCF.
-    sectors_all_excl_lucf = [
-        "Agriculture emissions",
-        # Note that bunker fuels should not be included. They are included as part of Transport for World, but for individual countries, they are not included either in Transport, or in Totals.
-        # 'Aviation and shipping emissions',
-        "Buildings emissions",
-        "Electricity and heat emissions",
-        "Fugitive emissions",
-        "Industry emissions",
-        "Manufacturing and construction emissions",
-        "Other fuel combustion emissions",
-        "Transport emissions",
-        "Waste emissions",
-    ]
-    sectors_all_incl_lucf = sectors_all_excl_lucf + [sector_lucf]
-    # Initialise a new list (to check that the list of countries with issues is as expected).
-    found_countries_with_issues = []
+    Returns the set of countries where the sum diverges from the total (above a small threshold).
+    """
+    found_countries_with_issues = set()
     for gas in sorted(set(tb["gas"])):
         for country in sorted(set(tb["country"])):
             _tb = tb[(tb["country"] == country) & (tb["gas"] == gas)].reset_index(drop=True)
-            for case in ["excl. lucf", "incl. lucf"]:
-                group = sectors_all_excl_lucf if case == "excl. lucf" else sectors_all_incl_lucf
-                total = sector_total_excl_lucf if case == "excl. lucf" else sector_total_incl_lucf
-                _tb_sum = (
-                    _tb[(_tb["sector"].isin(group))]
-                    .groupby("year", as_index=False)
-                    .agg({"value": "sum"})
-                    .assign(**{"source": f"sum {case}"})
-                )
-                _tb_total = _tb[(_tb["sector"] == total)].reset_index(drop=True).assign(**{"source": f"total {case}"})
-                _tb_compared = _tb_sum.merge(_tb_total, on="year", suffixes=("_sum", "_total"))
-                _tb_compared["pct_diff"] = 100 * (
-                    abs(_tb_compared["value_sum"] - _tb_compared["value_total"]) / _tb_compared["value_total"]
-                )
-                _tb_compared["abs_diff"] = abs(_tb_compared["value_sum"] - _tb_compared["value_total"])
-                # Ignore large percentage deviations on small numbers.
-                _tb_issues = _tb_compared[(_tb_compared["abs_diff"] > 0.1) & (_tb_compared["pct_diff"] > 5)]
-                if not _tb_issues.empty:
-                    # Uncomment to plot countries with identified issues.
-                    # import owid.catalog.processing as pr
-                    # import plotly.express as px
-                    # px.line(pr.concat([_tb_sum, _tb_total]), x="year", y="value", color="source", markers=True, title=f"{gas} - {country}").show()
-                    if country not in EXPECTED_COUNTRIES_WITH_ISSUES:
-                        error = f"Expected sum of sectors to add up to total excluding LUCF ({gas} - {country}: {_tb_issues['pct_diff'].max()}). Consider adding it to the list of countries with known issues."
-                        log.error(error)
-                    found_countries_with_issues.append(country)
-    error = "Update the list of countries with issues."
-    assert set(found_countries_with_issues) == set(EXPECTED_COUNTRIES_WITH_ISSUES), error
-
-    # Check that Energy is the sum of all individual energy sectors.
-    sector_energy = "Energy emissions"
-    # List of sectors that should add up to Energy.
-    sectors_all_energy = [
-        # Note that bunker fuels should not be included. They are included as part of Transport for World, but for individual countries, they are not included either in Transport, or in Totals.
-        # 'Aviation and shipping emissions',
-        "Buildings emissions",
-        "Electricity and heat emissions",
-        "Fugitive emissions",
-        "Manufacturing and construction emissions",
-        "Other fuel combustion emissions",
-        "Transport emissions",
-    ]
-    # Initialise a new list (to check that the list of countries with issues is as expected).
-    found_countries_with_issues = []
-    for gas in sorted(set(tb["gas"])):
-        for country in sorted(set(tb["country"])):
-            _tb = tb[(tb["country"] == country) & (tb["gas"] == gas)].reset_index(drop=True)
-            _tb_sum = (
-                _tb[(_tb["sector"].isin(sectors_all_energy))]
-                .groupby("year", as_index=False)
-                .agg({"value": "sum"})
-                .assign(**{"source": f"sum"})
-            )
-            _tb_total = _tb[(_tb["sector"] == sector_energy)].reset_index(drop=True).assign(**{"source": f"total"})
+            _tb_sum = _tb[_tb["sector"].isin(sectors_group)].groupby("year", as_index=False).agg({"value": "sum"})
+            _tb_total = _tb[_tb["sector"] == sector_total][["year", "value"]].reset_index(drop=True)
             _tb_compared = _tb_sum.merge(_tb_total, on="year", suffixes=("_sum", "_total"))
             _tb_compared["pct_diff"] = 100 * (
                 abs(_tb_compared["value_sum"] - _tb_compared["value_total"]) / _tb_compared["value_total"]
@@ -275,16 +226,44 @@ def sanity_check_outputs(tb):
             # Ignore large percentage deviations on small numbers.
             _tb_issues = _tb_compared[(_tb_compared["abs_diff"] > 0.1) & (_tb_compared["pct_diff"] > 5)]
             if not _tb_issues.empty:
-                # Uncomment to plot countries with identified issues.
-                # import owid.catalog.processing as pr
-                # import plotly.express as px
-                # px.line(pr.concat([_tb_sum, _tb_total]), x="year", y="value", color="source", markers=True, title=f"{gas} - {country}").show()
                 if country not in EXPECTED_COUNTRIES_WITH_ISSUES:
-                    error = f"Expected sum of energy sectors to add up to Energy ({gas} - {country}: {_tb_issues['pct_diff'].max()}). Consider adding it to the list of countries with known issues."
-                    log.error(error)
-                found_countries_with_issues.append(country)
+                    log.error(
+                        f"{check_label} ({gas} - {country}: {_tb_issues['pct_diff'].max():.1f}%). Consider adding it to the list of countries with known issues."
+                    )
+                found_countries_with_issues.add(country)
+    return found_countries_with_issues
+
+
+def sanity_check_outputs(tb):
+    # For World, transport includes bunker fuels (for individual countries, it does not).
+    _tb = tb[
+        (tb["country"] == "World") & (tb["sector"].isin(["Transport emissions", "Aviation and shipping emissions"]))
+    ].pivot(index=["country", "year", "gas"], columns=["sector"], join_column_levels_with="_")
+    error = "For World, transport should always be larger than bunker fuels."
+    assert _tb[_tb["value_Transport emissions"] < _tb["value_Aviation and shipping emissions"]].empty, error
+
+    found_countries_with_issues = set()
+    # Check that the sum of all individual sectors adds up to total excluding LUCF.
+    found_countries_with_issues |= _check_sectors_sum_to_total(
+        tb,
+        SECTORS_TOTAL_EXCL_LUCF,
+        "Total emissions excluding LUCF",
+        "Expected sum of sectors to add up to total excluding LUCF.",
+    )
+    # Check that the sum of all individual sectors (including LUCF) adds up to total including LUCF.
+    found_countries_with_issues |= _check_sectors_sum_to_total(
+        tb,
+        SECTORS_TOTAL_INCL_LUCF,
+        "Total emissions including LUCF",
+        "Expected sum of sectors to add up to total including LUCF.",
+    )
+    # Check that the sum of energy sub-sectors adds up to Energy.
+    found_countries_with_issues |= _check_sectors_sum_to_total(
+        tb, SECTORS_ENERGY, "Energy emissions", "Expected sum of energy sectors to add up to Energy."
+    )
+
     error = "Update the list of countries with issues."
-    assert set(found_countries_with_issues) == set(EXPECTED_COUNTRIES_WITH_ISSUES), error
+    assert found_countries_with_issues == set(EXPECTED_COUNTRIES_WITH_ISSUES), error
 
 
 def run() -> None:
