@@ -104,6 +104,8 @@ steps:
   data://garden/plastic_waste/2026-01-14/cottom_plastic_waste:
     - data://meadow/plastic_waste/2026-01-14/cottom_plastic_waste
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/plastic_waste/2026-01-14/cottom_plastic_waste:
     - data://garden/plastic_waste/2026-01-14/cottom_plastic_waste
   export://multidim/plastic_waste/latest/mismanaged_plastic_waste:

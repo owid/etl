@@ -7,6 +7,24 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define regions for aggregation
+REGIONS = [
+    # Income groups
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "High-income countries",
+    # Continents
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    # World
+    "World",
+]
+
 
 def run() -> None:
     #
@@ -15,14 +33,8 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("cottom_plastic_waste")
 
-    # Load population dataset
-    ds_population = paths.load_dataset("population")
-
     # Read tables from meadow dataset.
     tb = ds_meadow.read("cottom_plastic_waste")
-
-    # Read population table
-    tb_pop = ds_population.read("population")
 
     #
     # Process data.
@@ -30,8 +42,40 @@ def run() -> None:
     # Harmonize country names for national data
     tb = paths.regions.harmonize_names(tb)
 
-    # Merge with population data
-    tb = pr.merge(tb, tb_pop[["country", "year", "population"]], on=["country", "year"], how="left")
+    # Add income group aggregates for pwg (plastic waste generation) and recalculate pwg_per_cap
+    # First, filter to only pwg variable for aggregation
+    tb_pwg = tb[["country", "year", "pwg"]].copy()
+
+    # Add population to calculate per capita
+    tb_pwg = paths.regions.add_population(tb_pwg)
+
+    # Add region aggregates (income groups, continents, and World)
+    # Note: population is automatically aggregated by the add_aggregates method
+    tb_pwg = paths.regions.add_aggregates(
+        tb_pwg,
+        aggregations={"pwg": "sum", "population": "sum"},
+        regions=REGIONS,
+    )
+
+    # Calculate pwg_per_cap for countries and income groups using our population
+    tb_pwg["pwg_per_cap"] = (tb_pwg["pwg"] * 1000) / tb_pwg["population"]
+    tb_pwg["pwg_per_cap"].metadata.origins = tb_pwg["pwg"].metadata.origins
+
+    # Keep only aggregated regions with pwg and pwg_per_cap
+    tb_pwg_regions = tb_pwg[tb_pwg["country"].isin(REGIONS)].copy()
+    tb_pwg_regions = tb_pwg_regions[["country", "year", "pwg", "pwg_per_cap"]].copy()
+
+    # For the main table, drop the original pwg_per_cap column and recalculate using our population
+    tb = tb.drop(columns=["pwg_per_cap"])
+    tb = paths.regions.add_population(tb)
+    tb["pwg_per_cap"] = (tb["pwg"] * 1000) / tb["population"]
+    tb["pwg_per_cap"].metadata.origins = tb["pwg"].metadata.origins
+
+    # Now concatenate aggregated regions with the original countries
+    # Use concat with verify_integrity=False and then drop any duplicates that may exist
+    tb = pr.concat([tb, tb_pwg_regions], ignore_index=True)
+    # Remove any potential duplicates (keep="first" will prioritize original data if "World" already exists)
+    tb = tb.drop_duplicates(subset=["country", "year"], keep="first")
 
     # Calculate missing per capita variables (convert from tonnes to kg per person)
     per_capita_vars = {
@@ -41,8 +85,6 @@ def run() -> None:
         "plas_disp_em": "plas_disp_em_per_cap",
         "plas_recy_em": "plas_recy_em_per_cap",
     }
-
-    tb["pwg_per_cap"] = tb["pwg_per_cap"] * 1000  # Convert from tonnes to kg
 
     for total_var, per_cap_var in per_capita_vars.items():
         if total_var in tb.columns:
