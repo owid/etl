@@ -617,3 +617,47 @@ steps:
     - data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy
   data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
     - data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths
+
+  # GBD 2021 - GBD Prevalence
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_prevalence.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
+
+  # GBD 2021 - GBD Deaths and DALYs
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_cause:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_cause:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_cause_dalys:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+
+  # GBD 2021 - GBD Mental Health
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_mental_health.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health
+
+  # GBD 2021 - GBD Risk Factors - Drugs (downloaded separately due errors in the source that were fixed after initial gbd_risk import)
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_drug_risk:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_drug_risk.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_drug_risk:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_drug_risk
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_drug_risk:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_drug_risk
