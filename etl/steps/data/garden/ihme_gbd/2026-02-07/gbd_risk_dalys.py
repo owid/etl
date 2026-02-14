@@ -22,10 +22,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("gbd_risk_deaths")
+    ds_meadow = paths.load_dataset("gbd_risk_dalys")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("gbd_risk_deaths", reset_index=True)
+    tb = ds_meadow.read("gbd_risk_dalys", reset_index=True)
     tb = tb.drop(columns=["population_group_name"])
     ds_regions = paths.load_dataset("regions")
     #
@@ -43,7 +43,7 @@ def run() -> None:
     )
 
     # Format the tables
-    tb = tb.format(["country", "year", "metric", "measure", "rei", "age", "cause"], short_name="gbd_risk_deaths")
+    tb = tb.format(["country", "year", "metric", "measure", "rei", "age", "cause"])
 
     #
     # Save outputs.

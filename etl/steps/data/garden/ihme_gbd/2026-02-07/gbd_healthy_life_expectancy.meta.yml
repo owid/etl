@@ -1,0 +1,28 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
+        - Global Health
+    processing_level: major
+    display:
+      numDecimalPlaces: 1
+
+dataset:
+  non_redistributable: true
+tables:
+  gbd_healthy_life_expectancy:
+    variables:
+      healthy_life_expectancy_newborn:
+        title: Health-adjusted life expectancy at birth
+        unit: years
+        description_short: The number of years that a newborn can expect to live in good health, if the rates of all-cause mortality and all-cause disability in a specified year of interest would remain constant into the future.
+      life_expectancy_newborn:
+        title: Life expectancy at birth
+        unit: years
+        description_short: The number of years a person is expected to live from birth, assuming they will experience the age-specific mortality rate observed in a given year throughout their lifetime.
+      years_lived_with_disability:
+        title: Years lived with disability or diseases
+        unit: years
+        description_processing: The life expectancy at birth minus the health-adjusted life expectancy at birth
+
