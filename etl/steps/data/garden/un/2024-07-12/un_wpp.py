@@ -112,7 +112,7 @@ def run() -> None:
     # FERTILITY #
     tb_fertility = process_fertility(tb_fertility)
     tb_fertility = set_variant_to_estimates(tb_fertility)
-    tb_fertility = estimate_tfr_owid_regions(tb_fertility, tb_births, tb_population)
+    tb_fertility = estimate_tfr_owid_regions(tb_fertility.copy(), tb_births, tb_population)
 
     tb_fertility = tb_fertility.format(COLUMNS_INDEX, short_name="fertility_rate")
 
@@ -865,5 +865,5 @@ def estimate_tfr_owid_regions(tb_fertility: Table, tb_births: Table, tb_populati
     tb = tb[COLUMNS_INDEX + ["fertility_rate"]]
 
     # Add to fertility table
-    tb_fertility = pr.concat([tb_fertility, tb], ignore_index=True)
+    tb = pr.concat([tb_fertility, tb], ignore_index=True)
     return tb
