@@ -65,8 +65,12 @@ function getContainerName(branch: string): string {
  * Reads the YAML file to get the actual slug (important for mdim charts
  * where the slug like "covid/covid#covid_cases" differs from the filename).
  * Falls back to the filename if no slug field is found.
+ *
+ * For mdim charts, also builds the full catalogPath by inserting the version
+ * from the step path (matching GraphStep._create_multidim_collection logic):
+ *   slug "covid/covid#covid_cases" + version "latest" → "covid/latest/covid#covid_cases"
  */
-async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUri: string; slug: string }> {
+async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUri: string; slug: string; catalogPath?: string }> {
 	const graphDir = path.join(wsRoot, 'etl', 'steps', 'graph');
 	const rel = path.relative(graphDir, filePath);
 	const stepPath = rel.replace('.chart.yml', '');
@@ -76,7 +80,21 @@ async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUr
 	const match = content.match(/^slug:\s*(.+)$/m);
 	const slug = match ? match[1].trim() : path.basename(stepPath);
 
-	return { stepUri: `graph://${stepPath}`, slug };
+	// For mdim charts (slug contains #), build full catalog path with version.
+	// YAML slug "covid/covid#covid_cases" + step version "latest" → "covid/latest/covid#covid_cases"
+	let catalogPath: string | undefined;
+	if (slug.includes('#') && slug.includes('/')) {
+		const parts = stepPath.split('/');  // e.g. ["covid", "latest", "covid-cases"]
+		if (parts.length >= 2) {
+			const version = parts[1];  // e.g. "latest"
+			const slashIdx = slug.indexOf('/');
+			const namespace = slug.slice(0, slashIdx);      // "covid"
+			const rest = slug.slice(slashIdx + 1);           // "covid#covid_cases"
+			catalogPath = `${namespace}/${version}/${rest}`;  // "covid/latest/covid#covid_cases"
+		}
+	}
+
+	return { stepUri: `graph://${stepPath}`, slug, catalogPath };
 }
 
 interface InfoBarData {
@@ -272,12 +290,12 @@ async function openPreview(filePath: string) {
 	try {
 		const branch = await getGitBranch(wsRoot);
 		const containerName = getContainerName(branch);
-		const { stepUri, slug } = await parseChartYml(filePath, wsRoot);
+		const { stepUri, slug, catalogPath } = await parseChartYml(filePath, wsRoot);
 		const isMdim = slug.includes('#');
-		const encodedSlug = encodeURIComponent(slug);
-		// Mdim charts are served at /admin/grapher/{encoded_slug}, regular at /grapher/{slug}
-		const stagingUrl = isMdim
-			? `http://${containerName}/admin/grapher/${encodedSlug}`
+		// For mdim charts, use the full catalogPath (URL-encoded) at /admin/grapher/
+		// For regular charts, use the slug at /grapher/
+		const stagingUrl = isMdim && catalogPath
+			? `http://${containerName}/admin/grapher/${encodeURIComponent(catalogPath)}`
 			: `http://${containerName}/grapher/${slug}`;
 
 		const panel = vscode.window.createWebviewPanel(
