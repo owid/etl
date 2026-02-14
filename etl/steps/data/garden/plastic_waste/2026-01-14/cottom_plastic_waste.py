@@ -1,7 +1,5 @@
 """Garden step for plastic waste data with country harmonization."""
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
