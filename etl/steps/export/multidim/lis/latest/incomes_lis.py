@@ -14,6 +14,9 @@ DIMENSIONS_CONFIG = {
     "welfare_type": ["dhi", "mi"],
 }
 
+# Define equivalence_scale
+EQUIVALENCE_SCALE = "square root"
+
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
 
@@ -27,7 +30,7 @@ def run() -> None:
     columns_to_keep = []
     for column in tb.drop(columns=["country", "year"]).columns:
         dims = tb[column].metadata.dimensions
-        if dims and dims.get("equivalence_scale") == "square root":
+        if dims and dims.get("equivalence_scale") == EQUIVALENCE_SCALE:
             columns_to_keep.append(column)
             dims.pop("equivalence_scale")
             # Convert integer decile values to clean strings (e.g. 1 -> "1", not "1.0")

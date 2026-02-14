@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.collection.model.view import Indicator
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -16,6 +17,9 @@ DIMENSIONS_CONFIG = {
     "welfare_type": ["before tax", "after tax"],
     "quantile": "*",
 }
+
+# Define if data is extrapolated or not
+EXTRAPOLATED = "no"
 
 
 def run() -> None:
@@ -34,7 +38,7 @@ def run() -> None:
     columns_to_keep = []
     for column in tb.drop(columns=["country", "year"]).columns:
         dims = tb[column].metadata.dimensions
-        if dims and dims.get("extrapolated") == "no":
+        if dims and dims.get("extrapolated") == EXTRAPOLATED:
             columns_to_keep.append(column)
             # Remove dimensions that are not needed (they're now fixed values)
             for dimension in ["period", "extrapolated"]:
@@ -213,8 +217,6 @@ def run() -> None:
     # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after_scatter" and view.indicators.y:
-            from etl.collection.model.view import Indicator
-
             before_tax_ind = None
             after_tax_ind = None
             for ind in view.indicators.y:

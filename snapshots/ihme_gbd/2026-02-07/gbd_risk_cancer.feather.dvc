@@ -4,9 +4,9 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Risk Factors
+    title: Global Burden of Disease - Risk Factors for Cancer Deaths
     description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the risk factors that contribute to deaths and DALYs from all causes, cardiovascular diseases, lower respiratory infections, diarrheal diseases and cancers.
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the risk factors that contribute to deaths from different types of cancers.
     date_published: "2025-10-20"
     # Citation
     producer: IHME, Global Burden of Disease
@@ -15,9 +15,13 @@ meta:
         attribution_short: "IHME-GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
-    date_accessed: 2026-02-07
+    date_accessed: "2026-02-07"
 
     # License
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: 82bc27b51eb01daf1b182863c58a2c71
+    size: 216730610
+    path: gbd_risk_cancer.feather
