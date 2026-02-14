@@ -4,24 +4,25 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Risk Factors - Deaths
+    title: Global Burden of Disease - Life expectancy
     description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the risk factors that contribute to deaths and DALYs from all causes, cardiovascular diseases, lower respiratory infections, diarrheal diseases and cancers.
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends.'
     date_published: "2025-10-20"
     # Citation
     producer: IHME, Global Burden of Disease
     citation_full: |-
       "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2023 (GBD 2023). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2025. Available from https://vizhub.healthdata.org/gbd-results/."
-        attribution_short: "IHME-GBD"
+    attribution_short: "IHME-GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
-    date_accessed: '2026-02-07'
+    url_download: https://dl.healthdata.org/gbd-api-2023-collaborator/f34fa8ea423eb533d824bc276374add0_files/IHME-GBD_2023_DATA-f34fa8ea-1.zip
+    date_accessed: "2026-02-07"
 
     # License
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: 8b6c656848375a6f0d0ed85cfbbeb92e
-    size: 379692242
-    path: gbd_risk_deaths.feather
+  - md5: 866ec6e04533c6a94bde86b445248cb5
+    size: 242153
+    path: gbd_life_expectancy.zip
