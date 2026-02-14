@@ -1,0 +1,31 @@
+title:
+  title: Plastics entering the ocean from rivers
+  title_variant: by measure
+
+default_selection:
+  - Indonesia
+  - Vietnam
+  - China
+  - India
+  - United States
+
+topic_tags:
+  - Plastic Pollution
+
+dimensions:
+  - slug: "measure"
+    name: "Measure"
+    choices:
+      - slug: "total"
+        name: "Total"
+        description: "Total amount of plastic pollution entering the ocean via rivers in tonnes per year"
+      - slug: "per_capita"
+        name: "Per capita"
+        description: "Plastic pollution entering the ocean via rivers per capita in kilograms per person"
+      - slug: "share_of_global"
+        name: "Share of global total"
+        description: "Country's share of total global plastic pollution entering the ocean"
+
+views:
+  # Views will be filled out programmatically.
+  []

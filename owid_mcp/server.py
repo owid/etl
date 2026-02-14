@@ -1,9 +1,12 @@
 import asyncio
 import uuid
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 import logfire
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
+from fastmcp.server.middleware.caching import CallToolSettings, ResponseCachingMiddleware
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
 
@@ -49,6 +52,17 @@ INSTRUCTIONS = (
 INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
 
 
+@asynccontextmanager
+async def lifespan(app: FastMCP) -> AsyncIterator[None]:
+    """Server lifespan handler for startup/shutdown tasks."""
+    # Startup: mount all modular servers (v3.0 uses mount instead of import_server)
+    app.mount(indicators.mcp)
+    app.mount(posts.mcp)
+    app.mount(charts.mcp)
+    yield
+    # Shutdown: cleanup if needed
+
+
 # NOTE:
 # Because the ChatGPT connector doesn't perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
 # you must run your FastMCP server in stateless mode. Otherwise FastMCP won't recognize the incoming
@@ -59,7 +73,6 @@ INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in O
 # it successfully makes the first request but the subsequent request fails with 404. So it's likely something
 # about the session ID.
 mcp = FastMCP(
-    stateless_http=True,
     name="Our World in Data MCP",
     instructions="\n\n".join(
         [
@@ -70,6 +83,8 @@ mcp = FastMCP(
             INSTRUCTIONS_ENTITIES,
         ]
     ),
+    lifespan=lifespan,
+    stateless_http=True,
 )
 
 
@@ -106,27 +121,22 @@ class RequestLoggingMiddleware(Middleware):
         return result
 
 
-# Add the logging middleware
+# Add middleware: logging first, then caching
 mcp.add_middleware(RequestLoggingMiddleware())
 
-
-# Import the modular servers without prefixes
-# Note: import_server is async, so we need to handle this during server startup
-async def setup_server():
-    """Setup the server by importing modules."""
-    await mcp.import_server(indicators.mcp)
-    await mcp.import_server(posts.mcp)
-    await mcp.import_server(charts.mcp)
-
-
-# Create the setup task - this will be awaited when needed
-_server_setup_task = setup_server()
+# Response caching for expensive operations (5 minute TTL)
+mcp.add_middleware(
+    ResponseCachingMiddleware(
+        call_tool_settings=CallToolSettings(
+            ttl=300,
+            included_tools=["search_indicator", "fetch_indicator_metadata", "search_chart", "search_posts"],
+        )
+    )
+)
 
 
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Setup the server before running
-    asyncio.run(_server_setup_task)
-    mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)
+    mcp.run(transport="http", host="0.0.0.0", port=8080)

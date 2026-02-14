@@ -260,3 +260,10 @@ steps:
     - data://meadow/wid/2025-03-14/world_inequality_database
   data://grapher/wid/2025-03-14/world_inequality_database:
     - data://garden/wid/2025-03-14/world_inequality_database
+
+    # PIP
+      # Dimensional PIP pipeline
+  data://garden/wb/2025-10-09/world_bank_pip:
+    # - data://meadow/wb/2025-10-09/world_bank_pip
+  data://grapher/wb/2025-10-09/world_bank_pip:
+    - data://garden/wb/2025-10-09/world_bank_pip

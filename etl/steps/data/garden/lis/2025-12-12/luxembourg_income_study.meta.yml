@@ -126,6 +126,13 @@ definitions:
     Inequality is measured here in terms of income before taxes and benefits.
     <%- endif %>
 
+  numdecimalplaces_period: |-
+    <% if period == "day" %>
+    2
+    <%- else %>
+    0
+    <%- endif %>
+
   # For Grapher configuration
 
   headcount_ratio_title: |-
@@ -133,7 +140,7 @@ definitions:
     <% if poverty_line in poverty_line_ipl %>
     Share of population living in extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty: Share of population below <<poverty_line>> ({definitions.welfare_type})
+    Share of population below <<poverty_line>> ({definitions.welfare_type})
     <%- else %>
     Poverty: Share of population living on less than {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
@@ -143,7 +150,7 @@ definitions:
     <% if poverty_line in poverty_line_ipl %>
     Number of people living in extreme poverty ({definitions.welfare_type})
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty: Number of people below <<poverty_line>> ({definitions.welfare_type})
+    Number of people below <<poverty_line>> ({definitions.welfare_type})
     <%- else %>
     Poverty: Number of people living on less than {definitions.poverty_line_a_day} ({definitions.welfare_type})
     <%- endif %>
@@ -980,7 +987,7 @@ tables:
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Mean income ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:
@@ -1014,7 +1021,7 @@ tables:
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Median income ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:
@@ -1053,7 +1060,7 @@ tables:
           name: |-
             {macros}
             Average (<<percentiles_avg_share(decile)>>) ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:
@@ -1134,7 +1141,7 @@ tables:
           name: |-
             {macros}
             Threshold (<<percentiles_thr(decile)>>) ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
         presentation:
           grapher_config:

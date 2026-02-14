@@ -15,7 +15,7 @@ from structlog import getLogger
 
 from etl.files import yaml_load
 from etl.grapher import helpers as gh
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = getLogger()
 # Get paths and naming conventions for current step.
@@ -43,7 +43,7 @@ if SUBSET:
             SUBSET += "|" + "|".join(sorted(indicator_prefixes))
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -143,7 +143,10 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(
+        tables=all_tables,
+        default_metadata=ds_garden.metadata,
+    )
     ds_grapher.save()
 
     # Show warnings at the very end so they are not lost in the middle of the processing logs

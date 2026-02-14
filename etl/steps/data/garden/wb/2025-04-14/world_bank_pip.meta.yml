@@ -617,6 +617,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: World Bank Poverty and Inequality Platform (PIP) - Legacy dataset (old 2011 and 2017 prices)
   update_period_days: 180
 
 

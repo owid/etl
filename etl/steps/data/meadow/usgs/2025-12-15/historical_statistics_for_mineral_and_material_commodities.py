@@ -13,7 +13,7 @@ import pandas as pd
 from docx import Document
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Initialize logger.
@@ -325,7 +325,7 @@ def extract_paragraph(text: str, header: str) -> str:
     return " ".join(paragraph_text).strip()
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -364,8 +364,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir, tables=[tb, tb_metadata], check_variables_metadata=True, default_metadata=snap.metadata
+    ds_meadow = paths.create_dataset(
+        tables=[tb, tb_metadata],
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
     )
 
     # Save changes in the new meadow dataset.
