@@ -260,6 +260,30 @@ zoom: 0.95
 </div>
 
 ---
+zoom: 0.85
+---
+
+# Benchmark: Keyword vs Semantic Search
+
+**318 queries across 122 topics, scored by LLM judge (0-3 relevance scale)**
+
+| Metric | Keyword (Algolia) | Semantic (Cloudflare) | Diff | Sig |
+|---|---|---|---|---|
+| NDCG@5 | 0.840 | **0.923** | +0.083 | ★ |
+| NDCG@10 | 0.839 | **0.922** | +0.083 | ★ |
+| Precision@5 | 0.742 | 0.756 | +0.014 | |
+| MRR | 0.821 | **0.872** | +0.051 | ★ |
+| Latency (ms) | **152** | 876 | +724 | ★ |
+
+<div class="text-sm mt-2">★ = p<0.05 (paired bootstrap, n=10,000)</div>
+
+**Semantic wins**: conceptual queries ("underage work" → child labor), multi-word phrases, zero-result recovery
+
+**Keyword wins**: short exact matches ("tfr", "cities"), acronyms — and **faster**
+
+<div class="text-xs opacity-60 mt-2">Details: <a href="https://github.com/owid/analytics/pull/696">owid/analytics#696</a></div>
+
+---
 
 ---
 layout: section
