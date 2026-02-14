@@ -74,8 +74,9 @@ def run() -> None:
     # Update the World row with corrected pwg value
     tb.loc[tb["country"] == "World", "pwg"] = world_pwg_corrected
 
-    # Recalculate per capita values for pwg (convert from daily to annual per capita)
+    # Recalculate per capita values for wg and pwg (convert from daily to annual per capita)
     tb["pwg_per_cap"] = (tb["pwg"] * 1000) / tb["population_2020"]
+    tb["wg_per_cap"] = (tb["wg"] * 1000) / tb["population_2020"]
 
     # Calculate missing per capita variables (convert from tonnes to kg per person)
     per_capita_vars = {
