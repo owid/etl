@@ -1,7 +1,7 @@
 # What are the world's deadliest animals?
 
 !!! info ""
-    :octicons-person-16: **[Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie), [Fiona Spooner](https://ourworldindata.org/team/fiona-spooner)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20World%20deadliest%20animals)
+    :octicons-person-16: **[Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie), [Fiona Spooner](https://ourworldindata.org/team/fiona-spooner)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20World's%20deadliest%20animals)
 
 ## Introduction and summary
 
@@ -31,10 +31,10 @@ Here is a table of the final figures used in the main visualization in the artic
 | Tapeworms (Cysticercosis) | 2,000 |
 | Tsetse flies (Trypanosomiasis) | 1,500 |
 | Elephants | 1,000 |
-| Hippopotamuses | \>500 |
+| Hippopotamuses | >500 |
 | Bees, wasps and hornets | 500 |
 | Big cats | 300 |
-| Crocodiles | \>150 |
+| Crocodiles | >150 |
 | Jellyfish | 100 |
 | Spiders | 50 |
 | Bears | 20 |
@@ -151,7 +151,7 @@ An older [WHO Factsheet from 2017](https://www3.paho.org/hq/dmdocuments/2017/201
 
 In the visualization, we assumed that Ascaris roundworms kill **4,000 people** per year. This is through the spread of the disease *Ascariasis*.
 
-The number of deaths from *Ascariasis* is hard to estimate as its often misattributed to other factors such as intestinal obstruction and sepsis. Medical manuals — such as [this one](https://www.msdmanuals.com/home/infections/parasitic-infections-roundworms-nematodes/ascariasis) — often give a fairly large range of "\~2,000 to 10,000 deaths each year"
+The number of deaths from *Ascariasis* is hard to estimate as it's often misattributed to other factors such as intestinal obstruction and sepsis. Medical manuals — such as [this one](https://www.msdmanuals.com/home/infections/parasitic-infections-roundworms-nematodes/ascariasis) — often give a fairly large range of "\~2,000 to 10,000 deaths each year"
 
 The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 4,973 people died from Ascariasis in 2023.
 
@@ -277,7 +277,7 @@ We think that these fatal incidents could be quite highly concentrated in the Ph
 
 ### Hippopotamuses
 
-In the visualisation, we assumed that hippopotamuses kill **around 50 people** per year. This is for the single, common hippopotamus species (Hippopotamus amphibius).
+In the visualization, we assumed that hippopotamuses kill **around 50 people** per year. This is for the single, common hippopotamus species (Hippopotamus amphibius).
 
 A figure of around 500 deaths per year is widely repeated in media and online sources (here it is from [the BBC](https://www.bbc.co.uk/news/world-36320744) and [Africa Check](https://africacheck.org/fact-checks/meta-programme-fact-checks/yes-hippos-kill-around-500-people-year-africa)) but these claims often fail to present clear, concrete sources.
 
@@ -332,4 +332,3 @@ The Norwegian Institute for Nature Research (NINA) [notes that](https://wolf.org
 This data is more complete for Europe and North America, and there may be some attacks outside of these regions (although likely limited to Asia since others are outside of the wolf's range).
 
 We therefore think that 2 per year is slightly too low, but the total wouldn't be dramatically higher. That's why we estimated 5 per year, but with uncertainty.
-
