@@ -80,22 +80,22 @@ def run() -> None:
     # Calculate shares and densities.
     tb = calculate_shares_and_densities(tb)
 
-    # Add dominant population concentration variable.
-    tb = add_dominant_population_type(tb)
+    # Calculate population share change.
+    tb = calculate_population_share_change(tb)
+
+    # Create separate table for dominant population type before splitting.
+    tb_dominant = create_dominant_population_table(tb.copy())
 
     # Split data into estimates and projections.
     tb = split_estimates_projections(tb)
 
     # Melt to make the metadata easier to generate.
-    # Note: We exclude dominant_population_type from melting as it contains string values
-    # and would cause type conflicts with numeric indicators
-    cols_to_melt = [col for col in tb.columns if col not in ["country", "year", "dominant_population_type_estimates", "dominant_population_type_projections"]]
-    tb = tb.melt(id_vars=["country", "year"], value_vars=cols_to_melt, var_name="indicator", value_name="value")
+    tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
 
     # Split the indicator column for easier metadata generation.
     # Pattern: metric_urbanization_level_type (e.g., population_urban_centre_estimates)
     tb[["metric", "location_type", "data_type"]] = tb["indicator"].str.extract(
-        r"(area|population|built_up_area|popshare|share|density)_(urban_centre|urban_cluster|rural_total|urban_total)_(estimates|projections)"
+        r"(area|population|built_up_area|popshare|share|density|popshare_change)_(urban_centre|urban_cluster|rural_total|urban_total)_(estimates|projections)"
     )
 
     # Drop rows with NaN in index columns (non-matching indicators)
@@ -104,14 +104,31 @@ def run() -> None:
     # Drop the original indicator column.
     tb = tb.drop(columns=["indicator"])
 
-    # Format the table.
+    # Format the main table.
     tb = tb.format(["country", "year", "metric", "location_type", "data_type"])
+
+    # Add metric dimension to dominant table to match main table structure
+    tb_dominant["metric"] = "dominant_type"
+
+    # Format the dominant population table.
+    tb_dominant = tb_dominant.format(
+        [
+            "country",
+            "year",
+            "location_type",
+            "data_type",
+            "metric",
+        ],
+        short_name="ghsl_countries_dominant_type",
+    )
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    # Create a new garden dataset with both tables.
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_dominant], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -153,15 +170,39 @@ def calculate_shares_and_densities(tb):
     return tb
 
 
-def add_dominant_population_type(tb):
-    """Add a variable indicating which location type has the dominant population concentration."""
+def calculate_population_share_change(tb):
+    """Calculate population share change for each location type.
+
+    This metric represents the change in population share (in percentage points)
+    over 5-year intervals. For example, if a city's population share goes from
+    30% to 35%, the popshare_change would be +5 percentage points.
+
+    Note: Values can be volatile for small territories where entire areas may
+    shift classification categories.
+    """
+    # Sort by country and year to ensure proper ordering for growth calculations.
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Calculate population share change for each location type.
+    # Note: data is at 5-year intervals, so this represents the change over 5 years.
+    for location_type in ["urban_centre", "urban_cluster", "rural_total", "urban_total"]:
+        popshare_col = f"popshare_{location_type}"
+
+        # Calculate change in population share: popshare_t - popshare_t-1 (in percentage points)
+        tb[f"popshare_change_{location_type}"] = (
+            tb.groupby("country")[popshare_col].diff()
+        )
+
+    return tb
+
+
+def create_dominant_population_table(tb):
+    """Create a separate table for dominant population type indicator."""
     # Determine which location type has the highest population share.
-    tb["dominant_population_type"] = tb[
-        ["popshare_urban_centre", "popshare_urban_cluster", "popshare_rural_total"]
-    ].idxmax(axis=1)
+    dominant_col = tb[["popshare_urban_centre", "popshare_urban_cluster", "popshare_rural_total"]].idxmax(axis=1)
 
     # Map the column names to more readable labels.
-    tb["dominant_population_type"] = tb["dominant_population_type"].map(
+    tb["value"] = dominant_col.map(
         {
             "popshare_urban_centre": "Cities",
             "popshare_urban_cluster": "Towns",
@@ -169,7 +210,31 @@ def add_dominant_population_type(tb):
         }
     )
 
-    return tb
+    # Keep only country, year, and dominant_population_type columns.
+    tb_dominant = tb[["country", "year", "value"]].copy()
+
+    # Add data_type dimension column.
+    # Split into estimates and projections.
+    tb_dominant_estimates = tb_dominant[tb_dominant["year"] < START_OF_PROJECTIONS].copy()
+    tb_dominant_estimates["data_type"] = "estimates"
+    tb_dominant_estimates["location_type"] = (
+        "by_dominant_type"  # Add a location_type value to allow merging with main table views later
+    )
+
+    tb_dominant_projections = tb_dominant[tb_dominant["year"] >= START_OF_PROJECTIONS - 5].copy()
+    tb_dominant_projections["data_type"] = "projections"
+    tb_dominant_projections["location_type"] = (
+        "by_dominant_type"  # Add a location_type value to allow merging with main table views later
+    )
+
+    # Combine both.
+    tb_dominant = pr.concat([tb_dominant_estimates, tb_dominant_projections], ignore_index=True)
+
+    # Copy origins from source columns.
+    if "popshare_urban_centre" in tb.columns and tb["popshare_urban_centre"].metadata.origins:
+        tb_dominant["value"].metadata.origins = tb["popshare_urban_centre"].metadata.origins
+
+    return tb_dominant
 
 
 def split_estimates_projections(tb):

@@ -137,6 +137,26 @@ tables:
             <% elif location_type == "urban_total" and metric == 'density' and data_type == 'projections' %>
             Projected population density in urban areas
 
+            <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'estimates' %>
+            Change in population share in cities
+            <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'projections' %>
+            Projected change in population share in cities
+
+            <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'estimates' %>
+            Change in population share in towns
+            <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'projections' %>
+            Projected change in population share in towns
+
+            <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'estimates' %>
+            Change in population share in rural areas
+            <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'projections' %>
+            Projected change in population share in rural areas
+
+            <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'estimates' %>
+            Change in population share in urban areas
+            <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'projections' %>
+            Projected change in population share in urban areas
+
             <% endif %>
           unit:
             <% if metric == 'area' or metric == 'built_up_area' %>
@@ -147,6 +167,8 @@ tables:
             %
             <% elif metric == 'density' %>
             people per km²
+            <% elif metric == 'popshare_change' %>
+            percentage points
             <%- endif -%>
 
           short_unit:
@@ -156,13 +178,17 @@ tables:
             %
             <% elif metric == 'density' %>
             per km²
+            <% elif metric == 'popshare_change' %>
+            pp
             <%- endif -%>
-          description_processing:
+          description_processing: |-
             <% if metric == 'share' or metric == 'popshare' %>
             The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns, rural areas) by the overall total, providing a percentage representation for each category.
-           <% elif metric == 'density' %>
+            <% elif metric == 'density' %>
             Population density was calculated by dividing the population of cities by the total area it covers, providing a measure of the number of people living in each km².
-           <%- endif -%>
+            <% elif metric == 'popshare_change' %>
+            Change in population share was calculated as the difference in percentage points between consecutive time periods (5-year intervals). For example, if the urban share increased from 30% to 35%, the change would be +5 percentage points. Note: values can be volatile for small territories where entire areas may shift classification categories.
+            <%- endif -%>
           display:
             numDecimalPlaces:
                 <% if metric == 'area' or metric == 'built_up_area' %>
@@ -173,4 +199,23 @@ tables:
                 1
                 <% elif metric == 'density' %>
                 0
+                <% elif metric == 'popshare_change' %>
+                2
                 <%- endif -%>
+
+  ghsl_countries_dominant_type:
+    variables:
+      value:
+        title: |-
+          <% if data_type == 'estimates' %>
+          Dominant population concentration type
+          <% elif data_type == 'projections' %>
+          Dominant population concentration type (projected)
+          <%- endif -%>
+        unit: ""
+        description_short: Indicates whether the majority of the population lives in cities, towns, or rural areas.
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: OwidCategoricalC

@@ -1,6 +1,6 @@
 title:
-  title: Population in cities, towns, and rural areas
-  title_variant: by location type
+  title: Population of cities, towns, and rural areas
+  title_variant: by settlement type
 
 default_selection:
   - World
@@ -14,30 +14,45 @@ topic_tags:
 
 dimensions:
   - slug: "location_type"
-    name: "Location type"
+    name: "Settlement type"
     choices:
-      - slug: "all"
-        name: "All (combined)"
-        description: "Population in cities, towns, and rural areas combined in a stacked chart"
-      - slug: "cities"
+      - slug: "urban_centre"
         name: "Cities"
-        description: "Population living in cities (urban centres)"
-      - slug: "towns"
+        description: "Settlements with at least 1,500 people per square kilometre and at least 50,000 people in total."
+      - slug: "urban_cluster"
         name: "Towns"
-        description: "Population living in towns (urban clusters)"
-      - slug: "rural_areas"
+        description: "Settlements with at least 300 people per square kilometre and at least 5,000 people in total."
+      - slug: "rural_total"
         name: "Rural areas"
-        description: "Population living in rural areas"
+        description: "Settlements with fewer than 300 people per square kilometre, or denser areas that are not part of a city or town."
+      - slug: "urban_total"
+        name: "Cities and towns (urban)"
+        description: "Population in cities and towns combined, excluding rural areas."
+      - slug: "location_type_stacked"
+        name: "All (stacked)"
+        description: "Cities, towns, and rural areas shown in a stacked area chart"
+      - slug: "by_dominant_type"
+        name: "By dominant settlement type"
+        description: "Shows which settlement type (cities, towns, or rural areas) contains the largest share of the population."
 
   - slug: "metric"
     name: "Metric"
     choices:
       - slug: "population"
-        name: "Absolute"
+        name: "Number of people"
         description: "Total population in absolute numbers"
       - slug: "popshare"
-        name: "Relative (%)"
+        name: "Share of population (%)"
         description: "Share of total population as a percentage"
+      - slug: "density"
+        name: "Population density (people per sq km)"
+        description: "Population density in people per square kilometre"
+      - slug: "popshare_change"
+        name: "Change in population share (pp)"
+        description: "Change in population share in percentage points over 5-year intervals. Values can be volatile for small territories."
+      - slug: "dominant_type"
+        name: "Dominant settlement type"
+        description: "Which settlement type (cities, towns, or rural areas) contains the largest share of the population"
 
   - slug: "data_type"
     name: "Data type"
