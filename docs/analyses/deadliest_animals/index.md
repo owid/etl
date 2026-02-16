@@ -107,7 +107,7 @@ Several other sources have much higher estimates.
 
 The WHO states 59,000 deaths per year in its [Rabies Factsheet](https://www.who.int/news-room/fact-sheets/detail/rabies). We think this might be sourced from a [2015 paper by Hampson et al](https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0003709). The WHO's [Global Health Estimates](https://www.who.int/data/global-health-estimates) for 2023 were 43,833.
 
-The US Center for Disease Control and Prevention (CDC) gives [even higher figures](https://www.cdc.gov/rabies/around-world/index.html) of 70,000 deaths per year. However, it's not clear how often these estimates are updated.
+The US Centers for Disease Control and Prevention (CDC) gives [even higher figures](https://www.cdc.gov/rabies/around-world/index.html) of 70,000 deaths per year. However, it's not clear how often these estimates are updated.
 
 Based on this range, we went with a figure of 40,000 deaths per year, but this comes with significant uncertainty.
 
