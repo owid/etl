@@ -80,17 +80,26 @@ def run() -> None:
     # Calculate shares and densities.
     tb = calculate_shares_and_densities(tb)
 
+    # Add dominant population concentration variable.
+    tb = add_dominant_population_type(tb)
+
     # Split data into estimates and projections.
     tb = split_estimates_projections(tb)
 
     # Melt to make the metadata easier to generate.
-    tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
+    # Note: We exclude dominant_population_type from melting as it contains string values
+    # and would cause type conflicts with numeric indicators
+    cols_to_melt = [col for col in tb.columns if col not in ["country", "year", "dominant_population_type_estimates", "dominant_population_type_projections"]]
+    tb = tb.melt(id_vars=["country", "year"], value_vars=cols_to_melt, var_name="indicator", value_name="value")
 
     # Split the indicator column for easier metadata generation.
     # Pattern: metric_urbanization_level_type (e.g., population_urban_centre_estimates)
     tb[["metric", "location_type", "data_type"]] = tb["indicator"].str.extract(
         r"(area|population|built_up_area|popshare|share|density)_(urban_centre|urban_cluster|rural_total|urban_total)_(estimates|projections)"
     )
+
+    # Drop rows with NaN in index columns (non-matching indicators)
+    tb = tb.dropna(subset=["metric", "location_type", "data_type"])
 
     # Drop the original indicator column.
     tb = tb.drop(columns=["indicator"])
@@ -140,6 +149,25 @@ def calculate_shares_and_densities(tb):
 
     # Drop temporary total columns.
     tb = tb.drop(columns=["total_population", "total_area"])
+
+    return tb
+
+
+def add_dominant_population_type(tb):
+    """Add a variable indicating which location type has the dominant population concentration."""
+    # Determine which location type has the highest population share.
+    tb["dominant_population_type"] = tb[
+        ["popshare_urban_centre", "popshare_urban_cluster", "popshare_rural_total"]
+    ].idxmax(axis=1)
+
+    # Map the column names to more readable labels.
+    tb["dominant_population_type"] = tb["dominant_population_type"].map(
+        {
+            "popshare_urban_centre": "Cities",
+            "popshare_urban_cluster": "Towns",
+            "popshare_rural_total": "Rural areas",
+        }
+    )
 
     return tb
 

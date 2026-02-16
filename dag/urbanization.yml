@@ -78,6 +78,10 @@ steps:
   data://grapher/urbanization/2025-12-10/ghsl_countries:
     - data://garden/urbanization/2025-12-10/ghsl_countries
 
+  # GHSL countries multidim
+  export://multidim/urbanization/latest/cities_towns_rural_areas:
+    - data://grapher/urbanization/2025-12-10/ghsl_countries
+
   # GHSL urban centers
   data://meadow/urbanization/2025-12-10/ghsl_urban_centers:
     - snapshot://urbanization/2025-12-10/ghsl_urban_centers.xlsx

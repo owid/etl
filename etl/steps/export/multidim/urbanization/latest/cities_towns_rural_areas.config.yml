@@ -1,0 +1,54 @@
+title:
+  title: Population in cities, towns, and rural areas
+  title_variant: by location type
+
+default_selection:
+  - World
+  - China
+  - India
+  - United States
+  - Indonesia
+
+topic_tags:
+  - Urbanization
+
+dimensions:
+  - slug: "location_type"
+    name: "Location type"
+    choices:
+      - slug: "all"
+        name: "All (combined)"
+        description: "Population in cities, towns, and rural areas combined in a stacked chart"
+      - slug: "cities"
+        name: "Cities"
+        description: "Population living in cities (urban centres)"
+      - slug: "towns"
+        name: "Towns"
+        description: "Population living in towns (urban clusters)"
+      - slug: "rural_areas"
+        name: "Rural areas"
+        description: "Population living in rural areas"
+
+  - slug: "metric"
+    name: "Metric"
+    choices:
+      - slug: "population"
+        name: "Absolute"
+        description: "Total population in absolute numbers"
+      - slug: "popshare"
+        name: "Relative (%)"
+        description: "Share of total population as a percentage"
+
+  - slug: "data_type"
+    name: "Data type"
+    choices:
+      - slug: "estimates"
+        name: "Estimates"
+        description: "Historical estimates (before 2025)"
+      - slug: "projections"
+        name: "Projections"
+        description: "Future projections (2025 onwards)"
+
+views:
+  # Views will be filled out programmatically.
+  []
