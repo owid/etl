@@ -307,7 +307,7 @@ In the visualization, we assumed that bears kill **around 20 people** per year. 
 
 Brown bears and sloth bears are responsible for the majority of fatal attacks globally.
 
-The most comprehensive estimate for black bears comes from [Bombieri et al. (2019)](https://www.nature.com/articles/s41598-019-44341-w), who documented 95 fatal attacks by brown bears between 2000 and 2015, which is an average of around 6 deaths per year. Sloth bears are estimated to kill more than 10 people per year, based on reports summarized by [National Geographic](https://www.nationalgeographic.com/animals/article/sloth-bears-are-worlds-deadliest-india-human-conflict); this is mostly in India.
+The most comprehensive estimate for brown bears comes from [Bombieri et al. (2019)](https://www.nature.com/articles/s41598-019-44341-w), who documented 95 fatal attacks by brown bears between 2000 and 2015, which is an average of around 6 deaths per year. Sloth bears are estimated to kill more than 10 people per year, based on reports summarized by [National Geographic](https://www.nationalgeographic.com/animals/article/sloth-bears-are-worlds-deadliest-india-human-conflict); this is mostly in India.
 
 Other species kill far fewer people. [Polar bears](https://en.wikipedia.org/wiki/Bear_attack#Polar_bears) and [American black bears](https://en.wikipedia.org/wiki/Bear_attack#American_black_bears) kill fewer than 1 person per year based on historical records. [Asian black bears](https://en.wikipedia.org/wiki/Bear_attack#Asian_black_bears) are estimated to kill around one person per year in Japan.
 
