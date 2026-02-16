@@ -286,10 +286,8 @@ def run() -> None:
     tb_un = tb_un[tb_un["year"] < tb_un["year"].max()].reset_index(drop=True)
 
     # Create shares of final electricity consumption by custom sectors.
-    # TODO: Fix missing origins in the following operation.
-    tb_un = tb_un.rename(columns={"value": ""}).pivot(
-        index=["country", "year"], columns=["sector"], join_column_levels_with=""
-    )
+    tb_un = tb_un.pivot(index=["country", "year"], columns=["sector"], join_column_levels_with="_")
+    tb_un = tb_un.rename(columns={column: column.replace("value_", "") for column in tb_un.columns}, errors="raise")
     tb_un = tb_un.rename(columns={COLUMN_UN_FINAL_ENERGY: "total"}, errors="raise")
     for sector, subsectors in SECTOR_UN_MAPPING.items():
         tb_un[sector] = tb_un[subsectors].sum(axis=1) / tb_un["total"]
