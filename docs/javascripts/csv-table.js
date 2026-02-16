@@ -57,6 +57,17 @@ function buildCsvTable(container, headers, rows, detailCols) {
   wrap.appendChild(table);
   container.appendChild(wrap);
 
+  // Prevent column reflow on first expand: briefly show all columns
+  // (synchronously, before the browser paints), measure the stable widths
+  // of the main columns, then hide detail columns again.
+  if (detailCols.length) {
+    table.classList.add("show-details");
+    hRow.querySelectorAll("th:not(.detail-col):not(.detail-col-peek)").forEach(function (th) {
+      th.style.width = th.offsetWidth + "px";
+    });
+    table.classList.remove("show-details");
+  }
+
   // Right fade — column toggle
   if (detailCols.length) {
     var fade = document.createElement("div");
