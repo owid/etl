@@ -11,7 +11,7 @@ The data shows that almost all countries have ended large-scale forced labor, of
 
 Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical documentation, we detail how we constructed the dataset.
 
-You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in the article.
+You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/)***(TODO: Update link).
 
 
 ## What data we used

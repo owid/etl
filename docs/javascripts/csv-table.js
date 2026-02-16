@@ -19,20 +19,6 @@ document$.subscribe(function () {
 });
 
 function buildCsvTable(container, headers, rows, detailCols) {
-  // Add toggle button for detail columns
-  if (detailCols.length) {
-    var btn = document.createElement("button");
-    btn.className = "csv-table-toggle";
-    btn.textContent = "Show details";
-    btn.addEventListener("click", function () {
-      var t = container.querySelector("table");
-      var on = t.classList.toggle("show-details");
-      btn.textContent = on ? "Hide details" : "Show details";
-    });
-    container.appendChild(btn);
-  }
-
-  // Scrollable wrapper
   var wrap = document.createElement("div");
   wrap.className = "csv-table-scroll";
 
@@ -44,7 +30,9 @@ function buildCsvTable(container, headers, rows, detailCols) {
   headers.forEach(function (h) {
     var th = document.createElement("th");
     th.textContent = h;
-    if (detailCols.indexOf(h) >= 0) th.classList.add("detail-col");
+    var idx = detailCols.indexOf(h);
+    if (idx === 0) th.classList.add("detail-col-peek");
+    else if (idx > 0) th.classList.add("detail-col");
     hRow.appendChild(th);
   });
   thead.appendChild(hRow);
@@ -57,7 +45,9 @@ function buildCsvTable(container, headers, rows, detailCols) {
     headers.forEach(function (h) {
       var td = document.createElement("td");
       td.textContent = row[h] || "";
-      if (detailCols.indexOf(h) >= 0) td.classList.add("detail-col");
+      var idx = detailCols.indexOf(h);
+      if (idx === 0) td.classList.add("detail-col-peek");
+      else if (idx > 0) td.classList.add("detail-col");
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -66,6 +56,37 @@ function buildCsvTable(container, headers, rows, detailCols) {
 
   wrap.appendChild(table);
   container.appendChild(wrap);
+
+  // Right fade — column toggle
+  if (detailCols.length) {
+    var fade = document.createElement("div");
+    fade.className = "csv-table-fade";
+    fade.title = "Show more columns";
+
+    var icon = document.createElement("div");
+    icon.className = "csv-fade-icon";
+    icon.textContent = "+";
+    fade.appendChild(icon);
+
+    fade.addEventListener("click", function () {
+      var on = table.classList.toggle("show-details");
+      container.classList.toggle("details-visible");
+      icon.textContent = on ? "\u00d7" : "+";
+      fade.title = on ? "Hide detail columns" : "Show more columns";
+    });
+
+    container.appendChild(fade);
+  }
+
+  // Bottom fade — decorative scroll hint, hides when scrolled to bottom
+  var bottomFade = document.createElement("div");
+  bottomFade.className = "csv-table-bottom-fade";
+  container.appendChild(bottomFade);
+
+  wrap.addEventListener("scroll", function () {
+    var atBottom = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 10;
+    bottomFade.style.opacity = atBottom ? "0" : "1";
+  });
 
   // Enable sorting via tablesort (already loaded by the site)
   if (typeof Tablesort !== "undefined") new Tablesort(table);
