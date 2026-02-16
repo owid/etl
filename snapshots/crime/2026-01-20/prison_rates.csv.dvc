@@ -10,17 +10,15 @@ meta:
       The World Prison Brief is hosted by the Institute for Crime & Justice Policy Research (ICPR), at Birkbeck, University of London. ICPR hosts and updates the World Prison Brief as part of its World Prison Research Programme. This programme, which involves collaboration with research partners, civil society organisations and policy makers, aims to inform and promote debate and policy reform through international comparative research projects, publications and civil society engagement.
 
       In addition to providing access to the World Prison Brief database, this website holds other prisons publications by ICPR, including World Prison Population Lists, the handbook A Human Rights Approach to Prison Management, research project reports, blogs and expert commentary on prisons issues.
-    date_published: "2025-12-01"
-
+    date_published: "2026-01-20"
     # Citation
     producer: Institute for Crime & Justice Policy Research
     citation_full: |-
       World Prison Brief, Institute for Crime & Justice Policy Research.
     attribution_short: ICJPR
-
     # Files
     url_main: https://www.prisonstudies.org/highest-to-lowest/prison_population_rate?field_region_taxonomy_tid=All
-    date_accessed: '2026-01-20'
+    date_accessed: "2026-01-20"
 
     # License
     license:

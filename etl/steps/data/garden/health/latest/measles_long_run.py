@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_hist = ds_meadow_historical.read("measles_historical")
     tb_curr = ds_meadow_current.read("measles_cases")
-    tb_curr = tb_curr.drop(columns=["states_with_cases", "outbreaks_n"])
+    tb_curr = tb_curr.drop(columns=["states_with_cases", "outbreaks_n", "filter_esp"])
     # Concatenate historical and current tables.
     tb = pr.concat([tb_hist, tb_curr], short_name="measles_long_run")
     # Save outputs.
