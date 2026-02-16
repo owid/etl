@@ -140,3 +140,96 @@ div.highlight pre span.gp {
     transition: none;
   }
 }
+
+/* --- CSV Data Table ------------------------------------------------ */
+
+.csv-table-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.4em 1em;
+  margin-bottom: 0.75em;
+  border: 1px solid var(--md-primary-fg-color);
+  border-radius: 0.2rem;
+  background: transparent;
+  color: var(--md-primary-fg-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.csv-table-toggle:hover {
+  background: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+.csv-table-scroll {
+  overflow: auto;
+  max-height: 70vh;
+  border: 1px solid var(--md-typeset-table-color);
+  border-radius: 0.2rem;
+  margin-bottom: 1em;
+}
+
+.csv-table-scroll table {
+  border-collapse: collapse;
+  margin: 0;
+  width: max-content;
+  font-size: 0.82rem;
+}
+
+.csv-table-scroll th,
+.csv-table-scroll td {
+  padding: 0.5em 0.9em;
+  border-bottom: 1px solid var(--md-typeset-table-color);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* All cells get an opaque background (needed for sticky positioning) */
+.csv-table-scroll td {
+  background: var(--md-default-bg-color);
+}
+
+.csv-table-scroll tbody tr:nth-child(even) td {
+  background: var(--md-code-bg-color);
+}
+
+/* Header */
+.csv-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--md-default-bg-color);
+  font-weight: 700;
+  border-bottom: 2px solid var(--md-typeset-table-color);
+}
+
+/* Sticky first column */
+.csv-table-scroll td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  font-weight: 500;
+  border-right: 2px solid var(--md-typeset-table-color);
+}
+
+.csv-table-scroll th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  border-right: 2px solid var(--md-typeset-table-color);
+}
+
+/* Detail columns: hidden by default, wrappable when shown */
+.csv-table-scroll .detail-col {
+  display: none;
+  white-space: normal;
+  min-width: 200px;
+  max-width: 420px;
+}
+
+.csv-table-scroll table.show-details .detail-col {
+  display: table-cell;
+}

@@ -144,10 +144,12 @@ extra_javascript = [
     "https://unpkg.com/katex@0/dist/katex.min.js",
     "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
     "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
+    "https://unpkg.com/papaparse@5/papaparse.min.js",
     "javascripts/katex.js",
     "javascripts/tablesort.js",
     "javascripts/cell-toggles.js",
     "javascripts/notebook-copy.js",
+    "javascripts/csv-table.js",
     # Mermaid is handled by the markdown extension (see pymdownx.superfences config below)
 ]
 

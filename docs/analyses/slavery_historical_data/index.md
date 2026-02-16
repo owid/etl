@@ -78,5 +78,6 @@ And where data was missing for only a few years, we assumed there was no abrupt 
 
 You can find a country-by-country table with the end year and short notes explaining how we decided on each of them below. The table also links to the sources for the chart's annotations, which we added ourselves (since V-Dem does not include country descriptions).
 
-***TODO: Add table
+<div class="csv-table" data-src="slavery_historical_data.csv" data-detail-columns="Coding explanation,Chart annotation"></div>
+
 ***TODO: Fix footnotes
