@@ -6,8 +6,8 @@ from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Keep data only until 2023, as the baseline doesn't make sense beyond that
-YEAR_LIMIT = 2023
+# Keep data only until 2024, as the baseline doesn't make sense beyond that
+YEAR_LIMIT = 2024
 
 
 def run() -> None:
@@ -26,7 +26,7 @@ def run() -> None:
     # Drop unused column
     tb = tb.drop(columns=["known_excess_deaths"])
 
-    # Keep data until 2023
+    # Keep data until 2024
     tb = tb.loc[tb["date"].dt.year <= YEAR_LIMIT]
 
     # Set index
