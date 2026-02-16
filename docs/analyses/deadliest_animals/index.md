@@ -5,7 +5,7 @@
 
 ## Introduction and summary
 
-In our article "[What are the world's deadliest animals?](http://ourworldindata.org/worlds-deadliest-animals)", we provide estimates for how many people are killed by various animals in a given year.
+In our article "[What are the world's deadliest animals?](https://ourworldindata.org/worlds-deadliest-animals)", we provide estimates for how many people are killed by various animals in a given year.
 
 The purpose of this article is not to give *the* definitive numbers on deaths by animals. As we'll see below, the data quality for many animals is not good enough to do so. But from the research and data available, we can provide a better sense of the relative magnitude of each.
 
