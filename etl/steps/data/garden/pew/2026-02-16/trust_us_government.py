@@ -22,12 +22,12 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # Use the smoothed trend and average by year.
+    # Average both indicators by year.
     tb["year"] = tb["date"].astype(str).str.extract(r"(\d{4})$").astype(int)
-    tb = tb.groupby(["country", "year"], observed=True, as_index=False)["smoothed_trend"].mean()
+    tb = tb.groupby(["country", "year"], observed=True, as_index=False)[["individual_polls", "smoothed_trend"]].mean()
 
-    # Rename the smoothed_trend column to trust_us_government.
-    tb = tb.rename(columns={"smoothed_trend": "trust_us_government"})
+    # Rename columns.
+    tb = tb.rename(columns={"individual_polls": "trust_us_government", "smoothed_trend": "trust_us_government_smoothed"}, errors="raise")
 
     # Improve table format.
     tb = tb.format(["country", "year"])
