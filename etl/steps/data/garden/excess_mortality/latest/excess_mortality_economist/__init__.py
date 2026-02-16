@@ -1,7 +1,6 @@
-from owid.catalog import Table
-
 from etl.helpers import PathFinder
-from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
+
+# from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -22,7 +21,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb)
 
     # Add last 12 months
-    tb = add_last12m_values(tb)
+    # tb = add_last12m_values(tb)
     # Drop unused column
     tb = tb.drop(columns=["known_excess_deaths"])
 
@@ -46,14 +45,14 @@ def run() -> None:
     ds_garden.save()
 
 
-def add_last12m_values(tb: Table) -> Table:
-    """Add last 12 month data."""
-    columns = [
-        "cumulative_estimated_daily_excess_deaths",
-        "cumulative_estimated_daily_excess_deaths_ci_95_bot",
-        "cumulative_estimated_daily_excess_deaths_ci_95_top",
-    ]
-    for col in columns:
-        tb = add_last12m_to_metric(tb, col)
-        tb = add_last12m_to_metric(tb, f"{col}_per_100k")
-    return tb
+# def add_last12m_values(tb: Table) -> Table:
+#     """Add last 12 month data."""
+#     columns = [
+#         "cumulative_estimated_daily_excess_deaths",
+#         "cumulative_estimated_daily_excess_deaths_ci_95_bot",
+#         "cumulative_estimated_daily_excess_deaths_ci_95_top",
+#     ]
+#     for col in columns:
+#         tb = add_last12m_to_metric(tb, col)
+#         tb = add_last12m_to_metric(tb, f"{col}_per_100k")
+#     return tb
