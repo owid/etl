@@ -117,7 +117,7 @@ In the visualization, we assumed that freshwater snails kill **14,000 people** p
 
 The IHME and WHO estimates for this disease are similar.
 
-The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 13,467 people died from Schistosomasis in 2023.
+The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 13,467 people died from Schistosomiasis in 2023.
 
 The WHO's [Schistosomiasis Factsheet](https://www.who.int/news-room/fact-sheets/detail/schistosomiasis) gives a figure of 11,792, but the WHO also notes that these figures are "likely underestimated and need to be reassessed". Its Global Health Estimates had a figure of 14,133 for 2021.
 
