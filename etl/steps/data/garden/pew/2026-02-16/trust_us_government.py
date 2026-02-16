@@ -27,7 +27,10 @@ def run() -> None:
     tb = tb.groupby(["country", "year"], observed=True, as_index=False)[["individual_polls", "smoothed_trend"]].mean()
 
     # Rename columns.
-    tb = tb.rename(columns={"individual_polls": "trust_us_government", "smoothed_trend": "trust_us_government_smoothed"}, errors="raise")
+    tb = tb.rename(
+        columns={"individual_polls": "trust_us_government", "smoothed_trend": "trust_us_government_smoothed"},
+        errors="raise",
+    )
 
     # Improve table format.
     tb = tb.format(["country", "year"])
