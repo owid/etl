@@ -2,10 +2,9 @@
 
 from owid.catalog import Table, utils
 from owid.datautils.dataframes import map_series
+from structlog import get_logger
 
 from etl.helpers import PathFinder
-
-from structlog import get_logger
 
 # Initialize log.
 log = get_logger()
