@@ -69,11 +69,6 @@ SECTOR_MAPPING = {
         # - CO2, CH4, and N2O emissions from Agriculture/forestry, fishing, and other fuel consumption
         # Other fuel consumption includes emissions from military fuel use.
         "other_fuel_combustion",
-        # Waste sector contains emissions from following activities:
-        # - CH4 from Landfills (including industrial and municipal solid waste)
-        # - CH4 and N2O from Wastewater treatment (rural and urban)
-        # - CH4 and N2O from Other waste sources
-        "waste",
     ],
     "Getting around": [
         # Transportation subsector contains CO2, CH4 and N2O emissions from following activities:
@@ -87,7 +82,8 @@ SECTOR_MAPPING = {
         "transport",
         # Bunker fuels contain CO2 emissions from international marine and aviation bunkers. The split of domestic and international are determined by the departure and landing locations, and not by the nationality of the ship/airline.
         # Bunker Fuels are shown as a sector, but excluded from national totals for Energy (including energy subsector Transport) and Total GHG emissions, in accordance with IPCC Guidelines. In other words, except at World level, Total GHG emissions (and accordingly Energy sector, and Transport sub-sector emissions) do not include bunker fuel emissions.
-        "aviation_and_shipping",
+        # NOTE: We should not add aviation and shipping to transport. It is already included in World's transport, and it should be ignored at the country level.
+        # "aviation_and_shipping",
     ],
     "Keeping warm and cool": [
         # Building subsector contains CO2, CH4 and N2O emissions from following activities:
@@ -144,6 +140,11 @@ SECTOR_MAPPING = {
         # - Transmission and distribution
         # - CH4 and N2O from Other energy sources (solid fuels, oil and natural gas, incineration and open burning of waste)
         "fugitive",
+        # Waste sector contains emissions from following activities:
+        # - CH4 from Landfills (including industrial and municipal solid waste)
+        # - CH4 and N2O from Wastewater treatment (rural and urban)
+        # - CH4 and N2O from Other waste sources
+        "waste",
     ],
 }
 
@@ -156,9 +157,11 @@ def sanity_check_inputs(tb_ghg, tb_co2):
     columns_sectors = [
         column for column in tb_ghg.columns if "per_capita" not in column if column not in ["country", "year"]
     ]
-    # Remove energy sector, since it's a group of subsectors; idem for total columns.
+    # Remove energy sector, since it's a group of subsectors; idem for bunker fuels and total columns.
     columns_sectors = [
-        column for column in columns_sectors if column not in ["energy", "total_excluding_lucf", "total_including_lucf"]
+        column
+        for column in columns_sectors
+        if column not in ["energy", "aviation_and_shipping", "total_excluding_lucf", "total_including_lucf"]
     ]
     error = "Unexpected list of sectors."
     assert set(columns_sectors) == set(EXPECTED_SECTORS), error
