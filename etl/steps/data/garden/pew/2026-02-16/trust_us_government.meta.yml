@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trust
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  trust_us_government:
+    variables:
+      trust_us_government:
+        title: Trust in US government
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of people who say they trust the government in Washington to do what is right just about always/most of the time.
+        description_key:
+          - This data shows the share of people replying "just about always" or "most of the time" to the question "How much of the time do you think you can trust the government in Washington to do what is right?" The options were "just about always", "most of the time", "only some of the time", and "never".
+          - The data combines surveys from Pew Research Center, National Election Studies, Gallup, ABC/Washington Post, CBS/New York Times, and CNN.
+          - From the original data, we extracted the smoothed trend (which is a three-survey moving average) and then we averaged the values to have one observation per year.
+        description_from_producer: |-
+          % who say they trust the government in Washington to do what is right just about always/most of the time
+
+          Note: From 1976-February 2025, the smoothed trend line represents a three-survey moving average. Data prior to 1976, and the most recent number (September 2025), are from individual polls.
+
+          Sources: Pew Research Center, National Election Studies, Gallup, ABC/Washington Post, CBS/New York Times, and CNN surveys.
+        processing_level: major
+        description_processing: |-
+          From the original data, we extracted the smoothed trend (which is a three-survey moving average) and then we averaged the values to have one observation per year.
+        display:
+          name: Trust in US government
+          numDecimalPlaces: 0
+          tolerance: 5

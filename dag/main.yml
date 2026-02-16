@@ -794,6 +794,17 @@ steps:
   data://grapher/worldbank_wdi/2026-01-29/wdi:
     - data://garden/worldbank_wdi/2026-01-29/wdi
 
+
+  #
+  # Trust in US government - Pew Research Center
+  #
+  data://meadow/pew/2026-02-16/trust_us_government:
+    - snapshot://pew/2026-02-16/trust_us_government.csv
+  data://garden/pew/2026-02-16/trust_us_government:
+    - data://meadow/pew/2026-02-16/trust_us_government
+  data://grapher/pew/2026-02-16/trust_us_government:
+    - data://garden/pew/2026-02-16/trust_us_government
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
