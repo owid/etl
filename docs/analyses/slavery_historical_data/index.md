@@ -3,7 +3,7 @@
 !!! info ""
     :octicons-person-16: **[Bastian Herre](https://ourworldindata.org/team/bastian-herre), [Esteban Ortiz-Ospina](https://ourworldindata.org/team/esteban-ortiz-ospina), [Max Roser](https://ourworldindata.org/team/max-roser)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Slavery%20historical%20data)
 
-Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view to show when each country ended large-scale forced labor (or whether a country has not abolished it)](https://ourworldindata.org/)***(TODO: Update link).
+Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view to show when each country ended large-scale forced labor (or whether a country has not abolished it)](https://ourworldindata.org/).
 
 "Large-scale" forced labor here means forced labor that was common and entrenched — tolerated, enabled, or imposed by authorities, rather than isolated abuse.
 
@@ -11,7 +11,7 @@ The data shows that almost all countries have ended large-scale forced labor, of
 
 Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical documentation, we detail how we constructed the dataset.
 
-You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/)***(TODO: Update link).
+You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/).
 
 
 ## What data we used
@@ -44,7 +44,7 @@ This approach helps address key measurement challenges: using country experts he
 
 Despite these strengths, V-Dem also has limitations that matter for our purposes here. First, its forced-labor indicators are designed to measure severity, not to draw a clear line between countries with and without large-scale forced labor. V-Dem's main measure places countries on a continuous scale, and a secondary measure places them on the original 0-4 scale. But neither specifies where a meaningful cutoff for “large-scale” forced labor should lie.
 
-Second, coverage is incomplete. Some of today's smaller countries are not included in V-Dem at all. Others are only covered from independence or from around 1900 onward[^1], and for a few country-years, the forced-labor assessment data are missing.
+Second, coverage is incomplete. Some of today's smaller countries are not included in V-Dem at all. Others are only covered from independence or from around 1900 onward[^vdem-coverage], and for a few country-years, the forced-labor assessment data are missing.
 
 To address these limitations, we built on V-Dem's work in two ways. We set a cutoff for what counts as “large-scale” forced labor, and we extended coverage where possible by linking modern countries to earlier states that governed the same territory.
 
@@ -70,7 +70,7 @@ V-Dem's data does not cover every country for all of the last two centuries. To 
 
 V-Dem's coverage is enough to identify an end year for large-scale forced labor in 112 countries using our cutoff. For the remaining 62 countries, V-Dem's coverage starts later — often because these countries were not independent states for the full period we cover. To include these countries in a consistent long-run global series, we extended coverage back in time.
 
-Where a modern country's territory was previously governed by an identifiable predecessor state, we applied the predecessor's end year.[^2] This allowed us to assign end years for another 39 countries. For example, Belarus is covered only from 1990, but was part of the Soviet Union, so we use the Soviet Union's end year of 1954\.
+Where a modern country's territory was previously governed by an identifiable predecessor state, we applied the predecessor's end year.[^predecessors] This allowed us to assign end years for another 39 countries. For example, Belarus is covered only from 1990, but was part of the Soviet Union, so we use the Soviet Union's end year of 1954\.
 
 For the remaining 23 countries without clear historical predecessors, we consulted additional sources to manually fill the gaps ourselves. Where sources were unclear or disagreed, we adopted the conservative assumption that large-scale forced labor continued until the first year V-Dem covers the country. For example, the additional sources are unclear about the extent of forced labor in Nigeria in the early 20th century, which is why we use 1913 as the end year, the year before the V-Dem starts (and there's no large-scale forced labor based on the expert assessments and our cutoff).
 
@@ -80,5 +80,5 @@ You can find a country-by-country table with the end year and short notes explai
 
 <div class="csv-table" data-src="slavery_historical_data.csv" data-detail-columns="Coding explanation,Chart annotation"></div>
 
-[^1]: At most, V-Dem extends back to 1789, the year of the French Revolution, which it considers the beginning of modern history.
-[^2]: We identified predecessors using the historical maps of CShapes, the work of Andreas Wimmer and Brian Min, and V-Dem's own information on historical country names.
+[^vdem-coverage]: At most, V-Dem extends back to 1789, the year of the French Revolution, which it considers the beginning of modern history.
+[^predecessors]: We identified predecessors using the historical maps of CShapes, the work of Andreas Wimmer and Brian Min, and V-Dem's own information on historical country names.
