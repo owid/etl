@@ -189,9 +189,7 @@ def calculate_population_share_change(tb):
         popshare_col = f"popshare_{location_type}"
 
         # Calculate change in population share: popshare_t - popshare_t-1 (in percentage points)
-        tb[f"popshare_change_{location_type}"] = (
-            tb.groupby("country")[popshare_col].diff()
-        )
+        tb[f"popshare_change_{location_type}"] = tb.groupby("country")[popshare_col].diff()
 
     return tb
 
