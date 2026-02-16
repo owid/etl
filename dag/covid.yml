@@ -1,16 +1,16 @@
 steps:
   # Explorer
-  export://explorers/covid/latest/covid:
-    - data://grapher/covid/latest/cases_deaths
-    - data://grapher/covid/latest/vaccinations_global
-    - data://grapher/covid/latest/hospital
-    - data-private://grapher/covid/latest/sequence
-    - data://grapher/covid/latest/oxcgrt_policy
-    - data://grapher/covid/latest/tracking_r
-    - data://grapher/covid/latest/testing
-    - data://grapher/covid/latest/combined
-    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
-    - data://grapher/excess_mortality/latest/excess_mortality
+  # export://explorers/covid/latest/covid:
+  #   - data://grapher/covid/latest/cases_deaths
+  #   - data://grapher/covid/latest/vaccinations_global
+  #   - data://grapher/covid/latest/hospital
+  #   - data-private://grapher/covid/latest/sequence
+  #   - data://grapher/covid/latest/oxcgrt_policy
+  #   - data://grapher/covid/latest/tracking_r
+  #   - data://grapher/covid/latest/testing
+  #   - data://grapher/covid/latest/combined
+  #   - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+  #   - data://grapher/excess_mortality/latest/excess_mortality
 
   # Compact dataset (similar to former megafile)
   data://garden/covid/latest/compact:
