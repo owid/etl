@@ -3,7 +3,7 @@
 !!! info ""
     :octicons-person-16: **[Bastian Herre](https://ourworldindata.org/team/bastian-herre), [Esteban Ortiz-Ospina](https://ourworldindata.org/team/esteban-ortiz-ospina), [Max Roser](https://ourworldindata.org/team/max-roser)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Slavery%20historical%20data)
 
-Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view to show when each country ended large-scale forced labor (or whether a country has not abolished it)](https://ourworldindata.org/).
+Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view](https://ourworldindata.org/) to show when each country ended large-scale forced labor (or whether a country has not abolished it).
 
 "Large-scale" forced labor here means forced labor that was common and entrenched — tolerated, enabled, or imposed by authorities, rather than isolated abuse.
 
