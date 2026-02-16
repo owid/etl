@@ -57,6 +57,23 @@ def run() -> None:
         },
         common_view_config=MULTIDIM_CONFIG,
     )
+    # Add grouped view for location types (stacked area chart)
+    c1.group_views(
+        groups=[
+            {
+                "dimension": "location_type",
+                "choice_new_slug": "location_type_stacked",
+                "choices": ["urban_centre", "urban_cluster", "rural_total"],
+                "view_config": {
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["StackedArea"],
+                    "hideAnnotationFieldsInTitle": {"time": True},
+                    "addCountryMode": "add-country",
+                },
+            }
+        ]
+    )
 
     # Collection 2: Dominant type data (has metric='dominant_type', data_type, and location_type dimensions)
     c2 = paths.create_collection(
@@ -72,24 +89,6 @@ def run() -> None:
         [c1, c2],
         collection_name=paths.short_name,
         config=paths.load_collection_config(),
-    )
-
-    # Add grouped view for location types (stacked area chart)
-    c.group_views(
-        groups=[
-            {
-                "dimension": "location_type",
-                "choice_new_slug": "location_type_stacked",
-                "choices": ["urban_centre", "urban_cluster", "rural_total"],
-                "view_config": {
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["StackedArea"],
-                    "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "add-country",
-                },
-            }
-        ]
     )
 
     # Update view configurations and add colors
