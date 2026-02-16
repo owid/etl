@@ -111,7 +111,7 @@ definitions:
     presentation:
       grapher_config:
         note: |-
-          "Other emissions" are those that cannot be allocated to any specific sector; including waste in landfills, fugitive emissions, and other fuel combustion emissions.
+          "Other emissions" are those that cannot be allocated to any specific sector, including waste in landfills, fugitive emissions, and other fuel combustion. "Growing food" includes land-use change emissions, which can be negative.
 
 
 dataset:
