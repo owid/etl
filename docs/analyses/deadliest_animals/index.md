@@ -47,7 +47,7 @@ Here is a table of the final figures used in the main visualization in the artic
 
 In the visualization, we assumed that mosquitoes kill approximately **760,000 people** per year. Here, mosquitoes included multiple species.
 
-Mosquitoes kill humans indirectly by transmitting fatal infectious diseases. These disease are listed in the table below, sources, and estimates for how many people died from them in 2023.
+Mosquitoes kill humans indirectly by transmitting fatal infectious diseases. These diseases are listed in the table below, along with sources and estimates of how many people died from them in 2023.
 
 The largest killer, by far, was malaria which is spread by infected female *Anopheles* mosquitoes. In the table below we list the latest estimate — around 670,000 — from the [Institute for Health Metrics and Evaluation](https://vizhub.healthdata.org/gbd-results/). The World Health Organization reports a slightly lower [estimate of 610,000 deaths](https://www.who.int/news-room/fact-sheets/detail/malaria) in the most recent year.
 
