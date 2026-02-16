@@ -22,21 +22,19 @@ V-Dem's expert surveys include two questions on forced labor: one asks about how
 
 The full survey question for men \[women\] is:
 
-“Question: Are adult men \[women\] free from servitude and other kinds of forced labor?”
+> **Question:** "Are adult men \[women\] free from servitude and other kinds of forced labor?"
+>
+> **Clarification:** Involuntary servitude occurs when an adult is unable to quit a job s/he desires to leave — not by reason of economic necessity but rather by reason of employer's coercion. This includes labor camps but not work or service which forms part of normal civic obligations such as conscription or employment in command economies.
 
-Clarification: Involuntary servitude occurs when an adult is unable to quit a job s/he desires to leave — not by reason of economic necessity but rather by reason of employer's coercion. This includes labor camps but not work or service which forms part of normal civic obligations such as conscription or employment in command economies.
+**Responses:**
 
-Responses:
-
-0: Male \[Female\] servitude or other kinds of forced labor is widespread and accepted (perhaps even organized) by the state.
-
-1: Male \[Female\] servitude or other kinds of forced labor is substantial. Although officially opposed by the public authorities, the state is unwilling or unable to effectively contain the practice.
-
-2: Male \[Female\] servitude or other kinds of forced labor exists but is not widespread and usually actively opposed by public authorities, or only tolerated in some particular areas or among particular social groups.
-
-3: Male \[Female\] servitude or other kinds of forced labor is infrequent and only found in the criminal underground. It is actively and sincerely opposed by the public authorities.
-
-4: Male \[Female\] servitude or other kinds of forced labor is virtually non-existent.”
+| Score | Description |
+|:-----:|-------------|
+| **0** | Servitude or forced labor is widespread and accepted (perhaps even organized) by the state. |
+| **1** | Servitude or forced labor is substantial. Although officially opposed by the public authorities, the state is unwilling or unable to effectively contain the practice. |
+| **2** | Servitude or forced labor exists but is not widespread and usually actively opposed by public authorities, or only tolerated in some particular areas or among particular social groups. |
+| **3** | Servitude or forced labor is infrequent and only found in the criminal underground. It is actively and sincerely opposed by the public authorities. |
+| **4** | Servitude or forced labor is virtually non-existent. |
 
 V-Dem takes the independent expert assessments and calculates an overall score. They do this by using a [statistical model](https://v-dem.net/media/publications/wp21_2025.pdf) that combines the individual expert scores while accounting for uncertainty and differences between the individual assessments.
 
