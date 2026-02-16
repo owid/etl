@@ -26,12 +26,12 @@ Here is a table of the final figures used in the main visualization in the artic
 | Freshwater snails (Schistosomiasis) | 14,000 |
 | Kissing bugs (Chagas disease) | 8,000 |
 | Sandflies (Leishmaniasis) | 5,000 |
-| Roundworms (Ascariasis) | 5,000 |
+| Roundworms (Ascariasis) | 4,000 |
 | Scorpions | 3,000 |
 | Tapeworms (Cysticercosis) | 2,000 |
 | Tsetse flies (Trypanosomiasis) | 1,500 |
 | Elephants | 1,000 |
-| Hippopotamuses | >500 |
+| Hippopotamuses | >50 |
 | Bees, wasps and hornets | 500 |
 | Big cats | 300 |
 | Crocodiles | >150 |
