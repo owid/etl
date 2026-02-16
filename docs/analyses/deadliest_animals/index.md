@@ -1,7 +1,7 @@
 # What are the world's deadliest animals?
 
 !!! info ""
-    :octicons-person-16: **[Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie), [Fiona Spooner](https://ourworldindata.org/team/fiona-spooner)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20World's%20deadliest%20animals)
+    :octicons-person-16: **[Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie), [Fiona Spooner](https://ourworldindata.org/team/fiona-spooner)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20World%27s%20deadliest%20animals)
 
 ## Introduction and summary
 
