@@ -57,15 +57,17 @@ function buildCsvTable(container, headers, rows, detailCols) {
   wrap.appendChild(table);
   container.appendChild(wrap);
 
-  // Prevent column reflow on first expand: briefly show all columns
-  // (synchronously, before the browser paints), measure the stable widths
-  // of the main columns, then hide detail columns again.
+  // Lock main column widths to prevent reflow on first expand.
+  // Runs in rAF (before next paint, so no flash) to avoid breaking
+  // the browser's initial sticky-positioning setup.
   if (detailCols.length) {
-    table.classList.add("show-details");
-    hRow.querySelectorAll("th:not(.detail-col):not(.detail-col-peek)").forEach(function (th) {
-      th.style.width = th.offsetWidth + "px";
+    requestAnimationFrame(function () {
+      table.classList.add("show-details");
+      hRow.querySelectorAll("th:not(.detail-col):not(.detail-col-peek)").forEach(function (th) {
+        th.style.width = th.offsetWidth + "px";
+      });
+      table.classList.remove("show-details");
     });
-    table.classList.remove("show-details");
   }
 
   // Right fade — column toggle
