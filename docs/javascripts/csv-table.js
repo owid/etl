@@ -18,6 +18,24 @@ document$.subscribe(function () {
   });
 });
 
+// Turn markdown links [text](url) into <a> elements, keeping the rest as text nodes.
+function setCellContent(el, str) {
+  var re = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+  var last = 0;
+  var match;
+  while ((match = re.exec(str)) !== null) {
+    if (match.index > last) el.appendChild(document.createTextNode(str.slice(last, match.index)));
+    var a = document.createElement("a");
+    a.href = match[2];
+    a.textContent = match[1];
+    a.target = "_blank";
+    a.rel = "noopener";
+    el.appendChild(a);
+    last = re.lastIndex;
+  }
+  if (last < str.length) el.appendChild(document.createTextNode(str.slice(last)));
+}
+
 function buildCsvTable(container, headers, rows, detailCols) {
   var wrap = document.createElement("div");
   wrap.className = "csv-table-scroll";
@@ -44,7 +62,7 @@ function buildCsvTable(container, headers, rows, detailCols) {
     var tr = document.createElement("tr");
     headers.forEach(function (h) {
       var td = document.createElement("td");
-      td.textContent = row[h] || "";
+      setCellContent(td, row[h] || "");
       var idx = detailCols.indexOf(h);
       if (idx === 0) td.classList.add("detail-col-peek");
       else if (idx > 0) td.classList.add("detail-col");
