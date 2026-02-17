@@ -386,7 +386,7 @@ tables:
               <% elif location_type == 'rural_total' %>
               Rural areas
               <% elif location_type == 'urban_total' %>
-              Urban areas
+              Urban areas (cities and towns)
               <%- endif -%>
             isProjection: <% if data_type == 'projections' %>true<% else %>false<% endif %>
             numDecimalPlaces:
