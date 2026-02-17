@@ -8,14 +8,13 @@ definitions:
 
   # --- Reusable text blocks (plain language) ---
   text_degurba_overview: &text_degurba_overview |-
-    The [Degree of Urbanisation](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
+    The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
 
   text_data_source: &text_data_source |-
     The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
 
   text_degurba_caveat: &text_degurba_caveat |-
-    Urban and rural areas are defined differently across countries, using legal status, administrative boundaries, or population criteria. The [Degree of Urbanisation](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanisation rates may differ from country-reported figures.
-
+    Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanization rates may differ from country-reported figures.
   text_small_territory_caveat: &text_small_territory_caveat |-
     For small countries, values can change sharply when an entire area shifts from one classification to another.
 
@@ -30,7 +29,7 @@ tables:
     variables:
       value:
           description_short: |-
-            <% if data_type == 'estimates' %>Estimated<% else %>Projected<% endif %> <% if metric == 'population' %>number of people living<% elif metric == 'area' %>land area<% elif metric == 'built_up_area' %>area covered by buildings<% elif metric == 'share' %>share of land<% elif metric == 'popshare' %>share of population living<% elif metric == 'density' %>number of people per square kilometre<% elif metric == 'popshare_change' %>change in the share of population living<% endif %> <% if location_type == 'urban_centre' %>in [cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>in [towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>in [rural areas](#dod:rural-areas-degurba)<% elif location_type == 'urban_total' %>in urban areas<% endif %>. <% if location_type == 'urban_centre' %>Cities are<% elif location_type == 'urban_cluster' %>Towns and suburbs are<% elif location_type == 'rural_total' %>Rural areas are<% elif location_type == 'urban_total' %>Urban areas are<% endif %> identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
+            <% if data_type == 'estimates' %>Estimated<% else %>Projected<% endif %> <% if metric == 'population' %>number of people living<% elif metric == 'area' %>land area<% elif metric == 'built_up_area' %>area covered by buildings<% elif metric == 'share' %>share of land<% elif metric == 'popshare' %>share of population living<% elif metric == 'density' %>number of people per square kilometre<% elif metric == 'popshare_change' %>change in the share of the population living<% endif %> <% if location_type == 'urban_centre' %>in [cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>in [towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>in [rural areas](#dod:rural-areas-degurba)<% elif location_type == 'urban_total' %>in urban areas (the sum of [cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba))<% endif %><% if metric == 'popshare_change' %>, measured in percentage points over a 5-year period. Positive values indicate a growing share; negative values indicate a declining share<% if location_type == 'rural_total' %> (urbanization)<% endif %><% endif %>. Identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
 
           description_key:
             - *text_degurba_overview
@@ -50,9 +49,20 @@ tables:
 
             - |-
               <% if data_type == 'estimates' %>
-              Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the Global Human Settlement Layer.
+              Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
               <% else %>
               Projections (2025–2100) use the [CRISP (Cities and Rural Integrated Spatial Projections) spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence), which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
+              <% endif %>
+
+            - |-
+              <% if metric == 'popshare_change' %>
+              <% if location_type == 'urban_centre' or location_type == 'urban_total' %>
+              Positive values indicate a growing share of the population living in <% if location_type == 'urban_centre' %>cities<% else %>urban areas<% endif %>, while negative values indicate a declining share.
+              <% elif location_type == 'urban_cluster' %>
+              Positive values indicate a growing share of the population living in towns and suburbs, while negative values indicate a declining share.
+              <% elif location_type == 'rural_total' %>
+              Positive values indicate a growing share of the population living in rural areas, while negative values indicate a declining share (urbanization).
+              <% endif %>
               <% endif %>
 
             - *text_degurba_caveat
@@ -169,24 +179,24 @@ tables:
             Projected population density in urban areas
 
             <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in population share in cities
+            Change in the share of population living in cities
             <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in population share in cities
+            Projected change in the share of population living in cities
 
             <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in population share in towns
+            Change in the share of population living in towns and suburbs
             <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in population share in towns
+            Projected change in the share of population living in towns and suburbs
 
             <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in population share in rural areas
+            Change in the share of population living in rural areas
             <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in population share in rural areas
+            Projected change in the share of population living in rural areas
 
             <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in population share in urban areas
+            Change in the share of population living in urban areas
             <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in population share in urban areas
+            Projected change in the share of population living in urban areas
 
             <% endif %>
           unit:
@@ -221,6 +231,136 @@ tables:
             Change in population share was calculated as the difference between consecutive 5-year periods, measured in percentage points.
             <%- endif -%>
           presentation:
+            title_public: |-
+              <% if location_type == "rural_total" and metric == 'area' and data_type == 'estimates' %>
+              Land covered by rural areas
+              <% elif location_type == "rural_total" and metric == 'population' and data_type == 'estimates' %>
+              Population living in rural areas
+              <% elif location_type == "rural_total" and metric == 'share' and data_type == 'estimates' %>
+              Share of land covered by rural areas
+              <% elif location_type == "rural_total" and metric == 'popshare' and data_type == 'estimates' %>
+              Share of population living in rural areas
+              <% elif location_type == "rural_total" and metric == 'built_up_area' and data_type == 'estimates' %>
+              Built-up area in rural areas
+
+              <% elif location_type == "urban_centre" and metric == 'area' and data_type == 'estimates' %>
+              Land covered by cities
+              <% elif location_type == "urban_centre" and metric == 'population' and data_type == 'estimates' %>
+              Population living in cities
+              <% elif location_type == "urban_centre" and metric == 'share' and data_type == 'estimates' %>
+              Share of land covered by cities
+              <% elif location_type == "urban_centre" and metric == 'popshare' and data_type == 'estimates' %>
+              Share of population living in cities
+              <% elif location_type == "urban_centre" and metric == 'built_up_area' and data_type == 'estimates' %>
+              Built-up area in cities
+
+              <% elif location_type == "urban_cluster" and metric == 'area' and data_type == 'estimates' %>
+              Land covered by towns
+              <% elif location_type == "urban_cluster" and metric == 'population' and data_type == 'estimates' %>
+              Population living in towns
+              <% elif location_type == "urban_cluster" and metric == 'share' and data_type == 'estimates' %>
+              Share of land covered by towns
+              <% elif location_type == "urban_cluster" and metric == 'popshare' and data_type == 'estimates' %>
+              Share of population living in towns
+              <% elif location_type == "urban_cluster" and metric == 'built_up_area' and data_type == 'estimates' %>
+              Built-up area in towns
+
+              <% elif location_type == "urban_total" and metric == 'area' and data_type == 'estimates' %>
+              Land covered by urban areas
+              <% elif location_type == "urban_total" and metric == 'population' and data_type == 'estimates' %>
+              Population living in urban areas
+              <% elif location_type == "urban_total" and metric == 'share' and data_type == 'estimates' %>
+              Share of land covered by urban areas
+              <% elif location_type == "urban_total" and metric == 'popshare' and data_type == 'estimates' %>
+              Share of population living in urban areas
+              <% elif location_type == "urban_total" and metric == 'built_up_area' and data_type == 'estimates' %>
+              Built-up area in urban areas
+
+              <% elif location_type == "rural_total" and metric == 'area' and data_type == 'projections' %>
+              Projected land covered by rural areas
+              <% elif location_type == "rural_total" and metric == 'population' and data_type == 'projections' %>
+              Projected population living in rural areas
+              <% elif location_type == "rural_total" and metric == 'share' and data_type == 'projections' %>
+              Projected share of land covered by rural areas
+              <% elif location_type == "rural_total" and metric == 'popshare' and data_type == 'projections' %>
+              Projected share of population living in rural areas
+              <% elif location_type == "rural_total" and metric == 'built_up_area' and data_type == 'projections' %>
+              Projected built-up area in rural areas
+
+              <% elif location_type == "urban_centre" and metric == 'area' and data_type == 'projections' %>
+              Projected land covered by cities
+              <% elif location_type == "urban_centre" and metric == 'population' and data_type == 'projections' %>
+              Projected population living in cities
+              <% elif location_type == "urban_centre" and metric == 'share' and data_type == 'projections' %>
+              Projected share of land covered by cities
+              <% elif location_type == "urban_centre" and metric == 'popshare' and data_type == 'projections' %>
+              Projected share of population living in cities
+              <% elif location_type == "urban_centre" and metric == 'built_up_area' and data_type == 'projections' %>
+              Projected built-up area in cities
+
+              <% elif location_type == "urban_cluster" and metric == 'area' and data_type == 'projections' %>
+              Projected land covered by towns
+              <% elif location_type == "urban_cluster" and metric == 'population' and data_type == 'projections' %>
+              Projected population living in towns
+              <% elif location_type == "urban_cluster" and metric == 'share' and data_type == 'projections' %>
+              Projected share of land covered by towns
+              <% elif location_type == "urban_cluster" and metric == 'popshare' and data_type == 'projections' %>
+              Projected share of population living in towns
+              <% elif location_type == "urban_cluster" and metric == 'built_up_area' and data_type == 'projections' %>
+              Projected built-up area in towns
+
+              <% elif location_type == "urban_total" and metric == 'area' and data_type == 'projections' %>
+              Projected land covered by urban areas
+              <% elif location_type == "urban_total" and metric == 'population' and data_type == 'projections' %>
+              Projected population living in urban areas
+              <% elif location_type == "urban_total" and metric == 'share' and data_type == 'projections' %>
+              Projected share of land covered by urban areas
+              <% elif location_type == "urban_total" and metric == 'popshare' and data_type == 'projections' %>
+              Projected share of population living in urban areas
+              <% elif location_type == "urban_total" and metric == 'built_up_area' and data_type == 'projections' %>
+              Projected built-up area in urban areas
+
+              <% elif location_type == "urban_centre" and metric == 'density' and data_type == 'estimates' %>
+              Population density in cities
+              <% elif location_type == "urban_centre" and metric == 'density' and data_type == 'projections' %>
+              Projected population density in cities
+
+              <% elif location_type == "urban_cluster" and metric == 'density' and data_type == 'estimates' %>
+              Population density in towns
+              <% elif location_type == "urban_cluster" and metric == 'density' and data_type == 'projections' %>
+              Projected population density in towns
+
+              <% elif location_type == "rural_total" and metric == 'density' and data_type == 'estimates' %>
+              Population density in rural areas
+              <% elif location_type == "rural_total" and metric == 'density' and data_type == 'projections' %>
+              Projected population density in rural areas
+
+              <% elif location_type == "urban_total" and metric == 'density' and data_type == 'estimates' %>
+              Population density in urban areas
+              <% elif location_type == "urban_total" and metric == 'density' and data_type == 'projections' %>
+              Projected population density in urban areas
+
+              <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'estimates' %>
+              Change in the share of population living in cities
+              <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'projections' %>
+              Projected change in the share of population living in cities
+
+              <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'estimates' %>
+              Change in the share of population living in towns and suburbs
+              <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'projections' %>
+              Projected change in the share of population living in towns and suburbs
+
+              <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'estimates' %>
+              Change in the share of population living in rural areas
+              <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'projections' %>
+              Projected change in the share of population living in rural areas
+
+              <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'estimates' %>
+              Change in the share of population living in urban areas
+              <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'projections' %>
+              Projected change in the share of population living in urban areas
+
+              <% endif %>
             grapher_config:
               map:
                 colorScale:
@@ -238,6 +378,16 @@ tables:
                     <% endif %>
 
           display:
+            name: |-
+              <% if location_type == 'urban_centre' %>
+              Cities
+              <% elif location_type == 'urban_cluster' %>
+              Towns and suburbs
+              <% elif location_type == 'rural_total' %>
+              Rural areas
+              <% elif location_type == 'urban_total' %>
+              Urban areas
+              <%- endif -%>
             isProjection: <% if data_type == 'projections' %>true<% else %>false<% endif %>
             numDecimalPlaces:
                 <% if metric == 'area' or metric == 'built_up_area' %>
@@ -263,10 +413,10 @@ tables:
           <%- endif -%>
         unit: ""
         description_short: |-
-          Shows whether most people live in cities, towns and suburbs, or rural areas. Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
+          Shows whether most people live in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), or [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
 
         description_key:
-          - This shows which settlement type contains the largest share of a country's population.
+          - "This indicator shows where most people in a country live: in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), or [rural areas](#dod:rural-areas-degurba)."
 
           - *text_degurba_overview
 
@@ -276,11 +426,11 @@ tables:
           - *text_data_source
 
           - |-
-            <% if data_type == 'estimates' %>
-            Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the Global Human Settlement Layer.
-            <% else %>
-            Projections (2025–2100) use the CRISP spatial model, which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
-            <% endif %>
+              <% if data_type == 'estimates' %>
+              Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+              <% else %>
+              Projections (2025–2100) use the [CRISP (Cities and Rural Integrated Spatial Projections) spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence), which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
+              <% endif %>
 
           - *text_degurba_caveat
 
