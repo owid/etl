@@ -160,7 +160,7 @@ SECTOR_CW_MAPPING = {
         # - CH4 from Coal mining
         # - CH4 from Natural gas and oil systems
         # - Production
-        # - Faring and venting
+        # - Flaring and venting
         # - Transmission and distribution
         # - CH4 and N2O from Other energy sources (solid fuels, oil and natural gas, incineration and open burning of waste)
         "fugitive",
