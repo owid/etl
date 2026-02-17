@@ -8,7 +8,7 @@ definitions:
 
   # --- Reusable text blocks (plain language) ---
   text_degurba_overview: &text_degurba_overview |-
-    The Degree of Urbanisation (DEGURBA) classifies areas as cities, towns and suburbs, or rural areas based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
+    The [Degree of Urbanisation (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
 
   text_data_source: &text_data_source |-
     The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
