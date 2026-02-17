@@ -59,7 +59,7 @@ def run() -> None:
     for col in emissions_columns:
         tb_annual[f"per_capita_{col}"] = (tb_annual[col] * 1000) / tb_annual["population"]
 
-    tb_annual = add_inbound_outbound_tour(tb_annual, tb_tourism)
+    tb_annual = add_inbound_outbound_tour(tb_annual, tb_tourism, ds_regions)
 
     tb_monthly = process_monthly_data(tb)
 
@@ -145,15 +145,46 @@ def process_monthly_data(tb):
     return tb
 
 
-def add_inbound_outbound_tour(tb, tb_tourism):
-    just_inb_ratio = tb_tourism[["country", "year", "inbound_outbound_tourism"]]
-    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"], how="left")
+def add_inbound_outbound_tour(tb, tb_tourism, ds_regions):
+    # Get the underlying inbound/outbound tourism values (not just the ratio)
+    tb_tourism_vals = tb_tourism[[
+        "country", "year",
+        "in_tour_arrivals_trips_total_overnight_vis_tourists",
+        "out_tour_departures_trips_total_overnight_vis_tourists"
+    ]].copy()
 
-    # Calculate the interaction between TER_INT_a and inb_outb_tour
+    # Add regional aggregates for tourism
+    tb_tourism_vals = geo.add_regions_to_table(
+        tb=tb_tourism_vals,
+        index_columns=["country", "year"],
+        aggregations={
+            "in_tour_arrivals_trips_total_overnight_vis_tourists": "sum",
+            "out_tour_departures_trips_total_overnight_vis_tourists": "sum"
+        },
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
+
+    # Calculate the ratio from aggregated values (for both countries and regions)
+    tb_tourism_vals["inbound_outbound_tourism"] = (
+        tb_tourism_vals["in_tour_arrivals_trips_total_overnight_vis_tourists"] /
+        tb_tourism_vals["out_tour_departures_trips_total_overnight_vis_tourists"]
+    )
+
+    # Merge with CO2 data
+    tb = pr.merge(
+        tb,
+        tb_tourism_vals[["country", "year", "inbound_outbound_tourism"]],
+        on=["year", "country"],
+        how="left"
+    )
+
+    # Calculate tourism-adjusted indicators
     tb["int_inb_out_per_capita"] = tb["per_capita_TER_INT_a"] / tb["inbound_outbound_tourism"]
     tb["int_inb_out_tot"] = tb["TER_INT_a"] * tb["inbound_outbound_tourism"]
 
-    # Drop the 'inb_outb_tour' column
+    # Drop the tourism ratio column
     tb = tb.drop(["inbound_outbound_tourism"], axis=1)
 
     return tb
