@@ -127,7 +127,8 @@ nav = [
         { "Food supply of world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         { "Our COVID work" = "api/covid.md" },
         { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
-        { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
+        # TODO: Uncomment once main article is published, and update links to article
+        # { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
     ] },
 ]
 

@@ -1,3 +1,7 @@
+---
+status: new
+---
+
 # Tracking historical progress against slavery and forced labor: a long-run data view
 
 !!! info ""
@@ -9,7 +13,7 @@ Our team assembled a dataset and published the article [Tracking historical prog
 
 The data shows that almost all countries have ended large-scale forced labor, often surprisingly recently. This has been well documented in the many excellent books by historians and social scientists. What we add to this is a quantitative, bird's-eye perspective on the global history of slavery and forced labor.
 
-Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical documentation, we detail how we constructed the dataset and show it in full.
+Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical publication, we detail how we constructed the dataset and show it in full.
 
 You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/).
 
