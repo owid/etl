@@ -189,7 +189,7 @@ SECTORS_UN = sum(SECTOR_UN_MAPPING.values(), [])
 COLUMN_UN_FINAL_ENERGY = "Final energy consumption"
 
 
-def sanity_check_inputs(tb_ghg):
+def sanity_check_cw_data(tb_ghg):
     # List all columns sector emissions in the table of GHG emissions.
     columns_sectors = [
         column for column in tb_ghg.columns if "per_capita" not in column if column not in ["country", "year"]
@@ -215,6 +215,49 @@ def sanity_check_inputs(tb_ghg):
     # px.line(_tb[["year", "sum", "total_including_lucf"]].melt(id_vars=["year"]), x="year", y="value", color="variable", markers=True).update_yaxes(range=[0, None]).show()
 
 
+def sanity_check_un_data(tb_un):
+    error = "Unexpected units."
+    assert set(tb_un["unit"]) == {"Gigawatt-hours"}, error
+    # Ensure the total final energy consumption equals the sum of all sectors.
+    tb_un_sum = tb_un[tb_un["sector"].isin(SECTORS_UN)].groupby("year", as_index=False).agg({"value": "sum"})
+    tb_un_total = tb_un[tb_un["sector"] == COLUMN_UN_FINAL_ENERGY].groupby("year", as_index=False).agg({"value": "sum"})
+    tb_compared = tb_un_sum.merge(tb_un_total, on=["year"], how="inner", suffixes=("", "_sum"))
+    error = "Expected UN's final energy consumption to agree with the sum of the electricity consumption of each sector, within 0.01%."
+    assert (100 * (abs(tb_compared["value"] - tb_compared["value_sum"]) / tb_compared["value"]) < 0.01).all(), error
+    # Uncomment to show total final energy consumption compared to the sum of the electricity consumption of each sector.
+    # import plotly.express as px
+    # px.line(pd.concat([tb_un_total.assign(**{"source": "total"}), tb_un_sum.assign(**{"source": "sum"})]), x="year", y="value", color="source", markers=True)
+
+
+def fix_issue_with_switzerland_liechtenstein(tb_ghg, tb_un):
+    # UNdata has data for Switzerland-Liechtenstein, as well as for Liechtenstein.
+    # However, the latter country only has data for sector "other", and the full electricity share goes there.
+    error = "Expected Switzerland to be missing in UNdata (since it contains Switzerland-Liechtenstein)."
+    assert set(tb_ghg["country"]) - set(tb_un["country"]) == {"Switzerland"}, error
+    error = "Expected Liechtenstein to only have data for 'other' sector, with the full share of electricity."
+    liech_nonzero = tb_un[(tb_un["country"] == "Liechtenstein") & (tb_un["electricity_share"] > 0)]
+    assert (liech_nonzero["sector"] == "other").all() and (liech_nonzero["electricity_share"] == 1).all(), error
+    # I don't understand the details of this split.
+    # For the purpose of this step (where we calculate shares of electrycity) for now we can simply assume that the shares of final electricity consumption of both countries are the same.
+    # So, I'll drop Liechtenstein data, then rename "Switzerland-Liechtenstein" -> "Switzerland", and then repeat Switzerland's data, and assign it to Liechtenstein.
+    tb_un.loc[tb_un["country"] == "Switzerland-Liechtenstein", "country"] = "Switzerland"
+    tb_un = pr.concat(
+        [
+            tb_un[tb_un["country"] != "Liechtenstein"],
+            tb_un[tb_un["country"] == "Switzerland"].assign(**{"country": "Liechtenstein"}),
+        ],
+        ignore_index=True,
+    )
+
+    return tb_un
+
+
+def sanity_check_outputs(tb):
+    assert set(tb.dropna(subset="ghg_emissions_direct")["sector"]) == set(SECTOR_UN_MAPPING) | set(["electricity"])
+    assert set(tb.dropna(subset="ghg_emissions_indirect")["sector"]) == set(SECTOR_UN_MAPPING)
+    assert set(tb.dropna(subset="ghg_emissions")["sector"]) == set(SECTOR_UN_MAPPING)
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -230,16 +273,13 @@ def run() -> None:
     #
     # Process data.
     #
-    # Select only global data.
-    # tb_ghg = tb_ghg[tb_ghg["country"] == "World"].reset_index(drop=True)
-
     # Rename columns in Climate Watch table, for convenience.
     tb_ghg = tb_ghg.rename(
         columns={column: column.replace("_ghg_emissions", "") for column in tb_ghg.columns}, errors="raise"
     )
 
-    # Sanity checks.
-    sanity_check_inputs(tb_ghg=tb_ghg)
+    # Sanity check Climate Watch data.
+    sanity_check_cw_data(tb_ghg=tb_ghg)
 
     # Keep only columns of sector emissions.
     tb_ghg = tb_ghg[["country", "year"] + SECTORS_CW]
@@ -265,18 +305,7 @@ def run() -> None:
     )
 
     # Sanity checks.
-    # TODO: Make a function.
-    error = "Unexpected units."
-    assert set(tb_un["unit"]) == {"Gigawatt-hours"}, error
-    # Ensure the total final energy consumption equals the sum of all sectors.
-    tb_un_sum = tb_un[tb_un["sector"].isin(SECTORS_UN)].groupby("year", as_index=False).agg({"value": "sum"})
-    tb_un_total = tb_un[tb_un["sector"] == COLUMN_UN_FINAL_ENERGY].groupby("year", as_index=False).agg({"value": "sum"})
-    tb_compared = tb_un_sum.merge(tb_un_total, on=["year"], how="inner", suffixes=("", "_sum"))
-    error = "Expected UN's final energy consumption to agree with the sum of the electricity consumption of each sector, within 0.01%."
-    assert (100 * (abs(tb_compared["value"] - tb_compared["value_sum"]) / tb_compared["value"]) < 0.01).all(), error
-    # Uncomment to show total final energy consumption compared to the sum of the electricity consumption of each sector.
-    # import plotly.express as px
-    # px.line(pd.concat([tb_un_total.assign(**{"source": "total"}), tb_un_sum.assign(**{"source": "sum"})]), x="year", y="value", color="source", markers=True)
+    sanity_check_un_data(tb_un=tb_un)
 
     # For convenience, adapt units, from GWh to TWh.
     tb_un["value"] *= 1e-3
@@ -297,25 +326,8 @@ def run() -> None:
     # For convenience, transpose table.
     tb_un = tb_un.melt(id_vars=["country", "year"], value_name="electricity_share", var_name="sector")
 
-    # TODO: Make a function.
-    # UNdata has data for Switzerland-Liechtenstein, as well as for Liechtenstein.
-    # However, the latter country only has data for sector "other", and the full electricity share goes there.
-    error = "Expected Switzerland to be missing in UNdata (since it contains Switzerland-Liechtenstein)."
-    assert set(tb_ghg["country"]) - set(tb_un["country"]) == {"Switzerland"}, error
-    error = "Expected Liechtenstein to only have data for 'other' sector, with the full share of electricity."
-    liech_nonzero = tb_un[(tb_un["country"] == "Liechtenstein") & (tb_un["electricity_share"] > 0)]
-    assert (liech_nonzero["sector"] == "other").all() and (liech_nonzero["electricity_share"] == 1).all(), error
-    # I don't understand the details of this split.
-    # For the purpose of this step (where we calculate shares of electrycity) for now we can simply assume that the shares of final electricity consumption of both countries are the same.
-    # So, I'll drop Liechtenstein data, then rename "Switzerland-Liechtenstein" -> "Switzerland", and then repeat Switzerland's data, and assign it to Liechtenstein.
-    tb_un.loc[tb_un["country"] == "Switzerland-Liechtenstein", "country"] = "Switzerland"
-    tb_un = pr.concat(
-        [
-            tb_un[tb_un["country"] != "Liechtenstein"],
-            tb_un[tb_un["country"] == "Switzerland"].assign(**{"country": "Liechtenstein"}),
-        ],
-        ignore_index=True,
-    )
+    # Fix known issue with Switzerland-Liechtenstein.
+    tb_un = fix_issue_with_switzerland_liechtenstein(tb_ghg=tb_ghg, tb_un=tb_un)
 
     # Combine both tables.
     tb = tb_ghg.merge(tb_un, on=["country", "year", "sector"], how="outer")
@@ -341,21 +353,7 @@ def run() -> None:
     tb = tb.drop(columns=["electricity_share", "ghg_emissions_electricity_total"], errors="raise")
 
     # Sanity check outputs.
-    # TODO: Make a function.
-    assert set(tb.dropna(subset="ghg_emissions_direct")["sector"]) == set(SECTOR_UN_MAPPING) | set(["electricity"])
-    assert set(tb.dropna(subset="ghg_emissions_indirect")["sector"]) == set(SECTOR_UN_MAPPING)
-    assert set(tb.dropna(subset="ghg_emissions")["sector"]) == set(SECTOR_UN_MAPPING)
-
-    # Add an explanation to the metadata of which subsectors are included in each category.
-    description_processing = "Each category is made up of the following emission subcategories, based on IPCC definitions (as reported by Climate Watch):"
-    for sector, subsectors in SECTOR_CW_MAPPING.items():
-        _subsectors = (
-            ", ".join([s.replace("fugitive", "fugitive emissions").replace("_", " ") for s in subsectors]) + "."
-        )
-        description_processing += f"\n- {sector}: {_subsectors}"
-    for column in ["ghg_emissions", "ghg_emissions_direct", "ghg_emissions_indirect"]:
-        tb[column].metadata.description_processing = description_processing
-        tb[column].metadata.description_processing = description_processing
+    sanity_check_outputs(tb=tb)
 
     # Improve table format.
     tb = tb.format(keys=["country", "year", "sector"], short_name=paths.short_name)
