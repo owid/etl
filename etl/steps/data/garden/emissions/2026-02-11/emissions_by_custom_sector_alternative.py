@@ -254,7 +254,7 @@ def fix_issue_with_switzerland_liechtenstein(tb_ghg, tb_un):
     liech_nonzero = tb_un[(tb_un["country"] == "Liechtenstein") & (tb_un["electricity_share"] > 0)]
     assert (liech_nonzero["sector"] == "other").all() and (liech_nonzero["electricity_share"] == 1).all(), error
     # I don't understand the details of this split.
-    # For the purpose of this step (where we calculate shares of electrycity) for now we can simply assume that the shares of final electricity consumption of both countries are the same.
+    # For the purpose of this step (where we calculate shares of electricity) for now we can simply assume that the shares of final electricity consumption of both countries are the same.
     # So, I'll drop Liechtenstein data, then rename "Switzerland-Liechtenstein" -> "Switzerland", and then repeat Switzerland's data, and assign it to Liechtenstein.
     tb_un.loc[tb_un["country"] == "Switzerland-Liechtenstein", "country"] = "Switzerland"
     tb_un = pr.concat(
