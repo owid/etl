@@ -39,17 +39,19 @@ def run() -> None:
 
     tb = tb[tb["emissions_source"].isin(["TER_DOM", "TER_INT"])]
 
+    # Add population before regional aggregation
+    tb = geo.add_population_to_table(tb, ds_population)
+
     tb = geo.add_regions_to_table(
         tb=tb,
         index_columns=["country", "year", "month", "frequency_of_observation", "emissions_source"],
-        aggregations={"value": "sum"},
+        aggregations={"value": "sum", "population": "sum"},
         ds_regions=ds_regions,
         regions=REGIONS,
         frac_allowed_nans_per_year=0.9,
     )
 
     tb_annual = process_annual_data(tb)
-    tb_annual = geo.add_population_to_table(tb_annual, ds_population)
 
     emissions_columns = [col for col in tb_annual.columns if col not in ("country", "year", "population")]
 
@@ -61,13 +63,13 @@ def run() -> None:
 
     tb_monthly = process_monthly_data(tb)
 
-    # Generate per capital co2 emissions data and add it do the dataframe and convert to kg
-    for col in ["TER_DOM_m", "TER_INT_m"]:
-        tb_monthly[f"per_capita_{col}"] = (tb_monthly[col] * 1000) / tb_annual["population"]
-
     tb = pr.merge(tb_annual, tb_monthly, on=["year", "country"], how="outer")
     tb = tb[tb["year"] != 2025]
-    tb = tb.drop(["population"], axis=1)
+
+    # Generate per capita co2 emissions data for monthly after merge (when we have population)
+    for col in ["TER_DOM_m", "TER_INT_m"]:
+        tb[f"per_capita_{col}"] = (tb[col] * 1000) / tb["population"]
+
     tb["total_monthly_emissions"] = tb["TER_INT_m"] + tb["TER_DOM_m"]
 
     tb = tb.format(["country", "year"])
@@ -89,8 +91,15 @@ def process_annual_data(tb):
 
     tb["emissions_source"] = tb["emissions_source"].apply(lambda x: x + "_a")
 
+    # Preserve population column before pivot (keep first value per country-year)
+    tb_pop = tb[["country", "year", "population"]].drop_duplicates(subset=["country", "year"], keep="first")
+
     tb = tb.pivot(values="value", index=["country", "year"], columns=["emissions_source"])
     tb = tb.reset_index()
+
+    # Merge population back
+    tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
+
     tb["total_annual_emissions"] = tb["TER_INT_a"] + tb["TER_DOM_a"]
 
     return tb
