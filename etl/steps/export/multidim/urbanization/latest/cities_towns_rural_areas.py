@@ -99,7 +99,12 @@ def run() -> None:
             metric = view.dimensions.get("metric")
             # Only set stack mode if metric dimension exists
             if metric:
-                if metric == "popshare":
+                # Use line charts for density and popshare_change (not stackable)
+                if metric in ["density", "popshare_change"]:
+                    view.config["chartTypes"] = ["LineChart"]
+                    view.config["hasMapTab"] = False
+                    view.config["tab"] = "chart"
+                elif metric == "popshare":
                     view.config["stackMode"] = "relative"
                     view.config["yAxis"] = {"min": 0, "max": 100}
                 else:

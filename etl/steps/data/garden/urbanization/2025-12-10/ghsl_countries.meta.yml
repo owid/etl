@@ -8,7 +8,16 @@ definitions:
 
   # --- Reusable text blocks (plain language) ---
   text_degurba_overview: &text_degurba_overview |-
-    The Degree of Urbanisation (DEGURBA) is a standardized way to classify areas as cities, **towns and suburbs**, or **rural areas** for international comparisons. Developed by six organizations including the European Commission and endorsed by the UN, it provides a consistent definition across countries. Unlike administrative boundaries, DEGURBA classifies areas based on population density and cluster size, which means it captures the actual settlement patterns on the ground.
+    The Degree of Urbanisation (DEGURBA) classifies areas as cities, towns and suburbs, or rural areas based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
+
+  text_data_source: &text_data_source |-
+    The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
+
+  text_degurba_caveat: &text_degurba_caveat |-
+    DEGURBA may not match national definitions of "urban" or official city boundaries.
+
+  text_small_territory_caveat: &text_small_territory_caveat |-
+    For small territories (under 100,000 people), values can change sharply when entire areas shift classification.
 
 
 # Learn more about the available fields:
@@ -22,51 +31,34 @@ tables:
     variables:
       value:
           description_short: |-
-            <% if data_type == 'estimates' %>Estimated<% else %>Projected<% endif %> <% if metric == 'population' %>number of people<% elif metric == 'area' %>land area<% elif metric == 'built_up_area' %>built-up area<% elif metric == 'share' %>share of land area<% elif metric == 'popshare' %>share of population<% elif metric == 'density' %>population density<% elif metric == 'popshare_change' %>change in population share<% endif %> <% if location_type == 'urban_centre' %>in [cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>in [towns](#dod:towns-degurba)<% elif location_type == 'rural_total' %>in [rural areas](#dod:rural-areas-degurba)<% elif location_type == 'urban_total' %>in urban areas (cities and towns combined)<% endif %>, based on population density and total population of contiguous settlements, not administrative boundaries.
+            <% if data_type == 'estimates' %>Estimated<% else %>Projected<% endif %> <% if metric == 'population' %>number of people living<% elif metric == 'area' %>land area<% elif metric == 'built_up_area' %>area covered by buildings<% elif metric == 'share' %>share of land<% elif metric == 'popshare' %>share of population living<% elif metric == 'density' %>number of people per square kilometre<% elif metric == 'popshare_change' %>change in the share of population living<% endif %> <% if location_type == 'urban_centre' %>in [cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>in [towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>in [rural areas](#dod:rural-areas-degurba)<% elif location_type == 'urban_total' %>in urban areas<% endif %>. <% if location_type == 'urban_centre' %>Cities are<% elif location_type == 'urban_cluster' %>Towns and suburbs are<% elif location_type == 'rural_total' %>Rural areas are<% elif location_type == 'urban_total' %>Urban areas are<% endif %> identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
 
           description_key:
-            - |-
-              <% if metric == 'population' %>
-              This shows how many people live in <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %>.
-              <% elif metric == 'popshare' %>
-              This shows what percentage of the total population lives in <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %>.
-              <% elif metric == 'popshare_change' %>
-              This shows how the share of population living in <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %> changed compared to 5 years earlier, measured in percentage points. For example, if the urban share increased from 30% to 35%, this would show +5 percentage points. Note: Values can be highly volatile for small territories (population under 100,000) where classification changes cause large percentage swings.
-              <% elif metric == 'area' %>
-              This shows the total land area classified as <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %>.
-              <% elif metric == 'share' %>
-              This shows what percentage of the total land area is classified as <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %>.
-              <% elif metric == 'built_up_area' %>
-              This shows the surface area covered by buildings located in <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %>.
-              <% elif metric == 'density' %>
-              This shows the average number of people per square kilometre in <% if location_type == 'urban_centre' %>[cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>[towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>[rural areas](#dod:rural-areas-degurba)<% else %>urban areas (cities and towns combined)<% endif %>.
-              <% endif %>
-              <% if data_type == 'estimates' %>
-              These are historical estimates based on census data and satellite imagery.
-              <% else %>
-              These are model-based projections that become more uncertain further into the future.
-              <% endif %>
-
             - *text_degurba_overview
+
             - |-
               <% if location_type == 'urban_centre' %>
-              Cities ("urban centres") are defined as contiguous areas with at least 1,500 people per km² and at least 50,000 people total. The classification uses 1 km² grid cells as the basic unit, combining satellite imagery with census data to map where people actually live.
+              Cities are contiguous areas with at least 1,500 people per km² and a total population of at least 50,000.
               <% elif location_type == 'urban_cluster' %>
-              Towns and suburbs ("urban clusters") are defined as contiguous areas with at least 300 people per km² and at least 5,000 people total. The classification uses 1 km² grid cells as the basic unit, combining satellite imagery with census data to map where people actually live.
+              Towns and suburbs are contiguous areas with at least 300 people per km² and a total population of at least 5,000.
               <% elif location_type == 'rural_total' %>
-              Rural areas include all areas that don't meet the population density or size thresholds for cities or towns and suburbs. This includes sparsely populated countryside as well as small settlements. The classification uses 1 km² grid cells as the basic unit, combining satellite imagery with census data to map where people actually live.
+              Rural areas are places that don't meet the density or size thresholds for cities or towns.
               <% elif location_type == 'urban_total' %>
-              Urban areas combine both cities (urban centres) and towns and suburbs (urban clusters). Cities are contiguous areas with at least 1,500 people per km² and 50,000 people total. Towns and suburbs have at least 300 people per km² and 5,000 people total.
+              Urban areas include both cities (at least 1,500 people per km², 50,000 total) and towns and suburbs (at least 300 people per km², 5,000 total).
               <% endif %>
+
+            - *text_data_source
+
             - |-
               <% if data_type == 'estimates' %>
-              Historical estimates (1975-2020) are based on census data combined with satellite imagery of built-up areas from the Global Human Settlement Layer (GHSL). These provide the most reliable picture of past urbanization. The data is available at 5-year intervals.
+              Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the Global Human Settlement Layer.
               <% else %>
-              Projections (2025-2100) are created by downscaling national population projections using a spatial model (CRISP) that accounts for land characteristics and past settlement patterns. Uncertainty increases further into the future. The data is available at 5-year intervals.
+              Projections (2025–2100) use the CRISP spatial model, which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
               <% endif %>
-            - DEGURBA may not match official city limits or national definitions of "urban." A country classified as highly urbanized by DEGURBA might have different official statistics.
-            - For countries and territories with populations under 100,000 (e.g., Monaco, Vatican, small island nations), values can change dramatically between time periods due to the grid-based classification. Treat trends in these areas with caution.
-            - Future projections assume current settlement patterns continue and don't account for major events (wars, climate disasters, policy changes). They become more uncertain the further into the future.
+
+            - *text_degurba_caveat
+
+            - *text_small_territory_caveat
 
           title: |-
             <% if location_type == "rural_total" and metric == 'area' and data_type == 'estimates' %>
@@ -223,18 +215,20 @@ tables:
             <%- endif -%>
           description_processing: |-
             <% if metric == 'share' or metric == 'popshare' %>
-            The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns, rural areas) by the overall total, providing a percentage representation for each category.
+            Shares were calculated by dividing the area or population of each settlement type by the total, then multiplying by 100.
             <% elif metric == 'density' %>
-            Population density was calculated by dividing the population of cities by the total area it covers, providing a measure of the number of people living in each km².
+            Population density was calculated by dividing the population by the total area of that settlement type.
             <% elif metric == 'popshare_change' %>
-            Change in population share was calculated as the difference in percentage points between consecutive time periods (5-year intervals). For example, if the urban share increased from 30% to 35%, the change would be +5 percentage points. Note: values can be volatile for small territories where entire areas may shift classification categories.
+            Change in population share was calculated as the difference between consecutive 5-year periods, measured in percentage points.
             <%- endif -%>
           presentation:
             grapher_config:
               map:
                 colorScale:
                   baseColorScheme: |
-                    <% if location_type == 'urban_centre' %>
+                    <% if metric == 'popshare_change' %>
+                    RdYlBu
+                    <% elif location_type == 'urban_centre' %>
                     Blues
                     <% elif location_type == 'urban_cluster' %>
                     Purples
@@ -270,38 +264,29 @@ tables:
           <%- endif -%>
         unit: ""
         description_short: |-
-          <% if data_type == 'estimates' -%>
-          Indicates whether the majority of the population lives in cities, towns and suburbs, or rural areas, using the DEGURBA classification.
-          <%- else -%>
-          Indicates whether the majority of the population is projected to live in cities, towns and suburbs, or rural areas, using the DEGURBA classification.
-          <%- endif -%>
+          Shows whether most people live in cities, towns and suburbs, or rural areas. Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
 
         description_key:
-          - |-
-            This shows which settlement type contains the largest share of a country's population: cities, towns and suburbs, or rural areas. It provides a simple way to see whether a country is predominantly urban or rural.
-            <% if data_type == 'estimates' %>
-            These are based on historical census data and satellite imagery.
-            <% else %>
-            These are model-based projections that become more uncertain further into the future.
-            <% endif %>
+          - This shows which settlement type contains the largest share of a country's population.
 
           - *text_degurba_overview
-          - |-
-            How areas are classified:
-            - Cities ("urban centres"): Contiguous areas with at least 1,500 people per km² and at least 50,000 people total.
-            - Towns and suburbs ("urban clusters"): Contiguous areas with at least 300 people per km² and at least 5,000 people total.
-            - Rural areas: All remaining areas with lower density or smaller clusters.
 
-            The classification uses 1 km² grid cells as the basic unit, combining satellite imagery with census data to map where people actually live.
           - |-
-              <% if data_type == 'estimates' %>
-              Historical estimates (1975-2020) are based on census data combined with satellite imagery of built-up areas from the Global Human Settlement Layer (GHSL). These provide the most reliable picture of past urbanization. The data is available at 5-year intervals.
-              <% else %>
-              Projections (2025-2100) are created by downscaling national population projections using a spatial model (CRISP) that accounts for land characteristics and past settlement patterns. Uncertainty increases further into the future. The data is available at 5-year intervals.
-              <% endif %>
-          - DEGURBA may not match official city limits or national definitions of "urban." A country classified as highly urbanized by DEGURBA might have different official statistics.
-          - For countries and territories with populations under 100,000 (e.g., Monaco, Vatican, small island nations), values can change dramatically between time periods due to the grid-based classification. Treat trends in these areas with caution.
-          - Future projections assume current settlement patterns continue and don't account for major events (wars, climate disasters, policy changes). They become more uncertain the further into the future.
+            Cities are contiguous areas with at least 1,500 people per km² and a total population of at least 50,000. Towns and suburbs have at least 300 people per km² and 5,000 people total. Rural areas are everything else.
+
+          - *text_data_source
+
+          - |-
+            <% if data_type == 'estimates' %>
+            Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the Global Human Settlement Layer.
+            <% else %>
+            Projections (2025–2100) use the CRISP spatial model, which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
+            <% endif %>
+
+          - *text_degurba_caveat
+
+          - *text_small_territory_caveat
+
         display:
           isProjection: <% if data_type == 'projections' %>true<% else %>false<% endif %>
 
