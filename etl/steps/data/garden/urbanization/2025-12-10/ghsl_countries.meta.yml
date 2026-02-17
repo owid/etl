@@ -37,9 +37,9 @@ tables:
 
             - |-
               <% if location_type == 'urban_centre' %>
-              Cities are contiguous areas with at least 1,500 people per km² and a total population of at least 50,000.
+              Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometre and at least 50,000 people in total.
               <% elif location_type == 'urban_cluster' %>
-              Towns and suburbs are contiguous areas with at least 300 people per km² and a total population of at least 5,000.
+              Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
               <% elif location_type == 'rural_total' %>
               Rural areas are places with less than 300 people per km² or a total population of less than 5,000.
               <% elif location_type == 'urban_total' %>
@@ -52,7 +52,7 @@ tables:
               <% if data_type == 'estimates' %>
               Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the Global Human Settlement Layer.
               <% else %>
-              Projections (2025–2100) use the CRISP spatial model, which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
+              Projections (2025–2100) use the [CRISP (Cities and Rural Integrated Spatial Projections) spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence), which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
               <% endif %>
 
             - *text_degurba_caveat
@@ -271,7 +271,7 @@ tables:
           - *text_degurba_overview
 
           - |-
-            Cities are contiguous areas with at least 1,500 people per km² and a total population of at least 50,000. Towns and suburbs have at least 300 people per km² and 5,000 people total. Rural areas are everything else.
+            Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometre and at least 50,000 people in total. Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. Rural areas are everything else.
 
           - *text_data_source
 
