@@ -13,7 +13,7 @@ paths = PathFinder(__file__)
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania"]
 
 # Define fraction of allowed NaNs per year
-FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+FRAC_ALLOWED_NANS_PER_YEAR = 0.9
 
 
 def run() -> None:
@@ -48,7 +48,7 @@ def run() -> None:
         aggregations={"value": "sum", "population": "sum"},
         ds_regions=ds_regions,
         regions=REGIONS,
-        frac_allowed_nans_per_year=0.9,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
     )
 
     tb_annual = process_annual_data(tb)
