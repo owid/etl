@@ -67,6 +67,7 @@ def run() -> None:
                     "chartTypes": ["StackedArea"],
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
+                    "selectedFacetStrategy": "entity",
                 },
             },
             # Line chart: urban areas (total) vs rural
@@ -80,6 +81,8 @@ def run() -> None:
                     "chartTypes": ["LineChart"],
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
+                    "selectedFacetStrategy": "entity",
+                    ""
                 },
             },
         ]
