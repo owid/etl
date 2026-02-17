@@ -36,7 +36,7 @@ def run() -> None:
     tb = pr.merge(tb_long_run, tb_wdi, on=["country", "year"], how="outer", suffixes=("_long_run", "_wdi"))
 
     # If wdi data is available, use it. If not, use long run data.
-    tb["female_labor_participation"] = tb["female_labor_force_participation_wdi"].combine_first(
+    tb["female_labor_force_participation"] = tb["female_labor_force_participation_wdi"].combine_first(
         tb["female_labor_force_participation_long_run"]
     )
 
@@ -46,7 +46,7 @@ def run() -> None:
     )
 
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
