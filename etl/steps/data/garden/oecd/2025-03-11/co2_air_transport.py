@@ -66,6 +66,8 @@ def run() -> None:
     tb = pr.merge(tb_annual, tb_monthly, on=["year", "country"], how="outer")
     tb = tb[tb["year"] != 2025]
 
+    print(tb[(tb["country"].isin(REGIONS)) & (tb["year"] == 2021)][["country", "year", "int_inb_out_per_capita"]])
+
     # Generate per capita co2 emissions data for monthly after merge (when we have population)
     for col in ["TER_DOM_m", "TER_INT_m"]:
         tb[f"per_capita_{col}"] = (tb[col] * 1000) / tb["population"]
