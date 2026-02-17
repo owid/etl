@@ -8,17 +8,16 @@ definitions:
 
   # --- Reusable text blocks (plain language) ---
   text_degurba_overview: &text_degurba_overview |-
-    The [Degree of Urbanisation (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
+    The [Degree of Urbanisation](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
 
   text_data_source: &text_data_source |-
     The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
 
   text_degurba_caveat: &text_degurba_caveat |-
-    DEGURBA may not match national definitions of "urban" or official city boundaries.
+    Urban and rural areas are defined differently across countries, using legal status, administrative boundaries, or population criteria. The [Degree of Urbanisation](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanisation rates may differ from country-reported figures.
 
   text_small_territory_caveat: &text_small_territory_caveat |-
-    For small territories (under 100,000 people), values can change sharply when entire areas shift classification.
-
+    For small countries, values can change sharply when an entire area shifts from one classification to another.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -42,7 +41,7 @@ tables:
               <% elif location_type == 'urban_cluster' %>
               Towns and suburbs are contiguous areas with at least 300 people per km² and a total population of at least 5,000.
               <% elif location_type == 'rural_total' %>
-              Rural areas are places that don't meet the density or size thresholds for cities or towns.
+              Rural areas are places with less than 300 people per km² or a total population of less than 5,000.
               <% elif location_type == 'urban_total' %>
               Urban areas include both cities (at least 1,500 people per km², 50,000 total) and towns and suburbs (at least 300 people per km², 5,000 total).
               <% endif %>
