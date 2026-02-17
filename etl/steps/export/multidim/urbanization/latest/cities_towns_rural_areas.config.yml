@@ -26,7 +26,7 @@ dimensions:
         description: "Population in cities and towns combined."
       - slug: "location_type_stacked"
         name: "All settlement types"
-        description: "Cities, towns, and rural areas shown in a stacked area chart"
+        description: "Cities, towns, and rural areas shown on one chart."
       - slug: "by_dominant_type"
         name: "Dominant settlement type"
         description: "Shows whether cities, towns, or rural areas contain the largest share of the population."
