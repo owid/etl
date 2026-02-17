@@ -147,11 +147,14 @@ def process_monthly_data(tb):
 
 def add_inbound_outbound_tour(tb, tb_tourism, ds_regions):
     # Get the underlying inbound/outbound tourism values (not just the ratio)
-    tb_tourism_vals = tb_tourism[[
-        "country", "year",
-        "in_tour_arrivals_trips_total_overnight_vis_tourists",
-        "out_tour_departures_trips_total_overnight_vis_tourists"
-    ]].copy()
+    tb_tourism_vals = tb_tourism[
+        [
+            "country",
+            "year",
+            "in_tour_arrivals_trips_total_overnight_vis_tourists",
+            "out_tour_departures_trips_total_overnight_vis_tourists",
+        ]
+    ].copy()
 
     # Add regional aggregates for tourism
     tb_tourism_vals = geo.add_regions_to_table(
@@ -159,7 +162,7 @@ def add_inbound_outbound_tour(tb, tb_tourism, ds_regions):
         index_columns=["country", "year"],
         aggregations={
             "in_tour_arrivals_trips_total_overnight_vis_tourists": "sum",
-            "out_tour_departures_trips_total_overnight_vis_tourists": "sum"
+            "out_tour_departures_trips_total_overnight_vis_tourists": "sum",
         },
         ds_regions=ds_regions,
         regions=REGIONS,
@@ -168,16 +171,13 @@ def add_inbound_outbound_tour(tb, tb_tourism, ds_regions):
 
     # Calculate the ratio from aggregated values (for both countries and regions)
     tb_tourism_vals["inbound_outbound_tourism"] = (
-        tb_tourism_vals["in_tour_arrivals_trips_total_overnight_vis_tourists"] /
-        tb_tourism_vals["out_tour_departures_trips_total_overnight_vis_tourists"]
+        tb_tourism_vals["in_tour_arrivals_trips_total_overnight_vis_tourists"]
+        / tb_tourism_vals["out_tour_departures_trips_total_overnight_vis_tourists"]
     )
 
     # Merge with CO2 data
     tb = pr.merge(
-        tb,
-        tb_tourism_vals[["country", "year", "inbound_outbound_tourism"]],
-        on=["year", "country"],
-        how="left"
+        tb, tb_tourism_vals[["country", "year", "inbound_outbound_tourism"]], on=["year", "country"], how="left"
     )
 
     # Calculate tourism-adjusted indicators
