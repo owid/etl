@@ -9,6 +9,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: OECD - Trust in government data
   update_period_days: 365
 
 
