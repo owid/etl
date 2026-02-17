@@ -805,6 +805,17 @@ steps:
   data://grapher/pew/2026-02-16/trust_us_government:
     - data://garden/pew/2026-02-16/trust_us_government
 
+
+  #
+  # OECD - Trust in government
+  #
+  data://meadow/oecd/2026-02-17/trust_in_government:
+    - snapshot://oecd/2026-02-17/trust_in_government.csv
+  data://garden/oecd/2026-02-17/trust_in_government:
+    - data://meadow/oecd/2026-02-17/trust_in_government
+  data://grapher/oecd/2026-02-17/trust_in_government:
+    - data://garden/oecd/2026-02-17/trust_in_government
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

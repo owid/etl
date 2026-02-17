@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trust
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  trust_in_government:
+    variables:
+      trust_in_government:
+        title: Trust in government
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of respondents replying "yes" to the question "In this country, do you have confidence in national government, or not?"
+        description_key:
+          - "The original question asked was: “In this country, do you have confidence in each of the following, or not? ... How about national government?” The data shows the percentage of respondents answering “yes” (the other response categories being “no”, and “don’t know”)."
+          - The data comes from the annual Gallup World Poll, which samples around 1000 people per country each year. The sample is designed to be nationally representative of the population aged 15 and over (including rural areas).
+        processing_level: major
+        description_processing: As the data originally comes as 2- and 3-year pooled averages, we kept the latest year of each group as the year of the observation. For example, for the 2020-2022 average, we kept 2022 as the year of the observation.
+        description_from_producer: |-
+          Trust in government is based on the survey question: “In this country, do you have confidence in each of the following, or not? ... How about national government?” The data shown reflect the percentage of respondents answering “yes” (the other response categories being “no”, and “don’t know”). Information is sourced via the annual Gallup World Poll, which samples around 1 000 people per country each year. The sample is ex ante designed to be nationally representative of the population aged 15 and over (including rural areas).
+        display:
+          name: Trust in government
+          numDecimalPlaces: 1
+          tolerance: 5
+
+
