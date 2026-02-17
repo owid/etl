@@ -229,6 +229,22 @@ def sanity_check_un_data(tb_un):
     # px.line(pd.concat([tb_un_total.assign(**{"source": "total"}), tb_un_sum.assign(**{"source": "sum"})]), x="year", y="value", color="source", markers=True)
 
 
+def fix_limited_data_coverage(tb_un):
+    # The data coverage of the final year in the data is clearly incomplete; one can see that global data drops suddenly.
+    tb_un_totals = (
+        tb_un[tb_un["sector"] == COLUMN_UN_FINAL_ENERGY].groupby("year", as_index=False).agg({"value": "sum"}).sort_values("year")
+    )
+    latest_value = tb_un_totals["value"].iloc[-1]
+    previous_value = tb_un_totals["value"].iloc[-2]
+    error = "Expected a sharp drop in the latest year of UN final energy data (likely incomplete coverage)."
+    assert latest_value < 0.9 * previous_value, error
+
+    # Drop the latest year in the data.
+    tb_un = tb_un[tb_un["year"] < tb_un["year"].max()].reset_index(drop=True)
+
+    return tb_un
+
+
 def fix_issue_with_switzerland_liechtenstein(tb_ghg, tb_un):
     # UNdata has data for Switzerland-Liechtenstein, as well as for Liechtenstein.
     # However, the latter country only has data for sector "other", and the full electricity share goes there.
@@ -311,8 +327,8 @@ def run() -> None:
     tb_un["value"] *= 1e-3
     tb_un = tb_un.drop(columns=["unit"], errors="raise")
 
-    # TODO: The final year is clearly incomplete (it drops suddenly). Assert this drop in the data and then remove the latest year.
-    tb_un = tb_un[tb_un["year"] < tb_un["year"].max()].reset_index(drop=True)
+    # Fix limited data coverage.
+    tb_un = fix_limited_data_coverage(tb_un=tb_un)
 
     # Create shares of final electricity consumption by custom sectors.
     tb_un = tb_un.pivot(index=["country", "year"], columns=["sector"], join_column_levels_with="_")
