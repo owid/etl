@@ -9,7 +9,7 @@ Our team assembled a dataset and published the article [Tracking historical prog
 
 The data shows that almost all countries have ended large-scale forced labor, often surprisingly recently. This has been well documented in the many excellent books by historians and social scientists. What we add to this is a quantitative, bird's-eye perspective on the global history of slavery and forced labor.
 
-Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical documentation, we detail how we constructed the dataset.
+Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical documentation, we detail how we constructed the dataset and show it in full.
 
 You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/).
 
@@ -76,9 +76,9 @@ And where data was missing for only a few years, we assumed there was no abrupt 
 
 You can find a country-by-country table with the end year and short notes explaining how we decided on each of them below. The table also links to the sources for the chart's annotations, which we added ourselves (since V-Dem does not include country descriptions).
 
-[Download data](slavery_historical_data.csv){: download="slavery_historical_data.csv" }
-
 <div class="csv-table" data-src="slavery_historical_data.csv" data-detail-columns="Coding explanation,Chart annotation"></div>
+
+[Download data](slavery_historical_data.csv){: download="slavery_historical_data.csv" }
 
 [^vdem-coverage]: At most, V-Dem extends back to 1789, the year of the French Revolution, which it considers the beginning of modern history.
 [^predecessors]: We identified predecessors using the historical maps of CShapes, the work of Andreas Wimmer and Brian Min, and V-Dem's own information on historical country names.
