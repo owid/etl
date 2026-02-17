@@ -82,7 +82,6 @@ def run() -> None:
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
                     "selectedFacetStrategy": "entity",
-                    ""
                 },
             },
         ]
