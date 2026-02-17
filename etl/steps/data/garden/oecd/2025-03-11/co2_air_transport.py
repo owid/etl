@@ -39,6 +39,15 @@ def run() -> None:
 
     tb = tb[tb["emissions_source"].isin(["TER_DOM", "TER_INT"])]
 
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        index_columns=["country", "year", "month", "frequency_of_observation", "emissions_source"],
+        aggregations={"value": "sum"},
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        frac_allowed_nans_per_year=0.9,
+    )
+
     tb_annual = process_annual_data(tb)
     tb_annual = geo.add_population_to_table(tb_annual, ds_population)
 
@@ -61,7 +70,6 @@ def run() -> None:
     tb = tb.drop(["population"], axis=1)
     tb["total_monthly_emissions"] = tb["TER_INT_m"] + tb["TER_DOM_m"]
 
-    tb = geo.add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=REGIONS, frac_allowed_nans_per_year=0.9)
     tb = tb.format(["country", "year"])
 
     #
