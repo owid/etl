@@ -232,7 +232,10 @@ def sanity_check_un_data(tb_un):
 def fix_limited_data_coverage(tb_un):
     # The data coverage of the final year in the data is clearly incomplete; one can see that global data drops suddenly.
     tb_un_totals = (
-        tb_un[tb_un["sector"] == COLUMN_UN_FINAL_ENERGY].groupby("year", as_index=False).agg({"value": "sum"}).sort_values("year")
+        tb_un[tb_un["sector"] == COLUMN_UN_FINAL_ENERGY]
+        .groupby("year", as_index=False)
+        .agg({"value": "sum"})
+        .sort_values("year")
     )
     latest_value = tb_un_totals["value"].iloc[-1]
     previous_value = tb_un_totals["value"].iloc[-2]
