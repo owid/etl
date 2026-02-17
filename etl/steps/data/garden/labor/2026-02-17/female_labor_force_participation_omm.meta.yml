@@ -34,6 +34,11 @@ tables:
           We combined long-run data from Killingsworth and Heckman (1986) with ILOSTAT data from the World Bank’s World Development Indicators (national estimates). If there is data for both years, we keep the ILOSTAT data to be consistent with most recent years.
 
           In the long-run series, the data for Germany had two values for 1939, one with post WWI borders and one with West Germany borders (without Berlin). We kept the latter, which follows the convention of the rest of the dataset.
+        description_from_producer: ""
+        presentation:
+          grapher_config:
+            subtitle: ""
+            note: ""
         display:
           name: Female labor force participation rate
           numDecimalPlaces: 1

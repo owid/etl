@@ -40,6 +40,11 @@ def run() -> None:
         tb["female_labor_force_participation_long_run"]
     )
 
+    # Use origins from both sources
+    tb["female_labor_force_participation"].m.origins = (
+        tb["female_labor_force_participation_wdi"].m.origins + tb["female_labor_force_participation_long_run"].m.origins
+    )
+
     # Drop the original columns
     tb = tb.drop(
         columns=["female_labor_force_participation_long_run", "female_labor_force_participation_wdi"], errors="raise"
