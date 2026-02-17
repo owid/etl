@@ -1,4 +1,22 @@
 definitions:
+  description_processing_direct: |-
+    Climate Watch's original subsectors are mapped into broader intermediate sectors, and summed to obtain direct emissions for each sector:
+    - Agriculture: agriculture + land-use change and forestry.
+    - Transport: transport.
+    - Buildings: buildings.
+    - Electricity: electricity/heat.
+    - Industry: manufacturing/construction + industrial processes.
+    - Other: other fuel combustion + waste + fugitive emissions.
+  description_processing_indirect: |-
+    Using UNdata's figures on final electricity consumption by sector, we calculate the share of total electricity consumed by each non-electricity sector (e.g. the fraction of total electricity used by buildings, by industry, etc.).
+
+    Each sector's share of electricity consumption is then multiplied by the total emissions from electricity generation, yielding indirect emissions — the emissions attributable to the electricity each sector consumes.
+  description_processing_direct_and_indirect: |-
+    {definitions.description_processing_direct}
+
+    {definitions.description_processing_indirect}
+
+    Finally, direct and indirect emissions are summed to produce total emissions per sector, which reflect both on-site fuel combustion and the emissions embedded in electricity use.
   common:
     presentation:
       topic_tags:
@@ -123,7 +141,10 @@ tables:
     variables:
       ghg_emissions:
         title: Greenhouse gas emissions by human activity (direct and indirect emissions)
+        description_processing: "{definitions.description_processing_direct_and_indirect}"
       ghg_emissions_direct:
         title: Greenhouse gas emissions by human activity (direct emissions)
+        description_processing: "{definitions.description_processing_direct}"
       ghg_emissions_indirect:
         title: Greenhouse gas emissions by human activity (indirect emissions)
+        description_processing: "{definitions.description_processing_indirect}"
