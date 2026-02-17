@@ -40,3 +40,10 @@ steps:
     - snapshot://labor/2026-02-17/female_labor_force_participation_long_run.csv
   data://garden/labor/2026-02-17/female_labor_force_participation_long_run:
     - data://meadow/labor/2026-02-17/female_labor_force_participation_long_run
+
+  #
+  # Female labor participation rate OMM
+  #
+  data://garden/labor/2026-02-17/female_labor_participation_omm:
+    - data://garden/labor/2026-02-17/female_labor_force_participation_long_run
+    - data://garden/worldbank_wdi/2026-01-29/wdi

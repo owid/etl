@@ -15,7 +15,7 @@ dataset:
 tables:
   female_labor_force_participation_long_run:
     variables:
-      labor_force_participation:
+      female_labor_force_participation:
         title: Female labor force participation rate
         unit: "%"
         short_unit: "%"

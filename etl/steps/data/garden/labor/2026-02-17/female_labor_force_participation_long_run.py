@@ -22,6 +22,9 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
+    # Rename columns to female_labor_force_participation
+    tb = tb.rename(columns={"labor_force_participation": "female_labor_force_participation"}, errors="raise")
+
     # Improve table format.
     tb = tb.format(["country", "year"])
 
