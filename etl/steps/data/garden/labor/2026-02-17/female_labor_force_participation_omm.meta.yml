@@ -24,14 +24,20 @@ tables:
         description_key:
           - The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
           - People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
-          - We combined long-run data from Killingsworth and Heckman (1986) (covering the period up to 1960) with more recent estimates from ILOSTAT, accessed via the World Bank’s World Development Indicators.
+          - We combined long-run data from Killingsworth and Heckman (1986) with more recent estimates from ILOSTAT, accessed via the World Bank’s World Development Indicators.
           - We used ILOSTAT's national data instead of the modeled data to have the most long-run series possible, and to be consistent with the rest of the series.
           - The long-run series combines data from [Long (1958)](https://econpapers.repec.org/bookchap/nbrnberbk/long58-1.htm) with official statistics from each country, and the International Labour Organization's Yearbook of Labour Statistics.
           - For several observations before 1960, the working age population is age 14 or older, instead of 15 or older. In Great Britain, it is age 12 or older in the year 1921.
-          - Before 1960, data for the United Kingdom represents Great Britain (excludes Northern Ireland). Germany is represented by post-WWI until 1925, and by West Germany (without Berlin) from 1939 onwards.
+          - Up until 1951, data for the United Kingdom represents Great Britain (excludes Northern Ireland). Germany is represented by their post-WWI borders until 1925, and by West Germany (without Berlin) from 1939 until 1981.
         processing_level: major
         description_processing: |-
           We combined long-run data from Killingsworth and Heckman (1986) with ILOSTAT data from the World Bank’s World Development Indicators (national estimates). If there is data for both years, we keep the ILOSTAT data to be consistent with most recent years.
+
+          The latest year in the series coming from Killingsworth and Heckman (1986) depends on the country:
+          - For Canada, it is 1951.
+          - For Germany, it is 1981
+          - For the United Kingdom, it is 1951.
+          - For the United States, it is 1950.
 
           In the long-run series, the data for Germany had two values for 1939, one with post WWI borders and one with West Germany borders (without Berlin). We kept the latter, which follows the convention of the rest of the dataset.
         description_from_producer: ""
