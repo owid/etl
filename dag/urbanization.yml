@@ -87,3 +87,16 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2025-12-10/ghsl_urban_centers:
     - data://garden/urbanization/2025-12-10/ghsl_urban_centers
+
+  #
+  # UN WUP National Definitions
+  #
+  data://meadow/un/2026-02-17/wup_national_definitions:
+    - snapshot://un/2026-02-17/wup_urban_rural_population.xlsx
+    - snapshot://un/2026-02-17/wup_urban_rural_population_share.xlsx
+    - snapshot://un/2026-02-17/wup_urban_rural_population_growth.xlsx
+    - snapshot://un/2026-02-17/wup_urban_rural_population_share_growth.xlsx
+  data://garden/un/2026-02-17/wup_national_definitions:
+    - data://meadow/un/2026-02-17/wup_national_definitions
+  data://grapher/un/2026-02-17/wup_national_definitions:
+    - data://garden/un/2026-02-17/wup_national_definitions
