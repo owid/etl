@@ -23,8 +23,6 @@ def run() -> None:
     #
     # Process data.
     #
-    # Process each file - keep them as separate tables
-    tables = []
 
     tb_population = process_file(snap_population, metric="population")
 
@@ -62,7 +60,6 @@ def run() -> None:
         ],
         how="outer",
     )
-    print(tb)
 
     tb = tb.format(["country", "loc_id", "year", "area_type"])
     #
