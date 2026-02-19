@@ -189,9 +189,22 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     # World Bank PIP – poverty (income or consumption consolidated, no spells)
     ds_pip = paths.load_dataset("world_bank_pip")
+    # Regions (for country name → code mapping)
+    ds_regions = paths.load_dataset("regions")
+    country_name_to_code = ds_regions["regions"].reset_index().set_index("name")["code"]
 
     tb_ppp = load_and_choose_ppp_data(ds_wdi, ds_pip)
     tb_wdi_cpi = load_cpi_data(ds_wdi)
+
+    # Join PPP and CPI data
+    tb_joined = tb_ppp.join(tb_wdi_cpi, how="inner")
+
+    tb_joined["combined_factor"] = tb_joined["ppp"] * tb_joined["cpi_factor"]
+
+    # Add OWID country code
+    tb_joined["code"] = tb_joined.index.map(country_name_to_code)
+
+    print(tb_joined.to_csv())
 
 
 run()
