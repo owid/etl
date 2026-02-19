@@ -40,33 +40,38 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "American Samoa": Source.WDI,  # only defined by WDI
     "Andorra": Source.WDI,  # only defined by WDI
     "Antigua and Barbuda": Source.WDI,  # only defined by WDI
-    "Argentina": Source.WDI,  # only defined by WDI, PIP only has urban population
     "Argentina (urban)": Source.NONE,  # prefer WDI's value for Argentina, as PIP only has urban population
+    "Argentina": Source.WDI,  # only defined by WDI, PIP only has urban population
     "Aruba": Source.WDI,  # only defined by WDI
     "Bahamas": Source.WDI,  # only defined by WDI
     "Bahrain": Source.WDI,  # only defined by WDI
     "Belarus": Source.WDI,  # The Belarusian ruble has been redenominated in 2016, at a rate of 1 BYN = 10,000 BYR. WDI reflects this change.
     "Bermuda": Source.WDI,  # only defined by WDI
+    "Bolivia (urban)": Source.NONE,  # We don't want urban/rural splits.
     "British Virgin Islands": Source.WDI,  # only defined by WDI
     "Brunei": Source.WDI,  # only defined by WDI
     "Cambodia": Source.WDI,  # only defined by WDI
     "Cayman Islands": Source.WDI,  # only defined by WDI
-    "China": Source.WDI,  # only defined by WDI, PIP only has urban & rural population
     "China (rural)": Source.NONE,  # prefer WDI's value for China, as PIP only has urban & rural population
     "China (urban)": Source.NONE,  # prefer WDI's value for China, as PIP only has urban & rural population
+    "China": Source.WDI,  # only defined by WDI, PIP only has urban & rural population
+    "Colombia (urban)": Source.NONE,  # We don't want urban/rural splits.
     "Croatia": Source.WDI,  # Croatia has introduced the Euro in 2023. WDI reflects this change.
     "Curacao": Source.UNCLEAR,  # Curacao has had a currency change (from Antillean Guilder to Caribbean Guilder) in 2025, and it's unclear which currency WDI's data is given in.
     "Czechia": Source.UNCLEAR,  # deviation of 8%
     "Dominica": Source.WDI,  # only defined by WDI
     "East Timor": Source.UNCLEAR,  # deviation of 26%
+    "Ecuador (urban)": Source.NONE,  # We don't want urban/rural splits.
     "Egypt": Source.UNCLEAR,  # deviation of 23%
     "Eritrea": Source.WDI,  # only defined by WDI
+    "Ethiopia (rural)": Source.NONE,  # We don't want urban/rural splits.
     "Faroe Islands": Source.WDI,  # only defined by WDI
     "France": Source.PIP,  # deviation of 3.2%, it seems fine to rely on PIP here
     "French Polynesia": Source.WDI,  # only defined by WDI
     "Greenland": Source.WDI,  # only defined by WDI
     "Guam": Source.WDI,  # only defined by WDI
     "Guinea": Source.UNCLEAR,  # deviation of 8%
+    "Honduras (urban)": Source.NONE,  # We don't want urban/rural splits.
     "Hong Kong": Source.WDI,  # only defined by WDI
     "Kuwait": Source.WDI,  # only defined by WDI
     "Latvia": Source.UNCLEAR,  # deviation of 5%
@@ -75,6 +80,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Macao": Source.WDI,  # only defined by WDI
     "Malta": Source.PIP,  # deviation of 3.5%, it seems fine to rely on PIP here
     "Mauritania": Source.WDI,  # The Mauritanian ouguiya has been redenominated in 2017, at a rate of 1 MRU = 10 MRO. WDI reflects this change, while PIP doesn't.
+    "Micronesia (country) (urban)": Source.NONE,  # We don't want urban/rural splits.
     "Nauru": Source.UNCLEAR,  # deviation of 17%
     "New Caledonia": Source.WDI,  # only defined by WDI
     "New Zealand": Source.WDI,  # only defined by WDI
@@ -83,6 +89,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Palau": Source.WDI,  # only defined by WDI
     "Palestine": Source.UNCLEAR,  # deviation of 3.23x; Palestine doesn't have it own sovereign currency, and so it seems likely that the two values are given in different LCU units.
     "Puerto Rico": Source.WDI,  # only defined by WDI
+    "Rwanda (rural)": Source.NONE,  # We don't want urban/rural splits.
     "Saint Kitts and Nevis": Source.WDI,  # only defined by WDI
     "Saint Vincent and the Grenadines": Source.WDI,  # only defined by WDI
     "San Marino": Source.WDI,  # only defined by WDI
@@ -93,9 +100,12 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Sint Maarten (Dutch part)": Source.UNCLEAR,  # Sint Maarten has had a currency change (from Antillean Guilder to Caribbean Guilder) in 2025, and it's unclear which currency WDI's data is given in.
     "Somalia": Source.WDI,  # only defined by WDI
     "Sudan": Source.UNCLEAR,  # deviation of 18%
+    "Suriname (urban)": Source.NONE,  # We don't want urban/rural splits.
     "Taiwan": Source.PIP,  # only defined by PIP
     "Turks and Caicos Islands": Source.WDI,  # only defined by WDI
     "United States Virgin Islands": Source.WDI,  # only defined by WDI
+    "Uruguay (urban)": Source.NONE,  # We don't want urban/rural splits.
+    "Venezuela": Source.PIP,  # only defined by WDI
     "Yemen": Source.PIP,  # only defined by PIP
     "Zimbabwe": Source.UNCLEAR,  # deviation of 21x; Zimbabwe has had a multitude of currencies, and it's not clear which one the sources are using.
 }
@@ -109,24 +119,29 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
         .reset_index()
         .set_index("country")["pa_nus_prvt_pp"]
     )
+
+    print(ds_pip["other_indicators"]["ppp__ppp_version_2021__welfare_type_income_or_consumption"])
     # Purchasing Power Parity (PPP) rates (2021 prices)
     tb_pip_ppp = (
-        ds_pip["world_bank_pip"]
-        .query("ppp_version == @PPP_YEAR and year == @PPP_YEAR and ppp.notna()")
+        ds_pip["other_indicators"]
+        .rename(columns={"ppp__ppp_version_2021__welfare_type_income_or_consumption": "ppp"})
         .reset_index()
         .groupby("country")[
             "ppp"
         ]  # The PPP value is the same for all rows of a given country, so we can just take the minimum.
         .min()
+        .dropna()
     )
 
     tb_joined = tb_pip_ppp.to_frame("pip_ppp").join(tb_wdi_ppp.to_frame("wdi_ppp"), how="outer")
     tb_joined["ppp_factor"] = tb_joined["wdi_ppp"] / tb_joined["pip_ppp"]
 
-    within_deviation = tb_joined["ppp_factor"].between(1 - PPP_PIP_WDI_MAX_DEVIATION, 1 + PPP_PIP_WDI_MAX_DEVIATION)
+    within_deviation = (
+        tb_joined["ppp_factor"].between(1 - PPP_PIP_WDI_MAX_DEVIATION, 1 + PPP_PIP_WDI_MAX_DEVIATION).fillna(False)
+    )
 
     # Countries within deviation limits get PIP as the source; the rest need manual resolution.
-    tb_joined["ppp_source"] = np.where(within_deviation, "pip", np.nan)
+    tb_joined["ppp_source"] = np.where(within_deviation, "pip", None)
 
     # Validate that the manual override list exactly matches the set of deviating countries.
     countries_with_deviations = set(tb_joined[tb_joined["ppp_source"] != "pip"].index)
