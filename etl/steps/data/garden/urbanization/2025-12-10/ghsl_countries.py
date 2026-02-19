@@ -177,8 +177,8 @@ def calculate_population_share_change(tb):
     over 5-year intervals. For example, if a city's population share goes from
     30% to 35%, the popshare_change would be +5 percentage points.
 
-    Note: Values can be volatile for small territories where entire areas may
-    shift classification categories.
+    A 3-period rolling average is applied to reduce volatility, especially for
+    small territories where entire areas may shift classification categories.
     """
     # Sort by country and year to ensure proper ordering for growth calculations.
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
@@ -189,7 +189,12 @@ def calculate_population_share_change(tb):
         popshare_col = f"popshare_{location_type}"
 
         # Calculate change in population share: popshare_t - popshare_t-1 (in percentage points)
-        tb[f"popshare_change_{location_type}"] = tb.groupby("country")[popshare_col].diff()
+        change_col = tb.groupby("country")[popshare_col].diff()
+
+        # Apply 4-period rolling average to smooth volatility
+        tb[f"popshare_change_{location_type}"] = change_col.groupby(tb["country"]).transform(
+            lambda x: x.rolling(window=4, center=True, min_periods=1).mean()
+        )
 
     return tb
 

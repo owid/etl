@@ -228,7 +228,7 @@ tables:
             <% elif metric == 'density' %>
             Population density was calculated by dividing the population by the total area of that settlement type.
             <% elif metric == 'popshare_change' %>
-            Change in population share was calculated as the difference between consecutive 5-year periods, measured in percentage points.
+            Change in population share was calculated as the difference between consecutive 5-year periods, measured in percentage points. A 4-period (20-year) rolling average was applied to smooth volatility.
             <%- endif -%>
           presentation:
             title_public: |-
