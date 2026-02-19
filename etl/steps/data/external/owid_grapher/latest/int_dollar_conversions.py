@@ -1,14 +1,22 @@
+"""Computes "exchange rates" to convert from international dollars in a given year (PPP_YEAR) to local currency units (LCU) in the latest available year, for all countries. The conversion factor is computed as the product of:
+1. PPP conversion factor (LCU per international $) for the target year, and
+2. CPI adjustment factor (CPI[latest year] / CPI[PPP_YEAR]) to adjust for inflation between the target year and the latest available year.
+
+The PPP conversion factor is taken from the World Bank's PIP dataset or from the World Bank WDI dataset, depending on which source is available and more realistic for each country. The CPI data is taken from the World Bank WDI dataset.
+
+"""
+
 from enum import Enum
 
+import numpy as np
 from owid.catalog import Dataset
-from pandas import DataFrame, Series
+from pandas import DataFrame
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-PPP_VERSION = 2021
-TARGET_YEAR = 2021
+PPP_YEAR = 2021
 
 # Maximum deviation that's allowed between the PPP values from PIP and WDI, as a factor. When it's between these limits, we take the PIP value.
 PPP_PIP_WDI_MAX_DEVIATION = 0.03
@@ -18,7 +26,7 @@ class Source(Enum):
     NONE = "none"
     WDI = "wdi"
     PIP = "pip"
-    UNCLEAR = "unclear"  # when it's not clear which source is better, due to large deviations and no clear pattern in the deviations. drop these rows for now, but we might want to review them in the future and decide on a case-by-case basis which source to use.
+    UNCLEAR = "unclear"  # when it's not clear which source is better, due to large deviations or other issues, like recent currency changes or an unclear currency situation. drop these rows for now, but we might want to review them in the future and decide on a case-by-case basis which source to use.
 
 
 PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE = {
@@ -26,6 +34,7 @@ PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE = {
     "Bulgaria": Source.UNCLEAR,  # Bulgaria has introduced the Euro in 2025. Both sources still seem to have data in the Bulgarian lev.
 }
 
+# For each case where the values from PIP and WDI don't line up (either because one has data but not the other, or because their values deviate by more than PPP_PIP_WDI_MAX_DEVIATION), we manually choose which source to use, or whether to exclude the country altogether.
 PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Afghanistan": Source.WDI,  # only defined by WDI
     "American Samoa": Source.WDI,  # only defined by WDI
@@ -96,14 +105,14 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     # PPP conversion factor, private consumption (LCU per international $)
     tb_wdi_ppp = (
         ds_wdi["wdi"]
-        .query("year == @TARGET_YEAR and pa_nus_prvt_pp.notna()")
+        .query("year == @PPP_YEAR and pa_nus_prvt_pp.notna()")
         .reset_index()
         .set_index("country")["pa_nus_prvt_pp"]
     )
     # Purchasing Power Parity (PPP) rates (2021 prices)
     tb_pip_ppp = (
         ds_pip["world_bank_pip"]
-        .query("ppp_version == @PPP_VERSION and year == @TARGET_YEAR and ppp.notna()")
+        .query("ppp_version == @PPP_YEAR and year == @PPP_YEAR and ppp.notna()")
         .reset_index()
         .groupby("country")[
             "ppp"
@@ -114,70 +123,53 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     tb_joined = tb_pip_ppp.to_frame("pip_ppp").join(tb_wdi_ppp.to_frame("wdi_ppp"), how="outer")
     tb_joined["ppp_factor"] = tb_joined["wdi_ppp"] / tb_joined["pip_ppp"]
 
-    indexes_within_deviation = tb_joined["ppp_factor"].between(
-        1 - PPP_PIP_WDI_MAX_DEVIATION, 1 + PPP_PIP_WDI_MAX_DEVIATION
-    )
+    within_deviation = tb_joined["ppp_factor"].between(1 - PPP_PIP_WDI_MAX_DEVIATION, 1 + PPP_PIP_WDI_MAX_DEVIATION)
 
-    # Use PIP value where deviation is within limits, otherwise use WDI value
-    tb_joined["ppp_source"] = Series(index=tb_joined.index, dtype="string")
-    tb_joined.loc[indexes_within_deviation, "ppp_source"] = "pip"
+    # Countries within deviation limits get PIP as the source; the rest need manual resolution.
+    tb_joined["ppp_source"] = np.where(within_deviation, "pip", np.nan)
 
-    countries_with_deviations = set(tb_joined[tb_joined["ppp_source"].isna()].index.tolist())
+    # Validate that the manual override list exactly matches the set of deviating countries.
+    countries_with_deviations = set(tb_joined[tb_joined["ppp_source"] != "pip"].index)
+    missing_from_overrides = countries_with_deviations - PPP_DEVIATIONS_SOURCE_TO_USE.keys()
+    stale_in_overrides = PPP_DEVIATIONS_SOURCE_TO_USE.keys() - countries_with_deviations
 
-    set_diff_countries_minus_sources_mapping = countries_with_deviations.difference(PPP_DEVIATIONS_SOURCE_TO_USE.keys())
-    set_diff_sources_mapping_minus_countries = set(PPP_DEVIATIONS_SOURCE_TO_USE.keys()).difference(
-        countries_with_deviations
-    )
-
+    assert not missing_from_overrides, f"Countries with deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%) missing from PPP_DEVIATIONS_SOURCE_TO_USE: {missing_from_overrides}"
     assert (
-        len(set_diff_countries_minus_sources_mapping) == 0
-    ), f"There are some countries with deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%) that are not in the PPP_DEVIATIONS_SOURCE_TO_USE list: {set_diff_countries_minus_sources_mapping}. Please check the values and update the list accordingly."
+        not stale_in_overrides
+    ), f"Countries in PPP_DEVIATIONS_SOURCE_TO_USE that no longer have deviations: {stale_in_overrides}"
 
-    assert (
-        len(set_diff_sources_mapping_minus_countries) == 0
-    ), f"There are some countries in the PPP_DEVIATIONS_SOURCE_TO_USE list that don't have deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%): {set_diff_sources_mapping_minus_countries}. Please check the values and update the list accordingly."
+    # Apply manual overrides: map Source enum → "pip"/"wdi"/NaN.
+    source_to_label = {Source.WDI: "wdi", Source.PIP: "pip"}
+    source_overrides = {
+        country: source_to_label.get(source) for country, source in PPP_DEVIATIONS_SOURCE_TO_USE.items()
+    }
+    tb_joined.loc[source_overrides.keys(), "ppp_source"] = [source_overrides[c] for c in source_overrides]
 
-    # Apply the manually chosen source for deviating countries
-    for country, source in PPP_DEVIATIONS_SOURCE_TO_USE.items():
-        if source == Source.WDI:
-            tb_joined.loc[country, "ppp_source"] = "wdi"
-        elif source == Source.PIP:
-            tb_joined.loc[country, "ppp_source"] = "pip"
-        # Source.NONE and Source.UNCLEAR remain NaN
+    # Exclude additional countries (e.g. recent currency changes).
+    for country in PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE:
+        assert country in tb_joined.index, f"{country} from PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE not found in data."
+        tb_joined.loc[country, "ppp_source"] = np.nan
 
-    # Drop countries that should be excluded additionally
-    for country, source in PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE.items():
-        assert (
-            country in tb_joined.index
-        ), f"{country} is in the PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE list, but it's not in the joined PPP table. Please check the country name and update the list accordingly."
-        tb_joined.loc[country, "ppp_source"] = float("nan")
-
+    # Drop countries with no usable source, then pick the value from the chosen source.
     tb_joined = tb_joined.dropna(subset=["ppp_source"])
+    tb_joined["ppp"] = np.where(tb_joined["ppp_source"] == "pip", tb_joined["pip_ppp"], tb_joined["wdi_ppp"])
 
-    tb_joined["ppp"] = tb_joined.apply(
-        lambda row: row["pip_ppp"] if row["ppp_source"] == "pip" else row["wdi_ppp"], axis=1
-    )
+    assert tb_joined["ppp"].isna().sum() == 0, "Some countries still have missing PPP values after source selection."
 
-    assert (
-        tb_joined["ppp"].isna().sum() == 0
-    ), "There are some countries for which the PPP value is still missing after applying the source selection logic. Please check the values and update the logic accordingly."
-
-    tb_joined = tb_joined[["ppp", "ppp_source"]]
-
-    return tb_joined
+    return tb_joined[["ppp", "ppp_source"]]
 
 
 def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
-    # Consumer price index (2010 = 100) — keep TARGET_YEAR and the latest available year per country
+    # Consumer price index (2010 = 100) — keep PPP_YEAR and the latest available year per country
     tb_cpi_all = (
         ds_wdi["wdi"]
-        .query("year >= @TARGET_YEAR and fp_cpi_totl.notna()")
+        .query("year >= @PPP_YEAR and fp_cpi_totl.notna()")
         .reset_index()[["country", "year", "fp_cpi_totl"]]
         .rename(columns={"fp_cpi_totl": "cpi", "year": "cpi_year"})
     )
 
     # Get data for the target year
-    tb_cpi_base = tb_cpi_all.query("cpi_year == @TARGET_YEAR").set_index("country")[["cpi_year", "cpi"]]
+    tb_cpi_base = tb_cpi_all.query("cpi_year == @PPP_YEAR").set_index("country")[["cpi_year", "cpi"]]
     # Get data for the latest available year per country
     tb_cpi_latest = tb_cpi_all.loc[tb_cpi_all.groupby("country")["cpi_year"].idxmax()].set_index("country")[
         ["cpi_year", "cpi"]
@@ -208,13 +200,13 @@ def run() -> None:
     # Select a single PPP value per country, reconciling PIP and WDI sources.
     tb_ppp = load_and_reconcile_ppp_data(ds_wdi, ds_pip)
 
-    # Get CPI adjustment factor (CPI[latest year] / CPI[TARGET_YEAR]) per country.
+    # Get CPI adjustment factor (CPI[latest year] / CPI[PPP_YEAR]) per country.
     tb_cpi = load_cpi_data(ds_wdi)
 
     # Inner join: only keep countries that have both PPP and CPI data.
     tb = tb_ppp.join(tb_cpi, how="inner")
 
-    # The combined conversion factor converts from international dollars in TARGET_YEAR
+    # The combined conversion factor converts from international dollars in PPP_YEAR
     # to local currency units (LCU) in the latest CPI year.
     tb["conversion_factor"] = tb["ppp"] * tb["cpi_factor"]
 
@@ -225,7 +217,7 @@ def run() -> None:
     # Format output table.
     #
     tb = tb.rename(columns={"ppp": "ppp_factor", "cpi_year_latest": "conversion_factor_year"})
-    tb["ppp_year"] = TARGET_YEAR
+    tb["ppp_year"] = PPP_YEAR
     tb["ppp_factor"] = tb["ppp_factor"].round(3)
     tb["cpi_factor"] = tb["cpi_factor"].round(3)
     tb["conversion_factor"] = tb["conversion_factor"].round(3)
