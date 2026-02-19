@@ -105,7 +105,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Turks and Caicos Islands": Source.WDI,  # only defined by WDI
     "United States Virgin Islands": Source.WDI,  # only defined by WDI
     "Uruguay (urban)": Source.NONE,  # We don't want urban/rural splits.
-    "Venezuela": Source.PIP,  # only defined by WDI
+    "Venezuela": Source.PIP,  # only defined by PIP
     "Yemen": Source.PIP,  # only defined by PIP
     "Zimbabwe": Source.UNCLEAR,  # deviation of 21x; Zimbabwe has had a multitude of currencies, and it's not clear which one the sources are using.
 }
@@ -120,7 +120,6 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
         .set_index("country")["pa_nus_prvt_pp"]
     )
 
-    print(ds_pip["other_indicators"]["ppp__ppp_version_2021__welfare_type_income_or_consumption"])
     # Purchasing Power Parity (PPP) rates (2021 prices)
     tb_pip_ppp = (
         ds_pip["other_indicators"]
