@@ -413,10 +413,10 @@ tables:
           <%- endif -%>
         unit: ""
         description_short: |-
-          Shows whether most people live in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), or [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
+          Shows whether most people live in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
 
         description_key:
-          - "This indicator shows where most people in a country live: in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), or [rural areas](#dod:rural-areas-degurba)."
+          - "This indicator shows where most people in a country live: in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba)."
 
           - *text_degurba_overview
 
