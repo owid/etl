@@ -1,6 +1,5 @@
 from enum import Enum
 
-import pandas as pd
 from owid.catalog import Dataset
 from pandas import DataFrame, Series
 
@@ -120,10 +119,10 @@ def load_and_choose_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     )
 
     # Use PIP value where deviation is within limits, otherwise use WDI value
-    tb_joined["ppp"] = Series(index=tb_joined.index, dtype="float")
-    tb_joined.loc[indexes_within_deviation, "ppp"] = tb_joined.loc[indexes_within_deviation, "pip_ppp"]
+    tb_joined["ppp_source"] = Series(index=tb_joined.index, dtype="float")
+    tb_joined.loc[indexes_within_deviation, "ppp_source"] = "pip"
 
-    countries_with_deviations = set(tb_joined[tb_joined["ppp"].isna()].index.tolist())
+    countries_with_deviations = set(tb_joined[tb_joined["ppp_source"].isna()].index.tolist())
 
     set_diff_countries_minus_sources_mapping = countries_with_deviations.difference(PPP_DEVIATIONS_SOURCE_TO_USE.keys())
     set_diff_sources_mapping_minus_countries = set(PPP_DEVIATIONS_SOURCE_TO_USE.keys()).difference(
@@ -141,12 +140,9 @@ def load_and_choose_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     # Apply the manually chosen source for deviating countries
     for country, source in PPP_DEVIATIONS_SOURCE_TO_USE.items():
         if source == Source.WDI:
-            tb_joined.loc[country, "ppp"] = tb_joined.loc[country, "wdi_ppp"]
-            assert pd.notna(
-                tb_joined.loc[country, "ppp"]
-            ), f"WDI PPP value for {country} is NaN, but it was chosen as the source for this country."
+            tb_joined.loc[country, "ppp_source"] = "wdi"
         elif source == Source.PIP:
-            tb_joined.loc[country, "ppp"] = tb_joined.loc[country, "pip_ppp"]
+            tb_joined.loc[country, "ppp_source"] = "pip"
         # Source.NONE and Source.UNCLEAR remain NaN
 
     # Drop countries that should be excluded additionally
@@ -154,9 +150,19 @@ def load_and_choose_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
         assert (
             country in tb_joined.index
         ), f"{country} is in the PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE list, but it's not in the joined PPP table. Please check the country name and update the list accordingly."
-        tb_joined.loc[country, "ppp"] = float("nan")
+        tb_joined.loc[country, "ppp_source"] = float("nan")
 
-    tb_joined = tb_joined[["ppp"]].dropna()
+    tb_joined = tb_joined.dropna(subset=["ppp_source"])
+
+    tb_joined["ppp"] = tb_joined.apply(
+        lambda row: row["pip_ppp"] if row["ppp_source"] == "pip" else row["wdi_ppp"], axis=1
+    )
+
+    assert (
+        tb_joined["ppp"].isna().sum() == 0
+    ), "There are some countries for which the PPP value is still missing after applying the source selection logic. Please check the values and update the logic accordingly."
+
+    tb_joined = tb_joined[["ppp", "ppp_source"]]
 
     return tb_joined
 
