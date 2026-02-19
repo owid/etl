@@ -17,6 +17,7 @@ steps:
   data://external/owid_grapher/latest/int_dollar_conversions:
     - data://garden/worldbank_wdi/2026-01-29/wdi
     - data://garden/wb/2025-10-09/world_bank_pip
+    - data://garden/regions/2023-01-01/regions
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
