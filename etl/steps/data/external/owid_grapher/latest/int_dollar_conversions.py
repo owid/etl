@@ -1,5 +1,6 @@
 from enum import Enum
 
+import pandas as pd
 from owid.catalog import Dataset
 from pandas import DataFrame, Series
 
@@ -21,12 +22,12 @@ class Source(Enum):
     UNCLEAR = "unclear"  # when it's not clear which source is better, due to large deviations and no clear pattern in the deviations. drop these rows for now, but we might want to review them in the future and decide on a case-by-case basis which source to use.
 
 
-PPP_COUNTRIES_TO_DROP_ADDITIONALLY = {
+PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE = {
     # Countries for which we want to drop the PPP value, even if the sources don't deviate much.
     "Bulgaria": Source.UNCLEAR,  # Bulgaria has introduced the Euro in 2025. Both sources still seem to have data in the Bulgarian lev.
 }
 
-PPP_DEVIATES_SOURCE_TO_USE = {
+PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Afghanistan": Source.WDI,  # only defined by WDI
     "American Samoa": Source.WDI,  # only defined by WDI
     "Andorra": Source.WDI,  # only defined by WDI
@@ -122,22 +123,40 @@ def load_and_choose_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     tb_joined["ppp"] = Series(index=tb_joined.index, dtype="float")
     tb_joined.loc[indexes_within_deviation, "ppp"] = tb_joined.loc[indexes_within_deviation, "pip_ppp"]
 
-    print(tb_joined)
-
     countries_with_deviations = set(tb_joined[tb_joined["ppp"].isna()].index.tolist())
 
-    set_diff_countries_minus_sources_mapping = countries_with_deviations.difference(PPP_DEVIATES_SOURCE_TO_USE.keys())
-    set_diff_sources_mapping_minus_countries = set(PPP_DEVIATES_SOURCE_TO_USE.keys()).difference(
+    set_diff_countries_minus_sources_mapping = countries_with_deviations.difference(PPP_DEVIATIONS_SOURCE_TO_USE.keys())
+    set_diff_sources_mapping_minus_countries = set(PPP_DEVIATIONS_SOURCE_TO_USE.keys()).difference(
         countries_with_deviations
     )
 
     assert (
         len(set_diff_countries_minus_sources_mapping) == 0
-    ), f"There are some countries with deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%) that are not in the PPP_DEVIATES_SOURCE_TO_USE list: {set_diff_countries_minus_sources_mapping}. Please check the values and update the list accordingly."
+    ), f"There are some countries with deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%) that are not in the PPP_DEVIATIONS_SOURCE_TO_USE list: {set_diff_countries_minus_sources_mapping}. Please check the values and update the list accordingly."
 
     assert (
         len(set_diff_sources_mapping_minus_countries) == 0
-    ), f"There are some countries in the PPP_DEVIATES_SOURCE_TO_USE list that don't have deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%): {set_diff_sources_mapping_minus_countries}. Please check the values and update the list accordingly."
+    ), f"There are some countries in the PPP_DEVIATIONS_SOURCE_TO_USE list that don't have deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%): {set_diff_sources_mapping_minus_countries}. Please check the values and update the list accordingly."
+
+    # Apply the manually chosen source for deviating countries
+    for country, source in PPP_DEVIATIONS_SOURCE_TO_USE.items():
+        if source == Source.WDI:
+            tb_joined.loc[country, "ppp"] = tb_joined.loc[country, "wdi_ppp"]
+            assert pd.notna(
+                tb_joined.loc[country, "ppp"]
+            ), f"WDI PPP value for {country} is NaN, but it was chosen as the source for this country."
+        elif source == Source.PIP:
+            tb_joined.loc[country, "ppp"] = tb_joined.loc[country, "pip_ppp"]
+        # Source.NONE and Source.UNCLEAR remain NaN
+
+    # Drop countries that should be excluded additionally
+    for country, source in PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE.items():
+        assert (
+            country in tb_joined.index
+        ), f"{country} is in the PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE list, but it's not in the joined PPP table. Please check the country name and update the list accordingly."
+        tb_joined.loc[country, "ppp"] = float("nan")
+
+    tb_joined = tb_joined[["ppp"]].dropna()
 
     return tb_joined
 
