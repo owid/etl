@@ -92,7 +92,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
 }
 
 
-def load_and_choose_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
+def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     # PPP conversion factor, private consumption (LCU per international $)
     tb_wdi_ppp = (
         ds_wdi["wdi"]
@@ -191,42 +191,48 @@ def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
 
 
 def run() -> None:
-    # WDI indicators
+    #
+    # Load dependencies.
+    #
     ds_wdi = paths.load_dataset("wdi")
-    # World Bank PIP – poverty (income or consumption consolidated, no spells)
     ds_pip = paths.load_dataset("world_bank_pip")
-    # Regions (for country name → code mapping)
     ds_regions = paths.load_dataset("regions")
+
+    # Map country names to OWID country codes (e.g. "United Kingdom" → "GBR").
     country_name_to_code = ds_regions["regions"].reset_index().set_index("name")["code"]
 
-    tb_ppp = load_and_choose_ppp_data(ds_wdi, ds_pip)
-    tb_wdi_cpi = load_cpi_data(ds_wdi)
+    #
+    # Process data.
+    #
 
-    # Join PPP and CPI data
-    tb_joined = tb_ppp.join(tb_wdi_cpi, how="inner")
+    # Select a single PPP value per country, reconciling PIP and WDI sources.
+    tb_ppp = load_and_reconcile_ppp_data(ds_wdi, ds_pip)
 
-    tb_joined["conversion_factor"] = tb_joined["ppp"] * tb_joined["cpi_factor"]
+    # Get CPI adjustment factor (CPI[latest year] / CPI[TARGET_YEAR]) per country.
+    tb_cpi = load_cpi_data(ds_wdi)
 
-    # Add OWID country code
-    tb_joined["country_code"] = tb_joined.index.map(country_name_to_code)
+    # Inner join: only keep countries that have both PPP and CPI data.
+    tb = tb_ppp.join(tb_cpi, how="inner")
 
-    # Build JSON output
-    tb_out = tb_joined.rename(
-        columns={
-            "country_code": "country_code",
-            "ppp": "ppp_factor",
-            "ppp_source": "ppp_source",
-            "cpi_factor": "cpi_factor",
-            "conversion_factor": "conversion_factor",
-            "cpi_year_latest": "conversion_factor_year",
-        }
-    )
-    tb_out["ppp_year"] = TARGET_YEAR
-    tb_out["ppp_factor"] = tb_out["ppp_factor"].round(3)
-    tb_out["cpi_factor"] = tb_out["cpi_factor"].round(3)
-    tb_out["conversion_factor"] = tb_out["conversion_factor"].round(3)
-    tb_out["conversion_factor_year"] = tb_out["conversion_factor_year"].astype(int)
-    tb_out = tb_out[
+    # The combined conversion factor converts from international dollars in TARGET_YEAR
+    # to local currency units (LCU) in the latest CPI year.
+    tb["conversion_factor"] = tb["ppp"] * tb["cpi_factor"]
+
+    # Add OWID country code.
+    tb["country_code"] = tb.index.map(country_name_to_code)
+
+    #
+    # Format output table.
+    #
+    tb = tb.rename(columns={"ppp": "ppp_factor", "cpi_year_latest": "conversion_factor_year"})
+    tb["ppp_year"] = TARGET_YEAR
+    tb["ppp_factor"] = tb["ppp_factor"].round(3)
+    tb["cpi_factor"] = tb["cpi_factor"].round(3)
+    tb["conversion_factor"] = tb["conversion_factor"].round(3)
+    tb["conversion_factor_year"] = tb["conversion_factor_year"].astype(int)
+
+    # Select and order output columns.
+    tb = tb[
         [
             "country_code",
             "ppp_year",
@@ -237,9 +243,10 @@ def run() -> None:
             "conversion_factor_year",
         ]
     ]
-    tb_out.metadata.short_name = "int_dollar_conversions"
+    tb.metadata.short_name = paths.short_name
 
-    paths.create_dataset(tables=[tb_out], formats=["csv", "json"]).save()
-
-
-run()
+    #
+    # Save outputs.
+    #
+    ds = paths.create_dataset(tables=[tb], formats=["csv", "json"])
+    ds.save()
