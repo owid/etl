@@ -18,13 +18,13 @@ meta:
     # Files
     url_main: https://epoch.ai/benchmarks
     url_download: https://epoch.ai/data/benchmark_data.zip
-    date_accessed: '2026-02-18'
+    date_accessed: '2026-02-19'
 
     # License
     license:
       name: CC BY 4.0
       url: https://epoch.ai/about
 outs:
-  - md5: 5a962505c2227592c360801c55d48532
-    size: 290445
+  - md5: f30a40d388057b83165d623df0c3983c
+    size: 290447
     path: epoch_benchmark_data.zip
