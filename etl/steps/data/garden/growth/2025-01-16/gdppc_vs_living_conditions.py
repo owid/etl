@@ -86,7 +86,7 @@ def run() -> None:
     ds_gho = paths.load_dataset("gho")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_undp_hdr = paths.load_dataset("undp_hdr")
-    ds_ihme_gbd = paths.load_dataset("gbd_risk")
+    ds_ihme_gbd = paths.load_dataset("gbd_risk_deaths")
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
@@ -112,7 +112,7 @@ def run() -> None:
     )
     tb_pip = ds_pip.read("incomes")
     tb_undp_hdr = ds_undp_hdr.read("undp_hdr_sex")
-    tb_ihme_gbd = ds_ihme_gbd.read("gbd_risk")
+    tb_ihme_gbd = ds_ihme_gbd.read("gbd_risk_deaths")
 
     #
     # Process data.
@@ -168,8 +168,11 @@ def run() -> None:
     )
 
     # UNWTO
-    tb_unwto = tb_unwto[["country", "year", "out_tour_departures_ovn_vis_tourists_per_1000"]].rename(
-        columns={"out_tour_departures_ovn_vis_tourists_per_1000": "tourist_departures_per_1000_people"}, errors="raise"
+    tb_unwto = tb_unwto[["country", "year", "out_tour_departures_trips_total_overnight_vis_tourists_per_1000"]].rename(
+        columns={
+            "out_tour_departures_trips_total_overnight_vis_tourists_per_1000": "tourist_departures_per_1000_people"
+        },
+        errors="raise",
     )
 
     # Penn World Table

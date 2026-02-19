@@ -126,7 +126,9 @@ nav = [
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
         { "Food supply of world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         { "Our COVID work" = "api/covid.md" },
-        # { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
+        { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
+        # TODO: Uncomment once main article is published, and update links to article
+        # { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
     ] },
 ]
 
@@ -143,10 +145,12 @@ extra_javascript = [
     "https://unpkg.com/katex@0/dist/katex.min.js",
     "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
     "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
+    "https://unpkg.com/papaparse@5/papaparse.min.js",
     "javascripts/katex.js",
     "javascripts/tablesort.js",
     "javascripts/cell-toggles.js",
     "javascripts/notebook-copy.js",
+    "javascripts/csv-table.js",
     # Mermaid is handled by the markdown extension (see pymdownx.superfences config below)
 ]
 

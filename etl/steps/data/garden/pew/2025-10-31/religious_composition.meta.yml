@@ -107,7 +107,7 @@ tables:
           <% elif religion == "any_religion" %>
           The difference in the share of of people who are affiliated to any religion between 2010 and 2020.
           <% else -%>
-          The difference in the share of of people who are <<religion>> between 2010 and 2020.
+          The difference in the share of of people who are <<religion.title()>> between 2010 and 2020.
           <% endif -%>
         unit: "%"
         short_unit: "%"
@@ -140,7 +140,7 @@ tables:
             <%- elif religion == "other_religions" %>
              affiliated to other religions
             <%- else %>
-             who are <<religion>>
+             who are <<religion.title()>>
             <% endif %>
         unit: percentage
         short_unit: "%"
@@ -194,7 +194,7 @@ tables:
             <% elif religion == "other_religions" -%>
              affiliated to other religions
             <% else -%>
-             who are <<religion>>
+             who are <<religion.title()>>
             <% endif -%>
 
       count_unrounded:
@@ -226,5 +226,5 @@ tables:
             <%- elif religion == "other_religions" %>
              affiliated to other religions
             <%- else %>
-             who are <<religion>>
+             who are <<religion.title()>>
             <% endif -%>

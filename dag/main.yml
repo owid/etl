@@ -749,7 +749,6 @@ steps:
   data://grapher/oecd/2025-12-23/official_development_assistance:
     - data://garden/oecd/2025-12-23/official_development_assistance
 
-
   #
   # CORE Econ - Growth rate of GDP per capita and productivity
   #
@@ -761,6 +760,16 @@ steps:
   data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
     - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity
 
+  #
+  # World Prison Brief
+  #
+  data://meadow/crime/2026-01-21/prison_rates:
+    - snapshot://crime/2026-01-20/prison_rates.csv
+  data://garden/crime/2026-01-21/prison_rates:
+    - data://meadow/crime/2026-01-21/prison_rates
+    - data://garden/demography/2024-07-15/population
+  data://grapher/crime/2026-01-21/prison_rates:
+    - data://garden/crime/2026-01-21/prison_rates
 
   #
   # CORE Econ - Unemployment rate and unemployment benefit replacement rate
@@ -771,6 +780,41 @@ steps:
     - data://meadow/core_econ/2026-01-30/unemployment_rate_benefits
   data://grapher/core_econ/2026-01-30/unemployment_rate_benefits:
     - data://garden/core_econ/2026-01-30/unemployment_rate_benefits
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2026-01-29/wdi:
+    - snapshot://worldbank_wdi/2026-01-29/wdi.zip
+  data://garden/worldbank_wdi/2026-01-29/wdi:
+    - data://garden/un/2024-07-12/un_wpp
+    - snapshot://worldbank_wdi/2026-01-29/wdi.zip
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/worldbank_wdi/2026-01-29/wdi
+  data://grapher/worldbank_wdi/2026-01-29/wdi:
+    - data://garden/worldbank_wdi/2026-01-29/wdi
+
+
+  #
+  # Trust in US government - Pew Research Center
+  #
+  data://meadow/pew/2026-02-16/trust_us_government:
+    - snapshot://pew/2026-02-16/trust_us_government.csv
+  data://garden/pew/2026-02-16/trust_us_government:
+    - data://meadow/pew/2026-02-16/trust_us_government
+  data://grapher/pew/2026-02-16/trust_us_government:
+    - data://garden/pew/2026-02-16/trust_us_government
+
+
+  #
+  # OECD - Trust in government
+  #
+  data://meadow/oecd/2026-02-17/trust_in_government:
+    - snapshot://oecd/2026-02-17/trust_in_government.csv
+  data://garden/oecd/2026-02-17/trust_in_government:
+    - data://meadow/oecd/2026-02-17/trust_in_government
+  data://grapher/oecd/2026-02-17/trust_in_government:
+    - data://garden/oecd/2026-02-17/trust_in_government
 
 include:
   - dag/open_numbers.yml

@@ -9,6 +9,7 @@ The data is downloaded as a NetCDF file. Tutorials for using the Copernicus API 
 """
 
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
 # CDS API
@@ -37,7 +38,7 @@ def main(upload: bool) -> None:
         request = {
             "product_type": ["monthly_averaged_reanalysis"],
             "variable": ["2m_temperature"],
-            "year": [str(year) for year in range(1940, 2026)],
+            "year": [str(year) for year in range(1940, datetime.now().year + 1)],
             "month": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
             "time": ["00:00"],
             "data_format": "netcdf",

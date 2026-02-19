@@ -13,7 +13,13 @@ steps:
     - data://meadow/wb/2025-10-09/world_bank_pip
   data://grapher/wb/2026-01-22/world_bank_pip:
     - data://garden/wb/2026-01-22/world_bank_pip
-  export://multidim/wb/latest/world_bank_pip:
+  export://multidim/wb/latest/poverty_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/incomes_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/gini_pip:
+    - data://grapher/wb/2026-01-22/world_bank_pip
+  export://multidim/wb/latest/palma_ratio_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
   # Legacy PIP pipeline
   data://garden/wb/2025-10-09/world_bank_pip_legacy:
@@ -43,6 +49,14 @@ steps:
     - data://meadow/wid/2026-01-02/world_inequality_database
   data://grapher/wid/2026-01-12/world_inequality_database:
     - data://garden/wid/2026-01-12/world_inequality_database
+  export://multidim/wid/latest/incomes_wid:
+    - data://grapher/wid/2026-01-12/world_inequality_database
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/regions/2023-01-01/regions
+  export://multidim/wid/latest/gini_wid:
+    - data://grapher/wid/2026-01-12/world_inequality_database
+  export://multidim/wid/latest/palma_ratio_wid:
+    - data://grapher/wid/2026-01-12/world_inequality_database
 
     # Legacy WID pipeline
   data://garden/wid/2026-01-02/world_inequality_database_legacy:
@@ -68,12 +82,18 @@ steps:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
   export://explorers/lis/latest/incomes_lis:
     - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://multidim/lis/latest/gini_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://multidim/lis/latest/relative_poverty_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
+  export://multidim/lis/latest/incomes_lis:
+    - data://grapher/lis/2025-12-12/luxembourg_income_study
 
   # Poverty and inequality file for inequality comparisons at OWID
   data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
     - data://garden/wb/2025-10-09/world_bank_pip_legacy
     - data://garden/wid/2026-01-02/world_inequality_database_legacy
-    - data://garden/worldbank_wdi/2025-09-08/wdi
+    - data://garden/worldbank_wdi/2026-01-29/wdi
 
   # Inequality comparison data
   data://garden/poverty_inequality/2025-01-22/inequality_comparison:
