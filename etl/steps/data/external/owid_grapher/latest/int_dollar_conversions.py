@@ -119,7 +119,7 @@ def load_and_choose_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     )
 
     # Use PIP value where deviation is within limits, otherwise use WDI value
-    tb_joined["ppp_source"] = Series(index=tb_joined.index, dtype="float")
+    tb_joined["ppp_source"] = Series(index=tb_joined.index, dtype="string")
     tb_joined.loc[indexes_within_deviation, "ppp_source"] = "pip"
 
     countries_with_deviations = set(tb_joined[tb_joined["ppp_source"].isna()].index.tolist())
@@ -205,12 +205,41 @@ def run() -> None:
     # Join PPP and CPI data
     tb_joined = tb_ppp.join(tb_wdi_cpi, how="inner")
 
-    tb_joined["combined_factor"] = tb_joined["ppp"] * tb_joined["cpi_factor"]
+    tb_joined["conversion_factor"] = tb_joined["ppp"] * tb_joined["cpi_factor"]
 
     # Add OWID country code
-    tb_joined["code"] = tb_joined.index.map(country_name_to_code)
+    tb_joined["country_code"] = tb_joined.index.map(country_name_to_code)
 
-    print(tb_joined.to_csv())
+    # Build JSON output
+    tb_out = tb_joined.rename(
+        columns={
+            "country_code": "country_code",
+            "ppp": "ppp_factor",
+            "ppp_source": "ppp_source",
+            "cpi_factor": "cpi_factor",
+            "conversion_factor": "conversion_factor",
+            "cpi_year_latest": "conversion_factor_year",
+        }
+    )
+    tb_out["ppp_year"] = TARGET_YEAR
+    tb_out["ppp_factor"] = tb_out["ppp_factor"].round(3)
+    tb_out["cpi_factor"] = tb_out["cpi_factor"].round(3)
+    tb_out["conversion_factor"] = tb_out["conversion_factor"].round(3)
+    tb_out["conversion_factor_year"] = tb_out["conversion_factor_year"].astype(int)
+    tb_out = tb_out[
+        [
+            "country_code",
+            "ppp_year",
+            "ppp_factor",
+            "ppp_source",
+            "cpi_factor",
+            "conversion_factor",
+            "conversion_factor_year",
+        ]
+    ]
+    tb_out.metadata.short_name = "int_dollar_conversions"
+
+    paths.create_dataset(tables=[tb_out], formats=["csv", "json"]).save()
 
 
 run()
