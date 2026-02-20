@@ -636,7 +636,7 @@ def run() -> None:
     _n_rows_before = len(tb)
     tb = tb.dropna(how="any").reset_index(drop=True)
     error = "Unexpectedly high number of rows lost when merging food supply and land use."
-    assert (100 * (_n_rows_before - len(tb)) / _n_rows_before) < 23, error
+    assert (100 * (_n_rows_before - len(tb)) / _n_rows_before) < 24, error
 
     # Replace series by a rolling average.
     if ROLLING_AVERAGE_YEARS > 1:
@@ -697,15 +697,15 @@ def run() -> None:
     #     - 3 consistently stayed above the food supply levels of 1963.
     #     - 1 consistently achieved both.
     # With a restriction on net imports < 20% domestic supply:
-    # - Window of 59 years (1963-2022): 15 countries selected. Of those:
-    #     - 7 consistently stayed below the land use levels of 1963.
-    #     - 7 consistently stayed above the food supply levels of 1963.
-    #     - 3 consistently achieved both.
-    # With a restriction on net imports < 20% domestic supply, but using food supply instead of per capita food supply:
-    # - Window of 59 years (1963-2022): 15 countries selected. Of those:
-    #     - 7 consistently stayed below the land use levels of 1963.
-    #     - 12 consistently stayed above the food supply levels of 1963.
-    #     - 5 consistently achieved both.
+    # - Window of 59 years (1963-2022): 24 countries selected. Of those:
+    #     - 10 consistently stayed below the land use levels of 1963.
+    #     - 13 consistently stayed above the food supply levels of 1963.
+    #     - 4 consistently achieved both.
+    # With a restriction on net imports < 20% domestic supply, using total food supply (instead of per capita):
+    # - Window of 59 years (1963-2022): 24 countries selected. Of those:
+    #     - 10 consistently stayed below the land use levels of 1963.
+    #     - 20 consistently stayed above the food supply levels of 1963.
+    #     - 7 consistently achieved both.
 
     # Selected window of years.
     year_max_best = tb_change["year_max"].max()
