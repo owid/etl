@@ -81,7 +81,8 @@ def run() -> None:
     # Calculate shares and densities.
     tb = calculate_shares_and_densities(tb)
 
-    # Calculate population share change.
+    # Calculate annualized exponential growth rates for population shares.
+    # Uses UN F04-style formula: 100 * ln(P_t / P_{t-prev}) / (year_t - year_prev)
     tb = calculate_population_share_change(tb)
 
     # Create separate table for dominant population type before splitting.
@@ -172,39 +173,40 @@ def calculate_shares_and_densities(tb):
 
 
 def calculate_population_share_change(tb):
-    """Calculate annual exponential growth rate of population share.
+    """Calculate annualized exponential growth rate of population share.
 
-    This metric represents the average exponential rate of change - the constant
-    annual growth rate (expressed as a percent) that would take the population
-    share from its initial value to its final value over a 5-year period.
+    For each country and location type, compute the annualized rate between observations:
+        rate_t = 100 * ln(P_t / P_{t-prev}) / (year_t - year_prev)
 
-    Formula: ln(percPt/percP0) / 5 * 100
-    where percPt is the population share at time t, and percP0 is the share
-    5 years earlier.
+    This produces UN F04-style rates. For 5-year intervals, year_t - year_prev = 5.
+    The formula assumes constant exponential growth between observations.
+
+    Notes:
+    - Returns NaN when previous is missing/zero, current is missing, or ratio <= 0.
+    - Handles irregular year gaps automatically.
     """
 
-    # Sort by country and year to ensure proper ordering for growth calculations.
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
 
-    # Calculate population share change for each location type.
-    # Note: data is at 5-year intervals.
+    # Compute the year step per country (handles 5-year data and irregular gaps)
+    year_prev = tb.groupby("country")["year"].shift(1)
+    year_step = tb["year"] - year_prev  # e.g. 5 for five-year intervals
+
     for location_type in ["urban_centre", "urban_cluster", "rural_total", "urban_total"]:
         popshare_col = f"popshare_{location_type}"
 
-        # Get current and previous values
         current = tb[popshare_col]
         previous = tb.groupby("country")[popshare_col].shift(1)
 
-        # Calculate exponential growth rate: ln(percPt/percP0) / 5 * 100
-        # Handle edge cases: set to NaN when previous is 0, NaN, or when current/previous is invalid
         with np.errstate(divide="ignore", invalid="ignore"):
-            # Calculate ratio and handle inf values
-            ratio = np.where((previous == 0) | (previous.isna()) | (current.isna()), np.nan, current / previous)
-            # Calculate log, handling non-positive ratios
-            log_ratio = np.where((ratio <= 0) | np.isnan(ratio) | np.isinf(ratio), np.nan, np.log(ratio))
-            # Calculate final result
-            result = (log_ratio / 5) * 100
-            tb[f"popshare_change_{location_type}"] = result
+            # Valid only when we have a positive previous, a non-missing current, and a positive year step
+            valid = previous.notna() & current.notna() & (previous > 0) & (year_step.notna()) & (year_step > 0)
+
+            ratio = np.where(valid, current / previous, np.nan)
+            log_ratio = np.where((ratio > 0) & np.isfinite(ratio), np.log(ratio), np.nan)
+
+            # Annualized percent log growth rate
+            tb[f"popshare_change_{location_type}"] = 100 * (log_ratio / year_step)
 
     return tb
 
