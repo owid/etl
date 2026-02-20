@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -171,30 +172,39 @@ def calculate_shares_and_densities(tb):
 
 
 def calculate_population_share_change(tb):
-    """Calculate population share change for each location type.
+    """Calculate annual exponential growth rate of population share.
 
-    This metric represents the change in population share (in percentage points)
-    over 5-year intervals. For example, if a city's population share goes from
-    30% to 35%, the popshare_change would be +5 percentage points.
+    This metric represents the average exponential rate of change - the constant
+    annual growth rate (expressed as a percent) that would take the population
+    share from its initial value to its final value over a 5-year period.
 
-    A 3-period rolling average is applied to reduce volatility, especially for
-    small territories where entire areas may shift classification categories.
+    Formula: ln(percPt/percP0) / 5 * 100
+    where percPt is the population share at time t, and percP0 is the share
+    5 years earlier.
     """
+
     # Sort by country and year to ensure proper ordering for growth calculations.
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
 
     # Calculate population share change for each location type.
-    # Note: data is at 5-year intervals, so this represents the change over 5 years.
+    # Note: data is at 5-year intervals.
     for location_type in ["urban_centre", "urban_cluster", "rural_total", "urban_total"]:
         popshare_col = f"popshare_{location_type}"
 
-        # Calculate change in population share: popshare_t - popshare_t-1 (in percentage points)
-        change_col = tb.groupby("country")[popshare_col].diff()
+        # Get current and previous values
+        current = tb[popshare_col]
+        previous = tb.groupby("country")[popshare_col].shift(1)
 
-        # Apply 4-period rolling average to smooth volatility
-        tb[f"popshare_change_{location_type}"] = change_col.groupby(tb["country"]).transform(
-            lambda x: x.rolling(window=4, center=True, min_periods=1).mean()
-        )
+        # Calculate exponential growth rate: ln(percPt/percP0) / 5 * 100
+        # Handle edge cases: set to NaN when previous is 0, NaN, or when current/previous is invalid
+        with np.errstate(divide='ignore', invalid='ignore'):
+            # Calculate ratio and handle inf values
+            ratio = np.where((previous == 0) | (previous.isna()) | (current.isna()), np.nan, current / previous)
+            # Calculate log, handling non-positive ratios
+            log_ratio = np.where((ratio <= 0) | np.isnan(ratio) | np.isinf(ratio), np.nan, np.log(ratio))
+            # Calculate final result
+            result = (log_ratio / 5) * 100
+            tb[f"popshare_change_{location_type}"] = result
 
     return tb
 

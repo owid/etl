@@ -29,7 +29,7 @@ tables:
     variables:
       value:
           description_short: |-
-            <% if data_type == 'estimates' %>Estimated<% else %>Projected<% endif %> <% if metric == 'population' %>number of people living<% elif metric == 'area' %>land area<% elif metric == 'built_up_area' %>area covered by buildings<% elif metric == 'share' %>share of land<% elif metric == 'popshare' %>share of population living<% elif metric == 'density' %>number of people per square kilometre<% elif metric == 'popshare_change' %>change in the share of the population living<% endif %> <% if location_type == 'urban_centre' %>in [cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>in [towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>in [rural areas](#dod:rural-areas-degurba)<% elif location_type == 'urban_total' %>in urban areas (the sum of [cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba))<% endif %><% if metric == 'popshare_change' %>, measured in percentage points over a 5-year period. Positive values indicate a growing share; negative values indicate a declining share<% if location_type == 'rural_total' %> (urbanization)<% endif %><% endif %>. Identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
+            <% if data_type == 'estimates' %>Estimated<% else %>Projected<% endif %> <% if metric == 'population' %>number of people living<% elif metric == 'area' %>land area<% elif metric == 'built_up_area' %>area covered by buildings<% elif metric == 'share' %>share of land<% elif metric == 'popshare' %>share of population living<% elif metric == 'density' %>number of people per square kilometre<% elif metric == 'popshare_change' %>annual rate of change in the population share living<% endif %> <% if location_type == 'urban_centre' %>in [cities](#dod:cities-degurba)<% elif location_type == 'urban_cluster' %>in [towns and suburbs](#dod:towns-degurba)<% elif location_type == 'rural_total' %>in [rural areas](#dod:rural-areas-degurba)<% elif location_type == 'urban_total' %>in urban areas (the sum of [cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba))<% endif %><% if metric == 'popshare_change' %>, measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share<% if location_type == 'rural_total' %> (urbanization)<% endif %><% endif %>. Identified using satellite imagery and population data, applying the same density and size thresholds across all countries.
 
           description_key:
             - *text_degurba_overview
@@ -179,24 +179,24 @@ tables:
             Projected population density in urban areas
 
             <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in the share of population living in cities
+            Annual rate of change in the share of population living in cities
             <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in the share of population living in cities
+            Projected annual rate of change in the share of population living in cities
 
             <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in the share of population living in towns and suburbs
+            Annual rate of change in the share of population living in towns and suburbs
             <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in the share of population living in towns and suburbs
+            Projected annual rate of change in the share of population living in towns and suburbs
 
             <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in the share of population living in rural areas
+            Annual rate of change in the share of population living in rural areas
             <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in the share of population living in rural areas
+            Projected annual rate of change in the share of population living in rural areas
 
             <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'estimates' %>
-            Change in the share of population living in urban areas
+            Annual rate of change in the share of population living in urban areas
             <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'projections' %>
-            Projected change in the share of population living in urban areas
+            Projected annual rate of change in the share of population living in urban areas
 
             <% endif %>
           unit:
@@ -228,7 +228,7 @@ tables:
             <% elif metric == 'density' %>
             Population density was calculated by dividing the population by the total area of that settlement type.
             <% elif metric == 'popshare_change' %>
-            Change in population share was calculated as the difference between consecutive 5-year periods, measured in percentage points. A 4-period (20-year) rolling average was applied to smooth volatility.
+            The average exponential rate of change was calculated using the formula: ln(percPt/percP0) / 5 * 100, where percPt is the population share at time t and percP0 is the share 5 years earlier. This gives the constant annual growth rate (in percentage points) over the 5-year period.
             <%- endif -%>
           presentation:
             title_public: |-
@@ -341,24 +341,24 @@ tables:
               Projected population density in urban areas
 
               <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'estimates' %>
-              Change in the share of population living in cities
+              Annual rate of change in the share of population living in cities
               <% elif location_type == "urban_centre" and metric == 'popshare_change' and data_type == 'projections' %>
-              Projected change in the share of population living in cities
+              Projected annual rate of change in the share of population living in cities
 
               <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'estimates' %>
-              Change in the share of population living in towns and suburbs
+              Annual rate of change in the share of population living in towns and suburbs
               <% elif location_type == "urban_cluster" and metric == 'popshare_change' and data_type == 'projections' %>
-              Projected change in the share of population living in towns and suburbs
+              Projected annual rate of change in the share of population living in towns and suburbs
 
               <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'estimates' %>
-              Change in the share of population living in rural areas
+              Annual rate of change in the share of population living in rural areas
               <% elif location_type == "rural_total" and metric == 'popshare_change' and data_type == 'projections' %>
-              Projected change in the share of population living in rural areas
+              Projected annual rate of change in the share of population living in rural areas
 
               <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'estimates' %>
-              Change in the share of population living in urban areas
+              Annual rate of change in the share of population living in urban areas
               <% elif location_type == "urban_total" and metric == 'popshare_change' and data_type == 'projections' %>
-              Projected change in the share of population living in urban areas
+              Projected annual rate of change in the share of population living in urban areas
 
               <% endif %>
             grapher_config:

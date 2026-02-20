@@ -207,11 +207,11 @@ def create_stacked_metadata(metric, data_type):
         (
             "popshare_change",
             "estimates",
-        ): "Change in the share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), measured in percentage points over 5-year intervals. Positive values indicate a growing share; negative values indicate a declining share.",
+        ): "Annual rate of change in the population share living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
         (
             "popshare_change",
             "projections",
-        ): "Projected change in the share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), measured in percentage points over 5-year intervals. Positive values indicate a growing share; negative values indicate a declining share.",
+        ): "Projected annual rate of change in the population share living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
     }
 
     # Define description_key (varies by metric)
@@ -225,7 +225,7 @@ def create_stacked_metadata(metric, data_type):
 
     # Add interpretation for popshare_change
     if metric == "popshare_change":
-        interpretation_text = "For cities and towns, positive values indicate urbanization (a growing share of the population living in these areas), while negative values indicate the opposite. For rural areas, positive values indicate a growing rural share, while negative values indicate declining rural population share (urbanization)."
+        interpretation_text = "The rate of change is calculated using the formula ln(percPt/percP0) / 5 × 100, where percPt is the population share at time t and percP0 is the share 5 years earlier. This gives the constant annual growth rate over the 5-year period. For cities and towns, positive values indicate urbanization (a growing share of the population living in these areas), while negative values indicate the opposite. For rural areas, positive values indicate a growing rural share, while negative values indicate declining rural population share (urbanization)."
         description_key = base_description_key + [interpretation_text]
     else:
         description_key = base_description_key
@@ -286,11 +286,11 @@ def create_urban_vs_rural_metadata(metric, data_type):
         (
             "popshare_change",
             "estimates",
-        ): "Change in the share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), measured in percentage points over 5-year intervals. Positive values indicate a growing share; negative values indicate a declining share.",
+        ): "Annual rate of change in the population share living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
         (
             "popshare_change",
             "projections",
-        ): "Projected change in the share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), measured in percentage points over 5-year intervals. Positive values indicate a growing share; negative values indicate a declining share.",
+        ): "Projected annual rate of change in the population share living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
     }
 
     # Define description_key (varies by metric)
@@ -303,7 +303,7 @@ def create_urban_vs_rural_metadata(metric, data_type):
 
     # Add interpretation for popshare_change
     if metric == "popshare_change":
-        interpretation_text = "For urban areas, positive values indicate urbanization (a growing share of the population living in cities and towns), while negative values indicate the opposite. For rural areas, positive values indicate a growing rural share, while negative values indicate declining rural population share (urbanization)."
+        interpretation_text = "The rate of change is calculated using the formula ln(percPt/percP0) / 5 × 100, where percPt is the population share at time t and percP0 is the share 5 years earlier. This gives the constant annual growth rate over the 5-year period. For urban areas, positive values indicate urbanization (a growing share of the population living in cities and towns), while negative values indicate the opposite. For rural areas, positive values indicate a growing rural share, while negative values indicate declining rural population share (urbanization)."
         description_key = base_description_key + [interpretation_text]
     else:
         description_key = base_description_key
