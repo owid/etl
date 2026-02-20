@@ -251,12 +251,7 @@ def decoupling_mask(tb_change):
 
 
 def detect_decoupled_countries(tb_change, year_min, year_max):
-    """Return countries that meet the decoupling criterion for a given window.
-
-    A country is considered decoupled if GDP per capita increased by more than `PCT_CHANGE_MIN` and
-    consumption-based CO2 emissions per capita decreased by more than `PCT_CHANGE_MIN` between
-    `year_min` and `year_max`.
-    """
+    """Return countries that meet the decoupling criterion for a given window."""
     tb_sel = tb_change[
         (tb_change["year_min"] == year_min) & (tb_change["year_max"] == year_max) & decoupling_mask(tb_change=tb_change)
     ]
@@ -654,7 +649,7 @@ def run() -> None:
     # Add a column with imports/exports as a percentage of domestic supply.
     tb["imports_pct"] = 100 * tb["imports"] / tb["domestic_supply"]
     tb["exports_pct"] = 100 * tb["exports"] / tb["domestic_supply"]
-    tb["net_imports_pct"] = 100 * (tb["imports"] - tb["exports"]) / tb["domestic_supply"] * 100
+    tb["net_imports_pct"] = 100 * (tb["imports"] - tb["exports"]) / tb["domestic_supply"]
 
     # Create a table with all possible combinations of minimum and maximum year, and the change in food supply and land use of each country.
     tb_change = create_changes_table(tb, columns=["food_energy", "agricultural_land"])
@@ -721,7 +716,7 @@ def run() -> None:
         tb_change=tb_change, year_min=year_min_best, year_max=year_max_best
     )
 
-    # Select conly countries that were classified as decoupled.
+    # Select only countries that were classified as decoupled.
     tb = tb[tb["country"].isin(countries_decoupled)].reset_index(drop=True)
 
     # # Create a simple table with the selected window of years for the selected countries.
