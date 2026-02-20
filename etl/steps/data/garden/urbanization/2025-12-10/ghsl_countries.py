@@ -197,7 +197,7 @@ def calculate_population_share_change(tb):
 
         # Calculate exponential growth rate: ln(percPt/percP0) / 5 * 100
         # Handle edge cases: set to NaN when previous is 0, NaN, or when current/previous is invalid
-        with np.errstate(divide='ignore', invalid='ignore'):
+        with np.errstate(divide="ignore", invalid="ignore"):
             # Calculate ratio and handle inf values
             ratio = np.where((previous == 0) | (previous.isna()) | (current.isna()), np.nan, current / previous)
             # Calculate log, handling non-positive ratios
