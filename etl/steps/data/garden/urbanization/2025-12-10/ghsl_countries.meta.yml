@@ -360,7 +360,7 @@ tables:
                 colorScale:
                   baseColorScheme: |
                     <% if metric == 'popshare_change' %>
-                    RdYlBu
+                    PuOr
                     <% elif location_type == 'urban_centre' %>
                     Blues
                     <% elif location_type == 'urban_cluster' %>
