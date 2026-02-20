@@ -87,21 +87,10 @@ def run() -> None:
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
 
     # Split the indicator column for easier metadata generation.
-    # Pattern 1: metric_urbanization_level_type (e.g., population_urban_centre_estimates)
-    # Pattern 2: special metrics like urban_share_growth_rate_estimates
-
-    # Extract standard urbanization indicators.
-    standard_pattern = tb["indicator"].str.extract(
+    # Pattern: metric_urbanization_level_type (e.g., population_urban_centre_estimates)
+    tb[["metric", "location_type", "data_type"]] = tb["indicator"].str.extract(
         r"(area|population|built_up_area|popshare|share|density)_(urban_centre|urban_cluster|rural_total|urban_total)_(estimates|projections)"
     )
-
-    # Extract growth rate indicator.
-    growth_rate_pattern = tb["indicator"].str.extract(r"(urban_share_growth_rate)_(estimates|projections)")
-
-    # Combine patterns.
-    tb["metric"] = standard_pattern[0].fillna(growth_rate_pattern[0])
-    tb["location_type"] = standard_pattern[1].fillna("urban_total")  # Growth rate applies to urban_total
-    tb["data_type"] = standard_pattern[2].fillna(growth_rate_pattern[1])
 
     # Drop the original indicator column.
     tb = tb.drop(columns=["indicator"])
@@ -148,12 +137,6 @@ def calculate_shares_and_densities(tb):
     tb["density_urban_cluster"] = tb["population_urban_cluster"] / tb["area_urban_cluster"]
     tb["density_rural_total"] = tb["population_rural_total"] / tb["area_rural_total"]
     tb["density_urban_total"] = tb["population_urban_total"] / tb["area_urban_total"]
-
-    # Annual growth rate of urban population share (percentage points change per year).
-    # Sort by country and year to ensure correct calculation.
-    tb = tb.sort_values(["country", "year"])
-    # Calculate the difference in urban share between consecutive years.
-    tb["urban_share_growth_rate"] = tb.groupby("country", group_keys=False)["popshare_urban_total"].diff()
 
     # Drop temporary total columns.
     tb = tb.drop(columns=["total_population", "total_area"])
