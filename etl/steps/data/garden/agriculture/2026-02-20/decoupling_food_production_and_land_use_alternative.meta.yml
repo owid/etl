@@ -9,11 +9,11 @@ definitions:
 
 dataset:
   update_period_days: 365
-  title: "Decoupling of agricultural production and land use"
+  title: "Decoupling of agricultural production and land use (alternative method)"
 
 tables:
   decoupling_food_production_and_land_use_alternative:
-    title: "Decoupling of agricultural production and land use"
+    title: "Decoupling of agricultural production and land use (alternative method)"
     variables:
       food_energy:
         title: "Food production in terms of energy content"

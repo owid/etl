@@ -22,114 +22,359 @@ TODO: Analogously, we could consider applying a cap on exports in the first year
 
 """
 
-from etl.data_helpers import geo
+from pathlib import Path
+
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Minimum percentage increase in food supply in the latest year with respect to the first year.
+FOOD_INCREASE_PCT_MIN = 5
+# Minimum percentage decrease in land use in the latest year with respect to the first year.
+LAND_DECREASE_PCT_MIN = 5
+# Maximum imports as a percentage of domestic supply (applied to the latest year only).
+# TODO: Implement.
+IMPORTS_SHARE_OF_SUPPLY_MAX = 20
 
-def show_decoupled_countries(
-    food_column,
-    tb_fbsc,
-    tb_grouped,
-    min_food_pct_change=5,
-    min_land_pct_change=5,
-    max_net_share_imports=20,
-    max_net_share_median_over_years=10,
-):
+# Number of years for the rolling average (1 to not do any rolling average).
+ROLLING_AVERAGE_YEARS = 3
+
+# Path to local folder where charts will be saved.
+# NOTE: Functions that save files will be commented by default; uncomment while doing analysis.
+OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-20_food_decoupling_analysis/"
+
+
+def create_changes_table(tb, columns, min_window=1):
+    """Create a table with percent changes in various columns, for all country-window combinations."""
+    years = sorted(tb["year"].unique())
+    max_window = int(tb["year"].max() - tb["year"].min())
+
+    results = []
+    for window_size in range(min_window, max_window + 1):
+        for year_min in years:
+            year_max = year_min + window_size
+            if year_max not in years:
+                continue
+
+            tb_start = tb[tb["year"] == year_min][["country"] + columns]
+            tb_end = tb[tb["year"] == year_max][["country"] + columns]
+
+            tb_merged = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
+
+            tb_merged["year_min"] = year_min
+            tb_merged["year_max"] = year_max
+            tb_merged["n_years"] = year_max - year_min
+            for column in columns:
+                tb_merged[f"{column}_change"] = (
+                    (tb_merged[f"{column}_end"] - tb_merged[f"{column}_start"]) / tb_merged[f"{column}_start"] * 100
+                )
+            results.append(
+                tb_merged[["country", "year_min", "year_max", "n_years"] + [f"{column}_change" for column in columns]]
+            )
+
+    return pr.concat(results, ignore_index=True)
+
+
+def decoupling_mask(tb_change):
+    return (tb_change["food_energy_change"] > FOOD_INCREASE_PCT_MIN) & (
+        tb_change["agricultural_land_change"] < -LAND_DECREASE_PCT_MIN
+    )
+
+
+def detect_decoupled_countries(tb_change, year_min, year_max):
+    """Return countries that meet the decoupling criterion for a given window.
+
+    A country is considered decoupled if GDP per capita increased by more than `PCT_CHANGE_MIN` and
+    consumption-based CO2 emissions per capita decreased by more than `PCT_CHANGE_MIN` between
+    `year_min` and `year_max`.
+    """
+    tb_sel = tb_change[
+        (tb_change["year_min"] == year_min) & (tb_change["year_max"] == year_max) & decoupling_mask(tb_change=tb_change)
+    ]
+    return set(tb_sel["country"].unique())
+
+
+def plot_decoupled_countries(tb_change, countries, year_min, year_max, y_min=-50, y_max=50, output_folder=None):
     import plotly.express as px
 
-    year_max = tb_grouped["year"].max()
-    year_min = tb_grouped["year"].min()
+    countries_decoupled = sorted(countries)
 
-    # Calculate the share of net annual imports of each country-year.
-    # This is, for each country-year (after aggregating all the main food item groups):
-    # 100 * | imports - exports | / domestic supply
-    # Relevant element codes:
-    # 005611: Imports (tonnes)
-    # 005911: Exports (tonnes)
-    # 005511: Production (tonnes)
-    # Instead of production, it may be more appropriate to use domestic supply instead (Domestic supply = Production + Imports − Exports ± Stock changes).
-    # 005301: Domestic supply (tonnes)
-    imports = (
-        tb_fbsc[
-            (tb_fbsc["item_code"].isin(sorted(set(sum([items for _, items in FOOD_GROUPS_FBSC.items()], [])))))
-            & (tb_fbsc["element_code"].isin(["005611", "005911", "005301"]))
-        ]
-        .reset_index(drop=True)
-        .groupby(["country", "year", "element"], as_index=False)
-        .agg({"value": "sum"})
-        .pivot(index=["country", "year"], columns=["element"], join_column_levels_with="_")
-        .format()
-        .reset_index()
-    )
-    # Calculate the net import share (share of domestic production that is imported).
-    imports["net_import_share"] = (
-        100 * (imports["value_imports"] - imports["value_exports"]) / imports["value_domestic_supply"]
+    # Filter tb_change for the time series: fixed year_min, varying year_max from year_min to year_max.
+    tb_plot_base = tb_change[
+        (tb_change["country"].isin(countries_decoupled))
+        & (tb_change["year_min"] == year_min)
+        & (tb_change["year_max"] <= year_max)
+    ][["country", "year_max", "food_energy_change", "agricultural_land_change"]].copy()
+
+    tb_plot_base = tb_plot_base.rename(
+        columns={
+            "year_max": "year",
+            "food_energy_change": "Food supply per capita",
+            "agricultural_land_change": "Agricultural land",
+        }
     )
 
-    check = tb_grouped.copy()
-    # Add column of net imports share.
-    if max_net_share_median_over_years is None:
-        check = check.merge(imports, on=["country", "year"], how="left")
-    else:
-        # Instead of simply imposing a maximum net import share, we impose a maximum median (over the last 10 years) net import share, for each country.
-        imports = (
-            imports[(imports["year"] > (year_max - max_net_share_median_over_years))]
-            .groupby("country", as_index=False)
-            .agg({"net_import_share": "median"})
-        )
-        check = check.merge(imports, on=["country"], how="left")
-    check = check.merge(check[(check["year"] == year_min)], how="left", on=["country"], suffixes=("", "_baseline"))
-    check[f"{food_column}_change"] = (
-        100 * (check[food_column] - check[f"{food_column}_baseline"]) / check[f"{food_column}_baseline"]
+    # Add baseline point at year_min with 0% change.
+    from owid.catalog import Table
+
+    tb_plot_base = pr.concat(
+        [
+            Table(
+                {
+                    "country": countries_decoupled,
+                    "year": year_min,
+                    "Food supply per capita": 0,
+                    "Agricultural land": 0,
+                }
+            ),
+            tb_plot_base,
+        ],
+        ignore_index=True,
     )
-    check["agricultural_land_change"] = (
-        100 * (check["agricultural_land"] - check["agricultural_land_baseline"]) / check["agricultural_land_baseline"]
-    )
-    # List countries that could be added to the chart as examples of decoupling.
-    # Sort them by land use relative change.
-    _check = check[check["year"] == year_max]
-    if food_column == "production_energy":
-        decoupled = (
-            _check[
-                (_check["agricultural_land_change"] <= -min_land_pct_change)
-                & (_check[f"{food_column}_change"] >= min_food_pct_change)
-            ]
-            .dropna(subset=[f"{food_column}_change", "agricultural_land_change"], how="any")
-            .sort_values("agricultural_land_change")["country"]
-            .unique()
-            .tolist()
-        )
-    else:
-        decoupled = (
-            _check[
-                (_check["net_import_share"] <= max_net_share_imports)
-                & (_check["agricultural_land_change"] <= -min_land_pct_change)
-                & (_check[f"{food_column}_change"] >= min_food_pct_change)
-            ]
-            .dropna(subset=[f"{food_column}_change", "agricultural_land_change"], how="any")
-            .sort_values("agricultural_land_change")["country"]
-            .unique()
-            .tolist()
-        )
-    # Remove regions.
-    decoupled = [country for country in decoupled if "(FAO)" not in country if country not in geo.REGIONS]
-    # Plot decoupling curves for those countries.
-    columns = [f"{food_column}_change", "agricultural_land_change"]
-    for country in sorted(decoupled):
-        px.line(
-            check[check["country"] == country][["year"] + columns].melt(id_vars=["year"]),
+
+    # To avoid spurious warnings about mixing units, remove them.
+    for column in ["Food supply per capita", "Agricultural land"]:
+        tb_plot_base[column].metadata.unit = None
+        tb_plot_base[column].metadata.short_unit = None
+
+    # Create output folder if saving.
+    if output_folder is not None:
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+
+    for country in countries_decoupled:
+        tb_country = tb_plot_base[tb_plot_base["country"] == country].reset_index(drop=True)
+        if tb_country.empty:
+            continue
+        # Get final percentage changes for the title.
+        final_row = tb_country[tb_country["year"] == year_max]
+        if final_row.empty:
+            # Country doesn't have data for the full window; skip it.
+            print(f"Not enough data for this window of years for {country}")
+            continue
+        food_change = float(final_row["Food supply per capita"].iloc[0])
+        land_change = float(final_row["Agricultural land"].iloc[0])
+        tb_plot = tb_country.melt(id_vars=["country", "year"], var_name="Indicator", value_name="value")
+        fig = px.line(
+            tb_plot,
             x="year",
             y="value",
-            color="variable",
-            markers=True,
-            title=country,
-        ).show()
+            color="Indicator",
+            title=f"{country} (Food supply: {food_change:+.1f}%, Land use: {land_change:+.1f}%)",
+        ).update_yaxes(range=[y_min, y_max])
+        if output_folder is not None:
+            # Sanitize country name for filename.
+            safe_name = country.replace("/", "_").replace(" ", "_")
+            fig.write_image(Path(output_folder) / f"{safe_name}.png")
+        else:
+            fig.show()
 
-    # Print resulting list of decoupled countries.
-    print(", ".join(decoupled))
+
+def plot_slope_chart_grid(tb_change, countries_decoupled, year_min, year_max, n_cols=6, output_file=None):
+    """Create a grid of slope charts showing decoupling for each country."""
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    tb_decoupled = tb_change[
+        (tb_change["year_min"] == year_min)
+        & (tb_change["year_max"] == year_max)
+        & (tb_change["country"].isin(countries_decoupled))
+    ].reset_index(drop=True)
+    # To avoid spurious warnings about mixing units, remove them.
+    for column in ["food_energy_change", "agricultural_land_change"]:
+        tb_decoupled[column].metadata.unit = None
+        tb_decoupled[column].metadata.short_unit = None
+
+    tb_decoupled["decoupling_score"] = tb_decoupled["food_energy_change"] - tb_decoupled["agricultural_land_change"]
+    tb_decoupled = tb_decoupled.sort_values("decoupling_score", ascending=False)
+
+    countries_decoupled = list(tb_decoupled["country"])
+    n_countries = len(countries_decoupled)
+    n_rows = (n_countries + n_cols - 1) // n_cols
+
+    # Calculate global y-axis range for consistent scaling across all subplots.
+    y_max = tb_decoupled["food_energy_change"].max()
+    y_min = tb_decoupled["agricultural_land_change"].min()
+    # Add some padding.
+    y_range = [y_min * 1.15, y_max * 1.15]
+
+    # Create subplots grid.
+    fig = make_subplots(
+        rows=n_rows,
+        cols=n_cols,
+        subplot_titles=countries_decoupled,
+        vertical_spacing=0.08,
+        horizontal_spacing=0.04,
+    )
+
+    # Define colors (blue for food and red for land).
+    food_color = "#3366cc"
+    land_color = "#cc3333"
+
+    for i, country in enumerate(countries_decoupled):
+        row = i // n_cols + 1
+        col = i % n_cols + 1
+
+        country_data = tb_decoupled[tb_decoupled["country"] == country].iloc[0]
+        food_change = float(country_data["food_energy_change"])
+        land_change = float(country_data["agricultural_land_change"])
+
+        # Food supply line.
+        fig.add_trace(
+            go.Scatter(
+                x=[year_min, year_max],
+                y=[0, food_change],
+                mode="lines+text",
+                line=dict(color=food_color, width=2),
+                text=["", f"{food_change:+.0f}%"],
+                textposition="middle right",
+                textfont=dict(color=food_color, size=10),
+                showlegend=False,
+                cliponaxis=False,
+            ),
+            row=row,
+            col=col,
+        )
+
+        # Land use line.
+        fig.add_trace(
+            go.Scatter(
+                x=[year_min, year_max],
+                y=[0, land_change],
+                mode="lines+text",
+                line=dict(color=land_color, width=2),
+                text=["", f"{land_change:+.0f}%"],
+                textposition="middle right",
+                textfont=dict(color=land_color, size=10),
+                showlegend=False,
+                cliponaxis=False,
+            ),
+            row=row,
+            col=col,
+        )
+
+    # Update layout.
+    fig.update_layout(
+        height=200 * n_rows,
+        width=180 * n_cols,
+        title_text=f"Countries that achieved food supply increase while reducing land use, {year_min}-{year_max}",
+        showlegend=False,
+    )
+
+    # Hide axes for cleaner look, and apply consistent y-axis range.
+    fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
+    fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=True, zerolinecolor="lightgray", range=y_range)
+
+    if output_file is not None:
+        fig.write_image(output_file)
+    else:
+        fig.show()
+
+
+def time_window_analysis(tb_change) -> None:
+    import plotly.express as px
+
+    # Select those countries and windows where GDP increased more than 5%, and emissions decreased more than 5%.
+    tb_count = (
+        tb_change[decoupling_mask(tb_change=tb_change)]
+        .reset_index()
+        .groupby(["year_min", "year_max", "n_years"], as_index=False)
+        .agg({"index": "count"})
+        .rename(columns={"index": "n_countries_decoupled"})
+    )
+    # Visually check which window has the maximum number of decoupled countries.
+
+    # Plot the number of decoupled countries for each choice of year max, as a function of year min.
+    output_file = OUTPUT_FOLDER / "n-decoupled-countries-vs-year-min.png"
+    # Ensure folder exists.
+    OUTPUT_FOLDER.mkdir(exist_ok=True)
+    color_map = {y: "blue" if y == tb_count["year_max"].max() else "lightgray" for y in tb_count["year_max"].unique()}
+    fig = px.line(
+        tb_count.sort_values(["year_max", "year_min"], ascending=False),
+        x="year_min",
+        y="n_countries_decoupled",
+        color="year_max",
+        color_discrete_map=color_map,
+    ).update_yaxes(range=[0, None])
+    fig.write_image(output_file)
+
+    # Plot the number of decoupled countries for each choice of year max, as a function of the window size.
+    output_file = OUTPUT_FOLDER / "n-decoupled-countries-vs-n-years.png"
+    fig = px.line(
+        tb_count.sort_values(["year_max", "year_min"], ascending=False),
+        x="n_years",
+        y="n_countries_decoupled",
+        color="year_max",
+        color_discrete_map=color_map,
+    ).update_yaxes(range=[0, None])
+    fig.write_image(output_file)
+
+    # We see that the window with the maximum number of countries achieving decoupling is:
+    tb_count.sort_values("n_countries_decoupled", ascending=False).head(10)
+
+    # The full window of years is the maximum year minus the minium; but if we use a rolling average, the minimum year should be shifted forward to the end of the window.
+    years_full_window = tb_change["year_max"].max() - (tb_change["year_min"].min() + max(1, ROLLING_AVERAGE_YEARS) - 1)
+    # Then the choices are:
+    tb_count[
+        (tb_count["year_max"] == tb_count["year_max"].max()) & (tb_count["n_years"].isin([10, 15, 20]))
+    ].sort_values("n_countries_decoupled", ascending=False)
+    year_max_best = tb_change["year_max"].max()
+    # For the lower end of the window, it could be a 20, 15, or 10 year window.
+    # for window in [years_full_window, 50, 40, 30, 20, 10]:
+    for window in [years_full_window]:
+        year_min_best = year_max_best - window
+
+        # Selected list of countries decoupled.
+        countries_decoupled = detect_decoupled_countries(
+            tb_change=tb_change, year_min=year_min_best, year_max=year_max_best
+        )
+
+        print(
+            f"\n- Window of {window} years ({year_min_best}-{year_max_best}): {len(countries_decoupled)} countries selected. Of those:"
+        )
+        mask_selected = (
+            (tb_change["country"].isin(countries_decoupled))
+            & (tb_change["year_min"] == year_min_best)
+            & (tb_change["year_max"] <= year_max_best)
+        )
+        _lower_land = (
+            tb_change[mask_selected]
+            .groupby("country", as_index=False)
+            .agg({"agricultural_land_change": lambda x: (x < 0).all()})
+        )
+        lower_land = set(_lower_land[_lower_land["agricultural_land_change"]]["country"])
+        _higher_food = (
+            tb_change[mask_selected]
+            .groupby("country", as_index=False)
+            .agg({"food_energy_change": lambda x: (x > 0).all()})
+        )
+        higher_food = set(_higher_food[_higher_food["food_energy_change"]]["country"])
+        lower_land_and_higher_food = lower_land & higher_food
+        print(f"    - {len(lower_land)} consistently stayed below the land use levels of {year_min_best}.")
+        print(f"    - {len(higher_food)} consistently stayed above the food supply levels of {year_min_best}.")
+        print(f"    - {len(lower_land_and_higher_food)} consistently achieved both.")
+
+        # Plot the grid of slope charts of all decoupled countries.
+        output_file = OUTPUT_FOLDER / f"smooth-grid-{year_min_best}-{year_max_best}.png"
+        plot_slope_chart_grid(
+            tb_change=tb_change,
+            countries_decoupled=countries_decoupled,
+            year_min=year_min_best,
+            year_max=year_max_best,
+            output_file=output_file,
+        )
+
+        # Plot each decoupled country's change curves individually, within the selected window.
+        output_folder = OUTPUT_FOLDER / f"smooth-countries-{year_min_best}-{year_max_best}/"
+        plot_decoupled_countries(
+            tb_change=tb_change,
+            countries=countries_decoupled,
+            year_min=year_min_best,
+            year_max=year_max_best,
+            output_folder=output_folder,
+        )
 
 
 def run() -> None:
@@ -194,9 +439,70 @@ def run() -> None:
     error = "Unexpectedly high number of rows lost when merging food supply and land use."
     assert (100 * (_n_rows_before - len(tb)) / _n_rows_before) < 23, error
 
-    # TODO: Use rolling averages, and take some of the additional logic from the GDP vs emissions step.
+    # Replace series by a rolling average.
+    if ROLLING_AVERAGE_YEARS > 1:
+        tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+        for column in ["food_energy", "agricultural_land"]:
+            tb[column] = tb.groupby("country", sort=False)[column].transform(
+                lambda s: s.rolling(ROLLING_AVERAGE_YEARS, min_periods=1).mean()
+            )
 
-    # Select countries that feed more people with less land, excluding those that did that by using land elsewhere.
+    # Create a table with all possible combinations of minimum and maximum year, and the change in food supply and land use of each country.
+    tb_change = create_changes_table(tb, columns=["food_energy", "agricultural_land"])
+
+    # Analysis to pick the best minimum and maximum years.
+    # time_window_analysis(tb_change=tb_change)
+
+    # Results for different windows:
+    # - Window of 59 years (1963-2022): 43 countries selected. Of those:
+    #     - 15 consistently stayed below the land use levels of 1963.
+    #     - 23 consistently stayed above the food supply levels of 1963.
+    #     - 7 consistently achieved both.
+    # - Window of 50 years (1972-2022): 40 countries selected. Of those:
+    #     - 15 consistently stayed below the land use levels of 1972.
+    #     - 16 consistently stayed above the food supply levels of 1972.
+    #     - 3 consistently achieved both.
+    # - Window of 40 years (1982-2022): 41 countries selected. Of those:
+    #     - 17 consistently stayed below the land use levels of 1982.
+    #     - 7 consistently stayed above the food supply levels of 1982.
+    #     - 1 consistently achieved both.
+    # - Window of 30 years (1992-2022): 42 countries selected. Of those:
+    #     - 19 consistently stayed below the land use levels of 1992.
+    #     - 16 consistently stayed above the food supply levels of 1992.
+    #     - 7 consistently achieved both.
+    # - Window of 20 years (2002-2022): 31 countries selected. Of those:
+    #     - 21 consistently stayed below the land use levels of 2002.
+    #     - 9 consistently stayed above the food supply levels of 2002.
+    #     - 7 consistently achieved both.
+    # - Window of 10 years (2012-2022): 9 countries selected. Of those:
+    #     - 9 consistently stayed below the land use levels of 2012.
+    #     - 6 consistently stayed above the food supply levels of 2012.
+    #     - 6 consistently achieved both.
+
+    # Selected window of years.
+    year_max_best = tb_change["year_max"].max()
+    year_min_best = tb_change["year_min"].min() + max(1, ROLLING_AVERAGE_YEARS) - 1
+
+    # Selected decoupled countries in that window.
+    countries_decoupled = detect_decoupled_countries(
+        tb_change=tb_change, year_min=year_min_best, year_max=year_max_best
+    )
+
+    # Select conly countries that were classified as decoupled.
+    tb = tb[tb["country"].isin(countries_decoupled)].reset_index(drop=True)
+
+    # # Create a simple table with the selected window of years for the selected countries.
+    # tb_window = tb_change[
+    #     (tb_change["country"].isin(countries_decoupled))
+    #     & (tb_change["year_min"] == year_min_best)
+    #     & (tb_change["year_max"] == year_max_best)
+    # ].reset_index(drop=True)
+
+    # # Remove unnecessary columns.
+    # tb_window = tb_window.drop(columns=["year_min", "year_max", "n_years"], errors="raise")
+
+    # # Set an appropriate index and sort conveniently.
+    # tb_window = tb_window.format(["country"])
 
     ####################################################################################################################
     # TODO: Update these conclusions.
