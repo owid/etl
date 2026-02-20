@@ -46,6 +46,170 @@ ROLLING_AVERAGE_YEARS = 3
 # NOTE: Functions that save files will be commented by default; uncomment while doing analysis.
 OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-20_food_decoupling_analysis/"
 
+# Food groups (copied from the garden additional_variables step) created by OWID for FBSC (combination of FBS and FBSH).
+# This is needed to be able to compute totals for imports, exports and domestic supply (food supply, in kcal, already has a total item).
+FOOD_GROUPS_FBSC = {
+    "Cereals and grains": [
+        "00002905",  # Cereals, Excluding Beer
+        # Item group contains:
+        # 'Barley and products',
+        # 'Cereals, Other',
+        # 'Maize and products',
+        # 'Millet and products',
+        # 'Oats',
+        # 'Rice and products',
+        # 'Rye and products',
+        # 'Sorghum and products',
+        # 'Wheat and products',
+    ],
+    "Pulses": [
+        "00002911",  # Pulses
+        # Item group contains:
+        # 'Beans',
+        # 'Peas',
+        # 'Pulses, Other and products',
+    ],
+    "Starchy roots": [
+        "00002907",  # Starchy Roots
+        # Item group contains:
+        # 'Cassava and products',
+        # 'Potatoes and products',
+        # 'Roots, Other',
+        # 'Sweet potatoes',
+        # 'Yams',
+    ],
+    "Fruits and vegetables": [
+        "00002919",  # Fruits - Excluding Wine
+        # Item group contains:
+        # 'Apples and products',
+        # 'Bananas',
+        # 'Citrus, Other',
+        # 'Dates',
+        # 'Fruits, other',
+        # 'Grapefruit and products',
+        # 'Grapes and products (excl wine)',
+        # 'Lemons, Limes and products',
+        # 'Oranges, Mandarines',
+        # 'Pineapples and products',
+        # 'Plantains',
+        "00002918",  # Vegetables
+        # Item group contains:
+        # 'Onions',
+        # 'Tomatoes and products',
+        # 'Vegetables, other',
+    ],
+    "Oils and fats": [
+        "00002914",  # Vegetable Oils
+        # Item group contains:
+        # 'Coconut Oil',
+        # 'Cottonseed Oil',
+        # 'Groundnut Oil',
+        # 'Maize Germ Oil',
+        # 'Oilcrops Oil, Other',
+        # 'Olive Oil',
+        # 'Palm Oil',
+        # 'Palmkernel Oil',
+        # 'Rape and Mustard Oil',
+        # 'Ricebran Oil',
+        # 'Sesameseed Oil',
+        # 'Soyabean Oil',
+        # 'Sunflowerseed Oil'
+        "00002946",  # Animal fats group
+        # Item group contains:
+        # 'Butter, Ghee',
+        # 'Cream',
+        # 'Fats, Animals, Raw',
+        # 'Fish, Body Oil',
+        # 'Fish, Liver Oil'
+        "00002913",  # Oilcrops
+        # Item group contains:
+        # 'Coconuts - Incl Copra',
+        # 'Cottonseed',
+        # 'Groundnuts',
+        # 'Oilcrops, Other',
+        # 'Olives (including preserved)',
+        # 'Palm kernels',
+        # 'Rape and Mustardseed',
+        # 'Sesame seed',
+        # 'Soyabeans',
+        # 'Sunflower seed'
+        "00002912",  # Treenuts
+        # Item group contains:
+        # 'Nuts and products',
+    ],
+    "Sugar": [
+        "00002909",  # Sugar & Sweeteners
+        # Item group contains:
+        # 'Honey',
+        # 'Sugar (Raw Equivalent)',
+        # 'Sugar non-centrifugal',
+        # 'Sweeteners, Other',
+        "00002908",  # Sugar crops
+        # Item group contains:
+        # 'Sugar beet',
+        # 'Sugar cane',
+    ],
+    "Meat": [
+        "00002960",  # Fish and seafood
+        # Item group contains:
+        # 'Aquatic Animals, Others',
+        # 'Cephalopods',
+        # 'Crustaceans',
+        # 'Demersal Fish',
+        # 'Freshwater Fish',
+        # 'Marine Fish, Other',
+        # 'Molluscs, Other',
+        # 'Pelagic Fish',
+        "00002943",  # Meat, total
+        # Item group contains:
+        # 'Bovine Meat',
+        # 'Meat, Other',
+        # 'Mutton & Goat Meat',
+        # 'Pigmeat',
+        # 'Poultry Meat',
+    ],
+    "Dairy and eggs": [
+        "00002948",  # Milk - Excluding Butter
+        # Item group contains:
+        # 'Milk - Excluding Butter',
+        "00002949",  # Eggs
+        # Item group contains:
+        # 'Eggs',
+    ],
+    "Alcoholic beverages": [
+        "00002924",  # Alcoholic Beverages
+        # Item group contains:
+        # 'Alcohol, Non-Food',
+        # 'Beer',
+        # 'Beverages, Alcoholic',
+        # 'Beverages, Fermented',
+        # 'Wine',
+    ],
+    "Other": [
+        "00002928",  # Miscellaneous
+        # Item group contains:
+        # 'Infant food',
+        # 'Miscellaneous',
+        "00002923",  # Spices
+        # Item group contains:
+        # 'Cloves',
+        # 'Pepper',
+        # 'Pimento',
+        # 'Spices, Other',
+        "00002922",  # Stimulants
+        # Item group contains:
+        # 'Cocoa Beans and products',
+        # 'Coffee and products',
+        # 'Tea (including mate)',
+        "00002945",  # Offals
+        # Item group contains:
+        # 'Offals, Edible',
+        "00002961",  # Aquatic Products, Other
+        # 'Aquatic Plants',
+        # 'Meat, Aquatic Mammals',
+    ],
+}
+
 
 def create_changes_table(tb, columns, min_window=1):
     """Create a table with percent changes in various columns, for all country-window combinations."""
@@ -79,8 +243,10 @@ def create_changes_table(tb, columns, min_window=1):
 
 
 def decoupling_mask(tb_change):
-    return (tb_change["food_energy_change"] > FOOD_INCREASE_PCT_MIN) & (
-        tb_change["agricultural_land_change"] < -LAND_DECREASE_PCT_MIN
+    return (
+        (tb_change["food_energy_change"] > FOOD_INCREASE_PCT_MIN)
+        & (tb_change["agricultural_land_change"] < -LAND_DECREASE_PCT_MIN)
+        & (tb_change["net_imports_pct"] < IMPORTS_SHARE_OF_SUPPLY_MAX)
     )
 
 
@@ -401,15 +567,54 @@ def run() -> None:
     tb_rl = tb_rl[["country", "year", "value"]].rename(columns={"value": "agricultural_land"}, errors="raise")
 
     # Select relevant elements from the food balances data.
-    # Select item "Total" ("00002901").
     # Select element "Food available for consumption" ("0664pc"), in kcal/capita/day. It was converted from the original "Food supply (kcal/capita/day)" to total (by multiplying by FAO population) and then divided by informed OWID population (except for FAO regions, that were divided by FAO population).
-    tb = tb_fbsc[(tb_fbsc["element_code"] == "0664pc") & (tb_fbsc["item_code"] == "00002901")].reset_index(drop=True)
+    # Include also elements "Imports" ("005611") and "Domestic supply" ("005301"), to be able to exclude countries that are offshoring their land use; include "Exports" ("005911") in case we want to use it too.
+    tb = tb_fbsc[(tb_fbsc["element_code"].isin(["0664pc", "005611", "005301", "005911"]))].reset_index(drop=True)
+
     # Sanity check.
-    assert set(tb["element"]) == {"Food available for consumption"}
-    assert set(tb["unit"]) == {"kilocalories per day per capita"}
+    assert set(tb["element"]) == {"Domestic supply", "Exports", "Food available for consumption", "Imports"}
+    assert set(tb["unit"]) == {"kilocalories per day per capita", "tonnes"}
     assert tb[tb["value"].isnull()].empty
+    # While food supply contains a "Total" item, imports, exports, and domestic supply don't.
+    # Construct those totals by adding up all item groups.
+    total_items = sum(FOOD_GROUPS_FBSC.values(), [])
+    assert sorted(set(total_items)) == sorted(total_items)
+    tb_totals = (
+        tb[(tb["item_code"].isin(total_items))]
+        .groupby(["country", "year", "element_code", "element"], as_index=False)
+        .agg({"value": "sum"})
+        .assign(**{"item": "Total"})
+    )
+    # Sanity check.
+    error = "For food supply (the only element that has totals in the original data) the sum should coincide with the original totals."
+    check = tb[(tb["element_code"] == "0664pc") & (tb["item_code"] == "00002901")][
+        ["country", "year", "element_code", "value"]
+    ].merge(
+        tb_totals[(tb_totals["element_code"] == "0664pc")],
+        on=["country", "year", "element_code"],
+        how="inner",
+        suffixes=("", "_sum"),
+    )
+    assert ((100 * abs(check["value"] - check["value_sum"]) / check["value"]) < 1).all(), error
+    # Combine the original totals for food supply with the computed totals for imports, exports and domestic supply.
+    tb = pr.concat(
+        [
+            tb[(tb["element_code"] == "0664pc") & (tb["item_code"] == "00002901")],
+            tb_totals[tb_totals["element_code"] != "0664pc"],
+        ],
+        ignore_index=True,
+    )
     # Keep only relevant columns.
-    tb = tb[["country", "year", "value"]].rename(columns={"value": "food_energy"}, errors="raise")
+    tb = tb[["country", "year", "element_code", "value"]]
+    tb = tb.pivot(index=["country", "year"], columns=["element_code"], join_column_levels_with="_").rename(
+        columns={
+            "value_005301": "domestic_supply",
+            "value_005611": "imports",
+            "value_005911": "exports",
+            "value_0664pc": "food_energy",
+        },
+        errors="raise",
+    )
 
     ####################################################################################################################
     # TODO: Consider removing:
@@ -418,11 +623,10 @@ def run() -> None:
     # - Land use (in ha/year).
     # Alternatively, we could use per capita yearly food supply (kcal/capita/year), or total yearly food supply (kcal/year).
     # Convert kcal/capita/day to kcal/capita/year.
-    # tb.loc[(tb["element_code"] == "0664pc"), "food_energy"] *= 365
-
+    # tb["food_energy"] *= 365
     # Calculate the total food supply (not per capita).
-    # tb_total = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
-    # tb_total["food_energy"] *= tb_total["population"]
+    # tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
+    # tb["food_energy"] *= tb["population"]
     ####################################################################################################################
 
     # Combine food supply and agricultural land.
@@ -442,18 +646,32 @@ def run() -> None:
     # Replace series by a rolling average.
     if ROLLING_AVERAGE_YEARS > 1:
         tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
-        for column in ["food_energy", "agricultural_land"]:
+        for column in tb.drop(columns=["country", "year"]).columns:
             tb[column] = tb.groupby("country", sort=False)[column].transform(
                 lambda s: s.rolling(ROLLING_AVERAGE_YEARS, min_periods=1).mean()
             )
 
+    # Add a column with imports/exports as a percentage of domestic supply.
+    tb["imports_pct"] = 100 * tb["imports"] / tb["domestic_supply"]
+    tb["exports_pct"] = 100 * tb["exports"] / tb["domestic_supply"]
+    tb["net_imports_pct"] = 100 * (tb["imports"] - tb["exports"]) / tb["domestic_supply"] * 100
+
     # Create a table with all possible combinations of minimum and maximum year, and the change in food supply and land use of each country.
     tb_change = create_changes_table(tb, columns=["food_energy", "agricultural_land"])
 
+    # Add column of imports as a share of domestic supply of the latest year.
+    # TODO: Consider adding exports as a share of domestic supply of the earliest year.
+    tb_change = tb_change.merge(
+        tb[["country", "year", "imports_pct", "net_imports_pct"]].rename(columns={"year": "year_max"}),
+        on=["country", "year_max"],
+        how="inner",
+    )
+
     # Analysis to pick the best minimum and maximum years.
-    # time_window_analysis(tb_change=tb_change)
+    time_window_analysis(tb_change=tb_change)
 
     # Results for different windows:
+    # With no restrictions on imports:
     # - Window of 59 years (1963-2022): 43 countries selected. Of those:
     #     - 15 consistently stayed below the land use levels of 1963.
     #     - 23 consistently stayed above the food supply levels of 1963.
@@ -478,6 +696,21 @@ def run() -> None:
     #     - 9 consistently stayed below the land use levels of 2012.
     #     - 6 consistently stayed above the food supply levels of 2012.
     #     - 6 consistently achieved both.
+    # With a restriction on imports < 20% domestic supply:
+    # - Window of 59 years (1963-2022): 6 countries selected. Of those:
+    #     - 2 consistently stayed below the land use levels of 1963.
+    #     - 3 consistently stayed above the food supply levels of 1963.
+    #     - 1 consistently achieved both.
+    # With a restriction on net imports < 20% domestic supply:
+    # - Window of 59 years (1963-2022): 15 countries selected. Of those:
+    #     - 7 consistently stayed below the land use levels of 1963.
+    #     - 7 consistently stayed above the food supply levels of 1963.
+    #     - 3 consistently achieved both.
+    # With a restriction on net imports < 20% domestic supply, but using food supply instead of per capita food supply:
+    # - Window of 59 years (1963-2022): 15 countries selected. Of those:
+    #     - 7 consistently stayed below the land use levels of 1963.
+    #     - 12 consistently stayed above the food supply levels of 1963.
+    #     - 5 consistently achieved both.
 
     # Selected window of years.
     year_max_best = tb_change["year_max"].max()
