@@ -39,8 +39,11 @@ def run() -> None:
     tb = tb.drop_duplicates(subset=["country", "year", "area_type"], keep="first")
     tb = tb.drop(columns="loc_id")
 
+    # Add data_type dimension (estimates vs projections)
+    tb["data_type"] = tb["year"].apply(lambda y: "estimates" if y <= 2025 else "projections")
+
     # Set index
-    tb = tb.format(["country", "year", "area_type"])
+    tb = tb.format(["country", "year", "area_type", "data_type"])
 
     #
     # Save outputs.

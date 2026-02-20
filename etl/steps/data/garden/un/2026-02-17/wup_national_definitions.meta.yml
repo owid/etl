@@ -2,28 +2,31 @@
 definitions:
   common:
     presentation:
+      grapher_config:
+        note: Because the estimates of city and metropolitan areas are based on national definitions of what constitutes a city or metropolitan area, cross-country comparisons should be made with caution.
       topic_tags:
         - Urbanization
     processing_level: major
   description_key_common: &description_key_common
-      - |-
-        **National definitions of urban areas** vary considerably from country to country. Each nation uses its own criteria to define what constitutes an "urban" area, which may include:
+    - |-
+      **National definitions of urban areas** vary considerably from country to country. Each nation uses its own criteria to define what constitutes an "urban" area, which may include:
 
-        - Population size thresholds
-        - Population density requirements
-        - Type of economic activity (e.g., agricultural vs. non-agricultural)
-        - Physical characteristics of settlements
-        - Level of infrastructure and services
-        - Administrative or legal city status
-        - Or a combination of these factors
+      - Population size thresholds
+      - Population density requirements
+      - Type of economic activity (e.g., agricultural vs. non-agricultural)
+      - Physical characteristics of settlements
+      - Level of infrastructure and services
+      - Administrative or legal city status
+      - Or a combination of these factors
 
-        This variability means that a settlement classified as "urban" in one country might be considered "rural" in another, making direct cross-country comparisons challenging.
+    - |-
+      This variability means that a settlement classified as "urban" in one country might be considered "rural" in another, making direct cross-country comparisons challenging.
 
-      - |-
-        The UN collects data based on each country's own national definition of urban and rural areas. While this approach respects national statistical practices and reflects how countries themselves understand their urbanization, it creates challenges for international comparability.
+    - |-
+      The UN collects data based on each country's own national definition of urban and rural areas. While this approach respects national statistical practices and reflects how countries themselves understand their urbanization, it creates challenges for international comparability.
 
-      - |-
-        For internationally comparable data on urbanization, consider the [Degree of Urbanization (DEGURBA)](#dod:cities-degurba) classification, which applies consistent criteria across all countries using population density and settlement size thresholds.
+    - |-
+      For internationally comparable data on urbanization, consider our charts using [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) classification, which applies consistent criteria across all countries using population density and settlement size thresholds.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -36,72 +39,61 @@ tables:
   wup_urban_rural_population:
     variables:
       population:
-        title: |-
-          <% if area_type == 'urban' %>Urban population<% elif area_type == 'rural' %>Rural population<% else %>Total population<% endif %> by national definition
+        title: <% if area_type == "urban" %>Urban population<% elif area_type == "rural" %>Rural population<% else %>Total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
         unit: people
-        short_unit: ""
-        description_short: |-
-          <% if area_type == 'urban' %>Population living in areas defined as urban by national criteria<% elif area_type == 'rural' %>Population living in areas defined as rural by national criteria<% else %>Total population (sum of urban and rural)<% endif %>.
+        short_unit: ''
+        description_short: <% if area_type == "urban" %>Population living in areas defined as urban by national criteria<% elif area_type == "rural" %>Population living in areas defined as rural by national criteria<% else %>Total population (sum of urban and rural)<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
         description_key:
           - *description_key_common
-          - |-
-            Population figures are based on each country's own national definition of what constitutes an "urban" or "rural" area.
-
-          - |-
-            Historical estimates (1950-2024) are based on national census data and vital statistics, while projections (2025-2050) use demographic models consistent with the UN World Population Prospects.
-
         display:
           numDecimalPlaces: 0
+          isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
+          name:  <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+        presentation:
+         title_public: <% if area_type == "urban" %>Urban population<% elif area_type == "rural" %>Rural population<% else %>Total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+
 
       share:
-        title: |-
-          <% if area_type == 'urban' %>Percentage of population living in urban areas<% elif area_type == 'rural' %>Percentage of population living in rural areas<% else %>Share of total population<% endif %> by national definition
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          <% if area_type == 'urban' %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == 'rural' %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population<% endif %>.
+        title: <% if area_type == "urban" %>Percentage of population living in urban areas<% elif area_type == "rural" %>Percentage of population living in rural areas<% else %>Share of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        unit: '%'
+        short_unit: '%'
+        description_short: <% if area_type == "urban" %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == "rural" %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
         description_key:
           - *description_key_common
-          - |-
-            The urban and rural percentages sum to 100% for each country and year.
-
-          - |-
-            Urbanization trends based on national definitions may differ from those using standardized international classifications, as countries may change their urban definitions over time.
-
         display:
           numDecimalPlaces: 1
+          isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
+          name:  <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+        presentation:
+         title_public: <% if area_type == "urban" %>Percentage of population living in urban areas<% elif area_type == "rural" %>Percentage of population living in rural areas<% else %>Share of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
 
       growth_rate:
-        title: |-
-          <% if area_type == 'urban' %>Average annual rate of change of urban population<% elif area_type == 'rural' %>Average annual rate of change of rural population<% else %>Average annual rate of change of total population<% endif %> by national definition
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Average annual population growth rate as a percentage<% if area_type == 'urban' %> for urban areas<% elif area_type == 'rural' %> for rural areas<% endif %>. Positive values indicate population growth; negative values indicate decline.
+        title: <% if area_type == "urban" %>Average annual rate of change of urban population<% elif area_type == "rural" %>Average annual rate of change of rural population<% else %>Average annual rate of change of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        unit: '%'
+        short_unit: '%'
+        description_short: Average annual population growth rate as a percentage<% if area_type == "urban" %> for urban areas<% elif area_type == "rural" %> for rural areas<% endif %>. Positive values indicate population growth; negative values indicate decline<% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
         description_key:
           - *description_key_common
-          - |-
-            Growth rates are calculated as the average annual rate of change between census years or projection periods, typically 5-year intervals.
-
-          - |-
-            Urban growth rates are typically higher than rural rates due to both natural increase and rural-to-urban migration.
-
+          - Growth rates are calculated as the average annual rate of change between census years or projection periods, typically 5-year intervals.
+          - Urban growth rates are typically higher than rural rates due to both natural increase and rural-to-urban migration.
         display:
           numDecimalPlaces: 2
+          isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
+          name:  <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+        presentation:
+         title_public: <% if area_type == "urban" %>Average annual rate of change of urban population<% elif area_type == "rural" %>Average annual rate of change of rural population<% else %>Average annual rate of change of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
 
       share_growth_rate:
-        title: |-
-          <% if area_type == 'urban' %>Average annual rate of change of percentage urban<% elif area_type == 'rural' %>Average annual rate of change of percentage rural<% else %>Average annual rate of change of population share<% endif %> by national definition
-        unit: "percentage points"
-        short_unit: "pp"
-        description_short: |-
-          <% if area_type == 'urban' %>Average annual rate of change in the urban percentage. Positive values indicate urbanization (increasing urban share); negative values indicate declining urban share<% elif area_type == 'rural' %>Average annual rate of change in the rural percentage. Positive values indicate an increasing rural share (de-urbanization); negative values indicate declining rural share (urbanization)<% else %>Average annual rate of change in the share of population<% endif %>.
+        title: <% if area_type == "urban" %>Average annual rate of change of percentage urban<% elif area_type == "rural" %>Average annual rate of change of percentage rural<% else %>Average annual rate of change of population share<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        unit: '%'
+        short_unit: '%'
+        description_short: <% if area_type == "urban" %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the urban population share from its initial value to its final value over a given period. Positive values indicate urbanization (increasing urban share); negative values indicate declining urban share<% elif area_type == "rural" %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the rural population share from its initial value to its final value over a given period. Positive values indicate an increasing rural share (de-urbanization); negative values indicate declining rural share (urbanization)<% else %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the population share from its initial value to its final value over a given period<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
         description_key:
-          - *description_key_common
-          - |-
-            This measures how quickly the urbanization level is changing, not the population growth rate. For example, a value of 0.5 means the urban percentage is increasing by 0.5 percentage points per year on average.
-
-          - |-
-            <% if area_type == 'rural' %>For rural areas, positive values indicate an increasing rural share (de-urbanization), while negative values indicate declining rural share (urbanization).<% else %>Changes in these shares reflect both differential population growth rates and migration between urban and rural areas.<% endif %>
+          - '*description_key_common'
+          - <% if area_type == "rural" %>For rural areas, positive values indicate an increasing rural share (de-urbanization), while negative values indicate declining rural share (urbanization).<% else %>Changes in these shares reflect both differential population growth rates and migration between urban and rural areas.<% endif %>
         display:
           numDecimalPlaces: 3
+          isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
+          name:  <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+        presentation:
+         title_public: <% if area_type == "urban" %>Average annual rate of change of percentage urban<% elif area_type == "rural" %>Average annual rate of change of percentage rural<% else %>Average annual rate of change of population share<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
