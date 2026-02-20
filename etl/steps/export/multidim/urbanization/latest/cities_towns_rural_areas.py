@@ -53,7 +53,7 @@ def run() -> None:
         },
         common_view_config=MULTIDIM_CONFIG,
     )
-    # Add grouped views for location types
+    # Add grouped views for location types (only for population and popshare)
     c1.group_views(
         groups=[
             # Stacked area chart: cities, towns, rural
@@ -152,6 +152,20 @@ def run() -> None:
             view.config["chartTypes"] = []
             view.config["tab"] = "map"
 
+    # Remove grouped location views for popshare_change and density
+    # (these metrics don't make sense in stacked area or grouped views)
+    c.views = [
+        view
+        for view in c.views
+        if not (
+            (
+                view.dimensions.get("location_type") == "location_type_stacked"
+                or view.dimensions.get("location_type") == "urban_vs_rural"
+            )
+            and view.dimensions.get("metric") in ["popshare_change", "density"]
+        )
+    ]
+
     #
     # Save outputs.
     #
@@ -166,16 +180,6 @@ def create_stacked_metadata(metric, data_type):
         ("population", "projections"): "Projected population in cities, towns and suburbs, and rural areas",
         ("popshare", "estimates"): "Share of population in cities, towns and suburbs, and rural areas",
         ("popshare", "projections"): "Projected share of population in cities, towns and suburbs, and rural areas",
-        ("density", "estimates"): "Population density in cities, towns and suburbs, and rural areas",
-        ("density", "projections"): "Projected population density in cities, towns and suburbs, and rural areas",
-        (
-            "popshare_change",
-            "estimates",
-        ): "Change in the share of population in cities, towns and suburbs, and rural areas",
-        (
-            "popshare_change",
-            "projections",
-        ): "Projected change in the share of population in cities, towns and suburbs, and rural areas",
     }
 
     # Define description_short
@@ -196,42 +200,15 @@ def create_stacked_metadata(metric, data_type):
             "popshare",
             "projections",
         ): "Projected share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
-        (
-            "density",
-            "estimates",
-        ): "Estimated population density in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
-        (
-            "density",
-            "projections",
-        ): "Projected population density in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
-        (
-            "popshare_change",
-            "estimates",
-        ): "Annual rate of change in the population share living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
-        (
-            "popshare_change",
-            "projections",
-        ): "Projected annual rate of change in the population share living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
     }
 
-    # Define description_key (varies by metric)
-    base_description_key = [
+    # Define description_key
+    description_key = [
         "The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.",
         "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometre and at least 50,000 people in total.",
         "Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.",
         "Rural areas are places with less than 300 people per km² or a total population of less than 5,000.",
         "The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.",
-    ]
-
-    # Add interpretation for popshare_change
-    if metric == "popshare_change":
-        interpretation_text = "The rate of change is calculated using the formula ln(percPt/percP0) / 5 × 100, where percPt is the population share at time t and percP0 is the share 5 years earlier. This gives the constant annual growth rate over the 5-year period. For cities and towns, positive values indicate urbanization (a growing share of the population living in these areas), while negative values indicate the opposite. For rural areas, positive values indicate a growing rural share, while negative values indicate declining rural population share (urbanization)."
-        description_key = base_description_key + [interpretation_text]
-    else:
-        description_key = base_description_key
-
-    # Add common caveats
-    description_key += [
         "Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won't always match official city boundaries and therefore urbanization rates may differ from country-reported figures.",
         "For small countries, values can change sharply when an entire area shifts from one classification to another.",
     ]
@@ -251,10 +228,6 @@ def create_urban_vs_rural_metadata(metric, data_type):
         ("population", "projections"): "Projected population in urban and rural areas",
         ("popshare", "estimates"): "Share of population in urban and rural areas",
         ("popshare", "projections"): "Projected share of population in urban and rural areas",
-        ("density", "estimates"): "Population density in urban and rural areas",
-        ("density", "projections"): "Projected population density in urban and rural areas",
-        ("popshare_change", "estimates"): "Change in the share of population in urban and rural areas",
-        ("popshare_change", "projections"): "Projected change in the share of population in urban and rural areas",
     }
 
     # Define description_short
@@ -275,41 +248,14 @@ def create_urban_vs_rural_metadata(metric, data_type):
             "popshare",
             "projections",
         ): "Projected share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
-        (
-            "density",
-            "estimates",
-        ): "Estimated population density in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
-        (
-            "density",
-            "projections",
-        ): "Projected population density in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
-        (
-            "popshare_change",
-            "estimates",
-        ): "Annual rate of change in the population share living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
-        (
-            "popshare_change",
-            "projections",
-        ): "Projected annual rate of change in the population share living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share.",
     }
 
-    # Define description_key (varies by metric)
-    base_description_key = [
+    # Define description_key
+    description_key = [
         "The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.",
         "Urban areas combine cities (at least 1,500 people per km², 50,000 total) and towns and suburbs (at least 300 people per km², 5,000 total).",
         "Rural areas are places with less than 300 people per km² or a total population of less than 5,000.",
         "The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.",
-    ]
-
-    # Add interpretation for popshare_change
-    if metric == "popshare_change":
-        interpretation_text = "The rate of change is calculated using the formula ln(percPt/percP0) / 5 × 100, where percPt is the population share at time t and percP0 is the share 5 years earlier. This gives the constant annual growth rate over the 5-year period. For urban areas, positive values indicate urbanization (a growing share of the population living in cities and towns), while negative values indicate the opposite. For rural areas, positive values indicate a growing rural share, while negative values indicate declining rural population share (urbanization)."
-        description_key = base_description_key + [interpretation_text]
-    else:
-        description_key = base_description_key
-
-    # Add common caveats
-    description_key += [
         "Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won't always match official city boundaries and therefore urbanization rates may differ from country-reported figures.",
         "For small countries, values can change sharply when an entire area shifts from one classification to another.",
     ]

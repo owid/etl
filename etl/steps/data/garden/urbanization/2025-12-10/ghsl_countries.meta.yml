@@ -56,13 +56,7 @@ tables:
 
             - |-
               <% if metric == 'popshare_change' %>
-              <% if location_type == 'urban_centre' or location_type == 'urban_total' %>
-              Positive values indicate a growing share of the population living in <% if location_type == 'urban_centre' %>cities<% else %>urban areas<% endif %>, while negative values indicate a declining share.
-              <% elif location_type == 'urban_cluster' %>
-              Positive values indicate a growing share of the population living in towns and suburbs, while negative values indicate a declining share.
-              <% elif location_type == 'rural_total' %>
-              Positive values indicate a growing share of the population living in rural areas, while negative values indicate a declining share (urbanization).
-              <% endif %>
+              To measure how quickly urbanization is happening, we calculate the average annual rate at which the share of people living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% elif location_type == 'rural_total' %>rural areas<% else %>urban areas<% endif %> has grown or shrunk over a 5-year period. <% if location_type == 'urban_centre' or location_type == 'urban_cluster' or location_type == 'urban_total' %>A positive value means a larger share of the population was living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% else %>urban areas<% endif %> by the end of the period — in other words, urbanization was happening. A negative value means the opposite: the share living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% else %>urban areas<% endif %> shrank.<% else %>A positive value means the rural share grew, while a negative value means it fell (indicating urbanization).<% endif %>
               <% endif %>
 
             - *text_degurba_caveat
