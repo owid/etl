@@ -128,8 +128,9 @@ def run() -> None:
     has_capital_data = tb["urban_pop"].notna()
     has_top_100_data = tb["urban_pop_top_100"].notna()
 
-    # Identify city size columns.
+    # Identify city size columns (including aggregates from meadow).
     city_size_cols = [f"pop_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()]
+    city_size_cols.extend(["pop_above_300k", "pop_above_1m"])
     has_city_size_data = tb[city_size_cols[0]].notna()  # Check first column
 
     # Create capital-only table for regional aggregates.
@@ -201,25 +202,15 @@ def run() -> None:
     for size_name in CITY_SIZE_CUTOFFS.keys():
         tb_city_sizes = tb_city_sizes.rename(columns={f"pop_{size_name}": f"pop_citysize_{size_name}"})
 
-    # Calculate additional aggregates
-    # 300k or more
-    tb_city_sizes["pop_citysize_above_300k"] = (
-        tb_city_sizes["pop_citysize_300k_1m"]
-        + tb_city_sizes["pop_citysize_1m_3m"]
-        + tb_city_sizes["pop_citysize_3m_5m"]
-        + tb_city_sizes["pop_citysize_above_5m"]
-    )
-    # 1 million or more
-    tb_city_sizes["pop_citysize_above_1m"] = (
-        tb_city_sizes["pop_citysize_1m_3m"]
-        + tb_city_sizes["pop_citysize_3m_5m"]
-        + tb_city_sizes["pop_citysize_above_5m"]
+    # Rename aggregate columns (calculated from raw data in meadow).
+    tb_city_sizes = tb_city_sizes.rename(
+        columns={"pop_above_300k": "pop_citysize_above_300k", "pop_above_1m": "pop_citysize_above_1m"}
     )
 
-    # Calculate shares for all aggregates as percentage of urban population
-    for aggregate in ["above_300k", "above_1m"]:
-        tb_city_sizes[f"popshare_citysize_{aggregate}"] = (
-            tb_city_sizes[f"pop_citysize_{aggregate}"] / tb_city_sizes["urban_population"]
+    # Calculate shares as percentage of urban population for all city sizes and aggregates.
+    for col in ["above_300k", "above_1m"]:
+        tb_city_sizes[f"popshare_citysize_{col}"] = (
+            tb_city_sizes[f"pop_citysize_{col}"] / tb_city_sizes["urban_population"]
         ) * 100
 
     # Drop total and urban population.
