@@ -8,7 +8,6 @@ definitions:
 
   desc_key_common: &desc_key_common
     - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000. The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
-    - The time series runs from 1975 to 2100 at five-year intervals. Values from 1975 to 2020 are estimates based on satellite imagery and census data. Values from 2025 onwards are projections, and uncertainty increases further into the future.
     - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time. For density in particular, this can make fast-growing cities appear less dense in the past than they actually were, since the area used in the calculation includes land that wasn't yet part of the city.
     - Cities are also split at country borders, so a city that straddles two countries will appear as two separate entries.
     - City boundaries are model-derived and won't always match official administrative limits. In some countries, what is considered a single city may appear as multiple cities in this data, depending on how built-up areas are distributed. Data quality also varies by region and tends to be less reliable in countries with sparse or outdated census data.
@@ -330,6 +329,7 @@ tables:
         description_key:
           - Estimated total population living in the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
         display:
           numDecimalPlaces: 0
@@ -345,6 +345,7 @@ tables:
         description_key:
           - Projected total population living in the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
         display:
           numDecimalPlaces: 0
@@ -365,6 +366,7 @@ tables:
         description_key:
           - Estimated population density of the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
         description_processing: *desc_processing_density
         display:
@@ -382,6 +384,7 @@ tables:
         description_key:
           - Projected population density of the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
         description_processing: *desc_processing_density
         display:
@@ -402,6 +405,7 @@ tables:
         description_key:
           - Estimated total population living in each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the population of those same cities across time.
         display:
           numDecimalPlaces: 0
@@ -414,6 +418,7 @@ tables:
         description_key:
           - Projected total population living in each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the population of those same cities in future years.
         display:
           numDecimalPlaces: 0
@@ -431,6 +436,7 @@ tables:
         description_key:
           - Estimated population density of each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the density of those same cities across time.
         description_processing: *desc_processing_density
         display:
@@ -445,6 +451,7 @@ tables:
         description_key:
           - Projected population density of each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the density of those same cities in future years.
         description_processing: *desc_processing_density
         display:
@@ -463,6 +470,7 @@ tables:
         description_key:
           - Estimated share of a country's urban population living in its largest city (by 2020 population), based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
         display:
           numDecimalPlaces: 1
@@ -475,6 +483,7 @@ tables:
         description_key:
           - Projected share of a country's urban population living in its largest city (by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - The largest city is determined by 2020 population. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
         display:
           numDecimalPlaces: 1
@@ -490,6 +499,7 @@ tables:
         description_key:
           - Estimated total population living in cities with 50,000 to 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
@@ -504,6 +514,7 @@ tables:
         description_key:
           - Projected total population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
@@ -519,6 +530,7 @@ tables:
         description_key:
           - Estimated total population living in cities with 300,000 to 1 million people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 to 1 million
@@ -533,6 +545,7 @@ tables:
         description_key:
           - Projected total population living in cities with 300,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 to 1 million
@@ -548,6 +561,7 @@ tables:
         description_key:
           - Estimated total population living in cities with 1 to 3 million people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 1 to 3 million
@@ -562,6 +576,7 @@ tables:
         description_key:
           - Projected total population living in cities with 1 to 3 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 1 to 3 million
@@ -577,6 +592,7 @@ tables:
         description_key:
           - Estimated total population living in cities with 3 to 5 million people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 3 to 5 million
@@ -591,6 +607,7 @@ tables:
         description_key:
           - Projected total population living in cities with 3 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 3 to 5 million
@@ -606,6 +623,7 @@ tables:
         description_key:
           - Estimated total population living in megacities (cities with more than 5 million people), based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 5 million or more
@@ -620,6 +638,7 @@ tables:
         description_key:
           - Projected total population living in megacities (cities with more than 5 million people), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 5 million or more
@@ -639,6 +658,7 @@ tables:
         description_key:
           - Estimated share of the total population living in cities with 50,000 to 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
@@ -654,6 +674,7 @@ tables:
         description_key:
           - Projected share of the total population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
@@ -670,6 +691,7 @@ tables:
         description_key:
           - Estimated share of the total population living in cities with 300,000 to 1 million people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 to 1 million
@@ -685,6 +707,7 @@ tables:
         description_key:
           - Projected share of the total population living in cities with 300,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 to 1 million
@@ -701,6 +724,7 @@ tables:
         description_key:
           - Estimated share of the total population living in cities with 1 to 3 million people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 1 to 3 million
@@ -716,6 +740,7 @@ tables:
         description_key:
           - Projected share of the total population living in cities with 1 to 3 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 1 to 3 million
@@ -732,6 +757,7 @@ tables:
         description_key:
           - Estimated share of the total population living in cities with 3 to 5 million people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 3 to 5 million
@@ -747,6 +773,7 @@ tables:
         description_key:
           - Projected share of the total population living in cities with 3 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 3 to 5 million
@@ -763,6 +790,7 @@ tables:
         description_key:
           - Estimated share of the total population living in megacities (cities with more than 5 million people), based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 5 million or more
@@ -778,6 +806,7 @@ tables:
         description_key:
           - Projected share of the total population living in megacities (cities with more than 5 million people), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 5 million or more
@@ -796,6 +825,8 @@ tables:
         description_key:
           - Estimated total population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
@@ -810,6 +841,7 @@ tables:
         description_key:
           - Projected total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
@@ -826,6 +858,7 @@ tables:
         description_key:
           - Estimated share of the total population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
@@ -841,6 +874,7 @@ tables:
         description_key:
           - Projected share of the total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
@@ -857,6 +891,7 @@ tables:
         description_key:
           - Estimated annual growth rate of the population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         description_processing: *desc_processing_cagr
         display:
@@ -873,6 +908,7 @@ tables:
         description_key:
           - Projected annual growth rate of the population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         description_processing: *desc_processing_cagr
         display:
