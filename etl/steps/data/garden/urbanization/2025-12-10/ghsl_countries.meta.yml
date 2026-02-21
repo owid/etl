@@ -49,9 +49,11 @@ tables:
 
             - |-
               <% if data_type == 'estimates' %>
-              Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+              For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
+
+              From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
               <% else %>
-              Projections (2025–2100) use the [CRISP (Cities and Rural Integrated Spatial Projections) spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence), which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
+              From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
               <% endif %>
 
             - |-
@@ -420,11 +422,13 @@ tables:
           - *text_data_source
 
           - |-
-              <% if data_type == 'estimates' %>
-              Historical estimates (1975–2020) combine census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
-              <% else %>
-              Projections (2025–2100) use the [CRISP (Cities and Rural Integrated Spatial Projections) spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence), which extends past settlement patterns while aligning with UN World Population Prospects totals. Uncertainty increases further into the future.
-              <% endif %>
+            <% if data_type == 'estimates' %>
+            For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
+
+            From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+            <% else %>
+            From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+            <% endif %>
 
           - *text_degurba_caveat
 
