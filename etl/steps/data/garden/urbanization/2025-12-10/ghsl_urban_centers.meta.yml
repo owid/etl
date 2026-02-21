@@ -6,26 +6,20 @@ definitions:
         - Urbanization
     processing_level: minor
 
-  desc_key_common: &desc_key_common |-
-    The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000. The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
-
-    The time series runs from 1975 to 2100 at five-year intervals. Values from 1975 to 2020 are estimates based on satellite imagery and census data. Values from 2025 onwards are projections, and uncertainty increases further into the future.
-
-    City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time. For density in particular, this can make fast-growing cities appear less dense in the past than they actually were, since the area used in the calculation includes land that wasn't yet part of the city.
-
-    Cities are also split at country borders, so a city that straddles two countries will appear as two separate entries.
-
-    City boundaries are model-derived and won't always match official administrative limits. In some countries, what is considered a single city may appear as multiple cities in this data, depending on how built-up areas are distributed. Data quality also varies by region and tends to be less reliable in countries with sparse or outdated census data.
-
-    The vast majority of the 11,422 cities (10,852) passed a data-driven plausibility check comparing multiple independent datasets, giving them a high plausibility score. A further 304 have medium plausibility, 266 low, and 264 candidates were excluded entirely.
-
-    The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
+  desc_key_common: &desc_key_common
+    - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000. The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
+    - The time series runs from 1975 to 2100 at five-year intervals. Values from 1975 to 2020 are estimates based on satellite imagery and census data. Values from 2025 onwards are projections, and uncertainty increases further into the future.
+    - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time. For density in particular, this can make fast-growing cities appear less dense in the past than they actually were, since the area used in the calculation includes land that wasn't yet part of the city.
+    - Cities are also split at country borders, so a city that straddles two countries will appear as two separate entries.
+    - City boundaries are model-derived and won't always match official administrative limits. In some countries, what is considered a single city may appear as multiple cities in this data, depending on how built-up areas are distributed. Data quality also varies by region and tends to be less reliable in countries with sparse or outdated census data.
+    - The vast majority of the 11,422 cities (10,852) passed a data-driven plausibility check comparing multiple independent datasets, giving them a high plausibility score. A further 304 have medium plausibility, 266 low, and 264 candidates were excluded entirely.
+    - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
 
   desc_processing_density: &desc_processing_density |-
     Population density was calculated by dividing the population of the urban centre by its total land area.
 
   desc_processing_cagr: &desc_processing_cagr |-
-    The annualized exponential growth rate was calculated as: 100 × ln(P_t / P_prev) / (year_t - year_prev), where P_t is the population at time t and P_prev is the population at the previous observation. For five-year intervals, year_t - year_prev = 5. This produces UN F04-style rates, assuming constant exponential growth between observations.
+    The annualized exponential growth rate was calculated as: 100 × ln(P_t / P_prev) / (year_t - year_prev), where P_t is the population at time t and P_prev is the population at the previous observation. For five-year intervals, year_t - year_prev = 5. This assumes constant exponential growth between observations.
 
   desc_cities_definition: "[Cities](#dod:cities-degurba) are identified using satellite imagery and population data, applying the same density and size thresholds across all countries."
 
