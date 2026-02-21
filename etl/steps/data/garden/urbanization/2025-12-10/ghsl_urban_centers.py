@@ -29,31 +29,36 @@ REGIONS = [
 # City size cutoffs (in population).
 CITY_SIZE_CUTOFFS = {
     "below_300k": (0, 300000),
+    "300k_500k": (300000, 500000),
+    "500k_1m": (500000, 1000000),
     "300k_1m": (300000, 1000000),
     "1m_3m": (1000000, 3000000),
     "3m_5m": (3000000, 5000000),
+    "1m_5m": (1000000, 5000000),
     "above_5m": (5000000, float("inf")),
+    "5m_10m": (5000000, 10000000),
+    "above_10m": (10000000, float("inf")),
 }
 
 
 def calculate_citysize_growth_rates(tb, data_type):
-    """Calculate annualized exponential growth rate of population in cities >= 300k.
+    """Calculate annualized exponential growth rate of population share in cities >= 300k.
 
-    For each country, compute the annualized rate between observations:
-        rate_t = 100 * ln(P_t / P_{t-prev}) / (year_t - year_prev)
+    For each country, compute the annualized rate of the share between observations:
+        rate_t = 100 * ln(share_t / share_{t-prev}) / (year_t - year_prev)
 
     This produces UN F04-style rates. For 5-year intervals, year_t - year_prev = 5.
     The formula assumes constant exponential growth between observations.
 
     Args:
-        tb: Table with pop_citysize_above_300k_{data_type} column
+        tb: Table with popshare_citysize_above_300k_{data_type} column
         data_type: Either "estimates" or "projections"
 
     Notes:
     - Returns NaN when previous is missing/zero, current is missing, or ratio <= 0.
     - Handles irregular year gaps automatically.
     """
-    col_name = f"pop_citysize_above_300k_{data_type}"
+    col_name = f"popshare_citysize_above_300k_{data_type}"
 
     if col_name not in tb.columns:
         return tb
@@ -75,7 +80,7 @@ def calculate_citysize_growth_rates(tb, data_type):
         log_ratio = np.where((ratio > 0) & np.isfinite(ratio), np.log(ratio), np.nan)
 
         # Annualized percent log growth rate
-        tb[f"pop_citysize_above_300k_growth_{data_type}"] = 100 * (log_ratio / year_step)
+        tb[f"popshare_citysize_above_300k_growth_{data_type}"] = 100 * (log_ratio / year_step)
 
     return tb
 
@@ -178,36 +183,47 @@ def run() -> None:
         min_num_values_per_year=1,
     )
 
-    # Merge with total population to calculate shares.
+    # Merge with total and urban population to calculate shares.
     tb_city_sizes = pr.merge(
-        tb_city_sizes, tb_total_pop[["country", "year", "total_population"]], on=["country", "year"], how="left"
+        tb_city_sizes,
+        tb_total_pop[["country", "year", "total_population", "urban_population"]],
+        on=["country", "year"],
+        how="left",
     )
 
-    # Calculate shares as percentage of total population.
+    # Calculate shares as percentage of urban population.
     for size_name in CITY_SIZE_CUTOFFS.keys():
         tb_city_sizes[f"popshare_citysize_{size_name}"] = (
-            tb_city_sizes[f"pop_{size_name}"] / tb_city_sizes["total_population"]
+            tb_city_sizes[f"pop_{size_name}"] / tb_city_sizes["urban_population"]
         ) * 100
 
     # Rename absolute population columns to be more descriptive.
     for size_name in CITY_SIZE_CUTOFFS.keys():
         tb_city_sizes = tb_city_sizes.rename(columns={f"pop_{size_name}": f"pop_citysize_{size_name}"})
 
-    # Calculate population in cities >= 300k (300k_1m + 1m_3m + 3m_5m + above_5m).
+    # Calculate additional aggregates
+    # 300k or more
     tb_city_sizes["pop_citysize_above_300k"] = (
         tb_city_sizes["pop_citysize_300k_1m"]
         + tb_city_sizes["pop_citysize_1m_3m"]
         + tb_city_sizes["pop_citysize_3m_5m"]
         + tb_city_sizes["pop_citysize_above_5m"]
     )
+    # 1 million or more
+    tb_city_sizes["pop_citysize_above_1m"] = (
+        tb_city_sizes["pop_citysize_1m_3m"]
+        + tb_city_sizes["pop_citysize_3m_5m"]
+        + tb_city_sizes["pop_citysize_above_5m"]
+    )
 
-    # Calculate share of population in cities >= 300k.
-    tb_city_sizes["popshare_citysize_above_300k"] = (
-        tb_city_sizes["pop_citysize_above_300k"] / tb_city_sizes["total_population"]
-    ) * 100
+    # Calculate shares for all aggregates as percentage of urban population
+    for aggregate in ["above_300k", "above_1m"]:
+        tb_city_sizes[f"popshare_citysize_{aggregate}"] = (
+            tb_city_sizes[f"pop_citysize_{aggregate}"] / tb_city_sizes["urban_population"]
+        ) * 100
 
-    # Drop total population.
-    tb_city_sizes = tb_city_sizes.drop(columns=["total_population"])
+    # Drop total and urban population.
+    tb_city_sizes = tb_city_sizes.drop(columns=["total_population", "urban_population"])
 
     # Merge capitals, top 100, and city sizes.
     tb = pr.merge(tb_capitals, tb_top_100, on=["country", "year"], how="outer")
@@ -228,8 +244,9 @@ def run() -> None:
     # Add city size population and share columns.
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     columns_to_split.extend([f"popshare_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
-    # Add aggregate columns for cities >= 300k.
+    # Add aggregate columns.
     columns_to_split.extend(["pop_citysize_above_300k", "popshare_citysize_above_300k"])
+    columns_to_split.extend(["pop_citysize_above_1m", "popshare_citysize_above_1m"])
 
     for col in columns_to_split:
         if col in tb.columns:
@@ -241,9 +258,18 @@ def run() -> None:
     # Merge past estimates and future projections.
     tb = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
 
-    # Calculate growth rates for estimates and projections separately.
+    # Calculate growth rates for estimates and projections separately
+    # For projections, combine with estimates data to get 2015 for calculating 2020 growth
+    tb_for_proj_growth = tb.copy()
+    tb_for_proj_growth["popshare_citysize_above_300k_projections"] = tb_for_proj_growth[
+        "popshare_citysize_above_300k_projections"
+    ].fillna(tb_for_proj_growth["popshare_citysize_above_300k_estimates"])
+
     tb = calculate_citysize_growth_rates(tb, "estimates")
-    tb = calculate_citysize_growth_rates(tb, "projections")
+    tb_for_proj_growth = calculate_citysize_growth_rates(tb_for_proj_growth, "projections")
+    tb["popshare_citysize_above_300k_growth_projections"] = tb_for_proj_growth[
+        "popshare_citysize_above_300k_growth_projections"
+    ]
 
     tb = tb.format(["country", "year"])
 
