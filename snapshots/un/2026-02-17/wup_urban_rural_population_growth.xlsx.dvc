@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Urbanization Prospects 2025 - Average Annual Rate of Change of Urban and Rural Population by National Definition
+    description: |-
+      Average annual rate of change (growth rate) of urban and rural population based on national definitions of urban areas. The dataset provides growth rates as percentages by region, subregion, country and area from 1950 to 2050.
+
+      National definitions of "urban" vary considerably from country to country. Criteria such as population size, population density, type of economic activity, physical characteristics, level of infrastructure, or a combination of these may be used to define urban areas.
+    date_published: "2025"
+    title_snapshot: World Urbanization Prospects 2025 - Population Growth Rates (File 16)
+    description_snapshot: |-
+      File 16 contains the average annual rate of change of urban and rural population by national definitions. Data are presented in three sheets: Rural, Urban, and Total, with annual growth rate percentages for each year from 1950 to 2050.
+
+    # Citation
+    producer: United Nations Department of Economic and Social Affairs, Population Division
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2025). World Urbanization Prospects: The 2025 Revision, Online Edition. POP/DB/WUP/Rev.2025/F16
+
+    # Files
+    url_main: https://population.un.org/wup/
+    url_download: https://population.un.org/wup/assets/Download/Countries%20and%20Aggregates/WUP2025-F16-National-Definitions_Pop_rate_by_category.xlsx
+    date_accessed: '2025-02-17'
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: http://creativecommons.org/licenses/by/3.0/igo/
+outs:
+  - md5: 8ea32a565f237a104b56b5642af5eb73
+    size: 890616
+    path: wup_urban_rural_population_growth.xlsx
