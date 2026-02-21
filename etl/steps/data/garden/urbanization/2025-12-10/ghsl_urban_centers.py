@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -29,9 +30,54 @@ REGIONS = [
 CITY_SIZE_CUTOFFS = {
     "below_300k": (0, 300000),
     "300k_1m": (300000, 1000000),
-    "1m_5m": (1000000, 5000000),
+    "1m_3m": (1000000, 3000000),
+    "3m_5m": (3000000, 5000000),
     "above_5m": (5000000, float("inf")),
 }
+
+
+def calculate_citysize_growth_rates(tb, data_type):
+    """Calculate annualized exponential growth rate of population in cities >= 300k.
+
+    For each country, compute the annualized rate between observations:
+        rate_t = 100 * ln(P_t / P_{t-prev}) / (year_t - year_prev)
+
+    This produces UN F04-style rates. For 5-year intervals, year_t - year_prev = 5.
+    The formula assumes constant exponential growth between observations.
+
+    Args:
+        tb: Table with pop_citysize_above_300k_{data_type} column
+        data_type: Either "estimates" or "projections"
+
+    Notes:
+    - Returns NaN when previous is missing/zero, current is missing, or ratio <= 0.
+    - Handles irregular year gaps automatically.
+    """
+    col_name = f"pop_citysize_above_300k_{data_type}"
+
+    if col_name not in tb.columns:
+        return tb
+
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Compute the year step per country (handles 5-year data and irregular gaps)
+    year_prev = tb.groupby("country")["year"].shift(1)
+    year_step = tb["year"] - year_prev  # e.g. 5 for five-year intervals
+
+    current = tb[col_name]
+    previous = tb.groupby("country")[col_name].shift(1)
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        # Valid only when we have a positive previous, a non-missing current, and a positive year step
+        valid = previous.notna() & current.notna() & (previous > 0) & (year_step.notna()) & (year_step > 0)
+
+        ratio = np.where(valid, current / previous, np.nan)
+        log_ratio = np.where((ratio > 0) & np.isfinite(ratio), np.log(ratio), np.nan)
+
+        # Annualized percent log growth rate
+        tb[f"pop_citysize_above_300k_growth_{data_type}"] = 100 * (log_ratio / year_step)
+
+    return tb
 
 
 def run() -> None:
@@ -147,10 +193,11 @@ def run() -> None:
     for size_name in CITY_SIZE_CUTOFFS.keys():
         tb_city_sizes = tb_city_sizes.rename(columns={f"pop_{size_name}": f"pop_citysize_{size_name}"})
 
-    # Calculate population in cities >= 300k (300k_1m + 1m_5m + above_5m).
+    # Calculate population in cities >= 300k (300k_1m + 1m_3m + 3m_5m + above_5m).
     tb_city_sizes["pop_citysize_above_300k"] = (
         tb_city_sizes["pop_citysize_300k_1m"]
-        + tb_city_sizes["pop_citysize_1m_5m"]
+        + tb_city_sizes["pop_citysize_1m_3m"]
+        + tb_city_sizes["pop_citysize_3m_5m"]
         + tb_city_sizes["pop_citysize_above_5m"]
     )
 
@@ -158,13 +205,6 @@ def run() -> None:
     tb_city_sizes["popshare_citysize_above_300k"] = (
         tb_city_sizes["pop_citysize_above_300k"] / tb_city_sizes["total_population"]
     ) * 100
-
-    # Calculate annual growth rate of population in cities >= 300k.
-    # Sort by country and year to ensure correct calculation.
-    tb_city_sizes = tb_city_sizes.sort_values(["country", "year"])
-    tb_city_sizes["pop_citysize_above_300k_growth_rate"] = (
-        tb_city_sizes.groupby("country", group_keys=False)["pop_citysize_above_300k"].pct_change() * 100
-    )
 
     # Drop total population.
     tb_city_sizes = tb_city_sizes.drop(columns=["total_population"])
@@ -189,9 +229,7 @@ def run() -> None:
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     columns_to_split.extend([f"popshare_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     # Add aggregate columns for cities >= 300k.
-    columns_to_split.extend(
-        ["pop_citysize_above_300k", "popshare_citysize_above_300k", "pop_citysize_above_300k_growth_rate"]
-    )
+    columns_to_split.extend(["pop_citysize_above_300k", "popshare_citysize_above_300k"])
 
     for col in columns_to_split:
         if col in tb.columns:
@@ -202,6 +240,10 @@ def run() -> None:
 
     # Merge past estimates and future projections.
     tb = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
+
+    # Calculate growth rates for estimates and projections separately.
+    tb = calculate_citysize_growth_rates(tb, "estimates")
+    tb = calculate_citysize_growth_rates(tb, "projections")
 
     tb = tb.format(["country", "year"])
 
