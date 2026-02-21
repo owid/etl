@@ -27,6 +27,8 @@ definitions:
   desc_processing_cagr: &desc_processing_cagr |-
     The annualized exponential growth rate was calculated as: 100 × ln(P_t / P_prev) / (year_t - year_prev), where P_t is the population at time t and P_prev is the population at the previous observation. For five-year intervals, year_t - year_prev = 5. This produces UN F04-style rates, assuming constant exponential growth between observations.
 
+  desc_cities_definition: "[Cities](#dod:cities-degurba) are identified using satellite imagery and population data, applying the same density and size thresholds across all countries."
+
   entityAnnotationsMapCapitals: &entityAnnotationsMapCapitals |-
       Afghanistan: Kabul
       Albania: Tirana
@@ -331,7 +333,7 @@ tables:
       urban_pop_estimates:
         title: Population of the capital city
         unit: people
-        description_short: The total number of people living in the country's capital city.
+        description_short: The total number of people living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
@@ -346,7 +348,7 @@ tables:
       urban_pop_projections:
         title: Population of the capital city (projected)
         unit: people
-        description_short: Projected total number of people living in the country's capital city.
+        description_short: Projected total number of people living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -366,7 +368,7 @@ tables:
         title: Population density of the capital city
         unit: people per km²
         short_unit: per km²
-        description_short: The number of people per km² of land area in the country's capital city.
+        description_short: The number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Estimated population density of the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
@@ -383,7 +385,7 @@ tables:
         title: Population density of the capital city (projected)
         unit: people per km²
         short_unit: per km²
-        description_short: Projected number of people per km² of land area in the country's capital city.
+        description_short: Projected number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Projected population density of the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -403,7 +405,7 @@ tables:
       urban_pop_top_100_estimates:
         title: Population of the top 100 most populous cities
         unit: people
-        description_short: The total number of people living in cities ranked among the top 100 most populous in 2020.
+        description_short: The total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
@@ -415,7 +417,7 @@ tables:
       urban_pop_top_100_projections:
         title: Population of the top 100 most populous cities (projected)
         unit: people
-        description_short: Projected total number of people living in cities ranked among the top 100 most populous in 2020.
+        description_short: Projected total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -432,7 +434,7 @@ tables:
         title: Population density of the top 100 most populous cities
         unit: people per km²
         short_unit: per km²
-        description_short: The number of people per km² of land area for cities ranked among the top 100 most populous in 2020.
+        description_short: The number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated population density of each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
@@ -446,7 +448,7 @@ tables:
         title: Population density of the top 100 most populous cities (projected)
         unit: people per km²
         short_unit: per km²
-        description_short: Projected number of people per km² of land area for cities ranked among the top 100 most populous in 2020.
+        description_short: Projected number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Projected population density of each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -464,7 +466,7 @@ tables:
         title: Share of urban population living in the largest city
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the urban population living in the country's largest city.
+        description_short: Percentage of the urban population living in the country's largest city. {definitions.desc_cities_definition}
         description_key:
           - Estimated share of a country's urban population living in its largest city (by 2020 population), based on satellite imagery and census data.
           - *desc_key_common
@@ -476,7 +478,7 @@ tables:
         title: Share of urban population living in the largest city (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the urban population living in the country's largest city.
+        description_short: Projected percentage of the urban population living in the country's largest city. {definitions.desc_cities_definition}
         description_key:
           - Projected share of a country's urban population living in its largest city (by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -491,7 +493,7 @@ tables:
       pop_citysize_below_300k_estimates:
         title: Population living in cities with less than 300,000 people
         unit: people
-        description_short: Total population living in urban centres with fewer than 300,000 people.
+        description_short: Total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with fewer than 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
@@ -505,7 +507,7 @@ tables:
       pop_citysize_below_300k_projections:
         title: Population living in cities with less than 300,000 people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with fewer than 300,000 people.
+        description_short: Projected total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with fewer than 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -520,7 +522,7 @@ tables:
       pop_citysize_300k_1m_estimates:
         title: Population living in cities with 300,000 to 1 million people
         unit: people
-        description_short: Total population living in urban centres with 300,000 to 1 million people.
+        description_short: Total population living in cities with 300,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 300,000 to 1 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -534,7 +536,7 @@ tables:
       pop_citysize_300k_1m_projections:
         title: Population living in cities with 300,000 to 1 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 300,000 to 1 million people.
+        description_short: Projected total population living in cities with 300,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 300,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -549,7 +551,7 @@ tables:
       pop_citysize_1m_3m_estimates:
         title: Population living in cities with 1 to 3 million people
         unit: people
-        description_short: Total population living in urban centres with 1 to 3 million people.
+        description_short: Total population living in cities with 1 to 3 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 1 to 3 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -563,7 +565,7 @@ tables:
       pop_citysize_1m_3m_projections:
         title: Population living in cities with 1 to 3 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 1 to 3 million people.
+        description_short: Projected total population living in cities with 1 to 3 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 1 to 3 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -578,7 +580,7 @@ tables:
       pop_citysize_3m_5m_estimates:
         title: Population living in cities with 3 to 5 million people
         unit: people
-        description_short: Total population living in urban centres with 3 to 5 million people.
+        description_short: Total population living in cities with 3 to 5 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 3 to 5 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -592,7 +594,7 @@ tables:
       pop_citysize_3m_5m_projections:
         title: Population living in cities with 3 to 5 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 3 to 5 million people.
+        description_short: Projected total population living in cities with 3 to 5 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 3 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -607,7 +609,7 @@ tables:
       pop_citysize_above_5m_estimates:
         title: Population living in cities with more than 5 million people
         unit: people
-        description_short: Total population living in urban centres with more than 5 million people (megacities).
+        description_short: Total population living in cities with more than 5 million people (megacities). {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in megacities (cities with more than 5 million people), based on satellite imagery and census data.
           - *desc_key_common
@@ -621,7 +623,7 @@ tables:
       pop_citysize_above_5m_projections:
         title: Population living in cities with more than 5 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with more than 5 million people (megacities).
+        description_short: Projected total population living in cities with more than 5 million people (megacities). {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in megacities (cities with more than 5 million people), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -640,7 +642,7 @@ tables:
         title: Share of population living in cities with less than 300,000 people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in urban centres with fewer than 300,000 people.
+        description_short: Percentage of the total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
         description_key:
           - Estimated share of the total population living in cities with fewer than 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
@@ -655,7 +657,7 @@ tables:
         title: Share of population living in cities with less than 300,000 people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in urban centres with fewer than 300,000 people.
+        description_short: Projected percentage of the total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
         description_key:
           - Projected share of the total population living in cities with fewer than 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -671,7 +673,7 @@ tables:
         title: Share of population living in cities with 300,000 to 1 million people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in urban centres with 300,000 to 1 million people.
+        description_short: Percentage of the total population living in cities with 300,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated share of the total population living in cities with 300,000 to 1 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -686,7 +688,7 @@ tables:
         title: Share of population living in cities with 300,000 to 1 million people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in urban centres with 300,000 to 1 million people.
+        description_short: Projected percentage of the total population living in cities with 300,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected share of the total population living in cities with 300,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -702,7 +704,7 @@ tables:
         title: Share of population living in cities with 1 to 3 million people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in urban centres with 1 to 3 million people.
+        description_short: Percentage of the total population living in cities with 1 to 3 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated share of the total population living in cities with 1 to 3 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -717,7 +719,7 @@ tables:
         title: Share of population living in cities with 1 to 3 million people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in urban centres with 1 to 3 million people.
+        description_short: Projected percentage of the total population living in cities with 1 to 3 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected share of the total population living in cities with 1 to 3 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -733,7 +735,7 @@ tables:
         title: Share of population living in cities with 3 to 5 million people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in urban centres with 3 to 5 million people.
+        description_short: Percentage of the total population living in cities with 3 to 5 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated share of the total population living in cities with 3 to 5 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -748,7 +750,7 @@ tables:
         title: Share of population living in cities with 3 to 5 million people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in urban centres with 3 to 5 million people.
+        description_short: Projected percentage of the total population living in cities with 3 to 5 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected share of the total population living in cities with 3 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -764,7 +766,7 @@ tables:
         title: Share of population living in cities with more than 5 million people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in urban centres with more than 5 million people (megacities).
+        description_short: Percentage of the total population living in cities with more than 5 million people (megacities). {definitions.desc_cities_definition}
         description_key:
           - Estimated share of the total population living in megacities (cities with more than 5 million people), based on satellite imagery and census data.
           - *desc_key_common
@@ -779,7 +781,7 @@ tables:
         title: Share of population living in cities with more than 5 million people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in urban centres with more than 5 million people (megacities).
+        description_short: Projected percentage of the total population living in cities with more than 5 million people (megacities). {definitions.desc_cities_definition}
         description_key:
           - Projected share of the total population living in megacities (cities with more than 5 million people), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -797,7 +799,7 @@ tables:
       pop_citysize_above_300k_estimates:
         title: Population living in cities with 300,000 or more people
         unit: people
-        description_short: Total population living in urban centres with 300,000 or more people.
+        description_short: Total population living in cities with 300,000 or more people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
@@ -811,7 +813,7 @@ tables:
       pop_citysize_above_300k_projections:
         title: Population living in cities with 300,000 or more people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 300,000 or more people.
+        description_short: Projected total population living in cities with 300,000 or more people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -827,7 +829,7 @@ tables:
         title: Share of population living in cities with 300,000 or more people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in urban centres with 300,000 or more people.
+        description_short: Percentage of the total population living in cities with 300,000 or more people. {definitions.desc_cities_definition}
         description_key:
           - Estimated share of the total population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
@@ -842,7 +844,7 @@ tables:
         title: Share of population living in cities with 300,000 or more people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in urban centres with 300,000 or more people.
+        description_short: Projected percentage of the total population living in cities with 300,000 or more people. {definitions.desc_cities_definition}
         description_key:
           - Projected share of the total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -858,7 +860,7 @@ tables:
         title: Annual growth rate of population in cities with 300,000 or more people
         unit: "%"
         short_unit: "%"
-        description_short: The average annual percentage change in the total population living in cities with at least 300,000 people.
+        description_short: The average annual percentage change in the total population living in cities with at least 300,000 people. {definitions.desc_cities_definition}
         description_key:
           - Estimated annual growth rate of the population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
@@ -874,7 +876,7 @@ tables:
         title: Annual growth rate of population in cities with 300,000 or more people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: The expected average annual percentage change in the total population living in cities with at least 300,000 people.
+        description_short: The expected average annual percentage change in the total population living in cities with at least 300,000 people. {definitions.desc_cities_definition}
         description_key:
           - Projected annual growth rate of the population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -884,3 +886,5 @@ tables:
           name: 300,000 or more
           numDecimalPlaces: 2
           isProjection: true
+        presentation:
+          title_public: Annual growth rate of population in cities with 300,000 or more people (projected)
