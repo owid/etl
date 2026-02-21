@@ -16,6 +16,9 @@ INSTRUCTIONS:
     ```
     python snapshots/demography/2026-02-11/wittgenstein_human_capital.py --f1 data/wittgenstein_human_capital.zip --f2 data/wittgenstein_human_capital_historical.zip
     ```
+
+NOTE FOR FUTURE UPDATES:
+There is this alternative link (https://iiasa.ac.at/models-tools-data/ssp-2023), which seems to present the same data and present Zenodo links for bulk downloads. We could consider switching to that in the future, instead of relying on shiny servers.
 """
 
 import os
