@@ -12,7 +12,6 @@ definitions:
     - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time. For density in particular, this can make fast-growing cities appear less dense in the past than they actually were, since the area used in the calculation includes land that wasn't yet part of the city.
     - Cities are also split at country borders, so a city that straddles two countries will appear as two separate entries.
     - City boundaries are model-derived and won't always match official administrative limits. In some countries, what is considered a single city may appear as multiple cities in this data, depending on how built-up areas are distributed. Data quality also varies by region and tends to be less reliable in countries with sparse or outdated census data.
-    - The vast majority of the 11,422 cities (10,852) passed a data-driven plausibility check comparing multiple independent datasets, giving them a high plausibility score. A further 304 have medium plausibility, 266 low, and 264 candidates were excluded entirely.
     - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
 
   desc_processing_density: &desc_processing_density |-
