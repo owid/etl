@@ -854,7 +854,7 @@ tables:
         title: Annual growth rate of population in cities with 300,000 or more people
         unit: "%"
         short_unit: "%"
-        description_short: The average annual percentage change in the total population living in cities with at least 300,000 people. {definitions.desc_cities_definition}
+        description_short: Average annual population growth in cities with at least 300,000 people, calculated over five-year periods. For example, 2020 reflects average growth betwen 2015–2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated annual growth rate of the population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
@@ -870,7 +870,7 @@ tables:
         title: Annual growth rate of population in cities with 300,000 or more people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: The expected average annual percentage change in the total population living in cities with at least 300,000 people. {definitions.desc_cities_definition}
+        description_short: The expected average annual population growth in cities with at least 300,000 people, calculated over five-year periods. For example, 2020 reflects average growth between 2015–2020. {definitions.desc_cities_definition}
         description_key:
           - Projected annual growth rate of the population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
