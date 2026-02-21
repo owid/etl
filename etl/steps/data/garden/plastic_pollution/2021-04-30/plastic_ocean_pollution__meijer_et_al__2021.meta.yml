@@ -1,0 +1,62 @@
+dataset:
+  title: Plastic ocean pollution (Meijer et al. 2021)
+tables:
+  plastic_ocean_pollution__meijer_et_al__2021:
+    variables:
+      mismanaged_plastic_waste__metric_tons_year_1:
+        title: Mismanaged plastic waste (metric tons year-1)
+        unit: tonnes per year
+        short_unit: t
+        display:
+          name: Mismanaged plastic waste
+      mismanaged_plastic_waste_per_capita__kg_per_year:
+        title: Mismanaged plastic waste per capita (kg per year)
+        unit: kilograms per person
+        short_unit: kg
+        display:
+          name: Mismanaged plastic waste per capita
+      mismanaged_plastic_waste_to_ocean_per_capita__kg_per_year:
+        title: Mismanaged plastic waste to ocean per capita (kg per year)
+        unit: kilograms per person
+        short_unit: kg
+        display:
+          name: Plastic waste emitted to the ocean per capita
+      mismanaged_waste_emitted_to_the_ocean__metric_tons_year_1:
+        title: Mismanaged waste emitted to the ocean (metric tons year-1)
+        unit: tonnes per year
+        short_unit: t
+        display:
+          name: Plastic waste emitted to the ocean
+      probability_of_plastic_being_emitted_to_ocean:
+        title: Probability of plastic being emitted to ocean
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Probability of mismanaged plastic waste being emitted to ocean
+      share_of_global_mismanaged_plastic_waste:
+        title: Share of global mismanaged plastic waste
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of global mismanaged plastic waste
+      share_of_global_plastics_emitted_to_ocean:
+        title: Share of global plastics emitted to ocean
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of global plastic waste emitted to the ocean
+      share_of_mismanaged_plastic_waste_emitted_to_ocean:
+        title: Share of mismanaged plastic waste emitted to ocean
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of mismanaged plastic waste that is emitted to the ocean
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
