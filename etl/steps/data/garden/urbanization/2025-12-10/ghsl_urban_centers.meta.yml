@@ -485,33 +485,33 @@ tables:
       # CITY SIZE — ABSOLUTE POPULATION
       # -----------------------------------------------------------------------
       pop_citysize_below_300k_estimates:
-        title: Population living in cities with less than 300,000 people
+        title: Population living in cities with 50,000 to 300,000 people
         unit: people
-        description_short: Total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with 50,000 to 300,000 people. {definitions.desc_cities_definition}
         description_key:
-          - Estimated total population living in cities with fewer than 300,000 people, based on satellite imagery and census data.
+          - Estimated total population living in cities with 50,000 to 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Below 300,000
+          name: 50,000 to 300,000
           numDecimalPlaces: 0
         presentation:
-          title_public: Population living in cities with less than 300,000 people
+          title_public: Population living in cities with 50,000 to 300,000 people
 
       pop_citysize_below_300k_projections:
-        title: Population living in cities with less than 300,000 people (projected)
+        title: Population living in cities with 50,000 to 300,000 people (projected)
         unit: people
-        description_short: Projected total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with 50,000 to 300,000 people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with fewer than 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Below 300,000
+          name: 50,000 to 300,000
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with less than 300,000 people (projected)
+          title_public: Population living in cities with 50,000 to 300,000 people (projected)
 
       pop_citysize_300k_1m_estimates:
         title: Population living in cities with 300,000 to 1 million people
@@ -609,7 +609,7 @@ tables:
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Above 5 million
+          name: 5 million or more
           numDecimalPlaces: 0
         presentation:
           title_public: Population living in cities with more than 5 million people
@@ -623,7 +623,7 @@ tables:
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Above 5 million
+          name: 5 million or more
           numDecimalPlaces: 0
           isProjection: true
         presentation:
@@ -633,31 +633,31 @@ tables:
       # CITY SIZE — POPULATION SHARES
       # -----------------------------------------------------------------------
       popshare_citysize_below_300k_estimates:
-        title: Share of population living in cities with less than 300,000 people
+        title: Share of population living in cities with 50,000 to 300,000 people
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
+        description_short: Percentage of the total population living in cities with 50,000 to 300,000 people. {definitions.desc_cities_definition}
         description_key:
-          - Estimated share of the total population living in cities with fewer than 300,000 people, based on satellite imagery and census data.
+          - Estimated share of the total population living in cities with 50,000 to 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Below 300,000
+          name: 50,000 to 300,000
           numDecimalPlaces: 1
         presentation:
-          title_public: Share of population living in cities with less than 300,000 people
+          title_public: Share of population living in cities with 50,000 to 300,000 people
 
       popshare_citysize_below_300k_projections:
-        title: Share of population living in cities with less than 300,000 people (projected)
+        title: Share of population living in cities with 50,000 to 300,000 people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the total population living in cities with fewer than 300,000 people. {definitions.desc_cities_definition}
+        description_short: Projected percentage of the total population living in cities with 50,000 to 300,000 people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the total population living in cities with fewer than 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the total population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Below 300,000
+          name: 50,000 to 300,000
           numDecimalPlaces: 1
           isProjection: true
         presentation:
@@ -766,7 +766,7 @@ tables:
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Above 5 million
+          name: 5 million or more
           numDecimalPlaces: 1
         presentation:
           title_public: Share of population living in cities with more than 5 million people
@@ -781,7 +781,7 @@ tables:
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Above 5 million
+          name: 5 million or more
           numDecimalPlaces: 1
           isProjection: true
         presentation:
