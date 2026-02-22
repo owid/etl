@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+
+tables:
+  rural:
+    variables:
+      rate_of_change:
+        title: Annual rate of change of rural population share
+        unit: "%"
+        description_short: Annual rate of change of the percentage of population living in rural areas (thinly populated areas).
+        display:
+          numDecimalPlaces: 2
+  cities:
+    variables:
+      rate_of_change:
+        title: Annual rate of change of cities population share
+        unit: "%"
+        description_short: Annual rate of change of the percentage of population living in cities (densely populated areas).
+        display:
+          numDecimalPlaces: 2
+  towns:
+    variables:
+      rate_of_change:
+        title: Annual rate of change of towns population share
+        unit: "%"
+        description_short: Annual rate of change of the percentage of population living in towns and semi-dense areas.
+        display:
+          numDecimalPlaces: 2
+  cities_and_towns:
+    variables:
+      rate_of_change:
+        title: Annual rate of change of urban population share
+        unit: "%"
+        description_short: Annual rate of change of the percentage of population living in cities and towns combined.
+        display:
+          numDecimalPlaces: 2
