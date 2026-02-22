@@ -40,12 +40,7 @@ def run() -> None:
         tb = tb[tb["LocTypeName"].isin(["Country/Area"])].copy()
 
         # Reshape from wide to long format
-        tb = tb.melt(
-            id_vars=metadata_cols,
-            value_vars=year_cols,
-            var_name="year",
-            value_name="rate_of_change"
-        )
+        tb = tb.melt(id_vars=metadata_cols, value_vars=year_cols, var_name="year", value_name="rate_of_change")
 
         # Convert year to integer
         tb["year"] = tb["year"].astype(int)
