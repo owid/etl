@@ -102,7 +102,7 @@ def run() -> None:
 
     # Load total and urban population from ghsl_countries for share calculations.
     ds_countries = paths.load_dataset("ghsl_countries")
-    tb_countries = ds_countries.read("ghsl_countries").reset_index()
+    tb_countries = ds_countries.read("ghsl_countries")
     # Get total population by combining all three location types.
     tb_total_pop = tb_countries[
         (tb_countries["metric"] == "population")
@@ -114,7 +114,7 @@ def run() -> None:
     ).reset_index()
     tb_total_pop["total_population"] = tb_total_pop[["urban_centre", "urban_cluster", "rural_total"]].sum(axis=1)
     tb_total_pop["urban_population"] = tb_total_pop[["urban_centre", "urban_cluster"]].sum(axis=1)
-    tb_total_pop = tb_total_pop[["country", "year", "total_population", "urban_population"]]
+    tb_total_pop = tb_total_pop[["country", "year", "total_population", "urban_population", "urban_cluster"]]
 
     #
     # Process data.
@@ -187,7 +187,7 @@ def run() -> None:
     # Merge with total and urban population to calculate shares.
     tb_city_sizes = pr.merge(
         tb_city_sizes,
-        tb_total_pop[["country", "year", "total_population", "urban_population"]],
+        tb_total_pop[["country", "year", "total_population", "urban_population", "urban_cluster"]],
         on=["country", "year"],
         how="left",
     )
@@ -204,11 +204,18 @@ def run() -> None:
 
     # Rename aggregate columns (calculated from raw data in meadow).
     tb_city_sizes = tb_city_sizes.rename(
-        columns={"pop_above_300k": "pop_citysize_above_300k", "pop_above_1m": "pop_citysize_above_1m"}
+        columns={
+            "pop_above_300k": "pop_citysize_above_300k",
+            "pop_above_1m": "pop_citysize_above_1m",
+            "urban_cluster": "pop_citysize_below_50k",
+        }
     )
 
+    # Propagate origins to below_50k from GHSL countries dataset.
+    tb_city_sizes["pop_citysize_below_50k"].metadata.origins = tb_countries["value"].metadata.origins
+
     # Calculate shares as percentage of urban population for all city sizes and aggregates.
-    for col in ["above_300k", "above_1m"]:
+    for col in ["above_300k", "above_1m", "below_50k"]:
         tb_city_sizes[f"popshare_citysize_{col}"] = (
             tb_city_sizes[f"pop_citysize_{col}"] / tb_city_sizes["urban_population"]
         ) * 100
@@ -238,6 +245,7 @@ def run() -> None:
     # Add aggregate columns.
     columns_to_split.extend(["pop_citysize_above_300k", "popshare_citysize_above_300k"])
     columns_to_split.extend(["pop_citysize_above_1m", "popshare_citysize_above_1m"])
+    columns_to_split.extend(["pop_citysize_below_50k", "popshare_citysize_below_50k"])
 
     for col in columns_to_split:
         if col in tb.columns:
