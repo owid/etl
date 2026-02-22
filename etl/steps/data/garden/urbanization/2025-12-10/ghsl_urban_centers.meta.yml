@@ -1278,3 +1278,60 @@ tables:
           isProjection: true
         presentation:
           title_public: Annual growth rate of the share of population in cities with 300,000 or more people (projected)
+
+      pop_citysize_below_50k_estimates:
+        title: Population living in urban clusters with fewer than 50,000 people
+        unit: people
+        description_short: Total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_key:
+          - Estimated total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on satellite imagery and census data.
+          - *desc_key_common
+        display:
+          name: Below 50,000
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Population living in urban clusters with fewer than 50,000 people
+
+      pop_citysize_below_50k_projections:
+        title: Population living in urban clusters with fewer than 50,000 people
+          (projected)
+        unit: people
+        description_short: Projected total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_key:
+          - Projected total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - *desc_key_common
+        display:
+          name: Below 50,000
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Population living in urban clusters with fewer than 50,000 people (projected)
+
+      popshare_citysize_below_50k_estimates:
+        title: Share of urban population living in clusters with fewer than 50,000 people
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_key:
+          - Estimated share of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on satellite imagery and census data.
+          - *desc_key_common
+        display:
+          name: Below 50,000
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of urban population living in clusters with fewer than 50,000 people
+
+      popshare_citysize_below_50k_projections:
+        title: Share of urban population living in clusters with fewer than 50,000 people (projected)
+        unit: '%'
+        short_unit: '%'
+        description_short: Projected percentage of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_key:
+        - Projected share of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+        - *desc_key_common
+        display:
+          name: Below 50,000
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Share of urban population living in clusters with fewer than 50,000 people (projected)
