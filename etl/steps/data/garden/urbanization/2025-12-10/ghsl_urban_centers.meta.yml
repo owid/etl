@@ -21,6 +21,19 @@ definitions:
 
   desc_cities_definition: "[Cities](#dod:cities-degurba) are identified using satellite imagery and population data, applying the same density and size thresholds across all countries."
 
+
+  # Degurba overview
+  text_degurba_overview: &text_degurba_overview |-
+    The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
+
+  text_data_source: &text_data_source |-
+    The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
+
+  text_degurba_caveat: &text_degurba_caveat |-
+    Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanization rates may differ from country-reported figures.
+  text_small_territory_caveat: &text_small_territory_caveat |-
+    For small countries, values can change sharply when an entire area shifts from one classification to another.
+
   entityAnnotationsMapCapitals: &entityAnnotationsMapCapitals |-
       Afghanistan: Kabul
       Albania: Tirana
@@ -1280,26 +1293,35 @@ tables:
           title_public: Annual growth rate of the share of population in cities with 300,000 or more people (projected)
 
       pop_citysize_below_50k_estimates:
-        title: Population living in urban clusters with fewer than 50,000 people
+        title: Population living in towns and suburbs with fewer than 50,000 people
         unit: people
-        description_short: Total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_short: Total population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
-          - Estimated total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on satellite imagery and census data.
-          - *desc_key_common
+          - *text_degurba_overview
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
+          - From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+          - *text_data_source
+          - *text_degurba_caveat
+          - *text_small_territory_caveat
         display:
           name: Below 50,000
           numDecimalPlaces: 0
         presentation:
-          title_public: Population living in urban clusters with fewer than 50,000 people
+          title_public: Population living in towns and suburbs with fewer than 50,000 people
 
       pop_citysize_below_50k_projections:
-        title: Population living in urban clusters with fewer than 50,000 people
+        title: Population living in towns and suburbs with fewer than 50,000 people
           (projected)
         unit: people
-        description_short: Projected total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_short: Projected total population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
-          - Projected total population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
-          - *desc_key_common
+          - *text_degurba_overview
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - *text_data_source
+          - *text_degurba_caveat
+          - *text_small_territory_caveat
         display:
           name: Below 50,000
           numDecimalPlaces: 0
@@ -1308,30 +1330,39 @@ tables:
           title_public: Population living in urban clusters with fewer than 50,000 people (projected)
 
       popshare_citysize_below_50k_estimates:
-        title: Share of urban population living in clusters with fewer than 50,000 people
+        title: Share of urban population living in towns and suburbs with fewer than 50,000 people
         unit: '%'
         short_unit: '%'
-        description_short: Percentage of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_short: Percentage of the urban population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
-          - Estimated share of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on satellite imagery and census data.
-          - *desc_key_common
+          - *text_degurba_overview
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
+          - From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+          - *text_data_source
+          - *text_degurba_caveat
+          - *text_small_territory_caveat
         display:
           name: Below 50,000
           numDecimalPlaces: 1
         presentation:
-          title_public: Share of urban population living in clusters with fewer than 50,000 people
+          title_public: Share of urban population living in towns and suburbs with fewer than 50,000 people
 
       popshare_citysize_below_50k_projections:
-        title: Share of urban population living in clusters with fewer than 50,000 people (projected)
+        title: Share of urban population living in towns and suburbs with fewer than 50,000 people (projected)
         unit: '%'
         short_unit: '%'
-        description_short: Projected percentage of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people.
+        description_short: Projected percentage of the urban population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
-        - Projected share of the urban population living in [towns and suburbs]((#dod:towns-degurba) with fewer than 50,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
-        - *desc_key_common
+          - *text_degurba_overview
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - *text_data_source
+          - *text_degurba_caveat
+          - *text_small_territory_caveat
         display:
           name: Below 50,000
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in clusters with fewer than 50,000 people (projected)
+          title_public: Share of urban population living in towns and suburbs with fewer than 50,000 people (projected)
