@@ -1,0 +1,746 @@
+# Migration, Refugees, and Asylum Seekers Explorer Configuration
+# Based on migration_config_dict.py from 2024-08-05 version
+
+definitions:
+  common_views:
+    - config:
+        tab: map
+        hasMapTab: true
+        yAxisMin: 0
+        timeTolerance: 10
+
+config:
+  explorerTitle: Migration, Refugees, and Asylum Seekers
+  explorerSubtitle: Explore the migration of people across the world.
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/03/Migration-Data-Explorer.png
+  selection:
+    - Canada
+    - France
+    - Germany
+    - United Kingdom
+    - United States
+    - India
+    - China
+    - Syria
+    - Yemen
+  hideAlertBanner: true
+  wpBlockId: 49910
+  hasMapTab: true
+  yAxisMin: 0
+  hideAnnotationFieldsInTitle: true
+  tab: map
+  isPublished: true
+  pickerColumnSlugs: []
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: international_emigrants
+        name: International emigrants
+      - slug: international_immigrants
+        name: International immigrants
+      - slug: net_migration
+        name: Net migration
+      - slug: asylum_seekers_by_origin
+        name: Asylum seekers by origin
+      - slug: asylum_seekers_by_destination
+        name: Asylum seekers by destination
+      - slug: refugees_by_origin
+        name: Refugees by origin
+      - slug: refugees_by_destination
+        name: Refugees by destination
+      - slug: returned_refugees_by_origin
+        name: Returned refugees by origin
+      - slug: returned_refugees_by_destination
+        name: Returned refugees by destination
+      - slug: internally_displaced_persons
+        name: Internally displaced persons
+      - slug: internally_displaced_persons_conflict
+        name: Internally displaced persons (conflict)
+      - slug: internally_displaced_persons_disaster
+        name: Internally displaced persons (disaster)
+      - slug: returned_internally_displaced_persons
+        name: Returned internally displaced persons
+      - slug: stateless_persons_by_residence
+        name: Stateless persons by residence
+      - slug: remittances_as_share_of_gdp
+        name: Remittances as share of GDP
+      - slug: cost_of_sending_remittances
+        name: Cost of sending remittances
+      - slug: cost_of_receiving_remittances
+        name: Cost of receiving remittances
+    presentation:
+      type: dropdown
+  - slug: period_radio
+    name: Period
+    choices:
+      - slug: total_number
+        name: Total number
+      - slug: annual_change
+        name: Annual change
+    presentation:
+      type: radio
+  - slug: sub_metric_radio
+    name: Sub-Metric
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita_share
+        name: Per capita / Share of population
+    presentation:
+      type: radio
+  - slug: age_radio
+    name: Age
+    choices:
+      - slug: all_ages
+        name: All ages
+      - slug: under_18
+        name: Under 18
+      - slug: under_15
+        name: Under 15
+    presentation:
+      type: radio
+
+
+
+views:
+  # UNICEF child migration indicators
+  - dimensions:
+      metric: refugees_by_destination
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_asylum
+          display:
+            name: Refugees under 18 (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;100000.0,,;0
+  - dimensions:
+      metric: refugees_by_origin
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_origin
+          display:
+            name: Refugees under 18 (origin)
+            colorScaleScheme: YlOrRd
+            colorScaleNumericBins: 10.0,,;100.0,,;1000.0,,;10000.0,,;100000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: refugees_by_destination
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_asylum_per_1000
+          display:
+            name: Refugees under 18 per 1,000 population (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20,,;0
+  - dimensions:
+      metric: refugees_by_origin
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_origin_per_1000
+          display:
+            name: Refugees under 18 per 1,000 population (origin)
+            colorScaleScheme: YlOrRd
+            colorScaleNumericBins: 0.1,,;0.3,,;1.0,,;3.0,,;10.0,,;30,,;100,,;0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_conflict_violence
+          display:
+            name: IDPs under 18 (conflict and violence)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;100000.0,,;3000000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_disaster
+          display:
+            name: IDPs under 18 (disaster)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 100.0,,;300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_total
+          display:
+            name: IDPs under 18 (total)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 100.0,,;300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_conflict_violence
+          display:
+            name: New IDPs under 18 (conflict and violence)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_disaster
+          display:
+            name: New IDPs under 18 (disaster)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_total
+          display:
+            name: New IDPs under 18 (total)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_conflict_violence_per_1000
+          display:
+            name: IDPs under 18 per 1,000 population (conflict and violence)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;50.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_disaster_per_1000
+          display:
+            name: IDPs under 18 per 1,000 population (disaster)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_total_per_1000
+          display:
+            name: IDPs under 18 per 1,000 population (total)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;50.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_conflict_violence_per_1000
+          display:
+            name: New IDPs under 18 per 1,000 population (conflict and violence)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_disaster_per_1000
+          display:
+            name: New IDPs under 18 per 1,000 population (disaster)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_total_per_1000
+          display:
+            name: New IDPs under 18 per 1,000 population (total)
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;50.0,,;0
+
+  # UNHCR refugee data indicators
+  - dimensions:
+      metric: refugees_by_origin
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#refugees
+          display:
+            name: Refugees under UNHCR's mandate (origin)
+            colorScaleScheme: YlOrRd
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: asylum_seekers_by_origin
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#asylum_seekers
+          display:
+            name: Asylum seekers (origin)
+            colorScaleScheme: YlOrRd
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;0
+  - dimensions:
+      metric: refugees_by_destination
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#refugees
+          display:
+            name: Refugees under UNHCR's mandate (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: asylum_seekers_by_destination
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#asylum_seekers
+          display:
+            name: Asylum seekers (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;0
+  - dimensions:
+      metric: returned_internally_displaced_persons
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#returned_idps
+          display:
+            name: Returned IDPs (origin)
+            colorScaleScheme: BuGn
+            colorScaleNumericBins: 1000.0,,;10000.0,,;100000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: returned_internally_displaced_persons
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#returned_idps_per_100k
+          display:
+            name: Returned IDPs per 100,000 population (origin)
+            colorScaleScheme: BuGn
+            colorScaleNumericBins: 0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;50.0,,;0
+  - dimensions:
+      metric: returned_refugees_by_origin
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#returned_refugees
+          display:
+            name: Returned refugees (origin)
+            colorScaleScheme: BuGn
+            colorScaleNumericBins: 10.0,,;100.0,,;1000.0,,;10000.0,,;100000.0,,;0
+  - dimensions:
+      metric: returned_refugees_by_destination
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#returned_refugees
+          display:
+            name: Returned refugees (destination)
+            colorScaleScheme: GnBu
+            colorScaleNumericBins: 100.0,,;300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;0
+  - dimensions:
+      metric: stateless_persons_by_residence
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#stateless
+          display:
+            name: Stateless persons (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 10.0,,;100.0,,;300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;0
+  - dimensions:
+      metric: stateless_persons_by_residence
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#stateless_per_100k
+          display:
+            name: Stateless persons per 100k population (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 0.3,,;1.0,,;3.0,,;10.0,,;30.0,,;100.0,,;300.0,,;1000.0,,;0
+  - dimensions:
+      metric: refugees_by_origin
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#refugees_per_1000
+          display:
+            name: Refugees per 1,000 population (origin)
+            colorScaleScheme: YlOrRd
+            colorScaleNumericBins: 0.1,0.3,1.0,3.0,10.0,30.0,100.0,0
+  - dimensions:
+      metric: refugees_by_destination
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#refugees_per_1000
+          display:
+            name: Refugees per 1,000 population (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 0.1,,;0.3,,;1.0,,;3.0,,;10.0,,;30.0,,;0
+  - dimensions:
+      metric: asylum_seekers_by_origin
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#asylum_seekers_per_100k
+          display:
+            name: Asylum seekers per 100k population (origin)
+            colorScaleScheme: YlOrRd
+            colorScaleNumericBins: 10.0,,;20.0,,;50.0,,;100.0,,;200.0,,;500.0,,;0.0
+  - dimensions:
+      metric: asylum_seekers_by_destination
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
+          display:
+            name: Asylum seekers per 100k population (asylum)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 1.0,,;3.0,,;10.0,,;30.0,,;100.0,,;300.0,,;1000.0,,;0.0
+
+  # UN DESA migrant stock indicators
+  - dimensions:
+      metric: international_immigrants
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: migrant_stock#immigrants_all
+          display:
+            name: Immigrants (all)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 100000.0,,;200000.0,,;500000.0,,;1000000.0,,;2000000.0,,;5000000.0,,;10000000.0,,;0
+  - dimensions:
+      metric: international_emigrants
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: migrant_stock#emigrants_all
+          display:
+            name: Emigrants (all)
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 100000.0,,;200000.0,,;500000.0,,;1000000.0,,;2000000.0,,;5000000.0,,;10000000,,;0
+  - dimensions:
+      metric: international_immigrants
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: migrant_stock#immigrant_share_of_dest_population_all
+          display:
+            name: Share of the population that was born in another country
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;0
+  - dimensions:
+      metric: international_emigrants
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: migrant_stock#emigrants_share_of_total_population
+          display:
+            name: Share of the population that has left the country
+            colorScaleScheme: YlGnBu
+            colorScaleNumericBins: 1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;0
+
+  # UN WPP net migration indicators
+  - dimensions:
+      metric: net_migration
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: un_wpp/migration#net_migration__sex_all__age_all__variant_estimates
+          display:
+            name: Net migration
+            colorScaleScheme: RdYlBu
+            colorScaleNumericBins: -300000.0,,;-100000.0,,;-30000,,;-10000.0,,;-0.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;0
+    config:
+      title: Net migration
+      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+  - dimensions:
+      metric: net_migration
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: un_wpp/migration#net_migration_rate__sex_all__age_all__variant_estimates
+          display:
+            name: Net migration rate
+            colorScaleScheme: RdYlBu
+            colorScaleNumericBins: -5,,;-2,,;-1,,;-0.5,,;-0.2,,;-0.0,,;0.2,,;0.5,,;1,,;2,,;5,,;10,,;0
+    config:
+      title: Net migration rate
+      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
+
+  # World Bank remittance indicators
+  - dimensions:
+      metric: cost_of_receiving_remittances
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: wdi#si_rmt_cost_ib_zs
+          display:
+            name: Average cost for sending remittances to country
+            colorScaleScheme: Oranges
+            colorScaleNumericBins: 2.0,,;4.0,,;6.0,,;8.0,,;10.0,,;12.0,,;14.0,,;0.996667
+    config:
+      title: Average cost for sending remittances to country
+      subtitle: The average transaction cost as a percentage of total remittance sent from abroad to this country. The cost is based on a single transaction of USD 200.
+  - dimensions:
+      metric: cost_of_sending_remittances
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: wdi#si_rmt_cost_ob_zs
+          display:
+            name: Average cost for sending remittances from country
+            colorScaleScheme: Oranges
+            colorScaleNumericBins: 2.0,,;4.0,,;6.0,,;8.0,,;10.0,,;12.0,,;14.0,,;1.943111
+    config:
+      title: Average cost for sending remittances from country
+      subtitle: The average transaction cost as a percentage of total remittance received from abroad. The cost is based on a single transaction of USD 200.
+  - dimensions:
+      metric: remittances_as_share_of_gdp
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
+          display:
+            name: Remittances as share of GDP
+            colorScaleScheme: BuPu
+            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;0
+    config:
+      title: Remittances as share of GDP
+      subtitle: Share of GDP that is made up of the sum of all personal remittances sent by migrants to their home countries.
+
+  # IDMC internal displacement indicators
+  # IDPS (internally displaced persons)
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_new_displacement_rounded
+          display:
+            name: Conflict internal displacements
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;230
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_new_displacement_rounded
+          display:
+            name: Disaster internal displacements
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;230
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: annual_change
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_new_displacement_rounded
+          display:
+            name: Total internal displacements
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_total_displacement_rounded
+          display:
+            name: Conflict stock displacement
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;3000000.0,,;1640
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_total_displacement_rounded
+          display:
+            name: Disaster stock displacement
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;1640
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: total_number
+      sub_metric_radio: total
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_displacement_rounded
+          display:
+            name: Total stock displacement
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;3000000.0,,;1640
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
+          display:
+            name: Share of internally displaced population
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;50.0,,;100.0,,;0.0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
+          display:
+            name: Share of conflict displaced population
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;50.0,,;100.0,,;0.0
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: total_number
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
+          display:
+            name: Share of disaster displaced population
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;0.0
+  - dimensions:
+      metric: internally_displaced_persons
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
+          display:
+            name: Displacements per 1,000 people
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_conflict
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
+          display:
+            name: Conflict displacements per 1,000 people
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;0
+  - dimensions:
+      metric: internally_displaced_persons_disaster
+      period_radio: annual_change
+      sub_metric_radio: per_capita_share
+      age_radio: all_ages
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
+          display:
+            name: Disaster displacements per 1,000 people
+            colorScaleScheme: OrRd
+            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;0
