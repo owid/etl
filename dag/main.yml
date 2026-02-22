@@ -14,6 +14,11 @@ steps:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
     - data://grapher/worldbank_wdi/2025-09-08/wdi
+  # Create a step that computes conversion factors between local currencies and international dollars.
+  data://external/owid_grapher/latest/int_dollar_conversions:
+    - data://garden/worldbank_wdi/2026-01-29/wdi
+    - data://grapher/wb/2026-01-22/world_bank_pip
+    - data://garden/regions/2023-01-01/regions
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
