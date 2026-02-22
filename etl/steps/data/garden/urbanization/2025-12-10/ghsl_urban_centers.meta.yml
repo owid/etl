@@ -30,6 +30,7 @@ definitions:
 
   text_degurba_caveat: &text_degurba_caveat |-
     Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanization rates may differ from country-reported figures.
+
   text_small_territory_caveat: &text_small_territory_caveat |-
     For small countries, values can change sharply when an entire area shifts from one classification to another.
 
