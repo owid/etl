@@ -305,12 +305,22 @@ class PathFinder:
     def step_type(self) -> str:
         if self._is_snapshot_file:
             return "snapshot"
+        # Check if this is a graph step: etl/steps/graph/...
+        step_dir_parent = self.f.parent.parent.parent.name
+        if step_dir_parent == "graph":
+            return "graph"
+        # Otherwise it's a data step: etl/steps/data/...
         return self.f.parent.parent.parent.parent.name
 
     @property
     def channel(self) -> CHANNEL:
         if self._is_snapshot_file:
             return "snapshot"  # type: ignore
+        # Check if this is a graph step: etl/steps/graph/namespace/version/slug
+        step_dir_parent = self.f.parent.parent.parent.name
+        if step_dir_parent == "graph":
+            return "graph"  # type: ignore
+        # Data steps: etl/steps/data/channel/namespace/version/slug
         return self.f.parent.parent.parent.name  # type: ignore
 
     @property
@@ -336,6 +346,11 @@ class PathFinder:
     @property
     def metadata_path(self) -> Path:
         return self.directory / (self.short_name + ".meta.yml")
+
+    @property
+    def chart_path(self) -> Path:
+        """Path to .chart.yml file for graph steps."""
+        return self.directory / (self.short_name + ".chart.yml")
 
     @property
     def collection_path(self) -> Path:
@@ -433,6 +448,9 @@ class PathFinder:
 
         if step_type == "export":
             step_name = f"export://{channel}/{namespace}/{version}/{short_name}"
+        elif step_type == "graph" or channel == "graph":
+            # Graph steps use same format as data steps
+            step_name = f"graph://{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
@@ -868,6 +886,56 @@ class PathFinder:
             choice_renames=choice_renames,
             catalog_path_full=catalog_path_full,
             explorer=explorer,
+        )
+
+    def create_graph(
+        self,
+        yaml_params: dict[str, Any] | None = None,
+    ) -> int:
+        """
+        Create or update a chart in the grapher database.
+
+        This method provides a convenient wrapper around `upsert_graph()` that automatically
+        determines the chart slug, metadata file path, dependencies, and source checksum
+        from the PathFinder context.
+
+        Parameters
+        ----------
+        yaml_params : dict[str, Any] | None, default None
+            Optional dict for string substitution in YAML file.
+            Use placeholders in YAML like {threshold} and pass {"threshold": 4.73}.
+
+        Returns
+        -------
+        int
+            Chart ID in the grapher database
+
+        Examples
+        --------
+        >>> from etl.helpers import PathFinder
+        >>> paths = PathFinder(__file__)
+        >>> # Create chart with metadata from YAML
+        >>> paths.create_graph()
+        >>> # Create chart with dynamic threshold substituted into YAML
+        >>> threshold = calculate_threshold()
+        >>> paths.create_graph(yaml_params={"threshold": threshold})
+        """
+        from etl import config
+        from etl.grapher.graph import calculate_source_checksum, upsert_graph
+
+        # Calculate source checksum from dependencies and chart file
+        source_checksum = calculate_source_checksum(
+            dependencies=list(self.dependencies),
+            metadata_file=self.chart_path,
+        )
+
+        return upsert_graph(
+            slug=self.short_name,
+            metadata_file=self.chart_path,
+            dependencies=list(self.dependencies),
+            source_checksum=source_checksum,
+            graph_push=config.GRAPH_PUSH,
+            yaml_params=yaml_params,
         )
 
     @deprecated.deprecated(

@@ -860,4 +860,7 @@ include:
   - dag/growth.yml
   - dag/labor.yml
   - dag/economics.yml
+  - dag/graph/animal_welfare.yml
+  - dag/graph/covid.yml
+  - dag/graph/emissions.yml
   - dag/static_viz.yml

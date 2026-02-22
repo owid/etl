@@ -234,6 +234,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "export":
         step = ExportStep(path, dependencies)
 
+    elif step_type == "graph":
+        step = GraphStep(path, dependencies)
+
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
@@ -293,8 +296,8 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
         version = "latest"
         name = root
         identifier = root
-    elif prefix in ["snapshot"]:
-        # Ingestion steps.
+    elif prefix in ["snapshot", "graph"]:
+        # Ingestion steps and graph steps.
         channel = prefix
 
         # Extract attributes from root of the step.
@@ -1141,6 +1144,305 @@ class ETagStep(Step):
 
     def checksum_output(self) -> str:
         return get_etag(f"https://{self.path}")
+
+
+class GraphStep(Step):
+    """
+    A step that manages chart metadata in the grapher database.
+
+    Graph steps create or update charts based on indicator dependencies.
+    Single-indicator graphs can inherit metadata from the indicator's grapher_config.
+    Multi-indicator graphs require explicit metadata in a .chart.yml file.
+
+    Example:
+        graph://fur-farming-ban
+    """
+
+    path: str
+    dependencies: List[Step]
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        # path is now "namespace/version/short_name" like data steps
+        self.path = path
+        self.dependencies = dependencies
+
+    def __str__(self) -> str:
+        return f"graph://{self.path}"
+
+    @property
+    def slug(self) -> str:
+        """Extract slug from path (namespace/version/slug -> slug)."""
+        return self.path.split("/")[-1]
+
+    @property
+    def _step_dir(self) -> Path:
+        """Directory containing the step files."""
+        return paths.STEP_DIR / "graph" / self.path
+
+    @property
+    def metadata_file(self) -> Optional[Path]:
+        """Path to .chart.yml file."""
+        meta_file = self._step_dir.with_suffix(".chart.yml")
+        return meta_file if meta_file.exists() else None
+
+    @property
+    def _python_file(self) -> Optional[Path]:
+        """Path to .py file if it exists."""
+        py_file = self._step_dir.with_suffix(".py")
+        if py_file.exists():
+            return py_file
+        # Check for __init__.py in directory
+        init_file = self._step_dir / "__init__.py"
+        return init_file if init_file.exists() else None
+
+    def run(self) -> None:
+        """Run graph step - either Python file or YAML-only."""
+        from etl import config
+
+        # If GRAPH_PULL is enabled, pull from database instead of pushing
+        if config.GRAPH_PULL:
+            self._pull_from_database()
+            return
+
+        # Normal flow: push to database
+        # Check if there's a Python file
+        py_file = self._python_file
+        if py_file:
+            # Has Python code - run it
+            self._run_python_step(py_file)
+        else:
+            # YAML-only - use existing logic
+            self._run_yaml_only()
+
+    def _run_python_step(self, py_file: Path) -> None:
+        """Run Python module for graph step."""
+        # Import here to avoid circular imports
+        from importlib import import_module
+
+        # Import and run the module
+        if config.DEBUG:
+            # Run in isolated environment (same process, but isolated imports)
+            with isolated_env(py_file.parent):
+                module_path = py_file.relative_to(paths.BASE_DIR).as_posix().replace("/", ".").replace(".py", "")
+                step_module = import_module(module_path)
+                run_module_run(step_module, dest_dir=None)  # Graph steps don't have dest_dir
+        else:
+            # Run in subprocess (safer, but slower)
+            args = ["uv", "run", "etl", "d", "run-python-step"]
+            if config.IPDB_ENABLED:
+                args.append("--ipdb")
+            args.extend([str(self), ""])  # Empty string for dest_dir
+
+            env = os.environ.copy()
+            env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
+            try:
+                subprocess.check_call(args, env=env)
+            except subprocess.CalledProcessError as e:
+                sys.exit(e.returncode)
+
+    def _run_yaml_only(self) -> None:
+        """Create graph from YAML metadata - either a single chart or multidimensional collection."""
+        # Load metadata to determine if this is a multidim collection or normal chart
+        if not self.metadata_file or not self.metadata_file.exists():
+            raise ValueError(f"Metadata file not found for {self}")
+
+        from etl.grapher.graph import _load_metadata_file
+
+        metadata = _load_metadata_file(self.metadata_file)
+
+        # Determine if this is a multidimensional collection
+        if self._is_multidim_collection(metadata):
+            self._create_multidim_collection(metadata)
+        else:
+            self._create_single_chart(metadata)
+
+    @staticmethod
+    def _is_multidim_collection(metadata: dict) -> bool:
+        """
+        Determine if metadata defines a multidimensional collection.
+
+        A multidimensional collection has:
+        - A 'views' array defining multiple chart variants
+        - Dimensions with choices that users can select between
+
+        Examples:
+            # Multidim: Has views array
+            views:
+              - dimensions: {indicator: total}
+                indicators: {...}
+              - dimensions: {indicator: people}
+                indicators: {...}
+
+            # Normal chart: No views, just dimensions for indicator mapping
+            dimensions:
+              - property: y
+                catalogPath: grapher/.../indicator
+        """
+        return "views" in metadata and isinstance(metadata["views"], list)
+
+    def _create_multidim_collection(self, metadata: dict) -> None:
+        """Create a multidimensional collection from YAML config."""
+        from etl.collection.core.create import create_collection
+        from etl.dag_helpers import load_dag
+        from etl.grapher.graph import _expand_indicator_path
+
+        # Load DAG to get dependencies
+        dag = load_dag()
+        step_name = str(self)
+        dep_uris = list(dag.get(step_name, []))
+
+        # Expand short indicator names in views to full catalog paths
+        first_indicator_path = None
+        if "views" in metadata:
+            for view in metadata["views"]:
+                if "indicators" in view:
+                    for prop, indicators in view["indicators"].items():
+                        for i, indicator in enumerate(indicators):
+                            if "catalogPath" in indicator:
+                                indicator["catalogPath"] = _expand_indicator_path(indicator["catalogPath"], dep_uris)
+                                # Capture first indicator path for the collection catalog_path
+                                if first_indicator_path is None:
+                                    first_indicator_path = indicator["catalogPath"]
+
+        # Collection slug for multidim (without version)
+        # Must be set explicitly in metadata as 'slug'
+        # Format: namespace/base_dataset#collection_name
+        # Example: covid/covid#covid_deaths
+        if "slug" not in metadata:
+            raise ValueError(
+                f"Multidim graph step {self.path} requires 'slug' in metadata.\n"
+                f"Add to {self.metadata_path}:\n"
+                f"  slug: namespace/base#collection"
+            )
+
+        # Build full catalog_path by inserting version from step path
+        parts = self.path.split("/")
+        if len(parts) >= 3:
+            version = parts[1]
+            slug = metadata["slug"]
+            # Insert version: covid/covid#covid_deaths → covid/latest/covid#covid_deaths
+            if "/" in slug:
+                namespace, rest = slug.split("/", 1)
+                catalog_path = f"{namespace}/{version}/{rest}"
+            else:
+                catalog_path = slug
+        else:
+            catalog_path = metadata["slug"]
+
+        c = create_collection(
+            config_yaml=metadata,
+            dependencies=dep_uris,
+            catalog_path=catalog_path,
+        )
+        c.save()
+
+    def _pull_from_database(self) -> None:
+        """Pull chart configuration from database and write to .chart.yml file."""
+        from etl.dag_helpers import load_dag
+        from etl.grapher.graph import pull_graph
+
+        # Get metadata file path (create if doesn't exist)
+        metadata_file = self._step_dir.with_suffix(".chart.yml")
+
+        # Get dependencies from DAG
+        dag = load_dag()
+        step_name = str(self)
+        dep_uris = list(dag.get(step_name, []))
+
+        # Pull from database
+        pull_graph(
+            slug=self.slug,
+            metadata_file=metadata_file,
+            dependencies=dep_uris,
+        )
+
+    def _create_single_chart(self, metadata: dict) -> None:
+        """Create a single chart from YAML config."""
+        from etl import config
+        from etl.dag_helpers import load_dag
+        from etl.grapher.graph import upsert_graph
+
+        # Load DAG to get original dependency strings
+        dag = load_dag()
+        step_name = str(self)
+        dep_uris = list(dag.get(step_name, []))
+
+        if not dep_uris:
+            raise ValueError(
+                f"No dependencies found for {step_name} in DAG. "
+                f"Graph steps must have at least one indicator dependency."
+            )
+
+        source_checksum = self.checksum_input()
+
+        # Upsert graph to database (graph steps require --graph flag to run)
+        upsert_graph(
+            slug=self.slug,
+            metadata_file=self.metadata_file,
+            dependencies=dep_uris,
+            source_checksum=source_checksum,
+            graph_push=config.GRAPH_PUSH,
+        )
+
+    def is_dirty(self) -> bool:
+        """
+        Check if graph needs update based on:
+        - Local index.json doesn't exist or checksum differs
+        - (If --graph flag) Database chart doesn't exist or has different checksum
+        """
+        from etl import config
+        from etl.grapher.graph import _load_graph_metadata
+
+        # 1. Check if local index.json exists
+        metadata = _load_graph_metadata(self.slug)
+        if not metadata:
+            return True  # No metadata file, needs to be created
+
+        # 2. Check if any dependency changed
+        if any(d.is_dirty() for d in self.dependencies):
+            return True
+
+        # 3. Compare local checksum with expected checksum
+        local_checksum = metadata.get("local_checksum")
+        expected_checksum = self.checksum_input()
+
+        if local_checksum != expected_checksum:
+            return True
+
+        # 4. If --graph flag is set, also check if database needs updating
+        if config.GRAPH:
+            from etl.grapher.graph import fetch_graph_db_checksum, has_db_divergence
+
+            db_checksum = fetch_graph_db_checksum(self.slug)
+            if db_checksum != expected_checksum:
+                return True
+
+            # Check if database has diverged from what we last wrote
+            # This queries the DB to detect manual edits (similar to grapher steps)
+            if has_db_divergence(self.slug):
+                return True
+
+        return False
+
+    def checksum_input(self) -> str:
+        """
+        Return checksum of all inputs to this graph step.
+        Similar to DataStep.checksum_input() but for graph metadata.
+        """
+        from etl.grapher.graph import calculate_source_checksum
+
+        # Convert Step dependencies to URIs
+        dep_uris = [str(d) for d in self.dependencies]
+
+        return calculate_source_checksum(
+            dependencies=dep_uris,
+            metadata_file=self.metadata_file,
+        )
+
+    def checksum_output(self) -> str:
+        """Return checksum representing the graph step's state."""
+        return self.checksum_input()
 
 
 class PrivateMixin:
