@@ -83,6 +83,7 @@ steps:
     - snapshot://urbanization/2025-12-10/ghsl_urban_centers.xlsx
   data://garden/urbanization/2025-12-10/ghsl_urban_centers:
     - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+    - data://garden/urbanization/2025-12-10/ghsl_countries
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2025-12-10/ghsl_urban_centers:
