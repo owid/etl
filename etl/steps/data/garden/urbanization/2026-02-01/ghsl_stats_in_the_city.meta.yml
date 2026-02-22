@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ghsl_stats_in_the_city:
+    variables:
+      value:
+       title: << indicator >>
+       unit: << unit >>
+       short_unit: << short_unit >>
+       display:
+          numDecimalPlaces: 2
