@@ -24,6 +24,9 @@ definitions:
   desc_crossborder_exclusion: &desc_crossborder_exclusion |-
     Data is excluded for Gibraltar, Macao, and Monaco because their urban centers are cross-border agglomerations that extend beyond the country's boundaries, making the share calculation invalid.
 
+  desc_capital_threshold_caveat: &desc_capital_threshold_caveat |-
+    Capital cities are only included if they meet the threshold of at least 50,000 people in a contiguous urban area with a density of at least 1,500 people per km². Some capital cities (e.g., Canberra) do not appear in historical estimates because they did not meet this threshold, though they may appear in projections as they grow.
+
   # Degurba descriptions to use for towns and suburbs variables.
   text_degurba_overview: &text_degurba_overview |-
     The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
@@ -488,6 +491,7 @@ tables:
           - *desc_key_common
           - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
@@ -502,6 +506,7 @@ tables:
           - *desc_key_common
           - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
           - The largest city is determined by 2020 population. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
