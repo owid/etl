@@ -1061,9 +1061,10 @@ class ExportStep(DataStep):
             else:
                 DataStep._run_py(self)  # type: ignore
 
-        # save checksum
+        # save checksum (only update index.json, don't call ds.save() which iterates
+        # table_names and would pick up custom JSON files written by the export script)
         ds.metadata.source_checksum = self.checksum_input()
-        ds.save()
+        ds.metadata.save(ds._index_file)
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients
