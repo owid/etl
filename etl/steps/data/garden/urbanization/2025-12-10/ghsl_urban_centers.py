@@ -225,6 +225,12 @@ def run() -> None:
             tb_city_sizes[f"pop_citysize_{col}"] / tb_city_sizes["urban_population"]
         ) * 100
 
+    # Calculate shares as percentage of total population for key aggregates.
+    for col in ["above_1m"]:
+        tb_city_sizes[f"totalshare_citysize_{col}"] = (
+            tb_city_sizes[f"pop_citysize_{col}"] / tb_city_sizes["total_population"]
+        ) * 100
+
     # Drop total and urban population.
     tb_city_sizes = tb_city_sizes.drop(columns=["total_population", "urban_population"])
 
@@ -252,6 +258,8 @@ def run() -> None:
     columns_to_split.extend(["pop_citysize_above_300k", "popshare_citysize_above_300k"])
     columns_to_split.extend(["pop_citysize_above_1m", "popshare_citysize_above_1m"])
     columns_to_split.extend(["pop_citysize_below_50k", "popshare_citysize_below_50k"])
+    # Add total population share columns.
+    columns_to_split.extend(["totalshare_citysize_above_1m"])
 
     for col in columns_to_split:
         if col in tb.columns:

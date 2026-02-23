@@ -696,7 +696,7 @@ tables:
       pop_citysize_300k_500k_estimates:
         title: Population living in cities with 300,000 to 500,000 people
         unit: people
-        description_short: Total population living in urban centres with 300,000 to 500,000 people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with 300,000 to 500,000 people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 300,000 to 500,000 people, based on satellite imagery and census data.
           - *desc_key_common
@@ -710,7 +710,7 @@ tables:
       pop_citysize_300k_500k_projections:
         title: Population living in cities with 300,000 to 500,000 people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 300,000 to 500,000 people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with 300,000 to 500,000 people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 300,000 to 500,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -725,7 +725,7 @@ tables:
       pop_citysize_500k_1m_estimates:
         title: Population living in cities with 500,000 to 1 million people
         unit: people
-        description_short: Total population living in urban centres with 500,000 to 1 million people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with 500,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 500,000 to 1 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -739,7 +739,7 @@ tables:
       pop_citysize_500k_1m_projections:
         title: Population living in cities with 500,000 to 1 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 500,000 to 1 million people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with 500,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 500,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -754,7 +754,7 @@ tables:
       pop_citysize_1m_5m_estimates:
         title: Population living in cities with 1 to 5 million people
         unit: people
-        description_short: Total population living in urban centres with 1 to 5 million people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with 1 to 5 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 1 to 5 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -768,7 +768,7 @@ tables:
       pop_citysize_1m_5m_projections:
         title: Population living in cities with 1 to 5 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 1 to 5 million people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with 1 to 5 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 1 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -783,7 +783,7 @@ tables:
       pop_citysize_5m_10m_estimates:
         title: Population living in cities with 5 to 10 million people
         unit: people
-        description_short: Total population living in urban centres with 5 to 10 million people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with 5 to 10 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 5 to 10 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -797,7 +797,7 @@ tables:
       pop_citysize_5m_10m_projections:
         title: Population living in cities with 5 to 10 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 5 to 10 million people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with 5 to 10 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 5 to 10 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -812,7 +812,7 @@ tables:
       pop_citysize_above_10m_estimates:
         title: Population living in cities with more than 10 million people
         unit: people
-        description_short: Total population living in urban centres with more than 10 million people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with more than 10 million people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with more than 10 million people, based on satellite imagery and census data.
           - *desc_key_common
@@ -826,7 +826,7 @@ tables:
       pop_citysize_above_10m_projections:
         title: Population living in cities with more than 10 million people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with more than 10 million people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with more than 10 million people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with more than 10 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -841,7 +841,7 @@ tables:
       pop_citysize_above_1m_estimates:
         title: Population living in cities with 1 million or more people
         unit: people
-        description_short: Total population living in urban centres with 1 million or more people. {definitions.desc_cities_definition}
+        description_short: Total population living in cities with 1 million or more people. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in cities with 1 million or more people, based on satellite imagery and census data.
           - *desc_key_common
@@ -855,7 +855,7 @@ tables:
       pop_citysize_above_1m_projections:
         title: Population living in cities with 1 million or more people (projected)
         unit: people
-        description_short: Projected total population living in urban centres with 1 million or more people. {definitions.desc_cities_definition}
+        description_short: Projected total population living in cities with 1 million or more people. {definitions.desc_cities_definition}
         description_key:
           - Projected total population living in cities with 1 million or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
@@ -1221,6 +1221,39 @@ tables:
           isProjection: true
         presentation:
           title_public: Share of urban population living in cities with 1 million or more people (projected)
+
+      totalshare_citysize_above_1m_estimates:
+        title: Share of total population living in cities with 1 million or more people
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in cities with 1 million or more people. {definitions.desc_cities_definition}
+        description_key:
+          - Estimated share of the total population living in cities with 1 million or more people, based on satellite imagery and census data.
+          - *desc_key_common
+          - City size categories are based on each city's 2020 population and held fixed across all years.
+          - The total population includes both urban and rural populations.
+        display:
+          name: 1 million or more
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of total population living in cities with 1 million or more people
+
+      totalshare_citysize_above_1m_projections:
+        title: Share of total population living in cities with 1 million or more people (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected percentage of the total population living in cities with 1 million or more people. {definitions.desc_cities_definition}
+        description_key:
+          - Projected share of the total population living in cities with 1 million or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - *desc_key_common
+          - City size categories are based on each city's 2020 population and held fixed across all years.
+          - The total population includes both urban and rural populations.
+        display:
+          name: 1 million or more
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Share of total population living in cities with 1 million or more people (projected)
 
       # AGGREGATES — CITIES 300K+
       # -----------------------------------------------------------------------
