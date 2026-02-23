@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { readFile } from 'fs/promises';
-import { existsSync } from 'fs';
 import { ChildProcess, spawn } from 'child_process';
 
 const panels = new Map<string, vscode.WebviewPanel>();
@@ -423,12 +422,9 @@ function startWatchProcess(
 	const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
 	const etlrPath = path.resolve(wsRoot, etlrRel);
 
-	const args = etlArgs;
-	const command = `${etlrRel} ${args.join(' ')}`;
+	outputChannel.appendLine(`Starting watch: ${etlrPath} ${etlArgs.join(' ')}`);
 
-	outputChannel.appendLine(`Starting watch: ${etlrPath} ${args.join(' ')}`);
-
-	const proc = spawn(etlrPath, args, {
+	const proc = spawn(etlrPath, etlArgs, {
 		cwd: wsRoot,
 		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
 	});
@@ -1120,9 +1116,8 @@ function renderEntitySelector(table) {
 
 function randomizeEntity() {
     var table = DATA.tables[activeTable];
-    var entities = getEntitiesForTable(table);
-    if (entities.length === 0) return;
-    selectedEntity = entities[Math.floor(Math.random() * entities.length)];
+    selectedEntity = pickRandomEntity(table);
+    if (!selectedEntity) return;
     document.getElementById('entity-select').value = selectedEntity;
     renderCards(table);
 }
