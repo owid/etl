@@ -970,6 +970,7 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
     .card-type.categorical { color: #dcdcaa; }
 
     .card-unit { font-size: 11px; color: var(--vscode-descriptionForeground, #666); font-style: italic; }
+    .pop-badge { font-size: 10px; color: #a0a0a0; white-space: nowrap; flex-shrink: 0; }
 
     .sparkline-container { padding: 4px 0; }
     .sparkline-placeholder { color: var(--vscode-disabledForeground, #444); font-size: 11px; font-style: italic; height: 40px; display: flex; align-items: center; }
@@ -1159,7 +1160,8 @@ function renderCard(ind, table, entity) {
     var sparklineData = entity && ind.sparkline_by_entity && ind.sparkline_by_entity[entity] ? ind.sparkline_by_entity[entity] : null;
 
     var html = '<div class="card ' + cardClass + '">';
-    html += '<div class="card-header"><span class="card-title">' + escHtml(ind.title) + '</span><span class="card-type ' + typeClass + '">' + simplifyType(ind.type) + '</span></div>';
+    var popBadge = (ind.popularity > 0) ? '<span class="pop-badge" title="Popularity score">\u2605 ' + ind.popularity.toFixed(2) + '</span>' : '';
+    html += '<div class="card-header"><span class="card-title">' + escHtml(ind.title) + '</span><span style="display:flex;gap:4px;align-items:center">' + popBadge + '<span class="card-type ' + typeClass + '">' + simplifyType(ind.type) + '</span></span></div>';
     if (ind.unit) html += '<div class="card-unit">' + escHtml(ind.unit) + '</div>';
     if (!ind.is_numeric && ind.value_counts) {
         html += '<div class="sparkline-container">' + renderValueDist(ind.value_counts) + '</div>';
