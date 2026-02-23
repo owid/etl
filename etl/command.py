@@ -176,7 +176,6 @@ def main_cli(
     force_upload: bool = False,
     prefer_download: bool = False,
     subset: Optional[str] = None,
-    browse: bool = False,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -355,10 +354,7 @@ def construct_full_dag(dag: DAG) -> DAG:
 
     # For export:// steps, add the grapher:// steps that are needed to upsert data to DB.
     for step in list(dag.keys()):
-        if (
-            step.startswith("export://multidim/")
-            or step.startswith("export://explorers/")
-        ):
+        if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
                     dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
@@ -395,9 +391,6 @@ def construct_subdag(
     # Export steps
     if not export:
         excludes.append("export://.*")
-
-    # Graph steps are always excluded
-    excludes.append("graph://.*")
 
     # Grapher steps
     if not grapher and not export:
