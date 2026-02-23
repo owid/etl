@@ -36,7 +36,7 @@ def run() -> None:
                     "hideRelativeToggle": "false",
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "DiscreteBar", "SlopeChart"],
                 },
             },
         ]
