@@ -699,8 +699,11 @@ class DataStep(Step):
 
         r2 = s3_utils.connect_r2_cached()
 
+        # Private datasets have their data files in a separate private bucket
+        bucket = config.R2_BUCKET if self.is_public else config.R2_BUCKET_PRIVATE
+
         # Get available formats of a dataset
-        s3_files = s3_utils.list_s3_objects(f"s3://owid-catalog/{self.path}/", client=s3_utils.connect_r2_cached())
+        s3_files = s3_utils.list_s3_objects(f"s3://{bucket}/{self.path}/", client=s3_utils.connect_r2_cached())
         available_formats = {f.split(".")[-1] for f in s3_files} - {"json"}
 
         # if one of the format is in DEFAULT_FORMATS, download it
@@ -714,7 +717,7 @@ class DataStep(Step):
         include = [".meta.json"] + [f".{format}" for format in download_formats]
 
         s3_utils.download_s3_folder(
-            f"s3://owid-catalog/{self.path}/",
+            f"s3://{bucket}/{self.path}/",
             self._dest_dir,
             client=r2,
             include=include,
