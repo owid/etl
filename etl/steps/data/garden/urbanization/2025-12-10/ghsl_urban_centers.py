@@ -162,7 +162,9 @@ def run() -> None:
         tb_capitals_share["urban_pop"] / tb_capitals_share["total_population"]
     ) * 100
     # Keep only the share columns.
-    tb_capitals_share = tb_capitals_share[["country", "year", "urban_pop_share_largest_city", "total_pop_share_largest_city"]]
+    tb_capitals_share = tb_capitals_share[
+        ["country", "year", "urban_pop_share_largest_city", "total_pop_share_largest_city"]
+    ]
 
     # Merge share back to capitals table.
     tb_capitals = pr.merge(tb_capitals, tb_capitals_share, on=["country", "year"], how="left")
