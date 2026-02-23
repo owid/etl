@@ -503,6 +503,36 @@ tables:
           isProjection: true
 
       # -----------------------------------------------------------------------
+      # SHARE OF TOTAL POPULATION IN CAPITAL CITY
+      # -----------------------------------------------------------------------
+      total_pop_share_largest_city_estimates:
+        title: Share of total population living in the capital city
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in the country's capital city. {definitions.desc_cities_definition}
+        description_key:
+          - Estimated share of a country's total population living in its capital city, based on satellite imagery and census data.
+          - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - The capital city is determined by 2020 population. The total population includes both urban and rural populations.
+        display:
+          numDecimalPlaces: 1
+
+      total_pop_share_largest_city_projections:
+        title: Share of total population living in the capital city (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected percentage of the total population living in the country's capital city. {definitions.desc_cities_definition}
+        description_key:
+          - Projected share of a country's total population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - The capital city is determined by 2020 population. The total population includes both urban and rural populations.
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      # -----------------------------------------------------------------------
       # CITY SIZE — ABSOLUTE POPULATION
       # -----------------------------------------------------------------------
       pop_citysize_below_300k_estimates:

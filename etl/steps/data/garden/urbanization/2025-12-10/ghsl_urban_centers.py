@@ -148,18 +148,21 @@ def run() -> None:
     )
 
     # Calculate share of urban population living in largest city (capital).
-    # Merge with urban population data.
+    # Merge with urban and total population data.
     tb_capitals_share = pr.merge(
         tb_capitals[["country", "year", "urban_pop"]],
-        tb_total_pop[["country", "year", "urban_population"]],
+        tb_total_pop[["country", "year", "urban_population", "total_population"]],
         on=["country", "year"],
         how="left",
     )
     tb_capitals_share["urban_pop_share_largest_city"] = (
         tb_capitals_share["urban_pop"] / tb_capitals_share["urban_population"]
     ) * 100
-    # Keep only the share column.
-    tb_capitals_share = tb_capitals_share[["country", "year", "urban_pop_share_largest_city"]]
+    tb_capitals_share["total_pop_share_largest_city"] = (
+        tb_capitals_share["urban_pop"] / tb_capitals_share["total_population"]
+    ) * 100
+    # Keep only the share columns.
+    tb_capitals_share = tb_capitals_share[["country", "year", "urban_pop_share_largest_city", "total_pop_share_largest_city"]]
 
     # Merge share back to capitals table.
     tb_capitals = pr.merge(tb_capitals, tb_capitals_share, on=["country", "year"], how="left")
@@ -238,6 +241,7 @@ def run() -> None:
         "urban_density_top_100",
         "urban_pop_top_100",
         "urban_pop_share_largest_city",
+        "total_pop_share_largest_city",
     ]
     # Add city size population and share columns.
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
