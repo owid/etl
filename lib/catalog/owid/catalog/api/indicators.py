@@ -11,7 +11,7 @@ import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.models import ResponseSet
-from owid.catalog.api.tables import _load_table
+from owid.catalog.api.tables import _keep_latest_versions, _load_table
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.tables import Table
 
@@ -280,6 +280,7 @@ class IndicatorsAPI:
         *,
         limit: int = 10,
         show_legacy: bool = False,
+        latest: bool = False,
         timeout: int | None = None,
     ) -> ResponseSet[IndicatorResult]:
         """Search for indicators using natural language.
@@ -292,6 +293,9 @@ class IndicatorsAPI:
                 (e.g., "renewable energy capacity", "child mortality rate").
             limit: Maximum number of results to return. Default 10.
             show_legacy: If True, show pre-ETL indicators only. Default False.
+            latest: If True, only return the latest version of each indicator (grouped by
+                namespace, dataset, and column_name). Indicators without a version are dropped.
+                Default False.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
@@ -302,6 +306,9 @@ class IndicatorsAPI:
             ```python
             # Search for indicators
             results = client.indicators.search("CO2 emissions per capita")
+
+            # Only show latest version of each indicator
+            results = client.indicators.search("CO2 emissions per capita", latest=True)
 
             # View results (sorted by semantic score)
             for ind in results:
@@ -381,6 +388,10 @@ class IndicatorsAPI:
             )
             for r, path in raw_results
         ]
+
+        # Keep only latest version of each indicator
+        if latest:
+            results = _keep_latest_versions(results, key=lambda r: (r.namespace, r.dataset, r.column_name))
 
         return ResponseSet(
             results=results,

@@ -498,6 +498,115 @@ class TestResponseSet:
         assert top.score == 0.9
 
 
+class TestKeepLatestVersions:
+    """Test the _keep_latest_versions helper."""
+
+    def test_basic(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str
+
+        items = [
+            Item(name="a", version="2024-01-01"),
+            Item(name="a", version="2024-06-01"),
+            Item(name="b", version="2023-01-01"),
+            Item(name="a", version="2024-03-01"),
+            Item(name="b", version="2024-01-01"),
+        ]
+
+        result = _keep_latest_versions(items, key=lambda r: r.name)
+        assert len(result) == 2
+        # Check correct versions kept
+        by_name = {r.name: r.version for r in result}
+        assert by_name["a"] == "2024-06-01"
+        assert by_name["b"] == "2024-01-01"
+
+    def test_preserves_order(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str
+
+        items = [
+            Item(name="b", version="2024-01-01"),
+            Item(name="a", version="2024-06-01"),
+        ]
+
+        result = _keep_latest_versions(items, key=lambda r: r.name)
+        assert [r.name for r in result] == ["b", "a"]
+
+    def test_drops_none_versions(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str | None
+
+        items = [
+            Item(name="a", version=None),
+            Item(name="a", version="2024-01-01"),
+            Item(name="b", version=None),
+        ]
+
+        result = _keep_latest_versions(items, key=lambda r: r.name)
+        assert len(result) == 1
+        assert result[0].name == "a"
+        assert result[0].version == "2024-01-01"
+
+    def test_empty_input(self):
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        result = _keep_latest_versions([], key=lambda r: r)
+        assert result == []
+
+
+class TestTablesAPILatest:
+    """Test the latest parameter in TablesAPI.search()."""
+
+    def test_search_tables_latest(self):
+        """Test that latest=True returns only one version per table."""
+        client = Client()
+        # Search without latest - may return multiple versions
+        all_results = client.tables.search(table="population", namespace="un")
+        # Search with latest - should return fewer or equal results
+        latest_results = client.tables.search(table="population", namespace="un", latest=True)
+
+        assert len(latest_results) <= len(all_results)
+        assert len(latest_results) > 0
+
+        # Each (namespace, dataset, table, channel) combo should appear at most once
+        keys = [(r.namespace, r.dataset, r.table, r.channel) for r in latest_results]
+        assert len(keys) == len(set(keys))
+
+
+class TestIndicatorsAPILatest:
+    """Test the latest parameter in IndicatorsAPI.search()."""
+
+    def test_search_indicators_latest(self):
+        """Test that latest=True returns only one version per indicator."""
+        client = Client()
+        all_results = client.indicators.search("CO2 emissions", limit=20)
+        latest_results = client.indicators.search("CO2 emissions", limit=20, latest=True)
+
+        assert len(latest_results) <= len(all_results)
+
+        # Each (namespace, dataset, column_name) combo should appear at most once
+        keys = [(r.namespace, r.dataset, r.column_name) for r in latest_results]
+        assert len(keys) == len(set(keys))
+
+        # All results should have a version (None-version results are dropped)
+        assert all(r.version is not None for r in latest_results)
+
+
 class TestDataclassModels:
     """Test the dataclass model objects."""
 

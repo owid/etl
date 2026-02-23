@@ -54,6 +54,7 @@ def search(
     match: Literal["exact", "contains", "regex", "fuzzy"] = "fuzzy",
     fuzzy_threshold: int = 70,
     case: bool = False,
+    latest: bool = False,
 ) -> ResponseSet[TableResult] | ResponseSet[IndicatorResult] | ResponseSet[ChartResult]:
     """Search for available data without downloading (for browsing/discovery).
 
@@ -82,6 +83,10 @@ def search(
             - "regex": Regular expression
         fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables, and `name` field.
         case: Case-sensitive search (default: False).  Only for tables.
+        latest: If True, only return the latest version of each table or indicator.
+            For tables, groups by (namespace, dataset, table, channel).
+            For indicators, groups by (namespace, dataset, column_name) and drops those without a version.
+            Ignored for charts. Default False.
 
     Returns:
         Search results. Results can be indexed, iterated, and provide access to metadata without downloading data.
@@ -93,8 +98,8 @@ def search(
         print(f"Found {len(results)} charts")
         print(results[0].slug)  # Access chart slug without downloading data
 
-        # Search for tables
-        results = search("population", kind="table")
+        # Search for tables (latest versions only)
+        results = search("population", kind="table", latest=True)
         print(results[0].path)
 
         # Search for indicators
@@ -133,11 +138,12 @@ def search(
             match=match,
             fuzzy_threshold=fuzzy_threshold,
             case=case,
+            latest=latest,
         )
     elif kind == "indicator":
         # Search indicators using IndicatorsAPI
         assert name is not None  # Validated above
-        return client.indicators.search(name, limit=limit)
+        return client.indicators.search(name, limit=limit, latest=latest)
     elif kind == "chart":
         # Search charts using ChartsAPI
         assert name is not None  # Validated above

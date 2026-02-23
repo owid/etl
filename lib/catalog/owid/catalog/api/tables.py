@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import os
 import tempfile
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Any, Callable, Literal, TypeVar, cast
 from urllib.parse import urlparse
 
 import numpy as np
@@ -34,6 +34,42 @@ from owid.catalog.core.tables import Table
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+
+
+_T = TypeVar("_T")
+
+
+def _keep_latest_versions(
+    results: list[_T],
+    key: Callable[[_T], Any],
+) -> list[_T]:
+    """Keep only the result with the highest version for each group.
+
+    Groups results by the given key function and keeps the one with the
+    highest ``version`` attribute (string comparison, works for ISO dates).
+    Results without a version are dropped.
+
+    The original ordering of the kept items is preserved.
+    """
+    best: dict[Any, _T] = {}
+    for item in results:
+        version = getattr(item, "version", None)
+        if version is None:
+            continue
+        group = key(item)
+        prev = best.get(group)
+        if prev is None or str(version) > str(getattr(prev, "version", "")):
+            best[group] = item
+
+    # Preserve original order
+    seen: set[Any] = set()
+    out: list[_T] = []
+    for item in results:
+        group = key(item)
+        if group in best and group not in seen:
+            out.append(best[group])
+            seen.add(group)
+    return out
 
 
 # =============================================================================
@@ -577,6 +613,7 @@ class TablesAPI:
         fuzzy_threshold: int = 70,
         timeout: int | None = None,
         refresh_index: bool = False,
+        latest: bool = False,
     ) -> ResponseSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
@@ -596,6 +633,8 @@ class TablesAPI:
                 Only used when match="fuzzy". (default: 70)
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
             refresh_index: If True, force re-download of the catalog index. Default False.
+            latest: If True, only return the latest version of each table (grouped by
+                namespace, dataset, table, and channel). Default False.
 
         Returns:
             ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
@@ -606,6 +645,9 @@ class TablesAPI:
             ```python
             # Exact match (default) - searches garden channel by default
             results = client.tables.search(table="population")
+
+            # Only show latest version of each table
+            results = client.tables.search(table="population", latest=True)
 
             # Substring match
             results = client.tables.search(table="pop", match="contains")
@@ -661,6 +703,10 @@ class TablesAPI:
 
         # Convert to results
         results = self._to_results(matches, popularity)
+
+        # Keep only latest version of each table
+        if latest:
+            results = _keep_latest_versions(results, key=lambda r: (r.namespace, r.dataset, r.table, r.channel))
 
         # Build descriptive query from search parameters
         query = self._build_query(
