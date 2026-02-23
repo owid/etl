@@ -14,11 +14,11 @@ tables:
     title: "Decoupling of agricultural production and land use"
     variables:
       food_quantity:
-        title: "Quantity of food produced"
+        title: "Food supply"
         unit: tonnes
         short_unit: t
       food_energy:
-        title: "Food production in terms of energy content"
+        title: "Food supply in terms of energy content"
         unit: kilocalories
         short_unit: kcal
       population:
@@ -30,14 +30,14 @@ tables:
         unit: tonnes
         short_unit: t
       production_energy:
-        title: "Total agricultural production in terms of energy content"
+        title: "Total agricultural production in terms of caloric content"
         unit: kilocalories
         short_unit: kcal
         description_processing: >-
           Production in tonnes is converted to kilocalories using per-capita food supply data as conversion factors.
           To avoid double-counting, the portion of crop production used as domestic animal feed is subtracted before
           the conversion. The domestic share of feed is estimated proportionally:
-          domestic_feed = feed × production / (production + imports).
+          domestic_feed = feed x production / (production + imports).
       agricultural_land:
         title: "Agricultural land area"
         unit: hectares
@@ -46,11 +46,11 @@ tables:
     title: "Decoupling of agricultural production and land use, by item"
     variables:
       food_quantity:
-        title: "Quantity of food produced"
+        title: "Food supply"
         unit: tonnes
         short_unit: t
       food_energy:
-        title: "Food production in terms of energy content"
+        title: "Food supply in terms of energy content"
         unit: kilocalories
         short_unit: kcal
       population:
@@ -62,11 +62,11 @@ tables:
         unit: tonnes
         short_unit: t
       production_energy:
-        title: "Total agricultural production in terms of energy content"
+        title: "Total agricultural production in terms of caloric content"
         unit: kilocalories
         short_unit: kcal
         description_processing: >-
           Production in tonnes is converted to kilocalories using per-capita food supply data as conversion factors.
           To avoid double-counting, the portion of crop production used as domestic animal feed is subtracted before
           the conversion. The domestic share of feed is estimated proportionally:
-          domestic_feed = feed × production / (production + imports).
+          domestic_feed = feed x production / (production + imports).
