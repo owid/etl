@@ -422,6 +422,8 @@ function startWatchProcess(
 	const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
 	const etlrPath = path.resolve(wsRoot, etlrRel);
 
+	const command = `${etlrRel} ${etlArgs.join(' ')}`;
+
 	outputChannel.appendLine(`Starting watch: ${etlrPath} ${etlArgs.join(' ')}`);
 
 	const proc = spawn(etlrPath, etlArgs, {
@@ -793,6 +795,7 @@ function startDatasetWatchProcess(
 
 		if (text.includes('--- Detecting which steps')) {
 			cycleStart = Date.now();
+			recentOutput = '';  // Reset so errors only show the current cycle's output
 			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
 		}
 
