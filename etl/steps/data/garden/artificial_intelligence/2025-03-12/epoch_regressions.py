@@ -91,7 +91,7 @@ def run_regression(tb):
         f"{DL_ERA_START}–{int(END_DATE)}": np.array([DL_ERA_START, END_DATE]),
     }
 
-    metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__gradients"]
+    metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__total"]
     new_tables = []
 
     for metric in metrics:
