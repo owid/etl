@@ -258,19 +258,11 @@ def run() -> None:
     tb = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
 
     # Calculate growth rates for estimates and projections separately
-    # For projections, backfill only at the projection boundary to enable growth calculation
-    # for the first projection year (e.g., use 2020 estimate to calculate 2025 growth)
-    # but avoid labeling pre-projection years with projection-growth values
+    # For projections, combine with estimates data to get 2015 for calculating 2020 growth
     tb_for_proj_growth = tb.copy()
-
-    # Only fill projections column with estimates at/near the projection boundary
-    # This allows growth calculation to work at the boundary without extending into history
-    boundary_mask = (tb_for_proj_growth["year"] >= START_OF_PROJECTIONS - 5) & (
-        tb_for_proj_growth["year"] < START_OF_PROJECTIONS
-    )
-    tb_for_proj_growth.loc[boundary_mask, "popshare_citysize_above_300k_projections"] = tb_for_proj_growth.loc[
-        boundary_mask, "popshare_citysize_above_300k_projections"
-    ].fillna(tb_for_proj_growth.loc[boundary_mask, "popshare_citysize_above_300k_estimates"])
+    tb_for_proj_growth["popshare_citysize_above_300k_projections"] = tb_for_proj_growth[
+        "popshare_citysize_above_300k_projections"
+    ].fillna(tb_for_proj_growth["popshare_citysize_above_300k_estimates"])
 
     tb = calculate_citysize_growth_rates(tb, "estimates")
     tb_for_proj_growth = calculate_citysize_growth_rates(tb_for_proj_growth, "projections")
