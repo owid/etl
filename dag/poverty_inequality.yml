@@ -209,5 +209,5 @@ steps:
   # International dollars conversions (from PIP and WDI)
   data://external/owid_grapher/latest/int_dollar_conversions:
     - data://garden/worldbank_wdi/2026-01-29/wdi
-    - data://garden/wb/2026-01-22/world_bank_pip
+    - data://grapher/wb/2026-01-22/world_bank_pip
     - data://garden/regions/2023-01-01/regions
