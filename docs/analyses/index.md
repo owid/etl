@@ -42,10 +42,9 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
     [:material-download: Download data (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }
 
-<!-- TODO: Uncomment once main article is published, and update links to article -->
-<!-- !!! note ""
+!!! note ""
 
     ## Tracking historical progress against slavery and forced labor: a long-run data view
-    This document is a technical companion to the article ["Tracking historical progress against slavery and forced labor: a long-run data view"](https://ourworldindata.org/).
+    This document is a technical companion to the article ["Tracking historical progress against slavery and forced labor: a long-run data view"](https://ourworldindata.org/slavery).
 
-    [:material-book-open-variant: Methodology](slavery_historical_data/index.md){ .md-button } -->
+    [:material-book-open-variant: Methodology](slavery_historical_data/index.md){ .md-button }

@@ -258,3 +258,5 @@ steps:
     - snapshot-private://fasttrack/latest/end_of_slavery.csv
   data://grapher/fasttrack/latest/residential_electricity_consumption:
     - snapshot://fasttrack/latest/residential_electricity_consumption.csv
+  data-private://grapher/fasttrack/latest/gov_torture_kill:
+    - snapshot-private://fasttrack/latest/gov_torture_kill.csv
