@@ -70,6 +70,13 @@ def run() -> None:
             view.config["subtitle"] = meta.presentation.grapher_config["subtitle"].replace("male ", "")
             view.metadata["description_short"] = meta.description_short.replace("male ", "")
 
+            # Set display names for male_vs_female views
+            for i, ind in enumerate(view.indicators.y):
+                if i == 0:
+                    ind.display = {"name": "Males"}
+                elif i == 1:
+                    ind.display = {"name": "Females"}
+
     #
     # Save garden dataset.
     #
