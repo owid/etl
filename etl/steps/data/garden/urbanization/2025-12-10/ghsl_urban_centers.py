@@ -161,6 +161,7 @@ def run() -> None:
     tb_capitals_share["total_pop_share_largest_city"] = (
         tb_capitals_share["urban_pop"] / tb_capitals_share["total_population"]
     ) * 100
+
     # Keep only the share columns.
     tb_capitals_share = tb_capitals_share[
         ["country", "year", "urban_pop_share_largest_city", "total_pop_share_largest_city"]
@@ -238,6 +239,12 @@ def run() -> None:
     tb = pr.merge(tb_capitals, tb_top_100, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
 
+    # Exclude all share columns for cross-border cities where urban centers span multiple countries.
+    # For these cases, city/capital populations include areas outside the country's borders.
+    CROSS_BORDER_CITIES = ["Gibraltar", "Macao", "Monaco"]
+    share_cols_all = [col for col in tb.columns if "share" in col and "growth" not in col]
+    tb.loc[tb["country"].isin(CROSS_BORDER_CITIES), share_cols_all] = None
+
     # Split data into estimates and projections.
     past_estimates = tb[tb["year"] < START_OF_PROJECTIONS].copy()
     future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()
@@ -285,6 +292,21 @@ def run() -> None:
     ]
 
     tb = tb.format(["country", "year"])
+
+    #
+    # Sanity checks.
+    #
+    # Ensure no share values exceed 100% (which would indicate data quality issues).
+    share_columns = [col for col in tb.columns if "share" in col and "growth" not in col and col != "country"]
+    for col in share_columns:
+        max_value = tb[col].max()
+        if max_value > 100:
+            # Find problematic countries
+            problematic = tb[tb[col] > 100][["country", "year", col]].reset_index(drop=True)
+            raise AssertionError(
+                f"Column {col} has values exceeding 100%. This indicates data quality issues.\n"
+                f"Problematic rows:\n{problematic.head(10)}"
+            )
 
     #
     # Save outputs.
