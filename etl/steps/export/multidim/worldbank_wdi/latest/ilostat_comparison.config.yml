@@ -10,12 +10,16 @@ default_selection:
   - Rwanda
   - Angola
   - Mali
-originUrl: ourworldindata.org/work-employment
 
 default_dimensions:
   indicator: unemployment_rate
 
 definitions:
+
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/work-employment
+
   description_short_labor_force_participation_rate: |-
     Share of the working-age population who are economically active (employed or unemployed).
   description_short_unemployment_rate: |-
