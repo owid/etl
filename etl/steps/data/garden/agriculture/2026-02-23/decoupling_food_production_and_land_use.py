@@ -1,6 +1,16 @@
 """Create a dataset with indicators on food production (in kilocalories) and agricultural land use (in hectares).
 
 The goal is to create a visualization showing which countries have managed to decouple food production and land use.
+
+NOTE on double-counting correction:
+When summing crop and livestock production in calories, crops used as domestic animal feed would be counted twice:
+once as crop production, and again as the livestock output they helped produce. To avoid this, we subtract the
+estimated domestic feed portion from crop production before converting to calories.
+
+Since FAOSTAT's "feed" element reports total feed use (from both domestic and imported crops), we estimate the
+domestic share using a proportional allocation: domestic_feed = feed x ( production / (production + imports) ).
+This way, imported feed (which is not in the production count) is not subtracted.
+
 """
 
 from etl.data_helpers import geo
@@ -17,9 +27,15 @@ ELEMENT_CODES = [
     "0645pc",
     # "Production", in tonnes.
     "005511",
+    # "Feed", in tonnes. Used to void double-counting calories (in crops used for feed and then animal products).
+    "005521",
+    # "Imports", in tonnes. Used to estimate the domestic share of feed.
+    "005611",
 ]
 
-# List of food groups (copied from the garden additional_variables step) created by OWID for FBSC (combination of FBS and FBSH).
+
+# Food groups (copied from the garden additional_variables step) created by OWID for FBSC (combination of FBS and FBSH).
+# This is needed to be able to compute totals for imports (food supply, in kcal, already has a total item).
 FOOD_GROUPS_FBSC = {
     "Cereals and grains": [
         "00002905",  # Cereals, Excluding Beer
@@ -199,8 +215,9 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
     # Load data from a local file. The file can be downloaded from:
     # https://figshare.com/articles/dataset/Global_and_regional_drivers_of_land-use_emissions_in_1961-2017/12248735?file=26174975
     # Specifically tab "8.1.AgProd" for agricultural production, and "9.1.AgLand" for agricultural land use.
-    df_food = pd.read_excel(Path.home() / "Downloads/LUE_Data_CALUE.xlsx", sheet_name="8.1.AgProd")
-    df_land = pd.read_excel(Path.home() / "Downloads/LUE_Data_CALUE.xlsx", sheet_name="9.1.AgLand")
+    DATA_FILE = Path.home() / "Documents/owid/2026-02-20_food_decoupling_analysis/data/LUE_Data_CALUE.xlsx"
+    df_food = pd.read_excel(DATA_FILE, sheet_name="8.1.AgProd")
+    df_land = pd.read_excel(DATA_FILE, sheet_name="9.1.AgLand")
     # Reformat and combine sheets.
     df_food = df_food.rename(
         columns={column: column.replace("Area", "country").replace("Y", "") for column in df_food.columns}
@@ -247,8 +264,10 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
     check["pct_land"] = (
         100 * abs(check["agricultural_land"] - check["agricultural_land_hong"]) / check["agricultural_land_hong"]
     )
-    error = "Expected percentage difference between our production energy and that from Hong et al. (2021) to agree within ~10%"
-    assert check["pct_food"].median() < 11, error
+    # NOTE: With the feed correction, our production_energy is expected to be lower than Hong et al.'s.
+    # The median percentage difference may be larger than in the original step.
+    error = "Expected percentage difference between our production energy and that from Hong et al. (2021) to be within a reasonable range."
+    assert check["pct_food"].median() < 40, error
     error = "Expected percentage difference between our agricultural land and that from Hong et al. (2021) to agree within ~14%"
     assert check["pct_land"].median() < 14, error
     # Choose to plot food production or land use.
@@ -421,8 +440,8 @@ def run() -> None:
             "unit_short_name",
         ]
     ].drop_duplicates()
-    assert set(check["element"]) == {"Food available for consumption", "Production"}
-    assert set(check["unit"]) == {"kilograms per year per capita", "kilocalories per day per capita", "tonnes"}
+    assert {"Food available for consumption", "Production"}.issubset(set(check["element"]))
+    assert {"kilograms per year per capita", "kilocalories per day per capita", "tonnes"}.issubset(set(check["unit"]))
 
     # Convert kcal/capita/day to kcal/capita/year.
     tb.loc[(tb["element_code"] == "0664pc"), "value"] *= 365
@@ -433,7 +452,15 @@ def run() -> None:
         columns=["element_code"],
         values=["value"],
         join_column_levels_with="_",
-    ).rename(columns={"value_0645pc": "food_quantity", "value_0664pc": "food_energy", "value_005511": "production"})
+    ).rename(
+        columns={
+            "value_0645pc": "food_quantity",
+            "value_0664pc": "food_energy",
+            "value_005511": "production",
+            "value_005521": "feed",
+            "value_005611": "imports",
+        }
+    )
 
     # For sanity checks later on, keep the "Total" item of food.
     tb_total = tb[tb["item_code"] == "00002901"].reset_index(drop=True)
@@ -441,13 +468,18 @@ def run() -> None:
     assert set(tb_total["item"]) == {"Total"}, error
     error = "Expected 'Total' item to be only available for per capita food (kcal)."
     assert tb_total[(tb_total["production"].notnull()) | (tb_total["food_quantity"].notnull())].empty, error
-    tb_total = tb_total.drop(columns=["production", "food_quantity"])
+    tb_total = tb_total.drop(columns=["production", "food_quantity", "feed", "imports"])
 
     # Remove rows with no production data.
-    n_rows_before = len(tb)
+    # NOTE: With the additional element codes (feed, imports), the pivot creates more rows for items that have
+    # feed/imports data but no production (e.g., items a country imports but doesn't produce).
+    # We keep only rows for which we have production data.
     tb = tb.dropna(subset="production").reset_index(drop=True)
-    error = "Expected the number of rows to decrease by less than 30% after dropping nans in production."
-    assert 100 * (n_rows_before - len(tb)) / n_rows_before < 30, error
+
+    # Fill missing feed and imports with 0 (no data means no feed use / no imports for that item).
+    # TODO: Is this a good assumption?
+    tb["feed"] = tb["feed"].fillna(0)
+    tb["imports"] = tb["imports"].fillna(0)
 
     # Sometimes quantity is missing, but calories is informed, and sometimes is the opposite.
     # Check that either way those are edge cases, and then remove those rows.
@@ -467,11 +499,22 @@ def run() -> None:
     tb = tb[(tb["conversion"] > 0) & (tb["conversion"] < 1000)].reset_index(drop=True)
     # px.histogram(tb, x="conversion", title=f"All items (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent").show()
 
-    # Apply conversion factor (of kcal per 100g) to production (in tonnes).
-    tb["production_energy"] = tb["production"] * 10000 * tb["conversion"]
+    # When summing crop + livestock production in calories, crops fed to domestic animals get counted twice.
+    # To fix this, we subtract the portion of feed that came from domestic production.
+    # FAOSTAT's "feed" element reports total feed use (from both domestic and imported crops).
+    # We estimate the domestic share proportionally: if a country produces 1000t and imports 500t of maize,
+    # we assume that 1000/1500=2/3 of the maize used for feed came from domestic production.
+    # We then remove the domestic feed from the total production. In other words:
+    # domestic feed = feed x production / (production + imports)
+    # Net production = production - domestic feed
+    domestic_feed = tb["feed"] * (tb["production"] / (tb["production"] + tb["imports"])).fillna(0)
+    tb["production_net"] = (tb["production"] - domestic_feed).clip(lower=0)
+
+    # Apply conversion factor (of kcal per 100g) to net production (in tonnes).
+    tb["production_energy"] = tb["production_net"] * 10000 * tb["conversion"]
     # Sanity checks.
     error = "Unexpected zero or nan production energy."
-    assert tb[(tb["production_energy"] == 0) & (tb["production"] != 0)].empty, error
+    assert tb[(tb["production_energy"] == 0) & (tb["production_net"] != 0)].empty, error
     assert tb[(tb["production_energy"].isnull())].empty, error
 
     # FBS items are grouped together, and the proportions of subitems in each group may differ for different items, then it may be impossible (or quite inaccurate) to translate those groups into energy with a simple conversion factor.
@@ -531,34 +574,14 @@ def run() -> None:
     assert 100 * (_n_rows_before - len(tb_grouped)) / _n_rows_before < 0.5, error
 
     # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
-    # Overall, the estimates on total production (in kcal) per country agree very well (except for a few countries, more significantly Iceland).
     # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
     # Remove unnecessary columns.
-    tb = tb.drop(columns=["conversion", "item_code", "item_description"], errors="raise")
+    tb = tb.drop(
+        columns=["conversion", "item_code", "item_description", "feed", "imports", "production_net"], errors="raise"
+    )
 
-    ####################################################################################################################
-    # Conclusions:
-    # This is the list of countries for which:
-    # - Agricultural production increased by >= 5% in the latest year with respect to 1961.
-    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
-    # Hong Kong, Cyprus, Italy, Greece, Poland, Sweden, Hungary, Austria, New Zealand, South Korea, Australia, Guyana, Netherlands, Iran, Chile, Mongolia, Spain, Eswatini, Finland, France, Denmark, United Kingdom, Jordan, Germany, Switzerland, Argentina, Uruguay, Romania, Kiribati, Taiwan, Iceland, Bulgaria, Algeria, United States, Albania, Canada
     # show_decoupled_countries(food_column="production_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5)
-
-    # This is the list of countries for which:
-    # - Food supply increased by >= 5% in the latest year with respect to 1961.
-    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
-    # - The median net import share over the last 10 years is < 20%.
-    # Italy, Greece, Poland, Hungary, Austria, New Zealand, Australia, Guyana, Iran, Chile, Spain, Eswatini, France, Denmark, Germany, Argentina, Uruguay, Romania, Mauritius, Kiribati, Iceland, United States, Albania, Canada
-    # show_decoupled_countries(food_column="food_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5, max_net_share_imports=20, max_net_share_median_over_years=10)
-
-    # This is the list of countries for which:
-    # - Food supply increased by >= 5% in the latest year with respect to 1961.
-    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
-    # - The net import share is < 20% every year.
-    # Greece, Poland, Hungary, Austria, New Zealand, Australia, Guyana, Iran, Chile, Spain, Eswatini, France, Denmark, Germany, Argentina, Uruguay, Romania, Kiribati, Iceland, United States, Albania, Canada
-    # show_decoupled_countries(food_column="food_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5, max_net_share_imports=20, max_net_share_median_over_years=None)
-    ####################################################################################################################
 
     # Improve table formats.
     tb_grouped = tb_grouped.format(["country", "year"], short_name="decoupling_food_production_and_land_use_total")
