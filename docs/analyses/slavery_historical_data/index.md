@@ -7,7 +7,7 @@ status: new
 !!! info ""
     :octicons-person-16: **[Bastian Herre](https://ourworldindata.org/team/bastian-herre), [Esteban Ortiz-Ospina](https://ourworldindata.org/team/esteban-ortiz-ospina), [Max Roser](https://ourworldindata.org/team/max-roser)** • :octicons-calendar-16: February 16, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Slavery%20historical%20data)
 
-Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view](https://ourworldindata.org/) to show when each country ended large-scale forced labor (or whether a country has not abolished it).
+Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view](https://ourworldindata.org/slavery) to show when each country ended large-scale forced labor (or whether a country has not abolished it).
 
 "Large-scale" forced labor here means forced labor that was common and entrenched — tolerated, enabled, or imposed by authorities, rather than isolated abuse.
 
@@ -15,7 +15,7 @@ The data shows that almost all countries have ended large-scale forced labor, of
 
 Summarizing these massive changes is challenging. Forced labor can take many different forms; legal rules and real-world practices often don't match, and no country is completely free from forced labor. So, in the rest of this technical publication, we detail how we constructed the dataset and show it in full.
 
-You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/).
+You can read more about the significance of the decline in slavery and forced labor, and the more general measurement challenges, in [the article](https://ourworldindata.org/slavery).
 
 
 ## What data we used
