@@ -454,8 +454,9 @@ def plot_decoupled_countries(
     countries_decoupled = sorted(countries_decoupled)
 
     # Compute percentage change relative to baseline year for each country.
+    # Filter to year >= year_min to exclude years with incomplete rolling averages.
     tb_baseline = tb_grouped[tb_grouped["year"] == year_min][["country", "production_energy", "agricultural_land"]]
-    tb_plot = tb_grouped[tb_grouped["country"].isin(countries_decoupled)][
+    tb_plot = tb_grouped[(tb_grouped["country"].isin(countries_decoupled)) & (tb_grouped["year"] >= year_min)][
         ["country", "year", "production_energy", "agricultural_land"]
     ].merge(tb_baseline, on="country", suffixes=("", "_baseline"))
     tb_plot["Food production (calories)"] = (
@@ -810,6 +811,10 @@ def run() -> None:
     # With a 3-year rolling average, the effective first year is 1963 (average of 1961-1963).
     year_min = tb_grouped["year"].min() + max(1, ROLLING_AVERAGE_YEARS) - 1
     year_max = tb_grouped["year"].max()
+
+    # Remove years with incomplete rolling averages from both tables.
+    tb_grouped = tb_grouped[tb_grouped["year"] >= year_min].reset_index(drop=True)
+    tb = tb[tb["year"] >= year_min].reset_index(drop=True)
 
     tb_start = tb_grouped[tb_grouped["year"] == year_min][["country", "production_energy", "agricultural_land"]]
     tb_end = tb_grouped[tb_grouped["year"] == year_max][["country", "production_energy", "agricultural_land"]]
