@@ -13,11 +13,25 @@ This way, imported feed (which is not in the production count) is not subtracted
 
 """
 
+from pathlib import Path
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Minimum percentage increase in production energy for a country to qualify as "decoupled".
+PRODUCTION_INCREASE_PCT_MIN = 5
+# Minimum percentage decrease in agricultural land for a country to qualify as "decoupled".
+LAND_DECREASE_PCT_MIN = 5
+# Number of years for the rolling average (1 to not do any rolling average).
+# A 3-year window smooths year-to-year variability (e.g. bad harvests, COVID, stock changes).
+ROLLING_AVERAGE_YEARS = 3
+
+# Path to local folder where charts will be saved.
+# NOTE: Functions that save files will be commented by default; uncomment while doing analysis.
+OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-20_food_decoupling_analysis/results"
 
 # Columns from food balances dataset.
 ELEMENT_CODES = [
@@ -199,8 +213,13 @@ FOOD_GROUPS_FBSC = {
 }
 
 
-def sanity_check_compare_with_hong_et_al(tb_grouped):
-    # Compare my estimated totals for production energy with those from the Hong et al. (2021) paper, in terms of production calories and land use.
+def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER / "comparison-with-hong-et-al-2021"):
+    """Compare our production energy (with and without feed correction) with Hong et al. (2021).
+
+    Saves individual country charts to output_folder (or shows interactively if output_folder is None).
+    Each chart has 3 lines: "OWID (feed-corrected)", "OWID (uncorrected)", "Hong et al. (2021)".
+    Since Hong et al. likely double-counted feed, their values should be closer to our uncorrected values.
+    """
     from pathlib import Path
 
     import pandas as pd
@@ -231,8 +250,8 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
     # Harmonize country names using the same file as in the FAOSTAT steps.
     countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.countries.json"
     excluded_countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.excluded_countries.json"
-    df = geo.harmonize_countries(
-        df,
+    df = paths.regions.harmonize_names(
+        tb=df,
         countries_file=countries_file,
         excluded_countries_file=excluded_countries_file,
         warn_on_unknown_excluded_countries=False,
@@ -255,9 +274,11 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=True,
     )
-    check = pd.DataFrame(tb_grouped)[["country", "year", "production_energy", "agricultural_land"]].merge(
-        df, how="left", on=["country", "year"]
-    )
+    check = pd.DataFrame(tb_grouped)[
+        ["country", "year", "production_energy", "production_energy_uncorrected", "agricultural_land"]
+    ].merge(df, how="left", on=["country", "year"])
+
+    # Assertions on the corrected version.
     check["pct_food"] = (
         100 * abs(check["production_energy"] - check["production_energy_hong"]) / check["production_energy_hong"]
     )
@@ -270,27 +291,43 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
     assert check["pct_food"].median() < 40, error
     error = "Expected percentage difference between our agricultural land and that from Hong et al. (2021) to agree within ~14%"
     assert check["pct_land"].median() < 14, error
-    # Choose to plot food production or land use.
-    variable = "production_energy"
-    # variable = "agricultural_land"
-    value_name = f"{variable.replace('_', ' ')} of all food items / kcal"
+
+    # Plot food production: corrected, uncorrected, and Hong et al.
+    value_name = "Production energy / kcal"
     plot = (
-        check[["country", "year", variable, f"{variable}_hong"]]
-        .rename(columns={variable: "OWID", f"{variable}_hong": "Hong et al. (2021)"})
+        check[["country", "year", "production_energy", "production_energy_uncorrected", "production_energy_hong"]]
+        .rename(
+            columns={
+                "production_energy": "OWID (feed-corrected)",
+                "production_energy_uncorrected": "OWID (uncorrected)",
+                "production_energy_hong": "Hong et al. (2021)",
+            }
+        )
         .melt(id_vars=["country", "year"], value_name=value_name)
     )
+
+    if output_folder is not None:
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+
     for country in sorted(set(check["country"])):
         _plot = plot[plot["country"] == country].dropna()
-        if len(set(_plot["variable"])) == 2:
-            px.line(
-                _plot,
-                x="year",
-                y=value_name,
-                color="variable",
-                markers=True,
-                title=country,
-                range_y=(0, _plot[value_name].max() * 1.05),
-            ).show()
+        # Only plot if we have at least 2 series (OWID + Hong).
+        if len(set(_plot["variable"])) < 2:
+            continue
+        fig = px.line(
+            _plot,
+            x="year",
+            y=value_name,
+            color="variable",
+            markers=True,
+            title=country,
+            range_y=(0, _plot[value_name].max() * 1.05),
+        )
+        if output_folder is not None:
+            safe_name = country.replace("/", "_").replace(" ", "_")
+            fig.write_image(Path(output_folder) / f"{safe_name}.png")
+        else:
+            fig.show()
     # In terms of food production, most countries agree reasonably well with Hong et al (2021); in fact better than expected, given that FAOSTAT has probably changed since the publication of that paper.
     # Cases with significant discrepancies Indonesia, Hong-Kong, or Malaysia. And one where the difference is particularly significant is Iceland.
     # Land use differs significantly more, but I suppose that's also mostly due to changes in FAOSTAT RL data.
@@ -399,6 +436,177 @@ def show_decoupled_countries(
     print(", ".join(decoupled))
 
 
+def plot_decoupled_countries(
+    tb_grouped,
+    countries_decoupled,
+    year_min,
+    year_max,
+    y_min=-60,
+    y_max=200,
+    output_folder=OUTPUT_FOLDER / "decoupled-countries",
+):
+    """Plot individual line charts showing % change in production energy and agricultural land for each decoupled country."""
+    from pathlib import Path
+
+    import plotly.express as px
+    from owid.catalog import Table
+
+    countries_decoupled = sorted(countries_decoupled)
+
+    # Compute percentage change relative to baseline year for each country.
+    tb_baseline = tb_grouped[tb_grouped["year"] == year_min][["country", "production_energy", "agricultural_land"]]
+    tb_plot = tb_grouped[tb_grouped["country"].isin(countries_decoupled)][
+        ["country", "year", "production_energy", "agricultural_land"]
+    ].merge(tb_baseline, on="country", suffixes=("", "_baseline"))
+    tb_plot["Food production (calories)"] = (
+        100
+        * (tb_plot["production_energy"] - tb_plot["production_energy_baseline"])
+        / tb_plot["production_energy_baseline"]
+    )
+    tb_plot["Agricultural land"] = (
+        100
+        * (tb_plot["agricultural_land"] - tb_plot["agricultural_land_baseline"])
+        / tb_plot["agricultural_land_baseline"]
+    )
+
+    # Add baseline point at year_min with 0% change.
+    tb_plot = Table(tb_plot)
+
+    # Remove metadata units to avoid spurious warnings.
+    for column in ["Food production (calories)", "Agricultural land"]:
+        tb_plot[column].metadata.unit = None
+        tb_plot[column].metadata.short_unit = None
+
+    if output_folder is not None:
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+
+    for country in countries_decoupled:
+        tb_country = tb_plot[tb_plot["country"] == country].reset_index(drop=True)
+        if tb_country.empty:
+            continue
+        final_row = tb_country[tb_country["year"] == year_max]
+        if final_row.empty:
+            print(f"Not enough data for this window of years for {country}")
+            continue
+        food_change = float(final_row["Food production (calories)"].iloc[0])
+        land_change = float(final_row["Agricultural land"].iloc[0])
+        tb_melted = tb_country.melt(
+            id_vars=["country", "year"],
+            value_vars=["Food production (calories)", "Agricultural land"],
+            var_name="Indicator",
+            value_name="value",
+        )
+        fig = px.line(
+            tb_melted,
+            x="year",
+            y="value",
+            color="Indicator",
+            title=f"{country} (Food production: {food_change:+.1f}%, Land use: {land_change:+.1f}%)",
+        ).update_yaxes(range=[y_min, y_max])
+        if output_folder is not None:
+            safe_name = country.replace("/", "_").replace(" ", "_")
+            fig.write_image(Path(output_folder) / f"{safe_name}.png")
+        else:
+            fig.show()
+
+
+def plot_slope_chart_grid(
+    tb_changes, countries_decoupled, year_min, year_max, n_cols=6, output_file=OUTPUT_FOLDER / "smooth-grid.png"
+):
+    """Create a grid of slope charts showing decoupling for each country."""
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    tb_decoupled = tb_changes[tb_changes["country"].isin(countries_decoupled)].reset_index(drop=True)
+    # Remove metadata units to avoid spurious warnings.
+    for column in ["production_energy_change", "agricultural_land_change"]:
+        tb_decoupled[column].metadata.unit = None
+        tb_decoupled[column].metadata.short_unit = None
+
+    # Sort by "decoupling score" (production increase minus land decrease).
+    tb_decoupled["decoupling_score"] = (
+        tb_decoupled["production_energy_change"] - tb_decoupled["agricultural_land_change"]
+    )
+    tb_decoupled = tb_decoupled.sort_values("decoupling_score", ascending=False)
+
+    countries_sorted = list(tb_decoupled["country"])
+    n_countries = len(countries_sorted)
+    n_rows = (n_countries + n_cols - 1) // n_cols
+
+    # Calculate global y-axis range for consistent scaling.
+    y_max_val = tb_decoupled["production_energy_change"].max()
+    y_min_val = tb_decoupled["agricultural_land_change"].min()
+    y_range = [y_min_val * 1.15, y_max_val * 1.15]
+
+    fig = make_subplots(
+        rows=n_rows,
+        cols=n_cols,
+        subplot_titles=countries_sorted,
+        vertical_spacing=0.08,
+        horizontal_spacing=0.04,
+    )
+
+    food_color = "#3366cc"
+    land_color = "#cc3333"
+
+    for i, country in enumerate(countries_sorted):
+        row = i // n_cols + 1
+        col = i % n_cols + 1
+
+        country_data = tb_decoupled[tb_decoupled["country"] == country].iloc[0]
+        food_change = float(country_data["production_energy_change"])
+        land_change = float(country_data["agricultural_land_change"])
+
+        # Food production line.
+        fig.add_trace(
+            go.Scatter(
+                x=[year_min, year_max],
+                y=[0, food_change],
+                mode="lines+text",
+                line=dict(color=food_color, width=2),
+                text=["", f"{food_change:+.0f}%"],
+                textposition="middle right",
+                textfont=dict(color=food_color, size=10),
+                showlegend=False,
+                cliponaxis=False,
+            ),
+            row=row,
+            col=col,
+        )
+
+        # Land use line.
+        fig.add_trace(
+            go.Scatter(
+                x=[year_min, year_max],
+                y=[0, land_change],
+                mode="lines+text",
+                line=dict(color=land_color, width=2),
+                text=["", f"{land_change:+.0f}%"],
+                textposition="middle right",
+                textfont=dict(color=land_color, size=10),
+                showlegend=False,
+                cliponaxis=False,
+            ),
+            row=row,
+            col=col,
+        )
+
+    fig.update_layout(
+        height=200 * n_rows,
+        width=180 * n_cols,
+        title_text=f"Countries that increased food production while reducing land use, {year_min}-{year_max}",
+        showlegend=False,
+    )
+
+    fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
+    fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=True, zerolinecolor="lightgray", range=y_range)
+
+    if output_file is not None:
+        fig.write_image(output_file)
+    else:
+        fig.show()
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -410,9 +618,6 @@ def run() -> None:
     # Load FAOSTAT land use dataset, and read its main table.
     ds_rl = paths.load_dataset("faostat_rl")
     tb_rl = ds_rl.read("faostat_rl")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -512,6 +717,8 @@ def run() -> None:
 
     # Apply conversion factor (of kcal per 100g) to net production (in tonnes).
     tb["production_energy"] = tb["production_net"] * 10000 * tb["conversion"]
+    # Also compute the uncorrected version (with double-counting) for comparison with Hong et al.
+    tb["production_energy_uncorrected"] = tb["production"] * 10000 * tb["conversion"]
     # Sanity checks.
     error = "Unexpected zero or nan production energy."
     assert tb[(tb["production_energy"] == 0) & (tb["production_net"] != 0)].empty, error
@@ -525,12 +732,12 @@ def run() -> None:
     # So, the resulting food energy would be a weighted average of all those products (across all years and countries). Maybe, once we combine those items in the right proportion, the conversion factor would follow the resulting distribution above. For example, bread is at 249 kcal. So, maybe the first peak in the histogram (around 260 kcal) could be due to the abundance of bread (shifted up by other items).
 
     # Convert food quantity and food energy from per capita to totals.
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
     for column in ["food_quantity", "food_energy"]:
         tb[column] *= tb["population"]
 
     # Idem for the original "Total" of food (kcal).
-    tb_total = geo.add_population_to_table(tb=tb_total, ds_population=ds_population, warn_on_missing_countries=False)
+    tb_total = paths.regions.add_population(tb=tb_total, warn_on_missing_countries=False)
     tb_total["food_energy"] *= tb_total["population"]
 
     # Get the total from the already aggregated item groups.
@@ -539,12 +746,21 @@ def run() -> None:
     tb_grouped = (
         tb[tb["item_code"].isin(ITEM_CODES)]
         .groupby(["country", "year"], as_index=False)
-        .agg({column: "sum" for column in ["food_quantity", "food_energy", "production", "production_energy"]})
+        .agg(
+            {
+                column: "sum"
+                for column in [
+                    "food_quantity",
+                    "food_energy",
+                    "production",
+                    "production_energy",
+                    "production_energy_uncorrected",
+                ]
+            }
+        )
     )
     # For convenience, add population again to this table.
-    tb_grouped = geo.add_population_to_table(
-        tb=tb_grouped, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_grouped = paths.regions.add_population(tb=tb_grouped, warn_on_missing_countries=False)
 
     # Sanity check.
     tb_check = tb_grouped[["country", "year", "food_energy"]].merge(
@@ -576,12 +792,69 @@ def run() -> None:
     # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
     # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
-    # Remove unnecessary columns.
-    tb = tb.drop(
-        columns=["conversion", "item_code", "item_description", "feed", "imports", "production_net"], errors="raise"
+    # Remove regions and FAO aggregates (we only want individual countries).
+    tb_grouped = tb_grouped[
+        ~tb_grouped["country"].isin(paths.regions.regions_all)
+        & ~tb_grouped["country"].str.contains("(FAO)", regex=False)
+    ].reset_index(drop=True)
+
+    # Apply rolling averages to smooth year-to-year variability.
+    if ROLLING_AVERAGE_YEARS > 1:
+        tb_grouped = tb_grouped.sort_values(["country", "year"]).reset_index(drop=True)
+        for column in ["food_quantity", "food_energy", "production", "production_energy", "agricultural_land"]:
+            tb_grouped[column] = tb_grouped.groupby("country", sort=False)[column].transform(
+                lambda s: s.rolling(ROLLING_AVERAGE_YEARS, min_periods=1).mean()
+            )
+
+    # Select countries that achieved decoupling: production up and land down over the full time window.
+    # With a 3-year rolling average, the effective first year is 1963 (average of 1961-1963).
+    year_min = tb_grouped["year"].min() + max(1, ROLLING_AVERAGE_YEARS) - 1
+    year_max = tb_grouped["year"].max()
+
+    tb_start = tb_grouped[tb_grouped["year"] == year_min][["country", "production_energy", "agricultural_land"]]
+    tb_end = tb_grouped[tb_grouped["year"] == year_max][["country", "production_energy", "agricultural_land"]]
+    tb_changes = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
+    tb_changes["production_energy_change"] = (
+        100
+        * (tb_changes["production_energy_end"] - tb_changes["production_energy_start"])
+        / tb_changes["production_energy_start"]
+    )
+    tb_changes["agricultural_land_change"] = (
+        100
+        * (tb_changes["agricultural_land_end"] - tb_changes["agricultural_land_start"])
+        / tb_changes["agricultural_land_start"]
     )
 
-    # show_decoupled_countries(food_column="production_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5)
+    countries_decoupled = set(
+        tb_changes[
+            (tb_changes["production_energy_change"] >= PRODUCTION_INCREASE_PCT_MIN)
+            & (tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN)
+        ]["country"]
+    )
+
+    # Uncomment to plot individual charts for each decoupled country.
+    # plot_decoupled_countries(tb_grouped, countries_decoupled, year_min, year_max)
+    # Uncomment to plot a slope chart grid PNG with all decoupled countries.
+    # plot_slope_chart_grid(tb_changes, countries_decoupled, year_min, year_max)
+
+    # Filter both tables to only include decoupled countries.
+    tb_grouped = tb_grouped[tb_grouped["country"].isin(countries_decoupled)].reset_index(drop=True)
+    tb = tb[tb["country"].isin(countries_decoupled)].reset_index(drop=True)
+
+    # Remove unnecessary columns.
+    tb = tb.drop(
+        columns=[
+            "conversion",
+            "item_code",
+            "item_description",
+            "feed",
+            "imports",
+            "production_net",
+            "production_energy_uncorrected",
+        ],
+        errors="raise",
+    )
+    tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected"], errors="raise")
 
     # Improve table formats.
     tb_grouped = tb_grouped.format(["country", "year"], short_name="decoupling_food_production_and_land_use_total")
