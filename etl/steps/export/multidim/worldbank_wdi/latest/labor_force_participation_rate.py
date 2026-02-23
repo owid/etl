@@ -71,11 +71,12 @@ def run() -> None:
             view.metadata["description_short"] = meta.description_short.replace("male ", "")
 
             # Set display names for male_vs_female views
-            for i, ind in enumerate(view.indicators.y):
-                if i == 0:
-                    ind.display = {"name": "Males"}
-                elif i == 1:
+            for ind in view.indicators.y or []:
+                indicator_name = ind.catalogPath.split("#")[-1]
+                if "_fe_" in indicator_name:
                     ind.display = {"name": "Females"}
+                elif "_ma_" in indicator_name:
+                    ind.display = {"name": "Males"}
 
     #
     # Save garden dataset.
