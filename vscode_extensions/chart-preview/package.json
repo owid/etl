@@ -33,12 +33,7 @@
       "editor/title": [
         {
           "command": "chart-preview.open",
-          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /export[\\/\\\\]multidim/ && resourceFilename =~ /\\.(config\\.yml|py)$/",
-          "group": "navigation"
-        },
-        {
-          "command": "chart-preview.dataset",
-          "when": "resourceDirname =~ /etl[\\/\\\\]steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
+          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /export[\\/\\\\]multidim/ && resourceFilename =~ /\\.(config\\.yml|py)$/ || resourceDirname =~ /steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
           "group": "navigation"
         }
       ]
@@ -47,11 +42,6 @@
       {
         "command": "chart-preview.open",
         "key": "cmd+alt+p",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "chart-preview.dataset",
-        "key": "cmd+shift+v",
         "when": "editorTextFocus"
       }
     ],

@@ -300,6 +300,8 @@ def main_cli(
                 main(**kwargs)  # type: ignore
         else:
             main(**kwargs)  # type: ignore
+            if watch:
+                print("--- Dataset rebuild complete", flush=True)
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:

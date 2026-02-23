@@ -13,27 +13,6 @@ export function activate(context: vscode.ExtensionContext) {
 	outputChannel = vscode.window.createOutputChannel('Chart Preview');
 
 	const openCmd = vscode.commands.registerCommand('chart-preview.open', () => {
-		// If no active editor (e.g. focus is on preview panel), close the last preview
-		const editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			if (lastPreviewedFile && panels.has(lastPreviewedFile)) {
-				panels.get(lastPreviewedFile)!.dispose();
-				lastPreviewedFile = undefined;
-			}
-			return;
-		}
-		const filePath = editor.document.uri.fsPath;
-		if (filePath.endsWith('.chart.yml')) {
-			openPreview(filePath);
-		} else if (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py'))) {
-			openPreview(filePath);
-		} else {
-			vscode.window.showErrorMessage('Not a .chart.yml or export/multidim file');
-			return;
-		}
-	});
-
-	const datasetCmd = vscode.commands.registerCommand('chart-preview.dataset', () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			if (lastPreviewedFile && panels.has(lastPreviewedFile)) {
@@ -45,9 +24,16 @@ export function activate(context: vscode.ExtensionContext) {
 		const filePath = editor.document.uri.fsPath;
 		if (filePath.includes('/steps/data/') && filePath.endsWith('.py')) {
 			openDatasetPreview(filePath);
+		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
+			openPreview(filePath);
 		} else {
-			vscode.window.showErrorMessage('Not a data step .py file (expected path containing /steps/data/)');
+			vscode.window.showErrorMessage('Not a previewable file (expected a garden .py step or .chart.yml)');
 		}
+	});
+
+	// Keep chart-preview.dataset registered as an alias for backwards compatibility
+	const datasetCmd = vscode.commands.registerCommand('chart-preview.dataset', () => {
+		vscode.commands.executeCommand('chart-preview.open');
 	});
 
 	context.subscriptions.push(openCmd, datasetCmd, outputChannel);
@@ -753,11 +739,6 @@ function startDatasetWatchProcess(
 
 	const command = `${etlrRel} ${etlArgs.join(' ')}`;
 
-	// Path to dataset index — used to check if dataset exists before trying to render
-	const datasetIndexPath = path.join(
-		wsRoot, 'data', parsed.channel, parsed.namespace, parsed.version, parsed.shortName, 'index.json'
-	);
-
 	outputChannel.appendLine(`Starting dataset watch: ${etlrPath} ${etlArgs.join(' ')}`);
 
 	const proc = spawn(etlrPath, etlArgs, {
@@ -769,24 +750,22 @@ function startDatasetWatchProcess(
 
 	let recentOutput = '';
 	let firstRunDone = false;
+	let reloadInProgress = false;
 	let cycleStart = Date.now();
-	let stepsRunning = false;
-	let detectingDirty = false;
-	let pendingReloadTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const doReload = async () => {
+		if (reloadInProgress) return;
+		reloadInProgress = true;
 		const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
 
 		try {
-			outputChannel.appendLine('[dataset-preview] Step completed, generating preview JSON...');
+			outputChannel.appendLine('[dataset-preview] Rebuild complete, generating preview...');
 			const jsonStr = await runPreviewScript(wsRoot, parsed.relStepPath, filePath);
 
 			if (!firstRunDone) {
-				// First render — set the full HTML with data inlined
 				panel.webview.html = getDatasetPreviewHtml(jsonStr, command, elapsed);
 				firstRunDone = true;
 			} else {
-				// Subsequent renders — send updated data via postMessage
 				panel.webview.postMessage({ type: 'updateData', json: jsonStr });
 				panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
 				panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
@@ -801,64 +780,32 @@ function startDatasetWatchProcess(
 				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
 				panel.webview.postMessage({ type: 'showError', text: msg });
 			}
+		} finally {
+			reloadInProgress = false;
 		}
 	};
 
 	const handleOutput = (data: Buffer) => {
 		const text = data.toString();
 		recentOutput += text;
-		if (recentOutput.length > 4000) {
-			recentOutput = recentOutput.slice(-4000);
-		}
+		if (recentOutput.length > 4000) recentOutput = recentOutput.slice(-4000);
 		outputChannel.append(text);
 
 		if (!firstRunDone) {
 			panel.webview.postMessage({ type: 'log', text });
 		}
 
-		if (text.includes('Detecting which steps need rebuilding')) {
+		if (text.includes('--- Detecting which steps')) {
 			cycleStart = Date.now();
-			stepsRunning = false;
-			detectingDirty = true;
-			if (firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
-			}
+			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
 		}
 
 		if (text.includes('--- Running')) {
-			stepsRunning = true;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			if (firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
-			}
+			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
 		}
 
-		if (text.includes('All datasets up to date!')) {
-			stepsRunning = false;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			if (!firstRunDone && !existsSync(datasetIndexPath)) {
-				// Dataset hasn't been built yet — nothing to show, keep streaming logs
-			} else {
-				doReload();
-			}
-		}
-
-		if (detectingDirty && !stepsRunning && /OK \(\d/.test(text)) {
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); }
-			if (!firstRunDone && !existsSync(datasetIndexPath)) {
-				// Dataset hasn't been built yet — skip, keep streaming logs
-			} else {
-				pendingReloadTimer = setTimeout(() => { pendingReloadTimer = null; doReload(); }, 500);
-			}
-		}
-
-		if (stepsRunning && /OK \(\d/.test(text)) {
-			stepsRunning = false;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
+		// Sentinel printed by etlr after every successful watch cycle (both "up to date" and actual rebuild)
+		if (text.includes('--- Dataset rebuild complete')) {
 			doReload();
 		}
 
@@ -1150,7 +1097,9 @@ function getEntitiesForTable(table) {
 function pickRandomEntity(table) {
     var entities = getEntitiesForTable(table);
     if (entities.length === 0) return null;
-    return entities[Math.floor(Math.random() * entities.length)];
+    var arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return entities[arr[0] % entities.length];
 }
 
 function renderEntitySelector(table) {
