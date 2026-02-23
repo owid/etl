@@ -22,17 +22,39 @@
         "command": "chart-preview.open",
         "title": "Open Chart Preview",
         "icon": "$(open-preview)"
+      },
+      {
+        "command": "chart-preview.dataset",
+        "title": "Open Dataset Preview",
+        "icon": "$(open-preview)"
       }
     ],
     "menus": {
       "editor/title": [
         {
           "command": "chart-preview.open",
-          "when": "resourceFilename =~ /\\.chart\\.yml$/",
+          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /export[\\/\\\\]multidim/ && resourceFilename =~ /\\.(config\\.yml|py)$/",
+          "group": "navigation"
+        },
+        {
+          "command": "chart-preview.dataset",
+          "when": "resourceDirname =~ /etl[\\/\\\\]steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
           "group": "navigation"
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "chart-preview.open",
+        "key": "cmd+alt+p",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "chart-preview.dataset",
+        "key": "cmd+shift+v",
+        "when": "editorTextFocus"
+      }
+    ],
     "configuration": {
       "title": "Chart Preview",
       "properties": {
@@ -40,6 +62,11 @@
           "type": "string",
           "default": ".venv/bin/etlr",
           "description": "Path to the etlr binary (relative to workspace root)"
+        },
+        "chart-preview.pythonPath": {
+          "type": "string",
+          "default": ".venv/bin/python",
+          "description": "Path to the Python binary (relative to workspace root)"
         }
       }
     }
