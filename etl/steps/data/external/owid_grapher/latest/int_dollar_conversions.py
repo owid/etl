@@ -9,7 +9,6 @@ The PPP conversion factor is taken from the World Bank's PIP dataset or from the
 from enum import Enum
 from pathlib import Path
 
-import numpy as np
 from owid.catalog import Dataset
 from pandas import DataFrame
 
@@ -30,14 +29,9 @@ class Source(Enum):
     UNCLEAR = "unclear"  # when it's not clear which source is better, due to large deviations or other issues, like recent currency changes or an unclear currency situation. drop these rows for now, but we might want to review them in the future and decide on a case-by-case basis which source to use.
 
 
-PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE = {
-    # Countries for which we want to drop the PPP value, even if the sources don't deviate much.
-    "Bulgaria": Source.UNCLEAR,  # Bulgaria has introduced the Euro in 2025. Both sources still seem to have data in the Bulgarian lev.
-}
-
 # Decision rules for resolving PPP source conflicts (as agreed with Joe Hasell):
 #
-# 1. PIP and WDI agree (within PPP_PIP_WDI_MAX_DEVIATION): use PIP.
+# 1. PIP and WDI agree (within PPP_PIP_WDI_MAX_DEVIATION): use PIP, because almost all of our poverty data comes from PIP, and so they should align.
 # 2. Only one source has a value: use whichever has it (Source.PIP or Source.WDI).
 # 3. Both have values but they disagree significantly:
 #    - If WDI is more reliable (e.g. currency redenomination reflected in WDI but not PIP): use WDI.
@@ -57,7 +51,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Aruba": Source.WDI,  # only defined by WDI
     "Bahamas": Source.WDI,  # only defined by WDI
     "Bahrain": Source.WDI,  # only defined by WDI
-    "Belarus": Source.WDI,  # The Belarusian ruble has been redenominated in 2016, at a rate of 1 BYN = 10,000 BYR. WDI reflects this change.
+    "Belarus": Source.WDI,  # The Belarusian ruble has been redenominated in 2016, at a rate of 1 BYN (new) = 10,000 BYR (old). WDI reflects this change.
     "Bermuda": Source.WDI,  # only defined by WDI
     "Bolivia (urban)": Source.NONE,  # We don't want urban/rural splits.
     "British Virgin Islands": Source.WDI,  # only defined by WDI
@@ -91,7 +85,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Libya": Source.WDI,  # only defined by WDI
     "Macao": Source.WDI,  # only defined by WDI
     "Malta": Source.PIP,  # deviation of 3.5%, it seems fine to rely on PIP here
-    "Mauritania": Source.WDI,  # The Mauritanian ouguiya has been redenominated in 2017, at a rate of 1 MRU = 10 MRO. WDI reflects this change, while PIP doesn't.
+    "Mauritania": Source.WDI,  # The Mauritanian ouguiya has been redenominated in 2017, at a rate of 1 MRU (new) = 10 MRO (old). WDI reflects this change, while PIP doesn't.
     "Micronesia (country) (urban)": Source.NONE,  # We don't want urban/rural splits.
     "Nauru": Source.UNCLEAR,  # deviation of 17%
     "New Caledonia": Source.WDI,  # only defined by WDI
@@ -107,7 +101,7 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "San Marino": Source.WDI,  # only defined by WDI
     "Sao Tome and Principe": Source.UNCLEAR,  # deviation of 10%
     "Saudi Arabia": Source.WDI,  # only defined by WDI
-    "Sierra Leone": Source.WDI,  # The Sierra Leonean leone has been redenominated in 2022, at a rate of 1 SLE = 1000 SLL. WDI reflects this change, while PIP doesn't.
+    "Sierra Leone": Source.UNCLEAR,  # The Sierra Leonean leone has been redenominated in 2022, at a rate of 1 SLE (new) = 1000 SLL (old). WDI reflects this change, while PIP doesn't, but WDI also doesn't match the currency code given in the ICP 2021 metadata.
     "Singapore": Source.WDI,  # only defined by WDI
     "Sint Maarten (Dutch part)": Source.UNCLEAR,  # Sint Maarten has had a currency change (from Antillean Guilder to Caribbean Guilder) in 2025, and it's unclear which currency WDI's data is given in.
     "Somalia": Source.WDI,  # only defined by WDI
@@ -171,11 +165,6 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
         country: source_to_label.get(source) for country, source in PPP_DEVIATIONS_SOURCE_TO_USE.items()
     }
     tb_joined.loc[source_overrides.keys(), "ppp_source"] = [source_overrides[c] for c in source_overrides]
-
-    # Exclude additional countries (e.g. recent currency changes).
-    for country in PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE:
-        assert country in tb_joined.index, f"{country} from PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE not found in data."
-        tb_joined.loc[country, "ppp_source"] = np.nan
 
     # Drop countries with no usable source, then pick the value from the chosen source.
     tb_joined = tb_joined.dropna(subset=["ppp_source"])
@@ -244,7 +233,7 @@ def run() -> None:
     # Add OWID country code.
     tb["country_code"] = tb.index.map(country_name_to_code)
 
-    # Add currency code and name from ICP 2021 — same currency used in WDI/PIP PPP data.
+    # Add currency code and name from ICP 2021 — same currency used in WDI PPP data.
     # Use join (not index.map) to preserve origins from the source dataset.
     tb = tb.join(ds_icp["icp_2021_currencies"][["currency_code", "currency_name"]], how="left")
 
