@@ -39,9 +39,33 @@ class LicenseError(Exception):
     pass
 
 
+class ExplorerFetchError(Exception):
+    """Raised when an explorer view cannot be fetched (e.g., 503 from CSV endpoint)."""
+
+    pass
+
+
 # =============================================================================
 # Chart Loading Functions
 # =============================================================================
+
+
+def _parse_query_params(query_params: str) -> dict[str, str]:
+    """Parse a query parameter string into a dict.
+
+    Args:
+        query_params: Query string (e.g., "?Metric=Excess+mortality&Tab=Chart" or "Metric=Excess+mortality").
+
+    Returns:
+        Dict of parameter key-value pairs.
+    """
+    from urllib.parse import parse_qs
+
+    # Strip leading "?"
+    qs = query_params.lstrip("?")
+    parsed = parse_qs(qs, keep_blank_values=True)
+    # parse_qs returns lists; take first value
+    return {k: v[0] for k, v in parsed.items()}
 
 
 def _load_chart_table(
@@ -51,6 +75,7 @@ def _load_chart_table(
     use_column_short_names: bool,
     load_data: bool = True,
     timeout: int = 30,
+    extra_params: dict[str, str] | None = None,
 ) -> ChartTable:
     """Load chart data as ChartTable with rich metadata.
 
@@ -61,6 +86,7 @@ def _load_chart_table(
         load_data: If True (default), load full chart data.
                    If False, load only structure (columns and metadata) without rows.
         timeout: HTTP request timeout in seconds.
+        extra_params: Additional query parameters to pass to the CSV endpoint (e.g., for explorer views).
 
     Returns:
         ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
@@ -84,14 +110,18 @@ def _load_chart_table(
         config = _load_chart_table_config(slug, timeout=timeout, base_url=base_url)
 
         # Load data from CSV as ChartTable
+        csv_params: dict[str, str] = {
+            "useColumnShortNames": str(use_column_short_names).lower(),
+        }
+        if extra_params:
+            csv_params.update(extra_params)
+
         df = _load_chart_table_data(
             slug,
             timeout=timeout,
             load_data=load_data,
             base_url=base_url,
-            params={
-                "useColumnShortNames": str(use_column_short_names).lower(),
-            },
+            params=csv_params,
         )
 
         # Build table with metadata
@@ -355,8 +385,10 @@ class ChartResult(BaseModel):
     # Core fields (always present)
     slug: str
     title: str
-    url: str
     type: Literal["chart", "explorerView", "multiDimView"] = "chart"
+
+    # Query parameters (for explorer views, e.g., "?Metric=Excess+mortality+...")
+    query_params: str = ""
 
     # From fetch() - full chart details
     config: dict[str, Any] = Field(default_factory=dict)
@@ -386,12 +418,18 @@ class ChartResult(BaseModel):
         return f"{self.site_url}/explorers"
 
     @property
+    def url(self) -> str:
+        """Full URL to the interactive chart (built from slug, type, and query_params)."""
+        if self.type == "explorerView":
+            return f"{self.explorer_url}/{self.slug}{self.query_params}"
+        return f"{self.grapher_url}/{self.slug}"
+
+    @property
     def chart_base_url(self) -> str:
         """Base URL for this chart (derived from type)."""
         if self.type == "explorerView":
-            return f"{self.explorer_url}"
-        else:
-            return f"{self.grapher_url}"
+            return self.explorer_url
+        return self.grapher_url
 
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
@@ -412,6 +450,11 @@ class ChartResult(BaseModel):
             ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
             is populated from the chart's metadata.json.
 
+        Note:
+            Explorer views (``type="explorerView"``) are best-effort. Some explorers
+            may return 503 or other errors from their CSV endpoint. In those cases an
+            :class:`ExplorerFetchError` is raised with details.
+
         Example:
             ```python
             result = client.charts.search("life expectancy")[0]
@@ -424,13 +467,23 @@ class ChartResult(BaseModel):
         if load_data and self._cached_chart_table is not None:
             return self._cached_chart_table
 
-        tb = _load_chart_table(
-            self.slug,
-            load_data=load_data,
-            timeout=self._timeout,
-            use_column_short_names=True,
-            base_url=self.chart_base_url,
-        )
+        try:
+            tb = _load_chart_table(
+                self.slug,
+                load_data=load_data,
+                timeout=self._timeout,
+                use_column_short_names=True,
+                base_url=self.chart_base_url,
+                extra_params=_parse_query_params(self.query_params) if self.query_params else None,
+            )
+        except (requests.HTTPError, ChartNotFoundError) as e:
+            if self.type == "explorerView":
+                raise ExplorerFetchError(
+                    f"Failed to fetch explorer view '{self.slug}'. "
+                    f"Explorer CSV endpoints are not always available. "
+                    f"Try fetching the underlying chart directly. Error: {e}"
+                ) from e
+            raise
 
         # Cache only if loading full data with default params
         if load_data:
