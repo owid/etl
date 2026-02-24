@@ -150,7 +150,14 @@ def run() -> None:
     tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
 
     # Ensure metadata is propagated.
-    metadata_cols = ["urban_pop", "urban_density", "largest_city_pop", "largest_city_density", "urban_density_top_100", "urban_pop_top_100"]
+    metadata_cols = [
+        "urban_pop",
+        "urban_density",
+        "largest_city_pop",
+        "largest_city_density",
+        "urban_density_top_100",
+        "urban_pop_top_100",
+    ]
     # Add city size columns.
     metadata_cols.extend([f"pop_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     # Add aggregate columns.

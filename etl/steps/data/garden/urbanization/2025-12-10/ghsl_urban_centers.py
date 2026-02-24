@@ -250,11 +250,13 @@ def run() -> None:
 
     # Rename columns from meadow naming (pop_X) to garden naming (pop_citysize_X).
     rename_dict = {f"pop_{size_name}": f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()}
-    rename_dict.update({
-        "pop_above_300k": "pop_citysize_above_300k",
-        "pop_above_1m": "pop_citysize_above_1m",
-        "urban_cluster": "pop_citysize_below_50k",  # Small cities/towns (below 50k).
-    })
+    rename_dict.update(
+        {
+            "pop_above_300k": "pop_citysize_above_300k",
+            "pop_above_1m": "pop_citysize_above_1m",
+            "urban_cluster": "pop_citysize_below_50k",  # Small cities/towns (below 50k).
+        }
+    )
     tb_city_sizes = tb_city_sizes.rename(columns=rename_dict)
 
     # Propagate metadata for below_50k column (comes from ghsl_countries dataset).
@@ -309,23 +311,32 @@ def run() -> None:
     # Define all columns that need to be split.
     columns_to_split = [
         # Capital city metrics.
-        "urban_pop", "urban_density",
-        "urban_pop_share_capital", "total_pop_share_capital",
+        "urban_pop",
+        "urban_density",
+        "urban_pop_share_capital",
+        "total_pop_share_capital",
         # Largest city metrics (only shares, not raw pop/density).
-        "urban_pop_share_largest_city", "total_pop_share_largest_city",
+        "urban_pop_share_largest_city",
+        "total_pop_share_largest_city",
         # Top 100 cities metrics.
-        "urban_density_top_100", "urban_pop_top_100",
+        "urban_density_top_100",
+        "urban_pop_top_100",
     ]
     # Add all city size categories.
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     columns_to_split.extend([f"popshare_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     # Add aggregate city size columns.
-    columns_to_split.extend([
-        "pop_citysize_above_300k", "popshare_citysize_above_300k",
-        "pop_citysize_above_1m", "popshare_citysize_above_1m",
-        "pop_citysize_below_50k", "popshare_citysize_below_50k",
-        "totalshare_citysize_above_1m",
-    ])
+    columns_to_split.extend(
+        [
+            "pop_citysize_above_300k",
+            "popshare_citysize_above_300k",
+            "pop_citysize_above_1m",
+            "popshare_citysize_above_1m",
+            "pop_citysize_below_50k",
+            "popshare_citysize_below_50k",
+            "totalshare_citysize_above_1m",
+        ]
+    )
 
     # Split each column into _estimates and _projections.
     for col in columns_to_split:
