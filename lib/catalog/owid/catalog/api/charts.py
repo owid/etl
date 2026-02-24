@@ -699,4 +699,4 @@ class ChartsAPI:
             )
         except (requests.HTTPError, ChartNotFoundError) as e:
             hint = "an explorer view" if other_type == EXPLORER else "a grapher chart"
-            raise e.__class__(f"{e}\n\nIf this is {hint}, " f'try: fetch("{slug}", type={other_type!r})') from e
+            raise e.__class__(f"{e}\n\nIf this is {hint}, " f'try: fetch("{slug_or_url}", type={other_type!r})') from e
