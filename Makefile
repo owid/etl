@@ -68,8 +68,7 @@ docs.build: .venv
 	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
-	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml --dev-addr localhost:9010
-	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{})"
+	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{'dev_addr':'localhost:9010','open':False,'strict':False})"
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
