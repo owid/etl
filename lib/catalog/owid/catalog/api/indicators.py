@@ -303,7 +303,7 @@ class IndicatorsAPI:
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            SearchResults containing IndicatorResult objects, sorted according to ``sort_by``.
+            SearchResults containing IndicatorResult objects, sorted according to `sort_by`.
             Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
