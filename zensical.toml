@@ -101,7 +101,7 @@ nav = [
         "libraries/index.md",
         { "owid.catalog" = [
             { "Introduction" = "libraries/catalog/intro.md" },
-            { "APIsa" = "libraries/catalog/api.md" },
+            { "APIs" = "libraries/catalog/api.md" },
             { "Data processing" = "libraries/catalog/structures.md" },
             { "Library maintenance" = "libraries/catalog/maintenance.md" },
         ] },
