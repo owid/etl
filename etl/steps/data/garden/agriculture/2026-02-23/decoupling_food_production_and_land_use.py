@@ -318,8 +318,16 @@ def calculate_production_calories_correcting_for_feed(tb):
     # We then remove the domestic feed from the total domestic production, so:
     # domestic feed = feed x production / (production + imports)
     # Net production = production - domestic feed
+    # Note that some country-year-items have zero production and imports, but non-zero food and feed.
+    # I'm not sure why this happens (it may be related to stock changes, or missing data).
+    # For those odd cases, fill domestic feed with zero.
+    error = "Unexpectedly large percentage of rows where production and imports are zero but feed is not zero."
+    assert (100 * len(tb[(tb["production"] == 0) & (tb["imports"] == 0) & (tb["feed"] > 0)]) / len(tb)) < 0.1, error
     domestic_feed = tb["feed"] * (tb["production"] / (tb["production"] + tb["imports"])).fillna(0)
-    # TODO: Investigate the clipping. When is feed larger than production?
+    # There are also cases where feed is larger than production; this is plausible, although uncommon.
+    # For those cases, clip the net production to zero (to avoid negative numbers).
+    error = "Unexpectedly large percentage of rows where feed is larger than production."
+    assert 100 * len(tb[tb["feed"] > tb["production"]]) / len(tb) < 3, error
     tb["production_net"] = (tb["production"] - domestic_feed).clip(lower=0)
 
     # Apply conversion factor (of kcal per 100g) to net production (in tonnes).
