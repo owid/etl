@@ -1,7 +1,7 @@
 """Currency units per country from the World Bank ICP 2021 round.
 
 The ICP 2021 metadata directly maps WB ISO3 country codes to the currency used in price
-surveys, which is the same currency used in WDI and PIP PPP data — making this the ideal
+surveys, which is the same currency used in WDI PPP data — making this the ideal
 source for annotating int_dollar_conversions output.
 
 The WB ISO3 codes are mapped to OWID country names via the regions dataset.

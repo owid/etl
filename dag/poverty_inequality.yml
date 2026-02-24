@@ -207,12 +207,12 @@ steps:
     - data://meadow/poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al
 
   # International dollars conversions (from PIP and WDI)
-  snapshot://worldbank_icp/2021-01-01/icp_2021_currencies.json:
-  data://garden/worldbank_icp/2021-01-01/icp_2021_currencies:
-    - snapshot://worldbank_icp/2021-01-01/icp_2021_currencies.json
+  snapshot://worldbank_icp/2024-05-30/icp_2021_currencies.json:
+  data://garden/worldbank_icp/2024-05-30/icp_2021_currencies:
+    - snapshot://worldbank_icp/2024-05-30/icp_2021_currencies.json
     - data://garden/regions/2023-01-01/regions
   data://external/owid_grapher/latest/int_dollar_conversions:
     - data://garden/worldbank_wdi/2026-01-29/wdi
     - data://grapher/wb/2026-01-22/world_bank_pip
     - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_icp/2021-01-01/icp_2021_currencies
+    - data://garden/worldbank_icp/2024-05-30/icp_2021_currencies
