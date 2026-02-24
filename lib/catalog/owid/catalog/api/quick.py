@@ -1,8 +1,12 @@
-"""Quick access functions for data discovery and retrieval. For more complex use cases, refer to the [full API](../#owid.catalog.api.Client).
+"""Quick access functions for data discovery and retrieval.
 
-This module provides convenience functions for discovering and accessing OWID catalog data.
+For more complex use cases, refer to the [full API](../#owid.catalog.api.Client).
 
-The API separates discovery (searching)
+This module provides two convenience functions that separate discovery from download:
+
+- **search()**: Browse available data without downloading anything.
+- **fetch()**: Download data by slug, URL, or catalog path.
+
 Example: Search for available data (no download)
     ```python
     >>> from owid.catalog import search
@@ -10,8 +14,6 @@ Example: Search for available data (no download)
     >>> print(f"Found {len(results)} charts")
     >>> print(results[0].slug)
     ```
-
-from download (fetching)
 
 Example: Fetch specific data by path
     ```python
