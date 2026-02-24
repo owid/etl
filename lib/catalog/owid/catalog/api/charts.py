@@ -576,7 +576,7 @@ class ChartsAPI:
         countries: list[str] | None = None,
         topics: list[str] | None = None,
         require_all_countries: bool = False,
-        limit: int = 20,
+        limit: int = 10,
         page: int = 0,
         timeout: int | None = None,
     ) -> ResponseSet[ChartResult]:
