@@ -1,9 +1,0 @@
-tables:
-  iso4217_currencies:
-    variables:
-      currency_code:
-        title: ISO 4217 currency code
-        description_short: The ISO 4217 three-letter alphabetic code identifying the official currency of the country (e.g. "USD" for the United States Dollar).
-      currency_name:
-        title: Currency name
-        description_short: The official name of the currency as listed in the ISO 4217 standard (e.g. "US Dollar").

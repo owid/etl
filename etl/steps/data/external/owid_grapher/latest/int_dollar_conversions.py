@@ -219,7 +219,7 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_regions = paths.load_dataset("regions")
-    ds_iso4217 = paths.load_dataset("iso4217_currencies")
+    ds_icp = paths.load_dataset("icp_2021_currencies")
 
     # Map country names to OWID country codes (e.g. "United Kingdom" → "GBR").
     country_name_to_code = ds_regions["regions"].reset_index().set_index("name")["code"]
@@ -244,9 +244,9 @@ def run() -> None:
     # Add OWID country code.
     tb["country_code"] = tb.index.map(country_name_to_code)
 
-    # Add ISO 4217 currency code and name for each country (informational, for consumers of this dataset).
-    # Use join (not index.map) to preserve origins from the ISO dataset.
-    tb = tb.join(ds_iso4217["iso4217_currencies"][["currency_code", "currency_name"]], how="left")
+    # Add currency code and name from ICP 2021 — same currency used in WDI/PIP PPP data.
+    # Use join (not index.map) to preserve origins from the source dataset.
+    tb = tb.join(ds_icp["icp_2021_currencies"][["currency_code", "currency_name"]], how="left")
 
     #
     # Format output table.

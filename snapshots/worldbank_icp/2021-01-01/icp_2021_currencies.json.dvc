@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: World Bank
+    title: ICP 2021 — Currency Units
+    description: |-
+      Currency units used per country in the World Bank's International Comparison Program (ICP) 2021 round.
+      Each entry maps a country (identified by its World Bank ISO3 code) to the currency code and name
+      used in ICP 2021 price surveys, which is the same currency used in WDI and PIP PPP data.
+    title_snapshot: ICP 2021 — Currency Units
+    description_snapshot: |-
+      JSON array fetched from the World Bank metadata API. Each record contains the World Bank ISO3
+      country code, the ISO 4217 currency code, and the currency name.
+    citation_full: World Bank (2021). International Comparison Program 2021. https://www.worldbank.org/en/programs/icp
+    url_main: https://www.worldbank.org/en/programs/icp
+    url_download: https://api.worldbank.org/v2/sources/90/country/all/metatypes/CurrencyUnit?format=json
+    date_accessed: '2026-02-24'
+    date_published: '2021-01-01'
+    license:
+      name: Creative Commons Attribution 4.0
+      url: https://datacatalog.worldbank.org/public-licenses#cc-by
+outs:
+  - md5: 580e815b4e2d92dd2d43fc618db81b08
+    size: 19377
+    path: icp_2021_currencies.json
