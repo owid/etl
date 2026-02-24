@@ -3,12 +3,12 @@
 The Data API provides unified access to OWID's published data through a simple client interface.
 
 !!! tip "[Jump to the reference :octicons-arrow-down-16:](#api-reference)"
-
+<!--
 !!! warning "This library is under active development"
 
     This documentation reflects the latest version, v1.0.0rc3, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc3`.
 
-    We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon.
+    We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon. -->
 
 ## Quick Reference
 The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
