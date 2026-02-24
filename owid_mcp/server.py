@@ -72,6 +72,7 @@ async def lifespan(app: FastMCP) -> AsyncIterator[None]:
 # I run a request from https://platform.openai.com/chat/edit?prompt=pmpt_6881e40843788196aaa9923785c429b20de09e18aac0a654&version=1
 # it successfully makes the first request but the subsequent request fails with 404. So it's likely something
 # about the session ID.
+# NOTE: As of fastmcp 3.0, stateless_http is passed to run()/run_http_async()/http_app() instead of constructor.
 mcp = FastMCP(
     name="Our World in Data MCP",
     instructions="\n\n".join(
@@ -84,7 +85,6 @@ mcp = FastMCP(
         ]
     ),
     lifespan=lifespan,
-    stateless_http=True,
 )
 
 
@@ -139,4 +139,4 @@ mcp.add_middleware(
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    mcp.run(transport="http", host="0.0.0.0", port=8080)
+    mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)

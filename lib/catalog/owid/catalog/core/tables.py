@@ -24,7 +24,6 @@ import numpy as np
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
-import rdata
 import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
@@ -2664,6 +2663,8 @@ def read_rda(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> Table:
+    import rdata
+
     parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
     converted = rdata.conversion.convert(parsed)
 
@@ -2692,6 +2693,8 @@ def read_rda_multiple(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> dict[str, Table]:
+    import rdata
+
     # Read RData
     parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
     converted = rdata.conversion.convert(parsed)
@@ -2736,6 +2739,8 @@ def read_rds(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> Table:
+    import rdata
+
     parsed = rdata.parser.parse_file(filepath_or_buffer, extension="rds")  # type: ignore
     converted = rdata.conversion.convert(parsed)
 

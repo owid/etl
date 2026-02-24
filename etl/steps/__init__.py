@@ -9,6 +9,7 @@ import inspect
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -439,20 +440,27 @@ class DataStep(Step):
             return
 
         sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            if config.DEBUG:
-                self._run_py_isolated()
+        try:
+            if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+                if config.DEBUG:
+                    self._run_py_isolated()
+                else:
+                    self._run_py()
+
+            # We lock this to prevent the following error
+            # ImportError: PyO3 modules may only be initialized once per interpreter process
+            elif sp.with_suffix(".ipynb").exists():
+                with ipynb_lock:
+                    self._run_notebook()
+
             else:
-                self._run_py()
-
-        # We lock this to prevent the following error
-        # ImportError: PyO3 modules may only be initialized once per interpreter process
-        elif sp.with_suffix(".ipynb").exists():
-            with ipynb_lock:
-                self._run_notebook()
-
-        else:
-            raise Exception(f"have no idea how to run step: {self.path}")
+                raise Exception(f"have no idea how to run step: {self.path}")
+        except Exception:
+            # Clean up partial output so subsequent runs don't see an incomplete dataset
+            # (a directory without index.json would cause Dataset.__init__ to fail)
+            if self._dest_dir.is_dir() and not (self._dest_dir / "index.json").exists():
+                shutil.rmtree(self._dest_dir)
+            raise
 
         # was the index file modified? if not then `save` was not called
         # NOTE: we se warnings.warn instead of log.warning because we want this in stderr
@@ -494,7 +502,7 @@ class DataStep(Step):
         return False
 
     def has_existing_data(self) -> bool:
-        return self._dest_dir.is_dir()
+        return self._dest_dir.is_dir() and (self._dest_dir / "index.json").exists()
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
@@ -699,8 +707,11 @@ class DataStep(Step):
 
         r2 = s3_utils.connect_r2_cached()
 
+        # Private datasets have their data files in a separate private bucket
+        bucket = config.R2_BUCKET if self.is_public else config.R2_BUCKET_PRIVATE
+
         # Get available formats of a dataset
-        s3_files = s3_utils.list_s3_objects(f"s3://owid-catalog/{self.path}/", client=s3_utils.connect_r2_cached())
+        s3_files = s3_utils.list_s3_objects(f"s3://{bucket}/{self.path}/", client=s3_utils.connect_r2_cached())
         available_formats = {f.split(".")[-1] for f in s3_files} - {"json"}
 
         # if one of the format is in DEFAULT_FORMATS, download it
@@ -714,7 +725,7 @@ class DataStep(Step):
         include = [".meta.json"] + [f".{format}" for format in download_formats]
 
         s3_utils.download_s3_folder(
-            f"s3://owid-catalog/{self.path}/",
+            f"s3://{bucket}/{self.path}/",
             self._dest_dir,
             client=r2,
             include=include,
@@ -1058,9 +1069,10 @@ class ExportStep(DataStep):
             else:
                 DataStep._run_py(self)  # type: ignore
 
-        # save checksum
+        # save checksum (only update index.json, don't call ds.save() which iterates
+        # table_names and would pick up custom JSON files written by the export script)
         ds.metadata.source_checksum = self.checksum_input()
-        ds.save()
+        ds.metadata.save(ds._index_file)
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients
@@ -1183,15 +1195,17 @@ def _step_is_dirty(s: Step) -> bool:
 def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
     key = str(step)
     if key not in cache:
-        cache.add(key, step._is_dirty())
-    return cache[key]
+        # _is_dirty is a dynamically added copy of the original is_dirty method (see _add_is_dirty_cached)
+        cache.add(key, step._is_dirty())  # type: ignore[attr-defined]
+    return cache[key]  # type: ignore[return-value]
 
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
-    s._is_dirty = s.is_dirty
-    s._cache = cache
-    s.is_dirty = partial(_cached_is_dirty, s, cache)
+    # Intentional monkey-patching: save original method and replace with cached version
+    s._is_dirty = s.is_dirty  # type: ignore[attr-defined]
+    s._cache = cache  # type: ignore[attr-defined]
+    s.is_dirty = partial(_cached_is_dirty, s, cache)  # type: ignore[method-assign]
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 
