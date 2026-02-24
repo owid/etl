@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: SIX Group
+    title: ISO 4217 Currency Codes — List One
+    description: |-
+      The official list of ISO 4217 currency codes maintained by the SIX Group as the ISO 4217 Maintenance Agency.
+      It maps countries and territories to their official currency codes, numeric codes, and minor unit definitions.
+    title_snapshot: ISO 4217 Currency Codes — List One
+    description_snapshot: |-
+      JSON conversion of the ISO 4217 List One XML published by SIX Group.
+      Each record contains the country name, currency name, ISO 4217 3-letter alphabetic code,
+      numeric code, and the number of minor units (decimal places).
+      Entries without a currency code (e.g. territories with no universal currency) have null values for code fields.
+    citation_full: SIX Group (2026). ISO 4217 Maintenance Agency — Currency Code Services, List One. https://www.six-group.com/en/products-services/financial-information/market-reference-data/data-standards.html
+    url_main: https://www.six-group.com/en/products-services/financial-information/market-reference-data/data-standards.html
+    url_download: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
+    date_accessed: '2026-01-01'
+    date_published: '2026-01-01'
+    license:
+      name: Public domain
+      url: https://www.six-group.com/en/products-services/financial-information/market-reference-data/data-standards.html
+outs:
+  - md5: b974e3b4832fb248017ed9253303f101
+    size: 44919
+    path: iso4217_currencies.json

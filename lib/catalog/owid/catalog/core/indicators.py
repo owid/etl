@@ -489,14 +489,19 @@ class Indicator(pd.Series):
         return IndicatorRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
 
     def to_frame(self, name: str | None = None) -> Table:
-        """Convert Indicator to a Table (single-column table)."""
+        """Convert Indicator to a Table (single-column table).
+
+        When a new name is given, the indicator's metadata is copied to the renamed column
+        so that origins are not lost.
+        """
         # The parent to_frame() already returns a Table via _constructor_expanddim
-        # This override just provides proper type hints
         # Don't pass name=None explicitly, as that would make pandas use None as column name
         if name is None:
             return super().to_frame()  # type: ignore[return-value]
         else:
-            return super().to_frame(name=name)  # type: ignore[return-value]
+            tb = super().to_frame(name=name)  # type: ignore[return-value]
+            tb[name].metadata = self.metadata.copy()
+            return tb  # type: ignore
 
     def copy_metadata(self, from_variable: Indicator, inplace: bool = False) -> Indicator | None:
         """Copy metadata from another indicator.

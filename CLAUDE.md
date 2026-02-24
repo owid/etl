@@ -72,6 +72,10 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 
 ## Code Patterns
 
+### Preserving metadata/origins in steps
+
+**Never use `np.where`** for conditional column assignment in ETL steps — it strips variable metadata (including origins).
+
 ### Standard Garden Step
 ```python
 from etl.helpers import PathFinder

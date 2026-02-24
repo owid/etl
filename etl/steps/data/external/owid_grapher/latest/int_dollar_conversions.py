@@ -6,13 +6,16 @@ The PPP conversion factor is taken from the World Bank's PIP dataset or from the
 
 """
 
+import json
 from enum import Enum
+from pathlib import Path
 
 import numpy as np
 from owid.catalog import Dataset
 from pandas import DataFrame
 
 from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
 
 paths = PathFinder(__file__)
 
@@ -34,7 +37,18 @@ PPP_ADDITIONAL_COUNTRIES_TO_EXCLUDE = {
     "Bulgaria": Source.UNCLEAR,  # Bulgaria has introduced the Euro in 2025. Both sources still seem to have data in the Bulgarian lev.
 }
 
-# For each case where the values from PIP and WDI don't line up (either because one has data but not the other, or because their values deviate by more than PPP_PIP_WDI_MAX_DEVIATION), we manually choose which source to use, or whether to exclude the country altogether.
+# Decision rules for resolving PPP source conflicts (as agreed with Joe Hasell):
+#
+# 1. PIP and WDI agree (within PPP_PIP_WDI_MAX_DEVIATION): use PIP.
+# 2. Only one source has a value: use whichever has it (Source.PIP or Source.WDI).
+# 3. Both have values but they disagree significantly:
+#    - If WDI is more reliable (e.g. currency redenomination reflected in WDI but not PIP): use WDI.
+#    - If the situation is unclear or too complex to resolve: use Source.UNCLEAR (drop the country).
+# 4. Country should be excluded for other reasons (e.g. urban/rural split, recent currency change): Source.NONE.
+#
+# For each case where the values from PIP and WDI don't line up (either because one has data but not the
+# other, or because their values deviate by more than PPP_PIP_WDI_MAX_DEVIATION), we manually choose which
+# source to use, or whether to exclude the country altogether.
 PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Afghanistan": Source.WDI,  # only defined by WDI
     "American Samoa": Source.WDI,  # only defined by WDI
@@ -140,7 +154,8 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     )
 
     # Countries within deviation limits get PIP as the source; the rest need manual resolution.
-    tb_joined["ppp_source"] = np.where(within_deviation, "pip", None)
+    tb_joined["ppp_source"] = None
+    tb_joined.loc[within_deviation, "ppp_source"] = "pip"
 
     # Validate that the manual override list exactly matches the set of deviating countries.
     countries_with_deviations = set(tb_joined[tb_joined["ppp_source"] != "pip"].index)
@@ -166,7 +181,10 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
 
     # Drop countries with no usable source, then pick the value from the chosen source.
     tb_joined = tb_joined.dropna(subset=["ppp_source"])
-    tb_joined["ppp"] = np.where(tb_joined["ppp_source"] == "pip", tb_joined["pip_ppp"], tb_joined["wdi_ppp"])
+    # Start with wdi_ppp (carries WDI origins), then overwrite with pip_ppp where source is pip (carries PIP origins).
+    tb_joined["ppp"] = tb_joined["wdi_ppp"]
+    pip_mask = tb_joined["ppp_source"] == "pip"
+    tb_joined.loc[pip_mask, "ppp"] = tb_joined.loc[pip_mask, "pip_ppp"]
 
     assert tb_joined["ppp"].isna().sum() == 0, "Some countries still have missing PPP values after source selection."
 
@@ -196,6 +214,16 @@ def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
     return tb_wdi_cpi
 
 
+def load_currency_codes(snap: Snapshot) -> DataFrame:
+    """Load ISO 4217 currency codes, keeping one row per country (the first/primary currency listed)."""
+    records = json.loads(snap.path.read_text())
+    df = DataFrame(records).dropna(subset=["currency_code"])
+    # ISO 4217 country names are ALL CAPS — normalise to title case for joining.
+    df["country_name"] = df["country_name"].str.title()
+    # Some territories map to multiple currencies; keep the first occurrence (primary currency).
+    return df.drop_duplicates(subset=["country_name"])[["country_name", "currency_code"]].set_index("country_name")
+
+
 def run() -> None:
     #
     # Load dependencies.
@@ -203,6 +231,7 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_regions = paths.load_dataset("regions")
+    snap_iso4217 = paths.load_snapshot("iso4217_currencies.json")
 
     # Map country names to OWID country codes (e.g. "United Kingdom" → "GBR").
     country_name_to_code = ds_regions["regions"].reset_index().set_index("name")["code"]
@@ -227,20 +256,25 @@ def run() -> None:
     # Add OWID country code.
     tb["country_code"] = tb.index.map(country_name_to_code)
 
+    # Add ISO 4217 currency code for each country (informational, for consumers of this dataset).
+    df_iso = load_currency_codes(snap_iso4217)
+    tb["currency_code"] = tb.index.map(df_iso["currency_code"])
+
     #
     # Format output table.
     #
     tb = tb.rename(columns={"ppp": "ppp_factor", "cpi_year_latest": "conversion_factor_year"})
     tb["ppp_year"] = PPP_YEAR
-    tb["ppp_factor"] = tb["ppp_factor"].round(3)
-    tb["cpi_factor"] = tb["cpi_factor"].round(3)
-    tb["conversion_factor"] = tb["conversion_factor"].round(3)
+    tb["ppp_factor"] = tb["ppp_factor"].apply(lambda x: float(f"{x:.5g}"))
+    tb["cpi_factor"] = tb["cpi_factor"].apply(lambda x: float(f"{x:.5g}"))
+    tb["conversion_factor"] = tb["conversion_factor"].apply(lambda x: float(f"{x:.5g}"))
     tb["conversion_factor_year"] = tb["conversion_factor_year"].astype(int)
 
     # Select and order output columns.
     tb = tb[
         [
             "country_code",
+            "currency_code",
             "ppp_year",
             "ppp_factor",
             "ppp_source",
@@ -254,5 +288,11 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds = paths.create_dataset(tables=[tb], formats=["csv", "json"])
+    ds = paths.create_dataset(tables=[tb], formats=["csv", "json"], errors="warn")
     ds.save()
+
+    # Re-write the JSON with limited precision to avoid float representation noise (e.g. 1.2340000000001).
+    # double_precision=6 gives enough headroom for 5 significant figures across our value range.
+    json_path = Path(ds.path) / f"{paths.short_name}.json"
+    if json_path.exists():
+        tb.to_json(json_path, double_precision=6)

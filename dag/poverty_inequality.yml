@@ -211,3 +211,4 @@ steps:
     - data://garden/worldbank_wdi/2026-01-29/wdi
     - data://grapher/wb/2026-01-22/world_bank_pip
     - data://garden/regions/2023-01-01/regions
+    - snapshot://iso/2026-01-01/iso4217_currencies.json
