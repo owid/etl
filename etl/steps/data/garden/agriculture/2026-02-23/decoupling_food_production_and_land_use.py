@@ -213,6 +213,199 @@ FOOD_GROUPS_FBSC = {
 }
 
 
+def prepare_land_use_data(tb_rl):
+    # Select relevant elements from land use data.
+    # Item code "Agricultural land" (00006610).
+    # Element code "Area" (005110) in hectares.
+    tb_rl = tb_rl[(tb_rl["element_code"] == "005110") & (tb_rl["item_code"] == "00006610")].reset_index(drop=True)
+    error = "Units of area have changed."
+    assert set(tb_rl["unit"]) == {"hectares"}, error
+    tb_rl = tb_rl[["country", "year", "value"]].rename(columns={"value": "agricultural_land"}, errors="raise")
+
+    return tb_rl
+
+
+def prepare_food_balances_data(tb_fbsc):
+    # Select relevant elements of food production.
+    tb = tb_fbsc[(tb_fbsc["element_code"].isin(ELEMENT_CODES))].reset_index(drop=True)
+
+    # Sanity check.
+    check = tb[
+        [
+            "element_code",
+            "fao_element",
+            "element",
+            "element_description",
+            "unit",
+            "fao_unit_short_name",
+            "unit_short_name",
+        ]
+    ].drop_duplicates()
+    assert {"Food available for consumption", "Production"}.issubset(set(check["element"]))
+    assert {"kilograms per year per capita", "kilocalories per day per capita", "tonnes"}.issubset(set(check["unit"]))
+
+    # Convert kcal/capita/day to kcal/capita/year.
+    # TODO: Check if this is a good idea. It may be more convenient to have numbers in terms of daily calories.
+    tb.loc[(tb["element_code"] == "0664pc"), "value"] *= 365
+
+    # Pivot to have kcal and weight in separate columns.
+    tb = tb.pivot(
+        index=["country", "year", "item", "item_code", "item_description"],
+        columns=["element_code"],
+        values=["value"],
+        join_column_levels_with="_",
+    ).rename(
+        columns={
+            "value_0645pc": "food_quantity",
+            "value_0664pc": "food_energy",
+            "value_005511": "production",
+            "value_005521": "feed",
+            "value_005611": "imports",
+        }
+    )
+
+    return tb
+
+
+def handle_regions_and_missing_data(tb):
+    # Remove regions and FAO aggregates (we only want individual countries).
+    tb = tb[
+        ~tb["country"].isin(paths.regions.regions_all) & ~tb["country"].str.contains("(FAO)", regex=False)
+    ].reset_index(drop=True)
+
+    # NOTE: With the additional element codes (feed, imports), the pivot creates more rows for items that have
+    # feed/imports data but no production (e.g., items a country imports but doesn't produce).
+    # We keep only rows for which we have production data.
+    tb = tb.dropna(subset="production").reset_index(drop=True)
+
+    # Fill missing feed and imports with 0 (assuming that no data means no feed use or no imports for that item).
+    tb["feed"] = tb["feed"].fillna(0)
+    tb["imports"] = tb["imports"].fillna(0)
+
+    # Sometimes quantity is missing, but calories is informed, and sometimes is the opposite.
+    # Check that either way those are edge cases, and then remove those rows.
+    error = "Unexpected number of nans in food quantity or food energy."
+    assert 100 * len(tb[(tb["food_quantity"].isnull()) & (tb["food_energy"].notnull())]) / len(tb) < 0.1, error
+    assert 100 * len(tb[(tb["food_quantity"].notnull()) & (tb["food_energy"].isnull())]) / len(tb) < 0.1, error
+    tb = tb.dropna(subset=["food_quantity", "food_energy"], how="any").reset_index(drop=True)
+
+    return tb
+
+
+def calculate_production_calories_correcting_for_feed(tb):
+    # Calculate conversion factors, in kcal per 100g.
+    # To do that, we reverse-engineer FAOSTAT data: we divide calories by quantity to obtain the conversion factors.
+    tb["conversion"] = (tb["food_energy"] / (tb["food_quantity"] * 10)).fillna(0)
+
+    # Remove spurious conversion factors (which may happen when dividing by very small quantities); assume a maximum conversion factor of 1000 kcal per 100g.
+    error = "Unexpected number of rows where conversion factor is zero, but production is not."
+    assert 100 * len(tb[(tb["conversion"] == 0) & (tb["production"] > 0)]) / len(tb) < 3, error
+    error = "Unexpected number of rows where conversion factor is unreasonably high."
+    assert 100 * len(tb[(tb["conversion"] > 1000)]) / len(tb) < 2, error
+    # Remove all rows where conversion is zero or unreasonably high.
+    tb = tb[(tb["conversion"] > 0) & (tb["conversion"] < 1000)].reset_index(drop=True)
+    # Uncomment to visually inspect a histogram of conversions factors.
+    # px.histogram(tb, x="conversion", title=f"All items (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent").show()
+
+    # Naively, we could simply convert all production to calories, using the conversion factors.
+    # But we would be counting calories of crops that were used to feed animals, and then count the calories from those animals as well.
+    # We need to remove the calories of domestic production that are used for animal feed.
+    # However, FAOSTAT's "feed" element reports total feed use (from both domestic and imported crops).
+    # We estimate the domestic share proportionally.
+    # For example, imagine a country produces 1000t and imports 500t of maize; it also reports 600t of feed.
+    # We assume that 1000/1500=2/3 of the maize used for feed came from domestic production, and 500/1500=1/3 of from imports.
+    # This means that "domestic feed" would be 2/3 * 600t = 400t.
+    # We then remove the domestic feed from the total domestic production, so:
+    # domestic feed = feed x production / (production + imports)
+    # Net production = production - domestic feed
+    domestic_feed = tb["feed"] * (tb["production"] / (tb["production"] + tb["imports"])).fillna(0)
+    # TODO: Investigate the clipping. When is feed larger than production?
+    tb["production_net"] = (tb["production"] - domestic_feed).clip(lower=0)
+
+    # Apply conversion factor (of kcal per 100g) to net production (in tonnes).
+    tb["production_energy"] = tb["production_net"] * 10000 * tb["conversion"]
+    # Also compute the uncorrected version for comparison with Hong et al.
+    tb["production_energy_uncorrected"] = tb["production"] * 10000 * tb["conversion"]
+
+    # Sanity checks.
+    error = "Unexpected zero or nan production energy."
+    assert tb[(tb["production_energy"] == 0) & (tb["production_net"] != 0)].empty, error
+    assert tb[(tb["production_energy"].isnull())].empty, error
+
+    # NOTE: FBS items are grouped together, and the proportions of subitems in each group may differ for different items, then it may be impossible (or quite inaccurate) to translate those groups into energy with a simple conversion factor.
+    # for item in ["Wheat", "Apples"]:
+    #     px.histogram(tb[tb["item"] == item], x="conversion", title=f"{item} (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent", range_x=(0, 1000)).show()
+    # So, it seems that FBS has grouped items, e.g. Wheat actually means:
+    # 'Default composition: 15 Wheat, 16 Flour, wheat, 17 Bran, wheat, 18 Macaroni, 19 Germ, wheat, 20 Bread, 21 Bulgur, 22 Pastry, 23 Starch, wheat, 24 Gluten, wheat, 41 Cereals, breakfast, 110 Wafers, 114 Mixes and doughs, 115 Food preparations, flour, malt extract'
+    # So, the resulting food energy would be a weighted average of all those products (across all years and countries). Maybe, once we combine those items in the right proportion, the conversion factor would follow the resulting distribution above. For example, bread is at 249 kcal. So, maybe the first peak in the histogram (around 260 kcal) could be due to the abundance of bread (shifted up by other items).
+
+    return tb
+
+
+def calculate_totals_for_all_items(tb):
+    # Get the total from the already aggregated item groups.
+    # NOTE: It might be better to get the sum of their subitems (and compare with the item group sum totals).
+    ITEM_CODES = sorted(set(sum([items for _, items in FOOD_GROUPS_FBSC.items()], [])))
+    tb_grouped = (
+        tb[tb["item_code"].isin(ITEM_CODES)]
+        .groupby(["country", "year"], as_index=False)
+        .agg(
+            {
+                column: "sum"
+                for column in [
+                    "food_quantity",
+                    "food_energy",
+                    "production",
+                    "production_energy",
+                    "production_energy_uncorrected",
+                ]
+            }
+        )
+    )
+    # For convenience, add population again to this table.
+    tb_grouped = paths.regions.add_population(tb=tb_grouped, warn_on_missing_countries=False)
+
+    return tb_grouped
+
+
+def sanity_check_totals(tb_grouped, tb_fbsc):
+    # For sanity checks, recover the "Total" item of food from the original data.
+    tb_total = tb_fbsc[
+        (tb_fbsc["item_code"] == "00002901") & (tb_fbsc["element_code"].isin(ELEMENT_CODES))
+    ].reset_index(drop=True)
+    error = "'Total' item code or name has changed."
+    assert set(tb_total["item"]) == {"Total"}, error
+    error = "Expected 'Total' item to be only available for per capita food (kcal)."
+    for element in [element for element in ELEMENT_CODES if element != "0664pc"]:
+        assert tb_total[(tb_total["element_code"] == element)].empty, error
+    tb_total = tb_total[["country", "year", "value"]].rename(columns={"value": "food_energy"})
+    # TODO: Remove the following line if we decide it's better to keep food in daily calories.
+    tb_total["food_energy"] *= 365
+    # Convert to total (instead of per capita).
+    tb_total = paths.regions.add_population(tb=tb_total, warn_on_missing_countries=False)
+    tb_total["food_energy"] *= tb_total["population"]
+    # Check that the aggregated food energy coincides for each country with the original total food energy.
+    tb_check = tb_grouped[["country", "year", "food_energy"]].merge(
+        tb_total[["country", "year", "food_energy"]].rename(columns={"food_energy": "food_energy_original"})
+    )
+    tb_check["pct"] = (
+        100 * abs(tb_check["food_energy"] - tb_check["food_energy_original"]) / tb_check["food_energy_original"]
+    )
+    error = "Calculated total food energy (kcal) differs from original by more than expected."
+    assert tb_check["pct"].mean() < 5, error
+    # The only cases where the percentage difference is larger than 50% are for a short list of small countries.
+    assert set(tb_check[tb_check["pct"] > 50]["country"]) == {
+        "Bahrain",
+        "Bermuda",
+        "Kiribati",
+        "Macao",
+        "Nauru",
+        "Netherlands Antilles",
+        "Saint Kitts and Nevis",
+        "Seychelles",
+    }
+
+
 def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER / "comparison-with-hong-et-al-2021"):
     """Compare our production energy (with and without feed correction) with Hong et al. (2021).
 
@@ -220,8 +413,6 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
     Each chart has 3 lines: "OWID (feed-corrected)", "OWID (uncorrected)", "Hong et al. (2021)".
     Since Hong et al. likely double-counted feed, their values should be closer to our uncorrected values.
     """
-    from pathlib import Path
-
     import pandas as pd
     import plotly.express as px
     from owid.datautils.dataframes import map_series
@@ -250,15 +441,16 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
     # Harmonize country names using the same file as in the FAOSTAT steps.
     countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.countries.json"
     excluded_countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.excluded_countries.json"
+    # Harmonize all other country names.
     df = paths.regions.harmonize_names(
         tb=df,
         countries_file=countries_file,
         excluded_countries_file=excluded_countries_file,
         warn_on_unknown_excluded_countries=False,
         warn_on_unused_countries=False,
-        warn_on_missing_countries=True,
+        warn_on_missing_countries=False,
     )
-    # Missing mappings:
+    # Harmonize missing mappings (that are not in the FAOSTAT country harmonization file):
     df["country"] = map_series(
         df["country"],
         mapping={
@@ -277,8 +469,6 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
     check = pd.DataFrame(tb_grouped)[
         ["country", "year", "production_energy", "production_energy_uncorrected", "agricultural_land"]
     ].merge(df, how="left", on=["country", "year"])
-
-    # Assertions on the corrected version.
     check["pct_food"] = (
         100 * abs(check["production_energy"] - check["production_energy_hong"]) / check["production_energy_hong"]
     )
@@ -305,10 +495,8 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
         )
         .melt(id_vars=["country", "year"], value_name=value_name)
     )
-
     if output_folder is not None:
         Path(output_folder).mkdir(parents=True, exist_ok=True)
-
     for country in sorted(set(check["country"])):
         _plot = plot[plot["country"] == country].dropna()
         # Only plot if we have at least 2 series (OWID + Hong).
@@ -328,9 +516,10 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
             fig.write_image(Path(output_folder) / f"{safe_name}.png")
         else:
             fig.show()
-    # In terms of food production, most countries agree reasonably well with Hong et al (2021); in fact better than expected, given that FAOSTAT has probably changed since the publication of that paper.
+    # In terms of food production (before correcting for double-counting feed calories), most countries agree reasonably well with Hong et al (2021); in fact better than expected, given that FAOSTAT has probably changed since the publication of that paper.
     # Cases with significant discrepancies Indonesia, Hong-Kong, or Malaysia. And one where the difference is particularly significant is Iceland.
     # Land use differs significantly more, but I suppose that's also mostly due to changes in FAOSTAT RL data.
+    # The similarity between our uncorrected caloric series and Hong et al.'s series suggests that they did not correct for feed calories.
 
 
 def show_decoupled_countries(
@@ -446,8 +635,6 @@ def plot_decoupled_countries(
     output_folder=OUTPUT_FOLDER / "decoupled-countries",
 ):
     """Plot individual line charts showing % change in production energy and agricultural land for each decoupled country."""
-    from pathlib import Path
-
     import plotly.express as px
     from owid.catalog import Table
 
@@ -623,186 +810,48 @@ def run() -> None:
     #
     # Process data.
     #
-    # Select relevant elements from land use data.
-    # Item code "Agricultural land" (00006610).
-    # Element code "Area" (005110) in hectares.
-    tb_rl = tb_rl[(tb_rl["element_code"] == "005110") & (tb_rl["item_code"] == "00006610")].reset_index(drop=True)
-    error = "Units of area have changed."
-    assert set(tb_rl["unit"]) == {"hectares"}, error
-    tb_rl = tb_rl[["country", "year", "value"]].rename(columns={"value": "agricultural_land"}, errors="raise")
+    # Prepare land use data.
+    tb_rl = prepare_land_use_data(tb_rl=tb_rl)
 
-    # Select relevant elements of food production.
-    tb = tb_fbsc[(tb_fbsc["element_code"].isin(ELEMENT_CODES))].reset_index(drop=True)
+    # Prepare food balances data.
+    tb = prepare_food_balances_data(tb_fbsc=tb_fbsc)
 
-    # Sanity check.
-    check = tb[
-        [
-            "element_code",
-            "fao_element",
-            "element",
-            "element_description",
-            "unit",
-            "fao_unit_short_name",
-            "unit_short_name",
-        ]
-    ].drop_duplicates()
-    assert {"Food available for consumption", "Production"}.issubset(set(check["element"]))
-    assert {"kilograms per year per capita", "kilocalories per day per capita", "tonnes"}.issubset(set(check["unit"]))
+    # Some basic processing:
+    # * Remove regions (we only care about individual countries for this dataset).
+    # * Remove rows with no production, food, or food calories data.
+    # * Fill missing feed and imports with zeros.
+    tb = handle_regions_and_missing_data(tb=tb)
 
-    # Convert kcal/capita/day to kcal/capita/year.
-    tb.loc[(tb["element_code"] == "0664pc"), "value"] *= 365
-
-    # Pivot to have kcal and weight in separate columns.
-    tb = tb.pivot(
-        index=["country", "year", "item", "item_code", "item_description"],
-        columns=["element_code"],
-        values=["value"],
-        join_column_levels_with="_",
-    ).rename(
-        columns={
-            "value_0645pc": "food_quantity",
-            "value_0664pc": "food_energy",
-            "value_005511": "production",
-            "value_005521": "feed",
-            "value_005611": "imports",
-        }
-    )
-
-    # For sanity checks later on, keep the "Total" item of food.
-    tb_total = tb[tb["item_code"] == "00002901"].reset_index(drop=True)
-    error = "'Total' item code or name has changed."
-    assert set(tb_total["item"]) == {"Total"}, error
-    error = "Expected 'Total' item to be only available for per capita food (kcal)."
-    assert tb_total[(tb_total["production"].notnull()) | (tb_total["food_quantity"].notnull())].empty, error
-    tb_total = tb_total.drop(columns=["production", "food_quantity", "feed", "imports"])
-
-    # Remove rows with no production data.
-    # NOTE: With the additional element codes (feed, imports), the pivot creates more rows for items that have
-    # feed/imports data but no production (e.g., items a country imports but doesn't produce).
-    # We keep only rows for which we have production data.
-    tb = tb.dropna(subset="production").reset_index(drop=True)
-
-    # Fill missing feed and imports with 0 (no data means no feed use / no imports for that item).
-    # TODO: Is this a good assumption?
-    tb["feed"] = tb["feed"].fillna(0)
-    tb["imports"] = tb["imports"].fillna(0)
-
-    # Sometimes quantity is missing, but calories is informed, and sometimes is the opposite.
-    # Check that either way those are edge cases, and then remove those rows.
-    error = "Unexpected number of nans in food quantity or food energy."
-    assert 100 * len(tb[(tb["food_quantity"].isnull()) & (tb["food_energy"].notnull())]) / len(tb) < 0.1, error
-    assert 100 * len(tb[(tb["food_quantity"].notnull()) & (tb["food_energy"].isnull())]) / len(tb) < 0.1, error
-    tb = tb.dropna(subset=["food_quantity", "food_energy"], how="any").reset_index(drop=True)
-
-    # Calculate conversion factors, in kcal per 100g.
-    tb["conversion"] = (tb["food_energy"] / (tb["food_quantity"] * 10)).fillna(0)
-    # Remove spurious conversion factors (which may happen when dividing by very small quantities); assume a maximum conversion factor of 1000 kcal per 100g.
-    error = "Unexpected number of rows where conversion factor is zero, but production is not."
-    assert 100 * len(tb[(tb["conversion"] == 0) & (tb["production"] > 0)]) / len(tb) < 3, error
-    error = "Unexpected number of rows where conversion factor is unreasonably high."
-    assert 100 * len(tb[(tb["conversion"] > 1000)]) / len(tb) < 2, error
-    # Remove all rows where conversion is zero or unreasonably high.
-    tb = tb[(tb["conversion"] > 0) & (tb["conversion"] < 1000)].reset_index(drop=True)
-    # px.histogram(tb, x="conversion", title=f"All items (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent").show()
-
-    # When summing crop + livestock production in calories, crops fed to domestic animals get counted twice.
-    # To fix this, we subtract the portion of feed that came from domestic production.
-    # FAOSTAT's "feed" element reports total feed use (from both domestic and imported crops).
-    # We estimate the domestic share proportionally: if a country produces 1000t and imports 500t of maize,
-    # we assume that 1000/1500=2/3 of the maize used for feed came from domestic production.
-    # We then remove the domestic feed from the total production. In other words:
-    # domestic feed = feed x production / (production + imports)
-    # Net production = production - domestic feed
-    domestic_feed = tb["feed"] * (tb["production"] / (tb["production"] + tb["imports"])).fillna(0)
-    tb["production_net"] = (tb["production"] - domestic_feed).clip(lower=0)
-
-    # Apply conversion factor (of kcal per 100g) to net production (in tonnes).
-    tb["production_energy"] = tb["production_net"] * 10000 * tb["conversion"]
-    # Also compute the uncorrected version (with double-counting) for comparison with Hong et al.
-    tb["production_energy_uncorrected"] = tb["production"] * 10000 * tb["conversion"]
-    # Sanity checks.
-    error = "Unexpected zero or nan production energy."
-    assert tb[(tb["production_energy"] == 0) & (tb["production_net"] != 0)].empty, error
-    assert tb[(tb["production_energy"].isnull())].empty, error
-
-    # FBS items are grouped together, and the proportions of subitems in each group may differ for different items, then it may be impossible (or quite inaccurate) to translate those groups into energy with a simple conversion factor.
-    # for item in ["Wheat", "Apples"]:
-    #     px.histogram(tb[tb["item"] == item], x="conversion", title=f"{item} (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent", range_x=(0, 1000)).show()
-    # So, it seems that FBS has grouped items, e.g. Wheat actually means:
-    # 'Default composition: 15 Wheat, 16 Flour, wheat, 17 Bran, wheat, 18 Macaroni, 19 Germ, wheat, 20 Bread, 21 Bulgur, 22 Pastry, 23 Starch, wheat, 24 Gluten, wheat, 41 Cereals, breakfast, 110 Wafers, 114 Mixes and doughs, 115 Food preparations, flour, malt extract'
-    # So, the resulting food energy would be a weighted average of all those products (across all years and countries). Maybe, once we combine those items in the right proportion, the conversion factor would follow the resulting distribution above. For example, bread is at 249 kcal. So, maybe the first peak in the histogram (around 260 kcal) could be due to the abundance of bread (shifted up by other items).
+    # Calculate production in terms of caloric content, and correct to avoid double-counting calories of crops used for animal feed.
+    # NOTE: There are various important assumptions in this calculation, see function for more details.
+    tb = calculate_production_calories_correcting_for_feed(tb=tb)
 
     # Convert food quantity and food energy from per capita to totals.
+    # TODO: Check how much things change when using per capita.
     tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
     for column in ["food_quantity", "food_energy"]:
         tb[column] *= tb["population"]
 
-    # Idem for the original "Total" of food (kcal).
-    tb_total = paths.regions.add_population(tb=tb_total, warn_on_missing_countries=False)
-    tb_total["food_energy"] *= tb_total["population"]
+    # Calculate totals for each country-year.
+    # NOTE: tb_fbsc is used for sanity checks.
+    tb_grouped = calculate_totals_for_all_items(tb=tb)
 
-    # Get the total from the already aggregated item groups.
-    # NOTE: It might be better to get the sum of their subitems (and compare with the item group sum totals).
-    ITEM_CODES = sorted(set(sum([items for _, items in FOOD_GROUPS_FBSC.items()], [])))
-    tb_grouped = (
-        tb[tb["item_code"].isin(ITEM_CODES)]
-        .groupby(["country", "year"], as_index=False)
-        .agg(
-            {
-                column: "sum"
-                for column in [
-                    "food_quantity",
-                    "food_energy",
-                    "production",
-                    "production_energy",
-                    "production_energy_uncorrected",
-                ]
-            }
-        )
-    )
-    # For convenience, add population again to this table.
-    tb_grouped = paths.regions.add_population(tb=tb_grouped, warn_on_missing_countries=False)
-
-    # Sanity check.
-    tb_check = tb_grouped[["country", "year", "food_energy"]].merge(
-        tb_total[["country", "year", "food_energy"]].rename(columns={"food_energy": "food_energy_original"})
-    )
-    tb_check["pct"] = (
-        100 * abs(tb_check["food_energy"] - tb_check["food_energy_original"]) / tb_check["food_energy_original"]
-    )
-    error = "Calculated total food energy (kcal) differs from original by more than expected."
-    assert tb_check["pct"].mean() < 4, error
-    # The only cases where the percentage difference is larger than 50% are for a short list of small countries.
-    assert set(tb_check[tb_check["pct"] > 50]["country"]) == {
-        "Bahrain",
-        "Bermuda",
-        "Kiribati",
-        "Macao",
-        "Nauru",
-        "Netherlands Antilles",
-        "Saint Kitts and Nevis",
-        "Seychelles",
-    }
+    # Run sanity checks on the aggregated amounts (summed over all items).
+    sanity_check_totals(tb_grouped=tb_grouped, tb_fbsc=tb_fbsc)
 
     # Combine data on total food production with agricultural land.
     _n_rows_before = len(tb_grouped)
     tb_grouped = tb_grouped.merge(tb_rl, how="inner", on=["country", "year"])
-    error = "Unexpected number of rows lost when merging production and land use."
-    assert 100 * (_n_rows_before - len(tb_grouped)) / _n_rows_before < 0.5, error
+    error = "Unexpected percentage of rows lost when merging production and land use."
+    assert 100 * (_n_rows_before - len(tb_grouped)) / _n_rows_before < 1, error
 
     # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
-    # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
-
-    # Remove regions and FAO aggregates (we only want individual countries).
-    tb_grouped = tb_grouped[
-        ~tb_grouped["country"].isin(paths.regions.regions_all)
-        & ~tb_grouped["country"].str.contains("(FAO)", regex=False)
-    ].reset_index(drop=True)
+    sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
     # Apply rolling averages to smooth year-to-year variability.
     if ROLLING_AVERAGE_YEARS > 1:
         tb_grouped = tb_grouped.sort_values(["country", "year"]).reset_index(drop=True)
-        for column in ["food_quantity", "food_energy", "production", "production_energy", "agricultural_land"]:
+        for column in tb_grouped.drop(columns=["country", "year"]).columns:
             tb_grouped[column] = tb_grouped.groupby("country", sort=False)[column].transform(
                 lambda s: s.rolling(ROLLING_AVERAGE_YEARS, min_periods=1).mean()
             )
