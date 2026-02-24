@@ -9,7 +9,7 @@ The PPP conversion factor is taken from the World Bank's PIP dataset or from the
 from enum import Enum
 from pathlib import Path
 
-from owid.catalog import Dataset
+from owid.catalog import Dataset, VariableMeta
 from pandas import DataFrame
 
 from etl.helpers import PathFinder
@@ -175,6 +175,17 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
 
     assert tb_joined["ppp"].isna().sum() == 0, "Some countries still have missing PPP values after source selection."
 
+    # Set metadata
+    tb_joined["ppp"].metadata = VariableMeta(
+        title="PPP conversion factor, private consumption (LCU per international $)",
+        description="PPP conversion factor for private consumption, from either the World Bank PIP or WDI dataset, depending on which source is more reliable for each country. See the 'ppp_source' column for which source was used.",
+        unit="LCU per international $",
+        origins=[
+            *tb_joined["pip_ppp"].metadata.origins,
+            *tb_joined["wdi_ppp"].metadata.origins,
+        ],
+    )
+
     return tb_joined[["ppp", "ppp_source"]]
 
 
@@ -198,6 +209,11 @@ def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
 
     # Factor between cpi_year_base and cpi_year_latest
     tb_wdi_cpi["cpi_factor"] = tb_wdi_cpi["cpi_latest"] / tb_wdi_cpi["cpi_base"]
+
+    # Set metadata
+    tb_wdi_cpi["cpi_factor"].metadata.display = None
+    tb_wdi_cpi["cpi_factor"].metadata.unit = None
+
     return tb_wdi_cpi
 
 
@@ -246,6 +262,13 @@ def run() -> None:
     tb["cpi_factor"] = tb["cpi_factor"].apply(lambda x: float(f"{x:.5g}"))
     tb["conversion_factor"] = tb["conversion_factor"].apply(lambda x: float(f"{x:.5g}"))
     tb["conversion_factor_year"] = tb["conversion_factor_year"].astype(int)
+
+    # Override metadata
+    tb[
+        "conversion_factor"
+    ].metadata.description = "Conversion factor to convert from 2021 int-$ to the country's local currency units (LCU) in the latest available year, computed as the product of the PPP conversion factor and the CPI adjustment factor. Adjusts for purchasing power differences (in 2021), exchange rates, and inflation between 2021 and the latest available year."
+    tb["conversion_factor"].metadata.description_from_producer = None
+    tb["conversion_factor_year"].metadata.origins = []
 
     # Select and order output columns.
     tb = tb[
