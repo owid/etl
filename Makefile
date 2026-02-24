@@ -68,7 +68,7 @@ docs.build: .venv
 	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
-	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
+	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml --dev-addr localhost:9010
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
