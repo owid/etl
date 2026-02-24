@@ -62,6 +62,9 @@ dimensions:
       - slug: "projections"
         name: "Projections"
         description: "Future projections (2025 onwards)"
+      - slug: "all"
+        name: "All data"
+        description: "Both historical estimates and future projections"
 
 views:
   # Views will be filled out programmatically.
