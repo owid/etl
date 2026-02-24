@@ -467,7 +467,7 @@ def main() -> None:
     """Generate llms.txt in docs/."""
     llms_txt = generate_llms_txt()
 
-    out_path = DOCS_DIR / "llms.txt"
+    out_path = DOCS_DIR / "libraries" / "catalog" / "llms.txt"
     out_path.write_text(llms_txt)
     print(f"Generated {out_path} ({len(llms_txt)} chars)")
 
