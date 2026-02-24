@@ -246,35 +246,81 @@ def _discover_modules(
     return result
 
 
-def _get_own_members(cls: type) -> set[str]:
-    """Get names of members defined directly on cls (not inherited from parent classes)."""
-    own = set()
-    for parent in cls.__mro__[1:]:
-        pass  # We'll compare against parents below
+def _get_own_members(cls: type) -> list[str]:
+    """Get names of public members defined on cls with custom behavior.
 
-    parent_attrs: set[str] = set()
-    for parent in cls.__mro__[1:]:
-        parent_attrs.update(dir(parent))
+    Includes members that are either:
+    - New (not present on any parent class), or
+    - Overridden with a different docstring (custom OWID documentation)
 
-    for name in dir(cls):
+    Excludes members that are simple wrappers with unchanged pandas docstrings.
+    """
+    result = []
+
+    for name in sorted(dir(cls)):
         if name.startswith("_"):
             continue
-        # Include if: defined in cls.__dict__, or not present on any parent
-        if name in cls.__dict__ or name not in parent_attrs:
-            own.add(name)
+        if name not in cls.__dict__:
+            continue
 
-    return own
+        attr = getattr(cls, name, None)
+        if attr is None:
+            continue
+
+        # Check if this is a new member (not on any parent)
+        is_new = not any(hasattr(parent, name) for parent in cls.__mro__[1:])
+        if is_new:
+            result.append(name)
+            continue
+
+        # It's overridden — only include if docstring differs from parent
+        doc = getattr(attr, "__doc__", "") or ""
+        for parent in cls.__mro__[1:]:
+            parent_attr = getattr(parent, name, None)
+            if parent_attr is not None:
+                parent_doc = getattr(parent_attr, "__doc__", "") or ""
+                if doc != parent_doc and len(doc) > 10:
+                    result.append(name)
+                break
+
+    return result
+
+
+def _get_parent_info(cls: type) -> str:
+    """Return a note about the parent class if it's a well-known type."""
+    import pandas as pd
+
+    for parent in cls.__mro__[1:]:
+        if parent is pd.DataFrame:
+            return (
+                f"`{cls.__name__}` extends `pandas.DataFrame`. "
+                "All standard DataFrame methods are available. "
+                "Only methods unique to this class are listed below.\n"
+            )
+        if parent is pd.Series:
+            return (
+                f"`{cls.__name__}` extends `pandas.Series`. "
+                "All standard Series methods are available. "
+                "Only methods unique to this class are listed below.\n"
+            )
+    return ""
 
 
 def _format_class(cls: type, *, methods: bool = True) -> str:
     """Format a class with docstring and optionally its public methods.
 
-    Only includes methods/properties defined directly on the class,
-    not inherited from parent classes (e.g. pandas DataFrame/Series).
+    Only includes methods with custom OWID docstrings, not thin wrappers
+    with unchanged pandas documentation.
     """
     lines: list[str] = []
     lines.append(f"### {cls.__name__}")
     lines.append("")
+
+    # Note about parent class (e.g. "extends pandas.DataFrame")
+    parent_info = _get_parent_info(cls)
+    if parent_info:
+        lines.append(parent_info)
+        lines.append("")
 
     doc = _get_docstring(cls)
     if doc:
@@ -283,7 +329,7 @@ def _format_class(cls: type, *, methods: bool = True) -> str:
 
     if methods:
         own_members = _get_own_members(cls)
-        for name in sorted(own_members):
+        for name in own_members:
             attr = getattr(cls, name, None)
             if attr is None:
                 continue
