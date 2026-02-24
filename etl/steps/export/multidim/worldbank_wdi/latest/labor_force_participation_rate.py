@@ -36,7 +36,7 @@ def run() -> None:
                     "hideRelativeToggle": "false",
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "DiscreteBar", "SlopeChart"],
                 },
             },
         ]
@@ -69,6 +69,14 @@ def run() -> None:
             )
             view.config["subtitle"] = meta.presentation.grapher_config["subtitle"].replace("male ", "")
             view.metadata["description_short"] = meta.description_short.replace("male ", "")
+
+            # Set display names for male_vs_female views
+            for ind in view.indicators.y or []:
+                indicator_name = ind.catalogPath.split("#")[-1]
+                if "_fe_" in indicator_name:
+                    ind.display = {"name": "Females"}
+                elif "_ma_" in indicator_name:
+                    ind.display = {"name": "Males"}
 
     #
     # Save garden dataset.
