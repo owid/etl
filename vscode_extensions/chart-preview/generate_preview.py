@@ -83,8 +83,9 @@ def load_table_stats(dataset_path: str, table_name: str, popularity: dict[str, f
     year_min = year_max = entity_count = None
     sampled_entities: list[str] | None = None
     if "year" in tb.columns:
-        year_min = int(tb["year"].min())
-        year_max = int(tb["year"].max())
+        year_col = tb["year"].astype(int)
+        year_min = int(year_col.min())
+        year_max = int(year_col.max())
     if "country" in tb.columns:
         all_entities = list(tb["country"].unique())
         entity_count = len(all_entities)
