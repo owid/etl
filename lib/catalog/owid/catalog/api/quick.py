@@ -17,6 +17,8 @@ Example: Fetch specific data by path
     ```python
     >>> from owid.catalog import fetch
     >>> tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys")  # Slug with query params
+    >>> tb = fetch("https://ourworldindata.org/grapher/life-expectancy")  # Full URL
     >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")  # Table path
     >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")  # Indicator
     ```
@@ -162,7 +164,10 @@ def fetch(path: str) -> "Table | ChartTable":
 
             - Table: "channel/namespace/version/dataset/table"
             - Indicator: "channel/namespace/version/dataset/table#variable"
-            - Chart: "life-expectancy" (chart slug without '/' or '#')
+            - Chart slug: "life-expectancy"
+            - Chart URL: "https://ourworldindata.org/grapher/life-expectancy"
+            - Chart slug with query params: "years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"
+            - Explorer URL: "https://ourworldindata.org/explorers/energy"
 
     Returns:
         Table (for tables or indicators) or CharTable (for charts)
@@ -185,6 +190,12 @@ def fetch(path: str) -> "Table | ChartTable":
         tb = fetch("life-expectancy")
         print(tb.metadata.title)
 
+        # Fetch chart with query params
+        tb = fetch("years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys")
+
+        # Fetch chart by full URL
+        tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
+
         # Fetch from grapher channel
         tb = fetch("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
         ```
@@ -193,11 +204,15 @@ def fetch(path: str) -> "Table | ChartTable":
     client = Client()
 
     # Detect path type based on structure:
-    # - Contains "/" → catalog path (table or indicator)
-    # - Contains "#" → indicator path
-    # - Matches slug pattern (alphanumeric + dashes/underscores) → chart slug
+    # - Starts with "https://" → full chart/explorer URL
+    # - Contains "/" or "#" (but not a URL) → catalog path (table or indicator)
+    # - Matches slug pattern (possibly with ?query params) → chart slug
 
-    if "/" in path or "#" in path:
+    if path.startswith("https://"):
+        # Full URL — route to charts (handles grapher + explorer URLs)
+        return client.charts.fetch(path)
+
+    elif "/" in path or "#" in path:
         # Catalog path (table or indicator)
         try:
             catalog_path = CatalogPath.from_str(path)
@@ -219,13 +234,13 @@ def fetch(path: str) -> "Table | ChartTable":
                 f"Error: {e}"
             ) from e
 
-    elif _CHART_SLUG_PATTERN.match(path):
-        # Chart slug (alphanumeric with dashes/underscores)
+    elif _CHART_SLUG_PATTERN.match(path.split("?")[0]):
+        # Chart slug, possibly with query params (e.g. "life-expectancy?country=USA")
         return client.charts.fetch(path)
 
     else:
         raise ValueError(
             f"Invalid path format: '{path}'. "
             f"Expected a catalog path (with '/'), indicator path (with '#'), "
-            f"or chart slug (alphanumeric with dashes/underscores)."
+            f"or chart slug (alphanumeric with dashes/underscores, optionally with ?query params). If passing a URL for a chart or explorer, ensure it starts with 'https://'."
         )

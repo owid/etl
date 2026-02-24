@@ -6,7 +6,7 @@ The Data API provides unified access to OWID's published data through a simple c
 
 !!! warning "This library is under active development"
 
-    This documentation reflects the latest version, v1.0.0rc2, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc2`.
+    This documentation reflects the latest version, v1.0.0rc3, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc3`.
 
     We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon.
 
@@ -52,7 +52,7 @@ Optionally, you can defer data loading until it's actually needed, by using the 
 
 Different APIs use different path conventions:
 
-- **Charts**: `"life-expectancy"` (simple slug)
+- **Charts**: `"life-expectancy"` (simple slug), `"years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"` (with query params), or `"https://ourworldindata.org/grapher/life-expectancy"` (full URL)
 - **Tables**: `"garden/un/2024-07-12/un_wpp/population"` (channel/namespace/version/dataset/table)
 - **Indicators**: `"garden/un/2024-07-12/un_wpp/population#population"` (table path + #column)
 
