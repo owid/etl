@@ -123,14 +123,6 @@ def run() -> None:
         ]
     )
 
-    # Remove map tab from grouped location_type views (location_type_stacked and urban_vs_rural)
-    for view in c.views:
-        location_type = view.dimensions.get("location_type")
-        if location_type in ["location_type_stacked", "urban_vs_rural"]:
-            view.config = view.config.copy() if view.config else {}
-            view.config["hasMapTab"] = False
-            view.config["tab"] = "chart"
-
     # Update view configurations and add colors
     for view in c.views:
         data_type = view.dimensions.get("data_type")
@@ -149,37 +141,31 @@ def run() -> None:
                     view.config["title"] = metadata.get("title", "")
                     view.config["subtitle"] = metadata.get("description_short", "")
 
-        # Set stacked area chart config for grouped location views
-        if location_type == "location_type_stacked":
+        # Set config for grouped location views (stacked and urban vs rural)
+        if location_type in ["location_type_stacked", "urban_vs_rural"]:
             view.config = view.config.copy() if view.config else {}
 
-            # Add metadata for stacked views
-            metadata = create_stacked_metadata(metric, data_type)
-            view.metadata = metadata
-            view.config["title"] = metadata["title"]
-            view.config["subtitle"] = metadata["description_short"]
+            # Disable map tab for grouped location views
+            view.config["hasMapTab"] = False
+            view.config["tab"] = "chart"
+            if "map" in view.config:
+                del view.config["map"]
 
-            # Only set stack mode if metric dimension exists
-            if metric:
+            # Add metadata based on location type
+            if location_type == "location_type_stacked":
+                metadata = create_stacked_metadata(metric, data_type)
+            else:  # urban_vs_rural
+                metadata = create_urban_vs_rural_metadata(metric, data_type)
+                # Special config for popshare (0-100%)
                 if metric == "popshare":
-                    view.config["stackMode"] = "relative"
                     view.config["yAxis"] = {"min": 0, "max": 100}
-                else:
-                    view.config["stackMode"] = "absolute"
+            view.config["selectedFacetStrategy"] = "entity"
 
-        # Set config for urban vs rural line chart views
-        if location_type == "urban_vs_rural":
-            view.config = view.config.copy() if view.config else {}
+            view.config["yAxis"] = {"facetDomain": "independent"}
 
-            # Add metadata for urban vs rural views
-            metadata = create_urban_vs_rural_metadata(metric, data_type)
             view.metadata = metadata
             view.config["title"] = metadata["title"]
             view.config["subtitle"] = metadata["description_short"]
-
-            # Special config for popshare (0-100%)
-            if metric == "popshare":
-                view.config["yAxis"] = {"min": 0, "max": 100}
 
         # Map-only view for dominant settlement type
         if metric == "dominant_type":
@@ -253,27 +239,27 @@ def create_stacked_metadata(metric, data_type):
         (
             "population",
             "estimates",
-        ): "Estimated number of people living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Estimated number of people living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "population",
             "projections",
-        ): "Projected number of people living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Projected number of people living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "population",
             "estimates_and_projections",
-        ): "Number of people living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Number of people living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "popshare",
             "estimates",
-        ): "Estimated share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Estimated share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "popshare",
             "projections",
-        ): "Projected share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Projected share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "popshare",
             "estimates_and_projections",
-        ): "Share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Share of population living in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
     }
 
     # Define description_key - same for all data types
@@ -330,27 +316,27 @@ def create_urban_vs_rural_metadata(metric, data_type):
         (
             "population",
             "estimates",
-        ): "Estimated number of people living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Estimated number of people living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "population",
             "projections",
-        ): "Projected number of people living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Projected number of people living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "population",
             "estimates_and_projections",
-        ): "Number of people living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Number of people living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "popshare",
             "estimates",
-        ): "Estimated share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Estimated share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "popshare",
             "projections",
-        ): "Projected share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Projected share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
         (
             "popshare",
             "estimates_and_projections",
-        ): "Share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba). Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries.",
+        ): "Share of population living in urban areas ([cities](#dod:cities-degurba) and [towns and suburbs](#dod:towns-degurba) combined) and [rural areas](#dod:rural-areas-degurba), based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country.",
     }
 
     # Define description_key - same for all data types
@@ -415,7 +401,7 @@ def create_individual_view_metadata(location_type, metric, data_type):
     if metric == "dominant_type":
         description_short = (
             metric_descriptions[metric]
-            + ". Settlement types are identified using satellite imagery and population data, applying the same density and size thresholds across all countries."
+            + ", based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country."
         )
     else:
         metric_text = metric_descriptions.get(metric, "")
@@ -429,7 +415,7 @@ def create_individual_view_metadata(location_type, metric, data_type):
             else:
                 description_short += ", measured in percentage points. Positive values indicate a growing share; negative values indicate a declining share"
 
-        description_short += ", identified using satellite imagery and population data, applying the same density and size thresholds across all countries."
+        description_short += ", based on a harmonized definition that uses satellite imagery and population data to apply the same density and settlement-size thresholds in every country."
 
     title = _individual_title(location_type, metric, data_type)
 
