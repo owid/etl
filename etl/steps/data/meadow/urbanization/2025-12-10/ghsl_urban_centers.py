@@ -94,6 +94,18 @@ def run() -> None:
     # Keep all single-capital countries OR preferred capitals from multi-capital countries.
     tb_capitals = tb_capitals[~multi_capital_mask | preferred_mask].copy()
     tb_capitals = tb_capitals.drop(columns=["ID_MTUC_G0", "capital", "preferred_capital"])
+
+    # Population and density of the largest city by country and year (by population).
+    tb_largest_city = (
+        tb.sort_values("urban_pop", ascending=False)
+        .groupby(["country", "year"], as_index=False)
+        .first()[["country", "year", "urban_pop", "urban_density"]]
+        .copy()
+    )
+    tb_largest_city = tb_largest_city.rename(
+        columns={"urban_pop": "largest_city_pop", "urban_density": "largest_city_density"}
+    )
+
     # Select the top 100 most populous cities in 2020.
     tb_2020 = tb[tb["year"] == 2020]
     top_100_pop_2020 = tb_2020.nlargest(100, "urban_pop").drop_duplicates(subset=["ID_MTUC_G0"])
@@ -132,12 +144,13 @@ def run() -> None:
     agg_dict["pop_above_1m"] = "sum"
     tb_city_sizes = tb_all_cities.groupby(["country", "year"], as_index=False)[list(agg_dict.keys())].sum()
 
-    # Merge capital, top 100, and city size tables.
-    tb = pr.merge(tb_capitals, tb_top, on=["country", "year"], how="outer")
+    # Merge capital, largest city, top 100, and city size tables.
+    tb = pr.merge(tb_capitals, tb_largest_city, on=["country", "year"], how="outer")
+    tb = pr.merge(tb, tb_top, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
 
     # Ensure metadata is propagated.
-    metadata_cols = ["urban_pop", "urban_density", "urban_density_top_100", "urban_pop_top_100"]
+    metadata_cols = ["urban_pop", "urban_density", "largest_city_pop", "largest_city_density", "urban_density_top_100", "urban_pop_top_100"]
     # Add city size columns.
     metadata_cols.extend([f"pop_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     # Add aggregate columns.
