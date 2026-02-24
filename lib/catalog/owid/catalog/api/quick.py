@@ -85,6 +85,7 @@ def search(
         case: Case-sensitive search (default: False).  Only for tables.
         latest: If True, keep only the latest version of each result
             (grouped by namespace/dataset/table or indicator). Only for tables and indicators.
+            Note: results without a version are dropped when this is enabled.
 
     Returns:
         Search results. Results can be indexed, iterated, and provide access to metadata without downloading data.

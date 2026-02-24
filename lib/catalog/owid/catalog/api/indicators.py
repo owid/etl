@@ -296,6 +296,7 @@ class IndicatorsAPI:
             show_legacy: If True, show pre-ETL indicators only. Default False.
             latest: If True, keep only the latest version of each indicator
                 (grouped by namespace, dataset, column_name). Default False.
+                Note: results without a version are dropped when this is enabled.
             sort_by: How to sort results (default: "relevance"):
 
                 - "relevance": Combined score blending semantic similarity (60%) and popularity (40%).

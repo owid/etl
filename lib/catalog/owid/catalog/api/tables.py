@@ -661,6 +661,7 @@ class TablesAPI:
             refresh_index: If True, force re-download of the catalog index. Default False.
             latest: If True, keep only the latest version of each table
                 (grouped by namespace, dataset, table, channel). Default False.
+                Note: results without a version are dropped when this is enabled.
 
         Returns:
             ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
