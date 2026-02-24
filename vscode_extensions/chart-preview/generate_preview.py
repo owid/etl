@@ -8,8 +8,11 @@ Usage:
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -29,7 +32,13 @@ def _read_columns(feather_path: str, columns: list[str]) -> "pd.DataFrame":
     return feather.read_table(feather_path, columns=columns).to_pandas()
 
 
-def load_table_stats(dataset_path: str, table_name: str, popularity: dict[str, float] | None = None, short_name: str = "", namespace: str = "") -> dict:
+def load_table_stats(
+    dataset_path: str,
+    table_name: str,
+    popularity: dict[str, float] | None = None,
+    short_name: str = "",
+    namespace: str = "",
+) -> dict:
     """Load a table and compute per-indicator statistics using column projection."""
     import random as _random
 
@@ -129,8 +138,7 @@ def load_table_stats(dataset_path: str, table_name: str, popularity: dict[str, f
             total_non_null = int(vc.sum()) if len(vc) > 0 else 1
             top = vc.head(10)
             value_counts = [
-                {"value": str(k), "count": int(v), "pct": round(100 * v / total_non_null, 1)}
-                for k, v in top.items()
+                {"value": str(k), "count": int(v), "pct": round(100 * v / total_non_null, 1)} for k, v in top.items()
             ]
 
         # Sparkline: per-entity time series
@@ -145,9 +153,7 @@ def load_table_stats(dataset_path: str, table_name: str, popularity: dict[str, f
                 if len(data) > 200:
                     step_size = len(data) / 200
                     data = [data[int(i * step_size)] for i in range(200)]
-                sparkline_by_entity[str(entity)] = [
-                    {"year": int(y), "value": round(float(v), 4)} for y, v in data
-                ]
+                sparkline_by_entity[str(entity)] = [{"year": int(y), "value": round(float(v), 4)} for y, v in data]
 
         # Quality flags
         quality_flags = []
@@ -278,7 +284,9 @@ def generate_html(payload: dict) -> str:
 def main():
     parser = argparse.ArgumentParser(description="Generate dataset preview HTML")
     parser.add_argument("step_path", help="Path to ETL step file")
-    parser.add_argument("-o", "--output", default=None, help="Output HTML path (default: ai/dataset_preview/output.html)")
+    parser.add_argument(
+        "-o", "--output", default=None, help="Output HTML path (default: ai/dataset_preview/output.html)"
+    )
     parser.add_argument("--json", action="store_true", help="Output JSON to stdout instead of HTML file")
     args = parser.parse_args()
 
