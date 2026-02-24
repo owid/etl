@@ -425,9 +425,11 @@ def generate_llms_txt() -> str:
     lines: list[str] = []
 
     # Header
+    from owid.catalog import __version__
+
     lines.append("# owid-catalog")
     lines.append("")
-    lines.append("> Python library for accessing Our World in Data's catalog of research data.")
+    lines.append(f"> Python library for accessing Our World in Data's catalog of research data. Version: {__version__}")
     lines.append("")
 
     # Documentation content from markdown files
