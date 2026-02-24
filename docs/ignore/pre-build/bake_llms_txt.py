@@ -198,9 +198,9 @@ def generate_llms_full_txt() -> str:
     from owid.catalog.api.models import ResponseSet
     from owid.catalog.api.quick import fetch, search
     from owid.catalog.api.tables import TableResult, TablesAPI
+    from owid.catalog.core import tables as tables_module
     from owid.catalog.core.datasets import Dataset
     from owid.catalog.core.tables import Table
-    from owid.catalog.core import tables as tables_module
 
     sections: list[str] = []
 
