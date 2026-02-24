@@ -368,8 +368,6 @@ def calculate_totals_for_all_items(tb):
             }
         )
     )
-    # For convenience, add population again to this table.
-    tb_grouped = paths.regions.add_population(tb=tb_grouped, warn_on_missing_countries=False)
 
     return tb_grouped
 
@@ -387,9 +385,6 @@ def sanity_check_totals(tb_grouped, tb_fbsc):
     tb_total = tb_total[["country", "year", "value"]].rename(columns={"value": "food_energy"})
     # Convert to kcal/capita/year.
     tb_total["food_energy"] *= 365
-    # Convert to total (instead of per capita).
-    tb_total = paths.regions.add_population(tb=tb_total, warn_on_missing_countries=False)
-    tb_total["food_energy"] *= tb_total["population"]
     # Check that the aggregated food energy coincides for each country with the original total food energy.
     tb_check = tb_grouped[["country", "year", "food_energy"]].merge(
         tb_total[["country", "year", "food_energy"]].rename(columns={"food_energy": "food_energy_original"})
@@ -778,12 +773,6 @@ def run() -> None:
     # NOTE: There are various important assumptions in this calculation, see function for more details.
     tb = calculate_production_calories_correcting_for_feed(tb=tb)
 
-    # Convert food quantity and food energy from per capita to totals.
-    # TODO: Check how much things change when using per capita.
-    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
-    for column in ["food_quantity", "food_energy"]:
-        tb[column] *= tb["population"]
-
     # Calculate totals for each country-year.
     tb_grouped = calculate_totals_for_all_items(tb=tb)
 
@@ -799,6 +788,9 @@ def run() -> None:
     # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
     # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
+    # Remove unnecessary columns.
+    tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected"], errors="raise")
+
     # Apply a rolling average of ROLLING_AVERAGE_YEARS (defined above) on all indicators.
     tb_grouped = smoothen_curves(tb_grouped=tb_grouped)
 
@@ -808,9 +800,6 @@ def run() -> None:
 
     # Filter to only include decoupled countries.
     tb_grouped = tb_grouped[tb_grouped["country"].isin(countries_decoupled)].reset_index(drop=True)
-
-    # Remove unnecessary columns.
-    tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected"], errors="raise")
 
     # Improve table format.
     tb_grouped = tb_grouped.format(short_name=paths.short_name)

@@ -14,17 +14,13 @@ tables:
     title: "Decoupling of agricultural production and land use"
     variables:
       food_quantity:
-        title: "Food supply"
-        unit: tonnes
-        short_unit: t
+        title: "Food supply per capita"
+        unit: kilograms per person per year
+        short_unit: kg/person/year
       food_energy:
-        title: "Food supply in terms of energy content"
-        unit: kilocalories
-        short_unit: kcal
-      population:
-        title: "Population"
-        unit: persons
-        short_unit: ""
+        title: "Food supply per capita in terms of energy content"
+        unit: kilocalories per person per year
+        short_unit: kcal/person/year
       production:
         title: "Total agricultural production"
         unit: tonnes
