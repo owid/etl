@@ -655,7 +655,10 @@ function runPreviewScript(wsRoot: string, stepPath: string, filePath: string): P
 			clearTimeout(timeout);
 			previewScriptProcesses.delete(filePath);
 			if (code === 0) {
-				resolve(stdout);
+				// Strip any leading log/warning lines (e.g. structlog warnings on master branch)
+				// and extract only the JSON line.
+				const jsonLine = stdout.split('\n').find(l => l.trimStart().startsWith('{'));
+				resolve(jsonLine ?? stdout);
 			} else if (code !== null) {  // null = killed intentionally, ignore
 				reject(new Error(`Preview script failed (code ${code}):\n${stderr}`));
 			}

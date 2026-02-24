@@ -196,28 +196,26 @@ wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz
 
-# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and a list of custom extensions (defined in CUSTOM_EXTENSIONS).
-# Custom extensions are expected to be in the vscode_extensions folder, with a subfolder for each extension containing a folder install/ with a VSIX file.
+# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and all custom extensions found in vscode_extensions/.
+# Custom extensions are expected to have a subfolder install/ with a VSIX file.
 # The latest VSIX file in each install/ folder will be installed.
 install-vscode-extensions:
 	@echo '==> Checking and installing required VS Code extensions'
 	@if command -v code > /dev/null; then \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
 			if ! code --list-extensions | grep -q "$$EXT"; then \
 				code --install-extension $$EXT; \
 			fi; \
 		done; \
-		for EXT in $$CUSTOM_EXTENSIONS; do \
+		for EXT_DIR in $$EXTENSIONS_PATH/*/; do \
+			EXT=$$(basename $$EXT_DIR); \
 			if ! code --list-extensions | grep -q "owid.$$EXT"; then \
-				VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+				VSIX_FILE=$$(ls -v $$EXT_DIR/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
 				if [ -n "$$VSIX_FILE" ]; then \
 					echo "Installing owid.$$EXT from $$VSIX_FILE"; \
 					code --install-extension "$$VSIX_FILE"; \
-				else \
-					echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
 				fi; \
 			fi; \
 		done; \
@@ -229,15 +227,13 @@ install-vscode-extensions:
 vsce-sync:
 	@echo '==> Reinstalling all custom VS Code extensions'
 	@if command -v code > /dev/null; then \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
-		for EXT in $$CUSTOM_EXTENSIONS; do \
-			VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+		for EXT_DIR in $$EXTENSIONS_PATH/*/; do \
+			EXT=$$(basename $$EXT_DIR); \
+			VSIX_FILE=$$(ls -v $$EXT_DIR/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
 			if [ -n "$$VSIX_FILE" ]; then \
 				echo "Installing owid.$$EXT from $$VSIX_FILE"; \
 				code --install-extension "$$VSIX_FILE" --force; \
-			else \
-				echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
 			fi; \
 		done; \
 	else \
