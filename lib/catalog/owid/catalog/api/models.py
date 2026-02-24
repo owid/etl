@@ -168,9 +168,7 @@ class ResponseSet(BaseModel, Generic[T]):
 
         # For ChartResult, add thumbnail column and make URL clickable
         if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
-            df = df.copy()
-
-            # Get display labels from results (slug + query_params for explorers/multidim)
+            df = df.copy()            # Get display labels from results (slug + query_params for explorers/multidim)
             def _slug_label(r: Any) -> str:
                 slug = getattr(r, "slug", "")
                 query_params = getattr(r, "query_params", "")
