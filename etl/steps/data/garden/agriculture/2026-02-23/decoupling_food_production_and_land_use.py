@@ -244,7 +244,6 @@ def prepare_food_balances_data(tb_fbsc):
     assert {"kilograms per year per capita", "kilocalories per day per capita", "tonnes"}.issubset(set(check["unit"]))
 
     # Convert kcal/capita/day to kcal/capita/year.
-    # TODO: Check if this is a good idea. It may be more convenient to have numbers in terms of daily calories.
     tb.loc[(tb["element_code"] == "0664pc"), "value"] *= 365
 
     # Pivot to have kcal and weight in separate columns.
@@ -386,7 +385,7 @@ def sanity_check_totals(tb_grouped, tb_fbsc):
     for element in [element for element in ELEMENT_CODES if element != "0664pc"]:
         assert tb_total[(tb_total["element_code"] == element)].empty, error
     tb_total = tb_total[["country", "year", "value"]].rename(columns={"value": "food_energy"})
-    # TODO: Remove the following line if we decide it's better to keep food in daily calories.
+    # Convert to kcal/capita/year.
     tb_total["food_energy"] *= 365
     # Convert to total (instead of per capita).
     tb_total = paths.regions.add_population(tb=tb_total, warn_on_missing_countries=False)
