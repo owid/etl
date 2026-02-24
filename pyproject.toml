@@ -83,6 +83,8 @@ dependencies = [
     "pyopenssl>=25.3.0",
     "h5py>=3.15.1",
     "html5lib>=1.1",
+    "requests>=2.32.5",
+    "chardet<6.0.0",  # requests 2.32.5 checks chardet < 6.0.0 and warns if exceeded
 ]
 
 [tool.uv.sources]
