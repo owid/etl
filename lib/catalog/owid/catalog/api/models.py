@@ -170,8 +170,15 @@ class ResponseSet(BaseModel, Generic[T]):
         if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
             df = df.copy()
 
-            # Get slugs from results (order matches df rows)
-            slugs = [getattr(r, "slug", "") for r in self.results]
+            # Get display labels from results (slug + query_params for explorers/multidim)
+            def _slug_label(r: Any) -> str:
+                slug = getattr(r, "slug", "")
+                query_params = getattr(r, "query_params", "")
+                if query_params:
+                    return f"{slug}{query_params}"
+                return slug
+
+            slugs = [_slug_label(r) for r in self.results]
             # Handle truncated display (head + tail)
             if truncated:
                 slugs = slugs[: self._HEAD_ROWS] + slugs[-self._TAIL_ROWS :]
@@ -292,6 +299,7 @@ class ResponseSet(BaseModel, Generic[T]):
                 # Use type name check to avoid circular imports
                 if type(r).__name__ == "ChartResult":
                     row = {
+                        "type": getattr(r, "type", ""),
                         "slug": getattr(r, "slug", ""),
                         "title": getattr(r, "title", ""),
                         "description": getattr(r, "description", ""),
@@ -306,7 +314,6 @@ class ResponseSet(BaseModel, Generic[T]):
                     # Simplify if not advanced UI
                     if not self._ui_advanced:
                         row = {
-                            # "slug": row["slug"],
                             "title": row["title"],
                             "description": row["description"],
                             "last_updated": row["last_updated"],
@@ -407,6 +414,34 @@ class ResponseSet(BaseModel, Generic[T]):
             base_url=self.base_url,
             _ui_advanced=self._ui_advanced,
         )
+
+    def set_ui_advanced(self) -> "ResponseSet[T]":
+        """Switch to advanced display showing all fields (type, slug, popularity, etc.).
+
+        Returns:
+            Self (for chaining).
+
+        Example:
+            ```py
+            >>> results.set_ui_advanced()
+            ```
+        """
+        self._ui_advanced = True
+        return self
+
+    def set_ui_basic(self) -> "ResponseSet[T]":
+        """Switch to basic display showing only key fields (title, description, url).
+
+        Returns:
+            Self (for chaining).
+
+        Example:
+            ```py
+            >>> results.set_ui_basic()
+            ```
+        """
+        self._ui_advanced = False
+        return self
 
     def _get_version_string(self, item: T) -> str:
         """Get a sortable version string for any result type.

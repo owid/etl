@@ -12,6 +12,7 @@ from owid.catalog.api import (
     ResponseSet,
     TableResult,
 )
+from owid.catalog.api.charts import parse_chart_slug
 from owid.catalog.api.datasette import DatasetteAPI, DatasetteTable
 from owid.catalog.api.search import PageSearchResult
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
@@ -652,16 +653,27 @@ class TestDataclassModels:
         result = ChartResult(
             slug="test-chart",
             title="Test Chart",
-            url="https://ourworldindata.org/grapher/test-chart",
             site_url="https://ourworldindata.org",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
         assert result.site_url == "https://ourworldindata.org"
-        assert result.grapher_url == "https://ourworldindata.org/grapher"
-        assert result.explorer_url == "https://ourworldindata.org/explorers"
+        assert result.chart_base_url == "https://ourworldindata.org/grapher"
+        assert result.url == "https://ourworldindata.org/grapher/test-chart"
         assert result.type == "chart"
+
+    def test_chart_result_explorer_url(self):
+        result = ChartResult(
+            slug="covid",
+            title="COVID Explorer",
+            type="explorerView",
+            query_params="?Metric=Cases",
+            site_url="https://ourworldindata.org",
+        )
+
+        assert result.url == "https://ourworldindata.org/explorers/covid?Metric=Cases"
+        assert result.chart_base_url == "https://ourworldindata.org/explorers"
 
     def test_indicator_result(self):
         result = IndicatorResult(
@@ -709,6 +721,50 @@ class TestDataclassModels:
 
         assert result.title is None
         assert result.description is None
+
+
+class TestParseChartSlug:
+    """Test parse_chart_slug with grapher/explorer URLs and plain slugs."""
+
+    def test_plain_slug(self):
+        parsed = parse_chart_slug("life-expectancy")
+        assert parsed.slug == "life-expectancy"
+        assert parsed.query_params == ""
+        assert parsed.type == "chart"
+
+    def test_grapher_url(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/grapher/life-expectancy")
+        assert parsed.slug == "life-expectancy"
+        assert parsed.query_params == ""
+        assert parsed.type == "chart"
+
+    def test_grapher_url_with_params(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/grapher/life-expectancy?tab=table&time=2020")
+        assert parsed.slug == "life-expectancy"
+        assert parsed.query_params == "?tab=table&time=2020"
+        assert parsed.type == "chart"
+
+    def test_explorer_url(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/explorers/covid")
+        assert parsed.slug == "covid"
+        assert parsed.query_params == ""
+        assert parsed.type == "explorerView"
+
+    def test_explorer_url_with_params(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/explorers/covid?Metric=Cases&Interval=Weekly")
+        assert parsed.slug == "covid"
+        assert parsed.query_params == "?Metric=Cases&Interval=Weekly"
+        assert parsed.type == "explorerView"
+
+    def test_slug_with_query_params(self):
+        parsed = parse_chart_slug("education-spending?level=primary&spending_type=gdp_share")
+        assert parsed.slug == "education-spending"
+        assert parsed.query_params == "?level=primary&spending_type=gdp_share"
+        assert parsed.type == "chart"
+
+    def test_invalid_url_raises(self):
+        with pytest.raises(ValueError, match="grapher or explorer URL"):
+            parse_chart_slug("https://example.com/some-chart")
 
 
 class TestDatasetteAPI:
