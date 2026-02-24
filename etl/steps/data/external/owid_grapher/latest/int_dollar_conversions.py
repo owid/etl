@@ -6,7 +6,6 @@ The PPP conversion factor is taken from the World Bank's PIP dataset or from the
 
 """
 
-import json
 from enum import Enum
 from pathlib import Path
 
@@ -15,7 +14,6 @@ from owid.catalog import Dataset
 from pandas import DataFrame
 
 from etl.helpers import PathFinder
-from etl.snapshot import Snapshot
 
 paths = PathFinder(__file__)
 
@@ -214,16 +212,6 @@ def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
     return tb_wdi_cpi
 
 
-def load_currency_codes(snap: Snapshot) -> DataFrame:
-    """Load ISO 4217 currency codes, keeping one row per country (the first/primary currency listed)."""
-    records = json.loads(snap.path.read_text())
-    df = DataFrame(records).dropna(subset=["currency_code"])
-    # ISO 4217 country names are ALL CAPS — normalise to title case for joining.
-    df["country_name"] = df["country_name"].str.title()
-    # Some territories map to multiple currencies; keep the first occurrence (primary currency).
-    return df.drop_duplicates(subset=["country_name"])[["country_name", "currency_code"]].set_index("country_name")
-
-
 def run() -> None:
     #
     # Load dependencies.
@@ -231,7 +219,7 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_regions = paths.load_dataset("regions")
-    snap_iso4217 = paths.load_snapshot("iso4217_currencies.json")
+    ds_iso4217 = paths.load_dataset("iso4217_currencies")
 
     # Map country names to OWID country codes (e.g. "United Kingdom" → "GBR").
     country_name_to_code = ds_regions["regions"].reset_index().set_index("name")["code"]
@@ -256,9 +244,9 @@ def run() -> None:
     # Add OWID country code.
     tb["country_code"] = tb.index.map(country_name_to_code)
 
-    # Add ISO 4217 currency code for each country (informational, for consumers of this dataset).
-    df_iso = load_currency_codes(snap_iso4217)
-    tb["currency_code"] = tb.index.map(df_iso["currency_code"])
+    # Add ISO 4217 currency code and name for each country (informational, for consumers of this dataset).
+    # Use join (not index.map) to preserve origins from the ISO dataset.
+    tb = tb.join(ds_iso4217["iso4217_currencies"][["currency_code", "currency_name"]], how="left")
 
     #
     # Format output table.
@@ -275,6 +263,7 @@ def run() -> None:
         [
             "country_code",
             "currency_code",
+            "currency_name",
             "ppp_year",
             "ppp_factor",
             "ppp_source",

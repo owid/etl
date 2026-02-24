@@ -500,7 +500,8 @@ class Indicator(pd.Series):
             return super().to_frame()  # type: ignore[return-value]
         else:
             tb = super().to_frame(name=name)  # type: ignore[return-value]
-            tb[name].metadata = self.metadata.copy()
+            if self.name is not None:
+                tb[name].metadata = self.metadata.copy()
             return tb  # type: ignore
 
     def copy_metadata(self, from_variable: Indicator, inplace: bool = False) -> Indicator | None:

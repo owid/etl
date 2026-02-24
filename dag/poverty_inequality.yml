@@ -207,8 +207,10 @@ steps:
     - data://meadow/poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al
 
   # International dollars conversions (from PIP and WDI)
+  data://garden/iso/2026-01-01/iso4217_currencies:
+    - snapshot://iso/2026-01-01/iso4217_currencies.json
   data://external/owid_grapher/latest/int_dollar_conversions:
     - data://garden/worldbank_wdi/2026-01-29/wdi
     - data://grapher/wb/2026-01-22/world_bank_pip
     - data://garden/regions/2023-01-01/regions
-    - snapshot://iso/2026-01-01/iso4217_currencies.json
+    - data://garden/iso/2026-01-01/iso4217_currencies

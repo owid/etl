@@ -20,6 +20,6 @@ meta:
       name: Public domain
       url: https://www.six-group.com/en/products-services/financial-information/market-reference-data/data-standards.html
 outs:
-  - md5: b974e3b4832fb248017ed9253303f101
-    size: 44919
+  - md5: 7580dc11c6e070ab3a84e80d4c53e4b7
+    size: 51071
     path: iso4217_currencies.json

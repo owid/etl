@@ -9,6 +9,7 @@ The XML is converted to a JSON array of records with fields:
   - currency_code: ISO 4217 3-letter alphabetic code (e.g. "AFN"), or null
   - currency_number: ISO 4217 numeric code (e.g. 971), or null
   - minor_units: number of decimal places (e.g. 2), or null for special cases
+  - is_fund: true if the <CcyNm> element has IsFund="true" (special financial instruments, not everyday currencies)
 
 The published date is taken from the XML root attribute and stored in the snapshot metadata.
 """
@@ -51,6 +52,9 @@ def run(upload: bool) -> None:
         except ValueError:
             minor_units = None  # e.g. "N.A."
 
+        ccy_nm_el = entry.find("CcyNm")
+        is_fund = ccy_nm_el is not None and ccy_nm_el.get("IsFund") == "true"
+
         records.append(
             {
                 "country_name": text("CtryNm"),
@@ -58,6 +62,7 @@ def run(upload: bool) -> None:
                 "currency_code": text("Ccy"),
                 "currency_number": int(text("CcyNbr")) if text("CcyNbr") is not None else None,
                 "minor_units": minor_units,
+                "is_fund": is_fund,
             }
         )
 
