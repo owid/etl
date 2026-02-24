@@ -57,19 +57,33 @@ def _format_func(name: str, obj: Any, *, max_doc_lines: int = 0) -> str:
     return "\n".join(parts)
 
 
-
 # Pydantic inherited methods that clutter API reference
-_PYDANTIC_SKIP = frozenset({
-    "copy", "dict", "json", "model_copy", "model_dump", "model_dump_json",
-    "model_post_init", "model_rebuild", "model_validate", "model_validate_json",
-    "model_validate_strings",
-})
+_PYDANTIC_SKIP = frozenset(
+    {
+        "copy",
+        "dict",
+        "json",
+        "model_copy",
+        "model_dump",
+        "model_dump_json",
+        "model_post_init",
+        "model_rebuild",
+        "model_validate",
+        "model_validate_json",
+        "model_validate_strings",
+    }
+)
 
 # Pydantic inherited properties to skip
-_PYDANTIC_PROP_SKIP = frozenset({
-    "model_extra", "model_fields_set", "model_computed_fields",
-    "model_config", "model_fields",
-})
+_PYDANTIC_PROP_SKIP = frozenset(
+    {
+        "model_extra",
+        "model_fields_set",
+        "model_computed_fields",
+        "model_config",
+        "model_fields",
+    }
+)
 
 
 def _format_class(name: str, cls: type, *, include_methods: bool = True, max_doc_lines: int = 0) -> str:
@@ -191,7 +205,8 @@ def generate_llms_full_txt() -> str:
     sections: list[str] = []
 
     # -- Header --
-    sections.append(textwrap.dedent("""\
+    sections.append(
+        textwrap.dedent("""\
         # owid-catalog — Complete API Reference
 
         > Python library for accessing Our World in Data's published data.
@@ -202,10 +217,12 @@ def generate_llms_full_txt() -> str:
         ```bash
         pip install owid-catalog
         ```
-    """))
+    """)
+    )
 
     # -- Quick-start examples --
-    sections.append(textwrap.dedent("""\
+    sections.append(
+        textwrap.dedent("""\
         ## Quick Start
 
         ```python
@@ -231,7 +248,8 @@ def generate_llms_full_txt() -> str:
         results = client.charts.search("CO2 emissions")
         tb = client.charts.fetch("co2-emissions")
         ```
-    """))
+    """)
+    )
 
     # -- Convenience functions --
     sections.append("## Convenience Functions\n")
@@ -244,13 +262,15 @@ def generate_llms_full_txt() -> str:
     sections.append("## Client\n")
     sections.append(_format_class("Client", Client, include_methods=False))
     sections.append("")
-    sections.append(textwrap.dedent("""\
+    sections.append(
+        textwrap.dedent("""\
         The Client exposes three sub-API objects:
 
         - `client.charts` — ChartsAPI instance
         - `client.tables` — TablesAPI instance
         - `client.indicators` — IndicatorsAPI instance
-    """))
+    """)
+    )
 
     # -- ChartsAPI --
     sections.append("## ChartsAPI\n")
@@ -295,16 +315,26 @@ def generate_llms_full_txt() -> str:
 
     # -- Table --
     sections.append("## Table\n")
-    sections.append(textwrap.dedent("""\
+    sections.append(
+        textwrap.dedent("""\
         `Table` is a pandas DataFrame subclass with metadata support.
         Import: `from owid.catalog import Table`
-    """))
+    """)
+    )
     # Key methods only — the full class is huge
     key_table_methods = [
-        "format", "underscore", "to", "read",
-        "to_csv", "to_feather", "to_parquet",
-        "read_csv", "read_feather", "read_parquet",
-        "copy_metadata", "update_metadata",
+        "format",
+        "underscore",
+        "to",
+        "read",
+        "to_csv",
+        "to_feather",
+        "to_parquet",
+        "read_csv",
+        "read_feather",
+        "read_parquet",
+        "copy_metadata",
+        "update_metadata",
     ]
     for method_name in key_table_methods:
         method = getattr(Table, method_name, None)
@@ -333,15 +363,30 @@ def generate_llms_full_txt() -> str:
 
     # -- Processing module (top-level functions) --
     sections.append("## Processing Functions\n")
-    sections.append(textwrap.dedent("""\
+    sections.append(
+        textwrap.dedent("""\
         Metadata-preserving replacements for pandas operations.
         Import: `from owid.catalog import processing as pr`
-    """))
+    """)
+    )
     processing_funcs = [
-        "concat", "merge", "melt", "pivot", "multi_merge",
-        "read_csv", "read_excel", "read_feather", "read_parquet",
-        "read_json", "read_fwf", "read_stata", "read_rds", "read_rda",
-        "read_from_df", "read_from_dict", "read",
+        "concat",
+        "merge",
+        "melt",
+        "pivot",
+        "multi_merge",
+        "read_csv",
+        "read_excel",
+        "read_feather",
+        "read_parquet",
+        "read_json",
+        "read_fwf",
+        "read_stata",
+        "read_rds",
+        "read_rda",
+        "read_from_df",
+        "read_from_dict",
+        "read",
     ]
     for func_name in processing_funcs:
         func = getattr(tables_module, func_name, None)
@@ -354,7 +399,8 @@ def generate_llms_full_txt() -> str:
             sections.append("")
 
     # -- Common patterns --
-    sections.append(textwrap.dedent("""\
+    sections.append(
+        textwrap.dedent("""\
         ## Common Patterns
 
         ### Searching and fetching data
@@ -417,7 +463,8 @@ def generate_llms_full_txt() -> str:
         results.sort_by("popularity", reverse=True)            # sort
         latest = results.latest()                               # latest version
         ```
-    """))
+    """)
+    )
 
     return "\n".join(sections)
 
