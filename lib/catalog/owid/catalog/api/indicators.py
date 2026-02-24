@@ -5,13 +5,13 @@
 #
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.models import ResponseSet
-from owid.catalog.api.tables import _load_table
+from owid.catalog.api.tables import _keep_latest_versions, _load_table
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.tables import Table
 
@@ -280,6 +280,8 @@ class IndicatorsAPI:
         *,
         limit: int = 10,
         show_legacy: bool = False,
+        latest: bool = False,
+        sort_by: Literal["relevance", "similarity"] = "relevance",
         timeout: int | None = None,
     ) -> ResponseSet[IndicatorResult]:
         """Search for indicators using natural language.
@@ -292,18 +294,24 @@ class IndicatorsAPI:
                 (e.g., "renewable energy capacity", "child mortality rate").
             limit: Maximum number of results to return. Default 10.
             show_legacy: If True, show pre-ETL indicators only. Default False.
+            latest: If True, keep only the latest version of each indicator
+                (grouped by namespace, dataset, column_name). Default False.
+            sort_by: How to sort results (default: "relevance"):
+
+                - "relevance": Combined score blending semantic similarity (60%) and popularity (40%).
+                - "similarity": Sort by semantic similarity score only.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
 
         Returns:
-            SearchResults containing IndicatorResult objects, sorted by semantic similarity score.
+            SearchResults containing IndicatorResult objects, sorted according to ``sort_by``.
             Each result includes a `popularity` field (0.0-1.0) based on analytics views.
 
         Example:
             ```python
-            # Search for indicators
+            # Search for indicators (sorted by relevance by default)
             results = client.indicators.search("CO2 emissions per capita")
 
-            # View results (sorted by semantic score)
+            # View results
             for ind in results:
                 print(f"{ind.title}")
                 print(f"  Score: {ind.score:.3f}")
@@ -312,8 +320,8 @@ class IndicatorsAPI:
             # Load data from top result
             tb = results[0].fetch()
 
-            # Re-sort by popularity if desired
-            by_popularity = results.sort_by('popularity', reverse=True)
+            # Sort by semantic similarity only (original behavior)
+            results = client.indicators.search("CO2 emissions", sort_by="similarity")
             ```
         """
         params = {
@@ -381,6 +389,30 @@ class IndicatorsAPI:
             )
             for r, path in raw_results
         ]
+
+        # Drop indicators without a version (unless show_legacy=True)
+        if not show_legacy:
+            results = [r for r in results if r.version is not None]
+
+        # Keep only latest version per group if requested
+        if latest:
+            results = _keep_latest_versions(
+                results,
+                key=lambda r: (r.namespace, r.dataset, r.column_name),
+            )
+
+        # Sort results according to sort_by parameter
+        if sort_by == "similarity":
+            # Original behavior: sort by semantic score only
+            results.sort(key=lambda r: r.score, reverse=True)
+        else:
+            # "relevance" (default): blend similarity and popularity
+            # Normalize scores to 0-1 range for blending
+            max_score = max((r.score for r in results), default=1.0) or 1.0
+            results.sort(
+                key=lambda r: 0.6 * (r.score / max_score) + 0.4 * r.popularity,
+                reverse=True,
+            )
 
         return ResponseSet(
             results=results,
