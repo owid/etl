@@ -15,7 +15,6 @@ This way, imported feed (which is not in the production count) is not subtracted
 
 from pathlib import Path
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -530,107 +529,53 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
     # The similarity between our uncorrected caloric series and Hong et al.'s series suggests that they did not correct for feed calories.
 
 
-def show_decoupled_countries(
-    food_column,
-    tb_fbsc,
-    tb_grouped,
-    min_food_pct_change=5,
-    min_land_pct_change=5,
-    max_net_share_imports=20,
-    max_net_share_median_over_years=10,
-):
-    import plotly.express as px
+def smoothen_curves(tb_grouped):
+    # Apply rolling averages to smooth year-to-year variability.
+    if ROLLING_AVERAGE_YEARS > 1:
+        tb_grouped = tb_grouped.sort_values(["country", "year"]).reset_index(drop=True)
+        for column in tb_grouped.drop(columns=["country", "year"]).columns:
+            tb_grouped[column] = tb_grouped.groupby("country", sort=False)[column].transform(
+                lambda s: s.rolling(ROLLING_AVERAGE_YEARS, min_periods=1).mean()
+            )
 
-    year_max = tb_grouped["year"].max()
+        # With a 3-year rolling average, the effective first year is 1963 (average of 1961-1963).
+        # Remove years with incomplete rolling averages from both tables.
+        year_min = tb_grouped["year"].min() + ROLLING_AVERAGE_YEARS - 1
+        tb_grouped = tb_grouped[tb_grouped["year"] >= year_min].reset_index(drop=True)
+
+    return tb_grouped
+
+
+def detect_decoupled_countries(tb_grouped, plot=False):
     year_min = tb_grouped["year"].min()
+    year_max = tb_grouped["year"].max()
 
-    # Calculate the share of net annual imports of each country-year.
-    # This is, for each country-year (after aggregating all the main food item groups):
-    # 100 * | imports - exports | / domestic supply
-    # Relevant element codes:
-    # 005611: Imports (tonnes)
-    # 005911: Exports (tonnes)
-    # 005511: Production (tonnes)
-    # Instead of production, it may be more appropriate to use domestic supply instead (Domestic supply = Production + Imports − Exports ± Stock changes).
-    # 005301: Domestic supply (tonnes)
-    imports = (
-        tb_fbsc[
-            (tb_fbsc["item_code"].isin(sorted(set(sum([items for _, items in FOOD_GROUPS_FBSC.items()], [])))))
-            & (tb_fbsc["element_code"].isin(["005611", "005911", "005301"]))
-        ]
-        .reset_index(drop=True)
-        .groupby(["country", "year", "element"], as_index=False)
-        .agg({"value": "sum"})
-        .pivot(index=["country", "year"], columns=["element"], join_column_levels_with="_")
-        .format()
-        .reset_index()
+    tb_start = tb_grouped[tb_grouped["year"] == year_min][["country", "production_energy", "agricultural_land"]]
+    tb_end = tb_grouped[tb_grouped["year"] == year_max][["country", "production_energy", "agricultural_land"]]
+    tb_changes = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
+    tb_changes["production_energy_change"] = (
+        100
+        * (tb_changes["production_energy_end"] - tb_changes["production_energy_start"])
+        / tb_changes["production_energy_start"]
     )
-    # Calculate the net import share (share of domestic production that is imported).
-    imports["net_import_share"] = (
-        100 * (imports["value_imports"] - imports["value_exports"]) / imports["value_domestic_supply"]
+    tb_changes["agricultural_land_change"] = (
+        100
+        * (tb_changes["agricultural_land_end"] - tb_changes["agricultural_land_start"])
+        / tb_changes["agricultural_land_start"]
     )
 
-    check = tb_grouped.copy()
-    # Add column of net imports share.
-    if max_net_share_median_over_years is None:
-        check = check.merge(imports, on=["country", "year"], how="left")
-    else:
-        # Instead of simply imposing a maximum net import share, we impose a maximum median (over the last 10 years) net import share, for each country.
-        imports = (
-            imports[(imports["year"] > (year_max - max_net_share_median_over_years))]
-            .groupby("country", as_index=False)
-            .agg({"net_import_share": "median"})
-        )
-        check = check.merge(imports, on=["country"], how="left")
-    check = check.merge(check[(check["year"] == year_min)], how="left", on=["country"], suffixes=("", "_baseline"))
-    check[f"{food_column}_change"] = (
-        100 * (check[food_column] - check[f"{food_column}_baseline"]) / check[f"{food_column}_baseline"]
+    countries_decoupled = set(
+        tb_changes[
+            (tb_changes["production_energy_change"] >= PRODUCTION_INCREASE_PCT_MIN)
+            & (tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN)
+        ]["country"]
     )
-    check["agricultural_land_change"] = (
-        100 * (check["agricultural_land"] - check["agricultural_land_baseline"]) / check["agricultural_land_baseline"]
-    )
-    # List countries that could be added to the chart as examples of decoupling.
-    # Sort them by land use relative change.
-    _check = check[check["year"] == year_max]
-    if food_column == "production_energy":
-        decoupled = (
-            _check[
-                (_check["agricultural_land_change"] <= -min_land_pct_change)
-                & (_check[f"{food_column}_change"] >= min_food_pct_change)
-            ]
-            .dropna(subset=[f"{food_column}_change", "agricultural_land_change"], how="any")
-            .sort_values("agricultural_land_change")["country"]
-            .unique()
-            .tolist()
-        )
-    else:
-        decoupled = (
-            _check[
-                (_check["net_import_share"] <= max_net_share_imports)
-                & (_check["agricultural_land_change"] <= -min_land_pct_change)
-                & (_check[f"{food_column}_change"] >= min_food_pct_change)
-            ]
-            .dropna(subset=[f"{food_column}_change", "agricultural_land_change"], how="any")
-            .sort_values("agricultural_land_change")["country"]
-            .unique()
-            .tolist()
-        )
-    # Remove regions.
-    decoupled = [country for country in decoupled if "(FAO)" not in country if country not in geo.REGIONS]
-    # Plot decoupling curves for those countries.
-    columns = [f"{food_column}_change", "agricultural_land_change"]
-    for country in sorted(decoupled):
-        px.line(
-            check[check["country"] == country][["year"] + columns].melt(id_vars=["year"]),
-            x="year",
-            y="value",
-            color="variable",
-            markers=True,
-            title=country,
-        ).show()
 
-    # Print resulting list of decoupled countries.
-    print(", ".join(decoupled))
+    if plot:
+        plot_decoupled_countries(tb_grouped, countries_decoupled, year_min, year_max)
+        plot_slope_chart_grid(tb_changes, countries_decoupled, year_min, year_max)
+
+    return countries_decoupled
 
 
 def plot_decoupled_countries(
@@ -841,7 +786,6 @@ def run() -> None:
         tb[column] *= tb["population"]
 
     # Calculate totals for each country-year.
-    # NOTE: tb_fbsc is used for sanity checks.
     tb_grouped = calculate_totals_for_all_items(tb=tb)
 
     # Run sanity checks on the aggregated amounts (summed over all items).
@@ -854,77 +798,27 @@ def run() -> None:
     assert 100 * (_n_rows_before - len(tb_grouped)) / _n_rows_before < 1, error
 
     # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
-    sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
+    # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
-    # Apply rolling averages to smooth year-to-year variability.
-    if ROLLING_AVERAGE_YEARS > 1:
-        tb_grouped = tb_grouped.sort_values(["country", "year"]).reset_index(drop=True)
-        for column in tb_grouped.drop(columns=["country", "year"]).columns:
-            tb_grouped[column] = tb_grouped.groupby("country", sort=False)[column].transform(
-                lambda s: s.rolling(ROLLING_AVERAGE_YEARS, min_periods=1).mean()
-            )
+    # Apply a rolling average of ROLLING_AVERAGE_YEARS (defined above) on all indicators.
+    tb_grouped = smoothen_curves(tb_grouped=tb_grouped)
 
-    # Select countries that achieved decoupling: production up and land down over the full time window.
-    # With a 3-year rolling average, the effective first year is 1963 (average of 1961-1963).
-    year_min = tb_grouped["year"].min() + max(1, ROLLING_AVERAGE_YEARS) - 1
-    year_max = tb_grouped["year"].max()
+    # Select countries that achieved decoupling: production increased and land use decreased over the full time window.
+    # Set plot=True to generate individual country charts and a slope chart grid.
+    countries_decoupled = detect_decoupled_countries(tb_grouped, plot=False)
 
-    # Remove years with incomplete rolling averages from both tables.
-    tb_grouped = tb_grouped[tb_grouped["year"] >= year_min].reset_index(drop=True)
-    tb = tb[tb["year"] >= year_min].reset_index(drop=True)
-
-    tb_start = tb_grouped[tb_grouped["year"] == year_min][["country", "production_energy", "agricultural_land"]]
-    tb_end = tb_grouped[tb_grouped["year"] == year_max][["country", "production_energy", "agricultural_land"]]
-    tb_changes = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
-    tb_changes["production_energy_change"] = (
-        100
-        * (tb_changes["production_energy_end"] - tb_changes["production_energy_start"])
-        / tb_changes["production_energy_start"]
-    )
-    tb_changes["agricultural_land_change"] = (
-        100
-        * (tb_changes["agricultural_land_end"] - tb_changes["agricultural_land_start"])
-        / tb_changes["agricultural_land_start"]
-    )
-
-    countries_decoupled = set(
-        tb_changes[
-            (tb_changes["production_energy_change"] >= PRODUCTION_INCREASE_PCT_MIN)
-            & (tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN)
-        ]["country"]
-    )
-
-    # Uncomment to plot individual charts for each decoupled country.
-    # plot_decoupled_countries(tb_grouped, countries_decoupled, year_min, year_max)
-    # Uncomment to plot a slope chart grid PNG with all decoupled countries.
-    # plot_slope_chart_grid(tb_changes, countries_decoupled, year_min, year_max)
-
-    # Filter both tables to only include decoupled countries.
+    # Filter to only include decoupled countries.
     tb_grouped = tb_grouped[tb_grouped["country"].isin(countries_decoupled)].reset_index(drop=True)
-    tb = tb[tb["country"].isin(countries_decoupled)].reset_index(drop=True)
 
     # Remove unnecessary columns.
-    tb = tb.drop(
-        columns=[
-            "conversion",
-            "item_code",
-            "item_description",
-            "feed",
-            "imports",
-            "production_net",
-            "production_energy_uncorrected",
-        ],
-        errors="raise",
-    )
     tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected"], errors="raise")
 
-    # Improve table formats.
-    tb_grouped = tb_grouped.format(["country", "year"], short_name="decoupling_food_production_and_land_use_total")
-    tb = tb.format(keys=["country", "year", "item"], short_name=paths.short_name)
+    # Improve table format.
+    tb_grouped = tb_grouped.format(short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb, tb_grouped], default_metadata=ds_fbsc.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_grouped], default_metadata=ds_fbsc.metadata)
     ds_garden.save()

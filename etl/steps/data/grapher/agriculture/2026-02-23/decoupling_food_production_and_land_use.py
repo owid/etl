@@ -12,7 +12,7 @@ def run() -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("decoupling_food_production_and_land_use")
-    tb = ds_garden.read("decoupling_food_production_and_land_use_total", reset_index=False)
+    tb = ds_garden.read("decoupling_food_production_and_land_use", reset_index=False)
 
     #
     # Save outputs.
