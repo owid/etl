@@ -123,6 +123,14 @@ def run() -> None:
         ]
     )
 
+    # Remove map tab from grouped location_type views (location_type_stacked and urban_vs_rural)
+    for view in c.views:
+        location_type = view.dimensions.get("location_type")
+        if location_type in ["location_type_stacked", "urban_vs_rural"]:
+            view.config = view.config.copy() if view.config else {}
+            view.config["hasMapTab"] = False
+            view.config["tab"] = "chart"
+
     # Update view configurations and add colors
     for view in c.views:
         data_type = view.dimensions.get("data_type")
