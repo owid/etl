@@ -1,0 +1,4 @@
+steps:
+  # Replicate chart per-capita-co2-vs-average: https://admin.owid.io/admin/charts/3188/edit
+  graph://emissions/latest/per-capita-co2-vs-average:
+    - data://grapher/gcp/2025-11-13/global_carbon_budget

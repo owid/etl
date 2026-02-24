@@ -1,0 +1,8 @@
+steps:
+  # Replicate chart fur-farming-ban: https://admin.owid.io/admin/charts/7146/edit
+  graph://animal_welfare/latest/fur-farming-ban:
+    - data://grapher/animal_welfare/2024-12-17/fur_laws
+
+  # Replicate chart banning-of-chick-culling: https://admin.owid.io/admin/charts/7118/edit
+  graph://animal_welfare/latest/banning-of-chick-culling:
+    - data://grapher/animal_welfare/2023-09-01/chick_culling_laws

@@ -1,0 +1,90 @@
+slug: covid/covid#covid_deaths
+
+definitions:
+  common_views:
+    - config:
+        tab: map
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+
+title:
+  title: COVID-19 confirmed deaths
+  title_variant: ""
+
+default_selection:
+  - World
+  - Europe
+  - Asia
+
+topic_tags:
+  - COVID-19
+
+dimensions:
+  - slug: period
+    name: Period
+    choices:
+      - slug: weekly
+        name: Weekly
+        description: null
+      - slug: biweekly
+        name: Biweekly
+        description: null
+
+  - slug: metric
+    name: Indicator
+    choices:
+      - slug: absolute
+        name: Absolute number
+        description: null
+      - slug: per_capita
+        name: Per million people
+        description: Normalized by million people living in the country or region
+      - slug: change
+        name: Relative change (%)
+        description: Growth rate compared to the previous period
+
+views:
+  - dimensions:
+      period: weekly
+      metric: absolute
+    indicators:
+      y:
+        - catalogPath: weekly_deaths
+
+  - dimensions:
+      period: weekly
+      metric: per_capita
+    indicators:
+      y:
+        - catalogPath: weekly_deaths_per_million
+
+  - dimensions:
+      period: weekly
+      metric: change
+    indicators:
+      y:
+        - catalogPath: weekly_pct_growth_deaths
+
+  - dimensions:
+      period: biweekly
+      metric: absolute
+    indicators:
+      y:
+        - catalogPath: biweekly_deaths
+
+  - dimensions:
+      period: biweekly
+      metric: per_capita
+    indicators:
+      y:
+        - catalogPath: biweekly_deaths_per_million
+
+  - dimensions:
+      period: biweekly
+      metric: change
+    indicators:
+      y:
+        - catalogPath: biweekly_pct_growth_deaths
