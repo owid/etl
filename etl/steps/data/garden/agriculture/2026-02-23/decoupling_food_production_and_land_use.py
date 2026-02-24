@@ -2,15 +2,6 @@
 
 The goal is to create a visualization showing which countries have managed to decouple food production and land use.
 
-NOTE on double-counting correction:
-When summing crop and livestock production in calories, crops used as domestic animal feed would be counted twice:
-once as crop production, and again as the livestock output they helped produce. To avoid this, we subtract the
-estimated domestic feed portion from crop production before converting to calories.
-
-Since FAOSTAT's "feed" element reports total feed use (from both domestic and imported crops), we estimate the
-domestic share using a proportional allocation: domestic_feed = feed x ( production / (production + imports) ).
-This way, imported feed (which is not in the production count) is not subtracted.
-
 """
 
 from pathlib import Path
@@ -40,7 +31,7 @@ ELEMENT_CODES = [
     "0645pc",
     # "Production", in tonnes.
     "005511",
-    # "Feed", in tonnes. Used to void double-counting calories (in crops used for feed and then animal products).
+    # "Feed", in tonnes. Used to avoid double-counting calories (in crops used for feed and then animal products).
     "005521",
     # "Imports", in tonnes. Used to estimate the domestic share of feed.
     "005611",
@@ -523,7 +514,7 @@ def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER
     # The similarity between our uncorrected caloric series and Hong et al.'s series suggests that they did not correct for feed calories.
 
 
-def smoothen_curves(tb_grouped):
+def apply_rolling_average(tb_grouped):
     # Apply rolling averages to smooth year-to-year variability.
     if ROLLING_AVERAGE_YEARS > 1:
         tb_grouped = tb_grouped.sort_values(["country", "year"]).reset_index(drop=True)
@@ -792,7 +783,7 @@ def run() -> None:
     tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected"], errors="raise")
 
     # Apply a rolling average of ROLLING_AVERAGE_YEARS (defined above) on all indicators.
-    tb_grouped = smoothen_curves(tb_grouped=tb_grouped)
+    tb_grouped = apply_rolling_average(tb_grouped=tb_grouped)
 
     # Select countries that achieved decoupling: production increased and land use decreased over the full time window.
     # Set plot=True to generate individual country charts and a slope chart grid.
