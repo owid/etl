@@ -7,8 +7,6 @@ source for annotating int_dollar_conversions output.
 The WB ISO3 codes are mapped to OWID country names via the regions dataset.
 """
 
-from owid.catalog import Table
-
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
