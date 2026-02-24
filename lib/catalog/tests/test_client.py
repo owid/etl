@@ -3,7 +3,7 @@
 #
 import pytest
 
-from owid.catalog import Client, Table
+from owid.catalog import Client, Table, fetch, search
 from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
@@ -911,3 +911,119 @@ class TestDatasetteAPI:
         tables = api.list_tables(timeout=10)
         assert isinstance(tables, list)
         assert all(isinstance(t, DatasetteTable) for t in tables)
+
+
+class TestQuickSearch:
+    """Test the search() convenience function from quick.py."""
+
+    def test_search_charts_default(self):
+        """search() with a query returns ResponseSet[ChartResult] by default."""
+        results = search("population")
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, ChartResult) for r in results)
+
+    def test_search_tables(self):
+        """search(kind='table') returns ResponseSet[TableResult]."""
+        results = search("population", kind="table")
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, TableResult) for r in results)
+
+    def test_search_indicators(self):
+        """search(kind='indicator') returns ResponseSet[IndicatorResult]."""
+        results = search("life expectancy", kind="indicator")
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, IndicatorResult) for r in results)
+
+    def test_search_requires_name_for_charts(self):
+        """search(kind='chart') without name raises ValueError."""
+        with pytest.raises(ValueError, match="'name' is required"):
+            search(kind="chart")
+
+    def test_search_requires_name_for_indicators(self):
+        """search(kind='indicator') without name raises ValueError."""
+        with pytest.raises(ValueError, match="'name' is required"):
+            search(kind="indicator")
+
+    def test_search_invalid_kind(self):
+        """search() with invalid kind raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid kind"):
+            search("x", kind="invalid")  # type: ignore[arg-type]
+
+
+class TestQuickFetch:
+    """Test the fetch() convenience function from quick.py."""
+
+    def test_fetch_chart_slug(self):
+        """fetch() with a chart slug returns a ChartTable."""
+        tb = fetch("life-expectancy")
+        assert isinstance(tb, ChartTable)
+        assert len(tb) > 0
+
+    def test_fetch_chart_url(self):
+        """fetch() with a full grapher URL returns a ChartTable."""
+        tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
+        assert isinstance(tb, ChartTable)
+        assert len(tb) > 0
+
+    def test_fetch_table_path(self):
+        """fetch() with a catalog table path returns a Table."""
+        # Find a valid table path first
+        results = search("population", kind="table")
+        assert len(results) > 0
+        path = results[0].path
+        assert path is not None
+        tb = fetch(path)
+        assert isinstance(tb, Table)
+        assert len(tb) > 0
+
+    def test_fetch_invalid_path(self):
+        """fetch() with an invalid path raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid path format"):
+            fetch("!!!invalid")
+
+
+class TestResponseSetUI:
+    """Test set_ui_advanced() and set_ui_basic() on ResponseSet."""
+
+    def test_set_ui_advanced(self):
+        """set_ui_advanced() sets _ui_advanced = True."""
+        rs = ResponseSet(results=[1, 2], query="test", base_url="https://example.com")
+        result = rs.set_ui_advanced()
+        assert rs._ui_advanced is True
+        # Returns self for chaining
+        assert result is rs
+
+    def test_set_ui_basic(self):
+        """set_ui_basic() sets _ui_advanced = False."""
+        rs = ResponseSet(results=[1, 2], query="test", base_url="https://example.com")
+        rs.set_ui_advanced()
+        assert rs._ui_advanced is True
+        result = rs.set_ui_basic()
+        assert rs._ui_advanced is False
+        # Returns self for chaining
+        assert result is rs
+
+
+class TestIndicatorsSearchParams:
+    """Test indicator search with sort_by and latest parameters."""
+
+    def test_indicators_search_latest(self):
+        """latest=True deduplicates indicators by namespace/dataset/column."""
+        client = Client()
+        all_results = client.indicators.search("population")
+        latest_results = client.indicators.search("population", latest=True)
+
+        assert len(latest_results) > 0
+        assert len(latest_results) <= len(all_results)
+
+    def test_indicators_search_sort_by_relevance(self):
+        """Default sort_by='relevance' returns results (sanity check)."""
+        client = Client()
+        results = client.indicators.search("gdp per capita", sort_by="relevance")
+
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, IndicatorResult) for r in results)
