@@ -1151,6 +1151,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1203,6 +1207,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1253,6 +1261,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1307,6 +1319,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1358,6 +1374,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1407,6 +1427,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1461,6 +1485,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1512,6 +1540,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
@@ -1561,6 +1593,10 @@ tables:
             variantName: "{definitions.variant_name_iloest_modelled_data}"
             hasMapTab: true
             tab: map
+            chartTypes:
+              - LineChart
+              - DiscreteBar
+              - SlopeChart
             yAxis:
               min: 0
             map:
