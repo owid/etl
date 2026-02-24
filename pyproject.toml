@@ -70,7 +70,7 @@ dependencies = [
     # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
     "fastmcp>=3.0.0b1",
     "pyproj>=3.7.1",
-    "pydantic-ai>=1.40.0",
+    "pydantic-ai>=1.40.0,<1.63.0",  # 1.63.0 removed ToolManager._call_tool, breaking sentry-sdk pydantic-ai integration
     "logfire[fastapi,httpx]>=4.3.3",
     "metabase-api>=3.5.2",
     "codespell>=2.4.1",
