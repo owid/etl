@@ -636,7 +636,7 @@ function runPreviewScript(wsRoot: string, stepPath: string, filePath: string): P
 		const config = vscode.workspace.getConfiguration('chart-preview');
 		const pythonRel = config.get<string>('pythonPath', '.venv/bin/python');
 		const pythonPath = path.resolve(wsRoot, pythonRel);
-		const scriptPath = path.join(wsRoot, 'ai', 'dataset_preview', 'generate_preview.py');
+		const scriptPath = path.join(wsRoot, 'vscode_extensions', 'chart-preview', 'generate_preview.py');
 
 		const proc = spawn(pythonPath, [scriptPath, stepPath, '--json'], { cwd: wsRoot });
 		previewScriptProcesses.set(filePath, proc);
