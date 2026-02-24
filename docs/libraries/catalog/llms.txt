@@ -1,0 +1,3353 @@
+# owid-catalog
+
+> Python library for accessing Our World in Data's catalog of research data.
+
+# Catalog Library
+
+The `owid-catalog` library is the foundation of Our World in Data's data management system. It serves two main purposes:
+
+1. **Data API**: Access OWID data through unified client interfaces. We provide a reference for the most important objects and methods.
+2. **Data Structures**: Enhanced pandas DataFrames with rich metadata support
+
+## Installation
+
+```bash
+pip install owid-catalog
+```
+
+## Quick Start
+
+### Accessing Data via API
+
+```python
+from owid.catalog import Client
+
+client = Client()
+
+# Get chart data
+tb = client.charts.fetch("life-expectancy")
+
+# Search for indicators
+results = client.indicators.search("renewable energy")
+variable = results[0].fetch()
+
+# Query catalog tables
+results = client.tables.search(table="population", namespace="un")
+tb = results[0].fetch()
+```
+
+### Working with Data Structures
+
+```python
+from owid.catalog import Table
+
+# Tables are pandas DataFrames with metadata
+tb = Table(df)
+tb.metadata.short_name = "population"
+
+# Metadata propagates through operations
+tb_filtered = tb[tb["year"] > 2000]  # Keeps metadata
+tb_grouped = tb.groupby("country").sum()  # Preserves metadata
+```
+
+---
+
+# owid-catalog: Data APIs
+
+The Data API provides unified access to OWID's published data through a simple client interface.
+
+<!--
+## Quick Reference
+The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
+
+For example to fetch a table by its path:
+
+```python
+from owid.catalog import Client
+
+client = Client()
+tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+```
+
+For convenience, the library provides functions for the most common use cases:
+
+```python
+from owid.catalog import search, fetch
+
+# Search for charts (default)
+results = search("population")
+tb = results[0].fetch()
+
+# Direct fetch (by chart slug or table path)
+tb = fetch("life-expectancy")
+tb = fetch("garden/un/2024-07-12/un_wpp/population")
+```
+
+### Lazy Loading
+
+All `fetch()` methods return `Table`-like objects, which resemble pandas.DataFrame with the addition of metadata attributes that describe the data.
+```python
+tb = client.charts.fetch("life-expectancy")
+tb.metadata  # Available immediately
+tb["life_expectancy_0"].metadata  # Column metadata available
+```
+
+Optionally, you can defer data loading until it's actually needed, by using the `load_data=False` parameter in `fetch()` methods.
+
+
+### Path Formats
+
+Different APIs use different path conventions:
+
+- **Charts**: `"life-expectancy"` (simple slug), `"years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"` (with query params), or `"https://ourworldindata.org/grapher/life-expectancy"` (full URL)
+- **Tables**: `"garden/un/2024-07-12/un_wpp/population"` (channel/namespace/version/dataset/table)
+- **Indicators**: `"garden/un/2024-07-12/un_wpp/population#population"` (table path + #column)
+
+## API Reference
+
+### API result types
+
+Result objects returned by `fetch()` and `search()` methods.
+
+---
+
+We have created a python library to enable easy access to our large data catalog. It also assists our work in ETL, as it contains various methods and objects essential to the data wrangling procceses.
+
+
+Currently, this library lives in the `etl` repository ( find it here).
+
+### Installation
+Simply install it from PyPI:
+
+```shell
+pip install owid-catalog
+```
+
+### Update release
+After working on your changes in the library, publishing to PyPI is automated:
+
+1. **Bump the version** in  `lib/catalog/pyproject.toml`
+2. **Update the changelog** in  `lib/catalog/README.md`
+3. **Commit and push to `master`** - the package will be automatically published to PyPI via  GitHub Actions
+
+The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on the master branch. It includes a safety check to ensure the version was actually bumped before publishing.
+
+**Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in  GitHub Actions if needed.
+
+---
+
+# owid-catalog: Data Structures and Processing
+
+Enhanced pandas data structures with rich metadata support for OWID's data processing pipelines.
+
+## Quick Reference
+
+```python
+from owid.catalog import Dataset, Table, Variable
+from owid.catalog import processing as pr
+
+# Create a table with metadata
+tb = Table(df, metadata={"short_name": "population"})
+```
+
+### Metadata Hierarchy
+
+```
+Dataset
+├── metadata: DatasetMeta (sources, licenses, title)
+└── Tables
+    ├── metadata: TableMeta (table-level info)
+    └── Variables (columns)
+        └── metadata: VariableMeta (unit, description, sources)
+```
+
+### Metadata Propagation
+As the table is processed, metadata is preserved and propagated to resulting tables and variables.
+
+```python
+# Slicing
+tb_filtered = tb[tb["year"] > 2000]  # Keeps metadata
+# Filtering
+tb_loc = tb.loc[tb["country"] == "USA"]  # Keeps metadata
+# Sorting
+tb_sorted = tb.sort_values("gdp_per_capita")  # Keeps metadata
+# Column operations
+tb["gdp_per_capita_usd"] = tb["gdp_per_capita"] * 2
+
+# Merging
+tb_merged = pr.merge(tb1, tb2, on="country")  # Merges metadata
+# Concatenating
+tb_concat = pr.concat([tb1, tb2])  # Combines metadata
+# Pivoting
+tb_pivot = pr.pivot(tb, index="year", ...)  # Adjusts metadata
+# Melting
+tb_melted = pr.melt(tb, ...)
+```
+
+### File Formats
+
+Tables support multiple formats with automatic detection: feather, parquet, and CSV. Metadata is stored separately in `.meta.json` files.
+
+## Reference
+
+Metadata-aware alternatives to pandas functions.
+
+Container for multiple tables with shared metadata.
+
+pandas DataFrame with column-level metadata.
+
+pandas Series with metadata.
+
+---
+
+# API Reference (owid.catalog.api)
+
+## quick
+
+Quick access functions for data discovery and retrieval. For more complex use cases, refer to the full API.
+
+### `fetch(path: 'str') -> "'Table | ChartTable'"`
+
+Fetch data directly by path (auto-detects tables, indicators, or charts).
+
+This function downloads the data associated with the given path. It auto-detects
+whether you're accessing a table, indicator, or chart based on the path format.
+
+Args:
+    path: Path to the data resource:
+
+        - Table: "channel/namespace/version/dataset/table"
+        - Indicator: "channel/namespace/version/dataset/table#variable"
+        - Chart slug: "life-expectancy"
+        - Chart URL: "https://ourworldindata.org/grapher/life-expectancy"
+        - Chart slug with query params: "years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"
+        - Explorer URL: "https://ourworldindata.org/explorers/energy"
+
+Returns:
+    Table (for tables or indicators) or CharTable (for charts)
+
+Raises:
+    ValueError: If path format is invalid or resource not found
+
+Example:
+    ```python
+    # Fetch table
+    tb = fetch("garden/un/2024-07-12/un_wpp/population")
+    print(tb.shape)
+    print(tb.metadata)
+
+    # Fetch indicator as Table (single column)
+    tb = fetch("garden/un/2024-07-12/un_wpp/population#population")
+    print(tb.columns)
+
+    # Fetch chart data (slug auto-detected)
+    tb = fetch("life-expectancy")
+    print(tb.metadata.title)
+
+    # Fetch chart with query params
+    tb = fetch("years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys")
+
+    # Fetch chart by full URL
+    tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
+
+    # Fetch from grapher channel
+    tb = fetch("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
+    ```
+
+
+### `search(name: 'str | None' = None, *, kind: "Literal['table', 'indicator', 'chart']" = 'chart', limit: 'int' = 10, namespace: 'str | None' = None, version: 'str | None' = None, dataset: 'str | None' = None, channel: 'str | None' = None, match: "Literal['exact', 'contains', 'regex', 'fuzzy']" = 'fuzzy', fuzzy_threshold: 'int' = 70, case: 'bool' = False, latest: 'bool' = False) -> 'ResponseSet[TableResult] | ResponseSet[IndicatorResult] | ResponseSet[ChartResult]'`
+
+Search for available data without downloading (for browsing/discovery).
+
+This function searches for data in the catalog and returns a ResponseSet of results
+without downloading the actual data. Use this to explore and find the exact path or
+slug, then use fetch() to download the data.
+
+Args:
+    name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy").
+        Required for indicators and charts. Optional for tables (can filter by other params).
+    kind: What to search for (default: "chart"):
+
+        - "chart": Search published charts (returns ResponseSet[ChartResult])
+        - "table": Search catalog tables (returns ResponseSet[TableResult])
+        - "indicator": Search indicators/variables (returns ResponseSet[IndicatorResult])
+    limit: Maximum number of results to return (default: 10)
+    namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
+    version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
+    dataset: Filter by dataset name. Only for tables.
+    channel: Filter by channel (e.g., "garden", "grapher"). Only for tables, and `name` field.
+    match: Matching mode (default: "fuzzy" for typo-tolerance) (only for tables, and `name` field):
+
+        - "fuzzy": Typo-tolerant similarity matching
+        - "exact": Exact string match
+        - "contains": Substring match
+        - "regex": Regular expression
+    fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables, and `name` field.
+    case: Case-sensitive search (default: False).  Only for tables.
+    latest: If True, keep only the latest version of each result
+        (grouped by namespace/dataset/table or indicator). Only for tables and indicators.
+        Note: results without a version are dropped when this is enabled.
+
+Returns:
+    Search results. Results can be indexed, iterated, and provide access to metadata without downloading data.
+
+Example:
+    ```python
+    # Search for charts (default)
+    results = search("population")
+    print(f"Found {len(results)} charts")
+    print(results[0].slug)  # Access chart slug without downloading data
+
+    # Search for tables
+    results = search("population", kind="table")
+    print(results[0].path)
+
+    # Search for indicators
+    results = search("gdp", kind="indicator")
+    print(results[0].title)
+
+    # Exact match for tables
+    results = search("population", kind="table", match="exact")
+
+    # Filter tables by namespace and version
+    results = search("wdi", kind="table", namespace="worldbank_wdi", version="2024-01-10")
+
+    # Then fetch the data you need:
+    tb = results[0].fetch()
+    ```
+
+Warning:
+    For indicators and charts, filtering parameters (namespace, version, dataset, channel)
+    are ignored as they don't apply to those search types.
+
+
+## client
+
+### Client
+
+Unified client for all OWID data APIs.
+
+Provides access to our main APIs:
+
+- ChartsAPI: Fetch and search for published charts
+- IndicatorsAPI: Semantic search for data indicators
+- TablesAPI: Query and load tables from the data catalog
+
+Attributes:
+    charts: ChartsAPI instance for chart operations and search.
+    indicators: IndicatorsAPI instance for indicator search.
+    tables: TablesAPI instance for catalog operations.
+
+Example:
+    ```python
+    from owid.catalog import Client
+
+    client = Client()
+
+    # Charts: Published visualizations
+    results = client.charts.search("climate change")
+    chart = client.charts.fetch("life-expectancy")
+
+    # Tables: Catalog datasets
+    results = client.tables.search(table="population", namespace="un")
+    tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+
+    # Indicators: Semantic search for data series
+    results = client.indicators.search("renewable energy")
+    variable = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
+
+    # Custom URLs (e.g., for staging environments)
+    staging_client = Client(catalog_url="https://staging-catalog.example.com/")
+    ```
+
+
+## charts
+
+- **`ChartNotFoundError`**: Raised when a chart does not exist.
+
+### ChartResult
+
+An OWID chart (from fetch or search).
+
+Fields populated depend on the source:
+- fetch(): Provides config and metadata
+- search(): Provides subtitle, available_entities, num_related_articles, published_at, last_updated, popularity
+
+Core fields (slug, title, url) are always populated.
+
+Attributes:
+    slug: Chart URL identifier (e.g., "life-expectancy").
+    title: Chart title.
+    url: Full URL to the interactive chart.
+    config: Raw grapher configuration dict (from fetch).
+    metadata: Chart metadata dict including column info (from fetch).
+    subtitle: Chart subtitle/description (from search).
+    available_entities: List of entities/countries in the chart (from search).
+    num_related_articles: Number of related articles (from search).
+    published_at: When the chart was first published (from search).
+    last_updated: When the chart was last updated (from search).
+    popularity: Popularity score (0.0 to 1.0) based on analytics views (from search).
+
+#### `ChartResult.chart_base_url` (property)
+
+Base URL for this chart type (grapher or explorer, derived from site_url and type).
+
+#### `ChartResult.description` (property)
+
+Return a string description of the chart result.
+
+#### `fetch(self, *, load_data: 'bool' = True) -> 'ChartTable'`
+
+Fetch chart data as ChartTable with rich metadata.
+
+Args:
+    load_data: If True (default), load full chart data.
+               If False, load only structure (columns and metadata) without rows.
+
+Returns:
+    ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
+    is populated from the chart's metadata.json.
+
+Note:
+    Explorer views (``type="explorerView"``) are best-effort. Some explorers
+    may return 503 or other errors from their CSV endpoint. In those cases an
+    :class:`ExplorerFetchError` is raised with details.
+
+Example:
+    ```python
+    result = client.charts.search("life expectancy")[0]
+    tb = result.fetch()
+    print(tb.head())
+    print(tb["life_expectancy_0"].metadata.unit)
+    ```
+
+#### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
+
+This function is meant to behave like a BaseModel method to initialise private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+Args:
+    self: The BaseModel instance.
+    context: The context.
+
+#### `ChartResult.url` (property)
+
+Full URL to the interactive chart (built from chart_base_url, slug, and query_params).
+
+
+### ChartsAPI
+
+API for accessing OWID chart data and metadata.
+
+Provides methods to fetch data and metadata from published charts
+on ourworldindata.org. Also includes search functionality to find
+charts by keywords.
+
+Example:
+    ```python
+    from owid.catalog import Client
+
+    client = Client()
+
+    # Fetch chart data as ChartTable
+    tb = client.charts.fetch("life-expectancy")
+    print(tb.head())
+    print(tb["life_expectancy_0"].metadata.unit)
+    print(tb.metadata.chart_config.get("title"))  # Access chart config
+
+    # Search for charts
+    results = client.charts.search("gdp per capita")
+    tb = results[0].fetch()  # Fetch chart data as ChartTable
+    ```
+
+#### `ChartsAPI.base_url` (property)
+
+Base URL for the Grapher (read-only).
+
+#### `fetch(self, slug_or_url: 'str', *, type: 'ChartType | None' = None, load_data: 'bool' = True, timeout: 'int | None' = None) -> 'ChartTable'`
+
+Fetch chart data as a ChartTable with rich metadata.
+
+Accepts a chart slug, a slug with query parameters, or a full URL. The slug,
+query parameters, and chart type are extracted automatically.
+
+Args:
+    slug_or_url: One of:
+
+        - Chart slug: ``"life-expectancy"``
+        - Slug with query params: ``"education-spending?level=primary&spending_type=gdp_share"``
+        - Full grapher URL: ``"https://ourworldindata.org/grapher/life-expectancy?tab=table"``
+        - Full explorer URL: ``"https://ourworldindata.org/explorers/covid?Metric=Cases"``
+    type: Override the chart type. Defaults to ``"chart"`` (grapher).
+        Use ``"explorerView"`` for explorer views. Auto-detected from full URLs.
+    load_data: If True (default), load full chart data.
+               If False, load only structure (columns and metadata) without rows.
+    timeout: HTTP request timeout in seconds. Defaults to client timeout.
+
+Returns:
+    ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
+    is populated from the chart's metadata.json. Chart config is accessible via .metadata.chart_config.
+
+Note:
+    Explorer views are best-effort. Some explorers may return 503 or other errors
+    from their CSV endpoint.
+
+Example:
+    ```python
+    # Fetch a grapher chart by slug
+    tb = client.charts.fetch("life-expectancy")
+
+    # Fetch with query params (e.g., a multiDim view)
+    tb = client.charts.fetch("education-spending?level=primary&spending_type=gdp_share")
+
+    # Fetch from a full URL (type and query params auto-detected)
+    tb = client.charts.fetch("https://ourworldindata.org/explorers/covid?Metric=Cases")
+
+    # Explicitly fetch an explorer view
+    tb = client.charts.fetch("covid?Metric=Cases", type="explorerView")
+    ```
+
+#### `search(self, query: 'str', *, countries: 'list[str] | None' = None, topics: 'list[str] | None' = None, require_all_countries: 'bool' = False, limit: 'int' = 10, page: 'int' = 0, timeout: 'int | None' = None) -> 'ResponseSet[ChartResult]'`
+
+Search for charts matching a query.
+
+Args:
+    query: Search query string.
+    countries: Optional list of country names to filter by.
+    topics: Optional list of topic names to filter by.
+    require_all_countries: If True, only return charts with ALL
+        specified countries. Default False (any country matches).
+    limit: Maximum results to return (1-100). Default 20.
+    page: Page number for pagination (0-indexed). Default 0.
+    timeout: HTTP request timeout in seconds. Defaults to client timeout.
+
+Returns:
+    ResponseSet containing ChartResult objects, sorted by popularity (most viewed first).
+    Each result includes a `popularity` field (0.0-1.0) based on analytics views.
+
+Example:
+    ```python
+    # Basic search (sorted by popularity)
+    results = client.charts.search("life expectancy")
+    for chart in results:
+        print(f"{chart.title}: popularity={chart.popularity:.3f}")
+
+    # Filter by countries
+    results = client.charts.search(
+        "gdp",
+        countries=["France", "Germany"],
+        require_all_countries=True
+    )
+
+    # Get data from search results
+    tb = results[0].fetch()
+    ```
+
+
+- **`ExplorerFetchError`**: Raised when an explorer view cannot be fetched (e.g., 503 from CSV endpoint).
+
+- **`LicenseError`**: Raised when chart data cannot be downloaded due to licensing.
+
+### ParsedSlug
+
+Result of parsing a chart slug or URL.
+
+
+### `parse_chart_slug(slug_or_url: 'str') -> 'ParsedSlug'`
+
+Extract slug, query params, and type from a URL or plain slug.
+
+Args:
+    slug_or_url: Chart slug, grapher URL, or explorer URL.
+
+Returns:
+    ParsedSlug with slug, query_params, and type.
+
+Raises:
+    ValueError: If URL is not a valid grapher or explorer URL.
+
+
+## tables
+
+- **`CatalogVersionError`**: Raised when catalog format version is newer than library version.
+
+### TableResult
+
+A table found in the catalog.
+
+Attributes:
+    table: Table name.
+    path: Full path to the table.
+    channel: Data channel (garden, meadow, etc.).
+    namespace: Data provider namespace.
+    version: Version string.
+    dataset: Dataset name.
+    dimensions: List of dimension columns.
+    title: Human-readable title (from table or dataset metadata).
+    description: Detailed description (from table or dataset metadata).
+    is_public: Whether the data is publicly accessible.
+    formats: List of available formats.
+    popularity: Popularity score (0.0 to 1.0) based on analytics views.
+
+#### `fetch(self, *, load_data: 'bool' = True) -> 'Table'`
+
+Fetch table data.
+
+Args:
+    load_data: If True (default), load full table data.
+               If False, load only structure (columns and metadata) without rows.
+
+Returns:
+    Table with data and metadata (or just metadata if load_data=False).
+
+Example:
+    ```python
+    result = client.tables.search(table="population")[0]
+    tb = result.fetch()
+    print(tb.head())
+    print(tb.columns)
+    ```
+
+#### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
+
+This function is meant to behave like a BaseModel method to initialise private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+Args:
+    self: The BaseModel instance.
+    context: The context.
+
+
+### TablesAPI
+
+API for querying and loading tables from the OWID catalog.
+
+Provides methods to search for tables by various criteria and
+load table data from the catalog.
+
+Example:
+    ```python
+    from owid.catalog import Client
+
+    client = Client()
+
+    # Search for tables
+    results = client.tables.search(table="population", namespace="un")
+
+    # Load the first result
+    table = results[0].fetch()
+
+    # Fetch table directly by path
+    tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+    print(tb.head())
+    ```
+
+#### `TablesAPI.catalog_url` (property)
+
+Base URL for the catalog (read-only).
+
+#### `fetch(self, path: 'str', *, load_data: 'bool' = True, formats: 'list[str] | None' = None, is_public: 'bool' = True, timeout: 'int | None' = None) -> 'Table'`
+
+Fetch a table by catalog path.
+
+Loads the table directly from the catalog.
+
+Args:
+    path: Full catalog path (e.g., "garden/un/2024-07-12/un_wpp/population").
+    load_data: If True (default), load full table data.
+               If False, load only table structure (columns and metadata) without rows.
+    formats: List of formats to try. If None, tries all supported formats.
+    is_public: Whether the table is publicly accessible. Default True.
+    timeout: HTTP request timeout in seconds (currently unused, reserved for future).
+
+Returns:
+    Table with data and metadata (or just metadata if load_data=False).
+
+Raises:
+    ValueError: If path format is invalid.
+    KeyError: If table not found at path.
+
+Example:
+    ```python
+    # Load table with data
+    tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population")
+    print(tb.head())
+
+    # Load only metadata (no data rows)
+    tb = client.tables.fetch("garden/un/2024-07-12/un_wpp/population", load_data=False)
+    print(tb.columns)
+    ```
+
+#### `search(self, table: 'str | None' = None, namespace: 'str | None' = None, version: 'str | None' = None, dataset: 'str | None' = None, channel: 'str | None' = None, case: 'bool' = False, match: "Literal['exact', 'contains', 'regex', 'fuzzy']" = 'exact', fuzzy_threshold: 'int' = 70, timeout: 'int | None' = None, refresh_index: 'bool' = False, latest: 'bool' = False) -> 'ResponseSet[TableResult]'`
+
+Search the catalog for tables matching criteria.
+
+Args:
+    table: Table name pattern to search for
+    namespace: Filter by namespace (exact match)
+    version: Filter by version (exact match)
+    dataset: Dataset name pattern to search for
+    channel: Filter by channel (exact match). Defaults to 'garden' if not specified.
+    case: Case-sensitive search (default: False)
+    match: How to match table/dataset names (default: "exact"):
+        - "fuzzy": Typo-tolerant similarity matching
+        - "exact": Exact string match
+        - "contains": Substring match
+        - "regex": Regular expression pattern
+    fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching.
+        Only used when match="fuzzy". (default: 70)
+    timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
+    refresh_index: If True, force re-download of the catalog index. Default False.
+    latest: If True, keep only the latest version of each table
+        (grouped by namespace, dataset, table, channel). Default False.
+        Note: results without a version are dropped when this is enabled.
+
+Returns:
+    ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
+    If match="fuzzy", results are sorted by fuzzy relevance score instead.
+    Each result includes a `popularity` field (0.0-1.0) based on analytics views.
+
+Example:
+    ```python
+    # Exact match (default) - searches garden channel by default
+    results = client.tables.search(table="population")
+
+    # Substring match
+    results = client.tables.search(table="pop", match="contains")
+
+    # Regex search
+    results = client.tables.search(table="population.*density", match="regex")
+
+    # Fuzzy search sorted by relevance
+    results = client.tables.search(table="populaton", match="fuzzy")
+
+    # Case-sensitive fuzzy search with custom threshold
+    results = client.tables.search(table="GDP", match="fuzzy", case=True, fuzzy_threshold=85)
+
+    # Filter by namespace and version
+    results = client.tables.search(
+        table="wdi",
+        namespace="worldbank_wdi",
+        version="2025-09-08",
+    )
+
+    # Search in a specific channel
+    results = client.tables.search(
+        table="wdi",
+        namespace="worldbank_wdi",
+        version="2025-09-08",
+        channel="meadow",
+    )
+
+    # Load a specific result
+    tb = results[0].fetch()
+    ```
+
+
+## indicators
+
+### IndicatorResult
+
+An indicator found via semantic search.
+
+Attributes:
+    title: Indicator title/name.
+    indicator_id: Unique indicator ID.
+    path: Path in the catalog (e.g., "grapher/un/2024-07-12/un_wpp/population#population").
+    channel: Data channel (parsed from path).
+    namespace: Data provider namespace (parsed from path).
+    version: Version string (parsed from path).
+    dataset: Dataset name (parsed from path).
+    column_name: Column name in the table.
+    description: Full indicator description.
+    unit: Unit of measurement.
+    score: Semantic similarity score (0-1).
+    n_charts: Number of charts using this indicator.
+    popularity: Popularity score (0.0 to 1.0) based on analytics views.
+
+#### `fetch(self, *, load_data: 'bool' = True) -> 'Table'`
+
+Fetch indicator data as a single-column Table.
+
+Args:
+    load_data: If True (default), load full indicator data.
+               If False, load only structure (columns and metadata) without rows.
+
+Returns:
+    Table with the indicator column (plus index). Metadata is preserved.
+
+Example:
+    ```python
+    result = client.indicators.search("population")[0]
+    tb = result.fetch()
+    print(tb.head())
+    print(tb[tb.columns[0]].metadata.unit)
+    ```
+
+#### `fetch_table(self, *, load_data: 'bool' = True) -> 'Table'`
+
+Fetch the full table containing this indicator.
+
+Args:
+    load_data: If True (default), load full table data.
+               If False, load only structure (columns and metadata) without rows.
+
+Returns:
+    Table with all columns including this indicator.
+
+Example:
+    ```python
+    result = client.indicators.search("population")[0]
+    tb = result.fetch_table()
+    print(tb.columns)
+    ```
+
+#### `model_post_init(self, _IndicatorResult__context: 'Any') -> 'None'`
+
+Parse dataset, version, namespace, channel from path.
+
+
+### IndicatorsAPI
+
+API for semantic search of OWID indicators.
+
+Uses the search.owid.io service to find indicators using
+natural language queries and vector embeddings.
+
+Example:
+    ```python
+    from owid.catalog import Client
+
+    client = Client()
+
+    # Search for indicators
+    results = client.indicators.search("solar power generation")
+    for ind in results:
+        print(f"{ind.title} (score: {ind.score:.2f})")
+
+    # Fetch the indicator data as a single-column Table
+    tb = results[0].fetch()
+
+    # Or fetch the full table containing the indicator
+    full_table = results[0].fetch_table()
+    ```
+
+#### `IndicatorsAPI.catalog_url` (property)
+
+Base URL for the catalog (read-only).
+
+#### `fetch(self, path: 'str', *, load_data: 'bool' = True, timeout: 'int | None' = None) -> 'Table'`
+
+Fetch a specific indicator by catalog path.
+
+Args:
+    path: Catalog path in format "channel/namespace/version/dataset/table#column"
+    load_data: If True (default), load full indicator data.
+               If False, load only structure (columns and metadata) without rows.
+    timeout: HTTP request timeout in seconds (reserved for future use).
+
+Returns:
+    Table with a single indicator column (plus index). Metadata is preserved.
+
+Raises:
+    ValueError: If path format is invalid, table not found, or column doesn't exist.
+
+Example:
+    ```python
+    # Fetch indicator by path
+    tb = client.indicators.fetch("garden/un/2024-07-12/un_wpp/population#population")
+    print(tb.head())
+    print(tb["population"].metadata.unit)
+    ```
+
+#### `search(self, query: 'str', *, limit: 'int' = 10, show_legacy: 'bool' = False, latest: 'bool' = False, sort_by: "Literal['relevance', 'similarity']" = 'relevance', timeout: 'int | None' = None) -> 'ResponseSet[IndicatorResult]'`
+
+Search for indicators using natural language.
+
+Uses semantic search to find indicators that match the
+meaning of your query, not just keyword matching.
+
+Args:
+    query: Natural language search query
+        (e.g., "renewable energy capacity", "child mortality rate").
+    limit: Maximum number of results to return. Default 10.
+    show_legacy: If True, show pre-ETL indicators only. Default False.
+    latest: If True, keep only the latest version of each indicator
+        (grouped by namespace, dataset, column_name). Default False.
+        Note: results without a version are dropped when this is enabled.
+    sort_by: How to sort results (default: "relevance"):
+
+        - "relevance": Combined score blending semantic similarity (60%) and popularity (40%).
+        - "similarity": Sort by semantic similarity score only.
+    timeout: HTTP request timeout in seconds. Defaults to client timeout.
+
+Returns:
+    SearchResults containing IndicatorResult objects, sorted according to `sort_by`.
+    Each result includes a `popularity` field (0.0-1.0) based on analytics views.
+
+Example:
+    ```python
+    # Search for indicators (sorted by relevance by default)
+    results = client.indicators.search("CO2 emissions per capita")
+
+    # View results
+    for ind in results:
+        print(f"{ind.title}")
+        print(f"  Score: {ind.score:.3f}")
+        print(f"  Popularity: {ind.popularity:.3f}")
+
+    # Load data from top result
+    tb = results[0].fetch()
+
+    # Sort by semantic similarity only (original behavior)
+    results = client.indicators.search("CO2 emissions", sort_by="similarity")
+    ```
+
+#### `IndicatorsAPI.search_url` (property)
+
+URL for the indicators search API (read-only).
+
+
+## models
+
+### ResponseSet
+
+Generic container for API responses.
+
+Provides iteration, indexing, and conversion to CatalogFrame
+for backwards compatibility.
+
+Attributes:
+    results: List of result objects.
+    query: The query that produced these results.
+    total_count: Total number of results available (may be more than len(results)).
+
+#### `filter(self, predicate: 'Callable[[T], bool]') -> "'ResponseSet[T]'"`
+
+Filter results by predicate function.
+
+Returns a new ResponseSet with only items that match the predicate.
+The predicate should return True for items to keep.
+
+Args:
+    predicate: Function that takes an item of results (e.g. ChartResult) and returns True/False.
+
+Returns:
+    New ResponseSet with filtered results.
+
+Example:
+    ```py
+    >>> # Filter results by version
+    >>> results.filter(lambda r: r.version > '2024')
+
+    >>> # Filter by namespace
+    >>> results.filter(lambda r: r.namespace == "worldbank")
+
+    >>> # Chain multiple filters
+    >>> results.filter(lambda r: r.version > '2024').filter(lambda r: r.namespace == "un")
+    ```
+
+#### `latest(self, by: 'str | None' = None) -> 'T'`
+
+Get the most recent result.
+
+Returns the single item with the highest value for the sort key.
+
+Args:
+    by: Attribute name to sort by. If None (default), auto-detects:
+        - ChartResult: uses last_updated (as ISO string with time)
+        - TableResult/IndicatorResult: uses version
+
+Returns:
+    Single item with the highest value for the specified field.
+
+Raises:
+    ValueError: If no results are available.
+    AttributeError: If the specified attribute doesn't exist on the results.
+
+Example:
+    ```py
+    >>> # For TableResult/IndicatorResult - auto-detects version
+    >>> latest_table = results.latest()
+    >>> tb = latest_table.fetch()
+
+    >>> # For ChartResult - auto-detects last_updated
+    >>> latest_chart = chart_results.latest()
+    ```
+
+#### `model_post_init(self, _ResponseSet__context: 'Any') -> 'None'`
+
+Set total_count to length of results if not provided.
+
+#### `set_ui_advanced(self) -> "'ResponseSet[T]'"`
+
+Switch to advanced display showing all fields (type, slug, popularity, etc.).
+
+Returns:
+    Self (for chaining).
+
+Example:
+    ```py
+    >>> results.set_ui_advanced()
+    ```
+
+#### `set_ui_basic(self) -> "'ResponseSet[T]'"`
+
+Switch to basic display showing only key fields (title, description, url).
+
+Returns:
+    Self (for chaining).
+
+Example:
+    ```py
+    >>> results.set_ui_basic()
+    ```
+
+#### `sort_by(self, key: 'str | Callable[[T], Any]', *, reverse: 'bool' = False) -> "'ResponseSet[T]'"`
+
+Sort results by attribute name or key function.
+
+Returns a new ResponseSet with items sorted by the specified key.
+
+Args:
+    key: Either an attribute name (string) or a function that extracts a comparison key from each item.
+    reverse: If True, sort in descending order (default: False).
+
+Returns:
+    New ResponseSet with sorted results.
+
+Example:
+    ```py
+    >>> # Sort by version (ascending)
+    >>> results.sort_by('version')
+
+    >>> # Sort by version (descending - latest first)
+    >>> results.sort_by('version', reverse=True)
+
+    >>> # Sort by custom function (e.g., by score)
+    >>> results.sort_by(lambda r: r.score, reverse=True)
+
+    >>> # Chain sorting and filtering
+    >>> results.filter(lambda r: r.version > '2024').sort_by('version', reverse=True)
+    ```
+
+#### `to_frame(self) -> 'pd.DataFrame'`
+
+Convert results to a DataFrame.
+
+Returns:
+    DataFrame with one row per result.
+
+
+
+### `get_thumbnail_url(url: 'str') -> 'str'`
+
+Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
+Into https://ourworldindata.org/grapher/life-expectancy.png?country=~CHN
+
+
+---
+
+# Core Reference (owid.catalog.core)
+
+## tables
+
+### Table
+
+`Table` extends `pandas.DataFrame`. All standard DataFrame methods are available. Only methods unique to this class are listed below.
+
+
+Enhanced pandas DataFrame with rich metadata support.
+
+Table extends pandas DataFrame to include metadata at both the table level
+and individual column level. It's the primary data structure for ETL operations.
+
+Attributes:
+    metadata: Table-level metadata (title, description, sources, etc).
+    _fields: Dictionary mapping column names to their VariableMeta objects.
+    DEBUG: Set to True to enable metadata validation debugging.
+
+Example:
+    Create a table from a DataFrame:
+    ```
+    df = pd.DataFrame({"country": ["USA", "UK"], "gdp": [20, 3]})
+    table = Table(df, short_name="gdp")
+    ```
+
+    Create with metadata:
+    ```python
+    meta = TableMeta(short_name="gdp", title="GDP by country")
+    table = Table(df, metadata=meta)
+    ```
+
+    Copy metadata from another table:
+    ```python
+    new_table = Table(df, like=old_table)
+    ```
+
+#### `Table.all_columns` (property)
+
+Get names of all columns including index levels.
+
+Returns both regular columns and index names in a single list,
+useful for iterating over all variables in the table.
+
+Returns:
+    List of all column names and index level names.
+
+Example:
+    ```python
+    table = table.set_index(["country", "year"])
+    print(table.all_columns)  # ["country", "year", "gdp", "population"]
+    ```
+
+#### `amend_log(self, variable_names: 'list[str] | None' = None, comment: 'str | None' = None, operation: 'str | None' = None) -> 'Table'`
+
+Amend operation or comment of the latest processing log entry.
+
+#### `astype(self, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Cast table columns to specified dtype(s).
+
+Convert one or more columns to a specified data type. Wrapper
+around pandas astype that returns a Table.
+
+Args:
+    *args: Positional arguments passed to pandas.DataFrame.astype.
+    **kwargs: Keyword arguments passed to pandas.DataFrame.astype.
+
+Returns:
+    Table with columns cast to specified types.
+
+Example:
+    Cast single column:
+    ```python
+    table = table.astype({"population": int})
+    ```
+
+    Cast multiple columns:
+    ```python
+    table = table.astype({"year": int, "gdp": float})
+    ```
+
+    Cast all columns:
+    ```python
+    table = table.astype(str)
+    ```
+
+#### `check_metadata(self, ignore_columns: 'list[str] | None' = None) -> 'None'`
+
+Check that all variables in the table have origins.
+
+#### `Table.codebook` (property)
+
+Generate a human-readable codebook for this table.
+
+Creates a DataFrame summarizing all variables in the table with their
+titles, descriptions, units, and source attributions.
+
+Returns:
+    DataFrame with columns:
+
+        - column: Column name (including index columns)
+        - title: Title from metadata (title_public > display.name > title)
+        - description: Short description of the indicator
+        - unit: Unit of measurement with short unit in parentheses
+        - source: Formatted source attribution with URLs
+
+Example:
+    ```python
+    codebook = table.codebook
+    print(codebook.to_markdown())
+    ```
+
+#### `copy(self, deep: 'bool' = True) -> 'Table'`
+
+Create a copy of the table with all metadata.
+
+Args:
+    deep: If True (default), make a deep copy of the data and metadata.
+        If False, creates a shallow copy.
+
+Returns:
+    A new Table with copied data and metadata.
+
+Example:
+    ```python
+    table_copy = table.copy()  # Deep copy
+    table_copy = table.copy(deep=False)  # Shallow copy
+    ```
+
+#### `copy_metadata(self, from_table: 'Table', deep: 'bool' = False) -> 'Table'`
+
+Copy metadata from another table to this table.
+
+Copies both table-level metadata and variable-level metadata for all
+matching columns. Useful for preserving metadata after transformations.
+
+Args:
+    from_table: Source table to copy metadata from.
+    deep: If True, make a deep copy of the metadata. Default is False.
+
+Returns:
+    Self, for method chaining.
+
+Example:
+    ```python
+    new_table = Table(transformed_df)
+    new_table.copy_metadata(original_table)
+    ```
+
+#### `drop(self, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Drop specified labels from rows or columns.
+
+Remove rows or columns by specifying label names and axis.
+Wrapper around pandas drop that returns a Table.
+
+Args:
+    *args: Positional arguments passed to pandas.DataFrame.drop.
+    **kwargs: Keyword arguments passed to pandas.DataFrame.drop.
+
+Returns:
+    Table with specified labels dropped.
+
+Example:
+    Drop columns:
+    ```python
+    table = table.drop(columns=["column1", "column2"])
+    ```
+
+    Drop rows by index:
+    ```python
+    table = table.drop(index=["row1", "row2"])
+    ```
+
+    Drop columns with axis parameter:
+    ```python
+    table = table.drop(["column1"], axis=1)
+    ```
+
+#### `equals_table(self, table: 'Table') -> 'bool'`
+
+Check if two tables are equal including metadata.
+
+Compares both data and metadata for equality. This is more
+comprehensive than pandas equals() which only checks data.
+
+Args:
+    table: Table to compare with.
+
+Returns:
+    True if tables have identical data, metadata, and variable
+    metadata. False otherwise.
+
+Note:
+    NaN values are handled specially to ensure consistent comparison
+    even when NaN values are present.
+
+Example:
+    ```python
+    if table1.equals_table(table2):
+    ... print("Tables are identical")
+    ```
+
+#### `fillna(self, value: 'Any' = None, **kwargs: 'Any') -> 'Table'`
+
+Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
+table.
+
+#### `filter(self, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Subset rows or columns based on their labels.
+
+Filter the table to include only specified rows or columns by name.
+Wrapper around pandas filter that returns a Table.
+
+Args:
+    *args: Positional arguments passed to pandas.DataFrame.filter.
+    **kwargs: Keyword arguments passed to pandas.DataFrame.filter.
+        Common kwargs include:
+        - items: List of axis labels to select
+        - like: Keep labels matching this string pattern
+        - regex: Keep labels matching this regex pattern
+        - axis: Axis to filter on (0 for rows, 1 for columns)
+
+Returns:
+    Filtered Table with only selected labels.
+
+Example:
+    Filter columns by exact names:
+    ```python
+    table = table.filter(items=["country", "year", "gdp"])
+    ```
+
+    Filter columns containing pattern:
+    ```python
+    table = table.filter(like="population")
+    ```
+
+    Filter columns with regex:
+    ```python
+    table = table.filter(regex="^gdp_.*")
+    ```
+
+#### `format(self, keys: 'str | list[str] | None' = None, verify_integrity: 'bool' = True, underscore: 'bool' = True, sort_rows: 'bool' = True, sort_columns: 'bool' = False, short_name: 'str | None' = None, **kwargs: 'Any') -> 'Table'`
+
+Format the table according to OWID standards.
+
+Applies standard OWID formatting: underscores column names, sets index,
+verifies uniqueness, and sorts data. This is a convenience method that
+chains multiple operations commonly used in ETL workflows.
+
+Note:
+    Underscoring happens first, so use underscored key names in the
+    keys parameter (e.g., use 'country' if original had 'Country').
+
+Args:
+    keys: Index column name(s). If None, uses ["country", "year"].
+    verify_integrity: If True (default), raise error if index has
+        duplicate entries.
+    underscore: If True (default), convert column names to snake_case
+        format. Disable if names are already properly formatted.
+    sort_rows: If True (default), sort rows by index in ascending order.
+    sort_columns: If True, sort columns alphabetically. Default is False.
+    short_name: Optional short name to assign to table metadata.
+    **kwargs: Additional arguments passed to the underscore() method.
+
+Returns:
+    Formatted Table with standardized structure and metadata.
+
+Raises:
+    KeyError: If specified keys are not found in table columns.
+    ValueError: If verify_integrity=True and index has duplicates.
+
+Example:
+    Basic formatting with default country/year index:
+    ```python
+    table = table.format()
+    ```
+
+    Equivalent to:
+    ```python
+    table = table.underscore().set_index(
+        ["country", "year"], verify_integrity=True
+    ).sort_index()
+    ```
+
+    Custom index columns:
+    ```python
+    table = table.format(["country", "year", "sex"])
+    ```
+
+    Skip underscoring if already formatted:
+    ```python
+    table = table.format(underscore=False, keys=["country", "year"])
+    ```
+
+    Format with custom table name:
+    ```python
+    table = table.format(short_name="population_density")
+    ```
+
+#### `from_records(*args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Calling `Table.from_records` returns a Table, but does not call __init__ and misses metadata.
+
+#### `get_column_or_index(self, name: 'str') -> 'indicators.Indicator'`
+
+Get a variable by name from either columns or index.
+
+Retrieves a Variable from the table, checking both regular columns
+and index levels. This is useful when you don't know whether a
+variable is stored as a column or index.
+
+Args:
+    name: Name of the variable to retrieve.
+
+Returns:
+    Variable object with data and metadata.
+
+Raises:
+    ValueError: If name is not found in either columns or index.
+
+Example:
+    ```python
+    var = table.get_column_or_index("country")  # Works for column or index
+    print(var.metadata.title)
+    ```
+
+#### `groupby(self, *args: 'Any', observed: 'bool' = True, **kwargs: 'Any') -> "'TableGroupBy'"`
+
+Groupby that preserves metadata. It uses observed=True by default.
+
+#### `join(self, other: 'pd.DataFrame | Table', *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Join tables while preserving metadata.
+
+Extends pandas join with proper type signature for Table.
+Metadata from both tables is preserved in the result.
+
+Args:
+    other: Table or DataFrame to join with.
+    *args: Positional arguments passed to pandas.DataFrame.join.
+    **kwargs: Keyword arguments passed to pandas.DataFrame.join.
+        Supports all pandas join parameters.
+
+Returns:
+    Joined table with combined metadata.
+
+Example:
+    ```python
+    joined = table1.join(table2, on="country")
+    joined = table1.join(table2, how="outer")
+    ```
+
+#### `Table.m` (property)
+
+Metadata alias for shorter access (table.m instead of table.metadata).
+
+#### `melt(self, id_vars: 'tuple[str] | list[str] | str | None' = None, value_vars: 'tuple[str] | list[str] | str | None' = None, var_name: 'str' = 'variable', value_name: 'str' = 'value', short_name: 'str | None' = None, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Unpivot table from wide to long format.
+
+Converts columns into rows, transforming wide-format data into
+long-format. Wrapper around pandas melt that preserves metadata.
+See owid.catalog.tables.melt() for full documentation.
+
+Args:
+    id_vars: Column(s) to use as identifier variables (not melted).
+    value_vars: Column(s) to unpivot. If None, uses all columns
+        except id_vars.
+    var_name: Name for the variable column. Default is "variable".
+    value_name: Name for the value column. Default is "value".
+    short_name: Optional short name for resulting table metadata.
+    *args: Additional positional arguments passed to melt().
+    **kwargs: Additional keyword arguments passed to melt().
+
+Returns:
+    Melted Table in long format with preserved metadata.
+
+Example:
+    Melt all columns except country and year:
+    ```python
+    >>> long_table = table.melt(id_vars=["country", "year"])
+
+    >>> # Melt specific columns:
+    >>> long_table = table.melt(
+    ...     id_vars=["country", "year"],
+    ...     value_vars=["gdp", "population"]
+    ... )
+
+    >>> # Custom column names:
+    >>> long_table = table.melt(
+    ...     id_vars="country",
+    ...     var_name="indicator",
+    ...     value_name="measurement"
+    ... )
+    ```
+
+#### `merge(self, right: 'Any', *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Merge with another DataFrame or Table.
+
+Wrapper around pandas merge that preserves Table metadata.
+See owid.catalog.tables.merge() for full documentation.
+
+Args:
+    right: DataFrame or Table to merge with.
+    *args: Positional arguments passed to merge().
+    **kwargs: Keyword arguments passed to merge().
+
+Returns:
+    Merged Table with combined metadata.
+
+Example:
+    ```python
+    result = table1.merge(table2, on="country")
+    result = table1.merge(table2, left_on="code", right_on="country_code")
+    ```
+
+#### `metadata_filename(self, path: 'str')`
+
+#### `pivot(self, *, index: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, values: 'str | list[str] | None' = None, join_column_levels_with: 'str | None' = None, short_name: 'str | None' = None, fill_dimensions: 'bool' = True, **kwargs: 'Any') -> 'Table'`
+
+Reshape table from long to wide format.
+
+Converts rows into columns, transforming long-format data into
+wide-format. Wrapper around pandas pivot that preserves metadata.
+See owid.catalog.tables.pivot() for full documentation.
+
+Args:
+    index: Column(s) to use for the new index. If None, uses
+        existing index.
+    columns: Column(s) whose unique values become new columns.
+    values: Column(s) to aggregate. If None, uses all remaining
+        columns.
+    join_column_levels_with: If pivoting creates multi-level columns,
+        join them with this separator (e.g., "_").
+    short_name: Optional short name for resulting table metadata.
+    fill_dimensions: If True, fill missing dimension values.
+        Default is True.
+    **kwargs: Additional arguments passed to pivot().
+
+Returns:
+    Pivoted Table in wide format with preserved metadata.
+
+Example:
+    ```python
+    >>> # Basic pivot:
+    >>> wide = table.pivot(
+    ...     index="country",
+    ...     columns="year",
+    ...     values="gdp"
+    ... )
+
+    >>> # Flatten multi-level columns:
+    >>> wide = table.pivot(
+    ...     index="country",
+    ...     columns=["year", "sex"],
+    ...     values="population",
+    ...     join_column_levels_with="_"
+    ... )
+    ```
+
+#### `Table.primary_key` (property)
+
+Get the table's primary key column names.
+
+Returns the names of index levels, which serve as the table's
+primary key for identifying unique rows.
+
+Returns:
+    List of index level names (excluding None values).
+
+Example:
+    ```python
+    table = table.set_index(["country", "year"])
+    print(table.primary_key)  # ["country", "year"]
+    ```
+
+#### `prune_metadata(self) -> 'Table'`
+
+Remove metadata for columns no longer in the table.
+
+Cleans up the internal metadata dictionary to remove entries for columns
+that have been dropped. Useful after column filtering or selection operations.
+
+Returns:
+    Self, for method chaining.
+
+Example:
+    ```python
+    subset = table[["country", "gdp"]]  # Only 2 columns
+    subset.prune_metadata()  # Remove metadata for dropped columns
+    ```
+
+#### `read(path: 'str | Path', **kwargs: 'Any') -> 'Table'`
+
+Read a table from disk in any supported format.
+
+Automatically detects the format from file extension and loads
+the table with its metadata. Supports .csv, .feather, and .parquet.
+
+Args:
+    path: Path to the file to read. Extension determines format.
+    **kwargs: Additional arguments passed to format-specific reader.
+
+Returns:
+    Loaded Table with data and metadata.
+
+Raises:
+    ValueError: If file extension is not recognized.
+
+Example:
+    ```python
+    table = Table.read("data.feather")
+    table = Table.read("data.csv")
+    table = Table.read("data.parquet")
+    ```
+
+#### `read_csv(path: 'str | Path', **kwargs: 'Any') -> 'Table'`
+
+Read table from CSV file with accompanying metadata.
+
+Loads a table from a CSV file and its associated .meta.json metadata file.
+For example, reads both "data.csv" and "data.meta.json".
+
+Args:
+    path: Path to the CSV file (must end with .csv).
+    **kwargs: Additional arguments passed to the internal metadata loader.
+
+Returns:
+    Table with data and metadata loaded.
+
+Raises:
+    ValueError: If path doesn't end with .csv.
+
+Example:
+    ```python
+    table = Table.read_csv("data.csv")
+    table = Table.read_csv(Path("data.csv"))
+    ```
+
+#### `read_feather(path: 'str | Path', load_data: 'bool' = True, **kwargs: 'Any') -> 'Table'`
+
+Read table from Feather file with accompanying metadata.
+
+Loads a table from a Feather file and its associated .meta.json metadata file.
+Supports both local file paths and URLs.
+
+Args:
+    path: Path or URL to the Feather file (must end with .feather).
+    load_data: If True, load the actual data. If False, only load metadata
+        and column structure (useful for inspecting large files).
+    **kwargs: Additional arguments passed to the internal metadata loader.
+
+Returns:
+    Table with data and metadata loaded.
+
+Raises:
+    ValueError: If path doesn't end with .feather.
+
+Example:
+    ```python
+    table = Table.read_feather("data.feather")
+    table = Table.read_feather("https://example.com/data.feather")
+    metadata_only = Table.read_feather("data.feather", load_data=False)
+    ```
+
+#### `read_json(path: 'str | Path', **kwargs: 'Any') -> 'Table'`
+
+Read the table from a JSON file plus accompanying JSON sidecar.
+
+The path may be a local file path or a URL.
+
+#### `read_parquet(path: 'str | Path', **kwargs: 'Any') -> 'Table'`
+
+Read table from Parquet file with accompanying metadata.
+
+Loads a table from a Parquet file and its associated .meta.json metadata file.
+Supports both local file paths and URLs.
+
+Args:
+    path: Path or URL to the Parquet file (must end with .parquet).
+    **kwargs: Additional arguments passed to the internal metadata loader.
+
+Returns:
+    Table with data and metadata loaded.
+
+Raises:
+    ValueError: If path doesn't end with .parquet.
+
+Example:
+    ```python
+    table = Table.read_parquet("data.parquet")
+    table = Table.read_parquet("https://example.com/data.parquet")
+    ```
+
+#### `reindex(self, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Conform table to new index with optional filling logic.
+
+Create a new Table with changed index. Missing values are filled
+according to the specified method. Wrapper around pandas reindex.
+
+Args:
+    *args: Positional arguments passed to pandas.DataFrame.reindex.
+    **kwargs: Keyword arguments passed to pandas.DataFrame.reindex.
+
+Returns:
+    Table conformed to new index.
+
+Example:
+    Reindex with new labels:
+    ```python
+    table = table.reindex(["A", "B", "C", "D"])
+    ```
+
+    Fill missing values:
+    ```python
+    table = table.reindex(new_index, fill_value=0)
+    ```
+
+    Forward fill:
+    ```python
+    table = table.reindex(new_index, method="ffill")
+    ```
+
+#### `rename(self, *args: 'Any', **kwargs: 'Any') -> 'Table | None'`
+
+Rename columns while preserving their metadata.
+
+Extends pandas rename to maintain variable metadata when renaming columns
+or index levels. Metadata follows the renamed columns automatically.
+
+Args:
+    *args: Positional arguments passed to pandas.DataFrame.rename.
+    **kwargs: Keyword arguments passed to pandas.DataFrame.rename.
+        Supports all pandas rename parameters including mapper, index,
+        columns, and inplace.
+
+Returns:
+    Renamed table if inplace=False (default), None if inplace=True.
+
+Example:
+    ```python
+    new_table = table.rename(columns={"old_name": "new_name"})
+    table.rename(columns={"gdp": "gdp_usd"}, inplace=True)
+    ```
+
+#### `rename_index_names(self, renames: 'dict[str, str]') -> 'Table'`
+
+Rename index values names.
+
+#### `reset_index(self, level: 'Any' = None, *, inplace: 'bool' = False, **kwargs: 'Any') -> 'Table | None'`
+
+Reset the index to default integer index.
+
+Extends `pandas.reset_index` with proper type signature for Table.
+Converts index levels to regular columns.
+
+Args:
+    level: Index level(s) to reset. If None, resets all levels.
+    inplace: If True, modify the table in place. Default is False.
+    **kwargs: Additional arguments passed to pandas.DataFrame.reset_index.
+
+Returns:
+    Table with reset index if inplace=False, None if inplace=True.
+
+Example:
+    ```python
+    new_table = table.reset_index()  # Reset all index levels
+    new_table = table.reset_index(level="country")  # Reset one level
+    table.reset_index(inplace=True)  # Modify in place
+    ```
+
+#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> "'TableRolling'"`
+
+Rolling operation that preserves metadata.
+
+#### `set_index(self, keys: 'str | list[str]', **kwargs: 'Any') -> 'Table | None'`
+
+Set the DataFrame index using specified columns.
+
+Extends pandas set_index to update table metadata with primary key
+and dimension information. The index columns become the table's
+identifying dimensions.
+
+Args:
+    keys: Column name or list of column names to set as index.
+    **kwargs: Additional arguments passed to pandas.DataFrame.set_index.
+
+Returns:
+    Table with new index if inplace=False, None if inplace=True.
+
+Example:
+    ```python
+    table = table.set_index("country")
+    table = table.set_index(["country", "year"])
+    table.set_index("country", inplace=True)
+    ```
+
+#### `to(self, path: 'str | Path', repack: 'bool' = True) -> 'None'`
+
+Save this table to disk in a supported format.
+
+The format is automatically detected from the file extension
+(.csv, .feather, or .parquet).
+
+Args:
+    path: Output file path. Extension determines format.
+    repack: If True, optimize column dtypes to reduce file size.
+        Set to False for very large tables if optimization fails.
+
+Example:
+    ```python
+    table.to("data.feather")  # Save as Feather with optimization
+    table.to("data.csv")  # Save as CSV
+    table.to("data.parquet", repack=False)  # Skip optimization
+    ```
+
+#### `to_csv(self, path: 'Any | None' = None, **kwargs: 'Any') -> 'None | str'`
+
+Save table as CSV with accompanying metadata file.
+
+Saves both the data as CSV and metadata as a separate JSON file.
+For example, "mytable.csv" will have metadata at "mytable.meta.json".
+
+Args:
+    path: Output CSV path. If None, returns CSV as string.
+    **kwargs: Additional arguments passed to pandas.DataFrame.to_csv.
+        By default, includes index only if table has a primary key.
+
+Returns:
+    CSV string if path is None, otherwise None.
+
+Example:
+    ```python
+    table.to_csv("data.csv")  # Saves data.csv and data.meta.json
+    csv_str = table.to_csv()  # Returns CSV as string
+    ```
+
+#### `to_excel(self, excel_writer: 'Any', with_metadata: 'bool' = True, sheet_name: 'str' = 'data', metadata_sheet_name: 'str' = 'metadata', **kwargs: 'Any') -> 'None'`
+
+Save table to Excel file with optional metadata codebook.
+
+Exports the table data to an Excel file, optionally including a separate
+sheet with the codebook metadata.
+
+Args:
+    excel_writer: File path or ExcelWriter object to save to.
+    with_metadata: If True, include a metadata codebook sheet. Default is True.
+    sheet_name: Name for the data sheet. Default is "data".
+    metadata_sheet_name: Name for the metadata sheet. Default is "metadata".
+    **kwargs: Additional arguments passed to pandas.DataFrame.to_excel.
+
+Example:
+    ```python
+    table.to_excel("output.xlsx")  # With metadata
+    table.to_excel("output.xlsx", with_metadata=False)  # Data only
+    ```
+
+#### `to_feather(self, path: 'Any', repack: 'bool' = True, compression: "Literal['zstd', 'lz4', 'uncompressed']" = 'zstd', **kwargs: 'Any') -> 'None'`
+
+Save table as Feather file with accompanying metadata.
+
+Saves the table in Apache Arrow Feather format with a separate JSON
+metadata file. For example, "mytable.feather" will have metadata at
+"mytable.meta.json".
+
+Note:
+    Feather format cannot store indexes, so the index is reset before
+    saving and restored when reading.
+
+Args:
+    path: Output file path (must end with .feather).
+    repack: If True, optimize column dtypes to reduce file size.
+        Set to False for very large tables if repacking is slow.
+    compression: Compression algorithm to use. Options are:
+        - "zstd" (default): High compression ratio
+        - "lz4": Faster compression
+        - "uncompressed": No compression
+    **kwargs: Additional arguments passed to pandas.DataFrame.to_feather.
+
+Raises:
+    ValueError: If path doesn't end with .feather or if index names
+        overlap with column names.
+
+Example:
+    ```python
+    table.to_feather("data.feather")  # With compression
+    table.to_feather("data.feather", repack=False)  # Skip optimization
+    table.to_feather("data.feather", compression="lz4")  # Fast compression
+    ```
+
+#### `to_json(self, path: 'Any | None' = None, **kwargs: 'Any') -> 'None | str'`
+
+Save this table as a JSON file plus accompanying JSON metadata file.
+If the table is stored at "mytable.json", the metadata will be at
+"mytable.meta.json".
+
+By default, uses orient="records" which outputs a simple array of objects
+without schema information. The index is reset and included as regular columns.
+
+#### `to_parquet(self, path: 'Any', repack: 'bool' = True) -> 'None'`
+
+Save table as Parquet file with metadata sidecar.
+
+Saves the table in Apache Parquet format with a separate JSON metadata file.
+Parquet provides efficient columnar storage and compression.
+
+Note:
+    Metadata is stored in a separate .meta.json file rather than embedded
+    in the Parquet schema to enable efficient partial reading of large files.
+
+Args:
+    path: Output file path (must end with .parquet).
+    repack: If True, optimize column dtypes to reduce file size.
+        Set to False for very large tables if repacking is slow.
+
+Raises:
+    ValueError: If path doesn't end with .parquet.
+
+Example:
+    ```python
+    table.to_parquet("data.parquet")  # With optimization
+    table.to_parquet("data.parquet", repack=False)  # Skip optimization
+    ```
+
+#### `underscore(self, collision: "Literal['raise', 'rename', 'ignore']" = 'raise', inplace: 'bool' = False, camel_to_snake: 'bool' = False) -> 'Table'`
+
+Convert column and index names to underscore format.
+
+Converts all column names and index names to snake_case format.
+In rare cases where two columns map to the same underscored name,
+the collision parameter controls the behavior.
+
+Args:
+    collision: How to handle naming collisions:
+        - "raise" (default): Raise ValueError if collision occurs
+        - "rename": Append numbered suffix to duplicates
+        - "ignore": Keep first occurrence
+    inplace: If True, modify the table in place. Default is False.
+    camel_to_snake: If True, convert camelCase to snake_case.
+        Default is False (only converts spaces and special chars).
+
+Returns:
+    Table with underscored names (or None if inplace=True).
+
+Example:
+    Basic underscoring
+    ```python
+    table = table.underscore()
+    ```
+
+    Convert camelCase
+    ```python
+    table = table.underscore(camel_to_snake=True)
+    ```
+
+    Handle collisions
+    ```python
+    table = table.underscore(collision="rename")
+    ```
+
+    Modify in place
+    ```python
+    table.underscore(inplace=True)
+    ```
+
+#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable_names: 'list[str] | None' = None, comment: 'str | None' = None) -> 'Table'`
+
+#### `update_metadata(self, **kwargs: 'Any') -> 'Table'`
+
+Update table-level metadata fields.
+
+Convenience method to update multiple metadata fields at once.
+
+Args:
+    **kwargs: Metadata field names and values to update.
+        Must be valid TableMeta attributes.
+
+Returns:
+    Self, for method chaining.
+
+Raises:
+    AssertionError: If any field name is not a valid TableMeta attribute.
+
+Example:
+    ```python
+    table.update_metadata(title="GDP Data", description="GDP by country")
+    table.update_metadata(short_name="gdp_data")
+    ```
+
+#### `update_metadata_from_yaml(self, path: 'Path | str', table_name: 'str', yaml_params: 'dict[str, Any] | None' = None, extra_variables: "Literal['raise', 'ignore']" = 'raise', if_origins_exist: 'SOURCE_EXISTS_OPTIONS' = 'replace') -> 'None'`
+
+Update table and variable metadata from a YAML file.
+
+Loads metadata definitions from a .meta.yml file and updates both
+table-level and variable-level metadata. This is the primary way
+to add rich metadata in the ETL workflow.
+
+Args:
+    path: Path to the .meta.yml file with metadata definitions.
+    table_name: Name of the table in the YAML file to load metadata from.
+        Also updates the table's short_name to this value.
+    yaml_params: Additional parameters to pass to the YAML loader.
+    extra_variables: How to handle variables in YAML not in table:
+        - "raise" (default): Raise exception
+        - "ignore": Skip extra variables
+    if_origins_exist: How to handle existing origins:
+        - "replace" (default): Replace existing origin with new one
+        - "append": Append new origin to existing origins
+        - "fail": Raise exception if origin already exists
+
+Example:
+    ```python
+    >>> table.update_metadata_from_yaml("dataset.meta.yml", "population")
+    >>> table.update_metadata_from_yaml(
+    ...     Path("dataset.meta.yml"),
+    ...     "gdp_data",
+    ...     extra_variables="ignore"
+    ... )
+    ```
+
+
+### `merge(left: 'Table | pd.DataFrame', right: 'Table | pd.DataFrame', how: 'str' = 'inner', on: 'str | list[str] | None' = None, left_on: 'str | list[str] | None' = None, right_on: 'str | list[str] | None' = None, suffixes: 'tuple[str, str]' = ('_x', '_y'), short_name: 'str | None' = None, **kwargs: 'Any') -> 'Table'`
+
+
+### `concat(objs: 'list[Table]', *, axis: 'int | str' = 0, join: 'str' = 'outer', ignore_index: 'bool' = False, short_name: 'str | None' = None, **kwargs: 'Any') -> 'Table'`
+
+
+### `melt(frame: 'Table', id_vars: 'tuple[str] | list[str] | str | None' = None, value_vars: 'tuple[str] | list[str] | str | None' = None, var_name: 'str' = 'variable', value_name: 'str' = 'value', short_name: 'str | None' = None, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `pivot(data: 'Table', *, index: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, values: 'str | list[str] | None' = None, join_column_levels_with: 'str | None' = None, short_name: 'str | None' = None, fill_dimensions: 'bool' = True, **kwargs: 'Any') -> 'Table'`
+
+
+### `read_csv(filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_feather(filepath: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_excel(io: 'str | Path | IO[AnyStr]', *args: 'Any', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, **kwargs: 'Any') -> 'Table'`
+
+
+### `read_parquet(filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_from_df(data: 'pd.DataFrame', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False) -> 'Table'`
+
+
+### `read_from_dict(data: 'dict[Any, Any]', *args: 'Any', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, **kwargs: 'Any') -> 'Table'`
+
+
+### `multi_merge(tables: 'list[Table]', *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Merge multiple tables.
+
+This is a helper function when merging more than two tables on common columns.
+
+Args:
+    tables: Tables to merge.
+
+Returns:
+    combined: Merged table.
+
+
+### `keep_metadata(func: 'Callable[..., pd.DataFrame | pd.Series]') -> 'Callable[..., Table | indicators.Indicator]'`
+
+Decorator that turns a function that works on DataFrame or Series into a function that works
+on Table or Variable and preserves metadata.  If the decorated function renames columns, their
+metadata won't be copied.
+
+Example:
+    ```python
+    import owid.catalog.processing as pr
+
+    @pr.keep_metadata
+    def my_df_func(df: pd.DataFrame) -> pd.DataFrame:
+        return df + 1
+
+    tb = my_df_func(tb)
+
+
+    @pr.keep_metadata
+    def my_series_func(s: pd.Series) -> pd.Series:
+        return s + 1
+
+    tb.a = my_series_func(tb.a)
+    ```
+
+
+### `copy_metadata(from_table: 'Table', to_table: 'Table', deep: 'bool' = False) -> 'Table'`
+
+Copy metadata from a different table to self.
+
+
+### ExcelFile
+
+Class for parsing tabular Excel sheets into DataFrame objects.
+
+See read_excel for more documentation.
+
+Parameters
+----------
+path_or_buffer : str, bytes, path object (pathlib.Path or py._path.local.LocalPath),
+    A file-like object, xlrd workbook or openpyxl workbook.
+    If a string or path object, expected to be a path to a
+    .xls, .xlsx, .xlsb, .xlsm, .odf, .ods, or .odt file.
+engine : str, default None
+    If io is not a buffer or path, this must be set to identify io.
+    Supported engines: ``xlrd``, ``openpyxl``, ``odf``, ``pyxlsb``, ``calamine``
+    Engine compatibility :
+
+    - ``xlrd`` supports old-style Excel files (.xls).
+    - ``openpyxl`` supports newer Excel file formats.
+    - ``odf`` supports OpenDocument file formats (.odf, .ods, .odt).
+    - ``pyxlsb`` supports Binary Excel files.
+    - ``calamine`` supports Excel (.xls, .xlsx, .xlsm, .xlsb)
+      and OpenDocument (.ods) file formats.
+
+    .. versionchanged:: 1.2.0
+
+       The engine `xlrd <https://xlrd.readthedocs.io/en/latest/>`_
+       now only supports old-style ``.xls`` files.
+       When ``engine=None``, the following logic will be
+       used to determine the engine:
+
+       - If ``path_or_buffer`` is an OpenDocument format (.odf, .ods, .odt),
+         then `odf <https://pypi.org/project/odfpy/>`_ will be used.
+       - Otherwise if ``path_or_buffer`` is an xls format,
+         ``xlrd`` will be used.
+       - Otherwise if ``path_or_buffer`` is in xlsb format,
+         `pyxlsb <https://pypi.org/project/pyxlsb/>`_ will be used.
+
+       .. versionadded:: 1.3.0
+
+       - Otherwise if `openpyxl <https://pypi.org/project/openpyxl/>`_ is installed,
+         then ``openpyxl`` will be used.
+       - Otherwise if ``xlrd >= 2.0`` is installed, a ``ValueError`` will be raised.
+
+       .. warning::
+
+        Please do not report issues when using ``xlrd`` to read ``.xlsx`` files.
+        This is not supported, switch to using ``openpyxl`` instead.
+engine_kwargs : dict, optional
+    Arbitrary keyword arguments passed to excel engine.
+
+Examples
+--------
+>>> file = pd.ExcelFile('myfile.xlsx')  # doctest: +SKIP
+>>> with pd.ExcelFile("myfile.xls") as xls:  # doctest: +SKIP
+...     df1 = pd.read_excel(xls, "Sheet1")  # doctest: +SKIP
+
+
+## indicators
+
+### Indicator
+
+`Indicator` extends `pandas.Series`. All standard Series methods are available. Only methods unique to this class are listed below.
+
+
+Enhanced pandas Series with indicator-level metadata support.
+
+Indicator is a pandas Series subclass that stores rich metadata about individual
+indicators. It serves as the column type in Table objects and automatically
+propagates metadata through operations.
+
+Note:
+    This class was formerly called `Variable`. The old name is still available
+    as an alias for backwards compatibility.
+
+Key features:
+
+- Automatic metadata propagation through arithmetic operations
+- Processing log tracking for data provenance
+- Integration with OWID catalog metadata system
+- Support for rich metadata including sources, origins, licenses
+
+Attributes:
+    _name: Internal name storage for metadata mapping.
+    _fields: Dictionary mapping indicator names to their VariableMeta objects.
+    metadata: Indicator-level metadata accessible via `.metadata` or `.m` property.
+
+Example:
+    Create an indicator with metadata:
+
+    ```python
+    from owid.catalog import Indicator, VariableMeta
+
+    ind = Indicator(
+        [1, 2, 3],
+        name="gdp",
+        metadata=VariableMeta(
+            title="GDP",
+            unit="trillion USD",
+            description="Gross Domestic Product"
+        )
+    )
+    ```
+
+    Access metadata using shortcuts:
+
+    ```python
+    print(ind.metadata.title)  # Full property access
+    print(ind.m.title)         # Shorthand alias
+    print(ind.title)           # Direct property access
+    ```
+
+    Metadata propagates through operations:
+
+    ```python
+    gdp_per_capita = ind / population
+    # Result combines metadata from both indicators
+    ```
+
+#### `Indicator.additional_info` (property)
+
+#### `Indicator.checked_name` (property)
+
+#### `copy_metadata(self, from_variable: 'Indicator', inplace: 'bool' = False) -> 'Indicator | None'`
+
+Copy metadata from another indicator.
+
+Args:
+    from_variable: Source indicator to copy metadata from.
+    inplace: If True, modifies the current indicator. If False, returns a new indicator.
+
+Returns:
+    New indicator with copied metadata if `inplace=False`, otherwise None.
+
+Example:
+    Create new indicator with copied metadata
+    ```python
+    new_ind = ind1.copy_metadata(from_variable=ind2)
+    ```
+
+    Copy metadata in-place
+    ```python
+    ind1.copy_metadata(from_variable=ind2, inplace=True)
+    ```
+
+#### `Indicator.description` (property)
+
+#### `Indicator.description_from_producer` (property)
+
+#### `Indicator.description_key` (property)
+
+#### `Indicator.description_processing` (property)
+
+#### `Indicator.description_short` (property)
+
+#### `Indicator.dimensions` (property)
+
+#### `Indicator.display` (property)
+
+#### `Indicator.license` (property)
+
+#### `Indicator.licenses` (property)
+
+#### `Indicator.m` (property)
+
+Metadata alias for shorter access.
+
+Provides convenient shorthand access to indicator metadata.
+
+Returns:
+    The indicator's VariableMeta object.
+
+Example:
+    ```python
+    # These are equivalent:
+    ind.metadata.title
+    ind.m.title
+    ind.title  # Direct property access
+    ```
+
+#### `Indicator.metadata` (property)
+
+#### `Indicator.original_short_name` (property)
+
+#### `Indicator.original_title` (property)
+
+#### `Indicator.origins` (property)
+
+#### `Indicator.presentation` (property)
+
+#### `Indicator.processing_level` (property)
+
+#### `Indicator.processing_log` (property)
+
+#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
+
+Create a rolling window operation that preserves metadata.
+
+This method wraps pandas rolling operations while maintaining the indicator's metadata.
+
+Args:
+    *args: Arguments passed to `pandas.Series.rolling`.
+    **kwargs: Keyword arguments passed to `pandas.Series.rolling`.
+
+Returns:
+    IndicatorRolling object that applies operations while preserving metadata.
+
+Example:
+    Calculate 7-day rolling average
+    ```python
+    rolling_avg = ind.rolling(window=7).mean()
+    ```
+
+    The result retains the original indicator's metadata
+    ```python
+    assert rolling_avg.metadata.title == ind.metadata.title
+    ```
+
+#### `set_categories(self, *args: 'Any', **kwargs: 'Any') -> 'Indicator'`
+
+#### `Indicator.short_unit` (property)
+
+#### `Indicator.sort` (property)
+
+#### `Indicator.sources` (property)
+
+#### `Indicator.title` (property)
+
+#### `to_frame(self, name: 'str | None' = None) -> 'Table'`
+
+Convert Indicator to a Table (single-column table).
+
+#### `Indicator.type` (property)
+
+#### `Indicator.unit` (property)
+
+#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable: 'str | None' = None, comment: 'str | None' = None) -> 'Indicator'`
+
+Add an entry to the indicator's processing log.
+
+Records data transformation operations for data provenance tracking.
+
+Args:
+    operation: Name of the operation performed (e.g., "merge", "aggregate").
+    parents: List of parent indicators that contributed to this operation.
+        If None, uses the indicator itself as the only parent.
+    variable: Name of the variable for the log entry. If None, uses the
+        indicator's name or UNNAMED_INDICATOR.
+    comment: Optional comment describing the operation in detail.
+
+Returns:
+    The indicator itself (for method chaining).
+
+Example:
+    ```python
+    # Log a custom transformation
+    ind.update_log(
+        operation="normalize",
+        comment="Normalized to 2015 baseline"
+    )
+
+    # Log a merge operation
+    result.update_log(
+        operation="merge",
+        parents=[ind1, ind2],
+        comment="Combined GDP and population data"
+    )
+    ```
+
+
+### Indicator
+
+`Indicator` extends `pandas.Series`. All standard Series methods are available. Only methods unique to this class are listed below.
+
+
+Enhanced pandas Series with indicator-level metadata support.
+
+Indicator is a pandas Series subclass that stores rich metadata about individual
+indicators. It serves as the column type in Table objects and automatically
+propagates metadata through operations.
+
+Note:
+    This class was formerly called `Variable`. The old name is still available
+    as an alias for backwards compatibility.
+
+Key features:
+
+- Automatic metadata propagation through arithmetic operations
+- Processing log tracking for data provenance
+- Integration with OWID catalog metadata system
+- Support for rich metadata including sources, origins, licenses
+
+Attributes:
+    _name: Internal name storage for metadata mapping.
+    _fields: Dictionary mapping indicator names to their VariableMeta objects.
+    metadata: Indicator-level metadata accessible via `.metadata` or `.m` property.
+
+Example:
+    Create an indicator with metadata:
+
+    ```python
+    from owid.catalog import Indicator, VariableMeta
+
+    ind = Indicator(
+        [1, 2, 3],
+        name="gdp",
+        metadata=VariableMeta(
+            title="GDP",
+            unit="trillion USD",
+            description="Gross Domestic Product"
+        )
+    )
+    ```
+
+    Access metadata using shortcuts:
+
+    ```python
+    print(ind.metadata.title)  # Full property access
+    print(ind.m.title)         # Shorthand alias
+    print(ind.title)           # Direct property access
+    ```
+
+    Metadata propagates through operations:
+
+    ```python
+    gdp_per_capita = ind / population
+    # Result combines metadata from both indicators
+    ```
+
+#### `Indicator.additional_info` (property)
+
+#### `Indicator.checked_name` (property)
+
+#### `copy_metadata(self, from_variable: 'Indicator', inplace: 'bool' = False) -> 'Indicator | None'`
+
+Copy metadata from another indicator.
+
+Args:
+    from_variable: Source indicator to copy metadata from.
+    inplace: If True, modifies the current indicator. If False, returns a new indicator.
+
+Returns:
+    New indicator with copied metadata if `inplace=False`, otherwise None.
+
+Example:
+    Create new indicator with copied metadata
+    ```python
+    new_ind = ind1.copy_metadata(from_variable=ind2)
+    ```
+
+    Copy metadata in-place
+    ```python
+    ind1.copy_metadata(from_variable=ind2, inplace=True)
+    ```
+
+#### `Indicator.description` (property)
+
+#### `Indicator.description_from_producer` (property)
+
+#### `Indicator.description_key` (property)
+
+#### `Indicator.description_processing` (property)
+
+#### `Indicator.description_short` (property)
+
+#### `Indicator.dimensions` (property)
+
+#### `Indicator.display` (property)
+
+#### `Indicator.license` (property)
+
+#### `Indicator.licenses` (property)
+
+#### `Indicator.m` (property)
+
+Metadata alias for shorter access.
+
+Provides convenient shorthand access to indicator metadata.
+
+Returns:
+    The indicator's VariableMeta object.
+
+Example:
+    ```python
+    # These are equivalent:
+    ind.metadata.title
+    ind.m.title
+    ind.title  # Direct property access
+    ```
+
+#### `Indicator.metadata` (property)
+
+#### `Indicator.original_short_name` (property)
+
+#### `Indicator.original_title` (property)
+
+#### `Indicator.origins` (property)
+
+#### `Indicator.presentation` (property)
+
+#### `Indicator.processing_level` (property)
+
+#### `Indicator.processing_log` (property)
+
+#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
+
+Create a rolling window operation that preserves metadata.
+
+This method wraps pandas rolling operations while maintaining the indicator's metadata.
+
+Args:
+    *args: Arguments passed to `pandas.Series.rolling`.
+    **kwargs: Keyword arguments passed to `pandas.Series.rolling`.
+
+Returns:
+    IndicatorRolling object that applies operations while preserving metadata.
+
+Example:
+    Calculate 7-day rolling average
+    ```python
+    rolling_avg = ind.rolling(window=7).mean()
+    ```
+
+    The result retains the original indicator's metadata
+    ```python
+    assert rolling_avg.metadata.title == ind.metadata.title
+    ```
+
+#### `set_categories(self, *args: 'Any', **kwargs: 'Any') -> 'Indicator'`
+
+#### `Indicator.short_unit` (property)
+
+#### `Indicator.sort` (property)
+
+#### `Indicator.sources` (property)
+
+#### `Indicator.title` (property)
+
+#### `to_frame(self, name: 'str | None' = None) -> 'Table'`
+
+Convert Indicator to a Table (single-column table).
+
+#### `Indicator.type` (property)
+
+#### `Indicator.unit` (property)
+
+#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable: 'str | None' = None, comment: 'str | None' = None) -> 'Indicator'`
+
+Add an entry to the indicator's processing log.
+
+Records data transformation operations for data provenance tracking.
+
+Args:
+    operation: Name of the operation performed (e.g., "merge", "aggregate").
+    parents: List of parent indicators that contributed to this operation.
+        If None, uses the indicator itself as the only parent.
+    variable: Name of the variable for the log entry. If None, uses the
+        indicator's name or UNNAMED_INDICATOR.
+    comment: Optional comment describing the operation in detail.
+
+Returns:
+    The indicator itself (for method chaining).
+
+Example:
+    ```python
+    # Log a custom transformation
+    ind.update_log(
+        operation="normalize",
+        comment="Normalized to 2015 baseline"
+    )
+
+    # Log a merge operation
+    result.update_log(
+        operation="merge",
+        parents=[ind1, ind2],
+        comment="Combined GDP and population data"
+    )
+    ```
+
+
+### `copy_metadata(from_variable: 'Indicator', to_variable: 'Indicator', inplace: 'bool' = False) -> 'Indicator | None'`
+
+Copy metadata from one indicator to another.
+
+Args:
+    from_variable: Source indicator to copy metadata from.
+    to_variable: Target indicator to copy metadata to.
+    inplace: If True, modifies `to_variable` in place. If False, returns a new indicator.
+
+Returns:
+    New indicator with copied metadata if `inplace=False`, otherwise None.
+
+Example:
+    Create new indicator with copied metadata
+    ```python
+    new_ind = copy_metadata(from_variable=source, to_variable=target)
+    ```
+
+    Copy metadata in-place
+    ```python
+    copy_metadata(from_variable=source, to_variable=target, inplace=True)
+    ```
+
+
+## datasets
+
+### Dataset
+
+A dataset is a folder containing data tables with metadata.
+
+A Dataset represents a collection of related data tables stored in a directory.
+Each dataset has an `index.json` file containing metadata about the dataset
+and references to its tables.
+
+Attributes:
+    path: Path to the dataset directory.
+    metadata: Dataset-level metadata (title, description, sources, etc).
+
+Example:
+    Load an existing dataset:
+
+    ```python
+    >>> ds = Dataset("data://garden/demography/2023-03-31/population")
+    >>> table = ds["population"]
+    ```
+
+    Create a new dataset:
+    ```python
+    >>> ds = Dataset.create_empty("path/to/dataset")
+    >>> ds.add(table)
+    >>> ds.save()
+    ```
+
+#### `add(self, table: 'tables.Table', formats: 'list[FileFormat]' = ['feather'], repack: 'bool' = True) -> 'None'`
+
+Add a table to this dataset.
+
+Saves the table to the dataset's directory in the specified format(s).
+By default, saves in multiple formats for compatibility.
+
+Args:
+    table: The table to add to the dataset.
+    formats: List of file formats to save (feather, parquet, csv).
+        Defaults to DEFAULT_FORMATS (usually ["feather"]).
+    repack: If True, optimize column dtypes to reduce file size
+        (e.g. float64 -> float32). Set to False for very large dataframes
+        if repacking fails or is too slow.
+
+Raises:
+    PrimaryKeyMissing: If table has no primary key and OWID_STRICT is set.
+    NonUniqueIndex: If table index has duplicates and OWID_STRICT is set.
+
+Example:
+    ```python
+    >>> ds.add(table)  # Save in default format
+    >>> ds.add(table, formats=["csv"])  # Save only as CSV
+    >>> ds.add(table, repack=False)  # Skip optimization
+    ```
+
+#### `Dataset.additional_info` (property)
+
+#### `Dataset.channel` (property)
+
+#### `checksum(self) -> 'str'`
+
+Calculate MD5 checksum of all data and metadata in the dataset.
+
+Generates a checksum that includes the dataset's index file and all
+data files. Useful for detecting changes to the dataset.
+
+Returns:
+    MD5 checksum as a hexadecimal string.
+
+Example:
+    ```python
+    >>> checksum = ds.checksum()
+    >>> print(f"Dataset checksum: {checksum}")
+    ```
+
+#### `create_empty(path: 'str | Path', metadata: 'DatasetMeta | None' = None) -> 'Dataset'`
+
+#### `Dataset.description` (property)
+
+#### `index(self, catalog_path: 'Path' = PosixPath('/')) -> 'pd.DataFrame'`
+
+Generate an index DataFrame describing all tables in this dataset.
+
+Creates a summary DataFrame with one row per table, including metadata
+like namespace, version, checksum, dimensions, and file paths.
+
+Args:
+    catalog_path: Base path for calculating relative paths. Defaults to "/".
+
+Returns:
+    DataFrame with columns: namespace, dataset, version, table, checksum, is_public,
+    title, description, dimensions, path, channel, and formats.
+
+Example:
+    ```python
+    >>> index = ds.index()
+    >>> print(index[["table", "dimensions", "checksum"]])
+    ```
+
+#### `Dataset.is_public` (property)
+
+#### `Dataset.licenses` (property)
+
+#### `Dataset.m` (property)
+
+Metadata alias for shorter access (ds.m instead of ds.metadata).
+
+#### `Dataset.namespace` (property)
+
+#### `Dataset.non_redistributable` (property)
+
+#### `read(self, name: 'str | None' = None, reset_index: 'bool' = True, safe_types: 'bool' = True, reset_metadata: "Literal['keep', 'keep_origins', 'reset']" = 'keep', load_data: 'bool' = True) -> 'tables.Table'`
+
+Read a table from the dataset with performance options.
+
+This is an alternative to `ds[table_name]` with more control over
+loading behavior for performance optimization.
+
+Args:
+    name: Name of the table to read. If None and dataset has only one
+        table, reads that table automatically.
+    reset_index: If True, don't set primary keys. This can make loading
+        large multi-index datasets much faster. Default is True.
+    safe_types: If True, convert numeric columns to nullable types
+        (Float64, Int64) and categorical to string[pyarrow]. This increases
+        memory usage but prevents type issues. Default is True.
+    reset_metadata: Controls variable metadata reset behavior:
+        - "keep": Leave metadata unchanged (default)
+        - "keep_origins": Reset metadata but retain origins attribute
+        - "reset": Reset all variable metadata
+    load_data: If False, only load metadata without actual data. Useful
+        when you only need to inspect metadata. Default is True.
+
+Returns:
+    The loaded table with data and metadata.
+
+Raises:
+    ValueError: If name is None but dataset contains multiple tables.
+    KeyError: If the specified table name doesn't exist.
+
+Example:
+    Read single table with safe defaults
+    ```python
+    table = ds.read()
+    ```
+
+    Keep index
+    ```python
+    >>> table = ds.read("population", reset_index=False)
+    ```
+
+    Faster, less memory
+    ```python
+    >>> table = ds.read("large_table", safe_types=False)
+    ```
+
+    Only metadata
+    ```python
+    >>> meta_only = ds.read(load_data=False)
+    ```
+
+#### `save(self) -> 'None'`
+
+#### `Dataset.short_name` (property)
+
+#### `Dataset.source_checksum` (property)
+
+#### `Dataset.sources` (property)
+
+#### `Dataset.table_names` (property)
+
+#### `Dataset.title` (property)
+
+#### `update_metadata(self, metadata_path: 'Path', yaml_params: 'dict[str, Any] | None' = None, if_source_exists: 'SOURCE_EXISTS_OPTIONS' = 'replace', if_origins_exist: 'SOURCE_EXISTS_OPTIONS' = 'replace', errors: "Literal['ignore', 'warn', 'raise']" = 'raise', extra_variables: "Literal['raise', 'ignore']" = 'raise') -> 'None'`
+
+Update dataset and table metadata from a YAML file.
+
+Loads metadata from a .meta.yml file and updates the dataset's metadata
+and all referenced tables. This is the primary way to add rich metadata
+to datasets in the ETL workflow.
+
+Args:
+    metadata_path: Path to the .meta.yml file with metadata definitions.
+        See existing metadata files for examples of the expected structure.
+    yaml_params: Additional parameters to pass to the YAML loader.
+    if_source_exists: How to handle existing sources:
+        - "replace" (default): Replace existing source with new one
+        - "append": Append new source to existing sources
+        - "fail": Raise exception if source already exists
+    if_origins_exist: How to handle existing origins:
+        - "replace" (default): Replace existing origin with new one
+        - "append": Append new origin to existing origins
+        - "fail": Raise exception if origin already exists
+    errors: How to handle errors during update:
+        - "raise" (default): Raise exception on errors
+        - "warn": Issue warning but continue processing
+        - "ignore": Silently ignore errors
+    extra_variables: How to handle variables in metadata not in dataset:
+        - "raise" (default): Raise exception
+        - "ignore": Skip extra variables
+
+Example:
+    ```python
+    >>> ds.update_metadata(Path("dataset.meta.yml"))
+    >>> ds.update_metadata(
+    ...     Path("dataset.meta.yml"),
+    ...     if_origins_exist="append",
+    ...     errors="warn"
+    ... )
+    ```
+
+#### `Dataset.update_period_days` (property)
+
+#### `Dataset.version` (property)
+
+
+### `Literal(*args, **kwargs)`
+
+
+
+
+### `Literal(*args, **kwargs)`
+
+
+## meta
+
+### MetaBase
+
+Base class for all metadata objects in the catalog.
+
+Provides common functionality for metadata serialization, hashing, comparison,
+and persistence. All metadata classes (DatasetMeta, TableMeta, VariableMeta, etc.)
+inherit from this base class.
+
+Key features:
+
+- JSON serialization/deserialization
+- Deterministic hashing for deduplication
+- Deep copying support
+- File persistence (save/load)
+- Dictionary conversion
+
+Example:
+    ```python
+    from owid.catalog import DatasetMeta
+
+    # Create metadata
+    meta = DatasetMeta(title="GDP Data", short_name="gdp")
+
+    # Save to file
+    meta.save("metadata.json")
+
+    # Load from file
+    loaded = DatasetMeta.load("metadata.json")
+
+    # Convert to dictionary
+    d = meta.to_dict()
+
+    # Create deep copy
+    copy = meta.copy(deep=True)
+    ```
+
+#### `copy(self, deep: bool = True) -> Self`
+
+Create a copy of the metadata object.
+
+Args:
+    deep: If True, creates a deep copy (copies nested objects).
+        If False, creates a shallow copy.
+
+Returns:
+    Copy of the metadata object.
+
+Example:
+    ```python
+    original = DatasetMeta(title="GDP")
+    copy = original.copy(deep=True)
+    copy.title = "Population"  # Doesn't affect original
+    ```
+
+#### `from_dict(d: dict[str, typing.Any]) -> ~T`
+
+Create metadata object from dictionary.
+
+Args:
+    d: Dictionary with metadata fields.
+
+Returns:
+    New metadata object of the appropriate type.
+
+Example:
+    ```python
+    d = {"title": "GDP", "short_name": "gdp"}
+    meta = DatasetMeta.from_dict(d)
+    ```
+
+Note:
+    This uses a custom implementation that's significantly faster than
+    the default dataclasses_json method.
+
+#### `load(filename: str) -> Self`
+
+Load metadata from a JSON file.
+
+Args:
+    filename: Path to the JSON file containing metadata.
+
+Returns:
+    Metadata object loaded from the file.
+
+Example:
+    ```python
+    meta = DatasetMeta.load("dataset_meta.json")
+    print(meta.title)
+    ```
+
+#### `save(self, filename: str | pathlib.Path) -> None`
+
+Save metadata to a JSON file.
+
+Args:
+    filename: Path where the metadata should be saved.
+
+Example:
+    ```python
+    meta = DatasetMeta(title="GDP")
+    meta.save("dataset_meta.json")
+    ```
+
+#### `to_dict(self, encode_json: bool = False) -> dict[str, typing.Any]`
+
+Convert metadata object to dictionary.
+
+Args:
+    encode_json: If True, encodes values for JSON serialization.
+
+Returns:
+    Dictionary representation of the metadata.
+
+Example:
+    ```python
+    meta = DatasetMeta(title="GDP", short_name="gdp")
+    d = meta.to_dict()
+    print(d["title"])  # "GDP"
+    ```
+
+#### `update(self, **kwargs: dict[str, typing.Any]) -> None`
+
+Update metadata fields with new values.
+
+Args:
+    **kwargs: Field names and their new values. None values are ignored.
+
+Example:
+    ```python
+    meta = DatasetMeta(title="GDP")
+    meta.update(title="GDP Data", description="Annual GDP figures")
+    ```
+
+
+### License
+
+License information for data products.
+
+Stores licensing details for datasets and variables, including the license
+name and URL to the full license text.
+
+Attributes:
+    name: License name (e.g., "CC BY 4.0", "MIT", "Public Domain").
+    url: URL to the full license text or information page.
+
+Example:
+    ```python
+    from owid.catalog import License
+
+    # Creative Commons license
+    license = License(
+        name="CC BY 4.0",
+        url="https://creativecommons.org/licenses/by/4.0/"
+    )
+
+    # Check if license is defined
+    if license:
+        print(f"Licensed under: {license.name}")
+    ```
+
+
+### Source
+
+Legacy source metadata for datasets.
+
+Warning:
+    **DEPRECATED**: Use `Origin` instead for new datasets. This class is
+    maintained for backward compatibility only.
+
+Source contains metadata about the origin of data in legacy format. Modern
+datasets should use the `Origin` class which provides more comprehensive
+metadata fields.
+
+Attributes:
+    name: Source name or identifier.
+    description: Description of the source.
+    url: URL to the source's main page.
+    source_data_url: Direct URL to download the data.
+    owid_data_url: OWID-hosted URL for the data.
+    date_accessed: Date when the source was accessed (ISO format).
+    publication_date: Date when the source was published.
+    publication_year: Year of publication.
+    published_by: Publisher or institution name (used in Grapher).
+
+    Example:
+        ```python
+        # Legacy usage (prefer Origin for new code)
+        source = Source(
+            name="World Bank",
+            published_by="World Bank Group",
+            url="https://data.worldbank.org"
+        )
+        ```
+
+Note:
+    In Grapher admin, only the first source of a dataset is visible and editable.
+    The most important fields for Grapher are `published_by` and `description`.
+
+
+### Origin
+
+Comprehensive metadata about the origin of a data product.
+
+Origin provides detailed provenance information for datasets, including
+producer details, citations, URLs, publication dates, and licensing. This is
+the modern replacement for the legacy `Source` class.
+
+Attributes:
+    producer: Name of the institution or author(s) that produced the data
+        (e.g., "World Bank", "United Nations").
+    title: Title of the original data product.
+    description: Description of the data product and its methodology.
+    title_snapshot: Title of the specific data subset extracted from the product.
+        Only use if different from `title`.
+    description_snapshot: Description of the snapshot subset. Use when the
+        snapshot differs from the full data product.
+    citation_full: Complete citation for the data product in academic format.
+    attribution: Name to use for attribution (e.g., "V-Dem Institute" instead
+        of individual authors). Defaults to `producer` if not provided.
+    attribution_short: Short form of attribution for space-constrained contexts.
+    version_producer: Version number or identifier from the data producer
+        (e.g., "v12", "2023.1").
+    url_main: Authoritative URL for the dataset's main page.
+    url_download: Direct URL to download the dataset.
+    date_accessed: ISO-format date when the dataset was accessed (YYYY-MM-DD).
+    date_published: Publication date (YYYY-MM-DD), year (YYYY), or "latest"
+        for continuously updated datasets.
+    license: License information for the data product.
+
+Example:
+    ```python
+    from owid.catalog import Origin, License
+
+    # Comprehensive origin metadata
+    origin = Origin(
+        producer="World Bank",
+        title="World Development Indicators",
+        description="Annual indicators of development",
+        attribution_short="World Bank",
+        version_producer="2024",
+        url_main="https://datatopics.worldbank.org/world-development-indicators/",
+        url_download="https://databank.worldbank.org/data/download/WDI_CSV.zip",
+        date_accessed="2024-01-15",
+        date_published="2024",
+        license=License(
+            name="CC BY 4.0",
+            url="https://creativecommons.org/licenses/by/4.0/"
+        )
+    )
+
+    # Minimal origin (only required fields)
+    origin_minimal = Origin(
+        producer="UN",
+        title="Population Data"
+    )
+    ```
+
+Raises:
+    ValueError: If `date_published` is not a valid year, date, or "latest".
+
+
+### FaqLink
+
+FaqLink(gdoc_id: str, fragment_id: str)
+
+
+### VariablePresentationMeta
+
+VariablePresentationMeta(grapher_config: dict[str, typing.Any] | None = None, title_public: str | None = None, title_variant: str | None = None, attribution_short: str | None = None, attribution: str | None = None, topic_tags: list[str] = <factory>, faqs: list[owid.catalog.core.meta.FaqLink] = <factory>)
+
+
+### VariableMeta
+
+Allowed fields for `display` attribute used for grapher:
+    name
+    zeroDay
+    yearIsDay
+    includeInTable
+    numDecimalPlaces
+    conversionFactor
+    entityAnnotationsMap
+Fields `unit` and `shortUnit` are copied from attributes `unit` and `short_unit`
+on VariableMeta object
+
+NOTE: consider using its own object for `display` instead of dict and also possibly
+underscoring fields and converting them back to camelCase before inserting to grapher
+
+#### `render(self, dim_dict: dict[str, typing.Any], remove_dods: bool = False) -> 'VariableMeta'`
+
+Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+:param dim_dict: dictionary of dimensions to render
+:param remove_dods: remove references to details on demand from a text
+
+Usage:
+    from owid.catalog import Dataset
+    from etl import paths
+
+    ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
+    tb = ds['ceds_air_pollutants']
+    tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
+
+#### `VariableMeta.schema_version` (property)
+
+Schema version is used to easily understand everywhere what metadata standard was used
+for authoring this variable metadata. Defaults to 1 for our legacy variables. "Modern" variables
+that fill in the presentation key and use origins should record 2 here.
+
+
+### DatasetMeta
+
+The metadata for this entire dataset kept in JSON (e.g. mydataset/index.json).
+
+The number of fields is limited, but should handle everything that we get from
+Snapshot. There is a lot more opportunity to store more metadata at the table and
+the variable level.
+
+#### `update_from_yaml(self, path: pathlib.Path | str, if_source_exists: Literal['fail', 'append', 'replace'] = 'fail') -> None`
+
+The main reason for wanting to do this is to manually override what goes into Grapher before an export.
+
+#### `DatasetMeta.uri` (property)
+
+Return unique URI for this dataset if
+
+
+### TableDimension
+
+dict() -> new empty dictionary
+dict(mapping) -> new dictionary initialized from a mapping object's
+    (key, value) pairs
+dict(iterable) -> new dictionary initialized as if via:
+    d = {}
+    for k, v in iterable:
+        d[k] = v
+dict(**kwargs) -> new dictionary initialized with the name=value pairs
+    in the keyword argument list.  For example:  dict(one=1, two=2)
+
+
+### TableMeta
+
+TableMeta(short_name: str | None = None, title: str | None = None, description: str | None = None, dataset: owid.catalog.core.meta.DatasetMeta | None = None, primary_key: list[str] = <factory>, dimensions: list[owid.catalog.core.meta.TableDimension] | None = None)
+
+#### `TableMeta.checked_name` (property)
+
+#### `TableMeta.uri` (property)
+
+Return unique URI for this table.
+
+
+### `to_html(record: Any) -> str | None`
+
+
+## processing
+
+Common operations performed on tables and variables.
+
+### ExcelFile
+
+Class for parsing tabular Excel sheets into DataFrame objects.
+
+See read_excel for more documentation.
+
+Parameters
+----------
+path_or_buffer : str, bytes, path object (pathlib.Path or py._path.local.LocalPath),
+    A file-like object, xlrd workbook or openpyxl workbook.
+    If a string or path object, expected to be a path to a
+    .xls, .xlsx, .xlsb, .xlsm, .odf, .ods, or .odt file.
+engine : str, default None
+    If io is not a buffer or path, this must be set to identify io.
+    Supported engines: ``xlrd``, ``openpyxl``, ``odf``, ``pyxlsb``, ``calamine``
+    Engine compatibility :
+
+    - ``xlrd`` supports old-style Excel files (.xls).
+    - ``openpyxl`` supports newer Excel file formats.
+    - ``odf`` supports OpenDocument file formats (.odf, .ods, .odt).
+    - ``pyxlsb`` supports Binary Excel files.
+    - ``calamine`` supports Excel (.xls, .xlsx, .xlsm, .xlsb)
+      and OpenDocument (.ods) file formats.
+
+    .. versionchanged:: 1.2.0
+
+       The engine `xlrd <https://xlrd.readthedocs.io/en/latest/>`_
+       now only supports old-style ``.xls`` files.
+       When ``engine=None``, the following logic will be
+       used to determine the engine:
+
+       - If ``path_or_buffer`` is an OpenDocument format (.odf, .ods, .odt),
+         then `odf <https://pypi.org/project/odfpy/>`_ will be used.
+       - Otherwise if ``path_or_buffer`` is an xls format,
+         ``xlrd`` will be used.
+       - Otherwise if ``path_or_buffer`` is in xlsb format,
+         `pyxlsb <https://pypi.org/project/pyxlsb/>`_ will be used.
+
+       .. versionadded:: 1.3.0
+
+       - Otherwise if `openpyxl <https://pypi.org/project/openpyxl/>`_ is installed,
+         then ``openpyxl`` will be used.
+       - Otherwise if ``xlrd >= 2.0`` is installed, a ``ValueError`` will be raised.
+
+       .. warning::
+
+        Please do not report issues when using ``xlrd`` to read ``.xlsx`` files.
+        This is not supported, switch to using ``openpyxl`` instead.
+engine_kwargs : dict, optional
+    Arbitrary keyword arguments passed to excel engine.
+
+Examples
+--------
+>>> file = pd.ExcelFile('myfile.xlsx')  # doctest: +SKIP
+>>> with pd.ExcelFile("myfile.xls") as xls:  # doctest: +SKIP
+...     df1 = pd.read_excel(xls, "Sheet1")  # doctest: +SKIP
+
+
+### `concat(objs: 'list[Table]', *, axis: 'int | str' = 0, join: 'str' = 'outer', ignore_index: 'bool' = False, short_name: 'str | None' = None, **kwargs: 'Any') -> 'Table'`
+
+
+### `ignore_warnings(ignore_warnings: collections.abc.Iterable[type] = (<class 'Warning'>,))`
+
+Ignore warnings. You can pass a list of specific warnings to ignore like MetadataWarning or StepWarning.
+
+Usage:
+    with ignore_warnings():
+        ds_garden = create_dataset(...)
+
+
+### `keep_metadata(func: 'Callable[..., pd.DataFrame | pd.Series]') -> 'Callable[..., Table | indicators.Indicator]'`
+
+Decorator that turns a function that works on DataFrame or Series into a function that works
+on Table or Variable and preserves metadata.  If the decorated function renames columns, their
+metadata won't be copied.
+
+Example:
+    ```python
+    import owid.catalog.processing as pr
+
+    @pr.keep_metadata
+    def my_df_func(df: pd.DataFrame) -> pd.DataFrame:
+        return df + 1
+
+    tb = my_df_func(tb)
+
+
+    @pr.keep_metadata
+    def my_series_func(s: pd.Series) -> pd.Series:
+        return s + 1
+
+    tb.a = my_series_func(tb.a)
+    ```
+
+
+### `melt(frame: 'Table', id_vars: 'tuple[str] | list[str] | str | None' = None, value_vars: 'tuple[str] | list[str] | str | None' = None, var_name: 'str' = 'variable', value_name: 'str' = 'value', short_name: 'str | None' = None, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `merge(left: 'Table | pd.DataFrame', right: 'Table | pd.DataFrame', how: 'str' = 'inner', on: 'str | list[str] | None' = None, left_on: 'str | list[str] | None' = None, right_on: 'str | list[str] | None' = None, suffixes: 'tuple[str, str]' = ('_x', '_y'), short_name: 'str | None' = None, **kwargs: 'Any') -> 'Table'`
+
+
+### `multi_merge(tables: 'list[Table]', *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Merge multiple tables.
+
+This is a helper function when merging more than two tables on common columns.
+
+Args:
+    tables: Tables to merge.
+
+Returns:
+    combined: Merged table.
+
+
+### `pivot(data: 'Table', *, index: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, values: 'str | list[str] | None' = None, join_column_levels_with: 'str | None' = None, short_name: 'str | None' = None, fill_dimensions: 'bool' = True, **kwargs: 'Any') -> 'Table'`
+
+
+### `read(filepath_or_buffer: 'str | Path | IO[AnyStr]', *args: 'Any', file_extension: 'str | None' = None, metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, **kwargs: 'Any') -> 'Table'`
+
+Read a file based on extension, dispatching to the appropriate reader.
+
+Args:
+    filepath_or_buffer: Path to the file or file-like object to read.
+    *args: Additional positional arguments passed to the format-specific reader.
+    file_extension: File extension (without dot). If None, inferred from filepath.
+    metadata: Table metadata.
+    origin: Origin of the table data.
+    underscore: True to make all column names snake case.
+    **kwargs: Additional keyword arguments passed to the format-specific reader.
+
+Returns:
+    Table with data and metadata.
+
+Note:
+    For reading ZIP files, use Snapshot.extracted() context manager instead.
+    See etl/snapshot.py for the recommended approach to handling archives.
+
+
+### `read_csv(filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_feather(filepath: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_excel(io: 'str | Path | IO[AnyStr]', *args: 'Any', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, **kwargs: 'Any') -> 'Table'`
+
+
+### `read_from_df(data: 'pd.DataFrame', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False) -> 'Table'`
+
+
+### `read_from_dict(data: 'dict[Any, Any]', *args: 'Any', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, **kwargs: 'Any') -> 'Table'`
+
+
+### `read_from_records(data: 'Any', *args: 'Any', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, **kwargs: 'Any')`
+
+
+### `read_json(path_or_buf: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_fwf(filepath_or_buffer: 'FilePath | ReadCsvBuffer[bytes] | ReadCsvBuffer[str]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_stata(filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+### `read_rda(filepath_or_buffer: 'str | Path | IO[AnyStr]', table_name: 'str | None' = None, metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False) -> 'Table'`
+
+
+### `read_rda_multiple(filepath_or_buffer: 'str | Path | IO[AnyStr]', table_names: 'list[str] | None' = None, metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False) -> 'dict[str, Table]'`
+
+
+### `read_rds(filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False) -> 'Table'`
+
+
+### `read_df(df: 'pd.DataFrame', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False) -> 'Table'`
+
+Create a Table (with metadata and an origin) from a DataFrame.
+
+Args:
+    df: Input DataFrame.
+    metadata: Table metadata (with a title and description).
+    origin: Origin of the table.
+    underscore: True to ensure all column names are snake case.
+
+Returns:
+    Table: Original data as a Table with metadata and an origin.
+
+
+### `read_custom(read_function: 'Callable', filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta', origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+Read data using a custom reader function and return a Table with metadata.
+
+This function allows using any custom data reading function while automatically
+attaching metadata and origin information to the resulting Table. Useful when
+standard read functions (read_csv, read_excel, etc.) don't meet specific needs.
+
+Args:
+    read_function: Custom function to read the data. Must accept filepath_or_buffer as first argument and return a DataFrame or Table.
+    filepath_or_buffer: Path to the file or file-like object to read.
+    metadata: Table metadata.
+    origin: Origin of the table data.
+    underscore: True to make all column names snake case.
+    *args: Additional positional arguments to pass to read_function.
+    **kwargs: Additional keyword arguments to pass to read_function.
+
+Returns:
+    Table: Data read by the custom function as a Table with attached metadata and origin.
+
+
+### `read_parquet(filepath_or_buffer: 'str | Path | IO[AnyStr]', metadata: 'TableMeta | None' = None, origin: 'Origin | None' = None, underscore: 'bool' = False, *args: 'Any', **kwargs: 'Any') -> 'Table'`
+
+
+
+
+

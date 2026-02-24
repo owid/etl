@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import io
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple
 
 import pandas as pd
 import requests
@@ -20,6 +20,21 @@ from owid.catalog.core.meta import Origin, VariableMeta
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
+
+
+# =============================================================================
+# Constants
+# =============================================================================
+
+#: Chart type for standard grapher charts.
+CHART: Literal["chart"] = "chart"
+#: Chart type for explorer views.
+EXPLORER: Literal["explorerView"] = "explorerView"
+#: Chart type for multi-dimensional views.
+MULTI_DIM: Literal["multiDimView"] = "multiDimView"
+
+#: Union type for all chart types.
+ChartType = Literal["chart", "explorerView", "multiDimView"]
 
 
 # =============================================================================
@@ -39,9 +54,33 @@ class LicenseError(Exception):
     pass
 
 
+class ExplorerFetchError(Exception):
+    """Raised when an explorer view cannot be fetched (e.g., 503 from CSV endpoint)."""
+
+    pass
+
+
 # =============================================================================
 # Chart Loading Functions
 # =============================================================================
+
+
+def _parse_query_params(query_params: str) -> dict[str, str]:
+    """Parse a query parameter string into a dict.
+
+    Args:
+        query_params: Query string (e.g., "?Metric=Excess+mortality&Tab=Chart" or "Metric=Excess+mortality").
+
+    Returns:
+        Dict of parameter key-value pairs.
+    """
+    from urllib.parse import parse_qs
+
+    # Strip leading "?"
+    qs = query_params.lstrip("?")
+    parsed = parse_qs(qs, keep_blank_values=True)
+    # parse_qs returns lists; take first value
+    return {k: v[0] for k, v in parsed.items()}
 
 
 def _load_chart_table(
@@ -51,6 +90,7 @@ def _load_chart_table(
     use_column_short_names: bool,
     load_data: bool = True,
     timeout: int = 30,
+    extra_params: dict[str, str] | None = None,
 ) -> ChartTable:
     """Load chart data as ChartTable with rich metadata.
 
@@ -61,6 +101,7 @@ def _load_chart_table(
         load_data: If True (default), load full chart data.
                    If False, load only structure (columns and metadata) without rows.
         timeout: HTTP request timeout in seconds.
+        extra_params: Additional query parameters to pass to the CSV endpoint (e.g., for explorer views).
 
     Returns:
         ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
@@ -84,14 +125,18 @@ def _load_chart_table(
         config = _load_chart_table_config(slug, timeout=timeout, base_url=base_url)
 
         # Load data from CSV as ChartTable
+        csv_params: dict[str, str] = {
+            "useColumnShortNames": str(use_column_short_names).lower(),
+        }
+        if extra_params:
+            csv_params.update(extra_params)
+
         df = _load_chart_table_data(
             slug,
             timeout=timeout,
             load_data=load_data,
             base_url=base_url,
-            params={
-                "useColumnShortNames": str(use_column_short_names).lower(),
-            },
+            params=csv_params,
         )
 
         # Build table with metadata
@@ -142,25 +187,47 @@ def _load_chart_table(
         return _load()
 
 
-def parse_chart_slug(slug_or_url: str) -> str:
-    """Extract slug from URL or return as-is.
+class ParsedSlug(NamedTuple):
+    """Result of parsing a chart slug or URL."""
+
+    slug: str
+    query_params: str
+    type: Literal["chart", "explorerView"]
+
+
+def parse_chart_slug(slug_or_url: str) -> ParsedSlug:
+    """Extract slug, query params, and type from a URL or plain slug.
 
     Args:
-        slug_or_url: Chart slug or full Grapher URL.
+        slug_or_url: Chart slug, grapher URL, or explorer URL.
 
     Returns:
-        Chart slug.
+        ParsedSlug with slug, query_params, and type.
 
     Raises:
-        ValueError: If URL is not a valid Grapher URL.
+        ValueError: If URL is not a valid grapher or explorer URL.
     """
     if slug_or_url.startswith("https://ourworldindata.org/grapher/"):
-        # Handle URLs with query params
         path = slug_or_url.split("/grapher/")[1]
-        return path.split("?")[0]
+        slug = path.split("?")[0]
+        query_params = "?" + path.split("?", 1)[1] if "?" in path else ""
+        return ParsedSlug(slug=slug, query_params=query_params, type=CHART)
+    elif slug_or_url.startswith("https://ourworldindata.org/explorers/"):
+        path = slug_or_url.split("/explorers/")[1]
+        slug = path.split("?")[0]
+        query_params = "?" + path.split("?", 1)[1] if "?" in path else ""
+        return ParsedSlug(slug=slug, query_params=query_params, type=EXPLORER)
     elif slug_or_url.startswith("https://"):
-        raise ValueError("URL must be a Grapher URL, e.g. https://ourworldindata.org/grapher/life-expectancy")
-    return slug_or_url
+        raise ValueError(
+            "URL must be a grapher or explorer URL, e.g.\n"
+            "  https://ourworldindata.org/grapher/life-expectancy\n"
+            "  https://ourworldindata.org/explorers/covid?Metric=Cases"
+        )
+    # Plain slug, possibly with query params (e.g. "education-spending?level=primary")
+    if "?" in slug_or_url:
+        slug, params = slug_or_url.split("?", 1)
+        return ParsedSlug(slug=slug, query_params="?" + params, type=CHART)
+    return ParsedSlug(slug=slug_or_url, query_params="", type=CHART)
 
 
 def _load_chart_table_metadata(slug: str, *, timeout: int, base_url: str) -> dict[str, Any]:
@@ -355,8 +422,10 @@ class ChartResult(BaseModel):
     # Core fields (always present)
     slug: str
     title: str
-    url: str
-    type: Literal["chart", "explorerView", "multiDimView"] = "chart"
+    type: ChartType = CHART
+
+    # Query parameters (for explorer views, e.g., "?Metric=Excess+mortality+...")
+    query_params: str = ""
 
     # From fetch() - full chart details
     config: dict[str, Any] = Field(default_factory=dict)
@@ -376,22 +445,18 @@ class ChartResult(BaseModel):
     site_url: str = Field(frozen=True)
 
     @property
-    def grapher_url(self) -> str:
-        """Base URL for the Grapher (derived from site_url)."""
+    def chart_base_url(self) -> str:
+        """Base URL for this chart type (grapher or explorer, derived from site_url and type)."""
+        if self.type == EXPLORER:
+            return f"{self.site_url}/explorers"
         return f"{self.site_url}/grapher"
 
     @property
-    def explorer_url(self) -> str:
-        """Base URL for explorers (derived from site_url)."""
-        return f"{self.site_url}/explorers"
-
-    @property
-    def chart_base_url(self) -> str:
-        """Base URL for this chart (derived from type)."""
-        if self.type == "explorerView":
-            return f"{self.explorer_url}"
-        else:
-            return f"{self.grapher_url}"
+    def url(self) -> str:
+        """Full URL to the interactive chart (built from chart_base_url, slug, and query_params)."""
+        if self.query_params:
+            return f"{self.chart_base_url}/{self.slug}{self.query_params}"
+        return f"{self.chart_base_url}/{self.slug}"
 
     # Private cached data field
     _cached_chart_table: ChartTable | None = PrivateAttr(default=None)
@@ -412,6 +477,11 @@ class ChartResult(BaseModel):
             ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
             is populated from the chart's metadata.json.
 
+        Note:
+            Explorer views (``type="explorerView"``) are best-effort. Some explorers
+            may return 503 or other errors from their CSV endpoint. In those cases an
+            :class:`ExplorerFetchError` is raised with details.
+
         Example:
             ```python
             result = client.charts.search("life expectancy")[0]
@@ -424,13 +494,23 @@ class ChartResult(BaseModel):
         if load_data and self._cached_chart_table is not None:
             return self._cached_chart_table
 
-        tb = _load_chart_table(
-            self.slug,
-            load_data=load_data,
-            timeout=self._timeout,
-            use_column_short_names=True,
-            base_url=self.chart_base_url,
-        )
+        try:
+            tb = _load_chart_table(
+                self.slug,
+                load_data=load_data,
+                timeout=self._timeout,
+                use_column_short_names=True,
+                base_url=self.chart_base_url,
+                extra_params=_parse_query_params(self.query_params) if self.query_params else None,
+            )
+        except (requests.HTTPError, ChartNotFoundError) as e:
+            if self.type == EXPLORER:
+                raise ExplorerFetchError(
+                    f"Failed to fetch explorer view '{self.slug}'. "
+                    f"Explorer CSV endpoints are not always available. "
+                    f"Try fetching the underlying chart directly. Error: {e}"
+                ) from e
+            raise
 
         # Cache only if loading full data with default params
         if load_data:
@@ -496,7 +576,7 @@ class ChartsAPI:
         countries: list[str] | None = None,
         topics: list[str] | None = None,
         require_all_countries: bool = False,
-        limit: int = 20,
+        limit: int = 10,
         page: int = 0,
         timeout: int | None = None,
     ) -> ResponseSet[ChartResult]:
@@ -548,16 +628,24 @@ class ChartsAPI:
         self,
         slug_or_url: str,
         *,
+        type: ChartType | None = None,
         load_data: bool = True,
         timeout: int | None = None,
     ) -> ChartTable:
         """Fetch chart data as a ChartTable with rich metadata.
 
-        Note:
-            Can only retrieve charts at the moment. In the future, we aim to also support Explorer and MultiDim views.
+        Accepts a chart slug, a slug with query parameters, or a full URL. The slug,
+        query parameters, and chart type are extracted automatically.
 
         Args:
-            slug_or_url: Chart slug or full URL.
+            slug_or_url: One of:
+
+                - Chart slug: ``"life-expectancy"``
+                - Slug with query params: ``"education-spending?level=primary&spending_type=gdp_share"``
+                - Full grapher URL: ``"https://ourworldindata.org/grapher/life-expectancy?tab=table"``
+                - Full explorer URL: ``"https://ourworldindata.org/explorers/covid?Metric=Cases"``
+            type: Override the chart type. Defaults to ``"chart"`` (grapher).
+                Use ``"explorerView"`` for explorer views. Auto-detected from full URLs.
             load_data: If True (default), load full chart data.
                        If False, load only structure (columns and metadata) without rows.
             timeout: HTTP request timeout in seconds. Defaults to client timeout.
@@ -566,20 +654,49 @@ class ChartsAPI:
             ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
             is populated from the chart's metadata.json. Chart config is accessible via .metadata.chart_config.
 
+        Note:
+            Explorer views are best-effort. Some explorers may return 503 or other errors
+            from their CSV endpoint.
+
         Example:
             ```python
+            # Fetch a grapher chart by slug
             tb = client.charts.fetch("life-expectancy")
-            print(tb.head())
-            print(tb["life_expectancy_0"].metadata.unit)
-            print(tb.metadata.chart_config.get("title"))
+
+            # Fetch with query params (e.g., a multiDim view)
+            tb = client.charts.fetch("education-spending?level=primary&spending_type=gdp_share")
+
+            # Fetch from a full URL (type and query params auto-detected)
+            tb = client.charts.fetch("https://ourworldindata.org/explorers/covid?Metric=Cases")
+
+            # Explicitly fetch an explorer view
+            tb = client.charts.fetch("covid?Metric=Cases", type="explorerView")
             ```
         """
         effective_timeout = timeout or self._client.timeout
-        slug = parse_chart_slug(slug_or_url)
-        return _load_chart_table(
-            slug,
-            load_data=load_data,
-            timeout=effective_timeout,
-            use_column_short_names=True,
-            base_url=self.base_url,
-        )
+        parsed = parse_chart_slug(slug_or_url)
+
+        slug = parsed.slug
+        effective_type = type or parsed.type
+        effective_params = parsed.query_params
+
+        # Pick base URL based on type
+        if effective_type == EXPLORER:
+            base_url = f"{self._site_url}/explorers"
+            other_type: ChartType = CHART
+        else:
+            base_url = self.base_url
+            other_type = EXPLORER
+
+        try:
+            return _load_chart_table(
+                slug,
+                load_data=load_data,
+                timeout=effective_timeout,
+                use_column_short_names=True,
+                base_url=base_url,
+                extra_params=_parse_query_params(effective_params) if effective_params else None,
+            )
+        except (requests.HTTPError, ChartNotFoundError) as e:
+            hint = "an explorer view" if other_type == EXPLORER else "a grapher chart"
+            raise e.__class__(f"{e}\n\nIf this is {hint}, " f'try: fetch("{slug_or_url}", type={other_type!r})') from e
