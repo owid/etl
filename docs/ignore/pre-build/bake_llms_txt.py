@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import inspect
 import textwrap
-from pathlib import Path
 from typing import Any
 
 from etl.paths import BASE_DIR
