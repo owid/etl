@@ -52,6 +52,10 @@ docs.pre: .venv
 	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
 	@.venv/bin/python docs/ignore/pre-build/generate_analytics_docs.py
 
+docs.llms: .venv
+	@echo '==> Generating llms.txt'
+	@.venv/bin/python docs/ignore/others/bake_llms_txt.py
+
 docs.post: .venv
 	@echo '==> Converting Jupyter Notebooks to HTML'
 	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
