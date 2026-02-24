@@ -56,6 +56,7 @@ tb_grouped = tb.groupby("country").sum()  # Preserves metadata
 
 The Data API provides unified access to OWID's published data through a simple client interface.
 
+<!--
 ## Quick Reference
 The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
 
@@ -98,7 +99,7 @@ Optionally, you can defer data loading until it's actually needed, by using the 
 
 Different APIs use different path conventions:
 
-- **Charts**: `"life-expectancy"` (simple slug)
+- **Charts**: `"life-expectancy"` (simple slug), `"years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"` (with query params), or `"https://ourworldindata.org/grapher/life-expectancy"` (full URL)
 - **Tables**: `"garden/un/2024-07-12/un_wpp/population"` (channel/namespace/version/dataset/table)
 - **Indicators**: `"garden/un/2024-07-12/un_wpp/population#population"` (table path + #column)
 
@@ -217,7 +218,10 @@ Args:
 
         - Table: "channel/namespace/version/dataset/table"
         - Indicator: "channel/namespace/version/dataset/table#variable"
-        - Chart: "life-expectancy" (chart slug without '/' or '#')
+        - Chart slug: "life-expectancy"
+        - Chart URL: "https://ourworldindata.org/grapher/life-expectancy"
+        - Chart slug with query params: "years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"
+        - Explorer URL: "https://ourworldindata.org/explorers/energy"
 
 Returns:
     Table (for tables or indicators) or CharTable (for charts)
@@ -239,6 +243,12 @@ Example:
     # Fetch chart data (slug auto-detected)
     tb = fetch("life-expectancy")
     print(tb.metadata.title)
+
+    # Fetch chart with query params
+    tb = fetch("years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys")
+
+    # Fetch chart by full URL
+    tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
 
     # Fetch from grapher channel
     tb = fetch("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
@@ -276,6 +286,7 @@ Args:
     case: Case-sensitive search (default: False).  Only for tables.
     latest: If True, keep only the latest version of each result
         (grouped by namespace/dataset/table or indicator). Only for tables and indicators.
+        Note: results without a version are dropped when this is enabled.
 
 Returns:
     Search results. Results can be indexed, iterated, and provide access to metadata without downloading data.
@@ -349,14 +360,6 @@ Example:
     staging_client = Client(catalog_url="https://staging-catalog.example.com/")
     ```
 
-#### `Client.explorer_url` (property)
-
-Base URL for explorers (derived from site_url).
-
-#### `Client.grapher_url` (property)
-
-Base URL for the Grapher (derived from site_url).
-
 
 ## charts
 
@@ -387,15 +390,11 @@ Attributes:
 
 #### `ChartResult.chart_base_url` (property)
 
-Base URL for this chart (derived from type).
+Base URL for this chart type (grapher or explorer, derived from site_url and type).
 
 #### `ChartResult.description` (property)
 
 Return a string description of the chart result.
-
-#### `ChartResult.explorer_url` (property)
-
-Base URL for explorers (derived from site_url).
 
 #### `fetch(self, *, load_data: 'bool' = True) -> 'ChartTable'`
 
@@ -422,10 +421,6 @@ Example:
     print(tb["life_expectancy_0"].metadata.unit)
     ```
 
-#### `ChartResult.grapher_url` (property)
-
-Base URL for the Grapher (derived from site_url).
-
 #### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
 
 This function is meant to behave like a BaseModel method to initialise private attributes.
@@ -435,6 +430,10 @@ It takes context as an argument since that's what pydantic-core passes when call
 Args:
     self: The BaseModel instance.
     context: The context.
+
+#### `ChartResult.url` (property)
+
+Full URL to the interactive chart (built from chart_base_url, slug, and query_params).
 
 
 ### ChartsAPI
@@ -466,15 +465,22 @@ Example:
 
 Base URL for the Grapher (read-only).
 
-#### `fetch(self, slug_or_url: 'str', *, load_data: 'bool' = True, timeout: 'int | None' = None) -> 'ChartTable'`
+#### `fetch(self, slug_or_url: 'str', *, type: 'ChartType | None' = None, load_data: 'bool' = True, timeout: 'int | None' = None) -> 'ChartTable'`
 
 Fetch chart data as a ChartTable with rich metadata.
 
-Note:
-    Can only retrieve charts at the moment. In the future, we aim to also support Explorer and MultiDim views.
+Accepts a chart slug, a slug with query parameters, or a full URL. The slug,
+query parameters, and chart type are extracted automatically.
 
 Args:
-    slug_or_url: Chart slug or full URL.
+    slug_or_url: One of:
+
+        - Chart slug: ``"life-expectancy"``
+        - Slug with query params: ``"education-spending?level=primary&spending_type=gdp_share"``
+        - Full grapher URL: ``"https://ourworldindata.org/grapher/life-expectancy?tab=table"``
+        - Full explorer URL: ``"https://ourworldindata.org/explorers/covid?Metric=Cases"``
+    type: Override the chart type. Defaults to ``"chart"`` (grapher).
+        Use ``"explorerView"`` for explorer views. Auto-detected from full URLs.
     load_data: If True (default), load full chart data.
                If False, load only structure (columns and metadata) without rows.
     timeout: HTTP request timeout in seconds. Defaults to client timeout.
@@ -483,15 +489,26 @@ Returns:
     ChartTable with chart data and chart_config. Column metadata (unit, description, etc.)
     is populated from the chart's metadata.json. Chart config is accessible via .metadata.chart_config.
 
+Note:
+    Explorer views are best-effort. Some explorers may return 503 or other errors
+    from their CSV endpoint.
+
 Example:
     ```python
+    # Fetch a grapher chart by slug
     tb = client.charts.fetch("life-expectancy")
-    print(tb.head())
-    print(tb["life_expectancy_0"].metadata.unit)
-    print(tb.metadata.chart_config.get("title"))
+
+    # Fetch with query params (e.g., a multiDim view)
+    tb = client.charts.fetch("education-spending?level=primary&spending_type=gdp_share")
+
+    # Fetch from a full URL (type and query params auto-detected)
+    tb = client.charts.fetch("https://ourworldindata.org/explorers/covid?Metric=Cases")
+
+    # Explicitly fetch an explorer view
+    tb = client.charts.fetch("covid?Metric=Cases", type="explorerView")
     ```
 
-#### `search(self, query: 'str', *, countries: 'list[str] | None' = None, topics: 'list[str] | None' = None, require_all_countries: 'bool' = False, limit: 'int' = 20, page: 'int' = 0, timeout: 'int | None' = None) -> 'ResponseSet[ChartResult]'`
+#### `search(self, query: 'str', *, countries: 'list[str] | None' = None, topics: 'list[str] | None' = None, require_all_countries: 'bool' = False, limit: 'int' = 10, page: 'int' = 0, timeout: 'int | None' = None) -> 'ResponseSet[ChartResult]'`
 
 Search for charts matching a query.
 
@@ -532,18 +549,23 @@ Example:
 
 - **`LicenseError`**: Raised when chart data cannot be downloaded due to licensing.
 
-### `parse_chart_slug(slug_or_url: 'str') -> 'str'`
+### ParsedSlug
 
-Extract slug from URL or return as-is.
+Result of parsing a chart slug or URL.
+
+
+### `parse_chart_slug(slug_or_url: 'str') -> 'ParsedSlug'`
+
+Extract slug, query params, and type from a URL or plain slug.
 
 Args:
-    slug_or_url: Chart slug or full Grapher URL.
+    slug_or_url: Chart slug, grapher URL, or explorer URL.
 
 Returns:
-    Chart slug.
+    ParsedSlug with slug, query_params, and type.
 
 Raises:
-    ValueError: If URL is not a valid Grapher URL.
+    ValueError: If URL is not a valid grapher or explorer URL.
 
 
 ## tables
@@ -680,6 +702,7 @@ Args:
     refresh_index: If True, force re-download of the catalog index. Default False.
     latest: If True, keep only the latest version of each table
         (grouped by namespace, dataset, table, channel). Default False.
+        Note: results without a version are dropped when this is enabled.
 
 Returns:
     ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
@@ -853,6 +876,7 @@ Args:
     show_legacy: If True, show pre-ETL indicators only. Default False.
     latest: If True, keep only the latest version of each indicator
         (grouped by namespace, dataset, column_name). Default False.
+        Note: results without a version are dropped when this is enabled.
     sort_by: How to sort results (default: "relevance"):
 
         - "relevance": Combined score blending semantic similarity (60%) and popularity (40%).
@@ -956,6 +980,30 @@ Example:
 #### `model_post_init(self, _ResponseSet__context: 'Any') -> 'None'`
 
 Set total_count to length of results if not provided.
+
+#### `set_ui_advanced(self) -> "'ResponseSet[T]'"`
+
+Switch to advanced display showing all fields (type, slug, popularity, etc.).
+
+Returns:
+    Self (for chaining).
+
+Example:
+    ```py
+    >>> results.set_ui_advanced()
+    ```
+
+#### `set_ui_basic(self) -> "'ResponseSet[T]'"`
+
+Switch to basic display showing only key fields (title, description, url).
+
+Returns:
+    Self (for chaining).
+
+Example:
+    ```py
+    >>> results.set_ui_basic()
+    ```
 
 #### `sort_by(self, key: 'str | Callable[[T], Any]', *, reverse: 'bool' = False) -> "'ResponseSet[T]'"`
 
