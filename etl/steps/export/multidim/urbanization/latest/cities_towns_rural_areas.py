@@ -249,12 +249,18 @@ def create_stacked_metadata(metric, data_type, location_type=None):
     """Create metadata for stacked location_type views."""
     # Define titles
     titles = {
-        ("population", "estimates"): "Population in cities, towns and suburbs, and rural areas",
-        ("population", "projections"): "Projected population in cities, towns and suburbs, and rural areas",
-        ("population", "estimates_and_projections"): "Population in cities, towns and suburbs, and rural areas",
-        ("popshare", "estimates"): "Share of population in cities, towns and suburbs, and rural areas",
-        ("popshare", "projections"): "Projected share of population in cities, towns and suburbs, and rural areas",
-        ("popshare", "estimates_and_projections"): "Share of population in cities, towns and suburbs, and rural areas",
+        ("population", "estimates"): "Population living in cities, towns and suburbs, and rural areas",
+        ("population", "projections"): "Projected population living in cities, towns and suburbs, and rural areas",
+        ("population", "estimates_and_projections"): "Population living in cities, towns and suburbs, and rural areas",
+        ("popshare", "estimates"): "Share of population living in cities, towns and suburbs, and rural areas",
+        (
+            "popshare",
+            "projections",
+        ): "Projected share of population living in cities, towns and suburbs, and rural areas",
+        (
+            "popshare",
+            "estimates_and_projections",
+        ): "Share of population living in cities, towns and suburbs, and rural areas",
     }
 
     # Define description_short
@@ -332,12 +338,12 @@ def create_urban_vs_rural_metadata(metric, data_type):
     """Create metadata for urban vs rural views."""
     # Define titles
     titles = {
-        ("population", "estimates"): "Population in urban and rural areas",
-        ("population", "projections"): "Projected population in urban and rural areas",
-        ("population", "estimates_and_projections"): "Population in urban and rural areas",
-        ("popshare", "estimates"): "Share of population in urban and rural areas",
-        ("popshare", "projections"): "Projected share of population in urban and rural areas",
-        ("popshare", "estimates_and_projections"): "Share of population in urban and rural areas",
+        ("population", "estimates"): "Population living in urban and rural areas",
+        ("population", "projections"): "Projected population living in urban and rural areas",
+        ("population", "estimates_and_projections"): "Population living in urban and rural areas",
+        ("popshare", "estimates"): "Share of population living in urban and rural areas",
+        ("popshare", "projections"): "Projected share of population living in urban and rural areas",
+        ("popshare", "estimates_and_projections"): "Share of population living in urban and rural areas",
     }
 
     # Define description_short
