@@ -166,8 +166,13 @@ steps:
   #
   data://meadow/faostat/2026-02-25/faostat_cisp:
     - snapshot://faostat/2026-02-25/faostat_cisp.zip
+  ##################################################################################################################
+  # NOTE: The latest version of FBS is missing data for various countries that are currently under review.
+  # For now, import the data for those missing countries from the previous version:
+  ##################################################################################################################
   data://meadow/faostat/2026-02-25/faostat_fbs:
     - snapshot://faostat/2026-02-25/faostat_fbs.zip
+    - snapshot://faostat/2025-03-17/faostat_fbs.zip
   data://meadow/faostat/2026-02-25/faostat_fbsh:
     - snapshot://faostat/2026-02-25/faostat_fbsh.zip
   data://meadow/faostat/2026-02-25/faostat_fs:
