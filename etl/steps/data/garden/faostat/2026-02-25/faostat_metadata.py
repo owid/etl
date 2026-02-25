@@ -114,14 +114,15 @@ def clean_global_dataset_descriptions_table(tb_datasets: Table, tb_custom_datase
     tb_datasets = tb_datasets.copy()
 
     # Check that the dataset descriptions of fbsh and fbs are identical.
-    error = (
-        "Datasets fbsh and fbs have different descriptions. "
-        "This may happen in the future: Simply check that nothing significant has changed and remove this assertion."
-    )
-    assert (
-        tb_datasets[tb_datasets["dataset"] == "faostat_fbsh"]["fao_dataset_description"].item()
-        == tb_datasets[tb_datasets["dataset"] == "faostat_fbs"]["fao_dataset_description"].item()
-    ), error
+    # Since the 2026-02-25 update, the dataset descriptions of FBSH and FBS are slightly different (just a few words are different, no conceptually relevant differences).
+    # error = (
+    #     "Datasets fbsh and fbs have different descriptions. "
+    #     "This may happen in the future: Simply check that nothing significant has changed and remove this assertion."
+    # )
+    # assert (
+    #     tb_datasets[tb_datasets["dataset"] == "faostat_fbsh"]["fao_dataset_description"].item()
+    #     == tb_datasets[tb_datasets["dataset"] == "faostat_fbs"]["fao_dataset_description"].item()
+    # ), error
     # Drop row for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
     tb_datasets = tb_datasets[tb_datasets["dataset"] != "faostat_fbsh"].reset_index(drop=True)
     tb_datasets.loc[tb_datasets["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
