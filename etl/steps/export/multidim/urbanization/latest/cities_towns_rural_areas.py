@@ -56,10 +56,24 @@ def run() -> None:
     # Add grouped views for location types (only for population and popshare)
     c1.group_views(
         groups=[
-            # Stacked area chart: cities, towns, rural
+            # Stacked line chart: cities, towns, rural
             {
                 "dimension": "location_type",
                 "choice_new_slug": "location_type_stacked",
+                "choices": ["urban_centre", "urban_cluster", "rural_total"],
+                "view_config": {
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart"],
+                    "hideAnnotationFieldsInTitle": {"time": True},
+                    "addCountryMode": "add-country",
+                    "selectedFacetStrategy": "entity",
+                },
+            },
+            # Stacked area chart: cities, towns, rural
+            {
+                "dimension": "location_type",
+                "choice_new_slug": "location_type_area",
                 "choices": ["urban_centre", "urban_cluster", "rural_total"],
                 "view_config": {
                     "hasMapTab": False,
@@ -102,8 +116,16 @@ def run() -> None:
         collection_name=paths.short_name,
         config=paths.load_collection_config(),
     )
+    # Rename data_type for location_type_area views BEFORE grouping
+    # This prevents them from being included in the grouping operation below
+    for view in c.views:
+        if view.dimensions.get("location_type") == "location_type_area":
+            if view.dimensions.get("data_type") == "estimates":
+                view.dimensions["data_type"] = "estimates_and_projections"
+            else:
+                view.dimensions["data_type"] = "drop_projections"
 
-    # Group estimates and projections together for all views
+    # Group estimates and projections together for all views (except location_type_area which was already renamed)
     c.group_views(
         groups=[
             {
@@ -120,7 +142,7 @@ def run() -> None:
                     "hideAnnotationFieldsInTitle": {"time": True},
                 },
             }
-        ]
+        ],
     )
 
     # Update view configurations and add colors
@@ -133,7 +155,7 @@ def run() -> None:
         # These views inherit metadata from the indicator but need updated description_key
         if data_type == "estimates_and_projections" and not view.metadata:
             # Skip grouped location views (handled separately below)
-            if location_type not in ["location_type_stacked", "urban_vs_rural"]:
+            if location_type not in ["location_type_stacked", "location_type_area", "urban_vs_rural"]:
                 metadata = create_individual_view_metadata(location_type, metric, data_type)
                 if metadata:
                     view.metadata = metadata
@@ -142,7 +164,7 @@ def run() -> None:
                     view.config["subtitle"] = metadata.get("description_short", "")
 
         # Set config for grouped location views (stacked and urban vs rural)
-        if location_type in ["location_type_stacked", "urban_vs_rural"]:
+        if location_type in ["location_type_stacked", "location_type_area", "urban_vs_rural"]:
             view.config = view.config.copy() if view.config else {}
 
             # Disable map tab for grouped location views
@@ -152,8 +174,9 @@ def run() -> None:
                 del view.config["map"]
 
             # Add metadata based on location type
-            if location_type == "location_type_stacked":
-                metadata = create_stacked_metadata(metric, data_type)
+            if location_type in ["location_type_stacked", "location_type_area"]:
+                metadata = create_stacked_metadata(metric, data_type, location_type)
+
             else:  # urban_vs_rural
                 metadata = create_urban_vs_rural_metadata(metric, data_type)
                 # Special config for popshare (0-100%)
@@ -177,7 +200,7 @@ def run() -> None:
     # (these metrics don't make sense in stacked area or grouped views)
     c.drop_views(
         dimensions={
-            "location_type": ["location_type_stacked", "urban_vs_rural"],
+            "location_type": ["location_type_stacked", "location_type_area", "urban_vs_rural"],
             "metric": ["popshare_change", "density"],
         }
     )
@@ -185,7 +208,7 @@ def run() -> None:
     # Uncomment if we want to include both estimates and projections in separate views
     c.drop_views(
         dimensions={
-            "data_type": ["estimates", "projections"],
+            "data_type": ["estimates", "projections", "drop_projections"],
         }
     )
     #
@@ -222,7 +245,7 @@ def _individual_title(location_type: str, metric: str, data_type: str) -> str:
     return f"{metric.replace('_', ' ').title()} in {base}"
 
 
-def create_stacked_metadata(metric, data_type):
+def create_stacked_metadata(metric, data_type, location_type=None):
     """Create metadata for stacked location_type views."""
     # Define titles
     titles = {
@@ -281,9 +304,15 @@ def create_stacked_metadata(metric, data_type):
             "From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections."
         )
     elif data_type == "estimates_and_projections":
-        description_key.append(
-            "For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/). From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections."
-        )
+        # For location_type_area, only show estimates description (no projections)
+        if location_type == "location_type_area":
+            description_key.append(
+                "For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/)."
+            )
+        else:
+            description_key.append(
+                "For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/). From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections."
+            )
 
     description_key.extend(
         [
