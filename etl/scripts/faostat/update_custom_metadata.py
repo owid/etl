@@ -308,9 +308,7 @@ def update_custom_items_or_elements_file(item_or_element, version=VERSION, read_
         choice = input(f"\n  Type {BOLD}d{RESET} to review diffs, or {BOLD}enter{RESET} to continue: ").strip().lower()
         if choice == "d":
             for ds, code, field, old_fao, new_fao, _ in fao_changes:
-                _display_differences(
-                    old=old_fao, new=new_fao, message=f"{ds} ({item_or_element} {code}): {field}"
-                )
+                _display_differences(old=old_fao, new=new_fao, message=f"{ds} ({item_or_element} {code}): {field}")
     else:
         _print(f"  {DIM}No FAO changes.{RESET}")
 
