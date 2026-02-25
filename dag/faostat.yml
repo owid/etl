@@ -279,8 +279,3 @@ steps:
     - data://garden/faostat/2026-02-25/faostat_metadata
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
-  data://garden/faostat/2026-02-25/food_explorer:
-    - data://garden/faostat/2026-02-25/faostat_metadata
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
