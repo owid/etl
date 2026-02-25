@@ -673,6 +673,10 @@ def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel
         step_names += [f"{NAMESPACE}_fbsc"]
         step_names = [step for step in step_names if step not in [f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"]]
 
+    # In garden or grapher, always include additional_variables (it depends on multiple datasets).
+    if channel in ["garden", "grapher"] and "additional_variables" not in step_names:
+        step_names += ["additional_variables"]
+
     # In grapher there is never a step for metadata.
     if channel == "grapher":
         step_names = [step for step in step_names if step not in [f"{NAMESPACE}_metadata"]]
