@@ -125,3 +125,18 @@ steps:
   #
   data://grapher/space/2026-01-08/non_debris_objects_by_orbit:
     - data://garden/space/2026-01-08/objects_in_space
+  #
+  # UNOOSA - Online Index of Objects Launched into Outer Space
+  #
+  data://meadow/space/2026-02-25/object_launches:
+    - snapshot://space/2026-02-25/object_launches.csv
+  #
+  # UNOOSA - Online Index of Objects Launched into Outer Space
+  #
+  data://garden/space/2026-02-25/object_launches:
+    - data://meadow/space/2026-02-25/object_launches
+  #
+  # UNOOSA - Online Index of Objects Launched into Outer Space
+  #
+  data://grapher/space/2026-02-25/object_launches:
+    - data://garden/space/2026-02-25/object_launches
