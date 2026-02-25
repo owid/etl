@@ -652,7 +652,6 @@ def write_steps_to_dag_file(dag_steps: Dict[str, Set[str]], header_line: Optiona
             _dag_file.write(new_step_lines)
 
 
-
 def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str) -> List[str]:
     """Apply some custom rules to add or remove steps from the list of steps to be created.
 
