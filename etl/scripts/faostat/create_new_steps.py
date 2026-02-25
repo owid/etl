@@ -370,7 +370,7 @@ def create_step_file(channel: str, step_name: str) -> None:
         # Check if shared module in the latest version of the step is identical to the new shared module.
         latest_shared_file = versions_dir / step_latest_version / f"{RUN_FILE_NAME}.py"
         new_shared_file = new_step_dir / f"{RUN_FILE_NAME}.py"
-        if checksum_file(latest_shared_file) != checksum_file(new_shared_file):
+        if latest_shared_file.exists() and checksum_file(latest_shared_file) != checksum_file(new_shared_file):
             log.warning(f"Shared module in version {step_latest_version} differs from new shared module.")
 
 
