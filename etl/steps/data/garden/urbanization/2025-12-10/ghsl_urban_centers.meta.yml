@@ -479,43 +479,45 @@ tables:
           isProjection: true
 
       # -----------------------------------------------------------------------
-      # SHARE OF URBAN POPULATION IN LARGEST CITY
+      # SHARE OF URBAN/TOTAL POPULATION IN CAPITAL CITY
       # -----------------------------------------------------------------------
-      urban_pop_share_largest_city_estimates:
-        title: Share of urban population living in the largest city
+
+      urban_pop_share_capital_estimates:
+        title: Share of urban population living in the capital city
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the urban population living in the country's largest city. {definitions.desc_cities_definition}
+        description_short: Percentage of the urban population living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
-          - Estimated share of a country's urban population living in its largest city (by 2020 population), based on satellite imagery and census data.
+          - Estimated share of a country's urban population living in its capital city, based on satellite imagery and census data.
           - *desc_key_common
           - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
-          - The largest city is determined by 2020 population. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
 
-      urban_pop_share_largest_city_projections:
-        title: Share of urban population living in the largest city (projected)
+      urban_pop_share_capital_projections:
+        title: Share of urban population living in the capital city (projected)
         unit: "%"
         short_unit: "%"
-        description_short: Projected percentage of the urban population living in the country's largest city. {definitions.desc_cities_definition}
+        description_short: Projected percentage of the urban population living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of a country's urban population living in its largest city (by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of a country's urban population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
-          - The largest city is determined by 2020 population. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
           isProjection: true
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
 
-      # -----------------------------------------------------------------------
-      # SHARE OF TOTAL POPULATION IN CAPITAL CITY
-      # -----------------------------------------------------------------------
-      total_pop_share_largest_city_estimates:
+      total_pop_share_capital_estimates:
         title: Share of total population living in the capital city
         unit: "%"
         short_unit: "%"
@@ -524,12 +526,14 @@ tables:
           - Estimated share of a country's total population living in its capital city, based on satellite imagery and census data.
           - *desc_key_common
           - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
-          - The capital city is determined by 2020 population. The total population includes both urban and rural populations.
+          - The total population includes both urban and rural populations.
+          - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
 
-      total_pop_share_largest_city_projections:
+      total_pop_share_capital_projections:
         title: Share of total population living in the capital city (projected)
         unit: "%"
         short_unit: "%"
@@ -538,7 +542,71 @@ tables:
           - Projected share of a country's total population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
-          - The capital city is determined by 2020 population. The total population includes both urban and rural populations.
+          - The total population includes both urban and rural populations.
+          - Where a country has multiple capital cities, the population shown is for the administrative capital.
+          - *desc_crossborder_exclusion
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
+
+      # -----------------------------------------------------------------------
+      # SHARE OF URBAN/TOTAL POPULATION IN LARGEST CITY
+      # -----------------------------------------------------------------------
+
+      urban_pop_share_largest_city_estimates:
+        title: Share of urban population living in the largest city
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the urban population living in the country's largest city (by population). {definitions.desc_cities_definition}
+        description_key:
+          - Estimated share of a country's urban population living in its largest city (determined by 2020 population), based on satellite imagery and census data.
+          - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - *desc_crossborder_exclusion
+        display:
+          numDecimalPlaces: 1
+
+      urban_pop_share_largest_city_projections:
+        title: Share of urban population living in the largest city (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected percentage of the urban population living in the country's largest city (by population). {definitions.desc_cities_definition}
+        description_key:
+          - Projected share of a country's urban population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - *desc_crossborder_exclusion
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      total_pop_share_largest_city_estimates:
+        title: Share of total population living in the largest city
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the total population living in the country's largest city (by population). {definitions.desc_cities_definition}
+        description_key:
+          - Estimated share of a country's total population living in its largest city (determined by 2020 population), based on satellite imagery and census data.
+          - *desc_key_common
+          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
+          - *desc_crossborder_exclusion
+        display:
+          numDecimalPlaces: 1
+
+      total_pop_share_largest_city_projections:
+        title: Share of total population living in the largest city (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected percentage of the total population living in the country's largest city (by population). {definitions.desc_cities_definition}
+        description_key:
+          - Projected share of a country's total population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - *desc_key_common
+          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
