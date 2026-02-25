@@ -221,5 +221,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=[tb])
+    # NOTE: Pass the new snapshot metadata explicitly, since the table combines data from two snapshots
+    # with slightly different descriptions, which would cause the description to be None.
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snapshot.metadata)
     ds_meadow.save()
