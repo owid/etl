@@ -13,6 +13,7 @@ meta:
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+    attribution: Food and Agriculture Organization of the United Nations (2026)
 outs:
   - md5: 4a4e4597b425aace4e1a8e6e4c3f026e
     size: 16139499
