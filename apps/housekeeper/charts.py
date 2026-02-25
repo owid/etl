@@ -18,6 +18,7 @@ from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.housekeeper.utils import (
+    CONFIG,
     MODEL_DEFAULT_PRETTY,
     TODAY,
     get_chart_summary,
@@ -30,10 +31,9 @@ from etl.slack_helpers import send_slack_message
 
 log = get_logger()
 
-# Default reviewers for daily chart reviews
-# Users are identified by UserIDs. To get the ID for a user, check slackId column in MySQL table `users`.
-DAILY_CHART_REVIEWER_DEFAULT = "U07437LD7JR"  # Tuna
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U07437LD7JR"  # Tuna - alt: Fiona (U01T5MG8DTM)
+# Default reviewer for daily chart reviews (from config.yaml)
+DEFAULT_SLACK_ID = CONFIG["charts"]["default_slack_id"]
+REVIEWER_OVERRIDES = CONFIG["charts"].get("reviewer_overrides", {})
 
 
 ####################################
@@ -58,10 +58,8 @@ def send_slack_chart_reviews(
 
     # Get user data (slack usernames)
     slack_users = get_usernames()
-    # Replace Max for Hannah (https://owid.slack.com/archives/C087DMCTYM9/p1768236870922109)
-    HANNAH_ID = "U4U46QBJ5"
-    MAX_ID = "U3E5PRWNN"
-    slack_users = {k: (HANNAH_ID if v == MAX_ID else v) for k, v in slack_users.items()}
+    # Apply reviewer overrides from config.yaml
+    slack_users = {k: REVIEWER_OVERRIDES.get(v, v) for k, v in slack_users.items()}
 
     # Uncomment below if you want to test the workflow without tagging people
     # slack_users = {k: "U011L616WE5" for k, v in slack_users.items()}
@@ -186,7 +184,7 @@ def build_published_message(chart, refs):
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DEFAULT_SLACK_ID}>\n"
         f"_{message_usage}_\n"
     )
     return message
@@ -350,42 +348,9 @@ def get_references(chart_id: int):
 
 def get_usernames():
     df = read_metabase(
-        "select * from users",
+        "select fullName, slackId from users where slackId is not null",
         database_id=5,
     )
-
-    if "slackId" not in df.columns:
-        SLACK_NAMES = {
-            "Angela Wenham": "U06U7HMGJSU",
-            "Antoinette Finnegan": "U0550KX9ZG9",
-            "Bastian Herre": "U01Q41A9PJS",
-            "Bertha Rohenkohl": "U07TQ8APT1T",
-            "Bobbie Macdonald": "U0117V5H16U",
-            "Charlie Giattino": "U01310BHF4J",
-            "Daniel Bachler": "U01TSHGPXRV",
-            "Edouard Mathieu": "U01129F6DQQ",
-            "Esteban Ortiz Ospina": "U3E8LTA3X",
-            "Fiona Spooner": "U01T5MG8DTM",
-            "Hannah Ritchie": "U4U46QBJ5",
-            "Ike Saunders": "U036Q593X54",
-            "Joe Hasell": "U3GSPFCV6",
-            "Lucas Rodés-Guirao": "U01THNNPDCG",
-            "Marcel Gerber": "U011L616WE5",
-            "Martin Račák": "U06S4C4KGJZ",
-            "Marwa Boukarim": "U03DTUH6T7S",
-            "Matthieu Bergel": "ULG7KK63Z",
-            "Max Roser": "U3E5PRWNN",
-            "Mojmir Vinkler": "U02US02AWA1",
-            "Natalie Reynolds-Garcia": "U03QPP629GW",
-            "Pablo Arriagada": "U03DR3BKE5R",
-            "Pablo Rosado": "U02UVHS46AZ",
-            "Sophia Mersmann": "U04QE4CFUKC",
-            "Tuna Acisu": "U07437LD7JR",
-            "Valerie Muigai": "U027C4D5B7F",
-            "Veronika Samborska": "U053NDCFT7C",
-        }
-        df["slackId"] = df["fullName"].map(SLACK_NAMES)
-
     df = df[["fullName", "slackId"]].dropna()
     dix = df.set_index("fullName")["slackId"].to_dict()
     return dix
@@ -423,7 +388,7 @@ def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
     Logic:
     1. Check created_by - if in SLACK_NAMES, use them
     2. Check revisions chronologically - find first editor in SLACK_NAMES
-    3. Fall back to DAILY_DRAFT_CHART_REVIEWER_DEFAULT
+    3. Fall back to DEFAULT_SLACK_ID
 
     Args:
         chart: Chart row (pandas Series) with created_by and revisions fields.
@@ -454,7 +419,7 @@ def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
             return slack_tag, f"You edited this chart on {date_str}.", date_str
 
     # 3. Fall back to default
-    slack_tag = DAILY_DRAFT_CHART_REVIEWER_DEFAULT
+    slack_tag = DEFAULT_SLACK_ID
     return slack_tag, "You are the default reviewer for draft charts.", None
 
 
