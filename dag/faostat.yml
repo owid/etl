@@ -159,8 +159,8 @@ steps:
   # Global food explorer.
   #
   export://explorers/faostat/latest/global_food:
-    - data://grapher/faostat/2025-03-17/faostat_qcl
-    - data://grapher/faostat/2025-03-17/faostat_fbsc
+    - data://grapher/faostat/2026-02-25/faostat_qcl
+    - data://grapher/faostat/2026-02-25/faostat_fbsc
   #
   # FAOSTAT meadow steps for version 2026-02-25
   #
