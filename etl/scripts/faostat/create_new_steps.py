@@ -684,6 +684,56 @@ def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel
     return step_names
 
 
+def update_explorer_dependencies_in_dag(
+    namespace: str = NAMESPACE,
+    new_version: str = VERSION,
+) -> None:
+    """Update the dependencies of explorer steps in the dag file to point to the new grapher version.
+
+    Explorer steps use 'latest' as version, so they don't need new step files or new dag entries.
+    Instead, the existing dag entry is modified in-place to update dependency versions.
+
+    Parameters
+    ----------
+    namespace : str
+        Namespace.
+    new_version : str
+        New version to use for grapher dependencies.
+
+    """
+    dag = load_dag()
+
+    # Find all explorer steps for this namespace.
+    explorer_steps = {
+        step: dag[step]
+        for step in dag
+        if get_channel_from_dag_line(step) == "explorers" and get_namespace_from_dag_line(step) == namespace
+    }
+
+    if not explorer_steps:
+        return
+
+    # Read the dag file content.
+    with open(DAG_FILE) as f:
+        dag_content = f.read()
+
+    for step_name, dependencies in explorer_steps.items():
+        for dependency in dependencies:
+            if get_namespace_from_dag_line(dependency) != namespace:
+                continue
+            try:
+                old_version = get_version_from_dag_line(dependency)
+            except ValueError:
+                continue
+            if old_version != new_version:
+                new_dependency = dependency.replace(old_version, new_version)
+                dag_content = dag_content.replace(dependency, new_dependency)
+                log.info(f"Updated explorer dependency: {dependency} -> {new_dependency}")
+
+    with open(DAG_FILE, "w") as f:
+        f.write(dag_content)
+
+
 def run(channel: str, include_all_datasets: bool = False) -> None:
     if include_all_datasets:
         # List all datasets, even if their source data was not updated.
@@ -709,6 +759,10 @@ def run(channel: str, include_all_datasets: bool = False) -> None:
         # Update dag file with new dependencies.
         header_line = f"# FAOSTAT {channel} steps for version {VERSION}"
         write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
+
+        # When updating grapher steps, also update explorer dependencies.
+        if channel == "grapher":
+            update_explorer_dependencies_in_dag()
     else:
         log.info("Nothing to update.")
 
