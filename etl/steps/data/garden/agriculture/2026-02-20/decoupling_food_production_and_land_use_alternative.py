@@ -1,7 +1,5 @@
 """Create a dataset with indicators on food supply (in kilocalories) and agricultural land use (in hectares).
 
-TODO: Check if there's an update on the relevant indicators in FAOSTAT.
-
 The goal is to create a visualization showing that some countries managed to feed more people with less land.
 In other words, we need to select countries that have managed to decouple per capita food supply and land use.
 
@@ -10,15 +8,11 @@ So we need to find a way to avoid showing decoupled countries that simply offsho
 
 We propose the following approach:
 - We use 3-year rollowing averages, to avoid variability at the year level (e.g. due to COVID, bad harvest, stock changes, etc.).
-# TODO: Should we consider a longer rolling window? Those three years may be particularly low due to COVID.
 - We pick our relevant window, which will be 1963 (meaning the average of 1961, 1962, and 1963) to 2022 (meaning the average of 2020, 2021, 2022). This is the biggest window possible given the available data.
-# TODO: Should we consider a shorter baseline window (following a similar logic to the step on decoupling GDP and emissions)?
 - We select countries where:
   - Food supply has increased in that period by at least 5%.
   - Land use has decreased in that period by at least 5%.
   - Imports are lower than 20% of domestic supply in the latest year. This imports cap avoids selecting countries that have offshored land use, i.e. they are feeding more people by using more land elsewhere.
-
-TODO: Analogously, we could consider applying a cap on exports in the first year. It's possible that some countries used to export a lot of food and now they export very little. Those countries may show an increase in food supply and a significant decrease in land use; but this decrease in land use would be due to feeding fewer people elsewhere, rather than feeding more people in their own country. I'm not sure if this is necessary, and I imagine this may not be a common case. Try it and see if it makes a relevant difference.
 
 """
 
@@ -663,7 +657,7 @@ def run() -> None:
     )
 
     # Analysis to pick the best minimum and maximum years.
-    time_window_analysis(tb_change=tb_change)
+    # time_window_analysis(tb_change=tb_change)
 
     # Results for different windows:
     # With no restrictions on imports:
