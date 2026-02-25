@@ -56,30 +56,15 @@ def run() -> None:
     # Add grouped views for location types (only for population and popshare)
     c1.group_views(
         groups=[
-            # Stacked area chart: cities, towns, rural (estimates only)
+            # Stacked area chart: cities, towns, rural
             {
                 "dimension": "location_type",
                 "choice_new_slug": "location_type_stacked",
                 "choices": ["urban_centre", "urban_cluster", "rural_total"],
-                "dimensions_filters": {"data_type": ["estimates"]},
                 "view_config": {
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["StackedArea"],
-                    "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "add-country",
-                    "selectedFacetStrategy": "entity",
-                },
-            },
-            # Line chart: cities, towns, rural (estimates and projections)
-            {
-                "dimension": "location_type",
-                "choice_new_slug": "location_type_line",
-                "choices": ["urban_centre", "urban_cluster", "rural_total"],
-                "view_config": {
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["LineChart"],
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "add-country",
                     "selectedFacetStrategy": "entity",
@@ -156,8 +141,8 @@ def run() -> None:
                     view.config["title"] = metadata.get("title", "")
                     view.config["subtitle"] = metadata.get("description_short", "")
 
-        # Set config for grouped location views (stacked, line, and urban vs rural)
-        if location_type in ["location_type_stacked", "location_type_line", "urban_vs_rural"]:
+        # Set config for grouped location views (stacked and urban vs rural)
+        if location_type in ["location_type_stacked", "urban_vs_rural"]:
             view.config = view.config.copy() if view.config else {}
 
             # Disable map tab for grouped location views
@@ -167,10 +152,7 @@ def run() -> None:
                 del view.config["map"]
 
             # Add metadata based on location type
-            if location_type in ["location_type_stacked", "location_type_line"]:
-                view.config["chartTypes"] = (
-                    ["StackedArea"] if location_type == "location_type_stacked" else ["LineChart"]
-                )
+            if location_type == "location_type_stacked":
                 metadata = create_stacked_metadata(metric, data_type)
             else:  # urban_vs_rural
                 metadata = create_urban_vs_rural_metadata(metric, data_type)
@@ -195,7 +177,7 @@ def run() -> None:
     # (these metrics don't make sense in stacked area or grouped views)
     c.drop_views(
         dimensions={
-            "location_type": ["location_type_stacked", "location_type_line", "urban_vs_rural"],
+            "location_type": ["location_type_stacked", "urban_vs_rural"],
             "metric": ["popshare_change", "density"],
         }
     )
