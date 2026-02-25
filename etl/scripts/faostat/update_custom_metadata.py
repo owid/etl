@@ -206,7 +206,7 @@ def update_custom_datasets_file(version=VERSION, read_only=False, confirmation=F
         fao_new_dataset_metadata = Dataset(DATA_DIR / "meadow/faostat" / version / dataset_short_name).metadata
 
         for field in ["title", "description"]:
-            new = getattr(fao_new_dataset_metadata, field)
+            new = getattr(fao_new_dataset_metadata, field) or ""
             try:
                 # Load custom dataset metadata for current domain.
                 old = custom_datasets.loc[dataset_short_name].fillna("")[f"{compare_with}_dataset_{field}"]
