@@ -326,20 +326,22 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
         The current workflow is a bit convoluted: we fetch snapshots, create meadow and garden steps, and the edit snapshots again. But for now, this workflow is the safest working solution.
 
-12. From the ETL Wizard, use Chart Diff to visually inspect changes between the old and new versions of updated charts, and
+12. From the ETL Wizard, use Anomalist to visually inspect potential data issues.
+
+13. From the ETL Wizard, use Anomalist and Chart Diff to visually inspect changes between the old and new versions of updated charts, and
     accept or reject changes. Inspect also changes in the global food explorer using Explorer Diff.
 
-13. Manually update the version of any `faostat` used as dependency in unrelated datasets (`faostat_rl` is used in `weekly_wildfires`).
+14. Manually update the version of any `faostat` used as dependency in unrelated datasets (`faostat_rl` is used in `weekly_wildfires`).
 
-14. Update other steps in the `agriculture` namespace that rely on any `faostat_*` step.
+15. Update other steps in the `agriculture` namespace that rely on any `faostat_*` step.
 
-15. Archive old steps.
+16. Archive old steps.
 
     ```bash
     etl archive faostat/YYYY-MM-DD --include-usages
     ```
 
-16. After merging all code and once production is up-to-date, archive unnecessary grapher datasets.
+17. After merging all code and once production is up-to-date, archive unnecessary grapher datasets.
 
 ## Workflow to make changes to a dataset
 
