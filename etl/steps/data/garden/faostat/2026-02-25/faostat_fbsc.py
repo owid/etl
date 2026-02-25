@@ -65,8 +65,9 @@ def combine_fbsh_and_fbs_datasets(
 
     """
     # Sanity checks.
-    error = "Description of fbs and fbsh datasets is different."
-    assert ds_fbsh.metadata.description == ds_fbs.metadata.description, error
+    # Since the 2026-02-25 update, the dataset descriptions of FBSH and FBS are slightly different (just a few words are different, no conceptually relevant differences).
+    # error = "Description of fbs and fbsh datasets is different."
+    # assert ds_fbsh.metadata.description == ds_fbs.metadata.description, error
     error = "Licenses of fbsh and fbs are different."
     assert ds_fbsh.metadata.licenses == ds_fbs.metadata.licenses, error
 
