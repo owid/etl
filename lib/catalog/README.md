@@ -17,8 +17,6 @@ The `owid-catalog` library is the foundation of Our World in Data's data managem
 pip install owid-catalog
 ```
 
-> **Note**: The library is currently in Release Candidate stage (v1.0.0-rc2). Install with: `pip install owid-catalog==1.0.0rc2`
-
 ## Quick Examples
 
 ### Accessing OWID Data
@@ -87,42 +85,53 @@ make watch
 
 ## Changelog
 
-### `v1.0.0rc2` (Release Candidate)
-- **Highlights**
-    - **Integrate `Table` object into API module:** All `fetch()` methods now return `owid.catalog.Table` objects with full metadata support, including charts.
-    - **Popularity scores**: Search results now include `popularity` field (0.0-1.0) based on analytics views
-    - **CatalogPath helper**: New pathlib-like class for parsing catalog paths (e.g., `grapher/who/2024/gho/table#indicator`)
-    - **Performance improvements**: Replaced slow `iterrows()` with vectorized operations in TablesAPI
-    - **refresh_index parameter**: New `search(..., refresh_index=True)` to force catalog index reload
-- **Others**
-    - Embedded catalog index loading directly in TablesAPI (removed ETLCatalog dependency)
-    - Modularized `search()` into helper methods: `_filter_index()`, `_fetch_popularity()`, `_to_results()`
-    - API URLs now immutable with Pydantic `Field(frozen=True)` - consistent flow from Client → API → Result
-    - Improved `.latest()` method with better version handling and timestamps
-    - Legacy catalog code moved to `owid.catalog.api.legacy` module
-    - Results sorted by popularity by default (most viewed first)
+### `v1.0.0`
+- **New unified Client API**
+  - `owid.catalog.Client` as single entry point with `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`
+  - Quick access via `search()` and `fetch()` convenience functions
+  - Rich result types: `ChartResult`, `IndicatorResult`, `TableResult` with `ResponseSet` container
+- **Charts API**
+  - Fetch chart data by slug, URL, or slug with query params
+  - Parse chart slugs from grapher/explorer URLs via `parse_chart_slug()`
+  - Explorer best-effort fetching with graceful error handling
+  - `set_ui_advanced()` / `set_ui_basic()` for display configuration
+- **Tables API**
+  - Search catalog by table, namespace, version, dataset, and channel
+  - Fetch tables directly by catalog path
+  - Embedded catalog index with local caching
+- **Indicators API**
+  - Semantic search via `search.owid.io` vector embeddings
+  - Sort by relevance (similarity + popularity blend) or similarity only
+  - `fetch()` for single-column indicator or `fetch_table()` for the full table
+- **Search & discovery**
+  - Fuzzy, exact, contains, and regex matching modes
+  - `.latest()` filtering to keep only newest versions
+  - Popularity scores (0.0-1.0) from analytics views, results sorted by popularity
+  - `refresh_index` parameter to force catalog index reload
+- **Data structures integration**
+  - All `fetch()` methods return `owid.catalog.Table` with full metadata
+  - `CatalogPath` helper for parsing catalog paths
+  - Lazy loading with `load_data=False` for deferred data access
+- **Library reorganization**
+  - Restructured into `owid.catalog.core` (data structures) and `owid.catalog.api` (remote access)
+  - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compat maintained)
+  - Legacy code moved to `owid.catalog.api.legacy`
+  - New dependencies: `pydantic` v2.0+
+- **Private data support**
+  - Private datasets served from separate R2 bucket
+  - API can fetch private data from private bucket
+- **Performance**
+  - Vectorized operations replacing `iterrows()` in TablesAPI
+  - Embedded catalog index loading (removed ETLCatalog dependency)
+  - Modularized search into helper methods
+- **Other**
+  - Thumbnail display in `ResponseSet` for chart results
+  - JSON output format support
+  - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
+  - API URLs immutable with Pydantic `Field(frozen=True)`
 
 <details>
 <summary>See previous versions</summary>
-
-### `v1.0.0rc1` (Release Candidate)
-- **Highlights**
-  - **New unified Client API**: Complete API refactor with `owid.catalog.Client` as single entry point
-  - **Specialized APIs**: `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`, `SiteSearchAPI` for different data access patterns
-  - **Lazy loading**: All data access uses lazy loading with `@property` decorators for performance
-  - **Rich result types**: `ChartResult`, `IndicatorResult`, `TableResult`, `PageSearchResult` with comprehensive metadata
-  - **Breaking changes**:
-    - `catalog.find()` deprecated in favor of `Client().tables.search()` (backwards compatibility maintained)
-    - `catalog.charts` module has been removed in favor of `Client().chart`  - **Others**
-  - New dependencies: `pydantic` (v2.0+), `deprecated` for data models and deprecation warnings
-  - Documentation restructure: Split into intro, API reference, and data structures guides
-  - Method renames: `ChartsAPI.metadata()` → `get_metadata()`, `config()` → `get_config()` for consistency
-  - Enhanced type checking with pydantic `BaseModel` for all result types
-  - Backwards compatibility layer maintains support for legacy `catalog.find()` calls
-  - `ResponseSet` container with iteration, indexing, and DataFrame conversion
-  - Loading indicators for long-running API requests
-  - Comprehensive exception handling: `ChartNotFoundError`, `LicenseError`
-
 
 #### `v0.4.5`
 - Allow both `table` and `dataset` parameters in `find()` (they can now be used together)

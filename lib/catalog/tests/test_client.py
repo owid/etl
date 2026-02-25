@@ -3,7 +3,7 @@
 #
 import pytest
 
-from owid.catalog import Client, Table
+from owid.catalog import Client, Table, fetch, search
 from owid.catalog.api import (
     ChartNotFoundError,
     ChartResult,
@@ -12,6 +12,7 @@ from owid.catalog.api import (
     ResponseSet,
     TableResult,
 )
+from owid.catalog.api.charts import parse_chart_slug
 from owid.catalog.api.datasette import DatasetteAPI, DatasetteTable
 from owid.catalog.api.search import PageSearchResult
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
@@ -498,6 +499,153 @@ class TestResponseSet:
         assert top.score == 0.9
 
 
+class TestNormalizeVersion:
+    """Test _normalize_version helper."""
+
+    def test_date_passthrough(self):
+        from owid.catalog.api.tables import _normalize_version
+
+        assert _normalize_version("2024-01-15") == "2024-01-15"
+
+    def test_year_normalization(self):
+        from owid.catalog.api.tables import _normalize_version
+
+        assert _normalize_version("2024") == "2024-99-99"
+
+    def test_latest_sorts_highest(self):
+        from owid.catalog.api.tables import _normalize_version
+
+        assert _normalize_version("latest") == "9999-99-99"
+
+    def test_mixed_format_comparison(self):
+        from owid.catalog.api.tables import _normalize_version
+
+        versions = ["2024-01-01", "2024", "latest", "2023-12-31"]
+        sorted_versions = sorted(versions, key=_normalize_version)
+        assert sorted_versions == ["2023-12-31", "2024-01-01", "2024", "latest"]
+
+
+class TestKeepLatestVersions:
+    """Test _keep_latest_versions helper."""
+
+    def test_basic_grouping(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str
+
+        items = [
+            Item(name="a", version="2023-01-01"),
+            Item(name="a", version="2024-06-01"),
+            Item(name="b", version="2024-01-01"),
+            Item(name="a", version="2024-01-01"),
+        ]
+        result = _keep_latest_versions(items, key=lambda r: (r.name,))
+        assert len(result) == 2
+        names = {r.name for r in result}
+        assert names == {"a", "b"}
+        # The "a" kept should be the 2024-06-01 version
+        a_item = next(r for r in result if r.name == "a")
+        assert a_item.version == "2024-06-01"
+
+    def test_preserves_order(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str
+
+        items = [
+            Item(name="b", version="2024-01-01"),
+            Item(name="a", version="2024-06-01"),
+        ]
+        result = _keep_latest_versions(items, key=lambda r: (r.name,))
+        assert [r.name for r in result] == ["b", "a"]
+
+    def test_none_version_dropped(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str | None
+
+        items = [
+            Item(name="a", version=None),
+            Item(name="b", version="2024-01-01"),
+        ]
+        result = _keep_latest_versions(items, key=lambda r: (r.name,))
+        assert len(result) == 1
+        assert result[0].name == "b"
+
+    def test_empty_input(self):
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        assert _keep_latest_versions([], key=lambda r: (r,)) == []
+
+    def test_single_group(self):
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str
+
+        items = [
+            Item(name="a", version="2023-01-01"),
+            Item(name="a", version="2024-01-01"),
+            Item(name="a", version="2023-06-01"),
+        ]
+        result = _keep_latest_versions(items, key=lambda r: (r.name,))
+        assert len(result) == 1
+        assert result[0].version == "2024-01-01"
+
+    def test_year_vs_date_comparison(self):
+        """Test that year-only version sorts after all dates in that year."""
+        from pydantic import BaseModel
+
+        from owid.catalog.api.tables import _keep_latest_versions
+
+        class Item(BaseModel):
+            name: str
+            version: str
+
+        items = [
+            Item(name="a", version="2024-12-31"),
+            Item(name="a", version="2024"),
+        ]
+        result = _keep_latest_versions(items, key=lambda r: (r.name,))
+        assert len(result) == 1
+        assert result[0].version == "2024"  # "2024" normalizes to "2024-99-99" > "2024-12-31"
+
+
+class TestTablesAPILatest:
+    """Integration test for TablesAPI.search with latest=True."""
+
+    def test_latest_deduplicates(self):
+        """Search for population with latest=True should have fewer results."""
+        client = Client()
+        all_results = client.tables.search(table="population")
+        latest_results = client.tables.search(table="population", latest=True)
+
+        assert len(latest_results) > 0
+        assert len(latest_results) <= len(all_results)
+
+        # Each (namespace, dataset, table, channel) should appear at most once
+        seen = set()
+        for r in latest_results:
+            group = (r.namespace, r.dataset, r.table, r.channel)
+            assert group not in seen, f"Duplicate group found: {group}"
+            seen.add(group)
+
+
 class TestDataclassModels:
     """Test the dataclass model objects."""
 
@@ -505,16 +653,27 @@ class TestDataclassModels:
         result = ChartResult(
             slug="test-chart",
             title="Test Chart",
-            url="https://ourworldindata.org/grapher/test-chart",
             site_url="https://ourworldindata.org",
         )
 
         assert result.slug == "test-chart"
         assert result.title == "Test Chart"
         assert result.site_url == "https://ourworldindata.org"
-        assert result.grapher_url == "https://ourworldindata.org/grapher"
-        assert result.explorer_url == "https://ourworldindata.org/explorers"
+        assert result.chart_base_url == "https://ourworldindata.org/grapher"
+        assert result.url == "https://ourworldindata.org/grapher/test-chart"
         assert result.type == "chart"
+
+    def test_chart_result_explorer_url(self):
+        result = ChartResult(
+            slug="covid",
+            title="COVID Explorer",
+            type="explorerView",
+            query_params="?Metric=Cases",
+            site_url="https://ourworldindata.org",
+        )
+
+        assert result.url == "https://ourworldindata.org/explorers/covid?Metric=Cases"
+        assert result.chart_base_url == "https://ourworldindata.org/explorers"
 
     def test_indicator_result(self):
         result = IndicatorResult(
@@ -562,6 +721,50 @@ class TestDataclassModels:
 
         assert result.title is None
         assert result.description is None
+
+
+class TestParseChartSlug:
+    """Test parse_chart_slug with grapher/explorer URLs and plain slugs."""
+
+    def test_plain_slug(self):
+        parsed = parse_chart_slug("life-expectancy")
+        assert parsed.slug == "life-expectancy"
+        assert parsed.query_params == ""
+        assert parsed.type == "chart"
+
+    def test_grapher_url(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/grapher/life-expectancy")
+        assert parsed.slug == "life-expectancy"
+        assert parsed.query_params == ""
+        assert parsed.type == "chart"
+
+    def test_grapher_url_with_params(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/grapher/life-expectancy?tab=table&time=2020")
+        assert parsed.slug == "life-expectancy"
+        assert parsed.query_params == "?tab=table&time=2020"
+        assert parsed.type == "chart"
+
+    def test_explorer_url(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/explorers/covid")
+        assert parsed.slug == "covid"
+        assert parsed.query_params == ""
+        assert parsed.type == "explorerView"
+
+    def test_explorer_url_with_params(self):
+        parsed = parse_chart_slug("https://ourworldindata.org/explorers/covid?Metric=Cases&Interval=Weekly")
+        assert parsed.slug == "covid"
+        assert parsed.query_params == "?Metric=Cases&Interval=Weekly"
+        assert parsed.type == "explorerView"
+
+    def test_slug_with_query_params(self):
+        parsed = parse_chart_slug("education-spending?level=primary&spending_type=gdp_share")
+        assert parsed.slug == "education-spending"
+        assert parsed.query_params == "?level=primary&spending_type=gdp_share"
+        assert parsed.type == "chart"
+
+    def test_invalid_url_raises(self):
+        with pytest.raises(ValueError, match="grapher or explorer URL"):
+            parse_chart_slug("https://example.com/some-chart")
 
 
 class TestDatasetteAPI:
@@ -708,3 +911,119 @@ class TestDatasetteAPI:
         tables = api.list_tables(timeout=10)
         assert isinstance(tables, list)
         assert all(isinstance(t, DatasetteTable) for t in tables)
+
+
+class TestQuickSearch:
+    """Test the search() convenience function from quick.py."""
+
+    def test_search_charts_default(self):
+        """search() with a query returns ResponseSet[ChartResult] by default."""
+        results = search("population")
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, ChartResult) for r in results)
+
+    def test_search_tables(self):
+        """search(kind='table') returns ResponseSet[TableResult]."""
+        results = search("population", kind="table")
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, TableResult) for r in results)
+
+    def test_search_indicators(self):
+        """search(kind='indicator') returns ResponseSet[IndicatorResult]."""
+        results = search("life expectancy", kind="indicator")
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, IndicatorResult) for r in results)
+
+    def test_search_requires_name_for_charts(self):
+        """search(kind='chart') without name raises ValueError."""
+        with pytest.raises(ValueError, match="'name' is required"):
+            search(kind="chart")
+
+    def test_search_requires_name_for_indicators(self):
+        """search(kind='indicator') without name raises ValueError."""
+        with pytest.raises(ValueError, match="'name' is required"):
+            search(kind="indicator")
+
+    def test_search_invalid_kind(self):
+        """search() with invalid kind raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid kind"):
+            search("x", kind="invalid")  # type: ignore[arg-type]
+
+
+class TestQuickFetch:
+    """Test the fetch() convenience function from quick.py."""
+
+    def test_fetch_chart_slug(self):
+        """fetch() with a chart slug returns a ChartTable."""
+        tb = fetch("life-expectancy")
+        assert isinstance(tb, ChartTable)
+        assert len(tb) > 0
+
+    def test_fetch_chart_url(self):
+        """fetch() with a full grapher URL returns a ChartTable."""
+        tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
+        assert isinstance(tb, ChartTable)
+        assert len(tb) > 0
+
+    def test_fetch_table_path(self):
+        """fetch() with a catalog table path returns a Table."""
+        # Find a valid table path first
+        results = search("population", kind="table")
+        assert len(results) > 0
+        path = results[0].path
+        assert path is not None
+        tb = fetch(path)
+        assert isinstance(tb, Table)
+        assert len(tb) > 0
+
+    def test_fetch_invalid_path(self):
+        """fetch() with an invalid path raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid path format"):
+            fetch("!!!invalid")
+
+
+class TestResponseSetUI:
+    """Test set_ui_advanced() and set_ui_basic() on ResponseSet."""
+
+    def test_set_ui_advanced(self):
+        """set_ui_advanced() sets _ui_advanced = True."""
+        rs = ResponseSet(results=[1, 2], query="test", base_url="https://example.com")
+        result = rs.set_ui_advanced()
+        assert rs._ui_advanced is True
+        # Returns self for chaining
+        assert result is rs
+
+    def test_set_ui_basic(self):
+        """set_ui_basic() sets _ui_advanced = False."""
+        rs = ResponseSet(results=[1, 2], query="test", base_url="https://example.com")
+        rs.set_ui_advanced()
+        assert rs._ui_advanced is True
+        result = rs.set_ui_basic()
+        assert rs._ui_advanced is False
+        # Returns self for chaining
+        assert result is rs
+
+
+class TestIndicatorsSearchParams:
+    """Test indicator search with sort_by and latest parameters."""
+
+    def test_indicators_search_latest(self):
+        """latest=True deduplicates indicators by namespace/dataset/column."""
+        client = Client()
+        all_results = client.indicators.search("population")
+        latest_results = client.indicators.search("population", latest=True)
+
+        assert len(latest_results) > 0
+        assert len(latest_results) <= len(all_results)
+
+    def test_indicators_search_sort_by_relevance(self):
+        """Default sort_by='relevance' returns results (sanity check)."""
+        client = Client()
+        results = client.indicators.search("gdp per capita", sort_by="relevance")
+
+        assert isinstance(results, ResponseSet)
+        assert len(results) > 0
+        assert all(isinstance(r, IndicatorResult) for r in results)

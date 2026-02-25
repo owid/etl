@@ -20,7 +20,7 @@ jinja_env = jinja2.Environment(
 
 
 # Helper function to raise an error with << raise("uh oh...") >>
-def raise_helper(msg):
+def raise_helper(msg: str) -> None:
     raise Exception(msg)
 
 
@@ -64,7 +64,7 @@ def _expand_jinja_text(text: str, dim_dict: dict[str, str], remove_dods: bool = 
     return out
 
 
-def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs) -> Any:
+def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs: Any) -> Any:
     """Expand Jinja in all metadata fields. This modifies the original object in place."""
     if obj is None:
         return None
