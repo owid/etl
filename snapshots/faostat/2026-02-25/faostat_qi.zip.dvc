@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Production: Production Indices'
+    description: |-
+      The FAO indices of agricultural production show the relative level of the aggregate volume of agricultural production for each year in comparison with the base period 2014-2016. Indices for meat production are computed based on data on production from indigenous animals.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Production: Production Indices (2026).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/QI
+    url_download: https://bulks-faostat.fao.org/production/Production_Indices_E_All_Data_(Normalized).zip
+    date_accessed: '2026-02-25'
+    date_published: '2026-02-09'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 4a4e4597b425aace4e1a8e6e4c3f026e
+    size: 16139499
+    path: faostat_qi.zip

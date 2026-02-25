@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Land, Inputs and Sustainability: Land Use'
+    description: |-
+      The FAOSTAT Land Use domain contains data on twenty-one land use categories and twenty-three categories of irrigation and agricultural practices. Data are available yearly and by country, regional and global levels. The domain includes Land Use Indicators providing information on the percentage share of agricultural and forest land, and their sub-components, including irrigated areas and areas under organic agriculture, within a country land use matrix. Data are available at country, regional and global level, for the following elements: (in percentage) i) Share in Land area; ii) Share in Agricultural land, iii) Share in Cropland; and iv) Share in Forest land; (in ha/pc) v) Area per capita.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Land Use (2025).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/RL
+    url_download: https://bulks-faostat.fao.org/production/Inputs_LandUse_E_All_Data_(Normalized).zip
+    date_accessed: '2026-02-25'
+    date_published: '2025-11-14'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 7b212ffc1eaee17705d88f6deb3cd89f
+    size: 2959632
+    path: faostat_rl.zip
