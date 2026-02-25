@@ -5,7 +5,7 @@ meta:
     description: |-
       This data is compiled from the Online Index of Objects Launched into Outer Space, maintained by the United Nations Office for Outer Space Affairs since 1962.
     citation_full: |-
-      United Nations Office for Outer Space Affairs (UNOOSA, 2026). Online Index of Objects Launched into Outer Space. Retrieved from https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+      United Nations Office for Outer Space Affairs (UNOOSA, 2026). Online Index of Objects Launched into Outer Space.
     attribution_short: UNOOSA
     url_main: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
     date_accessed: '2026-02-25'
