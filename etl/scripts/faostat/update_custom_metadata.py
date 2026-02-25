@@ -5,20 +5,18 @@ This will cause the garden faostat_metadata step to raise warnings, and may caus
 explorer.
 
 This script updates all fao fields in custom_datasets.csv, custom_elements_and_units.csv, and custom_items.csv files.
-It runs 6 phases:
-  1. FAO dataset fields   (auto-accepted)
-  2. OWID dataset fields  (interactive -- you review each change)
-  3. FAO element fields    (auto-accepted)
-  4. OWID element fields   (interactive)
-  5. FAO item fields       (auto-accepted)
-  6. OWID item fields      (interactive)
+
+For each file, it:
+  1. Auto-accepts FAO field changes (aligning our records with new FAO data).
+  2. Interactively reviews OWID fields, but ONLY where the corresponding FAO field changed.
+  3. Saves once at the end.
 
 Usage:
   cd etl/scripts/faostat
-  python update_custom_metadata.py                  # normal run (all 6 phases)
-  python update_custom_metadata.py --field dataset  # only dataset phases
-  python update_custom_metadata.py --field element  # only element phases
-  python update_custom_metadata.py --field item     # only item phases
+  python update_custom_metadata.py                  # normal run (all 3 file types)
+  python update_custom_metadata.py --field dataset  # only dataset file
+  python update_custom_metadata.py --field element  # only element file
+  python update_custom_metadata.py --field item     # only item file
   python update_custom_metadata.py --dry-run        # preview changes without writing files
 
 """
@@ -68,8 +66,8 @@ def _truncate(text: str, max_len: int = 120) -> str:
     return text[:max_len] + f"{DIM}...{RESET}"
 
 
-def _display_differences(old: str, new: str, message: str, old_label: str = "OLD", new_label: str = "NEW") -> None:
-    """Show differences between old and new text, with word-level highlighting."""
+def _display_differences(old: str, new: str, message: str) -> None:
+    """Show a single merged paragraph with inline red (removed) and green (added) highlights."""
     _print()
     _print(f"  {CYAN}{BOLD}{'─' * 76}{RESET}")
     _print(f"  {CYAN}{BOLD}{message}{RESET}")
@@ -83,31 +81,25 @@ def _display_differences(old: str, new: str, message: str, old_label: str = "OLD
         _print(f"  {YELLOW}Only whitespace/formatting changes (content is identical).{RESET}")
         return
 
-    # Word-level diff for actual content changes.
+    # Word-level diff: build a single merged paragraph.
     old_words = old_normalized.split()
     new_words = new_normalized.split()
 
     sm = difflib.SequenceMatcher(None, old_words, new_words)
-
-    old_parts = []
-    new_parts = []
+    parts = []
 
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
         if tag == "equal":
-            chunk = " ".join(old_words[i1:i2])
-            old_parts.append(chunk)
-            new_parts.append(chunk)
+            parts.append(" ".join(old_words[i1:i2]))
         elif tag == "replace":
-            old_parts.append(f"{RED}{BOLD}" + " ".join(old_words[i1:i2]) + RESET)
-            new_parts.append(f"{GREEN}{BOLD}" + " ".join(new_words[j1:j2]) + RESET)
+            parts.append(f"{RED}[-" + " ".join(old_words[i1:i2]) + f"-]{RESET}")
+            parts.append(f"{GREEN}[+" + " ".join(new_words[j1:j2]) + f"+]{RESET}")
         elif tag == "delete":
-            old_parts.append(f"{RED}{BOLD}" + " ".join(old_words[i1:i2]) + RESET)
+            parts.append(f"{RED}[-" + " ".join(old_words[i1:i2]) + f"-]{RESET}")
         elif tag == "insert":
-            new_parts.append(f"{GREEN}{BOLD}" + " ".join(new_words[j1:j2]) + RESET)
+            parts.append(f"{GREEN}[+" + " ".join(new_words[j1:j2]) + f"+]{RESET}")
 
-    _print(f"  {RED}{old_label}:{RESET} {' '.join(old_parts)}")
-    _print()
-    _print(f"  {GREEN}{new_label}:{RESET} {' '.join(new_parts)}")
+    _print(f"  {' '.join(parts)}")
     _print()
 
 
@@ -176,27 +168,8 @@ def _confirm_and_write_data_to_file(custom_data, custom_data_file, n_changes=0):
             break
 
 
-def update_custom_datasets_file(version=VERSION, read_only=False, confirmation=False, compare_with="fao"):
-    """Update custom_datasets.csv file of a specific version of the garden steps.
-
-    Parameters
-    ----------
-    version : _type_, optional
-        Version of the garden steps to consider (where the custom_*.csv file to be updated is).
-    read_only : bool, optional
-        True to find changes without actually overwriting existing file.
-    confirmation : bool, optional
-        True to prompt for confirmation before accepting changes.
-    compare_with : str, optional
-        The original source to compare with. Can be 'fao' or 'owid'.
-
-    Returns
-    -------
-    custom_datasets_updated : pd.DataFrame
-        Updated dataframe of custom datasets.
-
-    """
-    # Path to custom datasets file in garden.
+def update_custom_datasets_file(version=VERSION, read_only=False):
+    """Update custom_datasets.csv: auto-accept FAO changes, then review OWID fields only where FAO changed."""
     custom_datasets_file = STEP_DIR / "data/garden/faostat" / version / "custom_datasets.csv"
 
     error = f"File custom_datasets.csv not found. Ensure garden steps for version {version} exist."
@@ -204,125 +177,90 @@ def update_custom_datasets_file(version=VERSION, read_only=False, confirmation=F
 
     # Load custom datasets file.
     custom_datasets = pd.read_csv(custom_datasets_file).set_index("dataset")
-
-    # Initialize a new custom datasets dataframe.
     custom_datasets_updated = custom_datasets.copy()
 
-    # Collect changes (for summary in auto-accept mode).
-    changes = []
+    # --- Step 1: Detect and auto-accept FAO field changes ---
+    _print(f"\n  {BOLD}Aligning FAO fields...{RESET}")
+    fao_changes = []  # (dataset_short_name, field, old_fao, new_fao)
 
     for domain in tqdm(INCLUDED_DATASETS_CODES):
         dataset_short_name = f"faostat_{domain}"
-
-        # Load metadata from new meadow dataset.
-        fao_new_dataset_metadata = Dataset(DATA_DIR / "meadow/faostat" / version / dataset_short_name).metadata
+        fao_new_metadata = Dataset(DATA_DIR / "meadow/faostat" / version / dataset_short_name).metadata
 
         for field in ["title", "description"]:
-            new = getattr(fao_new_dataset_metadata, field) or ""
+            new_fao = getattr(fao_new_metadata, field) or ""
             try:
-                # Load custom dataset metadata for current domain.
-                old = custom_datasets.loc[dataset_short_name].fillna("")[f"{compare_with}_dataset_{field}"]
+                old_fao = custom_datasets.loc[dataset_short_name].fillna("")[f"fao_dataset_{field}"]
             except KeyError:
-                # This may be a new dataset that didn't exist in the previous version.
-                old = ""
+                old_fao = ""
 
-            _old = old
-            _new = new
-            if (_old != _new) and not (pd.isna(new) and pd.isna(old)):
-                if confirmation:
-                    # Interactive mode: show word-level diff for long text fields.
-                    row = custom_datasets.loc[dataset_short_name].fillna("")
-                    owid_current = row.get(f"owid_dataset_{field}", "")
-                    fao_new = new
+            if old_fao != new_fao and not (pd.isna(new_fao) and pd.isna(old_fao)):
+                fao_changes.append((dataset_short_name, field, old_fao, new_fao))
+                custom_datasets_updated.loc[dataset_short_name, f"fao_dataset_{field}"] = new_fao
 
-                    _display_differences(
-                        old=owid_current,
-                        new=fao_new,
-                        message=f"{dataset_short_name}: {field}",
-                        old_label="OWID (current)",
-                        new_label="FAO (new)",
-                    )
-
-                    chosen = _confirm_edit_or_skip(owid_current, fao_new)
-                else:
-                    # Auto-accept mode: silently collect changes.
-                    chosen = new
-                    changes.append((dataset_short_name, field, old, new))
-
-                # Update field.
-                custom_datasets_updated.loc[dataset_short_name, f"{compare_with}_dataset_{field}"] = chosen
-
-    # Sort custom datasets conveniently.
-    custom_datasets_updated = custom_datasets_updated.sort_index()
-
-    n_changes = len(changes)
-
-    if not confirmation and n_changes > 0:
-        # Print summary for auto-accepted changes.
-        _print(f"\n  {GREEN}Auto-accepted {n_changes} change{'s' if n_changes != 1 else ''}:{RESET}")
-        for ds, field, _old, _new in changes:
+    if fao_changes:
+        _print(f"\n  {GREEN}Auto-accepted {len(fao_changes)} FAO change{'s' if len(fao_changes) != 1 else ''}:{RESET}")
+        for ds, field, _, _ in fao_changes:
             _print(f"    {BOLD}{ds}{RESET}: {field}")
         choice = input(f"\n  Type {BOLD}d{RESET} to review diffs, or {BOLD}enter{RESET} to continue: ").strip().lower()
         if choice == "d":
-            for ds, field, _old, _new in changes:
-                _display_differences(
-                    old=_old,
-                    new=_new,
-                    message=f"{ds}: {field}",
-                    old_label="FAO (old)",
-                    new_label="FAO (new)",
-                )
-    elif n_changes == 0 and not confirmation:
-        _print(f"  {DIM}No changes found.{RESET}")
-
-    # In interactive mode, count changes by comparing with original (before sorting).
-    if confirmation:
-        n_interactive_changes = (
-            (custom_datasets_updated.reindex_like(custom_datasets).fillna("") != custom_datasets.fillna("")).sum().sum()
-        )
-        has_changes = n_interactive_changes > 0
-        n_total = n_interactive_changes
+            for ds, field, old_fao, new_fao in fao_changes:
+                _display_differences(old=old_fao, new=new_fao, message=f"{ds}: {field}")
     else:
-        has_changes = n_changes > 0
-        n_total = n_changes
+        _print(f"  {DIM}No FAO changes.{RESET}")
 
-    if not has_changes:
-        _print(f"  {DIM}No changes found or accepted.{RESET}")
+    # --- Step 2: Review OWID fields where FAO changed ---
+    if fao_changes:
+        _print(f"\n  {BOLD}Reviewing OWID fields ({len(fao_changes)} to review)...{RESET}")
 
-    if has_changes and not read_only:
-        _confirm_and_write_data_to_file(
-            custom_data=custom_datasets_updated, custom_data_file=custom_datasets_file, n_changes=n_total
-        )
+        n_prompts = 0
+        for ds, field, old_fao, new_fao in fao_changes:
+            try:
+                row = custom_datasets.loc[ds].fillna("")
+                owid_current = row[f"owid_dataset_{field}"]
+            except KeyError:
+                owid_current = ""
+
+            # Skip if effective value already matches new FAO (no change).
+            effective_current = owid_current if owid_current else old_fao
+            if effective_current == new_fao:
+                continue
+
+            if not owid_current:
+                _print(f"\n  {DIM}OWID is empty (inherited from FAO).{RESET}")
+
+            _display_differences(
+                old=effective_current,
+                new=new_fao,
+                message=f"{ds}: {field}",
+            )
+
+            chosen = _confirm_edit_or_skip(owid_current, new_fao)
+            # If chosen matches FAO, leave OWID empty so it inherits naturally.
+            custom_datasets_updated.loc[ds, f"owid_dataset_{field}"] = "" if chosen == new_fao else chosen
+            n_prompts += 1
+
+        if n_prompts == 0:
+            _print(f"  {DIM}All OWID fields already match — nothing to review.{RESET}")
+
+    # --- Save ---
+    n_total = int(
+        (custom_datasets_updated.reindex_like(custom_datasets).fillna("") != custom_datasets.fillna("")).sum().sum()
+    )
+
+    if n_total == 0:
+        _print(f"  {DIM}No changes to save.{RESET}")
+    elif read_only:
+        _print(f"  {YELLOW}{n_total} change{'s' if n_total != 1 else ''} detected (dry run, not saving).{RESET}")
+    else:
+        _confirm_and_write_data_to_file(custom_datasets_updated, custom_datasets_file, n_changes=n_total)
 
     return custom_datasets_updated
 
 
-def update_custom_items_or_elements_file(
-    item_or_element, version=VERSION, read_only=False, confirmation=False, compare_with="fao"
-):
-    """Update custom_elements_and_units.csv file of a specific version of the garden steps.
-
-    Parameters
-    ----------
-    item_or_element: str
-        Either "item" or "element".
-    version : _type_, optional
-        Version of the garden steps to consider (where the custom_*.csv file to be updated is).
-    read_only : bool, optional
-        True to find changes without actually overwriting existing file.
-    confirmation : bool, optional
-        True to prompt for confirmation before accepting changes.
-    compare_with : str, optional
-        The original source to compare with. Can be 'fao' or 'owid'.
-
-    Returns
-    -------
-    custom_elements_updated : pd.DataFrame
-        Updated dataframe of custom elements and units.
-
-    """
+def update_custom_items_or_elements_file(item_or_element, version=VERSION, read_only=False):
+    """Update custom file: auto-accept FAO changes, then review OWID fields only where FAO changed."""
     if item_or_element == "element":
-        # Path to custom elements and units file in garden.
         custom_file = STEP_DIR / "data/garden/faostat" / version / "custom_elements_and_units.csv"
         fields = ["element", "element_description", "unit", "unit_short_name"]
     else:
@@ -334,155 +272,129 @@ def update_custom_items_or_elements_file(
 
     # Load custom definitions file.
     custom_definitions = pd.read_csv(custom_file, dtype=str).set_index(["dataset", f"{item_or_element}_code"])
-
-    # Initialize a new custom definitions dataframe.
     custom_definitions_updated = custom_definitions.copy()
-
-    # Collect changes (for summary in auto-accept mode).
-    changes = []
 
     # Load metadata from new garden dataset.
     fao_new_metadata = Dataset(DATA_DIR / "garden/faostat" / version / "faostat_metadata")
 
-    # Go one by one on the datasets for which there is at least one custom definition.
+    # --- Step 1: Detect and auto-accept FAO field changes ---
+    _print(f"\n  {BOLD}Aligning FAO fields...{RESET}")
+    fao_changes = []  # (dataset_short_name, code, field, old_fao, new_fao, old_row)
+
     for dataset_short_name in tqdm(custom_definitions.index.get_level_values(0).unique()):
-        for code in tqdm(custom_definitions.loc[dataset_short_name].index.get_level_values(0).unique()):
+        for code in custom_definitions.loc[dataset_short_name].index.get_level_values(0).unique():
             try:
                 new_metadata = fao_new_metadata[f"{item_or_element}s"].loc[dataset_short_name, code].fillna("")
             except KeyError:
                 log.error(
-                    f"{item_or_element.capitalize()} code {code} (for dataset {dataset_short_name}) in custom definitions file was not found in new faostat_metadata. Remove it from the custom file or replace it with another code."
+                    f"{item_or_element.capitalize()} code {code} (dataset {dataset_short_name}) not found in new "
+                    f"metadata. Remove it from the custom file or replace it with another code."
                 )
                 continue
-            old_metadata = custom_definitions.loc[dataset_short_name, code].fillna("")
+            old_row = custom_definitions.loc[dataset_short_name, code].fillna("")
+
             for field in fields:
-                new = new_metadata[f"fao_{field}"]
-                old = old_metadata[f"{compare_with}_{field}"]
+                new_fao = new_metadata[f"fao_{field}"]
+                old_fao = old_row[f"fao_{field}"]
 
-                # If old and new are not identical (or if they are not both nan) update custom_*.
-                if (old != new) and not (pd.isna(new) and pd.isna(old)):
-                    if confirmation:
-                        # Interactive mode: show full context (all 4 values).
-                        fao_old = old_metadata.get(f"fao_{field}", "")
-                        owid_current = old_metadata.get(f"owid_{field}", "")
-                        fao_new = new
-                        owid_new = fao_new  # proposed new OWID value
+                if old_fao != new_fao and not (pd.isna(new_fao) and pd.isna(old_fao)):
+                    fao_changes.append((dataset_short_name, code, field, old_fao, new_fao, old_row))
+                    custom_definitions_updated.loc[(dataset_short_name, code), f"fao_{field}"] = new_fao
 
-                        _print()
-                        _print(f"  {CYAN}{BOLD}{'─' * 76}{RESET}")
-                        _print(f"  {CYAN}{BOLD}{dataset_short_name} ({item_or_element} {code}): {field}{RESET}")
-                        _print(f"  {CYAN}{BOLD}{'─' * 76}{RESET}")
-                        _print(f"  {DIM}FAO (previous):{RESET}  {fao_old}")
-                        _print(f"  FAO (current):   {fao_new}")
-                        _print(f"  {YELLOW}OWID (current):{RESET}  {owid_current}")
-                        _print(f"  {GREEN}OWID (new):{RESET}      {owid_new}")
-
-                        # For unit fields on elements, show the custom factor as context.
-                        if item_or_element == "element" and field in ("unit", "unit_short_name"):
-                            factor = old_metadata.get("owid_unit_factor", "")
-                            if factor:
-                                _print(f"  {YELLOW}Note: OWID applies a custom factor of {BOLD}{factor}{RESET}")
-                        _print()
-
-                        chosen = _confirm_edit_or_skip(owid_current, owid_new)
-                    else:
-                        # Auto-accept mode: silently collect changes.
-                        chosen = new
-                        changes.append((dataset_short_name, code, field, old, new))
-
-                    # Update FAO field.
-                    custom_definitions_updated.loc[(dataset_short_name, code), f"{compare_with}_{field}"] = chosen
-
-    # Sort custom definitions file conveniently.
-    custom_definitions_updated = custom_definitions_updated.sort_values([f"fao_{item_or_element}"])
-
-    n_changes = len(changes)
-
-    if not confirmation and n_changes > 0:
-        # Print summary for auto-accepted changes.
-        _print(f"\n  {GREEN}Auto-accepted {n_changes} change{'s' if n_changes != 1 else ''}:{RESET}")
-        for ds, code, field, _old, _new in changes:
+    if fao_changes:
+        _print(f"\n  {GREEN}Auto-accepted {len(fao_changes)} FAO change{'s' if len(fao_changes) != 1 else ''}:{RESET}")
+        for ds, code, field, _, _, _ in fao_changes:
             _print(f"    {BOLD}{ds}{RESET} ({item_or_element} {code}): {field}")
         choice = input(f"\n  Type {BOLD}d{RESET} to review diffs, or {BOLD}enter{RESET} to continue: ").strip().lower()
         if choice == "d":
-            for ds, code, field, _old, _new in changes:
+            for ds, code, field, old_fao, new_fao, _ in fao_changes:
                 _display_differences(
-                    old=_old,
-                    new=_new,
-                    message=f"{ds} ({item_or_element} {code}): {field}",
-                    old_label="FAO (old)",
-                    new_label="FAO (new)",
+                    old=old_fao, new=new_fao, message=f"{ds} ({item_or_element} {code}): {field}"
                 )
-    elif n_changes == 0 and not confirmation:
-        _print(f"  {DIM}No changes found.{RESET}")
-
-    # In interactive mode, count changes by comparing with original (before sorting).
-    if confirmation:
-        n_interactive_changes = (
-            (custom_definitions_updated.reindex_like(custom_definitions).fillna("") != custom_definitions.fillna(""))
-            .sum()
-            .sum()
-        )
-        has_changes = n_interactive_changes > 0
-        n_total = n_interactive_changes
     else:
-        has_changes = n_changes > 0
-        n_total = n_changes
+        _print(f"  {DIM}No FAO changes.{RESET}")
 
-    if not has_changes:
-        _print(f"  {DIM}No changes found or accepted.{RESET}")
+    # --- Step 2: Review OWID fields where FAO changed ---
+    if fao_changes:
+        _print(f"\n  {BOLD}Reviewing OWID fields ({len(fao_changes)} to review)...{RESET}")
 
-    if has_changes and not read_only:
-        _confirm_and_write_data_to_file(
-            custom_data=custom_definitions_updated, custom_data_file=custom_file, n_changes=n_total
-        )
+        n_prompts = 0
+        for ds, code, field, old_fao, new_fao, old_row in fao_changes:
+            owid_current = old_row.get(f"owid_{field}", "")
+            effective_current = owid_current or old_fao
+
+            # Skip if effective value already matches new FAO (no change).
+            if effective_current == new_fao:
+                continue
+
+            inherited = ""
+            if not owid_current:
+                inherited = f"  {DIM}(inherited from FAO){RESET}"
+
+            if "description" in field:
+                # Word-level diff for long text.
+                _display_differences(
+                    old=effective_current,
+                    new=new_fao,
+                    message=f"{ds} ({item_or_element} {code}): {field}",
+                )
+                if not owid_current:
+                    _print(f"  {DIM}OWID is empty (inherited from FAO).{RESET}")
+            else:
+                # Compact display for short fields.
+                _print()
+                _print(f"  {CYAN}{BOLD}{'─' * 76}{RESET}")
+                _print(f"  {CYAN}{BOLD}{ds} ({item_or_element} {code}): {field}{RESET}")
+                _print(f"  {CYAN}{BOLD}{'─' * 76}{RESET}")
+                _print(f"  {YELLOW}OWID (current):{RESET}  {effective_current}{inherited}")
+                _print(f"  {GREEN}FAO (new):{RESET}       {new_fao}")
+
+            # For unit fields on elements, show the custom factor as context.
+            if item_or_element == "element" and field in ("unit", "unit_short_name"):
+                factor = old_row.get("owid_unit_factor", "")
+                if factor:
+                    _print(f"  {YELLOW}Note: OWID applies a custom factor of {BOLD}{factor}{RESET}")
+            _print()
+
+            chosen = _confirm_edit_or_skip(owid_current, new_fao)
+            # If chosen matches FAO, leave OWID empty so it inherits naturally.
+            custom_definitions_updated.loc[(ds, code), f"owid_{field}"] = "" if chosen == new_fao else chosen
+            n_prompts += 1
+
+        if n_prompts == 0:
+            _print(f"  {DIM}All OWID fields already match — nothing to review.{RESET}")
+
+    # --- Save ---
+    n_total = int(
+        (custom_definitions_updated.reindex_like(custom_definitions).fillna("") != custom_definitions.fillna(""))
+        .sum()
+        .sum()
+    )
+
+    if n_total == 0:
+        _print(f"  {DIM}No changes to save.{RESET}")
+    elif read_only:
+        _print(f"  {YELLOW}{n_total} change{'s' if n_total != 1 else ''} detected (dry run, not saving).{RESET}")
+    else:
+        _confirm_and_write_data_to_file(custom_definitions_updated, custom_file, n_changes=n_total)
 
     return custom_definitions_updated
 
 
 # Phase definitions for the main block.
 PHASES = [
+    {"label": "Dataset fields", "field": "dataset", "func": update_custom_datasets_file, "kwargs": {}},
     {
-        "label": "FAO dataset fields",
-        "field": "dataset",
-        "mode": "auto-accept",
-        "func": "update_custom_datasets_file",
-        "kwargs": {"confirmation": False, "compare_with": "fao"},
-    },
-    {
-        "label": "OWID dataset fields",
-        "field": "dataset",
-        "mode": "interactive",
-        "func": "update_custom_datasets_file",
-        "kwargs": {"confirmation": True, "compare_with": "owid"},
-    },
-    {
-        "label": "FAO element fields",
+        "label": "Element & unit fields",
         "field": "element",
-        "mode": "auto-accept",
-        "func": "update_custom_items_or_elements_file",
-        "kwargs": {"item_or_element": "element", "confirmation": False, "compare_with": "fao"},
+        "func": update_custom_items_or_elements_file,
+        "kwargs": {"item_or_element": "element"},
     },
     {
-        "label": "OWID element fields",
-        "field": "element",
-        "mode": "interactive",
-        "func": "update_custom_items_or_elements_file",
-        "kwargs": {"item_or_element": "element", "confirmation": True, "compare_with": "owid"},
-    },
-    {
-        "label": "FAO item fields",
+        "label": "Item fields",
         "field": "item",
-        "mode": "auto-accept",
-        "func": "update_custom_items_or_elements_file",
-        "kwargs": {"item_or_element": "item", "confirmation": False, "compare_with": "fao"},
-    },
-    {
-        "label": "OWID item fields",
-        "field": "item",
-        "mode": "interactive",
-        "func": "update_custom_items_or_elements_file",
-        "kwargs": {"item_or_element": "item", "confirmation": True, "compare_with": "owid"},
+        "func": update_custom_items_or_elements_file,
+        "kwargs": {"item_or_element": "item"},
     },
 ]
 
@@ -509,7 +421,7 @@ if __name__ == "__main__":
         "--field",
         choices=["dataset", "element", "item"],
         default=None,
-        help="Only run phases for a specific field type (dataset, element, or item). Runs all if omitted.",
+        help="Only run for a specific file type (dataset, element, or item). Runs all if omitted.",
     )
     args = argument_parser.parse_args()
 
@@ -519,18 +431,11 @@ if __name__ == "__main__":
     # Filter phases if --field is given.
     phases_to_run = [p for p in PHASES if args.field is None or p["field"] == args.field]
 
-    func_map = {
-        "update_custom_datasets_file": update_custom_datasets_file,
-        "update_custom_items_or_elements_file": update_custom_items_or_elements_file,
-    }
-
     for i, phase in enumerate(phases_to_run, 1):
-        mode_color = GREEN if phase["mode"] == "auto-accept" else YELLOW
         _print(f"\n  {BOLD}{'=' * 76}{RESET}")
-        _print(f"  {BOLD}Phase {i}/{len(phases_to_run)}: {phase['label']}  {mode_color}[{phase['mode']}]{RESET}")
+        _print(f"  {BOLD}Phase {i}/{len(phases_to_run)}: {phase['label']}{RESET}")
         _print(f"  {BOLD}{'=' * 76}{RESET}")
 
-        func = func_map[phase["func"]]
-        _ = func(version=args.version, read_only=args.read_only, **phase["kwargs"])
+        phase["func"](version=args.version, read_only=args.read_only, **phase["kwargs"])
 
     _print(f"\n  {BOLD}Done.{RESET}\n")
