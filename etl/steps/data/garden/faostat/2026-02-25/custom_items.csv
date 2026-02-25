@@ -64,7 +64,7 @@ faostat_qcl,00001018,"Edible offal of goat, fresh, chilled or frozen","Offal, go
 faostat_qcl,00001036,"Edible offal of pigs, fresh, chilled or frozen","Offal, pigs","Edible offal of pigs, fresh, chilled or frozen This subclass includes: - edible offal of pigs, animals of subclass 02140, fresh, chilled or frozen",
 faostat_qcl,00000978,"Edible offal of sheep, fresh, chilled or frozen","Offal, sheep","Edible offal of sheep, fresh, chilled or frozen This subclass includes: - edible offal of sheep, animals of subclass 02122, fresh, chilled or frozen",
 faostat_qcl,00001128,"Edible offals of camels and other camelids, fresh, chilled or frozen","Offal, camels","Edible offals of camels and other camelids, fresh, chilled or frozen (Unofficial definition)",
-faostat_qcl,00001098,"Edible offals of horses and other equines,  fresh, chilled or frozen","Offal, horses","Edible offals of horses and other equines,  fresh, chilled or frozen (Unofficial definition)",
+faostat_qcl,00001098,"Edible offals of horses and other equines, fresh, chilled or frozen","Offal, horses","Edible offals of horses and other equines,  fresh, chilled or frozen (Unofficial definition)",
 faostat_qcl,00000399,Eggplants (aubergines),Eggplants,Eggplants (aubergines) This subclass is defined through the following headings/subheadings of the HS 2007: 0709.30.,
 faostat_fbsc,00002744,Eggs,All egg products,"Default composition: 916 Egg albumine, 1062 Eggs, hen, in shell, 1063 Eggs, liquid, 1064 Eggs, dried, 1091 Eggs, other bird, in shell",
 faostat_fbsc,00002949,Eggs,,,
