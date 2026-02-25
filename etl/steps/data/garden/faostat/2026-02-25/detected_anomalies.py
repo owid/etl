@@ -11,6 +11,7 @@ import os
 from typing import Tuple
 
 import plotly.express as px
+import plotly.io as pio
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -21,6 +22,10 @@ ANOMALY_DESCRIPTION_INTRODUCTION = "\n\nProcessing of possible data anomalies by
 
 # If environment variable INSPECT_ANOMALIES is set to True, run the step in interactive mode.
 INSPECT_ANOMALIES = bool(os.getenv("INSPECT_ANOMALIES", False))
+
+# Use the browser renderer so that anomaly charts open in a browser tab (instead of dumping HTML to the terminal).
+if INSPECT_ANOMALIES:
+    pio.renderers.default = "browser"
 
 
 class DataAnomaly(abc.ABC):
