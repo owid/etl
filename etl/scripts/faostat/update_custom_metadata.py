@@ -434,6 +434,8 @@ if __name__ == "__main__":
         _print(f"  {BOLD}Phase {i}/{len(phases_to_run)}: {phase['label']}{RESET}")
         _print(f"  {BOLD}{'=' * 76}{RESET}")
 
-        phase["func"](version=args.version, read_only=args.read_only, **phase["kwargs"])
+        func = phase["func"]
+        assert callable(func)
+        func(version=args.version, read_only=args.read_only, **phase["kwargs"])
 
     _print(f"\n  {BOLD}Done.{RESET}\n")
