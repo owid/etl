@@ -1071,5 +1071,5 @@ def run() -> None:
         check_variables_metadata=False,
     )
 
-    # Save new garden dataset.
+    # Save the new garden dataset.
     ds_grapher.save()
