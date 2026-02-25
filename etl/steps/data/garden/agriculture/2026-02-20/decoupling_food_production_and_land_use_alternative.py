@@ -713,43 +713,6 @@ def run() -> None:
     # Select only countries that were classified as decoupled.
     tb = tb[tb["country"].isin(countries_decoupled)].reset_index(drop=True)
 
-    # # Create a simple table with the selected window of years for the selected countries.
-    # tb_window = tb_change[
-    #     (tb_change["country"].isin(countries_decoupled))
-    #     & (tb_change["year_min"] == year_min_best)
-    #     & (tb_change["year_max"] == year_max_best)
-    # ].reset_index(drop=True)
-
-    # # Remove unnecessary columns.
-    # tb_window = tb_window.drop(columns=["year_min", "year_max", "n_years"], errors="raise")
-
-    # # Set an appropriate index and sort conveniently.
-    # tb_window = tb_window.format(["country"])
-
-    ####################################################################################################################
-    # TODO: Update these conclusions.
-    # Conclusions:
-    # This is the list of countries for which:
-    # - Agricultural production increased by >= 5% in the latest year with respect to 1961.
-    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
-    # Hong Kong, Cyprus, Italy, Greece, Poland, Sweden, Hungary, Austria, New Zealand, South Korea, Australia, Guyana, Netherlands, Iran, Chile, Mongolia, Spain, Eswatini, Finland, France, Denmark, United Kingdom, Jordan, Germany, Switzerland, Argentina, Uruguay, Romania, Kiribati, Taiwan, Iceland, Bulgaria, Algeria, United States, Albania, Canada
-    # show_decoupled_countries(food_column="production_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5)
-
-    # This is the list of countries for which:
-    # - Food supply increased by >= 5% in the latest year with respect to 1961.
-    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
-    # - The median net import share over the last 10 years is < 20%.
-    # Italy, Greece, Poland, Hungary, Austria, New Zealand, Australia, Guyana, Iran, Chile, Spain, Eswatini, France, Denmark, Germany, Argentina, Uruguay, Romania, Mauritius, Kiribati, Iceland, United States, Albania, Canada
-    # show_decoupled_countries(food_column="food_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5, max_net_share_imports=20, max_net_share_median_over_years=10)
-
-    # This is the list of countries for which:
-    # - Food supply increased by >= 5% in the latest year with respect to 1961.
-    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
-    # - The net import share is < 20% every year.
-    # Greece, Poland, Hungary, Austria, New Zealand, Australia, Guyana, Iran, Chile, Spain, Eswatini, France, Denmark, Germany, Argentina, Uruguay, Romania, Kiribati, Iceland, United States, Albania, Canada
-    # show_decoupled_countries(food_column="food_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5, max_net_share_imports=20, max_net_share_median_over_years=None)
-    ####################################################################################################################
-
     # Improve table formats.
     tb = tb.format(keys=["country", "year"], short_name=paths.short_name)
 

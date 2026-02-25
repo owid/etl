@@ -15,6 +15,12 @@ def run() -> None:
     tb = ds_garden.read("decoupling_food_production_and_land_use_alternative", reset_index=False)
 
     #
+    # Process data.
+    #
+    # Keep only needed columns.
+    tb = tb[["food_energy", "agricultural_land"]]
+
+    #
     # Save outputs.
     #
     # Create a new grapher dataset.
