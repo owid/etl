@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from owid.catalog.utils import underscore_table
+from owid.catalog.core.utils import underscore_table
 
 from etl.helpers import PathFinder
 
