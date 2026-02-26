@@ -90,6 +90,7 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
             .replace("animal_feed", "used for animal feed in")
             .replace("exports", "exported by")
             .replace("other_uses", "used for biofuels in")
+            .replace("_", " ")
         )
         combined[column].metadata.title = title
         combined[column].metadata.unit = "tonnes"
