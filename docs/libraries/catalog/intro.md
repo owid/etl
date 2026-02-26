@@ -1,13 +1,13 @@
----
-status:
-    - new
----
 # Catalog Library
 
 The `owid-catalog` library is the foundation of Our World in Data's data management system. It serves two main purposes:
 
 1. **[Data API](api.md)**: Access OWID data through unified client interfaces. We provide a reference for the most important objects and methods.
 2. **[Data Structures](structures.md)**: Enhanced pandas DataFrames with rich metadata support
+
+!!! tip "AI/LLM integration"
+    An [`llms.txt`](llms.txt) file is available for AI agents and LLM tools.
+
 
 ## Installation
 

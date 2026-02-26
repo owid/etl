@@ -1,4 +1,14 @@
 charts:
+  # Default Slack user ID for chart review notifications.
+  # To get the ID for a user, check slackId column in MySQL table `users`,
+  # or visit this Metabase question: http://metabase.owid.io/question/1072-users-with-slack-handle
+  default_slack_id: "U07437LD7JR" # Tuna
+
+  # Override reviewer mapping: redirect notifications from one user to another.
+  # Key is the original Slack user ID, value is the replacement Slack user ID.
+  reviewer_overrides:
+    "U3E5PRWNN": "U4U46QBJ5" # Max -> Hannah
+
   llm:
     model_name: openai:gpt-5.2
     system_prompt: |-
