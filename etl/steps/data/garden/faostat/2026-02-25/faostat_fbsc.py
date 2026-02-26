@@ -242,6 +242,16 @@ def run() -> None:
     # Improve metadata (of wide table).
     improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
+    ####################################################################################################################
+    # TEMPORARY: Add note about data sourced from previous snapshot for missing FBS countries.
+    # Remove this block once FAOSTAT restores data for these countries.
+    fbs_note = "The latest FAOSTAT release (published on 2025-10-28) is missing data for Benin, Burundi, Central African Republic, Chad, Dominica, Japan, Mali, Somalia, South Sudan, Sudan, and Togo, due to an ongoing review. To avoid data gaps, we sourced data for those countries from a previous FAOSTAT release."
+    for column in tb_wide.columns:
+        if column not in ["area_code"]:
+            existing = tb_wide[column].metadata.description_processing or ""
+            tb_wide[column].metadata.description_processing = (existing + "\n" + fbs_note).strip()
+    ####################################################################################################################
+
     # Check that column "value" has two origins (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have two origins."
     assert len(tb_long["value"].metadata.origins) == 2, error

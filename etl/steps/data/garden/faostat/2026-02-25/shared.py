@@ -2494,6 +2494,16 @@ def run(dest_dir: str) -> None:
     # Improve metadata (of wide table).
     improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
+    ####################################################################################################################
+    # TEMPORARY: Add note about data sourced from previous snapshot for faostat_qv.
+    # Remove this block once FAOSTAT restores post-2017 data for EU member states.
+    if dataset_short_name == "faostat_qv":
+        qv_note = "A recent FAOSTAT release removed post-2017 data for individual EU member states from the Value of Agricultural Production dataset. To avoid data gaps, we sourced data for those countries from a previous FAOSTAT release."
+        for column in tb_wide.columns:
+            existing = tb_wide[column].metadata.description_processing or ""
+            tb_wide[column].metadata.description_processing = (existing + "\n" + qv_note).strip()
+    ####################################################################################################################
+
     # Check that column "value" has an origin (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."
     assert len(tb_long["value"].metadata.origins) == 1, error
