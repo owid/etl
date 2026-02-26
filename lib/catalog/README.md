@@ -85,6 +85,12 @@ make watch
 
 ## Changelog
 
+### `v1.0.1`
+- **ResponseSet ergonomics**
+  - Remove deprecated `ResponseSet.results` property (use `.items` instead)
+  - Add `.to_dict()` method for serializing results to plain dicts (useful for AI/LLM context windows)
+  - Add `all_fields` parameter to `.to_frame()` to temporarily override display mode without mutating instance state
+
 ### `v1.0.0`
 - **New unified Client API**
   - `owid.catalog.Client` as single entry point with `ChartsAPI`, `IndicatorsAPI`, `TablesAPI`
