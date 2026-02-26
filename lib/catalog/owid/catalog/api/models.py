@@ -281,14 +281,21 @@ class ResponseSet(BaseModel, Generic[T]):
 
         return max(self.items, key=lambda item: getattr(item, by))
 
-    def to_frame(self) -> pd.DataFrame:
+    def to_frame(self, advanced: bool | None = None) -> pd.DataFrame:
         """Convert results to a DataFrame.
+
+        Args:
+            advanced: If True, show all fields. If False, show only key fields.
+                If None (default), use the instance's _ui_advanced setting.
 
         Returns:
             DataFrame with one row per result.
         """
         if not self.items:
             return pd.DataFrame()
+
+        # Resolve effective advanced flag: explicit arg > instance setting
+        is_advanced = advanced if advanced is not None else self._ui_advanced
 
         # Convert Pydantic models to dicts
         rows = []
@@ -311,7 +318,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     }
 
                     # Simplify if not advanced UI
-                    if not self._ui_advanced:
+                    if not is_advanced:
                         row = {
                             "title": row["title"],
                             "description": row["description"],
@@ -326,7 +333,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     row.pop("base_url", None)
 
                     # Simplify if not advanced UI
-                    if not self._ui_advanced:
+                    if not is_advanced:
                         row = {
                             "title": row.get("title") or "",
                             "description": row.get("description") or "",

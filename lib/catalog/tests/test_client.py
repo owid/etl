@@ -1006,6 +1006,56 @@ class TestResponseSetUI:
         # Returns self for chaining
         assert result is rs
 
+    def test_to_frame_advanced_arg_overrides_instance(self):
+        """to_frame(advanced=True) shows all fields even when _ui_advanced is False."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            title: str
+            description: str
+            version: str
+            path: str
+            extra: int
+
+        items = [MockResult(title="A", description="desc", version="2024", path="p", extra=42)]
+        rs = ResponseSet(items=items, query="test", base_url="https://example.com")
+
+        # Default (basic) — only key fields
+        df_basic = rs.to_frame()
+        assert "extra" not in df_basic.columns
+        assert "title" in df_basic.columns
+
+        # advanced=True — all fields shown
+        df_adv = rs.to_frame(advanced=True)
+        assert "extra" in df_adv.columns
+        assert df_adv["extra"].iloc[0] == 42
+
+        # Instance _ui_advanced should not have changed
+        assert rs._ui_advanced is False
+
+    def test_to_frame_advanced_false_overrides_instance(self):
+        """to_frame(advanced=False) shows basic fields even when _ui_advanced is True."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            title: str
+            description: str
+            version: str
+            path: str
+            extra: int
+
+        items = [MockResult(title="A", description="desc", version="2024", path="p", extra=42)]
+        rs = ResponseSet(items=items, query="test", base_url="https://example.com")
+        rs.set_ui_advanced()
+
+        # Instance is advanced, but arg overrides to basic
+        df = rs.to_frame(advanced=False)
+        assert "extra" not in df.columns
+        assert "title" in df.columns
+
+        # Instance _ui_advanced should still be True
+        assert rs._ui_advanced is True
+
 
 class TestIndicatorsSearchParams:
     """Test indicator search with sort_by and latest parameters."""
