@@ -185,8 +185,13 @@ steps:
     - snapshot://faostat/2026-02-25/faostat_qcl.zip
   data://meadow/faostat/2026-02-25/faostat_qi:
     - snapshot://faostat/2026-02-25/faostat_qi.zip
+  ##################################################################################################################
+  # NOTE: The latest version of QV is missing post-2017 data for all EU-27 countries.
+  # For now, import the data for those missing country-years from the previous version:
+  ##################################################################################################################
   data://meadow/faostat/2026-02-25/faostat_qv:
     - snapshot://faostat/2026-02-25/faostat_qv.zip
+    - snapshot://faostat/2025-03-17/faostat_qv.zip
   data://meadow/faostat/2026-02-25/faostat_rfn:
     - snapshot://faostat/2026-02-25/faostat_rfn.zip
   data://meadow/faostat/2026-02-25/faostat_rl:
