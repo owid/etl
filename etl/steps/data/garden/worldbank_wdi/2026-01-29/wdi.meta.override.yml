@@ -54,7 +54,7 @@ definitions:
   ####################################################################################
 
   employment: Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
-  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. It is also known as the employment-to-population ratio. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
 
   icse_93: The concept of status in employment refers to a person's relationship with their job — that is, who they work for or with. It does not refer to the sector, their skill level, or the quality of their work. This is based on the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93), which groups jobs according to the type of relationship between the worker and their job or employer.
 
@@ -878,6 +878,9 @@ tables:
         description_key:
           - This indicator measures a country’s total trade (exports and imports) relative to the size of its economy.
           - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.
+        presentation:
+          topic_tags:
+            - Trade & Globalization
 
       eg_elc_accs_zs_without:
         title:  Access to electricity (% of population with no access)
@@ -1886,12 +1889,12 @@ tables:
           topic_tags:
             - Work & Employment
           grapher_config:
-            title: Employment-to-population ratio
+            title: Employment rate
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
             variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
-          name: Employment-to-population ratio
+          name: Employment rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1913,12 +1916,12 @@ tables:
           topic_tags:
             - Work & Employment
           grapher_config:
-            title: Male employment-to-population ratio
+            title: Male employment rate
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
             variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
-          name: Male employment-to-population ratio
+          name: Male employment rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1940,12 +1943,12 @@ tables:
           topic_tags:
             - Work & Employment
           grapher_config:
-            title: Female employment-to-population ratio
+            title: Female employment rate
             note: |-
               {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
             variantName: "{definitions.variant_name_iloest_modelled_data}"
         display:
-          name: Female employment-to-population ratio
+          name: Female employment rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1967,12 +1970,12 @@ tables:
           topic_tags:
             - Work & Employment
           grapher_config:
-            title: Employment-to-population ratio
+            title: Employment rate
             note: |-
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
         display:
-          name: Employment-to-population ratio
+          name: Employment rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1994,12 +1997,12 @@ tables:
           topic_tags:
             - Work & Employment
           grapher_config:
-            title: Female employment-to-population ratio
+            title: Female employment rate
             note: |-
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
         display:
-          name: Female employment-to-population ratio
+          name: Female employment rate
           numDecimalPlaces: 1
           tolerance: 5
 
