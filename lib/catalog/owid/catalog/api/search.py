@@ -224,7 +224,7 @@ class SiteSearchAPI:
         results.sort(key=lambda r: r.popularity, reverse=True)
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
             base_url=self._site_url,
@@ -277,7 +277,7 @@ class SiteSearchAPI:
             )
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
             base_url="https://ourworldindata.org",
