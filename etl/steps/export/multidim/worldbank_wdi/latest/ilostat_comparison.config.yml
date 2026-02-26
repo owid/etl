@@ -36,7 +36,7 @@ definitions:
     People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
   description_key_unemployment: |-
     The unemployment rate measures the share of the [labor force](#dod:labor-force) that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
-  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. It is also known as the employment-to-population ratio. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
 
   description_key_iloest_modelled_data: |-
     This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
@@ -66,7 +66,7 @@ dimensions:
         name: Labor force participation rate
         description: Share of the working-age population who are economically active (employed or unemployed)
       - slug: employment_to_population_ratio
-        name: Employment-to-population ratio
+        name: Employment rate
         description: Share of the working-age population who are employed
 views:
   - dimensions:
@@ -138,7 +138,7 @@ views:
           display:
             name: Modeled estimates by the ILO
     config:
-      title: "Employment-to-population ratios: modeled vs. national estimates"
+      title: "Employment rates: modeled vs. national estimates"
       subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
