@@ -82,20 +82,29 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
     combined = combined.format(["country", "year"], sort_columns=True)
 
     # Adapt metadata.
+    column_titles = {
+        "maize_exports_ukraine": "Maize exported by Ukraine",
+        "maize_exports_russia": "Maize exported by Russia",
+        "wheat_exports_ukraine": "Wheat exported by Ukraine",
+        "wheat_exports_russia": "Wheat exported by Russia",
+        "maize_animal_feed_eu": "Maize used for animal feed in the EU",
+        "maize_animal_feed_uk": "Maize used for animal feed in the UK",
+        "maize_animal_feed_us": "Maize used for animal feed in the US",
+        "wheat_animal_feed_eu": "Wheat used for animal feed in the EU",
+        "wheat_animal_feed_uk": "Wheat used for animal feed in the UK",
+        "wheat_animal_feed_us": "Wheat used for animal feed in the US",
+        "maize_other_uses_eu": "Maize used for biofuels in the EU",
+        "maize_other_uses_uk": "Maize used for biofuels in the UK",
+        "maize_other_uses_us": "Maize used for biofuels in the US",
+        "wheat_other_uses_eu": "Wheat used for biofuels in the EU",
+        "wheat_other_uses_uk": "Wheat used for biofuels in the UK",
+        "wheat_other_uses_us": "Wheat used for biofuels in the US",
+    }
     combined.metadata.short_name = "maize_and_wheat_in_the_context_of_the_ukraine_war"
     for column in combined.columns:
-        title = (
-            column.replace("maize_", "Maize ")
-            .replace("wheat_", "Wheat ")
-            .replace("animal_feed", "used for animal feed in")
-            .replace("exports", "exported by")
-            .replace("other_uses", "used for biofuels in")
-            .replace("_", " ")
-        )
-        combined[column].metadata.title = title
+        combined[column].metadata.title = column_titles[column]
         combined[column].metadata.unit = "tonnes"
         combined[column].metadata.short_unit = "t"
-    combined = combined.underscore()
 
     return combined
 
