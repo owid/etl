@@ -761,6 +761,9 @@ def make_table_growth_rate(tb_population: Table, tb_un_gr: Table) -> Table:
     tb = pr.concat([tb_estimated, tb_un], ignore_index=True)
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
 
+    # Remove unnecessary metadata fields to avoid errors
+    tb_growth_rate.growth_rate.metadata.presentation = None
+
     return tb
 
 
