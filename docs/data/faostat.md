@@ -206,12 +206,6 @@ Using data from garden, we create an additional dataset in the `explorers` chann
 These are the steps OWID follows to ensure that FAOSTAT data is up-to-date, or to update one or more datasets for
 which there is new data (let us call the new dataset version to be created `YYYY-MM-DD`):
 
-0. Activate the etl virtual environment (from the root folder of the etl repository):
-
-```bash
-  . .venv/bin/activate
-```
-
 1.  Execute the ingestion script, to fetch data for any dataset that may have been updated in FAOSTAT.
     If no dataset requires an update, the workflow stops here.
 
@@ -220,7 +214,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
             This can be executed with the `-r` flag to simply check for updates without writing anything.
 
         ```bash
-        python etl/scripts/faostat/create_new_snapshots.py
+        python etl/scripts/faostat/create_new_snapshots.py -a
         ```
 
         !!! note
@@ -233,17 +227,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
             downloading this domain, add it to the list `INCLUDED_DATASETS_CODES`. Then replace variables used in those
             charts with the new ones.
 
-2.  Manually inspect the snapshot metadata files, and fix common issues in dataset descriptions:
-
-- Insert line break after first sentence (which usually is the general description of the dataset).
-- Remove spurious symbols.
-- Insert spaces where missing (e.g. "end of sentence.Start of next sentence").
-- Remove double spaces (e.g. "end of sentence. Start of next sentence").
-- Insert line breaks to create paragraphs (by context).
-- Remove incomplete sentences (sometimes there are half sentences that may have been added by mistake).
-- Remove mentions to links in FAOSTAT page (since they will not be seen from grapher).
-
-3.  Create new meadow steps.
+2.  Create new meadow steps.
 
     !!! note
 
@@ -253,13 +237,13 @@ which there is new data (let us call the new dataset version to be created `YYYY
     python etl/scripts/faostat/create_new_steps.py -c meadow -a
     ```
 
-4.  Run the new etl meadow steps, to generate the meadow datasets.
+3.  Run the new etl meadow steps, to generate the meadow datasets.
 
     ```bash
     etl run meadow/faostat/YYYY-MM-DD
     ```
 
-5.  Create new garden steps.
+4.  Create new garden steps.
 
     ```bash
     python etl/scripts/faostat/create_new_steps.py -c garden
@@ -272,7 +256,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
         This way we can be aware of any unexpected FAO changes in units.
         If any changes are made to `custom_*.csv` files, you may need to force-run the garden `faostat_metadata` step to implement those changes.
 
-6.  Run the new etl garden steps, to generate the garden datasets.
+5.  Run the new etl garden steps, to generate the garden datasets.
 
     ```bash
     etl run garden/faostat/YYYY-MM-DD
@@ -296,7 +280,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
         TODO: The descriptions of anomalies used to appear in `description`, but now they are not included in any indicator metadata. Ideally they should appear in `description_processing`. Consider doing this in the next update.
 
-7.  Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
+6.  Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
 
     ```bash
     python etl/scripts/faostat/update_custom_metadata.py
@@ -308,38 +292,31 @@ which there is new data (let us call the new dataset version to be created `YYYY
     etl run garden/faostat/YYYY-MM-DD
     ```
 
-8.  Create new grapher steps.
+7.  Create new grapher steps.
 
     ```bash
     python etl/scripts/faostat/create_new_steps.py -c grapher
     ```
 
-9.  Run the new etl grapher steps, to generate the grapher charts.
+8.  Run the new etl grapher steps, to generate the grapher charts.
 
     ```bash
     etl run faostat/YYYY-MM-DD --grapher
     ```
 
-10. From the ETL Wizard, use Indicator Upgrader for each of the grapher datasets to replace variables in charts to their latest versions.
+9. Replace variables in charts to their latest versions.
 
-11. Update the versions of the dependencies of the explorers step `export://explorers/faostat/latest/global_food` in the dag (for the moment, this has to be done manually).
+  ```bash
+  etl indicator-upgrade auto
+  ```
 
-12. Run the explorers step, to update the global food explorer.
+10. Run the explorers step, to update the global food explorer.
 
     ```bash
     etl run explorers/faostat/latest/global_food --export
     ```
 
-13. From the ETL Wizard, use Chart Diff to visually inspect changes between the old and new versions of updated charts, and
-    accept or reject changes. Inspect also changes in the global food explorer using Explorer Diff.
-
-14. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
-
-    !!! note
-
-        In the future this could be handled automatically by one of the existing scripts.
-
-15. Update titles and descriptions of snapshot origins (to use the custom dataset titles and descriptions defined in garden). Also, attributions will be added to origins.
+11. Update titles and descriptions of snapshot origins (to use the custom dataset titles and descriptions defined in garden). Also, attributions will be added to origins.
 
     ```bash
     python etl/scripts/faostat/update_snapshots_metadata.py
@@ -349,11 +326,22 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
         The current workflow is a bit convoluted: we fetch snapshots, create meadow and garden steps, and the edit snapshots again. But for now, this workflow is the safest working solution.
 
-16. Manually update the version of any `faostat` used as dependency in unrelated datasets (`faostat_rl` is used in `weekly_wildfires` and `population`).
+12. From the ETL Wizard, use Anomalist to visually inspect potential data issues.
 
-17. From the ETL dashboard, select archivable, namespace `faostat`, and archive all old steps.
+13. From the ETL Wizard, use Anomalist and Chart Diff to visually inspect changes between the old and new versions of updated charts, and
+    accept or reject changes. Inspect also changes in the global food explorer using Explorer Diff.
 
-18. After merging all code and once production is up-to-date, archive unnecessary grapher datasets.
+14. Manually update the version of any `faostat` used as dependency in unrelated datasets (`faostat_rl` is used in `weekly_wildfires`).
+
+15. Update other steps in the `agriculture` namespace that rely on any `faostat_*` step.
+
+16. Archive old steps.
+
+    ```bash
+    etl archive faostat/YYYY-MM-DD --include-usages
+    ```
+
+17. After merging all code and once production is up-to-date, archive unnecessary grapher datasets.
 
 ## Workflow to make changes to a dataset
 
