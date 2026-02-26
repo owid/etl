@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Human Development Index (HDI)
+        - Human Development Index (HDI)
     display: &common-display
       entityAnnotationsMap: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
 
@@ -76,15 +76,15 @@ tables:
                   - 0.8
                   - 0.1
             selectedEntityNames:
-            - East Asia (AHDI)
-            - South Asia (AHDI)
-            - Middle East (AHDI)
-            - North Africa (AHDI)
-            - Latin America (AHDI)
-            - Sub Saharan Africa (AHDI)
-            - Western offshoots (AHDI)
-            - Western Europe (AHDI)
-            - Eastern Europe (AHDI)
+              - East Asia (AHDI)
+              - South Asia (AHDI)
+              - Middle East (AHDI)
+              - North Africa (AHDI)
+              - Latin America (AHDI)
+              - Sub Saharan Africa (AHDI)
+              - Western offshoots (AHDI)
+              - Western Europe (AHDI)
+              - Eastern Europe (AHDI)
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
           topic_tags:
@@ -144,6 +144,8 @@ tables:
               - Nigeria
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
+          topic_tags:
+            - Human Development Index (HDI)
       life_expectancy:
         title: Life expectancy
         unit: "years"
@@ -157,6 +159,9 @@ tables:
           name: Life expectancy
           numDecimalPlaces: 1
           <<: *common-display
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
 
       years_of_schooling:
         title: Years of schooling
@@ -171,6 +176,9 @@ tables:
           name: Years of schooling
           numDecimalPlaces: 1
           <<: *common-display
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
 
       liberal_democracy_index:
         title: Liberal Democracy Index
@@ -205,6 +213,9 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
           <<: *common-display
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
 
       life_expectancy_index:
         title: Kakwani index of life expectancy

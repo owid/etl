@@ -441,6 +441,9 @@ tables:
           name: Female share of low pay earners
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Economic Inequality by Gender
 
       gender_wage_gap_by_occupation:
         title: Gender wage gap - <<classif1>>
@@ -476,8 +479,8 @@ tables:
           {definitions.description_processing_avg_earnings_outliers}
         presentation:
           faqs:
-          - fragment_id: poverty-international-dollars
-            gdoc_id: "{definitions.gdoc_id}"
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
         display:
           name: Average hourly earnings of employees - <<sex>>
           numDecimalPlaces: 1
@@ -729,6 +732,16 @@ tables:
           name: Labor income share as a percent of GDP
           numDecimalPlaces: 1
           <<: *common_display
+      average_hourly_earnings_employees_by_sex__sex_total__classif1_currency__2021_ppp_dollar:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Economic Inequality
+            - Wages
+      gender_wage_gap_by_occupation__classif1_occupation__skill_level__total:
+        presentation:
+          topic_tags:
+            - Economic Inequality by Gender
 
   regions:
     variables:
@@ -740,6 +753,9 @@ tables:
         display:
           name: ILO region
 
+        presentation:
+          topic_tags:
+            - World Regions
       ilo_subregion:
         title: ILO subregion
         unit: ""

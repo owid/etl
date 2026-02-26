@@ -10,9 +10,15 @@ tables:
       livestock_antimicrobial_usage_tonnes:
         title: Antimicrobial usage in livestock (tonnes)
         unit: ''
+        presentation:
+          topic_tags:
+            - Antibiotics & Antibiotic Resistance
       livestock_antimicrobial_usage_pcu_kg:
         title: Antimicrobial usage in livestock (population corrected units, kg)
         unit: ''
       livestock_antimicrobial_usage_mgpcu:
         title: Antimicrobial usage in livestock (mg per population corrected units)
         unit: ''
+        presentation:
+          topic_tags:
+            - Pandemics

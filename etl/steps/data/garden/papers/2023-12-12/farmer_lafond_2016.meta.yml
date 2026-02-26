@@ -540,3 +540,8 @@ tables:
           name: Wind turbine (Denmark)
         presentation:
           title_public: Cost of wind turbine (Denmark)
+      cost:
+        presentation:
+          topic_tags:
+            - Energy
+            - Technological Change

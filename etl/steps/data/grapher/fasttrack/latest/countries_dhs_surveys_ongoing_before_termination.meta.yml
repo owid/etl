@@ -11,6 +11,9 @@ tables:
         unit: ''
         description: |-
           The status of the national Demographic and Health Surveys being conducted in the country in 2025. 'Commencing' means the survey was due to start in 2025; 'fieldwork incomplete' means the data collection had commenced but was incomplete; 'fieldwork complete, final report unavailable' means the data collection had been completed but the report and analysis had not been complete or published.
+        presentation:
+          topic_tags:
+            - Global Health
     dimensions:
       - name: country
         slug: country

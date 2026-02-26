@@ -10,3 +10,6 @@ tables:
         title: Heat-related death rate
         unit: per 100,000
         description: The estimated increase in heat-related deaths per 100,000 people in a RCP4.5 warming scenario.
+        presentation:
+          topic_tags:
+            - Climate Change

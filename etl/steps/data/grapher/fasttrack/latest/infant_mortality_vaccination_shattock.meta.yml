@@ -12,3 +12,8 @@ tables:
         short_unit: '%'
         description: |-
           Infant mortality rate measures the share of newborns who die before reaching their first birthday. This is shown in a hypothetical scenario without vaccinations.
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Foreign Aid
+            - Vaccination

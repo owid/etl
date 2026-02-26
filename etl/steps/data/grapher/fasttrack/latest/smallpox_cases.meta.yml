@@ -15,3 +15,8 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Pandemics
+            - Smallpox
+            - Vaccination

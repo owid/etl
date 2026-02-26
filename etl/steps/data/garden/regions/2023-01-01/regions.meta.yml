@@ -47,3 +47,35 @@ tables:
         title: "Successors of a historical region"
         description_short: |
           List of successors of a historical region.
+      owid_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      who_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      pew_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      wb_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      un_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      unsdg_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      un_m49_1_region:
+        presentation:
+          topic_tags:
+            - World Regions
+      un_m49_2_region:
+        presentation:
+          topic_tags:
+            - World Regions

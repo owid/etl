@@ -39,15 +39,11 @@ definitions:
 
     We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
 
-  map_brackets_gdp: &map_brackets_gdp
-    [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
-  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
-    [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+  map_brackets_gdp: &map_brackets_gdp [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
+  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
 
-  selected_entity_names_gdp: &selected_entity_names_gdp
-    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
-  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
-    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp: &selected_entity_names_gdp [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
 
   ####################################################################################
   # ILOSTAT definitions
@@ -150,7 +146,7 @@ definitions:
       timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10, 20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         baseColorScheme: Blues
 
   # Gross enrolment ratio configuration
@@ -175,13 +171,13 @@ definitions:
     - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_trained_teachers: &desc_key_trained_teachers
-   - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
-   - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
-   - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
-   - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
-   - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
-   - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
-   - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
+    - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
+    - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
+    - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+    - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+    - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
+    - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
+    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 
   ####################################################################################
   # Energy definitions
@@ -703,8 +699,8 @@ tables:
                   - ''
                   - ''
                 customNumericColors:
-                  - null
-                  - null
+                  - 
+                  - 
                 legendDescription: Prevalence of stunting (% of children under 5)
             selectedEntityNames:
               - China
@@ -792,8 +788,8 @@ tables:
                   - ''
                   - ''
                 customNumericColors:
-                  - null
-                  - null
+                  - 
+                  - 
                 legendDescription: Prevalence of stunting (% of children under 5)
             selectedEntityNames:
               - China
@@ -883,7 +879,7 @@ tables:
             - Trade & Globalization
 
       eg_elc_accs_zs_without:
-        title:  Access to electricity (% of population with no access)
+        title: Access to electricity (% of population with no access)
         unit: '% of population'
         short_unit: '%'
         description_short: *description_short_electricity
@@ -1014,7 +1010,7 @@ tables:
         title: Gross enrollment in pre-primary education
         short_unit: '%'
         unit: '%'
-        description_short:  Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
+        description_short: Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrollment in pre-primary education
@@ -1039,7 +1035,7 @@ tables:
           name: Girls
 
       se_pre_enrr_ma:
-        title:  Gross enrollment in pre-primary education among boys
+        title: Gross enrollment in pre-primary education among boys
         short_unit: '%'
         unit: '%'
         description_short: Number of boys of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of boys of the official pre-primary school age.
@@ -2326,6 +2322,8 @@ tables:
         presentation:
           grapher_config:
             note: When both national survey estimates and ILO modeled estimates are available, they are classified as "agreeing" if they differ by less than 0.1 percentage points, and as "disagreeing" otherwise.
+          topic_tags:
+            - Work & Employment
         display:
           name: Availability of unemployment estimates by source
           numDecimalPlaces: 0
@@ -2427,3 +2425,641 @@ tables:
           name: Number of people out of the labor force
           numDecimalPlaces: 0
           tolerance: 0
+      fx_own_totl_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Financial Inclusion
+      per_si_allsi_adq_pop_tot:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
+            - Social Spending
+      per_sa_allsa_adq_pop_tot:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Poverty
+            - Social Spending
+      per_lm_alllm_adq_pop_tot:
+        presentation:
+          topic_tags:
+            - Unemployment
+            - Work & Employment
+      ny_adj_svnx_cd:
+        presentation:
+          topic_tags:
+            - Consumer Credit, Debt & Saving
+            - Economic Growth
+            - Government Spending
+      omm_net_savings_percap:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Consumer Credit, Debt & Saving
+            - Economic Growth
+      ag_lnd_irig_ag_zs:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Water Use & Stress
+      er_h2o_fwag_zs:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      nv_agr_totl_zs:
+        presentation:
+          topic_tags:
+            - Employment in Agriculture
+      is_air_psgr:
+        presentation:
+          topic_tags:
+            - Tourism
+            - Transport
+      is_air_good_mt_k1:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+            - Transport
+      er_h2o_fwtl_k3:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      sh_xpd_chex_pp_cd:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+      ip_pat_resd:
+        presentation:
+          topic_tags:
+            - Research & Development
+      si_spr_pc40_zg:
+        presentation:
+          topic_tags:
+            - Economic Inequality
+      sh_hiv_artc_zs:
+        presentation:
+          topic_tags:
+            - Global Health
+            - HIV/AIDS
+      er_fsh_aqua_mt:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Meat & Dairy Production
+      ag_lnd_arbl_ha_pc:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Land Use
+            - Land Use & Yields in Agriculture
+      ms_mil_totl_tf_zs:
+        presentation:
+          topic_tags:
+            - Military Personnel & Spending
+      armed_forces_share_population:
+        presentation:
+          topic_tags:
+            - Military Personnel & Spending
+            - State Capacity
+      ms_mil_totl_p1:
+        presentation:
+          topic_tags:
+            - Military Personnel & Spending
+      sh_hiv_pmtc_zs:
+        presentation:
+          topic_tags:
+            - HIV/AIDS
+            - Sexual & Reproductive Health
+      fb_atm_totl_p5:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Financial Inclusion
+            - Healthcare Spending
+      en_atm_pm25_mc_m3:
+        presentation:
+          topic_tags:
+            - Air Pollution
+      sh_sta_brtc_zs:
+        presentation:
+          topic_tags:
+            - Maternal Mortality
+      sp_reg_brth_zs:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Population Growth
+            - State Capacity
+      it_net_bbnd_p2:
+        presentation:
+          topic_tags:
+            - Internet
+            - Technological Change
+      er_fsh_capt_mt:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Fish & Overfishing
+            - Meat & Dairy Production
+      sh_dth_mort:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+      sh_hiv_0014:
+        presentation:
+          topic_tags:
+            - HIV/AIDS
+      sh_mlr_nets_zs:
+        presentation:
+          topic_tags:
+            - Malaria
+      sh_sta_aric_zs:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Child & Infant Mortality
+            - Respiratory Diseases
+      sh_sta_orth:
+        presentation:
+          topic_tags:
+            - Child Health
+            - Diarrheal Diseases
+      sh_med_cmhw_p3:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+      fp_cpi_totl:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Poverty
+      sp_dyn_conu_zs:
+        presentation:
+          topic_tags:
+            - Contraception & Abortion
+            - Fertility Rate
+            - Population Growth
+            - Sexual & Reproductive Health
+      sh_sta_diab_zs:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+      en_clc_drsk_xq:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+      eg_imp_cons_zs:
+        presentation:
+          topic_tags:
+            - Energy
+      eg_egy_prim_pp_kd:
+        presentation:
+          topic_tags:
+            - Energy
+      sh_sta_bfed_zs:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Hunger & Undernourishment
+      ne_rsb_gnfs_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+      sh_sta_fgms_zs:
+        presentation:
+          topic_tags:
+            - Sexual & Reproductive Health
+            - Violence Against Children & Children's Rights
+            - Women's Rights
+      ag_con_fert_zs:
+        presentation:
+          topic_tags:
+            - Fertilizers
+      en_fsh_thrd_no:
+        presentation:
+          topic_tags:
+            - Biodiversity
+      it_mlt_main_p2:
+        presentation:
+          topic_tags:
+            - Technological Change
+      bx_klt_dinv_wd_gd_zs:
+        presentation:
+          topic_tags:
+            - Foreign Direct Investment
+            - Trade & Globalization
+      bm_klt_dinv_wd_gd_zs:
+        presentation:
+          topic_tags:
+            - Foreign Direct Investment
+            - Trade & Globalization
+      sl_gdp_pcap_em_kd:
+        presentation:
+          topic_tags:
+            - Economic Growth
+      gc_rev_xgrt_gd_zs:
+        presentation:
+          topic_tags:
+            - Government Revenue
+            - Government Spending
+            - Taxation
+      sh_uhc_sci:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+      sh_med_beds_zs:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare
+            - Healthcare Spending
+      hd_hci_ovrl:
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
+      sh_mlr_incd_p3:
+        presentation:
+          topic_tags:
+            - Malaria
+      er_h2o_fwin_zs:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      fp_cpi_totl_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Food Prices
+            - Prices
+      er_h2o_intr_k3:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      vc_idp_nwds:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+      ag_lnd_totl_k2:
+        presentation:
+          topic_tags:
+            - Land Use
+      it_net_bbnd:
+        presentation:
+          topic_tags:
+            - Internet
+            - Technological Change
+      it_mlt_main:
+        presentation:
+          topic_tags:
+            - Technological Change
+      sh_mmr_risk_zs:
+        presentation:
+          topic_tags:
+            - Maternal Mortality
+            - Sexual & Reproductive Health
+      nv_ind_manf_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+      er_mrn_ptmr_zs:
+        presentation:
+          topic_tags:
+            - Biodiversity
+      sp_dyn_to65_ma_zs:
+        presentation:
+          topic_tags:
+            - Age Structure
+            - Life Expectancy
+      it_cel_sets:
+        presentation:
+          topic_tags:
+            - Technological Change
+      it_cel_sets_p2:
+        presentation:
+          topic_tags:
+            - Technological Change
+      bx_trf_pwkr_dt_gd_zs:
+        presentation:
+          topic_tags:
+            - Migration
+            - Remittances
+      sh_dyn_ncom_zs:
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Non-communicable Diseases
+      er_h2o_fwdm_zs:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      ny_gdp_totl_rt_zs:
+        presentation:
+          topic_tags:
+            - Fossil Fuels
+            - Metals & Minerals
+      dt_oda_alld_kd:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+      sh_hiv_incd_14:
+        presentation:
+          topic_tags:
+            - HIV/AIDS
+      fb_cbk_brch_p5:
+        presentation:
+          topic_tags:
+            - Banks & Financial Institutions
+            - Healthcare Spending
+            - Trade & Globalization
+      sh_dth_nmrt:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+      sh_med_numw_p3:
+        presentation:
+          topic_tags:
+            - Doctors & Health Workers
+            - Global Health
+            - Maternal Mortality
+      ny_gdp_petr_rt_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Energy
+      sh_xpd_oopc_pp_cd:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+      er_h2o_intr_pc:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      sh_med_phys_zs:
+        presentation:
+          topic_tags:
+            - Doctors & Health Workers
+            - Global Health
+            - Healthcare Spending
+      sp_pop_totl:
+        presentation:
+          topic_tags:
+            - Economic Inequality
+            - Population Growth
+      pa_nus_prvt_pp:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Poverty
+      sh_anm_chld_zs:
+        presentation:
+          topic_tags:
+            - Micronutrient Deficiency
+      sh_prg_anem:
+        presentation:
+          topic_tags:
+            - Micronutrient Deficiency
+            - Sexual & Reproductive Health
+      sh_anm_allw_zs:
+        presentation:
+          topic_tags:
+            - Micronutrient Deficiency
+      sh_xpd_pvtd_pp_cd:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+      sh_xpd_ghed_gd_zs:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
+      is_rrs_pasg_km:
+        presentation:
+          topic_tags:
+            - Transport
+      gb_xpd_rsdv_gd_zs:
+        presentation:
+          topic_tags:
+            - Research & Development
+      sp_pop_scie_rd_p6:
+        presentation:
+          topic_tags:
+            - Research & Development
+      sh_sgr_irsk_zs:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+            - Poverty
+      ip_jrn_artc_sc:
+        presentation:
+          topic_tags:
+            - Research & Development
+      bg_gsr_nfsv_gd_zs:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      tx_val_food_zs_un:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      tx_val_manf_zs_un:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      sh_sta_maln_zs:
+        presentation:
+          topic_tags:
+            - Child Health
+            - Hunger & Undernourishment
+      sh_mlr_tret_zs:
+        presentation:
+          topic_tags:
+            - Malaria
+      sh_sta_wast_zs:
+        presentation:
+          topic_tags:
+            - Child Health
+            - Hunger & Undernourishment
+      sh_sta_orcf_zs:
+        presentation:
+          topic_tags:
+            - Diarrheal Diseases
+      gc_xpn_comp_zs:
+        presentation:
+          topic_tags:
+            - Government Spending
+      gc_xpn_intp_zs:
+        presentation:
+          topic_tags:
+            - Government Revenue
+            - Government Spending
+            - Interest Rates
+            - Research & Development
+      sn_itk_salt_zs:
+        presentation:
+          topic_tags:
+            - Micronutrient Deficiency
+      ag_lnd_agri_zs:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Land Use
+            - Land Use & Yields in Agriculture
+      ag_lnd_arbl_zs:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Land Use
+            - Land Use & Yields in Agriculture
+      sh_sta_brtw_zs:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Micronutrient Deficiency
+      sh_sta_anvc_zs:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Global Health
+            - Maternal Mortality
+            - Sexual & Reproductive Health
+      sh_xpd_oopc_ch_zs:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+      per_allsp_cov_pop_tot:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Labor Market Policies
+            - Work & Employment
+      si_pov_nahc:
+        presentation:
+          topic_tags:
+            - Poverty
+      sp_urb_totl_in_zs:
+        presentation:
+          topic_tags:
+            - Urbanization
+      sh_xpd_ghed_ch_zs:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+      omm_share_service_exports:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      sh_sgr_crsk_zs:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+      sh_dyn_aids_fe_zs:
+        presentation:
+          topic_tags:
+            - HIV/AIDS
+      sg_gen_parl_zs:
+        presentation:
+          topic_tags:
+            - Women in Politics
+            - Women's Rights
+      sp_dyn_conm_zs:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Women's Rights
+      sp_pop_totl_fe_zs:
+        presentation:
+          topic_tags:
+            - Gender Ratio
+      iq_spi_ovrl:
+        presentation:
+          topic_tags:
+            - State Capacity
+      sh_med_saop_p5:
+        presentation:
+          topic_tags:
+            - Doctors & Health Workers
+            - Global Health
+            - Healthcare Spending
+      tm_tax_mrch_wm_ar_zs:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      er_lnd_ptld_zs:
+        presentation:
+          topic_tags:
+            - Biodiversity
+      en_bir_thrd_no:
+        presentation:
+          topic_tags:
+            - Biodiversity
+      en_mam_thrd_no:
+        presentation:
+          topic_tags:
+            - Biodiversity
+      sh_alc_pcap_li:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+      gc_xpn_totl_gd_zs:
+        presentation:
+          topic_tags:
+            - Government Spending
+      cm_mkt_lcap_gd_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+      sp_uwt_tfrt:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Women's Rights
+      ag_lnd_totl_ur_k2:
+        presentation:
+          topic_tags:
+            - Urbanization
+      omm_urb_pop_slum:
+        presentation:
+          topic_tags:
+            - Urbanization
+      ne_exp_gnfs_kd:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      ne_imp_gnfs_kd:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+      sn_itk_vita_zs:
+        presentation:
+          topic_tags:
+            - Micronutrient Deficiency
+      sp_dyn_wfrt:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+      er_gdp_fwtl_m3_kd:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+      sg_vaw_reas_zs:
+        presentation:
+          topic_tags:
+            - Women's Rights
+      sp_m18_2024_fe_zs:
+        presentation:
+          topic_tags:
+            - Marriages & Divorces
+            - Violence Against Children & Children's Rights
+            - Women's Rights
+      sp_dyn_to65_fe_zs:
+        presentation:
+          topic_tags:
+            - Age Structure
+            - Life Expectancy

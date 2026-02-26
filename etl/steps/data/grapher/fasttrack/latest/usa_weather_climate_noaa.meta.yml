@@ -49,6 +49,9 @@ tables:
       heatwave_index:
         title: Heatwave Index
         unit: ''
+        presentation:
+          topic_tags:
+            - Natural Disasters
       hot_daily_highs:
         title: Hot summer days
         unit: '%'

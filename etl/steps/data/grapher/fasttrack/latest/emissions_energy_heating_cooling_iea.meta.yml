@@ -28,6 +28,9 @@ tables:
         display:
           name: Space cooling
         description: Energy use of space cooling technologies — mostly air conditioning units.
+        presentation:
+          topic_tags:
+            - Energy
       heating_co2:
         title: Heating
         unit: tonnes

@@ -11,3 +11,7 @@ tables:
         unit: '%'
         short_unit: '%'
         description: The share of live births that are pre-term. This is defined as being born between 22 and 37 weeks.
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Maternal Mortality

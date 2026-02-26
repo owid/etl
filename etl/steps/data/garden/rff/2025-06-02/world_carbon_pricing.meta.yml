@@ -6,7 +6,7 @@ definitions:
       - A country is considered to have a carbon tax or emissions trading system if at least one IPCC sector or gas is covered by the instrument. These instruments do not need to cover all sectors within the economy for this to apply.
   presentation:
     topic_tags:
-    - CO2 & Greenhouse Gas Emissions
+      - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365
@@ -61,8 +61,14 @@ tables:
         unit: ""
         description_short: This data indicates whether at least one sector(-fuel) is covered by at least one emissions trading system at the national level, or only at the sub-national level, or whether no sector is covered.
         processing_level: major
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
       tax:
         title: Covered by tax instrument in at least one sector
         unit: ""
         description_short: This data indicates whether at least one sector(-fuel) is covered by at least one carbon tax at the national level, or only at the sub-national level, or whether no sector is covered.
         processing_level: major
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions

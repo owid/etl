@@ -107,6 +107,9 @@ tables:
           name: Excess mortality P-scores, 5-year average baseline, all ages
           includeInTable: true
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
       p_avg_0_14:
         title: p_avg_0_14
         # title: Excess mortality P-scores (5-year average baseline, 0–14)
@@ -180,6 +183,8 @@ tables:
             subtitle: The percentage difference between the reported number of weekly or monthly deaths in 2020–2022 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             <<: *color_scale_percent
+          topic_tags:
+            - COVID-19
       p_proj_0_14:
         title: p_proj_0_14
         # title: Excess mortality P-scores (projected baseline, 0–14)
@@ -447,6 +452,8 @@ tables:
                   - 700000
                   - 800000
                   - 900000
+          topic_tags:
+            - COVID-19
       cum_proj_deaths_all_ages:
         title: cum_proj_deaths_all_ages
         # title: Cumulative number of deaths (projected, all ages)
@@ -477,6 +484,8 @@ tables:
             subtitle: The percentage difference between the cumulative number of deaths since 1 January 2020 and the cumulative projected deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             <<: *color_scale_percent
+          topic_tags:
+            - COVID-19
       cum_excess_per_million_proj_all_ages:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
@@ -509,6 +518,8 @@ tables:
                   - 8000
                   - 9000
       # auxiliary columns
+          topic_tags:
+            - COVID-19
       time:
         title: Time
         unit: ""

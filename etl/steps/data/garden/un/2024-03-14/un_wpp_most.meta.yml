@@ -56,3 +56,6 @@ tables:
           - 70-79
         presentation:
           title_public: Ten year age-group with the highest population
+          topic_tags:
+            - Age Structure
+            - Population Growth

@@ -1,0 +1,8 @@
+tables:
+  renewable_capacity_by_technology:
+    variables:
+      capacity:
+        presentation:
+          topic_tags:
+            - Energy
+            - Renewable Energy
