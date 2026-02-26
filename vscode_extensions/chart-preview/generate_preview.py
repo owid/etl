@@ -78,11 +78,13 @@ def load_table_stats(
 
     # Columns available for sparklines/dimensions
     dim_cols_present = [c for c in ["country", "year"] if c in dimensions or c in all_cols]
+    # Extra dimensions beyond country/year (e.g. lighting_source, price_year)
+    extra_dims = sorted(d for d in dimensions if d not in ("country", "year"))
     can_sparkline = has_year and has_country and use_feather
 
     # Load all needed columns in a single feather read for efficiency
     if use_feather:
-        cols_to_load = list(dict.fromkeys(dim_cols_present + indicator_cols))  # dedup, preserve order
+        cols_to_load = list(dict.fromkeys(dim_cols_present + extra_dims + indicator_cols))  # dedup, preserve order
         tb = _read_columns(str(feather_path), cols_to_load)
     else:
         # Fallback: load full table (parquet/csv datasets)
@@ -103,6 +105,13 @@ def load_table_stats(
             sampled_entities = _random.sample(all_entities, MAX_SPARKLINE_ENTITIES)
         else:
             sampled_entities = all_entities
+
+    # Discover unique values for extra dimensions
+    extra_dimensions: dict[str, list] = {}
+    for dim in extra_dims:
+        if dim in tb.columns:
+            vals = sorted(tb[dim].dropna().unique(), key=str)
+            extra_dimensions[dim] = [str(v) if not isinstance(v, (int, float)) else v for v in vals]
 
     # Filter to sampled entities once for sparklines
     if can_sparkline and sampled_entities is not None:
@@ -141,11 +150,20 @@ def load_table_stats(
                 {"value": str(k), "count": int(v), "pct": round(100 * v / total_non_null, 1)} for k, v in top.items()
             ]
 
-        # Sparkline: per-entity time series
+        # Sparkline: per-entity time series, grouped by extra dimensions
+        # Structure: sparkline_by_entity[dim_key][entity] = [{year, value}, ...]
+        # For tables without extra dims, dim_key is "_"
         sparkline_by_entity = None
         if is_numeric and sparkline_df is not None:
             sparkline_by_entity = {}
-            for entity, grp in sparkline_df.groupby("country", observed=True):
+            group_cols = ["country"] + [d for d in extra_dims if d in sparkline_df.columns]
+            for group_key, grp in sparkline_df.groupby(group_cols, observed=True):
+                if isinstance(group_key, str):
+                    entity = group_key
+                    dim_key = "_"
+                else:
+                    entity = str(group_key[0])
+                    dim_key = "|".join(str(v) for v in group_key[1:]) if len(group_key) > 1 else "_"
                 series_ent = grp.set_index("year")[col].dropna().sort_index()
                 if len(series_ent) < 2:
                     continue
@@ -153,15 +171,17 @@ def load_table_stats(
                 if len(data) > 200:
                     step_size = len(data) / 200
                     data = [data[int(i * step_size)] for i in range(200)]
-                sparkline_by_entity[str(entity)] = [{"year": int(y), "value": round(float(v), 4)} for y, v in data]
+                if dim_key not in sparkline_by_entity:
+                    sparkline_by_entity[dim_key] = {}
+                sparkline_by_entity[dim_key][entity] = [{"year": int(y), "value": round(float(v), 4)} for y, v in data]
 
         # Quality flags
         quality_flags = []
         if not meta.title:
             quality_flags.append("missing_title")
-        if not meta.unit and is_numeric:
+        if meta.unit is None and is_numeric:
             quality_flags.append("missing_unit")
-        if not meta.description_short:
+        if not meta.description_short and not meta.description_key:
             quality_flags.append("missing_description")
         if not meta.origins:
             quality_flags.append("missing_origins")
@@ -199,6 +219,7 @@ def load_table_stats(
         "n_indicators_shown": len(indicator_cols),
         "truncated": truncated,
         "dimensions": sorted(dimensions),
+        "extra_dimensions": extra_dimensions,
         "year_min": year_min,
         "year_max": year_max,
         "entity_count": entity_count,
