@@ -1,9 +1,7 @@
 meta:
   origin:
     producer: Food and Agriculture Organization of the United Nations
-    title: 'SDG Indicators
-
-      '
+    title: 'SDG Indicators'
     description: |
       This dataset includes a selection of indicators used to monitor progress toward the United Nations Sustainable Development Goals (SDGs).
 
