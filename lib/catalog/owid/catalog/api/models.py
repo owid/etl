@@ -281,11 +281,11 @@ class ResponseSet(BaseModel, Generic[T]):
 
         return max(self.items, key=lambda item: getattr(item, by))
 
-    def to_frame(self, advanced: bool | None = None) -> pd.DataFrame:
+    def to_frame(self, all_fields: bool | None = None) -> pd.DataFrame:
         """Convert results to a DataFrame.
 
         Args:
-            advanced: If True, show all fields. If False, show only key fields.
+            all_fields: If True, show all fields. If False, show only key fields.
                 If None (default), use the instance's _ui_advanced setting.
 
         Returns:
@@ -294,8 +294,8 @@ class ResponseSet(BaseModel, Generic[T]):
         if not self.items:
             return pd.DataFrame()
 
-        # Resolve effective advanced flag: explicit arg > instance setting
-        is_advanced = advanced if advanced is not None else self._ui_advanced
+        # Resolve effective flag: explicit arg > instance setting
+        is_advanced = all_fields if all_fields is not None else self._ui_advanced
 
         # Convert Pydantic models to dicts
         rows = []

@@ -89,7 +89,7 @@ make watch
 - **ResponseSet ergonomics**
   - Rename `ResponseSet.results` → `.items` to eliminate redundant `results.results` access pattern
   - Add `.to_dict()` method for serializing results to plain dicts (useful for AI/LLM context windows)
-  - Add `advanced` parameter to `.to_frame()` to temporarily override display mode without mutating instance state
+  - Add `all_fields` parameter to `.to_frame()` to temporarily override display mode without mutating instance state
 
 ### `v1.0.0`
 - **New unified Client API**
