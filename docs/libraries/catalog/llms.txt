@@ -1,6 +1,6 @@
 # owid-catalog
 
-> Python library for accessing Our World in Data's catalog of research data. Version: 1.0.0
+> Python library for accessing Our World in Data's catalog of research data. Version: 1.0.1
 
 # Catalog Library
 
@@ -56,7 +56,6 @@ tb_grouped = tb.groupby("country").sum()  # Preserves metadata
 
 The Data API provides unified access to OWID's published data through a simple client interface.
 
-<!--
 ## Quick Reference
 The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
 
@@ -990,6 +989,10 @@ Example:
 #### `model_post_init(self, _ResponseSet__context: 'Any') -> 'None'`
 
 Set total_count to length of results if not provided.
+
+#### `ResponseSet.results` (property)
+
+Deprecated: use ``.items`` instead.
 
 #### `set_ui_advanced(self) -> "'ResponseSet[T]'"`
 
