@@ -2,7 +2,8 @@
 ########################################################################################################################
 TEMPORARY STEP WHILE FAOSTAT QV FIXES THEIR MISSING DATA!
 
-In the latest release (published 2025-11-14), FAOSTAT removed post-2017 data for all 27 EU member states from the Value of Agricultural Production (QV) dataset. The EU-27 aggregate still has data up to 2024, but individual country data stops at 2017. Non-EU European countries (e.g. UK, Norway, Switzerland) are unaffected.
+In the latest release, FAOSTAT removed post-2017 data for all 27 EU member states from the Value of Agricultural Production (QV) dataset.
+The EU-27 aggregate still has data up to 2024, but individual country data stops at 2017. Non-EU European countries (e.g. UK, Norway, Switzerland) are unaffected.
 
 For now, we fetch post-2017 data for EU-27 countries from the previous snapshot.
 
