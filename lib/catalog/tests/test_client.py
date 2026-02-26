@@ -1056,21 +1056,6 @@ class TestResponseSetUI:
         # Instance _ui_advanced should still be True
         assert rs._ui_advanced is True
 
-    def test_results_property_deprecated_alias(self):
-        """Accessing .results emits a DeprecationWarning and returns .items."""
-        import warnings
-
-        rs = ResponseSet(items=[1, 2, 3], query="test", base_url="https://example.com")
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            val = rs.results
-            assert len(w) == 1
-            assert issubclass(w[0].category, DeprecationWarning)
-            assert "use .items instead" in str(w[0].message)
-
-        assert val == [1, 2, 3]
-        assert val is rs.items
 
 
 class TestIndicatorsSearchParams:

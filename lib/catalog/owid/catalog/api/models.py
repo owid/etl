@@ -5,7 +5,6 @@
 #
 from __future__ import annotations
 
-import warnings
 from pathlib import Path
 from typing import Any, Callable, Generic, Iterator, TypeVar, overload
 from urllib import parse
@@ -39,16 +38,6 @@ class ResponseSet(BaseModel, Generic[T]):
 
     # Tweak this to have a more advanced display
     _ui_advanced: bool = False
-
-    @property
-    def results(self) -> list[T]:
-        """Deprecated: use ``.items`` instead."""
-        warnings.warn(
-            "ResponseSet.results is deprecated, use .items instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.items
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
