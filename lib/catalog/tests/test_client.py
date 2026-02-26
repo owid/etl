@@ -1057,7 +1057,6 @@ class TestResponseSetUI:
         assert rs._ui_advanced is True
 
 
-
 class TestIndicatorsSearchParams:
     """Test indicator search with sort_by and latest parameters."""
 
