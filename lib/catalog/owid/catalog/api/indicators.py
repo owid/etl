@@ -416,7 +416,7 @@ class IndicatorsAPI:
             )
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=data.get("total_results", len(results)),
             base_url=self.catalog_url,

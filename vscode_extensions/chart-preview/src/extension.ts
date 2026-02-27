@@ -22,9 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		const filePath = editor.document.uri.fsPath;
 		if (filePath.includes('/steps/data/') && filePath.endsWith('.py')) {
-			openDatasetPreview(filePath);
+			openPreview(filePath, datasetStrategy);
 		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
-			openPreview(filePath);
+			openPreview(filePath, chartStrategy);
 		} else {
 			vscode.window.showErrorMessage('Not a previewable file (expected a garden .py step or .chart.yml)');
 		}
@@ -43,6 +43,33 @@ export function deactivate() {
 	watchProcesses.clear();
 	for (const [, proc] of previewScriptProcesses) { proc.kill(); }
 	previewScriptProcesses.clear();
+}
+
+// --- Strategy interface ---
+
+interface PreviewConfig {
+	stepUri: string;
+	etlArgs: string[];
+	fileName: string;
+	/** Strategy-specific data passed through to reload callbacks */
+	extra?: unknown;
+}
+
+interface WatchState {
+	command: string;
+	recentOutput: string;
+	firstRunDone: boolean;
+	cycleStart: number;
+	filePath: string;
+	wsRoot: string;
+}
+
+interface PreviewStrategy {
+	parse(filePath: string, wsRoot: string): Promise<PreviewConfig> | PreviewConfig;
+	doReload(panel: vscode.WebviewPanel, state: WatchState, config: PreviewConfig): Promise<void> | void;
+	onDispose?(filePath: string): void;
+	/** Extra per-chunk output handling (e.g. chart's "not found in database" check) */
+	handleOutput?(text: string, state: WatchState, panel: vscode.WebviewPanel): void;
 }
 
 // --- Helpers ---
@@ -122,6 +149,36 @@ function parseExportMultidim(filePath: string, wsRoot: string): { stepUri: strin
 	return { stepUri: `export://multidim/${stepPath}`, catalogPath };
 }
 
+/**
+ * Parse an ETL data step file path into its components.
+ * e.g. /path/to/etl/steps/data/garden/biodiversity/2025-04-07/cherry_blossom.py
+ *   → { channel: "garden", namespace: "biodiversity", version: "2025-04-07", shortName: "cherry_blossom" }
+ */
+function parseDataStepPath(filePath: string, wsRoot: string): {
+	stepUri: string;
+	channel: string;
+	namespace: string;
+	version: string;
+	shortName: string;
+	relStepPath: string;
+} {
+	const dataDir = path.join(wsRoot, 'etl', 'steps', 'data');
+	const rel = path.relative(dataDir, filePath).replace(/\.py$/, '');
+	const parts = rel.split(path.sep);
+	if (parts.length < 4) {
+		throw new Error(`Cannot parse data step path: ${filePath}`);
+	}
+	const [channel, namespace, version, shortName] = parts;
+	return {
+		stepUri: `data://${channel}/${namespace}/${version}/${shortName}`,
+		channel,
+		namespace,
+		version,
+		shortName,
+		relStepPath: `etl/steps/data/${rel}.py`,
+	};
+}
+
 interface InfoBarData {
 	command: string;
 	stagingUrl: string;
@@ -129,6 +186,360 @@ interface InfoBarData {
 	status: string;
 	latency?: string;
 }
+
+// Track in-flight preview script processes so we can kill them on panel close / new run
+const previewScriptProcesses = new Map<string, ChildProcess>();
+
+/**
+ * Run the Python generate_preview.py script and return the JSON payload.
+ * Kills any previous in-flight script for the same filePath.
+ * Times out after 10 minutes to avoid zombies on huge datasets.
+ */
+function runPreviewScript(wsRoot: string, stepPath: string, filePath: string): Promise<string> {
+	// Kill any previous in-flight script for this panel
+	const prev = previewScriptProcesses.get(filePath);
+	if (prev) { prev.kill(); previewScriptProcesses.delete(filePath); }
+
+	return new Promise((resolve, reject) => {
+		const config = vscode.workspace.getConfiguration('chart-preview');
+		const pythonRel = config.get<string>('pythonPath', '.venv/bin/python');
+		const pythonPath = path.resolve(wsRoot, pythonRel);
+		const scriptPath = path.join(wsRoot, 'vscode_extensions', 'chart-preview', 'generate_preview.py');
+
+		const proc = spawn(pythonPath, [scriptPath, stepPath, '--json'], { cwd: wsRoot });
+		previewScriptProcesses.set(filePath, proc);
+
+		const timeout = setTimeout(() => {
+			proc.kill();
+			previewScriptProcesses.delete(filePath);
+			reject(new Error(`Preview script timed out after 10 minutes.\n\nThe dataset may be too large to preview quickly.`));
+		}, 600_000);
+
+		let stdout = '';
+		let stderr = '';
+		proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
+		proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
+		proc.on('close', (code) => {
+			clearTimeout(timeout);
+			previewScriptProcesses.delete(filePath);
+			if (code === 0) {
+				// Strip any leading log/warning lines (e.g. structlog warnings on master branch)
+				// and extract only the JSON line.
+				const jsonLine = stdout.split('\n').find(l => l.trimStart().startsWith('{'));
+				resolve(jsonLine ?? stdout);
+			} else if (code !== null) {  // null = killed intentionally, ignore
+				reject(new Error(`Preview script failed (code ${code}):\n${stderr}`));
+			}
+		});
+		proc.on('error', (err) => { clearTimeout(timeout); reject(err); });
+	});
+}
+
+function killWatchProcess(filePath: string) {
+	const proc = watchProcesses.get(filePath);
+	if (proc) {
+		proc.kill();
+		watchProcesses.delete(filePath);
+	}
+}
+
+// --- Chart strategy ---
+
+interface ChartExtra {
+	stagingUrl: string;
+	containerName: string;
+	isMdim: boolean;
+}
+
+const chartStrategy: PreviewStrategy = {
+	async parse(filePath, wsRoot) {
+		const branch = await getGitBranch(wsRoot);
+		const containerName = getContainerName(branch);
+
+		let stepUri: string;
+		let stagingUrl: string;
+		let isMdim: boolean;
+		let etlArgs: string[];
+		let fileName: string;
+
+		if (filePath.includes('/export/multidim/')) {
+			const parsed = parseExportMultidim(filePath, wsRoot);
+			stepUri = parsed.stepUri;
+			stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
+			isMdim = true;
+			etlArgs = [stepUri, '--export', '--watch', '--private'];
+			fileName = path.basename(filePath).replace(/\.(config\.yml|py)$/, '');
+		} else {
+			const parsed = await parseChartYml(filePath, wsRoot);
+			stepUri = parsed.stepUri;
+			const slug = parsed.slug;
+			const catalogPath = parsed.catalogPath;
+			isMdim = slug.includes('#');
+			stagingUrl = isMdim && catalogPath
+				? `http://${containerName}/admin/grapher/${encodeURIComponent(catalogPath)}`
+				: `http://${containerName}/grapher/${slug}`;
+			etlArgs = [stepUri, '--graph', '--graph-push', '--watch', '--private'];
+			fileName = path.basename(filePath).replace('.chart.yml', '');
+		}
+
+		return { stepUri, etlArgs, fileName, extra: { stagingUrl, containerName, isMdim } as ChartExtra };
+	},
+
+	doReload(panel, state, config) {
+		const { stagingUrl, containerName, isMdim } = config.extra as ChartExtra;
+		const elapsed = ((Date.now() - state.cycleStart) / 1000).toFixed(1);
+		const info: InfoBarData = { command: state.command, stagingUrl, stepUri: config.stepUri, status: 'OK', latency: `${elapsed}s` };
+
+		if (!state.firstRunDone) {
+			const bustUrl = `${stagingUrl}?_t=${Date.now()}`;
+			panel.webview.html = generateEmbedHtml(bustUrl, containerName, info, isMdim);
+			state.firstRunDone = true;
+		} else {
+			panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
+			panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
+			panel.webview.postMessage({ type: 'reload', src: `${stagingUrl}?_t=${Date.now()}` });
+		}
+		outputChannel.appendLine('[chart-preview] Chart updated, refreshing preview.');
+	},
+
+	handleOutput(text, state, panel) {
+		// Helpful message for missing data dependencies
+		if (text.includes('Indicator not found in database') || text.includes('not found in database')) {
+			panel.webview.html = getErrorHtml(
+				'Data dependencies not found on staging server.\n\n'
+				+ 'Run the grapher step for the data dependency first, e.g.:\n'
+				+ '  .venv/bin/etlr <data-dependency> --grapher --private\n\n'
+				+ 'Then retry or re-open the chart preview.\n\n'
+				+ '--- etlr output ---\n' + state.recentOutput,
+				'Preview Error',
+				true
+			);
+		}
+	},
+};
+
+// --- Dataset strategy ---
+
+interface DatasetExtra {
+	parsed: ReturnType<typeof parseDataStepPath>;
+	reloadInProgress: boolean;
+}
+
+const datasetStrategy: PreviewStrategy = {
+	parse(filePath, wsRoot) {
+		const parsed = parseDataStepPath(filePath, wsRoot);
+		return {
+			stepUri: parsed.stepUri,
+			etlArgs: [parsed.stepUri, '--watch', '--private'],
+			fileName: parsed.shortName,
+			extra: { parsed, reloadInProgress: false } as DatasetExtra,
+		};
+	},
+
+	async doReload(panel, state, config) {
+		const extra = config.extra as DatasetExtra;
+		if (extra.reloadInProgress) return;
+		extra.reloadInProgress = true;
+		const elapsed = ((Date.now() - state.cycleStart) / 1000).toFixed(1);
+
+		try {
+			outputChannel.appendLine('[dataset-preview] Rebuild complete, generating preview...');
+			const jsonStr = await runPreviewScript(state.wsRoot, extra.parsed.relStepPath, state.filePath);
+
+			if (!state.firstRunDone) {
+				panel.webview.html = getDatasetPreviewHtml(jsonStr, state.command, elapsed);
+				state.firstRunDone = true;
+			} else {
+				panel.webview.postMessage({ type: 'updateData', json: jsonStr });
+				panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
+				panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
+			}
+			outputChannel.appendLine('[dataset-preview] Preview updated.');
+		} catch (err: unknown) {
+			const msg = err instanceof Error ? err.message : String(err);
+			outputChannel.appendLine(`[dataset-preview] Preview script error: ${msg}`);
+			if (!state.firstRunDone) {
+				panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Preview Error', true);
+			} else {
+				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
+				panel.webview.postMessage({ type: 'showError', text: msg });
+			}
+		} finally {
+			extra.reloadInProgress = false;
+		}
+	},
+
+	onDispose(filePath) {
+		const scriptProc = previewScriptProcesses.get(filePath);
+		if (scriptProc) { scriptProc.kill(); previewScriptProcesses.delete(filePath); }
+	},
+};
+
+// --- Unified open + watch ---
+
+async function openPreview(filePath: string, strategy: PreviewStrategy) {
+	const existing = panels.get(filePath);
+	if (existing) {
+		existing.dispose();
+		lastPreviewedFile = undefined;
+		return;
+	}
+	lastPreviewedFile = filePath;
+
+	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+	if (!workspaceFolder) {
+		vscode.window.showErrorMessage('No workspace folder found');
+		return;
+	}
+
+	const wsRoot = workspaceFolder.uri.fsPath;
+
+	try {
+		const config = await strategy.parse(filePath, wsRoot);
+
+		const vsConfig = vscode.workspace.getConfiguration('chart-preview');
+		const etlrRel = vsConfig.get<string>('etlrPath', '.venv/bin/etlr');
+		const command = `${etlrRel} ${config.etlArgs.join(' ')}`;
+
+		const panel = vscode.window.createWebviewPanel(
+			'chartPreview',
+			`Preview: ${config.fileName}`,
+			vscode.ViewColumn.Beside,
+			{ enableScripts: true, retainContextWhenHidden: true }
+		);
+
+		panels.set(filePath, panel);
+
+		panel.onDidDispose(() => {
+			panels.delete(filePath);
+			killWatchProcess(filePath);
+			strategy.onDispose?.(filePath);
+		});
+
+		panel.webview.onDidReceiveMessage((msg) => {
+			if (msg.type === 'retry') {
+				panel.webview.html = getLoadingHtml(command);
+				startWatchProcess(filePath, panel, wsRoot, config, command, strategy);
+			}
+		});
+
+		panel.webview.html = getLoadingHtml(command);
+
+		startWatchProcess(filePath, panel, wsRoot, config, command, strategy);
+	} catch (err: unknown) {
+		const msg = err instanceof Error ? err.message : String(err);
+		vscode.window.showErrorMessage(`Preview failed: ${msg}`);
+	}
+}
+
+function startWatchProcess(
+	filePath: string,
+	panel: vscode.WebviewPanel,
+	wsRoot: string,
+	config: PreviewConfig,
+	command: string,
+	strategy: PreviewStrategy,
+) {
+	killWatchProcess(filePath);
+
+	const vsConfig = vscode.workspace.getConfiguration('chart-preview');
+	const etlrRel = vsConfig.get<string>('etlrPath', '.venv/bin/etlr');
+	const etlrPath = path.resolve(wsRoot, etlrRel);
+
+	outputChannel.appendLine(`Starting watch: ${etlrPath} ${config.etlArgs.join(' ')}`);
+
+	const proc = spawn(etlrPath, config.etlArgs, {
+		cwd: wsRoot,
+		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
+	});
+
+	watchProcesses.set(filePath, proc);
+
+	const state: WatchState = {
+		command,
+		recentOutput: '',
+		firstRunDone: false,
+		cycleStart: Date.now(),
+		filePath,
+		wsRoot,
+	};
+
+	const handleOutput = (data: Buffer) => {
+		const text = data.toString();
+		state.recentOutput += text;
+		if (state.recentOutput.length > 4000) state.recentOutput = state.recentOutput.slice(-4000);
+		outputChannel.append(text);
+
+		// Stream logs to loading screen before first result
+		if (!state.firstRunDone) {
+			panel.webview.postMessage({ type: 'log', text });
+		}
+
+		// New watch cycle starting — reset output buffer
+		if (text.includes('--- Detecting which steps')) {
+			state.cycleStart = Date.now();
+			state.recentOutput = '';
+			if (state.firstRunDone) {
+				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
+			}
+		}
+
+		if (text.includes('--- Running')) {
+			if (state.firstRunDone) {
+				panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
+			}
+		}
+
+		// Universal sentinel printed by etlr after every successful watch cycle
+		if (text.includes('--- Dataset rebuild complete') || text.includes('All datasets up to date!')) {
+			strategy.doReload(panel, state, config);
+		}
+
+		// Detect errors
+		if (text.includes('FAILED') || text.includes('step_failed')) {
+			if (!state.firstRunDone) {
+				panel.webview.html = getErrorHtml(state.recentOutput, 'Preview Error', true);
+			} else {
+				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
+				panel.webview.postMessage({ type: 'showError', text: state.recentOutput });
+			}
+		}
+
+		// Strategy-specific output handling
+		strategy.handleOutput?.(text, state, panel);
+	};
+
+	proc.stdout.on('data', handleOutput);
+	proc.stderr.on('data', handleOutput);
+
+	proc.on('error', (err: Error) => {
+		watchProcesses.delete(filePath);
+		outputChannel.appendLine(`Watch process error: ${err.message}`);
+		panel.webview.html = getErrorHtml(
+			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`,
+			'Preview Error',
+			true
+		);
+	});
+
+	proc.on('close', (code: number | null) => {
+		watchProcesses.delete(filePath);
+		outputChannel.appendLine(`Watch process exited with code ${code}`);
+		if (code !== 0 && code !== null) {
+			if (!state.firstRunDone) {
+				panel.webview.html = getErrorHtml(
+					`etlr exited with code ${code}.\n\n${state.recentOutput}`,
+					'Preview Error',
+					true
+				);
+			} else {
+				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
+			}
+		}
+	});
+}
+
+// --- HTML generators ---
 
 function chartIframeDoc(grapherSrc: string, containerName: string): string {
 	// Separate HTML document for the chart — loaded inside an iframe so each
@@ -286,7 +697,7 @@ body {
 </html>`;
 }
 
-function getErrorHtml(message: string, title = 'Chart Preview Error', retryable = false): string {
+function getErrorHtml(message: string, title = 'Preview Error', retryable = false): string {
 	const escaped = message
 		.replace(/&/g, '&amp;')
 		.replace(/</g, '&lt;')
@@ -328,526 +739,6 @@ function retry() { vscode.postMessage({ type: 'retry' }); }
 </script>
 </body>
 </html>`;
-}
-
-// --- Core logic ---
-
-async function openPreview(filePath: string) {
-	const existing = panels.get(filePath);
-	if (existing) {
-		existing.dispose();
-		lastPreviewedFile = undefined;
-		return;
-	}
-	lastPreviewedFile = filePath;
-
-	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-	if (!workspaceFolder) {
-		vscode.window.showErrorMessage('No workspace folder found');
-		return;
-	}
-
-	const wsRoot = workspaceFolder.uri.fsPath;
-	const fileName = path.basename(filePath).replace(/\.(chart\.yml|config\.yml|py)$/, '');
-
-	try {
-		const branch = await getGitBranch(wsRoot);
-		const containerName = getContainerName(branch);
-
-		let stepUri: string;
-		let stagingUrl: string;
-		let isMdim: boolean;
-		let etlArgs: string[];
-
-		if (filePath.includes('/export/multidim/')) {
-			// Export/multidim step
-			const parsed = parseExportMultidim(filePath, wsRoot);
-			stepUri = parsed.stepUri;
-			stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
-			isMdim = true;
-			etlArgs = [stepUri, '--export', '--watch', '--private'];
-		} else {
-			// Graph step (.chart.yml)
-			const parsed = await parseChartYml(filePath, wsRoot);
-			stepUri = parsed.stepUri;
-			const slug = parsed.slug;
-			const catalogPath = parsed.catalogPath;
-			isMdim = slug.includes('#');
-			stagingUrl = isMdim && catalogPath
-				? `http://${containerName}/admin/grapher/${encodeURIComponent(catalogPath)}`
-				: `http://${containerName}/grapher/${slug}`;
-			etlArgs = [stepUri, '--graph', '--graph-push', '--watch', '--private'];
-		}
-
-		const panel = vscode.window.createWebviewPanel(
-			'chartPreview',
-			`Preview: ${fileName}`,
-			vscode.ViewColumn.Beside,
-			{ enableScripts: true, retainContextWhenHidden: true }
-		);
-
-		panels.set(filePath, panel);
-
-		panel.onDidDispose(() => {
-			panels.delete(filePath);
-			killWatchProcess(filePath);
-		});
-
-		const config = vscode.workspace.getConfiguration('chart-preview');
-		const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-		const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-		panel.webview.html = getLoadingHtml(command);
-
-		startWatchProcess(filePath, panel, wsRoot, stepUri, stagingUrl, containerName, isMdim, etlArgs);
-	} catch (err: unknown) {
-		const msg = err instanceof Error ? err.message : String(err);
-		vscode.window.showErrorMessage(`Chart preview failed: ${msg}`);
-	}
-}
-
-function startWatchProcess(
-	filePath: string,
-	panel: vscode.WebviewPanel,
-	wsRoot: string,
-	stepUri: string,
-	stagingUrl: string,
-	containerName: string,
-	isMdim: boolean,
-	etlArgs: string[],
-) {
-	killWatchProcess(filePath);
-
-	const config = vscode.workspace.getConfiguration('chart-preview');
-	const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-	const etlrPath = path.resolve(wsRoot, etlrRel);
-
-	const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-	outputChannel.appendLine(`Starting watch: ${etlrPath} ${etlArgs.join(' ')}`);
-
-	const proc = spawn(etlrPath, etlArgs, {
-		cwd: wsRoot,
-		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
-	});
-
-	watchProcesses.set(filePath, proc);
-
-	const info: InfoBarData = { command, stagingUrl, stepUri, status: 'Running...' };
-
-	let recentOutput = '';
-	let firstRunDone = false;
-	let cycleStart = Date.now();
-	let stepsRunning = false;  // true after "--- Running", false after step OK
-	let detectingDirty = false;  // true after "Detecting which steps", false after OK
-	let pendingReloadTimer: ReturnType<typeof setTimeout> | null = null;
-
-	const doReload = () => {
-		const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
-		info.status = 'OK';
-		info.latency = `${elapsed}s`;
-
-		if (!firstRunDone) {
-			const bustUrl = `${stagingUrl}?_t=${Date.now()}`;
-			panel.webview.html = generateEmbedHtml(bustUrl, containerName, info, isMdim);
-			firstRunDone = true;
-		} else {
-			panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
-			panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
-			panel.webview.postMessage({ type: 'reload', src: `${stagingUrl}?_t=${Date.now()}` });
-		}
-		outputChannel.appendLine('[chart-preview] Chart updated, refreshing preview.');
-	};
-
-	const handleOutput = (data: Buffer) => {
-		const text = data.toString();
-		recentOutput += text;
-		// Keep only the last 4000 chars for error display
-		if (recentOutput.length > 4000) {
-			recentOutput = recentOutput.slice(-4000);
-		}
-		outputChannel.append(text);
-
-		// Stream logs to loading screen before chart is ready
-		if (!firstRunDone) {
-			panel.webview.postMessage({ type: 'log', text });
-		}
-
-		// Track cycle phases:
-		// 1. "--- Detecting which steps need rebuilding..." → dirty check starts
-		// 2. "OK (0.6s)" → dirty check done (ignore this OK)
-		// 3a. "--- Running N steps..." → steps are executing
-		// 3b. "--- All datasets up to date!" → nothing to run
-		// 4. "OK (1.5s)" after "--- Running" → step completed
-
-		if (text.includes('Detecting which steps need rebuilding')) {
-			cycleStart = Date.now();
-			stepsRunning = false;
-			detectingDirty = true;
-			if (firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
-			}
-		}
-
-		if (text.includes('--- Running')) {
-			stepsRunning = true;
-			detectingDirty = false;
-			// Cancel pending reload — steps are about to run
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			if (firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
-			}
-		}
-
-		// "All datasets up to date" — nothing changed
-		if (text.includes('All datasets up to date!')) {
-			stepsRunning = false;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			doReload();
-		}
-
-		// OK after dirty detection — might mean "all up to date" (watch mode doesn't
-		// always print "All datasets up to date!"). Schedule a reload after a short
-		// delay; cancel if "--- Running" arrives before the timer fires.
-		if (detectingDirty && !stepsRunning && /OK \(\d/.test(text)) {
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); }
-			pendingReloadTimer = setTimeout(() => { pendingReloadTimer = null; doReload(); }, 500);
-		}
-
-		// OK after steps ran — this is the real completion
-		if (stepsRunning && /OK \(\d/.test(text)) {
-			stepsRunning = false;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			doReload();
-		}
-
-		// Detect errors
-		if (text.includes('FAILED') || text.includes('step_failed')) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(recentOutput);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: recentOutput });
-			}
-		}
-
-		// Helpful message for missing data dependencies
-		if (text.includes('Indicator not found in database') || text.includes('not found in database')) {
-			panel.webview.html = getErrorHtml(
-				'Data dependencies not found on staging server.\n\n'
-				+ 'Run the grapher step for the data dependency first, e.g.:\n'
-				+ '  .venv/bin/etlr <data-dependency> --grapher --private\n\n'
-				+ 'Then re-open the chart preview.\n\n'
-				+ '--- etlr output ---\n' + recentOutput
-			);
-		}
-	};
-
-	proc.stdout.on('data', handleOutput);
-	proc.stderr.on('data', handleOutput);
-
-	proc.on('error', (err: Error) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Watch process error: ${err.message}`);
-		panel.webview.html = getErrorHtml(
-			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`
-		);
-	});
-
-	proc.on('close', (code: number | null) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Watch process exited with code ${code}`);
-		if (code !== 0 && code !== null) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(
-					`etlr exited with code ${code}.\n\n${recentOutput}`
-				);
-			}
-			// Restart watch after failure — etlr crashes on step errors,
-			// killing the watch loop. Restart so the next file save triggers
-			// a fresh run.
-			outputChannel.appendLine('[chart-preview] Restarting watch in 2s...');
-			setTimeout(() => {
-				if (panels.has(filePath)) {
-					startWatchProcess(filePath, panel, wsRoot, stepUri, stagingUrl, containerName, isMdim, etlArgs);
-				}
-			}, 2000);
-		}
-	});
-}
-
-function killWatchProcess(filePath: string) {
-	const proc = watchProcesses.get(filePath);
-	if (proc) {
-		proc.kill();
-		watchProcesses.delete(filePath);
-	}
-}
-
-// --- Dataset Preview ---
-
-/**
- * Parse an ETL data step file path into its components.
- * e.g. /path/to/etl/steps/data/garden/biodiversity/2025-04-07/cherry_blossom.py
- *   → { channel: "garden", namespace: "biodiversity", version: "2025-04-07", shortName: "cherry_blossom" }
- */
-function parseDataStepPath(filePath: string, wsRoot: string): {
-	stepUri: string;
-	channel: string;
-	namespace: string;
-	version: string;
-	shortName: string;
-	relStepPath: string;
-} {
-	const dataDir = path.join(wsRoot, 'etl', 'steps', 'data');
-	const rel = path.relative(dataDir, filePath).replace(/\.py$/, '');
-	const parts = rel.split(path.sep);
-	if (parts.length < 4) {
-		throw new Error(`Cannot parse data step path: ${filePath}`);
-	}
-	const [channel, namespace, version, shortName] = parts;
-	return {
-		stepUri: `data://${channel}/${namespace}/${version}/${shortName}`,
-		channel,
-		namespace,
-		version,
-		shortName,
-		relStepPath: `etl/steps/data/${rel}.py`,
-	};
-}
-
-// Track in-flight preview script processes so we can kill them on panel close / new run
-const previewScriptProcesses = new Map<string, ChildProcess>();
-
-/**
- * Run the Python generate_preview.py script and return the JSON payload.
- * Kills any previous in-flight script for the same filePath.
- * Times out after 120s to avoid zombies on huge datasets.
- */
-function runPreviewScript(wsRoot: string, stepPath: string, filePath: string): Promise<string> {
-	// Kill any previous in-flight script for this panel
-	const prev = previewScriptProcesses.get(filePath);
-	if (prev) { prev.kill(); previewScriptProcesses.delete(filePath); }
-
-	return new Promise((resolve, reject) => {
-		const config = vscode.workspace.getConfiguration('chart-preview');
-		const pythonRel = config.get<string>('pythonPath', '.venv/bin/python');
-		const pythonPath = path.resolve(wsRoot, pythonRel);
-		const scriptPath = path.join(wsRoot, 'vscode_extensions', 'chart-preview', 'generate_preview.py');
-
-		const proc = spawn(pythonPath, [scriptPath, stepPath, '--json'], { cwd: wsRoot });
-		previewScriptProcesses.set(filePath, proc);
-
-		const timeout = setTimeout(() => {
-			proc.kill();
-			previewScriptProcesses.delete(filePath);
-			reject(new Error(`Preview script timed out after 10 minutes.\n\nThe dataset may be too large to preview quickly.`));
-		}, 600_000);
-
-		let stdout = '';
-		let stderr = '';
-		proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
-		proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
-		proc.on('close', (code) => {
-			clearTimeout(timeout);
-			previewScriptProcesses.delete(filePath);
-			if (code === 0) {
-				// Strip any leading log/warning lines (e.g. structlog warnings on master branch)
-				// and extract only the JSON line.
-				const jsonLine = stdout.split('\n').find(l => l.trimStart().startsWith('{'));
-				resolve(jsonLine ?? stdout);
-			} else if (code !== null) {  // null = killed intentionally, ignore
-				reject(new Error(`Preview script failed (code ${code}):\n${stderr}`));
-			}
-		});
-		proc.on('error', (err) => { clearTimeout(timeout); reject(err); });
-	});
-}
-
-async function openDatasetPreview(filePath: string) {
-	const existing = panels.get(filePath);
-	if (existing) {
-		existing.dispose();
-		lastPreviewedFile = undefined;
-		return;
-	}
-	lastPreviewedFile = filePath;
-
-	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-	if (!workspaceFolder) {
-		vscode.window.showErrorMessage('No workspace folder found');
-		return;
-	}
-
-	const wsRoot = workspaceFolder.uri.fsPath;
-
-	try {
-		const parsed = parseDataStepPath(filePath, wsRoot);
-		const fileName = parsed.shortName;
-
-		const config = vscode.workspace.getConfiguration('chart-preview');
-		const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-		const etlArgs = [parsed.stepUri, '--watch', '--private'];
-		const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-		const panel = vscode.window.createWebviewPanel(
-			'datasetPreview',
-			`Dataset: ${fileName}`,
-			vscode.ViewColumn.Beside,
-			{ enableScripts: true, retainContextWhenHidden: true }
-		);
-
-		panels.set(filePath, panel);
-
-		panel.onDidDispose(() => {
-			panels.delete(filePath);
-			killWatchProcess(filePath);
-			const scriptProc = previewScriptProcesses.get(filePath);
-			if (scriptProc) { scriptProc.kill(); previewScriptProcesses.delete(filePath); }
-		});
-
-		panel.webview.onDidReceiveMessage((msg) => {
-			if (msg.type === 'retry') {
-				panel.webview.html = getLoadingHtml(command);
-				startDatasetWatchProcess(filePath, panel, wsRoot, parsed, etlArgs);
-			}
-		});
-
-		panel.webview.html = getLoadingHtml(command);
-
-		startDatasetWatchProcess(filePath, panel, wsRoot, parsed, etlArgs);
-	} catch (err: unknown) {
-		const msg = err instanceof Error ? err.message : String(err);
-		vscode.window.showErrorMessage(`Dataset preview failed: ${msg}`);
-	}
-}
-
-function startDatasetWatchProcess(
-	filePath: string,
-	panel: vscode.WebviewPanel,
-	wsRoot: string,
-	parsed: ReturnType<typeof parseDataStepPath>,
-	etlArgs: string[],
-) {
-	killWatchProcess(filePath);
-
-	const config = vscode.workspace.getConfiguration('chart-preview');
-	const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-	const etlrPath = path.resolve(wsRoot, etlrRel);
-
-	const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-	outputChannel.appendLine(`Starting dataset watch: ${etlrPath} ${etlArgs.join(' ')}`);
-
-	const proc = spawn(etlrPath, etlArgs, {
-		cwd: wsRoot,
-		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
-	});
-
-	watchProcesses.set(filePath, proc);
-
-	let recentOutput = '';
-	let firstRunDone = false;
-	let reloadInProgress = false;
-	let cycleStart = Date.now();
-
-	const doReload = async () => {
-		if (reloadInProgress) return;
-		reloadInProgress = true;
-		const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
-
-		try {
-			outputChannel.appendLine('[dataset-preview] Rebuild complete, generating preview...');
-			const jsonStr = await runPreviewScript(wsRoot, parsed.relStepPath, filePath);
-
-			if (!firstRunDone) {
-				panel.webview.html = getDatasetPreviewHtml(jsonStr, command, elapsed);
-				firstRunDone = true;
-			} else {
-				panel.webview.postMessage({ type: 'updateData', json: jsonStr });
-				panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
-				panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
-			}
-			outputChannel.appendLine('[dataset-preview] Preview updated.');
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : String(err);
-			outputChannel.appendLine(`[dataset-preview] Preview script error: ${msg}`);
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Dataset Preview Error', true);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: msg });
-			}
-		} finally {
-			reloadInProgress = false;
-		}
-	};
-
-	const handleOutput = (data: Buffer) => {
-		const text = data.toString();
-		recentOutput += text;
-		if (recentOutput.length > 4000) recentOutput = recentOutput.slice(-4000);
-		outputChannel.append(text);
-
-		if (!firstRunDone) {
-			panel.webview.postMessage({ type: 'log', text });
-		}
-
-		if (text.includes('--- Detecting which steps')) {
-			cycleStart = Date.now();
-			recentOutput = '';  // Reset so errors only show the current cycle's output
-			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
-		}
-
-		if (text.includes('--- Running')) {
-			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
-		}
-
-		// Sentinel printed by etlr after every successful watch cycle (both "up to date" and actual rebuild)
-		if (text.includes('--- Dataset rebuild complete')) {
-			doReload();
-		}
-
-		if (text.includes('FAILED') || text.includes('step_failed')) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(recentOutput, 'Dataset Preview Error', true);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: recentOutput });
-			}
-		}
-	};
-
-	proc.stdout.on('data', handleOutput);
-	proc.stderr.on('data', handleOutput);
-
-	proc.on('error', (err: Error) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Dataset watch process error: ${err.message}`);
-		panel.webview.html = getErrorHtml(
-			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`,
-			'Dataset Preview Error'
-		);
-	});
-
-	proc.on('close', (code: number | null) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Dataset watch process exited with code ${code}`);
-		if (code !== 0 && code !== null) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(
-					`etlr exited with code ${code}.\n\n${recentOutput}`,
-					'Dataset Preview Error',
-					true
-				);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-			}
-		}
-	});
 }
 
 function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string): string {

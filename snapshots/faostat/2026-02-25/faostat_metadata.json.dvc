@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: Metadata and identifiers
+    description: Metadata and identifiers used in FAOSTAT datasets.
+    citation_full: Food and Agriculture Organization of the United Nations (2026).
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data
+    date_accessed: '2026-02-25'
+    date_published: '2026-02-25'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: e5dd9ca823c39183d71f5671b5b4cc7e
+    size: 6042531
+    path: faostat_metadata.json

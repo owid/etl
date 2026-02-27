@@ -745,7 +745,7 @@ class TablesAPI:
         )
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=len(results),
             base_url=self.catalog_url,
