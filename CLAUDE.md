@@ -147,6 +147,19 @@ uv add package_name
 uv remove package_name
 ```
 
+## VSCode Extensions
+
+Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
+
+```bash
+cd vscode_extensions/<name>
+npm run compile
+npx @vscode/vsce package --out install/<name>-<version>.vsix
+code --install-extension install/<name>-<version>.vsix --force
+```
+
+Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
+
 ## Extended Documentation
 
 See `.claude/docs/` for:

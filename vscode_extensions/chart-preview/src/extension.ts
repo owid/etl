@@ -21,12 +21,12 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		const filePath = editor.document.uri.fsPath;
-		if (filePath.includes('/steps/data/') && filePath.endsWith('.py')) {
+		if (filePath.includes('/steps/data/') && (filePath.endsWith('.py') || filePath.endsWith('.meta.yml'))) {
 			openPreview(filePath, datasetStrategy);
 		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
 			openPreview(filePath, chartStrategy);
 		} else {
-			vscode.window.showErrorMessage('Not a previewable file (expected a garden .py step or .chart.yml)');
+			vscode.window.showErrorMessage('Not a previewable file (expected a data step .py/.meta.yml or .chart.yml)');
 		}
 	});
 
@@ -163,7 +163,7 @@ function parseDataStepPath(filePath: string, wsRoot: string): {
 	relStepPath: string;
 } {
 	const dataDir = path.join(wsRoot, 'etl', 'steps', 'data');
-	const rel = path.relative(dataDir, filePath).replace(/\.py$/, '');
+	const rel = path.relative(dataDir, filePath).replace(/\.(py|meta\.yml)$/, '');
 	const parts = rel.split(path.sep);
 	if (parts.length < 4) {
 		throw new Error(`Cannot parse data step path: ${filePath}`);
@@ -309,10 +309,9 @@ const chartStrategy: PreviewStrategy = {
 				'Data dependencies not found on staging server.\n\n'
 				+ 'Run the grapher step for the data dependency first, e.g.:\n'
 				+ '  .venv/bin/etlr <data-dependency> --grapher --private\n\n'
-				+ 'Then retry or re-open the chart preview.\n\n'
+				+ 'Then re-open the chart preview.\n\n'
 				+ '--- etlr output ---\n' + state.recentOutput,
-				'Preview Error',
-				true
+				'Preview Error'
 			);
 		}
 	},
@@ -323,16 +322,21 @@ const chartStrategy: PreviewStrategy = {
 interface DatasetExtra {
 	parsed: ReturnType<typeof parseDataStepPath>;
 	reloadInProgress: boolean;
+	stagingUrl: string;
 }
 
 const datasetStrategy: PreviewStrategy = {
-	parse(filePath, wsRoot) {
+	async parse(filePath, wsRoot) {
 		const parsed = parseDataStepPath(filePath, wsRoot);
+		const branch = await getGitBranch(wsRoot);
+		const containerName = getContainerName(branch);
+		const isGrapher = parsed.channel === 'grapher';
+		const stagingUrl = isGrapher ? `http://${containerName}/admin/datasets` : '';
 		return {
 			stepUri: parsed.stepUri,
 			etlArgs: [parsed.stepUri, '--watch', '--private'],
 			fileName: parsed.shortName,
-			extra: { parsed, reloadInProgress: false } as DatasetExtra,
+			extra: { parsed, reloadInProgress: false, stagingUrl } as DatasetExtra,
 		};
 	},
 
@@ -347,7 +351,7 @@ const datasetStrategy: PreviewStrategy = {
 			const jsonStr = await runPreviewScript(state.wsRoot, extra.parsed.relStepPath, state.filePath);
 
 			if (!state.firstRunDone) {
-				panel.webview.html = getDatasetPreviewHtml(jsonStr, state.command, elapsed);
+				panel.webview.html = getDatasetPreviewHtml(jsonStr, state.command, elapsed, extra.stagingUrl);
 				state.firstRunDone = true;
 			} else {
 				panel.webview.postMessage({ type: 'updateData', json: jsonStr });
@@ -358,12 +362,8 @@ const datasetStrategy: PreviewStrategy = {
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : String(err);
 			outputChannel.appendLine(`[dataset-preview] Preview script error: ${msg}`);
-			if (!state.firstRunDone) {
-				panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Preview Error', true);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: msg });
-			}
+			state.firstRunDone = false;
+			panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Preview Error');
 		} finally {
 			extra.reloadInProgress = false;
 		}
@@ -416,13 +416,6 @@ async function openPreview(filePath: string, strategy: PreviewStrategy) {
 			strategy.onDispose?.(filePath);
 		});
 
-		panel.webview.onDidReceiveMessage((msg) => {
-			if (msg.type === 'retry') {
-				panel.webview.html = getLoadingHtml(command);
-				startWatchProcess(filePath, panel, wsRoot, config, command, strategy);
-			}
-		});
-
 		panel.webview.html = getLoadingHtml(command);
 
 		startWatchProcess(filePath, panel, wsRoot, config, command, strategy);
@@ -466,6 +459,16 @@ function startWatchProcess(
 
 	const handleOutput = (data: Buffer) => {
 		const text = data.toString();
+
+		// New watch cycle — reset buffer before appending so traceback is preserved
+		if (text.includes('--- Detecting which steps')) {
+			state.recentOutput = '';
+			state.cycleStart = Date.now();
+			if (state.firstRunDone) {
+				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
+			}
+		}
+
 		state.recentOutput += text;
 		if (state.recentOutput.length > 4000) state.recentOutput = state.recentOutput.slice(-4000);
 		outputChannel.append(text);
@@ -473,15 +476,6 @@ function startWatchProcess(
 		// Stream logs to loading screen before first result
 		if (!state.firstRunDone) {
 			panel.webview.postMessage({ type: 'log', text });
-		}
-
-		// New watch cycle starting — reset output buffer
-		if (text.includes('--- Detecting which steps')) {
-			state.cycleStart = Date.now();
-			state.recentOutput = '';
-			if (state.firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
-			}
 		}
 
 		if (text.includes('--- Running')) {
@@ -495,14 +489,10 @@ function startWatchProcess(
 			strategy.doReload(panel, state, config);
 		}
 
-		// Detect errors
+		// Detect errors — always replace the full page so we get the traceback + Retry
 		if (text.includes('FAILED') || text.includes('step_failed')) {
-			if (!state.firstRunDone) {
-				panel.webview.html = getErrorHtml(state.recentOutput, 'Preview Error', true);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: state.recentOutput });
-			}
+			state.firstRunDone = false;
+			panel.webview.html = getErrorHtml(state.recentOutput, 'Preview Error');
 		}
 
 		// Strategy-specific output handling
@@ -517,8 +507,7 @@ function startWatchProcess(
 		outputChannel.appendLine(`Watch process error: ${err.message}`);
 		panel.webview.html = getErrorHtml(
 			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`,
-			'Preview Error',
-			true
+			'Preview Error'
 		);
 	});
 
@@ -526,15 +515,11 @@ function startWatchProcess(
 		watchProcesses.delete(filePath);
 		outputChannel.appendLine(`Watch process exited with code ${code}`);
 		if (code !== 0 && code !== null) {
-			if (!state.firstRunDone) {
-				panel.webview.html = getErrorHtml(
-					`etlr exited with code ${code}.\n\n${state.recentOutput}`,
-					'Preview Error',
-					true
-				);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-			}
+			state.firstRunDone = false;
+			panel.webview.html = getErrorHtml(
+				`etlr exited with code ${code}.\n\n${state.recentOutput}`,
+				'Preview Error'
+			);
 		}
 	});
 }
@@ -577,18 +562,6 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
             overflow-x: auto;
         }
         iframe { flex: 1; width: 100%; border: none; min-height: 0; }
-        #error-panel {
-            display: none; flex: 1; padding: 20px; overflow: auto;
-            font-family: var(--vscode-editor-font-family, monospace);
-            font-size: 12px; color: var(--vscode-errorForeground, #f44);
-            background: var(--vscode-editor-background);
-        }
-        #error-panel pre {
-            white-space: pre-wrap; word-wrap: break-word;
-            background: var(--vscode-textBlockQuote-background, #1e1e1e);
-            padding: 12px; border-radius: 4px;
-            color: var(--vscode-editor-foreground);
-        }
         #info-bar .row { display: flex; gap: 8px; white-space: nowrap; }
         #info-bar .label { color: var(--vscode-foreground, #ccc); font-weight: 600; min-width: 70px; }
         #info-bar .status-ok { color: var(--vscode-testing-iconPassed, #4ec94e); }
@@ -606,7 +579,6 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
         <div class="row"><span class="label">Latency</span> <span id="latency">${info.latency || '-'}</span></div>
     </div>
     ${iframeTag}
-    <div id="error-panel"><h3>Step Failed</h3><pre id="error-output"></pre></div>
     <script>
         const containerName = '${containerName}';
         const isMdim = ${isMdim};
@@ -620,14 +592,7 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
             if (msg.type === 'latency') {
                 document.getElementById('latency').textContent = msg.text;
             }
-            if (msg.type === 'showError') {
-                document.getElementById('chart-frame').style.display = 'none';
-                const ep = document.getElementById('error-panel');
-                ep.style.display = 'block';
-                document.getElementById('error-output').textContent = msg.text;
-            }
             if (msg.type === 'reload') {
-                document.getElementById('error-panel').style.display = 'none';
                 const frame = document.getElementById('chart-frame');
                 frame.style.display = '';
                 if (isMdim) {
@@ -697,7 +662,7 @@ body {
 </html>`;
 }
 
-function getErrorHtml(message: string, title = 'Preview Error', retryable = false): string {
+function getErrorHtml(message: string, title = 'Preview Error'): string {
 	const escaped = message
 		.replace(/&/g, '&amp;')
 		.replace(/</g, '&lt;')
@@ -717,31 +682,24 @@ pre {
 	padding: 12px; border-radius: 4px;
 	color: var(--vscode-editor-foreground);
 }
-button {
-	margin-top: 12px;
-	padding: 6px 16px;
-	background: var(--vscode-button-background, #0e639c);
-	color: var(--vscode-button-foreground, #fff);
-	border: none; border-radius: 3px; cursor: pointer; font-size: 13px;
-}
-button:hover { background: var(--vscode-button-hoverBackground, #1177bb); }
 </style>
 </head>
 <body>
 <h3>${title}</h3>
 <pre>${escaped}</pre>
-${retryable ? '<button onclick="retry()">Retry</button>' : ''}
 <script>
-${retryable ? `
-const vscode = acquireVsCodeApi();
-function retry() { vscode.postMessage({ type: 'retry' }); }
-` : ''}
+window.addEventListener('message', (e) => {
+    if (e.data.type === 'status' || e.data.type === 'log') {
+        document.querySelector('h3').textContent = 'Rebuilding...';
+        document.querySelector('h3').style.color = 'var(--vscode-foreground)';
+    }
+});
 </script>
 </body>
 </html>`;
 }
 
-function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string): string {
+function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string, stagingUrl: string = ''): string {
 	return `<!DOCTYPE html>
 <html>
 <head>
@@ -795,22 +753,29 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
     }
     .quality-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 
-    #entity-bar {
+    #filter-bar {
         flex-shrink: 0; padding: 6px 16px;
         background: var(--vscode-editor-background, #1e1e1e);
         border-bottom: 1px solid var(--vscode-panel-border, #2a2a2a);
-        display: flex; align-items: center; gap: 8px;
+        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
         font-size: 11px; color: var(--vscode-descriptionForeground, #888);
     }
-    #entity-bar.hidden { display: none; }
-    #entity-select {
+    .filter-group { display: flex; align-items: center; gap: 4px; }
+    #filter-bar select {
         background: var(--vscode-input-background, #333);
         color: var(--vscode-input-foreground, #ccc);
         border: 1px solid var(--vscode-input-border, #555);
         border-radius: 3px; padding: 2px 6px;
         font-size: 11px; font-family: inherit; max-width: 250px;
     }
-    #entity-select:focus { outline: 1px solid var(--vscode-focusBorder, #3794ff); border-color: var(--vscode-focusBorder, #3794ff); }
+    #filter-bar select:focus, #filter-bar input:focus { outline: 1px solid var(--vscode-focusBorder, #3794ff); border-color: var(--vscode-focusBorder, #3794ff); }
+    #search-input {
+        background: var(--vscode-input-background, #333);
+        color: var(--vscode-input-foreground, #ccc);
+        border: 1px solid var(--vscode-input-border, #555);
+        border-radius: 3px; padding: 2px 6px;
+        font-size: 11px; font-family: inherit; min-width: 160px;
+    }
     #random-btn {
         background: var(--vscode-input-background, #333);
         color: var(--vscode-descriptionForeground, #aaa);
@@ -819,19 +784,6 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
         font-size: 11px; font-family: inherit; cursor: pointer;
     }
     #random-btn:hover { background: var(--vscode-list-hoverBackground, #3c3c3c); color: var(--vscode-foreground, #ccc); }
-
-    #error-panel {
-        display: none; flex: 1; padding: 20px; overflow: auto;
-        font-family: var(--vscode-editor-font-family, monospace);
-        font-size: 12px; color: var(--vscode-errorForeground, #f44);
-        background: var(--vscode-editor-background);
-    }
-    #error-panel pre {
-        white-space: pre-wrap; word-wrap: break-word;
-        background: var(--vscode-textBlockQuote-background, #1e1e1e);
-        padding: 12px; border-radius: 4px;
-        color: var(--vscode-editor-foreground);
-    }
 
     #cards {
         flex: 1; overflow-y: auto; padding: 16px;
@@ -903,20 +855,25 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
 <div id="info-bar"></div>
 <div id="table-tabs" class="hidden"></div>
 <div id="summary"></div>
-<div id="entity-bar" class="hidden">
-    <label for="entity-select">Entity:</label>
-    <select id="entity-select"></select>
-    <button id="random-btn" onclick="randomizeEntity()">Shuffle</button>
+<div id="filter-bar">
+    <div class="filter-group"><input id="search-input" type="text" placeholder="Filter indicators..." oninput="renderCards(DATA.tables[activeTable])" /></div>
+    <div class="filter-group" id="dim-filters"></div>
+    <div class="filter-group" id="entity-group" style="display:none">
+        <label for="entity-select">Entity:</label>
+        <select id="entity-select"></select>
+        <button id="random-btn" onclick="randomizeEntity()">Shuffle</button>
+    </div>
 </div>
 <div id="cards"></div>
-<div id="error-panel"><h3>Step Failed</h3><pre id="error-output"></pre></div>
 
 <script>
 let DATA = ${jsonStr};
 let activeTable = 0;
 let selectedEntity = null;
+let selectedDimValues = {};  // { dimName: selectedValue }
 const COMMAND = ${JSON.stringify(command)};
 const LATENCY = ${JSON.stringify(latency)};
+const STAGING_URL = ${JSON.stringify(stagingUrl)};
 
 const vscode = acquireVsCodeApi();
 
@@ -941,12 +898,6 @@ function init() {
             const el = document.getElementById('latency');
             if (el) { el.textContent = msg.text; }
         }
-        if (msg.type === 'showError') {
-            document.getElementById('cards').style.display = 'none';
-            const ep = document.getElementById('error-panel');
-            ep.style.display = 'block';
-            document.getElementById('error-output').textContent = msg.text;
-        }
     });
 }
 
@@ -959,6 +910,7 @@ function renderInfoBar() {
         '<div class="row"><span class="label">Dataset</span> <span class="value">' + (d.title || d.short_name) + '</span></div>' +
         '<div class="row"><span class="label">Tables</span> <span class="value">' + d.n_tables + ' table' + (d.n_tables > 1 ? 's' : '') + ' \\u00b7 ' + totalIndicators + ' indicator' + (totalIndicators > 1 ? 's' : '') + ' \\u00b7 ' + totalRows.toLocaleString() + ' rows</span></div>' +
         '<div class="row"><span class="label">Command</span> <span class="value">' + COMMAND + '</span></div>' +
+        (STAGING_URL ? '<div class="row"><span class="label">Staging</span> <span><a href="' + STAGING_URL + '" style="color:var(--vscode-textLink-foreground,#3794ff);text-decoration:none">' + STAGING_URL + '</a></span></div>' : '') +
         '<div class="row"><span class="label">Status</span> <span id="status" class="status-ok">OK</span></div>' +
         '<div class="row"><span class="label">Latency</span> <span id="latency">' + LATENCY + 's</span></div>';
 }
@@ -978,11 +930,19 @@ function switchTab(idx) {
     renderTable(idx);
 }
 
+function getCurrentDimKey(table) {
+    var extraDims = table.extra_dimensions || {};
+    var dimNames = Object.keys(extraDims).sort();
+    if (dimNames.length === 0) return '_';
+    return dimNames.map(function(d) { return String(selectedDimValues[d] || extraDims[d][0]); }).join('|');
+}
+
 function getEntitiesForTable(table) {
+    var dimKey = getCurrentDimKey(table);
     var entities = new Set();
     for (var ind of table.indicators) {
-        if (ind.sparkline_by_entity) {
-            for (var name of Object.keys(ind.sparkline_by_entity)) { entities.add(name); }
+        if (ind.sparkline_by_entity && ind.sparkline_by_entity[dimKey]) {
+            for (var name of Object.keys(ind.sparkline_by_entity[dimKey])) { entities.add(name); }
         }
     }
     return Array.from(entities).sort();
@@ -996,13 +956,72 @@ function pickRandomEntity(table) {
     return entities[arr[0] % entities.length];
 }
 
-function renderEntitySelector(table) {
-    var bar = document.getElementById('entity-bar');
-    var select = document.getElementById('entity-select');
+function renderDimensionSelectors(table) {
+    var container = document.getElementById('dim-filters');
+    var extraDims = table.extra_dimensions || {};
+    var dimNames = Object.keys(extraDims).sort();
+    if (dimNames.length === 0) { container.innerHTML = ''; return; }
+
+    // Initialize selectedDimValues with first value for any new dimensions
+    for (var d of dimNames) {
+        if (!selectedDimValues[d] && extraDims[d].length > 0) {
+            selectedDimValues[d] = String(extraDims[d][0]);
+        }
+    }
+
+    var html = '';
+    for (var dim of dimNames) {
+        var label = dim.replace(/_/g, ' ');
+        html += '<label>' + escHtml(label) + ':</label>';
+        html += '<select data-dim="' + escHtml(dim) + '">';
+        for (var val of extraDims[dim]) {
+            var sv = String(val);
+            var sel = sv === String(selectedDimValues[dim]) ? ' selected' : '';
+            html += '<option value="' + escHtml(sv) + '"' + sel + '>' + escHtml(sv) + '</option>';
+        }
+        html += '</select>';
+    }
+    container.innerHTML = html;
+
+    // Wire change handlers
+    container.querySelectorAll('select').forEach(function(sel) {
+        sel.onchange = function() {
+            selectedDimValues[sel.dataset.dim] = sel.value;
+            // Re-pick entity since available entities may differ per dimension combo
+            selectedEntity = pickRandomEntity(DATA.tables[activeTable]);
+            renderEntitySelector(DATA.tables[activeTable]);
+            renderCards(DATA.tables[activeTable]);
+        };
+    });
+}
+
+function renderFilterBar(table) {
+    renderDimensionSelectors(table);
+
     var entities = getEntitiesForTable(table);
-    if (entities.length === 0) { bar.classList.add('hidden'); return; }
-    bar.classList.remove('hidden');
-    if (!selectedEntity) { selectedEntity = pickRandomEntity(table); }
+    var entityGroup = document.getElementById('entity-group');
+    if (entities.length === 0) { entityGroup.style.display = 'none'; return; }
+    entityGroup.style.display = '';
+
+    var select = document.getElementById('entity-select');
+    if (!selectedEntity || entities.indexOf(selectedEntity) < 0) { selectedEntity = pickRandomEntity(table); }
+    var options = '';
+    for (var e of entities) {
+        var sel = e === selectedEntity ? ' selected' : '';
+        options += '<option value="' + escHtml(e) + '"' + sel + '>' + escHtml(e) + '</option>';
+    }
+    select.innerHTML = options;
+    select.onchange = function() { selectedEntity = select.value; renderCards(DATA.tables[activeTable]); };
+}
+
+function renderEntitySelector(table) {
+    // Update just the entity dropdown without re-rendering dimension selectors
+    var entities = getEntitiesForTable(table);
+    var entityGroup = document.getElementById('entity-group');
+    if (entities.length === 0) { entityGroup.style.display = 'none'; return; }
+    entityGroup.style.display = '';
+    var select = document.getElementById('entity-select');
+    if (!selectedEntity || entities.indexOf(selectedEntity) < 0) { selectedEntity = pickRandomEntity(table); }
     var options = '';
     for (var e of entities) {
         var sel = e === selectedEntity ? ' selected' : '';
@@ -1022,9 +1041,6 @@ function randomizeEntity() {
 
 function renderTable(idx) {
     var table = DATA.tables[idx];
-    // Hide error panel and show cards
-    document.getElementById('error-panel').style.display = 'none';
-    document.getElementById('cards').style.display = '';
 
     var flaggedCount = table.indicators.filter(function(ind) { return ind.quality_flags.length > 0; }).length;
     var indLabel = table.truncated
@@ -1039,19 +1055,27 @@ function renderTable(idx) {
         summaryHtml += '<span><span class="quality-dot" style="background:#e8a838"></span>' + flaggedCount + ' with quality issues</span>';
     }
     document.getElementById('summary').innerHTML = summaryHtml;
-    renderEntitySelector(table);
+    renderFilterBar(table);
     renderCards(table);
 }
 
 function renderCards(table) {
-    document.getElementById('cards').innerHTML = table.indicators.map(function(ind) { return renderCard(ind, table, selectedEntity); }).join('');
+    var q = (document.getElementById('search-input').value || '').toLowerCase();
+    var filtered = table.indicators.filter(function(ind) {
+        if (!q) return true;
+        return (ind.title || '').toLowerCase().indexOf(q) >= 0
+            || (ind.short_name || '').toLowerCase().indexOf(q) >= 0;
+    });
+    document.getElementById('cards').innerHTML = filtered.map(function(ind) { return renderCard(ind, table, selectedEntity); }).join('');
 }
 
 function renderCard(ind, table, entity) {
     var flagCount = ind.quality_flags.length;
     var cardClass = flagCount >= 3 ? 'error' : flagCount > 0 ? 'warn' : '';
     var typeClass = getTypeClass(ind.type);
-    var sparklineData = entity && ind.sparkline_by_entity && ind.sparkline_by_entity[entity] ? ind.sparkline_by_entity[entity] : null;
+    var dimKey = getCurrentDimKey(table);
+    var dimGroup = ind.sparkline_by_entity && ind.sparkline_by_entity[dimKey] ? ind.sparkline_by_entity[dimKey] : null;
+    var sparklineData = entity && dimGroup && dimGroup[entity] ? dimGroup[entity] : null;
 
     var html = '<div class="card ' + cardClass + '">';
     var popBadge = (ind.popularity > 0) ? '<span class="pop-badge" title="Popularity score">\u2605 ' + ind.popularity.toFixed(2) + '</span>' : '';
