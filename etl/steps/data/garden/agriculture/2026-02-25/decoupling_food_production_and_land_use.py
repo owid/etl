@@ -14,7 +14,7 @@ paths = PathFinder(__file__)
 # Minimum percentage increase in production energy for a country to qualify as "decoupled".
 PRODUCTION_INCREASE_PCT_MIN = 5
 # Minimum percentage increase in food supply for a country to qualify as "decoupled".
-FOOD_SUPPLY_PCT_MIN = 5
+FOOD_SUPPLY_PCT_MIN = 0
 # Minimum percentage decrease in agricultural land for a country to qualify as "decoupled".
 LAND_DECREASE_PCT_MIN = 5
 # Number of years for the rolling average (1 to not do any rolling average).
