@@ -1715,6 +1715,11 @@
     "dataPublisherSource": ""
   },
   {
+    "rawName": "Staff calculations based on the Human Capital Project, World Bank (WB), uri: https://humancapital.worldbank.org/en/home",
+    "name": "World Bank based on the Human Capital Project",
+    "dataPublisherSource": ""
+  },
+  {
     "rawName": "International Debt Statistics, World Bank (WB), uri: https://www.worldbank.org/en/programs/debt-statistics, note: https://www.worldbank.org/en/programs/debt-statistics",
     "name": "International Debt Statistics - World Bank",
     "dataPublisherSource": ""

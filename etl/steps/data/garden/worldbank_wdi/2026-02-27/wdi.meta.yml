@@ -1310,33 +1310,6 @@ tables:
         unit: '% of expense'
       gf_xpd_budg_zs:
         title: Primary government expenditures as a proportion of original approved budget (%)
-      hd_hci_ovrl:
-        title: Human Capital Index (HCI) (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_fe:
-        title: Human Capital Index (HCI), Female (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_lb:
-        title: Human Capital Index (HCI), Lower Bound (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_lb_fe:
-        title: Human Capital Index (HCI), Female, Lower Bound (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_lb_ma:
-        title: Human Capital Index (HCI), Male, Lower Bound (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_ma:
-        title: Human Capital Index (HCI), Male (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_ub:
-        title: Human Capital Index (HCI), Upper Bound (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_ub_fe:
-        title: Human Capital Index (HCI), Female, Upper Bound (scale 0-1)
-        unit: ''
-      hd_hci_ovrl_ub_ma:
-        title: Human Capital Index (HCI), Male, Upper Bound (scale 0-1)
-        unit: ''
       ic_bus_ndns_zs:
         title: New business density (new registrations per 1,000 people ages 15-64)
         short_unit: new registrations
@@ -5258,3 +5231,65 @@ tables:
         title: UHC service coverage sub-index on reproductive, maternal, newborn and child health
       sh_uhc_sci_capacity:
         title: UHC service coverage sub-index on service capacity and access
+      hd_hcip_ovrl_to:
+        title: 'Human capital index plus (HCI+): overall score, total (scale 0–325)'
+      hd_hcip_educ_fe:
+        title: 'Human capital index plus (HCI+): education pillar score, female (scale 0–188)'
+      hd_hcip_educ_ma:
+        title: 'Human capital index plus (HCI+): education pillar score, male (scale 0–188)'
+      hd_hcip_ovrl_ma:
+        title: 'Human capital index plus (HCI+): overall score, male (scale 0–325)'
+      hd_hcip_hlth_ma:
+        title: 'Human capital index plus (HCI+): health pillar score, male (scale 0–50)'
+      hd_hcip_otjl_ma:
+        title: 'Human capital index plus (HCI+): on-the-job learning pillar score, male (scale -30–87)'
+      hd_hcip_hlth_fe:
+        title: 'Human capital index plus (HCI+): health pillar score, female (scale 0–50)'
+      hd_hcip_educ_to:
+        title: 'Human capital index plus (HCI+): education pillar score, total (scale 0–188)'
+      hd_hcip_otjl_to:
+        title: 'Human capital index plus (HCI+): on-the-job learning pillar score, total (scale -30–87)'
+      hd_hcip_otjl_fe:
+        title: 'Human capital index plus (HCI+): on-the-job learning pillar score, female (scale -30–87)'
+      hd_hcip_hlth_to:
+        title: 'Human capital index plus (HCI+): health pillar score, total (scale 0–50)'
+      hd_hcip_ovrl_fe:
+        title: 'Human capital index plus (HCI+): overall score, female (scale 0–325)'
+      # Computed variables (derived in garden step)
+      ny_gdp_mktp_cd_adjusted:
+        title: GDP (constant 2021 US$)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: Gross domestic product measured in constant 2021 US dollars, adjusted using the GDP deflator.
+      ny_gdp_pcap_cd_adjusted:
+        title: GDP per capita (constant 2021 US$)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: Gross domestic product per capita measured in constant 2021 US dollars, adjusted using the GDP deflator.
+      unemployment_rate_ilo_modeling_comparison_absolute:
+        title: Availability of unemployment estimates by source
+        description_short: Whether the unemployment rate estimate comes from national data or ILO modeled estimates.
+      labor_force:
+        title: Labor force
+        unit: ''
+        description_short: Total labor force, derived from WDI labor force participation rate and UN WPP population data.
+      number_employed:
+        title: Number of employed people
+        unit: ''
+        description_short: Total number of employed people, derived from WDI employment-to-population ratio and UN WPP population data.
+      number_unemployed:
+        title: Number of unemployed people
+        unit: ''
+        description_short: Total number of unemployed people, derived from WDI unemployment rate and labor force.
+      number_below_working_age:
+        title: Number of people below working age
+        unit: ''
+        description_short: Number of people aged 0-14, from UN WPP population data.
+      number_out_of_labor_force:
+        title: Number of people out of the labor force
+        unit: ''
+        description_short: Number of people aged 15+ who are not in the labor force.
+      population:
+        title: Population
+        unit: ''
+        description_short: Total population, from the population dataset used for per-capita calculations.

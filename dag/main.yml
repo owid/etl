@@ -817,10 +817,10 @@ steps:
     - data://garden/oecd/2026-02-17/trust_in_government
 
   data://garden/worldbank_wdi/2026-02-27/wdi:
-    - data://meadow/worldbank_wdi/2026-01-29/wdi
+    - data://meadow/worldbank_wdi/2026-02-27/wdi
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/regions/2023-01-01/regions
-    - snapshot://worldbank_wdi/2026-01-29/wdi.zip
+    - snapshot://worldbank_wdi/2026-02-27/wdi.zip
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
 
