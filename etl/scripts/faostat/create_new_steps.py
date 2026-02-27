@@ -370,7 +370,7 @@ def create_step_file(channel: str, step_name: str) -> None:
         # Check if shared module in the latest version of the step is identical to the new shared module.
         latest_shared_file = versions_dir / step_latest_version / f"{RUN_FILE_NAME}.py"
         new_shared_file = new_step_dir / f"{RUN_FILE_NAME}.py"
-        if checksum_file(latest_shared_file) != checksum_file(new_shared_file):
+        if latest_shared_file.exists() and checksum_file(latest_shared_file) != checksum_file(new_shared_file):
             log.warning(f"Shared module in version {step_latest_version} differs from new shared module.")
 
 
@@ -607,47 +607,6 @@ def create_updated_dependency_graph(
     return new_steps
 
 
-def update_food_explorer_dependency_version() -> None:
-    """Ensure the dependency of the food explorer corresponds to the latest version of the garden dataset of the food
-    explorer.
-
-    """
-    # Load the full content of the dag.
-    with open(DAG_FILE, "r") as _dag_file:
-        dag_lines = _dag_file.read()
-
-    # Exact dag line for the OWID food explorer.
-    dag_line_explorer = "data://garden/faostat/latest/food_explorer"
-    # Find the latest version of the FAOSTAT food explorer dataset in garden.
-    new_version = find_latest_version_for_step(channel="garden", step_name="food_explorer")
-    if new_version is None:
-        raise FileNotFoundError("Food explorer step file not found.")
-    # To begin with, assume old version is identical to new.
-    old_version = new_version
-    # Find dag line for the food explorer, and replace the following line with the new version of the garden dataset.
-    replace_line = False
-    new_lines = ""
-    for line in dag_lines.split("\n"):
-        if replace_line:
-            # Current line corresponds to the dependency of the food explorer.
-            # Get version of the dependency of the food explorer that is written currently in the dag.
-            old_version = get_version_from_dag_line(line)
-            # Replace that version with the latest one.
-            new_lines += line.replace(old_version, new_version) + "\n"
-            replace_line = False
-        else:
-            new_lines += line + "\n"
-        if dag_line_explorer in line:
-            # The next line is the one corresponding to the dependency of the food explorer.
-            replace_line = True
-
-    if old_version != new_version:
-        log.info("Updating version of the dependency dataset of the food explorer.")
-        # Write new lines to dag file.
-        with open(DAG_FILE, "w") as _dag_file:
-            _dag_file.write(new_lines[:-1])
-
-
 def write_steps_to_dag_file(dag_steps: Dict[str, Set[str]], header_line: Optional[str]) -> None:
     """Add new lines to the dag, given a graph of additional dependencies.
 
@@ -692,9 +651,6 @@ def write_steps_to_dag_file(dag_steps: Dict[str, Set[str]], header_line: Optiona
         with open(DAG_FILE, "a") as _dag_file:
             _dag_file.write(new_step_lines)
 
-        # Ensure the dependency of the food explorer corresponds is the latest version.
-        update_food_explorer_dependency_version()
-
 
 def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str) -> List[str]:
     """Apply some custom rules to add or remove steps from the list of steps to be created.
@@ -717,15 +673,65 @@ def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel
         step_names += [f"{NAMESPACE}_fbsc"]
         step_names = [step for step in step_names if step not in [f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"]]
 
-    # In garden, if either fbsc or qcl were updated, update food explorer.
-    if (channel == "garden") and (any({f"{NAMESPACE}_fbsc", f"{NAMESPACE}_qcl"} & set(step_names))):
-        step_names += ["food_explorer"]
+    # In garden or grapher, always include additional_variables (it depends on multiple datasets).
+    if channel in ["garden", "grapher"] and "additional_variables" not in step_names:
+        step_names += ["additional_variables"]
 
     # In grapher there is never a step for metadata.
     if channel == "grapher":
         step_names = [step for step in step_names if step not in [f"{NAMESPACE}_metadata"]]
 
     return step_names
+
+
+def update_explorer_dependencies_in_dag(
+    namespace: str = NAMESPACE,
+    new_version: str = VERSION,
+) -> None:
+    """Update the dependencies of explorer steps in the dag file to point to the new grapher version.
+
+    Explorer steps use 'latest' as version, so they don't need new step files or new dag entries.
+    Instead, the existing dag entry is modified in-place to update dependency versions.
+
+    Parameters
+    ----------
+    namespace : str
+        Namespace.
+    new_version : str
+        New version to use for grapher dependencies.
+
+    """
+    dag = load_dag()
+
+    # Find all explorer steps for this namespace.
+    explorer_steps = {
+        step: dag[step]
+        for step in dag
+        if get_channel_from_dag_line(step) == "explorers" and get_namespace_from_dag_line(step) == namespace
+    }
+
+    if not explorer_steps:
+        return
+
+    # Read the dag file content.
+    with open(DAG_FILE) as f:
+        dag_content = f.read()
+
+    for step_name, dependencies in explorer_steps.items():
+        for dependency in dependencies:
+            if get_namespace_from_dag_line(dependency) != namespace:
+                continue
+            try:
+                old_version = get_version_from_dag_line(dependency)
+            except ValueError:
+                continue
+            if old_version != new_version:
+                new_dependency = dependency.replace(old_version, new_version)
+                dag_content = dag_content.replace(dependency, new_dependency)
+                log.info(f"Updated explorer dependency: {dependency} -> {new_dependency}")
+
+    with open(DAG_FILE, "w") as f:
+        f.write(dag_content)
 
 
 def run(channel: str, include_all_datasets: bool = False) -> None:
@@ -753,6 +759,10 @@ def run(channel: str, include_all_datasets: bool = False) -> None:
         # Update dag file with new dependencies.
         header_line = f"# FAOSTAT {channel} steps for version {VERSION}"
         write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
+
+        # When updating grapher steps, also update explorer dependencies.
+        if channel == "grapher":
+            update_explorer_dependencies_in_dag()
     else:
         log.info("Nothing to update.")
 

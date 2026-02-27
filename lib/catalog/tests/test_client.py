@@ -326,28 +326,28 @@ class TestResponseSet:
     """Test the ResponseSet container."""
 
     def test_iteration(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", base_url="https://example.com")
+        results = ResponseSet(items=[1, 2, 3], query="test", base_url="https://example.com")
 
         items = list(results)
         assert items == [1, 2, 3]
 
     def test_indexing(self):
-        results = ResponseSet(results=["a", "b", "c"], query="test", base_url="https://example.com")
+        results = ResponseSet(items=["a", "b", "c"], query="test", base_url="https://example.com")
 
         assert results[0] == "a"
         assert results[1] == "b"
         assert results[2] == "c"
 
     def test_len(self):
-        results = ResponseSet(results=[1, 2, 3, 4, 5], query="test", base_url="https://example.com")
+        results = ResponseSet(items=[1, 2, 3, 4, 5], query="test", base_url="https://example.com")
         assert len(results) == 5
 
     def test_total_count_auto_set(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", base_url="https://example.com")
+        results = ResponseSet(items=[1, 2, 3], query="test", base_url="https://example.com")
         assert results.total_count == 3
 
     def test_total_count_explicit(self):
-        results = ResponseSet(results=[1, 2, 3], query="test", total_count=100, base_url="https://example.com")
+        results = ResponseSet(items=[1, 2, 3], query="test", total_count=100, base_url="https://example.com")
         assert results.total_count == 100
 
     def test_filter(self):
@@ -365,7 +365,7 @@ class TestResponseSet:
             MockResult(version="2023-12-01", name="c"),
             MockResult(version="2024-03-01", name="d"),
         ]
-        results = ResponseSet(results=items, query="test", base_url="https://example.com")
+        results = ResponseSet(items=items, query="test", base_url="https://example.com")
 
         # Filter by version (>= "2024-03-01" matches 2024-03-01 and 2024-06-01)
         filtered = results.filter(lambda r: r.version >= "2024-03-01")
@@ -395,7 +395,7 @@ class TestResponseSet:
             MockResult(version="2024-01-01", score=0.9),
             MockResult(version="2024-06-01", score=0.7),
         ]
-        results = ResponseSet(results=items, query="test", base_url="https://example.com")
+        results = ResponseSet(items=items, query="test", base_url="https://example.com")
 
         # Sort by version ascending
         sorted_results = results.sort_by("version")
@@ -425,7 +425,7 @@ class TestResponseSet:
             MockResult(name="a", value=1),
             MockResult(name="b", value=2),
         ]
-        results = ResponseSet(results=items, query="test", base_url="https://example.com")
+        results = ResponseSet(items=items, query="test", base_url="https://example.com")
 
         # Sort by value using lambda
         sorted_results = results.sort_by(lambda r: r.value)
@@ -451,7 +451,7 @@ class TestResponseSet:
             MockResult(version="2024-06-01", published_at="2024-06-15", score=0.9),
             MockResult(version="2024-03-01", published_at="2024-03-15", score=0.7),
         ]
-        results = ResponseSet(results=items, query="test", base_url="https://example.com")
+        results = ResponseSet(items=items, query="test", base_url="https://example.com")
 
         # Get latest by version
         latest = results.latest(by="version")
@@ -467,7 +467,7 @@ class TestResponseSet:
 
     def test_latest_empty_results(self):
         """Test that latest() raises ValueError on empty results."""
-        results = ResponseSet(results=[], query="test", base_url="https://example.com")
+        results = ResponseSet(items=[], query="test", base_url="https://example.com")
 
         with pytest.raises(ValueError, match="No results available"):
             results.latest(by="version")
@@ -487,7 +487,7 @@ class TestResponseSet:
             MockResult(version="2024-03-01", namespace="un", score=0.7),
             MockResult(version="2024-02-01", namespace="worldbank", score=0.6),
         ]
-        results = ResponseSet(results=items, query="test", base_url="https://example.com")
+        results = ResponseSet(items=items, query="test", base_url="https://example.com")
 
         # Chain filter -> sort -> index
         filtered = results.filter(lambda r: r.namespace == "un").sort_by("version", reverse=True)[0]
@@ -990,7 +990,7 @@ class TestResponseSetUI:
 
     def test_set_ui_advanced(self):
         """set_ui_advanced() sets _ui_advanced = True."""
-        rs = ResponseSet(results=[1, 2], query="test", base_url="https://example.com")
+        rs = ResponseSet(items=[1, 2], query="test", base_url="https://example.com")
         result = rs.set_ui_advanced()
         assert rs._ui_advanced is True
         # Returns self for chaining
@@ -998,13 +998,63 @@ class TestResponseSetUI:
 
     def test_set_ui_basic(self):
         """set_ui_basic() sets _ui_advanced = False."""
-        rs = ResponseSet(results=[1, 2], query="test", base_url="https://example.com")
+        rs = ResponseSet(items=[1, 2], query="test", base_url="https://example.com")
         rs.set_ui_advanced()
         assert rs._ui_advanced is True
         result = rs.set_ui_basic()
         assert rs._ui_advanced is False
         # Returns self for chaining
         assert result is rs
+
+    def test_to_frame_all_fields_arg_overrides_instance(self):
+        """to_frame(all_fields=True) shows all fields even when _ui_advanced is False."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            title: str
+            description: str
+            version: str
+            path: str
+            extra: int
+
+        items = [MockResult(title="A", description="desc", version="2024", path="p", extra=42)]
+        rs = ResponseSet(items=items, query="test", base_url="https://example.com")
+
+        # Default (basic) — only key fields
+        df_basic = rs.to_frame()
+        assert "extra" not in df_basic.columns
+        assert "title" in df_basic.columns
+
+        # all_fields=True — all fields shown
+        df_adv = rs.to_frame(all_fields=True)
+        assert "extra" in df_adv.columns
+        assert df_adv["extra"].iloc[0] == 42
+
+        # Instance _ui_advanced should not have changed
+        assert rs._ui_advanced is False
+
+    def test_to_frame_advanced_false_overrides_instance(self):
+        """to_frame(all_fields=False) shows basic fields even when _ui_advanced is True."""
+        from pydantic import BaseModel
+
+        class MockResult(BaseModel):
+            title: str
+            description: str
+            version: str
+            path: str
+            extra: int
+
+        items = [MockResult(title="A", description="desc", version="2024", path="p", extra=42)]
+        rs = ResponseSet(items=items, query="test", base_url="https://example.com")
+        rs.set_ui_advanced()
+
+        # Instance is advanced, but arg overrides to basic
+        df = rs.to_frame(all_fields=False)
+        assert "extra" not in df.columns
+        assert "title" in df.columns
+
+        # Instance _ui_advanced should still be True
+        assert rs._ui_advanced is True
 
 
 class TestIndicatorsSearchParams:
