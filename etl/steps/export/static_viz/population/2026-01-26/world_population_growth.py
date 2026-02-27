@@ -47,17 +47,8 @@ def run() -> None:
     tb = tb.loc[tb["country"] == "World", ["year", "population"]].copy().reset_index(drop=True)
     tb = tb.sort_values("year").reset_index(drop=True)
 
-    # Calculate growth rates using adjacent years
-    tb["year_prev"] = tb["year"].shift(1)
-    tb["pop_prev"] = tb["population"].shift(1)
-    tb["years_diff"] = tb["year"] - tb["year_prev"]
-
-    # Vectorized growth rate calculation
-    mask = (tb["years_diff"] > 0) & (tb["pop_prev"] > 0)
-    tb["growth_rate"] = np.nan
-    tb.loc[mask, "growth_rate"] = 100 * (
-        np.log(tb.loc[mask, "population"] / tb.loc[mask, "pop_prev"]) / tb.loc[mask, "years_diff"]
-    )
+    tb_growth = ds_pop.read("population_growth_rate")
+    tb_growth = tb_growth.loc[tb_growth["country"] == "World", ["year", "growth_rate"]].copy().reset_index(drop=True)
 
     # Calculate special growth rate for 1700 using 10,000 BCE as baseline
     growth_rate_1700 = None
@@ -70,13 +61,11 @@ def run() -> None:
         growth_rate_1700 = 100 * (np.log(pop_1700 / pop_10000bce) / (1700 - (-10000)))
         paths.log.info(f"Calculated growth rate for 1700 (10,000 BCE to 1700): {growth_rate_1700:.4f}%")
         # Override 1700 growth rate with long-term baseline
-        tb.loc[tb["year"] == 1700, "growth_rate"] = growth_rate_1700
+        tb_growth.loc[tb_growth["year"] == 1700, "growth_rate"] = growth_rate_1700
     else:
         paths.log.warning("Could not calculate growth rate for 1700: missing 10,000 BCE or 1700 data")
 
-    # Clean up temporary columns
-    tb = tb.drop(columns=["year_prev", "pop_prev", "years_diff"])
-
+    tb = tb.merge(tb_growth, on="year", how="left")
     # Filter to 1700-2100
     tb = tb[(tb["year"] >= 1700) & (tb["year"] <= 2100)].copy()
 

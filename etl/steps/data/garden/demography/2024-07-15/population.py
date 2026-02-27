@@ -763,7 +763,6 @@ def make_table_growth_rate(tb_population: Table, tb_un_gr: Table) -> Table:
 
     # Remove unnecessary metadata fields to avoid errors
     tb["growth_rate"].metadata.presentation = None
-    print(tb["growth_rate"])
     return tb
 
 
@@ -772,13 +771,13 @@ def _estimate_growth_rate(tb_population: Table) -> Table:
 
     Uses the continuous growth formula: growth_rate = 100 * ln(P_t / P_{t-1}) / (t - t_{t-1})
 
-    Pre-1900, only years that are multiples of 50 are kept (sparse HYDE data), so the rate
+    Pre-1800, only years that are multiples of 50 are kept (sparse HYDE data), so the rate
     represents an average over longer intervals.
     """
     tb = tb_population.sort_values(by=["country", "year"]).copy()
 
-    # PRE-1900: Only keep years that are multiples of 50
-    tb = tb.loc[(tb["year"] >= 1900) | (tb["year"] % 50 == 0)]
+    # PRE-1800: Only keep years that are multiples of 50
+    tb = tb.loc[(tb["year"] >= 1800) | (tb["year"] % 50 == 0)]
 
     # Creating the 'previous_population' and 'previous_year' columns
     tb["previous_population"] = tb.groupby("country")["population"].shift(1)
