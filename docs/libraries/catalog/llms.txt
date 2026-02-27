@@ -1,6 +1,6 @@
 # owid-catalog
 
-> Python library for accessing Our World in Data's catalog of research data.
+> Python library for accessing Our World in Data's catalog of research data. Version: 1.0.1
 
 # Catalog Library
 
@@ -56,7 +56,6 @@ tb_grouped = tb.groupby("country").sum()  # Preserves metadata
 
 The Data API provides unified access to OWID's published data through a simple client interface.
 
-<!--
 ## Quick Reference
 The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
 
@@ -134,6 +133,16 @@ The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on
 
 **Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in  GitHub Actions if needed.
 
+### Generate `llms.txt`
+
+The library ships an `llms.txt` file (at `docs/libraries/catalog/llms.txt`) that is auto-generated from module docstrings and documentation markdown files. To regenerate it after changing docstrings or docs:
+
+```shell
+make docs.llms
+```
+
+This runs `docs/ignore/others/bake_llms_txt.py`, which inspects the public API surface and doc files so the output stays in sync with the codebase.
+
 ---
 
 # owid-catalog: Data Structures and Processing
@@ -204,7 +213,7 @@ pandas Series with metadata.
 
 ## quick
 
-Quick access functions for data discovery and retrieval. For more complex use cases, refer to the full API.
+Quick access functions for data discovery and retrieval.
 
 ### `fetch(path: 'str') -> "'Table | ChartTable'"`
 
@@ -920,9 +929,9 @@ Provides iteration, indexing, and conversion to CatalogFrame
 for backwards compatibility.
 
 Attributes:
-    results: List of result objects.
+    items: List of result objects.
     query: The query that produced these results.
-    total_count: Total number of results available (may be more than len(results)).
+    total_count: Total number of results available (may be more than len(items)).
 
 #### `filter(self, predicate: 'Callable[[T], bool]') -> "'ResponseSet[T]'"`
 
@@ -981,6 +990,10 @@ Example:
 
 Set total_count to length of results if not provided.
 
+#### `ResponseSet.results` (property)
+
+Deprecated: use ``.items`` instead.
+
 #### `set_ui_advanced(self) -> "'ResponseSet[T]'"`
 
 Switch to advanced display showing all fields (type, slug, popularity, etc.).
@@ -1033,9 +1046,30 @@ Example:
     >>> results.filter(lambda r: r.version > '2024').sort_by('version', reverse=True)
     ```
 
-#### `to_frame(self) -> 'pd.DataFrame'`
+#### `to_dict(self) -> 'list[dict[str, Any]]'`
+
+Convert results to a list of plain dictionaries.
+
+Useful for serializing results for AI/LLM context windows
+or any scenario where you need simple dict representations.
+
+Returns:
+    List of dictionaries, one per result item.
+
+Example:
+    ```py
+    >>> results = client.charts.search("gdp")
+    >>> results.to_dict()
+    [{'slug': 'gdp-per-capita', 'title': 'GDP per capita', ...}, ...]
+    ```
+
+#### `to_frame(self, all_fields: 'bool | None' = None) -> 'pd.DataFrame'`
 
 Convert results to a DataFrame.
+
+Args:
+    all_fields: If True, show all fields. If False, show only key fields.
+        If None (default), use the instance's _ui_advanced setting.
 
 Returns:
     DataFrame with one row per result.

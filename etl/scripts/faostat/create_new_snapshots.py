@@ -20,6 +20,10 @@ uv run python -m create_new_snapshots -r
 ```
 uv run python -m create_new_snapshots
 ```
+* To create new snapshots for all datasets, even if the source data was not updated:
+```
+uv run python -m create_new_snapshots -a
+```
 
 """
 
@@ -280,7 +284,7 @@ class FAOAdditionalMetadata:
             snap.create_snapshot(filename=f.name, upload=True)
 
 
-def main(read_only: bool = False) -> None:
+def main(read_only: bool = False, include_all_datasets: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
     existing_snapshots = [
         snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
@@ -303,7 +307,7 @@ def main(read_only: bool = False) -> None:
         dataset_code = description["DatasetCode"].lower()
         if dataset_code in INCLUDED_DATASETS_CODES:
             faostat_dataset = FAODataset(description)
-            if is_dataset_already_up_to_date(
+            if not include_all_datasets and is_dataset_already_up_to_date(
                 existing_snapshots=existing_snapshots,
                 source_data_url=faostat_dataset.source_data_url,
                 source_modification_date=faostat_dataset.modification_date,
@@ -337,5 +341,12 @@ if __name__ == "__main__":
         action="store_true",
         help="If given, simply check for updates without creating snapshots.",
     )
+    argument_parser.add_argument(
+        "-a",
+        "--include_all_datasets",
+        default=False,
+        action="store_true",
+        help="If given, create snapshots for all datasets, even if the source data was not updated.",
+    )
     args = argument_parser.parse_args()
-    main(read_only=args.read_only)
+    main(read_only=args.read_only, include_all_datasets=args.include_all_datasets)
