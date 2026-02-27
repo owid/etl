@@ -262,7 +262,16 @@ def main_cli(
             with launch_ipdb_on_exception():
                 main(**kwargs)  # type: ignore
         else:
-            main(**kwargs)  # type: ignore
+            try:
+                main(**kwargs)  # type: ignore
+            except Exception:
+                if not watch:
+                    raise
+                import traceback
+
+                traceback.print_exc()
+                print("--- step_failed", flush=True)
+                continue
             if watch:
                 print("--- Dataset rebuild complete", flush=True)
 

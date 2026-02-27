@@ -309,10 +309,9 @@ const chartStrategy: PreviewStrategy = {
 				'Data dependencies not found on staging server.\n\n'
 				+ 'Run the grapher step for the data dependency first, e.g.:\n'
 				+ '  .venv/bin/etlr <data-dependency> --grapher --private\n\n'
-				+ 'Then retry or re-open the chart preview.\n\n'
+				+ 'Then re-open the chart preview.\n\n'
 				+ '--- etlr output ---\n' + state.recentOutput,
-				'Preview Error',
-				true
+				'Preview Error'
 			);
 		}
 	},
@@ -364,7 +363,7 @@ const datasetStrategy: PreviewStrategy = {
 			const msg = err instanceof Error ? err.message : String(err);
 			outputChannel.appendLine(`[dataset-preview] Preview script error: ${msg}`);
 			state.firstRunDone = false;
-			panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Preview Error', true);
+			panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Preview Error');
 		} finally {
 			extra.reloadInProgress = false;
 		}
@@ -415,13 +414,6 @@ async function openPreview(filePath: string, strategy: PreviewStrategy) {
 			panels.delete(filePath);
 			killWatchProcess(filePath);
 			strategy.onDispose?.(filePath);
-		});
-
-		panel.webview.onDidReceiveMessage((msg) => {
-			if (msg.type === 'retry') {
-				panel.webview.html = getLoadingHtml(command);
-				startWatchProcess(filePath, panel, wsRoot, config, command, strategy);
-			}
 		});
 
 		panel.webview.html = getLoadingHtml(command);
@@ -500,7 +492,7 @@ function startWatchProcess(
 		// Detect errors — always replace the full page so we get the traceback + Retry
 		if (text.includes('FAILED') || text.includes('step_failed')) {
 			state.firstRunDone = false;
-			panel.webview.html = getErrorHtml(state.recentOutput, 'Preview Error', true);
+			panel.webview.html = getErrorHtml(state.recentOutput, 'Preview Error');
 		}
 
 		// Strategy-specific output handling
@@ -515,8 +507,7 @@ function startWatchProcess(
 		outputChannel.appendLine(`Watch process error: ${err.message}`);
 		panel.webview.html = getErrorHtml(
 			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`,
-			'Preview Error',
-			true
+			'Preview Error'
 		);
 	});
 
@@ -527,8 +518,7 @@ function startWatchProcess(
 			state.firstRunDone = false;
 			panel.webview.html = getErrorHtml(
 				`etlr exited with code ${code}.\n\n${state.recentOutput}`,
-				'Preview Error',
-				true
+				'Preview Error'
 			);
 		}
 	});
@@ -672,7 +662,7 @@ body {
 </html>`;
 }
 
-function getErrorHtml(message: string, title = 'Preview Error', retryable = false): string {
+function getErrorHtml(message: string, title = 'Preview Error'): string {
 	const escaped = message
 		.replace(/&/g, '&amp;')
 		.replace(/</g, '&lt;')
@@ -692,25 +682,18 @@ pre {
 	padding: 12px; border-radius: 4px;
 	color: var(--vscode-editor-foreground);
 }
-button {
-	margin-top: 12px;
-	padding: 6px 16px;
-	background: var(--vscode-button-background, #0e639c);
-	color: var(--vscode-button-foreground, #fff);
-	border: none; border-radius: 3px; cursor: pointer; font-size: 13px;
-}
-button:hover { background: var(--vscode-button-hoverBackground, #1177bb); }
 </style>
 </head>
 <body>
 <h3>${title}</h3>
 <pre>${escaped}</pre>
-${retryable ? '<button onclick="retry()">Retry</button>' : ''}
 <script>
-${retryable ? `
-const vscode = acquireVsCodeApi();
-function retry() { vscode.postMessage({ type: 'retry' }); }
-` : ''}
+window.addEventListener('message', (e) => {
+    if (e.data.type === 'status' || e.data.type === 'log') {
+        document.querySelector('h3').textContent = 'Rebuilding...';
+        document.querySelector('h3').style.color = 'var(--vscode-foreground)';
+    }
+});
 </script>
 </body>
 </html>`;
