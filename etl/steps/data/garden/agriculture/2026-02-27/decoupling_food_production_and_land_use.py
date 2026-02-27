@@ -11,19 +11,24 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Minimum percentage increase in production energy for a country to qualify as "decoupled".
-PRODUCTION_INCREASE_PCT_MIN = 5
-# Minimum percentage increase in food supply for a country to qualify as "decoupled".
-FOOD_SUPPLY_PCT_MIN = 0
+# Minimum percentage increase in total domestically produced food energy for a country to qualify as "decoupled".
+DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN = 5
+# Minimum percentage increase in per-capita domestically produced food energy for a country to qualify as "decoupled".
+# Set to a very negative number (e.g. -1000) to effectively disable this criterion.
+# Setting it to zero means that at least it didn't decrease.
+DOMESTIC_FOOD_PC_INCREASE_PCT_MIN = 0
 # Minimum percentage decrease in agricultural land for a country to qualify as "decoupled".
 LAND_DECREASE_PCT_MIN = 5
+# Maximum percentage increase in imported feed energy for a country to qualify as "decoupled".
+# A value of 0 means imported feed must not increase at all.
+IMPORTED_FEED_INCREASE_PCT_MAX = 0
 # Number of years for the rolling average (1 to not do any rolling average).
 # A 3-year window smooths year-to-year variability (e.g. bad harvests, COVID, stock changes).
 ROLLING_AVERAGE_YEARS = 3
 
 # Path to local folder where charts will be saved.
 # NOTE: Functions that save files will be commented by default; uncomment while doing analysis.
-OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-20_food_decoupling_analysis/results"
+OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-27_food_decoupling_analysis/results"
 
 # Columns from food balances dataset.
 ELEMENT_CODES = [
@@ -37,6 +42,8 @@ ELEMENT_CODES = [
     "005521",
     # "Imports", in tonnes. Used to estimate the domestic share of feed.
     "005611",
+    # "Food", in tonnes. Amount allocated to human consumption (excludes feed, seed, processing, waste, other non-food uses).
+    "005142",
 ]
 
 
@@ -233,7 +240,7 @@ def prepare_food_balances_data(tb_fbsc):
             "unit_short_name",
         ]
     ].drop_duplicates()
-    assert {"Food available for consumption", "Production"}.issubset(set(check["element"]))
+    assert {"Food available for consumption", "Production", "Food"}.issubset(set(check["element"]))
     assert {"kilograms per year per capita", "kilocalories per day per capita", "tonnes"}.issubset(set(check["unit"]))
 
     # Convert kcal/capita/day to kcal/capita/year.
@@ -252,6 +259,7 @@ def prepare_food_balances_data(tb_fbsc):
             "value_005511": "production",
             "value_005521": "feed",
             "value_005611": "imports",
+            "value_005142": "food",
         }
     )
 
@@ -269,9 +277,13 @@ def handle_regions_and_missing_data(tb):
     # We keep only rows for which we have production data.
     tb = tb.dropna(subset="production").reset_index(drop=True)
 
-    # Fill missing feed and imports with 0 (assuming that no data means no feed use or no imports for that item).
+    # Fill missing feed, imports, and food with 0 (assuming that no data means no use for that item).
+    # Check that the food element is not missing too often before filling with 0.
+    error = "Unexpectedly high percentage of rows where food element is missing."
+    assert 100 * len(tb[tb["food"].isnull()]) / len(tb) < 10, error
     tb["feed"] = tb["feed"].fillna(0)
     tb["imports"] = tb["imports"].fillna(0)
+    tb["food"] = tb["food"].fillna(0)
 
     # Sometimes quantity is missing, but calories is informed, and sometimes is the opposite.
     # Check that either way those are edge cases, and then remove those rows.
@@ -283,9 +295,10 @@ def handle_regions_and_missing_data(tb):
     return tb
 
 
-def calculate_production_calories_correcting_for_feed(tb):
+def calculate_food_and_feed_energy(tb):
     # Calculate conversion factors, in kcal per 100g.
     # To do that, we reverse-engineer FAOSTAT data: we divide calories by quantity to obtain the conversion factors.
+    # NOTE: Conversion factors are needed to convert imported feed (in tonnes) to calories.
     tb["conversion"] = (tb["food_energy"] / (tb["food_quantity"] * 10)).fillna(0)
 
     # Remove spurious conversion factors (which may happen when dividing by very small quantities); assume a maximum conversion factor of 1000 kcal per 100g.
@@ -295,48 +308,40 @@ def calculate_production_calories_correcting_for_feed(tb):
     assert 100 * len(tb[(tb["conversion"] > 1000)]) / len(tb) < 2, error
     # Remove all rows where conversion is zero or unreasonably high.
     tb = tb[(tb["conversion"] > 0) & (tb["conversion"] < 1000)].reset_index(drop=True)
-    # Uncomment to visually inspect a histogram of conversions factors.
-    # px.histogram(tb, x="conversion", title=f"All items (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent").show()
 
-    # Naively, we could simply convert all production to calories, using the conversion factors.
-    # But we would be counting calories of crops that were used to feed animals, and then count the calories from those animals as well.
-    # We need to remove the calories of domestic production that are used for animal feed.
-    # However, FAOSTAT's "feed" element reports total feed use (from both domestic and imported crops).
-    # We estimate the domestic share proportionally.
-    # For example, imagine a country produces 1000t and imports 500t of maize; it also reports 600t of feed.
-    # We assume that 1000/1500=2/3 of the maize used for feed came from domestic production, and 500/1500=1/3 of from imports.
-    # This means that "domestic feed" would be 2/3 * 600t = 400t.
-    # We then remove the domestic feed from the total domestic production, so:
-    # domestic feed = feed x production / (production + imports)
-    # Net production = production - domestic feed
+    # Estimate the domestic share of each item's supply: the proportion of domestic supply that comes from
+    # domestic production (as opposed to imports).
+    # For example, if a country produces 1000t and imports 500t of maize, the domestic share is 1000/1500 = 2/3.
     # Note that some country-year-items have zero production and imports, but non-zero food and feed.
-    # I'm not sure why this happens (it may be related to stock changes, or missing data).
-    # For those odd cases, fill domestic feed with zero.
+    # For those odd cases, fill domestic share with zero.
     error = "Unexpectedly large percentage of rows where production and imports are zero but feed is not zero."
     assert (100 * len(tb[(tb["production"] == 0) & (tb["imports"] == 0) & (tb["feed"] > 0)]) / len(tb)) < 0.1, error
-    domestic_feed = tb["feed"] * (tb["production"] / (tb["production"] + tb["imports"])).fillna(0)
-    # There are also cases where feed is larger than production; this is plausible, although uncommon.
-    # For those cases, clip the net production to zero (to avoid negative numbers).
+    domestic_share = (tb["production"] / (tb["production"] + tb["imports"])).fillna(0)
+
+    # Domestically produced food energy, per item.
+    # The "food" element (005142) gives the total tonnes allocated to human consumption, already excluding
+    # feed, seed, processing, waste, and other non-food uses. We estimate the domestic share of food
+    # using the same proportional allocation: food_domestic = food * domestic_share.
+    # Total (kcal): use the "food" element (tonnes) with conversion factors.
+    food_domestic = (tb["food"] * domestic_share).clip(upper=tb["production"])
+    tb["food_domestic_energy"] = food_domestic * 10000 * tb["conversion"]
+    # Per-capita (kcal/capita/year): food_energy (0664pc) is already per capita, multiply by domestic_share.
+    tb["food_domestic_energy_pc"] = tb["food_energy"] * domestic_share
+
+    # Imported feed energy (kcal, per item).
+    # Imported feed = feed * (1 - domestic_share) = feed * imports / (production + imports).
+    # This requires conversion factors to go from tonnes to calories.
+    imported_feed = tb["feed"] * (1 - domestic_share)
+    tb["imported_feed_energy"] = imported_feed * 10000 * tb["conversion"]
+
+    # Also compute production_energy (feed-corrected) and uncorrected, for backward compatibility and
+    # comparison with Hong et al.
+    domestic_feed = tb["feed"] * domestic_share
     error = "Unexpectedly large percentage of rows where feed is larger than production."
     assert 100 * len(tb[tb["feed"] > tb["production"]]) / len(tb) < 3, error
     tb["production_net"] = (tb["production"] - domestic_feed).clip(lower=0)
-
-    # Apply conversion factor (of kcal per 100g) to net production (in tonnes).
     tb["production_energy"] = tb["production_net"] * 10000 * tb["conversion"]
-    # Also compute the uncorrected version for comparison with Hong et al.
     tb["production_energy_uncorrected"] = tb["production"] * 10000 * tb["conversion"]
-
-    # Sanity checks.
-    error = "Unexpected zero or nan production energy."
-    assert tb[(tb["production_energy"] == 0) & (tb["production_net"] != 0)].empty, error
-    assert tb[(tb["production_energy"].isnull())].empty, error
-
-    # NOTE: FBS items are grouped together, and the proportions of subitems in each group may differ for different items, then it may be impossible (or quite inaccurate) to translate those groups into energy with a simple conversion factor.
-    # for item in ["Wheat", "Apples"]:
-    #     px.histogram(tb[tb["item"] == item], x="conversion", title=f"{item} (all years and countries)", labels={"conversion": f"Conversion  / kcal per 100g"}, nbins=500, histnorm="percent", range_x=(0, 1000)).show()
-    # So, it seems that FBS has grouped items, e.g. Wheat actually means:
-    # 'Default composition: 15 Wheat, 16 Flour, wheat, 17 Bran, wheat, 18 Macaroni, 19 Germ, wheat, 20 Bread, 21 Bulgur, 22 Pastry, 23 Starch, wheat, 24 Gluten, wheat, 41 Cereals, breakfast, 110 Wafers, 114 Mixes and doughs, 115 Food preparations, flour, malt extract'
-    # So, the resulting food energy would be a weighted average of all those products (across all years and countries). Maybe, once we combine those items in the right proportion, the conversion factor would follow the resulting distribution above. For example, bread is at 249 kcal. So, maybe the first peak in the histogram (around 260 kcal) could be due to the abundance of bread (shifted up by other items).
 
     return tb
 
@@ -357,6 +362,9 @@ def calculate_totals_for_all_items(tb):
                     "production",
                     "production_energy",
                     "production_energy_uncorrected",
+                    "food_domestic_energy",
+                    "food_domestic_energy_pc",
+                    "imported_feed_energy",
                 ]
             }
         )
@@ -538,20 +546,25 @@ def detect_decoupled_countries(tb_grouped, plot=False):
     year_min = tb_grouped["year"].min()
     year_max = tb_grouped["year"].max()
 
-    tb_start = tb_grouped[tb_grouped["year"] == year_min][
-        ["country", "production_energy", "food_energy", "agricultural_land"]
-    ]
-    tb_end = tb_grouped[tb_grouped["year"] == year_max][
-        ["country", "production_energy", "food_energy", "agricultural_land"]
-    ]
+    metrics = ["food_domestic_energy", "food_domestic_energy_pc", "imported_feed_energy", "agricultural_land"]
+    tb_start = tb_grouped[tb_grouped["year"] == year_min][["country"] + metrics]
+    tb_end = tb_grouped[tb_grouped["year"] == year_max][["country"] + metrics]
     tb_changes = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
-    tb_changes["production_energy_change"] = (
+
+    tb_changes["food_domestic_energy_change"] = (
         100
-        * (tb_changes["production_energy_end"] - tb_changes["production_energy_start"])
-        / tb_changes["production_energy_start"]
+        * (tb_changes["food_domestic_energy_end"] - tb_changes["food_domestic_energy_start"])
+        / tb_changes["food_domestic_energy_start"]
     )
-    tb_changes["food_energy_change"] = (
-        100 * (tb_changes["food_energy_end"] - tb_changes["food_energy_start"]) / tb_changes["food_energy_start"]
+    tb_changes["food_domestic_energy_pc_change"] = (
+        100
+        * (tb_changes["food_domestic_energy_pc_end"] - tb_changes["food_domestic_energy_pc_start"])
+        / tb_changes["food_domestic_energy_pc_start"]
+    )
+    tb_changes["imported_feed_energy_change"] = (
+        100
+        * (tb_changes["imported_feed_energy_end"] - tb_changes["imported_feed_energy_start"])
+        / tb_changes["imported_feed_energy_start"]
     )
     tb_changes["agricultural_land_change"] = (
         100
@@ -559,13 +572,40 @@ def detect_decoupled_countries(tb_grouped, plot=False):
         / tb_changes["agricultural_land_start"]
     )
 
-    countries_decoupled = set(
-        tb_changes[
-            (tb_changes["production_energy_change"] >= PRODUCTION_INCREASE_PCT_MIN)
-            & (tb_changes["food_energy_change"] >= FOOD_SUPPLY_PCT_MIN)
-            & (tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN)
-        ]["country"]
+    # Handle edge cases where imported feed at baseline is zero.
+    # If feed was zero at start and is still zero (or decreased), that's fine (change = 0).
+    # If feed was zero at start but increased, treat as infinite increase (disqualify).
+    zero_start_mask = tb_changes["imported_feed_energy_start"] == 0
+    tb_changes.loc[zero_start_mask & (tb_changes["imported_feed_energy_end"] == 0), "imported_feed_energy_change"] = 0
+    tb_changes.loc[zero_start_mask & (tb_changes["imported_feed_energy_end"] > 0), "imported_feed_energy_change"] = (
+        float("inf")
     )
+
+    # Diagnostic: print how many countries pass each criterion individually.
+    cond_land = tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN
+    cond_food_total = tb_changes["food_domestic_energy_change"] >= DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN
+    cond_food_pc = tb_changes["food_domestic_energy_pc_change"] >= DOMESTIC_FOOD_PC_INCREASE_PCT_MIN
+    cond_feed = tb_changes["imported_feed_energy_change"] <= IMPORTED_FEED_INCREASE_PCT_MAX
+    n_total = len(tb_changes)
+    print(f"Total countries with data: {n_total}")
+    print(f"  Land decrease >= {LAND_DECREASE_PCT_MIN}%: {cond_land.sum()}")
+    print(f"  Domestic food (total) increase >= {DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN}%: {cond_food_total.sum()}")
+    print(f"  Domestic food (per capita) increase >= {DOMESTIC_FOOD_PC_INCREASE_PCT_MIN}%: {cond_food_pc.sum()}")
+    print(f"  Imported feed change <= {IMPORTED_FEED_INCREASE_PCT_MAX}%: {cond_feed.sum()}")
+    print(f"  Land + food (total) + food (pc): {(cond_land & cond_food_total & cond_food_pc).sum()}")
+    print(f"  All criteria: {(cond_land & cond_food_total & cond_food_pc & cond_feed).sum()}")
+
+    # Detailed view: countries passing land + food (total + pc), sorted by imported feed change.
+    both = tb_changes[cond_land & cond_food_total & cond_food_pc].sort_values("imported_feed_energy_change")
+    print(f"\n  {'Country':30s}  {'Food tot':>9s}  {'Food pc':>8s}  {'Land':>8s}  {'Feed':>10s}")
+    for _, row in both.iterrows():
+        feed_val = row["imported_feed_energy_change"]
+        feed_str = f"{feed_val:+.0f}%" if feed_val != float("inf") else "+inf"
+        print(
+            f"  {str(row['country']):30s}  {row['food_domestic_energy_change']:+8.1f}%  {row['food_domestic_energy_pc_change']:+7.1f}%  {row['agricultural_land_change']:+7.1f}%  {feed_str:>10s}"
+        )
+
+    countries_decoupled = set(tb_changes[cond_land & cond_food_total & cond_food_pc & cond_feed]["country"])
 
     if plot:
         plot_decoupled_countries(tb_grouped, countries_decoupled, year_min, year_max)
@@ -583,27 +623,32 @@ def plot_decoupled_countries(
     y_max=200,
     output_folder=OUTPUT_FOLDER / "decoupled-countries",
 ):
-    """Plot individual line charts showing % change in production energy and agricultural land for each decoupled country."""
+    """Plot individual line charts showing % change in domestic food, imported feed, and agricultural land for each decoupled country."""
     import plotly.express as px
     from owid.catalog import Table
+
+    if not countries_decoupled:
+        print("No decoupled countries to plot.")
+        return
 
     countries_decoupled = sorted(countries_decoupled)
 
     # Compute percentage change relative to baseline year for each country.
-    # Filter to year >= year_min to exclude years with incomplete rolling averages.
-    tb_baseline = tb_grouped[tb_grouped["year"] == year_min][
-        ["country", "production_energy", "food_energy", "agricultural_land"]
-    ]
+    metrics = ["food_domestic_energy", "imported_feed_energy", "agricultural_land"]
+    tb_baseline = tb_grouped[tb_grouped["year"] == year_min][["country"] + metrics]
     tb_plot = tb_grouped[(tb_grouped["country"].isin(countries_decoupled)) & (tb_grouped["year"] >= year_min)][
-        ["country", "year", "production_energy", "food_energy", "agricultural_land"]
+        ["country", "year"] + metrics
     ].merge(tb_baseline, on="country", suffixes=("", "_baseline"))
-    tb_plot["Total production (calories)"] = (
+    tb_plot["Domestically produced food (calories)"] = (
         100
-        * (tb_plot["production_energy"] - tb_plot["production_energy_baseline"])
-        / tb_plot["production_energy_baseline"]
+        * (tb_plot["food_domestic_energy"] - tb_plot["food_domestic_energy_baseline"])
+        / tb_plot["food_domestic_energy_baseline"]
     )
-    tb_plot["Food supply (calories per person)"] = (
-        100 * (tb_plot["food_energy"] - tb_plot["food_energy_baseline"]) / tb_plot["food_energy_baseline"]
+    # Handle division by zero when baseline imported feed is zero.
+    tb_plot["Imported feed (calories)"] = (
+        100
+        * (tb_plot["imported_feed_energy"] - tb_plot["imported_feed_energy_baseline"])
+        / tb_plot["imported_feed_energy_baseline"].replace(0, float("nan"))
     )
     tb_plot["Agricultural land"] = (
         100
@@ -611,11 +656,10 @@ def plot_decoupled_countries(
         / tb_plot["agricultural_land_baseline"]
     )
 
-    # Add baseline point at year_min with 0% change.
     tb_plot = Table(tb_plot)
 
     # Remove metadata units to avoid spurious warnings.
-    for column in ["Total production (calories)", "Food supply (calories per person)", "Agricultural land"]:
+    for column in ["Domestically produced food (calories)", "Imported feed (calories)", "Agricultural land"]:
         tb_plot[column].metadata.unit = None
         tb_plot[column].metadata.short_unit = None
 
@@ -630,12 +674,12 @@ def plot_decoupled_countries(
         if final_row.empty:
             print(f"Not enough data for this window of years for {country}")
             continue
-        food_change = float(final_row["Total production (calories)"].iloc[0])
-        supply_change = float(final_row["Food supply (calories per person)"].iloc[0])
+        food_change = float(final_row["Domestically produced food (calories)"].iloc[0])
+        feed_change = float(final_row["Imported feed (calories)"].iloc[0])
         land_change = float(final_row["Agricultural land"].iloc[0])
         tb_melted = tb_country.melt(
             id_vars=["country", "year"],
-            value_vars=["Total production (calories)", "Food supply (calories per person)", "Agricultural land"],
+            value_vars=["Domestically produced food (calories)", "Imported feed (calories)", "Agricultural land"],
             var_name="Indicator",
             value_name="Change from baseline (%)",
         )
@@ -645,11 +689,11 @@ def plot_decoupled_countries(
             y="Change from baseline (%)",
             color="Indicator",
             color_discrete_map={
-                "Total production (calories)": "blue",
-                "Food supply (calories per person)": "green",
+                "Domestically produced food (calories)": "blue",
+                "Imported feed (calories)": "orange",
                 "Agricultural land": "red",
             },
-            title=f"{country} (Production: {food_change:+.1f}%, Supply: {supply_change:+.1f}%, Land: {land_change:+.1f}%)",
+            title=f"{country} (Food: {food_change:+.1f}%, Feed: {feed_change:+.1f}%, Land: {land_change:+.1f}%)",
         ).update_yaxes(range=[y_min, y_max])
         if output_folder is not None:
             safe_name = country.replace("/", "_").replace(" ", "_")
@@ -665,15 +709,19 @@ def plot_slope_chart_grid(
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
+    if not countries_decoupled:
+        print("No decoupled countries to plot in slope chart.")
+        return
+
     tb_decoupled = tb_changes[tb_changes["country"].isin(countries_decoupled)].reset_index(drop=True)
     # Remove metadata units to avoid spurious warnings.
-    for column in ["production_energy_change", "agricultural_land_change"]:
+    for column in ["food_domestic_energy_change", "agricultural_land_change"]:
         tb_decoupled[column].metadata.unit = None
         tb_decoupled[column].metadata.short_unit = None
 
-    # Sort by "decoupling score" (production increase minus land decrease).
+    # Sort by "decoupling score" (domestic food increase minus land decrease).
     tb_decoupled["decoupling_score"] = (
-        tb_decoupled["production_energy_change"] - tb_decoupled["agricultural_land_change"]
+        tb_decoupled["food_domestic_energy_change"] - tb_decoupled["agricultural_land_change"]
     )
     tb_decoupled = tb_decoupled.sort_values("decoupling_score", ascending=False)
 
@@ -682,7 +730,7 @@ def plot_slope_chart_grid(
     n_rows = (n_countries + n_cols - 1) // n_cols
 
     # Calculate global y-axis range for consistent scaling.
-    y_max_val = tb_decoupled["production_energy_change"].max()
+    y_max_val = tb_decoupled["food_domestic_energy_change"].max()
     y_min_val = tb_decoupled["agricultural_land_change"].min()
     y_range = [y_min_val * 1.15, y_max_val * 1.15]
 
@@ -702,7 +750,7 @@ def plot_slope_chart_grid(
         col = i % n_cols + 1
 
         country_data = tb_decoupled[tb_decoupled["country"] == country].iloc[0]
-        food_change = float(country_data["production_energy_change"])
+        food_change = float(country_data["food_domestic_energy_change"])
         land_change = float(country_data["agricultural_land_change"])
 
         # Total production line.
@@ -742,7 +790,7 @@ def plot_slope_chart_grid(
     fig.update_layout(
         height=200 * n_rows,
         width=180 * n_cols,
-        title_text=f"Countries that increased total production while reducing land use, {year_min}-{year_max}",
+        title_text=f"Countries that increased domestic food production while reducing land use, {year_min}-{year_max}",
         showlegend=False,
     )
 
@@ -782,9 +830,10 @@ def run() -> None:
     # * Fill missing feed and imports with zeros.
     tb = handle_regions_and_missing_data(tb=tb)
 
-    # Calculate production in terms of caloric content, and correct to avoid double-counting calories of crops used for animal feed.
+    # Calculate domestically produced food energy and imported feed energy.
+    # Also computes production_energy (feed-corrected) for backward compatibility.
     # NOTE: There are various important assumptions in this calculation, see function for more details.
-    tb = calculate_production_calories_correcting_for_feed(tb=tb)
+    tb = calculate_food_and_feed_energy(tb=tb)
 
     # Calculate totals for each country-year.
     tb_grouped = calculate_totals_for_all_items(tb=tb)
@@ -802,7 +851,7 @@ def run() -> None:
     # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
     # Remove unnecessary columns.
-    tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected"], errors="raise")
+    tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected", "food_quantity"], errors="raise")
 
     # Apply a rolling average of ROLLING_AVERAGE_YEARS (defined above) on all indicators.
     tb_grouped = apply_rolling_average(tb_grouped=tb_grouped)
