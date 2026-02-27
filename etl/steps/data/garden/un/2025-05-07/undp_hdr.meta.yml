@@ -167,9 +167,6 @@ tables:
           numDecimalPlaces: 3
 
       # GDI Group
-        presentation:
-          topic_tags:
-            - Human Development Index (HDI)
       gdi_group:
         title: GDI Group
         unit: ""
@@ -192,9 +189,6 @@ tables:
       # 4 Gender Inequality Index
       ###########################################################
       # Gender Inequality Index
-        presentation:
-          topic_tags:
-            - Human Development Index (HDI)
       gii:
         title: Gender Inequality Index
         unit: ""
@@ -312,9 +306,6 @@ tables:
         display:
           numDecimalPlaces: 1
 
-        presentation:
-          topic_tags:
-            - Human Development Index (HDI)
       pop_total:
         title: Total population
         unit: "people"

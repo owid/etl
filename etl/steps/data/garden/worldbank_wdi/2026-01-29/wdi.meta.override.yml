@@ -2326,8 +2326,6 @@ tables:
         presentation:
           grapher_config:
             note: When both national survey estimates and ILO modeled estimates are available, they are classified as "agreeing" if they differ by less than 0.1 percentage points, and as "disagreeing" otherwise.
-          topic_tags:
-            - Work & Employment
         display:
           name: Availability of unemployment estimates by source
           numDecimalPlaces: 0
@@ -2443,11 +2441,6 @@ tables:
           topic_tags:
             - Government Spending
             - Poverty
-      per_lm_alllm_adq_pop_tot:
-        presentation:
-          topic_tags:
-            - Unemployment
-            - Work & Employment
       ny_adj_svnx_cd:
         presentation:
           topic_tags:
@@ -2664,10 +2657,6 @@ tables:
           topic_tags:
             - Global Health
             - Healthcare Spending
-      hd_hci_ovrl:
-        presentation:
-          topic_tags:
-            - Human Development Index (HDI)
       sh_mlr_incd_p3:
         presentation:
           topic_tags:

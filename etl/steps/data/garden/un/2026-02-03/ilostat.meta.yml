@@ -751,6 +751,7 @@ tables:
         description_short: World regions as defined by the International Labour Organization (ILO).
         display:
           name: ILO region
+
       ilo_subregion:
         title: ILO subregion
         unit: ""

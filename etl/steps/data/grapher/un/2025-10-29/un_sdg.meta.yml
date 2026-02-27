@@ -495,8 +495,6 @@ tables:
             note: |-
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
-          topic_tags:
-            - Work & Employment
         display:
           name: Share of workers in informal employment
           numDecimalPlaces: 1
@@ -551,8 +549,6 @@ tables:
             note: |-
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
-          topic_tags:
-            - Work & Employment
         display:
           name: Share of male workers in informal employment
           numDecimalPlaces: 1
@@ -676,8 +672,6 @@ tables:
             note: |-
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
-          topic_tags:
-            - Work & Employment
         display:
           name: Share of young people not in education, employment or training
           numDecimalPlaces: 1
@@ -793,6 +787,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
+
         presentation:
           topic_tags:
             - Causes of Death
@@ -827,9 +822,6 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-        presentation:
-          topic_tags:
-            - Work & Employment
 
   _8_8_1__sl_emp_injur__no_breakdown__female:
     variables:
@@ -918,7 +910,6 @@ tables:
           topic_tags:
             - Age Structure
             - Fertility Rate
-
   _3_7_2__sp_dyn_adkl__10_to_14_years_old:
     variables:
       _3_7_2__sp_dyn_adkl__10_to_14_years_old:
@@ -926,7 +917,6 @@ tables:
           topic_tags:
             - Age Structure
             - Fertility Rate
-
   _2_b_1__ag_prd_xsubdy:
     variables:
       _2_b_1__ag_prd_xsubdy:
@@ -1078,7 +1068,6 @@ tables:
         presentation:
           topic_tags:
             - Climate Change
-
   _12_1_1__sg_scp_cntry:
     variables:
       _12_1_1__sg_scp_cntry:
@@ -1454,7 +1443,6 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-
   _3_b_2__dc_tof_hlthnt:
     variables:
       _3_b_2__dc_tof_hlthnt:
@@ -1524,7 +1512,6 @@ tables:
       _4_3_1__se_adt_eductrn__15_to_64_years_old__both_sexes:
         presentation:
           topic_tags:
-            - Global Education
             - Global Education
   _3_c_1__sh_med_den__pharmacists:
     variables:
@@ -1945,7 +1932,6 @@ tables:
         presentation:
           topic_tags:
             - Internet
-            - Internet
             - Technological Change
   _9_c_1__it_mob_4gntwk:
     variables:
@@ -1960,7 +1946,6 @@ tables:
           topic_tags:
             - Economic Growth
             - Employment in Agriculture
-            - Economic Growth
   _9_3_2__fc_acc_ssid:
     variables:
       _9_3_2__fc_acc_ssid:
@@ -1968,7 +1953,6 @@ tables:
           topic_tags:
             - Economic Growth
             - Healthcare Spending
-            - Economic Growth
   _14_7_1__en_scp_fshgdp:
     variables:
       _14_7_1__en_scp_fshgdp:

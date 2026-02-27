@@ -442,7 +442,6 @@ tables:
           topic_tags:
             - Global Health
             - Maternal Mortality
-            - Global Health
   alcohol__abstainers_lifetime__pct:
     variables:
       alcohol__abstainers_lifetime__pct__sex_both_sexes:
@@ -541,6 +540,5 @@ tables:
       uhc_service_coverage_index__sdg_3_8_1:
         presentation:
           topic_tags:
-            - Global Health
             - Global Health
             - Healthcare Spending
