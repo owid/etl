@@ -87,21 +87,11 @@ def run() -> None:
 
     paths.log.info(f"Using year_cut={year_cut} (projections start at {year_cut + 1})")
 
-    # Omit growth rates for years that don't match the filtering pattern:
-    # Keep only: 100-year intervals (1700-1800), 100-year intervals (1800-1900), 5-year intervals (1900-1950), all years >= 1950
-    filter_mask = (
-        ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
-        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
-        | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
-        | (tb["year"] >= 1950)
-    )
-    tb.loc[~filter_mask, "growth_rate"] = np.nan
-
     # Convert population to billions
     tb["population_billions"] = tb["population"] / 1e9
 
     # Create visualization (all figure operations grouped in function)
-    fig = create_visualization(tb, year_cut, growth_rate_1700, filter_mask)
+    fig = create_visualization(tb, year_cut, growth_rate_1700)
 
     # Save chart outputs
     paths.export_fig(
@@ -175,7 +165,6 @@ def create_visualization(
     tb: Table,
     year_cut: int,
     growth_rate_1700: float | None,
-    filter_mask: pd.Series,
 ) -> plt.Figure:
     """Create the population growth visualization figure.
 
@@ -183,7 +172,6 @@ def create_visualization(
         tb: Complete table with year, population, growth_rate and metadata
         year_cut: Year where historical data ends and projections begin
         growth_rate_1700: Special growth rate for 1700 (10,000 BCE baseline)
-        filter_mask: Boolean mask for years where growth rate should be displayed
 
     Returns:
         Matplotlib figure object

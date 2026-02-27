@@ -771,13 +771,16 @@ def _estimate_growth_rate(tb_population: Table) -> Table:
 
     Uses the continuous growth formula: growth_rate = 100 * ln(P_t / P_{t-1}) / (t - t_{t-1})
 
-    Pre-1800, only years that are multiples of 50 are kept (sparse HYDE data), so the rate
-    represents an average over longer intervals.
+    Processing:
+    1. Calculate growth rates for all consecutive year pairs from 1700 onwards
+    2. Smooth source-transition years (1800, 1950) by averaging neighbors
+    3. Apply selective display filtering to reduce noise in sparse historical data:
+       - 1700-1800: Only 100-year intervals (1700, 1800)
+       - 1800-1900: Only 100-year intervals (1800, 1900)
+       - 1900-1950: Only 5-year intervals (1900, 1905, 1910, ...)
+       - 1950+: All years (annual data from UN WPP)
     """
     tb = tb_population.sort_values(by=["country", "year"]).copy()
-
-    # PRE-1800: Only keep years that are multiples of 50
-    tb = tb.loc[(tb["year"] >= 1800) | (tb["year"] % 50 == 0)]
 
     # Creating the 'previous_population' and 'previous_year' columns
     tb["previous_population"] = tb.groupby("country")["population"].shift(1)
@@ -789,7 +792,7 @@ def _estimate_growth_rate(tb_population: Table) -> Table:
     # Drop rows without previous year
     tb = tb.dropna(subset=["previous_year"])
 
-    # Estimate population growth rate
+    # Estimate population growth rate for all consecutive years
     tb["growth_rate"] = 100 * (
         np.log(tb["population"] / tb["previous_population"]) / (tb["year"] - tb["previous_year"])
     )
@@ -803,6 +806,16 @@ def _estimate_growth_rate(tb_population: Table) -> Table:
     for transition_year in [1800, 1950]:
         mask = tb["year"] == transition_year
         tb.loc[mask, "growth_rate"] = (tb.loc[mask, "previous_growth_rate"] + tb.loc[mask, "next_growth_rate"]) / 2
+
+    # Apply selective display filtering to reduce noise in sparse historical data
+    # Keep only specific year intervals for pre-1950 data, all years for 1950+
+    filter_mask = (
+        ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
+        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
+        | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
+        | (tb["year"] >= 1950)
+    )
+    tb.loc[~filter_mask, "growth_rate"] = np.nan
 
     # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
