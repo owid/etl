@@ -203,6 +203,8 @@ def fetch_single_indicator_metadata(indicator_code: str) -> dict | None:
     api_url = f"{LEGACY_API_BASE_URL}/{indicator_code}?format=json"
 
     response = requests.get(api_url, timeout=30)
+    if response.status_code == 404:
+        return None
     response.raise_for_status()
     js = response.json()
 
@@ -299,8 +301,10 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
         last_updated = last_updated.replace("+00:00", "")
     snap.metadata.origin.date_published = dt.datetime.strptime(last_updated, "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d")  # type: ignore
 
-    # Update the download URL to the latest version.
-    snap.metadata.origin.url_download = [r for r in meta_orig["Resources"] if r["name"] == "CSV file"][0]["url"]
+    # Update the download URL to the latest version (only if not already set to a generic URL).
+    api_download_url = [r for r in meta_orig["Resources"] if r["name"] == "CSV file"][0]["url"]
+    if "WDI_CSV.zip" not in str(snap.metadata.origin.url_download):
+        snap.metadata.origin.url_download = api_download_url
 
     # Update the description (in case it changed).
     snap.metadata.origin.description = BeautifulSoup(
