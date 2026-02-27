@@ -737,7 +737,6 @@ tables:
           topic_tags:
             - Economic Growth
             - Economic Inequality
-            - Wages
       gender_wage_gap_by_occupation__classif1_occupation__skill_level__total:
         presentation:
           topic_tags:
@@ -752,10 +751,6 @@ tables:
         description_short: World regions as defined by the International Labour Organization (ILO).
         display:
           name: ILO region
-
-        presentation:
-          topic_tags:
-            - World Regions
       ilo_subregion:
         title: ILO subregion
         unit: ""

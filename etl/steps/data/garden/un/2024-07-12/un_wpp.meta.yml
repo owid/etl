@@ -114,7 +114,6 @@ tables:
       population__sex_all__age_0_4__variant_medium:
         presentation:
           topic_tags:
-            - Future Population Growth
             - Population Growth
   growth_rate:
     variables:

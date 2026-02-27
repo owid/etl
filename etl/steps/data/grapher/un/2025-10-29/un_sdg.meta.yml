@@ -163,11 +163,11 @@ tables:
                 baseColorScheme: Greens
                 binningStrategy: manual
                 customNumericColors:
-                  - 
-                  - 
-                  - 
-                  - 
-                  - 
+                  -
+                  -
+                  -
+                  -
+                  -
                 customNumericValues:
                   - 0
                   - 10
@@ -223,11 +223,11 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericColors:
-                  - 
-                  - 
-                  - 
-                  - 
-                  - 
+                  -
+                  -
+                  -
+                  -
+                  -
                 customNumericValues:
                   - 0
                   - 10
@@ -496,8 +496,6 @@ tables:
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
           topic_tags:
-            - Informal Sector
-            - Labor Force Participation & Employment
             - Work & Employment
         display:
           name: Share of workers in informal employment
@@ -526,7 +524,6 @@ tables:
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
           topic_tags:
-            - Women's Employment
             - Work & Employment
         display:
           name: Share of female workers in informal employment
@@ -555,7 +552,6 @@ tables:
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
           topic_tags:
-            - Informal Sector
             - Work & Employment
         display:
           name: Share of male workers in informal employment
@@ -681,7 +677,6 @@ tables:
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
           topic_tags:
-            - Unemployment
             - Work & Employment
         display:
           name: Share of young people not in education, employment or training
@@ -798,12 +793,11 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-
         presentation:
           topic_tags:
             - Causes of Death
             - Work & Employment
-            - Work Conditions & Safety
+
   _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
     variables:
       _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
@@ -835,11 +829,10 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-
         presentation:
           topic_tags:
             - Work & Employment
-            - Work Conditions & Safety
+
   _8_8_1__sl_emp_injur__no_breakdown__female:
     variables:
       _8_8_1__sl_emp_injur__no_breakdown__female:
@@ -887,7 +880,6 @@ tables:
         presentation:
           topic_tags:
             - Economic Growth
-            - Labor Force Participation & Employment
   _9_2_2__sl_tlf_manf:
     variables:
       _9_2_2__sl_tlf_manf:
@@ -899,7 +891,6 @@ tables:
 
         presentation:
           topic_tags:
-            - Labor Force Participation & Employment
             - Trade & Globalization
   _10_4_1__sl_emp_gtotl:
     variables:
@@ -920,10 +911,10 @@ tables:
       _5_6_2__sh_lgr_acsrhe:
         presentation:
           topic_tags:
-            - Education and Knowledge
+            - Global Education
             - Fertility Rate
             - Global Health
-            - Sexual & Reproductive Health
+            - Fertility Rate
   _3_7_2__sp_dyn_adkl__15_to_19_years_old:
     variables:
       _3_7_2__sp_dyn_adkl__15_to_19_years_old:
@@ -931,8 +922,7 @@ tables:
           topic_tags:
             - Age Structure
             - Fertility Rate
-            - Sexual & Reproductive Health
-            - Teenage Pregnancy
+
   _3_7_2__sp_dyn_adkl__10_to_14_years_old:
     variables:
       _3_7_2__sp_dyn_adkl__10_to_14_years_old:
@@ -940,15 +930,12 @@ tables:
           topic_tags:
             - Age Structure
             - Fertility Rate
-            - Sexual & Reproductive Health
-            - Teenage Pregnancy
+
   _2_b_1__ag_prd_xsubdy:
     variables:
       _2_b_1__ag_prd_xsubdy:
         presentation:
           topic_tags:
-            - Agricultural Production
-            - Agricultural Regulation & Policy
             - Trade & Globalization
   _9_1_2__is_rdp_pfvol__air_transport:
     variables:
@@ -1031,7 +1018,6 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Water Pollution
   _12_6_1__en_scp_frmn__no_breakdown:
     variables:
       _12_6_1__en_scp_frmn__no_breakdown:
@@ -1044,7 +1030,6 @@ tables:
       _16_10_2__sg_inf_accss:
         presentation:
           topic_tags:
-            - Accountability & Transparency
             - Global Health
             - Trust
   _15_6_1__er_cbd_nagoya:
@@ -1078,14 +1063,13 @@ tables:
           topic_tags:
             - CO2 & Greenhouse Gas Emissions
             - Economic Growth
-            - Environmental Protection & Regulation
+            - Climate Change
   _16_a_1__sg_nhr_cmplnc:
     variables:
       _16_a_1__sg_nhr_cmplnc:
         presentation:
           topic_tags:
             - Human Rights
-            - Intergovernmental Organizations & Diplomacy
   _11_b_1__sg_dsr_lgrgsr:
     variables:
       _11_b_1__sg_dsr_lgrgsr:
@@ -1098,12 +1082,7 @@ tables:
         presentation:
           topic_tags:
             - Climate Change
-  _17_18_3__sg_stt_nsdsfnd:
-    variables:
-      _17_18_3__sg_stt_nsdsfnd:
-        presentation:
-          topic_tags:
-            - Unlisted
+
   _12_1_1__sg_scp_cntry:
     variables:
       _12_1_1__sg_scp_cntry:
@@ -1187,7 +1166,6 @@ tables:
       _3_c_1__sh_med_den__dentists:
         presentation:
           topic_tags:
-            - Doctors & Health Workers
             - Global Health
             - Healthcare Spending
   _11_5_2__vc_dsr_gdpls:
@@ -1297,7 +1275,6 @@ tables:
           topic_tags:
             - Environmental Impacts of Food Production
             - Food Supply
-            - Food Waste
   _16_6_1__gf_xpd_gbpc:
     variables:
       _16_6_1__gf_xpd_gbpc:
@@ -1329,7 +1306,6 @@ tables:
       _16_2_2__vc_htf_detv__under_18_years_old__female:
         presentation:
           topic_tags:
-            - Human Trafficking
             - Migration
   _6_5_1__er_h2o_iwrmd:
     variables:
@@ -1406,7 +1382,6 @@ tables:
           topic_tags:
             - Human Rights
             - Land Use
-            - Property Rights
   _1_5_3__sg_dsr_lgrgsr:
     variables:
       _1_5_3__sg_dsr_lgrgsr:
@@ -1438,7 +1413,7 @@ tables:
       _16_2_3__vc_vaw_sxvln__18_to_29_years_old__male:
         presentation:
           topic_tags:
-            - Sexual & Reproductive Health
+            - Fertility Rate
             - Violence Against Children & Children's Rights
   _10_7_1__sl_emp_rcost_mo__both_sexes:
     variables:
@@ -1459,7 +1434,6 @@ tables:
         presentation:
           topic_tags:
             - Clean Water & Sanitation
-            - Hygiene
             - Sanitation
   _15_4_2__er_mtn_grncvi__total__mountain_green_cover_index__mgci:
     variables:
@@ -1485,12 +1459,7 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-  _17_18_2__sg_stt_fpos:
-    variables:
-      _17_18_2__sg_stt_fpos:
-        presentation:
-          topic_tags:
-            - Unlisted
+
   _3_b_2__dc_tof_hlthnt:
     variables:
       _3_b_2__dc_tof_hlthnt:
@@ -1517,7 +1486,6 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Food and Agriculture
   _4_6_1__se_adt_funs__male__numeracy:
     variables:
       _4_6_1__se_adt_funs__male__numeracy:
@@ -1562,13 +1530,12 @@ tables:
         presentation:
           topic_tags:
             - Global Education
-            - Quality of Education
+            - Global Education
   _3_c_1__sh_med_den__pharmacists:
     variables:
       _3_c_1__sh_med_den__pharmacists:
         presentation:
           topic_tags:
-            - Doctors & Health Workers
             - Global Health
             - Healthcare Spending
   _3_5_1__sh_sud_alcol__both_sexes:
@@ -1597,7 +1564,6 @@ tables:
           topic_tags:
             - Global Education
             - Internet
-            - Primary & Secondary Education
   _2_3_1__pd_agr_ssfp__both_sexes:
     variables:
       _2_3_1__pd_agr_ssfp__both_sexes:
@@ -1623,7 +1589,6 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Food and Agriculture
   _4_2_1__se_dev_ontrk__36_to_59_months_old__both_sexes:
     variables:
       _4_2_1__se_dev_ontrk__36_to_59_months_old__both_sexes:
@@ -1635,14 +1600,14 @@ tables:
       _15_2_1__ag_lnd_frstcert:
         presentation:
           topic_tags:
-            - Environmental Protection & Regulation
+            - Climate Change
             - Forests & Deforestation
   _15_2_1__ag_lnd_frstmgt:
     variables:
       _15_2_1__ag_lnd_frstmgt:
         presentation:
           topic_tags:
-            - Environmental Protection & Regulation
+            - Climate Change
             - Forests & Deforestation
   _15_2_1__ag_lnd_frstprct:
     variables:
@@ -1650,7 +1615,7 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Environmental Protection & Regulation
+            - Climate Change
             - Forests & Deforestation
   _15_1_2__er_ptd_frhwtr:
     variables:
@@ -1658,7 +1623,7 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Environmental Protection & Regulation
+            - Climate Change
   _2_5_2__er_rsk_lbreds:
     variables:
       _2_5_2__er_rsk_lbreds:
@@ -1676,7 +1641,7 @@ tables:
       _5_2_1__vc_vaw_marr__15_to_49_years_old:
         presentation:
           topic_tags:
-            - Crime
+            - Homicides
             - Women's Rights
   _10_a_1__tm_trf_zero__total_or_no_breakdown:
     variables:
@@ -1745,7 +1710,6 @@ tables:
       _16_7_1__sg_dmk_parlmp_lc:
         presentation:
           topic_tags:
-            - Women in Politics
             - Women's Rights
   _16_7_1__sg_dmk_jdc__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__total__female__judges:
     variables:
@@ -1753,14 +1717,12 @@ tables:
         presentation:
           topic_tags:
             - Gender Ratio
-            - Women in Politics
             - Women's Rights
   _16_7_1__sg_dmk_parlmp_uc:
     variables:
       _16_7_1__sg_dmk_parlmp_uc:
         presentation:
           topic_tags:
-            - Women in Politics
             - Women's Rights
   _16_1_4__vc_sns_waln_drk__both_sexes:
     variables:
@@ -1775,7 +1737,6 @@ tables:
         presentation:
           topic_tags:
             - Human Rights
-            - Intergovernmental Organizations & Diplomacy
   _15_3_1__ag_lnd_dgrd:
     variables:
       _15_3_1__ag_lnd_dgrd:
@@ -1808,7 +1769,6 @@ tables:
       _2_2_2__sn_sta_ovwgt__both_sexes:
         presentation:
           topic_tags:
-            - Child Health
             - Obesity
   _16_2_1__vc_vaw_phypyv__1_to_14_years_old:
     variables:
@@ -1827,7 +1787,6 @@ tables:
       _5_4_1__sl_dom_tspd__15_years_old_and_over__all_areas__female:
         presentation:
           topic_tags:
-            - Women's Employment
             - Work & Employment
   _3_d_2__sh_bld_ecoli:
     variables:
@@ -1869,7 +1828,6 @@ tables:
         presentation:
           topic_tags:
             - Global Health
-            - Healthcare
             - Healthcare Spending
   _6_6_1__en_lkrv_pwap:
     variables:
@@ -1979,15 +1937,14 @@ tables:
       _5_5_1__sg_gen_locgels:
         presentation:
           topic_tags:
-            - Women in Politics
             - Women's Rights
   _5_2_1__vc_vaw_marr__15_years_old_and_over:
     variables:
       _5_2_1__vc_vaw_marr__15_years_old_and_over:
         presentation:
           topic_tags:
-            - Crime
-            - Sexual & Reproductive Health
+            - Homicides
+            - Fertility Rate
             - Women's Rights
   _1_2_2__sd_mdp_muhc__all_age_ranges_or_no_breaks_by_age__all_areas__both_sexes:
     variables:
@@ -2000,7 +1957,7 @@ tables:
       _5_b_1__it_mob_own__both_sexes:
         presentation:
           topic_tags:
-            - Communication Technology
+            - Internet
             - Internet
             - Technological Change
   _9_c_1__it_mob_4gntwk:
@@ -2008,7 +1965,7 @@ tables:
       _9_c_1__it_mob_4gntwk:
         presentation:
           topic_tags:
-            - Communication Technology
+            - Internet
             - Technological Change
   _9_3_1__nv_ind_ssis__manufacturing:
     variables:
@@ -2017,7 +1974,7 @@ tables:
           topic_tags:
             - Economic Growth
             - Employment in Agriculture
-            - Industrialization
+            - Economic Growth
   _9_3_2__fc_acc_ssid:
     variables:
       _9_3_2__fc_acc_ssid:
@@ -2025,7 +1982,7 @@ tables:
           topic_tags:
             - Economic Growth
             - Healthcare Spending
-            - Industrialization
+            - Economic Growth
   _14_7_1__en_scp_fshgdp:
     variables:
       _14_7_1__en_scp_fshgdp:
@@ -2051,7 +2008,7 @@ tables:
       _2_a_2__dc_tof_agrl:
         presentation:
           topic_tags:
-            - Agricultural Regulation & Policy
+            - Agricultural Production
             - Foreign Aid
   _16_4_1__di_ill_in__drug_trafficking:
     variables:
@@ -2101,7 +2058,6 @@ tables:
         presentation:
           topic_tags:
             - Foreign Aid
-            - Infrastructure Projects
   _6_a_1__dc_tof_washl:
     variables:
       _6_a_1__dc_tof_washl:
@@ -2137,7 +2093,6 @@ tables:
           topic_tags:
             - Homicides
             - Human Rights
-            - Prisons
   _11_a_1__sd_cpa_uprdp:
     variables:
       _11_a_1__sd_cpa_uprdp:
@@ -2155,9 +2110,8 @@ tables:
       _5_6_1__sh_fpl_infm:
         presentation:
           topic_tags:
-            - Contraception & Abortion
             - Human Rights
-            - Sexual & Reproductive Health
+            - Fertility Rate
             - Women's Rights
   _5_3_1__sp_dyn_mrbf15:
     variables:
@@ -2171,6 +2125,6 @@ tables:
       _16_2_3__vc_vaw_sxvln__18_to_29_years_old__female:
         presentation:
           topic_tags:
-            - Sexual & Reproductive Health
+            - Fertility Rate
             - Violence Against Children & Children's Rights
             - Women's Rights

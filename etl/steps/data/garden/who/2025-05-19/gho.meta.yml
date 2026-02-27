@@ -162,7 +162,7 @@ tables:
       ? overweight_prevalence_among_children_under_5_years_of_age__pct_weight_for_height__gt_plus2_sd__model_based_estimates__sex_both_sexes
       : presentation:
           topic_tags:
-            - Child Health
+            - Child & Infant Mortality
             - Obesity
   existence_of_national_screening_program_for_cervical_cancer:
     variables:
@@ -359,7 +359,6 @@ tables:
           topic_tags:
             - Child & Infant Mortality
             - Pneumonia
-            - Respiratory Diseases
   estimated_number_of_individuals_in_the_country_requiring_preventive_chemotherapy_for_onchocerciasis:
     variables:
       estimated_number_of_individuals_in_the_country_requiring_preventive_chemotherapy_for_onchocerciasis:
@@ -392,7 +391,7 @@ tables:
       measles__number_of_reported_cases:
         presentation:
           topic_tags:
-            - Measles
+            - Eradication of Diseases
             - Vaccination
   reported_number_of_human_rabies_deaths:
     variables:
@@ -438,7 +437,7 @@ tables:
       ? stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates__sex_both_sexes
       : presentation:
           topic_tags:
-            - Child Health
+            - Child & Infant Mortality
             - Hunger & Undernourishment
   antenatal_care_coverage__at_least_four_visits__pct:
     variables:
@@ -447,7 +446,7 @@ tables:
           topic_tags:
             - Global Health
             - Maternal Mortality
-            - Sexual & Reproductive Health
+            - Global Health
   alcohol__abstainers_lifetime__pct:
     variables:
       alcohol__abstainers_lifetime__pct__sex_both_sexes:
@@ -527,7 +526,7 @@ tables:
       neonates_protected_at_birth_against_neonatal_tetanus__pab__pct:
         presentation:
           topic_tags:
-            - Child Health
+            - Child & Infant Mortality
             - Tetanus
   current_health_expenditure__che__as_percentage_of_gross_domestic_product__gdp__pct:
     variables:
@@ -548,5 +547,5 @@ tables:
         presentation:
           topic_tags:
             - Global Health
-            - Health Inequality
+            - Global Health
             - Healthcare Spending

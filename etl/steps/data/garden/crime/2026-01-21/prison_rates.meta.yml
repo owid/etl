@@ -27,10 +27,8 @@ tables:
           numDecimalPlaces: 0
         presentation:
           topic_tags:
-            - Crime
             - Homicides
             - Population Growth
-            - Prisons
       pretrial_detainees_pct:
         title: Share of prisoners that are pre-trial detainees
         description_short: Pre-trial detainees and remand prisoners as a percentage of the total prison population.
@@ -39,10 +37,6 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-        presentation:
-          topic_tags:
-            - Crime
-            - Prisons
       female_prisoners_pct:
         title: Share of prisoners that are female
         unit: "%"
@@ -62,10 +56,6 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-        presentation:
-          topic_tags:
-            - Crime
-            - Prisons
       number_of_institutions:
         title: Number of institutions
         unit: institutions
@@ -84,10 +74,6 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-        presentation:
-          topic_tags:
-            - Crime
-            - Prisons
       pretrial_remand_number:
         title: Number of pre-trial/remand prisoners in the prison population
         unit: prisoners
