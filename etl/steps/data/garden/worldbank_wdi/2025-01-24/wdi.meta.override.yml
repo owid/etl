@@ -1016,11 +1016,9 @@ tables:
       ic_elc_outg:
         presentation:
           topic_tags:
-            - Business Environment
             - Energy
       ic_reg_durs:
         presentation:
           topic_tags:
-            - Business Environment
             - Economic Growth
             - Trade & Globalization

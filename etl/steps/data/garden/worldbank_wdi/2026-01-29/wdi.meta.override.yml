@@ -1248,7 +1248,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
           grapher_config:
             title: Female labor force participation rate
             subtitle: |-
@@ -1695,7 +1695,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
           grapher_config:
             title: Female labor force participation rate
             note: |-
@@ -1749,7 +1749,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Economic Growth
           grapher_config:
             title: Unemployment rate
             note: |-
@@ -1803,7 +1803,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
           grapher_config:
             title: Female unemployment rate
             note: |-
@@ -1937,7 +1937,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
           grapher_config:
             title: Female employment rate
             note: |-
@@ -1991,7 +1991,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
           grapher_config:
             title: Female employment rate
             note: |-
@@ -2039,7 +2039,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
         display:
           name: Share of the labor force that is female
           numDecimalPlaces: 1
@@ -2053,7 +2053,8 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Child Labor
+            - Violence Against Children & Children's Rights
         display:
           name: Children in employment
           numDecimalPlaces: 1
@@ -2093,7 +2094,7 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Child Labor
         display:
           name: Children in employment, work only
           numDecimalPlaces: 1
@@ -2107,7 +2108,9 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Child Labor
+            - Violence Against Children & Children's Rights
+            - Working Hours
         display:
           name: Average working hours of children, study and work
           numDecimalPlaces: 1
@@ -2297,7 +2300,8 @@ tables:
         presentation:
           attribution_short: ILO
           topic_tags:
-            - Work & Employment
+            - Women's Employment
+            - Women's Rights
           grapher_config:
             title: Ratio of female to male labor force participation rates
             note: |-
@@ -2429,19 +2433,16 @@ tables:
         presentation:
           topic_tags:
             - Economic Growth
-            - Financial Inclusion
       per_si_allsi_adq_pop_tot:
         presentation:
           topic_tags:
             - Government Spending
             - Healthcare Spending
-            - Social Spending
       per_sa_allsa_adq_pop_tot:
         presentation:
           topic_tags:
             - Government Spending
             - Poverty
-            - Social Spending
       per_lm_alllm_adq_pop_tot:
         presentation:
           topic_tags:
@@ -2450,14 +2451,12 @@ tables:
       ny_adj_svnx_cd:
         presentation:
           topic_tags:
-            - Consumer Credit, Debt & Saving
             - Economic Growth
             - Government Spending
       omm_net_savings_percap:
         presentation:
           topic_tags:
             - CO2 & Greenhouse Gas Emissions
-            - Consumer Credit, Debt & Saving
             - Economic Growth
       ag_lnd_irig_ag_zs:
         presentation:
@@ -2475,7 +2474,6 @@ tables:
       is_air_psgr:
         presentation:
           topic_tags:
-            - Tourism
             - Transport
       is_air_good_mt_k1:
         presentation:
@@ -2513,7 +2511,6 @@ tables:
           topic_tags:
             - Agricultural Production
             - Land Use
-            - Land Use & Yields in Agriculture
       ms_mil_totl_tf_zs:
         presentation:
           topic_tags:
@@ -2531,12 +2528,10 @@ tables:
         presentation:
           topic_tags:
             - HIV/AIDS
-            - Sexual & Reproductive Health
       fb_atm_totl_p5:
         presentation:
           topic_tags:
             - Economic Growth
-            - Financial Inclusion
             - Healthcare Spending
       en_atm_pm25_mc_m3:
         presentation:
@@ -2580,11 +2575,9 @@ tables:
           topic_tags:
             - Burden of Disease
             - Child & Infant Mortality
-            - Respiratory Diseases
       sh_sta_orth:
         presentation:
           topic_tags:
-            - Child Health
             - Diarrheal Diseases
       sh_med_cmhw_p3:
         presentation:
@@ -2599,10 +2592,8 @@ tables:
       sp_dyn_conu_zs:
         presentation:
           topic_tags:
-            - Contraception & Abortion
             - Fertility Rate
             - Population Growth
-            - Sexual & Reproductive Health
       sh_sta_diab_zs:
         presentation:
           topic_tags:
@@ -2632,7 +2623,6 @@ tables:
       sh_sta_fgms_zs:
         presentation:
           topic_tags:
-            - Sexual & Reproductive Health
             - Violence Against Children & Children's Rights
             - Women's Rights
       ag_con_fert_zs:
@@ -2650,12 +2640,10 @@ tables:
       bx_klt_dinv_wd_gd_zs:
         presentation:
           topic_tags:
-            - Foreign Direct Investment
             - Trade & Globalization
       bm_klt_dinv_wd_gd_zs:
         presentation:
           topic_tags:
-            - Foreign Direct Investment
             - Trade & Globalization
       sl_gdp_pcap_em_kd:
         presentation:
@@ -2664,7 +2652,6 @@ tables:
       gc_rev_xgrt_gd_zs:
         presentation:
           topic_tags:
-            - Government Revenue
             - Government Spending
             - Taxation
       sh_uhc_sci:
@@ -2676,7 +2663,6 @@ tables:
         presentation:
           topic_tags:
             - Global Health
-            - Healthcare
             - Healthcare Spending
       hd_hci_ovrl:
         presentation:
@@ -2695,7 +2681,6 @@ tables:
           topic_tags:
             - Economic Growth
             - Food Prices
-            - Prices
       er_h2o_intr_k3:
         presentation:
           topic_tags:
@@ -2721,7 +2706,6 @@ tables:
         presentation:
           topic_tags:
             - Maternal Mortality
-            - Sexual & Reproductive Health
       nv_ind_manf_zs:
         presentation:
           topic_tags:
@@ -2747,12 +2731,10 @@ tables:
         presentation:
           topic_tags:
             - Migration
-            - Remittances
       sh_dyn_ncom_zs:
         presentation:
           topic_tags:
             - Causes of Death
-            - Non-communicable Diseases
       er_h2o_fwdm_zs:
         presentation:
           topic_tags:
@@ -2773,7 +2755,6 @@ tables:
       fb_cbk_brch_p5:
         presentation:
           topic_tags:
-            - Banks & Financial Institutions
             - Healthcare Spending
             - Trade & Globalization
       sh_dth_nmrt:
@@ -2783,7 +2764,6 @@ tables:
       sh_med_numw_p3:
         presentation:
           topic_tags:
-            - Doctors & Health Workers
             - Global Health
             - Maternal Mortality
       ny_gdp_petr_rt_zs:
@@ -2802,7 +2782,6 @@ tables:
       sh_med_phys_zs:
         presentation:
           topic_tags:
-            - Doctors & Health Workers
             - Global Health
             - Healthcare Spending
       sp_pop_totl:
@@ -2823,7 +2802,6 @@ tables:
         presentation:
           topic_tags:
             - Micronutrient Deficiency
-            - Sexual & Reproductive Health
       sh_anm_allw_zs:
         presentation:
           topic_tags:
@@ -2873,7 +2851,6 @@ tables:
       sh_sta_maln_zs:
         presentation:
           topic_tags:
-            - Child Health
             - Hunger & Undernourishment
       sh_mlr_tret_zs:
         presentation:
@@ -2882,7 +2859,6 @@ tables:
       sh_sta_wast_zs:
         presentation:
           topic_tags:
-            - Child Health
             - Hunger & Undernourishment
       sh_sta_orcf_zs:
         presentation:
@@ -2895,9 +2871,7 @@ tables:
       gc_xpn_intp_zs:
         presentation:
           topic_tags:
-            - Government Revenue
             - Government Spending
-            - Interest Rates
             - Research & Development
       sn_itk_salt_zs:
         presentation:
@@ -2908,13 +2882,11 @@ tables:
           topic_tags:
             - Agricultural Production
             - Land Use
-            - Land Use & Yields in Agriculture
       ag_lnd_arbl_zs:
         presentation:
           topic_tags:
             - Agricultural Production
             - Land Use
-            - Land Use & Yields in Agriculture
       sh_sta_brtw_zs:
         presentation:
           topic_tags:
@@ -2926,7 +2898,6 @@ tables:
             - Child & Infant Mortality
             - Global Health
             - Maternal Mortality
-            - Sexual & Reproductive Health
       sh_xpd_oopc_ch_zs:
         presentation:
           topic_tags:
@@ -2936,8 +2907,6 @@ tables:
         presentation:
           topic_tags:
             - Global Health
-            - Labor Market Policies
-            - Work & Employment
       si_pov_nahc:
         presentation:
           topic_tags:
@@ -2965,7 +2934,6 @@ tables:
       sg_gen_parl_zs:
         presentation:
           topic_tags:
-            - Women in Politics
             - Women's Rights
       sp_dyn_conm_zs:
         presentation:
@@ -2983,7 +2951,6 @@ tables:
       sh_med_saop_p5:
         presentation:
           topic_tags:
-            - Doctors & Health Workers
             - Global Health
             - Healthcare Spending
       tm_tax_mrch_wm_ar_zs:

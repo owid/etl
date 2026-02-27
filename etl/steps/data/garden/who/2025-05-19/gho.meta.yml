@@ -150,7 +150,6 @@ tables:
         presentation:
           topic_tags:
             - Causes of Death
-            - State Capacity
   ? prevalence_of_overweight_among_children_and_adolescents__bmi__gt__plus1_standard_deviations_above_the_median__crude_estimate__pct
   : variables:
       ? prevalence_of_overweight_among_children_and_adolescents__bmi__gt__plus1_standard_deviations_above_the_median__crude_estimate__pct__sex_both_sexes__age_group_5_19__years_of_age
@@ -162,7 +161,6 @@ tables:
       ? overweight_prevalence_among_children_under_5_years_of_age__pct_weight_for_height__gt_plus2_sd__model_based_estimates__sex_both_sexes
       : presentation:
           topic_tags:
-            - Child & Infant Mortality
             - Obesity
   existence_of_national_screening_program_for_cervical_cancer:
     variables:
@@ -391,7 +389,6 @@ tables:
       measles__number_of_reported_cases:
         presentation:
           topic_tags:
-            - Eradication of Diseases
             - Vaccination
   reported_number_of_human_rabies_deaths:
     variables:
@@ -437,7 +434,6 @@ tables:
       ? stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates__sex_both_sexes
       : presentation:
           topic_tags:
-            - Child & Infant Mortality
             - Hunger & Undernourishment
   antenatal_care_coverage__at_least_four_visits__pct:
     variables:
@@ -526,7 +522,6 @@ tables:
       neonates_protected_at_birth_against_neonatal_tetanus__pab__pct:
         presentation:
           topic_tags:
-            - Child & Infant Mortality
             - Tetanus
   current_health_expenditure__che__as_percentage_of_gross_domestic_product__gdp__pct:
     variables:

@@ -25,7 +25,6 @@ tables:
         description_short: The low estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting are included.
         presentation:
           topic_tags:
-            - Civil Wars
             - War & Peace
       war_deaths_high:
         title: War deaths (higher estimate)

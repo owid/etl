@@ -240,16 +240,17 @@ tables:
       deaths__sex_all__age_all__variant_estimates:
         presentation:
           topic_tags:
-            - Life Expectancy
-            - Population Growth
+            - Causes of Death
+            - Global Health
       deaths__sex_all__age_0_4__variant_estimates:
         presentation:
           topic_tags:
-            - Child & Infant Mortality
+            - Population Growth
       death_rate__sex_all__age_all__variant_estimates:
         presentation:
           topic_tags:
-            - Population Growth
+            - Causes of Death
+            - Global Health
       deaths__sex_all__age_0__variant_estimates:
         presentation:
           topic_tags:

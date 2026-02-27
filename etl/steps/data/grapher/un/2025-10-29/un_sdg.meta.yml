@@ -163,11 +163,11 @@ tables:
                 baseColorScheme: Greens
                 binningStrategy: manual
                 customNumericColors:
-                  -
-                  -
-                  -
-                  -
-                  -
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericValues:
                   - 0
                   - 10
@@ -223,11 +223,11 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericColors:
-                  -
-                  -
-                  -
-                  -
-                  -
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericValues:
                   - 0
                   - 10
@@ -524,7 +524,7 @@ tables:
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
           topic_tags:
-            - Work & Employment
+            - Women's Employment
         display:
           name: Share of female workers in informal employment
           numDecimalPlaces: 1
@@ -796,8 +796,6 @@ tables:
         presentation:
           topic_tags:
             - Causes of Death
-            - Work & Employment
-
   _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
     variables:
       _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
@@ -911,10 +909,8 @@ tables:
       _5_6_2__sh_lgr_acsrhe:
         presentation:
           topic_tags:
-            - Global Education
             - Fertility Rate
             - Global Health
-            - Fertility Rate
   _3_7_2__sp_dyn_adkl__15_to_19_years_old:
     variables:
       _3_7_2__sp_dyn_adkl__15_to_19_years_old:
@@ -936,6 +932,7 @@ tables:
       _2_b_1__ag_prd_xsubdy:
         presentation:
           topic_tags:
+            - Agricultural Production
             - Trade & Globalization
   _9_1_2__is_rdp_pfvol__air_transport:
     variables:
@@ -1063,7 +1060,6 @@ tables:
           topic_tags:
             - CO2 & Greenhouse Gas Emissions
             - Economic Growth
-            - Climate Change
   _16_a_1__sg_nhr_cmplnc:
     variables:
       _16_a_1__sg_nhr_cmplnc:
@@ -1413,7 +1409,6 @@ tables:
       _16_2_3__vc_vaw_sxvln__18_to_29_years_old__male:
         presentation:
           topic_tags:
-            - Fertility Rate
             - Violence Against Children & Children's Rights
   _10_7_1__sl_emp_rcost_mo__both_sexes:
     variables:
@@ -1600,14 +1595,12 @@ tables:
       _15_2_1__ag_lnd_frstcert:
         presentation:
           topic_tags:
-            - Climate Change
             - Forests & Deforestation
   _15_2_1__ag_lnd_frstmgt:
     variables:
       _15_2_1__ag_lnd_frstmgt:
         presentation:
           topic_tags:
-            - Climate Change
             - Forests & Deforestation
   _15_2_1__ag_lnd_frstprct:
     variables:
@@ -1615,7 +1608,6 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Climate Change
             - Forests & Deforestation
   _15_1_2__er_ptd_frhwtr:
     variables:
@@ -1623,7 +1615,6 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
-            - Climate Change
   _2_5_2__er_rsk_lbreds:
     variables:
       _2_5_2__er_rsk_lbreds:
@@ -1641,7 +1632,6 @@ tables:
       _5_2_1__vc_vaw_marr__15_to_49_years_old:
         presentation:
           topic_tags:
-            - Homicides
             - Women's Rights
   _10_a_1__tm_trf_zero__total_or_no_breakdown:
     variables:
@@ -1787,7 +1777,7 @@ tables:
       _5_4_1__sl_dom_tspd__15_years_old_and_over__all_areas__female:
         presentation:
           topic_tags:
-            - Work & Employment
+            - Women's Employment
   _3_d_2__sh_bld_ecoli:
     variables:
       _3_d_2__sh_bld_ecoli:
@@ -1917,7 +1907,6 @@ tables:
       _11_1_1__en_lnd_indqthsng__all_areas_or_breakdown_by_cities_not_available__all_areas:
         presentation:
           topic_tags:
-            - Housing
             - Urbanization
   _11_1_1__en_lnd_slum:
     variables:
@@ -1943,8 +1932,6 @@ tables:
       _5_2_1__vc_vaw_marr__15_years_old_and_over:
         presentation:
           topic_tags:
-            - Homicides
-            - Fertility Rate
             - Women's Rights
   _1_2_2__sd_mdp_muhc__all_age_ranges_or_no_breaks_by_age__all_areas__both_sexes:
     variables:
@@ -1965,7 +1952,6 @@ tables:
       _9_c_1__it_mob_4gntwk:
         presentation:
           topic_tags:
-            - Internet
             - Technological Change
   _9_3_1__nv_ind_ssis__manufacturing:
     variables:
@@ -2008,7 +1994,6 @@ tables:
       _2_a_2__dc_tof_agrl:
         presentation:
           topic_tags:
-            - Agricultural Production
             - Foreign Aid
   _16_4_1__di_ill_in__drug_trafficking:
     variables:
@@ -2111,7 +2096,6 @@ tables:
         presentation:
           topic_tags:
             - Human Rights
-            - Fertility Rate
             - Women's Rights
   _5_3_1__sp_dyn_mrbf15:
     variables:
@@ -2125,6 +2109,5 @@ tables:
       _16_2_3__vc_vaw_sxvln__18_to_29_years_old__female:
         presentation:
           topic_tags:
-            - Fertility Rate
             - Violence Against Children & Children's Rights
             - Women's Rights

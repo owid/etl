@@ -19,7 +19,6 @@ tables:
         presentation:
           topic_tags:
             - Environmental Impacts of Food Production
-            - Environmental Protection & Regulation
       environmental_performance_agri:
         title: Environmental Performance Index, Agriculture
         unit: ''
@@ -45,4 +44,3 @@ tables:
         presentation:
           topic_tags:
             - Environmental Impacts of Food Production
-            - Environmental Protection & Regulation
