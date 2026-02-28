@@ -743,19 +743,18 @@ steps:
     - data://meadow/health/2025-02-19/measles_historical
 
   # CDC Measles Cases 1985-present - autoupdate
-  data://meadow/cdc/latest/measles_cases:
-    - snapshot://cdc/latest/measles_cases.json
-  data://garden/cdc/latest/measles_cases:
-    - data://meadow/cdc/latest/measles_cases
-
-  #
+  # NOTE: Commented out on 2026-02-28 because the step is failing. CDC may have changed their data.
+  # data://meadow/cdc/latest/measles_cases:
+  #   - snapshot://cdc/latest/measles_cases.json
+  # data://garden/cdc/latest/measles_cases:
+  #   - data://meadow/cdc/latest/measles_cases
   # Long-run measles data (auto-updated)
-  data://garden/health/latest/measles_long_run:
-    - data://garden/cdc/latest/measles_cases
-    - data://garden/health/2025-02-19/measles_historical
-    - data://garden/demography/2024-07-15/population
-  data://grapher/health/latest/measles_long_run:
-    - data://garden/health/latest/measles_long_run
+  # data://garden/health/latest/measles_long_run:
+  #   - data://garden/cdc/latest/measles_cases
+  #   - data://garden/health/2025-02-19/measles_historical
+  #   - data://garden/demography/2024-07-15/population
+  # data://grapher/health/latest/measles_long_run:
+  #   - data://garden/health/latest/measles_long_run
 
   #
   # Cancer survival rates (GCO)
