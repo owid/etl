@@ -11,10 +11,11 @@ definitions:
       numDecimalPlaces: 0
 
 dataset:
+  title: Dietary choices of Brits and Americans
   update_period_days: 365
 
 tables:
-  dietary_choices_uk:
+  dietary_choices:
     variables:
       base:
         title: Weighted number of responses
