@@ -124,17 +124,17 @@ def run() -> None:
         if sex == "sex_side_by_side" or age == "age_side_by_side":
             view.metadata = {
                 "description_from_producer": "",
-                "description_short": view.config["subtitle"],
+                "description_short": view.config["subtitle"] if view.config else "",
                 "presentation": {
-                    "title_public": view.config["title"],
+                    "title_public": view.config["title"] if view.config else "",
                 },
             }
         else:
             # Only updated description_short for other views
             view.metadata = {
-                "description_short": view.config["subtitle"],
+                "description_short": view.config["subtitle"] if view.config else "",
                 "presentation": {
-                    "title_public": view.config["title"],
+                    "title_public": view.config["title"] if view.config else "",
                 },
             }
         edit_indicator_displays(view)
@@ -245,7 +245,7 @@ def create_grouped_views(collection):
             {
                 "dimension": "age_group",
                 "choice_new_slug": "age_side_by_side",
-                "choices": {"adult", "youth", "elderly"},
+                "choices": ["adult", "youth", "elderly"],
                 "view_config": view_config,
                 "view_metadata": view_metadata,
             },

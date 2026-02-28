@@ -23,6 +23,6 @@ meta:
       name: © International Federation of Robotics
       url: https://ifr.org/
 outs:
-  - md5: 03497a6f65e14b5eabbf6a9ad42daee1
-    size: 10812
+  - md5: a871b62fe1c4719c6aef3a14001fa870
+    size: 10825
     path: robot_density.xlsx

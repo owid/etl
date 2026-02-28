@@ -1,24 +1,28 @@
-"""Quick access functions for data discovery and retrieval. For more complex use cases, refer to the [full API](../#owid.catalog.api.Client).
+"""Quick access functions for data discovery and retrieval.
 
-This module provides convenience functions for discovering and accessing OWID catalog data.
+For more complex use cases, refer to the [full API](../#owid.catalog.api.Client).
 
-The API separates discovery (searching)
+This module provides two convenience functions that separate discovery from download:
+
+- **search()**: Browse available data without downloading anything.
+- **fetch()**: Download data by slug, URL, or catalog path.
+
 Example: Search for available data (no download)
     ```python
     >>> from owid.catalog import search
-    >>> results = search("population")  # Returns ResponseSet[TableResult]
-    >>> print(f"Found {len(results)} tables")
-    >>> print(results[0].path)
+    >>> results = search("population")  # Returns ResponseSet[ChartResult] (default)
+    >>> print(f"Found {len(results)} charts")
+    >>> print(results[0].slug)
     ```
-
-from download (fetching)
 
 Example: Fetch specific data by path
     ```python
     >>> from owid.catalog import fetch
-    >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")
-    >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")
-    >>> chart_tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("life-expectancy")  # Chart slug auto-detected
+    >>> tb = fetch("years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys")  # Slug with query params
+    >>> tb = fetch("https://ourworldindata.org/grapher/life-expectancy")  # Full URL
+    >>> tb = fetch("garden/un/2024-07-12/un_wpp/population")  # Table path
+    >>> tb_ind = fetch("garden/un/2024-07-12/un_wpp/population#population")  # Indicator
     ```
 """
 
@@ -45,7 +49,7 @@ if TYPE_CHECKING:
 def search(
     name: str | None = None,
     *,
-    kind: Literal["table", "indicator", "chart"] = "table",
+    kind: Literal["table", "indicator", "chart"] = "chart",
     limit: int = 10,
     namespace: str | None = None,
     version: str | None = None,
@@ -54,6 +58,7 @@ def search(
     match: Literal["exact", "contains", "regex", "fuzzy"] = "fuzzy",
     fuzzy_threshold: int = 70,
     case: bool = False,
+    latest: bool = False,
 ) -> ResponseSet[TableResult] | ResponseSet[IndicatorResult] | ResponseSet[ChartResult]:
     """Search for available data without downloading (for browsing/discovery).
 
@@ -64,11 +69,11 @@ def search(
     Args:
         name: Name or pattern to search for (e.g., "population", "gdp", "life-expectancy").
             Required for indicators and charts. Optional for tables (can filter by other params).
-        kind: What to search for (default: "table"):
+        kind: What to search for (default: "chart"):
 
+            - "chart": Search published charts (returns ResponseSet[ChartResult])
             - "table": Search catalog tables (returns ResponseSet[TableResult])
             - "indicator": Search indicators/variables (returns ResponseSet[IndicatorResult])
-            - "chart": Search published charts (returns ResponseSet[ChartResult])
         limit: Maximum number of results to return (default: 10)
         namespace: Filter by namespace (e.g., "un", "worldbank"). Only for tables.
         version: Filter by specific version (e.g., "2024-01-15"). Only for tables.
@@ -82,30 +87,33 @@ def search(
             - "regex": Regular expression
         fuzzy_threshold: Minimum similarity score 0-100 for fuzzy matching (default: 70).  Only for tables, and `name` field.
         case: Case-sensitive search (default: False).  Only for tables.
+        latest: If True, keep only the latest version of each result
+            (grouped by namespace/dataset/table or indicator). Only for tables and indicators.
+            Note: results without a version are dropped when this is enabled.
 
     Returns:
         Search results. Results can be indexed, iterated, and provide access to metadata without downloading data.
 
     Example:
         ```python
-        # Search for tables (fuzzy search by default)
+        # Search for charts (default)
         results = search("population")
-        print(f"Found {len(results)} tables")
-        print(results[0].path)  # Access table path without downloading data
+        print(f"Found {len(results)} charts")
+        print(results[0].slug)  # Access chart slug without downloading data
+
+        # Search for tables
+        results = search("population", kind="table")
+        print(results[0].path)
 
         # Search for indicators
         results = search("gdp", kind="indicator")
         print(results[0].title)
 
-        # Search for charts
-        results = search("life expectancy", kind="chart")
-        print(results[0].slug)
-
         # Exact match for tables
-        results = search("population", match="exact")
+        results = search("population", kind="table", match="exact")
 
         # Filter tables by namespace and version
-        results = search("wdi", namespace="worldbank_wdi", version="2024-01-10")
+        results = search("wdi", kind="table", namespace="worldbank_wdi", version="2024-01-10")
 
         # Then fetch the data you need:
         tb = results[0].fetch()
@@ -133,11 +141,12 @@ def search(
             match=match,
             fuzzy_threshold=fuzzy_threshold,
             case=case,
+            latest=latest,
         )
     elif kind == "indicator":
         # Search indicators using IndicatorsAPI
         assert name is not None  # Validated above
-        return client.indicators.search(name, limit=limit)
+        return client.indicators.search(name, limit=limit, latest=latest)
     elif kind == "chart":
         # Search charts using ChartsAPI
         assert name is not None  # Validated above
@@ -157,7 +166,10 @@ def fetch(path: str) -> "Table | ChartTable":
 
             - Table: "channel/namespace/version/dataset/table"
             - Indicator: "channel/namespace/version/dataset/table#variable"
-            - Chart: "life-expectancy" (chart slug without '/' or '#')
+            - Chart slug: "life-expectancy"
+            - Chart URL: "https://ourworldindata.org/grapher/life-expectancy"
+            - Chart slug with query params: "years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"
+            - Explorer URL: "https://ourworldindata.org/explorers/energy"
 
     Returns:
         Table (for tables or indicators) or CharTable (for charts)
@@ -180,6 +192,12 @@ def fetch(path: str) -> "Table | ChartTable":
         tb = fetch("life-expectancy")
         print(tb.metadata.title)
 
+        # Fetch chart with query params
+        tb = fetch("years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys")
+
+        # Fetch chart by full URL
+        tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
+
         # Fetch from grapher channel
         tb = fetch("grapher/demography/2025-10-22/life_expectancy/life_expectancy_at_birth")
         ```
@@ -188,11 +206,15 @@ def fetch(path: str) -> "Table | ChartTable":
     client = Client()
 
     # Detect path type based on structure:
-    # - Contains "/" → catalog path (table or indicator)
-    # - Contains "#" → indicator path
-    # - Matches slug pattern (alphanumeric + dashes/underscores) → chart slug
+    # - Starts with "https://" → full chart/explorer URL
+    # - Contains "/" or "#" (but not a URL) → catalog path (table or indicator)
+    # - Matches slug pattern (possibly with ?query params) → chart slug
 
-    if "/" in path or "#" in path:
+    if path.startswith("https://"):
+        # Full URL — route to charts (handles grapher + explorer URLs)
+        return client.charts.fetch(path)
+
+    elif "/" in path or "#" in path:
         # Catalog path (table or indicator)
         try:
             catalog_path = CatalogPath.from_str(path)
@@ -214,13 +236,13 @@ def fetch(path: str) -> "Table | ChartTable":
                 f"Error: {e}"
             ) from e
 
-    elif _CHART_SLUG_PATTERN.match(path):
-        # Chart slug (alphanumeric with dashes/underscores)
+    elif _CHART_SLUG_PATTERN.match(path.split("?")[0]):
+        # Chart slug, possibly with query params (e.g. "life-expectancy?country=USA")
         return client.charts.fetch(path)
 
     else:
         raise ValueError(
             f"Invalid path format: '{path}'. "
             f"Expected a catalog path (with '/'), indicator path (with '#'), "
-            f"or chart slug (alphanumeric with dashes/underscores)."
+            f"or chart slug (alphanumeric with dashes/underscores, optionally with ?query params). If passing a URL for a chart or explorer, ensure it starts with 'https://'."
         )

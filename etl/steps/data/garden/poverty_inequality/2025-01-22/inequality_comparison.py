@@ -73,7 +73,7 @@ def run() -> None:
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
     ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_wid = paths.load_dataset("world_inequality_database")
+    ds_wid = paths.load_dataset("world_inequality_database_legacy")
 
     tb = ds_pov_ineq.read("keyvars")
 

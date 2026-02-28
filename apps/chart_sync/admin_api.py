@@ -233,6 +233,27 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
+    def set_dataset_archived(self, dataset_id: int, is_archived: bool, user_id: Optional[int] = None) -> dict:
+        """Set the archived status of a dataset.
+
+        Args:
+            dataset_id: The ID of the dataset to archive/unarchive
+            is_archived: Whether to archive (True) or unarchive (False) the dataset
+            user_id: Optional user ID for the session
+
+        Returns:
+            Response dict from the API
+        """
+        resp = requests.post(
+            f"{self.owid_env.admin_api}/datasets/{dataset_id}/setArchived",
+            headers=self._headers(user_id),
+            json={"isArchived": is_archived},
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id, "is_archived": is_archived})
+        return js
+
 
 def requests_with_retry() -> requests.Session:
     s = requests.Session()

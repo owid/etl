@@ -953,6 +953,9 @@ for tab in range(len(tables)):
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
 
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
+
 # Add yAxisMin
 df_graphers["yAxisMin"] = yAxisMin
 

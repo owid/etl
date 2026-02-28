@@ -19,13 +19,21 @@ from etl.config import ENV_FILE_PROD, OWID_ENV, OWIDEnv
 log = get_logger()
 
 
-def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | None = None, verbose: bool = False):
+def approve_identical_chart_diffs(
+    dry_run: bool = True,
+    chart_ids: list[int] | None = None,
+    verbose: bool = False,
+    use_rounding: bool = True,
+    use_max_year_hash: bool = False,
+):
     """Core function to approve chart diffs with identical configurations.
 
     Args:
         dry_run: If True, only shows what would be approved without making changes
         chart_ids: Optional list of specific chart IDs to check. If None, checks all pending charts.
         verbose: If True, shows detailed diff for charts with different configs
+        use_rounding: If True, round numeric values to meaningful precision before comparing
+        use_max_year_hash: If True, use only max year for hashing instead of full data
 
     Returns:
         Tuple of (approved_count, checked_count)
@@ -45,6 +53,7 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
         config=True,
         metadata=False,
         data=False,
+        skip_analytics=True,
     )
 
     if df.empty:
@@ -74,25 +83,28 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
 
     def fetch_config(chart_id: int, env: OWIDEnv) -> tuple[int, dict]:
         """Fetch config for a single chart"""
-        return chart_id, get_chart_config_with_hashes(chart_id, env)
+        return chart_id, get_chart_config_with_hashes(
+            chart_id, env, round_values=use_rounding, use_max_year_hash=use_max_year_hash
+        )
 
     log.info("Fetching configs from staging environment")
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = {executor.submit(fetch_config, chart_id, OWID_ENV): chart_id for chart_id in chart_ids_to_check}
         for future in as_completed(futures):
             chart_id, config = future.result()
             configs_staging[chart_id] = config
 
     log.info("Fetching configs from production environment")
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = {executor.submit(fetch_config, chart_id, PROD_ENV): chart_id for chart_id in chart_ids_to_check}
         for future in as_completed(futures):
             chart_id, config = future.result()
             configs_prod[chart_id] = config
 
-    # Check each chart for identical configs and approve immediately
+    # Check each chart for identical configs and collect ones to approve
     approved_count = 0
     checked_count = 0
+    charts_to_approve = []
 
     for chart_id in chart_ids_to_check:
         checked_count += 1
@@ -104,11 +116,16 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
             log.warning("⚠️ Config not found for chart", chart_id=chart_id)
             continue
 
-        # Check if chart has map.time set (which should be reviewed manually)
+        # Check if chart has map.time set AND actually displays a map tab (which should be reviewed manually)
+        # Note: map.time only matters if the chart shows a map tab (hasMapTab: true or tab: "map")
         has_map_time = False
         if "map" in config_staging and isinstance(config_staging["map"], dict):
             if "time" in config_staging["map"]:
-                has_map_time = True
+                # Only flag if the chart actually shows a map tab
+                has_map_tab = config_staging.get("hasMapTab", False)
+                default_tab_is_map = config_staging.get("tab") == "map"
+                if has_map_tab or default_tab_is_map:
+                    has_map_time = True
 
         # Compare configs
         if config_staging == config_prod:
@@ -118,15 +135,7 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
                 log.info("✅ Would approve chart (dry run)", chart_id=chart_id)
                 approved_count += 1
             else:
-                # Get chart diff and approve immediately
-                diffs = chart_diff_loader.get_diffs(chart_ids=[chart_id], sync=True)
-                if diffs:
-                    with Session(OWID_ENV.engine) as session:
-                        diffs[0].approve(session)
-                        log.info("✅ Chart approved", chart_id=chart_id)
-                        approved_count += 1
-                else:
-                    log.warning("⚠️ No diff found for chart", chart_id=chart_id)
+                charts_to_approve.append(chart_id)
         else:
             log.info("⏭️ Configs differ - skipping", chart_id=chart_id)
             if verbose:
@@ -149,6 +158,16 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
                     print(f"{'='*80}")
                     print("".join(diff_lines))
                     print(f"{'='*80}\n")
+
+    # Batch approve all charts at once
+    if charts_to_approve:
+        log.info(f"Approving {len(charts_to_approve)} charts in batch")
+        diffs = chart_diff_loader.get_diffs(chart_ids=charts_to_approve, sync=True, skip_analytics=True)
+        with Session(OWID_ENV.engine) as session:
+            for diff in diffs:
+                diff.approve(session)
+                log.info("✅ Chart approved", chart_id=diff.chart_id)
+                approved_count += 1
 
     if dry_run:
         log.info(f"DRY RUN completed: {approved_count} charts would be approved out of {checked_count} checked")
@@ -178,10 +197,24 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
     default=False,
     help="Show detailed config differences for charts that differ between environments.",
 )
+@click.option(
+    "--no-rounding",
+    is_flag=True,
+    default=False,
+    help="Disable intelligent rounding before comparing data (require exact match).",
+)
+@click.option(
+    "--use-max-year-hash",
+    is_flag=True,
+    default=False,
+    help="Use only max year from each indicator for comparison (ignores data values).",
+)
 def cli(
     dry_run: bool,
     chart_id: tuple[int, ...],
     verbose: bool,
+    no_rounding: bool,
+    use_max_year_hash: bool,
 ) -> None:
     """Automatically approve chart diffs with identical data. This is done by taking their configs and replacing variable IDs with hashes of their data.
 
@@ -194,7 +227,13 @@ def cli(
     4. Reports results
     """
     chart_ids = list(chart_id) if chart_id else None
-    approve_identical_chart_diffs(dry_run=dry_run, chart_ids=chart_ids, verbose=verbose)
+    approve_identical_chart_diffs(
+        dry_run=dry_run,
+        chart_ids=chart_ids,
+        verbose=verbose,
+        use_rounding=not no_rounding,
+        use_max_year_hash=use_max_year_hash,
+    )
 
 
 if __name__ == "__main__":

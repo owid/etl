@@ -12,7 +12,6 @@ import structlog
 from click.core import Command
 
 from etl import paths
-from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
@@ -212,8 +211,9 @@ def _find_files_by_pattern(dataset_name: str, extension: str) -> list[Path]:
 
     if len(path_parts) == 3:
         # Full path: namespace/version/short_name
-        file_path = paths.SNAPSHOTS_DIR / f"{dataset_name}{extension}"
-        return [file_path] if file_path.exists() else []
+        # Use glob to support patterns like ".*.dvc" for files like "name.zip.dvc"
+        pattern = f"{dataset_name}{extension}"
+        return list(paths.SNAPSHOTS_DIR.glob(pattern))
 
     elif len(path_parts) == 2:
         # Partial path: version/short_name
@@ -346,6 +346,9 @@ def _call_snapshot_function(
 
 def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
     """Run snapshot creation when only .dvc file exists."""
+    # Defer heavy import until needed
+    from etl.snapshot import Snapshot
+
     dataset_name = _normalize_dataset_name(dataset_name)
     dvc_files = _find_files_by_pattern(dataset_name, ".*.dvc")
 

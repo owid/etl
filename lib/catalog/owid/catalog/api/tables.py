@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Callable, Literal, TypeVar, cast
 from urllib.parse import urlparse
 
 import numpy as np
@@ -24,6 +25,7 @@ from owid.catalog.api.utils import (
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
+    S3_OWID_URI_PRIVATE,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
 )
@@ -41,15 +43,22 @@ if TYPE_CHECKING:
 
 
 def _download_private_file_s3(uri: str, tmpdir: str) -> str:
-    """Download private files from S3 to temporary directory."""
+    """Download private files from S3 to temporary directory.
+
+    For private datasets:
+    - Metadata files (.meta.json) are stored in the public bucket for discoverability
+    - Data files are stored in the private bucket and require R2 credentials
+    """
     parsed = urlparse(uri)
     base, ext = os.path.splitext(parsed.path)
+    # Metadata stays in public bucket for discoverability
     s3_utils.download(
         S3_OWID_URI + base + ".meta.json",
         tmpdir + "/data.meta.json",
     )
+    # Data files are in private bucket
     s3_utils.download(
-        S3_OWID_URI + base + ext,
+        S3_OWID_URI_PRIVATE + base + ext,
         tmpdir + "/data" + ext,
     )
     return tmpdir + "/data" + ext
@@ -147,6 +156,67 @@ def _match_score(
 
 
 # =============================================================================
+# Version Helpers
+# =============================================================================
+
+_T = TypeVar("_T")
+
+
+def _normalize_version(v: str) -> str:
+    """Normalize a version string for correct chronological comparison.
+
+    Handles three formats:
+    - ``"latest"`` → ``"9999-99-99"`` (always newest)
+    - ``"YYYY"`` → ``"YYYY-99-99"`` (sorts after all YYYY-MM-DD of same year)
+    - ``"YYYY-MM-DD"`` → kept as-is
+
+    This ensures: ``2024-01-01 < 2024-06-15 < 2024 < latest``.
+    """
+    if v == "latest":
+        return "9999-99-99"
+    if re.fullmatch(r"\d{4}", v):
+        return f"{v}-99-99"
+    return v
+
+
+def _keep_latest_versions(
+    results: list[_T],
+    key: Callable[[_T], tuple],
+) -> list[_T]:
+    """Keep only the latest version of each group.
+
+    Groups *results* by ``key(item)`` and within each group keeps the item
+    whose ``version`` attribute is highest (using :func:`_normalize_version`
+    for comparison).  Items without a ``version`` attribute or with
+    ``version is None`` are dropped.  Original ordering is preserved.
+
+    Args:
+        results: List of result objects (must have a ``version`` attribute).
+        key: Function returning a grouping tuple for each item.
+
+    Returns:
+        De-duplicated list in original order.
+    """
+    if not results:
+        return []
+
+    # Find best version per group
+    best: dict[tuple, tuple[str, int]] = {}  # group_key -> (normalized_version, index)
+    for idx, item in enumerate(results):
+        version = getattr(item, "version", None)
+        if version is None:
+            continue
+        group = key(item)
+        norm = _normalize_version(str(version))
+        if group not in best or norm > best[group][0]:
+            best[group] = (norm, idx)
+
+    # Collect winners preserving original order
+    winner_indices = {v[1] for v in best.values()}
+    return [item for idx, item in enumerate(results) if idx in winner_indices]
+
+
+# =============================================================================
 # Table Loading
 # =============================================================================
 
@@ -229,6 +299,8 @@ class TableResult(BaseModel):
         version: Version string.
         dataset: Dataset name.
         dimensions: List of dimension columns.
+        title: Human-readable title (from table or dataset metadata).
+        description: Detailed description (from table or dataset metadata).
         is_public: Whether the data is publicly accessible.
         formats: List of available formats.
         popularity: Popularity score (0.0 to 1.0) based on analytics views.
@@ -252,6 +324,8 @@ class TableResult(BaseModel):
 
     # Content metadata
     dimensions: list[str] = Field(default_factory=list)
+    title: str | None = None
+    description: str | None = None
 
     # Technical metadata
     is_public: bool = True
@@ -541,6 +615,8 @@ class TablesAPI:
                     path=row["path"],
                     is_public=row.get("is_public", True),
                     dimensions=list(dimensions) if dimensions is not None else [],
+                    title=row.get("title"),
+                    description=row.get("description"),
                     formats=formats,
                     popularity=popularity.get(slug, 0.0),
                     catalog_url=self.catalog_url,
@@ -563,6 +639,7 @@ class TablesAPI:
         fuzzy_threshold: int = 70,
         timeout: int | None = None,
         refresh_index: bool = False,
+        latest: bool = False,
     ) -> ResponseSet[TableResult]:
         """Search the catalog for tables matching criteria.
 
@@ -582,6 +659,9 @@ class TablesAPI:
                 Only used when match="fuzzy". (default: 70)
             timeout: HTTP request timeout in seconds for catalog loading. Defaults to client timeout.
             refresh_index: If True, force re-download of the catalog index. Default False.
+            latest: If True, keep only the latest version of each table
+                (grouped by namespace, dataset, table, channel). Default False.
+                Note: results without a version are dropped when this is enabled.
 
         Returns:
             ResponseSet containing matching TableResult objects, sorted by popularity (most viewed first).
@@ -648,6 +728,13 @@ class TablesAPI:
         # Convert to results
         results = self._to_results(matches, popularity)
 
+        # Keep only latest version per group if requested
+        if latest:
+            results = _keep_latest_versions(
+                results,
+                key=lambda r: (r.namespace, r.dataset, r.table, r.channel),
+            )
+
         # Build descriptive query from search parameters
         query = self._build_query(
             table=table,
@@ -658,10 +745,11 @@ class TablesAPI:
         )
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=len(results),
             base_url=self.catalog_url,
+            _ui_advanced=False,
         )
 
     def fetch(

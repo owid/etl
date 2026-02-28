@@ -27,17 +27,17 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("Load temperature data")
     with zipfile.ZipFile(snap.path, "r") as zip_file:
         for file_info in zip_file.infolist():
-            if file_info.filename.endswith((".grb", ".grib")):  # Filter GRIB files
+            if file_info.filename.endswith(".nc"):  # Filter NetCDF files
                 with zip_file.open(file_info) as file:
                     file_content = file.read()
 
                 # Write to a temporary file
-                with tempfile.NamedTemporaryFile(delete=True, suffix=".grib") as tmp_file:
+                with tempfile.NamedTemporaryFile(delete=True, suffix=".nc") as tmp_file:
                     tmp_file.write(file_content)
                     tmp_file.flush()  # Ensure all data is written
 
-                    # Load the GRIB file using xarray and cfgrib
-                    da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
+                    # Load the NetCDF file using xarray
+                    da = xr.open_dataset(tmp_file.name, engine="h5netcdf").load()
     # Convert temperature from Kelvin to Celsius.
     da = da["t2m"] - 273.15
 
@@ -155,12 +155,9 @@ def run() -> None:
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
 
-    # Define the start and end dates
-    da["time"] = xr.DataArray(pd.to_datetime(da["time"].values), dims=da["valid_time"].dims)
-
-    # Now you can access the 'dt' accessor
-    start_time = da["time"].min().dt.date.astype(str).item()
-    end_time = da["time"].max().dt.date.astype(str).item()
+    # Define the start and end dates using valid_time coordinate (h5netcdf format)
+    start_time = pd.to_datetime(da["valid_time"].min().values).date().isoformat()
+    end_time = pd.to_datetime(da["valid_time"].max().values).date().isoformat()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)

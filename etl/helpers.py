@@ -2,6 +2,7 @@
 #  helpers.py
 #  etl
 #
+import os
 import re
 import time
 from functools import cache
@@ -205,6 +206,22 @@ def get_metadata_path(dest_dir: str) -> Path:
     return N.metadata_path
 
 
+def render_yaml_metadata(ds: catalog.Dataset) -> None:
+    """Render Jinja templates in metadata for all tables in a dataset.
+
+    This is useful when metadata YAML files contain Jinja templates that need to be
+    evaluated, but the dataset has no dimensions (so long_to_wide doesn't process them).
+
+    Call this after create_dataset when using Jinja in metadata files for datasets
+    without dimensions.
+    """
+    for table_name in ds.table_names:
+        table = ds[table_name]
+        for col in table.columns:
+            table[col].metadata = table[col].metadata.render({})
+        table._save_metadata(os.path.join(ds.path, table.metadata.checked_name + ".meta.json"))
+
+
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
     """Current file must be an ETL step."""
 
@@ -349,7 +366,7 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
-    def regions(self):
+    def regions(self) -> Regions:
         """Get Regions helper for the specific use of an ETL step."""
         if not hasattr(self, "_regions"):
             try:
@@ -895,6 +912,27 @@ class PathFinder:
         )
 
         return explorer
+
+    def export_fig(self, fig, filename: str, extensions: list[str], **kwargs) -> None:
+        """Export a matplotlib figure to multiple formats.
+
+        :param fig: The matplotlib figure to export.
+        :param filename: The base filename (without extension).
+        :param extensions: List of file extensions to export (e.g., ["png", "svg"]).
+        :param kwargs: Additional keyword arguments to pass to fig.savefig().
+        """
+        for ext in extensions:
+            path = self.directory / f"{filename}.{ext}"
+            save_kwargs = {
+                "fname": path,
+                "format": ext,
+                **kwargs,
+            }
+            if ext == "svg":
+                # Remove date metadata for SVG to keep files clean
+                save_kwargs["metadata"] = {"Date": None}
+            fig.savefig(**save_kwargs)
+            self.log.info(f"Saved chart to {path}")
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:

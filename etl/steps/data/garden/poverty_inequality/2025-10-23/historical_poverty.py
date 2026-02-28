@@ -54,6 +54,9 @@ NUM_OBSERVATIONS_TO_SHOW = 20
 NUM_RANDOM_ITERATIONS = 0
 ##############################################################################
 
+# Define PPP version to use
+PPP_VERSION = 2021
+
 # Poverty lines (daily income in 2021 PPP$)
 POVERTY_LINES = [3, 10, 30]
 
@@ -90,15 +93,11 @@ PIP_INDICATORS = ["gini", "mean"]
 # Define categories to filter in PIP, for survey-based and filled data
 PIP_CATEGORIES = {
     "survey": {
-        "ppp_version": 2021,
-        "poverty_line": "No poverty line",
         "welfare_type": "income or consumption",
         "table": "Income or consumption consolidated",
         "survey_comparability": "No spells",
     },
     "filled": {
-        "ppp_version": 2021,
-        "poverty_line": "No poverty line",
         "welfare_type": "income or consumption",
         "table": "Income or consumption intra/extrapolated",
         "survey_comparability": "No spells",
@@ -180,7 +179,8 @@ def run() -> None:
 
     # Load World Bank PIP dataset, and read its main table.
     ds_pip = paths.load_dataset("world_bank_pip")
-    tb_pip = ds_pip.read("world_bank_pip", safe_types=False)
+    tb_pip_inequality = ds_pip.read("inequality", safe_types=False)
+    tb_pip_incomes = ds_pip.read("incomes", safe_types=False)
 
     # Load historical inequality dataset, and read its main table.
     ds_van_zanden = paths.load_dataset("historical_inequality_van_zanden_et_al")
@@ -189,14 +189,6 @@ def run() -> None:
     # Load Ireland population dataset, and read its main table.
     ds_population_ireland = paths.load_dataset("population_ireland")
     tb_population_ireland = ds_population_ireland.read("population_ireland", safe_types=True)
-
-    # DEBUG: Filter to subset of countries for profiling
-    if PROFILING_MODE:
-        tb_thousand_bins = tb_thousand_bins.loc[tb_thousand_bins["country"].isin(PROFILING_COUNTRIES)].reset_index(
-            drop=True
-        )
-        tb_pip = tb_pip.loc[tb_pip["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
-        tb_van_zanden = tb_van_zanden.loc[tb_van_zanden["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
 
     # Filter to profiling countries if in profiling mode
     if PROFILING_MODE:
@@ -221,7 +213,10 @@ def run() -> None:
         countries_to_keep = PROFILING_COUNTRIES + ["World"] + regions + historical_entities
         tb_maddison = tb_maddison[tb_maddison["country"].isin(countries_to_keep)].reset_index(drop=True)
 
-        tb_pip = tb_pip[tb_pip["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
+        tb_pip_inequality = tb_pip_inequality[tb_pip_inequality["country"].isin(PROFILING_COUNTRIES)].reset_index(
+            drop=True
+        )
+        tb_pip_incomes = tb_pip_incomes[tb_pip_incomes["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
         tb_van_zanden = tb_van_zanden[tb_van_zanden["country"].isin(PROFILING_COUNTRIES)].reset_index(drop=True)
 
     #
@@ -270,7 +265,9 @@ def run() -> None:
     ###############################################################################
 
     # Prepare World Bank PIP data
-    tb_pip = prepare_pip_data(tb_pip=tb_pip, tb_thousand_bins=tb_thousand_bins)
+    tb_pip = prepare_pip_data(
+        tb_pip_inequality=tb_pip_inequality, tb_pip_incomes=tb_pip_incomes, tb_thousand_bins=tb_thousand_bins
+    )
 
     # Calculate Ginis from thousand bins distribution
     tb_pip = create_ginis_from_thousand_bins_distribution(tb_thousand_bins=tb_thousand_bins, tb_pip=tb_pip)
@@ -1263,31 +1260,43 @@ def add_population_comparison(tb_poverty: Table) -> Tuple[Table, Table]:
     return tb_poverty, tb_population
 
 
-def prepare_pip_data(tb_pip: Table, tb_thousand_bins: Table) -> Table:
+def prepare_pip_data(tb_pip_inequality: Table, tb_pip_incomes: Table, tb_thousand_bins: Table) -> Table:
     """
     Prepare World Bank PIP data to use it in extrapolations.
     Here we extract Ginis (survey-based) and means (survey-based and filled) from the latest PIP dataset
     """
-    tb_pip = tb_pip.copy()
+    tb_pip_inequality = tb_pip_inequality.copy()
+    tb_pip_incomes = tb_pip_incomes.copy()
     tb_thousand_bins = tb_thousand_bins.copy()
 
     # Keep only relevant columns
-    tb_pip = tb_pip[
+    tb_pip_inequality = tb_pip_inequality[
         [
             "country",
             "year",
-            "ppp_version",
-            "poverty_line",
             "welfare_type",
-            "decile",
             "table",
             "survey_comparability",
+            "gini",
         ]
-        + PIP_INDICATORS
     ]
 
+    tb_pip_incomes = tb_pip_incomes[
+        (tb_pip_incomes["ppp_version"] == PPP_VERSION)
+        & (tb_pip_incomes["decile"].isna())
+        & (tb_pip_incomes["period"] == "day")
+    ][["country", "year", "welfare_type", "table", "survey_comparability", "mean"]]
+
+    # Now merge both tables
+    tb_pip = pr.merge(
+        tb_pip_inequality,
+        tb_pip_incomes,
+        on=["country", "year", "welfare_type", "table", "survey_comparability"],
+        how="outer",
+    )
+
     # As Argentina is only available in PIP as "Argentina (urban)", rename it to "Argentina" to match with thousand_bins
-    tb_pip["country"] = tb_pip["country"].cat.rename_categories({"Argentina (urban)": "Argentina"})
+    tb_pip["country"] = tb_pip["country"].replace({"Argentina (urban)": "Argentina"})
 
     missing_in_thousand_bins, missing_in_pip = compare_countries_available_in_two_tables(
         tb_1=tb_thousand_bins, tb_2=tb_pip, name_tb_1="thousand_bins", name_tb_2="pip"
@@ -1308,21 +1317,15 @@ def prepare_pip_data(tb_pip: Table, tb_thousand_bins: Table) -> Table:
     # Filter data for each category and concatenate
     # I need two tables, tb_pip_survey and tb_pip_filled, for both mean and gini
     tb_pip_survey = tb_pip[
-        (tb_pip["ppp_version"] == PIP_CATEGORIES["survey"]["ppp_version"])
-        & (tb_pip["poverty_line"] == PIP_CATEGORIES["survey"]["poverty_line"])
-        & (tb_pip["welfare_type"] == PIP_CATEGORIES["survey"]["welfare_type"])
+        (tb_pip["welfare_type"] == PIP_CATEGORIES["survey"]["welfare_type"])
         & (tb_pip["table"] == PIP_CATEGORIES["survey"]["table"])
         & (tb_pip["survey_comparability"] == PIP_CATEGORIES["survey"]["survey_comparability"])
-        & (tb_pip["decile"].isna())
     ].reset_index(drop=True)
 
     tb_pip_filled = tb_pip[
-        (tb_pip["ppp_version"] == PIP_CATEGORIES["filled"]["ppp_version"])
-        & (tb_pip["poverty_line"] == PIP_CATEGORIES["filled"]["poverty_line"])
-        & (tb_pip["welfare_type"] == PIP_CATEGORIES["filled"]["welfare_type"])
+        (tb_pip["welfare_type"] == PIP_CATEGORIES["filled"]["welfare_type"])
         & (tb_pip["table"] == PIP_CATEGORIES["filled"]["table"])
         & (tb_pip["survey_comparability"] == PIP_CATEGORIES["filled"]["survey_comparability"])
-        & (tb_pip["decile"].isna())
     ].reset_index(drop=True)
 
     # Merge both tables

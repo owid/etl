@@ -1,0 +1,67 @@
+title:
+  title: Plastic pollution
+  title_variant: by type and source of pollution
+default_selection:
+  - Russia
+  - China
+  - United States
+  - Brazil
+  - Nigeria
+
+topic_tags:
+  - Plastic Pollution
+dimensions:
+  - slug: "emission_type"
+    name: "Pollution type"
+    choices:
+      - slug: "total_burned_debris"
+        name: "Total"
+        description: "Total macroplastic pollution combining debris and open burning"
+      - slug: "open_burning"
+        name: "Open burning"
+        description: "Macroplastic burned in open, uncontrolled fires"
+      - slug: "debris"
+        name: "Debris"
+        description: "Macroplastic debris that escapes into the environment"
+      - slug: "total_by_type"
+        name: "Total by type"
+        description: "Total macroplastic pollution by type"
+  - slug: "emissions_source"
+    name: "Pollution source"
+    choices:
+      - slug: "all"
+        name: "All"
+        description: "All pollution sources combined"
+      - slug: "uncollected_waste"
+        name: "Uncollected waste"
+        description: "Pollution from waste never collected by formal services"
+      - slug: "litter"
+        name: "Litter"
+        description: "Pollution from direct littering"
+      - slug: "disposal"
+        name: "Disposal"
+        description: "Pollution from uncontrolled disposal sites"
+      - slug: "collection_system"
+        name: "Collection system"
+        description: "Pollution during collection and transport"
+      - slug: "rejects"
+        name: "Rejects"
+        description: "Pollution from sorting and recycling processes"
+      - slug: "total_by_source"
+        name: "Total by source"
+        description: "Total macroplastic pollution by source"
+  - slug: "measure"
+    name: "Measure"
+    choices:
+      - slug: "total"
+        name: "Total"
+        description: "Total pollution in tonnes"
+      - slug: "per_person"
+        name: "Per person"
+        description: "Pollution per capita in kilograms"
+      - slug: "share_of_global_total"
+        name: "Share of global total"
+        description: "Share of global pollution as a percentage"
+views:
+  # Views will be filled out programmatically.
+  []

@@ -253,59 +253,61 @@ Add this to your User `settings.json` (View -> Command Palette -> Preferences: O
 
 ## Improve your terminal experience
 
-We recommend using [:octicons-link-external-16: Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugins and themes that can make your life easier.
+!!! tip "Using [:octicons-link-external-16: Oh My Zsh](https://ohmyz.sh/)."
+
+    We recommend using Oh My Zsh. It comes with a lot of plugins and themes that can make your life easier.
 
 
-???  "Automatic virtualenv activation"
+### Automatic virtualenv activation
 
-    We use python virtual environments ("venv") everywhere. It's very convenient to have a script that automatically activates the virtualenv when you enter a project folder. Add the following to your `~/.zshrc` or `~/.bashrc`:
+We use python virtual environments ("venv") everywhere. It's very convenient to have a script that automatically activates the virtualenv when you enter a project folder. Add the following to your `~/.zshrc` or `~/.bashrc`:
 
-    ```bash
-    # enters the virtualenv when I enter the folder, provide it's called either .venv or env
-    autoload -U add-zsh-hook
-    load-py-venv() {
-        if [ -f .venv/bin/activate ]; then
-            # enter a virtual environment that's here
-            source .venv/bin/activate
-        elif [ -f env/bin/activate ]; then
-            source env/bin/activate
-        elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
-            # exit a virtual environment when you enter a new project folder
-            deactivate
-        fi
+```bash
+# enters the virtualenv when I enter the folder, provide it's called either .venv or env
+autoload -U add-zsh-hook
+load-py-venv() {
+    if [ -f .venv/bin/activate ]; then
+        # enter a virtual environment that's here
+        source .venv/bin/activate
+    elif [ -f env/bin/activate ]; then
+        source env/bin/activate
+    elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
+        # exit a virtual environment when you enter a new project folder
+        deactivate
+    fi
+}
+add-zsh-hook chpwd load-py-venv
+load-py-venv
+```
+
+Some staff members also use [:octicons-link-external-16: Nushell](https://www.nushell.sh/), which supports similar hooks. Edit your `$nu.config-path` file, find the `hooks` section, and add to it an `env_change` stanza:
+
+```
+hooks:
+    env_change: {
+    PWD: [
+        {
+        condition: {|before, after| ["pyproject.toml" "requirements.txt" "setup.py"] | any {|f| $f | path exists } }
+        code: "
+            if ('.venv/bin/python' | path exists) {
+            print -e 'Activating virtualenv'
+            $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' } | prepend $\"($env.PWD)/.venv/bin\")
+            } else {
+            $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' })
+            }
+            "
+        }
+    ]
     }
-    add-zsh-hook chpwd load-py-venv
-    load-py-venv
-    ```
+```
 
-    Some staff members also use [:octicons-link-external-16: Nushell](https://www.nushell.sh/), which supports similar hooks. Edit your `$nu.config-path` file, find the `hooks` section, and add to it an `env_change` stanza:
+### Speed up navigation in terminal with autojump
 
-    ```
-    hooks:
-      env_change: {
-        PWD: [
-          {
-            condition: {|before, after| ["pyproject.toml" "requirements.txt" "setup.py"] | any {|f| $f | path exists } }
-            code: "
-                if ('.venv/bin/python' | path exists) {
-                print -e 'Activating virtualenv'
-                $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' } | prepend $\"($env.PWD)/.venv/bin\")
-                } else {
-                $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' })
-                }
-              "
-          }
-        ]
-      }
-    ```
+Instead of `cd ...` to a correct folder, you can add the following to your `~/.zshrc` or `~/.bashrc`:
 
-??? "Speed up navigation in terminal with autojump"
+```bash
+# autojump
+[[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
+```
 
-    Instead of `cd ...` to a correct folder, you can add the following to your `~/.zshrc` or `~/.bashrc`:
-
-    ```bash
-    # autojump
-    [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
-    ```
-
-    and then type `j etl` or `j grapher` to jump to the right folder.
+and then type `j etl` or `j grapher` to jump to the right folder.

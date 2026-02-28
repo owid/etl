@@ -84,7 +84,7 @@ def publish(
         sanity_checks(catalog, channel=c)
 
     for c in channel:
-        sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run)
+        sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, private_bucket=config.R2_BUCKET_PRIVATE)
 
 
 def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
@@ -97,14 +97,16 @@ def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
             sys.exit(1)
 
 
-def sync_catalog_to_s3(bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
+def sync_catalog_to_s3(
+    bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False, private_bucket: Optional[str] = None
+) -> None:
     s3 = connect_r2()
     if is_catalog_up_to_date(s3, bucket, catalog, channel):
         print(f"Catalog's channel {channel} is up to date!")
         return
 
     print(f"Syncing datasets from channel {channel}")
-    sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run)
+    sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run, private_bucket=private_bucket)
     if not dry_run:
         update_catalog(s3, bucket, catalog, channel)
 
@@ -120,10 +122,17 @@ def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL)
 
 
 def sync_datasets(
-    s3: Any, bucket: str, catalog: Path, channel: CHANNEL, delete_datasets: bool = False, dry_run: bool = False
+    s3: Any,
+    bucket: str,
+    catalog: Path,
+    channel: CHANNEL,
+    delete_datasets: bool = False,
+    dry_run: bool = False,
+    private_bucket: Optional[str] = None,
 ) -> None:
     """Go dataset by dataset and check if each one needs updating.
     :param delete_datasets: if True, delete datasets from S3 that are not in the local catalog
+    :param private_bucket: bucket for private data files (metadata stays in public bucket)
     """
     existing = get_published_checksums(bucket, channel)
 
@@ -143,9 +152,17 @@ def sync_datasets(
         if published_checksum == ds.checksum():
             continue
 
-        print("-", path)
+        print("-", path, "(private)" if not ds.metadata.is_public else "")
         if not dry_run:
-            sync_folder(s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public)
+            sync_folder(
+                s3,
+                bucket,
+                catalog,
+                catalog / path,
+                path,
+                public=ds.metadata.is_public,
+                private_bucket=private_bucket,
+            )
 
     if delete_datasets:
         print("Datasets to delete:")
@@ -153,6 +170,11 @@ def sync_datasets(
             print("-", path)
             if not dry_run:
                 delete_dataset(s3, bucket, path)
+
+
+def is_metadata_file(filename: str) -> bool:
+    """Check if a file is a metadata file (should stay in public bucket for discoverability)."""
+    return filename.endswith(".meta.json") or filename.endswith("index.json")
 
 
 def sync_folder(
@@ -163,16 +185,27 @@ def sync_folder(
     dest_path: str,
     delete: bool = True,
     public: bool = True,
+    private_bucket: Optional[str] = None,
 ) -> None:
     """
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
+
+    For private datasets (public=False):
+    - Metadata files (.meta.json, index.json) go to the public bucket for discoverability
+    - Data files (.feather, .parquet, .csv) go to the private bucket
     """
     # make sure we're not syncing other folders with the same prefix
     if not dest_path.endswith("/"):
         dest_path += "/"
 
+    # For private datasets, we need to check both buckets for existing files
     existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
+    existing_private: Dict[str, Optional[str]] = {}
+    if private_bucket and not public:
+        existing_private = {
+            o["Key"]: object_md5(s3, private_bucket, o["Key"], o) for o in walk_s3(s3, private_bucket, dest_path)
+        }
 
     # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
     # have huge number of tables, upload them in parallel
@@ -182,30 +215,48 @@ def sync_folder(
             checksum = files.checksum_file(filename)
             rel_filename = filename.relative_to(catalog).as_posix()
 
-            existing_checksum = existing.get(rel_filename)
+            # Determine target bucket: metadata files always go to public bucket,
+            # data files for private datasets go to private bucket
+            if public or is_metadata_file(rel_filename):
+                target_bucket = bucket
+                existing_checksum = existing.get(rel_filename)
+            else:
+                target_bucket = private_bucket or bucket
+                existing_checksum = existing_private.get(rel_filename)
 
             if checksum != existing_checksum:
-                print("  PUT", rel_filename)
+                bucket_label = f"[{target_bucket}]" if target_bucket != bucket else ""
+                print(f"  PUT {rel_filename} {bucket_label}")
                 ExtraArgs: Dict[str, Any] = {"Metadata": {"md5": checksum}}
-                if public:
+                # Only set public-read ACL for files going to public bucket
+                if target_bucket == bucket:
                     ExtraArgs["ACL"] = "public-read"
                 futures.append(
                     executor.submit(
                         s3.upload_file,
                         filename.as_posix(),
-                        bucket,
+                        target_bucket,
                         rel_filename,
                         ExtraArgs=ExtraArgs,
                     )
                 )
 
+            # Track which files we've seen for deletion purposes
             if rel_filename in existing:
                 del existing[rel_filename]
+            if rel_filename in existing_private:
+                del existing_private[rel_filename]
 
         if delete:
+            # Delete stale files from public bucket
             for rel_filename in existing:
                 print("  DEL", rel_filename)
                 futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=rel_filename))
+            # Delete stale files from private bucket
+            if private_bucket and not public:
+                for rel_filename in existing_private:
+                    print(f"  DEL {rel_filename} [{private_bucket}]")
+                    futures.append(executor.submit(s3.delete_object, Bucket=private_bucket, Key=rel_filename))
 
         concurrent.futures.wait(futures)
 

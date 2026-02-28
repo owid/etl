@@ -1,0 +1,106 @@
+
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+      grapher_config:
+        note: Country totals exclude plastic waste exported overseas, which may be at greater risk of entering the ocean.
+        map:
+          colorScale:
+            baseColorScheme: Reds
+
+  text_modelled_estimate: &text_modelled_estimate
+    These estimates come from a statistical model that combines location-specific data with environmental factors. They are not direct measurements for every country and river.
+
+  text_mpw_definition: &text_mpw_definition
+    Mismanaged plastic waste is plastic that is littered or thrown away improperly. It is not securely contained in a landfill or properly managed facility, so it can escape into the environment.
+
+  text_scope_macroplastics: &text_scope_macroplastics
+    These estimates focus on larger plastic items (typically bigger than 0.5 cm) that float on or near the water surface. They do not include tiny microplastics, plastic on riverbeds, or plastic stopped by dams.
+
+  text_framework: &text_framework
+    The study uses location-specific data on mismanaged plastic waste and combines it with environmental factors. These factors include rainfall, wind, land use, terrain steepness, distance to rivers, river size, and distance to the ocean. This helps estimate how much plastic reaches the ocean through rivers.
+
+  text_emission_probability: &text_emission_probability
+    "The chance of plastic reaching the ocean depends on three things: first, whether it gets washed away by rain and wind; second, whether it travels from land into a river (affected by land use, slope, and distance); and third, whether it flows through the river network to the ocean (affected by river size and distance to the coast)."
+
+  text_pe_interpretation: &text_pe_interpretation
+    This probability shows the estimated chance that mismanaged plastic waste from a specific location will reach the ocean via rivers within a year. It is based on local environmental and geographic conditions.
+
+  text_me_definition: &text_me_definition
+    Annual emissions for a river basin are calculated by multiplying the mismanaged plastic waste in each location by its probability of reaching the ocean, then adding up all locations across the entire basin.
+
+  text_uncertainty_context: &text_uncertainty_context
+    These estimates have significant uncertainty and can differ substantially from actual measurements. For example, if a river is estimated to carry 100 tonnes of plastic, the true value could reasonably be anywhere from 25 to 400 tonnes, and in some cases could be as low as 10 or as high as 1,000 tonnes.
+
+  text_exported_waste_caveat: &text_exported_waste_caveat
+    These figures do not include plastic waste that is shipped overseas for processing. That exported waste may be at higher risk of entering the ocean if it is not properly managed in the destination country.
+
+dataset:
+  title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
+
+tables:
+  meijer_2021:
+    variables:
+      p_e_percent:
+        title: Probability of mismanaged plastic waste reaching the ocean via rivers
+        unit: "%"
+        short_unit: "%"
+        description_short: *text_mpw_definition
+        description_key:
+          - *text_modelled_estimate
+          - *text_mpw_definition
+          - *text_framework
+          - *text_emission_probability
+          - *text_pe_interpretation
+          - *text_scope_macroplastics
+        display:
+          numDecimalPlaces: 1
+
+      me_tons_per_year:
+        title: Plastic pollution entering the ocean through rivers
+        unit: tonnes
+        short_unit: t
+        description_short: Estimated quantity of plastic pollution entering the ocean via rivers, in tonnes per year.
+        description_key:
+          - *text_modelled_estimate
+          - *text_me_definition
+          - *text_scope_macroplastics
+          - *text_uncertainty_context
+          - *text_exported_waste_caveat
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+
+      me_tons_per_year_per_capita:
+        title: Plastic pollution entering the ocean through rivers, per person
+        unit: kilograms per person
+        short_unit: kg
+        description_short: Estimated quantity of plastic pollution entering the ocean via rivers, in kilograms per person per year.
+        description_key:
+          - *text_modelled_estimate
+          - *text_me_definition
+          - This per capita figure is calculated by dividing the country's estimated emissions by its population.
+          - *text_scope_macroplastics
+          - *text_uncertainty_context
+          - *text_exported_waste_caveat
+        display:
+          numDecimalPlaces: 1
+
+      me_tons_per_year_share_of_global:
+        title: Share of global plastic pollution entering the ocean through rivers
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated share of global plastic pollution entering the ocean via rivers.
+        processing_level: major
+        description_key:
+          - *text_modelled_estimate
+          - *text_me_definition
+          - This is calculated as the country's estimated emissions divided by the global total in the same year.
+          - *text_scope_macroplastics
+          - *text_uncertainty_context
+          - *text_exported_waste_caveat
+        display:
+          numDecimalPlaces: 1

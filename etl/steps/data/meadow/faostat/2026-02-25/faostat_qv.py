@@ -1,0 +1,262 @@
+"""FAOSTAT meadow step for faostat_qv dataset.
+########################################################################################################################
+TEMPORARY STEP WHILE FAOSTAT QV FIXES THEIR MISSING DATA!
+
+In the latest release, FAOSTAT removed post-2017 data for all 27 EU member states from the Value of Agricultural Production (QV) dataset.
+The EU-27 aggregate still has data up to 2024, but individual country data stops at 2017. Non-EU European countries (e.g. UK, Norway, Switzerland) are unaffected.
+
+For now, we fetch post-2017 data for EU-27 countries from the previous snapshot.
+
+Once that's fixed, replace this step by the one-line import of shared:
+from .shared import run  # noqa:F401
+########################################################################################################################
+"""
+
+import os
+import tempfile
+import zipfile
+from pathlib import Path
+
+import owid.catalog.processing as pr
+import structlog
+from owid.catalog import Table
+
+from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# Initialise log.
+log = structlog.get_logger()
+
+# Define path to current folder, namespace and version of all datasets in this folder.
+CURRENT_DIR = Path(__file__).parent
+NAMESPACE = CURRENT_DIR.parent.name
+VERSION = CURRENT_DIR.name
+
+# EU-27 countries that are missing post-2017 data in the new snapshot.
+MISSING_COUNTRIES = [
+    "Austria",
+    "Belgium",
+    "Bulgaria",
+    "Croatia",
+    "Cyprus",
+    "Czechia",
+    "Denmark",
+    "Estonia",
+    "Finland",
+    "France",
+    "Germany",
+    "Greece",
+    "Hungary",
+    "Ireland",
+    "Italy",
+    "Latvia",
+    "Lithuania",
+    "Luxembourg",
+    "Malta",
+    "Netherlands (Kingdom of the)",
+    "Poland",
+    "Portugal",
+    "Romania",
+    "Slovakia",
+    "Slovenia",
+    "Spain",
+    "Sweden",
+]
+
+# Year after which data is missing for EU-27 countries.
+LAST_INFORMED_YEAR = 2017
+
+
+def load_data(snapshot: Snapshot) -> Table:
+    """Load snapshot data (as a table) for current dataset.
+
+    Parameters
+    ----------
+    local_path : Path or str
+        Path to local snapshot file.
+
+    Returns
+    -------
+    data : Table
+        Snapshot data.
+
+    """
+    # Unzip data into a temporary folder.
+    with tempfile.TemporaryDirectory() as temp_dir:
+        z = zipfile.ZipFile(snapshot.path)
+        z.extractall(temp_dir)
+        (filename,) = list(filter(lambda x: "(Normalized)" in x, os.listdir(temp_dir)))
+
+        # Load data from main file.
+        try:
+            data = pr.read_csv(
+                os.path.join(temp_dir, filename),
+                encoding="utf-8",
+                low_memory=False,
+                origin=snapshot.metadata.origin,
+                metadata=snapshot.to_table_metadata(),
+            )
+        except UnicodeDecodeError:
+            data = pr.read_csv(
+                os.path.join(temp_dir, filename),
+                encoding="windows-1252",
+                low_memory=False,
+                origin=snapshot.metadata.origin,
+                metadata=snapshot.to_table_metadata(),
+            )
+
+    return data
+
+
+def run_sanity_checks(tb: Table) -> None:
+    """Run basic sanity checks on loaded data (raise assertion errors if any check fails).
+
+    Parameters
+    ----------
+    tb : Table
+        Data to be checked.
+
+    """
+    tb = tb.copy()
+
+    # Check that column "Year Code" is identical to "Year", and can therefore be dropped.
+    error = "Column 'Year Code' does not coincide with column 'Year'."
+    if "Year" not in tb.columns:
+        pass
+        # Column 'Year' is not in data (this happens at least in faostat_wcad, which requires further processing).
+    elif tb["Year"].dtype == int:
+        # In most cases, columns "Year Code" and "Year" are simply the year.
+        assert (tb["Year Code"] == tb["Year"]).all(), error
+    else:
+        # Sometimes (e.g. for dataset fs) there are year ranges (e.g. with "Year Code" 20002002 and "Year" "2000-2002").
+        assert (tb["Year Code"] == tb["Year"].str.replace("-", "").astype(int)).all(), error
+
+    # Check that there is only one element-unit for each element code.
+    error = "Multiple element-unit for the same element code."
+    assert (tb.groupby(["Element", "Unit"])["Element Code"].nunique() == 1).all(), error
+
+
+def prepare_output_data(tb: Table) -> Table:
+    """Prepare data before saving it to meadow.
+
+    Parameters
+    ----------
+    tb : Table
+        Data.
+
+    Returns
+    -------
+    tb : Table
+        Data ready to be stored as a table in meadow.
+
+    """
+    tb = tb.copy()
+
+    # Select columns to keep.
+    # Note:
+    # * Ignore column "Year Code" (which is almost identical to "Year", and does not add information).
+    # * Ignore column "Note" (which is included only in faostat_fa, faostat_fs, faostat_sdgb and faostat_wcad datasets).
+    #   This column may contain double-quoted text within double-quoted text, which becomes impossible to parse.
+    #   E.g. faostat_wcad line 105.
+    # * Add "Recipient Country Code" and "Recipient Code", which are the names for "Area Code" and "Area", respectively,
+    #   for dataset faostat_fa.
+    columns_to_keep = [
+        "Area Code",
+        "Area",
+        "Year",
+        "Item Code",
+        "Item",
+        "Element Code",
+        "Element",
+        "Unit",
+        "Value",
+        "Flag",
+        "Recipient Country Code",
+        "Recipient Country",
+    ]
+    # Select only columns that are found in the table.
+    columns_to_keep = list(set(columns_to_keep) & set(tb.columns))
+    tb = tb.loc[:, columns_to_keep]
+
+    # Set index columns depending on what columns are available in the table.
+    # Note: "Recipient Country Code" appears only in faostat_fa, and seems to replace "Area Code".
+    index_columns = list({"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code"} & set(tb.columns))
+    if tb.duplicated(subset=index_columns).any():
+        log.warning("Index has duplicated keys.")
+
+    # Ensure all columns are snake-case, and set an index.
+    tb = tb.set_index(index_columns).underscore()
+
+    return tb
+
+
+def run() -> None:
+    #
+    # Load data.
+    #
+    # Fetch the dataset short name from dest_dir.
+    dataset_short_name = "faostat_qv"
+
+    # Load snapshot.
+    snapshot = paths.load_snapshot(version=VERSION)
+    tb_snapshot = load_data(snapshot)
+
+    # Load old snapshot.
+    snapshot_old = paths.load_snapshot(version="2025-03-17")
+    tb_snapshot_old = load_data(snapshot_old)
+
+    #
+    # Process data.
+    #
+    # Run sanity checks.
+    run_sanity_checks(tb=tb_snapshot)
+    run_sanity_checks(tb=tb_snapshot_old)
+
+    # Prepare output meadow table.
+    tb = prepare_output_data(tb=tb_snapshot)
+    tb_old = prepare_output_data(tb=tb_snapshot_old)
+
+    # Check that column "value" has an origin (other columns are not as important and may not have origins).
+    assert len(tb["value"].metadata.origins) == 1, f"Column 'value' of {dataset_short_name} must have one origin."
+    assert len(tb_old["value"].metadata.origins) == 1, f"Column 'value' of {dataset_short_name} must have one origin."
+
+    # Remove the origins from the old table.
+    for column in tb_old.columns:
+        tb_old[column].metadata.origins = []
+
+    # Check that the new snapshot is missing post-2017 data for the expected EU-27 countries.
+    tb = tb.reset_index()
+    for country in MISSING_COUNTRIES:
+        max_year = tb.loc[tb["area"] == country, "year"].max()
+        error = f"Expected {country} to have max year {LAST_INFORMED_YEAR} in new snapshot, but found {max_year}. Check if FAOSTAT has restored EU-27 data and, if so, remove this temporary step (as explained in docstring)."
+        assert max_year == LAST_INFORMED_YEAR, error
+
+    # Check that the old snapshot has post-2017 data for these countries.
+    tb_old = tb_old.reset_index()
+    for country in MISSING_COUNTRIES:
+        max_year = tb_old.loc[tb_old["area"] == country, "year"].max()
+        error = (
+            f"Expected {country} to have data after {LAST_INFORMED_YEAR} in old snapshot, but max year is {max_year}."
+        )
+        assert max_year > LAST_INFORMED_YEAR, error
+
+    # Append old data for EU-27 countries to the new table.
+    # NOTE: Use all years (not just post-2017) to avoid possible spurious jumps at the boundary.
+    tb = pr.concat(
+        [tb[~tb["area"].isin(MISSING_COUNTRIES)], tb_old[tb_old["area"].isin(MISSING_COUNTRIES)]], ignore_index=True
+    )
+
+    # Improve table format.
+    tb = tb.format(keys=["item_code", "year", "element_code", "area_code"])
+
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset.
+    # NOTE: Pass the new snapshot metadata explicitly, since the table combines data from two snapshots
+    # with slightly different descriptions, which would cause the description to be None.
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snapshot.metadata)
+    ds_meadow.save()

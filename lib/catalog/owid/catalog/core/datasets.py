@@ -399,7 +399,8 @@ class Dataset:
             catalog_path: Base path for calculating relative paths. Defaults to "/".
 
         Returns:
-            DataFrame with columns: namespace, dataset, version, table, checksum, is_public, dimensions, path, and channel.
+            DataFrame with columns: namespace, dataset, version, table, checksum, is_public,
+            title, description, dimensions, path, channel, and formats.
 
         Example:
             ```python
@@ -423,6 +424,10 @@ class Dataset:
 
             assert metadata.short_name
             row["table"] = metadata.short_name
+
+            # Content metadata (fallback to dataset-level if table-level not available)
+            row["title"] = metadata.title or self.metadata.title
+            row["description"] = metadata.description or self.metadata.description
 
             row["dimensions"] = json.dumps(metadata.primary_key)
 

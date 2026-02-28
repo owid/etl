@@ -1,0 +1,387 @@
+# Indicator ID renaming. Maps source IDs to clean short names.
+# Set value to null to drop the indicator.
+
+epi:
+  "PLWH": "plwh"
+  "NEW_INFECTIONS": "new_infections"
+  "AIDS_DEATHS": "aids_deaths"
+  "HIV_INCIDENCE": "hiv_incidence"
+  "HIV_PREVALENCE": "hiv_prevalence"
+  "AIDS_MORTALITY_1000_POP": "aids_mortality_1000_pop"
+  "PERCENT_PLWH": "percent_plwh"
+  "PERCENT_KNOW_STATUS_ON_ART": "percent_know_status_on_art"
+  "PLHIV_KNOWLEDGE_OF_STATUS": "plhiv_knowledge_of_status"
+  "DEATHS_PLHIV_ALL_CAUSES": "deaths_plhiv_all_causes"
+  "AIDS_ORPHANS": "aids_orphans"
+  "PEOPLE_RECEIVING_ART": "people_receiving_art"
+  "PERCENT_ON_ART_VL_SUPPRESSED": "percent_art_vl_suppressed"
+  "VIRAL_LOAD_SUPPRESSION": "viral_load_suppression"
+  "IPR": "ipr"
+  "CHILDREN_EXPOSED_UNINFECTED": "children_exposed_uninfected"
+  "INFECTIONS_AVERTED_PMTCT": "infections_averted_pmtct"
+  "NUMBER_PLHIV_KNOWLEDGE_OF_STATUS": "number_plhiv_knowledge_of_status"
+  "DEATHS_AVERTED_ART": "deaths_averted_art"
+  "IMR": "imr"
+  "NUMBER_VIRAL_SUPPRESSION": "number_viral_suppression"
+  "MOTHERS_NEEDING_ARV_FOR_PMTCT": "mothers_needing_arv_for_pmtct"
+  "COVERAGE_MOTHERS_RECEIVING_ARV": "coverage_mothers_receiving_arv"
+  "PEOPLE_UNSUPP_VL": "people_unsupp_vl"
+  "MTCT_RATE": "mtct_rate"
+  "MOTHERS_RECEIVING_ARV_FOR_PMTCT": "mothers_receiving_arv_for_pmtct"
+  ##
+  "NO_RECEIVE_ART_DURING_BF": "art_none_bf"
+  "DID_NOT_RECEIVE_ART_DURING_PREGNANCY_CHILD_INFECTED_DURING_": "art_none_preg_child_inf_preg"
+  "MOTHER_DROPPED_OFF_ART_DURING_BREASTFEEDING_CHILD_INFECTED_": "art_drop_bf_child_inf"
+  "MOTHER_DROPPED_OFF_ART_DURING_PREGNANCY_CHILD_INFECTED_DURI": "art_drop_preg_child_inf"
+  "MOTHER_INFECTED_DURING_BREASTFEEDING_CHILD_INFECTED_DURING_": "mother_child_inf_bf"
+  "MOTHER_INFECTED_DURING_PREGNANCY_CHILD_INFECTED_DURING_PREG": "mother_child_inf_preg"
+  ##
+  "STARTED_ART_BEFORE_THE_PREGNANCY_CHILD_INFECTED_DURING_BREA": "art_start_before_preg_child_inf_bf"
+  "STARTED_ART_BEFORE_THE_PREGNANCY_CHILD_INFECTED_DURING_PREG": "art_start_before_preg_child_inf_preg"
+  "STARTED_ART_DURING_IN_PREGNANCY_CHILD_INFECTED_DURING_BREAS": "art_start_during_preg_child_inf_bf"
+  "STARTED_ART_DURING_IN_PREGNANCY_CHILD_INFECTED_DURING_PREGN": "art_start_child_inf_during_preg"
+  "STARTED_ART_LATE_IN_PREGNANCY_CHILD_INFECTED_DURING_BREASTF": "art_start_late_preg_child_inf_bf"
+  "STARTED_ART_LATE_IN_PREGNANCY_CHILD_INFECTED_DURING_PREGNAN": "art_start_late_preg_child_inf_preg"
+  ##
+  "PCT_CHANGE_AIDS_DEATHS_2010": "pct_change_aids_deaths_2010"
+  "PCT_CHANGE_NEW_INFECTIONS_2010": "pct_change_new_infections_2010"
+  ## DISCARD
+  "TARGET_IPR": null
+  "NEWLY_INITIATING_ART": null
+  "LATE_HIV_DIAGNOSIS": null
+  "TARGET_PLHIV_VIRAL_SUPPRESSION": null
+  "TARGET_ON_ART_VL_SUPPRESSED": null
+  "ANC_TESTING": null
+  "TARGET_PLHIV_KNOWLEDGE_OF_STATUS": null
+  "TARGET_KNOW_STATUS_ON_ART": null
+  "TARGET_PLHIV_ON_ART": null
+  "EARLY_INFANT_DIAGNOSIS": null
+gam:
+  #######################
+  # GAM
+  #######################
+  # low quality
+  "EXPENDITURE_TB_HIV_ACTIVITIES": "expenditure_tb_hiv_activities"
+  # Newly enrolled to HIV treatment
+  "HIV_CARE": "hiv_care"
+  "HIV_TB_DIAGNOSIS": "hiv_tb_diagnosis"
+  "HIV_TB_PATIENTS_UNDER_IPT": "hiv_tb_patients_under_ipt"
+  "NEWLY_ENROLLED_CARE": "newly_enrolled_care"
+  "PLHIV_IN_CARE_WITH_ACTIVE_TB": "plhiv_in_care_with_active_tb"
+  "PLHIV_RECEIVING_TB_PREVENTIVE_THERAPY": "plhiv_receiving_tb_preventive_therapy"
+  # Currently enrolled to HIV treatment
+  "PLHIV_CURRENT_ENROLLED": "plhiv_current_enrolled"
+  "PLHIV_CURRENT_TB_PREVENTATIVE": "plhiv_current_tb_preventative"
+  "PLHIV_CURRENT_TREATMENT_TB": "plhiv_current_treatment_tb"
+  # Condoms distributed to prisoners
+  "PRISONERS_CONDOMS_DISTRIBUTED": "prisoners_condoms_distributed"
+  # TB
+  "HIV_TB_PATIENTS_RECEIVING_ART": "hiv_tb_patients_receiving_art"
+  "HIV_TB_ART_COVERAGE": "share_hiv_tb_patients_receiving_art" # NEW
+  "HIV_TB_PATIENTS_RECEIVING_CPT": "hiv_tb_patients_receiving_cpt"
+  "PCT_HIV_TB_CPT": "share_hiv_tb_patients_receiving_cpt" # NEW
+  "NEW_RELAPSE_TB_CASES": "new_relapse_tb_cases"
+  "NOTIFIED_TB_CASES": "notified_tb_cases"
+  # TPT, ART
+  "PEOPLE_ART_ELIG_TPT": "people_art_elig_tpt"
+  "PEOPLE_ART_ELIG_TPT_STRT": "people_art_elig_tpt_strt"
+  "PEOPLE_NEW_ART_ELIG_TPT_STRT": "people_new_art_elig_tpt_strt"
+  "NUM_ART_COMPLT_TPT": "num_art_complt_tpt"
+  "NUM_ART_INIT_TPT": "num_art_init_tpt"
+  "PROP_ART_TPT_START": "prop_art_tpt_start"
+  "PROP_NEW_ART_TPT_STRT": "prop_new_art_tpt_strt"
+  # Others
+  "RESOURCE_NEEDS_FT": "resource_needs_ft"
+  "TB_EXPENDITURE": "tb_expenditure"
+  # Prisoners
+  "PRISONERS_TB": "prisoners_tb"
+  "PEOPLE_ON_PREP": "people_on_prep"
+  "PER_TPT_ART_CMPLT": "per_tpt_art_cmplt"
+  # Needles
+  "PWID_NEEDLES": "pwid_needles"
+  "PWID_NEEDLES_DISTRIBUTED": "prisoners_needles" # NEW
+  # TB patients with HIV documented status
+  "TB_PATIENTS_DOCUMENTED_HIV_STATUS": "tb_patients_documented_hiv_status"
+  "TB_PATIENTS_DOCUMENTED_HIV_POSITIVE_STATUS": "tb_patients_documented_hiv_positive_status"
+  "TB_PATIENTS_TESTED_POSITIVE_HIV": "tb_patients_tested_positive_hiv"
+  #######################
+  # GAM SEX
+  #######################
+  "KNOWLEDGE_IN_YOUNG_PEOPLE": "knowledge_in_young_people"
+  #######################
+  # GAM AGE
+  #######################
+  "MALE_CIRCUMCISIONS_PERFORMED": "male_circumcisions_performed"
+  #######################
+  # GAM GROUP
+  #######################
+  "DISCRIMINATION_HC_SETTINGS": "discrimination_hc_settings"
+  "DOMESTIC_SPENDING_FUND_SOURCE": "domestic_spending_fund_source"
+  "RESOURCE_AVAIL_CONSTANT": "resource_avail_constant"
+  ## condoms_distributed_pp
+  "SW_CONDOMS_DISTRIBUTED": "sw_condoms_distributed"
+  "MSM_CONDOMS_DISTRIBUTED": "msm_condoms_distributed"
+  ## population
+  "POPULATION": "population"
+  "SEX_WORKERS_POPULATION_SIZE": "sex_workers_population_size"
+  "TG_POPULATION_SIZE": "tg_population_size"
+  "PWID_POPULATION_SIZE": "pwid_population_size"
+  "PRISONERS_POPULATION_SIZE": "prisoners_population_size"
+  "MSM_POPULATION_SIZE": "msm_population_size"
+  #######################
+  # GAM ESTIMATES
+  #######################
+  "COMANAGEMENT_TB_HIV": "comanagement_tb_hiv"
+  "HIV_NEW_TB_CASES": "hiv_new_tb_cases"
+  "INCIDENT_TB_CASES": "incident_tb_cases"
+  "TB_RELATED_DEATHS": "tb_related_deaths"
+  #######################
+  # GAM HEPATITIS
+  #######################
+  ## viral_hepatitis
+  "TG_HEPATITIS": "tg_hepatitis"
+  "MSM_HEPATITIS": "msm_hepatitis"
+  "SW_HEPATITIS": "sw_hepatitis"
+  "PWID_HEPATITIS": "pwid_hepatitis"
+  ##
+  "PRISONERS_HEPATITIS_C": "prisoners_hepatitis_c"
+  #######################
+  # GAM AGE GROUP
+  #######################
+  "PREVALENCE_MALE_CIRCUMCISION": "prevalence_male_circumcision"
+  "HIV_SELF_TESTS": "hiv_self_tests" # This is not collapsed under hiv_tests actually
+  #######################
+  # GAM SEX GROUP
+  #######################
+  "CONDOMS_DISTRIBUTED": "condoms_distributed"
+  ## experience_violence
+  "SW_EXP_PHYS_SV": "sw_exp_phys_sv"
+  "IDU_EXP_PHYS_SV": "idu_exp_phys_sv"
+  "MSM_EXP_PHYS_SV": "msm_exp_phys_sv"
+  "TG_EXP_PHYS_SV": "tg_exp_phys_sv"
+  ## syphilis_prevalence
+  "SW_SYPHILIS": "sw_syphilis"
+  "MSM_SYPHILIS": "msm_syphilis"
+  "TG_SYPHILIS": "tg_syphilis" # NEW
+  #######################
+  # GAM AGE SEX
+  #######################
+  "ATT_TOW_WIFE_BEATING": "att_tow_wife_beating"
+  "DEMAND_FAMILY_PLANNING": "demand_family_planning"
+  "PREVALENCE_IPV": "prevalence_ipv"
+  "PWID_OST_COVERAGE": "pwid_ost_coverage"
+  "HIV_POS_RATE": "hiv_pos_rate"
+  #######################
+  # GAM AGE SEX GROUP
+  #######################
+  ## art_coverage
+  "SEX_WORKERS_ART_COVERAGE": "sex_workers_art_coverage"
+  "MSM_ART_COVERAGE": "msm_art_coverage"
+  "PWID_ART_COVERAGE": "pwid_art_coverage"
+  "TG_ART_COVERAGE": "tg_art_coverage"
+  "PRISONERS_ART_COVERAGE": "prisoners_art_coverage"
+  ## avoidance_care
+  "SW_AVOIDANCE_CARE": "sw_avoidance_care"
+  "PWID_AVOIDANCE_CARE": "pwid_avoidance_care"
+  "TG_AVOIDED_HEALTHCARE_FACILITY": "tg_avoided_healthcare_facility"
+  "MSM_AFRAID_TO_SEEK_HEALTH_SERVICES": "msm_afraid_to_seek_health_services"
+  ## condom_use
+  "CONDOM_USE": "condom_use"
+  "SEX_WORKERS_CONDOM_USE": "sex_workers_condom_use"
+  "TG_CONDOM_USE": "tg_condom_use"
+  "PWID_CONDOM_USE": "pwid_condom_use"
+  "MSM_CONDOM_USE": "msm_condom_use"
+  ##
+  "DISCRIMINATORY_ATTITUDES": "discriminatory_attitudes"
+  ## experience_stigma
+  "SW_KP_REPORT_EXP_SD": "sw_kp_report_exp_sd"
+  "TG_KP_REPORT_EXP_SD": "tg_kp_report_exp_sd"
+  "IDU_KP_REPORT_EXP_SD": "idu_kp_report_exp_sd"
+  "MSM_KP_REPORT_EXP_SD": "msm_kp_report_exp_sd"
+  ## hiv_prevalence
+  "TG_HIV_PREVALENCE": "tg_hiv_prevalence"
+  "MSM_HIV_PREVALENCE": "msm_hiv_prevalence"
+  "SEX_WORKERS_HIV_PREVALENCE": "sex_workers_hiv_prevalence"
+  "PWID_HIV_PREVALENCE": "pwid_hiv_prevalence"
+  "PRISONERS_HIV_PREVALENCE": "prisoners_hiv_prevalence"
+  ## hiv_programmes_coverage
+  "TG_PROGRAMMES": "tg_programmes"
+  "SW_PROGRAMMES": "sw_programmes"
+  "PWID_PROGRAMMES": "pwid_programmes"
+  "MSM_PROGRAMMES": "msm_programmes"
+  ## hiv_status_awareness
+  "TG_HIV_STATUS": "tg_hiv_status"
+  "SW_HIV_STATUS": "sw_hiv_status"
+  "PWID_HIV_STATUS": "pwid_hiv_status"
+  "MSM_HIV_STATUS": "msm_hiv_status"
+  ## hiv_tests
+  "HIV_TESTING_TB_PATIENTS": "hiv_testing_tb_patients"
+  "HIV_TESTS_VOL": "hiv_tests_vol"
+  ##
+  "PWID_SAFETY": "pwid_safety"
+  #####################################################################
+  # TO BE MAPPED
+  #####################################################################
+  # Cervical cancer
+  "WOMEN_SCREENED_CC_ANY_SCREEN_TEST": null
+  "PROGRAMME_CERVICAL_CANCER": null
+  "SURVEY_CERVICAL_CANCER": null
+  "CERVICAL_PRECANCER_TREATMENT": null
+  "TREATMENT_INVASIVE_CC": null
+  # Congenital syphilis
+  "CONGENITAL_SYPHILIS_CASES": null
+  "CONGENITAL_SYPHILIS_RATE_100K": null
+  # Hepatitis C
+  "HEPATITIS_C_TESTING": null
+  # Syphilis
+  "VERTICAL_TRANSMISSION_SYPHILIS": null
+  # Stigma
+  "PLHIV_REP_INTER_STIG": null
+  # Others
+  "ADVANCED_HIV_DISEASE": null
+  "COVERAGE_DSD_ART_MODELS": null
+  "VLS_PLHIV_DSD_ART_MODELS": null
+  "HEPATITIS_C_TREATMENT": null
+  "PLHIV_REP_EXP_SD_CS": null
+  "PEOPLE_NEW_ART_ELIG_TPT": null
+  "PLHIV_SEEK_RV": null
+  "DENIED_SERVICES_HIV_STATUS": null
+  "PRISONERS_OST": null #prisoners_ost
+kpa:
+  #######################
+  # GAM
+  #######################
+  # Condoms distributed to prisoners
+  "PRISONERS_CONDOMS_DISTRIBUTED": "prisoners_condoms_distributed"
+  # Prisoners
+  "PRISONERS_TB": "prisoners_tb"
+  # Needles
+  "PWID_NEEDLES": "pwid_needles"
+  "PWID_NEEDLES_DISTRIBUTED": "prisoners_needles"
+  #######################
+  # GAM GROUP
+  #######################
+  ## condoms_distributed_pp
+  "SW_CONDOMS_DISTRIBUTED": "sw_condoms_distributed"
+  "MSM_CONDOMS_DISTRIBUTED": "msm_condoms_distributed"
+  ## population
+  "SEX_WORKERS_POPULATION_SIZE": "sex_workers_population_size"
+  "TG_POPULATION_SIZE": "tg_population_size"
+  "PWID_POPULATION_SIZE": "pwid_population_size"
+  "PRISONERS_POPULATION_SIZE": "prisoners_population_size"
+  "MSM_POPULATION_SIZE": "msm_population_size"
+  #######################
+  # GAM HEPATITIS
+  #######################
+  ## viral_hepatitis
+  "TG_HEPATITIS": "tg_hepatitis"
+  "MSM_HEPATITIS": "msm_hepatitis"
+  "SW_HEPATITIS": "sw_hepatitis"
+  "PWID_HEPATITIS": "pwid_hepatitis"
+  ##
+  "PRISONERS_HEPATITIS_C": "prisoners_hepatitis_c"
+  #######################
+  # GAM SEX GROUP
+  #######################
+  ## experience_violence
+  "SW_EXP_PHYS_SV": "sw_exp_phys_sv"
+  "IDU_EXP_PHYS_SV": "idu_exp_phys_sv"
+  "MSM_EXP_PHYS_SV": "msm_exp_phys_sv"
+  "TG_EXP_PHYS_SV": "tg_exp_phys_sv"
+  ## syphilis_prevalence
+  "SW_SYPHILIS": "sw_syphilis"
+  "MSM_SYPHILIS": "msm_syphilis"
+  "TG_SYPHILIS": "tg_syphilis" # NEW
+  #######################
+  # GAM AGE SEX
+  #######################
+  "PWID_OST_COVERAGE": "pwid_ost_coverage"
+  #######################
+  # GAM AGE SEX GROUP
+  #######################
+  ## art_coverage
+  "SEX_WORKERS_ART_COVERAGE": "sex_workers_art_coverage"
+  "MSM_ART_COVERAGE": "msm_art_coverage"
+  "PWID_ART_COVERAGE": "pwid_art_coverage"
+  "TG_ART_COVERAGE": "tg_art_coverage"
+  "PRISONERS_ART_COVERAGE": "prisoners_art_coverage"
+  ## avoidance_care
+  "SW_AVOIDANCE_CARE": "sw_avoidance_care"
+  "PWID_AVOIDANCE_CARE": "pwid_avoidance_care"
+  "TG_AVOIDED_HEALTHCARE_FACILITY": "tg_avoided_healthcare_facility"
+  "MSM_AFRAID_TO_SEEK_HEALTH_SERVICES": "msm_afraid_to_seek_health_services"
+  ## condom_use
+  "SEX_WORKERS_CONDOM_USE": "sex_workers_condom_use"
+  "TG_CONDOM_USE": "tg_condom_use"
+  "PWID_CONDOM_USE": "pwid_condom_use"
+  "MSM_CONDOM_USE": "msm_condom_use"
+  ## experience_stigma
+  "SW_KP_REPORT_EXP_SD": "sw_kp_report_exp_sd"
+  "TG_KP_REPORT_EXP_SD": "tg_kp_report_exp_sd"
+  "IDU_KP_REPORT_EXP_SD": "idu_kp_report_exp_sd"
+  "MSM_KP_REPORT_EXP_SD": "msm_kp_report_exp_sd"
+  ## hiv_prevalence
+  "TG_HIV_PREVALENCE": "tg_hiv_prevalence"
+  "MSM_HIV_PREVALENCE": "msm_hiv_prevalence"
+  "SEX_WORKERS_HIV_PREVALENCE": "sex_workers_hiv_prevalence"
+  "PWID_HIV_PREVALENCE": "pwid_hiv_prevalence"
+  "PRISONERS_HIV_PREVALENCE": "prisoners_hiv_prevalence"
+  ## hiv_programmes_coverage
+  "TG_PROGRAMMES": "tg_programmes"
+  "SW_PROGRAMMES": "sw_programmes"
+  "PWID_PROGRAMMES": "pwid_programmes"
+  "MSM_PROGRAMMES": "msm_programmes"
+  ## hiv_status_awareness
+  "TG_HIV_STATUS": "tg_hiv_status"
+  "SW_HIV_STATUS": "sw_hiv_status"
+  "PWID_HIV_STATUS": "pwid_hiv_status"
+  "MSM_HIV_STATUS": "msm_hiv_status"
+  ##
+  "PWID_SAFETY": "pwid_safety"
+  #######################
+  # DROPPING
+  #######################
+  ## Present in GAM
+  "DENIED_SERVICES_HIV_STATUS": null
+  "PRISONERS_OST": null
+  ## New to KPA
+  "EMIS_HIV_DIAGNOSIS": null
+  "EMIS_RECENT_DIAGNOSIS": null
+  "Q_A_74": null
+  "Q_A_67": null
+  "EMIS_PREP_KNOWLEDGE": null
+  "EMIS_SMT_GON": null
+  "EMIS_HAV": null
+  "EMIS_SMT_CHL": null
+  "EMIS_SMT_SYP": null
+  "EMIS_DISCLOSED_MSM": null
+  "PRISON_HAS_NSP": null
+  "EMIS_CONDOMLESS": null
+  "Q_A_68": null
+  "PRISONERS_HEPATITIS": null
+  "EMIS_HIV_STI_INFO": null
+  "EMIS_GONOR": null
+  "EMIS_STI_TEST": null
+  "EMIS_HIV_TESTING": null
+  "EMIS_FULL_STI_SCREEN": null
+  "HC_PROF_TOLD_HIV_STATUS": null
+  "DOMESTIC_SPENDING_KP": null
+  "EMIS_CHLAM": null
+  "EMIS_OUTNESS": null
+  "EMIS_HBV": null
+  "EMIS_COMMUNITY_TESTING": null
+  "Q_A_120": null
+  "EMIS_SYP": null
+  "EMIS_CONDOMS_DIST": null
+  "EMIS_PREP": null
+  "EMIS_UU_KNOWLEDGE": null
+  "EMIS_GON_NOT": null
+  "PRISON_HAS_OST": null
+  "EMIS_MSM_REACHED": null
+  "Q_A_69": null
+  "EMIS_PEP_KNOWLEDGE": null
+  "Q_A_65": null
+  "EMIS_SYP_NOT": null
+  # In consideration
+  "MSM_POPULATION_SIZE_AY": null
+  "SEX_WORKERS_POPULATION_SIZE_AY": null

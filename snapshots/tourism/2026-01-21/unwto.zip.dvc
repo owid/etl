@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: UN Tourism Statistics Database
+    description: |-
+      UN World Tourism Organization collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations. The data covers various aspects of tourism, such as inbound tourism (including arrivals by region, main purpose, and mode of transport, as well as accommodation and tourism expenditure in the country), domestic tourism (including trips and accommodation), outbound tourism (including departures and tourism expenditure in other countries), tourism industries (such as accommodation in hotels and similar establishments), and employment (including the number of employees in tourism industries).
+    date_published: '2025-12-29'
+
+    # Citation
+    producer: UN Tourism
+    citation_full: |-
+      "World Tourism Organization (2025). UN Tourism Statistics Database, Madrid. Data updated on 23 December 2025. More information: https://www.untourism.int/tourism-statistics/tourism-statistics-database"
+
+    # Files
+    url_main: https://www.untourism.int/tourism-statistics/tourism-statistics-database
+    url_download: https://pre-webunwto.s3.amazonaws.com/s3fs-public/2025-12/UN_Tourism_bulk_data_download_12_2025.zip
+    date_accessed: '2026-01-21'
+
+    # License
+    license:
+      name: © UNWTO, 92844/14/23
+      url: https://www.unwto.org/copyright
+outs:
+  - md5: 6e3607f7dc75d3fb0d3135f98a687149
+    size: 7495460
+    path: unwto.zip

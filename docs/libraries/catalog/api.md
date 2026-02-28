@@ -4,12 +4,6 @@ The Data API provides unified access to OWID's published data through a simple c
 
 !!! tip "[Jump to the reference :octicons-arrow-down-16:](#api-reference)"
 
-!!! warning "This library is under active development"
-
-    This documentation reflects the latest version, v1.0.0rc2, which is currently in Release Candidate stage. To install it run `pip install owid-catalog==v1.0.0rc2`.
-
-    We are continuously working to enhance its functionality and performance, and expect to release the stable v1.0.0 soon.
-
 ## Quick Reference
 The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
 
@@ -26,10 +20,13 @@ For convenience, the library provides functions for the most common use cases:
 
 ```python
 from owid.catalog import search, fetch
-# Search and fetch
+
+# Search for charts (default)
 results = search("population")
 tb = results[0].fetch()
-# Direct fetch
+
+# Direct fetch (by chart slug or table path)
+tb = fetch("life-expectancy")
 tb = fetch("garden/un/2024-07-12/un_wpp/population")
 ```
 
@@ -49,7 +46,7 @@ Optionally, you can defer data loading until it's actually needed, by using the 
 
 Different APIs use different path conventions:
 
-- **Charts**: `"life-expectancy"` (simple slug)
+- **Charts**: `"life-expectancy"` (simple slug), `"years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"` (with query params), or `"https://ourworldindata.org/grapher/life-expectancy"` (full URL)
 - **Tables**: `"garden/un/2024-07-12/un_wpp/population"` (channel/namespace/version/dataset/table)
 - **Indicators**: `"garden/un/2024-07-12/un_wpp/population#population"` (table path + #column)
 

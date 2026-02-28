@@ -1,0 +1,624 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tourism
+
+  # =============================================================================
+  # REUSABLE DESCRIPTION KEY BLOCKS
+  # =============================================================================
+
+  # --- Counting methodology ---
+  desc_counting: &desc_counting |-
+    Each trip by the same person is counted separately.
+
+  # --- Arrivals and departures ---
+  desc_key_arrivals: &desc_key_arrivals
+    - *desc_counting
+    - When an individual visits a country multiple times within a year, each visit is counted as a separate arrival.
+    - Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually.
+    - As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
+
+  desc_key_arrivals_us_note: &desc_key_arrivals_us_note
+    - Before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.
+
+  desc_key_departures: &desc_key_departures
+    - When an individual leaves its residence country multiple times within a year, each visit is counted as a separate departure.
+    - As a result, the number of departures does not necessarily reflect the number of individuals traveling, as one person can generate multiple departures.
+
+  # --- Domestic tourism ---
+  desc_key_domestic: &desc_key_domestic
+    - A domestic trip refers to travel from the time of leaving one's usual residence until returning.
+    - *desc_counting
+
+  # --- Trip purpose ---
+  desc_key_purpose: &desc_key_purpose
+    - *desc_counting
+    - The main purpose of a trip is defined as the purpose in the absence of which the trip would not have taken place.
+
+  # --- Region of origin ---
+  desc_key_region_origin: &desc_key_region_origin
+    - The country linked to the departure should correspond to the visitor's country of residence.
+    - However, some countries deviate from UN Tourism recommendations and classify their nationals residing abroad as a distinct category, rather than as residents of those countries.
+
+  # --- Per capita metrics ---
+  desc_key_per_1000_arrivals: &desc_key_per_1000_arrivals
+    - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the destination country.
+    - This enables standardized comparison across different population sizes and provides an estimate of tourism intensity.
+    - For instance, if there are "10 arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international arrivals.
+
+  desc_key_per_1000_same_day: &desc_key_per_1000_same_day
+    - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the destination country.
+    - This enables standardized comparison across different population sizes and provides insight into the level of same-day travel.
+    - For instance, if there are "10 same-day arrivals per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international same-day arrivals.
+
+  desc_key_per_1000_departures: &desc_key_per_1000_departures
+    - Per "1,000 people" refers to the calculation of trips per 1,000 individuals within the population of the origin country.
+    - This enables standardized comparison across different population sizes and provides an estimate of outbound tourism intensity.
+    - For instance, if there are "10 departures per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 international departures.
+
+  desc_key_per_1000_employment: &desc_key_per_1000_employment
+    - Per "1,000 people" refers to the calculation of employed persons per 1,000 individuals within the population.
+    - This enables standardized comparison across different population sizes and provides an estimate of the significance of the tourism sector in terms of employment.
+    - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
+
+  # --- Visitor-type note (receipts / expenditure) ---
+  note_all_visitor_types: &note_all_visitor_types |-
+    Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+
+  note_purpose: &note_purpose |-
+    The main purpose is defined as the purpose without which the trip would not have taken place.
+
+  # --- Employment ---
+  desc_key_employment: &desc_key_employment
+    - Includes employees and the self-employed.
+    - Individuals may hold multiple jobs concurrently and could be counted in multiple tourism sectors.
+
+  # =============================================================================
+  # INBOUND TOURISM (Receipts) — Money flowing INTO a country from foreign visitors
+  # =============================================================================
+
+  desc_key_inbound_travel: &desc_key_inbound_travel
+    - International tourism receipts (travel) measure the money a country earns from foreign visitors spending within its borders.
+    - This covers accommodation, food and drink, local transport, entertainment, shopping, and cruise fares.
+    - It excludes international transport to reach the destination (such as flights), which is recorded separately.
+    - All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
+
+  desc_key_inbound_passenger_transport: &desc_key_inbound_passenger_transport
+    - International tourism receipts (passenger transport) measure the money a country earns when foreign visitors fly on its airlines.
+    - For example, if a French tourist flies to Brazil on a Brazilian airline, that fare counts as a receipt for Brazil.
+    - This includes airfares, excess baggage fees, and onboard purchases, but excludes cruise fares (counted under travel).
+
+  desc_key_inbound_total: &desc_key_inbound_total
+    - Total international tourism receipts measure all the money a country earns from foreign visitors.
+    - This includes spending within the country (accommodation, food, transport, entertainment, shopping, cruises) plus fares paid to the country's airlines.
+    - All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
+
+  # =============================================================================
+  # OUTBOUND TOURISM (Expenditure) — Money flowing OUT of a country when residents travel abroad
+  # =============================================================================
+
+  desc_key_outbound_travel: &desc_key_outbound_travel
+    - International tourism expenditure (travel) measures the money a country's residents spend in foreign countries.
+    - This covers accommodation, food and drink, local transport, entertainment, shopping, and cruise fares abroad, but not purchases made at home before the trip.
+    - It excludes international transport (such as flights), which is recorded separately.
+
+  desc_key_outbound_passenger_transport: &desc_key_outbound_passenger_transport
+    - International tourism expenditure (passenger transport) measures the money a country's residents pay to foreign airlines.
+    - For example, if a Brazilian flies to France on Air France, that fare counts as expenditure for Brazil. Flying on a Brazilian airline would not count here.
+    - This includes airfares, excess baggage fees, and onboard purchases, but excludes cruise fares (counted under travel).
+
+  desc_key_outbound_total: &desc_key_outbound_total
+    - Total international tourism expenditure measures all the money a country's residents spend abroad as tourists.
+    - This includes spending in foreign countries (accommodation, food, transport, entertainment, shopping, cruises) plus fares paid to foreign airlines.
+    - All types of foreign visitors are included, such as students and seasonal workers, which can be significant in certain countries.
+
+  # =============================================================================
+  # INFLATION ADJUSTMENT NOTES
+  # =============================================================================
+
+  note_us_cpi_adjustment: &note_us_cpi_adjustment |-
+    Values have been adjusted for US inflation using the Consumer Price Index (CPI) with 2021 as the base year. CPI data comes from the World Bank World Development Indicators (FP.CPI.TOTL).
+
+  note_ppp_cpi_adjustment: &note_ppp_cpi_adjustment |-
+    Values have been adjusted for both local inflation and differences in cost of living across countries. Expenditures were converted from current US dollars to local currency using World Bank exchange rates, inflation-adjusted to a 2021 base year, and converted to international dollars using PPP factors. As UN Tourism does not report the exchange rates used to convert from local currency to nominal US dollars, our reliance on World Bank exchange rates may introduce uncertainty, especially where exchange rates are volatile.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  unwto:
+    variables:
+
+      # =========================================================================
+      # DOMESTIC TOURISM
+      # =========================================================================
+
+      dom_tour_trips_total_overnight_vis_tourists:
+        title: Trips by domestic tourists
+        unit: trips
+        description_short: Number of trips by individuals who travel within their own country and spend at least one night at their destination.
+        description_key:
+          - *desc_key_domestic
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      dom_tour_trips_total_overnight_vis_tourists_per_person:
+        title: Trips by domestic tourists per person
+        unit: trips per person
+        description_short: Number of trips by individuals who travel within their own country and spend at least one night at their destination, per person in the country's population.
+        description_key:
+          - *desc_key_domestic
+          - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
+          - This enables standardized comparison across different population sizes and provides an estimate of domestic tourism intensity.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 1
+
+      dom_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
+        title: Local guests in hotels and similar establishments
+        unit: guests
+        description_short: Number of domestic visitors who check in to hotels and similar accommodation establishments within their own country.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # INBOUND TOURISM — ARRIVALS
+      # =========================================================================
+
+      in_tour_arrivals_trips_total_overnight_vis_tourists:
+        title: Arrivals of tourists from abroad
+        unit: arrivals
+        description_short: Number of trips by visitors who arrive from abroad and stay overnight.
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_arrivals_us_note
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_arrivals_trips_total_overnight_vis_tourists_per_1000:
+        title: Arrivals of tourists from abroad per 1,000 people
+        unit: arrivals per 1,000 people
+        description_short: Number of trips by visitors who arrive from abroad and stay overnight, per 1,000 people in the destination country's population.
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_per_1000_arrivals
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_arrivals_trips_total_same_day_vis_excur:
+        title: Arrivals of same-day visitors from abroad
+        unit: arrivals
+        description_short: Number of trips by visitors who arrive from abroad and depart within the same day.
+        description_key:
+          - *desc_key_arrivals
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_arrivals_trips_total_same_day_vis_excur_per_1000:
+        title: Arrivals of same-day visitors from abroad per 1,000 people
+        unit: arrivals per 1,000 people
+        description_short: Number of trips by visitors who arrive from abroad and depart within the same day, per 1,000 people in the destination country’s population.
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_per_1000_same_day
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_accom_short_term_hotels_and_similar_isic_5510_guests:
+        title: Foreign guests staying in hotels and similar establishments
+        unit: guests
+        description_short: Number of international visitors who check in to hotels and similar accommodation establishments.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # INBOUND TOURISM — PURPOSE OF VISIT
+      # =========================================================================
+
+      in_tour_purpose_trips_by_business_overnight_vis_tourists:
+        title: Arrivals of tourists from abroad for business purposes
+        unit: trips
+        description_short: Number of international trips where the main purpose is business-related and the visitor stays overnight.
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_purpose
+        presentation:
+          grapher_config:
+            note: *note_purpose
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_purpose_trips_by_personal_overnight_vis_tourists:
+        title: Arrivals of tourists from abroad for personal purposes
+        unit: trips
+        description_short: Number of international trips where the main purpose is personal (leisure, visiting friends and relatives, health, etc.) and the visitor stays overnight.
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_purpose
+        presentation:
+          grapher_config:
+            note: *note_purpose
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # INBOUND TOURISM — REGION OF ORIGIN
+      # =========================================================================
+
+      inbound_tourism_by_region:
+        title: International tourist arrivals by region of origin
+        unit: arrivals
+        description_short: Number of international tourist arrivals broken down by the region where visitors reside.
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total:
+        title: International tourists visiting from Africa
+        unit: arrivals
+        description_short: Number of international tourists arriving from countries in Africa (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+      in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total:
+        title: International tourists visiting from the Americas
+        unit: arrivals
+        description_short: Number of international tourists arriving from countries in the Americas (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total:
+        title: International tourists visiting from East Asia and the Pacific
+        unit: arrivals
+        description_short: Number of international tourists arriving from countries in East Asia and the Pacific (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total:
+        title: International tourists visiting from Europe
+        unit: arrivals
+        description_short: Number of international tourists arriving from countries in Europe (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total:
+        title: International tourists visiting from the Middle East
+        unit: arrivals
+        description_short: Number of international tourists arriving from countries in the Middle East (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total:
+        title: International tourists visiting from South Asia
+        unit: arrivals
+        description_short: Number of international tourists arriving from countries in South Asia (overnight visitors).
+        description_key:
+          - *desc_key_arrivals
+          - *desc_key_region_origin
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # INBOUND TOURISM — EXPENDITURE (RECEIPTS)
+      # =========================================================================
+
+      in_tour_exp_balance_of_payments_travel_vis:
+        title: Spending by international visitors while visiting a country on travel
+        unit: current US$
+        short_unit: $
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
+        description_key:
+          - *desc_key_inbound_travel
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      in_tour_exp_balance_of_payments_passenger_transport_vis:
+        title: Spending by international visitors while visiting a country on passenger transport
+        unit: current US$
+        short_unit: $
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, local transport, entertainment, shopping, and cruise fares within the destination country.
+        description_key:
+          - *desc_key_inbound_passenger_transport
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      in_tour_exp_balance_of_payments_total_vis:
+        title: Spending by international visitors while visiting a country
+        unit: current US$
+        short_unit: $
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, local transport, entertainment, shopping, and fares paid to the country’s own airlines. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
+        description_key:
+          - *desc_key_inbound_total
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      in_tour_exp_total_share_gdp:
+        title: Spending by international visitors while visiting a country as a share of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, transport, entertainment, shopping, and fares paid to the country’s own airlines, as a share of, as a share of [GDP](#dod:gdp).
+        description_key:
+          - *desc_key_inbound_total
+          - A high percentage means that the country earns a large amount from foreign visitors relative to the size of the economy. A low percentage means it earns relatively little.
+          - In small countries with a lot of tourism, this ratio can look very large. This is because this indicator compares total international tourist spending to the overall size of the economy, [GDP](#dod:gdp). It is not the same as the tourism sector's contribution to GDP, which is shown in this [other chart](https://ourworldindata.org/grapher/tourism-gdp-proportion-of-total-gdp).
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 2
+
+      inbound_exp_ppp_cpi_adj_2021:
+        title: Spending by international visitors while visiting a country (in international-$ in 2021 prices)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        description_short: Money received by the destination country from foreign visitors, including spending on accommodation, food, transport, entertainment, shopping, and fares paid to the country’s own airlines. This data is adjusted for inflation and differences in living costs between countries.
+        description_key:
+          - *desc_key_inbound_total
+          - *note_ppp_cpi_adjustment
+        description_processing: |-
+          We adjusted the data to account for both local inflation and differences in cost of living across countries. First, we converted expenditures from US dollars to local currency using official exchange rates. Then we adjusted for local inflation using each country's Consumer Price Index (CPI), normalized to 2021. Finally, we converted the values to international dollars using purchasing power parity (PPP) conversion factors for private consumption from 2021.
+        presentation:
+          grapher_config:
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+        display:
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # OUTBOUND TOURISM — DEPARTURES
+      # =========================================================================
+
+      out_tour_departures_trips_total_overnight_vis_tourists:
+        title: International tourist departures
+        unit: departures
+        description_short: Number of trips by country's residents who travel abroad and stay overnight.
+        description_key:
+          - *desc_key_departures
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      out_tour_departures_trips_total_overnight_vis_tourists_per_1000:
+        title: International tourist departures per 1,000 people
+        unit: departures per 1,000 people
+        description_short: Number of trips by country's residents who travel abroad and stay overnight, per 1,000 people in the origin country's population.
+        description_key:
+          - *desc_key_departures
+          - *desc_key_per_1000_departures
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # OUTBOUND TOURISM — EXPENDITURE
+      # =========================================================================
+
+      out_tour_exp_balance_of_payments_travel_vis:
+        title: Spending by a country’s residents while travelling abroad on travel (current US$)
+        unit: current US$
+        short_unit: $
+        description_short: Money spent by a country's residents abroad on accommodation, food, local transport, entertainment, shopping, and cruise fares. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
+        description_key:
+          - *desc_key_outbound_travel
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      out_tour_exp_balance_of_payments_passenger_transport_vis:
+        title: Spending by a country’s residents while travelling abroad on passenger transport (current US$)
+        unit: current US$
+        short_unit: $
+        description_short: Money spent on fares paid to foreign airlines by the country's residents, including airfares, excess baggage fees, and onboard purchases. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
+        description_key:
+          - *desc_key_outbound_passenger_transport
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      out_tour_exp_balance_of_payments_total_vis:
+        title: Spending by a country’s residents while travelling abroad (current US$)
+        unit: current US$
+        short_unit: $
+        description_short: Money spent by a country’s residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
+        description_key:
+          - *desc_key_outbound_total
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 0
+
+      out_tour_exp_total_share_gdp:
+        title: Spending by a country’s residents while travelling abroad as a share of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines, as a percentage of the country's [GDP](#dod:gdp).
+        description_key:
+          - *desc_key_outbound_total
+          - A high percentage means that residents spend a large amount abroad relative to the size of the economy. A low percentage means they spend relatively little.
+        presentation:
+          grapher_config:
+            note: *note_all_visitor_types
+        display:
+          numDecimalPlaces: 2
+
+      outbound_exp_us_cpi_adj_2021:
+        title: Spending by a country’s residents while travelling abroad (in constant 2021 US$)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines. This data is expressed in in constant 2021 US$. It is adjusted for inflation but does not account for differences in living costs between countries.
+        description_key:
+          - *desc_key_outbound_total
+          - *note_us_cpi_adjustment
+        description_processing: |-
+          We adjusted the data for US inflation by dividing nominal expenditure values by the US Consumer Price Index (CPI) adjustment factor, with 2021 as the base year. This accounts for changes in the purchasing power of the US dollar over time.
+        presentation:
+          grapher_config:
+            note: This data is expressed in constant 2021 US$, adjusted for inflation using the US Consumer Price Index. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+        display:
+          numDecimalPlaces: 0
+
+      # =========================================================================
+      # RATIOS AND COMPARATIVE METRICS
+      # =========================================================================
+
+      business_personal_ratio:
+        title: Ratio of business to personal tourism arrivals
+        unit: ratio
+        description_short: A country with a ratio greater than one indicates a higher number of arrivals for business and professional purposes compared to personal purposes.
+        description_key:
+          - A value greater than 1 means more business travelers than personal travelers; a value less than 1 means the opposite.
+          - For example, a ratio of 0.25 means there is one business traveler for every four personal travelers.
+          - *desc_key_purpose
+        display:
+          tolerance: 2
+          numDecimalPlaces: 1
+
+      inbound_outbound_tourism:
+        title: Ratio of inbound to outbound tourist trips
+        unit: ratio
+        description_short: Tourist trips refer to the number of trips made by individuals traveling abroad and staying overnight. A country with a ratio greater than one has more incoming than outgoing tourists (i.e. has more visitors than locals leaving).
+        description_key:
+          - A value greater than 1 means a country receives more tourists than it sends abroad; a value less than 1 means the opposite.
+          - For example, a ratio of 2 means two tourists arrive for every one resident who travels abroad.
+          - This ratio provides insight into whether a country is a net importer or exporter of tourists.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 1
+
+      same_day_tourist_ratio:
+        title: Ratio of same-day to overnight tourist arrivals
+        unit: ratio
+        description_short: Same-day trips are those by visitors who arrive and depart within the same day. Tourist trips are those by people who stay overnight. A country with a ratio greater than one has more trips by visitors who leave the same day than those that stay overnight.
+        description_key:
+          - A value greater than 1 means more same-day visitors than overnight tourists; a value less than 1 means the opposite.
+          - For example, a ratio of 0.5 means there is one same-day visitor for every two overnight tourists.
+          - High values are typical for countries with many land borders or those that serve as day-trip destinations from neighboring countries.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 1
+
+      # =========================================================================
+      # ACCOMMODATION
+      # =========================================================================
+
+      tour_ind_cap_accom_short_term_hotels_and_similar_isic_5510_length_of_stay_avg:
+        title: Average length of stay in hotels and similar establishments
+        unit: days
+        description_short: Average number of days tourists stay in hotels and similar accommodation establishments.
+        description_key:
+          - The average length of stay is calculated by dividing the total number of overnight stays by the total number of guests.
+        display:
+          numDecimalPlaces: 1
+
+      # =========================================================================
+      # EMPLOYMENT
+      # =========================================================================
+
+      employment_employed_persons_in_the_tour_ind_num:
+        title: Employment in the tourism industries
+        unit: people
+        description_short: Number of people working in tourism-related industries, including both employees and self-employed individuals.
+        description_key:
+          - *desc_key_employment
+        presentation:
+          grapher_config:
+            note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+
+      employment_employed_persons_in_the_tour_ind_num_per_1000:
+        title: Employment in the tourism industries per 1,000 people
+        unit: persons per 1,000 people
+        description_short: Number of people working in tourism-related industries per 1,000 people in the country's population.
+        description_key:
+          - *desc_key_employment
+          - *desc_key_per_1000_employment
+        presentation:
+          grapher_config:
+            note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 0
+      # =========================================================================
+      # ECONOMIC IMPACT
+      # =========================================================================
+
+      tourism_share_gdp:
+        title: Tourism contribution to GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of a country's [GDP](#dod:gdp) that comes directly from tourism, including spending by visitors and the industries that serve them.
+        description_key:
+          - This indicator shows how much tourism directly contributes to a country’s economy.
+          - It captures the value created when visitors spend money in the country, for example on accommodation, food, transport, entertainment, shopping, and other services.
+          - This includes not only tourism-specific industries (like hotels and airlines), but also other industries that supply goods and services to visitors. It also includes taxes on the goods and services that tourists buy, minus any subsidies.
+          - It adds together the value created by these activities, known as gross value added.
+          - The result is expressed as a share of the country’s total [GDP](#dod:gdp), showing how important tourism is to the overall economy.
+          - This indicator is used in the Sustainable Development Goals (SDG 8.9.1) to track progress in promoting sustainable tourism.
+        description_from_producer: Tourism Direct GDP (TDGDP) is defined as the sum of the part of gross value added (at basic prices) generated by all industries in response to internal tourism consumption plus the amount of net taxes on products and imports included within the value of this expenditure at purchasers' prices.
+        display:
+          tolerance: 2
+          numDecimalPlaces: 1
+
+      total_tables:
+        title: Number of tourism satellite account tables implemented
+        unit: tables
+        description_short: Number of standardized data tables implemented within the Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) to track tourism's economic and environmental impacts.
+        description_key:
+          - The Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) are standardized methods used by countries to measure tourism's impacts.
+          - TSA tables track economic aspects such as tourist spending, production of tourism-related goods and services, and employment.
+          - SEEA tables monitor environmental impacts, including consumption of resources like water and energy, and emissions of greenhouse gases and waste.
+          - The number of tables implemented indicates how comprehensively tourism's impacts are being tracked.
+        display:
+          numDecimalPlaces: 0

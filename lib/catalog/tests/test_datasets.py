@@ -115,6 +115,54 @@ def test_add_table():
         assert t2.metadata.dataset == ds.metadata
 
 
+def test_index_includes_title_and_description():
+    """Test that Dataset.index() includes title and description columns."""
+    t = mock_table()
+    t.metadata.title = "Table Title"
+    t.metadata.description = "Table Description"
+
+    with temp_dataset_dir() as dirname:
+        ds = Dataset.create_empty(dirname)
+        ds.metadata = DatasetMeta(
+            short_name="test_dataset",
+            title="Dataset Title",
+            description="Dataset Description",
+        )
+
+        ds.add(t)
+        index = ds.index()
+
+        # Check that title and description columns exist
+        assert "title" in index.columns
+        assert "description" in index.columns
+
+        # Check that table-level metadata is used
+        assert index.iloc[0]["title"] == "Table Title"
+        assert index.iloc[0]["description"] == "Table Description"
+
+
+def test_index_falls_back_to_dataset_metadata():
+    """Test that Dataset.index() falls back to dataset-level title/description when table-level is missing."""
+    t = mock_table()
+    t.metadata.title = None
+    t.metadata.description = None
+
+    with temp_dataset_dir() as dirname:
+        ds = Dataset.create_empty(dirname)
+        ds.metadata = DatasetMeta(
+            short_name="test_dataset",
+            title="Dataset Title",
+            description="Dataset Description",
+        )
+
+        ds.add(t)
+        index = ds.index()
+
+        # Check that dataset-level metadata is used as fallback
+        assert index.iloc[0]["title"] == "Dataset Title"
+        assert index.iloc[0]["description"] == "Dataset Description"
+
+
 @patch.dict(os.environ, {})
 def test_add_table_without_primary_key():
     t = mock_table().reset_index()

@@ -1,5 +1,6 @@
 config:
   explorerTitle: Animal Welfare
+  originUrl: https://ourworldindata.org/animal-welfare
   isPublished: true
   entityType: country
   explorerSubtitle: Explore the number of animals slaughtered and welfare impacts.

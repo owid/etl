@@ -198,24 +198,24 @@ definitions:
     - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
     - It covers all types of public education spending — including teacher salaries, textbooks, school maintenance, capital projects such as building classrooms, and even external funding from international donors that is channeled through government budgets.
     - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
-    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
+    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrollment rates.
 
   # Enrollment and attendance descriptions
   desc_key_ger: &desc_key_ger
-    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
-    - It measures enrolment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrolment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
-    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - The gross enrollment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures enrollment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrollment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrollment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
     - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
     - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
     - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
-    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
+    - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_net_enr: &desc_key_net_enr
-    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrolment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
+    - The net enrollment rate shows what percentage of children are enrolled at the education level intended for their age.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrollment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
     - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
-    - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
+    - The data comes from school administrative records that track enrollment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_literacy: &desc_literacy
     - Literacy is a foundational skill. Children need to learn to read so that they can read to learn. When we fail to teach this foundational skill, people have fewer opportunities to lead the rich and interesting lives that a good education offers.
@@ -237,8 +237,8 @@ definitions:
     - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
     - A share of 10% for children out of primary school means that 90% of all 6- to 11-year-olds are enrolled in primary education.
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
-    - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
-    - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+    - The data comes from administrative school enrollment records and household surveys, which provide age-specific insights when compared to population estimates.
+    - As with all education data, results should be interpreted carefully. Differences in how enrollment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
 
   desc_key_prof: &desc_key_prof
     - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
@@ -246,9 +246,9 @@ definitions:
     - "At the end of **[primary education](#dod:primary-education)**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
     - "At the end of **[lower secondary](#dod:lower-secondary-education)**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
     - "There are two types of estimates: one for all children in the age group, and one for students who are enrolled in school."
-    - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
+    - Estimates for all children adjust for school completion and enrollment, offering a full population-level view — including those who dropped out or were never enrolled.
     - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
-    - Data comes from international assessments such as [TIMSS, PIRLS](https://timssandpirls.bc.edu/), or [PISA](https://www.oecd.org/en/about/programmes/pisa.html), combined with completion and enrolment data from surveys or statistical models.
+    - Data comes from international assessments such as [TIMSS, PIRLS](https://timssandpirls.bc.edu/), or [PISA](https://www.oecd.org/en/about/programmes/pisa.html), combined with completion and enrollment data from surveys or statistical models.
 
   desc_key_qualified_teachers: &desc_key_qualified_teachers
     - Not all teachers have the same level of academic preparation in the subjects they teach. This indicator measures the percentage of teachers at each education level who have at least the minimum academic qualifications required for teaching their subjects at that level in their country.
@@ -722,82 +722,82 @@ tables:
           numDecimalPlaces: 1
 
       # ========================================================================
-      # Enrolment ratios
+      # enrollment ratios
       # ========================================================================
 
       gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
-        title: Gross enrolment ratio in tertiary education
+        title: Gross enrollment ratio in tertiary education
         description_short: Number of people of any age group who are enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public: Gross enrolment ratio in tertiary education
+          title_public: Gross enrollment ratio in tertiary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Tertiary education
 
       gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f:
-        title: Gross enrolment ratio in tertiary education among women
+        title: Gross enrollment ratio in tertiary education among women
         description_short: Number of women of any age group who are enrolled in [tertiary](#dod:tertiary-education) education expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public: Gross enrolment ratio in tertiary education among women
+          title_public: Gross enrollment ratio in tertiary education among women
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Women
 
       gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_m:
-        title: Gross enrolment ratio in tertiary education among men
+        title: Gross enrollment ratio in tertiary education among men
         description_short: Number of men of any age group who are enrolled in [tertiary](#dod:tertiary-education) education expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public: Gross enrolment ratio in tertiary education among men
+          title_public: Gross enrollment ratio in tertiary education among men
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Men
 
       net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp:
-        title: Net enrolment rate in pre-primary education
+        title: Net enrollment rate in pre-primary education
         description_short: Percentage of children of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public: Net enrolment rate in pre-primary education
+          title_public: Net enrollment rate in pre-primary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Pre-primary education
 
       net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp:
-        title: Net enrolment rate in pre-primary education among girls
+        title: Net enrollment rate in pre-primary education among girls
         description_short: Percentage of girls of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public: Net enrolment rate in pre-primary education among girls
+          title_public: Net enrollment rate in pre-primary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
 
       net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp:
-        title: Net enrolment rate in pre-primary education among boys
+        title: Net enrollment rate in pre-primary education among boys
         description_short: Percentage of boys of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public: Net enrolment rate in pre-primary education among boys
+          title_public: Net enrollment rate in pre-primary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1

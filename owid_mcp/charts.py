@@ -1,6 +1,6 @@
 import io
 import urllib.parse
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 import pandas as pd
@@ -23,7 +23,7 @@ class ChartDataResult(BaseModel):
     # title: str  # string title for the search result item
     text: str  # full text of the document or item
     url: str  # URL to the document or search result item
-    metadata: Optional[Dict[str, Any]] = None  # optional key/value pairing of data
+    metadata: dict[str, Any] | None = None  # optional key/value pairing of data
 
 
 class ChartSearchResult(BaseModel):
@@ -53,32 +53,14 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
-@mcp.tool
-async def fetch_chart_data(id: str, time: Optional[str] = None, countries: Optional[str] = None) -> ChartDataResult:
-    """Download a grapher CSV and return the processed data.
-
-    The returned CSV includes:
-    - Entity: Country/region names (removed if Code column has no empty values)
-    - Code: Country/region ISO codes
-    - Year: Time period
-    - [Metric columns]: The actual data values
-
-    IMPORTANT: Only provide data that exists in the fetched CSV. Do not hallucinate
-    or interpolate missing values.
-
-    Args:
-        id: The chart slug (e.g., 'population-density') returned by `search_chart`.
-        time: Optional time range filter (e.g., '1990..2010', 'earliest..2010', '1990..latest').
-        countries: Optional tilde-separated list of country codes (e.g., 'USA~GBR~DEU' or 'OWID_WRL' for world).
-
-    Returns:
-        ChartDataResult with `text` containing processed CSV data and metadata about
-        the dataset structure.
-    """
-    log.info("chart.fetch_data", slug=id, time=time, countries=countries)
+async def _fetch_chart_data_impl(
+    chart_id: str, time: str | None = None, countries: str | None = None
+) -> ChartDataResult:
+    """Core implementation for fetching chart data."""
+    log.info("chart.fetch_data", slug=chart_id, time=time, countries=countries)
 
     # Construct CSV URL from slug
-    csv_url = f"https://ourworldindata.org/grapher/{id}.csv"
+    csv_url = f"https://ourworldindata.org/grapher/{chart_id}.csv"
 
     # Build query parameters
     query_params = {"tab": "line", "csvType": "filtered"}
@@ -114,7 +96,7 @@ async def fetch_chart_data(id: str, time: Optional[str] = None, countries: Optio
     processed_csv: str = df.to_csv(index=False)  # type: ignore
 
     return ChartDataResult(
-        id=id,
+        id=chart_id,
         text=processed_csv,
         url=fetch_url,
         metadata={
@@ -129,8 +111,33 @@ async def fetch_chart_data(id: str, time: Optional[str] = None, countries: Optio
     )
 
 
-@mcp.tool
-async def fetch_chart_image(id: str, time: Optional[str] = None, countries: Optional[str] = None) -> ImageContent:
+@mcp.tool(tags={"chart", "data"})
+async def fetch_chart_data(id: str, time: str | None = None, countries: str | None = None) -> ChartDataResult:
+    """Download a grapher CSV and return the processed data.
+
+    The returned CSV includes:
+    - Entity: Country/region names (removed if Code column has no empty values)
+    - Code: Country/region ISO codes
+    - Year: Time period
+    - [Metric columns]: The actual data values
+
+    IMPORTANT: Only provide data that exists in the fetched CSV. Do not hallucinate
+    or interpolate missing values.
+
+    Args:
+        id: The chart slug (e.g., 'population-density') returned by `search_chart`.
+        time: Optional time range filter (e.g., '1990..2010', 'earliest..2010', '1990..latest').
+        countries: Optional tilde-separated list of country codes (e.g., 'USA~GBR~DEU' or 'OWID_WRL' for world).
+
+    Returns:
+        ChartDataResult with `text` containing processed CSV data and metadata about
+        the dataset structure.
+    """
+    return await _fetch_chart_data_impl(id, time, countries)
+
+
+@mcp.tool(tags={"chart", "image"})
+async def fetch_chart_image(id: str, time: str | None = None, countries: str | None = None) -> ImageContent:
     """Download a grapher PNG image by converting chart slug to PNG URL.
 
     Takes a chart slug from search results and constructs a PNG URL to download
@@ -179,8 +186,8 @@ async def fetch_chart_image(id: str, time: Optional[str] = None, countries: Opti
         raise ValueError(f"Failed to download PNG: {exc}")
 
 
-@mcp.tool
-async def search_chart(query: str) -> List[ChartSearchResult]:
+@mcp.tool(tags={"chart", "search"})
+async def search_chart(query: str) -> list[ChartSearchResult]:
     """Search OWID using Algolia and return grapher CSV URLs.
 
     IMPORTANT: Include country names in your query for country-specific data.
@@ -197,7 +204,7 @@ async def search_chart(query: str) -> List[ChartSearchResult]:
 
     hits = await make_algolia_request(query, 10)
 
-    results: List[ChartSearchResult] = []
+    results: list[ChartSearchResult] = []
     for hit in hits:
         slug = hit["slug"]
         title = hit.get("title") or slug.replace("-", " ").title()

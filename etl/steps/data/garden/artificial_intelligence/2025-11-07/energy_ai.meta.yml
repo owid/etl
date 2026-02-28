@@ -6,7 +6,7 @@ definitions:
         - Artificial Intelligence
         - Energy
   base_case: &base_case
-    - The Base Case looks at how electricity use in data centres is expected to change if today’s regulations stay the same and the industry develops as currently projected.
+    - The Base Case looks at how electricity use in data centers is expected to change if today's regulations stay the same and the industry develops as currently projected.
     - In the short term, the main factor shaping this outlook is industry forecasts for server shipments up to 2028, with similar trends assumed to continue beyond that point.
     - Improvements in energy efficiency are expected to play a key role in keeping electricity use from rising too quickly, even as demand for digital services continues to grow.
   data_centers_description: &data_centers_description
@@ -24,7 +24,7 @@ tables:
         title: Total electricity consumption by data centers
         unit: terawatt-hours
         short_unit: TWh
-        description_short: Electricity consumption by data centers, measured in [terawatt-hours](#dod:watt-hours). Data centres run the full spectrum of internet services from shopping to streaming, not solely AI. The exact split between AI and other uses is not available.
+        description_short: Electricity consumption by data centers, measured in [terawatt-hours](#dod:watt-hours). Data centers run the full spectrum of internet services from shopping to streaming, not solely AI. The exact split between AI and other uses is not available.
         description_key: *data_centers_description
         display:
           numDecimalPlaces: 0
@@ -47,7 +47,7 @@ tables:
         description_key:
           - This indicator shows what share of a country’s or region’s total electricity demand comes from data centers.
           - *data_centers_description
-        description_processing: We calculated this share by dividing data centre electricity consumption by total electricity demand for each country or region.
+        description_processing: We calculated this share by dividing data center electricity consumption by total electricity demand for each country or region.
         display:
           numDecimalPlaces: 1
 

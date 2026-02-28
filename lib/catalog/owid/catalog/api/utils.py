@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 # Constants
 OWID_CATALOG_VERSION = 3
 S3_OWID_URI = "s3://owid-catalog"
+S3_OWID_URI_PRIVATE = "s3://owid-catalog-private"
 PREFERRED_FORMAT: FileFormat = "feather"
 SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
 INDEX_FORMATS: list[FileFormat] = ["feather"]
@@ -28,7 +29,7 @@ INDEX_FORMATS: list[FileFormat] = ["feather"]
 # and classes require URLs to be passed explicitly.
 
 DEFAULT_CATALOG_URL = "https://catalog.ourworldindata.org/"
-DEFAULT_GRAPHER_URL = "https://ourworldindata.org/grapher"
+DEFAULT_SITE_URL = "https://ourworldindata.org"
 DEFAULT_INDICATORS_SEARCH_URL = "https://search.owid.io/indicators"
 DEFAULT_SITE_SEARCH_URL = "https://ourworldindata.org/api/search"
 

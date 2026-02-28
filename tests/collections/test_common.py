@@ -456,6 +456,73 @@ def test_merge_common_metadata_4():
     assert config == config_expected
 
 
+def test_merge_common_metadata_nested_priority_override():
+    """Test that nested values at lower priority can be overridden by higher priority entries.
+
+    This test verifies the fix for the bug where:
+    - Entry at priority 0 sets a nested value (map.colorScale.baseColorScheme: Blues)
+    - Entry at priority 1 sets a sibling nested value (map.colorScale.binningStrategy: manual)
+    - Another entry at priority 1 should be able to override the priority-0 value
+
+    This was incorrectly flagged as a conflict because priority was only tracked
+    at the top-level key, not at nested paths.
+    """
+    common_params = [
+        # Priority 0 - sets baseColorScheme
+        {
+            "config": {
+                "map": {
+                    "colorScale": {
+                        "baseColorScheme": "Blues",
+                    }
+                }
+            }
+        },
+        # Priority 1 - indicator: share - sets binningStrategy (sibling key)
+        {
+            "dimensions": {
+                "indicator": "share",
+            },
+            "config": {
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "manual",
+                    }
+                }
+            },
+        },
+        # Priority 1 - religion: buddhists - overrides baseColorScheme
+        {
+            "dimensions": {
+                "religion": "buddhists",
+            },
+            "config": {
+                "map": {
+                    "colorScale": {
+                        "baseColorScheme": "Purples",
+                    }
+                }
+            },
+        },
+    ]
+
+    active_dimensions = {"indicator": "share", "religion": "buddhists"}
+
+    common_params = [CommonView.from_dict(r) for r in common_params]
+    config = merge_common_metadata_by_dimension(common_params, active_dimensions, None, "config")
+
+    expected = {
+        "map": {
+            "colorScale": {
+                "baseColorScheme": "Purples",  # Overridden by religion: buddhists (priority 1 > 0)
+                "binningStrategy": "manual",  # Set by indicator: share
+            }
+        }
+    }
+
+    assert config == expected
+
+
 def test_merge_common_metadata_5():
     """Test conflict detection when multiple dimensions compete for same property.
 

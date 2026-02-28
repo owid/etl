@@ -136,19 +136,22 @@ The API module provides remote access to OWID data:
 ```python
 from owid.catalog import search, fetch
 
-# Search for tables (default)
+# Search for charts (default)
 results = search("population")
-print(results[0].path)
+print(results[0].slug)
 tb = results[0].fetch()  # fetch data directly from result
 
-# Search for indicators or charts
+# Search for tables
+results = search("population", kind="table")
+print(results[0].path)
+
+# Search for indicators
 results = search("life expectancy", kind="indicator")
-results = search("gdp per capita", kind="chart")
 
 # Fetch data by path (auto-detects type)
+tb = fetch("life-expectancy")  # chart (by slug)
 tb = fetch("grapher/demography/2024-12-03/population/population")  # table
 tb = fetch("grapher/demography/2024-12-03/population/population#population")  # indicator
-tb = fetch("life-expectancy")  # chart (by slug)
 
 # Or use Client for more control
 from owid.catalog import Client
