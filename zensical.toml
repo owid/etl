@@ -98,14 +98,14 @@ nav = [
         ] },
     ] },
     { "Libraries" = [
-        { "Python" = [
-            "libraries/index.md",
-            { "owid.catalog" = [
-                "libraries/catalog/index.md",
-                { "APIs" = "libraries/catalog/api.md" },
-                { "Data processing" = "libraries/catalog/structures.md" },
-                { "Library maintenance" = "libraries/catalog/maintenance.md" },
-            ] },
+        "libraries/index.md",
+        { "owid.catalog" = [
+            { "Introduction" = "libraries/catalog/intro.md" },
+            { "APIs" = "libraries/catalog/api.md" },
+            { "Data processing" = "libraries/catalog/structures.md" },
+            { "Library maintenance" = "libraries/catalog/maintenance.md" },
+        ] },
+        { "Other libraries" = [
             { "owid-grapher-py" = "libraries/grapher-py.md" },
             { "owid.repack" = "libraries/repack.md" },
             { "owid.datautils" = "libraries/datautils.md" },
@@ -127,8 +127,7 @@ nav = [
         { "Food supply of world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         { "Our COVID work" = "api/covid.md" },
         { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
-        # TODO: Uncomment once main article is published, and update links to article
-        # { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
+        { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
     ] },
 ]
 

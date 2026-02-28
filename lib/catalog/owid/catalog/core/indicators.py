@@ -344,7 +344,7 @@ class Indicator(pd.Series):
     def __ipow__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
         return self.__pow__(other)
 
-    def fillna(self, value=None, *args, **kwargs) -> Indicator:
+    def fillna(self, value: Any = None, *args: Any, **kwargs: Any) -> Indicator:
         # NOTE: Argument "inplace" will modify the original indicator's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
@@ -359,7 +359,7 @@ class Indicator(pd.Series):
         )
         return indicator
 
-    def dropna(self, *args, **kwargs) -> Indicator:
+    def dropna(self, *args: Any, **kwargs: Any) -> Indicator:
         # NOTE: Argument "inplace" will modify the original indicator's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
@@ -374,30 +374,30 @@ class Indicator(pd.Series):
         )
         return indicator
 
-    def add(self, other: Scalar | Series | Indicator, *args, **kwargs) -> Indicator:  # type: ignore
+    def add(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__add__(other=other)
 
-    def sub(self, other: Scalar | Series | Indicator, *args, **kwargs) -> Indicator:  # type: ignore
+    def sub(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__sub__(other=other)
 
-    def mul(self, other: Scalar | Series | Indicator, *args, **kwargs) -> Indicator:  # type: ignore
+    def mul(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__mul__(other=other)
 
-    def truediv(self, other: Scalar | Series | Indicator, *args, **kwargs) -> Indicator:  # type: ignore
+    def truediv(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__truediv__(other=other)
 
-    def div(self, other: Scalar | Series | Indicator, *args, **kwargs) -> Indicator:  # type: ignore
+    def div(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
         return self.truediv(other=other, *args, **kwargs)
 
-    def pct_change(self, *args, **kwargs) -> Indicator:
+    def pct_change(self, *args: Any, **kwargs: Any) -> Indicator:
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().pct_change(*args, **kwargs), name=indicator_name)
         indicator._fields[indicator_name] = combine_indicators_metadata(
@@ -405,7 +405,7 @@ class Indicator(pd.Series):
         )
         return indicator
 
-    def set_categories(self, *args, **kwargs) -> Indicator:
+    def set_categories(self, *args: Any, **kwargs: Any) -> Indicator:
         return Indicator(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
     def update_log(
@@ -463,7 +463,7 @@ class Indicator(pd.Series):
         )
         return self
 
-    def rolling(self, *args, **kwargs) -> IndicatorRolling:
+    def rolling(self, *args: Any, **kwargs: Any) -> IndicatorRolling:
         """Create a rolling window operation that preserves metadata.
 
         This method wraps pandas rolling operations while maintaining the indicator's metadata.
@@ -597,7 +597,7 @@ class IndicatorRolling:
             with preserved metadata.
         """
 
-        def func(*args, **kwargs):
+        def func(*args: Any, **kwargs: Any):
             """Apply function and return indicator with proper metadata."""
             x = getattr(self.rolling, name)(*args, **kwargs)
             return Indicator(x, name=self.name, metadata=self.metadata)
@@ -606,7 +606,7 @@ class IndicatorRolling:
         return func
 
 
-def _hash_dict(d):
+def _hash_dict(d: dict[str, Any]) -> int:
     return hash(json.dumps(d, sort_keys=True))
 
 
@@ -819,7 +819,7 @@ def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | 
 
 
 def combine_indicators_display(
-    indicators: list[Indicator], operation: OPERATION | None, _field_name="display"
+    indicators: list[Indicator], operation: OPERATION | None, _field_name: str = "display"
 ) -> dict[str, Any] | None:
     # Gather displays from all indicators that are defined.
     list_of_displays = [getattr(indicator.metadata, _field_name) for indicator in indicators]

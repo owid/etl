@@ -48,7 +48,7 @@ tables:
           zeroDay: '1949-01-01'
           yearIsDay: true
 
-      training_dataset_size__gradients:
+      training_dataset_size__total:
         title: Training dataset size
         unit: 'unique datapoints'
         description_short: The number of unique data points used to train the model. Each domain has a specific data point unit; for example, for vision it is images, for language it is words, and for games it is timesteps. This means systems can only be compared directly within the same domain.

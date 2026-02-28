@@ -52,6 +52,10 @@ docs.pre: .venv
 	@.venv/bin/python -m docs.ignore.pre-build.bake_semantic_search_api
 	@.venv/bin/python docs/ignore/pre-build/generate_analytics_docs.py
 
+docs.llms: .venv
+	@echo '==> Generating llms.txt'
+	@.venv/bin/python docs/ignore/others/bake_llms_txt.py
+
 docs.post: .venv
 	@echo '==> Converting Jupyter Notebooks to HTML'
 	.venv/bin/python docs/ignore/post-build/convert_notebooks.py
@@ -63,12 +67,12 @@ docs.build: .venv
 	@echo '==> Pre-processing documentation files'
 	@$(MAKE) --no-print-directory docs.pre
 	@echo '==> Building documentation with Zensical'
-	@DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
+	@DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').build(__import__('os').path.abspath('zensical.toml'),True)"
 	@echo '==> Post-processing documentation files'
 	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
-	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
+	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{'dev_addr':'localhost:9010','open':False,'strict':False})"
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
@@ -196,28 +200,26 @@ wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz
 
-# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and a list of custom extensions (defined in CUSTOM_EXTENSIONS).
-# Custom extensions are expected to be in the vscode_extensions folder, with a subfolder for each extension containing a folder install/ with a VSIX file.
+# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and all custom extensions found in vscode_extensions/.
+# Custom extensions are expected to have a subfolder install/ with a VSIX file.
 # The latest VSIX file in each install/ folder will be installed.
 install-vscode-extensions:
 	@echo '==> Checking and installing required VS Code extensions'
 	@if command -v code > /dev/null; then \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
 			if ! code --list-extensions | grep -q "$$EXT"; then \
 				code --install-extension $$EXT; \
 			fi; \
 		done; \
-		for EXT in $$CUSTOM_EXTENSIONS; do \
+		for EXT_DIR in $$EXTENSIONS_PATH/*/; do \
+			EXT=$$(basename $$EXT_DIR); \
 			if ! code --list-extensions | grep -q "owid.$$EXT"; then \
-				VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+				VSIX_FILE=$$(ls -v $$EXT_DIR/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
 				if [ -n "$$VSIX_FILE" ]; then \
 					echo "Installing owid.$$EXT from $$VSIX_FILE"; \
 					code --install-extension "$$VSIX_FILE"; \
-				else \
-					echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
 				fi; \
 			fi; \
 		done; \
@@ -229,15 +231,13 @@ install-vscode-extensions:
 vsce-sync:
 	@echo '==> Reinstalling all custom VS Code extensions'
 	@if command -v code > /dev/null; then \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version detect-outdated-practices"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
-		for EXT in $$CUSTOM_EXTENSIONS; do \
-			VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+		for EXT_DIR in $$EXTENSIONS_PATH/*/; do \
+			EXT=$$(basename $$EXT_DIR); \
+			VSIX_FILE=$$(ls -v $$EXT_DIR/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
 			if [ -n "$$VSIX_FILE" ]; then \
 				echo "Installing owid.$$EXT from $$VSIX_FILE"; \
 				code --install-extension "$$VSIX_FILE" --force; \
-			else \
-				echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
 			fi; \
 		done; \
 	else \

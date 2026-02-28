@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 # Pre-compile regex patterns for performance
 PATTERNS = {
     "date": re.compile(r"(\d{4})-?(\d{2})-?(\d{2})"),
-    "context_size": re.compile(r"\d+K$"),
+    "context_size": re.compile(r"(\d+K|max)$"),
     "claude_numeric": re.compile(r"claude-(\d+)-(\d+)-(\w+)", re.IGNORECASE),
     "claude_variant": re.compile(r"claude-(\w+)-(\d+(?:\.\d+)?)", re.IGNORECASE),
     "gpt_version": re.compile(r"gpt-([\d.]+)(?:-(\w+))?", re.IGNORECASE),

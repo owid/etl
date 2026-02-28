@@ -10,7 +10,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -19,8 +19,18 @@ YEAR_SPLIT = 2024
 COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
 COLUMNS_INDEX_MONTH = COLUMNS_INDEX + ["month"]
 
+# OWID Regions (estimated for certain indicators/tables)
+REGIONS = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Oceania",
+]
 
-def run(dest_dir: str) -> None:
+
+def run() -> None:
     #
     # Load inputs.
     #
@@ -49,74 +59,82 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    ## Population, Sex ratio
+    # POPULATION #
     tb_population_jan, tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
+    tb_population = add_owid_regions(tb_population, indicators=["population"])
+    ## Format
     tb_population = tb_population.format(COLUMNS_INDEX)
     tb_population_jan = tb_population_jan.format(COLUMNS_INDEX, short_name="population_january")  # January data
 
-    ## Sex ratio
+    # SEX RATIO #
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
     tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
 
-    ## Dependency ratio
+    # DEPENDENCY RATIO #
     tb_dependency = process_dependency(tb_population)
     tb_dependency = tb_dependency.format(COLUMNS_INDEX, short_name="dependency_ratio")
 
-    ## Growth rate
+    # GROWTH RATE #
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
     tb_growth_rate = tb_growth_rate.format(COLUMNS_INDEX)
 
-    ## Natural growth rate
+    # NATURAL GROWTH RATE #
     tb_nat_change = process_standard(tb_nat_change)
     tb_nat_change = set_variant_to_estimates(tb_nat_change)
     tb_nat_change["natural_change_rate"] /= 10
     tb_nat_change = tb_nat_change.format(COLUMNS_INDEX)
 
-    ## Migration
+    # MIGRATION #
     tb_migration = process_migration(tb_migration, tb_migration_rate)
+    tb_migration = add_owid_regions(tb_migration, indicators=["net_migration"])
     del tb_migration_rate
     tb_migration = set_variant_to_estimates(tb_migration)
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
 
-    ## Deaths
+    # DEATHS #
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
     del tb_death_rate
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
 
-    ## Births
+    # BIRTHS #
     tb_births = process_births(tb_births, tb_birth_rate)
     del tb_birth_rate
+    tb_births = add_owid_regions(tb_births, indicators=["births"])
     tb_births = set_variant_to_estimates(tb_births)
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
 
-    ## Median age
+    # MEDIAN_AGE #
     tb_median_age = process_standard(tb_median_age)
     tb_median_age = set_variant_to_estimates(tb_median_age)
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
 
-    ## Fertility
+    # FERTILITY #
     tb_fertility = process_fertility(tb_fertility)
     tb_fertility = set_variant_to_estimates(tb_fertility)
-    tb_fertility = tb_fertility.format(COLUMNS_INDEX)
+    tb_fertility = estimate_tfr_owid_regions(tb_fertility.copy(), tb_births, tb_population)
 
-    ## Fertility by age (distribution)
+    tb_fertility = tb_fertility.format(COLUMNS_INDEX, short_name="fertility_rate")
+
+    # FERTILITY BY AGE (distribution) #
     tb_fertility_births_single = process_fertility_births_single(tb_fertility_births_single)
 
-    ## Life Expectancy
+    # LIFE EXPECTANCY #
     tb_le = process_le(tb_le)
     tb_le = set_variant_to_estimates(tb_le)
     tb_le = tb_le.format(COLUMNS_INDEX)
 
-    ## Mortality
+    # MORTALITY #
     tb_mortality = process_mortality(tb_mortality)
     tb_mortality = set_variant_to_estimates(tb_mortality)
     tb_mortality = tb_mortality.format(COLUMNS_INDEX)
 
-    ## Mean age at childbearing
+    # MEAN AGE AT CHILDBEARING #
     tb_childbearing_age = process_standard(tb_childbearing_age)
     tb_childbearing_age = set_variant_to_estimates(tb_childbearing_age)
     tb_childbearing_age = tb_childbearing_age.format(COLUMNS_INDEX)
+
+    # Add regions on tb_population (easy), tb_migration (easy), tb_births + tb_population -> tb_fertility
 
     # Build tables list for dataset
     tables = [
@@ -141,8 +159,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -228,18 +245,18 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     tb = tb.merge(tb_density, on=COLUMNS_INDEX_MONTH, how="left")
     del tb_density
 
-    # Age as sting
+    # Age as string
     tb["age"] = tb["age"].astype("string")
     tb_sex["age"] = tb_sex["age"].astype("string")
     # Separate january and july data
     msk_jan = tb["month"] == "January"
-    tb_jan = tb[msk_jan]
-    tb = tb[~msk_jan]
+    tb_jan = tb.loc[msk_jan]
+    tb = tb.loc[~msk_jan]
     tb = tb.drop(columns=["month"])
     tb_jan = tb_jan.drop(columns=["month"])
     # Remove january data for sex ratio
     tb_sex_msk = tb_sex["month"] == "January"
-    tb_sex = tb_sex[~tb_sex_msk]
+    tb_sex = tb_sex.loc[~tb_sex_msk]
     tb_sex = tb_sex.drop(columns=["month"])
 
     return tb_jan, tb, tb_sex
@@ -778,4 +795,75 @@ def harmonize_country_names(tb: Table):
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
     )
+    return tb
+
+
+def add_owid_regions(tb: Table, indicators: list[str], index_columns: str | None = None) -> Table:
+    """Add OWID regions to the table."""
+    if index_columns is None:
+        index_columns = COLUMNS_INDEX
+    aggregations = {indicator: "sum" for indicator in indicators}
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        aggregations=aggregations,
+        index_columns=index_columns,
+        regions=REGIONS,
+        min_frac_countries_informed=0.7,
+    )
+    return tb
+
+
+def estimate_tfr_owid_regions(tb_fertility: Table, tb_births: Table, tb_population: Table) -> Table:
+    """Estimate TFR for OWID regions using births and population data.
+
+    This is done as
+
+    1. Define age groups of interest: 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49.
+    2. Get region aggregates on births from females in each age group. Get female population in each age group.
+    3. Estimate regional ASFR values as (births from age group) / (female population in age group). E.g.
+        `ASFR = births from female pop aged 15-19 / female pop aged 15-19`
+    4. Estimate TFR as the sum of ASFR values across age groups, multiplied by 5 (to account for 5-year age groups). E.g.
+        `TFR = 5 * (ASFR_15-19 + ASFR_20-24 + ... + ASFR_45-49)`
+    """
+    # Age groups of interest: 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49
+    age_groups = {"15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"}
+    # We will group by COLUMNS_INDEX except for "age", bc TFR only applies to all population
+    columns_group = [col for col in COLUMNS_INDEX if col != "age"]
+
+    # Get births for 15-49 age group
+    tb_births_15_49 = tb_births.reset_index()
+    assert not age_groups - set(tb_births_15_49["age"].unique()), "Some expected age groups are missing in births data"
+    tb_births_15_49 = tb_births_15_49.loc[
+        (tb_births_15_49["age"].isin(age_groups)) & (tb_births_15_49["country"].isin(REGIONS)),
+        COLUMNS_INDEX + ["births"],
+    ]
+
+    # Get 15-49 age group female population
+    tb_fpop_15_49 = tb_population.reset_index()
+    assert not age_groups - set(
+        tb_fpop_15_49["age"].unique()
+    ), "Some expected age groups are missing in population data"
+    tb_fpop_15_49 = tb_fpop_15_49.loc[
+        (tb_fpop_15_49["age"].isin(age_groups))
+        & (tb_fpop_15_49["country"].isin(REGIONS))
+        & (tb_fpop_15_49["sex"] == "female")
+    ]
+    tb_fpop_15_49["sex"] = "all"
+
+    # Merge births x fem population
+    tb = tb_births_15_49.merge(
+        tb_fpop_15_49,
+        on=COLUMNS_INDEX,
+        validate="1:1",
+    )
+
+    # Estimate TFR
+    tb["fertility_rate"] = 5 * tb["births"] / tb["population"]
+    tb = tb.groupby(columns_group, as_index=False)["fertility_rate"].sum()
+    tb["age"] = "all"
+    # Keep relevant columns
+    tb = tb[COLUMNS_INDEX + ["fertility_rate"]]
+
+    # Add to fertility table
+    tb = pr.concat([tb_fertility, tb], ignore_index=True)
     return tb
