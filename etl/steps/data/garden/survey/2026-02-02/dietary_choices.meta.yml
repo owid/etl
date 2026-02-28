@@ -9,6 +9,14 @@ definitions:
         - Food Supply
     display:  &common-display
       numDecimalPlaces: 0
+    description_key:
+      - "The data contains the results of a biannual YouGov survey of around 2,000 adults in the UK (around 1,000 in the US) aged 18 years and older."
+      - "Participants were asked the question: 'Which of these best describes your diet?'.
+      - "Meat eater: eat meat and/or poultry."
+      - "Pescetarian: eat fish but do not eat meat or poultry."
+      - "Flexitarian: mainly vegetarian, but occasionally eat meat or fish."
+      - "Vegetarian: do not eat any meat, poultry, game, fish, or shellfish."
+      - "Plant-based / Vegan: do not eat dairy products, eggs, or any other animal product."
 
 dataset:
   title: Dietary choices of Brits and Americans
