@@ -35,6 +35,18 @@ def run() -> None:
     error = "A survey group may have been renamed."
     assert set(tb["group"]) == set(SELECTED_GROUPS), error
 
+    # Sanity check: percentages should be close to 100% (within 2.5pp due to rounding in the source).
+    pct_cols = [c for c in tb.columns if c not in ["group", "date"]]
+    error = "Percentages deviate from 100% by more than 2.5 percentage points for some rows."
+    assert (abs(tb[pct_cols].sum(axis=1) - 100) <= 2.5).all(), error
+
+    # Adjust "None of these" so that percentages add up to exactly 100%.
+    # (The original data has small rounding gaps, typically less than 2.5 percentage points.)
+    tb["none"] += 100 - tb[pct_cols].sum(axis=1)
+
+    error = "Percentages do not add up to exactly 100% after adjustment."
+    assert (tb[pct_cols].sum(axis=1) == 100).all(), error
+
     # Use age group as the entity column.
     tb = tb.rename(columns={"group": "country", "date": "year"}, errors="raise")
 

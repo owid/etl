@@ -86,6 +86,8 @@ tables:
         title: Percentage of people with other diets
         description_short: |-
           Percentage of participants who responded to the question "Which of these best describes your diet?" with "None of these".
+        description_processing: |-
+          The original percentages from YouGov do not always sum to exactly 100% due to rounding. To ensure they add up to 100%, any small residual (typically less than 2.5 percentage points) has been added to this category.
         unit: "%"
         short_unit: "%"
         display:

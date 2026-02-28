@@ -29,7 +29,8 @@ def run() -> None:
     # Adapt table format to grapher requirements.
     tb = tb.drop(columns=["base", "base_unweighted"], errors="raise")
 
-    # Filter each country to its selected groups.
+    # Filter each country to its selected age groups.
+    pct_cols = [c for c in tb.columns if c not in ["country", "group", "date"]]
     tables = []
     for country, groups in SELECTED_GROUPS.items():
         tb_country = tb[tb["country"] == country].copy()
@@ -42,6 +43,18 @@ def run() -> None:
         tables.append(tb_country)
 
     tb = pr.concat(tables)
+
+    # Sanity check: percentages should be close to 100% (within 2.5pp due to rounding in the source).
+    error = "Percentages deviate from 100% by more than 2.5 percentage points for some rows."
+    assert (abs(tb[pct_cols].sum(axis=1) - 100) <= 2.5).all(), error
+
+    # Adjust "None of these" so that percentages add up to exactly 100%.
+    # (The original data has small rounding gaps, typically less than 2.5 percentage points.)
+    tb["none"] += 100 - tb[pct_cols].sum(axis=1)
+
+    error = "Percentages do not add up to exactly 100% after adjustment."
+    assert (tb[pct_cols].sum(axis=1) == 100).all(), error
+
     tb = tb.rename(columns={"date": "year"}, errors="raise")
 
     # Prepare display metadata.
