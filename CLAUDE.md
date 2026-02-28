@@ -166,6 +166,7 @@ See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `performance.md` - Profiling and optimization
 - `pipeline-stages.md` - Pipeline architecture details
+- `creating-multidim-from-charts.md` - Building MDIMs from existing chart slugs (querying datasette, creating views, etc.)
 
 ## Individual Preferences
 
