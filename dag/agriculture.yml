@@ -270,7 +270,10 @@ steps:
   data://garden/agriculture/2026-02-27/decoupling_food_production_and_land_use:
     - data://garden/faostat/2026-02-25/faostat_fbsc
     - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/faostat/2026-02-25/faostat_qcl
     - data://garden/regions/2023-01-01/regions
+    # TODO: Add faostat_scl as a proper dependency once a new version is imported.
+    # For now, the step reads the SCL feather file directly from data/garden/faostat/2025-03-10/faostat_scl/.
   #
   # Decoupling of agricultural production and land use (with feed correction)
   #

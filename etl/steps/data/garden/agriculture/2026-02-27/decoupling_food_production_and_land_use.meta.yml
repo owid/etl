@@ -74,20 +74,31 @@ tables:
           This is summed across all FAOSTAT food balance item groups per country and year.
 
           A 3-year rolling average is applied to smooth year-to-year variability.
-      imported_feed_energy:
-        title: "Imported feed energy"
-        unit: kilocalories
-        short_unit: kcal
-        description_processing: >-
-          Imported feed is estimated as:
-          imported_feed = feed x imports / (production + imports),
-          where feed (element 005521) is total domestic feed use in tonnes.
-
-          This is converted to kilocalories using conversion factors derived from per-capita food supply data,
-          and summed across all FAOSTAT food balance item groups per country and year.
-
-          A 3-year rolling average is applied to smooth year-to-year variability.
       agricultural_land:
         title: "Agricultural land area"
         unit: hectares
         short_unit: ha
+      offshored_land:
+        title: "Estimated offshored land from imported feed"
+        unit: hectares
+        short_unit: ha
+        description_processing: >-
+          Offshored land estimates the cropland area needed abroad to produce a country's imported
+          animal feed. Imported feed (in tonnes) is estimated per item as:
+          imported_feed = feed x imports / (production + imports).
+
+          This is divided by the global average yield (tonnes per hectare) of the top 5 feed crops
+          (maize, wheat, barley, soybeans, sorghum), computed from FAOSTAT QCL data as
+          total global production / total global area harvested, per year.
+
+          A 3-year rolling average is applied to smooth year-to-year variability.
+      total_land:
+        title: "Total land footprint (domestic + offshored)"
+        unit: hectares
+        short_unit: ha
+        description_processing: >-
+          Total land footprint is the sum of domestic agricultural land (from FAOSTAT land use data)
+          and estimated offshored land (from imported feed converted to hectares using global average
+          feed crop yields).
+
+          A 3-year rolling average is applied to smooth year-to-year variability.

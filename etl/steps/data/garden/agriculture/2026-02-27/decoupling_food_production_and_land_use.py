@@ -2,6 +2,8 @@
 
 The goal is to create a visualization showing which countries have managed to decouple food production and land use.
 
+TODO: This is still work in progress, I'm trying various approaches to find a good measurable criterion for decoupling, and selecting which countries fulfil them, if any.
+
 """
 
 from pathlib import Path
@@ -12,16 +14,16 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Minimum percentage increase in total domestically produced food energy for a country to qualify as "decoupled".
-DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN = 5
-# Minimum percentage increase in per-capita domestically produced food energy for a country to qualify as "decoupled".
-# Set to a very negative number (e.g. -1000) to effectively disable this criterion.
+DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN = 0
+# Minimum percentage increase in total per-capita food supply (kcal/capita/day) for a country to qualify as "decoupled".
+# This uses total food available (domestic + imported), not just domestically produced.
 # Setting it to zero means that at least it didn't decrease.
-DOMESTIC_FOOD_PC_INCREASE_PCT_MIN = 0
+FOOD_PC_INCREASE_PCT_MIN = 0
 # Minimum percentage decrease in agricultural land for a country to qualify as "decoupled".
-LAND_DECREASE_PCT_MIN = 5
-# Maximum percentage increase in imported feed energy for a country to qualify as "decoupled".
-# A value of 0 means imported feed must not increase at all.
-IMPORTED_FEED_INCREASE_PCT_MAX = 0
+LAND_DECREASE_PCT_MIN = 0
+# Minimum percentage decrease in total land footprint (domestic + offshored) for a country to qualify as "decoupled".
+# Offshored land is estimated from imported feed using global average feed crop yields.
+TOTAL_LAND_DECREASE_PCT_MIN = 0
 # Number of years for the rolling average (1 to not do any rolling average).
 # A 3-year window smooths year-to-year variability (e.g. bad harvests, COVID, stock changes).
 ROLLING_AVERAGE_YEARS = 3
@@ -212,6 +214,342 @@ FOOD_GROUPS_FBSC = {
 }
 
 
+# Top feed crops used to estimate a fallback average yield (for unmapped items).
+FEED_CROP_NAMES = ["Maize", "Wheat", "Barley", "Soybeans", "Sorghum"]
+
+# Mapping from SCL item codes to (QCL parent crop code, extraction rate).
+# The extraction rate is the fraction of the parent crop's weight that becomes this product.
+# E.g., 1 tonne of soybeans → ~0.79 tonnes of soybean cake, so extraction_rate = 0.79.
+# To estimate the parent crop tonnage needed: parent_tonnes = product_tonnes / extraction_rate.
+# For primary crops that appear directly in QCL, extraction_rate = 1.0.
+# Items mapped to None have no meaningful crop yield (dairy, fish, meat, etc.).
+FEED_SCL_TO_QCL_MAPPING = {
+    # Primary crops (directly in QCL, extraction_rate = 1.0)
+    # SCL "Maize (corn)" (34.1% of global feed) → QCL "Maize"
+    "00000056": ("00000056", 1.0),
+    # SCL "Wheat" (7.3%) → QCL "Wheat"
+    "00000015": ("00000015", 1.0),
+    # SCL "Barley" (4.0%) → QCL "Barley"
+    "00000044": ("00000044", 1.0),
+    # SCL "Sugar cane" (3.4%) → QCL "Sugar cane"
+    "00000156": ("00000156", 1.0),
+    # SCL "Rice" (1.5%) → QCL "Rice"
+    "00000027": ("00000027", 1.0),
+    # SCL "Soya beans" (1.4%) → QCL "Soybeans"
+    "00000236": ("00000236", 1.0),
+    # SCL "Sweet potatoes" (1.4%) → QCL "Sweet potatoes"
+    "00000122": ("00000122", 1.0),
+    # SCL "Potatoes" (1.4%) → QCL "Potatoes"
+    "00000116": ("00000116", 1.0),
+    # SCL "Other vegetables, fresh n.e.c." (1.3%) → QCL same
+    "00000463": ("00000463", 1.0),
+    # SCL "Sorghum" (1.0%) → QCL "Sorghum"
+    "00000083": ("00000083", 1.0),
+    # SCL "Cassava, fresh" (0.8%) → QCL "Cassava"
+    "00000125": ("00000125", 1.0),
+    # SCL "Oats" (0.7%) → QCL "Oats"
+    "00000075": ("00000075", 1.0),
+    # SCL "Triticale" (0.6%) → QCL "Triticale"
+    "00000097": ("00000097", 1.0),
+    # SCL "Cotton seed" (0.5%) → QCL "Seed cotton"
+    "00000329": ("00000328", 1.0),
+    # SCL "Yams" (0.4%) → QCL "Yams"
+    "00000137": ("00000137", 1.0),
+    # SCL "Watermelons" (0.4%) → QCL "Watermelons"
+    "00000567": ("00000567", 1.0),
+    # SCL "Sugar beet" (0.3%) → QCL "Sugar beet"
+    "00000157": ("00000157", 1.0),
+    # SCL "Rape or colza seed" (0.3%) → QCL "Rapeseed"
+    "00000270": ("00000270", 1.0),
+    # SCL "Rye" (0.3%) → QCL "Rye"
+    "00000071": ("00000071", 1.0),
+    # SCL "Peas, dry" (0.3%) → QCL "Peas, dry"
+    "00000187": ("00000187", 1.0),
+    # SCL "Millet" (0.2%) → QCL "Millet"
+    "00000079": ("00000079", 1.0),
+    # SCL "Cabbages" (0.2%) → QCL "Cabbages"
+    "00000358": ("00000358", 1.0),
+    # SCL "Edible roots and tubers n.e.c." (0.2%) → QCL same
+    "00000149": ("00000149", 1.0),
+    # SCL "Sunflower seed" (0.2%) → QCL "Sunflower seed"
+    "00000267": ("00000267", 1.0),
+    # SCL "Beans, dry" (0.2%) → QCL "Beans, dry"
+    "00000176": ("00000176", 1.0),
+    # SCL "Chick peas, dry" (0.1%) → QCL "Chick peas, dry"
+    "00000191": ("00000191", 1.0),
+    # SCL "Cucumbers and gherkins" (0.1%) → QCL same
+    "00000397": ("00000397", 1.0),
+    # SCL "Carrots and turnips" (0.1%) → QCL same
+    "00000426": ("00000426", 1.0),
+    # SCL "Broad beans and horse beans, dry" (0.1%) → QCL same
+    "00000181": ("00000181", 1.0),
+    # SCL "Mixed grain" (0.1%) → QCL "Mixed grain"
+    "00000103": ("00000103", 1.0),
+    # Oilseed cakes (by-product → parent crop)
+    # SCL "Cake of soya beans" (12.1%) → QCL "Soybeans"; ~79% extraction rate
+    "00000238": ("00000236", 0.79),
+    # SCL "Cake of rapeseed" (1.8%) → QCL "Rapeseed"; ~60% extraction rate
+    "00000272": ("00000270", 0.60),
+    # SCL "Cake of sunflower seed" (0.9%) → QCL "Sunflower seed"; ~55% extraction rate
+    "00000269": ("00000267", 0.55),
+    # SCL "Cake of cottonseed" (0.7%) → QCL "Seed cotton"; ~45% extraction rate
+    "00000332": ("00000328", 0.45),
+    # SCL "Cake of palm kernel" (0.6%) → QCL "Palm fruit oil" (proxy); ~50% extraction rate
+    "00000259": ("00000254", 0.50),
+    # SCL "Cake of groundnuts" (0.4%) → QCL "Groundnuts"; ~55% extraction rate
+    "00000245": ("00000242", 0.55),
+    # SCL "Cake of rice bran" (0.3%) → QCL "Rice"; ~5% of paddy rice weight
+    "00000037": ("00000027", 0.05),
+    # SCL "Cake of maize" (0.2%) → QCL "Maize"; ~5% extraction rate
+    "00000061": ("00000056", 0.05),
+    # SCL "Cake, oilseeds n.e.c." (0.1%) → None (no single parent crop)
+    "00000341": None,
+    # SCL "Cake of linseed" (0.06%) → QCL "Linseed"; ~60% extraction rate
+    "00000335": ("00000333", 0.60),
+    # SCL "Cake of copra" (0.08%) → QCL "Coconuts"; ~35% extraction rate
+    "00000253": ("00000249", 0.35),
+    # SCL "Cake of sesame seed" (0.06%) → QCL "Sesame seed"; ~50% extraction rate
+    "00000291": ("00000289", 0.50),
+    # SCL "Cake of mustard seed" (<0.05%) → QCL "Mustard seed"; ~60% extraction rate
+    "00000294": ("00000292", 0.60),
+    # Cereal brans (by-product → parent cereal)
+    # SCL "Bran of wheat" (3.5%) → QCL "Wheat"; ~25% extraction rate
+    "00000017": ("00000015", 0.25),
+    # SCL "Bran of rice" (2.1%) → QCL "Rice"; ~10% of paddy weight
+    "00000035": ("00000027", 0.10),
+    # SCL "Bran of maize" (0.7%) → QCL "Maize"; ~8% extraction rate
+    "00000059": ("00000056", 0.08),
+    # SCL "Bran of sorghum" (0.1%) → QCL "Sorghum"; ~15% extraction rate
+    "00000085": ("00000083", 0.15),
+    # SCL "Bran of millet" (0.09%) → QCL "Millet"; ~15% extraction rate
+    "00000081": ("00000079", 0.15),
+    # SCL "Bran of cereals n.e.c." (0.08%) → QCL "Cereals n.e.c."; ~20% extraction rate
+    "00000112": ("00000108", 0.20),
+    # SCL "Bran of barley" (0.07%) → QCL "Barley"; ~20% extraction rate
+    "00000047": ("00000044", 0.20),
+    # SCL "Bran of oats" (0.06%) → QCL "Oats"; ~25% extraction rate
+    "00000077": ("00000075", 0.25),
+    # Other processed crops (by-product → parent crop)
+    # SCL "Cassava, dry" (1.0%) → QCL "Cassava"; ~30% of fresh weight after drying
+    "00000128": ("00000125", 0.30),
+    # SCL "Molasses" (0.8%) → QCL "Sugar cane"; ~3% extraction rate
+    "00000165": ("00000156", 0.03),
+    # SCL "Rice, broken" (0.8%) → QCL "Rice"; ~10% extraction rate
+    "00000032": ("00000027", 0.10),
+    # SCL "Gluten feed and meal" (0.5%) → QCL "Maize" (mainly from corn wet milling); ~25%
+    "00000846": ("00000056", 0.25),
+    # SCL "Germ of wheat" (0.4%) → QCL "Wheat"; ~3% extraction rate
+    "00000019": ("00000015", 0.03),
+    # SCL "Germ of maize" (0.2%) → QCL "Maize"; ~8% extraction rate
+    "00000057": ("00000056", 0.08),
+    # SCL "Maize gluten" (0.07%) → QCL "Maize"; ~6% extraction rate
+    "00000063": ("00000056", 0.06),
+    # SCL "Raw cane or beet sugar" (0.07%) → QCL "Sugar cane" (proxy); ~12% extraction rate
+    "00000162": ("00000156", 0.12),
+    # SCL "Cereal preparations" (0.07%) → None (heterogeneous)
+    "00000113": None,
+    # SCL "Mango pulp" (0.08%) → None (negligible, no clear QCL match)
+    "00000584": None,
+    # SCL "Flours and meals of oilseeds" (0.07%) → None (heterogeneous)
+    "00000343": None,
+    # Dairy and animal products (no cropland equivalent)
+    # SCL "Whey, fresh" (2.5%) — dairy by-product
+    "00000903": None,
+    # SCL "Skim milk of buffalo" (1.7%) — dairy
+    "00000954": None,
+    # SCL "Skim milk of cows" (1.3%) — dairy
+    "00000888": None,
+    # SCL "Raw milk of cattle" (1.1%) — dairy
+    "00000882": None,
+    # SCL "Raw milk of buffalo" (0.3%) — dairy
+    "00000951": None,
+    # SCL "Whey, dry" (0.1%) — dairy
+    "00000900": None,
+    # SCL "Whey, condensed" (0.08%) — dairy
+    "00000890": None,
+    # SCL "Buttermilk" (0.06%) — dairy
+    "00000893": None,
+    # SCL "Skim milk and whey powder" (0.05%) — dairy
+    "00000898": None,
+    # SCL "Raw milk of camel" (0.05%) — dairy
+    "00001130": None,
+    # SCL "Tallow" (0.07%) — animal fat
+    "00001225": None,
+}
+
+
+def calculate_global_feed_yield(tb_qcl):
+    """Compute the global production-weighted average yield (tonnes/hectare) for feed crops, per year.
+
+    Uses World-level Production (005510) and Area harvested (005312) for the top 5 feed crops.
+    Returns a table with columns ["year", "global_feed_yield"].
+    """
+    tb = tb_qcl[
+        (tb_qcl["country"] == "World")
+        & (tb_qcl["item"].isin(FEED_CROP_NAMES))
+        & (tb_qcl["element_code"].isin(["005510", "005312"]))
+    ].reset_index(drop=True)
+
+    error = f"Expected all {len(FEED_CROP_NAMES)} feed crops at World level in QCL."
+    assert set(tb["item"]) == set(FEED_CROP_NAMES), error
+
+    # Pivot to get production and area as separate columns.
+    tb_pivot = tb.pivot(index=["year", "item"], columns="element_code", values="value").reset_index()
+    tb_pivot.columns.name = None
+    tb_pivot = tb_pivot.rename(columns={"005510": "production_qcl", "005312": "area_harvested"})
+
+    # Global weighted average yield = total production / total area, per year.
+    tb_yearly = tb_pivot.groupby("year", as_index=False).agg({"production_qcl": "sum", "area_harvested": "sum"})
+    tb_yearly["global_feed_yield"] = tb_yearly["production_qcl"] / tb_yearly["area_harvested"]
+
+    # Print some diagnostics.
+    print(
+        f"Global feed yield range: {tb_yearly['global_feed_yield'].min():.2f} - {tb_yearly['global_feed_yield'].max():.2f} t/ha"
+    )
+    print(f"Global feed yield (latest year): {tb_yearly['global_feed_yield'].iloc[-1]:.2f} t/ha")
+
+    return tb_yearly[["year", "global_feed_yield"]]
+
+
+def calculate_export_weighted_yields(tb_qcl, tb_scl):
+    """Compute export-weighted global yield per QCL crop item and year.
+
+    For each crop, the yield is the weighted average of country-level yields,
+    weighted by each country's export volume (from SCL). This better reflects
+    the yield of crops entering international trade.
+
+    Returns a DataFrame with columns ["qcl_item_code", "year", "export_weighted_yield"].
+    """
+    import pandas as pd
+
+    # Ensure we work with plain DataFrames (SCL is loaded from feather, QCL from catalog).
+    tb_qcl = pd.DataFrame(tb_qcl)
+    tb_scl = pd.DataFrame(tb_scl)
+    # Get the unique QCL crop codes we need yields for.
+    qcl_codes_needed = set()
+    for mapping in FEED_SCL_TO_QCL_MAPPING.values():
+        if mapping is not None:
+            qcl_codes_needed.add(mapping[0])
+
+    # QCL: country-level production and area harvested
+    tb_yields = tb_qcl[
+        (tb_qcl["item_code"].isin(qcl_codes_needed))
+        & (tb_qcl["element_code"].isin(["005510", "005312"]))
+        & (tb_qcl["country"] != "World")
+    ].reset_index(drop=True)
+
+    tb_yields = tb_yields.pivot(
+        index=["country", "year", "item_code"], columns="element_code", values="value"
+    ).reset_index()
+    tb_yields.columns.name = None
+    tb_yields = tb_yields.rename(columns={"005510": "production", "005312": "area_harvested"})
+
+    # Compute country-level yield (tonnes per hectare).
+    tb_yields = tb_yields[(tb_yields["area_harvested"] > 0) & (tb_yields["production"] > 0)].copy()
+    tb_yields["yield"] = tb_yields["production"] / tb_yields["area_harvested"]
+
+    # SCL: country-level exports for the same items
+    # We need to map from QCL item codes back to SCL item codes for exports.
+    # For primary crops, the codes are the same. For by-products, we want the parent crop exports.
+    # Simplification: use exports of the QCL item code from SCL (works for primary crops).
+    tb_exports = (
+        tb_scl[
+            (tb_scl["item_code"].isin(qcl_codes_needed))
+            & (tb_scl["element_code"] == "005910")  # Export quantity
+            & (tb_scl["country"] != "World")
+        ][["country", "year", "item_code", "value"]]
+        .rename(columns={"value": "exports"})
+        .reset_index(drop=True)
+    )
+
+    # Merge yields with exports.
+    tb_merged = tb_yields.merge(tb_exports, on=["country", "year", "item_code"], how="left")
+    tb_merged["exports"] = tb_merged["exports"].fillna(0)
+
+    # For items with no export data, fall back to production-weighted yield.
+    # This handles cases where SCL doesn't have the same item code as QCL.
+    tb_merged["weight"] = tb_merged["exports"].where(tb_merged["exports"] > 0, tb_merged["production"])
+
+    # Compute weighted average yield per item and year.
+    tb_merged["yield_x_weight"] = tb_merged["yield"] * tb_merged["weight"]
+    tb_weighted = tb_merged.groupby(["item_code", "year"], as_index=False).agg(
+        {"yield_x_weight": "sum", "weight": "sum"}
+    )
+    tb_weighted["export_weighted_yield"] = tb_weighted["yield_x_weight"] / tb_weighted["weight"]
+
+    return tb_weighted[["item_code", "year", "export_weighted_yield"]].rename(columns={"item_code": "qcl_item_code"})
+
+
+def calculate_offshored_land_from_scl(tb_scl, tb_qcl):
+    """Compute offshored land per country-year from SCL feed/import/production data.
+
+    For each country, year, and feed item:
+      1. Estimate imported feed: feed × imports / (production + imports)
+      2. Convert by-products to parent crop equivalent using extraction rates
+      3. Divide by the export-weighted global yield of the parent crop
+
+    Returns a DataFrame with columns ["country", "year", "offshored_land"].
+    """
+    import pandas as pd
+
+    # Ensure we work with plain DataFrames.
+    tb_scl = pd.DataFrame(tb_scl)
+    tb_qcl = pd.DataFrame(tb_qcl)
+
+    # Get export-weighted yields per QCL item and year.
+    tb_yields = calculate_export_weighted_yields(tb_qcl, tb_scl)
+
+    # Get SCL data for mapped items: feed (005520), production (005510), imports (005610).
+    mapped_scl_codes = set(FEED_SCL_TO_QCL_MAPPING.keys())
+    tb_feed = tb_scl[
+        (tb_scl["item_code"].isin(mapped_scl_codes))
+        & (tb_scl["element_code"].isin(["005520", "005510", "005610"]))
+        & (tb_scl["country"] != "World")
+    ].reset_index(drop=True)
+
+    # Pivot elements into columns.
+    tb_feed = tb_feed.pivot(
+        index=["country", "year", "item_code"], columns="element_code", values="value"
+    ).reset_index()
+    tb_feed.columns.name = None
+    tb_feed = tb_feed.rename(columns={"005520": "feed", "005510": "production", "005610": "imports"})
+    for col in ["feed", "production", "imports"]:
+        if col in tb_feed.columns:
+            tb_feed[col] = tb_feed[col].fillna(0)
+
+    # Skip items mapped to None (dairy, etc.) — they have no cropland equivalent.
+    tb_feed["mapping"] = tb_feed["item_code"].map(FEED_SCL_TO_QCL_MAPPING)
+    tb_feed = tb_feed[tb_feed["mapping"].notna()].copy()
+
+    # Extract QCL parent code and extraction rate.
+    tb_feed["qcl_item_code"] = tb_feed["mapping"].apply(lambda x: x[0])
+    tb_feed["extraction_rate"] = tb_feed["mapping"].apply(lambda x: x[1])
+    tb_feed = tb_feed.drop(columns=["mapping"])
+
+    # Estimate imported feed per item.
+    total_supply = tb_feed["production"] + tb_feed["imports"]
+    import_share = (tb_feed["imports"] / total_supply).where(total_supply > 0, 0)
+    tb_feed["imported_feed"] = tb_feed["feed"] * import_share
+
+    # Convert by-product tonnage to parent crop equivalent.
+    tb_feed["parent_crop_equivalent"] = tb_feed["imported_feed"] / tb_feed["extraction_rate"]
+
+    # Merge with export-weighted yields.
+    tb_feed = tb_feed.merge(tb_yields, on=["qcl_item_code", "year"], how="left")
+
+    # Compute offshored land per item (hectares).
+    tb_feed["offshored_land_item"] = (tb_feed["parent_crop_equivalent"] / tb_feed["export_weighted_yield"]).fillna(0)
+
+    # For items without yield data, use fallback (will be handled by the caller).
+    # Sum across all items per country-year.
+    tb_offshored = tb_feed.groupby(["country", "year"], as_index=False).agg(
+        offshored_land=("offshored_land_item", "sum"),
+        imported_feed_total=("imported_feed", "sum"),
+    )
+
+    return tb_offshored
+
+
 def prepare_land_use_data(tb_rl):
     # Select relevant elements from land use data.
     # Item code "Agricultural land" (00006610).
@@ -328,11 +666,10 @@ def calculate_food_and_feed_energy(tb):
     # Per-capita (kcal/capita/year): food_energy (0664pc) is already per capita, multiply by domestic_share.
     tb["food_domestic_energy_pc"] = tb["food_energy"] * domestic_share
 
-    # Imported feed energy (kcal, per item).
-    # Imported feed = feed * (1 - domestic_share) = feed * imports / (production + imports).
-    # This requires conversion factors to go from tonnes to calories.
-    imported_feed = tb["feed"] * (1 - domestic_share)
-    tb["imported_feed_energy"] = imported_feed * 10000 * tb["conversion"]
+    # Imported food energy (kcal, per item): food from imports for domestic consumption.
+    # food_domestic_energy + food_imported_energy = total food energy (from our per-item calculation).
+    food_imported = tb["food"] * (1 - domestic_share)
+    tb["food_imported_energy"] = food_imported * 10000 * tb["conversion"]
 
     # Also compute production_energy (feed-corrected) and uncorrected, for backward compatibility and
     # comparison with Hong et al.
@@ -364,7 +701,7 @@ def calculate_totals_for_all_items(tb):
                     "production_energy_uncorrected",
                     "food_domestic_energy",
                     "food_domestic_energy_pc",
-                    "imported_feed_energy",
+                    "food_imported_energy",
                 ]
             }
         )
@@ -409,122 +746,6 @@ def sanity_check_totals(tb_grouped, tb_fbsc):
     }
 
 
-def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER / "comparison-with-hong-et-al-2021"):
-    """Compare our production energy (with and without feed correction) with Hong et al. (2021).
-
-    Saves individual country charts to output_folder (or shows interactively if output_folder is None).
-    Each chart has 3 lines: "OWID (feed-corrected)", "OWID (uncorrected)", "Hong et al. (2021)".
-    Since Hong et al. likely double-counted feed, their values should be closer to our uncorrected values.
-    """
-    import pandas as pd
-    import plotly.express as px
-    from owid.datautils.dataframes import map_series
-
-    from etl.paths import STEP_DIR
-
-    # Extract the version of the fbsc step from the dependency uri.
-    fbsc_version = [step.split("/")[4] for step in paths.dependencies if "faostat_fbsc" in step][0]
-
-    # Load data from a local file. The file can be downloaded from:
-    # https://figshare.com/articles/dataset/Global_and_regional_drivers_of_land-use_emissions_in_1961-2017/12248735?file=26174975
-    # Specifically tab "8.1.AgProd" for agricultural production, and "9.1.AgLand" for agricultural land use.
-    DATA_FILE = Path.home() / "Documents/owid/2026-02-20_food_decoupling_analysis/data/LUE_Data_CALUE.xlsx"
-    df_food = pd.read_excel(DATA_FILE, sheet_name="8.1.AgProd")
-    df_land = pd.read_excel(DATA_FILE, sheet_name="9.1.AgLand")
-    # Reformat and combine sheets.
-    df_food = df_food.rename(
-        columns={column: column.replace("Area", "country").replace("Y", "") for column in df_food.columns}
-    ).melt(id_vars=["country"], var_name="year", value_name="production_energy_hong")
-    df_land = df_land.rename(
-        columns={column: column.replace("Area", "country").replace("Y", "") for column in df_land.columns}
-    ).melt(id_vars=["country"], var_name="year", value_name="agricultural_land_hong")
-    df = df_food.merge(df_land, on=["country", "year"], how="outer")
-    df["year"] = df["year"].astype(int)
-
-    # Harmonize country names using the same file as in the FAOSTAT steps.
-    countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.countries.json"
-    excluded_countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.excluded_countries.json"
-    # Harmonize all other country names.
-    df = paths.regions.harmonize_names(
-        tb=df,
-        countries_file=countries_file,
-        excluded_countries_file=excluded_countries_file,
-        warn_on_unknown_excluded_countries=False,
-        warn_on_unused_countries=False,
-        warn_on_missing_countries=False,
-    )
-    # Harmonize missing mappings (that are not in the FAOSTAT country harmonization file):
-    df["country"] = map_series(
-        df["country"],
-        mapping={
-            "China- mainland": "China",
-            "China- Macao SAR": "Macao",
-            "Turkey": "Turkey",
-            "United Kingdom": "United Kingdom",
-            "Netherlands": "Netherlands",
-            "Saint Helena- Ascension and Tristan da Cunha": "Saint Helena",
-            "China- Taiwan Province of": "Taiwan",
-            "China- Hong Kong SAR": "Hong Kong",
-        },
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=True,
-    )
-    check = pd.DataFrame(tb_grouped)[
-        ["country", "year", "production_energy", "production_energy_uncorrected", "agricultural_land"]
-    ].merge(df, how="left", on=["country", "year"])
-    check["pct_food"] = (
-        100 * abs(check["production_energy"] - check["production_energy_hong"]) / check["production_energy_hong"]
-    )
-    check["pct_land"] = (
-        100 * abs(check["agricultural_land"] - check["agricultural_land_hong"]) / check["agricultural_land_hong"]
-    )
-    # NOTE: With the feed correction, our production_energy is expected to be lower than Hong et al.'s.
-    # The median percentage difference may be larger than in the original step.
-    error = "Expected percentage difference between our production energy and that from Hong et al. (2021) to be within a reasonable range."
-    assert check["pct_food"].median() < 40, error
-    error = "Expected percentage difference between our agricultural land and that from Hong et al. (2021) to agree within ~14%"
-    assert check["pct_land"].median() < 14, error
-
-    # Plot production: corrected, uncorrected, and Hong et al.
-    value_name = "Production energy / kcal"
-    plot = (
-        check[["country", "year", "production_energy", "production_energy_uncorrected", "production_energy_hong"]]
-        .rename(
-            columns={
-                "production_energy": "OWID (feed-corrected)",
-                "production_energy_uncorrected": "OWID (uncorrected)",
-                "production_energy_hong": "Hong et al. (2021)",
-            }
-        )
-        .melt(id_vars=["country", "year"], value_name=value_name)
-    )
-    if output_folder is not None:
-        Path(output_folder).mkdir(parents=True, exist_ok=True)
-    for country in sorted(set(check["country"])):
-        _plot = plot[plot["country"] == country].dropna()
-        # Only plot if we have at least 2 series (OWID + Hong).
-        if len(set(_plot["variable"])) < 2:
-            continue
-        fig = px.line(
-            _plot,
-            x="year",
-            y=value_name,
-            color="variable",
-            markers=True,
-            title=country,
-            range_y=(0, _plot[value_name].max() * 1.05),
-        )
-        if output_folder is not None:
-            safe_name = country.replace("/", "_").replace(" ", "_")
-            fig.write_image(Path(output_folder) / f"{safe_name}.png")
-        else:
-            fig.show()
-    # In terms of food production (before correcting for double-counting feed calories), most countries agree reasonably well with Hong et al (2021); in fact better than expected, given that FAOSTAT has probably changed since the publication of that paper.
-    # Cases with significant discrepancies Indonesia, Hong-Kong, or Malaysia. And one where the difference is particularly significant is Iceland.
-    # Land use differs significantly more, but I suppose that's also mostly due to changes in FAOSTAT RL data.
-    # The similarity between our uncorrected caloric series and Hong et al.'s series suggests that they did not correct for feed calories.
-
-
 def apply_rolling_average(tb_grouped):
     # Apply rolling averages to smooth year-to-year variability.
     if ROLLING_AVERAGE_YEARS > 1:
@@ -546,7 +767,13 @@ def detect_decoupled_countries(tb_grouped, plot=False):
     year_min = tb_grouped["year"].min()
     year_max = tb_grouped["year"].max()
 
-    metrics = ["food_domestic_energy", "food_domestic_energy_pc", "imported_feed_energy", "agricultural_land"]
+    metrics = [
+        "food_domestic_energy",
+        "food_energy",
+        "agricultural_land",
+        "offshored_land",
+        "total_land",
+    ]
     tb_start = tb_grouped[tb_grouped["year"] == year_min][["country"] + metrics]
     tb_end = tb_grouped[tb_grouped["year"] == year_max][["country"] + metrics]
     tb_changes = tb_start.merge(tb_end, on="country", suffixes=("_start", "_end"))
@@ -556,150 +783,238 @@ def detect_decoupled_countries(tb_grouped, plot=False):
         * (tb_changes["food_domestic_energy_end"] - tb_changes["food_domestic_energy_start"])
         / tb_changes["food_domestic_energy_start"]
     )
-    tb_changes["food_domestic_energy_pc_change"] = (
-        100
-        * (tb_changes["food_domestic_energy_pc_end"] - tb_changes["food_domestic_energy_pc_start"])
-        / tb_changes["food_domestic_energy_pc_start"]
-    )
-    tb_changes["imported_feed_energy_change"] = (
-        100
-        * (tb_changes["imported_feed_energy_end"] - tb_changes["imported_feed_energy_start"])
-        / tb_changes["imported_feed_energy_start"]
+    tb_changes["food_energy_pc_change"] = (
+        100 * (tb_changes["food_energy_end"] - tb_changes["food_energy_start"]) / tb_changes["food_energy_start"]
     )
     tb_changes["agricultural_land_change"] = (
         100
         * (tb_changes["agricultural_land_end"] - tb_changes["agricultural_land_start"])
         / tb_changes["agricultural_land_start"]
     )
-
-    # Handle edge cases where imported feed at baseline is zero.
-    # If feed was zero at start and is still zero (or decreased), that's fine (change = 0).
-    # If feed was zero at start but increased, treat as infinite increase (disqualify).
-    zero_start_mask = tb_changes["imported_feed_energy_start"] == 0
-    tb_changes.loc[zero_start_mask & (tb_changes["imported_feed_energy_end"] == 0), "imported_feed_energy_change"] = 0
-    tb_changes.loc[zero_start_mask & (tb_changes["imported_feed_energy_end"] > 0), "imported_feed_energy_change"] = (
-        float("inf")
+    tb_changes["total_land_change"] = (
+        100 * (tb_changes["total_land_end"] - tb_changes["total_land_start"]) / tb_changes["total_land_start"]
+    )
+    tb_changes["offshored_land_change"] = (
+        100
+        * (tb_changes["offshored_land_end"] - tb_changes["offshored_land_start"])
+        / tb_changes["offshored_land_start"].replace(0, float("nan"))
     )
 
     # Diagnostic: print how many countries pass each criterion individually.
-    cond_land = tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN
+    cond_total_land = tb_changes["total_land_change"] <= -TOTAL_LAND_DECREASE_PCT_MIN
+    cond_domestic_land = tb_changes["agricultural_land_change"] <= -LAND_DECREASE_PCT_MIN
     cond_food_total = tb_changes["food_domestic_energy_change"] >= DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN
-    cond_food_pc = tb_changes["food_domestic_energy_pc_change"] >= DOMESTIC_FOOD_PC_INCREASE_PCT_MIN
-    cond_feed = tb_changes["imported_feed_energy_change"] <= IMPORTED_FEED_INCREASE_PCT_MAX
+    cond_food_pc = tb_changes["food_energy_pc_change"] >= FOOD_PC_INCREASE_PCT_MIN
     n_total = len(tb_changes)
     print(f"Total countries with data: {n_total}")
-    print(f"  Land decrease >= {LAND_DECREASE_PCT_MIN}%: {cond_land.sum()}")
+    print(f"  Total land decrease >= {TOTAL_LAND_DECREASE_PCT_MIN}%: {cond_total_land.sum()}")
+    print(f"  Domestic land decrease >= {LAND_DECREASE_PCT_MIN}% (info): {cond_domestic_land.sum()}")
     print(f"  Domestic food (total) increase >= {DOMESTIC_FOOD_TOTAL_INCREASE_PCT_MIN}%: {cond_food_total.sum()}")
-    print(f"  Domestic food (per capita) increase >= {DOMESTIC_FOOD_PC_INCREASE_PCT_MIN}%: {cond_food_pc.sum()}")
-    print(f"  Imported feed change <= {IMPORTED_FEED_INCREASE_PCT_MAX}%: {cond_feed.sum()}")
-    print(f"  Land + food (total) + food (pc): {(cond_land & cond_food_total & cond_food_pc).sum()}")
-    print(f"  All criteria: {(cond_land & cond_food_total & cond_food_pc & cond_feed).sum()}")
+    print(f"  Total food (per capita) increase >= {FOOD_PC_INCREASE_PCT_MIN}%: {cond_food_pc.sum()}")
+    print(f"  Total land + food (total) + food (pc): {(cond_total_land & cond_food_total & cond_food_pc).sum()}")
 
-    # Detailed view: countries passing land + food (total + pc), sorted by imported feed change.
-    both = tb_changes[cond_land & cond_food_total & cond_food_pc].sort_values("imported_feed_energy_change")
-    print(f"\n  {'Country':30s}  {'Food tot':>9s}  {'Food pc':>8s}  {'Land':>8s}  {'Feed':>10s}")
+    # Detailed view: countries passing food (total + pc), sorted by total land change.
+    both = tb_changes[cond_food_total & cond_food_pc].sort_values("total_land_change")
+    print(f"\n  {'Country':30s}  {'Food tot':>9s}  {'Food pc':>8s}  {'Dom land':>9s}  {'Total land':>11s}")
     for _, row in both.iterrows():
-        feed_val = row["imported_feed_energy_change"]
-        feed_str = f"{feed_val:+.0f}%" if feed_val != float("inf") else "+inf"
         print(
-            f"  {str(row['country']):30s}  {row['food_domestic_energy_change']:+8.1f}%  {row['food_domestic_energy_pc_change']:+7.1f}%  {row['agricultural_land_change']:+7.1f}%  {feed_str:>10s}"
+            f"  {str(row['country']):30s}  {row['food_domestic_energy_change']:+8.1f}%  {row['food_energy_pc_change']:+7.1f}%  {row['agricultural_land_change']:+8.1f}%  {row['total_land_change']:+10.1f}%"
         )
 
-    countries_decoupled = set(tb_changes[cond_land & cond_food_total & cond_food_pc & cond_feed]["country"])
+    countries_decoupled = set(tb_changes[cond_total_land & cond_food_total & cond_food_pc]["country"])
 
     if plot:
-        plot_decoupled_countries(tb_grouped, countries_decoupled, year_min, year_max)
+        plot_countries_stacked(
+            tb_grouped,
+            countries_decoupled,
+            year_min,
+            year_max,
+            output_folder=OUTPUT_FOLDER / "decoupled-countries-stacked",
+        )
         plot_slope_chart_grid(tb_changes, countries_decoupled, year_min, year_max)
 
     return countries_decoupled
 
 
-def plot_decoupled_countries(
+def plot_countries_stacked(
     tb_grouped,
-    countries_decoupled,
+    countries,
     year_min,
     year_max,
-    y_min=-60,
-    y_max=200,
-    output_folder=OUTPUT_FOLDER / "decoupled-countries",
+    output_folder=OUTPUT_FOLDER / "stacked",
 ):
-    """Plot individual line charts showing % change in domestic food, imported feed, and agricultural land for each decoupled country."""
-    import plotly.express as px
-    from owid.catalog import Table
-
-    if not countries_decoupled:
-        print("No decoupled countries to plot.")
+    """Two-panel stacked charts for a given list of countries."""
+    countries = sorted(countries)
+    if not countries:
+        print("No countries to plot (stacked).")
         return
 
-    countries_decoupled = sorted(countries_decoupled)
-
-    # Compute percentage change relative to baseline year for each country.
-    metrics = ["food_domestic_energy", "imported_feed_energy", "agricultural_land"]
-    tb_baseline = tb_grouped[tb_grouped["year"] == year_min][["country"] + metrics]
-    tb_plot = tb_grouped[(tb_grouped["country"].isin(countries_decoupled)) & (tb_grouped["year"] >= year_min)][
-        ["country", "year"] + metrics
-    ].merge(tb_baseline, on="country", suffixes=("", "_baseline"))
-    tb_plot["Domestically produced food (calories)"] = (
-        100
-        * (tb_plot["food_domestic_energy"] - tb_plot["food_domestic_energy_baseline"])
-        / tb_plot["food_domestic_energy_baseline"]
-    )
-    # Handle division by zero when baseline imported feed is zero.
-    tb_plot["Imported feed (calories)"] = (
-        100
-        * (tb_plot["imported_feed_energy"] - tb_plot["imported_feed_energy_baseline"])
-        / tb_plot["imported_feed_energy_baseline"].replace(0, float("nan"))
-    )
-    tb_plot["Agricultural land"] = (
-        100
-        * (tb_plot["agricultural_land"] - tb_plot["agricultural_land_baseline"])
-        / tb_plot["agricultural_land_baseline"]
-    )
-
-    tb_plot = Table(tb_plot)
-
-    # Remove metadata units to avoid spurious warnings.
-    for column in ["Domestically produced food (calories)", "Imported feed (calories)", "Agricultural land"]:
-        tb_plot[column].metadata.unit = None
-        tb_plot[column].metadata.short_unit = None
-
+    print(f"Plotting {len(countries)} stacked charts to {output_folder} ...")
     if output_folder is not None:
         Path(output_folder).mkdir(parents=True, exist_ok=True)
 
-    for country in countries_decoupled:
-        tb_country = tb_plot[tb_plot["country"] == country].reset_index(drop=True)
-        if tb_country.empty:
-            continue
-        final_row = tb_country[tb_country["year"] == year_max]
-        if final_row.empty:
-            print(f"Not enough data for this window of years for {country}")
-            continue
-        food_change = float(final_row["Domestically produced food (calories)"].iloc[0])
-        feed_change = float(final_row["Imported feed (calories)"].iloc[0])
-        land_change = float(final_row["Agricultural land"].iloc[0])
-        tb_melted = tb_country.melt(
-            id_vars=["country", "year"],
-            value_vars=["Domestically produced food (calories)", "Imported feed (calories)", "Agricultural land"],
-            var_name="Indicator",
-            value_name="Change from baseline (%)",
-        )
-        fig = px.line(
-            tb_melted,
-            x="year",
-            y="Change from baseline (%)",
-            color="Indicator",
-            color_discrete_map={
-                "Domestically produced food (calories)": "blue",
-                "Imported feed (calories)": "orange",
-                "Agricultural land": "red",
-            },
-            title=f"{country} (Food: {food_change:+.1f}%, Feed: {feed_change:+.1f}%, Land: {land_change:+.1f}%)",
-        ).update_yaxes(range=[y_min, y_max])
-        if output_folder is not None:
-            safe_name = country.replace("/", "_").replace(" ", "_")
-            fig.write_image(Path(output_folder) / f"{safe_name}.png")
-        else:
-            fig.show()
+    for country in countries:
+        plot_country_stacked(tb_grouped, country, year_min, year_max, output_folder=output_folder)
+
+    print(f"Done. {len(countries)} stacked charts saved.")
+
+
+def plot_country_stacked(
+    tb_grouped,
+    country,
+    year_min,
+    year_max,
+    output_folder=None,
+):
+    """Two-panel line chart for a single country.
+
+    Top panel: Domestic food production, domestic food per capita, food imports, total food per capita.
+    Bottom panel: Domestic land, total land (domestic + offshored).
+    All shown as % change from baseline (baseline = 0).
+    """
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    cols = [
+        "food_domestic_energy",
+        "food_imported_energy",
+        "food_energy",
+        "food_domestic_energy_pc",
+        "agricultural_land",
+        "offshored_land",
+        "total_land",
+    ]
+    tb_c = tb_grouped[(tb_grouped["country"] == country) & (tb_grouped["year"] >= year_min)][
+        ["country", "year"] + cols
+    ].reset_index(drop=True)
+    if tb_c.empty:
+        return
+
+    baseline = tb_c[tb_c["year"] == year_min]
+    if baseline.empty:
+        return
+
+    # Baseline values for computing % change (baseline = 0).
+    food_dom_base = float(baseline["food_domestic_energy"].iloc[0])
+    food_imp_base = float(baseline["food_imported_energy"].iloc[0])
+    food_pc_base = float(baseline["food_energy"].iloc[0])
+    food_dom_pc_base = float(baseline["food_domestic_energy_pc"].iloc[0])
+    land_dom_base = float(baseline["agricultural_land"].iloc[0])
+    land_total_base = float(baseline["total_land"].iloc[0])
+    if food_dom_base == 0 or food_pc_base == 0 or food_dom_pc_base == 0 or land_dom_base == 0:
+        return
+
+    # Each metric as % change from baseline (baseline = 0).
+    food_dom = 100 * (tb_c["food_domestic_energy"] / food_dom_base - 1)
+    food_imp = (
+        100 * (tb_c["food_imported_energy"] / food_imp_base - 1)
+        if food_imp_base > 0
+        else tb_c["food_imported_energy"] * 0
+    )
+    food_pc_total = 100 * (tb_c["food_energy"] / food_pc_base - 1)
+    food_pc_dom = 100 * (tb_c["food_domestic_energy_pc"] / food_dom_pc_base - 1)
+    land_dom = 100 * (tb_c["agricultural_land"] / land_dom_base - 1)
+    land_total = 100 * (tb_c["total_land"] / land_total_base - 1)
+    years = tb_c["year"]
+
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.1,
+        subplot_titles=["Food (% change from baseline)", "Land use (% change from baseline)"],
+    )
+
+    # Top panel: food lines.
+    fig.add_trace(
+        go.Scatter(
+            x=years,
+            y=food_dom,
+            name="Domestic food production",
+            mode="lines",
+            line=dict(color="rgba(0,100,200,0.6)", width=2),
+        ),
+        row=1,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=years,
+            y=food_pc_dom,
+            name="Domestic food per capita",
+            mode="lines",
+            line=dict(color="rgb(0,50,150)", width=2.5),
+        ),
+        row=1,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=years,
+            y=food_imp,
+            name="Food imports",
+            mode="lines",
+            line=dict(color="gray", width=1.5),
+        ),
+        row=1,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=years,
+            y=food_pc_total,
+            name="Total food per capita",
+            mode="lines",
+            line=dict(color="gray", width=1.5, dash="dash"),
+        ),
+        row=1,
+        col=1,
+    )
+
+    # Bottom panel: land lines.
+    fig.add_trace(
+        go.Scatter(
+            x=years,
+            y=land_dom,
+            name="Domestic land",
+            mode="lines",
+            line=dict(color="rgb(200,50,50)", width=2),
+        ),
+        row=2,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=years,
+            y=land_total,
+            name="Total land (incl. offshored feed)",
+            mode="lines",
+            line=dict(color="rgb(140,30,30)", width=2.5),
+        ),
+        row=2,
+        col=1,
+    )
+
+    # Horizontal baseline at 0 and vertical line at 2010 (SCL data start) on both panels.
+    for row in [1, 2]:
+        fig.add_hline(y=0, line_dash="solid", line_color="gray", line_width=1, opacity=0.5, row=row, col=1)
+        fig.add_vline(x=2010, line_dash="dash", line_color="gray", line_width=1, opacity=0.5, row=row, col=1)
+
+    fig.update_layout(
+        height=600,
+        width=800,
+        title_text=country,
+        title_font_size=20,
+        legend=dict(x=1.02, y=0.5, xanchor="left", yanchor="middle", traceorder="normal"),
+        margin=dict(r=250),
+    )
+
+    if output_folder is not None:
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+        safe_name = country.replace("/", "_").replace(" ", "_")
+        fig.write_image(Path(output_folder) / f"{safe_name}.png")
+    else:
+        fig.show()
 
 
 def plot_slope_chart_grid(
@@ -714,15 +1029,14 @@ def plot_slope_chart_grid(
         return
 
     tb_decoupled = tb_changes[tb_changes["country"].isin(countries_decoupled)].reset_index(drop=True)
-    # Remove metadata units to avoid spurious warnings.
-    for column in ["food_domestic_energy_change", "agricultural_land_change"]:
-        tb_decoupled[column].metadata.unit = None
-        tb_decoupled[column].metadata.short_unit = None
+    # Remove metadata units to avoid spurious warnings (only if using owid catalog Tables).
+    for column in ["food_domestic_energy_change", "total_land_change"]:
+        if hasattr(tb_decoupled[column], "metadata"):
+            tb_decoupled[column].metadata.unit = None
+            tb_decoupled[column].metadata.short_unit = None
 
-    # Sort by "decoupling score" (domestic food increase minus land decrease).
-    tb_decoupled["decoupling_score"] = (
-        tb_decoupled["food_domestic_energy_change"] - tb_decoupled["agricultural_land_change"]
-    )
+    # Sort by "decoupling score" (domestic food increase minus total land change).
+    tb_decoupled["decoupling_score"] = tb_decoupled["food_domestic_energy_change"] - tb_decoupled["total_land_change"]
     tb_decoupled = tb_decoupled.sort_values("decoupling_score", ascending=False)
 
     countries_sorted = list(tb_decoupled["country"])
@@ -731,7 +1045,7 @@ def plot_slope_chart_grid(
 
     # Calculate global y-axis range for consistent scaling.
     y_max_val = tb_decoupled["food_domestic_energy_change"].max()
-    y_min_val = tb_decoupled["agricultural_land_change"].min()
+    y_min_val = tb_decoupled["total_land_change"].min()
     y_range = [y_min_val * 1.15, y_max_val * 1.15]
 
     fig = make_subplots(
@@ -751,7 +1065,7 @@ def plot_slope_chart_grid(
 
         country_data = tb_decoupled[tb_decoupled["country"] == country].iloc[0]
         food_change = float(country_data["food_domestic_energy_change"])
-        land_change = float(country_data["agricultural_land_change"])
+        land_change = float(country_data["total_land_change"])
 
         # Total production line.
         fig.add_trace(
@@ -790,7 +1104,7 @@ def plot_slope_chart_grid(
     fig.update_layout(
         height=200 * n_rows,
         width=180 * n_cols,
-        title_text=f"Countries that increased domestic food production while reducing land use, {year_min}-{year_max}",
+        title_text=f"Countries that increased domestic food production while reducing total land footprint, {year_min}-{year_max}",
         showlegend=False,
     )
 
@@ -814,6 +1128,23 @@ def run() -> None:
     # Load FAOSTAT land use dataset, and read its main table.
     ds_rl = paths.load_dataset("faostat_rl")
     tb_rl = ds_rl.read("faostat_rl")
+
+    # Load FAOSTAT production dataset (for feed crop yields).
+    ds_qcl = paths.load_dataset("faostat_qcl")
+    tb_qcl = ds_qcl.read("faostat_qcl").reset_index()
+
+    # Load FAOSTAT Supply Utilization Accounts (for comprehensive feed data including oilseed cakes, bran, etc.).
+    # TODO: Replace with paths.load_dataset("faostat_scl") once a new SCL version is imported.
+    import pyarrow.feather as feather
+
+    _SCL_PATH = Path(__file__).parents[6] / "data/garden/faostat/2025-03-10/faostat_scl/faostat_scl.feather"
+    # Load only the columns we need to save memory (the full SCL feather is ~10M rows).
+    tb_scl = feather.read_table(
+        str(_SCL_PATH), columns=["country", "year", "item_code", "element_code", "value"]
+    ).to_pandas()
+    # Convert categorical columns to plain types to avoid issues with groupby/fillna.
+    for col in tb_scl.select_dtypes(include=["category"]).columns:
+        tb_scl[col] = tb_scl[col].astype(str)
 
     #
     # Process data.
@@ -847,20 +1178,38 @@ def run() -> None:
     error = "Unexpected percentage of rows lost when merging production and land use."
     assert 100 * (_n_rows_before - len(tb_grouped)) / _n_rows_before < 1, error
 
-    # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
-    # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
-
     # Remove unnecessary columns.
     tb_grouped = tb_grouped.drop(columns=["production_energy_uncorrected", "food_quantity"], errors="raise")
+
+    # Compute offshored land from SCL data (comprehensive feed including oilseed cakes, brans, etc.).
+    # SCL covers 2010-2022; for earlier years, offshored land is assumed to be zero
+    # (international feed trade was negligible before the 1970s-80s).
+    tb_offshored = calculate_offshored_land_from_scl(tb_scl=tb_scl, tb_qcl=tb_qcl)
+
+    # Merge offshored land into tb_grouped. Use pandas merge since tb_offshored is a plain DataFrame.
+    # Store metadata-bearing columns, merge as plain DataFrames, then restore.
+    import pandas as pd
+    from owid.catalog import Table
+
+    _tb = pd.DataFrame(tb_grouped).merge(
+        tb_offshored[["country", "year", "offshored_land"]], on=["country", "year"], how="left"
+    )
+    tb_grouped = Table(_tb)
+    # Forward-fill offshored land per country so that years beyond SCL range (2023+) use the last
+    # known value instead of 0. Then fill remaining NaNs (years before SCL, i.e. pre-2010) with 0.
+    tb_grouped["offshored_land"] = tb_grouped.groupby("country")["offshored_land"].ffill().fillna(0)
+
+    # Total land footprint = domestic agricultural land + offshored land.
+    tb_grouped["total_land"] = tb_grouped["agricultural_land"] + tb_grouped["offshored_land"]
 
     # Apply a rolling average of ROLLING_AVERAGE_YEARS (defined above) on all indicators.
     tb_grouped = apply_rolling_average(tb_grouped=tb_grouped)
 
     # Select countries that achieved decoupling: production increased and land use decreased over the full time window.
     # Set plot=True to generate individual country charts and a slope chart grid.
-    countries_decoupled = detect_decoupled_countries(tb_grouped, plot=False)
+    countries_decoupled = detect_decoupled_countries(tb_grouped, plot=True)
 
-    # Filter to only include decoupled countries.
+    # Filter to decoupled countries.
     tb_grouped = tb_grouped[tb_grouped["country"].isin(countries_decoupled)].reset_index(drop=True)
 
     # Improve table format.
