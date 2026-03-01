@@ -108,10 +108,8 @@ def run() -> None:
     # add armed personnel as share of population
     tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
 
-
     # add regions to remittance data
     tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
-
 
     # Adjust GDP indicators in current US$ to constant US$ using the growth of the same indicator in LCU
     for gdp_current_usd, gdp_constant_lcu in GDP_INDICATORS.items():
@@ -124,18 +122,13 @@ def run() -> None:
             ds_population=ds_population,
         )
 
-
     tb_garden = add_energy_access_variables(tb_garden)
-
 
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
-
     tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
 
-
     tb_garden = add_labor_force_breakdown_data(tb=tb_garden, tb_population_wpp=tb_population_wpp)
-
 
     # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
     #  I tried to calculate them myself, but some large countries such as India have missing values and
@@ -165,7 +158,6 @@ def run() -> None:
         )
         .format(["country", "year"])
     )
-
 
     ####################################################################################################################
     # Fix typos found in description from producer.

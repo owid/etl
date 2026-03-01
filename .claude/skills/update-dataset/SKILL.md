@@ -90,6 +90,7 @@ You MUST:
    - CHECKPOINT
 7) Indicator upgrade (optional, staging only)
    - Use indicator-upgrader subagent with `<short_name> <branch>`
+   - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging: `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"`. If the count is 0, the upgrade did not run — re-run it.
    - CHECKPOINT (if executed)
 
 ## Guardrails and tips
