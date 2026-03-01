@@ -301,7 +301,14 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
         last_updated = last_updated.replace("+00:00", "")
     snap.metadata.origin.date_published = dt.datetime.strptime(last_updated, "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d")  # type: ignore
 
-    # Update the download URL to the latest version (only if not already set to a generic URL).
+    # Update the download URL to the latest version.
+    # NOTE: The WB API returns a versioned URL (e.g. WDI_CSV_2026_01_29.zip) which lags behind
+    # the actual latest release — it still pointed to the January data after the February update.
+    # We use the generic URL (WDI_CSV.zip) instead, which always serves the latest data.
+    # The condition preserves the generic URL if it's already set in the DVC file, preventing
+    # this function from overwriting it with the stale versioned URL from the API.
+    # If the World Bank ever fixes the API to return the latest release URL,
+    # this condition and the generic URL in the DVC file can be removed.
     api_download_url = [r for r in meta_orig["Resources"] if r["name"] == "CSV file"][0]["url"]
     if "WDI_CSV.zip" not in str(snap.metadata.origin.url_download):
         snap.metadata.origin.url_download = api_download_url
