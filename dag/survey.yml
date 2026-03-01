@@ -30,17 +30,23 @@ steps:
   data://grapher/survey/2026-01-13/acceptability_of_us_farming_practices:
     - data://garden/survey/2026-01-13/acceptability_of_us_farming_practices
   #
-  # YouGov - Dietary choices of Brits.
+  # YouGov - Dietary choices (UK and US).
   #
-  data://meadow/survey/2026-02-02/dietary_choices_uk:
+  data://meadow/survey/2026-02-02/dietary_choices:
     - snapshot://survey/2026-02-02/dietary_choices_uk.xlsx
+    - snapshot://survey/2026-02-02/dietary_choices_us.xlsx
   #
-  # YouGov - Dietary choices of Brits.
+  # YouGov - Dietary choices (UK and US).
   #
-  data://garden/survey/2026-02-02/dietary_choices_uk:
-    - data://meadow/survey/2026-02-02/dietary_choices_uk
+  data://garden/survey/2026-02-02/dietary_choices:
+    - data://meadow/survey/2026-02-02/dietary_choices
   #
-  # YouGov - Dietary choices of Brits.
+  # YouGov - Dietary choices (UK and US).
   #
-  data://grapher/survey/2026-02-02/dietary_choices_uk:
-    - data://garden/survey/2026-02-02/dietary_choices_uk
+  data://grapher/survey/2026-02-02/dietary_choices:
+    - data://garden/survey/2026-02-02/dietary_choices
+  #
+  # YouGov - Dietary choices (UK by age).
+  #
+  data://grapher/survey/2026-02-02/dietary_choices_uk_by_age:
+    - data://garden/survey/2026-02-02/dietary_choices

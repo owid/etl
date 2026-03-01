@@ -36,7 +36,7 @@ def run() -> None:
         "Publication date",
         "Parameters",
         "Training compute (FLOP)",
-        "Training dataset size (gradients)",
+        "Training dataset size (total)",
         "Notability criteria",
     ]
 
