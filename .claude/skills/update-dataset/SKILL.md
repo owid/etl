@@ -66,7 +66,9 @@ You MUST:
 
 1) Run ETL update command (etl-update subagent)
    - Inputs: `<namespace>/<old_version>/<short_name>` plus any required flags
+   - **CRITICAL**: Run `etl update` ONCE for the full step URI (e.g., `data://garden/namespace/old_version/short_name`). Do NOT run it separately per channel (snapshot, meadow, garden, grapher). Running it once ensures all cross-step DAG dependencies are updated together. Running it per-channel leaves stale version references in `dag/main.yml` (e.g., garden pointing to old meadow version).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
+   - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
    - CHECKPOINT (stop → summarize → ask → require yes)
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
@@ -88,10 +90,12 @@ You MUST:
    - CHECKPOINT
 7) Indicator upgrade (optional, staging only)
    - Use indicator-upgrader subagent with `<short_name> <branch>`
+   - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging: `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"`. If the count is 0, the upgrade did not run — re-run it.
    - CHECKPOINT (if executed)
 
 ## Guardrails and tips
 
+- **DAG consistency**: After `etl update`, always verify that all new steps in `dag/main.yml` reference each other with the new version. A common bug is garden depending on old meadow or old snapshot — this silently loads stale data.
 - Never return empty tables or comment out logic as a workaround — fix the parsing/transformations instead.
 - Column name changes: update garden processing code and metadata YAMLs (garden/grapher) to match schema changes.
 - Indexing: avoid leaking index columns from `reset_index()`; format tables with `tb.format(["country", "year"])` as appropriate.
