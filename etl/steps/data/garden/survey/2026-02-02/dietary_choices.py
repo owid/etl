@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
+from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
 
@@ -14,7 +15,9 @@ COLUMNS = {
     "Meat eater (eat meat and/or poultry)": "meat_eater",
     "None of these": "none",
     "Pescetarian (eat fish but do not eat meat or poultry)": "pescetarian",
+    # UK uses "Plant-based / Vegan" (with space before slash), US uses "Plant-based/Vegan" (no space).
     "Plant-based / Vegan (do not eat dairy products, eggs, or any other animal product)": "vegan",
+    "Plant-based/Vegan (do not eat dairy products, eggs, or any other animal product)": "vegan",
     "Vegetarian (do not eat any meat, poultry, game, fish or shellfish)": "vegetarian",
 }
 
@@ -27,7 +30,7 @@ def run_sanity_checks(tb: Table) -> None:
     assert (tb >= 0).all().all(), error
 
     error = "Base and unweighted base, on a given date, should add up to the same number (or at least within 1%)."
-    _tb = tb.groupby(["date"]).agg({"base": "sum", "base_unweighted": "sum"})
+    _tb = tb.groupby(["country", "date"]).agg({"base": "sum", "base_unweighted": "sum"})
     assert ((100 * abs(_tb["base"] - _tb["base_unweighted"]) / _tb["base_unweighted"]) < 1).all(), error
 
 
@@ -36,8 +39,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("dietary_choices_uk")
-    tb = ds_meadow.read("dietary_choices_uk")
+    ds_meadow = paths.load_dataset("dietary_choices")
+    tb = ds_meadow.read("dietary_choices")
 
     #
     # Process data.
@@ -46,25 +49,30 @@ def run() -> None:
     tb = tb.rename(columns={"which_of_these_best_describes_your_diet": "diet"}, errors="raise")
 
     # Rename diets.
-    tb["diet"] = tb["diet"].map(COLUMNS)
+    tb["diet"] = map_series(
+        tb["diet"], mapping=COLUMNS, warn_on_missing_mappings=True, warn_on_unused_mappings=True, show_full_warning=True
+    )
 
     # Transform the table to long format.
-    tb = tb.melt(id_vars=["diet", "group"], var_name="date", value_name="value")
+    tb = tb.melt(id_vars=["diet", "group", "country"], var_name="date", value_name="value")
+
+    # Drop rows with no data (UK and US surveys cover different date ranges).
+    tb = tb.dropna(subset=["value"])
 
     # Format date column.
     tb["date"] = tb["date"].str[1:].str.replace("_", "-")
 
     # Transform the table to wide format.
-    tb = tb.pivot(index=["group", "date"], columns="diet", values="value", join_column_levels_with="_")
+    tb = tb.pivot(index=["country", "group", "date"], columns="diet", values="value", join_column_levels_with="_")
 
     # Convert fractions into percentages.
-    tb[tb.drop(columns=["group", "date", "base", "base_unweighted"]).columns] *= 100
+    tb[tb.drop(columns=["country", "group", "date", "base", "base_unweighted"]).columns] *= 100
 
     # Ensure columns have the right type.
     tb = tb.astype({"base": int, "base_unweighted": int})
 
     # Improve table format.
-    tb = tb.format(keys=["group", "date"], sort_columns=True)
+    tb = tb.format(keys=["country", "group", "date"], sort_columns=True)
 
     # Sanity checks on outputs.
     run_sanity_checks(tb=tb)
