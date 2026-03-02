@@ -40,15 +40,21 @@ def run() -> None:
         values="share",
     ).reset_index()
 
-    # Use question_short as the entity (hack to adapt to grapher's country/year format).
+    # Use question_short as the entity.
     tb = tb.drop(columns=["country", "question", "question_title"])
     tb = tb.rename(columns={"question_short": "country"})
 
     # Set titles on value columns.
     for col in tb.columns:
         if col not in ["country", "year"]:
-            tb[col].metadata.title = f"Share of respondents that answered '{col.replace('_', ' ').title()}'"
+            response = col.replace("_", " ").capitalize()
+            title = f"Share of respondents that answered '{response}'"
+            tb[col].metadata.title = title
             tb[col].metadata.description_processing = "Survey questions have been shortened for visualization purposes."
+            tb[col].metadata.display = {"name": response}
+            from owid.catalog import VariablePresentationMeta
+
+            tb[col].metadata.presentation = VariablePresentationMeta(title_public=title)
 
     # Format table.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
