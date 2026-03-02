@@ -15,7 +15,12 @@ SHEETS_AND_COLUMNS = {
     ],
     "SDG": ["SD_POP_HGR_"],  # Share of population living in the high green area
     "INFRASTRUCTURES": ["IN_ROA_DEN_"],  # Road network density
-    "HEALTH": ["HL_SHP_HOS_", "HL_SHP_PHA_"],  # Share of population with access to hospitals and pharmacies
+    "HEALTH": [
+        "HL_SHP_HOS_",  # Share of population with access to hospitals
+        "HL_SHP_PHA_",  # Share of population with access to pharmacies
+        "HL_FCL_HOS_",  # Number of hospitals
+        "HL_FCL_PHA_",  # Number of pharmacies
+    ],
 }
 # Column and indicator mapping.
 COLUMN_MAPPING = {
@@ -24,6 +29,8 @@ COLUMN_MAPPING = {
     "IN_ROA_DEN_": "Road network density",
     "HL_SHP_HOS_": "Share of population with access to hospitals",
     "HL_SHP_PHA_": "Share of population with access to pharmacies",
+    "HL_FCL_HOS_": "Number of hospitals",
+    "HL_FCL_PHA_": "Number of pharmacies",
 }
 
 
@@ -79,24 +86,21 @@ def run() -> None:
             # Replace indicator names with their mapped full names
             tb["indicator"] = tb["indicator"].map(COLUMN_MAPPING)
 
-            # Match population to the year of the indicator
-            # Use melt to reshape population columns, then merge
-            tb_pop_long = tb[["city", "country", "ID_UC_G0"] + pop_columns].drop_duplicates()
-            tb_pop_long = tb_pop_long.melt(
-                id_vars=["city", "country", "ID_UC_G0"],
-                value_vars=pop_columns,
-                var_name="pop_col",
-                value_name="population",
+            # Use 2020 population for all years
+            tb_pop_2020 = tb_population[["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0", "GH_POP_TOT_2020"]].copy()
+            tb_pop_2020 = tb_pop_2020.rename(
+                columns={
+                    "GC_UCN_MAI_2025": "city",
+                    "GC_CNT_GAD_2025": "country",
+                    "GH_POP_TOT_2020": "population",
+                }
             )
-            # Extract year from population column name (e.g., "GH_POP_TOT_2025" -> "2025")
-            tb_pop_long["year"] = tb_pop_long["pop_col"].str.extract(r"(\d{4})$")[0]
-            tb_pop_long = tb_pop_long.drop(columns=["pop_col"])
 
             # Drop population columns from main table
             tb = tb.drop(columns=pop_columns)
 
-            # Merge population based on city, country, ID_UC_G0, and year
-            tb = pr.merge(tb, tb_pop_long, on=["city", "country", "ID_UC_G0", "year"], how="left")
+            # Merge 2020 population (will be used for all years)
+            tb = pr.merge(tb, tb_pop_2020, on=["city", "country", "ID_UC_G0"], how="left")
 
             # Drop ID_UC_G0 as it's no longer needed
             tb = tb.drop(columns=["ID_UC_G0"])
@@ -108,9 +112,10 @@ def run() -> None:
     # Add origins metadata.
     tb["value"].metadata.origins = [snap.m.origin]
 
-    # Aggregate to country level using different methods for Share vs non-Share indicators
-    # First, identify which indicators contain "Share"
+    # Aggregate to country level using different methods for different indicator types
+    # Identify indicator types
     tb["is_share"] = tb["indicator"].str.contains("Share", case=False, na=False)
+    tb["is_count"] = tb["indicator"].str.contains("Number of", case=False, na=False)
 
     # For Share indicators: calculate population-weighted average
     tb_share = tb[tb["is_share"]].copy()
@@ -122,18 +127,27 @@ def run() -> None:
     tb_share_agg["value"] = tb_share_agg["weighted_value"] / tb_share_agg["population"]
     tb_share_agg = tb_share_agg[["country", "year", "indicator", "value"]]
 
-    # For non-Share indicators: calculate population-weighted average
-    tb_non_share = tb[~tb["is_share"]].copy()
-    tb_non_share["weighted_value"] = tb_non_share["value"] * tb_non_share["population"]
+    # For count indicators (Number of hospitals/pharmacies): sum counts, then calculate per capita
+    tb_count = tb[tb["is_count"]].copy()
+    tb_count_agg = tb_count.groupby(["country", "year", "indicator"], as_index=False).agg(
+        {"value": "sum", "population": "sum"}
+    )
+    # Calculate per 100,000 population
+    tb_count_agg["value"] = (tb_count_agg["value"] / tb_count_agg["population"]) * 100000
+    tb_count_agg = tb_count_agg[["country", "year", "indicator", "value"]]
 
-    tb_non_share_agg = tb_non_share.groupby(["country", "year", "indicator"], as_index=False).agg(
+    # For other non-Share, non-count indicators: calculate population-weighted average
+    tb_other = tb[~tb["is_share"] & ~tb["is_count"]].copy()
+    tb_other["weighted_value"] = tb_other["value"] * tb_other["population"]
+
+    tb_other_agg = tb_other.groupby(["country", "year", "indicator"], as_index=False).agg(
         {"weighted_value": "sum", "population": "sum"}
     )
-    tb_non_share_agg["value"] = tb_non_share_agg["weighted_value"] / tb_non_share_agg["population"]
-    tb_non_share_agg = tb_non_share_agg[["country", "year", "indicator", "value"]]
+    tb_other_agg["value"] = tb_other_agg["weighted_value"] / tb_other_agg["population"]
+    tb_other_agg = tb_other_agg[["country", "year", "indicator", "value"]]
 
-    # Combine both aggregated datasets
-    tb = pr.concat([tb_share_agg, tb_non_share_agg], ignore_index=True)
+    # Combine all aggregated datasets
+    tb = pr.concat([tb_share_agg, tb_count_agg, tb_other_agg], ignore_index=True)
 
     # Improve tables format.
     tb = tb.format(["country", "year", "indicator"])

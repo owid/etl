@@ -2,7 +2,7 @@
 definitions:
   common:
     display:
-      numDecimalPlaces: 1
+      numDecimalPlaces: 2
     presentation:
       topic_tags:
         - Urbanization
@@ -76,3 +76,26 @@ tables:
           - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
         description_from_producer: Share of population living within a kilometer buffer of a pharmacy facility, inside the urban center over total urban centre population.
         description_processing: We aggregate pharmacy access from cities to countries using population-weighted averages. This ensures the country figure reflects the access rate for the average urban resident, not the average city.
+
+      number_of_hospitals:
+        title: Number of hospitals per 100,000 people
+        unit: per 100,000 people
+        description_short: Number of hospital facilities per 100,000 [city](#dod:cities-degurba) residents.
+        description_key:
+          - Calculated by summing all hospital facilities across cities in a country and dividing by the total urban population (in units of 100,000).
+          - Hospital locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some hospitals may be missing.
+          - Uses 2020 urban population for all years as the denominator.
+        description_from_producer: Number of hospital facilities.
+        description_processing: We sum the total number of hospitals across all cities in a country, then divide by the total urban population and multiply by 100,000 to get hospitals per 100,000 urban residents.
+
+      number_of_pharmacies:
+        title: Number of pharmacies per 100,000 people
+        unit: per 100,000 people
+        description_short: Number of pharmacy facilities per 100,000 [city](#dod:cities-degurba) residents.
+        description_key:
+          - Calculated by summing all pharmacy facilities across cities in a country and dividing by the total urban population (in units of 100,000).
+          - Pharmacy locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some pharmacies may be missing.
+          - Uses 2020 urban population for all years as the denominator.
+        description_from_producer: Number of pharmacy facilities.
+        description_processing: We sum the total number of pharmacies across all cities in a country, then divide by the total urban population and multiply by 100,000 to get pharmacies per 100,000 urban residents.
+
