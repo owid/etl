@@ -502,7 +502,23 @@ class DataStep(Step):
         return False
 
     def has_existing_data(self) -> bool:
-        return self._dest_dir.is_dir() and (self._dest_dir / "index.json").exists()
+        if not (self._dest_dir.is_dir() and (self._dest_dir / "index.json").exists()):
+            return False
+        # Check that every data file has its .meta.json sidecar — a missing
+        # sidecar indicates a previous run crashed mid-save, so treat the
+        # output as incomplete and re-run the step.
+        for f in self._dest_dir.iterdir():
+            if f.suffix in (".feather", ".parquet", ".csv"):
+                if not f.with_suffix(".meta.json").exists():
+                    log.warning(
+                        "corrupt_step_output",
+                        step=self.path,
+                        data_file=f.name,
+                        missing=f.with_suffix(".meta.json").name,
+                        msg="Missing .meta.json sidecar — marking step as dirty for re-run",
+                    )
+                    return False
+        return True
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
@@ -732,6 +748,21 @@ class DataStep(Step):
             exclude=["index.json"],
             delete=True,
         )
+
+        # Fallback: for private datasets, .meta.json may only exist in the public
+        # bucket (before the catalog is re-published with duplicated metadata).
+        # TODO: Remove this fallback once the catalog has been fully re-synced.
+        if not self.is_public:
+            for f in self._dest_dir.iterdir():
+                if f.suffix in (".feather", ".parquet", ".csv") and not f.with_suffix(".meta.json").exists():
+                    s3_utils.download_s3_folder(
+                        f"s3://{config.R2_BUCKET}/{self.path}/",
+                        self._dest_dir,
+                        client=r2,
+                        include=[".meta.json"],
+                        delete=False,
+                    )
+                    break
 
         """download files over HTTPS, the problem is that we don't have a list of tables to download
         in index.json
