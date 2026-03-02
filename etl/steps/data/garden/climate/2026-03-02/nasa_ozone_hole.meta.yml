@@ -9,7 +9,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  ozone_hole_area:
+  nasa_ozone_hole:
     variables:
       max_hole_area:
         title: Maximum ozone hole area
