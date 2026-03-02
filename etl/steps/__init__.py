@@ -502,7 +502,23 @@ class DataStep(Step):
         return False
 
     def has_existing_data(self) -> bool:
-        return self._dest_dir.is_dir() and (self._dest_dir / "index.json").exists()
+        if not (self._dest_dir.is_dir() and (self._dest_dir / "index.json").exists()):
+            return False
+        # Check that every data file has its .meta.json sidecar — a missing
+        # sidecar indicates a previous run crashed mid-save, so treat the
+        # output as incomplete and re-run the step.
+        for f in self._dest_dir.iterdir():
+            if f.suffix in (".feather", ".parquet", ".csv"):
+                if not f.with_suffix(".meta.json").exists():
+                    log.warning(
+                        "corrupt_step_output",
+                        step=self.path,
+                        data_file=f.name,
+                        missing=f.with_suffix(".meta.json").name,
+                        msg="Missing .meta.json sidecar — marking step as dirty for re-run",
+                    )
+                    return False
+        return True
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
