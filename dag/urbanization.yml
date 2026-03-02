@@ -105,13 +105,3 @@ steps:
     - data://meadow/un/2026-02-17/wup_national_definitions
   data://grapher/un/2026-02-17/wup_national_definitions:
     - data://garden/un/2026-02-17/wup_national_definitions
-
-  #
-  # SDG 11.2.1 - Access to Public Transport
-  #
-  data://meadow/urbanization/2026-03-02/sdg_11_2_1:
-    - snapshot://urbanization/2026-03-02/sdg_11_2_1.xlsx
-  data://garden/urbanization/2026-03-02/sdg_11_2_1:
-    - data://meadow/urbanization/2026-03-02/sdg_11_2_1
-  data://grapher/urbanization/2026-03-02/sdg_11_2_1:
-    - data://garden/urbanization/2026-03-02/sdg_11_2_1
