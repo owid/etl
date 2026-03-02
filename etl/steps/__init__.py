@@ -749,6 +749,21 @@ class DataStep(Step):
             delete=True,
         )
 
+        # Fallback: for private datasets, .meta.json may only exist in the public
+        # bucket (before the catalog is re-published with duplicated metadata).
+        # TODO: Remove this fallback once the catalog has been fully re-synced.
+        if not self.is_public:
+            for f in self._dest_dir.iterdir():
+                if f.suffix in (".feather", ".parquet", ".csv") and not f.with_suffix(".meta.json").exists():
+                    s3_utils.download_s3_folder(
+                        f"s3://{config.R2_BUCKET}/{self.path}/",
+                        self._dest_dir,
+                        client=r2,
+                        include=[".meta.json"],
+                        delete=False,
+                    )
+                    break
+
         """download files over HTTPS, the problem is that we don't have a list of tables to download
         in index.json
 
