@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.datautils.dataframes import map_series
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -386,16 +388,37 @@ def run() -> None:
     # Process data.
     #
     # Map numeric codes to human-readable labels.
+    # Variables with sparse mappings (only endpoints or midpoints) will have unmapped intermediate values.
+    sparse_mapping_vars = {
+        "ban_factory_farming_arg",
+        "ban_farming_arg",
+        "ban_labels",
+        "divest",
+        "percent_factory_farmed",
+        "years_end_farming",
+    }
     for col, mapping in VARIABLE_MAPPINGS.items():
         if col in tb.columns:
-            tb[col] = tb[col].map(mapping)
+            nans_before = tb[col].isna().sum()
+            # NOTE: Set warn flags to True to debug on next update.
+            tb[col] = map_series(
+                tb[col],
+                mapping,
+                make_unmapped_values_nan=True,
+                warn_on_unused_mappings=False,
+                warn_on_missing_mappings=False,
+            )
+            # Assert mapping didn't introduce new NaN (except for sparse mapping variables).
+            if col not in sparse_mapping_vars:
+                nans_after = tb[col].isna().sum()
+                assert (
+                    nans_after == nans_before
+                ), f"Mapping introduced {nans_after - nans_before} new NaN values in '{col}'."
 
-    # This is a US-only survey; add country column.
+    # Add country column.
     tb["country"] = "United States"
 
-    #
     # Build aggregated table: weighted share of each response per question and year.
-    #
     all_categorical = list(VARIABLE_MAPPINGS.keys()) + STRING_CATEGORICAL
     # Keep only categorical columns that exist in the data.
     all_categorical = [c for c in all_categorical if c in tb.columns]
@@ -411,38 +434,72 @@ def run() -> None:
     # Drop rows where the response is missing (not all questions asked in all years).
     tb_long = tb_long.dropna(subset=["response"])
 
+    # Assert all variable names have a title.
+    questions_in_data = set(tb_long["question"].unique())
+    missing_titles = questions_in_data - set(VARIABLE_TITLES.keys())
+    assert not missing_titles, f"Variables missing from VARIABLE_TITLES: {missing_titles}"
+
+    # Assert all grouped variables exist in the data.
+    grouped_vars = set(VARIABLE_TO_GROUP.keys())
+    missing_grouped = grouped_vars - questions_in_data
+    assert not missing_grouped, f"Grouped variables missing from data: {missing_grouped}"
+
     # Add group column (only for grouped Likert agree questions).
-    tb_long["group"] = tb_long["question"].map(VARIABLE_TO_GROUP)
+    tb_long["group"] = map_series(
+        tb_long["question"],
+        VARIABLE_TO_GROUP,
+        make_unmapped_values_nan=True,
+        warn_on_unused_mappings=True,
+    )
 
     # Add title, short question, and full question text columns.
-    tb_long["question_title"] = tb_long["question"].map(VARIABLE_TITLES)
-    tb_long["question_short"] = tb_long["question"].map(
-        lambda v: VARIABLE_SHORT_QUESTIONS.get(v, VARIABLE_TITLES.get(v, v))
+    tb_long["question_title"] = map_series(
+        tb_long["question"],
+        VARIABLE_TITLES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
     )
-    tb_long["question"] = tb_long["question"].map(lambda v: VARIABLE_QUESTIONS.get(v, VARIABLE_TITLES.get(v, v)))
+    tb_long["question_short"] = map_series(
+        tb_long["question"],
+        {**VARIABLE_TITLES, **VARIABLE_SHORT_QUESTIONS},
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
+    tb_long["question"] = map_series(
+        tb_long["question"],
+        {**VARIABLE_TITLES, **VARIABLE_QUESTIONS},
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
 
     # Compute weighted share per (year, question, response).
     tb_agg = tb_long.groupby(
         ["country", "year", "group", "question", "question_title", "question_short", "response"],
-        observed=True,
         as_index=False,
     ).agg({"weight": "sum"})
     # Normalize to percentages within each (year, question).
-    totals = tb_agg.groupby(["country", "year", "question"], observed=True)["weight"].transform("sum")
+    totals = tb_agg.groupby(["country", "year", "question"])["weight"].transform("sum")
     tb_agg["weight"] = (tb_agg["weight"] / totals * 100).round(1)
-    tb_agg = tb_agg.rename(columns={"weight": "share"})
+    tb_agg = tb_agg.rename(columns={"weight": "share"}, errors="raise")
 
-    # Set short name and format.
-    tb_agg.metadata.short_name = "animals_food_and_technology_responses"
-    tb_agg = tb_agg.format(["country", "year", "group", "question", "question_title", "question_short", "response"])
+    # Assert shares sum to ~100% for each (year, question).
+    share_totals = tb_agg.groupby(["country", "year", "question"], as_index=False)["share"].sum()
+    assert ((share_totals["share"] - 100).abs() < 1).all(), (
+        f"Shares do not sum to ~100% for some (year, question) groups:\n"
+        f"{share_totals[((share_totals - 100).abs() >= 1)]}"
+    )
 
     # Add metadata to the share column programmatically.
     tb_agg["share"].metadata.description_key = [
         "The survey has been repeated in 2017, 2019, 2020, 2021, 2023, and 2025, with 7,165 participants across six waves. Responses are weighted to be representative of the US population.",
     ]
 
-    # Format individual-level table.
-    tb = tb.format(["country", "year", "entry_id"])
+    # Improve table formats.
+    tb = tb.format(["country", "year", "entry_id"], short_name=paths.short_name)
+    tb_agg = tb_agg.format(
+        ["country", "year", "group", "question", "question_title", "question_short", "response"],
+        short_name="animals_food_and_technology_responses",
+    )
 
     #
     # Save outputs.
