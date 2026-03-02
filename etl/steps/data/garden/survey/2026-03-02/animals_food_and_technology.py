@@ -79,28 +79,29 @@ FARM_CONDITIONS = {
     3: "Improved",
 }
 
-PERCENT_FACTORY_FARMED = {
-    10: "0-20%",
-    30: "20-40%",
-    50: "40-60%",
-    70: "60-80%",
-    90: "80-100%",
-}
-
 VOTE = {
     1: "Consider a candidate's position on factory farming as just one of many important factors",
     2: "Not see factory farming as a major issue",
     3: "Only vote for a candidate who shares your views on factory farming",
 }
 
-YEARS_END_FARMING = {
-    10: "0-20 years",
-    30: "20-40 years",
-    50: "40-60 years",
-    70: "60-80 years",
-    90: "80-100 years",
-    110: "100+ years",
-}
+# NOTE: percent_factory_farmed and years_end_farming are excluded from aggregation because their
+# encoding changed across survey waves (categorical in earlier years, continuous in 2023+).
+# PERCENT_FACTORY_FARMED = {
+#     10: "0-20%",
+#     30: "20-40%",
+#     50: "40-60%",
+#     70: "60-80%",
+#     90: "80-100%",
+# }
+# YEARS_END_FARMING = {
+#     10: "0-20 years",
+#     30: "20-40 years",
+#     50: "40-60 years",
+#     70: "60-80 years",
+#     90: "80-100 years",
+#     110: "100+ years",
+# }
 
 BAN_FACTORY_FARMING_ARG = {
     1: "Ban factory farming animals",
@@ -188,10 +189,12 @@ VARIABLE_TITLES = {
     "farm_conditions": "Farm conditions",
     "discomfort_rev": "Discomfort with industry (rev)",
     "plant_diet_soc_rev": "Society plant based (rev)",
-    "percent_factory_farmed": "Percent factory farmed",
     "sentience_rev": "Animal sentience (rev)",
+    # Excluded from aggregation (encoding changed across years).
+    # "percent_factory_farmed": "Percent factory farmed",
     "vote": "Vote",
-    "years_end_farming": "Years end farming",
+    # Excluded from aggregation (encoding changed across years).
+    # "years_end_farming": "Years end farming",
     "factory_farming_politics": "Factory farming politics",
     "politics": "Political views",
     "veg": "Vegetarian or vegan",
@@ -249,9 +252,11 @@ VARIABLE_SHORT_QUESTIONS = {
     "donate": "How much of $10 would you donate to help farmed animals?",
     "demonstration": "How likely would you be to join a demonstration against factory farming?",
     "farm_conditions": "Have conditions for farmed animals improved in recent years?",
-    "percent_factory_farmed": "What percentage of farmed animals live on factory farms?",
+    # Excluded from aggregation (encoding changed across years).
+    # "percent_factory_farmed": "What percentage of farmed animals live on factory farms?",
     "vote": "How would factory farming affect your vote?",
-    "years_end_farming": "When will humanity stop using animals for food?",
+    # Excluded from aggregation (encoding changed across years).
+    # "years_end_farming": "When will humanity stop using animals for food?",
     "factory_farming_politics": 'Is opposition to factory farming "liberal" or "conservative"?',
     "politics": "How would you describe your political views?",
     "ban_factory_farming_arg": "Ban vs. continue factory farming",
@@ -297,10 +302,12 @@ VARIABLE_QUESTIONS = {
     "farm_conditions": "In the past few years, do you think conditions farmed animals live in have...?",
     "discomfort_rev": "I am comfortable with the way animals are used in the food industry.",
     "plant_diet_soc_rev": "People should consume fewer plant-based foods (fruits, grains, beans, and/or vegetables) and more animal-based foods (meat, dairy, and/or eggs).",
-    "percent_factory_farmed": "If you had to guess, what percentage of farmed animals (e.g. cows, chickens, fish) do you think live on factory farms?",
     "sentience_rev": "Farmed animals have substantially less ability to feel pain and discomfort than humans.",
+    # Excluded from aggregation (encoding changed across years).
+    # "percent_factory_farmed": "If you had to guess, what percentage of farmed animals (e.g. cows, chickens, fish) do you think live on factory farms?",
     "vote": "Thinking about how the factory farming issue might affect your vote for major offices, would you...?",
-    "years_end_farming": "If you had to guess, at how many years from now do you think humanity will stop using animals for food production?",
+    # Excluded from aggregation (encoding changed across years).
+    # "years_end_farming": "If you had to guess, at how many years from now do you think humanity will stop using animals for food production?",
     "factory_farming_politics": 'Do you see opposition to factory farming as a "liberal" or "conservative" viewpoint?',
     "politics": "How would you describe your political views?",
     "ban_factory_farming_arg": "Some people think that we should ban factory farming animals, to reduce harm to humans and animals. Others think that we should continue factory farming animals, to provide low-cost meat to consumers. Where would you place yourself on this scale?",
@@ -346,10 +353,12 @@ VARIABLE_MAPPINGS = {
     "farm_conditions": FARM_CONDITIONS,
     "discomfort_rev": LIKERT_AGREE_7,
     "plant_diet_soc_rev": LIKERT_AGREE_7,
-    "percent_factory_farmed": PERCENT_FACTORY_FARMED,
     "sentience_rev": LIKERT_AGREE_7,
+    # Excluded from aggregation (encoding changed across years).
+    # "percent_factory_farmed": PERCENT_FACTORY_FARMED,
     "vote": VOTE,
-    "years_end_farming": YEARS_END_FARMING,
+    # Excluded from aggregation (encoding changed across years).
+    # "years_end_farming": YEARS_END_FARMING,
     "factory_farming_politics": POLITICS_5,
     "politics": POLITICS_5,
     "veg": YES_NO,
@@ -394,8 +403,6 @@ def run() -> None:
         "ban_farming_arg",
         "ban_labels",
         "divest",
-        "percent_factory_farmed",
-        "years_end_farming",
     }
     for col, mapping in VARIABLE_MAPPINGS.items():
         if col in tb.columns:
