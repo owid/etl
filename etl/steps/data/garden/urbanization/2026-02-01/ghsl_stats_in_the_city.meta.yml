@@ -1,7 +1,8 @@
-No file was uploaded, so I'll apply all the changes directly. Here's the updated YAML with every instance of "urban centers" replaced with "cities":
-yaml# NOTE: To learn more about the fields, hover over their names.
+
 definitions:
   common:
+    display:
+      numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Urbanization
@@ -44,7 +45,7 @@ tables:
         title: Share of city residents living in a high-greenness area
         unit: "%"
         short_unit: "%"
-        description_short: Share of [city residents](#dod:cities-degurba) living in areas with high vegetation cover.
+        description_short: Share of [city](#dod:cities-degurba) residents living in areas with high vegetation cover.
         description_key:
           - Areas are classified as "high greenness" based on satellite vegetation data (NDVI), averaged over three years, using thresholds that UN-Habitat defines separately for different agro-ecological zones.
           - Measured within a 300-meter buffer around the built-up area of each city.
@@ -56,7 +57,7 @@ tables:
         title: Share of city residents with a hospital nearby
         unit: "%"
         short_unit: "%"
-        description_short: Share of [city residents](#dod:cities-degurba) living within 1 km of a hospital.
+        description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a hospital.
         description_key:
           - Calculated as the share of people in a city who live within 1 km of a hospital.
           - Hospital locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some hospitals may be missing.
@@ -68,7 +69,7 @@ tables:
         title: Share of city residents with a pharmacy nearby
         unit: "%"
         short_unit: "%"
-        description_short: Share of [city residents](#dod:cities-degurba) living within 1 km of a pharmacy.
+        description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a pharmacy.
         description_key:
           - Calculated as the share of people in a city who live within 1 km of a pharmacy.
           - Pharmacy locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some pharmacies may be missing.
