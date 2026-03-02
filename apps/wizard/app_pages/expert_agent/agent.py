@@ -2,7 +2,6 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Literal
 
-import logfire
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -26,7 +25,7 @@ from etl.analytics.datasette import (
 )
 from etl.analytics.metabase import _generate_question_url, create_question, get_question_info
 from etl.analytics.metabase import get_question_data as _get_question_data
-from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
+from etl.config import GOOGLE_API_KEY, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -37,9 +36,6 @@ from etl.docs import (
 )
 from etl.files import ruamel_dump
 from etl.paths import BASE_DIR, DOCS_DIR
-
-logfire.configure(token=LOGFIRE_TOKEN_EXPERT)
-logfire.instrument_pydantic_ai()
 
 #######################################################
 # LOAD KNOWLEDGE BASE
