@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: "Animals, Food, and Technology"
     description: |-
-      This data is from a cross-sectional survey on attitudes towards animals, food, and technology run by the [Sentience Institute](https://www.sentienceinstitute.org/). Each sample was recruited in partnership with [Ipsos](https://www.ipsos.com/) based on census estimates from the [American Community Survey](https://www.census.gov/programs-surveys/acs). The survey has been repeated, with minor changes, in 2019, 2020, 2021, 2023, and 2025, with 7165 participants across the six survey wave. The survey and analysis code associated with this dataset can be found at [OSF](https://osf.io/a4qjg/).
+      This data is from a cross-sectional survey on attitudes towards animals, food, and technology run by the [Sentience Institute](https://www.sentienceinstitute.org/). Each sample was recruited in partnership with [Ipsos](https://www.ipsos.com/) based on census estimates from the [American Community Survey](https://www.census.gov/programs-surveys/acs). The survey has been repeated, with minor changes, in 2019, 2020, 2021, 2023, and 2025, with 7165 participants across the six survey waves. The survey and analysis code associated with this dataset can be found at [OSF](https://osf.io/a4qjg/).
     date_published: "2025-12-29"
 
     # Citation
