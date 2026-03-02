@@ -1,0 +1,2243 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+  entityAnnotationsMapCities: &entityAnnotationsMapCities |-
+    Amrān: Yemen
+    Ar'ar: Saudi Arabia
+    s-Hertogenbosch: Netherlands
+    A Coruña (La Coruña): Spain
+    ARad: Romania
+    Aachen: Germany
+    Aalborg: Denmark
+    Aba: Nigeria
+    Abakan: Russia
+    Abbotsford (Matsqui),BC: Canada
+    Abbottābad: Pakistan
+    Abeokuta: Nigeria
+    Aberdeen: United Kingdom
+    Abhā: Saudi Arabia
+    Abidjan: Cote d'Ivoire
+    Abu Zaby (Abu Dhabi): United Arab Emirates
+    Abuja: Nigeria
+    Abū Kabīr: Egypt
+    Acarigua-Aruare: Venezuela
+    Accra: Ghana
+    Ad-Dammam: Saudi Arabia
+    Ad-Dawhah (Doha): Qatar
+    Ad-Doha: Palestine
+    Adan (Aden): Yemen
+    Addis Ababa: Ethiopia
+    Adelaide: Australia
+    Ado-Ekiti: Nigeria
+    Agadez: Niger
+    Agadir: Morocco
+    Agboville: Cote d'Ivoire
+    Aguascalientes: Mexico
+    Ahmadabad: India
+    Ahmadnagar: India
+    Ahvaz: Iran
+    Aizawl: India
+    Ajaccio: France
+    Akita: Japan
+    Akkar: Lebanon
+    Akola: India
+    Akron: United States
+    Akure: Nigeria
+    Al Gadarif: Sudan
+    Al Obeid (Al Ubayyid): Sudan
+    Al Shamal: Qatar
+    Al'metjevsk (Almetyevsk): Russia
+    Al-'Arīsh (El Arish): Egypt
+    Al-Basrah (Basra): Iraq
+    Al-Buraymī: Oman
+    Al-Bīrah (Al-Bireh): Palestine
+    Al-Fayyum: Egypt
+    Al-Fujayrah (Fujairah): United Arab Emirates
+    Al-Ghardaqah (Hurghada): Egypt
+    Al-Hasakah: Syria
+    Al-Hudaydah: Yemen
+    Al-Iskandariyah (Alexandria): Egypt
+    Al-Khafjī: Saudi Arabia
+    Al-Kharj (As-Saīḥ): Saudi Arabia
+    Al-Khartum (Khartoum): Sudan
+    Al-Khawr (Al Khor): Qatar
+    Al-Kuwayt (Kuwait City): Kuwait
+    Al-Kāf (Le Kef): Tunisia
+    Al-Madinah (Medina): Saudi Arabia
+    Al-Mahdiyah (Mahdia): Tunisia
+    Al-Manshāh: Egypt
+    Al-Mansurah: Egypt
+    Al-Munastīr (Monastir): Tunisia
+    Al-Qahirah (Cairo): Egypt
+    Al-Qayrawān (Kairouan): Tunisia
+    Al-Qaṣrayn (Kasserine): Tunisia
+    Al-Qurayyāt: Saudi Arabia
+    Al-Wakrah: Qatar
+    Albacete: Spain
+    Albuquerque: United States
+    Alcalá de Henares: Spain
+    Alcoy (Alcoi): Spain
+    Aldwick / Felpham: United Kingdom
+    Alessandria: Italy
+    Alicante: Spain
+    Alice Springs: Australia
+    Alkmaar: Netherlands
+    Almada: Portugal
+    Almaty: Kazakhstan
+    Almelo: Netherlands
+    Almere: Netherlands
+    Almería: Spain
+    Alphen aan den Rijn: Netherlands
+    Altagracia de Orituco: Venezuela
+    Alto Molócuè: Mozambique
+    Alwar: India
+    Alčevs'k (Alchevsk): Ukraine
+    Amara: Iraq
+    Amarillo: United States
+    Ambato: Ecuador
+    Amersfoort: Netherlands
+    Amiens: France
+    Ammān (Amman): Jordan
+    Amora: Portugal
+    Amparafaravola: Madagascar
+    Amravati: India
+    Amritsar: India
+    Amroha: India
+    Amsterdam: Netherlands
+    An-Nabaṭīyah (Nabatieh): Lebanon
+    Anand: India
+    Anantapur: India
+    Anantnāg: India
+    Anchorage: United States
+    Ancona: Italy
+    Anderlecht: Belgium
+    Andizhan: Uzbekistan
+    Angarsk: Russia
+    Angers: France
+    Angra dos Reis: Brazil
+    Angren: Uzbekistan
+    Ankara: Turkey
+    Annaba: Algeria
+    Annecy: France
+    Anqing: China
+    Antananarivo: Madagascar
+    Antibes: France
+    Antsirabe: Madagascar
+    Antsiranana (Diégo-Suarez): Madagascar
+    Antwerpen: Belgium
+    Anuradhapura: Sri Lanka
+    Anápolis: Brazil
+    Aomori: Japan
+    Aparecida de Goiânia: Brazil
+    Apeldoorn: Netherlands
+    Apia: Samoa
+    Apopa: El Salvador
+    Aqtaý (Aktau): Kazakhstan
+    Aqtóbe (Aktobe): Kazakhstan
+    Ar Ram: Palestine
+    Ar-Rass: Saudi Arabia
+    Ar-Rayyan: Qatar
+    Ar-Riyadh (Riyadh): Saudi Arabia
+    Aracaju: Brazil
+    Arak: Iran
+    Araxá: Brazil
+    Ardabil: Iran
+    Arequipa: Peru
+    Arezzo: Italy
+    Arica: Chile
+    Arkhangelsk: Russia
+    Armavir: Russia
+    Arnhem: Netherlands
+    Arraiján: Panama
+    Arras: France
+    Arusha: Tanzania
+    Arzamas: Russia
+    Asahikawa: Japan
+    Ash-Shaḥāniyah (Al Shahaniya): Qatar
+    Ash-Shaṭrah: Iraq
+    Ashdod: Israel
+    Ashford: United Kingdom
+    Ashgabat: Turkmenistan
+    Asmara: Eritrea
+    Assen: Netherlands
+    Astana: Kazakhstan
+    Asti: Italy
+    Astrakhan: Russia
+    Asunción: Paraguay
+    Asyut: Egypt
+    Athínai (Athens): Greece
+    Atlanta: United States
+    Atlantico_Soledad: Colombia
+    Attock: Pakistan
+    Auckland: New Zealand
+    Auderghem: Belgium
+    Augsburg: Germany
+    Aunglan: Myanmar
+    Avignon: France
+    Avilés: Spain
+    Awasa (Hawassa): Ethiopia
+    Ayacucho: Peru
+    Aylesbury: United Kingdom
+    Ayr / Prestwick: United Kingdom
+    Az-Zaqazig: Egypt
+    Az-Zubayr (Zubayr): Iraq
+    Azrou: Morocco
+    Ačinsk (Achinsk): Russia
+    Aḍ-Ḍ'āyan (Al Daayen): Qatar
+    Aṭbarah (Atbara): Sudan
+    Ba'albak (Baalbek): Lebanon
+    Baalbek-Hermel: Lebanon
+    Baaqoobah: Iraq
+    Babrujsk (Babruysk): Belarus
+    Bachmut (Bakhmut): Ukraine
+    Bacolod: Philippines
+    Bacău: Romania
+    Bad Soden am Taunus / Kelkheim: Germany
+    Baden-Würtemberg: Germany
+    Badulla: Sri Lanka
+    Badīn: Pakistan
+    Baghdad: Iraq
+    Bago (Pegu): Myanmar
+    Baguio City: Philippines
+    Baharampur: India
+    Bahawalpur: Pakistan
+    Bahia Blanca: Argentina
+    Bahir Dar: Ethiopia
+    Bahāwalnagar: Pakistan
+    Baia Mare: Romania
+    Baja California: Mexico
+    Baja California Sur: Mexico
+    Baku: Azerbaijan
+    Balakovo: Russia
+    Balkanabat: Turkmenistan
+    Balochistan-Awaran: Pakistan
+    Balochistan-Barkhan: Pakistan
+    Balochistan-Dera Bugti: Pakistan
+    Balochistan-Duki: Pakistan
+    Balochistan-Gwadar: Pakistan
+    Balochistan-Harnai: Pakistan
+    Balochistan-Jaffarabad: Pakistan
+    Balochistan-Kachhi/ Bolan: Pakistan
+    Balochistan-Kharan: Pakistan
+    Balochistan-Kohlu: Pakistan
+    Balochistan-Lasbela: Pakistan
+    Balochistan-Loralai: Pakistan
+    Balochistan-Mastung: Pakistan
+    Balochistan-Nasirabad/ Tamboo: Pakistan
+    Balochistan-Nushki: Pakistan
+    Balochistan-Pishin: Pakistan
+    Balochistan-Qilla Abdullah: Pakistan
+    Balochistan-Sibbi: Pakistan
+    Balochistan-Sohbatpur: Pakistan
+    Balochistan-Total: Pakistan
+    Balochistan-Washuk: Pakistan
+    Balochistan-Ziarat: Pakistan
+    Balqash (Balchaš, Balkhash): Kazakhstan
+    Bamako: Mali
+    Bamberg: Germany
+    Bamenda: Cameroon
+    Banda Aceh: Indonesia
+    Bandar Abbas: Iran
+    Bandar Lampung: Indonesia
+    Bandar Seri Begawan (Brunei City): Brunei
+    Bandung: Indonesia
+    Bangalore: India
+    Bangor: United Kingdom
+    Bangui: Central African Republic
+    Banja Luka: Bosnia and Herzegovina
+    Banjarmasin: Indonesia
+    Banjul: Gambia
+    Banská Bystrica: Slovakia
+    Banzart (Bizerte): Tunisia
+    Barcelona: Spain
+    Barcelona-Puerto La Cruz: Venezuela
+    Bareilly: India
+    Bari: Italy
+    Barinas: Venezuela
+    Barisal: Bangladesh
+    Barletta: Italy
+    Barnaul: Russia
+    Barnsley: United Kingdom
+    Barquisimeto: Venezuela
+    Barranquilla: Colombia
+    Barreiro: Portugal
+    Barretos: Brazil
+    Barrie,ONT: Canada
+    Basel: Switzerland
+    Basildon: United Kingdom
+    Basingstoke: United Kingdom
+    Basseterre: Saint Kitts and Nevis
+    Bata: Equatorial Guinea
+    Batajsk (Bataysk): Russia
+    Bath: United Kingdom
+    Batken oblast: Kyrgyzstan
+    Batna: Algeria
+    Batticaloa: Sri Lanka
+    Batumi: Georgia
+    Bavaria: Germany
+    Bayamo: Cuba
+    Bayonne: France
+    Bayreuth: Germany
+    Bayrut (Beirut): Lebanon
+    Baýramaly (Bajram-Ali): Turkmenistan
+    Be'er Sheva: Israel
+    Bedford: United Kingdom
+    Beira: Mozambique
+    BeitJala: Palestine
+    BeitSahour: Palestine
+    Beitbridge: Zimbabwe
+    Beituniya: Palestine
+    Bekaa: Lebanon
+    Bekobod: Uzbekistan
+    Belfast: United Kingdom
+    Belfort: France
+    Belgaum: India
+    Belgorod: Russia
+    Belize: Belize
+    Belleville,ONT: Canada
+    Belmopan: Belize
+    Belo Horizonte: Brazil
+    Belém: Brazil
+    Bengbu: China
+    Bengkulu: Indonesia
+    Benguela: Angola
+    Benidorm: Spain
+    Benin City: Nigeria
+    Benrath: Germany
+    Beograd (Belgrade): Serbia
+    Berbera: Somalia
+    Berchem-Sainte-Agathe: Belgium
+    Berdjans'k (Berdiansk): Ukraine
+    Berdsk: Russia
+    Berdyčiv (Berdychiv): Ukraine
+    Berezniki: Russia
+    Bergamo: Italy
+    Bergen: Norway
+    Bergen op Zoom: Netherlands
+    Berlin: Germany
+    Bern: Switzerland
+    Bertoua: Cameroon
+    Besançon: France
+    Besharyk (Beshariq): Uzbekistan
+    Bethlehem (Beit Lahm): Palestine
+    Beverwijk/Heemskerk: Netherlands
+    Bełchatów: Poland
+    Bhakkar: Pakistan
+    Bharatpur: Nepal
+    Bhiwandi: India
+    Bhopal: India
+    Białystok: Poland
+    Biel (Bienne): Switzerland
+    Bielefeld: Germany
+    Bielsko-Biała: Poland
+    Bijsk (Biysk): Russia
+    Bila Cerkva (Bila Tserkva): Ukraine
+    Bilbao: Spain
+    Bindura: Zimbabwe
+    Biratnagar: Nepal
+    Birendranagar: Nepal
+    Birgunj: Nepal
+    Birmingham (West Midlands): United Kingdom
+    Bishkek: Kyrgyzstan
+    Bissau: Guinea-Bissau
+    Bitung: Indonesia
+    Blackburn: United Kingdom
+    Blackpool: United Kingdom
+    Blagoveščensk (Blagoveshchensk): Russia
+    Blanchardstown: Ireland
+    Blantyre / Hamilton: United Kingdom
+    Blantyre-Limbe: Malawi
+    Blida: Algeria
+    Blumenau: Brazil
+    Bo: Sierra Leone
+    Bobo-Dioulasso: Burkina Faso
+    Bocholt: Germany
+    Bogotá: Colombia
+    Bogra: Bangladesh
+    Bohicon: Benin
+    Bojnūrd: Iran
+    Bokhtar (Kurgan-T'ube): Tajikistan
+    Bologna: Italy
+    Bolzano (Bozen): Italy
+    Bonn: Germany
+    Bordeaux: France
+    Borås: Sweden
+    Borča: Serbia
+    Boston: United States
+    Botoșani: Romania
+    Bouake: Cote d'Ivoire
+    Bougouni: Mali
+    Boulogne-sur-mer: France
+    Bourges: France
+    Bournemouth: United Kingdom
+    Bracknell: United Kingdom
+    Braga: Portugal
+    Brandenburg an der Havel: Germany
+    Brantford,ONT: Canada
+    Brasília: Brazil
+    Bratislava: Slovakia
+    Braunschweig: Germany
+    Brazzaville: Congo
+    Brașov: Romania
+    Breda: Netherlands
+    Bregenz: Austria
+    Bremen: Germany
+    Bremerhaven: Germany
+    Brescia: Italy
+    Brest: Belarus
+    Bridgetown: Barbados
+    Brighton-Worthing-Littlehampton: United Kingdom
+    Brindisi: Italy
+    Brisbane: Australia
+    Bristol: United Kingdom
+    Brno: Czechia
+    Brugge: Belgium
+    Bruxelles-Brussel: Belgium
+    Brăila: Romania
+    Bucaramanga: Colombia
+    Bucuresti (Bucharest): Romania
+    Budapest: Hungary
+    Buenos Aires: Argentina
+    Buffalo: United States
+    Bujumbura: Burundi
+    Bunbury: Australia
+    Bur Sa'id: Egypt
+    Burgas: Bulgaria
+    Burgos: Spain
+    Burnley: United Kingdom
+    Bursa: Turkey
+    Burton upon Trent: United Kingdom
+    Busan: South Korea
+    Butembo: Democratic Republic of Congo
+    Butwal: Nepal
+    Buxoro (Bukhara): Uzbekistan
+    Bydgoszcz: Poland
+    Béjaïa: Algeria
+    Béziers: France
+    Bābol: Iran
+    Bălți (Bel'cy): Moldova
+    Būston (Čkalovsk / Chkalovsk): Tajikistan
+    Cabimas: Venezuela
+    Cabinda: Angola
+    Cabudare: Venezuela
+    Caen: France
+    Cagayan de Oro City: Philippines
+    Cagliari: Italy
+    Cairns: Australia
+    Cajamarca: Peru
+    Calais: France
+    Calgary: Canada
+    Cali: Colombia
+    Camaguey: Cuba
+    Cambridge: United Kingdom
+    Campeche: Mexico
+    Campinas: Brazil
+    Campo Grande: Brazil
+    Canberra: Australia
+    Cannock / Hednesford: United Kingdom
+    Cap-Haïtien: Haiti
+    Cape Coast: Ghana
+    Cape Town: South Africa
+    Capital Governorate: Bahrain
+    Caracas: Venezuela
+    Cardiff: United Kingdom
+    Carlisle: United Kingdom
+    Cartagena: Colombia
+    Castelldefels: Spain
+    Castries: Saint Lucia
+    Catamarca (San Fernando del Valle de Catamarca): Argentina
+    Catania: Italy
+    Cebu City: Philippines
+    Central Coast: Australia
+    Cergy-Pontoise: France
+    Cerignola: Italy
+    Ceske Budejovice: Czechia
+    Cessnock: Australia
+    Cha-Am: Thailand
+    Chakwāl: Pakistan
+    Chambery: France
+    Chandigarh: India
+    Changzhi: China
+    Changzhou, Jingsu: China
+    Chanía: Greece
+    Charleroi: Belgium
+    Charlotte: United States
+    Chartres: France
+    Chegutu: Zimbabwe
+    Chelmsford: United Kingdom
+    Cheltenham: United Kingdom
+    Chemnitz: Germany
+    Chengdu: China
+    Chennai (Madras): India
+    Cheonan: South Korea
+    Chester: United Kingdom
+    Chesterfield: United Kingdom
+    Chełm: Poland
+    Chiang Mai: Thailand
+    Chiang Rai: Thailand
+    Chiapas: Mexico
+    Chicago: United States
+    Chiclayo: Peru
+    Chihuahua: Mexico
+    Chilaw: Sri Lanka
+    Chimaltenango: Guatemala
+    Chimbote: Peru
+    Chinandega: Nicaragua
+    Chingola: Zambia
+    Chinhoyi: Zimbabwe
+    Chinīot: Pakistan
+    Chittagong: Bangladesh
+    Chişinău: Moldova
+    Chlef: Algeria
+    Chomutov / Jirkov: Czechia
+    Chone: Ecuador
+    Chongjin: North Korea
+    Christchurch: New Zealand
+    Chui oblast: Kyrgyzstan
+    Chumphon: Thailand
+    Chārsadda: Pakistan
+    Chārīkār: Afghanistan
+    Chŏngju: North Korea
+    Cienfuegos: Cuba
+    Cirebon: Indonesia
+    Ciudad Bolivar: Venezuela
+    Ciudad De La Costa: Uruguay
+    Ciudad Guayana: Venezuela
+    Ciudad Ojeda: Venezuela
+    Ciudad Sandino: Nicaragua
+    Ciudad de Guatemala (Guatemala City): Guatemala
+    Ciudad de México (Mexico City): Mexico
+    Ciudad de Panamá (Panama City): Panama
+    Ciudad del Este: Paraguay
+    Clermont-Ferrand: France
+    Clovis,CA: United States
+    Cluj-Napoca: Romania
+    Coahuila de Zaragoza: Mexico
+    Coatbridge: United Kingdom
+    Cobán: Guatemala
+    Cochabamba: Bolivia
+    Coimbatore: India
+    Coimbra: Portugal
+    Colchester: United Kingdom
+    Colima: Mexico
+    Colmar: France
+    Colombo: Sri Lanka
+    Columbia, South Carolina: United States
+    Comayagua: Honduras
+    Comilla: Bangladesh
+    Como: Italy
+    Comodoro Rivadavia: Argentina
+    Conakry: Guinea
+    Concepción: Chile
+    Concordia: Argentina
+    Constanța: Romania
+    Copiapó: Chile
+    Corby: United Kingdom
+    Cork: Ireland
+    Coro (Santa Ana de Coro): Venezuela
+    Coslada: Spain
+    Cotonou: Benin
+    Cottbus: Germany
+    Coventry-Bedworth: United Kingdom
+    Craiova: Romania
+    Crawley: United Kingdom
+    Crewe: United Kingdom
+    Criciúma: Brazil
+    Cuenca: Ecuador
+    Cuiabá: Brazil
+    Cumana: Venezuela
+    Cundinamarca_Soacha: Colombia
+    Curitiba: Brazil
+    Cusco: Peru
+    Cyangugu (Shangugu): Rwanda
+    Częstochowa: Poland
+    Cáceres: Spain
+    Cádiz: Spain
+    Câmpia Turzii: Romania
+    Córdoba: Argentina
+    Cúa: Venezuela
+    Da Nang: Vietnam
+    Dacorum: United Kingdom
+    Daegu: South Korea
+    Daejon: South Korea
+    Dakar: Senegal
+    Dalian: China
+    Dallas: United States
+    Daloa: Cote d'Ivoire
+    Damak: Nepal
+    Damanhūr (Damanhour): Egypt
+    Dar es Salaam: Tanzania
+    Dar-el-Beida (Casablanca): Morocco
+    Darlington: United Kingdom
+    Darmstadt: Germany
+    Darwin: Australia
+    Daugavpils: Latvia
+    Daule: Ecuador
+    Davao City: Philippines
+    Daşoguz: Turkmenistan
+    Debrecen: Hungary
+    Dehdasht: Iran
+    Delhi: India
+    Delmenhorst: Germany
+    Denau (Denov): Uzbekistan
+    Derby: United Kingdom
+    Derry (Londonderry): United Kingdom
+    Dese (Dessie): Ethiopia
+    Detroit: United States
+    Deventer: Netherlands
+    Dhaka: Bangladesh
+    Dhamar: Yemen
+    Dharan: Nepal
+    Dijon: France
+    Dili: East Timor
+    Dimashq (Damascus): Syria
+    Dinajpur: Bangladesh
+    Diourbel: Senegal
+    Dire Dawa: Ethiopia
+    Disūq (Desouk): Egypt
+    Divinópolis: Brazil
+    Diwaniyah: Iraq
+    Diyarb Najm: Egypt
+    Djalal-Abad oblast  : Kyrgyzstan
+    Djibouti: Djibouti
+    Djougou: Benin
+    Dobrič (Dobrich): Bulgaria
+    Dodoma: Tanzania
+    Doncaster: United Kingdom
+    Donetsk: Ukraine
+    Donostia (San Sebastián): Spain
+    Dordrecht: Netherlands
+    Dosso: Niger
+    Douai-Lens: France
+    Douala: Cameroon
+    Douz Nord: Tunisia
+    Douz Sud: Tunisia
+    Drammen: Norway
+    Dresden: Germany
+    Dubayy (Dubai): United Arab Emirates
+    Dublin: Ireland
+    Duesseldorf: Germany
+    Duisburg: Germany
+    Dukhan: Qatar
+    Duluth,MN: United States
+    Dumyāṭ (Damietta): Egypt
+    Dundee: United Kingdom
+    Dunedin: New Zealand
+    Dunkerque: France
+    Dunqulā (Dongola): Sudan
+    Durango: Mexico
+    Durban (Ethekwini): South Africa
+    Durham: United States
+    Dushanbe: Tajikistan
+    Dzeržinsk (Dzerzhinsk): Russia
+    Düren: Germany
+    Dādu: Pakistan
+    East Kilbride: United Kingdom
+    East London (Buffalo City): South Africa
+    Eastbourne: United Kingdom
+    Eastleigh: United Kingdom
+    Ebolowa: Cameroon
+    Ede: Netherlands
+    Edinburgh: United Kingdom
+    Edmonton: Canada
+    Eindhoven: Netherlands
+    El Djazaïr  (Algiers): Algeria
+    El Djelfa: Algeria
+    El Khroub: Algeria
+    El Paso: United States
+    El Prat de Llobregat: Spain
+    El Progreso: Honduras
+    Elbasan (Elbasani): Albania
+    Elbląg: Poland
+    Elche (Elx): Spain
+    Eldoret: Kenya
+    Ellesmere Port: United Kingdom
+    Embilipitiya: Sri Lanka
+    Enschede: Netherlands
+    Enugu: Nigeria
+    Erfurt: Germany
+    Erlangen: Germany
+    Escuintla: Guatemala
+    Esmeraldas: Ecuador
+    Esslingen am Neckar: Germany
+    Estelí: Nicaragua
+    Etterbeek: Belgium
+    Eugene,OR: United States
+    Evere: Belgium
+    Exeter: United Kingdom
+    Ezulwini: Eswatini
+    Ełk: Poland
+    Eṣfahān (Isfahan): Iran
+    Faaa/Punaauia/Papeete: French Polynesia
+    Faisalabad: Pakistan
+    Falkirk: United Kingdom
+    Faloojah: Iraq
+    Farg'ona (Fergana): Uzbekistan
+    Fargo,ND: United States
+    Farāh: Afghanistan
+    Fayetteville: United States
+    Fayetteville - Springdale - Rogers: United States
+    Feira De Santana: Brazil
+    Ferkessédougou: Cote d'Ivoire
+    Ferrara: Italy
+    Ferrol (El Ferrol): Spain
+    Fianarantsoa: Madagascar
+    Firenze (Florence): Italy
+    Fkih Ben Salah: Morocco
+    Flensburg: Germany
+    Florianópolis: Brazil
+    Forest: Belgium
+    Formosa: Argentina
+    Fortaleza: Brazil
+    Francistown: Botswana
+    Frankfurt (Oder): Germany
+    Frankfurt am Main: Germany
+    Fredrikstad/Sarpsborg: Norway
+    Freetown: Sierra Leone
+    Freiburg im Breisgau: Germany
+    Fribourg: Switzerland
+    Frimley / Farnborough: United Kingdom
+    Fréjus: France
+    Fukuyama: Japan
+    Funchal: Portugal
+    Fès: Morocco
+    Fürth: Germany
+    Fāqūs (Faqous): Egypt
+    Fălticeni: Romania
+    Gaborone: Botswana
+    Gabú (Nova Lamego): Guinea-Bissau
+    Gainesville,FL: United States
+    Galle: Sri Lanka
+    Ganja: Azerbaijan
+    Ganshoren: Belgium
+    Gao: Mali
+    Gaoyou: China
+    Garapan (Fananganan): Northern Mariana Islands
+    Garoua: Cameroon
+    Garut Kota: Indonesia
+    Gazipur: Bangladesh
+    Gdańsk: Poland
+    Gdynia: Poland
+    Geelong: Australia
+    Gela: Italy
+    Genova (Genoa): Italy
+    Gent: Belgium
+    Genève: Switzerland
+    Georgetown: Guyana
+    Gera: Germany
+    Gevelsberg / Schwelm: Germany
+    Ghotki: Pakistan
+    Gießen: Germany
+    Gijón: Spain
+    Gisenyi: Rwanda
+    Gitarama (Muhanga): Rwanda
+    Glasgow: United Kingdom
+    Gliwice: Poland
+    Gloucester: United Kingdom
+    Gniezno: Poland
+    Godagari: Bangladesh
+    Gold Coast-Tweed Head: Australia
+    Goma: Democratic Republic of Congo
+    Gombe: Nigeria
+    Gomel: Belarus
+    Gondar: Ethiopia
+    Gorgan: Iran
+    Gornoslaski Zwiazek Metropolitalny: Poland
+    Gorzów Wielkopolski: Poland
+    Gouda: Netherlands
+    Gqeberha: South Africa
+    Granada: Nicaragua
+    Grande São Luís: Brazil
+    Gravesham: United Kingdom
+    Graz: Austria
+    Great Yarmouth: United Kingdom
+    Greater Sudbury (Grand Sudbury),ONT: Canada
+    Greensboro: United States
+    Grenoble: France
+    Grimsby / Cleethorpes: United Kingdom
+    Grodno: Belarus
+    Groningen: Netherlands
+    Grosseto: Italy
+    Grudziądz: Poland
+    Gröpelingen / Vegesack: Germany
+    Guanajuato: Mexico
+    Guangzhou, Guangdong: China
+    Guantánamo: Cuba
+    Guarapari: Brazil
+    Guarenas-Guatire: Venezuela
+    Guayaquil: Ecuador
+    Guelph,ONT: Canada
+    Guerrero: Mexico
+    Guildford: United Kingdom
+    Guixi, Chongqing: China
+    Gujranwala: Pakistan
+    Gujrat: Pakistan
+    Gulu: Uganda
+    Gurué: Mozambique
+    Gwangju: South Korea
+    Gweru (Gwelo): Zimbabwe
+    Győr: Hungary
+    Göppingen: Germany
+    Görlitz: Germany
+    Göteborg: Sweden
+    Göttingen: Germany
+    Gütersloh: Germany
+    Głogów: Poland
+    Ha'il: Saudi Arabia
+    Haarlem: Netherlands
+    Hagen: Germany
+    Hai Phòng: Vietnam
+    Haikou: China
+    Halab (Aleppo): Syria
+    Haldwani-cum-kathgodam: India
+    Halifax: Canada
+    Halle (Saale): Germany
+    Halmstad: Sweden
+    Halton: United Kingdom
+    Hamah: Syria
+    Hambantota: Sri Lanka
+    Hamburg: Germany
+    Hamhung: North Korea
+    Hamilton: Canada
+    Hamm: Germany
+    Hanau: Germany
+    Hangzhou: China
+    Haninge: Sweden
+    Hannover: Germany
+    Haputale: Sri Lanka
+    Harar: Ethiopia
+    Harare: Zimbabwe
+    Harburg: Germany
+    Hardoī: India
+    Hargeysa: Somalia
+    Harlow: United Kingdom
+    Harrogate: United Kingdom
+    Hartford: United States
+    Hartlepool: United Kingdom
+    Hastings: United Kingdom
+    Haunstetten: Germany
+    Havirov: Czechia
+    Hebron (Al-Khalīl): Palestine
+    Heerlen: Netherlands
+    Hefa (Haifa): Israel
+    Heidelberg: Germany
+    Heilbronn: Germany
+    Helmond: Netherlands
+    Helsingborg: Sweden
+    Helsinki: Finland
+    Hengelo: Netherlands
+    Herat: Afghanistan
+    Hereford: United Kingdom
+    Herning: Denmark
+    Herzogenrath: Germany
+    Hesse: Germany
+    Hidalgo: Mexico
+    Higüey (Salvaleón de Higüey): Dominican Republic
+    Hildesheim: Germany
+    Hilversum: Netherlands
+    Hims (Homs): Syria
+    Hindupur: India
+    Hjørring: Denmark
+    Hobart: Australia
+    Holguín: Cuba
+    Hong Kong, Hong Kong: China
+    Honiara: Solomon Islands
+    Honolulu: United States
+    Hoorn: Netherlands
+    Horsens: Denmark
+    Houndé: Burkina Faso
+    Houston: United States
+    Hrabuvka: Czechia
+    Hradec Králové: Czechia
+    Huacho: Peru
+    Huambo: Angola
+    Huancayo: Peru
+    Huddersfield: United Kingdom
+    Hue: Vietnam
+    Huehuetenango: Guatemala
+    Hufuf-Mubarraz: Saudi Arabia
+    Huye: Rwanda
+    Hyderabad: India
+    Hyndburn: United Kingdom
+    Hà Noi: Vietnam
+    Hørsholm: Denmark
+    Hāfizābād: Pakistan
+    Iasi: Romania
+    Ibadan: Nigeria
+    Ibb: Yemen
+    Ica: Peru
+    Igualada: Spain
+    Ijebu-Ode: Nigeria
+    Ilhéus: Brazil
+    Iligan: Philippines
+    Indaiatuba: Brazil
+    Indore: India
+    Ingolstadt: Germany
+    Innsbruck: Austria
+    Inowrocław: Poland
+    Ioánnina: Greece
+    Ipswich: United Kingdom
+    Iquique: Chile
+    Iquitos: Peru
+    Irbid: Jordan
+    Irbil (Erbil): Iraq
+    Irun (Irún): Spain
+    Irákleion (Heraklion): Greece
+    Iserlohn: Germany
+    Isfara: Tajikistan
+    Ishøj: Denmark
+    Islamabad: Pakistan
+    Istanbul: Turkey
+    Istaravšan (Istarawshan): Tajikistan
+    Itahari: Nepal
+    Ituiutaba: Brazil
+    Iwaki: Japan
+    Ixelles: Belgium
+    Izmir: Turkey
+    Jabalpur: India
+    Jacareí: Brazil
+    Jackson, Mississippi: United States
+    Jacksonville, Florida: United States
+    Jacobābād: Pakistan
+    Jaffna: Sri Lanka
+    Jaipur: India
+    Jakarta: Indonesia
+    Jalisco: Mexico
+    Jalna: India
+    Jalālābād: Afghanistan
+    Jamalpur: Bangladesh
+    Jambi: Indonesia
+    Janakpur (Janakpurdham): Nepal
+    Janīn (Jenin): Palestine
+    Jaraguá do Sul: Brazil
+    Jarbah Ḥawmat as-Sūq (Djerba Houmt Souk): Tunisia
+    Jastrzębie-Zdrój: Poland
+    Jaén: Peru
+    Jeju: South Korea
+    Jelenia Góra: Poland
+    Jena: Germany
+    Jequié: Brazil
+    Jericho (Ariha): Palestine
+    Jerusalem: Israel
+    Jessore: Bangladesh
+    Jette: Belgium
+    Jhang: Pakistan
+    Jhelum: Pakistan
+    Ji'nan, Shandong: China
+    Jiangmen: China
+    Jiddah: Saudi Arabia
+    Jima (Jimma): Ethiopia
+    Jinja: Uganda
+    Jinju: South Korea
+    Jizzax (Dzhizak): Uzbekistan
+    Jodhpur: India
+    Johannesburg: South Africa
+    Johor: Malaysia
+    Joinville: Brazil
+    Jombang: Indonesia
+    Jos: Nigeria
+    Juba: South Sudan
+    Jubayl: Saudi Arabia
+    Juliaca: Peru
+    Jundūbah (Jendouba): Tunisia
+    Jyväskylä: Finland
+    Kabul: Afghanistan
+    Kaduna: Nigeria
+    Kaiping, Guangdong: China
+    Kaiserslautern: Germany
+    Kale (Kalemyo, Kalay): Myanmar
+    Kalisz: Poland
+    Kampala: Uganda
+    Kanazawa: Japan
+    Kandahar: Afghanistan
+    Kandi: Benin
+    Kandy: Sri Lanka
+    Kanggye: North Korea
+    Kankan: Guinea
+    Kannur: India
+    Kano: Nigeria
+    Kanpur: India
+    Kansas City: United States
+    Kaolack: Senegal
+    Kapellen / Ekeren: Belgium
+    Kara (Lama-Kara): Togo
+    Karaganda: Kazakhstan
+    Karaj: Iran
+    Karbala: Iraq
+    Karlsruhe: Germany
+    Kasese: Uganda
+    Kashan: Iran
+    Kassala: Sudan
+    Kassel: Germany
+    Kasur: Pakistan
+    Kasztelanka: Poland
+    Kathmandu: Nepal
+    Katowice: Poland
+    Kaunas: Lithuania
+    Kavála: Greece
+    Kayes: Mali
+    Kayonza: Rwanda
+    Kazan: Russia
+    Kecskemét: Hungary
+    Kedah: Malaysia
+    Keighley: United Kingdom
+    Kelantan: Malaysia
+    Kelowna,BC: Canada
+    Kempten (Allgäu): Germany
+    Kendari: Indonesia
+    Kenema: Sierra Leone
+    Kerman: Iran
+    Kermanshah: Iran
+    Kettering: United Kingdom
+    Khamis Mushayt: Saudi Arabia
+    Khaīrpur: Pakistan
+    Khemis Miliana: Algeria
+    Khon-Kaen: Thailand
+    Khorog (Choruġ): Tajikistan
+    Khorramabad: Iran
+    Khujand (Chuçand): Tajikistan
+    Khulna: Bangladesh
+    Khushāb: Pakistan
+    Khyber Pakhtunkhwa-Bannu: Pakistan
+    Khyber Pakhtunkhwa-Chitral: Pakistan
+    Khyber Pakhtunkhwa-D. I. Khan: Pakistan
+    Khyber Pakhtunkhwa-Hangu: Pakistan
+    Khyber Pakhtunkhwa-Haripur: Pakistan
+    Khyber Pakhtunkhwa-Karak: Pakistan
+    Khyber Pakhtunkhwa-Khyber: Pakistan
+    Khyber Pakhtunkhwa-Lakki Marwat: Pakistan
+    Khyber Pakhtunkhwa-Lower Dir: Pakistan
+    Khyber Pakhtunkhwa-Malakand: Pakistan
+    Khyber Pakhtunkhwa-Swat: Pakistan
+    Khyber Pakhtunkhwa-Tank: Pakistan
+    Khyber Pakhtunkhwa-Total: Pakistan
+    Khyber Pakhtunkhwa-Upper Dir: Pakistan
+    Khān Ābād: Afghanistan
+    Khānewāl: Pakistan
+    Kidderminster: United Kingdom
+    Kiel: Germany
+    Kielce: Poland
+    Kigali: Rwanda
+    Kikinda: Serbia
+    Kikwit: Democratic Republic of Congo
+    Killeen,TX: United States
+    Kimbe: Papua New Guinea
+    Kingaroy: Australia
+    Kingston: Jamaica
+    Kingston upon Hull: United Kingdom
+    Kingston,ONT: Canada
+    Kingstown: Saint Vincent and the Grenadines
+    Kinshasa: Democratic Republic of Congo
+    Kirkuk: Iraq
+    Kisangani: Democratic Republic of Congo
+    Kisumu: Kenya
+    Kita: Mali
+    Kitakyushu-Fukuoka M.M.A.: Japan
+    Kitchener,ONT: Canada
+    Kitwe: Zambia
+    Kladno: Czechia
+    Klagenfurt am Wörthersee: Austria
+    Klaipėda: Lithuania
+    Knoxville: United States
+    Koblenz: Germany
+    Kobo: Ethiopia
+    Kobryn (Kobrin): Belarus
+    Kocaeli: Turkey
+    Kochi (Cochin): India
+    Koekelberg: Belgium
+    Kohāt: Pakistan
+    Kolding: Denmark
+    Kolkata (Calcutta): India
+    Kolwezi: Democratic Republic of Congo
+    Konibodom: Tajikistan
+    Konya: Turkey
+    Korhogo: Cote d'Ivoire
+    Koriyama: Japan
+    Koszalin: Poland
+    Koutiala: Mali
+    Kozhikode (Calicut): India
+    Košice: Slovakia
+    Kraków (Cracow): Poland
+    Krefeld: Germany
+    Kristiansand: Norway
+    Krung Thep (Bangkok): Thailand
+    Kuala Lumpur: Malaysia
+    Kuala Terengganu: Malaysia
+    Kumasi: Ghana
+    Kumba: Cameroon
+    Kurgan: Russia
+    Kurnool: India
+    Kwekwe (Que Que): Zimbabwe
+    Kyiv (Kiev): Ukraine
+    Köln (Cologne): Germany
+    København (Copenhagen): Denmark
+    Kānchipuram (Kancheepuram): India
+    Kāshmar: Iran
+    Kūlob: Tajikistan
+    La Ceiba: Honduras
+    La Chorrera: Panama
+    La Habana (Havana): Cuba
+    La Louvière: Belgium
+    La Paz: Bolivia
+    La Plata: Argentina
+    La Rochelle: France
+    La Romana: Dominican Republic
+    La Seyne-sur-Mer / Sanary-sur-Mer: France
+    La Vega (Concepción de la Vega): Dominican Republic
+    Labuan (Victoria): Malaysia
+    Lae: Papua New Guinea
+    Lagos: Nigeria
+    Lahore: Pakistan
+    Lakhīmpur: India
+    Landshut: Germany
+    Lankaran: Azerbaijan
+    Larkana: Pakistan
+    Las Piedras: Uruguay
+    Las Tunas (Victoria de las Tunas): Cuba
+    Las Vegas: United States
+    Lashio: Myanmar
+    Lashkargāh: Afghanistan
+    Lattakia: Syria
+    Launceston: Australia
+    Lausanne: Switzerland
+    Lautoka: Fiji
+    Layyah: Pakistan
+    Le Havre: France
+    Le Mans: France
+    Lecce: Italy
+    Leeds / Bradford: United Kingdom
+    Leeuwarden (Ljouwert): Netherlands
+    Lefkosía (Nicosia): Cyprus
+    Legionowo: Poland
+    Legnica: Poland
+    Leicester: United Kingdom
+    Leiden: Netherlands
+    Leipzig: Germany
+    Lelystad: Netherlands
+    Lemesos: Cyprus
+    Les Clayes-sous-Bois: France
+    Leshan: China
+    Leszno: Poland
+    Lethbridge,ALTA: Canada
+    Leuven: Belgium
+    Leverkusen: Germany
+    León: Nicaragua
+    Lianyungang: China
+    Liberec: Czechia
+    Liberia: Costa Rica
+    Libreville: Gabon
+    Liepāja: Latvia
+    Lille: France
+    Lilongwe: Malawi
+    Lima: Peru
+    Limeira: Brazil
+    Limerick (Luimneach): Ireland
+    Limoges: France
+    Limón (Puerto Limón): Costa Rica
+    Lincoln: United Kingdom
+    Linköping: Sweden
+    Linz: Austria
+    Lira: Uganda
+    Lisboa (Lisbon): Portugal
+    Liverpool: United Kingdom
+    Livingston: United Kingdom
+    Livorno: Italy
+    Liège: Belgium
+    Ljubljana: Slovenia
+    Lodhrān: Pakistan
+    Logroño: Spain
+    Lohja (Lojo): Finland
+    Loikaw: Myanmar
+    Loja: Ecuador
+    Lomé: Togo
+    London: Canada
+    Long Xuyen: Vietnam
+    Los Angeles-Long Beach-Santa Ana: United States
+    Los Teques: Venezuela
+    Louga: Senegal
+    Loughborough: United Kingdom
+    Lower Hutt: New Zealand
+    Lower Saxony: Germany
+    Luanda: Angola
+    Lubango: Angola
+    Lubin: Poland
+    Lublin: Poland
+    Lubumbashi: Democratic Republic of Congo
+    Ludhiana: India
+    Ludwigsburg: Germany
+    Luena: Angola
+    Lugano: Switzerland
+    Lund: Sweden
+    Lusail: Qatar
+    Lusaka: Zambia
+    Luton: United Kingdom
+    Luxembourg (Lëtzebuerg): Luxembourg
+    Luzern: Switzerland
+    Lviv: Ukraine
+    Lyon: France
+    Lørenskog: Norway
+    Lübeck: Germany
+    Lüdenscheid: Germany
+    Lüneburg: Germany
+    Lünen: Germany
+    Lütten Klein: Germany
+    M'Sila: Algeria
+    Maastricht: Netherlands
+    Macapá: Brazil
+    Machala: Ecuador
+    Madanīn (Médenine): Tunisia
+    Madrid: Spain
+    Madurai: India
+    Madīnat Sittah Uktūbar (6th October City): Egypt
+    Madīnat ash-Shamāl (Ar-Ruways): Qatar
+    Magdeburg: Germany
+    Mahajanga (Majunga): Madagascar
+    Maidenhead: United Kingdom
+    Maidstone: United Kingdom
+    Mainz: Germany
+    Makassar (Ujung Pandang): Indonesia
+    Makkah (Mecca): Saudi Arabia
+    Malaba: Kenya
+    Malabo: Equatorial Guinea
+    Malaga: Spain
+    Malanje: Angola
+    Maldonado: Uruguay
+    Male': Maldives
+    Malegaon: India
+    Malmö: Sweden
+    Man: Cote d'Ivoire
+    Manado: Indonesia
+    Managua: Nicaragua
+    Manaus: Brazil
+    Manchester: United Kingdom
+    Manchester,NH: United States
+    Mandalay: Myanmar
+    Mandi Bahāuddīn: Pakistan
+    Mangalia: Romania
+    Manhiça: Mozambique
+    Manila: Philippines
+    Mannheim: Germany
+    Manresa: Spain
+    Mansfield: United Kingdom
+    Mantes-la-Jolie: France
+    Maputo: Mozambique
+    Maracaibo: Venezuela
+    Maracay: Venezuela
+    Maradi: Niger
+    Mardan: Pakistan
+    Mariara: Venezuela
+    Marl: Germany
+    Marovoay: Madagascar
+    Marrakech: Morocco
+    Marsala: Italy
+    Marseille: France
+    Marseille-Aix-en-Provence: France
+    Martigues / Port-de-Bouc: France
+    Martin: Slovakia
+    Mary: Turkmenistan
+    Masaka: Uganda
+    Masaya: Nicaragua
+    Maseru: Lesotho
+    Mashhad: Iran
+    Masqat (Muscat): Oman
+    Masvingo: Zimbabwe
+    Masākin (M'saken): Tunisia
+    Matara: Sri Lanka
+    Matera: Italy
+    Matsue: Japan
+    Matsumoto: Japan
+    Maurepas / Montigny-le-Bretonneux: France
+    Mawlamyine (Moulmein): Myanmar
+    Maxixe: Mozambique
+    Mazar-e Sharif: Afghanistan
+    Mazatenango: Guatemala
+    Mazyr (Mozyr'): Belarus
+    Mbabane: Eswatini
+    Mbale: Uganda
+    Mbalmayo: Cameroon
+    Mbarara: Uganda
+    Mbour (M'Bour): Senegal
+    McAllen: United States
+    Meaux: France
+    Mechelen: Belgium
+    Mecklenburg Western Pomerania: Germany
+    Medan: Indonesia
+    Medellín: Colombia
+    Medway: United Kingdom
+    Meerut: India
+    Meknès: Morocco
+    Melaka (Malacca): Malaysia
+    Melbourne: Australia
+    Melilla: Spain
+    Melo: Uruguay
+    Melun: France
+    Memphis: United States
+    Mendoza: Argentina
+    Menongue: Angola
+    Merca: Somalia
+    Mercedes: Uruguay
+    Meru: Kenya
+    Messina: Italy
+    Mestre: Italy
+    Metz: France
+    Michoacan de Ocampo: Mexico
+    Midelt: Morocco
+    Mielec: Poland
+    Mila: Algeria
+    Milagro: Ecuador
+    Milano (Milan): Italy
+    Milton Keynes: United Kingdom
+    Mingachevir: Azerbaijan
+    Minneapolis,MN: United States
+    Minsk: Belarus
+    Mishima: Japan
+    Miskolc: Hungary
+    Misratah: Libya
+    Miānwāli: Pakistan
+    Mobile: United States
+    Mocuba: Mozambique
+    Modena: Italy
+    Modesto: United States
+    Moers / Rheinhausen: Germany
+    Molenbeek-Saint-Jean: Belgium
+    Mollet del Vallès: Spain
+    Mombasa: Kenya
+    Monaco-Ville: Monaco
+    Moncton,NB: Canada
+    Monrovia: Liberia
+    Montana: Bulgaria
+    Montes Claros: Brazil
+    Montevideo: Uruguay
+    Montgomery: United States
+    Montpellier: France
+    Montréal: Canada
+    Moquegua: Peru
+    Moradabad: India
+    Morelos: Mexico
+    Morena: India
+    Morioka: Japan
+    Moroni: Comoros
+    Moskva (Moscow): Russia
+    Mossoró: Brazil
+    Most: Czechia
+    Mostaganem (Mestghanem): Algeria
+    Motherwell / Wishaw: United Kingdom
+    Mount Lebanon: Lebanon
+    Mudanjiang: China
+    Muenster (Westfalen): Germany
+    Muharraq Governorate: Bahrain
+    Mulhouse: France
+    Multan: Pakistan
+    Mumbai (Bombay): India
+    Muqdisho (Mogadishu): Somalia
+    Murcia: Spain
+    Musaī'īd (Umm Sa'īd, Mesaieed): Qatar
+    Muswellbrook: Australia
+    Mutare: Zimbabwe
+    Muzaffargarh: Pakistan
+    Myeik (Mergui): Myanmar
+    Myitkyina: Myanmar
+    Mykolaiv: Ukraine
+    Mymensingh: Bangladesh
+    Mysłowice: Poland
+    Mzuzu: Malawi
+    Mönchengladbach: Germany
+    München (Munich): Germany
+    Mānsehra: Pakistan
+    Mīrpur Khās: Pakistan
+    N'Djaména: Chad
+    N'dalatando: Angola
+    Nacala Porto: Mozambique
+    Nadi: Fiji
+    Nairobi: Kenya
+    Najaf: Iraq
+    Nakuru: Kenya
+    Namangan: Uzbekistan
+    Nampula: Mozambique
+    Namur: Belgium
+    Nancy: France
+    Nanning: China
+    Nantes: France
+    Napier: New Zealand
+    Napoli (Naples): Italy
+    Narva: Estonia
+    Naryn oblast: Kyrgyzstan
+    Nashik: India
+    Nashville-Davidson: United States
+    Nassau: Bahamas
+    Natal: Brazil
+    National: Belarus
+    Natitingou: Benin
+    Navoiy (Navoi): Uzbekistan
+    Nay Pyi Taw: Myanmar
+    Nayarit: Mexico
+    Nazret: Ethiopia
+    Ndola: Zambia
+    Negeri Sembilan: Malaysia
+    Nellore: India
+    Netanya: Israel
+    Neumünster: Germany
+    Neuquén-Plottier-Cipolletti: Argentina
+    Neuss: Germany
+    New Orleans: United States
+    New York: United States
+    Newcastle-Maitland: Australia
+    Newcastle-under-Lyme: United Kingdom
+    Newport: United Kingdom
+    Ngaoundéré: Cameroon
+    Nha Trang: Vietnam
+    Niamey: Niger
+    Nice-Cannes: France
+    Nieuwegein / IJsselstein: Netherlands
+    Niigata: Japan
+    Nijmegen: Netherlands
+    Nitra: Slovakia
+    Niš: Serbia
+    Nkongsamba: Cameroon
+    Norak (Nurak): Tajikistan
+    Norrköping: Sweden
+    North Lebanon: Lebanon
+    North Rhine-Westphalia: Germany
+    Northampton: United Kingdom
+    Northern Governorate: Bahrain
+    Norwich: United Kingdom
+    Nottingham: United Kingdom
+    Nouakchott: Mauritania
+    Novara: Italy
+    Novi Sad: Serbia
+    Novo Gama: Brazil
+    Nowshera: Pakistan
+    Nowy Sącz: Poland
+    Nuevo Leon: Mexico
+    Nukus: Uzbekistan
+    Nuneaton: United Kingdom
+    Nyanza (Nyabisindu): Rwanda
+    Nyeri: Kenya
+    Nyíregyháza: Hungary
+    Nzérékoré: Guinea
+    Nîmes: France
+    Nābul (Nabeul): Tunisia
+    Nābulus (Nablus): Palestine
+    Nārowāl: Pakistan
+    Năvodari: Romania
+    Nīshābūr (Nishapur/Neyshabur): Iran
+    Oaxaca: Mexico
+    Oberá: Argentina
+    Odense: Denmark
+    Odesa: Ukraine
+    Okara: Pakistan
+    Okayama: Japan
+    Okinawa: Japan
+    Oldenburg (Oldenburg): Germany
+    Olomouc: Czechia
+    Olsztyn: Poland
+    Omaha: United States
+    Oostende: Belgium
+    Opole: Poland
+    Oradea: Romania
+    Oral (Ural'sk): Kazakhstan
+    Orléans: France
+    Oruro: Bolivia
+    Osaka: Japan
+    Osh oblast: Kyrgyzstan
+    Oshawa: Canada
+    Osijek: Croatia
+    Oslo: Norway
+    Osnabrück: Germany
+    Osorno: Chile
+    Oss: Netherlands
+    Ostia: Italy
+    Ostrava: Czechia
+    Ostrowiec Świętokrzyski: Poland
+    Ostrów Wielkopolski: Poland
+    Ottawa-Gatineau: Canada
+    Ouagadougou: Burkina Faso
+    Oujda: Morocco
+    Oulad Teïma: Morocco
+    Oulu: Finland
+    Oviedo: Spain
+    Oxford: United Kingdom
+    Oyo: Nigeria
+    Ozamis: Philippines
+    Oš (Osh): Kyrgyzstan
+    P'yongyang: North Korea
+    Pabianice: Poland
+    Paderborn: Germany
+    Padova: Italy
+    Pahang: Malaysia
+    Palembang: Indonesia
+    Palencia: Spain
+    Palermo: Italy
+    Palma: Spain
+    Palmas: Brazil
+    Palmerston: New Zealand
+    Palu: Indonesia
+    Pamplona (Iruña): Spain
+    Panevėžys: Lithuania
+    Pançakent (Panjakent): Tajikistan
+    Parakou: Benin
+    Paramaribo: Suriname
+    Paraná: Argentina
+    Parauapebas: Brazil
+    Parbhani: India
+    Pardubice: Czechia
+    Parepare: Indonesia
+    Paris: France
+    Parla: Spain
+    Parma: Italy
+    Passos: Brazil
+    Pathein: Myanmar
+    Pati: Indonesia
+    Patna: India
+    Pau: France
+    Pavia: Italy
+    Pavlodar: Kazakhstan
+    Paysandú: Uruguay
+    Pekalongan: Indonesia
+    Pekan Baru: Indonesia
+    Pemalang: Indonesia
+    Pematangsiantar: Indonesia
+    Pemba: Mozambique
+    Perak: Malaysia
+    Pereira: Colombia
+    Perlis: Malaysia
+    Perm: Russia
+    Perpignan: France
+    Perth: Australia
+    Perugia: Italy
+    Pesaro: Italy
+    Peshawar: Pakistan
+    Petah Tiqwa (Petah Tikva): Israel
+    Peterborough: United Kingdom
+    Peterborough,ONT: Canada
+    Pforzheim: Germany
+    Phan Thiết: Vietnam
+    Phatthalung: Thailand
+    Philadelphia: United States
+    Phnum Pénh (Phnom Penh): Cambodia
+    Pietermaritzburg (The Msunduzi): South Africa
+    Pijnacker / Berkel en Rodenrijs: Netherlands
+    Piotrków Trybunalski: Poland
+    Pisa: Italy
+    Piła: Poland
+    Plauen: Germany
+    Pleven: Bulgaria
+    Ploiești: Romania
+    Plovdiv: Bulgaria
+    Plymouth: United Kingdom
+    Plzen: Czechia
+    Podgorica (Titograd): Montenegro
+    Pointe-Noire: Congo
+    Poissy: France
+    Poitiers: France
+    Pokhara: Nepal
+    Polack (Polock, Polotsk): Belarus
+    Pordenone: Italy
+    Porsgrunn/Skien: Norway
+    Port Harcourt: Nigeria
+    Port Moresby: Papua New Guinea
+    Port Sudan (Bur Sudan): Sudan
+    Port of Spain: Trinidad and Tobago
+    Port-Louis: Mauritius
+    Port-au-Prince: Haiti
+    Portland: United States
+    Portmore: Jamaica
+    Porto: Portugal
+    Porto-Novo: Benin
+    Portsmouth: United Kingdom
+    Poruba: Czechia
+    Porvoo (Borgå): Finland
+    Porz: Germany
+    Potsdam: Germany
+    Poznań: Poland
+    Pozzuoli: Italy
+    Praha (Prague): Czechia
+    Praia: Cape Verde
+    Prato: Italy
+    Preston: United Kingdom
+    Providence: United States
+    Przemyśl: Poland
+    Pucallpa: Peru
+    Puebla: Mexico
+    Puerto Barrios: Guatemala
+    Puerto Plata (San Felipe de Puerto Plata): Dominican Republic
+    Puerto de la Cruz: Spain
+    Pul-e Khumrī: Afghanistan
+    Pulau Pinang: Malaysia
+    Pune (Poona): India
+    Punjab-D. G. Khan: Pakistan
+    Punjab-Nankana Sahib: Pakistan
+    Punjab-Rajanpur: Pakistan
+    Punjab-T.T. Singh: Pakistan
+    Punta Arenas: Chile
+    Purmerend: Netherlands
+    Purwakarta: Indonesia
+    Puttalam: Sri Lanka
+    Pátrai (Patras): Greece
+    Pécs: Hungary
+    Pôrto Alegre: Brazil
+    Pôrto Velho: Brazil
+    Pākpattan: Pakistan
+    Pāli: India
+    Pīrānshahr: Iran
+    Płock: Poland
+    Qacentina: Algeria
+    Qafṣah (Gafsa): Tunisia
+    Qalqīlyah (Qalqiliya): Palestine
+    Qarshi (Karshi): Uzbekistan
+    Qaskeleń (Kaskelen): Kazakhstan
+    Qazvin: Iran
+    Qingdao: China
+    Qo'qon (Kokand): Uzbekistan
+    Qom: Iran
+    Quaregnon / Frameries: Belgium
+    Queretaro: Mexico
+    Quetta: Pakistan
+    Quetzaltenango: Guatemala
+    Quevedo: Ecuador
+    Quintana Roo: Mexico
+    Quito: Ecuador
+    Qujing: China
+    Qulsary (Kulsary): Kazakhstan
+    Québec: Canada
+    Qā'em Shahr: Iran
+    Qābis (Gabès): Tunisia
+    Radom: Poland
+    Radā': Yemen
+    Rafḥā': Saudi Arabia
+    Rahim Yar Khan: Pakistan
+    Raipur: India
+    Rajkot: India
+    Rajshahi: Bangladesh
+    Raleigh: United States
+    Ramadi: Iraq
+    Ramallah: Palestine
+    Randers: Denmark
+    Rasŏn: North Korea
+    Ratnapura: Sri Lanka
+    Rawalpindi: Pakistan
+    Reading: United Kingdom
+    Recife: Brazil
+    Redditch: United Kingdom
+    Redhill / Reigate: United Kingdom
+    Regensburg: Germany
+    Reggio di Calabria: Italy
+    Reghin: Romania
+    Regina,SASK: Canada
+    Reims: France
+    Remscheid: Germany
+    Rennes: France
+    Reus: Spain
+    Reutlingen: Germany
+    Rewa: India
+    Reykjavík: Iceland
+    Rhineland Palatinate: Germany
+    Ribeirão  Preto: Brazil
+    Riga: Latvia
+    Rijeka: Croatia
+    Rio de Janeiro: Brazil
+    Riobamba: Ecuador
+    Risaralda_Dosquebradas: Colombia
+    Rishon LeZiyyon (Rishon LeZion): Israel
+    Rivera: Uruguay
+    Rivne (Rovno): Ukraine
+    Roanoke: United States
+    Roma (Rome): Italy
+    Roosendaal: Netherlands
+    Rosario: Argentina
+    Roseau: Dominica
+    Rosenheim: Germany
+    Rostock: Germany
+    Rotherham: United Kingdom
+    Rotterdam: Netherlands
+    Rouen: France
+    Rovaniemi: Finland
+    Rubio: Venezuela
+    Rugby: United Kingdom
+    Ruhengeri: Rwanda
+    Ruhrgebiet: Germany
+    Ruse (Rousse): Bulgaria
+    Rustington: United Kingdom
+    Rybnik: Poland
+    Rýdnyj (Rudniy): Kazakhstan
+    Rzeszów: Poland
+    Rákosliget: Hungary
+    Río Cuarto: Argentina
+    Río Gallegos: Argentina
+    Rüsselsheim am Main: Germany
+    Rā's al-Khaymah (Ras al-Khaimah): United Arab Emirates
+    Saarbrücken: Germany
+    Saarland: Germany
+    Sabadell: Spain
+    Sacramento: United States
+    Safaqis: Tunisia
+    Safi: Morocco
+    Saguenay,QUE: Canada
+    Sahiwal: Pakistan
+    Saidpur: Bangladesh
+    Saint John's: Antigua and Barbuda
+    Saint John,NB: Canada
+    Saint-Brieuc: France
+    Saint-Gilles: Belgium
+    Saint-Josse-ten-Noode: Belgium
+    Saint-Louis: Senegal
+    Saint-Quentin: France
+    Saint-marc: Haiti
+    Saint-Étienne: France
+    Salahah (Salalah): Oman
+    Salamanca: Spain
+    Salem: India
+    Salfit: Palestine
+    Salihorsk (Soligorsk): Belarus
+    Salinas: United States
+    Salmās: Iran
+    Salt Lake City: United States
+    Salto: Uruguay
+    Salvador: Brazil
+    Salzburg: Austria
+    Samara: Russia
+    Samarinda: Indonesia
+    Samarkand: Uzbekistan
+    Samsun: Turkey
+    San Antonio: United States
+    San Carlos del Zulia: Venezuela
+    San Cristóbal: Venezuela
+    San Diego: United States
+    San Fernando de Apure: Venezuela
+    San Francisco: Argentina
+    San Francisco de Macorís: Dominican Republic
+    San Jose: United States
+    San José: Costa Rica
+    San Juan: Argentina
+    San Juan Sacatepéquez: Guatemala
+    San Juan de los Morros: Venezuela
+    San Luis Potosi: Mexico
+    San Marino: San Marino
+    San Martín ( La Colonia): Argentina
+    San Miguel: El Salvador
+    San Miguel de Tucumán: Argentina
+    San Pedro Sula: Honduras
+    San Pedro de Jujuy: Argentina
+    San Salvador: El Salvador
+    San Salvador de Jujuy: Argentina
+    San-Pédro: Cote d'Ivoire
+    Sana'a': Yemen
+    Sanandaj: Iran
+    Sandnes: Norway
+    Sankt Peterburg (Saint Petersburg): Russia
+    Sannār (Sennar): Sudan
+    Sant Boi de Llobregat: Spain
+    Santa Ana: El Salvador
+    Santa Clara: Cuba
+    Santa Cruz: Bolivia
+    Santa Cruz de Tenerife: Spain
+    Santa Cruz do Capibaribe: Brazil
+    Santa Fe: Argentina
+    Santa Lucía Cotzumalguapa: Guatemala
+    Santa Maria: Brazil
+    Santa Monica: Spain
+    Santa Rosa: United States
+    Santana (Porto Santana): Brazil
+    Santander: Spain
+    Santander_Floridablanca: Colombia
+    Santander_Piedecuesta: Colombia
+    Santiago: Chile
+    Santiago Del Estero: Argentina
+    Santiago de Compostela: Spain
+    Santiago de Cuba: Cuba
+    Santo Domingo: Dominican Republic
+    Santos: Brazil
+    Sapporo: Japan
+    Sarajevo: Bosnia and Herzegovina
+    Sargodha: Pakistan
+    Sari: Iran
+    Sasebo: Japan
+    Saskatoon: Canada
+    Sassari: Italy
+    Sassuolo: Italy
+    Saurimo: Angola
+    Savannah: United States
+    Saxony: Germany
+    Saxony-Anhalt: Germany
+    Sayada-Ksar Helal_Moknine: Tunisia
+    Scarborough: United Kingdom
+    Schaerbeek: Belgium
+    Schleswig-Holstein: Germany
+    Schweinfurt: Germany
+    Scunthorpe: United Kingdom
+    Seattle: United States
+    Sefton: United Kingdom
+    Sekondi Takoradi: Ghana
+    Selangor: Malaysia
+    Semarang: Indonesia
+    Semeı (Semey): Kazakhstan
+    Seoul: South Korea
+    Serdar: Turkmenistan
+    Setúbal: Portugal
+    Sevilla: Spain
+    Shahjahanpur: India
+    Shahrisabz (Shakhrisabz): Uzbekistan
+    Shaki: Azerbaijan
+    Shanghai: China
+    Sheffield: United Kingdom
+    Sheikhupura: Pakistan
+    Shenzhen: China
+    Shepparton: Australia
+    Sherbrooke,QUE: Canada
+    Shikārpur: Pakistan
+    Shimkent: Kazakhstan
+    Shiraz: Iran
+    Shirvan: Azerbaijan
+    Shizuoka: Japan
+    Shrewsbury: United Kingdom
+    Shādegān: Iran
+    Shāhdādkot: Pakistan
+    Shāhīn Shahr: Iran
+    Shīrvān: Iran
+    Sialkot: Pakistan
+    Sibiu: Romania
+    Sidi Slimane: Morocco
+    Sikasso: Mali
+    Silyānah (Siliana): Tunisia
+    Sinaloa: Mexico
+    Sindelfingen: Germany
+    Sindh-Jamshoro: Pakistan
+    Sindh-Karachi Central: Pakistan
+    Sindh-Karachi East: Pakistan
+    Sindh-Karachi Malir: Pakistan
+    Sindh-Karachi South: Pakistan
+    Sindh-Karachi West: Pakistan
+    Sindh-Kashmore: Pakistan
+    Sindh-Korangi: Pakistan
+    Sindh-Matiari: Pakistan
+    Sindh-Nowshero Feroze: Pakistan
+    Sindh-Sanghar: Pakistan
+    Sindh-Shaheed Banazir Abad: Pakistan
+    Sindh-Sujawal: Pakistan
+    Sindh-Tharparkar: Pakistan
+    Sindh-Thatta: Pakistan
+    Sindh-Total: Pakistan
+    Singapore: Singapore
+    Singrauli: India
+    Sinjah (Singa): Sudan
+    Sinuiju: North Korea
+    Sioux Falls: United States
+    Siracusa: Italy
+    Sittard-Geleen: Netherlands
+    Siĕm Réab (Siem Reap): Cambodia
+    Skopje: North Macedonia
+    Slagelse: Denmark
+    Slough: United Kingdom
+    Soest / Baarn: Netherlands
+    Sofia: Bulgaria
+    Sokodé: Togo
+    Songkhla: Thailand
+    Songrim: North Korea
+    Sonora: Mexico
+    Sopron: Hungary
+    Soshanguve: South Africa
+    South Lebanon: Lebanon
+    Southampton/Portsmouth (South Hampshire): United Kingdom
+    Southend-On-Sea: United Kingdom
+    Southern Governorate: Bahrain
+    Spijkenisse: Netherlands
+    Split: Croatia
+    Springfield, Massachusett, Connecticut: United States
+    Srinagar: India
+    St Albans: United Kingdom
+    St. Catharines-Niagara: Canada
+    St. Gallen: Switzerland
+    St. George's: Grenada
+    St. John's,NL: Canada
+    St. Louis: United States
+    Stafford: United Kingdom
+    Stalowa Wola: Poland
+    Stara Zagora: Bulgaria
+    Stargard Szczeciński: Poland
+    Stavanger: Norway
+    Stevenage: United Kingdom
+    Stockholm: Sweden
+    Stockton-on-Tees: United Kingdom
+    Stoke-on-Trent (The Potteries): United Kingdom
+    Strasbourg: France
+    Stuttgart: Germany
+    Subang: Indonesia
+    Sucre: Bolivia
+    Suining, Sichuan: China
+    Sukkur: Pakistan
+    Sullana: Peru
+    Sumgayit: Azerbaijan
+    Sunshine Coast: Australia
+    Surabaya: Indonesia
+    Surakarta: Indonesia
+    Surat: India
+    Sutton in Ashfield: United Kingdom
+    Suva: Fiji
+    Suwałki: Poland
+    Svendborg: Denmark
+    Swansea: United Kingdom
+    Swindon: United Kingdom
+    Swords: Ireland
+    Swābi: Pakistan
+    Sydney: Australia
+    Sylhet: Bangladesh
+    Szczecin: Poland
+    Szeged: Hungary
+    Szombathely: Hungary
+    Székesfehérvár: Hungary
+    São Carlos: Brazil
+    São Gonçalo: Brazil
+    São José dos Campos: Brazil
+    São Paulo: Brazil
+    São Tomé: Sao Tome and Principe
+    Séfrou: Morocco
+    Ségou: Mali
+    Sétif: Algeria
+    Södertälje: Sweden
+    Sīdī Bū Zayd (Sidi Bouzid): Tunisia
+    Sītāpur: India
+    Słupsk: Poland
+    Ta'izz: Yemen
+    Tabasco: Mexico
+    Tabriz: Iran
+    Tabuk: Saudi Arabia
+    Tachileik: Myanmar
+    Tacloban: Philippines
+    Tacna: Peru
+    Tacuarembó: Uruguay
+    Taif: Saudi Arabia
+    Talas oblast: Kyrgyzstan
+    Talavera de la Reina: Spain
+    Talca: Chile
+    Taldyqorǵan (Taldy-Kurgan, Taldykorgan): Kazakhstan
+    Tallahassee,FL: United States
+    Tallinn: Estonia
+    Tamale: Ghana
+    Tamanrasset (Tamenghasset): Algeria
+    Tamaulipas: Mexico
+    Tampere: Finland
+    Tamworth: United Kingdom
+    Tando Allāhyār: Pakistan
+    Tando Muhammad Khān: Pakistan
+    Tanger: Morocco
+    Tangshan, Hebei: China
+    Taolanaro (Tola'aro, Tôlanaro, Fort-Dauphin): Madagascar
+    Tapiola / Niittykumpu: Finland
+    Tarabulus (Tripoli): Libya
+    Tarapoto: Peru
+    Taraz: Kazakhstan
+    Tarija: Bolivia
+    Tarragona: Spain
+    Tartu: Estonia
+    Tarīm: Yemen
+    Tashkent: Uzbekistan
+    Tatabánya: Hungary
+    Tatuí: Brazil
+    Taunggyi: Myanmar
+    Taunton: United Kingdom
+    Tauranga: New Zealand
+    Tawzar (Tozeur): Tunisia
+    Tbilisi: Georgia
+    Tczew: Poland
+    Tegucigalpa: Honduras
+    Tehran: Iran
+    Teixeira de Freitas: Brazil
+    Tejen (Tedžen): Turkmenistan
+    Tel Aviv-Yafo (Tel Aviv-Jaffa): Israel
+    Telford: United Kingdom
+    Temecula-Murrieta: United States
+    Temirtaý: Kazakhstan
+    Teresina: Brazil
+    Termiz (Termez): Uzbekistan
+    Terrassa (Tarrasa): Spain
+    Thanet: United Kingdom
+    Thatcham: United Kingdom
+    Thessaloniki: Greece
+    Thies: Senegal
+    Thimphu: Bhutan
+    Thoothukkudi (Tuticorin): India
+    Thun: Switzerland
+    Thunder Bay,ONT: Canada
+    Thuringia: Germany
+    Thurrock: United Kingdom
+    Thành Pho Ho Chí Minh (Ho Chi Minh City): Vietnam
+    Tianjin: China
+    Tiaret (Tihert): Algeria
+    Tikapur: Nepal
+    Tilburg: Netherlands
+    Timisoara: Romania
+    Tipitapa: Nicaragua
+    Tiranë (Tirana): Albania
+    Tiraspol (Tiraspol'): Moldova
+    Tlaxcala: Mexico
+    To'rtko'l (Turtkul): Uzbekistan
+    Toamasina: Madagascar
+    Tokushima: Japan
+    Tokyo: Japan
+    Toledo: Spain
+    Tolga: Algeria
+    Toliara (Tuléar): Madagascar
+    Tolyatti: Russia
+    Tomakomai: Japan
+    Tomaszów Mazowiecki: Poland
+    Torbay: United Kingdom
+    Torino (Turin): Italy
+    Toronto: Canada
+    Torrelavega: Spain
+    Torremolinos: Spain
+    Torrevieja: Spain
+    Toruń: Poland
+    Touba: Senegal
+    Toulon: France
+    Toulouse: France
+    Tours: France
+    Toyama: Japan
+    Toyohashi: Japan
+    Trabzon: Turkey
+    Trento: Italy
+    Trier: Germany
+    Trnava: Slovakia
+    Trois-Rivières,QUE: Canada
+    Trondheim: Norway
+    Troyes: France
+    Trujillo: Peru
+    Tucupita: Venezuela
+    Tula: Russia
+    Tulcán: Ecuador
+    Tulsa: United States
+    Tumkur: India
+    Tunbridge Wells: United Kingdom
+    Tunis: Tunisia
+    Turbat: Pakistan
+    Turku (Åbo): Finland
+    Tursunzoda: Tajikistan
+    Tuzla: Bosnia and Herzegovina
+    Túrkistan (Turkestan): Kazakhstan
+    Tychy: Poland
+    Tyneside conurbation: United Kingdom
+    Tyumen: Russia
+    Târgu Jiu: Romania
+    Täby: Sweden
+    Tébessa: Algeria
+    Témara: Morocco
+    Tétouan: Morocco
+    Tønsberg: Norway
+    Tübingen: Germany
+    Türkmenabat: Turkmenistan
+    Türkmenbaşy (Turkmenbashi): Turkmenistan
+    Uccle: Belgium
+    Udine: Italy
+    Ufa: Russia
+    Uitenhage (Kwanobuhle - Despatch): South Africa
+    Ulaanbaatar: Mongolia
+    Ulm/Neu-Ulm: Germany
+    Umerkot: Pakistan
+    Umeå: Sweden
+    Umm Slal: Qatar
+    Umm Ṣalāl Muḥammad (Al-Kahrīṭiyāt): Qatar
+    Umuarama: Brazil
+    Upper Hutt: New Zealand
+    Uppsala: Sweden
+    Urganch (Urgench): Uzbekistan
+    Ust-Kamenogorsk: Kazakhstan
+    Usulután: El Salvador
+    Utrecht: Netherlands
+    Vaduz: Liechtenstein
+    Vah̦dat: Tajikistan
+    Vaihingen / Möhringen: Germany
+    Valdemoro: Spain
+    Valence: France
+    Valencia: Spain
+    Valenciennes: France
+    Valera: Venezuela
+    Valladolid: Spain
+    Valletta: Malta
+    Vancouver: Canada
+    Varna: Bulgaria
+    Varāmīn: Iran
+    Veenendaal: Netherlands
+    Vehāri: Pakistan
+    Vejle: Denmark
+    Veliko Tǎrnovo: Bulgaria
+    Venezia: Italy
+    Venlo: Netherlands
+    Veracruz de Ignacio de la Llave: Mexico
+    Verona: Italy
+    Verviers / Dison: Belgium
+    Veszprém: Hungary
+    Vicenza: Italy
+    Victoria: Canada
+    Viengchan: Laos
+    Vientiane: Laos
+    Vigo: Spain
+    Vijayawada: India
+    Viladecans: Spain
+    Vilanova i la Geltrú: Spain
+    Villa Mercedes: Argentina
+    Vilnius: Lithuania
+    Vinh: Vietnam
+    Virginia Beach: United States
+    Visalia: United States
+    Vitebsk: Belarus
+    Vitoria-Gasteiz: Spain
+    Vitória da Conquista: Brazil
+    Vleuten / De Meern: Netherlands
+    Volgograd: Russia
+    Vungtau: Vietnam
+    Várzea Grande: Brazil
+    Västerås: Sweden
+    Vĩnh Long: Vietnam
+    W.P.Putrajaya: Malaysia
+    Waco,TX: United States
+    Wad Medani: Sudan
+    Wahran (Oran): Algeria
+    Wakefield: United Kingdom
+    Warrington: United Kingdom
+    Warszawa (Warsaw): Poland
+    Warwick: United Kingdom
+    Washington: United Kingdom
+    Washington, D.C.: United States
+    Watermael-Boitsfort: Belgium
+    Waveney: United Kingdom
+    Wałbrzych: Poland
+    Wellington: New Zealand
+    Weston-super-Mare: United Kingdom
+    Wewak: Papua New Guinea
+    Wichita: United States
+    Widnica: Poland
+    Wien (Vienna): Austria
+    Wiesbaden: Germany
+    Wigan / Skelmersdale: United Kingdom
+    Wilmington: United States
+    Windhoek: Namibia
+    Windsor: Canada
+    Winnipeg: Canada
+    Winston-Salem: United States
+    Winterthur: Switzerland
+    Woking: United Kingdom
+    Wolfsburg: Germany
+    Wollongong: Australia
+    Woluwe-Saint-Lambert: Belgium
+    Woluwe-Saint-Pierre: Belgium
+    Worcester: United Kingdom
+    Worthing: United Kingdom
+    Wrocław: Poland
+    Wuhan: China
+    Wuppertal: Germany
+    Wycombe: United Kingdom
+    Würzburg: Germany
+    Włocławek: Poland
+    Xiamen: China
+    Xingping: China
+    Xuchang: China
+    Yakima,WA: United States
+    Yamagata: Japan
+    Yamaguchi: Japan
+    Yambol: Bulgaria
+    Yamoussoukro: Cote d'Ivoire
+    Yanggu, Shandong: China
+    Yangon: Myanmar
+    Yaritagua: Venezuela
+    Yarīm: Yemen
+    Yerevan: Armenia
+    Yevlakh: Azerbaijan
+    Yiyang, Hunan: China
+    York: United Kingdom
+    Ysyk-Kul oblast : Kyrgyzstan
+    Yucatan: Mexico
+    Yulin, Guangxi: China
+    Yuma,AZ: United States
+    Zacatecas: Mexico
+    Zadar: Croatia
+    Zaghwān (Zaghouan): Tunisia
+    Zagreb: Croatia
+    Zamora: Spain
+    Zamość: Poland
+    Zaragoza: Spain
+    Zaḥlah (Zahlé): Lebanon
+    Zenica: Bosnia and Herzegovina
+    Zgierz: Poland
+    Zhengzhou, Henan: China
+    Zhuji: China
+    Zielona Góra: Poland
+    Ziguinchor: Senegal
+    Zinder: Niger
+    Zoetermeer: Netherlands
+    Zomba: Malawi
+    Zug: Switzerland
+    Zunyi: China
+    Zwolle: Netherlands
+    Zárate: Argentina
+    Zürich (Zurich): Switzerland
+    Zākhū (Zaxo): Iraq
+    el Masnou: Spain
+    s-Gravenhage (The Hague): Netherlands
+    Águas Lindas de Goiás: Brazil
+    Ålesund: Norway
+    Århus: Denmark
+    Érd: Hungary
+    Örebro: Sweden
+    Ústí nad Labem: Czechia
+    Ābādān: Iran
+    Ādoni: India
+    Āmol: Iran
+    Đà Lạt: Vietnam
+    Łomża: Poland
+    Łódź: Poland
+    Šiauliai: Lithuania
+    Šumen (Shumen): Bulgaria
+    Žilina: Slovakia
+    Ṣaydā (Sidon): Lebanon
+    Ṣuḥār (Sohar): Oman
+    Ṣūr (Tyre): Lebanon
+    Ṭarābulus (Tripoli): Lebanon
+    Ṭūbās: Palestine
+    Ṭūlkarm (Tulkarem): Palestine
+
+
+dataset:
+  update_period_days: 365
+  title: SDG Indicator 11.2.1 - Access to Public Transport
+
+tables:
+  sdg_11_2_1_city:
+    title: Access to Public Transport - City Level
+    description: |-
+      City-level data on the proportion of the population that has convenient access to public transport. Convenient access is defined as having a public transport stop within 500 meters walking distance.
+    variables:
+      public_transport_access:
+        title: Share of urban population with convenient access to public transport
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of the population that has convenient access to public transport (within 500 meters walking distance).
+        description_key:
+          - SDG Indicator 11.2.1 measures the proportion of the population that has convenient access to public transport, disaggregated by sex, age and persons with disabilities.
+          - Convenient access is defined as having a public transport stop within 500 meters walking distance.
+          - This indicator is based on mapping of public transport stops and population distribution data.
+        display:
+          numDecimalPlaces: 1
+          entityAnnotationsMap: *entityAnnotationsMapCities
+
+  sdg_11_2_1_country:
+    title: Access to Public Transport - Country Level
+    description: |-
+      Country-level aggregates showing the average proportion of urban population with convenient access to public transport. This is calculated as the mean across all cities in each country.
+    variables:
+      public_transport_access:
+        title: Average share of urban population with convenient access to public transport across cities
+        unit: "%"
+        short_unit: "%"
+        description_short: Average across all cities in the country of the proportion of the population that has convenient access to public transport (within 500 meters walking distance).
+        description_key:
+          - This is calculated as the mean across all cities in each country that have data available.
+          - SDG Indicator 11.2.1 measures the proportion of the population that has convenient access to public transport, where convenient access is defined as having a public transport stop within 500 meters walking distance.
+          - The country average provides a summary measure but may not be population-weighted, so larger cities have the same weight as smaller cities.
+        display:
+          numDecimalPlaces: 1
