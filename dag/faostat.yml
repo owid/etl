@@ -141,21 +141,6 @@ steps:
   data://grapher/faostat/2025-03-17/faostat_sdgb:
     - data://garden/faostat/2025-03-17/faostat_sdgb
   #
-  # FAOSTAT garden step for additional variables for version 2025-03-17
-  #
-  data://garden/faostat/2025-03-17/additional_variables:
-    - data://garden/faostat/2025-03-17/faostat_rl
-    - data://garden/faostat/2025-03-17/faostat_qi
-    - data://garden/faostat/2025-03-17/faostat_qcl
-    - data://garden/faostat/2025-03-17/faostat_sdgb
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/faostat/2025-03-17/faostat_rfn
-  #
-  # FAOSTAT grapher step for additional variables for version 2025-03-17
-  #
-  data://grapher/faostat/2025-03-17/additional_variables:
-    - data://garden/faostat/2025-03-17/additional_variables
-  #
   # Global food explorer.
   #
   export://explorers/faostat/latest/global_food:
