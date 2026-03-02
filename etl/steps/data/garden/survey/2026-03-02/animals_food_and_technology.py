@@ -479,14 +479,15 @@ def run() -> None:
     ).agg({"weight": "sum"})
     # Normalize to percentages within each (year, question).
     totals = tb_agg.groupby(["country", "year", "question"])["weight"].transform("sum")
-    tb_agg["weight"] = (tb_agg["weight"] / totals * 100).round(1)
+    tb_agg["weight"] = tb_agg["weight"] / totals * 100
     tb_agg = tb_agg.rename(columns={"weight": "share"}, errors="raise")
 
-    # Assert shares sum to ~100% for each (year, question).
+    # Assert shares sum to exactly 100% for each (year, question).
+    # This must hold because sum(weight) == total by construction; any discrepancy is a floating-point artifact.
     share_totals = tb_agg.groupby(["country", "year", "question"], as_index=False)["share"].sum()
-    assert ((share_totals["share"] - 100).abs() < 1).all(), (
-        f"Shares do not sum to ~100% for some (year, question) groups:\n"
-        f"{share_totals[((share_totals - 100).abs() >= 1)]}"
+    assert ((share_totals["share"] - 100).abs() < 1e-10).all(), (
+        f"Shares do not sum to 100% for some (year, question) groups:\n"
+        f"{share_totals[((share_totals['share'] - 100).abs() >= 1e-10)]}"
     )
 
     # Add metadata to the share column programmatically.
