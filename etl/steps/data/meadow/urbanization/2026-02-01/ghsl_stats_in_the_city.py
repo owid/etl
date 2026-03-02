@@ -86,21 +86,28 @@ def run() -> None:
             # Replace indicator names with their mapped full names
             tb["indicator"] = tb["indicator"].map(COLUMN_MAPPING)
 
-            # Use 2020 population for all years
-            tb_pop_2020 = tb_population[["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0", "GH_POP_TOT_2020"]].copy()
-            tb_pop_2020 = tb_pop_2020.rename(
+            # Melt population columns to match with year
+            tb_pop_melted = tb_population.melt(
+                id_vars=["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0"],
+                value_vars=pop_columns,
+                var_name="pop_col",
+                value_name="population",
+            )
+            # Extract year from population column name (e.g., GH_POP_TOT_2020 -> 2020)
+            tb_pop_melted["year"] = tb_pop_melted["pop_col"].str[-4:]
+            tb_pop_melted = tb_pop_melted.rename(
                 columns={
                     "GC_UCN_MAI_2025": "city",
                     "GC_CNT_GAD_2025": "country",
-                    "GH_POP_TOT_2020": "population",
                 }
             )
+            tb_pop_melted = tb_pop_melted.drop(columns=["pop_col"])
 
             # Drop population columns from main table
             tb = tb.drop(columns=pop_columns)
 
-            # Merge 2020 population (will be used for all years)
-            tb = pr.merge(tb, tb_pop_2020, on=["city", "country", "ID_UC_G0"], how="left")
+            # Merge population data matching by year
+            tb = pr.merge(tb, tb_pop_melted, on=["city", "country", "ID_UC_G0", "year"], how="left")
 
             # Drop ID_UC_G0 as it's no longer needed
             tb = tb.drop(columns=["ID_UC_G0"])
@@ -136,14 +143,9 @@ def run() -> None:
     tb_count_agg["value"] = (tb_count_agg["value"] / tb_count_agg["population"]) * 100000
     tb_count_agg = tb_count_agg[["country", "year", "indicator", "value"]]
 
-    # For other non-Share, non-count indicators: calculate population-weighted average
+    # For other non-Share, non-count indicators: calculate simple mean
     tb_other = tb[~tb["is_share"] & ~tb["is_count"]].copy()
-    tb_other["weighted_value"] = tb_other["value"] * tb_other["population"]
-
-    tb_other_agg = tb_other.groupby(["country", "year", "indicator"], as_index=False).agg(
-        {"weighted_value": "sum", "population": "sum"}
-    )
-    tb_other_agg["value"] = tb_other_agg["weighted_value"] / tb_other_agg["population"]
+    tb_other_agg = tb_other.groupby(["country", "year", "indicator"], as_index=False).agg({"value": "mean"})
     tb_other_agg = tb_other_agg[["country", "year", "indicator", "value"]]
 
     # Combine all aggregated datasets
