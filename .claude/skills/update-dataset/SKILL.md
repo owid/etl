@@ -33,6 +33,7 @@ Assumptions:
 - [ ] CHECKPOINT — present consolidated summary and request approval
 - [ ] If approved, commit, push, and update PR description
 - [ ] Optional: run indicator upgrade on staging and persist report
+- [ ] Draft Slack announcement and notify user to post it to #data-updates-comms
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -92,6 +93,12 @@ You MUST:
    - Use indicator-upgrader subagent with `<short_name> <branch>`
    - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging: `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"`. If the count is 0, the upgrade did not run — re-run it.
    - CHECKPOINT (if executed)
+
+8) Slack announcement
+   - Fill out the template at `.claude/skills/update-dataset/slack-announcement-template.md` using facts gathered during the update (coverage, chart count, key changes, etc.)
+   - Ask user if unsure about any details
+   - Save the draft to `workbench/<short_name>/slack-announcement.md`
+   - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md`. Please review and post it to **#data-updates-comms**."
 
 ## Guardrails and tips
 
