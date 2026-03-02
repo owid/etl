@@ -18,7 +18,7 @@ Custom VS Code extensions enhance your ETL development workflow by automating re
 To install all custom extensions:
 
 ```bash
-make install-vscode-extensions
+make vsce-sync
 ```
 
 This installs both marketplace extensions (Ruff, YAML) and our custom extensions from `vscode_extensions/*/install/*.vsix`.
@@ -214,7 +214,7 @@ Reload VS Code: cmd+shift+p → "Developer: Reload Window"
 
 ### Extension not working after update
 
-**Problem**: Ran `make install-vscode-extensions` but extension didn't update.
+**Problem**: Ran `make vsce-sync` but extension didn't update.
 
 **Cause**: This command skips already-installed extensions.
 

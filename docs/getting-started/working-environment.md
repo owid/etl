@@ -230,7 +230,7 @@ We highly recommended installing the following extensions:
 We've built custom VS Code extensions to streamline ETL development. To install all extensions:
 
 ```bash
-make install-vscode-extensions
+make vsce-sync
 ```
 
 This includes extensions for navigating ETL steps, debugging interactively, comparing versions, and detecting outdated code patterns.
