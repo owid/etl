@@ -120,6 +120,38 @@ DIVEST = {
     7: "Oppose divestment from factory farming",
 }
 
+# Groups of Likert agree questions for thematic charts.
+QUESTION_GROUPS = {
+    "Bans on factory farming and slaughterhouses": [
+        "ban_factory_farming",
+        "ban_slaughterhouses",
+        "ban_farming",
+        "ban_slaughterhouses_rev",
+    ],
+    "Livestock treatment and animal pain": [
+        "sentience",
+        "important_issue",
+        "humane_soc",
+        "humane_self",
+        "discomfort",
+        "discomfort_rev",
+        "sentience_rev",
+    ],
+    "Dietary choices and meat-eating": [
+        "plant_diet_self",
+        "plant_diet_soc",
+        "personal_choice",
+        "price_plant_diet_soc",
+        "price_plant_diet_self",
+        "price_cultured_soc",
+        "price_cultured_self",
+        "plant_diet_soc_rev",
+    ],
+}
+
+# Reverse lookup: variable name -> group name.
+VARIABLE_TO_GROUP = {var: group for group, vars in QUESTION_GROUPS.items() for var in vars}
+
 # String categorical variables to also aggregate (already text in the source data).
 STRING_CATEGORICAL = [
     "gender",
@@ -375,6 +407,9 @@ def run() -> None:
     # Drop rows where the response is missing (not all questions asked in all years).
     tb_long = tb_long.dropna(subset=["response"])
 
+    # Add group column (only for grouped Likert agree questions).
+    tb_long["group"] = tb_long["question"].map(VARIABLE_TO_GROUP)
+
     # Add title, short question, and full question text columns.
     tb_long["question_title"] = tb_long["question"].map(VARIABLE_TITLES)
     tb_long["question_short"] = tb_long["question"].map(
@@ -384,7 +419,9 @@ def run() -> None:
 
     # Compute weighted share per (year, question, response).
     tb_agg = tb_long.groupby(
-        ["country", "year", "question", "question_title", "question_short", "response"], observed=True, as_index=False
+        ["country", "year", "group", "question", "question_title", "question_short", "response"],
+        observed=True,
+        as_index=False,
     ).agg({"weight": "sum"})
     # Normalize to percentages within each (year, question).
     totals = tb_agg.groupby(["country", "year", "question"], observed=True)["weight"].transform("sum")
@@ -393,12 +430,12 @@ def run() -> None:
 
     # Set short name and format.
     tb_agg.metadata.short_name = "animals_food_and_technology_responses"
-    tb_agg = tb_agg.format(["country", "year", "question", "question_title", "question_short", "response"])
+    tb_agg = tb_agg.format(["country", "year", "group", "question", "question_title", "question_short", "response"])
 
     # Add metadata to the share column programmatically.
     tb_agg["share"].metadata.description_key = [
         "The survey has been repeated in 2017, 2019, 2020, 2021, 2023, and 2025, with 7,165 participants across six waves. Responses are weighted to be representative of the US population.",
-    ] + list(VARIABLE_QUESTIONS.values())
+    ]
 
     # Format individual-level table.
     tb = tb.format(["country", "year", "entry_id"])
