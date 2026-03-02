@@ -3,31 +3,20 @@ import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-import logfire
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.server.middleware.caching import CallToolSettings, ResponseCachingMiddleware
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
+from sentry_sdk.integrations.mcp import MCPIntegration
 
-from etl.config import LOGFIRE_TOKEN_MCP, enable_sentry
+from etl.config import enable_sentry
 
 # Import the modular servers
 from owid_mcp import charts, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
-enable_sentry(enable_logs=True)
-
-if LOGFIRE_TOKEN_MCP:
-    logfire.configure(token=LOGFIRE_TOKEN_MCP, service_name="owid_mcp")
-    logfire.instrument_httpx()
-
-    # logging.basicConfig(
-    #     handlers=[logfire.LogfireLoggingHandler()],
-    #     level=logging.INFO,
-    # )
-else:
-    logfire.configure(send_to_logfire=False)
+enable_sentry(enable_logs=True, integrations=[MCPIntegration()])
 
 INSTRUCTIONS = (
     "RECOMMENDED TOOLS (for full MCP clients):\n"
@@ -96,27 +85,21 @@ class RequestLoggingMiddleware(Middleware):
             **context.message.__dict__,
         }
 
-        # Put every MCP call inside a Logfire span so it shows up as a trace
-        msg = str(context.method)
-        if attrs.get("name"):
-            msg += " - " + str(attrs["name"])
-        with logfire.span(msg, **attrs):
-            # Log incoming request
-            sentry_logger.info(
-                "request started",
-                attributes=attrs,
-            )
+        # Log incoming request
+        sentry_logger.info(
+            "request started",
+            attributes=attrs,
+        )
 
-            # handle request
-            try:
-                result = await call_next(context)
-            except (asyncio.CancelledError, KeyboardInterrupt):
-                # Don't send these to Sentry - they're normal shutdown signals
-                raise
-            except Exception as e:
-                capture_exception(e)
-                logfire.exception("request failed", **attrs)
-                raise e
+        # handle request
+        try:
+            result = await call_next(context)
+        except (asyncio.CancelledError, KeyboardInterrupt):
+            # Don't send these to Sentry - they're normal shutdown signals
+            raise
+        except Exception as e:
+            capture_exception(e)
+            raise e
 
         return result
 
