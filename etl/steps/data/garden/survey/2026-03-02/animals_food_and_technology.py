@@ -130,8 +130,8 @@ STRING_CATEGORICAL = [
     "religion",
 ]
 
-# Short labels for each variable (from codebook "Variable label" column).
-VARIABLE_SHORT_LABELS = {
+# Variable titles (from codebook "Variable label" column).
+VARIABLE_TITLES = {
     "education": "Education",
     "plant_diet_soc": "Society plant based",
     "plant_diet_self": "Personal plant based",
@@ -185,6 +185,54 @@ VARIABLE_SHORT_LABELS = {
     "diet": "Diet",
     "political_party": "Political party",
     "religion": "Religion",
+}
+
+# Shortened question text for visualization purposes.
+VARIABLE_SHORT_QUESTIONS = {
+    "plant_diet_soc": "People should eat fewer animal-based and more plant-based foods",
+    "plant_diet_self": "I am trying to eat fewer animal-based and more plant-based foods",
+    "discomfort": "I have discomfort with how animals are used in the food industry",
+    "sentience": "Farmed animals can feel pain and discomfort like humans",
+    "personal_choice": "To eat animals or be vegetarian is a personal choice",
+    "important_issue": "Factory farming is one of the most important social issues today",
+    "ban_factory_farming": "I support a ban on factory farming",
+    "ban_slaughterhouses": "I support a ban on slaughterhouses",
+    "ban_farming": "I support a ban on animal farming",
+    "donate": "How much of $10 would you donate to help farmed animals?",
+    "demonstration": "How likely would you be to join a demonstration against factory farming?",
+    "price_plant_diet_soc": "At equal prices, people should eat more plant-based foods",
+    "price_plant_diet_self": "At equal prices, I would prefer more plant-based foods",
+    "price_cultured_soc": "At equal prices, people should eat more cultured foods",
+    "price_cultured_self": "At equal prices, I would prefer more cultured foods",
+    "humane_soc": "Most farmed animals are treated well",
+    "humane_self": "The animal products I buy come from humanely treated animals",
+    "ban_slaughterhouses_rev": "I oppose a ban on slaughterhouses",
+    "farm_conditions": "Have conditions for farmed animals improved in recent years?",
+    "discomfort_rev": "I am comfortable with how animals are used in the food industry",
+    "plant_diet_soc_rev": "People should eat fewer plant-based and more animal-based foods",
+    "percent_factory_farmed": "What percentage of farmed animals live on factory farms?",
+    "sentience_rev": "Farmed animals feel substantially less pain than humans",
+    "vote": "How would factory farming affect your vote?",
+    "years_end_farming": "When will humanity stop using animals for food?",
+    "factory_farming_politics": 'Is opposition to factory farming "liberal" or "conservative"?',
+    "politics": "How would you describe your political views?",
+    "ban_factory_farming_arg": "Ban vs. continue factory farming",
+    "ban_farming_arg": "Ban vs. continue all animal farming",
+    "ban_labels": "Ban vs. allow meat-like terms for plant-based products",
+    "divest": "Should universities divest from factory farming?",
+    "politics_econ": "Political views on economic issues",
+    "politics_soc": "Political views on social issues",
+    "vid_image": "Saw graphic images or video of farmed animals",
+    "seen_protest": "Saw a factory farming protest",
+    "seen_doc": "Watched a documentary on animal farming",
+    "animal_conv": "Had a conversation about factory farming",
+    "ate_burger": "Ate a plant-based burger",
+    "ate_c_burger": "Ate a cultured meat burger",
+    "veg_restaurant": "Ate at a vegetarian or vegan restaurant",
+    "time_animals": "Spent time with farmed animals",
+    "read_book": "Read a book about factory farming or plant-based food",
+    "diet_openness_veg": "Open to trying a vegetarian or vegan diet",
+    "diet_openness_meat": "Open to trying a meat-only diet",
 }
 
 # Full survey question text for each variable (from codebook "Variable survey question" column).
@@ -327,13 +375,16 @@ def run() -> None:
     # Drop rows where the response is missing (not all questions asked in all years).
     tb_long = tb_long.dropna(subset=["response"])
 
-    # Add short label and full question text columns.
-    tb_long["question_short"] = tb_long["question"].map(VARIABLE_SHORT_LABELS)
-    tb_long["question"] = tb_long["question"].map(lambda v: VARIABLE_QUESTIONS.get(v, VARIABLE_SHORT_LABELS.get(v, v)))
+    # Add title, short question, and full question text columns.
+    tb_long["question_title"] = tb_long["question"].map(VARIABLE_TITLES)
+    tb_long["question_short"] = tb_long["question"].map(
+        lambda v: VARIABLE_SHORT_QUESTIONS.get(v, VARIABLE_TITLES.get(v, v))
+    )
+    tb_long["question"] = tb_long["question"].map(lambda v: VARIABLE_QUESTIONS.get(v, VARIABLE_TITLES.get(v, v)))
 
     # Compute weighted share per (year, question, response).
     tb_agg = tb_long.groupby(
-        ["country", "year", "question", "question_short", "response"], observed=True, as_index=False
+        ["country", "year", "question", "question_title", "question_short", "response"], observed=True, as_index=False
     ).agg({"weight": "sum"})
     # Normalize to percentages within each (year, question).
     totals = tb_agg.groupby(["country", "year", "question"], observed=True)["weight"].transform("sum")
@@ -342,7 +393,12 @@ def run() -> None:
 
     # Set short name and format.
     tb_agg.metadata.short_name = "animals_food_and_technology_responses"
-    tb_agg = tb_agg.format(["country", "year", "question", "question_short", "response"])
+    tb_agg = tb_agg.format(["country", "year", "question", "question_title", "question_short", "response"])
+
+    # Add metadata to the share column programmatically.
+    tb_agg["share"].metadata.description_key = [
+        "The survey has been repeated in 2017, 2019, 2020, 2021, 2023, and 2025, with 7,165 participants across six waves. Responses are weighted to be representative of the US population.",
+    ] + list(VARIABLE_QUESTIONS.values())
 
     # Format individual-level table.
     tb = tb.format(["country", "year", "entry_id"])
