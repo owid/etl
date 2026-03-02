@@ -25,13 +25,13 @@ steps:
   # ILOSTAT national vs. modeled comparison (from WDI)
   #
   export://multidim/worldbank_wdi/latest/ilostat_comparison:
-    - data://grapher/worldbank_wdi/2026-01-29/wdi
+    - data://grapher/worldbank_wdi/2026-02-27/wdi
 
   #
   # Labor force participation rate MDim from WDI-ILOSTAT (modeled data)
   #
   export://multidim/worldbank_wdi/latest/labor_force_participation_rate:
-    - data://grapher/worldbank_wdi/2026-01-29/wdi
+    - data://grapher/worldbank_wdi/2026-02-27/wdi
 
   #
   # Female labor force participation in the long run (from Killingsworth and Heckman, 1986)
@@ -46,6 +46,6 @@ steps:
   #
   data://garden/labor/2026-02-17/female_labor_force_participation_omm:
     - data://garden/labor/2026-02-17/female_labor_force_participation_long_run
-    - data://garden/worldbank_wdi/2026-01-29/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
   data://grapher/labor/2026-02-17/female_labor_force_participation_omm:
     - data://garden/labor/2026-02-17/female_labor_force_participation_omm
