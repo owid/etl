@@ -1,4 +1,5 @@
-# NOTE: To learn more about the fields, hover over their names.
+No file was uploaded, so I'll apply all the changes directly. Here's the updated YAML with every instance of "urban centers" replaced with "cities":
+yaml# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     presentation:
@@ -7,7 +8,7 @@ definitions:
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# https://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
@@ -15,9 +16,62 @@ dataset:
 tables:
   ghsl_stats_in_the_city:
     variables:
-      value:
-       title: << indicator >>
-       unit: << unit >>
-       short_unit: << short_unit >>
-       display:
-          numDecimalPlaces: 2
+      average_download_speed:
+        title: Average download speed
+        unit: Megabits per second
+        short_unit: Mbps
+        description_short: Average internet download speed in [cities](#dod:cities-degurba).
+        description_key:
+          - Speeds are measured using the Speedtest app, which people use voluntarily to test their own connection. This means coverage is higher in places where more people run these tests.
+          - Data is missing for cities where few or no people have used the app.
+          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
+        description_from_producer: Network performance is measured via users through the Speedtest app. Therefore, information is missing for areas where no users are actively testing the network performance.
+        description_processing: We aggregate download speeds from cities to countries using population-weighted averages. This means larger cities contribute more to the country average, so the figure reflects the experience of the average urban resident rather than the average city.
+
+      road_network_density:
+        title: Road network density
+        unit: m/m²
+        short_unit: m/m²
+        description_short: Total length of roads per square meter of land in [cities](#dod:cities-degurba).
+        description_key:
+          - Calculated by dividing the total length of roads in a city by its area.
+          - Road data comes from the Overture Maps Foundation.
+          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
+        description_from_producer: Road network density, total road length inside the urban center divided by the urban center area.
+        description_processing: We aggregate road network density from cities to countries using population-weighted averages. This ensures the country figure reflects the road density experienced by the average urban resident, giving more weight to larger cities.
+
+      share_of_population_living_in_the_high_green_area:
+        title: Share of city residents living in a high-greenness area
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of [city residents](#dod:cities-degurba) living in areas with high vegetation cover.
+        description_key:
+          - Areas are classified as "high greenness" based on satellite vegetation data (NDVI), averaged over three years, using thresholds that UN-Habitat defines separately for different agro-ecological zones.
+          - Measured within a 300-meter buffer around the built-up area of each city.
+          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
+        description_from_producer: Share of the Urban Centre population living in area of high greenness for the corresponding year.
+        description_processing: We aggregate this share from cities to countries using population-weighted averages. This ensures larger cities contribute proportionally more to the country figure, so it reflects the experience of the average urban resident.
+
+      share_of_population_with_access_to_hospitals:
+        title: Share of city residents with a hospital nearby
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of [city residents](#dod:cities-degurba) living within 1 km of a hospital.
+        description_key:
+          - Calculated as the share of people in a city who live within 1 km of a hospital.
+          - Hospital locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some hospitals may be missing.
+          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
+        description_from_producer: Share of population living within a kilometer buffer of a hospital facility, inside the urban center over total urban centre population.
+        description_processing: We aggregate hospital access from cities to countries using population-weighted averages. This ensures the country figure reflects the access rate for the average urban resident, not the average city.
+
+      share_of_population_with_access_to_pharmacies:
+        title: Share of city residents with a pharmacy nearby
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of [city residents](#dod:cities-degurba) living within 1 km of a pharmacy.
+        description_key:
+          - Calculated as the share of people in a city who live within 1 km of a pharmacy.
+          - Pharmacy locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some pharmacies may be missing.
+          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
+        description_from_producer: Share of population living within a kilometer buffer of a pharmacy facility, inside the urban center over total urban centre population.
+        description_processing: We aggregate pharmacy access from cities to countries using population-weighted averages. This ensures the country figure reflects the access rate for the average urban resident, not the average city.
