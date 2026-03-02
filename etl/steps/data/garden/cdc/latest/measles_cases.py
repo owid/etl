@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow.read("measles_cases")
     tb = tb[tb["filter"] == "1985-Present*"]
     assert tb["filter"].unique() == ["1985-Present*"]
-    tb = tb.drop(columns=["filter", "outbreaks_range", "outbreaks_cases"])
+    tb = tb.drop(columns=["filter", "filter_esp"])
     #
     # Process data.
     #
