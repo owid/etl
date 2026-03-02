@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Animals, Food, and Technology"
+    description: |-
+      This data is from a cross-sectional survey on attitudes towards animals, food, and technology run by the [Sentience Institute](https://www.sentienceinstitute.org/). Each sample was recruited in partnership with [Ipsos](https://www.ipsos.com/) based on census estimates from the [American Community Survey](https://www.census.gov/programs-surveys/acs). The survey has been repeated, with minor changes, in 2019, 2020, 2021, 2023, and 2025, with 7165 participants across the six survey wave. The survey and analysis code associated with this dataset can be found at [OSF](https://osf.io/a4qjg/).
+    date_published: "2025-12-29"
+
+    # Citation
+    producer: Sentience Institute
+    citation_full: |-
+      Sentience Institute. Anthis, Jacy Reese; Ladak, Ali (2025), “Animals, Food, and Technology (AFT) Survey 2017-2021”, Mendeley Data, V2, doi: 10.17632/k3xcndsswk.2
+
+    # Files
+    url_main: https://data.mendeley.com/datasets/k3xcndsswk/2
+    url_download: https://data.mendeley.com/public-files/datasets/k3xcndsswk/files/142c0c80-2ce8-49eb-b9ad-b28d564edb98/file_downloaded
+    date_accessed: '2026-03-02'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.mendeley.com/datasets/k3xcndsswk/2
+outs:
+  - md5: fe2c02507c98dc5d0d3d1ff5b599b973
+    size: 3416200
+    path: animals_food_and_technology.csv
