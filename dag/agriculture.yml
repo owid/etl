@@ -227,3 +227,33 @@ steps:
   #
   data://grapher/agriculture/2025-10-16/corn_yields:
     - data://garden/agriculture/2025-10-16/corn_yields
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://garden/agriculture/2026-03-02/daily_calories_per_person:
+    - data://meadow/agriculture/2024-05-23/fao_1949
+    - data://meadow/agriculture/2024-05-23/fao_2000
+    - data://meadow/agriculture/2024-05-23/grigg_1995
+    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+    - data://meadow/agriculture/2024-05-23/fogel_2004
+    - data://meadow/agriculture/2024-05-23/jonsson_1998
+    - data://meadow/usda_ers/2025-03-26/food_availability
+    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://grapher/agriculture/2026-03-02/daily_calories_per_person:
+    - data://garden/agriculture/2026-03-02/daily_calories_per_person
+  #
+  # Long-term food and agriculture trends
+  #
+  data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/faostat/2026-02-25/faostat_rl
+  #
+  # Long-term food and agriculture trends
+  #
+  data://grapher/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
+    - data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends
