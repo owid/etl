@@ -50,3 +50,18 @@ steps:
   #
   data://grapher/survey/2026-02-02/dietary_choices_uk_by_age:
     - data://garden/survey/2026-02-02/dietary_choices
+  #
+  # Sentience Institute - Animals, Food, and Technology.
+  #
+  data://meadow/survey/2026-03-02/animals_food_and_technology:
+    - snapshot://survey/2026-03-02/animals_food_and_technology.csv
+  #
+  # Sentience Institute - Animals, Food, and Technology.
+  #
+  data://garden/survey/2026-03-02/animals_food_and_technology:
+    - data://meadow/survey/2026-03-02/animals_food_and_technology
+  #
+  # Sentience Institute - Animals, Food, and Technology.
+  #
+  data://grapher/survey/2026-03-02/animals_food_and_technology:
+    - data://garden/survey/2026-03-02/animals_food_and_technology
