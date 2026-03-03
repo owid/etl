@@ -5,6 +5,10 @@ meta:
     citation_full: Economic Research Service of the United States Department of Agriculture (USDA/ERS) - Food expenditure (2023).
     attribution_short: USDA/ERS
     url_main: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/
+    # To check if there is an update, go to:
+    # https://www.ers.usda.gov/topics/international-markets-us-trade/international-consumer-and-food-industry-trends/data
+    # And hover over the link "Data on expenditures on food and alcoholic beverages in selected countries"
+    # Currently (as of 2026-03-03) it still says "data-on-expenditures-on-food-and-alcoholic-beverages-in-selected-countries_2019-2023.xlsx", so it was not updated.
     url_download: |-
       https://www.ers.usda.gov/sites/default/files/data-on-expenditures-on-food-and-alcoholic-beverages-in-selected-countries_2019-2023.xlsx
     date_accessed: '2025-03-26'
