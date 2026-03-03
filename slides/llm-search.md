@@ -32,7 +32,6 @@ layout: cover
   - Straightforward queries like "public school funding" fail
 
 - **Reputation considerations**
-  - Test AI on structured data (our strength)
   - Avoid ChatGPT/MCP pitfalls (hallucinations, unreliability)
   - Users trust us for accurate data, not generative text
 
@@ -221,45 +220,6 @@ zoom: 0.95
 - ~1-5s latency
 
 ---
-
-
-# Vocabulary: The Foundation
-
-**Bridging user language to our taxonomy**
-
-<div class="grid grid-cols-2 gap-8">
-
-<div>
-
-**Keyword Search**
-- Inverted index (A-B-C)
-- Exact match required
-- Limited synonym support
-
-**Limitations:**
-- "public school funding" → no results
-- "road traffic deaths age" → no results
-- Phrase matching is brittle
-
-</div>
-
-<div>
-
-**Semantic Search**
-- Embeddings/vectors
-- Maps "solar power" → "renewable energy"
-- Understands related concepts
-
-**Benefits:**
-- Handles synonyms naturally
-- Works across languages (33% of users non-English)
-- Bridges vocabulary gaps
-
-</div>
-
-</div>
-
----
 zoom: 0.85
 ---
 
@@ -305,6 +265,7 @@ zoom: 0.8
 - Open-source, self-hosted — full control
 
 **Why Typesense**:
+- Get out of Algolia lock-in
 - Hybrid search out of the box (no glue code)
 - Matthieu had a prototype in the pipeline
 - ~$20/month hosting vs Algolia's growing costs
@@ -316,16 +277,20 @@ zoom: 0.8
 **Cost/Latency**: ~$20/month, ~100-300ms
 
 ---
-zoom: 0.8
+zoom: 0.7
 ---
 
 # Pitch 2: Suggested Keywords
+
+<div class="grid grid-cols-2 gap-8 items-center">
+
+<div>
 
 **Problem**: Users don't know what terms to search for
 
 **Solution**: Show related search keywords as user types
 - Real-time keyword suggestions
-- Based on vocabulary from our charts/articles
+- Based on **vocabulary from our charts/articles**
 - Help users refine their queries
 
 **Implementation**:
@@ -342,18 +307,34 @@ zoom: 0.8
 - Included in semantic search costs (~$10-15/month)
 - ~50-100ms latency
 
+</div>
+
+<div class="flex items-center justify-center">
+
+<img src="./hints.png" style="width: 100%; max-width: 500px;" />
+
+</div>
+
+</div>
+
+
+
 ---
 zoom: 0.75
 ---
 
 # Pitch 3: Suggested Topics
 
+<div class="grid grid-cols-2 gap-8 items-center">
+
+<div>
+
 **Problem**: Users may not know what topics are available
 
 **Solution**: Context-aware topic recommendations
 - Show related topics based on current query
 - Display when search returns zero results
-- Showcase our topic searches (which are really good!)
+- **Showcase our topic searches** (which are really good!)
 - Show featured metrics
 
 **Implementation**:
@@ -369,6 +350,16 @@ zoom: 0.75
 **Cost/Latency**:
 - Minimal (mostly existing infrastructure)
 - ~50ms latency
+
+</div>
+
+<div class="flex items-center justify-center">
+
+<img src="./hints.png" style="width: 100%; max-width: 500px;" />
+
+</div>
+
+</div>
 
 ---
 zoom: 0.85
