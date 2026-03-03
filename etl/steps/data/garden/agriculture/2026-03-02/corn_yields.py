@@ -50,7 +50,7 @@ def convert_marketing_year_to_harvesting_year(tb):
     # To avoid unnecessary confusion, remove data that appears now "in the future".
     # This is data for the current year, which is uncertain or incomplete in any case.
     current_year = int(tb["yield"].metadata.origins[0].date_published.split("-")[0])
-    tb = tb[tb["year"] <= current_year].reset_index(drop=True)
+    tb = tb[tb["year"] < current_year].reset_index(drop=True)
 
     return tb
 
