@@ -155,11 +155,6 @@ steps:
   data://grapher/usda_ers/2025-03-26/food_expenditure:
     - data://garden/usda_ers/2025-03-26/food_expenditure
   #
-  # Crop yields explorer.
-  #
-  export://explorers/agriculture/latest/crop_yields:
-    - data://grapher/agriculture/2025-03-26/attainable_yields
-  #
   # Long-term food and agriculture trends
   #
   data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
@@ -198,16 +193,19 @@ steps:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
   #
   # Lobell Lab: Crop productivity in southern Africa
+  # NOTE: Not updateable.
   #
   data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - snapshot://agriculture/2025-10-15/crop_yields_in_southern_africa.zip
   #
   # Lobell Lab: Crop productivity in southern Africa
+  # NOTE: Not updateable.
   #
   data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa
   #
   # Lobell Lab: Crop productivity in southern Africa
+  # NOTE: Not updateable.
   #
   data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa
@@ -257,3 +255,87 @@ steps:
   #
   data://grapher/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
     - data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2026-03-02/food_expenditure_in_us:
+    - snapshot://usda_ers/2026-03-02/food_expenditure_in_us.xlsx
+  #
+  # Food expenditure in US - USDA
+  #
+  data://garden/usda_ers/2026-03-02/food_expenditure_in_us:
+    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2026-03-02/food_expenditure_in_us
+  #
+  # Food expenditure in US - USDA
+  #
+  data://grapher/usda_ers/2026-03-02/food_expenditure_in_us:
+    - data://garden/usda_ers/2026-03-02/food_expenditure_in_us
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://meadow/agriculture/2026-03-02/corn_yields:
+    - snapshot://agriculture/2026-03-02/corn_yields.xls
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://garden/agriculture/2026-03-02/corn_yields:
+    - data://meadow/agriculture/2026-03-02/corn_yields
+    - data://garden/regions/2023-01-01/regions
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://grapher/agriculture/2026-03-02/corn_yields:
+    - data://garden/agriculture/2026-03-02/corn_yields
+  #
+  # Long-term corn yields in United States.
+  #
+  data://meadow/usda_nass/2026-03-02/us_corn_yields:
+    - snapshot://usda_nass/2026-03-02/us_corn_yields.csv
+  #
+  # Long-term corn yields in United States.
+  #
+  data://garden/usda_nass/2026-03-02/us_corn_yields:
+    - data://meadow/usda_nass/2026-03-02/us_corn_yields
+  #
+  # Long-term crop yields.
+  #
+  data://garden/agriculture/2026-03-02/long_term_crop_yields:
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/agriculture/2026-03-02/uk_long_term_yields
+    - data://garden/usda_nass/2026-03-02/us_corn_yields
+    - data://garden/agriculture/2026-03-02/long_term_wheat_yields
+  #
+  # Long-term crop yields.
+  #
+  data://grapher/agriculture/2026-03-02/long_term_crop_yields:
+    - data://garden/agriculture/2026-03-02/long_term_crop_yields
+  #
+  # Long-term yields in the United Kingdom.
+  #
+  data://garden/agriculture/2026-03-02/uk_long_term_yields:
+    - data://garden/papers/2024-03-26/broadberry_et_al_2015
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/papers/2024-03-26/brassley_2000
+  #
+  # Long-term wheat yields in Europe.
+  #
+  data://garden/agriculture/2026-03-02/long_term_wheat_yields:
+    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+    - data://garden/faostat/2026-02-25/faostat_qcl
+  #
+  # Attainable yields.
+  #
+  data://garden/agriculture/2026-03-02/attainable_yields:
+    - data://garden/papers/2024-03-26/mueller_et_al_2012
+    - data://garden/agriculture/2026-03-02/long_term_crop_yields
+  #
+  # Attainable yields.
+  #
+  data://grapher/agriculture/2026-03-02/attainable_yields:
+    - data://garden/agriculture/2026-03-02/attainable_yields
+  #
+  # Crop yields explorer.
+  #
+  export://explorers/agriculture/latest/crop_yields:
+    - data://grapher/agriculture/2026-03-02/attainable_yields
