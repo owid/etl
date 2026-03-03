@@ -76,6 +76,9 @@ COUNTRIES_EXPECTED_TO_MISS_DATA = {
     "United States Virgin Islands",
     "Wallis and Futuna",
     "Western Sahara",
+    "Latin America and the Caribbean (FAO)",
+    "OECD (FAO)",
+    "Sub-Saharan Africa (FAO)",
 }
 
 # Expected list of additional countries that will be excluded from region aggregates due to limited data coverage.
@@ -247,29 +250,37 @@ def sanity_check_data_coverage(tb, regions):
         "Ethiopia (former)": (min_year, 1992),
         "Ethiopia": (1993, max_year),
         "Sudan (former)": (1961, 2011),
-        "Sudan": (2012, max_year),
+        "Sudan": (2012, 2022),
         # NOTE: One would expect South Sudan to start in 2012, but it starts in 2019.
         # Changes in historical regions in North America.
         # NOTE: Successors of Netherlands Antilles are not informed in the data, hence we exclude it from North America (adjusted).
         "Netherlands Antilles": (min_year, 2009),
         # Changes in data coverage in Africa.
         "Seychelles": (2010, max_year),
-        "South Sudan": (2019, max_year),
+        "South Sudan": (2019, 2022),
         "Democratic Republic of Congo": (2010, max_year),
+        "Mali": (1961, 2022),
         "Comoros": (2010, max_year),
-        "Somalia": (2010, max_year),
-        "Burundi": (2010, max_year),
+        "Somalia": (2010, 2022),
+        "Burundi": (2010, 2022),
         "Libya": (2010, max_year),
+        "Togo": (1961, 2022),
+        "Central African Republic": (1961, 2022),
+        "Chad": (1961, 2022),
+        "Benin": (1961, 2022),
         # Changes in data coverage in Asia.
         "Brunei": (min_year, 2009),
         "Syria": (2010, max_year),
         "Bahrain": (2019, max_year),
         "Bhutan": (2019, max_year),
         "Qatar": (2019, max_year),
-        "Oman": (1990, 2021),
+        "Oman": (1990, max_year),
         "North Korea": (min_year, 2018),
+        "Japan": (1961, 2022),
         # Changes in data coverage in North America.
         "Bermuda": (min_year, 2009),
+        "Cuba": (1961, 2019),
+        "Dominica": (1961, 2022),
         # Changes in data coverage in Oceania.
         "Marshall Islands": (2019, max_year),
         "Tonga": (2019, max_year),
@@ -298,95 +309,9 @@ def sanity_check_data_coverage(tb, regions):
     for country, (range_min, range_max) in countries_expected_coverage.items():
         error = f"Unexpected data coverage for {country}: ({tb[tb['country'] == country]['year'].min()}, {tb[tb['country'] == country]['year'].max()})"
         assert set(tb[tb["country"] == country]["year"]) == set(range(range_min, range_max + 1)), error
-        # Uncomment for debugging.
+        # If the assertion fails, comment it, and uncomment the following lines; then update the list above
         # if not set(tb[tb["country"] == country]["year"]) == set(range(range_min, range_max + 1)):
         #     print(f"'{country}': ({tb[tb['country'] == country]['year'].min()}, {tb[tb['country'] == country]['year'].max()}),")
-
-
-def additional_debugging_checks():
-    # This function loads the original meadow steps for FBSH and FBS, and combines them doing minimal processing.
-    # This function is only used to ensure that the results do not depend on any possibly additional processing that happens in the FAOSTAT garden step.
-    # NOTE: For this function to work, you will need to add some dependencies to the current step in the DAG, namely:
-    # - data://meadow/faostat/2025-03-17/faostat_fbs
-    # - data://meadow/faostat/2025-03-17/faostat_fbsh
-    # - data://garden/demography/2024-07-15/population
-    # - data://garden/wb/2025-07-01/income_groups
-    from owid.datautils.dataframes import combine_two_overlapping_dataframes
-
-    from etl.data_helpers import geo
-    from etl.paths import STEP_DIR
-
-    # Load FBSH and FBS datasets directly from meadow.
-    ds_fbs = paths.load_dataset("faostat_fbs")
-    tb_fbs = ds_fbs.read("faostat_fbs")
-    ds_fbsh = paths.load_dataset("faostat_fbsh")
-    tb_fbsh = ds_fbsh.read("faostat_fbsh")
-    tb_fbs = tb_fbs[(tb_fbs["element_code"].isin([511, 664])) & (tb_fbs["item_code"].isin([2501, 2901]))].rename(
-        columns={"area": "country"}
-    )
-    tb_fbs["col"] = tb_fbs["item"] + "-" + tb_fbs["element"]
-    tb_fbs = (
-        tb_fbs[["country", "year", "col", "value"]]
-        .pivot(index=["country", "year"], columns="col", join_column_levels_with="_")
-        .rename(
-            columns={
-                "value_Grand Total-Food supply (kcal/capita/day)": "food_supply",
-                "value_Population-Total Population - Both sexes": "population",
-            }
-        )
-    )
-    tb_fbsh = tb_fbsh[(tb_fbsh["element_code"].isin([511, 664])) & (tb_fbsh["item_code"].isin([2501, 2901]))].rename(
-        columns={"area": "country"}
-    )
-    tb_fbsh["col"] = tb_fbsh["item"] + "-" + tb_fbsh["element"]
-    tb_fbsh = (
-        tb_fbsh[["country", "year", "col", "value"]]
-        .pivot(index=["country", "year"], columns="col", join_column_levels_with="_")
-        .rename(
-            columns={
-                "value_Grand Total-Food supply (kcal/capita/day)": "food_supply",
-                "value_Population-Total Population - Both sexes": "population",
-            }
-        )
-    )
-    countries_file = STEP_DIR / f"data/garden/faostat/{ds_fbs.version}/faostat.countries.json"
-    excluded_countries_file = STEP_DIR / f"data/garden/faostat/{ds_fbs.version}/faostat.excluded_countries.json"
-    tb_fbs = geo.harmonize_countries(
-        tb_fbs,
-        countries_file=countries_file,
-        excluded_countries_file=excluded_countries_file,
-        warn_on_unknown_excluded_countries=False,
-        warn_on_unused_countries=False,
-        warn_on_missing_countries=True,
-    )
-    tb_fbsh = geo.harmonize_countries(
-        tb_fbsh,
-        countries_file=countries_file,
-        excluded_countries_file=excluded_countries_file,
-        warn_on_unknown_excluded_countries=False,
-        warn_on_unused_countries=False,
-        warn_on_missing_countries=True,
-    )
-    tb_fbsc = combine_two_overlapping_dataframes(tb_fbs, tb_fbsh, index_columns=["country", "year"])
-    tb_population = (
-        paths.load_dataset("population")
-        .read("population")[["country", "year", "population"]]
-        .rename(columns={"population": "owid_population"})
-    )
-    tb_population["owid_population"] /= 1000
-
-    # An additional check is to use OWID population instead of FAO population, to see if things change.
-    # tb_fbsc = tb_fbsc.merge(tb_population, on=["country", "year"], how="left")
-    # tb_fbsc["population"] = tb_fbsc["owid_population"].astype(float).fillna(tb_fbsc["population"])
-    # Also, visually inspect the difference between FAO and OWID population for USSR.
-    # check = tb_fbsc[tb_fbsc["country"].isin(["USSR"] + regions["USSR"])].groupby("year", as_index=False).agg({"population": "sum", "owid_population": "sum"})[["year", "population", "owid_population"]].melt(id_vars=["year"])
-    # px.line(check, x="year", y="value", color="variable", markers=True)
-    tb_fbsc["food_supply"] *= tb_fbsc["population"]
-    ds_regions = paths.load_dataset("regions")
-    ds_income_groups = paths.load_dataset("income_groups")
-    tb_fbsc = geo.add_regions_to_table(tb=tb_fbsc, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
-    return tb_fbsc
 
 
 def plot_adjusted_data(tb):
@@ -429,7 +354,6 @@ def run() -> None:
     # Load inputs.
     #
     # Load FAOSTAT combined food balances dataset, and read its main table.
-    # NOTE: It may be necessary to load the meadow FBSH and FBS datasets. For now, try with FBSC.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
     tb_fbsc = ds_fbsc.read("faostat_fbsc_flat")
 
@@ -446,9 +370,6 @@ def run() -> None:
     #
     # Select and rename columns in food balances data.
     tb_fbsc = tb_fbsc[list(COLUMNS_FBSC)].rename(columns=COLUMNS_FBSC, errors="raise")
-
-    # Uncomment the following line to replace the loaded FBSC dataset from garden, and instead load the original FBSH and FBS datasets from meadow. This ensures that the results are not affected by any further processing in the FAOSTAT garden step.
-    # tb_fbsc = additional_debugging_checks()
 
     # Adjust units of population data.
     tb_fbsc["population"] *= 1000
@@ -516,6 +437,23 @@ def run() -> None:
 
     # Uncomment to visually inspect all changes.
     # plot_adjusted_data(tb=tb)
+
+    ####################################################################################################################
+    # In the latest FAOSTAT update (2026-02-25), Africa is very incomplete in the latest year (2023).
+    # I'll assert the drop, and remove this point.
+    africa_2022 = tb[(tb["country"] == "Africa (adjusted)") & (tb["year"] == 2022)]["agricultural_land"].item()
+    africa_2023 = tb[(tb["country"] == "Africa (adjusted)") & (tb["year"] == 2023)]["agricultural_land"].item()
+    error = "Expected dip in Africa's agricultural land from 2022 and 2023. This may have been fixed; remove this code."
+    assert (100 * (africa_2022 - africa_2023) / africa_2022) > 23, error
+    tb.loc[
+        (tb["country"] == "Africa (adjusted)") & (tb["year"] == 2023),
+        ["population", "food_supply", "agricultural_land"],
+    ] = None
+
+    # A similar issue happens with Asia, but the dip is smaller than 3%, so we'll keep this.
+    # Additionally, Cuba's data from 2020 onwards has been removed from FBS, this causes a noticeable dip in 2020 for North America.
+    # This is unfortunate, but we'll keep this data, instead of removing 4 years of data.
+    ####################################################################################################################
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)
