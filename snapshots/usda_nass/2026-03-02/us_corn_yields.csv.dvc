@@ -19,7 +19,7 @@
 #         Period: YEAR
 # * Click on "Get Data" at the bottom left.
 # * Click on "spreadsheet" at the top right.
-# * Run this script with the flag `--path-to-file` followed by the path to the downloaded file.
+# * Run this snapshot with the flag `--path-to-file` followed by the path to the downloaded file.
 # To find the publication date:
 # * Go to: https://quickstats.nass.usda.gov/recent_stats
 # * Search for "CORN" and copy the date under "Released Time".
@@ -28,7 +28,7 @@ meta:
     producer: USDA National Agricultural Statistics Service (NASS)
     title: Long-term corn yields in United States
     citation_full: |-
-      National Agricultural Statistics Service of the United States Department of Agriculture (USDA/NASS) - Long-term corn yields in United States (2024).
+      National Agricultural Statistics Service of the United States Department of Agriculture (USDA/NASS) - Long-term corn yields in United States (2026).
     attribution_short: USDA/NASS
     url_main: https://quickstats.nass.usda.gov/
     date_accessed: '2026-03-02'
