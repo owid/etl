@@ -221,3 +221,64 @@ steps:
   #
   data://grapher/agriculture/2025-03-26/attainable_yields:
     - data://garden/agriculture/2025-03-26/attainable_yields
+  #
+  # Food expenditure in US archive (2018) - USDA
+  # NOTE: Not updateable.
+  #
+  data://meadow/usda_ers/2025-03-26/food_expenditure_in_us:
+    - snapshot://usda_ers/2025-03-26/food_expenditure_in_us.xlsx
+  #
+  # Food expenditure in US - USDA
+  #
+  data://garden/usda_ers/2025-03-26/food_expenditure_in_us:
+    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us
+    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive
+  #
+  # Food expenditure in US - USDA
+  #
+  data://grapher/usda_ers/2025-03-26/food_expenditure_in_us:
+    - data://garden/usda_ers/2025-03-26/food_expenditure_in_us
+  #
+  # Long-term corn yields in United States.
+  #
+  data://garden/usda_nass/2025-03-26/us_corn_yields:
+    - data://meadow/usda_nass/2025-03-26/us_corn_yields
+  #
+  # Long-term corn yields in United States.
+  #
+  data://meadow/usda_nass/2025-03-26/us_corn_yields:
+    - snapshot://usda_nass/2025-03-26/us_corn_yields.csv
+  #
+  # Long-term wheat yields in Europe.
+  #
+  data://garden/agriculture/2025-03-26/long_term_wheat_yields:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+  #
+  # Long-term food and agriculture trends
+  #
+  data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+  #
+  # Long-term food and agriculture trends
+  #
+  data://grapher/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
+    - data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://meadow/agriculture/2025-10-16/corn_yields:
+    - snapshot://agriculture/2025-10-16/corn_yields.xls
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://garden/agriculture/2025-10-16/corn_yields:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/agriculture/2025-10-16/corn_yields
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://grapher/agriculture/2025-10-16/corn_yields:
+    - data://garden/agriculture/2025-10-16/corn_yields
