@@ -37,18 +37,17 @@ def run() -> None:
     # Convert to string first to handle Categorical types
     tb_cities["city_country"] = tb_cities["city"].astype(str) + ", " + tb_cities["country"].astype(str)
 
-    # Select relevant columns for city-level table
+    # Select relevant columns for city-level table (dropping country as city_country contains it)
     tb_cities = tb_cities[
         [
-            "country",
             "city_country",
             "year",
             "public_transport_access",
         ]
     ]
-
+    tb_cities = tb_cities.rename(columns={"city_country": "country"})
     # Format the city-level table
-    tb_cities = tb_cities.format(["country", "city_country", "year"], short_name="sdg_11_2_1_city")
+    tb_cities = tb_cities.format(["country", "year"], short_name="sdg_11_2_1_city")
 
     #
     # Create country-level table
