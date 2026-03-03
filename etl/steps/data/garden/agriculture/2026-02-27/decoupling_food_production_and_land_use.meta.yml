@@ -1,0 +1,104 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Food Supply
+
+dataset:
+  update_period_days: 365
+  title: "Decoupling of agricultural production and land use"
+
+tables:
+  decoupling_food_production_and_land_use:
+    title: "Decoupling of agricultural production and land use"
+    variables:
+      food_energy:
+        title: "Food supply per capita in terms of energy content"
+        unit: kilocalories per person per year
+        short_unit: kcal/person/year
+      production:
+        title: "Total agricultural production"
+        unit: tonnes
+        short_unit: t
+      production_energy:
+        title: "Total agricultural production in terms of caloric content (feed-corrected)"
+        unit: kilocalories
+        short_unit: kcal
+        description_processing: >-
+          Calorie conversion factors (kcal per 100g) are derived for each item, country, and year by dividing
+          per-capita food supply in kilocalories by per-capita food supply in kilograms. Items with zero or
+          unreasonably high conversion factors (>1000 kcal/100g) are excluded.
+
+          To avoid double-counting calories from crops used as animal feed, the estimated domestic share of feed
+          is subtracted from production before converting to calories. The domestic share is estimated
+          proportionally: domestic_feed = feed x production / (production + imports).
+
+          The feed-corrected production in tonnes is then converted to kilocalories using the derived conversion
+          factors, and summed across all FAOSTAT food balance item groups per country and year.
+
+          A 3-year rolling average is applied to smooth year-to-year variability, and the first two years
+          (with incomplete windows) are removed.
+
+          This metric is kept for reference and comparison with previous versions. The primary decoupling metric
+          is food_domestic_energy.
+      food_domestic_energy:
+        title: "Domestically produced food energy"
+        unit: kilocalories
+        short_unit: kcal
+        description_processing: >-
+          Uses the FAOSTAT "Food" element (005142), which gives the total tonnage of each item
+          allocated to human food, already excluding feed, seed, processing, waste, and other
+          non-food uses. The domestic share is estimated proportionally:
+          domestic_share = production / (production + imports).
+
+          Domestically produced food in tonnes is computed as:
+          food_domestic = food_tonnes x domestic_share (capped at production),
+          and then converted to kilocalories using conversion factors derived from per-capita
+          food supply data.
+
+          This is summed across all FAOSTAT food balance item groups per country and year.
+
+          A 3-year rolling average is applied to smooth year-to-year variability.
+      food_domestic_energy_pc:
+        title: "Domestically produced food energy per capita"
+        unit: kilocalories per person per year
+        short_unit: kcal/person/year
+        description_processing: >-
+          Uses per-capita food energy supply (element 0664pc, in kcal/capita/year) and scales it
+          by the estimated domestic share: domestic_share = production / (production + imports).
+
+          Domestically produced food energy per capita is then:
+          food_domestic_energy_pc = food_energy_per_capita x domestic_share.
+
+          This is summed across all FAOSTAT food balance item groups per country and year.
+
+          A 3-year rolling average is applied to smooth year-to-year variability.
+      agricultural_land:
+        title: "Agricultural land area"
+        unit: hectares
+        short_unit: ha
+      offshored_land:
+        title: "Estimated offshored land from imported feed"
+        unit: hectares
+        short_unit: ha
+        description_processing: >-
+          Offshored land estimates the cropland area needed abroad to produce a country's imported
+          animal feed. Imported feed (in tonnes) is estimated per item as:
+          imported_feed = feed x imports / (production + imports).
+
+          This is divided by the global average yield (tonnes per hectare) of the top 5 feed crops
+          (maize, wheat, barley, soybeans, sorghum), computed from FAOSTAT QCL data as
+          total global production / total global area harvested, per year.
+
+          A 3-year rolling average is applied to smooth year-to-year variability.
+      total_land:
+        title: "Total land footprint (domestic + offshored)"
+        unit: hectares
+        short_unit: ha
+        description_processing: >-
+          Total land footprint is the sum of domestic agricultural land (from FAOSTAT land use data)
+          and estimated offshored land (from imported feed converted to hectares using global average
+          feed crop yields).
+
+          A 3-year rolling average is applied to smooth year-to-year variability.

@@ -1,0 +1,52 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Food Supply
+
+dataset:
+  update_period_days: 365
+  title: "Decoupling of agricultural production and land use"
+
+tables:
+  decoupling_food_production_and_land_use:
+    title: "Decoupling of agricultural production and land use"
+    variables:
+      food_quantity:
+        title: "Food supply per capita"
+        unit: kilograms per person per year
+        short_unit: kg/person/year
+      food_energy:
+        title: "Food supply per capita in terms of energy content"
+        unit: kilocalories per person per year
+        short_unit: kcal/person/year
+      production:
+        title: "Total agricultural production"
+        unit: tonnes
+        short_unit: t
+      production_energy:
+        title: "Total agricultural production in terms of caloric content"
+        unit: kilocalories
+        short_unit: kcal
+        description_processing: >-
+          Calorie conversion factors (kcal per 100g) are derived for each item, country, and year by dividing
+          per-capita food supply in kilocalories by per-capita food supply in kilograms. Items with zero or
+          unreasonably high conversion factors (>1000 kcal/100g) are excluded.
+
+          To avoid double-counting calories from crops used as animal feed, the estimated domestic share of feed
+          is subtracted from production before converting to calories. The domestic share is estimated
+          proportionally: domestic_feed = feed x production / (production + imports).
+
+          The feed-corrected production in tonnes is then converted to kilocalories using the derived conversion
+          factors, and summed across all FAOSTAT food balance item groups per country and year.
+
+          A 3-year rolling average is applied to smooth year-to-year variability, and the first two years
+          (with incomplete windows) are removed.
+
+          Only countries where production increased by at least 5% and agricultural land decreased by at least 5%
+          over the full time period are included.
+      agricultural_land:
+        title: "Agricultural land area"
+        unit: hectares
+        short_unit: ha
