@@ -172,3 +172,52 @@ steps:
   #
   data://grapher/wb/2024-09-09/food_prices_for_nutrition:
     - data://garden/wb/2024-09-09/food_prices_for_nutrition
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://garden/agriculture/2025-03-26/daily_calories_per_person:
+    - data://meadow/usda_ers/2025-03-26/food_availability
+    - data://meadow/agriculture/2024-05-23/fao_2000
+    - data://meadow/agriculture/2024-05-23/fogel_2004
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
+    - data://meadow/agriculture/2024-05-23/grigg_1995
+    - data://meadow/agriculture/2024-05-23/fao_1949
+    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+    - data://meadow/agriculture/2024-05-23/jonsson_1998
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://grapher/agriculture/2025-03-26/daily_calories_per_person:
+    - data://garden/agriculture/2025-03-26/daily_calories_per_person
+  #
+  # Long-term yields in the United Kingdom.
+  #
+  data://garden/agriculture/2025-03-26/uk_long_term_yields:
+    - data://garden/papers/2024-03-26/brassley_2000
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/papers/2024-03-26/broadberry_et_al_2015
+  #
+  # Long-term crop yields.
+  #
+  data://garden/agriculture/2025-03-26/long_term_crop_yields:
+    - data://garden/agriculture/2025-03-26/long_term_wheat_yields
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/agriculture/2025-03-26/uk_long_term_yields
+    - data://garden/usda_nass/2025-03-26/us_corn_yields
+  #
+  # Attainable yields.
+  #
+  data://garden/agriculture/2025-03-26/attainable_yields:
+    - data://garden/papers/2024-03-26/mueller_et_al_2012
+    - data://garden/agriculture/2025-03-26/long_term_crop_yields
+  #
+  # Long-term crop yields.
+  #
+  data://grapher/agriculture/2025-03-26/long_term_crop_yields:
+    - data://garden/agriculture/2025-03-26/long_term_crop_yields
+  #
+  # Attainable yields.
+  #
+  data://grapher/agriculture/2025-03-26/attainable_yields:
+    - data://garden/agriculture/2025-03-26/attainable_yields
