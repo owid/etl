@@ -74,6 +74,28 @@ DEFAULT_DAG_FILE = DAG_FILE
 # Hidden ETL file that will keep the time it took to execute each step.
 EXECUTION_TIME_FILE = BASE_DIR / ".execution_time.json"
 
+# Cache file for step browser (stores step list for instant startup)
+STEP_CACHE_FILE = CACHE_DIR / "step_browser.json"
+
+# Cache file for snapshot browser (stores snapshot list for instant startup)
+SNAPSHOT_CACHE_FILE = CACHE_DIR / "snapshot_browser.json"
+
+# Cache file for step popularity data (from Datasette analytics)
+POPULARITY_CACHE_FILE = CACHE_DIR / "step_popularity.json"
+
+# Cache file for browser history (stores last N search queries)
+# NOTE: This is the legacy single-file history, kept for backwards compatibility
+HISTORY_CACHE_FILE = CACHE_DIR / "browser_history.json"
+
+# Per-mode history directory for unified browser
+BROWSER_HISTORY_DIR = CACHE_DIR / "browser_history"
+
+
+def get_mode_history_file(mode_name: str) -> "Path":
+    """Get the history cache file for a specific browser mode."""
+    return BROWSER_HISTORY_DIR / f"{mode_name}.json"
+
+
 # TODO: Remove this once we fully deprecate owid-content
 # Default path to the explorers folder.
 EXPLORERS_DIR = Path(os.environ.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers"))

@@ -227,7 +227,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
         <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
         <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage(jsonConfig, "{owid_env.data_api_url}/v1/indicators/");
+            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage({{ config: jsonConfig, dataApiUrl: "{owid_env.data_api_url}/v1/indicators/", catalogUrl: "{owid_env.catalog_url}" }});
         </script>
     </div>
     """
@@ -538,6 +538,15 @@ def url_persist(component: Any) -> Any:
           key="abc",
           ...
         )
+
+    Important notes:
+        - Boolean values (checkbox/toggle) are stored as "True"/"False" strings in URL
+        - The component parses these strings back to booleans when rendered
+        - If you need to check the value before the component renders (e.g., in filtering logic),
+          check st.session_state first, then fall back to parsing st.query_params manually:
+            value = st.session_state.get("key")
+            if value is None:
+                value = st.query_params.get("key") != "False"
     """
 
     def _persist(*args, **kwargs):

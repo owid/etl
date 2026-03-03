@@ -25,19 +25,19 @@ log = get_logger()
 
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("load_data_array.start")
-    with zipfile.ZipFile(snap.path, "r") as zip_file:
-        for file_info in zip_file.infolist():
-            if file_info.filename.endswith((".grb", ".grib")):  # Filter GRIB files
-                with zip_file.open(file_info) as file:
-                    file_content = file.read()
+    # The snapshot is a gzip-compressed NetCDF file
+    import gzip
 
-                # Write to a temporary file
-                with tempfile.NamedTemporaryFile(delete=True, suffix=".grib") as tmp_file:
-                    tmp_file.write(file_content)
-                    tmp_file.flush()  # Ensure all data is written
+    with gzip.open(snap.path, "rb") as gz_file:
+        file_content = gz_file.read()
 
-                    # Load the GRIB file using xarray and cfgrib
-                    da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
+    # Write to a temporary file
+    with tempfile.NamedTemporaryFile(delete=True, suffix=".nc") as tmp_file:
+        tmp_file.write(file_content)
+        tmp_file.flush()  # Ensure all data is written
+
+        # Load the NetCDF file using xarray
+        da = xr.open_dataset(tmp_file.name, engine="h5netcdf").load()
     # Convert temperature from Kelvin to Celsius.
     da = da["t2m"] - 273.15
 

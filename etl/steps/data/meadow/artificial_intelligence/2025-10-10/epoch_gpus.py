@@ -28,7 +28,7 @@ def run() -> None:
         "FP32 (single precision) performance (FLOP/s)",
         "FP16 (half precision) performance (FLOP/s)",
         "INT8 performance (OP/s)",
-        "Memory size per board (Byte)",
+        "Memory (bytes)",
         "Memory bandwidth (byte/s)",
         "TDP (W)",
         "Process size (nm)",

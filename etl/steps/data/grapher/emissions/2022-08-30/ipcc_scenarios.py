@@ -124,15 +124,15 @@ def process_region(combined: Table, naming: Table, scenario_naming: Table, annot
     return tb
 
 
-def process(snap):
+def process(snap_extracted):
     """Process IPCC scenario data from archive."""
     # Read input files from archive
-    combined = snap.read_from_archive("ipcc.csv", encoding="latin1")
+    combined = snap_extracted.read("ipcc.csv", encoding="latin1")
     combined = combined.drop(columns=["MODEL"])
 
-    naming = snap.read_from_archive("variable_naming.csv", encoding="latin1")
-    scenario_naming = snap.read_from_archive("scenario_naming.csv", encoding="latin1")
-    annotations = snap.read_from_archive("annotations.csv", encoding="latin1")
+    naming = snap_extracted.read("variable_naming.csv", encoding="latin1")
+    scenario_naming = snap_extracted.read("scenario_naming.csv", encoding="latin1")
+    annotations = snap_extracted.read("annotations.csv", encoding="latin1")
 
     # Process each region
     region_mapping = {
@@ -152,7 +152,7 @@ def process(snap):
 
         # Add origin
         for col in tb.columns:
-            tb[col].m.origins = [snap.m.origin]
+            tb[col].m.origins = [snap_extracted._snapshot.m.origin]
 
         tables.append(tb)
 
@@ -176,8 +176,8 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("ipcc_scenarios.zip")
 
     # Process data from snapshot
-    with snap.open_archive():
-        tb = process(snap)
+    with snap.extracted() as archive:
+        tb = process(archive)
 
     tb.m.short_name = "ipcc_scenarios"
 

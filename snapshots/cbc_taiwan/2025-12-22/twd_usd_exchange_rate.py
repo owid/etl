@@ -38,6 +38,7 @@ YEAR_URLS = {
     2022: "https://www.cbc.gov.tw/en/cp-4237-157271-bd861-2.html",
     2023: "https://www.cbc.gov.tw/en/cp-4237-157403-d0a00-2.html",
     2024: "https://www.cbc.gov.tw/en/cp-4237-165072-15ec2-2.html",
+    2025: "https://www.cbc.gov.tw/en/cp-4237-188473-44dc2-2.html",
 }
 
 

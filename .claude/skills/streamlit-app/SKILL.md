@@ -5,14 +5,7 @@ description: Create or modify Streamlit apps in the Wizard. Use when building ne
 
 # Streamlit Apps in Wizard
 
-All apps live in `apps/wizard/` as part of the multi-page Wizard application.
-
-## Running
-
-```bash
-make wizard
-.venv/bin/etlwiz your-app  # Direct to app by alias
-```
+Apps live in `apps/wizard/app_pages/`. Run with `make wizard` or `.venv/bin/etlwiz <alias>`.
 
 ## Creating a New App
 
@@ -20,12 +13,7 @@ make wizard
 
 ```python
 import streamlit as st
-
-st.set_page_config(
-    page_title="Wizard: Your App",
-    page_icon="🪄",
-    layout="wide",
-)
+st.set_page_config(page_title="Wizard: Your App", page_icon="🪄", layout="wide")
 
 def main():
     st.title("Your App")
@@ -33,64 +21,57 @@ def main():
 main()
 ```
 
-2. Register in `apps/wizard/config/config.yml`:
+2. Register in `apps/wizard/config/config.yml` under a section's `apps` list:
 
 ```yaml
-sections:
-  - title: "Section Name"
-    apps:
-      - title: "Your App"
-        alias: your-app
-        entrypoint: app_pages/your_app/app.py
-        description: "What it does"
-        maintainer: "@slack-handle"
-        icon: ":material/icon:"
-        image_url: "https://..."
+- title: "Your App"
+  alias: your-app
+  entrypoint: app_pages/your_app/app.py
+  description: "What it does"
+  maintainer: "@slack-handle"
+  icon: ":material/icon:"
 ```
 
-## Key Patterns
+## Key Utilities
 
-### Session State
 ```python
-st.session_state.data = st.session_state.get("data", default)
-```
-
-### Caching
-```python
+# Caching (supports ttl, show_time, works outside Streamlit too)
 from apps.wizard.utils.components import st_cache_data
+@st_cache_data(custom_text="Loading...", ttl="1h")
 
-@st_cache_data(custom_text="Loading...")
-def load_data():
-    return expensive_operation()
-```
-
-### URL Persistence
-```python
+# URL-synced widgets (shareable state)
 from apps.wizard.utils.components import url_persist
-
 url_persist(st.selectbox)(label="Option", options=["a", "b"], key="my_key")
-```
+# ⚠️ Booleans stored as "True"/"False" strings in URL
 
-### Data Loading
-```python
+# Charts
+from apps.wizard.utils.components import grapher_chart, grapher_chart_from_url
+grapher_chart(catalog_path="grapher/ns/ver/ds#var")
+grapher_chart(variable_id=123, selected_entities=["France"], tab="map")
+
+# Data loading
 from apps.wizard.utils.cached import load_variables_in_dataset, load_variable_data
 
-indicators = load_variables_in_dataset(dataset_uri=["data://garden/ns/ver/ds"])
-data = load_variable_data(variable_id=123)
+# Environment & DB
+from etl.config import OWID_ENV  # .base_site, .indicators_url, .data_api_url
+from etl.db import get_engine
+from sqlalchemy.orm import Session
 ```
 
-## Custom Components
+## Components (`apps.wizard.utils.components`)
 
-From `apps.wizard.utils.components`:
-
-- `st_horizontal()` - Horizontal layout context manager
-- `Pagination` - Paginated lists
-- `grapher_chart()` - Render OWID charts
-- `st_wizard_page_link()` - Link to other wizard pages
-- `st_toast_success()` / `st_toast_error()` - Toast notifications
+- `st_horizontal()` — flexbox row context manager
+- `Pagination(items, items_per_page, pagination_key)` — paginated lists
+- `grapher_chart()` / `grapher_chart_from_url()` — OWID charts
+- `st_wizard_page_link(alias)` — link to another Wizard page
+- `st_tag(name, color, icon)` / `tag_in_md()` — colored badges
+- `st_toast_success()` / `st_toast_error()` — toast notifications
+- `preview_file(path)` — code preview in expander
 
 ## Rules
 
-- `st.set_page_config()` must be first Streamlit command
-- Use `@st.cache_data` for expensive operations
+- `st.set_page_config()` must be the **first** Streamlit command
+- Use `@st_cache_data` for expensive operations
 - Use `url_persist()` for shareable widget state
+- Material icons: `:material/icon_name:` (Google Material Symbols)
+- HTTP requests: always `timeout=30` and `.raise_for_status()`

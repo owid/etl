@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from owid.catalog import processing_log as pl
+from owid.catalog.core import processing_log as pl
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot

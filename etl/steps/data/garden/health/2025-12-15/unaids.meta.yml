@@ -908,11 +908,11 @@ tables:
         presentation:
           title_public: "Tuberculosis patients who tested positive for HIV"
 
-      condoms_distributed_per_100k:
-        title: Condoms distributed per 100,000 population
-        unit: "condoms per 100,000 people"
+      condoms_distributed_per_1k:
+        title: Condoms distributed per 1,000 population
+        unit: "condoms per 1,000 people"
         description_short: |-
-          Number of condoms distributed through public and private channels per 100,000 population during the reporting period.
+          The number of condoms distributed per 1,000 people in a given year, including free public-sector distribution, subsidized social marketing, and commercial sales.
         display:
           numDecimalPlaces: 0
         description_from_producer: |-
@@ -921,15 +921,15 @@ tables:
           Count of the number of male and female condoms that left the central or regional warehouses for onward distribution in the previous calendar year. Data should include condoms distributed for free (public providers), condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) and condoms sold through the commercial sector (private sector providers). There should be no double-counting of condoms in case of overlap. If condoms from public sector warehouses are given to nongovernmental organizations or community workers for distribution, condoms should be accounted for in the public sector.
         description_key:
           - |-
-            Measures the total quantity of condoms distributed from central/regional warehouses during the previous year, regardless of distribution channel or price point.
+            This indicator measures how many condoms were distributed per 1,000 people over the course of a year.
           - |-
-            Tracks three distinct distribution channels: free condoms through public providers, subsidized condoms via social marketing/NGOs, and commercial sales through private sector.
+            It includes condoms distributed for free by public providers, condoms sold at subsidized prices through social marketing programs (often run by non-governmental organizations), and condoms sold commercially through the private sector.
           - |-
-            Requires careful accounting to avoid double-counting when condoms move between distribution channels (e.g., from public sector to NGOs).
+            The data counts condoms leaving central or regional warehouses for onward distribution, not condoms actually used.
           - |-
-            For condoms provided to NGOs or community workers from public sector warehouses, attribution should remain with the public sector to maintain accurate tracking.
+            Condoms are counted only once, even if they pass between distribution channels (for example, from public sector warehouses to NGOs or community workers).
         presentation:
-          title_public: "Condoms distributed per 100,000 population"
+          title_public: "Condoms distributed per 1,000 population"
 
   gam_sex:
     variables:

@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: TOP500 Supercomputer Lists (1993-2025)
+    description: |-
+      The TOP500 project ranks and details the 500 most powerful non-distributed computer systems in the world. The project was started in 1993 and publishes an updated list of the supercomputers twice a year (June and November). This dataset combines all TOP500 lists from 1993 to 2025, including computational performance benchmarks, system specifications, and rankings.
+    date_published: "2025"
+
+    # Citation
+    producer: Dongarra et al.
+    citation_full: |-
+      “Performance of Various Computers Using Standard Linear Equations Software”, Jack Dongarra, University of Tennessee, Knoxville TN, 37996, Computer Science Technical Report Number CS - 89 – 85, today’s date, url:http://www.netlib.org/benchmark/performance.ps."
+    attribution_short: TOP500
+
+    # Files
+    url_main: https://www.top500.org/
+    date_accessed: 2026-02-01
+
+    # License
+    license:
+      name: © TOP500.org 1993-2025
+      url: https://www.top500.org/
+outs:
+  - md5: ada83e54f9bd5c9df32e416d5c69761a
+    size: 11500709
+    path: top500_supercomputers.csv

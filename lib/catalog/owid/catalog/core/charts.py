@@ -8,8 +8,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from owid.catalog.meta import TableMeta
-from owid.catalog.tables import Table
+from owid.catalog.core.meta import TableMeta
+from owid.catalog.core.tables import Table
 
 
 @dataclass

@@ -14,9 +14,9 @@ def run() -> None:
     snap = paths.load_snapshot("fra.zip")
 
     # Load data from snapshot.
-    with snap.open_archive():
-        tb = snap.read_from_archive(filename="FRA_Years_2025_12_05.csv")
-        tb_intervals = snap.read_from_archive(filename="Intervals_2025_12_05.csv")
+    with snap.extracted() as archive:
+        tb = archive.read(filename="FRA_Years_2025_12_05.csv")
+        tb_intervals = archive.read(filename="Intervals_2025_12_05.csv")
 
     # Extract starting year from year range format (e.g., "2020-2025" -> 2020)
     tb_intervals["year"] = tb_intervals["year"].astype(str).str[:4].astype(int)

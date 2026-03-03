@@ -20,13 +20,12 @@ from typing import List, Literal, Optional, cast
 from urllib.parse import quote
 
 import git
-import pandas as pd
-import sentry_sdk
+import pandas as pd  # 0.2
 import structlog
-from dotenv import dotenv_values, load_dotenv
-from joblib import Memory
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session
+from dotenv import dotenv_values, load_dotenv  # 0
+from joblib import Memory  # 0.08
+from sqlalchemy.engine import Engine  # 0.07
+from sqlalchemy.orm import Session  # ~ 0.07
 
 from etl.paths import BASE_DIR, CACHE_DIR
 
@@ -97,6 +96,7 @@ PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
+R2_BUCKET_PRIVATE = "owid-catalog-private"
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
 R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
@@ -303,7 +303,9 @@ DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schem
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry(enable_logs: bool = False) -> None:
+def enable_sentry(enable_logs: bool = False, integrations: list | None = None) -> None:
+    import sentry_sdk  # 0.1
+
     if SENTRY_DSN:
 
         def before_send(event, hint):
@@ -314,10 +316,13 @@ def enable_sentry(enable_logs: bool = False) -> None:
                     return None
             return event
 
-        kwargs = {"dsn": SENTRY_DSN, "before_send": before_send}
+        kwargs: dict = {"dsn": SENTRY_DSN, "before_send": before_send}
 
         if enable_logs:
             kwargs["_experiments"] = {"enable_logs": True}
+
+        if integrations:
+            kwargs["integrations"] = integrations
 
         sentry_sdk.init(**kwargs)
 
@@ -553,6 +558,17 @@ class OWIDEnv:
         return self.data_api_url + "/v1/indicators"
 
     @property
+    def catalog_url(self) -> str:
+        """Get catalog url."""
+        if self.env_remote == "production":
+            return "https://catalog.ourworldindata.org"
+        elif self.env_remote == "staging":
+            return f"http://{self.conf.DB_HOST}:8881"
+        else:
+            # For local dev, use production catalog
+            return "https://catalog.ourworldindata.org"
+
+    @property
     def wizard_url(self) -> str:
         """Get wizard url."""
         if self.env_local == "dev":
@@ -703,11 +719,6 @@ NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
-
-# Logfire for LLM observability
-LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
-LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
-LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
 
 # MCP server
 OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

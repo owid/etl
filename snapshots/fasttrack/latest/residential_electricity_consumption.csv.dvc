@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: International Energy Agency (IEA) and UN World Population Prospects (2024)
+    title: residential_electricity_consumption
+    citation_full: International Energy Agency (IEA) and UN World Population Prospects (2024)
+    url_main: https://www.iea.org/data-and-statistics/data-tools/energy-statistics-data-browser
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vThPlW2kJrQrwnsFAtiwGd3LwW8T58L5KA2c2frxYU6HngyOV3I_rRdfYPPlmqYpc2TEd192D8TFgIH/pub?output=csv
+    date_accessed: '2026-01-22'
+  name: Residential electricity consumption (IEA)
+  description: Estimates of electricity consumption in the residential sector only.
+  license: {}
+outs:
+  - md5: f200fbfdaef35c7ad575dac2a3260e33
+    size: 6870
+    path: residential_electricity_consumption.csv

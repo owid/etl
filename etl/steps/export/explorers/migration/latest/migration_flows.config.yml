@@ -9,6 +9,7 @@ definitions:
 
 config:
   explorerTitle: Migration Flows
+  originUrl: https://ourworldindata.org/migration
   explorerSubtitle: Explore global migration data, country-by-country.
   isPublished: true
   selection:

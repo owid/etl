@@ -1,5 +1,6 @@
 config:
   explorerTitle: Global Food
+  originUrl: https://ourworldindata.org/agricultural-production
   isPublished: true
   entityType: country
   explorerSubtitle: Explore the world's food system, from production to supply.

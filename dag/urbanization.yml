@@ -78,12 +78,30 @@ steps:
   data://grapher/urbanization/2025-12-10/ghsl_countries:
     - data://garden/urbanization/2025-12-10/ghsl_countries
 
+  # GHSL countries multidim
+  export://multidim/urbanization/latest/cities_towns_rural_areas:
+    - data://grapher/urbanization/2025-12-10/ghsl_countries
+
   # GHSL urban centers
   data://meadow/urbanization/2025-12-10/ghsl_urban_centers:
     - snapshot://urbanization/2025-12-10/ghsl_urban_centers.xlsx
   data://garden/urbanization/2025-12-10/ghsl_urban_centers:
     - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+    - data://garden/urbanization/2025-12-10/ghsl_countries
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2025-12-10/ghsl_urban_centers:
     - data://garden/urbanization/2025-12-10/ghsl_urban_centers
+
+  #
+  # UN WUP National Definitions
+  #
+  data://meadow/un/2026-02-17/wup_national_definitions:
+    - snapshot://un/2026-02-17/wup_urban_rural_population.xlsx
+    - snapshot://un/2026-02-17/wup_urban_rural_population_share.xlsx
+    - snapshot://un/2026-02-17/wup_urban_rural_population_growth.xlsx
+    - snapshot://un/2026-02-17/wup_urban_rural_population_share_growth.xlsx
+  data://garden/un/2026-02-17/wup_national_definitions:
+    - data://meadow/un/2026-02-17/wup_national_definitions
+  data://grapher/un/2026-02-17/wup_national_definitions:
+    - data://garden/un/2026-02-17/wup_national_definitions

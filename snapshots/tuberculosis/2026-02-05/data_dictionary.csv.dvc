@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: WHO
+    title: Global tuberculosis report
+    description: |-
+      WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
+    title_snapshot: Global tuberculosis report - data dictionary
+    citation_full: "Global tuberculosis report 2025. Geneva: World Health Organization; 2025."
+    attribution_short: WHO
+    url_main: https://www.who.int/teams/global-tuberculosis-programme/data
+    url_download: https://extranet.who.int/tme/generateCSV.asp?ds=dictionary
+    date_accessed: "2026-02-05"
+    date_published: "2025-11-12"
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/data-policy
+outs:
+  - md5: 1dfc8066910c1e2684dfa331c833533e
+    size: 108122
+    path: data_dictionary.csv

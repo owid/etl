@@ -13,15 +13,6 @@ COLUMNS_KEEP = {
     "ctb": "ctb",
     "ctb_rel": "ctb_rel",
 }
-# Age groups mapping
-AGE_GROUPS_MAPPING = {
-    1: "0",
-    2: "1-14",
-    3: "15-39",
-    4: "40-59",
-    5: "60-79",
-    6: "80+",
-}
 
 
 def run(dest_dir: str) -> None:
@@ -42,9 +33,6 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Age group
-    tb["age_group"] = tb["age_group"].map(AGE_GROUPS_MAPPING)
 
     # Get relative value as a percentage
     tb["ctb_rel"] *= 100

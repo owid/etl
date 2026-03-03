@@ -28,10 +28,6 @@ tb --> vb2[variable B2]
 tb --> vb3[variable B3]
 ```
 
-### Catalog ([:fontawesome-brands-github: `owid.catalog.CatalogMixin`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/catalogs.py))
-
-A catalog is a collection of datasets, represented on disk as a folder of folders.
-
 ### Datasets ([:fontawesome-brands-github: `owid.catalog.Dataset`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/datasets.py))
 
 A dataset is a group tables, represented on disk as a folder. Inside the folder, an `index.json` file containing metadata about the dataset as a whole.

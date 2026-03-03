@@ -3,7 +3,8 @@ from collections import defaultdict
 import pandas as pd
 import pytest
 
-from owid.catalog.meta import (
+from owid.catalog.core.indicators import Indicator
+from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     Origin,
@@ -12,8 +13,7 @@ from owid.catalog.meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from owid.catalog.tables import Table
-from owid.catalog.variables import Variable
+from owid.catalog.core.tables import Table
 
 
 @pytest.fixture
@@ -51,40 +51,40 @@ def licenses():
 
 @pytest.fixture
 def variable_1(sources, origins, licenses):
-    v1 = Variable(pd.Series([1, 2, 3]), name="Variable 1")
-    v1.metadata.title = "Title of Variable 1"
-    v1.metadata.description = "Description of Variable 1"
-    v1.metadata.unit = "Unit of Variable 1"
-    v1.metadata.unit = "Short unit of Variable 1"
+    v1 = Indicator(pd.Series([1, 2, 3]), name="Indicator 1")
+    v1.metadata.title = "Title of Indicator 1"
+    v1.metadata.description = "Description of Indicator 1"
+    v1.metadata.unit = "Unit of Indicator 1"
+    v1.metadata.unit = "Short unit of Indicator 1"
     v1.metadata.sources = [sources[2], sources[1]]
     v1.metadata.origins = [origins[2], origins[1]]
     v1.metadata.licenses = [licenses[1]]
     v1.metadata.processing_level = "minor"
-    v1.metadata.presentation = VariablePresentationMeta(title_public="Title of Variable 1")
+    v1.metadata.presentation = VariablePresentationMeta(title_public="Title of Indicator 1")
     v1.metadata.display = {"isProjection": True, "numDecimalPlaces": 1}
     return v1
 
 
 @pytest.fixture
 def variable_2(sources, origins, licenses):
-    v2 = Variable(pd.Series([4, 5, 6]), name="Variable 2")
-    v2.metadata.title = "Title of Variable 2"
+    v2 = Indicator(pd.Series([4, 5, 6]), name="Indicator 2")
+    v2.metadata.title = "Title of Indicator 2"
     v2.metadata.description = "Description of Variable 2"
-    v2.metadata.unit = "Unit of Variable 2"
-    v2.metadata.unit = "Short unit of Variable 2"
+    v2.metadata.unit = "Unit of Indicator 2"
+    v2.metadata.unit = "Short unit of Indicator 2"
     v2.metadata.sources = [sources[2], sources[3]]
     v2.metadata.origins = [origins[2], origins[3]]
     v2.metadata.licenses = [licenses[2], licenses[3]]
     v2.metadata.processing_level = "major"
-    v2.metadata.presentation = VariablePresentationMeta(title_public="Title of Variable 2")
+    v2.metadata.presentation = VariablePresentationMeta(title_public="Title of Indicator 2")
     v2.metadata.display = {"isProjection": True, "numDecimalPlaces": 1}
     return v2
 
 
 @pytest.fixture
 def variable_3(origins):
-    v3 = Variable(pd.Series(["a", "b", "c"]), name="Variable 3")
-    v3.metadata.title = "Title of Variable 3"
+    v3 = Indicator(pd.Series(["a", "b", "c"]), name="Indicator 3")
+    v3.metadata.title = "Title of Indicator 3"
     v3.metadata.origins = [origins[2]]
     return v3
 
@@ -103,13 +103,13 @@ def table_1(sources, licenses, origins):
     tb1._fields = defaultdict(
         VariableMeta,
         {
-            "country": VariableMeta(title="Country Title", description="Description of Table 1 Variable country"),
+            "country": VariableMeta(title="Country Title", description="Description of Table 1 Indicator country"),
             "a": VariableMeta(
-                title="Title of Table 1 Variable a",
-                description="Description of Table 1 Variable a",
-                description_short="Short description of Table 1 Variable a",
+                title="Title of Table 1 Indicator a",
+                description="Description of Table 1 Indicator a",
+                description_short="Short description of Table 1 Indicator a",
                 description_key=[
-                    "Key description point 1 of Variable 1",
+                    "Key description point 1 of Indicator 1",
                     "Common key description point",
                 ],
                 description_from_producer="Common description from producer",
@@ -117,24 +117,24 @@ def table_1(sources, licenses, origins):
                 origins=[origins[2], origins[1]],
                 licenses=[licenses[1]],
                 processing_level="minor",
-                presentation=VariablePresentationMeta(title_public="Title of Variable a"),
+                presentation=VariablePresentationMeta(title_public="Title of Indicator a"),
                 display={"isProjection": True, "numDecimalPlaces": 1},
             ),
             "b": VariableMeta(
-                title="Title of Table 1 Variable b",
-                description="Description of Table 1 Variable b",
-                description_short="Short description of Table 1 Variable b",
+                title="Title of Table 1 Indicator b",
+                description="Description of Table 1 Indicator b",
+                description_short="Short description of Table 1 Indicator b",
                 description_key=[
-                    "Key description point 1 of Variable 2",
+                    "Key description point 1 of Indicator 2",
                     "Common key description point",
-                    "Key description point 2 of Variable 2",
+                    "Key description point 2 of Indicator 2",
                 ],
                 description_from_producer="Common description from producer",
                 sources=[sources[2], sources[3]],
                 origins=[origins[2], origins[3]],
                 licenses=[licenses[2], licenses[3]],
                 processing_level="major",
-                presentation=VariablePresentationMeta(title_public="Title of Variable 2"),
+                presentation=VariablePresentationMeta(title_public="Title of Indicator 2"),
                 display={"isProjection": True, "numDecimalPlaces": 1},
             ),
         },
@@ -155,17 +155,17 @@ def table_2(sources, licenses):
                 title="Country Title",
             ),
             "a": VariableMeta(
-                title="Title of Table 2 Variable a",
-                description="Description of Table 2 Variable a",
+                title="Title of Table 2 Indicator a",
+                description="Description of Table 2 Indicator a",
                 sources=[sources[2]],
                 licenses=[licenses[2]],
                 processing_level="major",
-                presentation=VariablePresentationMeta(title_public="Title of Variable a"),
+                presentation=VariablePresentationMeta(title_public="Title of Indicator a"),
                 display={"isProjection": True, "numDecimalPlaces": 1, "tolerance": 2},
             ),
             "c": VariableMeta(
-                title="Title of Table 2 Variable c",
-                description="Description of Table 2 Variable c",
+                title="Title of Table 2 Indicator c",
+                description="Description of Table 2 Indicator c",
                 sources=[sources[2], sources[4]],
                 licenses=[licenses[4], licenses[2]],
             ),

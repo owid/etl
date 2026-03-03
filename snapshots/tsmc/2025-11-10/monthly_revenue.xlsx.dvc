@@ -8,7 +8,7 @@ meta:
       Historical monthly revenue data from Taiwan Semiconductor Manufacturing Company (TSMC), reported in millions of New Taiwan Dollars (NT$).
 
       The data includes consolidated monthly revenue figures starting from 2006, covering all months from January through December for each year.
-    date_published: "2025-10-31"
+    date_published: 2025-12-04
 
     # Citation
     producer: Taiwan Semiconductor Manufacturing Company
@@ -18,8 +18,8 @@ meta:
 
     # Files
     url_main: https://investor.tsmc.com/english/monthly-revenue/2025
-    url_download: https://investor.tsmc.com/english/encrypt/files/encrypt_file/mr/Historical_Monthly_Revenue_October_4.xlsx
-    date_accessed: 2025-11-10
+    url_download: https://investor.tsmc.com/english/encrypt/files/encrypt_file/mr/Historical_Monthly_Revenue_December_4.xlsx
+    date_accessed: 2026-01-23
 
     # License
     license:
@@ -27,6 +27,6 @@ meta:
       url: https://investor.tsmc.com/english/monthly-revenue/2025
 
 outs:
-  - md5: 2c46b99b280865bbd5a4653ad4d92119
-    size: 40582
+  - md5: ffe4951ca7e9ccdae39aa06e57db48fd
+    size: 40595
     path: monthly_revenue.xlsx

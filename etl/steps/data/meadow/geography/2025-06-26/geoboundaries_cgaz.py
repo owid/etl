@@ -16,8 +16,8 @@ def run() -> None:
     snap = paths.load_snapshot("geoboundaries_cgaz.zip")
 
     # Load data from snapshot.
-    with snap.open_archive():
-        tb = snap.read_from_archive(
+    with snap.extracted() as archive:
+        tb = archive.read(
             filename="geoBoundariesCGAZ_ADM0.shp",
             read_function=gpd.read_file,
         )

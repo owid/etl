@@ -13,7 +13,8 @@ import pandas as pd
 import pytest
 
 from owid.catalog import VariablePresentationMeta, tables
-from owid.catalog.datasets import FileFormat
+from owid.catalog.core.datasets import FileFormat
+from owid.catalog.core.indicators import Indicator
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import (
     SCHEMA,
@@ -22,7 +23,6 @@ from owid.catalog.tables import (
     get_unique_sources_from_tables,
     keep_metadata,
 )
-from owid.catalog.variables import Variable
 
 from .mocking import mock
 
@@ -128,7 +128,7 @@ def test_saving_empty_table_fails():
 
 
 # The parametrize decorator runs this test multiple times with different formats
-@pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
+@pytest.mark.parametrize("format", ["csv", "feather", "parquet", "json"])
 def test_round_trip_no_metadata(format: FileFormat) -> None:
     t1 = Table({"gdp": [100, 102, 104, 100], "countries": ["AU", "SE", "NA", "💡"]})
     with tempfile.TemporaryDirectory() as path:
@@ -136,14 +136,14 @@ def test_round_trip_no_metadata(format: FileFormat) -> None:
         t1.to(filename)
 
         assert exists(filename)
-        if format in ["csv", "feather"]:
+        if format in ["csv", "feather", "json"]:
             assert exists(splitext(filename)[0] + ".meta.json")
 
         t2 = Table.read(filename)
         assert_tables_eq(t1, t2)
 
 
-@pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
+@pytest.mark.parametrize("format", ["csv", "feather", "parquet", "json"])
 def test_round_trip_with_index(format: FileFormat) -> None:
     t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "NA"]})
     t1.set_index("country", inplace=True)
@@ -152,14 +152,14 @@ def test_round_trip_with_index(format: FileFormat) -> None:
         t1.to(filename)
 
         assert exists(filename)
-        if format in ["csv", "feather"]:
+        if format in ["csv", "feather", "json"]:
             assert exists(splitext(filename)[0] + ".meta.json")
 
         t2 = Table.read(filename)
         assert_tables_eq(t1, t2)
 
 
-@pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
+@pytest.mark.parametrize("format", ["csv", "feather", "parquet", "json"])
 def test_round_trip_with_metadata(format: FileFormat) -> None:
     t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "NA"]})
     t1.set_index("country", inplace=True)
@@ -171,7 +171,7 @@ def test_round_trip_with_metadata(format: FileFormat) -> None:
         t1.to(filename)
 
         assert exists(filename)
-        if format in ["csv", "feather"]:
+        if format in ["csv", "feather", "json"]:
             assert exists(splitext(filename)[0] + ".meta.json")
 
         t2 = Table.read(filename)
@@ -203,7 +203,7 @@ def test_field_metadata_serialised():
 def test_tables_from_dataframes_have_variable_columns():
     df = pd.DataFrame({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
     t = Table(df)
-    assert isinstance(t.gdp, Variable)
+    assert isinstance(t.gdp, Indicator)
 
     t.gdp.metadata.title = "test"
 
@@ -423,7 +423,7 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, lice
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
+    assert tb["country"].metadata.description == "Description of Table 1 Indicator country"
     # Column "year" has no metadata in either table.
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -470,7 +470,7 @@ def test_merge_with_on_argument(table_1, table_2) -> None:
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
+    assert tb["country"].metadata.description == "Description of Table 1 Indicator country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -502,7 +502,7 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, ori
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
+    assert tb["country"].metadata.description == "Description of Table 1 Indicator country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -542,7 +542,7 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, ori
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
+    assert tb["country"].metadata.description == "Description of Table 1 Indicator country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -567,7 +567,7 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, ori
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
+    assert tb["country"].metadata.description == "Description of Table 1 Indicator country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -639,7 +639,7 @@ def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> Non
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
+    assert tb["country"].metadata.description == "Description of Table 1 Indicator country"
     # Column "year" has no title and no description in any of the tables.
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -1014,30 +1014,30 @@ def test_multiply_columns(table_1, sources, origins, licenses):
 def test_groupby_sum(table_1) -> None:
     gt = table_1.groupby("country").a.sum()
     assert gt.values.tolist() == [3, 3]
-    assert gt.m.title == "Title of Table 1 Variable a"
+    assert gt.m.title == "Title of Table 1 Indicator a"
 
     gt = table_1.groupby("country")["a"].sum()
     assert gt.values.tolist() == [3, 3]
-    assert gt.m.title == "Title of Table 1 Variable a"
+    assert gt.m.title == "Title of Table 1 Indicator a"
 
     gt = table_1.groupby("country")[["a", "b"]].sum()
     assert gt.values.tolist() == [[3, 6], [3, 9]]
-    assert gt.a.m.title == "Title of Table 1 Variable a"
-    assert gt.b.m.title == "Title of Table 1 Variable b"
+    assert gt.a.m.title == "Title of Table 1 Indicator a"
+    assert gt.b.m.title == "Title of Table 1 Indicator b"
 
 
 def test_groupby_agg(table_1) -> None:
     gt = table_1.groupby("country")[["a", "b"]].agg("sum")
     assert gt.values.tolist() == [[3, 6], [3, 9]]
-    assert gt["a"].m.title == "Title of Table 1 Variable a"
+    assert gt["a"].m.title == "Title of Table 1 Indicator a"
 
     gt = table_1.groupby("country").a.agg(["min", "max"])
     assert gt.values.tolist() == [[3, 3], [1, 2]]
-    assert gt["min"].m.title == "Title of Table 1 Variable a"
+    assert gt["min"].m.title == "Title of Table 1 Indicator a"
 
     gt = table_1.groupby("country").a.agg("min")
     assert gt.values.tolist() == [3, 1]
-    assert gt.m.title == "Title of Table 1 Variable a"
+    assert gt.m.title == "Title of Table 1 Indicator a"
 
     def has_nan(x: pd.Series) -> bool:
         """Check if there is a NaN in a group."""
@@ -1057,7 +1057,7 @@ def test_groupby_agg(table_1) -> None:
         min_a=("a", "min"),
     )
     assert gt.min_a.values.tolist() == [3, 1]
-    assert gt.min_a.m.title == "Title of Table 1 Variable a"
+    assert gt.min_a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_apply_table(table_1) -> None:
@@ -1066,7 +1066,7 @@ def test_groupby_apply_table(table_1) -> None:
 
     tb = table_1.groupby("country").apply(func)
     assert tb.columns.tolist() == ["c"]
-    assert tb.c.m.title == "Title of Table 1 Variable a"
+    assert tb.c.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_apply_variable(table_1) -> None:
@@ -1076,12 +1076,12 @@ def test_groupby_apply_variable(table_1) -> None:
     a_ser = pd.DataFrame(table_1).groupby("country").apply(func)
     a_var = table_1.groupby("country").apply(func)
     assert a_ser.equals(pd.Series(a_var))
-    assert a_var.m.title == "Title of Table 1 Variable a"
+    assert a_var.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_apply_variable_2(table_1) -> None:
     def func(tb):
-        return Variable({"c": 1})
+        return Indicator({"c": 1})
 
     df_out = pd.DataFrame(table_1).groupby("country", as_index=False).apply(func)
     tb_out = table_1.groupby("country", as_index=False).apply(func)
@@ -1102,14 +1102,14 @@ def test_groupby_apply_constant(table_1) -> None:
 def test_groupby_count(table_1) -> None:
     gt = table_1.groupby("country").count()
     assert gt.values.tolist() == [[1, 1, 1], [2, 2, 2]]
-    assert gt.a.m.title == "Title of Table 1 Variable a"
+    assert gt.a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_transform(table_1) -> None:
     # column named `count` should work
     gt = table_1.rename(columns={"a": "count"}).groupby("country")["count"].transform("sum")
     assert gt.values.tolist() == [3, 3, 3]
-    assert gt.m.title == "Title of Table 1 Variable a"
+    assert gt.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_size(table_1) -> None:
@@ -1122,15 +1122,15 @@ def test_groupby_size(table_1) -> None:
 def test_groupby_fillna(table_1) -> None:
     gt = table_1.groupby("country").a.ffill()
     assert gt.values.tolist() == [1, 2, 3]
-    assert gt.m.title == "Title of Table 1 Variable a"
+    assert gt.m.title == "Title of Table 1 Indicator a"
     # original title hasn't changed
-    assert table_1.a.m.title == "Title of Table 1 Variable a"
+    assert table_1.a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
         assert isinstance(group._fields, defaultdict)
-        assert group.a.m.title == "Title of Table 1 Variable a"
+        assert group.a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_observed_default(table_1) -> None:
@@ -1143,7 +1143,7 @@ def test_groupby_levels(table_1) -> None:
     table_1 = table_1.set_index(["country", "year"])
     gt = table_1.groupby(level=[0, 1]).last()
     assert gt.values.tolist() == [[3, 6], [1, 4], [2, 5]]
-    assert gt.a.m.title == "Title of Table 1 Variable a"
+    assert gt.a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_groupby_as_index(table_1) -> None:
@@ -1156,7 +1156,7 @@ def test_groupby_as_index(table_1) -> None:
 
 def test_set_columns(table_1) -> None:
     table_1.columns = ["country", "year", "new_a", "new_b"]
-    assert table_1.new_a.m.title == "Title of Table 1 Variable a"
+    assert table_1.new_a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_fillna_with_number(table_1) -> None:
@@ -1275,7 +1275,7 @@ def test_keep_metadata_dataframe(table_1: Table) -> None:
 
     tb = rolling_sum(table_1[["a", "b"]])
     assert list(tb.a) == [1.0, 3.0, 5.0]
-    assert tb.a.m.title == "Title of Table 1 Variable a"
+    assert tb.a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_keep_metadata_series(table_1: Table) -> None:
@@ -1284,7 +1284,7 @@ def test_keep_metadata_series(table_1: Table) -> None:
         return pd.to_numeric(s)
 
     table_1.a = to_numeric(table_1.a)
-    assert table_1.a.m.title == "Title of Table 1 Variable a"
+    assert table_1.a.m.title == "Title of Table 1 Indicator a"
 
 
 def test_table_rolling(table_1: Table):
@@ -1315,14 +1315,128 @@ def test_assign_table(table_1: Table):
     # simple assign of series
     tb = table_1[["a"]].copy()
     tb["b"] = table_1["b"]
-    assert tb.b.m.title == "Title of Table 1 Variable b"
+    assert tb.b.m.title == "Title of Table 1 Indicator b"
 
     # assign table
     tb = table_1[["a"]].copy()
     tb[["b"]] = table_1[["b"]]
-    assert tb.b.m.title == "Title of Table 1 Variable b"
+    assert tb.b.m.title == "Title of Table 1 Indicator b"
 
     # assign table to column, this is supported by pandas and should be by Table, too
     tb = table_1[["a"]].copy()
     tb["b"] = table_1[["b"]]
-    assert tb.b.m.title == "Title of Table 1 Variable b"
+    assert tb.b.m.title == "Title of Table 1 Indicator b"
+
+
+# JSON format specific tests
+class TestJsonFormat:
+    def test_json_to_string(self) -> None:
+        """Test that to_json without path returns a string."""
+        t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        result = t.to_json()
+        assert isinstance(result, str)
+        assert "gdp" in result
+        assert "country" in result
+
+    def test_json_invalid_extension(self) -> None:
+        """Test that to_json raises error for invalid file extension."""
+        t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        with tempfile.TemporaryDirectory() as path:
+            with pytest.raises(ValueError, match='filename must end in ".json"'):
+                t.to_json(join(path, "table.txt"))
+
+    def test_read_json_invalid_extension(self) -> None:
+        """Test that read_json raises error for invalid file extension."""
+        with pytest.raises(ValueError, match='filename must end in ".json"'):
+            Table.read_json("/tmp/table.txt")
+
+    def test_json_with_multiindex(self) -> None:
+        """Test JSON round-trip with multi-index table.
+
+        The index is reset when writing to JSON, but restored when reading
+        based on the primary_key in the metadata sidecar file.
+        """
+        t1 = Table({"gdp": [100, 102, 104, 106], "country": ["AU", "AU", "SE", "SE"], "year": [2020, 2021, 2020, 2021]})
+        t1.set_index(["country", "year"], inplace=True)
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            assert exists(filename)
+            assert exists(splitext(filename)[0] + ".meta.json")
+
+            t2 = Table.read_json(filename)
+            # Index is restored from metadata
+            assert_tables_eq(t1, t2)
+
+    def test_json_with_field_metadata(self) -> None:
+        """Test that field-level metadata is preserved in JSON round-trip."""
+        t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        t1.gdp.description = "GDP description"
+        t1.gdp.title = "GDP Title"
+
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            t2 = Table.read_json(filename)
+            assert t2.gdp.metadata.description == "GDP description"
+            assert t2.gdp.metadata.title == "GDP Title"
+
+    def test_json_default_orient_is_records(self) -> None:
+        """Test that default orient is 'records' - simple array of objects."""
+        t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        t1.set_index("country", inplace=True)
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            # Read the raw JSON to verify orient='records' structure
+            with open(filename) as f:
+                data = json.load(f)
+
+            # 'records' orient is a simple array of objects, no schema
+            assert isinstance(data, list)
+            assert len(data) == 3
+            assert data[0] == {"country": "AU", "gdp": 100}
+
+            # Read it back - index is restored from metadata
+            t2 = Table.read_json(filename)
+            assert_tables_eq(t1, t2)
+
+    def test_json_with_numeric_types(self) -> None:
+        """Test JSON handles various numeric types correctly."""
+        t1 = Table(
+            {
+                "int_col": [1, 2, 3],
+                "float_col": [1.5, 2.5, 3.5],
+                "bool_col": [True, False, True],
+            }
+        )
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            t2 = Table.read_json(filename)
+            assert list(t2.int_col) == [1, 2, 3]
+            assert list(t2.float_col) == [1.5, 2.5, 3.5]
+
+    def test_json_metadata_file_structure(self) -> None:
+        """Test that JSON metadata sidecar file has correct structure."""
+        t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+        t1.set_index("country", inplace=True)
+        t1.gdp.description = "Test description"
+
+        with tempfile.TemporaryDirectory() as path:
+            filename = join(path, "table.json")
+            t1.to_json(filename)
+
+            meta_filename = join(path, "table.meta.json")
+            with open(meta_filename) as f:
+                meta = json.load(f)
+
+            assert "primary_key" in meta
+            assert meta["primary_key"] == ["country"]
+            assert "fields" in meta
+            assert "gdp" in meta["fields"]
+            assert meta["fields"]["gdp"]["description"] == "Test description"

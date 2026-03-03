@@ -57,7 +57,7 @@ def test_exec_graph_parallel():
         done.add(task)
 
     # Execute the graph in parallel with 2 workers
-    cmd.exec_graph_parallel(exec_graph, mock_func, workers=2, use_threads=True)
+    cmd.exec_graph_parallel(exec_graph, mock_func, continue_on_failure=False, workers=2, use_threads=True)
 
     # Assert that all tasks have been completed
     assert all(task in done for task in exec_graph.keys())

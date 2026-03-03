@@ -31,8 +31,8 @@ import requests
 import structlog
 from deprecated import deprecated
 from owid import catalog
-from owid.catalog.core import CatalogPath
-from owid.catalog.meta import VARIABLE_TYPE
+from owid.catalog.core.meta import VARIABLE_TYPE
+from owid.catalog.core.paths import CatalogPath
 from pyarrow import feather
 from sqlalchemy import (
     CHAR,
@@ -270,18 +270,12 @@ class Namespace(Base):
 
 class Tag(Base):
     __tablename__ = "tags"
-    __table_args__ = (
-        ForeignKeyConstraint(["parentId"], ["tags.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="tags_ibfk_1"),
-        Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
-        Index("parentId", "parentId"),
-        Index("slug", "slug", unique=True),
-    )
+    __table_args__ = (Index("slug", "slug", unique=True),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
-    parentId: Mapped[Optional[int]] = mapped_column(Integer)
     specialType: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     slug: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
 
@@ -431,10 +425,10 @@ class Chart(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
+    forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
-    isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     _updatedAt: Mapped[datetime] = mapped_column("updatedAt", DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
@@ -453,8 +447,9 @@ class Chart(Base):
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
         config = self.chart_config.full.copy()
-        # Add isInheritanceEnabled to config so it's included in comparisons
+        # Include chart-level flags in config so they're part of comparison/diff logic.
         config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        config["forceDatapage"] = bool(self.forceDatapage)
         return config
 
     @config.expression
@@ -714,6 +709,21 @@ class Dataset(Base):
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     tables: Mapped[Optional[list]] = mapped_column(JSON, default=None)
 
+    @property
+    def catalog_path(self) -> CatalogPath | None:
+        """Parsed CatalogPath object for this dataset."""
+        if not self.catalogPath:
+            return None
+        # catalogPath format is "namespace/version/dataset", we need to prepend "grapher/"
+        return CatalogPath.from_str(f"grapher/{self.catalogPath}")
+
+    @property
+    def step_uri(self) -> str | None:
+        """ETL step URI for this dataset (e.g. 'data://grapher/survey/2025-03-04/dietary_choices_uk')."""
+        if self.catalog_path is None:
+            return None
+        return self.catalog_path.step_uri
+
     def upsert(self, session: Session) -> "Dataset":
         cls = self.__class__
         q = select(cls).where(
@@ -805,6 +815,35 @@ class Dataset(Base):
         if not columns:
             columns = ["*"]
         return read_sql(f"select {','.join(columns)} from datasets")
+
+    @classmethod
+    def load_datasets_without_charts(cls, session: Session, dataset_ids: List[int]) -> List["Dataset"]:
+        """Load datasets that have no charts using their indicators.
+
+        Returns datasets that:
+        - Are in the provided dataset_ids list
+        - Are not already archived
+        - Have no charts using any of their variables
+        """
+        if not dataset_ids:
+            return []
+
+        query = text("""
+            SELECT d.*
+            FROM datasets d
+            WHERE d.id IN :dataset_ids
+            AND d.isArchived = 0
+            AND NOT EXISTS (
+                SELECT 1
+                FROM variables v
+                JOIN chart_dimensions cd ON cd.variableId = v.id
+                WHERE v.datasetId = d.id
+            )
+            ORDER BY d.id
+        """)
+
+        result = session.execute(select(cls).from_statement(query).params(dataset_ids=tuple(dataset_ids)))
+        return list(result.scalars().all())
 
 
 class SourceDescription(TypedDict, total=False):
@@ -1030,7 +1069,7 @@ class PostsGdocsVariablesFaqsLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
+    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.core.meta.FaqLink]) -> None:
         """Link the given Variable ID with Faqs"""
         # Fetch current linked Faqs for the given Variable ID
         existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
@@ -1169,7 +1208,7 @@ class Variable(Base):
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     dimensions: Mapped[Optional[Dimensions]] = mapped_column(JSON, default=None)
-    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30), default=None)
+    processingLevel: Mapped[Optional[catalog.core.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30), default=None)
     processingLog: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
     titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
@@ -1453,7 +1492,7 @@ class Variable(Base):
         return _infer_variable_type(values)
 
     def update_links(
-        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
+        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.core.meta.FaqLink], tag_names: List[str]
     ) -> None:
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.

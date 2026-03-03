@@ -2,7 +2,6 @@
 #
 #  etl.py
 #
-
 import difflib
 import itertools
 import json
@@ -18,25 +17,19 @@ from graphlib import TopologicalSorter
 from multiprocessing import Manager
 from os import environ
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Set
 
 import rich_click as click
-import structlog
-from ipdb import launch_ipdb_on_exception
 
-from etl import config, files, paths
+from etl import paths
 from etl.dag_helpers import load_dag
-from etl.steps import (
-    DAG,
-    DataStep,
-    GrapherStep,
-    Step,
-    compile_steps,
-    filter_to_subgraph,
-    select_dirty_steps,
-)
 
-config.enable_sentry()
+# Type-only imports for type hints (avoids loading heavy modules at import time)
+if TYPE_CHECKING:
+    from etl.steps import DAG, Step
+
+# Simple type alias for runtime use (matches etl.steps.DAG)
+DAG = Dict[str, Set[str]]
 
 # NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
 #   with owid libraries. It's better to wait for an official pandas 3.0 release and update
@@ -46,8 +39,6 @@ config.enable_sentry()
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
-
-log = structlog.get_logger()
 
 
 @click.command(name="run")
@@ -67,11 +58,6 @@ log = structlog.get_logger()
     "-p",
     is_flag=True,
     help="Run private steps.",
-)
-@click.option(
-    "--instant",
-    is_flag=True,
-    help="Only apply YAML metadata in the garden step.",
 )
 @click.option(
     "--grapher/--no-grapher",
@@ -169,7 +155,6 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    instant: bool = False,
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
@@ -210,6 +195,10 @@ def main_cli(
     """
     _update_open_file_limit()
 
+    from etl import config, files
+
+    config.enable_sentry()
+
     # make everything single threaded, useful for debugging
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1
@@ -219,10 +208,6 @@ def main_cli(
     # GRAPHER_INSERT_WORKERS should be split among workers
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
-
-    # Set INSTANT mode from CLI flag
-    if instant:
-        config.INSTANT = instant
 
     # Set CONTINUE_ON_FAILURE from CLI flag
     if continue_on_failure:
@@ -260,8 +245,16 @@ def main_cli(
     else:
         runs = [None]
 
-    for _ in runs:
+    for changed_file in runs:
+        if watch and changed_file is not None:
+            is_yaml = str(changed_file).endswith((".yml", ".yaml"))
+            config.INSTANT = is_yaml
+            mode_label = "instant (metadata only)" if is_yaml else "full"
+            print(f"--- File changed: {changed_file.name} [{mode_label}]", flush=True)
+
         if ipdb:
+            from ipdb import launch_ipdb_on_exception
+
             config.IPDB_ENABLED = True  # type: ignore[assignment]
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
@@ -269,7 +262,18 @@ def main_cli(
             with launch_ipdb_on_exception():
                 main(**kwargs)  # type: ignore
         else:
-            main(**kwargs)  # type: ignore
+            try:
+                main(**kwargs)  # type: ignore
+            except Exception:
+                if not watch:
+                    raise
+                import traceback
+
+                traceback.print_exc()
+                print("--- step_failed", flush=True)
+                continue
+            if watch:
+                print("--- Dataset rebuild complete", flush=True)
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
@@ -298,8 +302,11 @@ def main(
     """
     Execute all ETL steps listed in dag file.
     """
+    from etl import config
+    from etl.steps import compile_steps
+
     if grapher:
-        sanity_check_db_settings()
+        sanity_check_db_settings(grapher_user_id=config.GRAPHER_USER_ID)
 
     # Load DAG
     dag = load_dag(dag_path)
@@ -324,7 +331,7 @@ def main(
 
     # Run the steps we have selected and everything upstream of them
     run_steps(
-        steps,
+        steps=steps,
         dry_run=dry_run,
         force=force,
         private=private,
@@ -334,11 +341,11 @@ def main(
     )
 
 
-def sanity_check_db_settings() -> None:
+def sanity_check_db_settings(grapher_user_id) -> None:
     """
     Give a nice error if the DB has not been configured.
     """
-    if config.GRAPHER_USER_ID is None:
+    if grapher_user_id is None:
         click.echo("ERROR: No grapher user id has been set in the environment.")
         click.echo("       Did you configure the MySQL connection in .env?")
         sys.exit(1)
@@ -367,7 +374,7 @@ def construct_full_dag(dag: DAG) -> DAG:
 
 
 def construct_subdag(
-    dag: DAG,
+    dag: "DAG",
     includes: Optional[List[str]] = None,
     excludes: Optional[List[str]] = None,
     grapher: bool = False,
@@ -375,7 +382,9 @@ def construct_subdag(
     private: bool = False,
     only: bool = False,
     exact_match: bool = False,
-) -> DAG:
+) -> "DAG":
+    from etl.steps import filter_to_subgraph
+
     orig_includes = includes
 
     # Include everything when no arguments provided
@@ -409,7 +418,7 @@ def construct_subdag(
 
 
 def run_steps(
-    steps: List[Step],
+    steps: "List[Step]",
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
@@ -424,6 +433,9 @@ def run_steps(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
+    from etl import config
+    from etl.steps import select_dirty_steps
+
     # Validate private steps
     if not private:
         _validate_private_steps(steps)
@@ -455,22 +467,38 @@ def run_steps(
         print(
             f"--- Running {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
         )
-        return exec_steps(steps, strict=strict)
+        return exec_steps(
+            steps=steps,
+            strict_after=config.STRICT_AFTER,
+            continue_on_failure=config.CONTINUE_ON_FAILURE,
+            strict=strict,
+        )
     else:
         print(
             f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
         )
-        return exec_steps_parallel(steps, workers, strict=strict)
+        return exec_steps_parallel(
+            steps=steps,
+            workers=workers,
+            continue_on_failure=config.CONTINUE_ON_FAILURE,
+            strict_after=config.STRICT_AFTER,
+            strict=strict,
+        )
 
 
-def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
+def exec_steps(
+    steps: "List[Step]", strict_after: Any, continue_on_failure: bool, strict: Optional[bool] = None
+) -> None:
+    import structlog
+
+    log = structlog.get_logger()
     execution_times = {}
-    failing_steps: List[Step] = []
-    skipped_steps: List[Step] = []
+    failing_steps: "List[Step]" = []
+    skipped_steps: "List[Step]" = []
     exceptions: List[Exception] = []
 
     for i, step in enumerate(steps, 1):
-        if config.CONTINUE_ON_FAILURE and {s.path for s in step.dependencies} & {s.path for s in skipped_steps}:
+        if continue_on_failure and {s.path for s in step.dependencies} & {s.path for s in skipped_steps}:
             print(f"--- {i}. {step} (skipped)")
             skipped_steps.append(step)
             continue
@@ -478,7 +506,7 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
         print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
 
         # Determine strictness level for the current step
-        strict = _detect_strictness_level(step, strict)
+        strict = _detect_strictness_level(step, strict_after, strict)
 
         with strictness_level(strict):
             # Execute the step and measure the time taken
@@ -488,7 +516,7 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
-                if config.CONTINUE_ON_FAILURE:
+                if continue_on_failure:
                     failing_steps.append(step)
                     exceptions.append(e)
                     skipped_steps.append(step)
@@ -504,14 +532,14 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
         # Write the recorded execution times to the file after all steps have been executed
         _write_execution_times(execution_times)
 
-    if config.CONTINUE_ON_FAILURE and exceptions:
+    if continue_on_failure and exceptions:
         for step, exception in zip(failing_steps, exceptions):
             log.error("step_exception", step=str(step), exception=str(exception))
         # Raise the first exception
         raise exceptions[0]
 
 
-def _steps_sort_key(step: Step) -> int:
+def _steps_sort_key(step: "Step") -> int:
     """Sort steps by channel, so that grapher steps are executed first, then garden, then meadow, then snapshots."""
     str_step = str(step)
     if "grapher://" in str_step:
@@ -526,7 +554,9 @@ def _steps_sort_key(step: Step) -> int:
         return 4
 
 
-def exec_steps_parallel(steps: List[Step], workers: int, strict: Optional[bool] = None) -> None:
+def exec_steps_parallel(
+    steps: "List[Step]", workers: int, continue_on_failure: bool, strict_after: bool, strict: Optional[bool] = None
+) -> None:
     # put grapher steps in front of the queue to process them as soon as possible and lessen
     # the load on MySQL
     steps = sorted(steps, key=_steps_sort_key)
@@ -548,17 +578,33 @@ def exec_steps_parallel(steps: List[Step], workers: int, strict: Optional[bool] 
             exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
 
         # Prepare a function for execution that includes the necessary arguments
-        exec_func = partial(_exec_step_job, execution_times=execution_times, step_lookup=step_lookup, strict=strict)
+        exec_func = partial(
+            _exec_step_job,
+            execution_times=execution_times,
+            step_lookup=step_lookup,
+            strict_after=strict_after,
+            strict=strict,
+        )
 
         # Execute the graph of tasks in parallel
-        exec_graph_parallel(exec_graph, exec_func, workers)
+        exec_graph_parallel(
+            exec_graph=exec_graph,
+            func=exec_func,
+            continue_on_failure=continue_on_failure,
+            workers=workers,
+        )
 
         # After all tasks have completed, write the execution times to the file
         _write_execution_times(dict(execution_times))
 
 
 def exec_graph_parallel(
-    exec_graph: Dict[str, Any], func: Callable[[str], None], workers: int, use_threads=False, **kwargs
+    exec_graph: Dict[str, Any],
+    func: Callable[[str], None],
+    continue_on_failure: bool,
+    workers: int,
+    use_threads=False,
+    **kwargs,
 ) -> None:
     """
     Execute a graph of tasks in parallel using multiple workers. TopologicalSorter orders nodes in the
@@ -570,6 +616,9 @@ def exec_graph_parallel(
     :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
     :param kwargs: Additional keyword arguments to be passed to the function.
     """
+    import structlog
+
+    log = structlog.get_logger()
     topological_sorter = TopologicalSorter(exec_graph)
     topological_sorter.prepare()
 
@@ -590,7 +639,7 @@ def exec_graph_parallel(
             # Submit tasks that are ready to the executor, but skip those dependent on failed or skipped tasks
             tasks_to_submit = []
             for task in ready_tasks[:workers]:
-                if config.CONTINUE_ON_FAILURE:
+                if continue_on_failure:
                     # Check if any dependency of this task has failed or been skipped
                     task_deps = exec_graph.get(task, set())
                     if task_deps & (failed_tasks | skipped_tasks):
@@ -619,7 +668,7 @@ def exec_graph_parallel(
                         future.result()
                         topological_sorter.done(task)
                     except Exception as e:
-                        if config.CONTINUE_ON_FAILURE:
+                        if continue_on_failure:
                             failed_tasks.add(task)
                             skipped_tasks.add(
                                 task
@@ -631,7 +680,7 @@ def exec_graph_parallel(
                             raise e
 
         # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
-        if config.CONTINUE_ON_FAILURE and exceptions:
+        if continue_on_failure and exceptions:
             for exception in exceptions:
                 log.error("step_exception", exception=str(exception))
             raise exceptions[0]
@@ -653,7 +702,11 @@ def _create_expected_time_message(
 
 
 def _exec_step_job(
-    step_name: str, execution_times: MutableMapping, step_lookup: Dict[str, Step], strict: Optional[bool] = None
+    step_name: str,
+    execution_times: MutableMapping,
+    step_lookup: "Dict[str, Step]",
+    strict_after: Any,
+    strict: Optional[bool] = None,
 ) -> None:
     """
     Executes a step.
@@ -662,9 +715,12 @@ def _exec_step_job(
     :param step_lookup: Dictionary mapping step names to Step objects.
     :param strict: The strictness level for the step execution.
     """
+    import structlog
+
+    log = structlog.get_logger()
     print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
     step = step_lookup[step_name]
-    strict = _detect_strictness_level(step, strict)
+    strict = _detect_strictness_level(step, strict_after, strict)
     with strictness_level(strict):
         try:
             execution_times[step_name] = timed_run(lambda: step.run())
@@ -708,12 +764,14 @@ def _get_execution_time(step_name: str) -> Optional[float]:
         return execution_time
 
 
-def enumerate_steps(steps: List[Step]) -> None:
+def enumerate_steps(steps: "List[Step]") -> None:
     for i, step in enumerate(steps, 1):
         print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
 
 
-def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
+def _detect_strictness_level(step: "Step", strict_after: Any, strict: Optional[bool] = None) -> bool:
+    from etl.steps import DataStep
+
     # honour the command-line argument over anything else
     if strict is not None:
         return strict
@@ -724,7 +782,7 @@ def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
 
     # now it depends on the version
     # TODO fix the "latest" cases as well
-    return step.version != "latest" and step.version >= config.STRICT_AFTER
+    return step.version != "latest" and step.version >= strict_after
 
 
 @contextmanager
@@ -748,7 +806,7 @@ def timed_run(f: Callable[[], Any]) -> float:
     return time.time() - start_time
 
 
-def _validate_private_steps(steps: list[Step]) -> None:
+def _validate_private_steps(steps: "list[Step]") -> None:
     """Make sure there are no public steps that have private steps as dependency."""
     for step in steps:
         for dep in step.dependencies:
@@ -783,8 +841,10 @@ def _always_clean() -> bool:
     return False
 
 
-def _set_dependencies_to_nondirty(step: Step) -> None:
+def _set_dependencies_to_nondirty(step: "Step") -> None:
     """Set all dependencies of a step to non-dirty."""
+    from etl.steps import DataStep, GrapherStep
+
     if isinstance(step, DataStep):
         for step_dep in step.dependencies:
             step_dep.is_dirty = _always_clean  # type: ignore[method-assign]

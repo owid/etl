@@ -1,8 +1,8 @@
 import random
 
 from owid.catalog import Table, Variable, VariableMeta
-from owid.catalog import processing_log as pl
-from owid.catalog.processing_log import LogEntry, ProcessingLog
+from owid.catalog.core import processing_log as pl
+from owid.catalog.core.processing_log import LogEntry, ProcessingLog
 
 
 def enable_pl(func):

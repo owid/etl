@@ -1,0 +1,158 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Country pair distances and borders
+  description: |-
+    This dataset contains pairwise relationships between countries, including shared border lengths, geographic proximity, and neighboring country populations.
+
+    All scores are normalized so they sum to 1 for each country, making them directly comparable across countries of different sizes.
+
+    Border detection uses geoBoundaries CGAZ administrative boundaries at the ADM0 (sovereign state) level. Island nations and countries without land borders have a border score of 0 for all other countries but still have valid distance-based scores.
+
+tables:
+  neighbours:
+    variables:
+      score_border_distance:
+        title: Border distance score
+        unit: ""
+        description_short: A normalized score indicating how close another country is, with closer countries receiving higher scores.
+        description_key:
+          - Calculated as the inverse of the minimum border-to-border distance between two countries.
+          - Scores are normalized to sum to 1 for each country.
+          - Neighboring countries (sharing a border) have distance 0 and thus receive the highest possible scores.
+        description_processing: |-
+          Distance is computed using Shapely's .distance() method, which calculates the minimum Euclidean distance between two country geometries in degrees (WGS84 coordinate system). For neighboring countries with touching borders, this returns 0.
+
+          The score is computed as: 1 / (distance + epsilon), then normalized so all scores for a country sum to 1. This means closer countries get exponentially higher scores.
+
+          Geometries are simplified (tolerance ~5km) for computational efficiency while preserving neighbor detection accuracy.
+
+      score_neighbour_border:
+        title: Border share score
+        unit: ""
+        description_short: The proportion of a country's total land border that is shared with another country.
+        description_key:
+          - Only non-zero for countries that share a land border.
+          - Calculated as shared border length divided by total border length.
+          - Scores sum to 1 for each country (among its actual neighbors).
+          - Island nations have a score of 0 for all other countries.
+        description_processing: |-
+          Border share is computed by finding the geometric intersection of two country polygons and measuring the length of the resulting line geometry. This is then divided by the country's total border length (perimeter).
+
+          A small buffer (~1.1 km) is applied during neighbor detection to account for minor gaps in boundary data. Geometries are simplified (tolerance ~0.5km) for performance while maintaining accuracy for relative border shares.
+
+      score_neighbour_population:
+        title: Neighbor population score
+        unit: ""
+        description_short: The share of total neighboring population represented by each neighbor.
+        description_key:
+          - Only non-zero for countries that share a land border.
+          - Calculated as neighbor's population divided by total population of all neighbors.
+          - Uses 2024 population data.
+          - Scores sum to 1 for each country (among its actual neighbors).
+        description_processing: |-
+          For each country, we sum the population of all its land neighbors (using 2024 population data). Each neighbor's score is then their population divided by this total.
+
+          Countries without land borders (islands) have a score of 0 for all other countries.
+
+      score_neighbour_c1:
+        title: Combined neighbor score (border-weighted)
+        unit: ""
+        description_short: A combined proximity score weighting shared borders more heavily than distance.
+        description_key:
+          - Formula is 70% border share + 30% border distance.
+          - Emphasizes actual neighbors while still considering nearby non-neighbors.
+          - Useful when shared borders are the primary consideration.
+        description_processing: |-
+          Calculated as: (score_neighbour_border * 0.7) + (score_border_distance * 0.3)
+
+          This weighting emphasizes countries that share land borders while still giving some weight to geographic proximity for non-neighbors.
+
+      score_neighbour_c2:
+        title: Combined neighbor score (balanced)
+        unit: ""
+        description_short: A combined proximity score giving equal weight to shared borders and distance.
+        description_key:
+          - Formula is 50% border share + 50% border distance.
+          - Balances the importance of actual neighbors with geographic proximity.
+          - Useful as a general-purpose "closeness" metric.
+        description_processing: |-
+          Calculated as: (score_neighbour_border * 0.5) + (score_border_distance * 0.5)
+
+          This balanced weighting treats shared borders and geographic proximity as equally important, providing a general-purpose measure of how "close" two countries are.
+
+      score_neighbour_c3:
+        title: Combined neighbor score (distance-weighted)
+        unit: ""
+        description_short: A combined proximity score weighting geographic distance more heavily than borders.
+        description_key:
+          - Formula is 30% border share + 70% border distance.
+          - Emphasizes geographic proximity over shared borders.
+          - Useful for analyses where physical distance matters more than political boundaries.
+        description_processing: |-
+          Calculated as: (score_neighbour_border * 0.3) + (score_border_distance * 0.7)
+
+          This weighting emphasizes geographic proximity, making it useful for analyses where physical distance is more relevant than whether countries share a land border (e.g., trade routes, cultural diffusion).
+
+  neighbours_list:
+    variables:
+      neighbours_1:
+        title: Neighbors by border share
+        unit: ""
+        description_short: Semicolon-separated list of up to 10 countries, sorted by shared border length.
+        description_key:
+          - Countries with the largest shared border appear first.
+          - If fewer than 10 neighbors exist, remaining slots are filled with nearest non-neighbors by distance.
+          - Useful for identifying a country's most geographically integrated neighbors.
+        description_processing: |-
+          Countries are sorted by score_neighbour_border (descending). If fewer than 10 countries have a non-zero border score, additional countries are added based on score_border_distance until 10 countries are listed.
+
+      neighbours_2:
+        title: Neighbors by balanced score
+        unit: ""
+        description_short: Semicolon-separated list of up to 10 countries, sorted by the balanced combined score (50% border + 50% distance).
+        description_key:
+          - Balances shared borders with geographic proximity.
+          - If fewer than 10 neighbors exist, remaining slots are filled with nearest non-neighbors.
+        description_processing: |-
+          Countries are sorted by score_neighbour_c2 (descending). If fewer than 10 countries have a non-zero score, additional countries are added based on score_border_distance.
+
+      neighbours_3:
+        title: Neighbors by distance-weighted score
+        unit: ""
+        description_short: Semicolon-separated list of up to 10 countries, sorted by the distance-weighted combined score (30% border + 70% distance).
+        description_key:
+          - Emphasizes geographic proximity over shared borders.
+          - Useful for identifying countries that are physically close regardless of shared borders.
+        description_processing: |-
+          Countries are sorted by score_neighbour_c3 (descending). If fewer than 10 countries have a non-zero score, additional countries are added based on score_border_distance.
+
+      neighbours_4:
+        title: Neighbors by population
+        unit: ""
+        description_short: Semicolon-separated list of up to 10 neighboring countries, sorted by their population.
+        description_key:
+          - Only includes countries that share a land border.
+          - Largest neighboring countries by population appear first.
+          - If fewer than 10 neighbors exist, remaining slots are filled with nearest non-neighbors.
+        description_processing: |-
+          Countries are sorted by score_neighbour_population (descending), which reflects each neighbor's share of total neighboring population. If fewer than 10 land neighbors exist, additional countries are added based on score_border_distance.
+
+      neighbours_10:
+        title: Nearest countries by distance
+        unit: ""
+        description_short: Semicolon-separated list of 10 nearest countries, sorted purely by geographic distance.
+        description_key:
+          - Distance is measured as the minimum border-to-border distance between countries.
+          - Includes both neighbors (distance = 0) and non-neighbors.
+          - Useful for identifying geographically proximate countries regardless of shared borders.
+        description_processing: |-
+          Countries are sorted by score_border_distance (descending), which is based on the inverse of minimum border-to-border distance. No fallback is needed since all country pairs have a valid distance score.

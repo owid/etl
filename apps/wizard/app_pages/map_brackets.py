@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import requests
 import streamlit as st
-from owid.catalog import find
+from owid.catalog import fetch
 from owid.datautils.common import ExceptionFromDocstring
 from sqlalchemy.orm import Session
 from structlog import get_logger
@@ -81,9 +81,7 @@ class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
 @st.cache_data
 def load_mappable_regions_and_ids(df: pd.DataFrame) -> Dict[str, int]:
     # Load the external regions dataset.
-    regions = find(
-        "regions", dataset="regions", namespace="owid_grapher", channels=["external"], version="latest"
-    ).load()
+    regions = fetch("external/owid_grapher/latest/regions/regions")
     regions_mappable = regions[regions["is_mappable"]]["name"].tolist()
 
     # List all entity ids used by this variable.

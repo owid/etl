@@ -7,7 +7,7 @@ meta:
     description: |-
       Daily closing interbank spot market exchange rates between New Taiwan Dollar (NTD/TWD) and US Dollar (USD) from the Central Bank of the Republic of China (Taiwan).
       The exchange rate represents how many TWD are needed to purchase one USD.
-    date_published: "2025-12-22"
+    date_published: "2026-01-02"
 
     # Citation
     producer: Central Bank of the Republic of China (Taiwan)
@@ -17,13 +17,13 @@ meta:
     # Files
     url_main: https://www.cbc.gov.tw/en/lp-4237-2.html
     url_download: https://www.cbc.gov.tw/en/cp-4237-128173-40064-2.html
-    date_accessed: '2025-12-22'
+    date_accessed: '2026-01-23'
 
     # License
     license:
       name: Public domain
       url: https://www.cbc.gov.tw/en/lp-4237-2.html
 outs:
-  - md5: a188eb5de53075fe7b1bdfdd3aa57bfa
-    size: 83819
+  - md5: 55866681ddb0b53a22ed24dd1cd236ad
+    size: 88203
     path: twd_usd_exchange_rate.csv

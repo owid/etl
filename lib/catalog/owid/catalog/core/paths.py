@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass, replace
 from typing import Literal, cast, get_args
 
-# Available channels in the catalog (matches owid.catalog.datasets.CHANNEL)
+# Available channels in the catalog (matches owid.catalog.core.datasets.CHANNEL)
 CHANNEL = Literal[
     "snapshot",
     "garden",

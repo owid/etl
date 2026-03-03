@@ -1,7 +1,7 @@
 """Load a garden dataset and create an explorers dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table, warnings
+from owid.catalog.core import Table, warnings
 
 from etl.helpers import PathFinder
 
@@ -22,7 +22,7 @@ def run() -> None:
     #
     # Load garden datasets
     ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_wid = paths.load_dataset("world_inequality_database")
+    ds_wid = paths.load_dataset("world_inequality_database_legacy")
     ds_wdi = paths.load_dataset("wdi")
 
     # Read tables from garden datasets.
@@ -139,6 +139,7 @@ def run() -> None:
     ds_explorer = paths.create_dataset(
         tables=[tb, tb_percentiles, tb_wdi],
         default_metadata=ds_pip.metadata,
+        repack=False,
     )
     ds_explorer.save()
 

@@ -1,0 +1,34 @@
+# Find data at https://aidsinfo.unaids.org/ (go to 'Factsheets')
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global AIDS Update, Epidemic Indicators"
+    description: |-
+      UNAIDS leads the world's most extensive data collection on HIV epidemiology, programme coverage and finance and publishes the most authoritative and up-to-date information on the HIV epidemic.
+
+      In some cases there is no data for some country and year. This can be a result of very small epidemics among women in the reproductive age which makes estimation of the mother to child transmission very unstable. Another reason for missing data is that relevant authorities may have asked UNAIDS not to share their estimates.
+
+      A historic funding crisis is threatening to unravel decades of progress unless countries can make radical shifts to HIV programming and funding. The report highlights the impact that the sudden, large-scale funding cuts from international donors are having on countries most affected by HIV. Yet it also showcases some inspiring examples of resilience, with countries and communities stepping up in the face of adversity to protect the gains made and drive the HIV response forward.
+
+    date_published: "2026-01-15"
+
+    # Citation
+    producer: Joint United Nations Programme on HIV/AIDS
+    citation_full: |-
+      AIDS, crisis and the power to transform: UNAIDS Global AIDS Update 2025. Geneva: Joint United Nations Programme on HIV/AIDS; 2025. Full report: https://www.unaids.org/en/resources/documents/2025/2025-global-aids-update-summary
+
+    attribution_short: UNAIDS
+
+    # Files
+    url_main: https://aidsinfo.unaids.org/dataset
+    url_download: https://aidsinfo.unaids.org/public/documents/Estimates_2025_en.zip
+    date_accessed: "2026-01-19"
+
+    # License
+    license:
+      name: CC BY 3.0
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: e9390e2d60c754cdf624f0955040a3a5
+    size: 26613317
+    path: unaids_epi.zip

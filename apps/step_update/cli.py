@@ -96,7 +96,10 @@ class StepUpdater:
 
         # Find script file for old step.
         _step_py_files = list(step_dvc_file.parent.glob("*.py"))
-        if len(_step_py_files) == 1:
+        if len(_step_py_files) == 0:
+            # No .py file found - this is valid for simple snapshots that can be run with just the .dvc file.
+            step_py_file = None
+        elif len(_step_py_files) == 1:
             # Usually there is a single .py file with the same name. But it is possible that:
             #  * The single .py file has a different name.
             #    Example: gcp/2023-12-12/global_carbon_budget.py
@@ -144,13 +147,15 @@ class StepUpdater:
             # Write metadata to new file.
             step_dvc_file_new.write_text(metadata.to_yaml())
 
-            # Check if a new py file already exists.
-            step_py_file_new = folder_new / step_py_file.name
-            if not step_py_file_new.exists():
-                # Create a new py file.
-                # NOTE: If there is already a .py file in the new folder, it may be because another dvc file (used by
-                # that script) has already been updated. So, simply skip it.
-                step_py_file_new.write_bytes(step_py_file.read_bytes())
+            # Copy the .py file if one exists.
+            if step_py_file is not None:
+                # Check if a new py file already exists.
+                step_py_file_new = folder_new / step_py_file.name
+                if not step_py_file_new.exists():
+                    # Create a new py file.
+                    # NOTE: If there is already a .py file in the new folder, it may be because another dvc file (used by
+                    # that script) has already been updated. So, simply skip it.
+                    step_py_file_new.write_bytes(step_py_file.read_bytes())
 
             # Add the new snapshot as a dependency of the temporary dag.
             step_temp = (
@@ -268,7 +273,7 @@ class StepUpdater:
             log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github"]:
+        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github", "multidim"]:
             return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")

@@ -434,6 +434,9 @@ df_graphers = pd.concat([df_graphers, df_graphers_spells], ignore_index=True)
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
 
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
+
 # When the "Depending on" footnote is introduced, it generates unwanted texts as:
 # "Depending on the country and year, the data relates to income measured after taxes and benefits [per capita](#dod:per-capita)."
 # "Depending on the country and year, the data relates to consumption [per capita](#dod:per-capita)."

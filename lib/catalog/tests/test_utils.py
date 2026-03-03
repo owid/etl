@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
-from owid.catalog.utils import hash_any, remove_details_on_demand, underscore
+from owid.catalog.core.utils import hash_any, remove_details_on_demand, underscore
 
 
 def test_underscore():

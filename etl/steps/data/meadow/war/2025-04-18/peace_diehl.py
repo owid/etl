@@ -17,8 +17,8 @@ def run() -> None:
     # Retrieve snapshot
     snap = paths.load_snapshot("peace_diehl.zip")
 
-    with snap.open_archive():
-        tb = snap.read_from_archive("peacedata3.1.1/peacedata3.1.1.csv", header=None, na_values=[".", None])
+    with snap.extracted() as archive:
+        tb = archive.read("peacedata3.1.1/peacedata3.1.1.csv", header=None, na_values=[".", None])
 
     #
     # Process data.

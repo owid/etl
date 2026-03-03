@@ -10,7 +10,8 @@ from pathlib import Path
 
 import pytest  # noqa
 
-from owid.catalog import CHANNEL, ETLCatalog, LocalCatalog, Table, find
+from owid.catalog import CHANNEL, Table
+from owid.catalog.api.legacy import ETLCatalog, LocalCatalog
 
 from .test_datasets import create_temp_dataset
 
@@ -86,19 +87,6 @@ def test_local_default_channel():
 
     with mock_catalog(1, channels=("garden", "meadow")) as catalog:
         assert set(catalog.find().channel) == {"garden", "meadow"}
-
-
-def test_calling_find_adds_channels():
-    with suppress_deprecation_warnings():
-        find("abc")
-        from owid.catalog.catalogs import REMOTE_CATALOG
-
-        assert REMOTE_CATALOG.channels == ("garden",)  # type: ignore
-
-        find("abc", channels=("garden", "meadow"))
-        from owid.catalog.catalogs import REMOTE_CATALOG
-
-        assert set(REMOTE_CATALOG.channels) == {"garden", "meadow"}  # type: ignore
 
 
 def test_reindex_with_include():
