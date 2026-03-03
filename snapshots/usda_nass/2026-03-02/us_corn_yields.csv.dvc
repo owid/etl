@@ -1,0 +1,42 @@
+# The data was manually downloaded from USDA NASS web site.
+# To get the data follow these steps (it may take some time, since the web site responds slowly):
+# * Go to: https://quickstats.nass.usda.gov/
+# * Select:
+#     Select Commodity (one or more):
+#         Program: SURVEY
+#         Sector: CROPS
+#         Group: FIELD CROPS
+#         Commodity: CORN
+#         Category: YIELD
+#         Data Item: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE
+#         Domain: TOTAL
+#     Select Location (one or more):
+#         Geographic Level: NATIONAL
+#         State: US TOTAL
+#     Select Time (one or more):
+#         Year: [Select all years, by manually clicking on the most recent year (at the top) and going down with the mouse]
+#         Period Type: ANNUAL
+#         Period: YEAR
+# * Click on "Get Data" at the bottom left.
+# * Click on "spreadsheet" at the top right.
+# * Run this script with the flag `--path-to-file` followed by the path to the downloaded file.
+# To find the publication date:
+# * Go to: https://quickstats.nass.usda.gov/recent_stats
+# * Search for "CORN" and copy the date under "Released Time".
+meta:
+  origin:
+    producer: USDA National Agricultural Statistics Service (NASS)
+    title: Long-term corn yields in United States
+    citation_full: |-
+      National Agricultural Statistics Service of the United States Department of Agriculture (USDA/NASS) - Long-term corn yields in United States (2024).
+    attribution_short: USDA/NASS
+    url_main: https://quickstats.nass.usda.gov/
+    date_accessed: '2026-03-02'
+    date_published: '2026-03-02'
+    license:
+      name: Public domain
+      url: https://www.nass.usda.gov/Data_and_Statistics/Citation_Request/index.php
+outs:
+  - md5: 24b653f602273a2156eb425368f294ca
+    size: 27307
+    path: us_corn_yields.csv
