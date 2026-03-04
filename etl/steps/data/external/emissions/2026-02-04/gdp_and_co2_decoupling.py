@@ -50,7 +50,7 @@ RUNNING_AVERAGE_YEARS = 3
 
 # Path to local folder where charts will be saved.
 # NOTE: Functions that save files will be commented by default; uncomment while doing analysis.
-OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-02-05_decoupling_analysis/"
+OUTPUT_FOLDER = Path.home() / "Documents/owid/2026-03-04_gdp_co2_decoupling_analysis/"
 
 
 def fix_abrupt_changes_in_honduras(tb: Table) -> Table:
