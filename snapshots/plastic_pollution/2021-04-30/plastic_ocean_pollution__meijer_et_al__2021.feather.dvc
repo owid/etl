@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: |-
+      Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances.
+    url: https://advances.sciencemag.org/content/7/18/eaaz5803
+    date_accessed: 2021-04-30
+    published_by: |-
+      Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances.
+  name: Plastic ocean pollution (Meijer et al. 2021)
+  description: ''
+outs:
+  - md5: 5b2441d94e844a9a92ee7bb397904054
+    size: 18594
+    path: plastic_ocean_pollution__meijer_et_al__2021.feather

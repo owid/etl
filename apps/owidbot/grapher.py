@@ -7,7 +7,7 @@ from etl.paths import BASE_DIR
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    svg_tester_dirs = ("graphers", "grapher-views", "mdims", "explorers")
+    svg_tester_dirs = ("graphers", "grapher-views", "mdims", "explorers", "thumbnails")
     svg_tester_has_run = any(
         (BASE_DIR.parent / "owid-grapher-svgs" / dir_name / "verify-graphs.log").exists()
         for dir_name in svg_tester_dirs
@@ -16,6 +16,7 @@ def run(branch: str) -> str:
     svg_tester_grapher_views = make_differences_line("grapher-views") if svg_tester_has_run else ""
     svg_tester_mdims = make_differences_line("mdims") if svg_tester_has_run else ""
     svg_tester_explorers = make_differences_line("explorers") if svg_tester_has_run else ""
+    svg_tester_thumbnails = make_differences_line("thumbnails") if svg_tester_has_run else ""
 
     svg_tester_line = (
         f"- **SVG tester:** https://github.com/owid/owid-grapher-svgs/compare/{branch}" if svg_tester_has_run else ""
@@ -29,6 +30,7 @@ Number of differences (graphers): {svg_tester_graphers}
 Number of differences (grapher views): {svg_tester_grapher_views}
 Number of differences (mdims): {svg_tester_mdims}
 Number of differences (explorers): {svg_tester_explorers}
+Number of differences (thumbnails): {svg_tester_thumbnails}
 
 </details>
 """.strip()

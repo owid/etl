@@ -63,7 +63,11 @@ def run() -> None:
         aggregations=aggregations,
         regions=REGIONS,
         min_frac_countries_informed=0.7,
-        countries_that_must_have_data={"World": ["China", "India", "Indonesia", "United States"]},
+        countries_that_must_have_data={
+            "World": ["China", "India", "Indonesia", "United States"],
+            "Asia": ["China", "India", "Indonesia"],
+            "North America": ["United States", "Mexico", "Canada"],
+        },
     )
     tb.loc[tb["country"] == "World", "nim"] = np.nan
 

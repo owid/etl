@@ -273,7 +273,7 @@ class StepUpdater:
             log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github"]:
+        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github", "multidim"]:
             return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
@@ -426,20 +426,22 @@ class StepUpdater:
         elif isinstance(steps, tuple):
             steps = list(steps)
 
-        # Archivable steps should be archived in groups.
-        # For example, the meadow, garden and grapher steps of a step may be archivable, but we shouldn't archive only
-        # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
-        # dependency in the dag).
         for step in steps:
             if self.steps_df[self.steps_df["step"] == step].empty:
                 log.error(f"Step {step} not found in active dag.")
                 continue
 
+            usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
             if include_usages:
-                # Add all active usages of current step to the list of steps to update (if not already in the list).
-                usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
-
                 steps += [usage for usage in usages if usage not in steps]
+            else:
+                blocking = [u for u in usages if u not in steps]
+                if blocking:
+                    blocking_list = "\n  ".join(blocking)
+                    raise click.ClickException(
+                        f"Cannot archive '{step}' because it is used by active steps:\n  {blocking_list}\n"
+                        f"Use --include-usages to archive dependent steps as well."
+                    )
 
         # Sort steps in dependency order (i.e. snapshots first). This avoids an error in the following situation:
         # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).

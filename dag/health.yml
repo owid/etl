@@ -748,7 +748,6 @@ steps:
   data://garden/cdc/latest/measles_cases:
     - data://meadow/cdc/latest/measles_cases
 
-  #
   # Long-run measles data (auto-updated)
   data://garden/health/latest/measles_long_run:
     - data://garden/cdc/latest/measles_cases

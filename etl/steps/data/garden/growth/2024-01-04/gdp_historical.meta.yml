@@ -75,7 +75,7 @@ tables:
             selectedEntityNames:
               - World
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
-            hideLegend: true
+            hideSeriesLabels: true
       gdp_per_capita:
         title: GDP per capita
         unit: international-$ in 2017 prices
@@ -124,5 +124,5 @@ tables:
             selectedEntityNames:
               - World
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
-            hideLegend: true
+            hideSeriesLabels: true
 
