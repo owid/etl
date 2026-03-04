@@ -31,4 +31,12 @@ steps:
   data://grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018: !!set
     ? data://garden/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018
   data://garden/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018: !!set
-    snapshot://food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018.feather:
+    ? snapshot://food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018.feather
+  data://grapher/health/2019-05-14/human_height__ncd_risc__2017: !!set
+    ? data://garden/health/2019-05-14/human_height__ncd_risc__2017
+  data://garden/health/2019-05-14/human_height__ncd_risc__2017: !!set
+    ? snapshot://health/2019-05-14/human_height__ncd_risc__2017.feather
+  data://grapher/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources: !!set
+    ? data://garden/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources
+  data://garden/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources: !!set
+    snapshot://labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources.feather:
