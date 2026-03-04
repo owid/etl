@@ -513,7 +513,9 @@ def main():
     if keywords or topics:
         with st.container(border=True):
             if keywords:
-                keyword_links = [f"[{kw}](https://ourworldindata.org/search?q={kw.replace(' ', '+')})" for kw in keywords]
+                keyword_links = [
+                    f"[{kw}](https://ourworldindata.org/search?q={kw.replace(' ', '+')})" for kw in keywords
+                ]
                 st.markdown(f"🔑 **Suggested keywords:** {' · '.join(keyword_links)}")
             if topics:
                 topic_links = [f"[{t['name']}]({t['url']})" for t in topics]
@@ -547,12 +549,8 @@ def main():
     # Fetch search results from both panels in parallel
     with st.spinner("Searching..."):
         with ThreadPoolExecutor(max_workers=2) as executor:
-            left_future = executor.submit(
-                fetch_for_source, left_source, query, hits_per_page, left_options
-            )
-            right_future = executor.submit(
-                fetch_for_source, right_source, query, hits_per_page, right_options
-            )
+            left_future = executor.submit(fetch_for_source, left_source, query, hits_per_page, left_options)
+            right_future = executor.submit(fetch_for_source, right_source, query, hits_per_page, right_options)
             left_data, left_time = left_future.result()
             right_data, right_time = right_future.result()
 
