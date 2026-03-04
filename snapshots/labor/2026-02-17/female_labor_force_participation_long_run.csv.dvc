@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Female labor supply: a survey"
+    description: |-
+      This chapter presents a survey on female labor supply. The chapter surveys theoretical and empirical work on the labor supply of women, with special reference to women in Western economies, primarily the United States, in modern times. The behavior of female labor supply has important implications for many other phenomena, including marriage, fertility, divorce, the distribution of family earnings and male-female wage differentials. The labor supply of women is also of interest, because of the technical questions it poses. For example, because many women do not work, corner solutions are at least potentially a very important issue in both the theoretical and empirical analysis of female labor supply, even though in other contexts (for example, studies of consumer demand) corner solutions are often ignored. The chapter presents some “stylized facts” about female labor supply, and then discusses a number of theoretical models of special interest for understanding female labor supply. After considering empirical studies of the labor supply of women, the chapter concludes with some suggestions for future research. The chapter discusses major trends and cyclical patterns in time-series data, and then examines cross-sectional phenomena.
+    date_published: "1986-01-01"
+
+    # Citation
+    producer: Killingsworth and Heckman
+    citation_full: |-
+      Killingsworth, M.R. and Heckman, J.J. Female labor supply: A survey. Chapter 2 in Ashenfelter, O.C. and Layard, R. (eds.) (1986) Handbook of Labor Economics, Volume 1.
+
+    # Files
+    url_main: https://eml.berkeley.edu/~saez/course/Heckman%20and%20Killingsworth_Handbook.pdf
+    date_accessed: '2026-02-17'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://eml.berkeley.edu/~saez/course/Heckman%20and%20Killingsworth_Handbook.pdf
+outs:
+  - md5: 746f497bc3e9e9172c1bd206b0a0bc85
+    size: 739
+    path: female_labor_force_participation_long_run.csv

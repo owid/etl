@@ -293,13 +293,13 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.009.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry(enable_logs: bool = False) -> None:
+def enable_sentry(enable_logs: bool = False, integrations: list | None = None) -> None:
     import sentry_sdk  # 0.1
 
     if SENTRY_DSN:
@@ -312,10 +312,13 @@ def enable_sentry(enable_logs: bool = False) -> None:
                     return None
             return event
 
-        kwargs = {"dsn": SENTRY_DSN, "before_send": before_send}
+        kwargs: dict = {"dsn": SENTRY_DSN, "before_send": before_send}
 
         if enable_logs:
             kwargs["_experiments"] = {"enable_logs": True}
+
+        if integrations:
+            kwargs["integrations"] = integrations
 
         sentry_sdk.init(**kwargs)
 
@@ -712,11 +715,6 @@ NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
-
-# Logfire for LLM observability
-LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
-LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
-LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
 
 # MCP server
 OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

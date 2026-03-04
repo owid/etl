@@ -7,12 +7,42 @@ Important - You need and account to access the data.
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Cause of death or injury'
 * In Measure select 'Deaths'
-* In Metric select 'Number' and 'Percent'
-* In Cause select 'Select all level 2 causes'
-* In Location select 'Global', 'China', 'United States', 'Central African Republic', 'Brazil', 'France'
-* In Age select 'All ages',
-* In Sex select 'Both'
-* In Year select '2023'
+* In Metric select 'Number'
+* In Cause select:
+    Cardiovascular diseases
+    Chronic respiratory diseases
+    Conflict and terrorism
+    Diabetes and kidney diseases
+    Digestive diseases
+    Diarrheal diseases
+    Enteric infections
+    Falls
+    HIV/AIDS
+    HIV/AIDS and sexually transmitted infections
+    Interpersonal violence
+    Malaria
+    Maternal disorders
+    Mental disorders
+    Musculoskeletal disorders
+    Neglected tropical diseases and malaria
+    Neonatal disorders
+    Neoplasms
+    Neurological disorders
+    Nutritional deficiencies
+    Other infectious diseases
+    Other non-communicable diseases
+    Respiratory infections and tuberculosis
+    Self-harm
+    Self-harm and interpersonal violence
+    Skin and subcutaneous diseases
+    Substance use disorders
+    Transport injuries
+    Tuberculosis
+    Unintentional injuries
+* In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
+* In Age select: 'All ages', 5-14 years, 15-49 years, 50-69 years, 70+ years
+* In Sex select 'Both', 'Female', 'Male'
+* In Year select all years
 
 The data will then be requested and a download link will be sent to you with a number of zip files containing the data (approx < 10 files).
 
@@ -38,10 +68,8 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-URLS = [
-    "https://dl.healthdata.org:443/gbd-api-2023-public/4e6a849e2ac57f0d2f033ee7d48bb61d_files/IHME-GBD_2023_DATA-4e6a849e-1.zip",  # Both Sexes
-    "https://dl.healthdata.org:443/gbd-api-2023-public/99e2554027144a70b84855b1c85d26db_files/IHME-GBD_2023_DATA-99e25540-1.zip",
-]
+BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/50ca8e662c310414f7174f41222e634a_files/IHME-GBD_2023_DATA-50ca8e66-"
+NUMBER_OF_FILES = 10
 
 
 @click.command()
@@ -51,9 +79,10 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_treemap.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
-    for file in URLS:
-        df = download_data(file)
-        log.info(f"Download of file {file} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
+    for file_number in range(1, NUMBER_OF_FILES + 1):
+        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
+        df = download_data(file_number, base_url=BASE_URL)
+        log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
         dfs.append(df)
 
     # Concatenate the dataframes while keeping categorical columns to reduce memory usage.
@@ -63,9 +92,10 @@ def main(upload: bool) -> None:
     snap.create_snapshot(upload=upload, data=df)
 
 
-def download_data(url: str) -> pd.DataFrame:
+def download_data(file_number: int, base_url: str) -> pd.DataFrame:
     # Unique URL for each file
-    csv_file_name = f"{url.split('/')[-1]}".replace(".zip", ".csv")
+    url_to_download = f"{base_url}{file_number}.zip"
+    csv_file_name = f"{base_url.split('/')[-1]}{file_number}.csv"
 
     # Retry logic
     max_retries = 5
@@ -73,7 +103,7 @@ def download_data(url: str) -> pd.DataFrame:
 
     for attempt in range(max_retries):
         try:
-            response = requests.get(url)
+            response = requests.get(url_to_download)
             response.raise_for_status()
             break  # If request is successful, exit the loop
         except requests.RequestException as e:
@@ -85,7 +115,7 @@ def download_data(url: str) -> pd.DataFrame:
                 print(f"Failed to download the file after {max_retries} attempts. Error: {e}")
                 raise
     # Download data from source, open the csv within and return that.
-    response = requests.get(url)
+    response = requests.get(url_to_download)
 
     # Load the ZIP file into a BytesIO object
     zip_file = BytesIO(response.content)
@@ -104,7 +134,3 @@ def download_data(url: str) -> pd.DataFrame:
     df = repack_frame(df)
 
     return df
-
-
-if __name__ == "__main__":
-    main()

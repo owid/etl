@@ -425,6 +425,7 @@ class Chart(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
+    forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
@@ -446,8 +447,9 @@ class Chart(Base):
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
         config = self.chart_config.full.copy()
-        # Add isInheritanceEnabled to config so it's included in comparisons
+        # Include chart-level flags in config so they're part of comparison/diff logic.
         config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        config["forceDatapage"] = bool(self.forceDatapage)
         return config
 
     @config.expression

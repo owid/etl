@@ -1,30 +1,22 @@
 import asyncio
 import uuid
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
-import logfire
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
+from fastmcp.server.middleware.caching import CallToolSettings, ResponseCachingMiddleware
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
+from sentry_sdk.integrations.mcp import MCPIntegration
 
-from etl.config import LOGFIRE_TOKEN_MCP, enable_sentry
+from etl.config import enable_sentry
 
 # Import the modular servers
 from owid_mcp import charts, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
-enable_sentry(enable_logs=True)
-
-if LOGFIRE_TOKEN_MCP:
-    logfire.configure(token=LOGFIRE_TOKEN_MCP, service_name="owid_mcp")
-    logfire.instrument_httpx()
-
-    # logging.basicConfig(
-    #     handlers=[logfire.LogfireLoggingHandler()],
-    #     level=logging.INFO,
-    # )
-else:
-    logfire.configure(send_to_logfire=False)
+enable_sentry(enable_logs=True, integrations=[MCPIntegration()])
 
 INSTRUCTIONS = (
     "RECOMMENDED TOOLS (for full MCP clients):\n"
@@ -49,6 +41,17 @@ INSTRUCTIONS = (
 INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
 
 
+@asynccontextmanager
+async def lifespan(app: FastMCP) -> AsyncIterator[None]:
+    """Server lifespan handler for startup/shutdown tasks."""
+    # Startup: mount all modular servers (v3.0 uses mount instead of import_server)
+    app.mount(indicators.mcp)
+    app.mount(posts.mcp)
+    app.mount(charts.mcp)
+    yield
+    # Shutdown: cleanup if needed
+
+
 # NOTE:
 # Because the ChatGPT connector doesn't perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
 # you must run your FastMCP server in stateless mode. Otherwise FastMCP won't recognize the incoming
@@ -58,8 +61,8 @@ INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in O
 # I run a request from https://platform.openai.com/chat/edit?prompt=pmpt_6881e40843788196aaa9923785c429b20de09e18aac0a654&version=1
 # it successfully makes the first request but the subsequent request fails with 404. So it's likely something
 # about the session ID.
+# NOTE: As of fastmcp 3.0, stateless_http is passed to run()/run_http_async()/http_app() instead of constructor.
 mcp = FastMCP(
-    stateless_http=True,
     name="Our World in Data MCP",
     instructions="\n\n".join(
         [
@@ -70,6 +73,7 @@ mcp = FastMCP(
             INSTRUCTIONS_ENTITIES,
         ]
     ),
+    lifespan=lifespan,
 )
 
 
@@ -81,52 +85,41 @@ class RequestLoggingMiddleware(Middleware):
             **context.message.__dict__,
         }
 
-        # Put every MCP call inside a Logfire span so it shows up as a trace
-        msg = str(context.method)
-        if attrs.get("name"):
-            msg += " - " + str(attrs["name"])
-        with logfire.span(msg, **attrs):
-            # Log incoming request
-            sentry_logger.info(
-                "request started",
-                attributes=attrs,
-            )
+        # Log incoming request
+        sentry_logger.info(
+            "request started",
+            attributes=attrs,
+        )
 
-            # handle request
-            try:
-                result = await call_next(context)
-            except (asyncio.CancelledError, KeyboardInterrupt):
-                # Don't send these to Sentry - they're normal shutdown signals
-                raise
-            except Exception as e:
-                capture_exception(e)
-                logfire.exception("request failed", **attrs)
-                raise e
+        # handle request
+        try:
+            result = await call_next(context)
+        except (asyncio.CancelledError, KeyboardInterrupt):
+            # Don't send these to Sentry - they're normal shutdown signals
+            raise
+        except Exception as e:
+            capture_exception(e)
+            raise e
 
         return result
 
 
-# Add the logging middleware
+# Add middleware: logging first, then caching
 mcp.add_middleware(RequestLoggingMiddleware())
 
-
-# Import the modular servers without prefixes
-# Note: import_server is async, so we need to handle this during server startup
-async def setup_server():
-    """Setup the server by importing modules."""
-    await mcp.import_server(indicators.mcp)
-    await mcp.import_server(posts.mcp)
-    await mcp.import_server(charts.mcp)
-
-
-# Create the setup task - this will be awaited when needed
-_server_setup_task = setup_server()
+# Response caching for expensive operations (5 minute TTL)
+mcp.add_middleware(
+    ResponseCachingMiddleware(
+        call_tool_settings=CallToolSettings(
+            ttl=300,
+            included_tools=["search_indicator", "fetch_indicator_metadata", "search_chart", "search_posts"],
+        )
+    )
+)
 
 
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Setup the server before running
-    asyncio.run(_server_setup_task)
     mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)

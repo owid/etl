@@ -64,9 +64,11 @@ def validate_chart_config_and_set_defaults(
 
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
-    # Remove isInheritanceEnabled if present as it's not part of the schema
+    # Remove chart table fields if present as they're not part of the schema
     if "isInheritanceEnabled" in config_new:
         del config_new["isInheritanceEnabled"]
+    if "forceDatapage" in config_new:
+        del config_new["forceDatapage"]
     # Remove adminBaseUrl and bakedGrapherURL if present
     if "adminBaseUrl" in config_new:
         del config_new["adminBaseUrl"]

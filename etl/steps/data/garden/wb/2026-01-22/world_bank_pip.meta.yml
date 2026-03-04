@@ -200,7 +200,11 @@ definitions:
   description_key_welfare_type_poverty_explorer: |-
     Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
 
+  description_key_welfare_type_spells: |-
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). This chart shows the data with income and consumption measures separately.
+
   description_key_welfare_type_poverty: |-
+    <% if survey_comparability == "No spells" %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -208,9 +212,12 @@ definitions:
     <%- else %>
     {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
     <%- endif %>
+    <%- else %>
+    {definitions.description_key_welfare_type_spells}
+    <%- endif %>
 
   description_key_welfare_type: |-
-    <% if welfare_type is defined %>
+    <% if welfare_type is defined and survey_comparability is defined and survey_comparability == "No spells" %>
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -219,7 +226,7 @@ definitions:
     {definitions.description_key_welfare_type_base}
     <%- endif %>
     <%- else %>
-    {definitions.description_key_welfare_type_base}
+    {definitions.description_key_welfare_type_spells}
     <%- endif %>
 
   description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
@@ -264,19 +271,23 @@ definitions:
     The original data with *all* available income and consumption measures is shown separately in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).
 
   description_processing_main_poverty: |-
-    <% if survey_comparability is not defined or survey_comparability != "No spells" or welfare_type == "income or consumption" %>
+    <% if survey_comparability is not defined or survey_comparability == "No spells" %>
+    <% if welfare_type == "income or consumption" %>
     {definitions.description_processing_main_base}
 
     {definitions.description_processing_main_poverty_explorer}
     <%- elif welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
     <%- endif %>
+    <%- endif %>
 
   description_processing_main: |-
-    <% if (survey_comparability is not defined or survey_comparability != "No spells") or welfare_type == "income or consumption" %>
+    <% if survey_comparability is not defined or survey_comparability == "No spells" %>
+    <% if welfare_type == "income or consumption" %>
     {definitions.description_processing_main_base}
     <%- elif welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
+    <%- endif %>
     <%- endif %>
 
   description_processing_surveys_past_decade: |-
@@ -460,8 +471,13 @@ definitions:
   poverty_gap_index_subtitle: |-
     The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
 
+  spells_subtitle: |-
+    <% if survey_comparability is defined and survey_comparability != "No spells" %>
+     The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
+    <%- endif %>
+
   note_ppp: |-
-    <% if welfare_type == "income or consumption" %>
+    <% if welfare_type == "income or consumption" or (survey_comparability is defined and survey_comparability != "No spells") %>
     {definitions.ppp_adjustment_note} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
     <%- elif welfare_type == "income" %>
     {definitions.ppp_adjustment_note} It relates to income measured after taxes and benefits [per capita](#dod:per-capita).
@@ -470,15 +486,16 @@ definitions:
     <%- endif %>
 
   note_ppp_longer: |-
+    <% if welfare_type == "income or consumption" or (survey_comparability is defined and survey_comparability != "No spells") %>
     {definitions.ppp_adjustment_note_longer} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
-    <%- if welfare_type == "income" %>
+    <%- elif welfare_type == "income" %>
     {definitions.ppp_adjustment_note_longer} It relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
     {definitions.ppp_adjustment_note_longer} It relates to consumption [per capita](#dod:per-capita).
     <%- endif %>
 
   note_without_ppp: |-
-    <% if welfare_type == "income or consumption" %>
+    <% if welfare_type == "income or consumption" or (survey_comparability is defined and survey_comparability != "No spells") %>
     Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
     <%- elif welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
@@ -836,7 +853,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
-            subtitle: "{definitions.poverty_line_subtitle}"
+            subtitle: "{definitions.poverty_line_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_for_absolute_or_relative_poverty}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -931,7 +948,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.headcount_title}"
-            subtitle: "{definitions.poverty_line_subtitle}"
+            subtitle: "{definitions.poverty_line_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_for_absolute_or_relative_poverty}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1026,7 +1043,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.total_shortfall_title}"
-            subtitle: "{definitions.total_shortfall_subtitle}"
+            subtitle: "{definitions.total_shortfall_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_total_shortfall}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1079,7 +1096,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.avg_shortfall_title}"
-            subtitle: "{definitions.avg_shortfall_subtitle}"
+            subtitle: "{definitions.avg_shortfall_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp_longer}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1126,7 +1143,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.income_gap_ratio_title}"
-            subtitle: "{definitions.income_gap_ratio_subtitle}"
+            subtitle: "{definitions.income_gap_ratio_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp_longer}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1174,7 +1191,7 @@ tables:
             - Poverty
           grapher_config:
             title: "{definitions.poverty_gap_index_title}"
-            subtitle: "{definitions.poverty_gap_index_subtitle}"
+            subtitle: "{definitions.poverty_gap_index_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp_longer}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1286,7 +1303,7 @@ tables:
             - Economic Inequality
           grapher_config:
             title: "Gini coefficient"
-            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}
+            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}{definitions.spells_subtitle}
             note: ""
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1329,7 +1346,7 @@ tables:
           grapher_config:
             title: "Palma ratio"
             subtitle: |-
-              The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.note_without_ppp}
+              The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.note_without_ppp}{definitions.spells_subtitle}
             note: ""
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1499,7 +1516,7 @@ tables:
           grapher_config:
             title: "Mean log deviation"
             subtitle: |-
-              The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
+              The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.{definitions.spells_subtitle}
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1702,7 +1719,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: Mean <<welfare_type>> {definitions.per_period}
-            subtitle: "{definitions.ppp_adjustment_subtitle}"
+            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1752,7 +1769,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: Median <<welfare_type>> {definitions.per_period}
-            subtitle: "{definitions.ppp_adjustment_subtitle}"
+            subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1776,9 +1793,9 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The mean income or consumption per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean income or consumption per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
@@ -1792,7 +1809,7 @@ tables:
           name: |-
             {macros}
             <% if survey_comparability == "No spells" %>
-            Average (<<percentiles_avg_share(decile)>>)
+            Average (<<percentiles_avg_share(decile) | lower>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1802,7 +1819,7 @@ tables:
           title_public: |-
             {macros}
             <% if survey_comparability != "No spells" %>
-            Average (<<percentiles_avg_share(decile)>>)
+            Average (<<percentiles_avg_share(decile) | lower>>)
             <%- endif %>
           grapher_config:
             title: |-
@@ -1810,7 +1827,7 @@ tables:
               Mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>>
             subtitle: |-
               {macros}
-              The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}
+              The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1834,9 +1851,9 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The share of income or consumption by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The share of income or consumption by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
@@ -1850,7 +1867,7 @@ tables:
           name: |-
             {macros}
             <% if survey_comparability == "No spells" %>
-            Share (<<percentiles_avg_share(decile)>>)
+            Share (<<percentiles_avg_share(decile) | lower>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1860,7 +1877,7 @@ tables:
           title_public: |-
             {macros}
             <% if survey_comparability != "No spells" %>
-            Share (<<percentiles_avg_share(decile)>>)
+            Share (<<percentiles_avg_share(decile) | lower>>)
             <%- endif %>
           grapher_config:
             title: |-
@@ -1868,7 +1885,7 @@ tables:
               <<welfare_type.capitalize()>> share of the <<percentiles_avg_share(decile) | lower>>
             subtitle: |-
               {macros}
-              The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+              The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1905,7 +1922,7 @@ tables:
           name: |-
             {macros}
             <% if survey_comparability == "No spells" %>
-            Threshold (<<percentiles_thr(decile)>>)
+            Threshold (<<percentiles_thr(decile) | lower>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1915,11 +1932,11 @@ tables:
           title_public: |-
             {macros}
             <% if survey_comparability != "No spells" %>
-            Threshold (<<percentiles_thr(decile)>>)
+            Threshold (<<percentiles_thr(decile) | lower>>)
             <%- endif %>
           grapher_config:
             title: "{definitions.threshold_title}"
-            subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
+            subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"

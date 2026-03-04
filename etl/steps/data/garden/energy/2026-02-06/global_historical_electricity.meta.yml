@@ -1,0 +1,20 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  global_historical_electricity:
+    variables:
+      # Since (almost) all variables are combined with Ember's data, we don't need to define metadata for them.
+      # The only variables that don't have metadata are other_production and other_share, which we probably won't use.
+      {}

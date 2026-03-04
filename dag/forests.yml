@@ -48,7 +48,7 @@ steps:
     - snapshot://fao/2025-05-09/fra_forest_extent.xlsx
   data://garden/fao/2025-05-09/fra_forest_extent:
     - data://meadow/fao/2025-05-09/fra_forest_extent
-    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/faostat/2026-02-25/faostat_rl
 
   # Dominant Driver of Forest Loss
   data://meadow/forests/2025-08-26/tree_cover_loss_by_driver:

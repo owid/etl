@@ -14,7 +14,6 @@ def run() -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("gbd_treemap.feather")
-
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
     # standardize column names

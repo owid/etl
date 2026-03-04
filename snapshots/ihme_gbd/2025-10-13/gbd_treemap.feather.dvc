@@ -1,4 +1,5 @@
 meta:
+  is_public: false
   origin:
     producer: IHME, Global Burden of Disease
     title: Global Burden of Disease - Treemap data
@@ -14,6 +15,6 @@ meta:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: 70b65c22800dbe920d28f6674c8167f2
-    size: 2290626
+  - md5: 743f2ea2afa5de0466f013282ab09212
+    size: 81204010
     path: gbd_treemap.feather

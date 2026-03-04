@@ -114,6 +114,10 @@ definitions:
     <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
     Contributing family workers are defined as workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93_short}
     <%- endif %>
+  description_key_extra_employees: |-
+    <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
+    In some countries, self-employed workers who operate incorporated businesses are counted as employees, which can limit the comparability of self-employment estimates across countries.
+    <%- endif %>
   description_key_informal_employment_1: |-
     Informal employment encompasses all work activities done without formal arrangements (in law or in practice). Informality is a characteristic of the job, not the worker. These are often jobs without basic social or legal protection and employment benefits. It excludes illegal and illicit activities.
   description_key_informal_employment_2: |-
@@ -268,6 +272,7 @@ tables:
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_extra_employees}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -286,6 +291,7 @@ tables:
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_extra_employees}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
