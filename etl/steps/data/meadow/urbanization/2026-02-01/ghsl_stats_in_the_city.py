@@ -14,7 +14,10 @@ SHEETS_AND_COLUMNS = {
         "SC_CON_DSF_",  # Average download speed
     ],
     "SDG": ["SD_POP_HGR_"],  # Share of population living in the high green area
-    "INFRASTRUCTURES": ["IN_ROA_DEN_"],  # Road network density
+    "INFRASTRUCTURES": [
+        "IN_ROA_DEN_",  # Road network density
+        "IN_ROA_LEN_",  # Road length
+    ],
     "HEALTH": [
         "HL_SHP_HOS_",  # Share of population with access to hospitals
         "HL_SHP_PHA_",  # Share of population with access to pharmacies
@@ -27,6 +30,7 @@ COLUMN_MAPPING = {
     "SC_CON_DSF_": "Average download speed",
     "SD_POP_HGR_": "Share of population living in the high green area",
     "IN_ROA_DEN_": "Road network density",
+    "IN_ROA_LEN_": "Road length",
     "HL_SHP_HOS_": "Share of population with access to hospitals",
     "HL_SHP_PHA_": "Share of population with access to pharmacies",
     "HL_FCL_HOS_": "Number of hospitals",
@@ -123,6 +127,7 @@ def run() -> None:
     # Identify indicator types
     tb["is_share"] = tb["indicator"].str.contains("Share", case=False, na=False)
     tb["is_count"] = tb["indicator"].str.contains("Number of", case=False, na=False)
+    tb["is_road_length"] = tb["indicator"] == "Road length"
 
     # For Share indicators: calculate population-weighted average
     tb_share = tb[tb["is_share"]].copy()
@@ -143,13 +148,31 @@ def run() -> None:
     tb_count_agg["value"] = (tb_count_agg["value"] / tb_count_agg["population"]) * 100000
     tb_count_agg = tb_count_agg[["country", "year", "indicator", "value"]]
 
-    # For other non-Share, non-count indicators: calculate simple mean
-    tb_other = tb[~tb["is_share"] & ~tb["is_count"]].copy()
+    # For road length: sum total length, then calculate meters per inhabitant using 2020 population
+    tb_road_length = tb[tb["is_road_length"]].copy()
+
+    # Get 2020 population for each country
+    tb_pop_2020 = tb[tb["year"] == "2020"].groupby("country", as_index=False)["population"].sum()
+    tb_pop_2020 = tb_pop_2020.rename(columns={"population": "population_2020"})
+
+    # Sum road length by country and year
+    tb_road_length_agg = tb_road_length.groupby(["country", "year", "indicator"], as_index=False).agg({"value": "sum"})
+
+    # Merge with 2020 population
+    tb_road_length_agg = pr.merge(tb_road_length_agg, tb_pop_2020, on="country", how="left")
+
+    # Calculate meters per inhabitant using 2020 population
+    tb_road_length_agg["value"] = tb_road_length_agg["value"] / tb_road_length_agg["population_2020"]
+    tb_road_length_agg["indicator"] = "Road length per inhabitant"
+    tb_road_length_agg = tb_road_length_agg[["country", "year", "indicator", "value"]]
+
+    # For other non-Share, non-count, non-road-length indicators: calculate simple mean
+    tb_other = tb[~tb["is_share"] & ~tb["is_count"] & ~tb["is_road_length"]].copy()
     tb_other_agg = tb_other.groupby(["country", "year", "indicator"], as_index=False).agg({"value": "mean"})
     tb_other_agg = tb_other_agg[["country", "year", "indicator", "value"]]
 
     # Combine all aggregated datasets
-    tb = pr.concat([tb_share_agg, tb_count_agg, tb_other_agg], ignore_index=True)
+    tb = pr.concat([tb_share_agg, tb_count_agg, tb_road_length_agg, tb_other_agg], ignore_index=True)
 
     # Improve tables format.
     tb = tb.format(["country", "year", "indicator"])

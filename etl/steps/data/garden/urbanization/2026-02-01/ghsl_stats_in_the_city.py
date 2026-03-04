@@ -25,6 +25,7 @@ def run() -> None:
     # Pivot the table so each indicator becomes a column
     tb = tb.pivot(index=["country", "year"], columns="indicator", values="value").reset_index()
 
+    tb["Road network density"] = tb["Road network density"] * 1000  # Convert from m/m2 to km/km2.
     # Improve table format.
     tb = tb.format(["country", "year"])
 

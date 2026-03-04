@@ -1,101 +1,143 @@
-
 definitions:
   common:
     display:
-      numDecimalPlaces: 2
+      numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Urbanization
+    processing_level: minor
 
+  # Shared description used across variables
+  desc_key_common: &desc_key_common
+    - This dataset reports country-level indicators aggregated from [cities](#dod:cities-degurba). Cities are defined using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), which identifies urban centres based on population density and settlement size rather than administrative boundaries.
+    - City boundaries are model-derived and may not match official administrative limits. In some countries, what is considered a single city may appear as multiple cities depending on how built-up areas are distributed.
 
-# Learn more about the available fields:
-# https://docs.owid.io/projects/etl/architecture/metadata/reference/
+  # Processing anchors
+  desc_processing_pop_weighted: &desc_processing_pop_weighted |-
+    Country values were calculated as a population-weighted average across cities. Larger cities therefore contribute more to the country average, meaning the result reflects the experience of the average city resident rather than the average city.
+
+  desc_processing_simple_mean: &desc_processing_simple_mean |-
+    Country values were calculated as a simple average across cities. Each city contributes equally, regardless of population size.
+
+  desc_processing_sum_over_city_pop_2020: &desc_processing_sum_over_city_pop_2020 |-
+    We summed totals across all cities in each country and divided by the total city population in 2020. Using a fixed denominator makes values comparable over time but means changes may reflect both infrastructure growth and differences in historical population levels.
+
+  desc_speedtest_caveat: &desc_speedtest_caveat
+    - Internet speeds are measured using the Speedtest app, which users voluntarily run to test their own connection.
+    - Coverage is therefore higher in places where more people run these tests, and some cities have little or no data.
+
+  desc_osm_healthsites_caveat: &desc_osm_healthsites_caveat
+    - Facility locations come from OpenStreetMap via healthsites.io.
+    - Coverage and accuracy vary by location, and some hospitals or pharmacies may be missing or misclassified.
+
 dataset:
   update_period_days: 365
-
 
 tables:
   ghsl_stats_in_the_city:
     variables:
+
       average_download_speed:
-        title: Average download speed
-        unit: Megabits per second
+        title: Average internet download speed
+        unit: megabits per second
         short_unit: Mbps
-        description_short: Average internet download speed in [cities](#dod:cities-degurba).
+        description_short: Average internet download speed across [cities](#dod:cities-degurba), aggregated to the country level.
         description_key:
-          - Speeds are measured using the Speedtest app, which people use voluntarily to test their own connection. This means coverage is higher in places where more people run these tests.
-          - Data is missing for cities where few or no people have used the app.
-          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
-        description_from_producer: Network performance is measured via users through the Speedtest app. Therefore, information is missing for areas where no users are actively testing the network performance.
-        description_processing: We aggregate download speeds from cities to countries using population-weighted averages. This means larger cities contribute more to the country average, so the figure reflects the experience of the average urban resident rather than the average city.
+          - *desc_key_common
+          - Download speeds are measured using the Speedtest app.
+          - *desc_speedtest_caveat
+          - Country values are calculated as population-weighted averages across cities.
+        description_from_producer: Network performance is measured through user tests on the Speedtest app, so information is missing where users do not run tests.
+        description_processing: *desc_processing_pop_weighted
 
       road_network_density:
         title: Road network density
-        unit: m/m²
-        short_unit: m/m²
-        description_short: Total length of roads per square meter of land in [cities](#dod:cities-degurba).
+        unit: km per km²
+        short_unit: km/km²
+        description_short: Total length of roads per square kilometre of land in [cities](#dod:cities-degurba), aggregated to the country level.
         description_key:
-          - Calculated by dividing the total length of roads in a city by its area.
+          - *desc_key_common
+          - Calculated by dividing the total length of roads in a city by its land area.
           - Road data comes from the Overture Maps Foundation.
-          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
-        description_from_producer: Road network density, total road length inside the urban center divided by the urban center area.
-        description_processing: We aggregate road network density from cities to countries using population-weighted averages. This ensures the country figure reflects the road density experienced by the average urban resident, giving more weight to larger cities.
+          - Country values are calculated as simple averages across cities.
+        description_from_producer: Road network density is defined as total road length inside the urban centre divided by its area.
+        description_processing: *desc_processing_simple_mean
+
+      road_length_per_inhabitant:
+        title: Road length per city resident
+        unit: meters per person
+        short_unit: m
+        description_short: Total road length per resident across [cities](#dod:cities-degurba), aggregated to the country level.
+        description_key:
+          - *desc_key_common
+          - Calculated by summing the total length of roads across all cities in a country and dividing by the 2020 city population.
+          - Road data comes from the Overture Maps Foundation.
+          - Using a fixed (2020) population denominator allows comparisons over time.
+        description_from_producer: Total road length inside the urban center.
+        description_processing: *desc_processing_sum_over_city_pop_2020
 
       share_of_population_living_in_the_high_green_area:
-        title: Share of city residents living in a high-greenness area
+        title: Share of city residents living in high-greenness areas
         unit: "%"
         short_unit: "%"
-        description_short: Share of [city](#dod:cities-degurba) residents living in areas with high vegetation cover.
+        description_short: Share of [city](#dod:cities-degurba) residents living in areas with high vegetation cover, aggregated to the country level.
         description_key:
-          - Areas are classified as "high greenness" based on satellite vegetation data (NDVI), averaged over three years, using thresholds that UN-Habitat defines separately for different agro-ecological zones.
-          - Measured within a 300-meter buffer around the built-up area of each city.
-          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
-        description_from_producer: Share of the Urban Centre population living in area of high greenness for the corresponding year.
-        description_processing: We aggregate this share from cities to countries using population-weighted averages. This ensures larger cities contribute proportionally more to the country figure, so it reflects the experience of the average urban resident.
+          - *desc_key_common
+          - Areas are classified as "high greenness" using satellite vegetation data (NDVI).
+          - NDVI values are averaged over three years, with thresholds defined by UN-Habitat for different agro-ecological zones.
+          - Measured within a 300-metre buffer around the built-up area of each city.
+          - Country values are calculated as population-weighted averages across cities.
+        description_from_producer: Share of the Urban Centre population living in areas of high greenness.
+        description_processing: *desc_processing_pop_weighted
 
       share_of_population_with_access_to_hospitals:
         title: Share of city residents with a hospital nearby
         unit: "%"
         short_unit: "%"
-        description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a hospital.
+        description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a hospital, aggregated to the country level.
         description_key:
-          - Calculated as the share of people in a city who live within 1 km of a hospital.
-          - Hospital locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some hospitals may be missing.
-          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
-        description_from_producer: Share of population living within a kilometer buffer of a hospital facility, inside the urban center over total urban centre population.
-        description_processing: We aggregate hospital access from cities to countries using population-weighted averages. This ensures the country figure reflects the access rate for the average urban resident, not the average city.
+          - *desc_key_common
+          - Calculated as the share of people living within 1 kilometre of a hospital.
+          - *desc_osm_healthsites_caveat
+          - Country values are calculated as population-weighted averages across cities.
+        description_from_producer: Share of population living within a kilometer buffer of a hospital facility inside the urban centre.
+        description_processing: *desc_processing_pop_weighted
 
       share_of_population_with_access_to_pharmacies:
         title: Share of city residents with a pharmacy nearby
         unit: "%"
         short_unit: "%"
-        description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a pharmacy.
+        description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a pharmacy, aggregated to the country level.
         description_key:
-          - Calculated as the share of people in a city who live within 1 km of a pharmacy.
-          - Pharmacy locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some pharmacies may be missing.
-          - Country figures are calculated as a population-weighted average across cities, so larger cities count for more.
-        description_from_producer: Share of population living within a kilometer buffer of a pharmacy facility, inside the urban center over total urban centre population.
-        description_processing: We aggregate pharmacy access from cities to countries using population-weighted averages. This ensures the country figure reflects the access rate for the average urban resident, not the average city.
+          - *desc_key_common
+          - Calculated as the share of people living within 1 kilometre of a pharmacy.
+          - *desc_osm_healthsites_caveat
+          - Country values are calculated as population-weighted averages across cities.
+        description_from_producer: Share of population living within a kilometer buffer of a pharmacy facility inside the urban centre.
+        description_processing: *desc_processing_pop_weighted
 
       number_of_hospitals:
-        title: Number of hospitals per 100,000 people
+        title: Hospitals per 100,000 city residents
         unit: per 100,000 people
-        description_short: Number of hospital facilities per 100,000 [city](#dod:cities-degurba) residents.
+        short_unit: per 100k
+        description_short: Hospital facilities per 100,000 [city](#dod:cities-degurba) residents, aggregated to the country level.
         description_key:
-          - Calculated by summing all hospital facilities across cities in a country and dividing by the total urban population (in units of 100,000).
-          - Hospital locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some hospitals may be missing.
-          - Uses 2020 urban population for all years as the denominator.
+          - *desc_key_common
+          - Calculated by summing all hospital facilities across cities in a country.
+          - The total is divided by the country's city population for that year and expressed per 100,000 residents.
+          - *desc_osm_healthsites_caveat
         description_from_producer: Number of hospital facilities.
-        description_processing: We sum the total number of hospitals across all cities in a country, then divide by the total urban population and multiply by 100,000 to get hospitals per 100,000 urban residents.
+        description_processing: We summed the total number of hospitals across cities in each country and divided by the total city population for that year, multiplying by 100,000.
 
       number_of_pharmacies:
-        title: Number of pharmacies per 100,000 people
+        title: Pharmacies per 100,000 city residents
         unit: per 100,000 people
-        description_short: Number of pharmacy facilities per 100,000 [city](#dod:cities-degurba) residents.
+        short_unit: per 100k
+        description_short: Pharmacy facilities per 100,000 [city](#dod:cities-degurba) residents, aggregated to the country level.
         description_key:
-          - Calculated by summing all pharmacy facilities across cities in a country and dividing by the total urban population (in units of 100,000).
-          - Pharmacy locations come from OpenStreetMap via healthsites.io. Coverage and accuracy vary by location, and some pharmacies may be missing.
-          - Uses 2020 urban population for all years as the denominator.
+          - *desc_key_common
+          - Calculated by summing all pharmacy facilities across cities in a country.
+          - The total is divided by the country's city population for that year and expressed per 100,000 residents.
+          - *desc_osm_healthsites_caveat
         description_from_producer: Number of pharmacy facilities.
-        description_processing: We sum the total number of pharmacies across all cities in a country, then divide by the total urban population and multiply by 100,000 to get pharmacies per 100,000 urban residents.
-
+        description_processing: We summed the total number of pharmacies across cities in each country and divided by the total city population for that year, multiplying by 100,000.
