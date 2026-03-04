@@ -8,6 +8,7 @@ import rich_click as click
 import structlog
 from owid.catalog.utils import underscore
 from rich import print
+from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
