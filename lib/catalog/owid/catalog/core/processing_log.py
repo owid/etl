@@ -2,6 +2,7 @@ import os
 import random
 import tempfile
 import webbrowser
+from collections.abc import Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from functools import wraps
@@ -55,7 +56,7 @@ class LogEntry:
     @staticmethod
     def from_dict(d: dict[str, Any]) -> "LogEntry": ...  # type: ignore
 
-    def clone(self, **kwargs):
+    def clone(self, **kwargs: Any):
         """Clone the log entry, optionally overriding some attributes."""
         d = self.to_dict()
         d.update(**kwargs)
@@ -173,8 +174,8 @@ class ProcessingLog(list[LogEntry]):
         self,
         data_dir: Path | None = None,
         output: Literal["text", "html"] = "html",
-        show_upstream=True,
-        auto_open=True,
+        show_upstream: bool = True,
+        auto_open: bool = True,
     ):
         """Displays processing log as a Mermaid diagram in a browser or as a text.
         :param data_dir: Path to the data directory. Usually etl.paths.DATA_DIR.
@@ -243,9 +244,9 @@ def wrap(operation: str, parents: list[str] = []):
     #   as parents
     # TODO: make sure that the first argument `parent` is valid
     # TODO: validate that the function returns Table
-    def decorator(func):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             with disable_processing_log():
                 tb = func(*args, **kwargs)
 

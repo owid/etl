@@ -236,7 +236,7 @@ def _camel_to_snake(name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
 
-def underscore_table(t, *args, **kwargs):
+def underscore_table(t: Any, *args: Any, **kwargs: Any) -> Any:
     """Convert column and index names to underscore format.
 
     Warning:

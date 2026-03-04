@@ -80,15 +80,5 @@ class Client:
         self.tables = TablesAPI(self, catalog_url=catalog_url)
         self._site_search = SiteSearchAPI(self, base_url=site_search_url, site_url=site_url)
 
-    @property
-    def grapher_url(self) -> str:
-        """Base URL for the Grapher (derived from site_url)."""
-        return f"{self._site_url}/grapher"
-
-    @property
-    def explorer_url(self) -> str:
-        """Base URL for explorers (derived from site_url)."""
-        return f"{self._site_url}/explorers"
-
     def __repr__(self) -> str:
         return "Client(charts=..., indicators=..., tables=...)"

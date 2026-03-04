@@ -330,6 +330,9 @@ definitions:
   processing_per_cap_disposal: &processing_per_cap_disposal
     We calculated per capita pollution by dividing total plastic pollution from disposal sites by the population of each country or region.
 
+  processing_per_cap_pwg: &processing_per_cap_pwg
+    We calculated per capita plastic waste generation by dividing total plastic waste generation by the population of each country or region.
+
   processing_per_cap_recycling: &processing_per_cap_recycling
     We calculated per capita pollution by dividing total plastic pollution from recycling losses by the population of each country or region.
 
@@ -377,6 +380,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: Reds
+        description_processing: We recalculated the world total by summing all countries instead of using the modeled world estimate from Cottom et al. (2024).
         display:
           roundingMode: significantFigures
           numSignificantFigures: 3
@@ -391,6 +395,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: Oranges
+        description_processing: *processing_per_cap_pwg
         display:
           numDecimalPlaces: 1
 

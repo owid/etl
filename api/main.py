@@ -1,4 +1,3 @@
-import logfire
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,12 +37,6 @@ app = get_application()
 # NOTE: I tried using subapplications, but they don't propagate errors to middleware
 # see https://github.com/tiangolo/fastapi/discussions/8577 (even the latest versions didn't help)
 app.include_router(v1)
-
-if config.LOGFIRE_TOKEN_ETL_API:
-    logfire.configure(token=config.LOGFIRE_TOKEN_ETL_API)
-    logfire.instrument_fastapi(app)
-else:
-    logfire.configure(send_to_logfire=False)
 
 
 @app.get("/health")

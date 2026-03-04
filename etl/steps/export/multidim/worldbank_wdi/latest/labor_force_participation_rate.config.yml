@@ -13,7 +13,11 @@ default_selection:
   - Syria
   - Uganda
   - United States
-originUrl: ourworldindata.org/work-employment
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/work-employment
 
 default_dimensions:
   age_group: 15_plus

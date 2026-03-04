@@ -215,7 +215,7 @@ def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
                 _number_of_comment_lines += 1
                 new_lines.append(line)
                 continue
-            elif line.strip().startswith(step):
+            elif line.strip().startswith(step + ":"):
                 if _number_of_comment_lines > 0:
                     # Remove the previous comment lines and ignore the current line.
                     new_lines = new_lines[:-_number_of_comment_lines]

@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 
-import logfire
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,12 +55,6 @@ For searching charts and articles by title or content, see our [Search API](http
 app = get_application()
 
 app.include_router(v1)
-
-if config.LOGFIRE_TOKEN_ETL_API:
-    logfire.configure(token=config.LOGFIRE_TOKEN_ETL_API)
-    logfire.instrument_fastapi(app)
-else:
-    logfire.configure(send_to_logfire=False)
 
 
 @app.get("/health")
