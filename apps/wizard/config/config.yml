@@ -181,7 +181,7 @@ sections:
     apps:
       - title: "Search Comparison"
         alias: search-comparison
-        description: "Compare Algolia vs semantic search"
+        description: "Compare different search engines"
         maintainer: "@mojmir"
         entrypoint: app_pages/search_comparison/app.py
         icon: ":material/compare:"

@@ -27,6 +27,7 @@ import asyncio
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 import click
@@ -37,6 +38,10 @@ from google import genai  # type: ignore
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from etl.config import OWID_ENV  # type: ignore
+from owid.catalog import s3_utils  # type: ignore
+
+S3_BUCKET_NAME = "owid-public"
+S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
 # Gemini pricing (as of Feb 2025)
 PRICING = {
@@ -237,7 +242,8 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> li
     type=click.Choice(["gemini-2.5-flash-lite", "gemini-3-flash-preview"], case_sensitive=False),
     help="Gemini model to use (default: gemini-3-flash-preview)",
 )
-def main(topic: tuple[str, ...], output: str | None, model: str):
+@click.option("--no-upload", is_flag=True, help="Skip uploading to R2 (useful for testing)")
+def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool):
     """Extract vocabulary for topics using LLM (simple approach).
 
     Takes all chart titles and subtitles for topics and asks an LLM to extract
@@ -323,14 +329,28 @@ def main(topic: tuple[str, ...], output: str | None, model: str):
     click.echo(f"Output cost: ${total_output_cost:.6f}")
     click.echo(f"Total cost:  ${total_cost:.6f}")
 
-    # Save to file if requested
-    if output:
-        # If single topic, save as single object; if multiple, save as dict keyed by slug
-        if len(results) == 1:
-            output_data = results[0]
-        else:
-            output_data = {r["topic_slug"]: r for r in results}
+    # Build output data
+    if len(results) == 1:
+        output_data = results[0]
+    else:
+        output_data = {r["topic_slug"]: r for r in results}
 
+    # Upload to R2
+    if not no_upload:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(output_data, f, indent=2)
+            tmp_path = f.name
+
+        try:
+            s3_url = f"s3://{S3_BUCKET_NAME}/{S3_VOCABULARY_PATH}"
+            s3_utils.upload(s3_url, tmp_path, public=True)
+            click.echo()
+            click.secho(f"✓ Uploaded to: https://{S3_BUCKET_NAME}.owid.io/{S3_VOCABULARY_PATH}", fg="green")
+        finally:
+            os.unlink(tmp_path)
+
+    # Save to local file if requested
+    if output:
         with open(output, "w") as f:
             json.dump(output_data, f, indent=2)
         click.echo()
