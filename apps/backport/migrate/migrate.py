@@ -232,14 +232,14 @@ def _run_full_pipeline(old_dataset_id: int, namespace: str, version: str, short_
 
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str):
     add_to_dag(
-        {f"data://grapher/{namespace}/{version}/{short_name}": {f"data://garden/{namespace}/{version}/{short_name}"}},
+        {f"data://grapher/{namespace}/{version}/{short_name}": [f"data://garden/{namespace}/{version}/{short_name}"]},
         dag_path=DAG_MIGRATED_PATH,
     )
     add_to_dag(
         {
-            f"data://garden/{namespace}/{version}/{short_name}": {
+            f"data://garden/{namespace}/{version}/{short_name}": [
                 f"snapshot://{namespace}/{version}/{short_name}.feather"
-            }
+            ]
         },
         dag_path=DAG_MIGRATED_PATH,
     )
