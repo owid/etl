@@ -186,10 +186,20 @@ steps:
   #
   # Decoupling of GDP and CO2.
   #
-  data://external/emissions/2026-03-05/gdp_and_co2_decoupling:
+  data://garden/emissions/2026-03-05/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2026-02-27/wdi
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://grapher/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://external/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #

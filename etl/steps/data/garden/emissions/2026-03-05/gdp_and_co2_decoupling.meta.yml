@@ -1,0 +1,6 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  gdp_and_co2_decoupling:
+    title: Decoupling of per capita GDP and per capita consumption-based CO2 emissions
