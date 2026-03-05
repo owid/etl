@@ -70,7 +70,8 @@ tables:
         description_key:
           - This measures the share of city residents who live near abundant vegetation — a common proxy for access to green space and the cooling, air quality, and wellbeing benefits it provides.
           - Vegetation is measured from satellites using NDVI (a standard index of land surface greenness), averaged over three years and assessed within 300 metres of the built-up city area.
-          - What counts as "high greenness" varies by region. Thresholds are set by UN-Habitat for different agro-ecological zones using a sample of 700 cities, so a high score in a semi-arid region reflects a different level of greenery than the same score in a temperate one.
+          - This measures vegetation cover, not the presence of formal parks. A tree-lined street counts; a paved park with few trees may not.
+          - What counts as "high greenness" depends on where a city is. A city in a dry region is compared to other dry-region cities, not to cities in wetter, greener parts of the world. UN-Habitat set these benchmarks by averaging vegetation levels across 700 cities in each climate zone.
           - City boundaries are fixed at their 2025 extent, so historical values describe vegetation conditions inside today's city boundary — not the city as it was in the past.
           - *desc_key_city_definition
         description_processing: *desc_processing_pop_weighted
