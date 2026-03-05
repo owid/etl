@@ -600,3 +600,35 @@ steps:
     - data://garden/plastic_waste/2022-09-01/ocean_waste_by_item
   data://garden/plastic_waste/2022-09-01/ocean_waste_by_item:
     - snapshot://plastic_waste/2022-09-01/ocean_waste_by_item.feather
+  data://grapher/democracy/2022-04-19/government_transparency_index__hollyer_et_al__2014:
+    - data://garden/democracy/2022-04-19/government_transparency_index__hollyer_et_al__2014
+  data://garden/democracy/2022-04-19/government_transparency_index__hollyer_et_al__2014:
+    - snapshot://democracy/2022-04-19/government_transparency_index__hollyer_et_al__2014.feather
+  data://grapher/democracy/2017-09-24/trust__eurostat:
+    - data://garden/democracy/2017-09-24/trust__eurostat
+  data://garden/democracy/2017-09-24/trust__eurostat:
+    - snapshot://democracy/2017-09-24/trust__eurostat.feather
+  data://grapher/energy/2017-07-17/public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011:
+    - data://garden/energy/2017-07-17/public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011
+  data://garden/energy/2017-07-17/public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011:
+    - snapshot://energy/2017-07-17/public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011.feather
+  data://grapher/health/2018-03-24/drinking_habits_in_great_britain__uk_ons:
+    - data://garden/health/2018-03-24/drinking_habits_in_great_britain__uk_ons
+  data://garden/health/2018-03-24/drinking_habits_in_great_britain__uk_ons:
+    - snapshot://health/2018-03-24/drinking_habits_in_great_britain__uk_ons.feather
+  data://grapher/climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014:
+    - data://garden/climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014
+  data://garden/climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014:
+    - snapshot://climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014.feather
+  ? data://grapher/trade/2018-03-19/share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data
+  :   - data://garden/trade/2018-03-19/share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data
+  ? data://garden/trade/2018-03-19/share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data
+  :   - snapshot://trade/2018-03-19/share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data.feather
+  data://grapher/climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018:
+    - data://garden/climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018
+  data://garden/climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018:
+    - snapshot://climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018.feather
+  data://grapher/forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019:
+    - data://garden/forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019
+  data://garden/forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019:
+    - snapshot://forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019.feather

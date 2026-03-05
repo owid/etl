@@ -1,0 +1,21 @@
+dataset:
+  title: Public support and opposition to nuclear energy- Ipsos MORI (2011)
+tables:
+  public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011:
+    variables:
+      opposed_to_nuclear_energy__ipsos_mori__2011:
+        title: Opposed to nuclear energy (Ipsos MORI (2011))
+        unit: '%'
+        short_unit: '%'
+      support_for_nuclear_energy__ipsos_mori__2011:
+        title: Support for nuclear energy (Ipsos MORI (2011))
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
