@@ -337,9 +337,9 @@ def plot_slope_chart_grid(
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
-    # Ensure output folder exists.
-    if not output_file.parent.exists():
-        Path(output_file.parent).mkdir(parents=True, exist_ok=True)
+    # Ensure output folder exists (only if an output file is specified).
+    if output_file is not None and not output_file.parent.exists():
+        output_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Compute % changes from reference year for smooth curves.
     tb_changes = compute_changes_from_reference(tb=tb)
