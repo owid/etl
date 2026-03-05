@@ -7,9 +7,7 @@ A country is classified as decoupled if:
 2. Emissions in the latest year are at least PCT_CHANGE_MIN% below the level on peak emissions year.
 3. GDP in the latest year is at least PCT_CHANGE_MIN% above the level on peak emissions year.
 
-The step exports two tables:
-- decoupling_full: GDP and emissions (original + smooth) for all years for decoupled countries.
-- decoupling_since_peak: Same but only from peak emissions year onward, plus % change columns.
+The step exports one table with GDP and emissions (original + smooth) for all years for decoupled countries, plus the peak emissions year.
 
 """
 
@@ -83,16 +81,15 @@ def apply_rolling_averages(tb: Table) -> Table:
     return tb
 
 
-def detect_decoupled_countries(tb: Table) -> Table:
+def detect_decoupled_countries(tb: Table) -> set:
     """Detect countries that have decoupled GDP growth from CO2 emissions.
 
-    For each country, we Find the year of the peak in smoothed emissions, and then:
+    For each country, find the year of the peak in smoothed emissions, and then:
     1. Check that this peak is at least MIN_YEARS_SINCE_PEAK years before the latest year.
     2. Check if smoothed emissions in the latest year are at least PCT_CHANGE_MIN% below the peak-year level.
     3. Check if smoothed GDP in the latest year is at least PCT_CHANGE_MIN% above the peak-year level.
 
-    Return a table with columns: country, peak_emissions_year, latest_year, gdp_per_capita_change,
-    consumption_emissions_per_capita_change.
+    Return the set of country names that satisfy all conditions.
     """
     # Find the latest year per country.
     latest_years = tb.groupby("country", as_index=False)["year"].max().rename(columns={"year": "latest_year"})
@@ -117,9 +114,6 @@ def detect_decoupled_countries(tb: Table) -> Table:
         drop=True
     )
 
-    # Drop unnecessary columns.
-    tb_ref = tb_ref.drop(columns=["latest_year"])
-
     # Find the latest year values per country.
     idx_latest = tb.groupby("country")["year"].idxmax()
     tb_latest = tb.loc[
@@ -142,29 +136,26 @@ def detect_decoupled_countries(tb: Table) -> Table:
     )
 
     # Apply decoupling conditions.
-    tb_result = tb_merged[
+    decoupled = tb_merged[
         (tb_merged["consumption_emissions_per_capita_change"] < -PCT_CHANGE_MIN)
         & (tb_merged["gdp_per_capita_change"] > PCT_CHANGE_MIN)
-    ][
-        [
-            "country",
-            "peak_emissions_year",
-            "latest_year",
-            "gdp_per_capita_change",
-            "consumption_emissions_per_capita_change",
-        ]
-    ].reset_index(drop=True)
+    ]
 
-    return tb_result
+    return set(decoupled["country"])
 
 
-def compute_changes_from_reference(tb: Table, tb_decoupled: Table) -> Table:
-    """For each decoupled country, compute % change in smoothed GDP and CO2 from its reference year."""
+def get_peak_emissions_years(tb: Table, countries: set) -> dict:
+    """Return {country: peak_emissions_year} for the given countries."""
+    tb_sel = tb[tb["country"].isin(countries)]
+    idx_peak = tb_sel.groupby("country")["consumption_emissions_per_capita_smooth"].idxmax()
+    return dict(zip(tb.loc[idx_peak, "country"], tb.loc[idx_peak, "year"].astype(int)))
+
+
+def compute_changes_from_reference(tb: Table, countries: set) -> Table:
+    """For each country, compute % change in smoothed GDP and CO2 from its peak emissions year."""
+    peak_years = get_peak_emissions_years(tb, countries)
     results = []
-    for _, row in tb_decoupled.iterrows():
-        country = row["country"]
-        ref_year = int(row["peak_emissions_year"])
-
+    for country, ref_year in peak_years.items():
         tb_country = tb[tb["country"] == country].sort_values("year")
         ref_row = tb_country[tb_country["year"] == ref_year].iloc[0]
         ref_gdp = float(ref_row["gdp_per_capita_smooth"])
@@ -267,26 +258,23 @@ def plot_country(
 
 def plot_individual_countries(
     tb: Table,
-    tb_decoupled: Table,
+    decoupled_countries: set,
     since_peak: bool = True,
     output_folder: Path | None = None,
 ) -> None:
     """Plot individual country charts as % change from a baseline year.
 
     If since_peak=True, baseline is the peak emissions year.
-    If since_peak=False, baseline is the first fully-informed rolling average year (min_year + window - 1).
+    If since_peak=False, baseline is the first year in the data.
     """
-    for _, row in tb_decoupled.iterrows():
-        country = row["country"]
-        ref_year = int(row["peak_emissions_year"])
-
+    peak_years = get_peak_emissions_years(tb, decoupled_countries)
+    for country, ref_year in sorted(peak_years.items()):
         tb_country = tb[tb["country"] == country].sort_values("year")
 
         if since_peak:
             baseline_year = ref_year
         else:
-            # First year with a fully-informed rolling average.
-            baseline_year = int(tb_country["year"].min()) + RUNNING_AVERAGE_YEARS - 1
+            baseline_year = int(tb_country["year"].min())
 
         suffix = "" if since_peak else " [full]"
         plot_country(
@@ -301,7 +289,7 @@ def plot_individual_countries(
 
 def plot_slope_chart_grid(
     tb: Table,
-    tb_decoupled: Table,
+    decoupled_countries: set,
     n_cols: int = 6,
     output_file: Path | None = None,
 ) -> None:
@@ -324,7 +312,26 @@ def plot_slope_chart_grid(
     if not output_file.parent.exists():
         Path(output_file.parent).mkdir(parents=True, exist_ok=True)
 
-    tb_dec = tb_decoupled.copy()
+    # Compute % changes from reference year for smooth curves.
+    tb_changes = compute_changes_from_reference(tb=tb, countries=decoupled_countries)
+
+    # Build a summary table for sorting and slope endpoints.
+    peak_years = get_peak_emissions_years(tb, decoupled_countries)
+    latest_year = int(tb["year"].max())
+    summary_rows = []
+    for country, ref_year in peak_years.items():
+        tb_c = tb_changes[tb_changes["country"] == country].sort_values("year")
+        last_row = tb_c.iloc[-1]
+        summary_rows.append(
+            {
+                "country": country,
+                "peak_emissions_year": ref_year,
+                "latest_year": latest_year,
+                "gdp_per_capita_change": float(last_row["gdp_per_capita_change"]),
+                "consumption_emissions_per_capita_change": float(last_row["consumption_emissions_per_capita_change"]),
+            }
+        )
+    tb_dec = Table(summary_rows)
 
     # Sort countries.
     tb_dec["years_since_peak"] = tb_dec["latest_year"] - tb_dec["peak_emissions_year"]
@@ -339,9 +346,6 @@ def plot_slope_chart_grid(
     countries = list(tb_dec["country"])
     n_countries = len(countries)
     n_rows = (n_countries + n_cols - 1) // n_cols
-
-    # Compute % changes from reference year for smooth curves.
-    tb_changes = compute_changes_from_reference(tb=tb, tb_decoupled=tb_dec)
 
     # Global x-axis range: from earliest reference year to latest year.
     x_min = int(tb_dec["peak_emissions_year"].min())
@@ -495,18 +499,21 @@ def run() -> None:
     # Apply rolling averages (adds _smooth columns, keeps originals).
     if RUNNING_AVERAGE_YEARS > 1:
         tb = apply_rolling_averages(tb=tb)
+        # Drop years with partial rolling averages (first RUNNING_AVERAGE_YEARS - 1 years per country).
+        tb["_year_rank"] = tb.groupby("country")["year"].rank(method="first")
+        tb = tb[tb["_year_rank"] >= RUNNING_AVERAGE_YEARS].drop(columns=["_year_rank"]).reset_index(drop=True)
     else:
         tb["gdp_per_capita_smooth"] = tb["gdp_per_capita"]
         tb["consumption_emissions_per_capita_smooth"] = tb["consumption_emissions_per_capita"]
 
     # Detect decoupled countries using smoothed data.
-    tb_decoupled = detect_decoupled_countries(tb=tb)
+    decoupled_countries = detect_decoupled_countries(tb=tb)
 
     # Uncomment to plot GDP and emissions for each individual country selected as decoupled.
     # NOTE: It's convenient to visualize the curves since peak emissions year, but also the complete trend.
-    # plot_individual_countries(tb=tb, tb_decoupled=tb_decoupled, since_peak=True, output_folder=OUTPUT_FOLDER / "countries-since-peak")
-    # plot_individual_countries(tb=tb, tb_decoupled=tb_decoupled, since_peak=False, output_folder=OUTPUT_FOLDER / "countries-full")
-    # plot_slope_chart_grid(tb=tb, tb_decoupled=tb_decoupled, output_file=OUTPUT_FOLDER / "grid.png")
+    # plot_individual_countries(tb=tb, decoupled_countries=decoupled_countries, since_peak=True, output_folder=OUTPUT_FOLDER / "countries-since-peak")
+    # plot_individual_countries(tb=tb, decoupled_countries=decoupled_countries, since_peak=False, output_folder=OUTPUT_FOLDER / "countries-full")
+    # plot_slope_chart_grid(tb=tb, decoupled_countries=decoupled_countries, output_file=OUTPUT_FOLDER / "grid.png")
 
     # Visual selection:
     # After visual inspection (of charts since peak emissions year, but also all years) consider removing some selected countries, for any of the following reasons:
@@ -526,10 +533,6 @@ def run() -> None:
     #     "Dominican Republic",
     #     # Too much variability.
     #     "Jamaica",
-    #     # Too much variability.
-    #     "Jordan",
-    #     # Too much variability and possible upwards trend in emissions.
-    #     "Kazakhstan",
     #     # Too much variability and possible upwards trend in emissions.
     #     "Kyrgyzstan",
     #     # Possible upwards trend in emissions.
@@ -549,17 +552,15 @@ def run() -> None:
     #     "South Africa",
     # }
     # For now, keep all countries. We will select them visually when creating the final visualization.
-    # Update the table of decoupled countries.
-    # tb_decoupled = tb_decoupled[~tb_decoupled["country"].isin(decoupled_countries_dropped)].reset_index(drop=True)
+    # decoupled_countries -= decoupled_countries_dropped
     # Uncomment to plot the grid of selected decoupled countries.
-    # plot_slope_chart_grid(tb=tb, tb_decoupled=tb_decoupled, output_file=OUTPUT_FOLDER / "grid_selected.png")
-    # plot_individual_countries(tb=tb, tb_decoupled=tb_decoupled, since_peak=True, output_folder=OUTPUT_FOLDER / "decoupled-countries-since-peak")
+    # plot_slope_chart_grid(tb=tb, decoupled_countries=decoupled_countries, output_file=OUTPUT_FOLDER / "grid_selected.png")
+    # plot_individual_countries(tb=tb, decoupled_countries=decoupled_countries, since_peak=True, output_folder=OUTPUT_FOLDER / "decoupled-countries-since-peak")
 
-    # Add change columns.
-    tb_decoupled = compute_changes_from_reference(tb=tb, tb_decoupled=tb_decoupled)
+    # Select all years for decoupled countries.
+    tb_decoupled = tb[tb["country"].isin(decoupled_countries)].reset_index(drop=True)
 
-    # Drop unnecessary columns.
-    tb_decoupled = tb_decoupled.drop(columns=["peak_emissions_year"])
+    # Improve table format.
     tb_decoupled = tb_decoupled.format(["country", "year"], short_name=paths.short_name)
 
     #

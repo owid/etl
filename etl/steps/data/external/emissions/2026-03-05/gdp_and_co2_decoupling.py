@@ -1,4 +1,8 @@
-"""Detect countries that have decoupled per capita GDP growth from per capita consumption-based CO2 emissions."""
+"""Export start and end year data for countries that have decoupled GDP growth from CO2 emissions.
+
+Loads the garden table (all years for decoupled countries), finds each country's peak emissions year
+(year of max smoothed emissions), filters to peak and latest year, and computes percentage change columns.
+"""
 
 import owid.catalog.processing as pr
 
@@ -12,28 +16,57 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load Global Carbon Budget dataset and read its main table.
     ds_garden = paths.load_dataset("gdp_and_co2_decoupling")
-    tb_decoupled = ds_garden.read("gdp_and_co2_decoupling")
+    tb = ds_garden.read("gdp_and_co2_decoupling")
 
     #
     # Process data.
     #
-    # Prepare a table with only the first (peak emissions year) and last year for each country.
-    tb_first_and_last_year = pr.concat(
+    # Find the peak emissions year for each country (year of max smoothed emissions).
+    idx_peak = tb.groupby("country")["consumption_emissions_per_capita_smooth"].idxmax()
+    peak_years = tb.loc[idx_peak, ["country", "year"]].rename(columns={"year": "peak_emissions_year"})
+    tb = tb.merge(peak_years, on="country", how="left")
+
+    # Filter to only years since peak emissions year.
+    tb_since_peak = tb[tb["year"] >= tb["peak_emissions_year"]].reset_index(drop=True)
+
+    # Get only the first (peak emissions year) and last year for each country.
+    tb_result = pr.concat(
         [
-            tb_decoupled.groupby("country", as_index=False).first(),
-            tb_decoupled.groupby("country", as_index=False).last(),
+            tb_since_peak.groupby("country", as_index=False).first(),
+            tb_since_peak.groupby("country", as_index=False).last(),
         ],
         ignore_index=True,
     )
-    # Improve table format.
-    tb_first_and_last_year = tb_first_and_last_year.format(
-        ["country", "year"], short_name=paths.short_name + "_first_and_last_year"
+
+    # Compute percentage change in smoothed GDP and emissions from peak to latest year.
+    # For each country, the first row is the peak year (reference), the second is the latest year.
+    tb_result = tb_result.sort_values(["country", "year"]).reset_index(drop=True)
+    ref_values = (
+        tb_result.groupby("country", as_index=False)
+        .first()[["country", "gdp_per_capita_smooth", "consumption_emissions_per_capita_smooth"]]
+        .rename(
+            columns={"gdp_per_capita_smooth": "ref_gdp", "consumption_emissions_per_capita_smooth": "ref_emissions"}
+        )
     )
+    tb_result = tb_result.merge(ref_values, on="country", how="left")
+    tb_result["gdp_per_capita_change"] = (
+        (tb_result["gdp_per_capita_smooth"] - tb_result["ref_gdp"]) / tb_result["ref_gdp"] * 100
+    )
+    tb_result["consumption_emissions_per_capita_change"] = (
+        (tb_result["consumption_emissions_per_capita_smooth"] - tb_result["ref_emissions"])
+        / tb_result["ref_emissions"]
+        * 100
+    )
+
+    # Drop reference columns.
+    tb_result = tb_result.drop(columns=["ref_gdp", "ref_emissions"])
+
+    # Improve table format.
+    tb_result = tb_result.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
-    ds = paths.create_dataset(tables=[tb_first_and_last_year], formats=["csv"])
+    ds = paths.create_dataset(tables=[tb_result], formats=["csv"])
     ds.save()
