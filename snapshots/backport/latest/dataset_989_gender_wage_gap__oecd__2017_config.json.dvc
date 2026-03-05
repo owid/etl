@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/989
-    date_accessed: 2023-08-10 08:29:26.647386
+    url: https://admin.owid.io/admin/datasets/989
+    date_accessed: 2026-03-05 09:35:43.877067+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_989_gender_wage_gap__oecd__2017
-  description: The difference between male and female median wages divided by the
-    male median wages.
+  description: The difference between male and female median wages divided by the male median wages.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cf98901ed3b31f9fd9d88e3eddc8fc20
-  size: 1979
-  path: dataset_989_gender_wage_gap__oecd__2017_config.json
+  - md5: 3df88b6bc25eb4eaab1941c29530ab18
+    size: 2109
+    path: dataset_989_gender_wage_gap__oecd__2017_config.json

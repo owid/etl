@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5777
-    date_accessed: 2023-08-10 08:31:03.365894
+    url: https://admin.owid.io/admin/datasets/5777
+    date_accessed: 2026-03-05 09:38:25.887233+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Influenza vaccination rates in over 65s (OECD)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8d8d688cd4a66ae2d1178cb08a2ddb3c
-  size: 10186
-  path: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_values.feather
+  - md5: a96cd5a987d6065574aaa9eadf913c1f
+    size: 10378
+    path: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_values.feather

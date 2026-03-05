@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4905
-    date_accessed: 2023-08-10 07:43:04.806406
+    url: https://admin.owid.io/admin/datasets/4905
+    date_accessed: 2026-03-05 09:01:51.831097+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4905_a_millennium_of_macroeconomic_data__bank_of_england__2016
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 40647300610530d5053e400d181b757b
-  size: 67223
-  path: 
-    dataset_4905_a_millennium_of_macroeconomic_data__bank_of_england__2016_config.json
+  - md5: 09311f5a4b350c9209bbca2fec7e30a0
+    size: 74979
+    path: dataset_4905_a_millennium_of_macroeconomic_data__bank_of_england__2016_config.json

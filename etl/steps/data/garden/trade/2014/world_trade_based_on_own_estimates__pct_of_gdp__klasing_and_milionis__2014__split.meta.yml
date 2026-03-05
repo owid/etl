@@ -1,0 +1,31 @@
+dataset:
+  title: World trade based on own estimates (% of GDP) (Klasing and Milionis (2014))  (split)
+tables:
+  world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split:
+    variables:
+      world_trade_based_on_maddison__pct_of_gdp__klasing_and_milionis__2014:
+        title: World trade based on Maddison (% of GDP) (Klasing and Milionis (2014))
+        unit: '%'
+        short_unit: '%'
+        display:
+          unit: '%'
+        description: |-
+          World trade as a share of GDP using Maddison's GDP estimates in international dollars converted from constant to current prices using the US GDP deflator to denominate the sum of exports and imports.
+      world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014:
+        title: World trade based on own estimates (% of GDP) (Klasing and Milionis (2014))
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          unit: '%'
+        description: |-
+          World trade as a share of GDP based on Klasing and Milionis' (2014) own estimates. Klasing and Milionis (2014) use non-PPP adjusted GDP estimates.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
