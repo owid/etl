@@ -156,10 +156,16 @@ def detect_decoupled_countries(tb: Table) -> set:
 
 
 def get_peak_emissions_years(tb: Table, countries: set) -> dict:
-    """Return {country: peak_emissions_year} for the given countries."""
-    tb_sel = tb[tb["country"].isin(countries)]
+    """Return {country: peak_emissions_year} for the given countries.
+
+    Partially-smoothed years (first RUNNING_AVERAGE_YEARS - 1 per country) are ignored.
+    """
+    tb_sel = tb[tb["country"].isin(countries)].copy()
+    if RUNNING_AVERAGE_YEARS > 1:
+        tb_sel["_year_rank"] = tb_sel.groupby("country")["year"].rank(method="first")
+        tb_sel = tb_sel[tb_sel["_year_rank"] >= RUNNING_AVERAGE_YEARS].drop(columns=["_year_rank"])
     idx_peak = tb_sel.groupby("country")["consumption_emissions_per_capita_smooth"].idxmax()
-    return dict(zip(tb.loc[idx_peak, "country"], tb.loc[idx_peak, "year"].astype(int)))
+    return dict(zip(tb_sel.loc[idx_peak, "country"], tb_sel.loc[idx_peak, "year"].astype(int)))
 
 
 def compute_changes_from_reference(tb: Table, countries: set) -> Table:
@@ -190,6 +196,7 @@ def plot_country(
     baseline_year: int,
     title_suffix: str = "",
     output_folder: Path | None = None,
+    show_shaded_areas: bool = False,
 ) -> None:
     """Plot a single country's GDP and emissions as % change from baseline year (original + smooth).
 
@@ -249,6 +256,40 @@ def plot_country(
     # Vertical line at peak emissions year.
     fig.add_vline(x=ref_year, line_dash="dash", line_color="gray", opacity=0.5)
 
+    if show_shaded_areas:
+        # Shaded area for incomplete smoothing (first RUNNING_AVERAGE_YEARS - 1 years).
+        min_year = int(tb_c["year"].min())
+        max_year = int(tb_c["year"].max())
+        last_partial_year = min_year + RUNNING_AVERAGE_YEARS - 2
+        if RUNNING_AVERAGE_YEARS > 1 and last_partial_year >= min_year:
+            fig.add_vrect(
+                x0=min_year - 0.5,
+                x1=last_partial_year + 0.5,
+                fillcolor="gray",
+                opacity=0.08,
+                line_width=0,
+                annotation_text="Incomplete smoothing",
+                annotation_position="top left",
+                annotation_font_size=9,
+                annotation_font_color="gray",
+                annotation_textangle=-90,
+            )
+
+        # Shaded area for decoupled period (from peak emissions year onward).
+        if ref_year <= max_year:
+            fig.add_vrect(
+                x0=ref_year,
+                x1=max_year + 0.5,
+                fillcolor="green",
+                opacity=0.05,
+                line_width=0,
+                annotation_text="Decoupled",
+                annotation_position="top left",
+                annotation_font_size=9,
+                annotation_font_color="green",
+                annotation_textangle=-90,
+            )
+
     # Final % changes for the title.
     final_gdp = float(gdp_smooth_pct.iloc[-1])
     final_co2 = float(co2_smooth_pct.iloc[-1])
@@ -295,6 +336,7 @@ def plot_individual_countries(
             baseline_year=baseline_year,
             title_suffix=suffix,
             output_folder=output_folder,
+            show_shaded_areas=not since_peak,
         )
 
 
