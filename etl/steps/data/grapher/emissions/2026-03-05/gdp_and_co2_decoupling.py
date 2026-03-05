@@ -10,7 +10,7 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load Global Carbon Budget dataset and read its main table.
+    # Load garden gdp_and_co2_decoupling dataset and read its main table.
     ds_garden = paths.load_dataset("gdp_and_co2_decoupling")
     tb_garden = ds_garden.read("gdp_and_co2_decoupling", reset_index=False)
 
