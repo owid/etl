@@ -69,14 +69,19 @@ def apply_rolling_averages(tb: Table) -> Table:
     """Apply a trailing rolling average to GDP and emissions columns.
 
     New columns are added with a '_smooth' suffix, preserving the originals.
+    If RUNNING_AVERAGE_YEARS is 1, the smooth columns are just copies of the originals.
     """
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
-    tb["gdp_per_capita_smooth"] = tb.groupby("country", sort=False)["gdp_per_capita"].transform(
-        lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean()
-    )
-    tb["consumption_emissions_per_capita_smooth"] = tb.groupby("country", sort=False)[
-        "consumption_emissions_per_capita"
-    ].transform(lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean())
+    if RUNNING_AVERAGE_YEARS > 1:
+        tb["gdp_per_capita_smooth"] = tb.groupby("country", sort=False)["gdp_per_capita"].transform(
+            lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean()
+        )
+        tb["consumption_emissions_per_capita_smooth"] = tb.groupby("country", sort=False)[
+            "consumption_emissions_per_capita"
+        ].transform(lambda s: s.rolling(RUNNING_AVERAGE_YEARS, min_periods=1).mean())
+    else:
+        tb["gdp_per_capita_smooth"] = tb["gdp_per_capita"]
+        tb["consumption_emissions_per_capita_smooth"] = tb["consumption_emissions_per_capita"]
 
     return tb
 
@@ -91,6 +96,12 @@ def detect_decoupled_countries(tb: Table) -> set:
 
     Return the set of country names that satisfy all conditions.
     """
+    # Ignore years with partial rolling averages (first RUNNING_AVERAGE_YEARS - 1 years per country).
+    if RUNNING_AVERAGE_YEARS > 1:
+        tb = tb.copy()
+        tb["_year_rank"] = tb.groupby("country")["year"].rank(method="first")
+        tb = tb[tb["_year_rank"] >= RUNNING_AVERAGE_YEARS].drop(columns=["_year_rank"]).reset_index(drop=True)
+
     # Find the latest year per country.
     latest_years = tb.groupby("country", as_index=False)["year"].max().rename(columns={"year": "latest_year"})
     error = "Expected latest year informed for all countries to be the same."
@@ -497,16 +508,9 @@ def run() -> None:
     tb = tb[~tb["country"].isin(paths.regions.regions_all)].reset_index(drop=True)
 
     # Apply rolling averages (adds _smooth columns, keeps originals).
-    if RUNNING_AVERAGE_YEARS > 1:
-        tb = apply_rolling_averages(tb=tb)
-        # Drop years with partial rolling averages (first RUNNING_AVERAGE_YEARS - 1 years per country).
-        tb["_year_rank"] = tb.groupby("country")["year"].rank(method="first")
-        tb = tb[tb["_year_rank"] >= RUNNING_AVERAGE_YEARS].drop(columns=["_year_rank"]).reset_index(drop=True)
-    else:
-        tb["gdp_per_capita_smooth"] = tb["gdp_per_capita"]
-        tb["consumption_emissions_per_capita_smooth"] = tb["consumption_emissions_per_capita"]
+    tb = apply_rolling_averages(tb=tb)
 
-    # Detect decoupled countries using smoothed data.
+    # Detect decoupled countries using smoothed data (partially-smoothed years are ignored internally).
     decoupled_countries = detect_decoupled_countries(tb=tb)
 
     # Uncomment to plot GDP and emissions for each individual country selected as decoupled.
