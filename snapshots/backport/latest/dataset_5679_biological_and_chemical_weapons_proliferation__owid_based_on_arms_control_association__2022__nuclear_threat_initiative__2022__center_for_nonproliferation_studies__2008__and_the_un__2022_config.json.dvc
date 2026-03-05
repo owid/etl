@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5679
-    date_accessed: 2023-08-10 08:53:17.608267
+    url: https://admin.owid.io/admin/datasets/5679
+    date_accessed: 2026-03-05 12:34:17.321534+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
+  name: Grapher metadata for dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: db9652c872e96b4d75af25687886cd4b
-  size: 35071
-  path: 
-    dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022_config.json
+  - md5: cc9e1ea517520417fec50145e8f19fab
+    size: 37991
+    path: dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022_config.json

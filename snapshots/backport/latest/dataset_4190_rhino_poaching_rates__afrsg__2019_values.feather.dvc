@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4190
-    date_accessed: 2023-08-10 08:03:22.392104
+    url: https://admin.owid.io/admin/datasets/4190
+    date_accessed: 2026-03-05 12:31:46.428603+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Rhino poaching rates (AfRSG, 2019)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 35e8d9622c9fa05a78fe71afd1776ba3
-  size: 9618
-  path: dataset_4190_rhino_poaching_rates__afrsg__2019_values.feather
+  - md5: 434d176d65d3c75e382c5a5ec6f0afb1
+    size: 9786
+    path: dataset_4190_rhino_poaching_rates__afrsg__2019_values.feather

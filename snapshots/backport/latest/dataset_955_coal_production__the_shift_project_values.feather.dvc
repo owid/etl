@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/955
-    date_accessed: 2023-08-10 09:06:35.326179
+    url: https://admin.owid.io/admin/datasets/955
+    date_accessed: 2026-03-05 12:25:07.305341+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Coal production - The SHIFT Project
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9ebbcd5999368dd53ecfd8bcfa9427b0
-  size: 57090
-  path: dataset_955_coal_production__the_shift_project_values.feather
+  - md5: f9aef8a8d3cb251aeef80e70ad33f3b2
+    size: 60018
+    path: dataset_955_coal_production__the_shift_project_values.feather

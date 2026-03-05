@@ -1,0 +1,56 @@
+dataset:
+  title: Meat consumption in EU28 (OECD, 2018)
+tables:
+  meat_consumption_in_eu28__oecd__2018:
+    variables:
+      per_capita_beef_consumption:
+        title: Per capita beef consumption
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          name: Beef
+        description: Per capita beef consumption in the EU28, measured in kilograms per person per year.
+      per_capita_meat_consumption:
+        title: Per capita meat consumption
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          name: Total meat
+        description: Per capita meat consumption in the EU28, measured in kilograms per person per year.
+      per_capita_pork_consumption:
+        title: Per capita pork consumption
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          name: Pork
+        description: Per capita pork consumption in the EU28, measured in kilograms per person per year.
+      per_capita_poultry_consumption:
+        title: Per capita poultry consumption
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          name: Poultry
+        description: Per capita poultry consumption in the EU28, measured in kilograms per person per year.
+      per_capita_red_meat_consumption:
+        title: Per capita red meat consumption
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          name: Red meat
+        description: Per capita red meat consumption in the EU28, measured in kilograms per person per year.
+      per_capita_sheep_consumption:
+        title: Per capita sheep consumption
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          name: Sheep
+        description: Per capita sheep consumption in the EU28, measured in kilograms per person per year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

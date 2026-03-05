@@ -48,10 +48,10 @@ steps:
     - data://garden/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
   data://garden/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018:
     - snapshot://food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018.feather
-  data://grapher/trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data:
-    - data://garden/trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data
-  data://garden/trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data:
-    - snapshot://trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data.feather
+  ? data://grapher/trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data
+  :   - data://garden/trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data
+  ? data://garden/trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data
+  :   - snapshot://trade/2018-03-19/value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data.feather
   data://grapher/health/2017-04-10/health_coverage__ilo__2014:
     - data://garden/health/2017-04-10/health_coverage__ilo__2014
   data://garden/health/2017-04-10/health_coverage__ilo__2014:
@@ -136,10 +136,10 @@ steps:
     - data://garden/emissions/2021/ghg_emissions_from_food__crippa_et_al__2021
   data://garden/emissions/2021/ghg_emissions_from_food__crippa_et_al__2021:
     - snapshot://emissions/2021/ghg_emissions_from_food__crippa_et_al__2021.feather
-  data://grapher/economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016:
-    - data://garden/economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016
-  data://garden/economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016:
-    - snapshot://economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016.feather
+  ? data://grapher/economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016
+  :   - data://garden/economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016
+  ? data://garden/economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016
+  :   - snapshot://economics/2016/eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016.feather
   data://grapher/emissions/2019/deforestation_emissions_embedded_in_trade__pendrill_et_al__2019:
     - data://garden/emissions/2019/deforestation_emissions_embedded_in_trade__pendrill_et_al__2019
   data://garden/emissions/2019/deforestation_emissions_embedded_in_trade__pendrill_et_al__2019:
@@ -296,10 +296,10 @@ steps:
     - data://garden/culture/2009/books__buringh_and_van_zanden__2009
   data://garden/culture/2009/books__buringh_and_van_zanden__2009:
     - snapshot://culture/2009/books__buringh_and_van_zanden__2009.feather
-  data://grapher/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014:
-    - data://garden/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
-  data://garden/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014:
-    - snapshot://poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014.feather
+  ? data://grapher/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
+  :   - data://garden/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
+  ? data://garden/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
+  :   - snapshot://poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014.feather
   data://grapher/human_rights/2020/human_rights_protection__fariss_et_al__2020:
     - data://garden/human_rights/2020/human_rights_protection__fariss_et_al__2020
   data://garden/human_rights/2020/human_rights_protection__fariss_et_al__2020:
@@ -328,3 +328,183 @@ steps:
     - data://garden/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021
   data://garden/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
     - snapshot://emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021.feather
+  data://grapher/journalism/2022-03-08/press_freedom__freedom_house__2017:
+    - data://garden/journalism/2022-03-08/press_freedom__freedom_house__2017
+  data://garden/journalism/2022-03-08/press_freedom__freedom_house__2017:
+    - snapshot://journalism/2022-03-08/press_freedom__freedom_house__2017.feather
+  data://grapher/demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013:
+    - data://garden/demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013
+  data://garden/demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013:
+    - snapshot://demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013.feather
+  data://grapher/demography/2013-04-01/international_historical_statistics__deaths_per_1_000__brian_mitchell__2013:
+    - data://garden/demography/2013-04-01/international_historical_statistics__deaths_per_1_000__brian_mitchell__2013
+  data://garden/demography/2013-04-01/international_historical_statistics__deaths_per_1_000__brian_mitchell__2013:
+    - snapshot://demography/2013-04-01/international_historical_statistics__deaths_per_1_000__brian_mitchell__2013.feather
+  data://grapher/oecd/2023-03-01/oecd__trust_in_government:
+    - data://garden/oecd/2023-03-01/oecd__trust_in_government
+  data://garden/oecd/2023-03-01/oecd__trust_in_government:
+    - snapshot://oecd/2023-03-01/oecd__trust_in_government.feather
+  data://grapher/climate/2017-12-04/ozone_concentration_stateofglobalair:
+    - data://garden/climate/2017-12-04/ozone_concentration_stateofglobalair
+  data://garden/climate/2017-12-04/ozone_concentration_stateofglobalair:
+    - snapshot://climate/2017-12-04/ozone_concentration_stateofglobalair.feather
+  ? data://grapher/demography/2017-06-01/crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons
+  :   - data://garden/demography/2017-06-01/crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons
+  ? data://garden/demography/2017-06-01/crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons
+  :   - snapshot://demography/2017-06-01/crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons.feather
+  data://grapher/health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_children__who__2017:
+    - data://garden/health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_children__who__2017
+  data://garden/health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_children__who__2017:
+    - snapshot://health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_children__who__2017.feather
+  data://grapher/energy/2017-08-01/hubberts_peak__cavallo__and__eia:
+    - data://garden/energy/2017-08-01/hubberts_peak__cavallo__and__eia
+  data://garden/energy/2017-08-01/hubberts_peak__cavallo__and__eia:
+    - snapshot://energy/2017-08-01/hubberts_peak__cavallo__and__eia.feather
+  data://grapher/labor/2017-07-31/child_labor_in_us__long__1958:
+    - data://garden/labor/2017-07-31/child_labor_in_us__long__1958
+  data://garden/labor/2017-07-31/child_labor_in_us__long__1958:
+    - snapshot://labor/2017-07-31/child_labor_in_us__long__1958.feather
+  data://grapher/agriculture/2016-01-01/half_index__land_use__alexander_et_al__2016:
+    - data://garden/agriculture/2016-01-01/half_index__land_use__alexander_et_al__2016
+  data://garden/agriculture/2016-01-01/half_index__land_use__alexander_et_al__2016:
+    - snapshot://agriculture/2016-01-01/half_index__land_use__alexander_et_al__2016.feather
+  data://grapher/energy/2017-10-06/coal_production__the_shift_project:
+    - data://garden/energy/2017-10-06/coal_production__the_shift_project
+  data://garden/energy/2017-10-06/coal_production__the_shift_project:
+    - snapshot://energy/2017-10-06/coal_production__the_shift_project.feather
+  data://grapher/energy/2017-08-08/long_term_energy_transitions__energy_history__harvard__2016:
+    - data://garden/energy/2017-08-08/long_term_energy_transitions__energy_history__harvard__2016
+  data://garden/energy/2017-08-08/long_term_energy_transitions__energy_history__harvard__2016:
+    - snapshot://energy/2017-08-08/long_term_energy_transitions__energy_history__harvard__2016.feather
+  data://grapher/energy/2017-10-16/oil_production__etemad__and__luciana:
+    - data://garden/energy/2017-10-16/oil_production__etemad__and__luciana
+  data://garden/energy/2017-10-16/oil_production__etemad__and__luciana:
+    - snapshot://energy/2017-10-16/oil_production__etemad__and__luciana.feather
+  data://grapher/energy/2017-10-16/gas_production__etemad__and__luciana:
+    - data://garden/energy/2017-10-16/gas_production__etemad__and__luciana
+  data://garden/energy/2017-10-16/gas_production__etemad__and__luciana:
+    - snapshot://energy/2017-10-16/gas_production__etemad__and__luciana.feather
+  data://grapher/energy/2017-10-18/long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana:
+    - data://garden/energy/2017-10-18/long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana
+  data://garden/energy/2017-10-18/long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana:
+    - snapshot://energy/2017-10-18/long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana.feather
+  data://grapher/health/2018-02-07/deaths_from_smallpox_per_million_population__edwardes__1902:
+    - data://garden/health/2018-02-07/deaths_from_smallpox_per_million_population__edwardes__1902
+  data://garden/health/2018-02-07/deaths_from_smallpox_per_million_population__edwardes__1902:
+    - snapshot://health/2018-02-07/deaths_from_smallpox_per_million_population__edwardes__1902.feather
+  data://grapher/violence/2017-12-05/child_violence__ending_violence_in_childhood_report__2017:
+    - data://garden/violence/2017-12-05/child_violence__ending_violence_in_childhood_report__2017
+  data://garden/violence/2017-12-05/child_violence__ending_violence_in_childhood_report__2017:
+    - snapshot://violence/2017-12-05/child_violence__ending_violence_in_childhood_report__2017.feather
+  data://grapher/violence/2017-12-19/violent_discipline_in_the_us__us_general_social_survey__2017:
+    - data://garden/violence/2017-12-19/violent_discipline_in_the_us__us_general_social_survey__2017
+  data://garden/violence/2017-12-19/violent_discipline_in_the_us__us_general_social_survey__2017:
+    - snapshot://violence/2017-12-19/violent_discipline_in_the_us__us_general_social_survey__2017.feather
+  data://grapher/trade/2018-03-19/current_gdp__british_pounds__fouquin_and_hugot__cepii_2016:
+    - data://garden/trade/2018-03-19/current_gdp__british_pounds__fouquin_and_hugot__cepii_2016
+  data://garden/trade/2018-03-19/current_gdp__british_pounds__fouquin_and_hugot__cepii_2016:
+    - snapshot://trade/2018-03-19/current_gdp__british_pounds__fouquin_and_hugot__cepii_2016.feather
+  data://grapher/geography/2018-04-15/terrain_ruggedness_index__nunn_and_puga__2012:
+    - data://garden/geography/2018-04-15/terrain_ruggedness_index__nunn_and_puga__2012
+  data://garden/geography/2018-04-15/terrain_ruggedness_index__nunn_and_puga__2012:
+    - snapshot://geography/2018-04-15/terrain_ruggedness_index__nunn_and_puga__2012.feather
+  data://grapher/health/2018-04-17/alcohol_consumption_in_usa_since_1850__niaaa:
+    - data://garden/health/2018-04-17/alcohol_consumption_in_usa_since_1850__niaaa
+  data://garden/health/2018-04-17/alcohol_consumption_in_usa_since_1850__niaaa:
+    - snapshot://health/2018-04-17/alcohol_consumption_in_usa_since_1850__niaaa.feather
+  data://grapher/waste/2018-03-16/environment__municipal_waste__generation_and_treatment:
+    - data://garden/waste/2018-03-16/environment__municipal_waste__generation_and_treatment
+  data://garden/waste/2018-03-16/environment__municipal_waste__generation_and_treatment:
+    - snapshot://waste/2018-03-16/environment__municipal_waste__generation_and_treatment.feather
+  data://grapher/plastic_waste/2018-09-01/decomposition_times_of_marine_debris:
+    - data://garden/plastic_waste/2018-09-01/decomposition_times_of_marine_debris
+  data://garden/plastic_waste/2018-09-01/decomposition_times_of_marine_debris:
+    - snapshot://plastic_waste/2018-09-01/decomposition_times_of_marine_debris.feather
+  data://grapher/ggdc/2017-08-03/share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split:
+    - data://garden/ggdc/2017-08-03/share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split
+  data://garden/ggdc/2017-08-03/share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split:
+    - snapshot://ggdc/2017-08-03/share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split.feather
+  data://grapher/climate/2018-09-20/wildfire_data_in_the_us__nifc:
+    - data://garden/climate/2018-09-20/wildfire_data_in_the_us__nifc
+  data://garden/climate/2018-09-20/wildfire_data_in_the_us__nifc:
+    - snapshot://climate/2018-09-20/wildfire_data_in_the_us__nifc.feather
+  data://grapher/working_hours/2017-09-19/female_to_male_ratio_of_time_devoted_to_unpaid_care_work__oecd__2014__split:
+    - data://garden/working_hours/2017-09-19/female_to_male_ratio_of_time_devoted_to_unpaid_care_work__oecd__2014__split
+  data://garden/working_hours/2017-09-19/female_to_male_ratio_of_time_devoted_to_unpaid_care_work__oecd__2014__split:
+    - snapshot://working_hours/2017-09-19/female_to_male_ratio_of_time_devoted_to_unpaid_care_work__oecd__2014__split.feather
+  data://grapher/poverty_inequality/2018-10-01/gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017:
+    - data://garden/poverty_inequality/2018-10-01/gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017
+  data://garden/poverty_inequality/2018-10-01/gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017:
+    - snapshot://poverty_inequality/2018-10-01/gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017.feather
+  data://grapher/health/2019-02-14/alcohol_consumption_since_1890__alexander__and__holmes__2017:
+    - data://garden/health/2019-02-14/alcohol_consumption_since_1890__alexander__and__holmes__2017
+  data://garden/health/2019-02-14/alcohol_consumption_since_1890__alexander__and__holmes__2017:
+    - snapshot://health/2019-02-14/alcohol_consumption_since_1890__alexander__and__holmes__2017.feather
+  data://grapher/food/2018-01-25/meat_consumption_in_eu28__oecd__2018:
+    - data://garden/food/2018-01-25/meat_consumption_in_eu28__oecd__2018
+  data://garden/food/2018-01-25/meat_consumption_in_eu28__oecd__2018:
+    - snapshot://food/2018-01-25/meat_consumption_in_eu28__oecd__2018.feather
+  data://grapher/demography/2019-04-17/missing_women_estimates__bongaarts__and__guilmoto__2015:
+    - data://garden/demography/2019-04-17/missing_women_estimates__bongaarts__and__guilmoto__2015
+  data://garden/demography/2019-04-17/missing_women_estimates__bongaarts__and__guilmoto__2015:
+    - snapshot://demography/2019-04-17/missing_women_estimates__bongaarts__and__guilmoto__2015.feather
+  data://grapher/health/2019-05-19/rotavirus_deaths_and_cases_in_under_5s__ihme__2018:
+    - data://garden/health/2019-05-19/rotavirus_deaths_and_cases_in_under_5s__ihme__2018
+  data://garden/health/2019-05-19/rotavirus_deaths_and_cases_in_under_5s__ihme__2018:
+    - snapshot://health/2019-05-19/rotavirus_deaths_and_cases_in_under_5s__ihme__2018.feather
+  data://grapher/economics/2019-09-04/corporate_tax_revenue__ictd_unu_wider_grd__2019:
+    - data://garden/economics/2019-09-04/corporate_tax_revenue__ictd_unu_wider_grd__2019
+  data://garden/economics/2019-09-04/corporate_tax_revenue__ictd_unu_wider_grd__2019:
+    - snapshot://economics/2019-09-04/corporate_tax_revenue__ictd_unu_wider_grd__2019.feather
+  data://grapher/biodiversity/2022-12-14/rhino_poaching_rates__afrsg__2019:
+    - data://garden/biodiversity/2022-12-14/rhino_poaching_rates__afrsg__2019
+  data://garden/biodiversity/2022-12-14/rhino_poaching_rates__afrsg__2019:
+    - snapshot://biodiversity/2022-12-14/rhino_poaching_rates__afrsg__2019.feather
+  data://grapher/economics/2020-08-27/gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources:
+    - data://garden/economics/2020-08-27/gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources
+  data://garden/economics/2020-08-27/gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources:
+    - snapshot://economics/2020-08-27/gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources.feather
+  data://grapher/food/2020-02-22/calories_lost_by_food_group_and_region__wri__2013:
+    - data://garden/food/2020-02-22/calories_lost_by_food_group_and_region__wri__2013
+  data://garden/food/2020-02-22/calories_lost_by_food_group_and_region__wri__2013:
+    - snapshot://food/2020-02-22/calories_lost_by_food_group_and_region__wri__2013.feather
+  data://grapher/poverty_inequality/2021-01-27/top_marginal_income_tax_rate__world_inequality_report__2018:
+    - data://garden/poverty_inequality/2021-01-27/top_marginal_income_tax_rate__world_inequality_report__2018
+  data://garden/poverty_inequality/2021-01-27/top_marginal_income_tax_rate__world_inequality_report__2018:
+    - snapshot://poverty_inequality/2021-01-27/top_marginal_income_tax_rate__world_inequality_report__2018.feather
+  data://grapher/emissions/2021-01-28/carbon_opportunity_costs_by_food__searchinger_et_al__2018:
+    - data://garden/emissions/2021-01-28/carbon_opportunity_costs_by_food__searchinger_et_al__2018
+  data://garden/emissions/2021-01-28/carbon_opportunity_costs_by_food__searchinger_et_al__2018:
+    - snapshot://emissions/2021-01-28/carbon_opportunity_costs_by_food__searchinger_et_al__2018.feather
+  data://grapher/plastic_pollution/2021-04-30/plastic_pollution_by_top_50_rivers__meijer_et_al__2021:
+    - data://garden/plastic_pollution/2021-04-30/plastic_pollution_by_top_50_rivers__meijer_et_al__2021
+  data://garden/plastic_pollution/2021-04-30/plastic_pollution_by_top_50_rivers__meijer_et_al__2021:
+    - snapshot://plastic_pollution/2021-04-30/plastic_pollution_by_top_50_rivers__meijer_et_al__2021.feather
+  data://grapher/agriculture/2016-01-01/average_farm_size__lowder_et_al__2016:
+    - data://garden/agriculture/2016-01-01/average_farm_size__lowder_et_al__2016
+  data://garden/agriculture/2016-01-01/average_farm_size__lowder_et_al__2016:
+    - snapshot://agriculture/2016-01-01/average_farm_size__lowder_et_al__2016.feather
+  data://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014:
+    - data://garden/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014
+  data://garden/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014:
+    - snapshot://agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014.feather
+  data://grapher/agriculture/2016-01-01/farm_size_distribution__lowder_et_al__2016:
+    - data://garden/agriculture/2016-01-01/farm_size_distribution__lowder_et_al__2016
+  data://garden/agriculture/2016-01-01/farm_size_distribution__lowder_et_al__2016:
+    - snapshot://agriculture/2016-01-01/farm_size_distribution__lowder_et_al__2016.feather
+  data://grapher/health/2022-02-21/estimated_malaria_deaths:
+    - data://garden/health/2022-02-21/estimated_malaria_deaths
+  data://garden/health/2022-02-21/estimated_malaria_deaths:
+    - snapshot://health/2022-02-21/estimated_malaria_deaths.feather
+  data://grapher/plastic_waste/2022-09-01/ocean_waste_global_top10:
+    - data://garden/plastic_waste/2022-09-01/ocean_waste_global_top10
+  data://garden/plastic_waste/2022-09-01/ocean_waste_global_top10:
+    - snapshot://plastic_waste/2022-09-01/ocean_waste_global_top10.feather
+  data://grapher/health/2022-09-26/seasonal_influenza_mortality__glamor__2019:
+    - data://garden/health/2022-09-26/seasonal_influenza_mortality__glamor__2019
+  data://garden/health/2022-09-26/seasonal_influenza_mortality__glamor__2019:
+    - snapshot://health/2022-09-26/seasonal_influenza_mortality__glamor__2019.feather
+  ? data://grapher/war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
+  :   - data://garden/war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
+  ? data://garden/war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
+  :   - snapshot://war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022.feather

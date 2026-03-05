@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Gas production - Etemad & Luciana
+    description: |-
+      Data from 1900-1980 is sourced from Bouda Etemad and Jean Luciani, World Energy Production 1800 – 1985, ISBN 2-600-56007-6.
+
+      Data from 1980 onwards is source from U.S. Energy Information Administration, International Energy Statistics.
+    url: http://www.tsp-data-portal.org/
+    date_accessed: 2017-10-16
+    published_by: The SHIFT Project Data Portal
+  name: Gas production - Etemad & Luciana
+  description: ''
+outs:
+  - md5: 6d10f211a229a2488165ec6554869a0e
+    size: 40434
+    path: gas_production__etemad__and__luciana.feather

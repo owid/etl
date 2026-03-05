@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/971
-    date_accessed: 2023-08-10 07:51:38.633379
+    url: https://admin.owid.io/admin/datasets/971
+    date_accessed: 2026-03-05 12:25:08.392034+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Oil production - Etemad & Luciana
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3753225a47d7403643970d59f55a7ce8
-  size: 62370
-  path: dataset_971_oil_production__etemad__and__luciana_values.feather
+  - md5: a41f8461e9a38d1bab979034acfc08a0
+    size: 65202
+    path: dataset_971_oil_production__etemad__and__luciana_values.feather
