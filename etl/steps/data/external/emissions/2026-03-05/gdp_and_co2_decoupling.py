@@ -554,24 +554,11 @@ def run() -> None:
 
     # Uncomment to plot the grid of selected decoupled countries.
     # plot_slope_chart_grid(tb=tb, tb_decoupled=tb_decoupled, output_file=OUTPUT_FOLDER / "grid_selected.png")
+    # plot_individual_countries(tb=tb, tb_decoupled=tb_decoupled, since_peak=True, output_folder=OUTPUT_FOLDER / "decoupled-countries-since-peak")
 
-    # Prepare table with full history of all countries.
-    tb_full = tb[
-        [
-            "country",
-            "year",
-            "gdp_per_capita",
-            "consumption_emissions_per_capita",
-            "gdp_per_capita_smooth",
-            "consumption_emissions_per_capita_smooth",
-        ]
-    ].reset_index(drop=True)
-    # Improve table format.
-    tb_full = tb_full.format(["country", "year"], short_name="gdp_and_co2_all_countries")
-
-    # Prepare table with data since peak year for only decoupled countries, with % change columns.
-    tb_since_peak = compute_changes_from_reference(tb=tb, tb_decoupled=tb_decoupled)
-    tb_since_peak = tb_since_peak[
+    # Prepare table with data since peak year for only decoupled countries, with % change columns, for all years.
+    tb_all_years = compute_changes_from_reference(tb=tb, tb_decoupled=tb_decoupled)
+    tb_all_years = tb_all_years[
         [
             "country",
             "year",
@@ -583,12 +570,22 @@ def run() -> None:
             "consumption_emissions_per_capita_change",
         ]
     ].reset_index(drop=True)
-    tb_since_peak = tb_since_peak.format(
-        ["country", "year"], short_name="gdp_and_co2_decoupled_countries_since_peak_emissions_year"
+    tb_all_years = tb_all_years.format(["country", "year"], short_name=paths.short_name)
+
+    # Prepare another table with only the first (peak emissions year) and last year for each country.
+    tb_first_and_last_year = pr.concat(
+        [
+            tb_all_years.reset_index().groupby("country", as_index=False).first(),
+            tb_all_years.reset_index().groupby("country", as_index=False).last(),
+        ],
+        ignore_index=True,
+    )
+    tb_first_and_last_year = tb_first_and_last_year.format(
+        ["country", "year"], short_name=paths.short_name + "_first_and_last_year"
     )
 
     #
     # Save outputs.
     #
-    ds = paths.create_dataset(tables=[tb_full, tb_since_peak], formats=["feather", "csv"])
+    ds = paths.create_dataset(tables=[tb_all_years, tb_first_and_last_year], formats=["feather", "csv"])
     ds.save()
