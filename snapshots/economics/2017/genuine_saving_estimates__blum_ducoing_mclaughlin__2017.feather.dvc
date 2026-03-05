@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Blum, Ducoing, McLaughlin (2017)
+    url: https://www.st-andrews.ac.uk/media/dept-of-geography-and-sustainable-development/pdf-s/DP%202016-15%20Blum%20et%20al.pdf
+    date_accessed: 2026-03-05
+    published_by: |-
+      Blum, Ducoing, Ruiz, McLaughlin (2017). “A Sustainable Cenury? Genuine Savings in Developing and Developed Countries 1900-2000.” National Wealth: What is Missing, Why it Matters. Eds. Hamilton, K., & Hepburn, C. Oxford University Press.
+  name: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
+  description: ''
+outs:
+  - md5: 1fcf69f0da59650cb111c167d27486c0
+    size: 39130
+    path: genuine_saving_estimates__blum_ducoing_mclaughlin__2017.feather

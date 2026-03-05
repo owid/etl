@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2891
-    date_accessed: 2023-08-10 08:32:36.987299
+    url: https://admin.owid.io/admin/datasets/2891
+    date_accessed: 2026-03-05 11:01:12.002343+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Percentage of Americans living alone, by age - IPUMS
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 483605ad9411a4e555a3fd305bee9939
-  size: 18362
-  path: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_values.feather
+  - md5: db3de84cf2427699bc732d4acda122e1
+    size: 19906
+    path: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_values.feather

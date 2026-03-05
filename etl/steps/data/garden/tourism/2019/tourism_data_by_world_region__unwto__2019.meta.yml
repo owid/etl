@@ -1,0 +1,20 @@
+dataset:
+  title: Tourism data by World Region - UNWTO (2019)
+tables:
+  tourism_data_by_world_region__unwto__2019:
+    variables:
+      international_tourist_arrivals:
+        title: International Tourist Arrivals
+        unit: arrivals
+        display:
+          numDecimalPlaces: 0
+          unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

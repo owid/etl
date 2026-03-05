@@ -212,3 +212,119 @@ steps:
     - data://garden/demography/2021/share_of_one_person_households__owid_based_on_un_and_other_sources
   data://garden/demography/2021/share_of_one_person_households__owid_based_on_un_and_other_sources:
     - snapshot://demography/2021/share_of_one_person_households__owid_based_on_un_and_other_sources.feather
+  data://grapher/food/2021/environmental_impacts_of_seafood__gephart_et_al__2021:
+    - data://garden/food/2021/environmental_impacts_of_seafood__gephart_et_al__2021
+  data://garden/food/2021/environmental_impacts_of_seafood__gephart_et_al__2021:
+    - snapshot://food/2021/environmental_impacts_of_seafood__gephart_et_al__2021.feather
+  data://grapher/agriculture/2017/global_freshwater_use_since_1900__igb:
+    - data://garden/agriculture/2017/global_freshwater_use_since_1900__igb
+  data://garden/agriculture/2017/global_freshwater_use_since_1900__igb:
+    - snapshot://agriculture/2017/global_freshwater_use_since_1900__igb.feather
+  data://grapher/plastic_pollution/2018/plastic_bag_substitute_comparisons__danish_epa__2018:
+    - data://garden/plastic_pollution/2018/plastic_bag_substitute_comparisons__danish_epa__2018
+  data://garden/plastic_pollution/2018/plastic_bag_substitute_comparisons__danish_epa__2018:
+    - snapshot://plastic_pollution/2018/plastic_bag_substitute_comparisons__danish_epa__2018.feather
+  data://grapher/emissions/2017/emissions_air_pollutants_over_long_term__defra__and__epa:
+    - data://garden/emissions/2017/emissions_air_pollutants_over_long_term__defra__and__epa
+  data://garden/emissions/2017/emissions_air_pollutants_over_long_term__defra__and__epa:
+    - snapshot://emissions/2017/emissions_air_pollutants_over_long_term__defra__and__epa.feather
+  data://grapher/agriculture/2021/agricultural_total_factor_productivity__usda:
+    - data://garden/agriculture/2021/agricultural_total_factor_productivity__usda
+  data://garden/agriculture/2021/agricultural_total_factor_productivity__usda:
+    - snapshot://agriculture/2021/agricultural_total_factor_productivity__usda.feather
+  data://grapher/economics/2017/uk_nominal_wage_data__bank_of_england__2017:
+    - data://garden/economics/2017/uk_nominal_wage_data__bank_of_england__2017
+  data://garden/economics/2017/uk_nominal_wage_data__bank_of_england__2017:
+    - snapshot://economics/2017/uk_nominal_wage_data__bank_of_england__2017.feather
+  data://grapher/emissions/2019/deforestation_in_trade__pendrill:
+    - data://garden/emissions/2019/deforestation_in_trade__pendrill
+  data://garden/emissions/2019/deforestation_in_trade__pendrill:
+    - snapshot://emissions/2019/deforestation_in_trade__pendrill.feather
+  data://grapher/labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017:
+    - data://garden/labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017
+  data://garden/labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017:
+    - snapshot://labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017.feather
+  data://grapher/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
+    - data://garden/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018
+  data://garden/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
+    - snapshot://labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018.feather
+  data://grapher/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017:
+    - data://garden/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017
+  data://garden/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017:
+    - snapshot://agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017.feather
+  data://grapher/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011:
+    - data://garden/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011
+  data://garden/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011:
+    - snapshot://health/2011/air_pollution_by_city__fouquet_and_dpcc__2011.feather
+  data://grapher/plastic_waste/2017/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank:
+    - data://garden/plastic_waste/2017/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank
+  data://garden/plastic_waste/2017/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank:
+    - snapshot://plastic_waste/2017/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank.feather
+  data://grapher/economics/2017/productivity__level_of_gdp_per_capita_and_productivity:
+    - data://garden/economics/2017/productivity__level_of_gdp_per_capita_and_productivity
+  data://garden/economics/2017/productivity__level_of_gdp_per_capita_and_productivity:
+    - snapshot://economics/2017/productivity__level_of_gdp_per_capita_and_productivity.feather
+  data://grapher/food/2018/food_miles_by_transport_method__poore_and_nemecek__2018:
+    - data://garden/food/2018/food_miles_by_transport_method__poore_and_nemecek__2018
+  data://garden/food/2018/food_miles_by_transport_method__poore_and_nemecek__2018:
+    - snapshot://food/2018/food_miles_by_transport_method__poore_and_nemecek__2018.feather
+  data://grapher/biodiversity/2010/whale_populations__pershing_et_al__2010:
+    - data://garden/biodiversity/2010/whale_populations__pershing_et_al__2010
+  data://garden/biodiversity/2010/whale_populations__pershing_et_al__2010:
+    - snapshot://biodiversity/2010/whale_populations__pershing_et_al__2010.feather
+  data://grapher/energy/2020/coal_output_and_employment_in_uk__beis__2020:
+    - data://garden/energy/2020/coal_output_and_employment_in_uk__beis__2020
+  data://garden/energy/2020/coal_output_and_employment_in_uk__beis__2020:
+    - snapshot://energy/2020/coal_output_and_employment_in_uk__beis__2020.feather
+  data://grapher/demography/2018/percentage_of_americans_living_alone__by_age__ipums:
+    - data://garden/demography/2018/percentage_of_americans_living_alone__by_age__ipums
+  data://garden/demography/2018/percentage_of_americans_living_alone__by_age__ipums:
+    - snapshot://demography/2018/percentage_of_americans_living_alone__by_age__ipums.feather
+  data://grapher/smoking/2017/smoking_cigarette_sales__international_smoking_statistics__2017:
+    - data://garden/smoking/2017/smoking_cigarette_sales__international_smoking_statistics__2017
+  data://garden/smoking/2017/smoking_cigarette_sales__international_smoking_statistics__2017:
+    - snapshot://smoking/2017/smoking_cigarette_sales__international_smoking_statistics__2017.feather
+  data://grapher/emissions/2018/emissions_intensity__and__value_added_by_sector__linus_et_al:
+    - data://garden/emissions/2018/emissions_intensity__and__value_added_by_sector__linus_et_al
+  data://garden/emissions/2018/emissions_intensity__and__value_added_by_sector__linus_et_al:
+    - snapshot://emissions/2018/emissions_intensity__and__value_added_by_sector__linus_et_al.feather
+  data://grapher/economics/2017/genuine_saving_estimates__blum_ducoing_mclaughlin__2017:
+    - data://garden/economics/2017/genuine_saving_estimates__blum_ducoing_mclaughlin__2017
+  data://garden/economics/2017/genuine_saving_estimates__blum_ducoing_mclaughlin__2017:
+    - snapshot://economics/2017/genuine_saving_estimates__blum_ducoing_mclaughlin__2017.feather
+  data://grapher/culture/2009/books__buringh_and_van_zanden__2009:
+    - data://garden/culture/2009/books__buringh_and_van_zanden__2009
+  data://garden/culture/2009/books__buringh_and_van_zanden__2009:
+    - snapshot://culture/2009/books__buringh_and_van_zanden__2009.feather
+  data://grapher/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014:
+    - data://garden/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
+  data://garden/poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014:
+    - snapshot://poverty_inequality/2020/reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014.feather
+  data://grapher/human_rights/2020/human_rights_protection__fariss_et_al__2020:
+    - data://garden/human_rights/2020/human_rights_protection__fariss_et_al__2020
+  data://garden/human_rights/2020/human_rights_protection__fariss_et_al__2020:
+    - snapshot://human_rights/2020/human_rights_protection__fariss_et_al__2020.feather
+  data://grapher/food/2017/coefficient_of_variation__cv__in_caloric_intake:
+    - data://garden/food/2017/coefficient_of_variation__cv__in_caloric_intake
+  data://garden/food/2017/coefficient_of_variation__cv__in_caloric_intake:
+    - snapshot://food/2017/coefficient_of_variation__cv__in_caloric_intake.feather
+  data://grapher/health/2017/death_rate_by_age_group_england_and_wales__ons:
+    - data://garden/health/2017/death_rate_by_age_group_england_and_wales__ons
+  data://garden/health/2017/death_rate_by_age_group_england_and_wales__ons:
+    - snapshot://health/2017/death_rate_by_age_group_england_and_wales__ons.feather
+  data://grapher/labor/2017/female_labor_force_participation_rate__owid__2017:
+    - data://garden/labor/2017/female_labor_force_participation_rate__owid__2017
+  data://garden/labor/2017/female_labor_force_participation_rate__owid__2017:
+    - snapshot://labor/2017/female_labor_force_participation_rate__owid__2017.feather
+  data://grapher/tourism/2019/tourism_data_by_world_region__unwto__2019:
+    - data://garden/tourism/2019/tourism_data_by_world_region__unwto__2019
+  data://garden/tourism/2019/tourism_data_by_world_region__unwto__2019:
+    - snapshot://tourism/2019/tourism_data_by_world_region__unwto__2019.feather
+  data://grapher/violence/2013/ethnographic_and_archaeological_evidence_on_violent_deaths:
+    - data://garden/violence/2013/ethnographic_and_archaeological_evidence_on_violent_deaths
+  data://garden/violence/2013/ethnographic_and_archaeological_evidence_on_violent_deaths:
+    - snapshot://violence/2013/ethnographic_and_archaeological_evidence_on_violent_deaths.feather
+  data://grapher/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
+    - data://garden/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021
+  data://garden/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
+    - snapshot://emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021.feather

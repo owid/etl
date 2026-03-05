@@ -220,6 +220,8 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
     yml.indent(mapping=2, sequence=4, offset=2)
     # prevent line-wrap
     yml.width = 4096
+    # prevent block key syntax (? key) for long mapping keys
+    yml.best_map_flow_style = True
 
     stream = io.StringIO()
     yml.dump(d, stream)

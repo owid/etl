@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: OWID based on Maddison Project Database 2020, GCIP, van Zanden et al. (2014), de la Escosura (2012)
+    description: '[Provide link to detailed documentation before this is circulated publicly]'
+    date_accessed: 2026-03-05
+    published_by: |-
+      OWID based on Maddison Project Database, version 2020. Global Income and Consumption Project database.  Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update ”; van Zanden, Jan Luiten van, Joerg Baten, Peter Foldvari, and Bas van Leeuwen. 2014. “The Changing Shape of Global Inequality 1820–2000; Exploring a New Dataset.” Review of Income and Wealth 60 (2): 279–97; Prados de la Escosura, Leandro. 2012. “OUTPUT PER HEAD IN PRE-INDEPENDENCE AFRICA: QUANTITATIVE CONJECTURES.” Economic History of Developing Regions 27 (2): 1–36.
+  name: |-
+    Reconstruction of historical poverty trends by country, 1820-2017 (OWID based on Maddison Project Database 2020 and van Zanden et al. (2014))
+  description: ''
+  is_public: false
+outs:
+  - md5: dea650f6613887c8ab3847002c32408b
+    size: 440186
+    path: reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014.feather
