@@ -50,8 +50,19 @@ def run() -> None:
         * 100
     )
 
-    # Drop reference columns.
-    tb_result = tb_result.drop(columns=["ref_gdp", "ref_emissions"])
+    # Drop unnecessary columns.
+    tb_result = tb_result.drop(
+        columns=[
+            "ref_gdp",
+            "ref_emissions",
+            "consumption_emissions_per_capita",
+            "gdp_per_capita",
+            "gdp_per_capita_smooth",
+            "consumption_emissions_per_capita_smooth",
+            "peak_emissions_year",
+        ],
+        errors="raise",
+    )
 
     # Improve table format.
     tb_result = tb_result.format(["country", "year"], short_name=paths.short_name)
