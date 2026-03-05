@@ -268,7 +268,7 @@ def _generate_metadata_yaml(namespace: str, version: str, short_name: str, backp
     ds.metadata.version = version
     ds.metadata.short_name = short_name
 
-    meta = metadata_export(ds)
+    meta = metadata_export(ds, keep_title=True)
 
     # remove source and description which is already in snapshot
     meta["dataset"].pop("sources")

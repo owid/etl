@@ -828,22 +828,20 @@ class Dataset(Base):
         if not dataset_ids:
             return []
 
-        query = text("""
-            SELECT d.*
-            FROM datasets d
-            WHERE d.id IN :dataset_ids
-            AND d.isArchived = 0
-            AND NOT EXISTS (
-                SELECT 1
-                FROM variables v
-                JOIN chart_dimensions cd ON cd.variableId = v.id
-                WHERE v.datasetId = d.id
+        query = (
+            select(cls)
+            .where(
+                cls.id.in_(dataset_ids),
+                cls.isArchived == 0,
+                ~select(Variable.id)
+                .where(Variable.datasetId == cls.id)
+                .join(ChartDimensions, ChartDimensions.variableId == Variable.id)
+                .exists(),
             )
-            ORDER BY d.id
-        """)
+            .order_by(cls.id)
+        )
 
-        result = session.execute(select(cls).from_statement(query).params(dataset_ids=tuple(dataset_ids)))
-        return list(result.scalars().all())
+        return list(session.scalars(query).all())
 
 
 class SourceDescription(TypedDict, total=False):
