@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5367
-    date_accessed: 2023-08-10 08:59:21.121737
+    url: https://admin.owid.io/admin/datasets/5367
+    date_accessed: 2026-03-05 09:57:12.217029+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Marine stocks by region and taxa (ramlegacy)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e97461ff65bb6bae56add8a9c9ee4b91
-  size: 113154
-  path: dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy_values.feather
+  - md5: 7dce394537ce894c83add1f929d53abf
+    size: 115690
+    path: dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy_values.feather

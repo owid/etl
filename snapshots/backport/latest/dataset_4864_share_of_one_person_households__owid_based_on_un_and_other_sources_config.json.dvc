@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4864
-    date_accessed: 2023-08-10 08:51:21.598970
+    url: https://admin.owid.io/admin/datasets/4864
+    date_accessed: 2026-03-05 09:58:36.755230+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4864_share_of_one_person_households__owid_based_on_un_and_other_sources
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cc582670ecfc872fb0dda96446b663b8
-  size: 5242
-  path: 
-    dataset_4864_share_of_one_person_households__owid_based_on_un_and_other_sources_config.json
+  - md5: 6287d12b8820ce2c42b98643c610feaf
+    size: 5372
+    path: dataset_4864_share_of_one_person_households__owid_based_on_un_and_other_sources_config.json
