@@ -1,8 +1,4 @@
-"""Export start and end year data for countries that have decoupled GDP growth from CO2 emissions.
-
-Loads the garden table (all years for decoupled countries), finds each country's peak emissions year
-(year of max smoothed emissions), filters to peak and latest year, and computes percentage change columns.
-"""
+"""Export start and end year data for countries that have decoupled GDP growth from CO2 emissions."""
 
 import owid.catalog.processing as pr
 
@@ -22,11 +18,6 @@ def run() -> None:
     #
     # Process data.
     #
-    # Find the peak emissions year for each country (year of max smoothed emissions).
-    idx_peak = tb.groupby("country")["consumption_emissions_per_capita_smooth"].idxmax()
-    peak_years = tb.loc[idx_peak, ["country", "year"]].rename(columns={"year": "peak_emissions_year"})
-    tb = tb.merge(peak_years, on="country", how="left")
-
     # Filter to only years since peak emissions year.
     tb_since_peak = tb[tb["year"] >= tb["peak_emissions_year"]].reset_index(drop=True)
 

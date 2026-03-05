@@ -21,3 +21,6 @@ tables:
         title: Consumption-based CO₂ emissions per capita (smoothed)
         unit: tonnes per person
         short_unit: t
+      peak_emissions_year:
+        title: Peak emissions year
+        unit: ""
