@@ -115,3 +115,34 @@ def get_random_search_query(
     weights = weights / weights.sum()
 
     return df.sample(n=1, weights=weights)["query"].iloc[0]
+
+
+# Benchmark queries from owid/analytics search_benchmark pipeline
+# TODO: switch this to prod
+BENCHMARK_DATASET = "dev_search_benchmark"
+
+
+@memory.cache
+def fetch_benchmark_queries() -> pd.DataFrame:
+    """Fetch benchmark queries from BigQuery (cached)."""
+    query = f"""
+        SELECT query, query_type, topic
+        FROM `owid-analytics.{BENCHMARK_DATASET}.benchmark_queries`
+    """
+    return read_gbq(query, project_id="owid-analytics")
+
+
+def get_benchmark_query(query_type: str = "keyword") -> str:
+    """Get a random benchmark query of the given type.
+
+    Args:
+        query_type: Either "keyword" or "natural_language".
+
+    Returns:
+        A random benchmark query string.
+    """
+    df = fetch_benchmark_queries()
+    df = df[df["query_type"] == query_type]
+    if len(df) == 0:
+        raise ValueError(f"No benchmark queries found for query_type='{query_type}'")
+    return df.sample(n=1)["query"].iloc[0]
