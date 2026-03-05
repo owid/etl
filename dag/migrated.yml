@@ -508,3 +508,95 @@ steps:
   :   - data://garden/war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
   ? data://garden/war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
   :   - snapshot://war/2022-09-05/biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022.feather
+  data://grapher/labor/2017-09-27/child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996:
+    - data://garden/labor/2017-09-27/child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996
+  data://garden/labor/2017-09-27/child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996:
+    - snapshot://labor/2017-09-27/child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996.feather
+  data://grapher/economics/2016-09-20/tax_revenue__piketty__2014:
+    - data://garden/economics/2016-09-20/tax_revenue__piketty__2014
+  data://garden/economics/2016-09-20/tax_revenue__piketty__2014:
+    - snapshot://economics/2016-09-20/tax_revenue__piketty__2014.feather
+  data://grapher/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
+    - data://garden/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data
+  data://garden/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
+    - snapshot://climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data.feather
+  data://grapher/economics/2017-05-12/swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015:
+    - data://garden/economics/2017-05-12/swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015
+  data://garden/economics/2017-05-12/swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015:
+    - snapshot://economics/2017-05-12/swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015.feather
+  data://grapher/economics/2017-04-16/real_gdp_per_capita__london_and_delhi__owid:
+    - data://garden/economics/2017-04-16/real_gdp_per_capita__london_and_delhi__owid
+  data://garden/economics/2017-04-16/real_gdp_per_capita__london_and_delhi__owid:
+    - snapshot://economics/2017-04-16/real_gdp_per_capita__london_and_delhi__owid.feather
+  data://grapher/agriculture/2017-08-28/agri_environmental_indicators__energy__fao__2017:
+    - data://garden/agriculture/2017-08-28/agri_environmental_indicators__energy__fao__2017
+  data://garden/agriculture/2017-08-28/agri_environmental_indicators__energy__fao__2017:
+    - snapshot://agriculture/2017-08-28/agri_environmental_indicators__energy__fao__2017.feather
+  data://grapher/health/2017-09-11/year_of_smallpox_eradication_by_country__who__1988:
+    - data://garden/health/2017-09-11/year_of_smallpox_eradication_by_country__who__1988
+  data://garden/health/2017-09-11/year_of_smallpox_eradication_by_country__who__1988:
+    - snapshot://health/2017-09-11/year_of_smallpox_eradication_by_country__who__1988.feather
+  data://grapher/violence/2017-11-28/sexual_violence__unicef__2017:
+    - data://garden/violence/2017-11-28/sexual_violence__unicef__2017
+  data://garden/violence/2017-11-28/sexual_violence__unicef__2017:
+    - snapshot://violence/2017-11-28/sexual_violence__unicef__2017.feather
+  data://grapher/economics/2018-02-22/labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england:
+    - data://garden/economics/2018-02-22/labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england
+  data://garden/economics/2018-02-22/labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england:
+    - snapshot://economics/2018-02-22/labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england.feather
+  data://grapher/demography/2018-03-21/historical_gender_equality_index__how_was_life__2014:
+    - data://garden/demography/2018-03-21/historical_gender_equality_index__how_was_life__2014
+  data://garden/demography/2018-03-21/historical_gender_equality_index__how_was_life__2014:
+    - snapshot://demography/2018-03-21/historical_gender_equality_index__how_was_life__2014.feather
+  data://grapher/climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al:
+    - data://garden/climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al
+  data://garden/climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al:
+    - snapshot://climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al.feather
+  data://grapher/economics/2018-03-22/womens_economic_opportunity_2012__economist_intelligence_unit__2012:
+    - data://garden/economics/2018-03-22/womens_economic_opportunity_2012__economist_intelligence_unit__2012
+  data://garden/economics/2018-03-22/womens_economic_opportunity_2012__economist_intelligence_unit__2012:
+    - snapshot://economics/2018-03-22/womens_economic_opportunity_2012__economist_intelligence_unit__2012.feather
+  data://grapher/demography/2018-01-31/number_of_deaths_in_england_and_wales_by_age__ons:
+    - data://garden/demography/2018-01-31/number_of_deaths_in_england_and_wales_by_age__ons
+  data://garden/demography/2018-01-31/number_of_deaths_in_england_and_wales_by_age__ons:
+    - snapshot://demography/2018-01-31/number_of_deaths_in_england_and_wales_by_age__ons.feather
+  data://grapher/climate/2018-04-05/parties_to_montreal_protocol__unep__2023:
+    - data://garden/climate/2018-04-05/parties_to_montreal_protocol__unep__2023
+  data://garden/climate/2018-04-05/parties_to_montreal_protocol__unep__2023:
+    - snapshot://climate/2018-04-05/parties_to_montreal_protocol__unep__2023.feather
+  data://grapher/climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996:
+    - data://garden/climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996
+  data://garden/climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996:
+    - snapshot://climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996.feather
+  data://grapher/plastic_waste/2018-08-01/plastic_discarded__recycled__incinerated__geyer_et_al__2017:
+    - data://garden/plastic_waste/2018-08-01/plastic_discarded__recycled__incinerated__geyer_et_al__2017
+  data://garden/plastic_waste/2018-08-01/plastic_discarded__recycled__incinerated__geyer_et_al__2017:
+    - snapshot://plastic_waste/2018-08-01/plastic_discarded__recycled__incinerated__geyer_et_al__2017.feather
+  data://grapher/economics/2019-09-04/global_revenue_statistics_database__oecd__2018:
+    - data://garden/economics/2019-09-04/global_revenue_statistics_database__oecd__2018
+  data://garden/economics/2019-09-04/global_revenue_statistics_database__oecd__2018:
+    - snapshot://economics/2019-09-04/global_revenue_statistics_database__oecd__2018.feather
+  data://grapher/plastic_waste/2018-08-01/plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018:
+    - data://garden/plastic_waste/2018-08-01/plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018
+  data://garden/plastic_waste/2018-08-01/plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018:
+    - snapshot://plastic_waste/2018-08-01/plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018.feather
+  data://grapher/plastic_waste/2018-09-01/recycled_plastic_exports__brooks_et_al__2018:
+    - data://garden/plastic_waste/2018-09-01/recycled_plastic_exports__brooks_et_al__2018
+  data://garden/plastic_waste/2018-09-01/recycled_plastic_exports__brooks_et_al__2018:
+    - snapshot://plastic_waste/2018-09-01/recycled_plastic_exports__brooks_et_al__2018.feather
+  data://grapher/biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021:
+    - data://garden/biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021
+  data://garden/biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021:
+    - snapshot://biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021.feather
+  data://grapher/biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc:
+    - data://garden/biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc
+  data://garden/biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc:
+    - snapshot://biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc.feather
+  data://grapher/food/2022-03-15/ukraine_russia_contribution_to_global_food:
+    - data://garden/food/2022-03-15/ukraine_russia_contribution_to_global_food
+  data://garden/food/2022-03-15/ukraine_russia_contribution_to_global_food:
+    - snapshot://food/2022-03-15/ukraine_russia_contribution_to_global_food.feather
+  data://grapher/plastic_waste/2022-09-01/ocean_waste_by_item:
+    - data://garden/plastic_waste/2022-09-01/ocean_waste_by_item
+  data://garden/plastic_waste/2022-09-01/ocean_waste_by_item:
+    - snapshot://plastic_waste/2022-09-01/ocean_waste_by_item.feather

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2671
-    date_accessed: 2023-08-10 09:44:02.163884
+    url: https://admin.owid.io/admin/datasets/2671
+    date_accessed: 2026-03-05 13:14:27.538429+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2671_historical_gender_equality_index__how_was_life__2014
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d1e2bc5ec6c42b866377f1ddbeea6fca
-  size: 4443
-  path: dataset_2671_historical_gender_equality_index__how_was_life__2014_config.json
+  - md5: b89c344771731dfc03304d267f95c1ae
+    size: 4573
+    path: dataset_2671_historical_gender_equality_index__how_was_life__2014_config.json
