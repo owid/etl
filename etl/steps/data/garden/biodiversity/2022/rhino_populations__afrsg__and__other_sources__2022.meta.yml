@@ -1,0 +1,63 @@
+dataset:
+  title: Rhino populations (AfRSG & other sources, 2022)
+tables:
+  rhino_populations__afrsg__and__other_sources__2022:
+    variables:
+      black_rhino_population__afrsg__and__other_sources__2019:
+        title: Black Rhino population (AfRSG & other sources, 2019)
+        unit: ''
+        display:
+          name: Black Rhino
+          numDecimalPlaces: 0
+        description: Number of Black Rhinos.
+      indian_rhino_population__afrsg__and__other_sources__2022:
+        title: Indian Rhino population (AfRSG & other sources, 2022)
+        unit: ''
+        display:
+          name: Indian Rhino
+          numDecimalPlaces: 0
+        description: Number of Indian (Greater One-Horned) Rhinos.
+      javan_rhino_population__afrsg__and__other_sources__2022:
+        title: Javan Rhino population (AfRSG & other sources, 2022)
+        unit: ''
+        display:
+          name: Javan Rhino
+          numDecimalPlaces: 0
+        description: Number of Javan Rhinos.
+      northern_white_rhino_population__afrsg__and__other_sources__2019:
+        title: Northern White Rhino population (AfRSG & other sources, 2019)
+        unit: ''
+        display:
+          name: Northern White Rhino
+          numDecimalPlaces: 0
+        description: Number of Northern White Rhinos.
+      southern_white_rhino_population__afrsg__and__other_sources__2019:
+        title: Southern White Rhino population (AfRSG & other sources, 2019)
+        unit: ''
+        display:
+          name: Southern White Rhino
+          numDecimalPlaces: 0
+        description: Number of Southern White Rhinos.
+      sumatran_rhino_population__afrsg__and__other_sources__2019:
+        title: Sumatran Rhino population (AfRSG & other sources, 2019)
+        unit: ''
+        display:
+          name: Sumatran Rhino
+          numDecimalPlaces: 0
+        description: Number of Sumatran Rhinos.
+      white_rhino_population__afrsg__and__other_sources__2019:
+        title: White Rhino population (AfRSG & other sources, 2019)
+        unit: ''
+        display:
+          name: White Rhino
+          numDecimalPlaces: 0
+        description: Number of White (Northern plus Southern) Rhinos.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,81 @@
+dataset:
+  title: Smoking prevalence and cigarette consumption (IHME, GHDx (2012))
+tables:
+  smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012:
+    variables:
+      cigarette_consumption_per_smoker_per_day__ihme__ghdx__2012:
+        title: Cigarette consumption per smoker per day (IHME, GHDx (2012))
+        unit: ''
+      consumption_per_smoker_per_day_lower_bound__ihme__ghdx__2012:
+        title: Consumption per smoker per day lower bound (IHME, GHDx (2012))
+        unit: ''
+      consumption_per_smoker_per_day_upper_bound__ihme__ghdx__2012:
+        title: Consumption per smoker per day upper bound (IHME, GHDx (2012))
+        unit: ''
+      daily_smoking_prevalence__both__ihme__ghdx__2012:
+        title: Daily smoking prevalence - both (IHME, GHDx (2012))
+        unit: ''
+      daily_smoking_prevalence__female__ihme__ghdx__2012:
+        title: Daily smoking prevalence - female (IHME, GHDx (2012))
+        unit: ''
+      daily_smoking_prevalence__male__ihme__ghdx__2012:
+        title: Daily smoking prevalence - male (IHME, GHDx (2012))
+        unit: ''
+      lower_bound_for_daily_smoking_prevalence__both__ihme__ghdx__2012:
+        title: Lower bound for daily smoking prevalence - both (IHME, GHDx (2012))
+        unit: '%'
+        short_unit: '%'
+      lower_bound_for_daily_smoking_prevalence__female__ihme__ghdx__2012:
+        title: Lower bound for daily smoking prevalence - female (IHME, GHDx (2012))
+        unit: '%'
+        short_unit: '%'
+      lower_bound_for_daily_smoking_prevalence__male__ihme__ghdx__2012:
+        title: Lower bound for daily smoking prevalence - male (IHME, GHDx (2012))
+        unit: '%'
+        short_unit: '%'
+      lower_bound_for_number_of_daily_male_smokers__ihme__ghdx__2012:
+        title: Lower bound for number of daily male smokers (IHME, GHDx (2012))
+        unit: ''
+      lower_bound_for_number_of_daily_smokers__both__ihme__ghdx__2012:
+        title: Lower bound for number of daily smokers - both (IHME, GHDx (2012))
+        unit: ''
+      lower_bound_for_number_of_female_daily_smokers__ihme__ghdx__2012:
+        title: Lower bound for number of female daily smokers (IHME, GHDx (2012))
+        unit: ''
+      number_of_daily_female_smokers__ihme__ghdx__2012:
+        title: Number of daily female smokers (IHME, GHDx (2012))
+        unit: ''
+      number_of_daily_male_smokers__ihme__ghdx__2012:
+        title: Number of daily male smokers (IHME, GHDx (2012))
+        unit: ''
+      number_of_daily_smokers__both__ihme__ghdx__2012:
+        title: Number of daily smokers - both (IHME, GHDx (2012))
+        unit: ''
+      upper_bound_for_daily_smoking_prevalence__both__ihme__ghdx__2012:
+        title: Upper bound for daily smoking prevalence - both (IHME, GHDx (2012))
+        unit: '%'
+        short_unit: '%'
+      upper_bound_for_daily_smoking_prevalence__female__ihme__ghdx__2012:
+        title: Upper bound for daily smoking prevalence - female (IHME, GHDx (2012))
+        unit: ''
+      upper_bound_for_daily_smoking_prevalence__male__ihme__ghdx__2012:
+        title: Upper bound for daily smoking prevalence - male (IHME, GHDx (2012))
+        unit: ''
+      upper_bound_for_number_of_daily_male_smokers__ihme__ghdx__2012:
+        title: Upper bound for number of daily male smokers (IHME, GHDx (2012))
+        unit: ''
+      upper_bound_for_number_of_daily_smokers__both__ihme__ghdx__2012:
+        title: Upper bound for number of daily smokers - both (IHME, GHDx (2012))
+        unit: ''
+      upper_bound_for_number_of_female_daily_smokers__ihme__ghdx__2012:
+        title: Upper bound for number of female daily smokers (IHME, GHDx (2012))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
