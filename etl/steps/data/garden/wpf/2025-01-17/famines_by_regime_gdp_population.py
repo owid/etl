@@ -46,6 +46,7 @@ CUSTOM_REGIMES = {
     ("Russia, Western Soviet States", range(1939, 1948)): 3,
     ("Somaliland, African Red Sea Region", range(1910, 2020)): 3,
     ("Sudan", range(1888, 1893)): 3,
+    ("Austria, Hungary", range(1915, 1919)): 3,
 }
 
 

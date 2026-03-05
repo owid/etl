@@ -89,6 +89,10 @@ def run() -> None:
 
     # Drop columns that are not needed.
     tb = tb.drop(columns=["date_list", "date_range", "simplified_place"])
+    tb["famine_name"] = tb["famine_name"].rename({"Poland 1915-1918": "Austria-Hungary 1915-1918"})
+    mask = tb["famine_name"].eq("Poland 1915-1918") & tb["country"].eq("Poland")
+    tb.loc[mask, "country"] = "Austria, Hungary"
+
     tb = tb.format(["famine_name", "date"])
 
     #
