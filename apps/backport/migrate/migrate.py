@@ -271,8 +271,8 @@ def _generate_metadata_yaml(namespace: str, version: str, short_name: str, backp
     meta = metadata_export(ds, keep_title=True)
 
     # remove source and description which is already in snapshot
-    meta["dataset"].pop("sources")
-    meta["dataset"].pop("description")
+    meta["dataset"].pop("sources", None)
+    meta["dataset"].pop("description", None)
 
     yml_path = STEP_DIR / f"data/{ds.metadata.uri}.meta.yml"
 

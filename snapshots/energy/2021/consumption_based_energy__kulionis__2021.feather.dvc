@@ -1,0 +1,32 @@
+meta:
+  source:
+    name: Calculated by Viktoras Kulionis, based on the EXIOBASE v3.8.2 database
+    description: |-
+      Consumption-based (trade-adjusted) energy use can be calculated from data published in the EXIOBASE v3.8.2 database using a multi-regional input-output (MRIO) model.
+
+      This MRIO model uses data on the quantity of goods traded, and the country-specific energy intensity of producing those goods to estimate the amount of energy embodied in exported goods, and in imported goods.
+
+      Consumption-based (trade-adjusted) energy use is then calculated as domestic energy use minus energy embodied in exported goods, plus imported goods.
+
+      This trade-adjusted energy use data was calculated by <a href="https://baug.ethz.ch/en/department/people/staff/personen-detail.MjY1MDUz.TGlzdC82NzksLTU1NTc1NDEwMQ==.html">Viktoras Kulionis</a> using this approach.
+
+      The EXIOBASE v3.8.2 database is available online: https://zenodo.org/record/5589597#.YYf3EdnMK_0.
+
+      We have calculated per capita metrics by combining this data with population data from the UN World Population Prospects: https://population.un.org/wpp/
+
+      We have calculated energy intensity metrics by combining this data with GDP data (measured in 2017 international dollars, which corrects for inflation and cross-country price differences) from the World Bank: https://data.worldbank.org/indicator
+
+      Carbon intensity of energy is calculated by combining this data with CO2. emissions data from the Global Carbon Project.
+      Reference: Global Carbon Project. (2021). Supplemental data of Global Carbon Project 2021 (1.0) [Data set]. Global Carbon Project. https://doi.org/10.18160/gcp-2021.)
+
+      The EXIOBASE database contains a data error for Australia for 2018 and 2019, which provides erroneous results. We have therefore removed these two data points for Australia only.
+    url: https://zenodo.org/record/5589597#.YYf3EdnMK_0
+    date_accessed: 2026-03-05
+    published_by: Calculated by Viktoras Kulionis, based on the EXIOBASE v3.8.2 database
+  name: Consumption-based energy (Kulionis, 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: b031c9f7d189fbadb3731cfb56a5b39c
+    size: 116754
+    path: consumption_based_energy__kulionis__2021.feather
