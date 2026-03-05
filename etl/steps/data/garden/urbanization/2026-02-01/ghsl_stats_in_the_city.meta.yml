@@ -12,7 +12,7 @@ definitions:
     - Cities are split at country borders, so a cross-border city appears as a separate entry for each country. For country-level figures, only the portion inside that country is counted.
 
   desc_processing_pop_weighted: &desc_processing_pop_weighted |-
-    Country values are calculated as a population-weighted average across cities, so larger cities count more. This reflects what the average urban resident experiences rather than treating a city of 100,000 the same as one of 5 million. Population weights come from the GHSL 5-year series; for indicator years that fall between intervals, the nearest available population year is used.
+    Country values are calculated as a population-weighted average across cities, so larger cities count more. This reflects what the average city resident experiences rather than treating a city of 100,000 the same as one of 5 million. Population weights come from the GHSL 5-year series; for indicator years that fall between intervals, the nearest available population year is used.
 
   desc_processing_road_length: &desc_processing_road_length |-
     Road length is first converted to metres per person at the city level, then aggregated to the country level as a population-weighted average. Population weights come from the GHSL 5-year series; the nearest available population year to 2024 (i.e. 2025) is used.
@@ -33,7 +33,7 @@ tables:
         short_unit: Mbps
         description_short: Average fixed-broadband download speed across [cities](#dod:cities-degurba), aggregated to the country level.
         description_key:
-          - This measures how fast fixed (non-mobile) broadband connections are in cities. It gives a sense of the digital infrastructure available to urban residents.
+          - This measures how fast fixed (non-mobile) broadband connections are in cities. It gives a sense of the digital infrastructure available to city residents.
           - The speed data comes from Speedtest by Ookla and reflects tests that people voluntarily run, not a census of all connections. Coverage is uneven — places where fewer people run tests may have noisier or missing estimates.
           - This covers fixed broadband only. Mobile internet speeds, which are often the primary connection in lower-income countries, are not included.
           - *desc_key_city_definition
@@ -57,7 +57,7 @@ tables:
         short_unit: m
         description_short: Total road length per resident across [cities](#dod:cities-degurba), aggregated to the country level.
         description_key:
-          - This measures how much road infrastructure exists relative to the number of people living in cities. It reflects whether road networks have kept pace with urban populations.
+          - This measures how much road infrastructure exists relative to the number of people living in cities. It reflects whether road networks have kept pace with city populations.
           - Road data comes from the Overture Maps Foundation, an open global mapping dataset. Completeness and how roads are classified can differ across countries, so comparisons should be made with care.
           - *desc_key_city_definition
         description_processing: *desc_processing_road_length
@@ -68,7 +68,7 @@ tables:
         short_unit: "%"
         description_short: Share of [city](#dod:cities-degurba) residents living in neighbourhoods with high vegetation cover, aggregated to the country level.
         description_key:
-          - This measures the share of urban residents who live near abundant vegetation — a common proxy for access to green space and the cooling, air quality, and wellbeing benefits it provides.
+          - This measures the share of city residents who live near abundant vegetation — a common proxy for access to green space and the cooling, air quality, and wellbeing benefits it provides.
           - Vegetation is measured from satellites using NDVI (a standard index of land surface greenness), averaged over three years and assessed within 300 metres of the built-up city area.
           - What counts as "high greenness" varies by region. Thresholds are set by UN-Habitat for different agro-ecological zones using a sample of 700 cities, so a high score in a semi-arid region reflects a different level of greenery than the same score in a temperate one.
           - City boundaries are fixed at their 2025 extent, so historical values describe vegetation conditions inside today's city boundary — not the city as it was in the past.
@@ -104,7 +104,7 @@ tables:
         unit: per 100,000 people
         description_short: Number of hospital facilities per 100,000 [city](#dod:cities-degurba) residents, aggregated to the country level.
         description_key:
-          - This measures the density of hospitals relative to the urban population — how many facilities exist per 100,000 city residents.
+          - This measures the density of hospitals relative to the city population — how many facilities exist per 100,000 city residents.
           - Hospitals are identified from OpenStreetMap data. A facility is counted as a hospital when its attributes contain the word "hospital"; point and polygon features are compared to reduce duplicates.
           - Because this relies on OpenStreetMap, coverage varies. In some countries, hospitals may be missing or incorrectly tagged, which can make comparisons across countries unreliable.
           - *desc_key_city_definition
@@ -115,7 +115,7 @@ tables:
         unit: per 100,000 people
         description_short: Number of pharmacy facilities per 100,000 [city](#dod:cities-degurba) residents, aggregated to the country level.
         description_key:
-          - This measures the density of pharmacies relative to the urban population — how many facilities exist per 100,000 city residents.
+          - This measures the density of pharmacies relative to the city population — how many facilities exist per 100,000 city residents.
           - Pharmacies are identified from OpenStreetMap data. A facility is counted as a pharmacy when its attributes contain "pharmacy" but not "hospital"; point and polygon features are compared to reduce duplicates.
           - Because this relies on OpenStreetMap, coverage varies. In some countries, pharmacies may be missing or incorrectly tagged, which can make comparisons across countries unreliable.
           - *desc_key_city_definition
