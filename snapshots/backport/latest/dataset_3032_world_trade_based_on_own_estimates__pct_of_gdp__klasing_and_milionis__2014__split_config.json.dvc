@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3032
-    date_accessed: 2023-08-10 10:30:23.234164
+    url: https://admin.owid.io/admin/datasets/3032
+    date_accessed: 2026-03-05 09:53:10.293264+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split
+  name: Grapher metadata for dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 962d6af546ee51914531d838d670969c
-  size: 3349
-  path: 
-    dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split_config.json
+  - md5: 417036edf70602351feb2d0adffc6bcd
+    size: 3572
+    path: dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split_config.json
