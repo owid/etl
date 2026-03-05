@@ -37,6 +37,8 @@ CUSTOM_REGION_DICT = {
     "USSR (Southern Russia)": "Asia",
     "German occupied USSR ": "Asia",
     "Poland (ghettos and concentration camps)": "Europe",
+    "Austria-Hungary": "Europe",
+    "Austria, Hungary": "Europe",
 }
 
 
@@ -89,9 +91,9 @@ def run() -> None:
 
     # Drop columns that are not needed.
     tb = tb.drop(columns=["date_list", "date_range", "simplified_place"])
-    tb["famine_name"] = tb["famine_name"].rename({"Poland 1915-1918": "Austria-Hungary 1915-1918"})
-    mask = tb["famine_name"].eq("Poland 1915-1918") & tb["country"].eq("Poland")
-    tb.loc[mask, "country"] = "Austria, Hungary"
+
+    # Rename Poland 1915-1918 to Austria-Hungary 1915-1918
+    tb["famine_name"] = tb["famine_name"].replace({"Poland 1915-1918": "Austria-Hungary 1915-1918"})
 
     tb = tb.format(["famine_name", "date"])
 

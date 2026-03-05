@@ -26,7 +26,6 @@ CUSTOM_REGIMES = {
     ("Turkey, Armenians", range(1915, 1917)): 3,
     ("Iran", range(1870, 1873)): 3,
     ("Philippines", 1899): 3,
-    ("Poland", range(1915, 1918)): 3,
     ("Poland", range(1940, 1944)): 3,
     ("Russia, Kazakhstan", range(1932, 1935)): 3,
     ("Russia, Ukraine", range(1915, 1923)): 3,
@@ -210,7 +209,6 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         {"country": "India", "years": [1876, 1877, 1878], "year_range": [1870, 1884]},
         {"country": "Turkey", "years": [1894, 1895, 1896], "year_range": [1870, 1913]},
         {"country": "Philippines", "years": [1899, 1900, 1901], "ref_year": 1902},
-        {"country": "Poland", "years": [1915, 1916, 1917, 1918], "year_range": [1913, 1920]},
         {"country": "Poland", "years": [1940, 1941, 1942, 1943, 1944, 1945], "year_range": [1938, 1948]},
         {"country": "Iran", "years": [1871, 1872], "ref_year": 1870},
         {"country": "Iran", "years": [1917, 1918, 1919], "ref_year": 1913},
@@ -227,6 +225,11 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         elif "year_range" in rule:
             gdp_value = calculate_average_gdp(tb_gdp, rule["country"], rule["year_range"])
         replace_gdp(tb, rule["country"], rule["years"], gdp_value)
+
+    # Special case for Austria-Hungary - use Austria's GDP data
+    austria_hungary_years = [1915, 1916, 1917, 1918]
+    austria_gdp = calculate_average_gdp(tb_gdp, "Austria", [1913, 1920])
+    replace_gdp(tb, "Austria, Hungary", austria_hungary_years, austria_gdp)
 
     # Special cases for USSR/Russian Empire  - these countries were a part of the USSR/Russian Empire at the time so use the GDP of the USSR/Russia; some years aren't available so use an average of the surrounding years
     special_cases = {
@@ -314,12 +317,13 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
 
     tb_ext = tb_ext.rename(columns={"country": "original_country"})
 
-    # Mapping dictionary to rename specified countries to "USSR"
+    # Mapping dictionary to rename specified countries for population lookup
     country_mapping = {
         "Kazakhstan": "USSR",
-        "Russia, Ukraine": "Russia",  # Ukrane was a part of the Russian Emprie
+        "Russia, Ukraine": "Russia",  # Ukraine was a part of the Russian Empire
         "Russia, Western Soviet States": "USSR",
         "Moldova, Ukraine, Russia, Belarus": "USSR",
+        "Austria, Hungary": "Austria",  # Use Austria's population data for Austria-Hungary
     }
 
     # Create a new column with the renamed countries
