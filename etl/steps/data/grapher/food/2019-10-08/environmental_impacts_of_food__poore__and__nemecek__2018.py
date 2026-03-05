@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
+    tb = ds_garden["environmental_impacts_of_food__poore__and__nemecek__2018"]
 
     #
     # Save outputs.

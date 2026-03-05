@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
+    tb = ds_garden["plastic_ocean_pollution__meijer_et_al__2021"]
 
     #
     # Save outputs.

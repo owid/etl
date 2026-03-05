@@ -697,14 +697,7 @@ def _archive_datasets_without_charts(
                     step_uri=step_uri,
                 )
                 continue
-        else:
-            # No catalog path means we can't verify it's in the archive DAG, skip it
-            log.info(
-                "archive_datasets.skip_no_catalog_path",
-                dataset_id=dataset.id,
-                name=dataset.name,
-            )
-            continue
+        # else: no catalogPath — legacy dataset, safe to archive if it has no charts
 
         log.info("archive_datasets.archive", dataset_id=dataset.id, name=dataset.name, catalog_path=dataset.catalogPath)
         datasets_archived += 1
