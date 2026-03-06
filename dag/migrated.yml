@@ -632,10 +632,6 @@ steps:
     - data://garden/forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019
   data://garden/forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019:
     - snapshot://forests/2020-12-31/indonesian_deforestation_drivers__austin_et_al__2019.feather
-  data://grapher/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013:
-    - data://garden/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013
-  data://garden/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013:
-    - snapshot://health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013.feather
   data://grapher/economics/2016-09-22/top_marginal_income_tax_rate__reynolds__2008:
     - data://garden/economics/2016-09-22/top_marginal_income_tax_rate__reynolds__2008
   data://garden/economics/2016-09-22/top_marginal_income_tax_rate__reynolds__2008:
