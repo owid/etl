@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5777
-    date_accessed: 2023-08-10 08:30:31.388432
+    url: https://admin.owid.io/admin/datasets/5777
+    date_accessed: 2026-03-05 09:38:24.872777+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5777_influenza_vaccination_rates_in_over_65s__oecd
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 84a635c94d83d3af8e4b7afb063799e6
-  size: 2273
-  path: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_config.json
+  - md5: 847a145671d5bcaca2d9e81c2d38e035
+    size: 2403
+    path: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_config.json

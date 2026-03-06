@@ -141,6 +141,10 @@ def load_STAGING() -> Optional[str]:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
+    # Treat empty string and "0" as disabled
+    if STAGING in (None, "", "0"):
+        return None
+
     # Check if we're running via etl d run-python-step (suppress warnings)
     is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
 

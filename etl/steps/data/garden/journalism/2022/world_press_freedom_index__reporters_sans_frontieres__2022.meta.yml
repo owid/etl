@@ -1,0 +1,22 @@
+dataset:
+  title: World Press Freedom Index - Reporters sans Frontieres (2022)
+tables:
+  world_press_freedom_index__reporters_sans_frontieres__2022:
+    variables:
+      press_freedom_score:
+        title: Press Freedom Score
+        unit: ''
+        description: |-
+          The variable denotes a country's press freedom score. It combines data on violence against journalists with experts assessments by media professionals, lawyers, and sociologists on pluralism, media independence, media environment and self-censorship, legislative framework, transparency, and the quality of the infrastructure that supports the production of news and information.
+      press_freedom_status:
+        title: Press Freedom Status
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

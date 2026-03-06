@@ -1,0 +1,29 @@
+dataset:
+  title: Meat conversion efficiencies - Alexander et al. (2016)
+tables:
+  meat_conversion_efficiencies__alexander_et_al__2016:
+    variables:
+      energy_conversion_efficiency__alexander_et_al__2016:
+        title: Energy conversion efficiency (Alexander et al. (2016))
+        unit: '%'
+        short_unit: '%'
+        description: The percentage of energy (caloric) inputs as feed effectively converted to animal product.
+      feed_conversion_ratio__alexander_et_al__2016:
+        title: Feed conversion ratio (Alexander et al. (2016))
+        unit: ''
+        short_unit: kilograms
+        description: Feed required to produce one kilogram of meat or dairy product.
+      protein_feed_conversion_efficiency__alexander_et_al__2016:
+        title: Protein feed conversion efficiency (Alexander et al. (2016))
+        unit: '%'
+        short_unit: '%'
+        description: The percentage of protein inputs as feed effectively converted to animal product.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
