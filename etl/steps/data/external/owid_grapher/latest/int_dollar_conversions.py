@@ -129,7 +129,7 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     # Purchasing Power Parity (PPP) rates (2021 prices)
     tb_pip_ppp = (
         ds_pip["other_indicators"]
-        .rename(columns={"ppp__ppp_version_2021__welfare_type_income_or_consumption": "ppp"})
+        .query("ppp_version == @PPP_YEAR and ppp.notna()")
         .reset_index()
         .groupby("country")[
             "ppp"
