@@ -156,8 +156,7 @@ tables:
           - *desc_key_hospital_cross_country
           - *desc_key_city_definition
         description_processing: *desc_processing_facilities_per_capita
-        display:
-          numDecimalPlaces: 0
+
 
       number_of_pharmacies:
         title: Pharmacies per 100,000 city residents
@@ -170,5 +169,3 @@ tables:
           - *desc_key_pharmacy_cross_country
           - *desc_key_city_definition
         description_processing: *desc_processing_facilities_per_capita
-        display:
-          numDecimalPlaces: 0
