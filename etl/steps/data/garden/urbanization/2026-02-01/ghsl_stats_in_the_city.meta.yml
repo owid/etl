@@ -11,6 +11,43 @@ definitions:
     - Cities here are defined using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php), which maps dense settlements from population grids rather than administrative borders. To qualify, an area needs at least 1,500 people per km² and 50,000 residents in total. This means city boundaries won't always match official city limits, and some places people consider one city may appear as several — or vice versa — depending on how built-up areas connect.
     - Cities are split at country borders, so a cross-border city appears as a separate entry for each country. For country-level figures, only the portion inside that country is counted.
 
+  # Shared: proximity threshold caveat for 1 km access indicators
+  desc_key_1km_threshold: &desc_key_1km_threshold
+    - The 1 km threshold is a straight-line distance, not walking or travel time. Actual access depends on road layout, transport, and whether facilities are open and operational.
+
+
+  # Shared: hospital identification and tagging methodology
+  desc_key_hospital_identification: &desc_key_hospital_identification
+    - Hospitals are identified from OpenStreetMap data. A facility is counted as a hospital when its attributes contain the word "hospital"; point and polygon features are compared to reduce duplicates.
+
+  # Shared: caveat on the broad and inconsistent definition of "hospital"
+  desc_key_hospital_definition_broad: &desc_key_hospital_definition_broad
+    - The definition of "hospital" is broad and inconsistent across countries. It includes any facility tagged with "hospital" in OpenStreetMap, making no distinction between major teaching hospitals, small clinics, inpatient facilities, or outpatient centers. Different countries may tag similar facilities differently.
+
+  # Shared: OSM coverage caveat specific to hospital indicators
+  desc_key_hospital_osm_coverage: &desc_key_hospital_osm_coverage
+    - Because this relies on OpenStreetMap, coverage varies dramatically. Countries with active mapping communities (particularly in Europe) may have more facilities mapped, including small clinics, while others may only have major hospitals recorded. High values often reflect better OpenStreetMap coverage rather than more health infrastructure.
+
+  # Shared: cross-country comparison warning for hospital indicators
+  desc_key_hospital_cross_country: &desc_key_hospital_cross_country
+    - Cross-country comparisons are unreliable and should not be used to assess relative health system capacity. Differences often reflect OpenStreetMap mapping practices and volunteer activity rather than actual differences in hospital availability.
+
+  # Shared: pharmacy identification and tagging methodology
+  desc_key_pharmacy_identification: &desc_key_pharmacy_identification
+    - Pharmacies are identified from OpenStreetMap data. A facility is counted as a pharmacy when its attributes contain "pharmacy" but not "hospital"; point and polygon features are compared to reduce duplicates.
+
+  # Shared: OSM coverage caveat specific to pharmacy indicators
+  desc_key_pharmacy_osm_coverage: &desc_key_pharmacy_osm_coverage
+    - Because this relies on OpenStreetMap, coverage varies dramatically. Countries with active mapping communities may have more facilities mapped, while others may only have major pharmacies recorded. High values often reflect better OpenStreetMap coverage rather than more pharmacy infrastructure.
+
+  # Shared: cross-country comparison warning for pharmacy indicators
+  desc_key_pharmacy_cross_country: &desc_key_pharmacy_cross_country
+    - Cross-country comparisons are unreliable and should not be used to assess relative pharmacy availability. Differences often reflect OpenStreetMap mapping practices and volunteer activity rather than actual differences in pharmacy density.
+
+  # Shared: road data source caveat for road indicators
+  desc_key_road_data_source: &desc_key_road_data_source
+    - Road data comes from the Overture Maps Foundation, an open global mapping dataset. Completeness and how roads are classified can differ across countries, so comparisons should be made with care.
+
   desc_processing_pop_weighted: &desc_processing_pop_weighted |-
     Country values are calculated as a population-weighted average across cities, so larger cities count more. This reflects what the average city resident experiences rather than treating a city of 100,000 the same as one of 5 million. Population weights come from the GHSL 5-year series; for indicator years that fall between intervals, the nearest available population year is used.
 
@@ -47,7 +84,7 @@ tables:
         description_key:
           - This measures how densely roads are laid out within a city — the total length of roads divided by the city's land area. A higher value means roads are more closely spaced.
           - It captures the extent of the road network, but not road quality, width, or how well-connected the network is for getting around.
-          - Road data comes from the Overture Maps Foundation, an open global mapping dataset. Completeness and how roads are classified can differ across countries, so comparisons should be made with care.
+          - *desc_key_road_data_source
           - *desc_key_city_definition
         description_processing: *desc_processing_pop_weighted
 
@@ -58,7 +95,7 @@ tables:
         description_short: Total road length per resident across [cities](#dod:cities-degurba), aggregated to the country level.
         description_key:
           - This measures how much road infrastructure exists relative to the number of people living in cities. It reflects whether road networks have kept pace with city populations.
-          - Road data comes from the Overture Maps Foundation, an open global mapping dataset. Completeness and how roads are classified can differ across countries, so comparisons should be made with care.
+          - *desc_key_road_data_source
           - *desc_key_city_definition
         description_processing: *desc_processing_road_length
 
@@ -83,8 +120,12 @@ tables:
         description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a hospital, aggregated to the country level.
         description_key:
           - This measures how many city residents live within 1 kilometre of a hospital — a basic indicator of physical access to inpatient care.
-          - The 1 km threshold is a straight-line distance, not walking or travel time. Actual access depends on road layout, transport, and whether facilities are open and staffed.
-          - Hospital locations come from healthsites.io, which is built on OpenStreetMap. In some countries, facilities may be missing, duplicated, or tagged inconsistently, which can affect comparisons.
+          - *desc_key_1km_threshold
+          - High values can reflect either good coverage or compact geography. In small, densely populated cities, most residents may live within 1 km of the few hospitals that exist. This indicates proximity but not necessarily abundant healthcare capacity.
+          - *desc_key_hospital_identification
+          - *desc_key_hospital_definition_broad
+          - *desc_key_hospital_osm_coverage
+          - *desc_key_hospital_cross_country
           - *desc_key_city_definition
         description_processing: *desc_processing_pop_weighted
 
@@ -95,8 +136,11 @@ tables:
         description_short: Share of [city](#dod:cities-degurba) residents living within 1 km of a pharmacy, aggregated to the country level.
         description_key:
           - This measures how many city residents live within 1 kilometre of a pharmacy — a basic indicator of access to medicines and routine healthcare.
-          - The 1 km threshold is a straight-line distance, not walking or travel time. Actual access depends on road layout, transport, and whether facilities are open and stocked.
-          - Pharmacy locations come from healthsites.io, which is built on OpenStreetMap. In some countries, facilities may be missing, duplicated, or tagged inconsistently, which can affect comparisons.
+          - *desc_key_1km_threshold
+          - High values can reflect either good coverage or compact geography. In small, densely populated cities, most residents may live within 1 km of the few pharmacies that exist. This indicates proximity but not necessarily abundant pharmacy infrastructure.
+          - *desc_key_pharmacy_identification
+          - *desc_key_pharmacy_osm_coverage
+          - *desc_key_pharmacy_cross_country
           - *desc_key_city_definition
         description_processing: *desc_processing_pop_weighted
 
@@ -106,8 +150,10 @@ tables:
         description_short: Number of hospital facilities per 100,000 [city](#dod:cities-degurba) residents, aggregated to the country level.
         description_key:
           - This measures the density of hospitals relative to the city population — how many facilities exist per 100,000 city residents.
-          - Hospitals are identified from OpenStreetMap data. A facility is counted as a hospital when its attributes contain the word "hospital"; point and polygon features are compared to reduce duplicates.
-          - Because this relies on OpenStreetMap, coverage varies. In some countries, hospitals may be missing or incorrectly tagged, which can make comparisons across countries unreliable.
+          - *desc_key_hospital_identification
+          - *desc_key_hospital_definition_broad
+          - *desc_key_hospital_osm_coverage
+          - *desc_key_hospital_cross_country
           - *desc_key_city_definition
         description_processing: *desc_processing_facilities_per_capita
 
@@ -117,7 +163,8 @@ tables:
         description_short: Number of pharmacy facilities per 100,000 [city](#dod:cities-degurba) residents, aggregated to the country level.
         description_key:
           - This measures the density of pharmacies relative to the city population — how many facilities exist per 100,000 city residents.
-          - Pharmacies are identified from OpenStreetMap data. A facility is counted as a pharmacy when its attributes contain "pharmacy" but not "hospital"; point and polygon features are compared to reduce duplicates.
-          - Because this relies on OpenStreetMap, coverage varies. In some countries, pharmacies may be missing or incorrectly tagged, which can make comparisons across countries unreliable.
+          - *desc_key_pharmacy_identification
+          - *desc_key_pharmacy_osm_coverage
+          - *desc_key_pharmacy_cross_country
           - *desc_key_city_definition
         description_processing: *desc_processing_facilities_per_capita
