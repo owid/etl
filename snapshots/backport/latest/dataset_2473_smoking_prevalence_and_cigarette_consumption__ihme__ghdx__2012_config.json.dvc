@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2473
-    date_accessed: 2023-08-10 08:47:31.778508
+    url: https://admin.owid.io/admin/datasets/2473
+    date_accessed: 2026-03-05 09:37:29.486469+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 07ce4d61bce50195d7b38ffdefa06c57
-  size: 17505
-  path: 
-    dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012_config.json
+  - md5: 53d30cfdf30e59d4af89b16ef130ddb7
+    size: 19495
+    path: dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012_config.json

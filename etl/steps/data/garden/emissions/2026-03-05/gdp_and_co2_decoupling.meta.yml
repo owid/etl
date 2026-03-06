@@ -1,0 +1,26 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  gdp_and_co2_decoupling:
+    title: Decoupling of per capita GDP and per capita consumption-based CO2 emissions
+    variables:
+      gdp_per_capita:
+        title: GDP per capita
+        unit: international-$ in 2021 prices
+        short_unit: $
+      consumption_emissions_per_capita:
+        title: Consumption-based CO₂ emissions per capita
+        unit: tonnes per person
+        short_unit: t
+      gdp_per_capita_smooth:
+        title: GDP per capita (smoothed)
+        unit: international-$ in 2021 prices
+        short_unit: $
+      consumption_emissions_per_capita_smooth:
+        title: Consumption-based CO₂ emissions per capita (smoothed)
+        unit: tonnes per person
+        short_unit: t
+      peak_emissions_year:
+        title: Peak emissions year
+        unit: ""

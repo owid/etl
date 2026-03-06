@@ -158,6 +158,7 @@ def metadata_export(
     ds: Dataset,
     prune: bool = False,
     decimals: Optional[Union[int, Literal["auto", "no"]]] = None,
+    keep_title: bool = False,
 ) -> dict:
     """
     :param prune: If True, remove origins and licenses that would be propagated from the snapshot.
@@ -220,8 +221,10 @@ def metadata_export(
                     display.pop("includeInTable")
 
                 # if title is underscored and identical to column name, try to use display name as title
+                # skip this for migrations where preserving original variable names is critical
                 if (
-                    col == variable["title"]
+                    not keep_title
+                    and col == variable["title"]
                     and utils.underscore(variable["title"]) == variable["title"]
                     and display.get("name")
                     and display["name"] not in used_titles
