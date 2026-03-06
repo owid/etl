@@ -1,0 +1,70 @@
+dataset:
+  title: Job search methods US - Pew Research Center (2015)
+tables:
+  job_search_methods_us__pew_research_center__2015:
+    variables:
+      percentage_who_used_acquaintances_or_friends_of_friends:
+        title: Percentage who used acquaintances or friends-of-friends
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used acquaintances or friends-of-friends in their most recent job search.
+      percentage_who_used_ads_in_print_publications:
+        title: Percentage who used ads in print publications
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used ads in print publications in their most recent job search.
+      percentage_who_used_connections_with_close_friends_or_family:
+        title: Percentage who used connections with close friends or family
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used connections with close friends or family in their most recent job search.
+      percentage_who_used_employment_agencies__government_or_private:
+        title: Percentage who used employment agencies (government or private)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used employment agencies (government or private) in their most recent job search.
+      percentage_who_used_job_fairs__conferences__and_other_events:
+        title: Percentage who used job fairs, conferences, and other events
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used job fairs, conferences, and other events in their most recent job search.
+      percentage_who_used_online_resources_and_information:
+        title: Percentage who used online resources and information
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used online resources and information in their most recent job search.
+      percentage_who_used_professional_or_work_connections:
+        title: Percentage who used professional or work connections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The percentage of Americans, who have looked for a job in the last two years, and used professional or work connections in their most recent job search.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

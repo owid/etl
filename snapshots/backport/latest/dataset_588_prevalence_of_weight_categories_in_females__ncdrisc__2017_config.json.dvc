@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/588
-    date_accessed: 2023-08-10 07:46:58.763573
+    url: https://admin.owid.io/admin/datasets/588
+    date_accessed: 2026-03-06 07:45:24.743793+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2896277df65ced56b0fa06cfea007f97
-  size: 5165
-  path: 
-    dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017_config.json
+  - md5: 0becbad1877c0bb7738701d12f262a0b
+    size: 5574
+    path: dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017_config.json

@@ -1,0 +1,40 @@
+dataset:
+  title: Rhino poaching rates (AfRSG, 2019)
+tables:
+  rhino_poaching_rates__afrsg__2019:
+    variables:
+      number_of_seized_rhino_horns_and_pieces__afrsg__2019:
+        title: Number of seized rhino horns and pieces (AfRSG, 2019)
+        unit: horns
+        display:
+          name: Number of seized rhino horns and pieces
+        description: Number of seized rhino horns and pieces over the period from 2009 to September 2018.
+      rhinos_poached__afrsg__2019:
+        title: Rhinos Poached (AfRSG, 2019)
+        unit: rhinos poached
+        display:
+          name: Number of rhinos poached
+          numDecimalPlaces: 0
+        description: Number of rhinos poached.
+      rhinos_poached_day__afrsg__2019:
+        title: Rhinos Poached/day (AfRSG, 2019)
+        unit: rhinos per day
+        display:
+          name: Number of rhinos poached per day
+        description: Average number of rhinos poached per day.
+      weight_of_seized_rhino_horns__afrsg__2019:
+        title: Weight of seized rhino horns (AfRSG, 2019)
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: Weight of seized rhino horns
+        description: Weight of seized rhino horns over the period from 2009 to September 2018.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

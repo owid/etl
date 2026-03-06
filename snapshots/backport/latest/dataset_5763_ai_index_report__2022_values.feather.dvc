@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5763
-    date_accessed: 2023-08-10 09:41:12.034157
+    url: https://admin.owid.io/admin/datasets/5763
+    date_accessed: 2026-03-05 14:40:12.096291+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: AI Index Report (2022)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: adcf61ef5c8b63266c1b6a40d072a3d6
-  size: 53418
-  path: dataset_5763_ai_index_report__2022_values.feather
+  - md5: 032b695287b4c8683309201f155295e1
+    size: 54986
+    path: dataset_5763_ai_index_report__2022_values.feather

@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Organisation for Economic Co-operation and Development, Labour Force Statistics (2020)
+    url: https://stats.oecd.org/Index.aspx?DataSetCode=ANHRS#
+    date_accessed: 2020-09-16
+    published_by: Organisation for Economic Co-operation and Development (2020)
+  name: Working Hours – OECD (2020)
+  description: ''
+  is_public: false
+outs:
+  - md5: dd5f9d1843e5f9c39ea1ee2557a95bed
+    size: 9946
+    path: working_hours__oecd__2020.feather

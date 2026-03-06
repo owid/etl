@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/269
-    date_accessed: 2023-08-10 07:46:16.315372
+    url: https://admin.owid.io/admin/datasets/269
+    date_accessed: 2026-03-05 12:23:10.080835+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: International Historical Statistics (Births per 1,000) - Brian Mitchell (2013)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 22a28302ad04cf19eede894e15a3c9dd
-  size: 66026
-  path: 
-    dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013_values.feather
+  - md5: b1b7ff15a32d92bdeaa07554c1566ec0
+    size: 71506
+    path: dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013_values.feather

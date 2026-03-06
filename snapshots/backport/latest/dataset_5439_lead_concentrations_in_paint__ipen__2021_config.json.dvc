@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5439
-    date_accessed: 2023-08-10 08:25:17.226145
+    url: https://admin.owid.io/admin/datasets/5439
+    date_accessed: 2026-03-05 14:38:39.657938+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5439_lead_concentrations_in_paint__ipen__2021
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e90c6bb4dcb7593a7bb7c002ece1c3bf
-  size: 4445
-  path: dataset_5439_lead_concentrations_in_paint__ipen__2021_config.json
+  - md5: 2c9b6deb86fb8abc019f2bc01fabf803
+    size: 4761
+    path: dataset_5439_lead_concentrations_in_paint__ipen__2021_config.json

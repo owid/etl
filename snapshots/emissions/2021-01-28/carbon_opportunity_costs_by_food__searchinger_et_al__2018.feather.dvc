@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: |-
+      Searchinger, T. D., Wirsenius, S., Beringer, T., & Dumas, P. (2018). Assessing the efficiency of changes in land use for mitigating climate change. Nature.
+    description: |-
+      The Carbon Opportunity Cost (COC) of each crop is equal to the amount of carbon lost from native vegetation and soils in order to produce a given food product. If food products were not produced on a given plot of land, this land could be used to restore native vegetation and sequester carbon.
+
+      Because carbon storage is lost quickly but crop production can continue indefinitely, any system for evaluating the carbon costs of land use must in some way address the relative costs of emissions over time. Much of the discussion focuses on the value of up-front versus later mitigation. In general, this question can be thought as a question about what is the relative value of reducing emissions sooner rather than later. Searchinger et al. (2018) apply a 4% time 'discount rate' over 100 years. The the choice of a discount rate and a carbon value trajectory is a question of policy; the authors selected a 4% discount rate as their central scenario because it is roughly consistent with U.S. bioenergy policies.
+    url: https://www.nature.com/articles/s41586-018-0757-z
+    date_accessed: 2021-01-28
+    published_by: |-
+      Searchinger, T. D., Wirsenius, S., Beringer, T., & Dumas, P. (2018). Assessing the efficiency of changes in land use for mitigating climate change. Nature, 564(7735), 249-253.
+  name: Carbon Opportunity Costs by Food (Searchinger et al. 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 5a7293da8db162aed08b353082203528
+    size: 3874
+    path: carbon_opportunity_costs_by_food__searchinger_et_al__2018.feather

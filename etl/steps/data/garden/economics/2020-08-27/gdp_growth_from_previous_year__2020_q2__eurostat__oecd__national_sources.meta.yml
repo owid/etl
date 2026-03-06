@@ -1,0 +1,21 @@
+dataset:
+  title: GDP growth from previous year, 2020 Q2 (Eurostat, OECD, National sources)
+tables:
+  gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources:
+    variables:
+      gdp_growth_from_previous_year__2020_q2:
+        title: GDP growth from previous year, 2020 Q2
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

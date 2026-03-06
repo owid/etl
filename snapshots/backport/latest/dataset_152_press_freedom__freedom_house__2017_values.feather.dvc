@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/152
-    date_accessed: 2023-08-10 08:42:14.939446
+    url: https://admin.owid.io/admin/datasets/152
+    date_accessed: 2026-03-05 12:23:08.049021+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Press freedom - Freedom House (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 32d612e6d1077e3022f760d85507c9a0
-  size: 17258
-  path: dataset_152_press_freedom__freedom_house__2017_values.feather
+  - md5: 109c9391393350712b81f0d23e288c1a
+    size: 26130
+    path: dataset_152_press_freedom__freedom_house__2017_values.feather

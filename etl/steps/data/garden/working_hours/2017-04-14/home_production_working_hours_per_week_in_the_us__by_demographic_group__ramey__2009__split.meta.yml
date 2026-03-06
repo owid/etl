@@ -1,0 +1,22 @@
+dataset:
+  title: Home production working hours per week in the US, by demographic group (Ramey (2009)) (split)
+tables:
+  home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split:
+    variables:
+      home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009:
+        title: Home production working hours per week in the US, by demographic group (Ramey (2009))
+        unit: Percent
+        description: Home production working hours per week in the US, by demographic group.
+      home_production_working_hours_per_week_in_the_us__by_gender__employment_and_marital_status__ramey__2009:
+        title: Home production working hours per week in the US, by gender, employment and marital status (Ramey (2009))
+        unit: Percent
+        description: Home production working hours per week in the US, by gender, employment and marital status.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

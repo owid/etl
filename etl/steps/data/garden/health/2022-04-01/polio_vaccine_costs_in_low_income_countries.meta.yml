@@ -1,0 +1,32 @@
+dataset:
+  title: Polio vaccine costs in low-income countries
+tables:
+  polio_vaccine_costs_in_low_income_countries:
+    variables:
+      administration_cost_per_contact__usd__2019:
+        title: Administration cost per contact (USD, 2019)
+        unit: ''
+        display:
+          name: Administration cost
+      total_cost_per_contact__usd__2019:
+        title: Total cost per contact (USD, 2019)
+        unit: ''
+        display:
+          name: Total cost
+      vaccine_cost_per_contact_with_wastage__usd__2019:
+        title: Vaccine cost per contact with wastage (USD, 2019)
+        unit: ''
+        display:
+          name: Vaccine cost
+      world_bank_income_level:
+        title: World Bank Income level
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

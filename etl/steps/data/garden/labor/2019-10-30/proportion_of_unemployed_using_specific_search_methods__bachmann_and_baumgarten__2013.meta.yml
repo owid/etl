@@ -1,0 +1,35 @@
+dataset:
+  title: Proportion of unemployed using specific search methods - Bachmann and Baumgarten (2013)
+tables:
+  proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013:
+    variables:
+      percentage_of_unemployed_inserting_answering_ads_in_job_search:
+        title: Percentage of unemployed inserting/answering ads in job search
+        unit: ''
+      percentage_of_unemployed_studying_ads_in_job_search:
+        title: Percentage of unemployed studying ads in job search
+        unit: ''
+      percentage_of_unemployed_using_direct_applications_in_job_search:
+        title: Percentage of unemployed using direct applications in job search
+        unit: ''
+      percentage_of_unemployed_using_friends__relatives__trade_unions__etc__in_job_search:
+        title: Percentage of unemployed using friends, relatives, trade unions, etc. in job search
+        unit: ''
+      percentage_of_unemployed_using_private_employment_agency_in_job_search:
+        title: Percentage of unemployed using private employment agency in job search
+        unit: ''
+      percentage_of_unemployed_using_public_employment_office_in_job_search:
+        title: Percentage of unemployed using public employment office in job search
+        unit: ''
+      percentage_of_unemployed_using_test__interview__or_examination_in_job_search:
+        title: Percentage of unemployed using test, interview, or examination in job search
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

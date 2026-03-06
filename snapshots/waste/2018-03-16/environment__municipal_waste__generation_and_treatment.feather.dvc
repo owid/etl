@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: OECD - Environment - Municipal waste, Generation and Treatment
+    description: |-
+      Contact person/organisation
+      ENV.Stat@oecd.org
+      Data source(s) used
+      This dataset shows data provided by Member countries' authorities through the questionnaire on the state of the environment (OECD/Eurostat). They were updated or revised on the basis of data from other national and international sources available to the OECD Secretariat, and on the basis of comments received from national Delegates. Selected updates were also done in the context of the OECD Environmental Performance Reviews. The data are harmonised through the work of the OECD Working Party on Environmental Information (WPEI) and benefit from continued data quality efforts in OECD member countries, the OECD itself and other international organisations.In many countries systematic collection of environmental data has a short history; sources are typically spread across a range of agencies and levels of government, and information is often collected for other purposes. When interpreting these data, one should  keep in mind that definitions and measurement methods vary among countries, and that inter-country comparisons require careful interpretation. One should also note that data presented here refer to national level and may conceal major subnational differences.
+      Key statistical concept
+      This dataset presents trends in amounts of municipal (including household waste), and the treatment and disposal method used.The amount of waste generated in each country is related to the rate of urbanisation, the types and pattern of consumption, household revenue and lifestyles.
+      Metadata
+      http://stats.oecd.org/wbos/fileview2.aspx?IDFile=9bc27df8-1205-468c-b178-ce0d200f2641
+    url: https://stats.oecd.org/Index.aspx?DataSetCode=MUNW
+    date_accessed: 2018-03-16
+    published_by: OECD.Stat
+  name: Environment - Municipal waste, Generation and Treatment
+  description: This is a dataset imported by the automated fetcher
+outs:
+  - md5: 986efa43c173e97a0e11367966125c5c
+    size: 114882
+    path: environment__municipal_waste__generation_and_treatment.feather

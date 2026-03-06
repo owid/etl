@@ -1,0 +1,28 @@
+dataset:
+  title: Average farm size (Lowder et al. 2016)
+tables:
+  average_farm_size__lowder_et_al__2016:
+    variables:
+      average_farm_size_ha:
+        title: average_farm_size_ha
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Average farm size
+        description: Average size of farm holdings, measured in hectares. This is based on agricultural census data.
+      has_farm_size_increased_decreased:
+        title: has_farm_size_increased_decreased
+        unit: ''
+        display:
+          name: Has the average farm size increased or decreased since 1960?
+        description: |-
+          Average size of farm holdings are measured in hectares. This is based on agricultural census data. This metric measures whether average farm size increased or decreased between 1960 and 2000.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Labor force participation rates - Basu (1999)
+    url: http://www.jstor.org/stable/2564873
+    date_accessed: 2017-09-27
+    published_by: |-
+      Basu, Kaushik. Child labor: cause, consequence, and cure, with remarks on international labor standards. Journal of Economic literature 37.3 (1999): 1083-1119
+  name: Child Labor (World 1950-1995) - Basu (1999)
+  description: ''
+outs:
+  - md5: fe5f7955d866a760910b660bfcde3523
+    size: 3066
+    path: child_labor__world_1950_1995__basu__1999.feather

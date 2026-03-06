@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/443
-    date_accessed: 2023-08-10 09:11:48.892018
+    url: https://admin.owid.io/admin/datasets/443
+    date_accessed: 2026-03-05 13:31:07.434053+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_443_life_satisfaction__eurobarometer__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a8ed687c70c2c178b38220ebde9fcfca
-  size: 2109
-  path: dataset_443_life_satisfaction__eurobarometer__2017_config.json
+  - md5: f999dccad8d82c2ac3d51be1e07cfb5f
+    size: 2239
+    path: dataset_443_life_satisfaction__eurobarometer__2017_config.json

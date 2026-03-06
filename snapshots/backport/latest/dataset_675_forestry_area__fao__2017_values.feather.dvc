@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/675
-    date_accessed: 2023-08-10 08:44:34.294000
+    url: https://admin.owid.io/admin/datasets/675
+    date_accessed: 2026-03-05 14:27:55.076646+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Forestry area - FAO (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cfa0f26ecc0f0cb785c22bfd82fd6e95
-  size: 6490
-  path: dataset_675_forestry_area__fao__2017_values.feather
+  - md5: 3b087be00f2b341f30f9186e1cbca3af
+    size: 6530
+    path: dataset_675_forestry_area__fao__2017_values.feather

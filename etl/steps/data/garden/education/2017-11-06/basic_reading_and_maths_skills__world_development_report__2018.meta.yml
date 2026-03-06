@@ -1,0 +1,18 @@
+dataset:
+  title: Basic reading and maths skills - World Development Report (2018)
+tables:
+  basic_reading_and_maths_skills__world_development_report__2018:
+    variables:
+      percent_of_students_who_could_not_read_a_single_word_of_a_short_text:
+        title: Percent of students who could not read a single word of a short text
+        unit: '%'
+        description: Percent of grade 2 students who could not read a single word of a short text
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

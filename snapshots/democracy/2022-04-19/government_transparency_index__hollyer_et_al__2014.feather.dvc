@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Hollyer et al. (2014)
+    description: |-
+      This dataset provides information on government transparency, as per the index by Hollyer et al. (2014).
+
+      A government is considered more transparent if it provides data on many measures included in the World Governance Indicators to the World Bank, even if other countries do not.
+    url: http://hrvtransparency.org/
+    date_accessed: 2022-04-19
+    published_by: 'Hollyer, James, Peter Rosendorff, and James Vreeland. 2014. Measuring Transparency. Political Analysis 22(4): 413-434.'
+  name: Government Transparency index - Hollyer et al. (2014)
+  description: ''
+outs:
+  - md5: b3938eb31b59a7646dd0435a6faf6090
+    size: 98746
+    path: government_transparency_index__hollyer_et_al__2014.feather
