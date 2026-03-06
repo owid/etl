@@ -221,7 +221,7 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
     # prevent line-wrap
     yml.width = 4096
     # prevent block key syntax (? key) for long mapping keys
-    yml.best_map_flow_style = True
+    yml.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
 
     stream = io.StringIO()
     yml.dump(d, stream)
