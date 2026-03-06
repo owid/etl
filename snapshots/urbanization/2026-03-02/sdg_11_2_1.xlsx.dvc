@@ -5,24 +5,23 @@ meta:
     # Data product / Snapshot
     title: SDG Indicator 11.2.1 - Access to Public Transport
     description: |-
-      SDG Indicator 11.2.1 measures the proportion of the population that has convenient access to public transport, disaggregated by sex, age and persons with disabilities. Convenient access is defined as having a public transport stop within 500 meters walking distance. This dataset provides city-level data for urban areas worldwide.
-    date_published: "2023"
+      SDG Indicator 11.2.1 measures the proportion of the population that has convenient access to public transport, disaggregated by sex, age and persons with disabilities.
+    date_published: "2025"
 
     # Citation
-    producer: United Nations Statistics Division
+    producer: United Nations Human Settlements Programme
     citation_full: |-
-      United Nations Statistics Division - SDG Indicator 11.2.1 Database
-    attribution_short: UN
+      United Nations Human Settlements Programme (UN-Habitat). 2025. SDG Indicator 11.2.1 – Access to Public Transport. Urban Indicators Database.
+    attribution_short: UN-Habitat
 
     # Files
     url_download: https://guo-un-habitat.maps.arcgis.com/sharing/rest/content/items/62b0629736c44068bcf4ce2cbce03f8f/data
-    url_main: https://unstats.un.org/sdgs/dataportal
+    url_main: https://data.unhabitat.org/pages/access-to-basic-services-in-cities-and-urban-areas
     date_accessed: '2026-03-02'
 
     # License
     license:
       name: CC BY 4.0
-      url: https://creativecommons.org/licenses/by/4.0/
 outs:
   - md5: 1b7aabc299f249bf5d52db00e163ce3c
     size: 211000
