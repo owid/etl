@@ -900,3 +900,143 @@ steps:
     - data://garden/artificial_intelligence/2022-12-01/ai_index_report__2022
   data://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
     - snapshot://artificial_intelligence/2022-12-01/ai_index_report__2022.feather
+  data://grapher/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017:
+    - data://garden/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017
+  data://garden/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017:
+    - snapshot://health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017.feather
+  data://grapher/labor/2017-10-17/unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017:
+    - data://garden/labor/2017-10-17/unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017
+  data://garden/labor/2017-10-17/unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017:
+    - snapshot://labor/2017-10-17/unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017.feather
+  data://grapher/biodiversity/2021-06-01/fish_discards__un_fao:
+    - data://garden/biodiversity/2021-06-01/fish_discards__un_fao
+  data://garden/biodiversity/2021-06-01/fish_discards__un_fao:
+    - snapshot://biodiversity/2021-06-01/fish_discards__un_fao.feather
+  ? data://grapher/economics/2020-10-01/historical_poverty_rates_by_region__owid_based_on_maddison_project_database_2020__van_zanden_et_al__2014__de_la_escosura__2012
+  :   - data://garden/economics/2020-10-01/historical_poverty_rates_by_region__owid_based_on_maddison_project_database_2020__van_zanden_et_al__2014__de_la_escosura__2012
+  ? data://garden/economics/2020-10-01/historical_poverty_rates_by_region__owid_based_on_maddison_project_database_2020__van_zanden_et_al__2014__de_la_escosura__2012
+  :   - snapshot://economics/2020-10-01/historical_poverty_rates_by_region__owid_based_on_maddison_project_database_2020__van_zanden_et_al__2014__de_la_escosura__2012.feather
+  data://grapher/economics/2017-10-01/wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017:
+    - data://garden/economics/2017-10-01/wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017
+  data://garden/economics/2017-10-01/wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017:
+    - snapshot://economics/2017-10-01/wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017.feather
+  ? data://grapher/labor/2017-09-27/incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others
+  :   - data://garden/labor/2017-09-27/incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others
+  ? data://garden/labor/2017-09-27/incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others
+  :   - snapshot://labor/2017-09-27/incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others.feather
+  data://grapher/biodiversity/2020-12-01/change_in_marine_mammal_populations__duarte_et_al__2020:
+    - data://garden/biodiversity/2020-12-01/change_in_marine_mammal_populations__duarte_et_al__2020
+  data://garden/biodiversity/2020-12-01/change_in_marine_mammal_populations__duarte_et_al__2020:
+    - snapshot://biodiversity/2020-12-01/change_in_marine_mammal_populations__duarte_et_al__2020.feather
+  data://grapher/demography/2020-10-01/labour_force_dependency_ratio__iiasc:
+    - data://garden/demography/2020-10-01/labour_force_dependency_ratio__iiasc
+  data://garden/demography/2020-10-01/labour_force_dependency_ratio__iiasc:
+    - snapshot://demography/2020-10-01/labour_force_dependency_ratio__iiasc.feather
+  data://grapher/health/2017-07-20/prevalence_of_weight_categories_in_females__ncdrisc__2017:
+    - data://garden/health/2017-07-20/prevalence_of_weight_categories_in_females__ncdrisc__2017
+  data://garden/health/2017-07-20/prevalence_of_weight_categories_in_females__ncdrisc__2017:
+    - snapshot://health/2017-07-20/prevalence_of_weight_categories_in_females__ncdrisc__2017.feather
+  data://grapher/health/2018-05-07/health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006:
+    - data://garden/health/2018-05-07/health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006
+  data://garden/health/2018-05-07/health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006:
+    - snapshot://health/2018-05-07/health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006.feather
+  data://grapher/agriculture/2017-07-01/cereal_yield_index__world_bank__2017__and__owid:
+    - data://garden/agriculture/2017-07-01/cereal_yield_index__world_bank__2017__and__owid
+  data://garden/agriculture/2017-07-01/cereal_yield_index__world_bank__2017__and__owid:
+    - snapshot://agriculture/2017-07-01/cereal_yield_index__world_bank__2017__and__owid.feather
+  data://grapher/economics/2016-09-20/government_revenue__wallis__2000:
+    - data://garden/economics/2016-09-20/government_revenue__wallis__2000
+  data://garden/economics/2016-09-20/government_revenue__wallis__2000:
+    - snapshot://economics/2016-09-20/government_revenue__wallis__2000.feather
+  data://grapher/economics/2019-04-04/share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018:
+    - data://garden/economics/2019-04-04/share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018
+  data://garden/economics/2019-04-04/share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018:
+    - snapshot://economics/2019-04-04/share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018.feather
+  data://grapher/education/2016-06-29/oecd__education_statistics__2017:
+    - data://garden/education/2016-06-29/oecd__education_statistics__2017
+  data://garden/education/2016-06-29/oecd__education_statistics__2017:
+    - snapshot://education/2016-06-29/oecd__education_statistics__2017.feather
+  ? data://grapher/economics/2020-10-01/historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014
+  :   - data://garden/economics/2020-10-01/historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014
+  ? data://garden/economics/2020-10-01/historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014
+  :   - snapshot://economics/2020-10-01/historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014.feather
+  data://grapher/agriculture/2017-07-01/land_under_cereal_production_index__world_bank__2017:
+    - data://garden/agriculture/2017-07-01/land_under_cereal_production_index__world_bank__2017
+  data://garden/agriculture/2017-07-01/land_under_cereal_production_index__world_bank__2017:
+    - snapshot://agriculture/2017-07-01/land_under_cereal_production_index__world_bank__2017.feather
+  ? data://grapher/working_hours/2017-04-14/home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split
+  :   - data://garden/working_hours/2017-04-14/home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split
+  ? data://garden/working_hours/2017-04-14/home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split
+  :   - snapshot://working_hours/2017-04-14/home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split.feather
+  ? data://grapher/education/2017-11-28/corporal_punishment_in_schools__longitudinal_evidence_from_ethiopia__india__peru_and_vietnam__unicef_2015
+  :   - data://garden/education/2017-11-28/corporal_punishment_in_schools__longitudinal_evidence_from_ethiopia__india__peru_and_vietnam__unicef_2015
+  ? data://garden/education/2017-11-28/corporal_punishment_in_schools__longitudinal_evidence_from_ethiopia__india__peru_and_vietnam__unicef_2015
+  :   - snapshot://education/2017-11-28/corporal_punishment_in_schools__longitudinal_evidence_from_ethiopia__india__peru_and_vietnam__unicef_2015.feather
+  data://grapher/labor/2017-05-17/child_labor_in_us__economic_history_association__2017:
+    - data://garden/labor/2017-05-17/child_labor_in_us__economic_history_association__2017
+  data://garden/labor/2017-05-17/child_labor_in_us__economic_history_association__2017:
+    - snapshot://labor/2017-05-17/child_labor_in_us__economic_history_association__2017.feather
+  data://grapher/health/2021-11-29/randomized_controlled_trials_published_in_high_impact_medical_journals:
+    - data://garden/health/2021-11-29/randomized_controlled_trials_published_in_high_impact_medical_journals
+  data://garden/health/2021-11-29/randomized_controlled_trials_published_in_high_impact_medical_journals:
+    - snapshot://health/2021-11-29/randomized_controlled_trials_published_in_high_impact_medical_journals.feather
+  ? data://grapher/education/2018-08-08/relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017
+  :   - data://garden/education/2018-08-08/relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017
+  ? data://garden/education/2018-08-08/relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017
+  :   - snapshot://education/2018-08-08/relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017.feather
+  data://grapher/economics/2016-12-15/oecd__consumption_tax_trends_2016:
+    - data://garden/economics/2016-12-15/oecd__consumption_tax_trends_2016
+  data://garden/economics/2016-12-15/oecd__consumption_tax_trends_2016:
+    - snapshot://economics/2016-12-15/oecd__consumption_tax_trends_2016.feather
+  ? data://grapher/labor/2017-10-17/incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017
+  :   - data://garden/labor/2017-10-17/incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017
+  ? data://garden/labor/2017-10-17/incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017
+  :   - snapshot://labor/2017-10-17/incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017.feather
+  data://grapher/labor/2019-11-04/job_search_methods_us__pew_research_center__2015:
+    - data://garden/labor/2019-11-04/job_search_methods_us__pew_research_center__2015
+  data://garden/labor/2019-11-04/job_search_methods_us__pew_research_center__2015:
+    - snapshot://labor/2019-11-04/job_search_methods_us__pew_research_center__2015.feather
+  data://grapher/transport/2017-07-11/non_commercial_flight_distance_records__wikipedia:
+    - data://garden/transport/2017-07-11/non_commercial_flight_distance_records__wikipedia
+  data://garden/transport/2017-07-11/non_commercial_flight_distance_records__wikipedia:
+    - snapshot://transport/2017-07-11/non_commercial_flight_distance_records__wikipedia.feather
+  data://grapher/economics/2018-11-01/gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017:
+    - data://garden/economics/2018-11-01/gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017
+  data://garden/economics/2018-11-01/gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017:
+    - snapshot://economics/2018-11-01/gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017.feather
+  data://grapher/economics/2017-10-01/wealth_per_capita_by_component_by_country__world_bank__2017:
+    - data://garden/economics/2017-10-01/wealth_per_capita_by_component_by_country__world_bank__2017
+  data://garden/economics/2017-10-01/wealth_per_capita_by_component_by_country__world_bank__2017:
+    - snapshot://economics/2017-10-01/wealth_per_capita_by_component_by_country__world_bank__2017.feather
+  data://grapher/health/2021-11-29/clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021:
+    - data://garden/health/2021-11-29/clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021
+  data://garden/health/2021-11-29/clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021:
+    - snapshot://health/2021-11-29/clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021.feather
+  data://grapher/labor/2017-09-27/child_labor__world_1950_1995__basu__1999:
+    - data://garden/labor/2017-09-27/child_labor__world_1950_1995__basu__1999
+  data://garden/labor/2017-09-27/child_labor__world_1950_1995__basu__1999:
+    - snapshot://labor/2017-09-27/child_labor__world_1950_1995__basu__1999.feather
+  data://grapher/economics/2018-09-18/extreme_poverty_share_to_2030__crespo_cuaresma__2018:
+    - data://garden/economics/2018-09-18/extreme_poverty_share_to_2030__crespo_cuaresma__2018
+  data://garden/economics/2018-09-18/extreme_poverty_share_to_2030__crespo_cuaresma__2018:
+    - snapshot://economics/2018-09-18/extreme_poverty_share_to_2030__crespo_cuaresma__2018.feather
+  data://grapher/working_hours/2018-06-07/the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006:
+    - data://garden/working_hours/2018-06-07/the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006
+  data://garden/working_hours/2018-06-07/the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006:
+    - snapshot://working_hours/2018-06-07/the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006.feather
+  data://grapher/labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013:
+    - data://garden/labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013
+  data://garden/labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013:
+    - snapshot://labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013.feather
+  data://grapher/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
+    - data://garden/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018
+  data://garden/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
+    - snapshot://health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018.feather
+  data://grapher/economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018:
+    - data://garden/economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018
+  data://garden/economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018:
+    - snapshot://economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018.feather
+  data://grapher/economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018:
+    - data://garden/economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018
+  data://garden/economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018:
+    - snapshot://economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018.feather

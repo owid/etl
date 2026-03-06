@@ -1,0 +1,40 @@
+dataset:
+  title: Fish discards (UN FAO)
+tables:
+  fish_discards__un_fao:
+    variables:
+      discard_rate_by_target_species:
+        title: Discard rate by target species
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of fish catch that is discarded by target species
+      discard_rates_by_fishing_gear:
+        title: Discard rates by fishing gear
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of fish catch that is discarded by fishing gear
+      discards_by_fishing_gear__tonnes:
+        title: Discards by fishing gear (tonnes)
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Amount of discarded fish catch by fishing gear
+          numDecimalPlaces: 0
+      discards_by_target_species__tonnes:
+        title: Discards by target species (tonnes)
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Amount of discarded fish catch by target species
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

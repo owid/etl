@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2784
-    date_accessed: 2023-08-10 09:25:02.853909
+    url: https://admin.owid.io/admin/datasets/2784
+    date_accessed: 2026-03-06 07:45:25.821136+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Health provider absence rates - Chaudhury, Hammer, Kremer, Muralidharan, and
-    Rogers (2006)
+  name: Health provider absence rates - Chaudhury, Hammer, Kremer, Muralidharan, and Rogers (2006)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ba5bd0511e629ef8bc1e2f7aa5319001
-  size: 6370
-  path: 
-    dataset_2784_health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006_values.feather
+  - md5: c5b39be0ddb9c0583c172fc989e895bc
+    size: 6410
+    path: dataset_2784_health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006_values.feather

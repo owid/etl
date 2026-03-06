@@ -1,0 +1,17 @@
+dataset:
+  title: Year of Maternal and Neonatal Tetanus (MNT) elimination (WHO and KIWANIS, 2018)
+tables:
+  year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
+    variables:
+      year_of_maternal_neonatal_tetanus__mnt__elimination:
+        title: Year of Maternal Neonatal Tetanus (MNT) elimination
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
