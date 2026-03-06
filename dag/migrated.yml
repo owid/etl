@@ -760,3 +760,143 @@ steps:
     - data://garden/climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021
   data://garden/climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021:
     - snapshot://climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021.feather
+  data://grapher/economics/2017-10-01/relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005:
+    - data://garden/economics/2017-10-01/relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005
+  data://garden/economics/2017-10-01/relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005:
+    - snapshot://economics/2017-10-01/relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005.feather
+  data://grapher/economics/2016-09-21/revenue_shares_from_tax__flora__1983__and_ictd__2016:
+    - data://garden/economics/2016-09-21/revenue_shares_from_tax__flora__1983__and_ictd__2016
+  data://garden/economics/2016-09-21/revenue_shares_from_tax__flora__1983__and_ictd__2016:
+    - snapshot://economics/2016-09-21/revenue_shares_from_tax__flora__1983__and_ictd__2016.feather
+  data://grapher/labor/2017-09-27/child_labor__world_ilo__ilo__2017:
+    - data://garden/labor/2017-09-27/child_labor__world_ilo__ilo__2017
+  data://garden/labor/2017-09-27/child_labor__world_ilo__ilo__2017:
+    - snapshot://labor/2017-09-27/child_labor__world_ilo__ilo__2017.feather
+  data://grapher/health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009:
+    - data://garden/health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009
+  data://garden/health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009:
+    - snapshot://health/2017-07-23/prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009.feather
+  data://grapher/economics/2016-09-22/tax_composition__todaro_and_smith__2014:
+    - data://garden/economics/2016-09-22/tax_composition__todaro_and_smith__2014
+  data://garden/economics/2016-09-22/tax_composition__todaro_and_smith__2014:
+    - snapshot://economics/2016-09-22/tax_composition__todaro_and_smith__2014.feather
+  data://grapher/agriculture/2017-08-10/forestry_area__fao__2017:
+    - data://garden/agriculture/2017-08-10/forestry_area__fao__2017
+  data://garden/agriculture/2017-08-10/forestry_area__fao__2017:
+    - snapshot://agriculture/2017-08-10/forestry_area__fao__2017.feather
+  data://grapher/labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013:
+    - data://garden/labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013
+  data://garden/labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013:
+    - snapshot://labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013.feather
+  data://grapher/energy/2017-10-01/lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007:
+    - data://garden/energy/2017-10-01/lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007
+  data://garden/energy/2017-10-01/lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007:
+    - snapshot://energy/2017-10-01/lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007.feather
+  data://grapher/education/2017-11-06/basic_reading_and_maths_skills__world_development_report__2018:
+    - data://garden/education/2017-11-06/basic_reading_and_maths_skills__world_development_report__2018
+  data://garden/education/2017-11-06/basic_reading_and_maths_skills__world_development_report__2018:
+    - snapshot://education/2017-11-06/basic_reading_and_maths_skills__world_development_report__2018.feather
+  data://grapher/health/2017-12-04/deaths_from_smalllpox_and_all_causes_in_london_1629_1902:
+    - data://garden/health/2017-12-04/deaths_from_smalllpox_and_all_causes_in_london_1629_1902
+  data://garden/health/2017-12-04/deaths_from_smalllpox_and_all_causes_in_london_1629_1902:
+    - snapshot://health/2017-12-04/deaths_from_smalllpox_and_all_causes_in_london_1629_1902.feather
+  data://grapher/education/2018-02-09/male_to_female_ratio_high_school_courses_in_usa__goldin_et_al:
+    - data://garden/education/2018-02-09/male_to_female_ratio_high_school_courses_in_usa__goldin_et_al
+  data://garden/education/2018-02-09/male_to_female_ratio_high_school_courses_in_usa__goldin_et_al:
+    - snapshot://education/2018-02-09/male_to_female_ratio_high_school_courses_in_usa__goldin_et_al.feather
+  data://grapher/economics/2018-03-21/employment_and_gender_attitudes__pew_research_centre__2012:
+    - data://garden/economics/2018-03-21/employment_and_gender_attitudes__pew_research_centre__2012
+  data://garden/economics/2018-03-21/employment_and_gender_attitudes__pew_research_centre__2012:
+    - snapshot://economics/2018-03-21/employment_and_gender_attitudes__pew_research_centre__2012.feather
+  data://grapher/health/2018-03-15/number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011:
+    - data://garden/health/2018-03-15/number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011
+  data://garden/health/2018-03-15/number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011:
+    - snapshot://health/2018-03-15/number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011.feather
+  data://grapher/health/2018-04-27/alcohol_expenditure_in_the_usa_long_term__usda__2018:
+    - data://garden/health/2018-04-27/alcohol_expenditure_in_the_usa_long_term__usda__2018
+  data://garden/health/2018-04-27/alcohol_expenditure_in_the_usa_long_term__usda__2018:
+    - snapshot://health/2018-04-27/alcohol_expenditure_in_the_usa_long_term__usda__2018.feather
+  ? data://grapher/economics/2018-05-07/share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor
+  :   - data://garden/economics/2018-05-07/share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor
+  ? data://garden/economics/2018-05-07/share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor
+  :   - snapshot://economics/2018-05-07/share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor.feather
+  data://grapher/education/2018-05-16/literacy_rate__pct_of_total_respondents__dhs_surveys:
+    - data://garden/education/2018-05-16/literacy_rate__pct_of_total_respondents__dhs_surveys
+  data://garden/education/2018-05-16/literacy_rate__pct_of_total_respondents__dhs_surveys:
+    - snapshot://education/2018-05-16/literacy_rate__pct_of_total_respondents__dhs_surveys.feather
+  data://grapher/plastic_waste/2018-08-01/plastic_importers_to_china__brooks_et_al__2018:
+    - data://garden/plastic_waste/2018-08-01/plastic_importers_to_china__brooks_et_al__2018
+  data://garden/plastic_waste/2018-08-01/plastic_importers_to_china__brooks_et_al__2018:
+    - snapshot://plastic_waste/2018-08-01/plastic_importers_to_china__brooks_et_al__2018.feather
+  data://grapher/working_hours/2018-06-28/new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963:
+    - data://garden/working_hours/2018-06-28/new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963
+  data://garden/working_hours/2018-06-28/new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963:
+    - snapshot://working_hours/2018-06-28/new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963.feather
+  data://grapher/working_hours/2018-08-13/length_of_the_workday_in_1880__atack_and_bateman__1992:
+    - data://garden/working_hours/2018-08-13/length_of_the_workday_in_1880__atack_and_bateman__1992
+  data://garden/working_hours/2018-08-13/length_of_the_workday_in_1880__atack_and_bateman__1992:
+    - snapshot://working_hours/2018-08-13/length_of_the_workday_in_1880__atack_and_bateman__1992.feather
+  data://grapher/health/2016-01-01/health_insurance_coverage__tanzi__and__schuknecht__2000__split:
+    - data://garden/health/2016-01-01/health_insurance_coverage__tanzi__and__schuknecht__2000__split
+  data://garden/health/2016-01-01/health_insurance_coverage__tanzi__and__schuknecht__2000__split:
+    - snapshot://health/2016-01-01/health_insurance_coverage__tanzi__and__schuknecht__2000__split.feather
+  data://grapher/working_hours/2018-08-14/length_of_the_work_day__from_1890s_to_1991__costa__2000:
+    - data://garden/working_hours/2018-08-14/length_of_the_work_day__from_1890s_to_1991__costa__2000
+  data://garden/working_hours/2018-08-14/length_of_the_work_day__from_1890s_to_1991__costa__2000:
+    - snapshot://working_hours/2018-08-14/length_of_the_work_day__from_1890s_to_1991__costa__2000.feather
+  data://grapher/economics/2019-06-26/firms_with_financial_constraints__world_bank_enterprise_survey__2019:
+    - data://garden/economics/2019-06-26/firms_with_financial_constraints__world_bank_enterprise_survey__2019
+  data://garden/demography/2018-11-19/infant_mortality_rates_in_uk__ons__2018:
+    - snapshot://demography/2018-11-19/infant_mortality_rates_in_uk__ons__2018.feather
+  data://grapher/health/2019-09-18/annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019:
+    - data://garden/health/2019-09-18/annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019
+  data://garden/health/2019-09-18/annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019:
+    - snapshot://health/2019-09-18/annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019.feather
+  data://grapher/demography/2018-11-19/infant_mortality_rates_in_uk__ons__2018:
+    - data://garden/demography/2018-11-19/infant_mortality_rates_in_uk__ons__2018
+  data://garden/economics/2019-06-26/firms_with_financial_constraints__world_bank_enterprise_survey__2019:
+    - snapshot://economics/2019-06-26/firms_with_financial_constraints__world_bank_enterprise_survey__2019.feather
+  data://grapher/health/2019-09-01/relative_change_in_maternal_mortality_ratio__world_bank:
+    - data://garden/health/2019-09-01/relative_change_in_maternal_mortality_ratio__world_bank
+  data://garden/health/2019-09-01/relative_change_in_maternal_mortality_ratio__world_bank:
+    - snapshot://health/2019-09-01/relative_change_in_maternal_mortality_ratio__world_bank.feather
+  data://grapher/forests/2020-10-28/forest_transition_phase__pendrill_et_al__2019:
+    - data://garden/forests/2020-10-28/forest_transition_phase__pendrill_et_al__2019
+  data://garden/forests/2020-10-28/forest_transition_phase__pendrill_et_al__2019:
+    - snapshot://forests/2020-10-28/forest_transition_phase__pendrill_et_al__2019.feather
+  data://grapher/health/2020-11-01/swedish_covid_19_deaths_comparison:
+    - data://garden/health/2020-11-01/swedish_covid_19_deaths_comparison
+  data://garden/health/2020-11-01/swedish_covid_19_deaths_comparison:
+    - snapshot://health/2020-11-01/swedish_covid_19_deaths_comparison.feather
+  data://grapher/health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018:
+    - data://garden/health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018
+  data://garden/health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018:
+    - snapshot://health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018.feather
+  data://grapher/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
+    - data://garden/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022
+  data://garden/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
+    - snapshot://biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022.feather
+  data://grapher/biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022:
+    - data://garden/biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022
+  data://garden/biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022:
+    - snapshot://biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022.feather
+  data://grapher/biodiversity/2021-04-23/caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020:
+    - data://garden/biodiversity/2021-04-23/caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020
+  data://garden/biodiversity/2021-04-23/caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020:
+    - snapshot://biodiversity/2021-04-23/caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020.feather
+  data://grapher/human_rights/2021-06-14/laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019:
+    - data://garden/human_rights/2021-06-14/laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019
+  data://garden/human_rights/2021-06-14/laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019:
+    - snapshot://human_rights/2021-06-14/laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019.feather
+  data://grapher/biodiversity/2021-03-23/wildlife_trade__scheffers_et_al__2019:
+    - data://garden/biodiversity/2021-03-23/wildlife_trade__scheffers_et_al__2019
+  data://garden/biodiversity/2021-03-23/wildlife_trade__scheffers_et_al__2019:
+    - snapshot://biodiversity/2021-03-23/wildlife_trade__scheffers_et_al__2019.feather
+  data://grapher/health/2021-09-01/lead_concentrations_in_paint__ipen__2021:
+    - data://garden/health/2021-09-01/lead_concentrations_in_paint__ipen__2021
+  data://garden/health/2021-09-01/lead_concentrations_in_paint__ipen__2021:
+    - snapshot://health/2021-09-01/lead_concentrations_in_paint__ipen__2021.feather
+  data://grapher/artificial_intelligence/2022-12-01/ai_index_report__2022:
+    - data://garden/artificial_intelligence/2022-12-01/ai_index_report__2022
+  data://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
+    - snapshot://artificial_intelligence/2022-12-01/ai_index_report__2022.feather

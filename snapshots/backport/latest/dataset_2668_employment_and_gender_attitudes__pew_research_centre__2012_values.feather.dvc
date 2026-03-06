@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2668
-    date_accessed: 2023-08-10 08:35:45.637977
+    url: https://admin.owid.io/admin/datasets/2668
+    date_accessed: 2026-03-05 14:29:16.917048+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Employment and Gender attitudes - Pew Research Centre (2012)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2c5aadbbabc6132a424be8469d063830
-  size: 7018
-  path: 
-    dataset_2668_employment_and_gender_attitudes__pew_research_centre__2012_values.feather
+  - md5: 2e661fd3b8bb1855d4dee46d3a4d1fe2
+    size: 7066
+    path: dataset_2668_employment_and_gender_attitudes__pew_research_centre__2012_values.feather

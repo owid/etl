@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2788
-    date_accessed: 2023-08-10 09:13:42.061426
+    url: https://admin.owid.io/admin/datasets/2788
+    date_accessed: 2026-03-05 14:29:17.594254+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Share of people who report having intentions to start business - Global Entrepreneurship
-    Monitor
+  name: Share of people who report having intentions to start business - Global Entrepreneurship Monitor
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e33d3b7bf74ac7e9df3cf423eddf5926
-  size: 14578
-  path: 
-    dataset_2788_share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor_values.feather
+  - md5: 28a805d4c292950e74bd318bcb7f7087
+    size: 14434
+    path: dataset_2788_share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor_values.feather

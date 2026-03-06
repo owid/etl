@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: |-
+      Cramer et al. (2020). Widespread loss of Caribbean acroporid corals was underway before coral bleaching and disease outbreaks. Science Advances.
+    description: |-
+      This study reconstructs historical trends in reef cover of the coral species Acropora in the Caribbean. It is measured by two variables:
+      – the percentage of sites where Acropora was dominant
+      – the percentage of sites where Acropora was present
+
+      To present this data as a time-series: where timings are given as a range, we have simplified the values into the mid-point year: e.g. 1960-1969 is given as the year 1965.
+    url: https://advances.sciencemag.org/content/6/17/eaax9395
+    date_accessed: 2021-04-23
+    published_by: |-
+      Cramer, K. L., Jackson, J. B., Donovan, M. K., Greenstein, B. J., Korpanty, C. A., Cook, G. M., & Pandolfi, J. M. (2020). Widespread loss of Caribbean acroporid corals was underway before coral bleaching and disease outbreaks. Science Advances, 6(17), eaax9395.
+  name: Caribbean reefs with acropora corals present (Cramer et al. 2020)
+  description: ''
+  is_public: false
+outs:
+  - md5: 5ebcd190c33d5ca4654c056a6b9bd842
+    size: 3586
+    path: caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020.feather

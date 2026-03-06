@@ -1,0 +1,19 @@
+dataset:
+  title: Lighting efficiency in UK - OWID based on Fouquet & Pearson (2007)
+tables:
+  lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007:
+    variables:
+      efficiency_of_lighting__owid_based_on_fouquet__and__pearson__2007:
+        title: Efficiency of lighting (OWID based on Fouquet & Pearson (2007))
+        unit: lumen-hours per kilowatt-hour
+        description: |-
+          The weighted-average efficiency of lighting in the United Kingdom. Calculated based on percentage share and efficiency data of lighting sources from Fouquet & Pearson (2006). Data represents the national average efficiency, calculated as the sum of (% share * efficiency) of each source.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
