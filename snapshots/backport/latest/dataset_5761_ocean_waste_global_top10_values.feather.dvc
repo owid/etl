@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5761
-    date_accessed: 2023-08-10 08:42:22.249492
+    url: https://admin.owid.io/admin/datasets/5761
+    date_accessed: 2026-03-05 12:34:19.818317+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: ocean_waste_global_top10
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ff64eed055118508ed51eaaab504e741
-  size: 6402
-  path: dataset_5761_ocean_waste_global_top10_values.feather
+  - md5: c499210155a703b930e55edcf443532b
+    size: 6434
+    path: dataset_5761_ocean_waste_global_top10_values.feather

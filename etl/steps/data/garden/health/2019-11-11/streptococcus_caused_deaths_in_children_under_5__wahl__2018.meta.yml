@@ -1,0 +1,32 @@
+dataset:
+  title: Streptococcus-caused deaths in children under-5, Wahl (2018)
+tables:
+  streptococcus_caused_deaths_in_children_under_5__wahl__2018:
+    variables:
+      spn_non_pneumonia_non_meningitis_mortality_rate__aged_under_5:
+        title: Spn non-pneumonia-non-meningitis mortality rate (aged under-5)
+        unit: ''
+      streptococcus_meningitis_deaths__aged_under_5:
+        title: Streptococcus meningitis deaths (aged under-5)
+        unit: ''
+      streptococcus_meningitis_mortality_rate__aged_under_5:
+        title: Streptococcus meningitis mortality rate (aged under-5)
+        unit: ''
+      streptococcus_non_pneumonia_non_meningitis_deaths__aged_under_5:
+        title: Streptococcus non-pneumonia-non-meningitis deaths (aged under-5)
+        unit: ''
+      streptococcus_pneumonia_deaths__aged_under_5:
+        title: Streptococcus pneumonia deaths (aged under-5)
+        unit: ''
+      streptococcus_pneumonia_mortality_rate__aged_under_5:
+        title: Streptococcus pneumonia mortality rate (aged under-5)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

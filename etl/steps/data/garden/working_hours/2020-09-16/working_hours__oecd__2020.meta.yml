@@ -1,0 +1,17 @@
+dataset:
+  title: Working Hours – OECD (2020)
+tables:
+  working_hours__oecd__2020:
+    variables:
+      average_annual_hours_actually_worked_per_worker__oecd:
+        title: Average annual hours actually worked per worker (OECD)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

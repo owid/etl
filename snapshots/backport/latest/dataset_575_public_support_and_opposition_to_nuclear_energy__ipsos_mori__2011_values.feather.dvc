@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/575
-    date_accessed: 2023-08-10 08:58:56.775465
+    url: https://admin.owid.io/admin/datasets/575
+    date_accessed: 2026-03-05 13:25:44.671356+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Public support and opposition to nuclear energy- Ipsos MORI (2011)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 22f4337564d0ec5f720fb8e6314a1e34
-  size: 7106
-  path: 
-    dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_values.feather
+  - md5: 76bac39dd0ae13df07d957e4c80b172a
+    size: 7146
+    path: dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_values.feather

@@ -1,0 +1,35 @@
+dataset:
+  title: Health Insurance Coverage (US) - US Current Population Survey (2014)
+tables:
+  health_insurance_coverage__us__us_current_population_survey__2014:
+    variables:
+      health_insurance_coverage_us__any_plan__us_current_population_survey__2014:
+        title: Health Insurance Coverage US, Any Plan (US Current Population Survey (2014))
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          shortUnit: '%'
+          unit: '%'
+        description: Health Insurance Coverage by Type of Plan
+      health_insurance_coverage_us__govt_plan__us_current_population_survey__2014:
+        title: Health Insurance Coverage US, Govt Plan (US Current Population Survey (2014))
+        unit: '%'
+        short_unit: '%'
+        display:
+          unit: Score
+        description: Health Insurance Coverage by Type of Plan
+      health_insurance_coverage_us__private_plan__us_current_population_survey__2014:
+        title: Health Insurance Coverage US, Private Plan (US Current Population Survey (2014))
+        unit: '%'
+        short_unit: '%'
+        description: Health Insurance Coverage by Type of Plan
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

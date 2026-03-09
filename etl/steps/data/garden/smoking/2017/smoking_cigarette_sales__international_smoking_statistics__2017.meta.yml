@@ -1,0 +1,29 @@
+dataset:
+  title: Smoking cigarette sales (International Smoking Statistics (2017))
+tables:
+  smoking_cigarette_sales__international_smoking_statistics__2017:
+    variables:
+      number_of_cigarettes_smoked_per_smoker_per_day__females__iss__2017:
+        title: Number of cigarettes smoked per smoker per day, females (ISS (2017))
+        unit: ''
+      number_of_cigarettes_smoked_per_smoker_per_day__males__iss__2017:
+        title: Number of cigarettes smoked per smoker per day, males (ISS (2017))
+        unit: ''
+      prevalence_of_smoking__females__iss__2017:
+        title: Prevalence of smoking, females (ISS (2017))
+        unit: ''
+      prevalence_of_smoking__males__iss__2017:
+        title: Prevalence of smoking, males (ISS (2017))
+        unit: ''
+      sales_of_cigarettes_per_adult_per_day__international_smoking_statistics__2017:
+        title: Sales of cigarettes per adult per day (International Smoking Statistics (2017))
+        unit: cigarettes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

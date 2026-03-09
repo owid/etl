@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2672
-    date_accessed: 2023-08-10 09:17:36.161047
+    url: https://admin.owid.io/admin/datasets/2672
+    date_accessed: 2026-03-05 11:01:48.650499+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e671255bdcb6416d964953e60d114079
-  size: 10244
-  path: 
-    dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al_config.json
+  - md5: 420267f12f22c0f26916e3d33dde45d4
+    size: 11397
+    path: dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al_config.json

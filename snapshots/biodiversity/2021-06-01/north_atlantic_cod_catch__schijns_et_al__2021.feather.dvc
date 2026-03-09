@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Schjins et al. (2021). Five centuries of cod catches in Eastern Canada.
+    description: |-
+      This measures estimates of North Atlantic cod (Gadus morhua) catch off Newfoundland and Labrador, Eastern Canada. The stock defined by this assessment includes all cod caught within NAFO-delineated Divisions 2J3KL.
+    url: https://academic.oup.com/icesjms/advance-article/doi/10.1093/icesjms/fsab153/6359257
+    date_accessed: 2026-03-05
+    published_by: |-
+      Schijns, R., Froese, R., Hutchings, J. A., Pauly, D., & Raicevich, S. (2021). Five centuries of cod catches in Eastern Canada. ICES Journal of Marine Science.
+  name: North Atlantic cod catch (Schijns et al. 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: 69e977e8c2f4a919bbc00912f8c83553
+    size: 7234
+    path: north_atlantic_cod_catch__schijns_et_al__2021.feather

@@ -1,0 +1,21 @@
+dataset:
+  title: International Whaling Commissions Members by Year (2022)
+tables:
+  international_whaling_commissions_members_by_year__2022:
+    variables:
+      international_whaling_commission_members:
+        title: International Whaling Commission Members
+        unit: ''
+        display:
+          name: Which countries are members of the International Whaling Commission?
+        description: |-
+          The International Whaling Commission (IWC) was set up to provide for the proper conservation of whale stocks and thus make possible the orderly development of the whaling industry.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

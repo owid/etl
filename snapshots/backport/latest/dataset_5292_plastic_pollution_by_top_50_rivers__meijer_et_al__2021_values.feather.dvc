@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5292
-    date_accessed: 2023-08-10 09:10:08.121208
+    url: https://admin.owid.io/admin/datasets/5292
+    date_accessed: 2026-03-05 12:33:02.362009+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Plastic pollution by top 50 rivers (Meijer et al. 2021)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: be8c7dca453eda397ad3d5644486f125
-  size: 8042
-  path: 
-    dataset_5292_plastic_pollution_by_top_50_rivers__meijer_et_al__2021_values.feather
+  - md5: 74bc92eff88e246679daa1170675eaa2
+    size: 8098
+    path: dataset_5292_plastic_pollution_by_top_50_rivers__meijer_et_al__2021_values.feather

@@ -1,0 +1,19 @@
+dataset:
+  title: Share of industry in GDP at constant 2005 prices (GGDC) (split)
+tables:
+  share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split:
+    variables:
+      share_of_industry_in_gdp_at_constant_2005_prices__ggdc:
+        title: Share of industry in GDP at constant 2005 prices (GGDC)
+        unit: '% GDP'
+        description: |-
+          Estimates of value added by economic sector at constant 2005 national prices (expressed as share of total value added at constant 2005 national prices).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

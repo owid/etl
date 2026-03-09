@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2812
-    date_accessed: 2023-08-10 09:21:51.855617
+    url: https://admin.owid.io/admin/datasets/2812
+    date_accessed: 2026-03-05 13:26:55.489701+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2812_ozone_and_chlorine_projections_to_2100__scientific_assessment__2014
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 426a0f9b20b7fe8ce26390b7a99c06d2
-  size: 3501
-  path: 
-    dataset_2812_ozone_and_chlorine_projections_to_2100__scientific_assessment__2014_config.json
+  - md5: 839e1f7994c636ed48f2ab93212d6d2b
+    size: 3724
+    path: dataset_2812_ozone_and_chlorine_projections_to_2100__scientific_assessment__2014_config.json

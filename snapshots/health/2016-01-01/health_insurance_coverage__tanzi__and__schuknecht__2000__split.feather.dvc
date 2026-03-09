@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Tanzi & Schuknecht (2000) (2)
+    date_accessed: 2026-03-05
+    published_by: |-
+      Tanzi, Vito, and Ludger Schuknecht. Public spending in the 20th century: A global perspective. Cambridge University Press, 2000. Page 38.
+  name: Health Insurance Coverage (Tanzi & Schuknecht (2000)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: 0ec444199336ba7ebbfaa5849d4af2f5
+    size: 3362
+    path: health_insurance_coverage__tanzi__and__schuknecht__2000__split.feather

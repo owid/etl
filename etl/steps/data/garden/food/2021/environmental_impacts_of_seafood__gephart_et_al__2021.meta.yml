@@ -1,0 +1,52 @@
+dataset:
+  title: Environmental impacts of seafood (Gephart et al. 2021)
+tables:
+  environmental_impacts_of_seafood__gephart_et_al__2021:
+    variables:
+      freshwater_use__m3__kg_edible_weight:
+        title: Freshwater use (m3 / kg edible weight)
+        unit: m³ per kilogram
+        short_unit: m³
+        display:
+          name: Freshwater use per kilogram of seafood production
+        description: Freshwater use per kilogram of seafood production. This is measured by edible weight.
+      greenhouse_gas_emissions__kg__kg_edible_weight:
+        title: Greenhouse gas emissions (kg / kg edible weight)
+        unit: kg CO₂e per kg
+        short_unit: kg
+        display:
+          name: Greenhouse gas emissions per kilogram of seafood
+        description: Emissions are given per kilogram of fish or seafood by edible weight.
+      land_use__m2__kg_edible_weight:
+        title: Land use (m2 / kg edible weight)
+        unit: m² per kg
+        short_unit: m²
+        display:
+          name: Land use per kilogram of seafood
+        description: |-
+          Land use includes land used for aquaculture farms plus land for feed production. This is given per kilogram of fish or seafood by edible weight.
+      nitrogen__kgn__t_edible_weight:
+        title: Nitrogen (kgN / t edible weight)
+        unit: kilograms of nitrogen per tonne
+        short_unit: kg
+        display:
+          name: Nitrogen emissions per tonne of seafood
+        description: The amount of nitrogen pollution generated per tonne of seafood production. This is measured by edible
+          weight.
+      phosphorous__kgp__t_edible_weight:
+        title: Phosphorous (kgP / t edible weight)
+        unit: kilograms of phosphorous per tonne
+        short_unit: kg
+        display:
+          name: Phosphorous emissions per tonne of seafood
+        description: The amount of phosphorous pollution generated per tonne of seafood production. This is measured by edible
+          weight.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
