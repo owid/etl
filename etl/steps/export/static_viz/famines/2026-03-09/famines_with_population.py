@@ -205,7 +205,9 @@ def build_source_citation(tb_famines, tb_pop) -> str:
     return "Data sources: " + "; ".join(source_parts) if source_parts else "Data sources: World Peace Foundation; UN"
 
 
-def create_visualization(famine_data: pd.DataFrame, pop_data: pd.DataFrame, source_text: str, latest_decade_info: str) -> plt.Figure:
+def create_visualization(
+    famine_data: pd.DataFrame, pop_data: pd.DataFrame, source_text: str, latest_decade_info: str
+) -> plt.Figure:
     """Create the famines with population dual-axis chart.
 
     Args:
@@ -223,7 +225,7 @@ def create_visualization(famine_data: pd.DataFrame, pop_data: pd.DataFrame, sour
     text_color = "#333333"
     grey_text = "#666666"
 
-    fig, ax1 = plt.subplots(figsize=(20, 12), facecolor='none')
+    fig, ax1 = plt.subplots(figsize=(20, 12), facecolor="none")
 
     # Merge data for alignment
     plot_data = pd.merge(famine_data, pop_data, on="decade", how="left")
