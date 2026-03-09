@@ -1,0 +1,43 @@
+dataset:
+  title: Ethnographic and Archaeological Evidence on Violent Deaths
+tables:
+  ethnographic_and_archaeological_evidence_on_violent_deaths:
+    variables:
+      rate_of_violent_deaths__non_state_societies:
+        title: Rate of violent deaths (non-state societies)
+        unit: ''
+        description: Violent deaths per 100,000 people per year in non-state societies.
+      rate_of_violent_deaths__state_societies:
+        title: Rate of violent deaths (state societies)
+        unit: ''
+        description: Violent deaths per 100,000 people per year in state societies.
+      share_of_violent_deaths__non_state_societies:
+        title: Share of violent deaths (non-state societies)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Percentage of deaths due to murder or war per year in non-state societies.
+      share_of_violent_deaths__prehistoric_archeological_sites:
+        title: Share of violent deaths (prehistoric archeological sites)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Percentage of deaths due to murder or war per year in prehistoric societies.
+      share_of_violent_deaths__state_societies:
+        title: Share of violent deaths (state societies)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Percentage of deaths due to murder or war per year in state societies.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

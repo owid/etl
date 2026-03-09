@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Broadberry, S., Campbell, B. M., Klein, A., Overton, M., & Van Leeuwen, B. (2015)
+    description: |-
+      This dataset is produced using 'A4. Ind Production 1270-1870' sheet in BoE dataset. For each variables, output figures are indexed those in year 1700 (i.e. 1700 = 100), and they are measured on a log scale.
+    url: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies
+    date_accessed: 2017-08-25
+    published_by: Bank of England (BoE) 2017
+  name: Output of key industries in England - using Bank of England (2017)
+  description: This data produces output figures of key industries in England (1270-1870).
+outs:
+  - md5: a7411b0ce6dd983f2866890ba68c2b52
+    size: 27498
+    path: output_of_key_industries_in_england__using_bank_of_england__2017.feather

@@ -1325,14 +1325,27 @@ class Table(pd.DataFrame):
             joined = table1.join(table2, how="outer")
             ```
         """
+        lsuffix = kwargs.get("lsuffix", "")
+        rsuffix = kwargs.get("rsuffix", "")
+
         t = super().join(other, *args, **kwargs)
 
         t = t.copy_metadata(self)
 
-        # copy variables metadata from other table
+        # When lsuffix is used, columns from self that were renamed get their metadata copied.
+        if lsuffix:
+            for k, v in self._fields.items():
+                suffixed = k + lsuffix
+                if suffixed in t.columns:
+                    t._fields[suffixed] = v.copy()
+
+        # copy variables metadata from other table, accounting for rsuffix renaming
         if isinstance(other, Table):
             for k, v in other._fields.items():
-                t._fields[k] = v.copy()
+                if k in t.columns:
+                    t._fields[k] = v.copy()
+                elif rsuffix and (k + rsuffix) in t.columns:
+                    t._fields[k + rsuffix] = v.copy()
         return t  # type: ignore
 
     def _repr_html_(self):

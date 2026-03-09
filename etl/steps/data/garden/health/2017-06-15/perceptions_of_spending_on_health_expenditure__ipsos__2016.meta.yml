@@ -1,0 +1,28 @@
+dataset:
+  title: Perceptions of spending on health expenditure - IPSOS (2016)
+tables:
+  perceptions_of_spending_on_health_expenditure__ipsos__2016:
+    variables:
+      how_much_we_actually_spend_on_health_expenditure__ipsos__2016:
+        title: How much we actually spend on health expenditure (IPSOS (2016))
+        unit: '% of gross domestic product (GDP)'
+        short_unit: '%'
+        display:
+          unit: Percent
+        description: Percentage of GDP we actually spend on health expenditure per year
+      how_much_we_think_we_spend_on_health_expenditure__ipsos__2016:
+        title: How much we think we spend on health expenditure (IPSOS (2016))
+        unit: '% of gross domestic product (GDP)'
+        short_unit: '%'
+        display:
+          unit: Percent
+        description: Percentage of GDP the average person thinks its country spends on health expenditure per year
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

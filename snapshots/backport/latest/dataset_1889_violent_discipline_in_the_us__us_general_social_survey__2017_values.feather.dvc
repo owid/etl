@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1889
-    date_accessed: 2023-08-10 07:52:01.546739
+    url: https://admin.owid.io/admin/datasets/1889
+    date_accessed: 2026-03-05 12:26:38.365895+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Violent discipline in the US (US General Social Survey (2017))
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 44f0829f5d4f82e5767019d758147e5b
-  size: 7058
-  path: 
-    dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017_values.feather
+  - md5: 00f4f7d036c4f390bae8ef3e49d25d36
+    size: 7090
+    path: dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017_values.feather

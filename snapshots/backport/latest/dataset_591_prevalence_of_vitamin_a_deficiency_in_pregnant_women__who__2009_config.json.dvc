@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/591
-    date_accessed: 2023-08-10 08:01:02.133762
+    url: https://admin.owid.io/admin/datasets/591
+    date_accessed: 2026-03-05 14:27:09.303003+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9d9849224e3fbf1a3cacab30183d4815
-  size: 4909
-  path: 
-    dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009_config.json
+  - md5: 6ecfa4c3bf3ac92976f2284100886daa
+    size: 5132
+    path: dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009_config.json

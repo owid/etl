@@ -1,0 +1,22 @@
+dataset:
+  title: Drivers of recovery in European bird species (ZSL, 2022)
+tables:
+  drivers_of_recovery_in_european_bird_species__zsl__2022:
+    variables:
+      drivers_of_recovery__number_of_european_bird_species:
+        title: Drivers of recovery (number of European bird species)
+        unit: species
+        display:
+          name: Number of recovered European bird species by driver
+          numDecimalPlaces: 0
+        description: |-
+          The number of European bird species that have seen a significant recovery in their populations in recent decades, categorized by the main driver of their recovery.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Patents awarded in England, Scotland and Wales - Bottomley
+    description: |-
+      The annual number of patents awarded across all industries and sectors in England, Scotland and Ireland across the period of the Industrial Revolution (1700-1852).
+    url: https://www.sciencedirect.com/science/article/pii/S0014498314000321#bb0230
+    date_accessed: 2018-01-30
+    published_by: |-
+      Bottomley, S. (2014). Patenting in England, Scotland and Ireland during the industrial revolution, 1700–1852. Explorations in Economic History, 54, 48-63.
+  name: Patents awarded in England, Scotland and Wales - Bottomley
+  description: ''
+outs:
+  - md5: e73f8812eae50c2e88ace5300816808d
+    size: 5202
+    path: patents_awarded_in_england__scotland_and_wales__bottomley.feather

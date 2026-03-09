@@ -1,0 +1,18 @@
+dataset:
+  title: Oil production - Etemad & Luciana
+tables:
+  oil_production__etemad__and__luciana:
+    variables:
+      oil_production__etemad__and__luciana:
+        title: Oil production (Etemad & Luciana)
+        unit: 1900-2014
+        short_unit: TWh
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

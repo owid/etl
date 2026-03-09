@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2465
-    date_accessed: 2023-08-10 08:39:08.569329
+    url: https://admin.owid.io/admin/datasets/2465
+    date_accessed: 2026-03-05 11:01:29.415128+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7d0aa30b2ca4e886ad6ecab21f2143ae
-  size: 5509
-  path: 
-    dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_config.json
+  - md5: 8ce63cf7df9026aaf204bf9fa653408f
+    size: 6011
+    path: dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_config.json

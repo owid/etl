@@ -1,0 +1,58 @@
+dataset:
+  title: Rotavirus deaths and cases in under-5s (IHME, 2018)
+tables:
+  rotavirus_deaths_and_cases_in_under_5s__ihme__2018:
+    variables:
+      avertable_deaths_if_rotavirus_vaccine_coverage_was_100pct__troegers__2018:
+        title: Avertable deaths if rotavirus vaccine coverage was 100% (Troegers, 2018)
+        unit: avertable deaths
+        display:
+          name: Avertable deaths from rotavirus
+        description: |-
+          Estimated number of avertable deaths from rotavirus in 2016 if full coverage of the rotavirus vaccine was achieved.
+          Estimates of potentially avertable deaths from the rotavirus vaccine take into consideration its efficacy in different regions: whilst efficacy in children in high-income countries is typically greater than 90%, in lower-income countries, particularly in Sub-Saharan Africa, this efficacy rate is closer to 50%.
+      child_deaths_from_rotavirus__ihme__2018:
+        title: Child deaths from rotavirus (IHME, 2018)
+        unit: deaths of under-5s
+        short_unit: deaths
+        display:
+          name: Child deaths from rotavirus
+        description: |-
+          Estimated number of deaths of children under five years old from rotavirus (one of the leading forms of diarrheal disease).
+      child_mortality_from_rotavirus_per_100_000__ihme__2018:
+        title: Child mortality from rotavirus per 100,000 (IHME, 2018)
+        unit: deaths per 100,000
+        display:
+          name: Child mortality rate from rotavirus
+        description: |-
+          Estimated child mortality rate from rotavirus (one of the leading forms of diarrheal disease). This is measured as the number of deaths in children under 5 years old per 100,000 in this demographic.
+      deaths_averted_from_rotavirus_vaccine__troeger__2018:
+        title: Deaths averted from rotavirus vaccine (Troeger, 2018)
+        unit: averted deaths
+        display:
+          name: Averted deaths from rotavirus vaccine
+        description: Estimated number of averted deaths from the rotavirus vaccine.
+      rotavirus_cases_in_children__ihme__2018:
+        title: Rotavirus cases in children (IHME, 2018)
+        unit: cases
+        short_unit: cases
+        display:
+          name: Rotavirus cases in children
+        description: Estimated number of cases of rotavirus (one of the leading forms of diarrheal disease) in children under
+          five years old.
+      rotavirus_incidence_per_1_000_children__ihme__2018:
+        title: Rotavirus incidence per 1,000 children (IHME, 2018)
+        unit: cases per 1,000
+        display:
+          name: Rotavirus incidence per 1,000 children
+        description: |-
+          Estimated incidence (new cases) rate from rotavirus (one of the leading forms of diarrheal disease). This is measured as the number of new cases in children under 5 years old per 1,000 in this demographic.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

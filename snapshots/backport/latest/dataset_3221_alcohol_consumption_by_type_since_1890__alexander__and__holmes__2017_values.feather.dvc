@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3221
-    date_accessed: 2023-08-10 09:11:34.255199
+    url: https://admin.owid.io/admin/datasets/3221
+    date_accessed: 2026-03-05 13:36:12.837976+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Alcohol consumption by type since 1890 (Alexander & Holmes, 2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e4d70f47e4d4dd1c24db90bd31d4accf
-  size: 7682
-  path: 
-    dataset_3221_alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017_values.feather
+  - md5: 5dc49d1e23a12c3562327f2d9a852132
+    size: 7650
+    path: dataset_3221_alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017_values.feather

@@ -1,0 +1,35 @@
+meta:
+  source:
+    name: Child Labor (% children recorded as working) (Cunningham and Viazzo (1996) and others)
+    description: |-
+      Incidence of child labour in datasets for England and Italy is based on the percentage of children (aged 10-14) recorded as working at least one hour of work per week (thus defined as "children in employment"). Data for the United States is for children aged 10-13 only. Figures for the US have been calculated as the weighted-average of gender-specific incidences of labour, based on the male:female ratio (10-13 year-olds) from reported population figures.
+
+      Data for the global level is based on the definition of full-time child labour (which excludes children participating in light part-time work). World ILO-EPEAP data from 1950-1995 is based on children aged 10-14. World ILO-IPEC data from 2000-2012 broadens this definition to those aged 5-17. Estimates are based on census and national survey data.
+    url: |-
+      Cunningham, H. and Viazzo, P.P. (1996), Child labor in historical perspective, 1800-1985: case studies from Europe, Japan and Colombia, Unicef, Firenze. Available at: http://www.unicef-irc.org/publications/pdf/hisper_childlabour_low.pdf
+
+      Toniolo, G., & Vecchi, G. (2007). Italian Children at Work, 1881—1961. Giornale Degli Economisti E Annali Di Economia, 66 (Anno 120)(3), nuova serie, 401-427. Available at: http://www.jstor.org/stable/23248256
+
+      Long, C. D. (1958) The labor force under changing income and employment. Princeton, N.J.: Princeton University Press. Available at: http://econpapers.repec.org/bookchap/nbrnberbk/long58-1.htm
+
+      Basu, Kaushik. Child labor: cause, consequence, and cure, with remarks on international labor standards. Journal of Economic literature 37.3 (1999): 1083-1119. Available at: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.25.651&rep=rep1&type=pdf
+
+      ILO-IPEC, Marking progress against child labour – Global estimates and trends 2000-2012 / International Labour Office, International Programme on the Elimination of Child Labour (IPEC) – Geneva: ILO, 2013. Available at: http://www.ilo.org/wcmsp5/groups/public/---ed_norm/---ipec/documents/publication/wcms_221513.pdf
+    date_accessed: 2017-09-27
+    published_by: |-
+      Data on the incidence of child labor has been collated across four key sources.
+      England: Cunningham, H. and Viazzo, P.P. (1996)
+
+      Italy: Tonioli and Vecchi (2007)
+
+      United States: Long (1958)
+
+      World (1950-1995): International Labor Organisation Programme on Estimates and Projections on the Elimination of of Child Labor (ILO-EPEAP). Basu, 1999.
+
+      World (2000-2012): International Labor Organisation Programme on the Elimination of Child Labor (ILO-IPEC). ILO, 2013.
+  name: Incidence of child labor (England, Italy, US, World) - Cunningham and Viazzo (1996) and others
+  description: ''
+outs:
+  - md5: 1783cc63a9a6674e69fd1cb838d6dc9b
+    size: 3658
+    path: incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others.feather

@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5172
-    date_accessed: 2023-08-10 07:48:18.450969
+    url: https://admin.owid.io/admin/datasets/5172
+    date_accessed: 2026-03-05 13:36:17.007446+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Working Hours – OECD (2020)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7fb8dc7afc2435ba97ea22cd2976981f
-  size: 13698
-  path: dataset_5172_working_hours__oecd__2020_values.feather
+  - md5: a1c9044599b09dcef132429a04af36d5
+    size: 14058
+    path: dataset_5172_working_hours__oecd__2020_values.feather

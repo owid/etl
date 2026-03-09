@@ -1,0 +1,95 @@
+dataset:
+  title: Environment - Municipal waste, Generation and Treatment
+tables:
+  environment__municipal_waste__generation_and_treatment:
+    variables:
+      variable__pct_composting__munw:
+        title: Variable:% Composting - MUNW
+        unit: Percentage
+      variable__pct_incineration__munw:
+        title: Variable:% Incineration - MUNW
+        unit: Percentage
+      variable__pct_incineration_with_energy_recovery__munw:
+        title: Variable:% Incineration with energy recovery - MUNW
+        unit: Percentage
+      variable__pct_incineration_without_energy_recovery__munw:
+        title: Variable:% Incineration without energy recovery - MUNW
+        unit: Percentage
+      variable__pct_landfill__munw:
+        title: Variable:% Landfill - MUNW
+        unit: Percentage
+      variable__pct_material_recovery__recycling_plus_composting__munw:
+        title: Variable:% Material recovery (Recycling + Composting) - MUNW
+        unit: Percentage
+      variable__pct_recycling__munw:
+        title: Variable:% Recycling - MUNW
+        unit: Percentage
+      variable__amount_designated_for_recovery_operations__munw:
+        title: Variable:Amount designated for recovery operations - MUNW
+        unit: Tonnes
+      variable__bulky_waste__munw:
+        title: Variable:Bulky waste - MUNW
+        unit: Tonnes
+      variable__composting__munw:
+        title: Variable:Composting - MUNW
+        unit: Tonnes
+      variable__disposal_operations__munw:
+        title: Variable:Disposal operations - MUNW
+        unit: Tonnes
+      variable__electric_and_electronic_equipment_waste__munw:
+        title: Variable:Electric and electronic equipment waste - MUNW
+        unit: Tonnes
+      variable__household_and_similar_waste__munw:
+        title: Variable:Household and similar waste - MUNW
+        unit: Tonnes
+      variable__incineration_with_energy_recovery__munw:
+        title: Variable:Incineration with energy recovery - MUNW
+        unit: Tonnes
+      variable__incineration_without_energy_recovery__munw:
+        title: Variable:Incineration without energy recovery - MUNW
+        unit: Tonnes
+      variable__landfill__munw:
+        title: Variable:Landfill - MUNW
+        unit: Tonnes
+      variable__municipal_waste_generated__munw:
+        title: Variable:Municipal waste generated - MUNW
+        unit: Tonnes
+      variable__municipal_waste_generated_per_capita__munw:
+        title: Variable:Municipal waste generated per capita - MUNW
+        unit: Kilograms per capita
+      variable__municipal_waste_generated__index_1990__munw:
+        title: Variable:Municipal waste generated, Index 1990 - MUNW
+        unit: ''
+      variable__municipal_waste_generated__index_2000__munw:
+        title: Variable:Municipal waste generated, Index 2000 - MUNW
+        unit: ''
+      variable__municipal_waste_treated__munw:
+        title: Variable:Municipal waste treated - MUNW
+        unit: Tonnes
+      variable__other_disposal__munw:
+        title: Variable:Other disposal - MUNW
+        unit: Tonnes
+      variable__other_municipal_waste__munw:
+        title: Variable:Other municipal waste - MUNW
+        unit: Tonnes
+      variable__other_recovery__munw:
+        title: Variable:Other recovery - MUNW
+        unit: Tonnes
+      variable__recycling__munw:
+        title: Variable:Recycling - MUNW
+        unit: Tonnes
+      variable__total_incineration__munw:
+        title: Variable:Total Incineration - MUNW
+        unit: Tonnes
+      variable__waste_from_households__munw:
+        title: Variable:Waste from households - MUNW
+        unit: Tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
