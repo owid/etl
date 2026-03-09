@@ -378,22 +378,22 @@ L 1057.468375 126.931875
     </g>
     <g id="ytick_9">
      <g id="text_28">
-      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="583.816328" transform="rotate(-0 1276.269375 583.816328)">2 Billion</text>
+      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="585.926335" transform="rotate(-0 1276.269375 585.926335)">2 Billion</text>
      </g>
     </g>
     <g id="ytick_10">
      <g id="text_29">
-      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="434.433594" transform="rotate(-0 1276.269375 434.433594)">4 Billion</text>
+      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="438.653608" transform="rotate(-0 1276.269375 438.653608)">4 Billion</text>
      </g>
     </g>
     <g id="ytick_11">
      <g id="text_30">
-      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="285.05086" transform="rotate(-0 1276.269375 285.05086)">6 Billion</text>
+      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="291.380881" transform="rotate(-0 1276.269375 291.380881)">6 Billion</text>
      </g>
     </g>
     <g id="ytick_12">
      <g id="text_31">
-      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="135.668125" transform="rotate(-0 1276.269375 135.668125)">8 Billion</text>
+      <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #4c6a9c" x="1276.269375" y="144.108153" transform="rotate(-0 1276.269375 144.108153)">8 Billion</text>
      </g>
     </g>
     <g id="text_32">
@@ -401,22 +401,22 @@ L 1057.468375 126.931875
     </g>
    </g>
    <g id="line2d_32">
-    <path d="M 128.869375 628.540984 
-L 202.669375 622.982846 
-L 276.469375 615.042525 
-L 350.269375 607.096706 
-L 424.069375 596.629134 
-L 497.869375 587.06799 
-L 571.669375 573.895418 
-L 645.469375 557.448913 
-L 719.269375 542.427486 
-L 793.069375 503.410357 
-L 866.869375 452.679016 
-L 940.669375 396.442209 
-L 1014.469375 330.699102 
-L 1088.269375 267.667066 
-L 1162.069375 204.177226 
-L 1235.869375 139.549091 
+    <path d="M 128.869375 629.954867 
+L 202.669375 624.475236 
+L 276.469375 616.647071 
+L 350.269375 608.813485 
+L 424.069375 598.493767 
+L 497.869375 589.067672 
+L 571.669375 576.08116 
+L 645.469375 559.866959 
+L 719.269375 545.057708 
+L 793.069375 506.591689 
+L 866.869375 456.576921 
+L 940.669375 401.13445 
+L 1014.469375 336.319953 
+L 1088.269375 274.178234 
+L 1162.069375 211.585179 
+L 1235.869375 147.869905 
 " clip-path="url(#pbc975599bf)" style="fill: none; stroke: #4c6a9c; stroke-width: 3; stroke-linecap: square"/>
    </g>
   </g>

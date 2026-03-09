@@ -270,10 +270,12 @@ def create_visualization(
         # Format secondary y-axis (population in billions)
         ax2.set_ylabel("World population (right axis)", fontsize=14, color=line_color, labelpad=10)
         pop_max = valid_pop["population"].max()
-        pop_max_display = pop_max * 1.1
 
-        # Set population ticks (in billions) - every 2 billion
-        pop_ticks = np.arange(0, pop_max_display + 2e9, 2e9)
+        # Set notable population ticks: 0, 2, 4, 6, 8 billion
+        pop_ticks = np.array([0, 2e9, 4e9, 6e9, 8e9])
+        # Determine the upper limit based on max population
+        pop_max_display = max(8e9, np.ceil(pop_max / 2e9) * 2e9) * 1.1
+
         ax2.set_yticks(pop_ticks)
         ax2.set_yticklabels(
             [f"{int(p/1e9)} Billion" if p > 0 else "0" for p in pop_ticks], fontsize=12, color=line_color
