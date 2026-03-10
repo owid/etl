@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Calculated by Our World in Data based on the World Bank
+    description: |-
+      This was calculated by Our World in Data based on estimates the share of the population with access to electricity and clean fuels for cooking – published by the World Bank – and total population estimates from the UN World Population Prospects (UNWPP).
+
+      Original metrics of energy access shares and total population can be accessed from the World Bank World Development Indicators (available at: http://data.worldbank.org/data-catalog/world-development-indicators).
+    url: http://data.worldbank.org/data-catalog/world-development-indicators
+    date_accessed: 2026-03-10
+    published_by: |-
+      Calculated by Our World in Data based on energy access and population data published in the World Bank World Development Indicators
+  name: Number of people with and without energy access (OWID based on World Bank, 2021)
+  description: ''
+outs:
+  - md5: ceee20a2480c26b936413f6ce4c3a56d
+    size: 144186
+    path: number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021.feather

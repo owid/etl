@@ -1,0 +1,24 @@
+meta:
+  source:
+    name: US General Social Survey (2022)
+    description: |-
+      The General Social Survey (GSS) is a project of the independent research organization NORC at the University of Chicago, with principal funding from the National Science Foundation.
+    url: https://gssdataexplorer.norc.org/variables/441/vshow
+    date_accessed: 2022-03-07
+    published_by: |-
+      Davern, Michael; Bautista, Rene; Freese, Jeremy; Morgan, Stephen L.; and Tom W. Smith. General Social Surveys, 1972-2021 Cross-section [machine-readable data file, 68,846 cases]. Principal Investigator, Michael Davern; Co-Principal Investigators, Rene Bautista, Jeremy Freese, Stephen L. Morgan, and Tom W. Smith; Sponsored by National Science Foundation. – NORC ed. – Chicago: NORC, 2021: NORC at the University of Chicago [producer and distributor]. Data accessed from the GSS Data Explorer website at  gssdataexplorer.norc.org.
+  name: Interpersonal Trust - General Social Survey (GSS)
+  description: |-
+    Extracted from the GSS Data Explorer
+    Variable "trust" (https://gssdataexplorer.norc.org/variables/441/vshow)
+    -> Tabulate
+    Column: Trust (Can people be trusted)
+    Row: Year (GSS year for this respondent)
+    Weight var: WTSSCOMP
+    Sample design: Simple Random Sample
+    Exclude missing: Yes
+    Note: as of 7 Mar 2022 there is a typo in the values on the GSS website - we think that "Can't trust" actually mean "Can trust" and is the positive response, while "Can't be too careful" is the negative response.
+outs:
+  - md5: 603359f58acbf7391f69dd836fc0df0f
+    size: 3210
+    path: interpersonal_trust__general_social_survey__gss.feather

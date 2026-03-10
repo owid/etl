@@ -1,0 +1,21 @@
+dataset:
+  title: Clinical trials results reporting – EU-CTR (Dal-Ré, 2021)
+tables:
+  clinical_trials_results_reporting__eu_ctr__dal_re__2021:
+    variables:
+      proportion_of_all_clinical_trials_reporting_results_on_eu_ctr_in_time__pct:
+        title: Proportion of all clinical trials reporting results on EU-CTR in time (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of clinical trials that report results in time
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

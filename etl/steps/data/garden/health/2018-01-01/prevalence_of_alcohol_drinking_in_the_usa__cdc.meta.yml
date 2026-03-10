@@ -1,0 +1,23 @@
+dataset:
+  title: Prevalence of alcohol drinking in the USA - CDC
+tables:
+  prevalence_of_alcohol_drinking_in_the_usa__cdc:
+    variables:
+      adults_who_drank_in_last_30_days:
+        title: Adults who drank in last 30 days
+        unit: '%'
+      binge_drinking:
+        title: Binge drinking
+        unit: '%'
+      heavy_drinking:
+        title: Heavy drinking
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

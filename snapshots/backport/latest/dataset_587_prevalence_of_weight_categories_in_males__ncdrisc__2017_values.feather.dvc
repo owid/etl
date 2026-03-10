@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/587
-    date_accessed: 2023-08-10 09:22:51.986637
+    url: https://admin.owid.io/admin/datasets/587
+    date_accessed: 2026-03-10 09:13:53.156577+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Prevalence of weight categories in males - NCDRisC (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 01007e3121fa7c074c4382cf845fe835
-  size: 103154
-  path: 
-    dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017_values.feather
+  - md5: b2f46cc1836b78a9e07f6cbd114d0fea
+    size: 125234
+    path: dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017_values.feather

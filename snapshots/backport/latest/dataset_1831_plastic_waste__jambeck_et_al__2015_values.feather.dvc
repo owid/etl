@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/1831
-    date_accessed: 2026-03-05 09:37:09.324356+00:00
+    date_accessed: 2026-03-10 09:25:52.584904+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Plastic Waste - Jambeck et al. (2015)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-  - md5: af91ba45a46cd61b0fbe7fa6e1ad092f
-    size: 22218
+  - md5: d581a35e5ce9bc64af694593b60dd30e
+    size: 22234
     path: dataset_1831_plastic_waste__jambeck_et_al__2015_values.feather

@@ -9,7 +9,7 @@ TODO: This file contains some code that needs some revision:
 """
 
 import concurrent.futures
-import io
+import json
 import warnings
 from collections import defaultdict
 from http.client import RemoteDisconnected
@@ -370,7 +370,8 @@ def _fetch_data_df_from_s3(variable_id: int):
     # Compare ETags
     if stored_etag and current_etag and stored_etag == current_etag:
         # ETag matches, load from cache
-        data_df = pd.read_json(cache_filename)
+        with open(cache_filename) as f:
+            raw = json.loads(f.read())
     else:
         # Fetch new data
         response = _fetch_response("GET", url)
@@ -383,7 +384,9 @@ def _fetch_data_df_from_s3(variable_id: int):
             etag_filename.write_text(current_etag)
         elif etag_filename.exists():
             etag_filename.unlink()
-        data_df = pd.read_json(io.StringIO(response.text))
+        raw = json.loads(response.text)
+    # Use json.loads instead of pd.read_json to handle very large integers
+    data_df = pd.DataFrame(raw)
 
     # Process DataFrame
     data_df = data_df.rename(

@@ -1,0 +1,42 @@
+dataset:
+  title: Lead blood concentrations in LMIC (Ericson et al. 2021)
+tables:
+  lead_blood_concentrations_in_lmic__ericson_et_al__2021:
+    variables:
+      blood_lead_level_in_adults:
+        title: Blood lead level in adults
+        unit: µg/dL
+        short_unit: µg/dL
+        display:
+          name: Mean lead concentrations in the blood of adults
+        description: Mean lead concentrations in the blood of adults aged 14 and older.
+      blood_lead_level_in_children:
+        title: Blood lead level in children
+        unit: µg/dL
+        short_unit: µg/dL
+        display:
+          name: Mean lead concentrations in the blood of children
+        description: Mean lead concentrations in the blood of children aged 0 to 14 years old.
+      children_with_blood_lead__gt_10_ug_dl:
+        title: Children with blood lead >10 µg/dL
+        unit: children
+        display:
+          name: Number of children with blood levels greater than 10 µg/dL
+          numDecimalPlaces: 0
+        description: Number of children aged 0 to 14 years old with blood lead concentrations >10 µg/dL.
+      children_with_blood_lead__gt_5_ug_dl:
+        title: Children with blood lead >5 µg/dL
+        unit: children
+        display:
+          name: Number of children with blood levels greater than 5 µg/dL
+          numDecimalPlaces: 0
+        description: Number of children aged 0 to 14 years old with blood lead concentrations >5 µg/dL.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

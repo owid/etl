@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Fenner et al. (1988)
+    url: http://apps.who.int/iris/bitstream/10665/39485/1/9241561106.pdf
+    date_accessed: 2018-05-13
+    published_by: |-
+      Page 477 of Fenner, F., Henderson, D., Arita, I., Jezek, Z., & Ladnyi, I. (1988). Smallpox and its eradication. Geneva: World Health Organization.
+  name: Smallpox cases reported and revised - Fenner et al. (1988)
+  description: ''
+outs:
+  - md5: 849cb5157bce70ea6cb52f0a185635ad
+    size: 3690
+    path: smallpox_cases_reported_and_revised__fenner_et_al__1988.feather
