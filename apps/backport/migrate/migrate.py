@@ -233,7 +233,11 @@ def _run_full_pipeline(old_dataset_id: int, namespace: str, version: str, short_
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str, is_public: bool = True):
     private_suffix = "" if is_public else "-private"
     add_to_dag(
-        {f"data{private_suffix}://grapher/{namespace}/{version}/{short_name}": [f"data{private_suffix}://garden/{namespace}/{version}/{short_name}"]},
+        {
+            f"data{private_suffix}://grapher/{namespace}/{version}/{short_name}": [
+                f"data{private_suffix}://garden/{namespace}/{version}/{short_name}"
+            ]
+        },
         dag_path=DAG_MIGRATED_PATH,
     )
     add_to_dag(
