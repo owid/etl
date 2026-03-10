@@ -83,16 +83,6 @@ class SiteSearchAPI:
         """Base URL for the search API (read-only)."""
         return self._base_url
 
-    @property
-    def grapher_url(self) -> str:
-        """Base URL for the Grapher (read-only)."""
-        return f"{self._site_url}/grapher"
-
-    @property
-    def explorer_url(self) -> str:
-        """Base URL for explorers (read-only)."""
-        return f"{self._site_url}/explorers"
-
     def _search(
         self,
         query: str,
@@ -179,11 +169,12 @@ class SiteSearchAPI:
         # Perform search
         data = self._search(query, "charts", limit, page, extra_params, timeout=effective_timeout)
 
-        # Fetch popularity via Datasette API (chart slugs are full URLs)
-        # For popularity lookup, use grapher URLs for regular charts
+        # Fetch popularity via Datasette API
+        # Popularity lookup uses grapher URLs for regular charts
         hits = data.get("results", [])
+        grapher_url = f"{self._site_url}/grapher"
         urls = [
-            f"{self.grapher_url}/{hit.get('slug', '')}"
+            f"{grapher_url}/{hit.get('slug', '')}"
             for hit in hits
             if hit.get("slug") and hit.get("type", "chart") == "chart"
         ]
@@ -213,23 +204,17 @@ class SiteSearchAPI:
             if hit.get("updatedAt"):
                 last_updated = datetime.fromisoformat(hit["updatedAt"].replace("Z", "+00:00"))
 
-            # Build URL based on type
-            if chart_type == "explorerView":
-                url = f"{self.explorer_url}/{slug}{query_params}"
-            else:
-                url = f"{self.grapher_url}/{slug}"
-
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                url=url,
                 type=chart_type,  # type: ignore[arg-type]
+                query_params=query_params,
                 subtitle=hit.get("subtitle", ""),
                 available_entities=hit.get("availableEntities", []),
                 num_related_articles=hit.get("numRelatedArticles", 0),
                 published_at=published_at,
                 last_updated=last_updated,
-                popularity=popularity_data.get(f"{self.grapher_url}/{slug}", 0.0),
+                popularity=popularity_data.get(f"{grapher_url}/{slug}", 0.0),
                 site_url=self._site_url,
             )
             chart._timeout = effective_timeout
@@ -239,7 +224,7 @@ class SiteSearchAPI:
         results.sort(key=lambda r: r.popularity, reverse=True)
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
             base_url=self._site_url,
@@ -292,7 +277,7 @@ class SiteSearchAPI:
             )
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=data.get("totalCount", len(results)),
             base_url="https://ourworldindata.org",

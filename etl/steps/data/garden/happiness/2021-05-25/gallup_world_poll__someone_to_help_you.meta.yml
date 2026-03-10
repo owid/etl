@@ -1,0 +1,39 @@
+dataset:
+  title: Gallup World Poll - Someone to help you
+tables:
+  gallup_world_poll__someone_to_help_you:
+    variables:
+      ? |-
+        dk_rf__if_you_were_in_trouble__do_you_have_relatives_or_friends_you_can_count_on_to_help_you_whenever_you_need_them__or_not
+      : title: |-
+          DK/RF - If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: |-
+            DK/RF - If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+      no__if_you_were_in_trouble__do_you_have_relatives_or_friends_you_can_count_on_to_help_you_whenever_you_need_them__or_not:
+        title: |-
+          No - If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: |-
+            No - If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+      "yes__if_you_were_in_trouble__do_you_have_relatives_or_friends_you_can_count_on_to_help_you_whenever_you_need_them__or_not":
+        title: |-
+          Yes - If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: |-
+            Yes - If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

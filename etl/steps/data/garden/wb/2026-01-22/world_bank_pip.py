@@ -975,9 +975,6 @@ def inc_or_cons_data(tb: Table, dimensions: List[str]) -> Tuple[Table, Table, Ta
     tb_inc_spells = tb_spells[tb_spells["welfare_type"] == "income"].reset_index(drop=True)
     tb_cons_spells = tb_spells[tb_spells["welfare_type"] == "consumption"].reset_index(drop=True)
 
-    # Drop the survey_comparability column for tb_no_spells
-    tb_no_spells = tb_no_spells.drop(columns=["survey_comparability"], errors="raise")
-
     # Generate tb_inc_no_spells and tb_cons_no_spells
     tb_inc_no_spells = tb_no_spells[tb_no_spells["welfare_type"] == "income"].reset_index(drop=True)
     tb_cons_no_spells = tb_no_spells[tb_no_spells["welfare_type"] == "consumption"].reset_index(drop=True)
@@ -987,9 +984,19 @@ def inc_or_cons_data(tb: Table, dimensions: List[str]) -> Tuple[Table, Table, Ta
 
     check_jumps_in_grapher_dataset(tb_no_spells_smooth)
 
+    # Separate income and consumption in tb_no_spells_smooth and remove survey_comparability column afterward
+    # This is to keep the spells only for the data points I selected in tb_no_spells_smooth
+    tb_inc_spells_smooth = tb_no_spells_smooth[tb_no_spells_smooth["welfare_type"] == "income"].reset_index(drop=True)
+    tb_cons_spells_smooth = tb_no_spells_smooth[tb_no_spells_smooth["welfare_type"] == "consumption"].reset_index(
+        drop=True
+    )
+    tb_no_spells_smooth = tb_no_spells_smooth.drop(columns=["survey_comparability"], errors="raise")
+
     # Add the column table, identifying the type of table to use in Grapher
-    tb_inc_spells["table"] = "Income with spells"
-    tb_cons_spells["table"] = "Consumption with spells"
+    tb_inc_spells["table"] = "Income with spells - complete"
+    tb_cons_spells["table"] = "Consumption with spells - complete"
+    tb_inc_spells_smooth["table"] = "Income with spells"
+    tb_cons_spells_smooth["table"] = "Consumption with spells"
     tb_inc_no_spells["table"] = "Income"
     tb_cons_no_spells["table"] = "Consumption"
     tb_no_spells_smooth["table"] = "Income or consumption consolidated"
@@ -1005,10 +1012,12 @@ def inc_or_cons_data(tb: Table, dimensions: List[str]) -> Tuple[Table, Table, Ta
     # Concatenate all these tables
     tb = pr.concat(
         [
-            tb_inc_spells,
-            tb_cons_spells,
+            # tb_inc_spells, # for now not deploying this, as this is thousands of indicators we won't use
+            # tb_cons_spells,
             tb_inc_no_spells,
             tb_cons_no_spells,
+            tb_inc_spells_smooth,
+            tb_cons_spells_smooth,
             tb_filled,
         ],
         ignore_index=True,

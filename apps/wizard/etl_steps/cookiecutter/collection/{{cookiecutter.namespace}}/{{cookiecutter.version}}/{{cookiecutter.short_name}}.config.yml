@@ -5,4 +5,12 @@ default_selection:
   - World
 
 dimensions: []
+  # - slug: Internal name of the dimension (e.g. "poverty_line")
+  #   name: Public name of the dimension (e.g. "Poverty line")
+  #   description: Description of the dimension (if needed)
+  #   choices:
+  #     - slug: Internal name of the choice (e.g. "300")
+  #       name: Public name of the choice (e.g. "$3 a day")
+  #       description: Description of the choice (if needed)
+  #       group: Optional, groups the dropdown in a different section
 views: []

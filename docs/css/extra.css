@@ -140,3 +140,173 @@ div.highlight pre span.gp {
     transition: none;
   }
 }
+
+/* --- CSV Data Table ------------------------------------------------ */
+
+.csv-table {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.csv-table-scroll {
+  overflow: auto;
+  max-height: 70vh;
+  border: 1px solid var(--md-typeset-table-color);
+  border-radius: 0.2rem;
+}
+
+.csv-table-scroll table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  width: max-content;
+  font-size: 0.64rem;
+}
+
+.csv-table-scroll th,
+.csv-table-scroll td {
+  padding: 0.5em 0.9em;
+  border-bottom: 1px solid var(--md-typeset-table-color);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* No double border at table bottom (wrapper already has border) */
+.csv-table-scroll tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* All cells get an opaque background (needed for sticky positioning) */
+.csv-table-scroll td {
+  background: var(--md-default-bg-color);
+}
+
+.csv-table-scroll tbody tr:nth-child(even) td {
+  background: var(--md-code-bg-color);
+}
+
+/* Header */
+.csv-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--md-default-bg-color);
+  font-weight: 700;
+  border-bottom: 2px solid var(--md-typeset-table-color);
+}
+
+/* Sticky first column with border + shadow separator */
+.csv-table-scroll td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  font-weight: 500;
+  border-right: 1px solid var(--md-typeset-table-color);
+  box-shadow: 6px 0 8px -3px rgba(0, 0, 0, 0.15);
+}
+
+.csv-table-scroll th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  border-right: 1px solid var(--md-typeset-table-color);
+  box-shadow: 6px 0 8px -3px rgba(0, 0, 0, 0.15);
+}
+
+/* Peek column: first detail column shown truncated + faded */
+.csv-table-scroll .detail-col-peek {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--md-default-fg-color--lighter);
+  padding-right: 3.5em;
+}
+
+.csv-table-scroll table.show-details .detail-col-peek {
+  max-width: 420px;
+  overflow: visible;
+  white-space: normal;
+  color: inherit;
+  padding-right: 0.9em;
+}
+
+/* Other detail columns: fully hidden until expanded */
+.csv-table-scroll .detail-col {
+  display: none;
+  white-space: normal;
+  min-width: 200px;
+  max-width: 420px;
+}
+
+.csv-table-scroll table.show-details .detail-col {
+  display: table-cell;
+}
+
+/* Right fade overlay — column toggle */
+.csv-table-fade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 52px;
+  background: linear-gradient(to right, transparent, var(--md-default-bg-color) 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  cursor: pointer;
+  transition: width 0.15s;
+}
+
+.csv-table-fade:hover {
+  width: 64px;
+}
+
+.csv-table-fade .csv-fade-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--md-default-bg-color);
+  border: 1.5px solid var(--md-primary-fg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--md-primary-fg-color);
+  transition: background 0.15s, color 0.15s;
+}
+
+.csv-table-fade:hover .csv-fade-icon {
+  background: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* When columns are expanded */
+.csv-table.details-visible .csv-table-fade {
+  width: 28px;
+  background: none;
+}
+
+.csv-table.details-visible .csv-table-fade .csv-fade-icon {
+  width: 22px;
+  height: 22px;
+  font-size: 0.7rem;
+  border-width: 1px;
+}
+
+/* Bottom fade — decorative scroll hint, non-interactive */
+.csv-table-bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--md-default-bg-color));
+  pointer-events: none;
+  z-index: 4;
+  border-radius: 0 0 0.2rem 0.2rem;
+  transition: opacity 0.15s;
+}

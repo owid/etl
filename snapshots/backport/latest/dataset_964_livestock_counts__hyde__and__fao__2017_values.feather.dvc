@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/964
-    date_accessed: 2023-08-10 08:53:21.953311
+    url: https://admin.owid.io/admin/datasets/964
+    date_accessed: 2026-03-05 09:55:52.389602+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Livestock counts - HYDE & FAO (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 343f7330ba10bdf7b3cee2de6d813bd3
-  size: 38122
-  path: dataset_964_livestock_counts__hyde__and__fao__2017_values.feather
+  - md5: 36caa1d2c925209722275f90ce47948b
+    size: 42722
+    path: dataset_964_livestock_counts__hyde__and__fao__2017_values.feather

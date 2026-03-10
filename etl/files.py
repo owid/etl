@@ -220,6 +220,8 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
     yml.indent(mapping=2, sequence=4, offset=2)
     # prevent line-wrap
     yml.width = 4096
+    # prevent block key syntax (? key) for long mapping keys
+    yml.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
 
     stream = io.StringIO()
     yml.dump(d, stream)
@@ -413,7 +415,7 @@ def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.009.json
+    https://files.ourworldindata.org/schemas/grapher-schema.010.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema

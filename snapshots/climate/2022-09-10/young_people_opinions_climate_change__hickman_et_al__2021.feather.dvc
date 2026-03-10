@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: |-
+      Hickman et al. (2021). Climate anxiety in children and young people and their beliefs about government responses to climate change: a global survey.
+    description: |-
+      Hickman et al. (2021) surveyed young people, aged 16-to-25 years old, about their attitudes to climate change.
+
+      The total sample of this survey was approximately 10,000 people. This was split across 10 countries, which approximately 1,000 people in each country in the sample.
+    url: https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196(21)00278-3/fulltext
+    date_accessed: 2026-03-05
+    published_by: |-
+      Hickman, C., Marks, E., Pihkala, P., Clayton, S., Lewandowski, R. E., Mayall, E. E., ... & van Susteren, L. (2021). Climate anxiety in children and young people and their beliefs about government responses to climate change: a global survey. The Lancet Planetary Health, 5(12), e863-e873.
+  name: Young people opinions climate change (Hickman et al. 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: 77dc07ef1413a3d94846ff0d66006f98
+    size: 5890
+    path: young_people_opinions_climate_change__hickman_et_al__2021.feather

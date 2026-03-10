@@ -1,0 +1,53 @@
+dataset:
+  title: Global Revenue Statistics Database - OECD (2018)
+tables:
+  global_revenue_statistics_database__oecd__2018:
+    variables:
+      other_tax__pct_of_gdp__oecd__2018:
+        title: Other tax (% of GDP) (OECD (2018))
+        unit: '%'
+        description: |-
+          The level of tax revenues collected from taxes other than income and profits; social security contributions; payroll and workforce; property and; goods and services, as a percentage of GDP.
+      social_security_contributions__ssc__pct_of_gdp__oecd__2018:
+        title: Social security contributions (SSC) (% of GDP) (OECD (2018)
+        unit: '%'
+        description: |-
+          The level of total tax revenues collected from social security contributions (SSC), as a percentage of GDP.  SSC are classified by the OECD as "all compulsory payments that confer an entitlement to receive a (contingent) future social benefit".
+      taxes_on_goods_and_services__pct_of_gdp__oecd__2018:
+        title: Taxes on goods and services (% of GDP) (OECD (2018))
+        unit: '%'
+        description: |-
+          The level of tax revenues collected from taxes on goods and services, as a percentage of GDP.  This heading includes all taxes and duties levied on the production, extraction, sale, transfer, leasing or
+          delivery of goods, and the rendering of services;  or in respect of the use of goods or
+          permission to use goods or to perform activities
+      taxes_on_income__profits__and_capital_gains__pct_of_gdp__oecd__2018:
+        title: Taxes on income, profits, and capital gains (% of GDP) (OECD (2018))
+        unit: '%'
+        description: |-
+          The level of total tax revenues from taxes on income, profits, and capital gains of individuals and enterprises, as a percentage of GDP.
+      taxes_on_payroll_and_workforce__pct_of_gdp__oecd__2018:
+        title: Taxes on payroll and workforce (% of GDP) (OECD (2018))
+        unit: '%'
+        description: |-
+          The level of total tax revenues collected from taxes on payroll and workforce, as a percentage of GDP. This tax heading covers taxes paid by employers. employees, or the self-employed either as a proportion of payroll or a fixed amount per person, and which do not confer entitlement to social benefits. For example, the UK's national insurance surcharge (introduced in 1977).
+      taxes_on_property__pct_of_gdp__oecd__2018:
+        title: Taxes on property (% of GDP) (OECD (2018))
+        unit: '%'
+        description: |-
+          The level of total tax revenues collected from taxes on property, as a percentage of GDP. This heading covers recurrent and non-recurrent taxes on the use, ownership or transfer of property. It includes taxes on immovable property or net wealth, taxes on the change of ownership of property through inheritance or gift and taxes on financial and capital transactions.
+      total_tax__pct_of_gdp__oecd__2018:
+        title: Total tax (% of GDP) (OECD (2018))
+        unit: '%'
+        description: |-
+          The level of total tax revenues as a percentage of GDP. Total tax include sub-national revenues, and compulsory social security contributions paid to the general government.
+
+          The tax-to-GDP ratio measures tax levels used in cross-country comparisons.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

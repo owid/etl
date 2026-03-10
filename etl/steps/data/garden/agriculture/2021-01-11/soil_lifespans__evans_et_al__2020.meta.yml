@@ -1,0 +1,20 @@
+dataset:
+  title: Soil Lifespans (Evans et al. 2020)
+tables:
+  soil_lifespans__evans_et_al__2020:
+    variables:
+      cumulative_percentage:
+        title: Cumulative percentage
+        unit: ''
+      soil_lifespan__years:
+        title: Soil lifespan (years)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

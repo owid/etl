@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Surface ocean plastic by mass - Eriksen et al. (2014)
+    description: |-
+      Estimates by Eriksen et al. (2014) on the mass of surface ocean debris floating at sea, differentiated by ocean basin and particle size.
+
+      Particle size categories range from small microplastics to macroplastics.
+
+      Estimates are based on results from 24 expeditions (over the period 2007–2013) across all five sub-tropical gyres, costal Australia, Bay of Bengal and the Mediterranean Sea conducting surface net tows (N = 680) and visual survey transects of large plastic debris (N = 891). These field-based results were combined with oceanographic modelling of floating debris dispersal and wind-driven vertical mixing to derive total oceanic figures.
+    url: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0111913
+    date_accessed: 2026-03-10
+    published_by: |-
+      Eriksen, M., Lebreton, L. C., Carson, H. S., Thiel, M., Moore, C. J., Borerro, J. C., ... & Reisser, J. (2014). Plastic pollution in the world's oceans: more than 5 trillion plastic pieces weighing over 250,000 tons afloat at sea. PloS one, 9(12), e111913.
+  name: Surface ocean plastic by mass - Eriksen et al. (2014)
+  description: ''
+outs:
+  - md5: d689038afcc071808bb3d66be85746aa
+    size: 5434
+    path: surface_ocean_plastic_by_mass__eriksen_et_al__2014.feather

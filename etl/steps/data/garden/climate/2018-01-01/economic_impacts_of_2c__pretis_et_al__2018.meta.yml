@@ -1,0 +1,29 @@
+dataset:
+  title: Economic impacts of 2C - Pretis et al. (2018)
+tables:
+  economic_impacts_of_2c__pretis_et_al__2018:
+    variables:
+      _17th_percentile:
+        title: 17th percentile
+        unit: '%'
+      _2_5th_percentile:
+        title: 2.5th percentile
+        unit: '%'
+      _83rd_percentile:
+        title: 83rd percentile
+        unit: '%'
+      _97_5th_percentile:
+        title: 97.5th percentile
+        unit: '%'
+      median:
+        title: Median
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

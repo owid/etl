@@ -1,0 +1,74 @@
+dataset:
+  title: Aviation accidents and fatalities by flight phase (ASN, 2019)
+tables:
+  aviation_accidents_and_fatalities_by_flight_phase__asn__2019:
+    variables:
+      approach_accidents:
+        title: Approach accidents
+        unit: accidents
+        display:
+          name: Approach accidents
+        description: The number of aviation accidents in the approach phase of flight.
+      approach_fatalities:
+        title: Approach fatalities
+        unit: fatalities
+        display:
+          name: Approach fatalities
+        description: The number of aviation fatalities in the approach phase of flight.
+      en_route_accidents:
+        title: En route accidents
+        unit: accidents
+        display:
+          name: En route accidents
+        description: The number of aviation accidents in the en route phase of flight.
+      en_route_fatalities:
+        title: En route fatalities
+        unit: fatalities
+        display:
+          name: En route fatalities
+        description: The number of aviation fatalities in the en route phase of flight.
+      initial_climb_accidents:
+        title: Initial climb accidents
+        unit: accidents
+        display:
+          name: Initial climb accidents
+        description: The number of aviation accidents in the initial climb phase of flight.
+      initial_climb_fatalities:
+        title: Initial climb fatalities
+        unit: fatalities
+        display:
+          name: Initial climb fatalities
+        description: The number of aviation fatalities in the initial climb phase of flight.
+      landing_accidents:
+        title: Landing accidents
+        unit: accidents
+        display:
+          name: Landing accidents
+        description: The number of aviation accidents in the landing phase of flight.
+      landing_fatalities:
+        title: Landing fatalities
+        unit: fatalities
+        display:
+          name: Landing fatalities
+        description: The number of aviation fatalities in the landing phase of flight.
+      take_off_accidents:
+        title: Take off accidents
+        unit: accidents
+        display:
+          name: Take off accidents
+        description: The number of aviation accidents in the take off phase of flight.
+      take_off_fatalities:
+        title: Take off fatalities
+        unit: fatalities
+        display:
+          name: Take off fatalities
+        description: The number of aviation fatalities in the take off phase of flight.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,19 @@
+dataset:
+  title: Human rights protection – Fariss et al. (2020)
+tables:
+  human_rights_protection__fariss_et_al__2020:
+    variables:
+      human_rights_protection:
+        title: Human rights protection
+        unit: ''
+        display:
+          name: Human rights protection
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

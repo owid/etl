@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/380
-    date_accessed: 2023-08-10 08:59:06.883900
+    url: https://admin.owid.io/admin/datasets/380
+    date_accessed: 2026-03-05 09:57:28.267765+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
-  description: Absolute number of deaths per year from ambient particulate matter
-    air pollution- State of Global Air
+  description: Absolute number of deaths per year from ambient particulate matter air pollution- State of Global Air
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 58c0476302f13744f05970e4a0f146ef
-  size: 15682
-  path: 
-    dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_values.feather
+  - md5: 8047b4fc4ca8303339260f55a911a012
+    size: 15042
+    path: dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_values.feather

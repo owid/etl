@@ -1,0 +1,32 @@
+title:
+  title: Gini coefficient
+  title_variant: Luxembourg Income Study
+
+default_selection:
+  - United States
+  - United Kingdom
+  - Germany
+  - Canada
+  - Japan
+  - Brazil
+
+default_dimensions:
+  welfare_type: dhi
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/economic-inequality
+
+dimensions:
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: dhi
+        name: After tax
+      - slug: mi
+        name: Before tax
+      - slug: before_vs_after
+        name: Before vs. after tax
+
+views: []

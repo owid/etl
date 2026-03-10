@@ -1,0 +1,44 @@
+dataset:
+  title: Calories lost by food group and region (WRI, 2013)
+tables:
+  calories_lost_by_food_group_and_region__wri__2013:
+    variables:
+      per_capita_food_loss_or_waste__kcal_per_day__wri__2013:
+        title: Per capita food loss or waste (kcal per day)(WRI, 2013)
+        unit: kilocalories per person
+        short_unit: kcal
+        display:
+          name: Per capita food losses and waste
+        description: |-
+          Regional food losses and waste expressed in per capita terms of kilocalories per day. This includes all supply chain stages, from (and including) on-farm harvesting through to final food waste.
+
+          Figures are based only on food intended for direct human consumption: this means crops diverted for animal feed or industrial uses are not included as losses.
+      share_of_calories_lost_or_wasted_by_food_group__wri__2013:
+        title: Share of calories lost or wasted by food group (WRI, 2013)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of calories which are lost or wasted
+        description: |-
+          The share of each food group's calories which are lost in supply chains or wasted by consumers. This includes all supply chain stages, from (and including) on-farm harvesting through to final food waste.
+
+          Figures are based only on food intended for direct human consumption: this means crops diverted for animal feed or industrial uses are not included as losses.
+      share_of_global_food_loss_and_waste_by_region__wri__2013:
+        title: Share of global food loss and waste by region (WRI, 2013)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of global food loss and waste by region
+        description: |-
+          The breakdown of global calories losses and waste by region. This includes all supply chain stages, from (and including) on-farm harvesting through to final food waste.
+
+          Figures are based only on food intended for direct human consumption: this means crops diverted for animal feed or industrial uses are not included as losses.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

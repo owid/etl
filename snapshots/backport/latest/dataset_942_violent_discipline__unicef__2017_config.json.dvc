@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/942
-    date_accessed: 2023-08-10 08:52:15.569009
+    url: https://admin.owid.io/admin/datasets/942
+    date_accessed: 2026-03-05 13:33:42.042826+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_942_violent_discipline__unicef__2017
-  description: Percentage of children 2–14 years old who experience any violent discipline
-    (psychological aggression and/or physical punishment).
+  description: 'Percentage of children 2–14 years old who experience any violent discipline (psychological aggression and/or physical punishment). '
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c1613757afd40f1a6641240c964c7ae8
-  size: 7755
-  path: dataset_942_violent_discipline__unicef__2017_config.json
+  - md5: eae529c7b83f77bfafbc968c5c97b5d6
+    size: 8257
+    path: dataset_942_violent_discipline__unicef__2017_config.json

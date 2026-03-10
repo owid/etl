@@ -1,0 +1,35 @@
+dataset:
+  title: ocean_waste_items_by_region
+tables:
+  ocean_waste_items_by_region:
+    variables:
+      east_asia_and_pacific:
+        title: East Asia and Pacific
+        unit: ''
+      east_europe_and_central_asia:
+        title: East Europe and Central Asia
+        unit: ''
+      high_income:
+        title: High income
+        unit: ''
+      latin_america_and_the_caribbean:
+        title: Latin America and the Caribbean
+        unit: ''
+      north_africa_and_middle_east:
+        title: North Africa and Middle East
+        unit: ''
+      south_asia:
+        title: South Asia
+        unit: ''
+      sub_saharan_africa:
+        title: Sub-Saharan Africa
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

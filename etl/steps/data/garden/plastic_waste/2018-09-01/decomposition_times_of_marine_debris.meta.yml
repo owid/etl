@@ -1,0 +1,17 @@
+dataset:
+  title: Decomposition times of marine debris
+tables:
+  decomposition_times_of_marine_debris:
+    variables:
+      decomposition_rates_of_marine_debris__years:
+        title: Decomposition rates of marine debris (years)
+        unit: years
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

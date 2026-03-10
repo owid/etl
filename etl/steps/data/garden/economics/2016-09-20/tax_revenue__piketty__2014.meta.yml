@@ -1,0 +1,18 @@
+dataset:
+  title: Tax Revenue – Piketty (2014)
+tables:
+  tax_revenue__piketty__2014:
+    variables:
+      tax_revenue__piketty__2014:
+        title: Tax Revenue (Piketty (2014))
+        unit: '% national income'
+        short_unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

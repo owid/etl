@@ -1,0 +1,56 @@
+dataset:
+  title: Number of parties to multilateral environmental agreements - UNCTAD
+tables:
+  number_of_parties_to_multilateral_environmental_agreements__unctad:
+    variables:
+      cartagena_protocol_on_biosafety:
+        title: Cartagena Protocol on Biosafety
+        unit: ''
+      cites_convention_on_international_trade_in_endangered_species_of_wild_fauna_and_flora:
+        title: Cites Convention on International Trade in Endangered Species of Wild Fauna and Flora
+        unit: ''
+      cites_convention_on_international_trade_in_endangered_species_of_wild_fauna_nad_flora:
+        title: Cites Convention on International Trade in Endangered Species of Wild Fauna nad Flora
+        unit: ''
+      convention_on_biological_diversity__cbd:
+        title: Convention on Biological Diversity (CBD)
+        unit: ''
+      convention_on_the_conservation_of_migratory_species_of_wild_animals:
+        title: Convention on the Conservation of Migratory Species of Wild Animals
+        unit: ''
+      kyoto_protocol:
+        title: Kyoto Protocol
+        unit: ''
+      ramsar_convention:
+        title: Ramsar Convention
+        unit: ''
+      rotterdam_convention:
+        title: Rotterdam Convention
+        unit: ''
+      stockholm_convention_on_persistent_organic_pollutants:
+        title: Stockholm Convention on Persistent Organic Pollutants
+        unit: ''
+      un_convention_on_the_law_of_the_sea__unclos:
+        title: UN Convention on the Law of the Sea (UNCLOS)
+        unit: ''
+      un_convention_to_combat_desertification__unccd:
+        title: UN Convention to Combat Desertification (UNCCD)
+        unit: ''
+      un_framework_convention_on_climate_change__unfccc:
+        title: UN Framework Convention on Climate Change (UNFCCC)
+        unit: ''
+      vienna_convention__ozone:
+        title: Vienna Convention (Ozone)
+        unit: ''
+      world_heritage_convention:
+        title: World Heritage Convention
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

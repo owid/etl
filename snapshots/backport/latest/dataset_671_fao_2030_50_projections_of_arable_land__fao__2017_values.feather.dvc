@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/671
-    date_accessed: 2023-08-10 08:02:35.027254
+    url: https://admin.owid.io/admin/datasets/671
+    date_accessed: 2026-03-10 08:01:36.143405+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: FAO 2030-50 Projections of Arable Land - FAO (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 24ad9c9c6f26923fe050a0a9dceb0147
-  size: 6858
-  path: dataset_671_fao_2030_50_projections_of_arable_land__fao__2017_values.feather
+  - md5: f5156748d92672f3f82a7ef99ac4fb70
+    size: 6898
+    path: dataset_671_fao_2030_50_projections_of_arable_land__fao__2017_values.feather

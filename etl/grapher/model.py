@@ -425,6 +425,7 @@ class Chart(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
+    forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
@@ -446,8 +447,9 @@ class Chart(Base):
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
         config = self.chart_config.full.copy()
-        # Add isInheritanceEnabled to config so it's included in comparisons
+        # Include chart-level flags in config so they're part of comparison/diff logic.
         config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        config["forceDatapage"] = bool(self.forceDatapage)
         return config
 
     @config.expression
@@ -826,22 +828,20 @@ class Dataset(Base):
         if not dataset_ids:
             return []
 
-        query = text("""
-            SELECT d.*
-            FROM datasets d
-            WHERE d.id IN :dataset_ids
-            AND d.isArchived = 0
-            AND NOT EXISTS (
-                SELECT 1
-                FROM variables v
-                JOIN chart_dimensions cd ON cd.variableId = v.id
-                WHERE v.datasetId = d.id
+        query = (
+            select(cls)
+            .where(
+                cls.id.in_(dataset_ids),
+                cls.isArchived == 0,
+                ~select(Variable.id)
+                .where(Variable.datasetId == cls.id)
+                .join(ChartDimensions, ChartDimensions.variableId == Variable.id)
+                .exists(),
             )
-            ORDER BY d.id
-        """)
+            .order_by(cls.id)
+        )
 
-        result = session.execute(select(cls).from_statement(query).params(dataset_ids=tuple(dataset_ids)))
-        return list(result.scalars().all())
+        return list(session.scalars(query).all())
 
 
 class SourceDescription(TypedDict, total=False):
@@ -2103,9 +2103,10 @@ class ExplorerView(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     explorerSlug: Mapped[str] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
-    explorerView: Mapped[dict] = mapped_column(JSON)
+    dimensions: Mapped[dict] = mapped_column(JSON)
     chartConfigId: Mapped[Optional[str]] = mapped_column(CHAR(36, "utf8mb4_0900_as_cs"))
     error: Mapped[Optional[str]] = mapped_column(TEXT(collation="utf8mb4_0900_as_cs"))
+    viewId: Mapped[str] = mapped_column(String(512, "utf8mb4_0900_as_cs"))
 
     chart_config: Mapped[Optional["ChartConfig"]] = relationship("ChartConfig", back_populates="explorer_viewss")
     explorer: Mapped["Explorer"] = relationship("Explorer", back_populates="explorer_viewss")

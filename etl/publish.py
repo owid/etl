@@ -216,7 +216,9 @@ def sync_folder(
             rel_filename = filename.relative_to(catalog).as_posix()
 
             # Determine target bucket: metadata files always go to public bucket,
-            # data files for private datasets go to private bucket
+            # data files for private datasets go to private bucket.
+            # For private datasets, .meta.json is also duplicated to the private
+            # bucket so that PREFER_DOWNLOAD can get everything from one bucket.
             if public or is_metadata_file(rel_filename):
                 target_bucket = bucket
                 existing_checksum = existing.get(rel_filename)
@@ -240,6 +242,26 @@ def sync_folder(
                         ExtraArgs=ExtraArgs,
                     )
                 )
+
+            # Duplicate .meta.json to private bucket for private datasets
+            if (
+                not public
+                and private_bucket
+                and is_metadata_file(rel_filename)
+                and not rel_filename.endswith("index.json")
+            ):
+                private_checksum = existing_private.get(rel_filename)
+                if checksum != private_checksum:
+                    print(f"  PUT {rel_filename} [{private_bucket}]")
+                    futures.append(
+                        executor.submit(
+                            s3.upload_file,
+                            filename.as_posix(),
+                            private_bucket,
+                            rel_filename,
+                            ExtraArgs={"Metadata": {"md5": checksum}},
+                        )
+                    )
 
             # Track which files we've seen for deletion purposes
             if rel_filename in existing:

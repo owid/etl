@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2430
-    date_accessed: 2023-08-10 08:36:45.278226
+    url: https://admin.owid.io/admin/datasets/2430
+    date_accessed: 2026-03-10 09:12:47.367106+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2430_waste_production_and_management
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d81905da1c13b117d4f10c2b29bb6b4a
-  size: 12785
-  path: dataset_2430_waste_production_and_management_config.json
+  - md5: 83b50423dc47b7124d823ca8b85556b5
+    size: 13380
+    path: dataset_2430_waste_production_and_management_config.json

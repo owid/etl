@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2984
-    date_accessed: 2023-08-10 08:37:29.414507
+    url: https://admin.owid.io/admin/datasets/2984
+    date_accessed: 2026-03-10 08:05:01.881040+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Transport and communication costs, OECD Economic Outlook (2007)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f8a3d8eb8fb71aa4428be184f93139c5
-  size: 7794
-  path: 
-    dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007_values.feather
+  - md5: 5eefb2e439439fa48640d45dc84b80fd
+    size: 7826
+    path: dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007_values.feather

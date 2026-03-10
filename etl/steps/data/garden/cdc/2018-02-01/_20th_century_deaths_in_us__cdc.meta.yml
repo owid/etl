@@ -1,0 +1,260 @@
+dataset:
+  title: 20th century deaths in US - CDC
+tables:
+  _20th_century_deaths_in_us__cdc:
+    variables:
+      accidents__excl__road__pct_of_deaths:
+        title: Accidents (excl. road) - % of Deaths
+        unit: '%'
+      accidents__excl__road__death_rates:
+        title: Accidents (excl. road) - Death Rates
+        unit: deaths per 100,000
+      accidents__excl__road__deaths:
+        title: Accidents (excl. road) - Deaths
+        unit: deaths
+      accidents__total__deaths:
+        title: Accidents (total)  - Deaths
+        unit: deaths
+      accidents__total__pct_of_deaths:
+        title: Accidents (total) - % of Deaths
+        unit: '%'
+      accidents__total__death_rates:
+        title: Accidents (total) - Death Rates
+        unit: deaths per 100,000
+      arteriosclerosis__deaths:
+        title: Arteriosclerosis  - Deaths
+        unit: deaths
+      arteriosclerosis__pct_of_deaths:
+        title: Arteriosclerosis - % of Deaths
+        unit: '%'
+      arteriosclerosis__death_rates:
+        title: Arteriosclerosis - Death Rates
+        unit: deaths per 100,000
+      bronchitis__deaths:
+        title: Bronchitis  - Deaths
+        unit: deaths
+      bronchitis__pct_of_deaths:
+        title: Bronchitis - % of Deaths
+        unit: '%'
+      bronchitis__death_rates:
+        title: Bronchitis - Death Rates
+        unit: deaths per 100,000
+      copd__deaths:
+        title: COPD  - Deaths
+        unit: deaths
+      copd__pct_of_deaths:
+        title: COPD - % of Deaths
+        unit: '%'
+      copd__death_rates:
+        title: COPD - Death Rates
+        unit: deaths per 100,000
+      cancers__deaths:
+        title: Cancers  - Deaths
+        unit: deaths
+      cancers__pct_of_deaths:
+        title: Cancers - % of Deaths
+        unit: '%'
+      cancers__death_rates:
+        title: Cancers - Death Rates
+        unit: deaths per 100,000
+      communicable__infectious__neonatal_and_other_deaths__deaths:
+        title: Communicable, infectious, neonatal and other deaths  - Deaths
+        unit: deaths
+      communicable__infectious__neonatal_and_other_deaths__pct_of_deaths:
+        title: Communicable, infectious, neonatal and other deaths - % of Deaths
+        unit: '%'
+      communicable__infectious__neonatal_and_other_deaths__death_rates:
+        title: Communicable, infectious, neonatal and other deaths - Death Rates
+        unit: deaths per 100,000
+      dementia__deaths:
+        title: Dementia  - Deaths
+        unit: deaths
+      dementia__pct_of_deaths:
+        title: Dementia - % of Deaths
+        unit: '%'
+      dementia__death_rates:
+        title: Dementia - Death Rates
+        unit: deaths per 100,000
+      diabetes__deaths:
+        title: Diabetes  - Deaths
+        unit: deaths
+      diabetes__pct_of_deaths:
+        title: Diabetes - % of Deaths
+        unit: '%'
+      diabetes__death_rates:
+        title: Diabetes - Death Rates
+        unit: deaths per 100,000
+      diarrheal_disease__deaths:
+        title: Diarrheal disease  - Deaths
+        unit: deaths
+      diarrheal_disease__pct_of_deaths:
+        title: Diarrheal disease - % of Deaths
+        unit: '%'
+      diarrheal_disease__death_rates:
+        title: Diarrheal disease - Death Rates
+        unit: deaths per 100,000
+      heart_disease__deaths:
+        title: Heart disease  - Deaths
+        unit: deaths
+      heart_disease__pct_of_deaths:
+        title: Heart disease - % of Deaths
+        unit: '%'
+      heart_disease__death_rates:
+        title: Heart disease - Death Rates
+        unit: deaths per 100,000
+      homicide__deaths:
+        title: Homicide  - Deaths
+        unit: deaths
+      homicide__pct_of_deaths:
+        title: Homicide - % of Deaths
+        unit: '%'
+      homicide__death_rates:
+        title: Homicide - Death Rates
+        unit: deaths per 100,000
+      kidney_infection__deaths:
+        title: Kidney infection  - Deaths
+        unit: deaths
+      kidney_infection__pct_of_deaths:
+        title: Kidney infection - % of Deaths
+        unit: '%'
+      kidney_infection__death_rates:
+        title: Kidney infection - Death Rates
+        unit: deaths per 100,000
+      liver_disease__deaths:
+        title: Liver disease  - Deaths
+        unit: deaths
+      liver_disease__pct_of_deaths:
+        title: Liver disease - % of Deaths
+        unit: '%'
+      liver_disease__death_rates:
+        title: Liver disease - Death Rates
+        unit: deaths per 100,000
+      neonatal_disorders__deaths:
+        title: Neonatal disorders  - Deaths
+        unit: deaths
+      neonatal_disorders__pct_of_deaths:
+        title: Neonatal disorders - % of Deaths
+        unit: '%'
+      neonatal_disorders__death_rates:
+        title: Neonatal disorders - Death Rates
+        unit: deaths per 100,000
+      nephritis__deaths:
+        title: Nephritis  - Deaths
+        unit: deaths
+      nephritis__pct_of_deaths:
+        title: Nephritis - % of Deaths
+        unit: '%'
+      nephritis__death_rates:
+        title: Nephritis - Death Rates
+        unit: deaths per 100,000
+      non_communicable_diseases__ncds__deaths:
+        title: Non-communicable diseases (NCDs)  - Deaths
+        unit: deaths
+      non_communicable_diseases__ncds__pct_of_deaths:
+        title: Non-communicable diseases (NCDs) - % of Deaths
+        unit: '%'
+      non_communicable_diseases__ncds__death_rates:
+        title: Non-communicable diseases (NCDs) - Death Rates
+        unit: deaths per 100,000
+      other_bronchopulmonic_diseases__pct_of_deaths:
+        title: Other bronchopulmonic diseases - % of Deaths
+        unit: '%'
+      other_causes__deaths:
+        title: Other causes  - Deaths
+        unit: deaths
+      other_causes__pct_of_deaths:
+        title: Other causes - % of Deaths
+        unit: '%'
+      other_causes__death_rates:
+        title: Other causes - Death Rates
+        unit: deaths per 100,000
+      pneumonia_and_influenza__deaths:
+        title: Pneumonia and influenza  - Deaths
+        unit: deaths
+      pneumonia_and_influenza__pct_of_deaths:
+        title: Pneumonia and influenza - % of Deaths
+        unit: '%'
+      pneumonia_and_influenza__death_rates:
+        title: Pneumonia and influenza - Death Rates
+        unit: deaths per 100,000
+      respiratory_disease__deaths:
+        title: Respiratory disease  - Deaths
+        unit: deaths
+      respiratory_disease__pct_of_deaths:
+        title: Respiratory disease - % of Deaths
+        unit: '%'
+      respiratory_disease__death_rates:
+        title: Respiratory disease - Death Rates
+        unit: deaths per 100,000
+      road_accidents__deaths:
+        title: Road accidents  - Deaths
+        unit: deaths
+      road_accidents__pct_of_deaths:
+        title: Road accidents - % of Deaths
+        unit: '%'
+      road_accidents__death_rates:
+        title: Road accidents - Death Rates
+        unit: deaths per 100,000
+      septicemia__deaths:
+        title: Septicemia  - Deaths
+        unit: deaths
+      septicemia__pct_of_deaths:
+        title: Septicemia - % of Deaths
+        unit: '%'
+      septicemia__death_rates:
+        title: Septicemia - Death Rates
+        unit: deaths per 100,000
+      stroke__deaths:
+        title: Stroke  - Deaths
+        unit: deaths
+      stroke__pct_of_deaths:
+        title: Stroke - % of Deaths
+        unit: '%'
+      stroke__death_rates:
+        title: Stroke - Death Rates
+        unit: deaths per 100,000
+      suicide__deaths:
+        title: Suicide  - Deaths
+        unit: deaths
+      suicide__pct_of_deaths:
+        title: Suicide - % of Deaths
+        unit: '%'
+      suicide__death_rates:
+        title: Suicide - Death Rates
+        unit: deaths per 100,000
+      syphilis__deaths:
+        title: Syphilis  - Deaths
+        unit: deaths
+      syphilis__pct_of_deaths:
+        title: Syphilis - % of Deaths
+        unit: '%'
+      syphilis__death_rates:
+        title: Syphilis - Death Rates
+        unit: deaths per 100,000
+      total_deaths__deaths:
+        title: Total deaths  - Deaths
+        unit: deaths
+      total_deaths__pct_of_deaths:
+        title: Total deaths - % of Deaths
+        unit: '%'
+      total_deaths__death_rates:
+        title: Total deaths - Death Rates
+        unit: deaths per 100,000
+      tuberculosis__deaths:
+        title: Tuberculosis  - Deaths
+        unit: deaths
+      tuberculosis__pct_of_deaths:
+        title: Tuberculosis - % of Deaths
+        unit: '%'
+      tuberculosis__death_rates:
+        title: Tuberculosis - Death Rates
+        unit: deaths per 100,000
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

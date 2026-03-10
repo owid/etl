@@ -1,0 +1,70 @@
+dataset:
+  title: Fish catch in the UK (Thurstan et al. 2009)
+tables:
+  fish_catch_in_the_uk__thurstan_et_al__2009:
+    variables:
+      fish_landings_by_british_vessels:
+        title: Fish landings by British vessels
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fish landings
+          numDecimalPlaces: 0
+        description: Landings (catch brought back to land) of bottom-living fish (excluding shellfish).
+      fishing_power__motor_trawlers__smack_units:
+        title: Fishing power - motor trawlers (smack units)
+        unit: smack units
+        display:
+          name: Motor trawlers
+        description: |-
+          Fishing power is measured using the 'smack unit' as the baseline unit of fishing power (the fishing power of a typical 1880s sail trawler, or sailing smack as they were then called).
+
+          Fishing power is measured as the number of vessels multiplied by the fishing power of each.
+      fishing_power__sail_trawlers__smack_units:
+        title: Fishing power - sail trawlers (smack units)
+        unit: smack units
+        display:
+          name: Sail trawlers
+        description: |-
+          Fishing power is measured using the 'smack unit' as the baseline unit of fishing power (the fishing power of a typical 1880s sail trawler, or sailing smack as they were then called).
+
+          Fishing power is measured as the number of vessels multiplied by the fishing power of each.
+      fishing_power__steam_trawlers__smack_units:
+        title: Fishing power - steam trawlers (smack units)
+        unit: smack units
+        display:
+          name: Steam trawlers
+        description: |-
+          Fishing power is measured using the 'smack unit' as the baseline unit of fishing power (the fishing power of a typical 1880s sail trawler, or sailing smack as they were then called).
+
+          Fishing power is measured as the number of vessels multiplied by the fishing power of each.
+      landings_per_unit_of_fishing_power__bottom_gear:
+        title: Landings per unit of fishing power (bottom gear)
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Bottom trawlers
+      landings_per_unit_of_fishing_power__trawlers:
+        title: Landings per unit of fishing power (trawlers)
+        unit: tonnes
+        short_unit: t
+        display:
+          name: All trawlers
+      total_fishing_power__smack_units:
+        title: Total fishing power (smack units)
+        unit: smack units
+        display:
+          name: Fishing power
+        description: |-
+          Fishing power is measured using the 'smack unit' as the baseline unit of fishing power (the fishing power of a typical 1880s sail trawler, or sailing smack as they were then called).
+
+          Fishing power is measured as the number of vessels multiplied by the fishing power of each.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

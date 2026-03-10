@@ -1,11 +1,40 @@
 """Garden step for plastic waste data with country harmonization."""
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Define regions for aggregation
+REGIONS = [
+    # Income groups
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "High-income countries",
+    # Continents
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    # World
+    "World",
+]
+
+REGIONS_COTTOM_ET_AL = [
+    "Africa (UN M49)",
+    "Americas (UN M49)",
+    "Asia (UN M49)",
+    "Europe (UN M49)",
+    "High-income countries",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Oceania (UN M49)",
+    "Upper-middle-income countries",
+    "World",
+]
 
 
 def run() -> None:
@@ -15,14 +44,8 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("cottom_plastic_waste")
 
-    # Load population dataset
-    ds_population = paths.load_dataset("population")
-
     # Read tables from meadow dataset.
     tb = ds_meadow.read("cottom_plastic_waste")
-
-    # Read population table
-    tb_pop = ds_population.read("population")
 
     #
     # Process data.
@@ -30,8 +53,30 @@ def run() -> None:
     # Harmonize country names for national data
     tb = paths.regions.harmonize_names(tb)
 
-    # Merge with population data
-    tb = pr.merge(tb, tb_pop[["country", "year", "population"]], on=["country", "year"], how="left")
+    # Recalculate World total for pwg variable (exclude regional aggregates)
+    # The World total in the source data doesn't match the sum of countries
+    regions_to_exclude = [
+        "Africa (UN M49)",
+        "Americas (UN M49)",
+        "Asia (UN M49)",
+        "Europe (UN M49)",
+        "Oceania (UN M49)",
+        "High-income countries",
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+        "World",
+    ]
+
+    # Calculate correct world total as sum of all countries (non-region entities)
+    countries_only = tb[~tb["country"].isin(regions_to_exclude)]
+    world_pwg_corrected = countries_only["pwg"].sum()
+    # Update the World row with corrected pwg value
+    tb.loc[tb["country"] == "World", "pwg"] = world_pwg_corrected
+
+    # Recalculate per capita values for wg and pwg (convert from daily to annual per capita)
+    tb["pwg_per_cap"] = (tb["pwg"] * 1000) / tb["population_2020"]
+    tb["wg_per_cap"] = (tb["wg"] * 1000) / tb["population_2020"]
 
     # Calculate missing per capita variables (convert from tonnes to kg per person)
     per_capita_vars = {
@@ -42,12 +87,10 @@ def run() -> None:
         "plas_recy_em": "plas_recy_em_per_cap",
     }
 
-    tb["pwg_per_cap"] = tb["pwg_per_cap"] * 1000  # Convert from tonnes to kg
-
     for total_var, per_cap_var in per_capita_vars.items():
         if total_var in tb.columns:
             # Convert tonnes to kg (multiply by 1000) and divide by population
-            tb[per_cap_var] = (tb[total_var] * 1000) / tb["population"]
+            tb[per_cap_var] = (tb[total_var] * 1000) / tb["population_2020"]
             # Copy origins from the source variable
             tb[per_cap_var].metadata.origins = tb[total_var].metadata.origins
 
@@ -70,7 +113,7 @@ def run() -> None:
             tb[f"{var}_share_global"].metadata.origins = tb[var].metadata.origins
 
     # Drop the population column as it's not needed in the output
-    tb = tb.drop(columns=["population"])
+    tb = tb.drop(columns=["population_2020"])
 
     # Set index and format tables
     tb = tb.format(["country", "year"])

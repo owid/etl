@@ -1,0 +1,41 @@
+dataset:
+  title: Violent discipline – UNICEF (2017)
+tables:
+  violent_discipline__unicef__2017:
+    variables:
+      percentage_of_boys__2_14__who_experience_any_violent_discipline__unicef_global_databases__2016:
+        title: Percentage of boys (2–14) who experience any violent discipline (UNICEF Global Databases (2016))
+        unit: '% boys 2-14'
+        description: |-
+          Percentage of boys 2–14 years old who experience any violent discipline (psychological aggression and/or physical punishment).
+      percentage_of_children__2_14__in_rural_areas_who_experience_any_violent_discipline__unicef_global_databases__2016:
+        title: Percentage of children (2–14) in rural areas who experience any violent discipline (UNICEF Global Databases
+          (2016))
+        unit: '% children 2-14, rural'
+        description: |-
+          Percentage of children 2–14 years old, in rural areas, who experience any violent discipline (psychological aggression and/or physical punishment).
+      percentage_of_children__2_14__in_urban_areas_who_experience_any_violent_discipline__unicef_global_databases__2016:
+        title: Percentage of children (2–14) in urban areas who experience any violent discipline (UNICEF Global Databases
+          (2016))
+        unit: '% children 2-14, urban'
+        description: |-
+          Percentage of children 2–14 years old, in urban areas, who experience any violent discipline (psychological aggression and/or physical punishment).
+      percentage_of_children__2_14__who_experience_any_violent_discipline__unicef_global_databases__2016:
+        title: Percentage of children (2–14) who experience any violent discipline (UNICEF Global Databases (2016))
+        unit: '% children 2-14'
+        description: |-
+          Percentage of children 2–14 years old who experience any violent discipline (psychological aggression and/or physical punishment).
+      percentage_of_girls__2_14__who_experience_any_violent_discipline__unicef_global_databases__2016:
+        title: Percentage of girls (2–14) who experience any violent discipline (UNICEF Global Databases (2016))
+        unit: '% girls 2-14'
+        description: |-
+          Percentage of girls 2–14 years old who experience any violent discipline (psychological aggression and/or physical punishment).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

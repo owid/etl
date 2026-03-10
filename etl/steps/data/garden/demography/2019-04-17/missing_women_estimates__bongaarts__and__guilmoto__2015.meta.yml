@@ -1,0 +1,35 @@
+dataset:
+  title: Missing women estimates (Bongaarts & Guilmoto, 2015)
+tables:
+  missing_women_estimates__bongaarts__and__guilmoto__2015:
+    variables:
+      excess_female_deaths__bongaarts__and__guilmoto__2015:
+        title: Excess female deaths (Bongaarts & Guilmoto, 2015)
+        unit: excess deaths
+        display:
+          name: Excess female deaths
+        description: |-
+          Missing women are defined as the number of additional women who would be alive in the absence of sex discrimination. Missing women are the sum of women missing at birth (as a result of sex-selective abortion) and excess female mortality through infanticide or neglect.
+      missing_females__bongaarts__and__guilmoto__2015:
+        title: Missing Females (Bongaarts & Guilmoto, 2015)
+        unit: missing women
+        display:
+          name: Number of missing women
+        description: |-
+          Missing women are defined as the number of additional women who would be alive in the absence of sex discrimination. Missing women are the sum of women missing at birth (as a result of sex-selective abortion) and excess female mortality through infanticide or neglect.
+      missing_female_births__bongaarts__and__guilmoto__2015:
+        title: Missing female births (Bongaarts & Guilmoto, 2015)
+        unit: missing births
+        display:
+          name: Number of missing female births
+        description: |-
+          Missing women are defined as the number of additional women who would be alive in the absence of sex discrimination. Missing women are the sum of women missing at birth (as a result of sex-selective abortion) and excess female mortality through infanticide or neglect.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

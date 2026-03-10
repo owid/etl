@@ -1,0 +1,55 @@
+dataset:
+  title: Plastic Waste - Jambeck et al. (2015)
+tables:
+  plastic_waste__jambeck_et_al__2015:
+    variables:
+      coastal_population:
+        title: Coastal population
+        unit: ''
+      inadequately_managed_plastic_waste:
+        title: Inadequately managed plastic waste
+        unit: kilograms per day
+      municipal_waste_generated:
+        title: Municipal waste generated
+        unit: kilograms
+      per_capita_mismanaged_plastic_waste:
+        title: Per capita mismanaged plastic waste
+        unit: kilograms per person per day
+        short_unit: kg
+      per_capita_plastic_waste__kg_person_day:
+        title: Per capita plastic waste (kg/person/day)
+        unit: kilograms per person per day
+        short_unit: kg
+        display:
+          name: Per capita plastic waste
+      per_capita_waste_generation_rate:
+        title: Per capita waste generation rate
+        unit: kilograms per person per day
+        short_unit: kg
+      plastic_waste_generated:
+        title: Plastic waste generated
+        unit: kilograms
+      plastic_waste_littered:
+        title: Plastic waste littered
+        unit: kilograms per day
+      share_of_plastic_inadequately_managed:
+        title: Share of plastic inadequately managed
+        unit: '%'
+      share_of_plastics_in_waste_stream:
+        title: Share of plastics in waste stream
+        unit: '%'
+      total_mismanaged_plastic_waste_in_2010:
+        title: Total mismanaged plastic waste in 2010
+        unit: tonnes
+      total_mismanaged_plastic_waste_in_2025:
+        title: Total mismanaged plastic waste in 2025
+        unit: tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,76 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Trust
+
+  description_short_base: |-
+    Share of people who say they trust the US government to do what is right just about always/most of the time
+
+  description_key_question: |-
+    This data shows the share of people replying "just about always" or "most of the time" to the question "How much of the time do you think you can trust the government in Washington to do what is right?" The options were "just about always", "most of the time", "only some of the time", and "never".
+
+  description_key_sources: |-
+    The data combines surveys from Pew Research Center, National Election Studies, Gallup, ABC/Washington Post, CBS/New York Times, and CNN.
+
+  description_from_producer_base: |-
+    % who say they trust the government in Washington to do what is right just about always/most of the time
+
+    Sources: Pew Research Center, National Election Studies, Gallup, ABC/Washington Post, CBS/New York Times, and CNN surveys.
+
+  description_from_producer_smoothed_note: |-
+    Note: From 1976-February 2025, the smoothed trend line represents a three-survey moving average. Data prior to 1976, and the most recent number (September 2025), are from individual polls.
+
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  trust_us_government:
+    variables:
+      trust_us_government:
+        title: Trust in US government
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_base}, based on individual polls."
+        description_key:
+          - "{definitions.description_key_question}"
+          - "{definitions.description_key_sources}"
+          - From the original data, we extracted the individual poll results and then averaged the values to have one observation per year.
+        description_from_producer: |-
+          {definitions.description_from_producer_base}
+
+          {definitions.description_key_sources}
+        description_processing: |-
+          From the original data, we extracted the individual poll results and then averaged the values to have one observation per year.
+        display:
+          name: Trust in US government
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      trust_us_government_smoothed:
+        title: Trust in US government (smoothed trend)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_base}, based on a smoothed trend."
+        description_key:
+          - "{definitions.description_key_question}"
+          - "{definitions.description_key_sources}"
+          - From the original data, we extracted the smoothed trend (which is a three-survey moving average) and then averaged the values to have one observation per year.
+        description_from_producer: |-
+          {definitions.description_from_producer_base}
+
+          {definitions.description_from_producer_smoothed_note}
+        description_processing: |-
+          From the original data, we extracted the smoothed trend (which is a three-survey moving average) and then averaged the values to have one observation per year.
+        display:
+          name: Trust in US government
+          numDecimalPlaces: 0
+          tolerance: 5

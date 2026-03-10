@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/965
-    date_accessed: 2023-08-10 09:14:44.134071
+    url: https://admin.owid.io/admin/datasets/965
+    date_accessed: 2026-03-10 07:45:19.247066+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Number of parties to multilateral environmental agreements - UNCTAD
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c96d7f2c9183bff7c0d0acaf2ed37d9e
-  size: 8266
-  path: 
-    dataset_965_number_of_parties_to_multilateral_environmental_agreements__unctad_values.feather
+  - md5: f8d3b14f730214933857643bd5c008f0
+    size: 8306
+    path: dataset_965_number_of_parties_to_multilateral_environmental_agreements__unctad_values.feather

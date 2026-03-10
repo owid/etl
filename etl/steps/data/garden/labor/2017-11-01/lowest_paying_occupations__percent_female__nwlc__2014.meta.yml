@@ -1,0 +1,19 @@
+dataset:
+  title: Lowest paying occupations, percent female – NWLC (2014)
+tables:
+  lowest_paying_occupations__percent_female__nwlc__2014:
+    variables:
+      percent_women__nwlc__2014:
+        title: Percent women (NWLC (2014))
+        unit: '%'
+        description: |-
+          Percent women in low-wage occupations in the US. Low-wage occupations are defined here as typically paying less than $10.10 per hour.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

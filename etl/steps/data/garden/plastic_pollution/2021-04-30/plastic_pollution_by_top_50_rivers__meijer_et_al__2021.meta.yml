@@ -1,0 +1,32 @@
+dataset:
+  title: Plastic pollution by top 50 rivers (Meijer et al. 2021)
+tables:
+  plastic_pollution_by_top_50_rivers__meijer_et_al__2021:
+    variables:
+      mismanaged_waste_emitted_to_the_ocean__grams_per_second:
+        title: Mismanaged waste emitted to the ocean (grams per second)
+        unit: grams per second
+        short_unit: g
+        display:
+          name: Plastic waste emitted to the ocean per second
+      mismanaged_waste_emitted_to_the_ocean__metric_tons_year_1:
+        title: Mismanaged waste emitted to the ocean (metric tons year-1)
+        unit: tonnes per year
+        short_unit: t
+        display:
+          name: Plastic waste emitted to the ocean
+      share_of_global_plastics_emitted_to_ocean:
+        title: Share of global plastics emitted to ocean
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of global plastics emitted to the ocean
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

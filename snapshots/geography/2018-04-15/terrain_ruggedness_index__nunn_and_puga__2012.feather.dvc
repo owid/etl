@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Nunn and Puga (2012)
+    url: https://diegopuga.org/data/rugged/
+    date_accessed: 2018-04-15
+    published_by: |-
+      Nunn, Nathan, and Diego Puga, ‘‘Ruggedness: The Blessing of Bad Geography in Africa,’’ Review of Economics and Statistics, 94, no. 1 (2012), 20–36.
+  name: Terrain Ruggedness Index - Nunn and Puga (2012)
+  description: ''
+outs:
+  - md5: 5a47b400e49c908f3fee15d4f9edfd1e
+    size: 7714
+    path: terrain_ruggedness_index__nunn_and_puga__2012.feather

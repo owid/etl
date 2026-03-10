@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Harfoot et al. (2018). Unveiling the patterns and trends in 40 years of global trade in CITES-listed wildlife.
+    description: |-
+      To quantify wildlife trade across different species and over time, the authors calculate wildlife trade in 'whole organism equivalents (WOE).
+
+      As they define:
+      "To summarise and make the data equivalent across the heterogeneous types of products, we transformed products reported in trade to whole organism equivalents (WOEs), where possible. For example, five skulls represent five WOEs, whereas we assume that four ears are sourced from two animals and so represent two WOEs."
+    url: https://www.sciencedirect.com/science/article/pii/S0006320717312478#!
+    date_accessed: 2021-02-26
+    published_by: |-
+      Harfoot, M., Glaser, S. A., Tittensor, D. P., Britten, G. L., McLardy, C., Malsch, K., & Burgess, N. D. (2018). Unveiling the patterns and trends in 40 years of global trade in CITES-listed wildlife. Biological Conservation, 223, 47-57.
+  name: Global wildlife trade (Harfoot et al. 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: c9e4d3c5cca6554f3883c14d787c9a6b
+    size: 32426
+    path: global_wildlife_trade__harfoot_et_al__2018.feather

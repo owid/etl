@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/300
-    date_accessed: 2023-08-10 08:48:49.716727
+    url: https://admin.owid.io/admin/datasets/300
+    date_accessed: 2026-03-10 08:00:31.906903+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 35e9c8bc3cce217e95cf3c8ab2bb2c91
-  size: 4102
-  path: dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016_config.json
+  - md5: 1e59022b15b073dbdd7d4bbcb2ad0cbc
+    size: 4511
+    path: dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016_config.json

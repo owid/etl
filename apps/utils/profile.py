@@ -100,7 +100,7 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
             for _, func in additional_funcs:
                 lp.add_function(func)  # type: ignore
             # Enable profiler but don't profile run itself
-            lp.enable()
+            lp.enable()  # type: ignore
             lp_wrapper = module.run
         else:
             # If no -f functions specified, profile the run function

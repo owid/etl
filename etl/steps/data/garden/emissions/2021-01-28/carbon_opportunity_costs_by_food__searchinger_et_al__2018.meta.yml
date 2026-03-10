@@ -1,0 +1,22 @@
+dataset:
+  title: Carbon Opportunity Costs by Food (Searchinger et al. 2018)
+tables:
+  carbon_opportunity_costs_by_food__searchinger_et_al__2018:
+    variables:
+      carbon_opportunity_cost__kg_co2e_per_kg:
+        title: Carbon opportunity cost (kg CO2e per kg)
+        unit: kilograms CO₂e per kilogram
+        short_unit: kgCO₂e
+        display:
+          name: Carbon opportunity costs per kilogram of food
+        description: |-
+          The Carbon Opportunity Cost (COC) of each crop is equal to the amount of carbon lost from native vegetation and soils in order to produce a given food product. If food products were not produced on a given plot of land, this land could be used to restore native vegetation and sequester carbon.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

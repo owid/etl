@@ -1,0 +1,19 @@
+dataset:
+  title: Coal Phase Out (PPCA, BeyondCoal and other sources)
+tables:
+  coal_phase_out__ppca__beyondcoal_and_other_sources:
+    variables:
+      coal_exit_timeline__beyond_coal:
+        title: Coal Exit Timeline (Beyond Coal)
+        unit: ''
+        display:
+          name: When will countries phase out coal power?
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

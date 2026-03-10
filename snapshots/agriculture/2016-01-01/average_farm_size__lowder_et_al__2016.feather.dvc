@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: |-
+      Lowder et al. (2016). The number, size, and distribution of farms, smallholder farms, and family farms worldwide. World Development.
+    description: |-
+      This study uses agricultural census data to estimate the number and size distribution of farm holdings by country.
+
+      This article relies on data from numerous agricultural censuses, which are representative of all farms or farm households in a country. The Food and Agriculture Organization of the United Nations (FAO) has promoted the Programme for the World Census of Agriculture (WCA) since 1950 by providing governments with guidance on standard methodology and contents for their agricultural census.
+    url: https://www.sciencedirect.com/science/article/pii/S0305750X15002703
+    date_accessed: 2026-03-05
+    published_by: |-
+      Lowder, S. K., Skoet, J., & Raney, T. (2016). The number, size, and distribution of farms, smallholder farms, and family farms worldwide. World Development, 87, 16-29.
+  name: Average farm size (Lowder et al. 2016)
+  description: ''
+  is_public: false
+outs:
+  - md5: 6991abcc5a5b0bfd697d3dcbd7a3a80a
+    size: 11194
+    path: average_farm_size__lowder_et_al__2016.feather

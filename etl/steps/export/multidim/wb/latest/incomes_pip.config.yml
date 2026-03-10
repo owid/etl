@@ -1,0 +1,152 @@
+title:
+  title: Incomes across the distribution
+  title_variant: World Bank
+default_selection:
+  - United States
+  - South Korea
+  - Spain
+  - China
+  - Mauritania
+  - Ghana
+  - India
+  - Ethiopia
+  - Democratic Republic of Congo
+
+default_dimensions:
+  indicator: thr
+  decile: all
+  period: month
+  survey_comparability: No spells
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/economic-inequality
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: mean
+        name: Mean income or consumption
+        # description:
+      - slug: median
+        name: Median income or consumption
+        # description:
+      - slug: avg
+        name: Mean income or consumption, by decile
+        # description:
+      - slug: thr
+        name: Decile thresholds
+        # description:
+      - slug: share
+        name: Decile shares
+        # description:
+
+  - name: Decile
+    slug: decile
+    choices:
+      - slug: "1"
+        name: "Poorest 10%"
+      - slug: "5"
+        name: "Median"
+      - slug: "9"
+        name: "Richest 10% "
+      - slug: "10"
+        name: "Richest 10%"
+      - slug: "10_40_50"
+        name: Richest and poorest groups
+        group: Compare different deciles
+      - slug: "10_40_50_bar"
+        name: Richest and poorest groups (bar chart)
+        group: Compare different deciles
+      - slug: all
+        name: All deciles
+        group: Compare different deciles
+      - slug: all_bar
+        name: All deciles (bar chart)
+        group: Compare different deciles
+      - slug: nan
+        name: ""
+
+  - name: Period
+    slug: period
+    choices:
+      - slug: "day"
+        name: "Day"
+      - slug: "month"
+        name: "Month"
+      - slug: "year"
+        name: "Year"
+      - slug: "nan"
+        name: ""
+
+  - name: Breaks in data
+    slug: survey_comparability
+    description: The data provider reports where trends in countries are affected by changes in methodology. These breaks can be shown in the chart.
+    choices:
+      - slug: No spells
+        name: Don't show
+        description: Better for making broad comparisons across several countries
+      - slug: Spells
+        name: Show
+        description: Better for understanding trends within individual countries
+views:
+  - dimensions:
+      indicator: share
+      decile: "10_40_50"
+      period: nan
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Richest 10%"
+        - catalogPath: inequality#middle40_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Middle 40%"
+        - catalogPath: inequality#bottom50_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Poorest 50%"
+    config:
+      title: Distribution of income across richer and poorer groups
+      subtitle: The share of income received by different income groups.
+      note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."
+
+  - dimensions:
+      indicator: share
+      decile: "10_40_50_bar"
+      period: nan
+      table: Income or consumption consolidated
+      survey_comparability: No spells
+    indicators:
+      y:
+        - catalogPath: inequality#bottom50_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Poorest 50%"
+        - catalogPath: inequality#middle40_share__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Middle 40%"
+        - catalogPath: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Richest 10%"
+    config:
+      title: Distribution of income across richer and poorer groups
+      subtitle: The share of income received by different income groups.
+      note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+      hasMapTab: false
+      chartTypes: ["StackedDiscreteBar"]
+      selectedFacetStrategy: entity
+      baseColorScheme: OwidCategoricalE
+      sortBy: column
+      sortColumnSlug: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideTotalValueLabel: true
+    metadata:
+      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."

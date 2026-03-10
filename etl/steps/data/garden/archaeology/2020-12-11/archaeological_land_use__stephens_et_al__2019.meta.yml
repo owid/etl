@@ -1,0 +1,101 @@
+dataset:
+  title: Archaeological land use (Stephens et al. 2019)
+tables:
+  archaeological_land_use__stephens_et_al__2019:
+    variables:
+      cum_sum_regions:
+        title: cum_sum_regions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Cumulative sum of regions with land use present
+      extensive_agriculture:
+        title: extensive_agriculture
+        unit: ''
+        display:
+          name: Extent of extensive agriculture
+      extensive_agriculture_decline:
+        title: extensive_agriculture_decline
+        unit: ''
+        display:
+          name: Extensive agriculture decline date
+      extensive_agriculture_onset:
+        title: extensive_agriculture_onset
+        unit: ''
+        display:
+          name: Extensive agriculture onset date
+      foraging:
+        title: foraging
+        unit: ''
+        display:
+          name: Extent of foraging, hunting and gathering
+      foraging_decline_date:
+        title: foraging_decline_date
+        unit: ''
+        display:
+          name: Foraging, hunting and gathering decline date
+      foraging_onset_date:
+        title: foraging_onset_date
+        unit: ''
+        display:
+          name: Foraging, hunting and gathering onset date
+      global_share_land_use_extent:
+        title: global_share_land_use_extent
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of regions with land use
+      intensive_agriculture:
+        title: intensive_agriculture
+        unit: ''
+        display:
+          name: Extent of intensive agriculture
+      intensive_agriculture_decline:
+        title: intensive_agriculture_decline
+        unit: ''
+        display:
+          name: Intensive agriculture decline date
+      intensive_agriculture_onset:
+        title: intensive_agriculture_onset
+        unit: ''
+        display:
+          name: Intensive agriculture onset date
+      pastoralism:
+        title: pastoralism
+        unit: ''
+        display:
+          name: Extent of pastoralism
+      pastoralism_decline:
+        title: pastoralism_decline
+        unit: ''
+        display:
+          name: Pastoralism decline date
+      pastoralism_onset:
+        title: pastoralism_onset
+        unit: ''
+        display:
+          name: Pastoralism onset date
+      urban:
+        title: urban
+        unit: ''
+        display:
+          name: Extent of urbanization
+      urban_decline:
+        title: urban_decline
+        unit: ''
+        display:
+          name: Urbanism decline date
+      urban_onset:
+        title: urban_onset
+        unit: ''
+        display:
+          name: Urbanism onset date
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

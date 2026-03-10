@@ -1,0 +1,92 @@
+dataset:
+  title: Deforestation emissions embedded in trade (Pendrill et al. 2019)
+tables:
+  deforestation_emissions_embedded_in_trade__pendrill_et_al__2019:
+    variables:
+      cattle_meat:
+        title: cattle_meat
+        unit: ''
+      clothing:
+        title: clothing
+        unit: ''
+      construction:
+        title: construction
+        unit: ''
+      dairy_products:
+        title: dairy_products
+        unit: ''
+      food:
+        title: food
+        unit: ''
+      forestry_products:
+        title: forestry_products
+        unit: ''
+      manufactured_products:
+        title: manufactured_products
+        unit: ''
+      mobility:
+        title: mobility
+        unit: ''
+      oilseed_products:
+        title: oilseed_products
+        unit: ''
+      other_cereals:
+        title: other_cereals
+        unit: ''
+      other_crops:
+        title: other_crops
+        unit: ''
+      other_meat_products:
+        title: other_meat_products
+        unit: ''
+      per_capita_embodied_emissions:
+        title: per_capita_embodied_emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Per capita CO₂ emissions from deforestation for food production
+        description: |-
+          This measures per capita CO₂ emissions linked to deforestation for food production – it is trade-adjusted so reflects the carbon footprint of diets within a given country. It is based on the annual average over the period from 2010 to 2014.
+      plant_fibres:
+        title: plant_fibres
+        unit: ''
+      rice:
+        title: rice
+        unit: ''
+      services:
+        title: services
+        unit: ''
+      shelter:
+        title: shelter
+        unit: ''
+      sugar:
+        title: sugar
+        unit: ''
+      total_embodied_emissions:
+        title: total_embodied_emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Deforestation carbon footprint for food production
+          numDecimalPlaces: 0
+        description: |-
+          This measures the amount of CO₂ emissions linked to deforestation for food production – it is trade-adjusted so reflects the carbon footprint of diets within a given country. It is based on the annual average over the period from 2010 to 2014.
+      trade:
+        title: trade
+        unit: ''
+      veg_fruits_nuts:
+        title: veg_fruits_nuts
+        unit: ''
+      wheat:
+        title: wheat
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

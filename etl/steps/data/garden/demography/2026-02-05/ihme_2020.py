@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder
@@ -77,6 +78,9 @@ def run() -> None:
     tb_mig = ds_meadow.read("migration")  # country, year, scenario, val-upper-lower
     tb_mig = prepare_mig(tb_mig, "net_migration")
 
+    # Prepare live births table
+    # tb_births = ds_meadow.read("live_births")  # country,
+
     #
     # Process data.
     #
@@ -121,6 +125,28 @@ def run() -> None:
         on=["country", "year"],
         how="outer",
     )
+
+    # Add region aggregates
+    REGIONS = [
+        "Africa",
+        "North America",
+        "South America",
+        "Asia",
+        "Europe",
+        "Oceania",
+    ]
+    aggregations = {
+        "population": "sum",
+        "net_migration": "sum",
+    }
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        aggregations=aggregations,
+        regions=REGIONS,
+        min_frac_countries_informed=0.7,
+    )
+    # World net migration is meaningless (closed system)
+    tb.loc[tb["country"] == "World", "net_migration"] = np.nan
 
     # Improve table format.
     tb = tb.format(["country", "year"], short_name="ihme_2020")
