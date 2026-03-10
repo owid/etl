@@ -199,6 +199,10 @@ def main_cli(
 
     config.enable_sentry()
 
+    # in watch mode, run steps in-process (no subprocess) so exceptions propagate and the loop continues
+    if watch:
+        config.DEBUG = True
+
     # make everything single threaded, useful for debugging
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1

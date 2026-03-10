@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp vsce-compile vsce-sync
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync
 
 include default.mk
 
@@ -35,8 +35,8 @@ help:
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
-	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
-	@echo '  make vsce-sync 	Sync all custom VS Code extensions (reinstalling them)'
+	@echo '  make vsce-exclude-archived  Exclude archived steps from VSCode user settings'
+	@echo '  make vsce-sync 	Sync VS Code extensions (install missing, upgrade outdated)'
 # 	@echo '  make vsce-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
 	@echo '  make watch     	Run all tests, watching for changes'
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
@@ -200,51 +200,37 @@ wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz
 
-# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and all custom extensions found in vscode_extensions/.
-# Custom extensions are expected to have a subfolder install/ with a VSIX file.
-# The latest VSIX file in each install/ folder will be installed.
-install-vscode-extensions:
-	@echo '==> Checking and installing required VS Code extensions'
+# Sync VS Code extensions: installs missing ones and upgrades outdated ones (version-aware)
+vsce-sync:
 	@if command -v code > /dev/null; then \
+		INSTALLED=$$(code --list-extensions --show-versions); \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
-			if ! code --list-extensions | grep -q "$$EXT"; then \
+			if ! echo "$$INSTALLED" | grep -q "$$EXT"; then \
+				echo "Installing $$EXT"; \
 				code --install-extension $$EXT; \
 			fi; \
 		done; \
-		for EXT_DIR in $$EXTENSIONS_PATH/*/; do \
-			EXT=$$(basename $$EXT_DIR); \
-			if ! code --list-extensions | grep -q "owid.$$EXT"; then \
-				VSIX_FILE=$$(ls -v $$EXT_DIR/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
-				if [ -n "$$VSIX_FILE" ]; then \
-					echo "Installing owid.$$EXT from $$VSIX_FILE"; \
-					code --install-extension "$$VSIX_FILE"; \
-				fi; \
-			fi; \
-		done; \
-	else \
-		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
-	fi
-
-# Reinstall all custom VS Code extensions (forces update even if already installed)
-vsce-sync:
-	@echo '==> Reinstalling all custom VS Code extensions'
-	@if command -v code > /dev/null; then \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT_DIR in $$EXTENSIONS_PATH/*/; do \
 			EXT=$$(basename $$EXT_DIR); \
 			VSIX_FILE=$$(ls -v $$EXT_DIR/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
-			if [ -n "$$VSIX_FILE" ]; then \
-				echo "Installing owid.$$EXT from $$VSIX_FILE"; \
+			if [ -z "$$VSIX_FILE" ]; then continue; fi; \
+			REPO_VER=$$(echo "$$VSIX_FILE" | sed 's/.*-\([0-9].*\)\.vsix/\1/'); \
+			INSTALLED_VER=$$(echo "$$INSTALLED" | grep "owid\.$$EXT@" | sed 's/.*@//'); \
+			if [ "$$INSTALLED_VER" != "$$REPO_VER" ]; then \
+				echo "Installing owid.$$EXT $$REPO_VER (was: $${INSTALLED_VER:-not installed})"; \
 				code --install-extension "$$VSIX_FILE" --force; \
 			fi; \
 		done; \
 	else \
-		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
+		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension sync."; \
 	fi
 
-vscode-exclude-archived: .venv
+# Backward-compatible alias
+install-vscode-extensions: vsce-sync
+
+vsce-exclude-archived: .venv
 	@echo '==> Excluding archived steps from VSCode user settings'
 	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
 
