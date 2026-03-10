@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: 'OECD: Education at a Glance 2012'
+    description: |-
+      OECD Indicators is the authoritative source for accurate and relevant information on the state of education around the world
+    url: http://www.oecd-ilibrary.org/education/education-at-a-glance-2012_eag-2012-en
+    date_accessed: 2017-10-01
+    published_by: OECD (2012)
+  name: Labour cost ratio (45-54 year-old population) 2009 - OECD (2012)
+  description: |-
+    Education at a Glance 2012
+
+
+    Graph A10.4 – Labour cost ratio and attainment levels (2009 or latest available year)
+    Labour cost ratio of tertiary-educated individuals (5/6) to below upper secondary-educated individuals (0/1/2) and attainment levels of 45
+outs:
+  - md5: af9dda507394c6649b3817f1eb80c052
+    size: 3722
+    path: labour_cost_ratio__45_54_year_old_population__2009__oecd__2012.feather

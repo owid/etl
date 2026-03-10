@@ -1,0 +1,20 @@
+dataset:
+  title: German road deaths and accidents - destatis
+tables:
+  german_road_deaths_and_accidents__destatis:
+    variables:
+      accidents_reported_with_injury:
+        title: Accidents reported with injury
+        unit: ''
+      accidents_reported_with_material_damage:
+        title: Accidents reported with material damage
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3071
-    date_accessed: 2023-08-10 08:37:47.492961
+    url: https://admin.owid.io/admin/datasets/3071
+    date_accessed: 2026-03-10 09:23:27.276290+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3071_developmental_food_aid__oecd__2018
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d4963ea10746bd4a8cd5017f82ba6fbf
-  size: 2827
-  path: dataset_3071_developmental_food_aid__oecd__2018_config.json
+  - md5: 27813ad103901116088e2cd294877225
+    size: 2957
+    path: dataset_3071_developmental_food_aid__oecd__2018_config.json

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2893
-    date_accessed: 2023-08-10 07:44:14.884918
+    url: https://admin.owid.io/admin/datasets/2893
+    date_accessed: 2026-03-10 09:27:58.917498+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8add61ee583c5707a1a0fef3bb86244a
-  size: 17916
-  path: dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_config.json
+  - md5: 600a0e985220dd6049e5d0e9267c0ecc
+    size: 19627
+    path: dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_config.json

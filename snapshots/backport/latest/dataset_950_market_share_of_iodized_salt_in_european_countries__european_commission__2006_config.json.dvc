@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/950
-    date_accessed: 2023-08-10 09:41:44.865870
+    url: https://admin.owid.io/admin/datasets/950
+    date_accessed: 2026-03-10 09:25:29.996045+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006
+  name: Grapher metadata for dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bdd5a10766147b165cc7858a3db25172
-  size: 2212
-  path: 
-    dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006_config.json
+  - md5: 8c4dd388f3125fc7392bd8e437aec917
+    size: 2342
+    path: dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006_config.json

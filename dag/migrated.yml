@@ -1208,3 +1208,243 @@ steps:
     - data://garden/plastic_waste/2021-01-01/ocean_waste_items_by_region
   data://garden/plastic_waste/2021-01-01/ocean_waste_items_by_region:
     - snapshot://plastic_waste/2021-01-01/ocean_waste_items_by_region.feather
+  data://grapher/biodiversity/2018-11-16/biomass_and_taxa_abundance__bar_on_et_al__2018:
+    - data://garden/biodiversity/2018-11-16/biomass_and_taxa_abundance__bar_on_et_al__2018
+  data://garden/biodiversity/2018-11-16/biomass_and_taxa_abundance__bar_on_et_al__2018:
+    - snapshot://biodiversity/2018-11-16/biomass_and_taxa_abundance__bar_on_et_al__2018.feather
+  data://grapher/trade/2015-07-07/international_historical_statistics__european_trade__brian_mitchell__2015:
+    - data://garden/trade/2015-07-07/international_historical_statistics__european_trade__brian_mitchell__2015
+  data://garden/trade/2015-07-07/international_historical_statistics__european_trade__brian_mitchell__2015:
+    - snapshot://trade/2015-07-07/international_historical_statistics__european_trade__brian_mitchell__2015.feather
+  data://grapher/agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico:
+    - data://garden/agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico
+  data://garden/agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico:
+    - snapshot://agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico.feather
+  data://grapher/biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc:
+    - data://garden/biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc
+  data://garden/biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc:
+    - snapshot://biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc.feather
+  data://grapher/health/2018-05-12/smallpox_cases_by_country_1920_1977:
+    - data://garden/health/2018-05-12/smallpox_cases_by_country_1920_1977
+  data://garden/health/2018-05-12/smallpox_cases_by_country_1920_1977:
+    - snapshot://health/2018-05-12/smallpox_cases_by_country_1920_1977.feather
+  data://grapher/agriculture/2018-01-16/agricultural_policy_support__agrimonitor__2017:
+    - data://garden/agriculture/2018-01-16/agricultural_policy_support__agrimonitor__2017
+  data://garden/agriculture/2018-01-16/agricultural_policy_support__agrimonitor__2017:
+    - snapshot://agriculture/2018-01-16/agricultural_policy_support__agrimonitor__2017.feather
+  data://grapher/waste/2018-02-15/waste_production_and_management:
+    - data://garden/waste/2018-02-15/waste_production_and_management
+  data://garden/waste/2018-02-15/waste_production_and_management:
+    - snapshot://waste/2018-02-15/waste_production_and_management.feather
+  data://grapher/plastic_waste/2018-01-01/plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017:
+    - data://garden/plastic_waste/2018-01-01/plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017
+  data://garden/plastic_waste/2018-01-01/plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017:
+    - snapshot://plastic_waste/2018-01-01/plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017.feather
+  data://grapher/health/2017-07-24/prevalence_of_zinc_deficiency__wessells_et_al__2012:
+    - data://garden/health/2017-07-24/prevalence_of_zinc_deficiency__wessells_et_al__2012
+  data://garden/health/2017-07-24/prevalence_of_zinc_deficiency__wessells_et_al__2012:
+    - snapshot://health/2017-07-24/prevalence_of_zinc_deficiency__wessells_et_al__2012.feather
+  data://grapher/health/2017-07-20/prevalence_of_weight_categories_in_males__ncdrisc__2017:
+    - data://garden/health/2017-07-20/prevalence_of_weight_categories_in_males__ncdrisc__2017
+  data://garden/health/2017-07-20/prevalence_of_weight_categories_in_males__ncdrisc__2017:
+    - snapshot://health/2017-07-20/prevalence_of_weight_categories_in_males__ncdrisc__2017.feather
+  data://grapher/energy/2021-01-01/number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021:
+    - data://garden/energy/2021-01-01/number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021
+  data://garden/energy/2021-01-01/number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021:
+    - snapshot://energy/2021-01-01/number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021.feather
+  data://grapher/happiness/2019-11-13/friends_and_family_support__oecd_based_on_gallup__2016:
+    - data://garden/happiness/2019-11-13/friends_and_family_support__oecd_based_on_gallup__2016
+  data://garden/happiness/2019-11-13/friends_and_family_support__oecd_based_on_gallup__2016:
+    - snapshot://happiness/2019-11-13/friends_and_family_support__oecd_based_on_gallup__2016.feather
+  data-private://grapher/health/2021-01-01/lead_blood_concentrations_in_lmic__ericson_et_al__2021:
+    - data-private://garden/health/2021-01-01/lead_blood_concentrations_in_lmic__ericson_et_al__2021
+  data-private://garden/health/2021-01-01/lead_blood_concentrations_in_lmic__ericson_et_al__2021:
+    - snapshot-private://health/2021-01-01/lead_blood_concentrations_in_lmic__ericson_et_al__2021.feather
+  data://grapher/education/2018-02-20/unesco_metadata_on_literacy__uis__2017:
+    - data://garden/education/2018-02-20/unesco_metadata_on_literacy__uis__2017
+  data://garden/education/2018-02-20/unesco_metadata_on_literacy__uis__2017:
+    - snapshot://education/2018-02-20/unesco_metadata_on_literacy__uis__2017.feather
+  data-private://grapher/trade/2018-02-21/total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split:
+    - data-private://garden/trade/2018-02-21/total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split
+  data-private://garden/trade/2018-02-21/total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split:
+    - snapshot-private://trade/2018-02-21/total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split.feather
+  data-private://grapher/trade/2018-03-02/total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split:
+    - data-private://garden/trade/2018-03-02/total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split
+  data-private://garden/trade/2018-03-02/total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split:
+    - snapshot-private://trade/2018-03-02/total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split.feather
+  data-private://grapher/trade/2018-03-05/total_goods_trade_as_a_share_of_gdp__eurostat__2016__split:
+    - data-private://garden/trade/2018-03-05/total_goods_trade_as_a_share_of_gdp__eurostat__2016__split
+  data-private://garden/trade/2018-03-05/total_goods_trade_as_a_share_of_gdp__eurostat__2016__split:
+    - snapshot-private://trade/2018-03-05/total_goods_trade_as_a_share_of_gdp__eurostat__2016__split.feather
+  data-private://grapher/trade/2018-03-14/total_merchandise_trade_as_share_of_gdp__dots__2017__split:
+    - data-private://garden/trade/2018-03-14/total_merchandise_trade_as_share_of_gdp__dots__2017__split
+  data-private://garden/trade/2018-03-14/total_merchandise_trade_as_share_of_gdp__dots__2017__split:
+    - snapshot-private://trade/2018-03-14/total_merchandise_trade_as_share_of_gdp__dots__2017__split.feather
+  data-private://grapher/trade/2018-01-15/total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split:
+    - data-private://garden/trade/2018-01-15/total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split
+  data-private://garden/trade/2018-01-15/total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split:
+    - snapshot-private://trade/2018-01-15/total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split.feather
+  data-private://grapher/trade/2018-02-06/total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split:
+    - data-private://garden/trade/2018-02-06/total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split
+  data-private://garden/trade/2018-02-06/total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split:
+    - snapshot-private://trade/2018-02-06/total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split.feather
+  data://grapher/happiness/2022-03-07/interpersonal_trust__general_social_survey__gss:
+    - data://garden/happiness/2022-03-07/interpersonal_trust__general_social_survey__gss
+  data://garden/happiness/2022-03-07/interpersonal_trust__general_social_survey__gss:
+    - snapshot://happiness/2022-03-07/interpersonal_trust__general_social_survey__gss.feather
+  data://grapher/happiness/2017-11-29/clark__fleche__and__senik__happiness_inequality:
+    - data://garden/happiness/2017-11-29/clark__fleche__and__senik__happiness_inequality
+  data://garden/happiness/2017-11-29/clark__fleche__and__senik__happiness_inequality:
+    - snapshot://happiness/2017-11-29/clark__fleche__and__senik__happiness_inequality.feather
+  data-private://grapher/oecd/2019-05-04/corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019:
+    - data-private://garden/oecd/2019-05-04/corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019
+  data-private://garden/oecd/2019-05-04/corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019:
+    - snapshot-private://oecd/2019-05-04/corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019.feather
+  data-private://grapher/working_hours/2020-10-13/working_hours__boe__2016:
+    - data-private://garden/working_hours/2020-10-13/working_hours__boe__2016
+  data-private://garden/working_hours/2020-10-13/working_hours__boe__2016:
+    - snapshot-private://working_hours/2020-10-13/working_hours__boe__2016.feather
+  data://grapher/plastic_waste/2018-01-01/surface_ocean_plastic_by_mass__eriksen_et_al__2014:
+    - data://garden/plastic_waste/2018-01-01/surface_ocean_plastic_by_mass__eriksen_et_al__2014
+  data://garden/plastic_waste/2018-01-01/surface_ocean_plastic_by_mass__eriksen_et_al__2014:
+    - snapshot://plastic_waste/2018-01-01/surface_ocean_plastic_by_mass__eriksen_et_al__2014.feather
+  data://grapher/energy/2017-11-01/solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013:
+    - data://garden/energy/2017-11-01/solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013
+  data://garden/energy/2017-11-01/solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013:
+    - snapshot://energy/2017-11-01/solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013.feather
+  data-private://grapher/energy/2021-01-01/lead_petrol_banned:
+    - data-private://garden/energy/2021-01-01/lead_petrol_banned
+  data-private://garden/energy/2021-01-01/lead_petrol_banned:
+    - snapshot-private://energy/2021-01-01/lead_petrol_banned.feather
+  data-private://grapher/biodiversity/2021-02-26/global_wildlife_trade__harfoot_et_al__2018:
+    - data-private://garden/biodiversity/2021-02-26/global_wildlife_trade__harfoot_et_al__2018
+  data-private://garden/biodiversity/2021-02-26/global_wildlife_trade__harfoot_et_al__2018:
+    - snapshot-private://biodiversity/2021-02-26/global_wildlife_trade__harfoot_et_al__2018.feather
+  data://grapher/economics/2018-03-21/inheritance_for_women__how_was_life__2014:
+    - data://garden/economics/2018-03-21/inheritance_for_women__how_was_life__2014
+  data://garden/economics/2018-03-21/inheritance_for_women__how_was_life__2014:
+    - snapshot://economics/2018-03-21/inheritance_for_women__how_was_life__2014.feather
+  data://grapher/food/2017-05-23/prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017:
+    - data://garden/food/2017-05-23/prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017
+  data://garden/food/2017-05-23/prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017:
+    - snapshot://food/2017-05-23/prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017.feather
+  data://grapher/working_hours/2017-01-01/female_weekly_hours_worked__oecd__2017:
+    - data://garden/working_hours/2017-01-01/female_weekly_hours_worked__oecd__2017
+  data://garden/working_hours/2017-01-01/female_weekly_hours_worked__oecd__2017:
+    - snapshot://working_hours/2017-01-01/female_weekly_hours_worked__oecd__2017.feather
+  data://grapher/poverty_inequality/2018-02-27/gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017:
+    - data://garden/poverty_inequality/2018-02-27/gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017
+  data://garden/poverty_inequality/2018-02-27/gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017:
+    - snapshot://poverty_inequality/2018-02-27/gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017.feather
+  data://grapher/demography/2019-11-15/percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada:
+    - data://garden/demography/2019-11-15/percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada
+  data://garden/demography/2019-11-15/percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada:
+    - snapshot://demography/2019-11-15/percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada.feather
+  data://grapher/plastic_waste/2018-01-01/surface_ocean_plastic_by_particle_count__eriksen_et_al__2014:
+    - data://garden/plastic_waste/2018-01-01/surface_ocean_plastic_by_particle_count__eriksen_et_al__2014
+  data://garden/plastic_waste/2018-01-01/surface_ocean_plastic_by_particle_count__eriksen_et_al__2014:
+    - snapshot://plastic_waste/2018-01-01/surface_ocean_plastic_by_particle_count__eriksen_et_al__2014.feather
+  data://grapher/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_public__us_census_and_wdi__2013:
+    - data://garden/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_public__us_census_and_wdi__2013
+  data://garden/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_public__us_census_and_wdi__2013:
+    - snapshot://health_expenditure/2017-11-15/health_expenditure_us_1929_2013_public__us_census_and_wdi__2013.feather
+  data://grapher/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013:
+    - data://garden/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013
+  data://garden/health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013:
+    - snapshot://health_expenditure/2017-11-15/health_expenditure_us_1929_2013_private__us_census_and_wdi__2013.feather
+  data://grapher/economics/2017-01-01/wealth__total__by_component_for_various_country_groupings__world_bank__2017:
+    - data://garden/economics/2017-01-01/wealth__total__by_component_for_various_country_groupings__world_bank__2017
+  data://garden/economics/2017-01-01/wealth__total__by_component_for_various_country_groupings__world_bank__2017:
+    - snapshot://economics/2017-01-01/wealth__total__by_component_for_various_country_groupings__world_bank__2017.feather
+  data://grapher/trade/2015-12-09/intercontinental_trade__costa__palma_and_reis__2015:
+    - data://garden/trade/2015-12-09/intercontinental_trade__costa__palma_and_reis__2015
+  data://garden/trade/2015-12-09/intercontinental_trade__costa__palma_and_reis__2015:
+    - snapshot://trade/2015-12-09/intercontinental_trade__costa__palma_and_reis__2015.feather
+  data://grapher/labor/2017-11-01/lowest_paying_occupations__percent_female__nwlc__2014:
+    - data://garden/labor/2017-11-01/lowest_paying_occupations__percent_female__nwlc__2014
+  data://garden/labor/2017-11-01/lowest_paying_occupations__percent_female__nwlc__2014:
+    - snapshot://labor/2017-11-01/lowest_paying_occupations__percent_female__nwlc__2014.feather
+  data-private://grapher/oecd/2018-01-01/developmental_food_aid__oecd__2018:
+    - data-private://garden/oecd/2018-01-01/developmental_food_aid__oecd__2018
+  data-private://garden/oecd/2018-01-01/developmental_food_aid__oecd__2018:
+    - snapshot-private://oecd/2018-01-01/developmental_food_aid__oecd__2018.feather
+  data://grapher/health/2018-05-13/smallpox_cases_reported_and_revised__fenner_et_al__1988:
+    - data://garden/health/2018-05-13/smallpox_cases_reported_and_revised__fenner_et_al__1988
+  data://garden/health/2018-05-13/smallpox_cases_reported_and_revised__fenner_et_al__1988:
+    - snapshot://health/2018-05-13/smallpox_cases_reported_and_revised__fenner_et_al__1988.feather
+  data-private://grapher/fisheries/2021-01-01/trawling_by_region__amoroso_et_al__2018:
+    - data-private://garden/fisheries/2021-01-01/trawling_by_region__amoroso_et_al__2018
+  data-private://garden/fisheries/2021-01-01/trawling_by_region__amoroso_et_al__2018:
+    - snapshot-private://fisheries/2021-01-01/trawling_by_region__amoroso_et_al__2018.feather
+  data://grapher/oecd/2017-10-01/labour_cost_ratio__45_54_year_old_population__2009__oecd__2012:
+    - data://garden/oecd/2017-10-01/labour_cost_ratio__45_54_year_old_population__2009__oecd__2012
+  data://garden/oecd/2017-10-01/labour_cost_ratio__45_54_year_old_population__2009__oecd__2012:
+    - snapshot://oecd/2017-10-01/labour_cost_ratio__45_54_year_old_population__2009__oecd__2012.feather
+  data://grapher/oecd/2017-01-01/proportion_of_45_54_year_olds_with_tertiary_education_2009__oecd__2012:
+    - data://garden/oecd/2017-01-01/proportion_of_45_54_year_olds_with_tertiary_education_2009__oecd__2012
+  data://garden/oecd/2017-01-01/proportion_of_45_54_year_olds_with_tertiary_education_2009__oecd__2012:
+    - snapshot://oecd/2017-01-01/proportion_of_45_54_year_olds_with_tertiary_education_2009__oecd__2012.feather
+  data-private://grapher/health/2021-11-29/clinical_trials_results_reporting__eu_ctr__dal_re__2021:
+    - data-private://garden/health/2021-11-29/clinical_trials_results_reporting__eu_ctr__dal_re__2021
+  data-private://garden/health/2021-11-29/clinical_trials_results_reporting__eu_ctr__dal_re__2021:
+    - snapshot-private://health/2021-11-29/clinical_trials_results_reporting__eu_ctr__dal_re__2021.feather
+  data://grapher/health/2017-08-01/us_maternal_mortality_and_flfp_index__owid__2017:
+    - data://garden/health/2017-08-01/us_maternal_mortality_and_flfp_index__owid__2017
+  data://garden/health/2017-08-01/us_maternal_mortality_and_flfp_index__owid__2017:
+    - snapshot://health/2017-08-01/us_maternal_mortality_and_flfp_index__owid__2017.feather
+  data://grapher/health/2017-10-04/market_share_of_iodized_salt_in_european_countries__european_commission__2006:
+    - data://garden/health/2017-10-04/market_share_of_iodized_salt_in_european_countries__european_commission__2006
+  data://garden/health/2017-10-04/market_share_of_iodized_salt_in_european_countries__european_commission__2006:
+    - snapshot://health/2017-10-04/market_share_of_iodized_salt_in_european_countries__european_commission__2006.feather
+  data://grapher/plastic_waste/2017-11-22/plastic_waste__jambeck_et_al__2015:
+    - data://garden/plastic_waste/2017-11-22/plastic_waste__jambeck_et_al__2015
+  data://garden/plastic_waste/2017-11-22/plastic_waste__jambeck_et_al__2015:
+    - snapshot://plastic_waste/2017-11-22/plastic_waste__jambeck_et_al__2015.feather
+  data://grapher/transport/2018-03-07/german_road_deaths_and_accidents__destatis:
+    - data://garden/transport/2018-03-07/german_road_deaths_and_accidents__destatis
+  data://garden/transport/2018-03-07/german_road_deaths_and_accidents__destatis:
+    - snapshot://transport/2018-03-07/german_road_deaths_and_accidents__destatis.feather
+  data://grapher/health/2018-01-01/prevalence_of_alcohol_drinking_in_the_usa__cdc:
+    - data://garden/health/2018-01-01/prevalence_of_alcohol_drinking_in_the_usa__cdc
+  data://garden/health/2018-01-01/prevalence_of_alcohol_drinking_in_the_usa__cdc:
+    - snapshot://health/2018-01-01/prevalence_of_alcohol_drinking_in_the_usa__cdc.feather
+  data://grapher/health/2018-04-22/depression_prevalence_by_education__oecd:
+    - data://garden/health/2018-04-22/depression_prevalence_by_education__oecd
+  data://garden/health/2018-04-22/depression_prevalence_by_education__oecd:
+    - snapshot://health/2018-04-22/depression_prevalence_by_education__oecd.feather
+  data-private://grapher/working_hours/2018-06-28/time_spent__participation_time__and_participation_rates__eurostat:
+    - data-private://garden/working_hours/2018-06-28/time_spent__participation_time__and_participation_rates__eurostat
+  data-private://garden/working_hours/2018-06-28/time_spent__participation_time__and_participation_rates__eurostat:
+    - snapshot-private://working_hours/2018-06-28/time_spent__participation_time__and_participation_rates__eurostat.feather
+  data://grapher/plastic_waste/2018-01-01/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank:
+    - data://garden/plastic_waste/2018-01-01/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank
+  data://garden/plastic_waste/2018-01-01/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank:
+    - snapshot://plastic_waste/2018-01-01/plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank.feather
+  data://grapher/working_hours/2018-08-24/long_run_time_use_in_norway__by_sex__norway_statistics:
+    - data://garden/working_hours/2018-08-24/long_run_time_use_in_norway__by_sex__norway_statistics
+  data://garden/working_hours/2018-08-24/long_run_time_use_in_norway__by_sex__norway_statistics:
+    - snapshot://working_hours/2018-08-24/long_run_time_use_in_norway__by_sex__norway_statistics.feather
+  data-private://grapher/poverty_inequality/2018-09-17/extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018:
+    - data-private://garden/poverty_inequality/2018-09-17/extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018
+  data-private://garden/poverty_inequality/2018-09-17/extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018:
+    - snapshot-private://poverty_inequality/2018-09-17/extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018.feather
+  data-private://grapher/labor/2017-08-01/female_labor_force_participation_index__owid__2017__split:
+    - data-private://garden/labor/2017-08-01/female_labor_force_participation_index__owid__2017__split
+  data-private://garden/labor/2017-08-01/female_labor_force_participation_index__owid__2017__split:
+    - snapshot-private://labor/2017-08-01/female_labor_force_participation_index__owid__2017__split.feather
+  data-private://grapher/labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010:
+    - data-private://garden/labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010
+  data-private://garden/labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010:
+    - snapshot-private://labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010.feather
+  data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
+    - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022
+  data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
+    - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather
+  data-private://grapher/happiness/2021-05-25/gallup_world_poll__someone_to_help_you:
+    - data-private://garden/happiness/2021-05-25/gallup_world_poll__someone_to_help_you
+  data-private://garden/happiness/2021-05-25/gallup_world_poll__someone_to_help_you:
+    - snapshot-private://happiness/2021-05-25/gallup_world_poll__someone_to_help_you.feather
+  data://grapher/crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017:
+    - data://garden/crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017
+  data://garden/crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017:
+    - snapshot://crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017.feather

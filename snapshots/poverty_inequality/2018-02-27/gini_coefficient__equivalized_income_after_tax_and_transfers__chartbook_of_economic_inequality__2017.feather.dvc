@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Chartbook of Economic Inequality (2017)
+    url: https://www.chartbookofeconomicinequality.com
+    date_accessed: 2018-02-27
+    published_by: Atkinson, Hasell, Morelli, and Roser (2017), “The Chartbook of Economic Inequality"
+  name: Gini Coefficient, Equivalized Income After Tax and Transfers – Chartbook of Economic Inequality (2017)
+  description: ''
+outs:
+  - md5: ed5d415cd8772a3db24fc66ce22b37f2
+    size: 6050
+    path: gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017.feather

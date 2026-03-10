@@ -1,0 +1,27 @@
+dataset:
+  title: Biomass and taxa abundance (Bar-On et al. 2018)
+tables:
+  biomass_and_taxa_abundance__bar_on_et_al__2018:
+    variables:
+      abundance_of_organisms:
+        title: Abundance of organisms
+        unit: ''
+        display:
+          name: Abundance of organisms
+        description: Global number of individuals of a given taxonomic group.
+      global_biomass:
+        title: Global biomass
+        unit: tonnes carbon
+        short_unit: t
+        display:
+          name: Global biomass
+        description: Global biomass of taxonomic groups, measured in tonnes of carbon.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

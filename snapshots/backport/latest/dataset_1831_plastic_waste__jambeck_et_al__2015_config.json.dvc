@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/1831
-    date_accessed: 2026-03-05 09:37:01.991339+00:00
+    date_accessed: 2026-03-10 09:25:48.066837+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1831_plastic_waste__jambeck_et_al__2015

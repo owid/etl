@@ -8,7 +8,6 @@ import pandas as pd
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
@@ -197,23 +196,6 @@ def cli(
             narrative_charts_synced = 0
             synced_chart_ids: Set[int] = set()  # Track synced chart IDs for narrative chart sync
             synced_dataset_ids: Set[int] = set()  # Track dataset IDs from synced charts for archiving
-
-            # Collect old dataset IDs from variable mapping for archiving.
-            # The mapping tells us which old variables were replaced, and we can
-            # look up their dataset IDs in the target to archive orphaned datasets.
-            if archive:
-                try:
-                    from etl.db import read_sql
-
-                    df_mapping = read_sql("SELECT id_old FROM wiz__variable_mapping", source_session)
-                    if not df_mapping.empty:
-                        old_variable_ids = df_mapping["id_old"].tolist()
-                        old_vars = target_session.scalars(
-                            select(gm.Variable).where(gm.Variable.id.in_(old_variable_ids))
-                        ).all()
-                        synced_dataset_ids.update(v.datasetId for v in old_vars if v.datasetId)
-                except Exception:
-                    pass  # Table may not exist if no indicator upgrade was done
 
             # Iterate over all chart diffs
             failed_charts = []
