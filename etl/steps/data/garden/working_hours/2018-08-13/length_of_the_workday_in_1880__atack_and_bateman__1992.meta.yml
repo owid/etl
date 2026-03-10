@@ -1,0 +1,50 @@
+dataset:
+  title: Length of the workday in 1880 - Atack and Bateman (1992)
+tables:
+  length_of_the_workday_in_1880__atack_and_bateman__1992:
+    variables:
+      average_daily_minutes_of_work_in_summer__weighted_by_employees__atack_and_bateman__1992:
+        title: Average daily minutes of work in summer, weighted by employees (Atack and Bateman (1992))
+        unit: minutes
+        description: |-
+          Average daily minutes of work in the summer. Each firm observation is weighted by the sum of its male, female, and child workers.
+      average_daily_minutes_of_work_in_summer__weighted_by_firm__atack_and_bateman__1992:
+        title: Average daily minutes of work in summer, weighted by firm (Atack and Bateman (1992))
+        unit: minutes
+        description: |-
+          Average daily minutes of work in the summer. Calculated on the basis of each firm's reported hours of work between May and November, and November and May.
+      average_daily_minutes_of_work_in_winter__weighted_by_employees__atack_and_bateman__1992:
+        title: Average daily minutes of work in winter, weighted by employees (Atack and Bateman (1992))
+        unit: minutes
+        description: |-
+          Average daily minutes of work in the winter. Each firm observation is weighted by the sum of its male, female, and child workers.
+      average_daily_minutes_of_work_in_winter__weighted_by_firm__atack_and_bateman__1992:
+        title: Average daily minutes of work in winter, weighted by firm (Atack and Bateman (1992))
+        unit: minutes
+        description: |-
+          Average daily minutes of work in the winter. Calculated on the basis of each firm's reported hours of work between May and November, and November and May.
+      average_scheduled_minutes_of_work_per_day__atack_and_bateman__1992:
+        title: Average scheduled minutes of work per day (Atack and Bateman (1992))
+        unit: minutes
+        description: Average scheduled minutes of work per day nationwide in the United States.
+      mean_absolute_difference_in_minutes_of_work_between_summer_and_winter__weighted_by_employees__atack_and_bateman__1992:
+        title: Mean absolute difference in minutes of work between summer and winter, weighted by employees (Atack and Bateman
+          (1992))
+        unit: minutes
+        description: |-
+          Mean absolute difference in minutes worked between summer and winter, weighted by employees. Each firm observation is weighted by the sum of its male, female, and child workers.
+      mean_absolute_difference_in_minutes_of_work_between_summer_and_winter__weighted_by_firm__atack_and_bateman__1992:
+        title: Mean absolute difference in minutes of work between summer and winter, weighted by firm (Atack and Bateman
+          (1992))
+        unit: minutes
+        description: |-
+          Mean absolute difference in minutes worked between summer and winter, weighted by firm. Calculated on the basis of each firm's reported hours of work between May and November, and November and May.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: US General Social Survey (2017)
+    description: |-
+      The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking?
+    url: https://gssdataexplorer.norc.org/
+    date_accessed: 2017-12-19
+    published_by: GSS Data Explorer
+  name: Violent discipline in the US (US General Social Survey (2017))
+  description: ''
+outs:
+  - md5: 9d8072a07f822b81911e26fd8f266555
+    size: 9042
+    path: violent_discipline_in_the_us__us_general_social_survey__2017.feather

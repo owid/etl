@@ -1,0 +1,27 @@
+dataset:
+  title: Sexual Violence – UNICEF (2017)
+tables:
+  sexual_violence__unicef__2017:
+    variables:
+      prevalence_of_forced_sex_among_boys:
+        title: Prevalence of forced sex among boys
+        unit: '%'
+        description: Percentage of men aged 18 to 29 years who experienced forced sex before the age of 18
+      prevalence_of_forced_sex_among_girls:
+        title: Prevalence of forced sex among girls
+        unit: '%'
+        description: Percentage of women aged 18 to 29 years who experienced forced sex before the age of 18
+      sexual_violence_prevalence_among_girls__15_to_19__unicef_global_databases__2014:
+        title: Sexual violence prevalence among girls (15 to 19) (UNICEF Global Databases (2014))
+        unit: '%'
+        description: |-
+          Percentage of girls aged 15 to 19 years who ever experienced forced sexual intercourse or any other forced sexual acts (including in childhood).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

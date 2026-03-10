@@ -1,0 +1,21 @@
+dataset:
+  title: Energy efficiency by passenger mode in USA (BTS)
+tables:
+  energy_efficiency_by_passenger_mode_in_usa__bts:
+    variables:
+      energy_intensity__kwh_per_passenger_km:
+        title: Energy intensity (kWh per passenger-km)
+        unit: kilowatt-hours per passenger kilometer
+        short_unit: kWh
+        display:
+          name: Energy intensity per passenger kilometer
+        description: Energy intensity of travel is measured in kilowatt-hours per passenger-kilometer (kWh/km).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

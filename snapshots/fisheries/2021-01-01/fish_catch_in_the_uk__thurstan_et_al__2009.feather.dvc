@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: |-
+      Ruth Thurstan et al. (2010). The effects of 118 years of industrial fishing on UK bottom trawl fisheries. Nature Communications.
+    url: https://www.nature.com/articles/ncomms1013
+    date_accessed: 2026-03-10
+    published_by: |-
+      Thurstan, R. H., Brockington, S., & Roberts, C. M. (2010). The effects of 118 years of industrial fishing on UK bottom trawl fisheries. Nature communications, 1(1), 1-6.
+  name: Fish catch in the UK (Thurstan et al. 2009)
+  description: ''
+  is_public: false
+outs:
+  - md5: e5bcf10f4a93209bff59356e9ad0f3db
+    size: 15162
+    path: fish_catch_in_the_uk__thurstan_et_al__2009.feather

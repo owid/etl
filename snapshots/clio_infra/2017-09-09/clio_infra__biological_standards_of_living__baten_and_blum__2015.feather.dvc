@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Height Gini (Baten and Blum 2015)
+    description: |-
+      Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten’s formula: g htgini=-33.5 + 20.5*cv.
+
+      Data quality: As good as possible, but counter-checking and improvement welcome. Interpretations on individual country level should be done with careful checking.  An important caveat is many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region (in which country-specific measurement error tends to average out) is probably informative.
+    url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/HKZPR9
+    date_accessed: 2017-09-09
+    published_by: |-
+      Jörg Baten and Matthias Blum, “Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators”, Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011)
+  name: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
+  description: This is a dataset imported by the automated fetcher
+outs:
+  - md5: ed58540cdefeb5d87987b51e5f304127
+    size: 19378
+    path: clio_infra__biological_standards_of_living__baten_and_blum__2015.feather

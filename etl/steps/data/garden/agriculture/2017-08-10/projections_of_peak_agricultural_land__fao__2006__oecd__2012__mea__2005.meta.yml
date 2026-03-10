@@ -1,0 +1,47 @@
+dataset:
+  title: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
+tables:
+  projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005:
+    variables:
+      agricultural_area__fao__2006__oecd__2012__mea__2005:
+        title: Agricultural area (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+        description: Agricultural area in hectares.
+      fao_image__fao__2006__oecd__2012__mea__2005:
+        title: FAO/IMAGE (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+      iaastd__fao__2006__oecd__2012__mea__2005:
+        title: IAASTD (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+      mea_scenario_1__fao__2006__oecd__2012__mea__2005:
+        title: MEA Scenario 1 (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+      mea_scenario_2__fao__2006__oecd__2012__mea__2005:
+        title: MEA Scenario 2 (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+      mea_scenario_3__fao__2006__oecd__2012__mea__2005:
+        title: MEA Scenario 3 (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+      mea_scenario_4__fao__2006__oecd__2012__mea__2005:
+        title: MEA Scenario 4 (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+      oecd_outlook_baseline__fao__2006__oecd__2012__mea__2005:
+        title: OECD Outlook Baseline (FAO (2006), OECD (2012), MEA (2005))
+        unit: hectares
+        short_unit: ha
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

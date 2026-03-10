@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Forestry area - FAO (2017)
+    description: |-
+      Data on global forestry area from 1990 onwards is based on data from the UN Food and Agricultural Organization (FAO) database.
+      Data on global forestry prior to 1990 is less certain, and often prone to changes in definitions concerning forestry cover and density. We have extended this dataset to 1958 using reported data from the FAO World Forestry Inventory 1958 (published in 1960). Available at: http://www.fao.org/3/a-ad906t.pdf [accessed 18th August 2017].
+    url: http://www.fao.org/faostat/en/#home
+    date_accessed: 2026-03-05
+    published_by: UN Food and Agricultural Organization (FAO)(2017)
+  name: Forestry area - FAO (2017)
+  description: ''
+outs:
+  - md5: 3a6da8da2d9aa35bc1e3a171819a4bcf
+    size: 3186
+    path: forestry_area__fao__2017.feather

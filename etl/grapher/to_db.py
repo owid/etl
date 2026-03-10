@@ -493,15 +493,6 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
                 return False
 
         # then variables themselves with related data in other tables
-        con.execute(
-            text(
-                """
-            DELETE FROM country_latest_data WHERE variable_id IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-
         # delete relationships
         con.execute(
             text(

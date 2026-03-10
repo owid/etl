@@ -1,0 +1,70 @@
+dataset:
+  title: Output of key industries in England - using Bank of England (2017)
+tables:
+  output_of_key_industries_in_england__using_bank_of_england__2017:
+    variables:
+      coal:
+        title: Coal
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of coal, indexed to the year 1700 in log scale. It shows how much coal was produced relative to that in 1700 when measured on a log scale.
+      construction:
+        title: Construction
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total construction output, indexed to the year 1700 in log scale. It shows how much construction was done relative to that in 1700 when measured on a log scale.
+      foodstuffs:
+        title: Foodstuffs
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of foodstuffs, indexed to the year 1700 in log scale. It shows how much foodstuffs was produced relative to that in 1700 when measured on a log scale.
+      iron:
+        title: Iron
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of iron, indexed to the year 1700 in log scale. It shows how much iron was produced relative to that in 1700 when measured on a log scale.
+      leather:
+        title: Leather
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of leather, indexed to the year 1700 in log scale. It shows how much leather was produced relative to that in 1700 when measured on a log scale.
+      printed_books:
+        title: Printed books
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of printed books, indexed to the year 1700 in log scale. It shows how many books were printed relative to that in 1700 when measured on a log scale.
+      tin:
+        title: Tin
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of tin, indexed to the year 1700 in log scale. It shows how much tin was produced relative to that in 1700 when measured on a log scale.
+      wool_textiles:
+        title: Wool/Textiles
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of wool/textiles, indexed to the year 1700 in log scale. It shows how much wool/textiles was produced relative to that in 1700 when measured on a log scale.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

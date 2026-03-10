@@ -1,0 +1,98 @@
+dataset:
+  title: European vehicle passenger sales (ICCT, 2021)
+tables:
+  european_vehicle_passenger_sales__icct__2021:
+    variables:
+      all_hybrid_number:
+        title: all_hybrid_number
+        unit: ''
+      all_hybrid_share:
+        title: all_hybrid_share
+        unit: ''
+      battery_electric_number:
+        title: battery_electric_number
+        unit: ''
+      battery_electric_share:
+        title: battery_electric_share
+        unit: ''
+      battery_plugin_electric_number:
+        title: battery_plugin_electric_number
+        unit: ''
+      battery_plugin_electric_share:
+        title: battery_plugin_electric_share
+        unit: ''
+      co2_per_km:
+        title: co2_per_km
+        unit: grams CO₂ per km
+        short_unit: gCO₂
+        display:
+          name: Average carbon intensity of new passenger vehicles
+      diesel_gas_number:
+        title: diesel_gas_number
+        unit: ''
+      diesel_gas_share:
+        title: diesel_gas_share
+        unit: ''
+      diesel_number:
+        title: diesel_number
+        unit: ''
+      diesel_share:
+        title: diesel_share
+        unit: ''
+      fuel_efficiency_per_km:
+        title: fuel_efficiency_per_km
+        unit: ''
+      full_hybrid_number:
+        title: full_hybrid_number
+        unit: ''
+      full_hybrid_share:
+        title: full_hybrid_share
+        unit: ''
+      full_mild_hybrid_number:
+        title: full_mild_hybrid_number
+        unit: ''
+      full_mild_hybrid_share:
+        title: full_mild_hybrid_share
+        unit: ''
+      gas_number:
+        title: gas_number
+        unit: ''
+      gas_share:
+        title: gas_share
+        unit: ''
+      mild_hybrid_number:
+        title: mild_hybrid_number
+        unit: ''
+      mild_hybrid_share:
+        title: mild_hybrid_share
+        unit: ''
+      petrol_number:
+        title: petrol_number
+        unit: ''
+      petrol_share:
+        title: petrol_share
+        unit: ''
+      plugin_hybrid_number:
+        title: plugin_hybrid_number
+        unit: ''
+      plugin_hybrid_share:
+        title: plugin_hybrid_share
+        unit: ''
+      share_european_car_sales:
+        title: share_european_car_sales
+        unit: ''
+      total_passenger_vehicle_sales:
+        title: total_passenger_vehicle_sales
+        unit: ''
+      vehicle_price_eur:
+        title: vehicle_price_eur
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

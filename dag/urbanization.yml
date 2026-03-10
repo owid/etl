@@ -105,3 +105,13 @@ steps:
     - data://meadow/un/2026-02-17/wup_national_definitions
   data://grapher/un/2026-02-17/wup_national_definitions:
     - data://garden/un/2026-02-17/wup_national_definitions
+
+  #
+  # Stats in the city - socioeconomic and environmental indicators.
+  #
+  data://meadow/urbanization/2026-02-01/ghsl_stats_in_the_city:
+    - snapshot://urbanization/2026-02-01/ghsl_stats_in_the_city.zip
+  data://garden/urbanization/2026-02-01/ghsl_stats_in_the_city:
+    - data://meadow/urbanization/2026-02-01/ghsl_stats_in_the_city
+  data://grapher/urbanization/2026-02-01/ghsl_stats_in_the_city:
+    - data://garden/urbanization/2026-02-01/ghsl_stats_in_the_city

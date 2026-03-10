@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5275
-    date_accessed: 2023-08-10 08:57:19.668480
+    url: https://admin.owid.io/admin/datasets/5275
+    date_accessed: 2026-03-05 13:37:31.118251+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5275_eu_wild_bird_populations__eurostat__2022
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7d27af4051bc71dc42efca7c629cc18a
-  size: 6730
-  path: dataset_5275_eu_wild_bird_populations__eurostat__2022_config.json
+  - md5: d85c14c48794be8db4c7fa0127e6cff9
+    size: 7325
+    path: dataset_5275_eu_wild_bird_populations__eurostat__2022_config.json

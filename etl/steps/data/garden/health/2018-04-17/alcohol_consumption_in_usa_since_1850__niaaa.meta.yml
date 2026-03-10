@@ -1,0 +1,26 @@
+dataset:
+  title: Alcohol consumption in USA since 1850 — NIAAA
+tables:
+  alcohol_consumption_in_usa_since_1850__niaaa:
+    variables:
+      all_beverages__niaaa:
+        title: All beverages (NIAAA)
+        unit: ''
+      beer__niaaa:
+        title: Beer (NIAAA)
+        unit: litres per person
+      spirits__niaaa:
+        title: Spirits (NIAAA)
+        unit: litres per person
+      wine__niaaa:
+        title: Wine (NIAAA)
+        unit: litres per person
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

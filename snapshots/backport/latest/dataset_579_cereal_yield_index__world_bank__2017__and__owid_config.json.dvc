@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/579
-    date_accessed: 2023-08-10 07:43:25.204446
+    url: https://admin.owid.io/admin/datasets/579
+    date_accessed: 2026-03-06 07:46:06.679415+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_579_cereal_yield_index__world_bank__2017__and__owid
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6899fcd2f6a67a2fa71cb8567c1ef33b
-  size: 3095
-  path: dataset_579_cereal_yield_index__world_bank__2017__and__owid_config.json
+  - md5: 72dddea2114306e1c1317d450f8141d6
+    size: 3225
+    path: dataset_579_cereal_yield_index__world_bank__2017__and__owid_config.json

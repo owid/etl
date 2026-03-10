@@ -1,18 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5528
-    date_accessed: 2023-08-10 07:41:35.910899
+    url: https://admin.owid.io/admin/datasets/5528
+    date_accessed: 2026-03-05 12:34:17.510794+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Estimated Malaria Deaths
-  description: There is some rounding of the figures for each of the regions, so that
-    the sum doesn't quite add up to the values in the global estimates, which is also
-    rounded. For example their estimate of global malaria deaths is 627000, but the
-    regions sum to 626909.
+  description: There is some rounding of the figures for each of the regions, so that the sum doesn't quite add up to the values in the global estimates, which is also rounded. For example their estimate of global malaria deaths is 627000, but the regions sum to 626909.
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ef04713e2199605e86faad705800d842
-  size: 6850
-  path: dataset_5528_estimated_malaria_deaths_values.feather
+  - md5: 23957ec2bea59317920977167077f6f6
+    size: 7082
+    path: dataset_5528_estimated_malaria_deaths_values.feather

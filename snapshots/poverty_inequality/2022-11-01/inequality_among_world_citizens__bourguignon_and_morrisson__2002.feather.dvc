@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
+    description: |-
+      This paper investigates the distribution of well-being among world citizens during the last two centuries. The estimates show that inequality in the world distribution of income worsened from the beginning of the 19th century to World War II. After that, it seems to have stabilized or grown more slowly. In the early 19th century, most inequalities were due to differences within countries; later, it was due to differences between countries. Inequality in longevity also increased during the 19th century. Still, it then was reversed in the second half of the 20th century, perhaps mitigating the failure of income inequality to improve in the last decades. (JEL D31, F0, N0, O0)
+    url: http://dx.doi.org/10.1257/00028280260344443
+    date_accessed: 2026-03-05
+    published_by: Bourguignon and Morrisson (2002)
+  name: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
+  description: Backported
+  is_public: false
+outs:
+  - md5: a94bcf54c04288466e331aae2b5a7285
+    size: 4274
+    path: inequality_among_world_citizens__bourguignon_and_morrisson__2002.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Market share of iodized salt in European countries - European Commission (2006)
+    description: |-
+      Data represents the share of household salt sold on the market which has been fortified with iodine (the most efficient solution to iodine deficiency). This data is available across select European countries.
+    url: https://ec.europa.eu/food/sites/food/files/safety/docs/labelling_nutrition-supplements-responses-akj_en.pdf
+    date_accessed: 2017-10-04
+    published_by: European Commission (2006). Universal Salt Iodization.
+  name: Market share of iodized salt in European countries - European Commission (2006)
+  description: ''
+outs:
+  - md5: 71d1d38539dcbd395a8145482f70f867
+    size: 3514
+    path: market_share_of_iodized_salt_in_european_countries__european_commission__2006.feather

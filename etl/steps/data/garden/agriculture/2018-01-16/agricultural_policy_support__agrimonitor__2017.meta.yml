@@ -1,0 +1,20 @@
+dataset:
+  title: Agricultural policy support - (Agrimonitor, 2017)
+tables:
+  agricultural_policy_support__agrimonitor__2017:
+    variables:
+      general_services_support__idb_agrimonitor:
+        title: General Services Support (IDB Agrimonitor)
+        unit: '%'
+      producer_support__idb_agrimonitor:
+        title: Producer Support (IDB Agrimonitor)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5157
-    date_accessed: 2023-08-10 09:25:23.501244
+    url: https://admin.owid.io/admin/datasets/5157
+    date_accessed: 2026-03-05 12:31:47.542305+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: GDP growth from previous year, 2020 Q2 (Eurostat, OECD, National sources)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6b14c956fd21cfb3cf13b9b7d0b2ba4d
-  size: 7546
-  path: 
-    dataset_5157_gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources_values.feather
+  - md5: 228af6792974ce7499c0c341955e7bb1
+    size: 7578
+    path: dataset_5157_gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources_values.feather

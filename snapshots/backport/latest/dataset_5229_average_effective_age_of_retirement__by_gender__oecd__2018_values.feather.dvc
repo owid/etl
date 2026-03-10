@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5229
-    date_accessed: 2023-08-10 09:14:30.325389
+    url: https://admin.owid.io/admin/datasets/5229
+    date_accessed: 2026-03-05 10:58:14.205257+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Average effective age of retirement, by gender (OECD, 2018)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7fe0e453961f7960c647a8ac721b99fc
-  size: 23202
-  path: 
-    dataset_5229_average_effective_age_of_retirement__by_gender__oecd__2018_values.feather
+  - md5: 1be9129ea07a66406579fdc148072fa7
+    size: 23290
+    path: dataset_5229_average_effective_age_of_retirement__by_gender__oecd__2018_values.feather

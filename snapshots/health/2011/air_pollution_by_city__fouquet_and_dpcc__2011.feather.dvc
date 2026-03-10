@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Air pollution by city - Fouquet and DPCC (2011)
+    description: |-
+      Raw data and extension of this set to 2016 was generously supplied through personal communication with the author.
+      Data trends for Delhi have a shorter coverage, and are not available post-2010 (later measurements are now reported based on particle size rather than total suspended particulate matter).
+    url: |-
+      Fouquet (2011):
+      http://www.sciencedirect.com/science/article/pii/S0921800911002953
+      Government of India's Economic Survey of Delhi (2012-13):
+      http://delhi.gov.in/DoIT/DoIT_Planning/ES2012-13/EN/ES_chapter8.pdf
+    date_accessed: 2016-02-15
+    published_by: |-
+      Fouquet, R. (2011). Long run trends in energy-related external costs. Ecological Economics 70(12), 2380–2389 and the DPCC.
+  name: Air pollution by city - Fouquet and DPCC (2011)
+  description: ''
+outs:
+  - md5: b64d90c5b15f7a8de2eb46618423e282
+    size: 6610
+    path: air_pollution_by_city__fouquet_and_dpcc__2011.feather

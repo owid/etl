@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/470
-    date_accessed: 2023-08-10 08:54:44.832791
+    url: https://admin.owid.io/admin/datasets/470
+    date_accessed: 2026-03-05 13:11:15.254886+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_470_swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015
+  name: Grapher metadata for dataset_470_swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8a7c31836c7ce7ba5a89960343cae716
-  size: 9489
-  path: 
-    dataset_470_swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015_config.json
+  - md5: 73ae79968f1574a75876ed35b49b5b4b
+    size: 10418
+    path: dataset_470_swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015_config.json

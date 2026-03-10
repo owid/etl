@@ -152,9 +152,9 @@ def migrate(
 
     if backport:
         lg.info("migrate.backport_dataset")
-        # backport to refresh snapshots in S3
-        if force or pb.needs_update():
-            pb.upload(upload, dry_run, engine)
+        # always force backport during migration to ensure config.json is fresh
+        # (stale/empty configs from previous backports cause JSONDecodeError)
+        pb.upload(upload, dry_run, engine)
 
     if dry_run:
         lg.info("migrate.dry_run", namespace=namespace, version=version, short_name=short_name)
@@ -170,7 +170,7 @@ def migrate(
     _generate_step_files(namespace, version, short_name, pb.short_name)
 
     # add steps to DAG
-    _add_to_migrated_dag(namespace, version, short_name)
+    _add_to_migrated_dag(namespace, version, short_name, is_public=pb.public)
 
     if run:
         _run_full_pipeline(dataset_id, namespace, version, short_name, engine)
@@ -230,15 +230,20 @@ def _run_full_pipeline(old_dataset_id: int, namespace: str, version: str, short_
     print("[green]Charts have been updated to use the new variables.[/green]")
 
 
-def _add_to_migrated_dag(namespace: str, version: str, short_name: str):
+def _add_to_migrated_dag(namespace: str, version: str, short_name: str, is_public: bool = True):
+    private_suffix = "" if is_public else "-private"
     add_to_dag(
-        {f"data://grapher/{namespace}/{version}/{short_name}": [f"data://garden/{namespace}/{version}/{short_name}"]},
+        {
+            f"data{private_suffix}://grapher/{namespace}/{version}/{short_name}": [
+                f"data{private_suffix}://garden/{namespace}/{version}/{short_name}"
+            ]
+        },
         dag_path=DAG_MIGRATED_PATH,
     )
     add_to_dag(
         {
-            f"data://garden/{namespace}/{version}/{short_name}": [
-                f"snapshot://{namespace}/{version}/{short_name}.feather"
+            f"data{private_suffix}://garden/{namespace}/{version}/{short_name}": [
+                f"snapshot{private_suffix}://{namespace}/{version}/{short_name}.feather"
             ]
         },
         dag_path=DAG_MIGRATED_PATH,

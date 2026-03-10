@@ -1,0 +1,19 @@
+dataset:
+  title: Inheritance for women - How Was Life? (2014)
+tables:
+  inheritance_for_women__how_was_life__2014:
+    variables:
+      gender_equal_inheritance_for_women__how_was_life__2014:
+        title: Gender-equal inheritance for women (How Was Life (2014))
+        unit: 1=yes, 0=no
+        description: Measure of institutional inequality, where 1 corresponds to gender-equal inheritance for women, and 0
+          otherwise.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

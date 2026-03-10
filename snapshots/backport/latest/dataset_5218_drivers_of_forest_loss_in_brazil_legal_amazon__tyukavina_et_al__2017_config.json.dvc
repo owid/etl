@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5218
-    date_accessed: 2023-08-09 11:36:20.992976
+    url: https://admin.owid.io/admin/datasets/5218
+    date_accessed: 2026-03-10 07:48:03.318205+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017
+  name: Grapher metadata for dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0b2c483d79ac54446b68bb14a1b88a33
-  size: 11855
-  path: 
-    dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017_config.json
+  - md5: 6c28563c25398d8f5d29a5e1f1f8cb95
+    size: 13008
+    path: dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017_config.json

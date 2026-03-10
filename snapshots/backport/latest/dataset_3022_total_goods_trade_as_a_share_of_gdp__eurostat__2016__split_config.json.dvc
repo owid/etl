@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3022
-    date_accessed: 2023-08-10 08:04:22.718868
+    url: https://admin.owid.io/admin/datasets/3022
+    date_accessed: 2026-03-10 09:16:01.121666+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3022_total_goods_trade_as_a_share_of_gdp__eurostat__2016__split
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4baf125caed9f6681c274a5325603405
-  size: 2365
-  path: 
-    dataset_3022_total_goods_trade_as_a_share_of_gdp__eurostat__2016__split_config.json
+  - md5: b33a517bdda76b438af7848115db6cd7
+    size: 2495
+    path: dataset_3022_total_goods_trade_as_a_share_of_gdp__eurostat__2016__split_config.json

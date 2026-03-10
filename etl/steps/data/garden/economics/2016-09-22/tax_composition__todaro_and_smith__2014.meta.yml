@@ -1,0 +1,44 @@
+dataset:
+  title: Tax composition – Todaro and Smith (2014)
+tables:
+  tax_composition__todaro_and_smith__2014:
+    variables:
+      corporate_income_taxes__todaro_and_smith__2014:
+        title: Corporate income taxes (Todaro and Smith (2014))
+        unit: '% GDP'
+        short_unit: '%'
+        description: 1986; 1996
+      excise_taxes__todaro_and_smith__2014:
+        title: Excise taxes (Todaro and Smith (2014))
+        unit: '% GDP'
+        short_unit: '%'
+        description: 1986; 1996
+      general_consumption_taxes__todaro_and_smith__2014:
+        title: General consumption taxes (Todaro and Smith (2014))
+        unit: '% GDP'
+        short_unit: '%'
+        description: 1986; 1996
+      personal_income_taxes__todaro_and_smith__2014:
+        title: Personal Income taxes (Todaro and Smith (2014))
+        unit: '% GDP'
+        short_unit: '%'
+        description: 1986; 1996
+      social_security__todaro_and_smith__2014:
+        title: Social security (Todaro and Smith (2014))
+        unit: '% GDP'
+        short_unit: '%'
+        description: 1986; 1996
+      trade_taxes__todaro_and_smith__2014:
+        title: Trade taxes (Todaro and Smith (2014))
+        unit: '% GDP'
+        short_unit: '%'
+        description: 1986; 1996
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

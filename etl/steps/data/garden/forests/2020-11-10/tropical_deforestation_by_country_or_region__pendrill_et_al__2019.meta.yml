@@ -1,0 +1,69 @@
+dataset:
+  title: Tropical deforestation by country or region (Pendrill et al. (2019))
+tables:
+  tropical_deforestation_by_country_or_region__pendrill_et_al__2019:
+    variables:
+      deforestation_emissions:
+        title: Deforestation emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Annual CO₂ emissions from deforestation
+          numDecimalPlaces: 0
+      forest_loss__ha:
+        title: Forest loss (ha)
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Annual deforestation by region
+          numDecimalPlaces: 0
+      peat_emissions:
+        title: Peat emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Annual CO₂ emissions from peatlands
+          numDecimalPlaces: 0
+      share_of_commodity_driven_deforestation:
+        title: Share of commodity-driven deforestation
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of tropical deforestation
+      share_of_deforestation_and_peat_emissions:
+        title: Share of deforestation and peat emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of CO₂ emissions from tropical deforestation and peatlands
+      share_of_deforestation_emissions:
+        title: Share of deforestation emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of CO₂ emissions from tropical deforestation
+      share_of_peat_emissions:
+        title: Share of peat emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of CO₂ emissions from tropical peatlands
+      total_deforestation_and_peat_emissions:
+        title: Total deforestation and peat emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Annual CO₂ emissions from deforestation and peatlands
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
