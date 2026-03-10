@@ -9,7 +9,6 @@ TODO: This file contains some code that needs some revision:
 """
 
 import concurrent.futures
-import io
 import json
 import warnings
 from collections import defaultdict
