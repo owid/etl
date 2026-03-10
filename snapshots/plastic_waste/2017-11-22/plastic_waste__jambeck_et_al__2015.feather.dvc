@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: |-
+      Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., ... & Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science.
+    description: ''
+    url: http://science.sciencemag.org/content/347/6223/768/
+    date_accessed: 2017-11-22
+    published_by: |-
+      Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., ... & Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science.
+  name: Plastic Waste - Jambeck et al. (2015)
+  description: ''
+outs:
+  - md5: 5a7630922a50c8a92a0908fe176a4346
+    size: 22906
+    path: plastic_waste__jambeck_et_al__2015.feather

@@ -1,0 +1,23 @@
+dataset:
+  title: Developmental Food Aid (OECD, 2018)
+tables:
+  developmental_food_aid__oecd__2018:
+    variables:
+      developmental_food_aid__million_2016_usd:
+        title: Developmental Food Aid (million 2016 USD)
+        unit: million USD
+        short_unit: $
+        display:
+          conversionFactor: 1000000
+          name: Food aid received
+        description: |-
+          Conventionally, food aid includes grants and concessional loans that conform to official development assistance (ODA). Food aid is categorised and reported in terms of its uses and modes of supply. In terms of the use of food aid, three categories are distinguished: programme food aid is supplied as a resource transfer providing balance of payments (BoP) or budgetary support; project food aid is usually provided to support specific poverty alleviation and disaster prevention activities, targeted on specific beneficiary groups or areas; relief food aid is targeted on, and freely distributed to, victims of natural or man-made disasters. In practice, there has been a blurring of the distinctions between different categories of use, especially in an emergency, crisis situation. The other main approach to distinguish food aid is by looking at its sources or modes of supply: direct transfers, including all food aid originating from a donor country; food aid purchases or exchanges in one developing country for use as food aid in another country; and, local purchases, procured in a country and used as food aid in the same country. This indicator is measured in million USD constant prices, using 2016 as the base year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

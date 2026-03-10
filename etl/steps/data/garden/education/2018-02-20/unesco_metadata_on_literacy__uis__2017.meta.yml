@@ -1,0 +1,20 @@
+dataset:
+  title: UNESCO metadata on literacy (UIS (2017))
+tables:
+  unesco_metadata_on_literacy__uis__2017:
+    variables:
+      data_instruments_used_to_estimate_literacy__uis__2017:
+        title: Data instruments used to estimate literacy (UIS (2017))
+        unit: ''
+      methodologies_used_for_measuring_literacy__uis__2017:
+        title: Methodologies used for measuring literacy (UIS (2017))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,21 @@
+dataset:
+  title: Health Expenditure US 1929-2013 Private - US Census and WDI (2013)
+tables:
+  health_expenditure_us_1929_2013_private__us_census_and_wdi__2013:
+    variables:
+      us_health_expenditure__private__us_census_and_wdi__2013:
+        title: US Health Expenditure, Private (US Census and WDI (2013))
+        unit: '% of GDP'
+        short_unit: '%'
+        display:
+          unit: children
+        description: Health Expenditure, total  (% of GDP)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

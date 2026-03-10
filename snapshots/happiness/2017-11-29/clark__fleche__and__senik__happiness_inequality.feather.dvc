@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Clark, Flèche & Senik – Happiness Inequality
+    url: http://onlinelibrary.wiley.com/doi/10.1111/roiw.12190/abstract
+    date_accessed: 2017-11-29
+    published_by: |-
+      Clark, Andrew E., Sarah Flèche, and Claudia Senik. “Economic growth evens out happiness: Evidence from six surveys.” Review of Income and Wealth (2015)
+  name: Clark, Flèche & Senik – Happiness Inequality
+  description: ''
+outs:
+  - md5: 4b4b99a95b42290b16429b1cfd7d1058
+    size: 3706
+    path: clark__fleche__and__senik__happiness_inequality.feather

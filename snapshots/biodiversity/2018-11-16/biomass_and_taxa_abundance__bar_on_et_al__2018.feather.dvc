@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Biomass and taxa abundance (Bar-On et al. 2018)
+    description: |-
+      Estimates of the global biomass (measured in tonnes of carbon) and abundance (number of individuals) of different taxonomic groups.
+
+      Due to large uncertainty for some groups, these are used as order-of-magnitude estimates and come with notable error margins.
+    url: http://www.pnas.org/content/115/25/6506
+    date_accessed: 2018-11-16
+    published_by: |-
+      Bar-On, Y. M., Phillips, R., & Milo, R. (2018). The biomass distribution on Earth. Proceedings of the National Academy of Sciences, 201711842.
+  name: Biomass and taxa abundance (Bar-On et al. 2018)
+  description: ''
+outs:
+  - md5: 86165ae81c95153d4bfd9ad71c8760cc
+    size: 3818
+    path: biomass_and_taxa_abundance__bar_on_et_al__2018.feather

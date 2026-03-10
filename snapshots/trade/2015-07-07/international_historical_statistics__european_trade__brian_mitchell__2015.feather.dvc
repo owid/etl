@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: International Historical Statistics - Brian Mitchell (2015)
+    description: |-
+      National accounts and trade (GDP, imports and exports). The ratio is computed as the sum of imports and exports divided by GDP.
+    url: http://www.palgraveconnect.com/pc/doifinder/10.1057/9781137305688
+    date_accessed: 2015-07-07
+    published_by: International Historical Statistics
+  name: 'International Historical Statistics: European trade - Brian Mitchell (2015)'
+  description: |-
+    Ratio of exports and imports to GDP in current values for the seven largest European economies. Data is from International Historical Statistics by Brian Mitchell.
+
+
+    Notes: Germany uses NNP as a measure of output instead of GDP until 1945. Post-1945 Wes
+outs:
+  - md5: d1051ad3ba7a506752e1a69a38a6fdd3
+    size: 5674
+    path: international_historical_statistics__european_trade__brian_mitchell__2015.feather

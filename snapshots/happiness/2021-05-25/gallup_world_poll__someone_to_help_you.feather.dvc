@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Someone-to-help-you-Gallup-World-Poll
+    description: If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?
+    date_accessed: 2021-05-25
+    published_by: Gallup World Poll
+  name: Gallup World Poll - Someone to help you
+  description: (Max, 22 Feb 2023) This cannot be shared publicly! It is not publicly licensed. But I want to keep it internally.
+  is_public: false
+outs:
+  - md5: c48474b17c3e9108e75a2f3855c011f0
+    size: 25250
+    path: gallup_world_poll__someone_to_help_you.feather

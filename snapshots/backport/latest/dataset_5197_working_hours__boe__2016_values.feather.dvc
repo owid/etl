@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5197
-    date_accessed: 2023-08-10 08:28:56.955838
+    url: https://admin.owid.io/admin/datasets/5197
+    date_accessed: 2026-03-10 09:18:08.459814+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Working Hours – BoE (2016)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b21aa8d4b48c092c85c04f8ef005829f
-  size: 20818
-  path: dataset_5197_working_hours__boe__2016_values.feather
+  - md5: d58fd7c3acf3a995a8984014c6c33c24
+    size: 20850
+    path: dataset_5197_working_hours__boe__2016_values.feather

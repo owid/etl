@@ -1,0 +1,17 @@
+dataset:
+  title: Labour cost ratio (45-54 year-old population) 2009 - OECD (2012)
+tables:
+  labour_cost_ratio__45_54_year_old_population__2009__oecd__2012:
+    variables:
+      labour_cost_ratio__45_54_year_old_population__2009__oecd__2012:
+        title: Labour cost ratio (45-54 year-old population) 2009 (OECD (2012))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
