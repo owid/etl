@@ -50,7 +50,10 @@ def load_values(short_name: str) -> pd.DataFrame:
 def load_config(short_name: str) -> GrapherConfig:
     snap = Snapshot(f"backport/latest/{short_name}_config.json")
     with open(snap.path) as f:
-        return GrapherConfig.from_json(f.read())
+        content = f.read()
+    if not content.strip():
+        raise ValueError(f"Empty config.json for backport snapshot '{short_name}' at {snap.path}. Try re-running the backport with --force.")
+    return GrapherConfig.from_json(content)
 
 
 def long_to_wide(df: pd.DataFrame, prune: bool = True) -> pd.DataFrame:
