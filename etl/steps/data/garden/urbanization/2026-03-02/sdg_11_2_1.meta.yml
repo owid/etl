@@ -1,0 +1,35 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+dataset:
+  update_period_days: 365
+  description: |-
+    This dataset provides data on SDG Indicator 11.2.1 - the proportion of city residents with convenient access to public transport.
+
+    Country-level values are population-weighted averages across cities, using city population data from the Global Human Settlement Layer (GHSL) Urban Centers database.
+
+    Administrative regions (states, provinces, national averages) have been excluded from the dataset to focus on actual city-level measurements.
+
+tables:
+  sdg_11_2_1_country:
+    variables:
+      public_transport_access:
+        title: Share of city residents with convenient access to public transport (population-weighted)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of people in [cities](#dod:cities-degurba) who live within a short walk of a public transport stop — 500 metres for buses and trams, 1,000 metres for higher-capacity services like metro and rail.
+        description_key:
+          - This indicator measures the share of people in cities who live within a short walk of a public transport stop — 500 metres for buses and trams, 1,000 metres for metro and rail. Distances are measured along the street network, not in a straight line. The higher threshold for metro and rail reflects that people are willing to walk further for faster, more reliable services.
+          - This tells us whether people can physically reach a stop — not whether the service is actually good. A bus that runs twice a day counts the same as one that runs every five minutes.
+          - In many cities, informal transport fills a large share of daily travel needs. Because these networks are often not fully mapped, actual access may be higher than the figures suggest.
+          - Stop locations come from a mix of sources — OpenStreetMap, GTFS feeds, Google Maps, TomTom, and others. European cities use Eurostat data; some countries report their own figures from surveys or administrative records. This means the numbers are not always directly comparable across countries.
+          - Country figures are averages across cities, weighted by population. Larger cities count for more, which better reflects where most people actually live.
+          - City boundaries follow the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) standard and may not match official administrative boundaries.
+        description_processing: |-
+          Administrative regions (167 entries) were excluded from the original SDG dataset to focus on actual cities. Country values are calculated as population-weighted averages across all cities with available population data. City populations are sourced from the Global Human Settlement Layer (GHSL) Urban Centers database (2020 values). Cities are matched with GHSL data using multiple strategies: normalized name matching (removes diacritics, handles alternative names), substring matching, compound name handling (e.g., "City, Province" → "City"), prefix matching, and 59 manual mappings for cities with transliteration differences or alternative names (e.g., "Casablanca" → "Dar-el-Beida", "Luxembourg-Ville" → "Luxembourg (Lëtzebuerg)").
+        display:
+          numDecimalPlaces: 1
