@@ -41,7 +41,7 @@ definitions:
     footnote_displacements: |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     footnote_zero_displacements: &footnote_zero_displacements |-
-      Here, "0" means IDMC has not recorded any internal displacements this year. This does not mean that IDMC has confirmed that there are no internal displacements, but rather that none are known to IDMC at the time of reporting.
+      A value of 0 means that IDMC is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
     footnote_zero_idps: &footnote_zero_idps |-
       Here, "0" means IDMC has not recorded any internally displaced people (IDPs) in that region. This does not mean that IDMC has confirmed that there are no IDPs, but rather that none are known to IDMC at the time of reporting.
     idmc_na_processing: |-
