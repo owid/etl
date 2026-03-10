@@ -831,6 +831,20 @@ steps:
   data://grapher/worldbank_wdi/2026-02-27/wdi:
     - data://garden/worldbank_wdi/2026-02-27/wdi
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/atus/2026-03-10/atus_time_spent_with:
+    - snapshot://atus/2026-03-10/atus_who.zip
+    - snapshot://atus/2026-03-10/atus_act.zip
+    - snapshot://atus/2026-03-10/atus_sum.zip
+    - snapshot://atus/2024-12-10/activity_codes_2023.xls
+  data://garden/atus/2026-03-10/atus_time_spent_with:
+    - data://meadow/atus/2026-03-10/atus_time_spent_with
+  data://grapher/atus/2026-03-10/atus_time_spent_with:
+    - data://garden/atus/2026-03-10/atus_time_spent_with
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

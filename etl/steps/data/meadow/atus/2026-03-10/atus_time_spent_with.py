@@ -1,17 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
-from zipfile import ZipFile
-
-# from owid.catalog import Table, TableMeta
-from owid.catalog import processing as pr
-
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Codes for who was present with respondent.
-# see also: https://www.bls.gov/tus/dictionaries/atusintcodebk23.pdf
 
 WHO_CODES = {
     18: "Alone",
@@ -106,6 +99,7 @@ SUM_COL_DICT = {
     "TU20FWGT": "final_weight_2020",  # 2020 weight
 }
 
+
 ACTIVITY_COL_DICT = {
     "TUCASEID": "case_id",
     "TUACTIVITY_N": "activity_number",
@@ -148,69 +142,49 @@ WHO_COL_DICT = {
 }
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
+def run() -> None:
+    # Retrieve snapshots.
     snap_who = paths.load_snapshot("atus_who.zip")
-    snap_act = paths.load_snapshot("atus_activities.zip")
-    snap_sum = paths.load_snapshot("atus_summary.zip")
-    snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
+    snap_act = paths.load_snapshot("atus_act.zip")
+    snap_sum = paths.load_snapshot("atus_sum.zip")
 
-    # load tables:
-    who_data = snap_who.read_in_archive("atuswho_0323.dat", force_extension="csv")
-    act_data = snap_act.read_in_archive("atusact_0323.dat", force_extension="csv")
-    sum_data = snap_sum.read_in_archive("atussum_0323.dat", force_extension="csv")
-    act_codes = pr.read_excel(snap_act_codes.path, sheet_name="ATUS 2023 Lexicon", header=1)
-
-    # format act codes:
-    act_codes = act_codes.rename(columns={"6-digit activity code": "activity_code", "Activity": "activity_name"})
-    act_codes = act_codes[["activity_code", "activity_name"]]
-    act_codes = act_codes.dropna()
+    with snap_who.extracted() as archive:
+        tb_who = archive.read("atuswho_0324.dat", force_extension="csv")
+    with snap_act.extracted() as archive:
+        tb_act = archive.read("atusact_0324.dat", force_extension="csv")
+    with snap_sum.extracted() as archive:
+        tb_sum = archive.read("atussum_0324.dat", force_extension="csv")
 
     # Rename columns in WHO and ACT tables.
-    who_data = who_data.rename(columns=WHO_COL_DICT).reset_index()
-    act_data = act_data.rename(columns=ACTIVITY_COL_DICT).reset_index()
+    tb_who = tb_who.rename(columns=WHO_COL_DICT).reset_index()
+    tb_act = tb_act.rename(columns=ACTIVITY_COL_DICT).reset_index()
 
     # add column for who was present with respondent
     # error arises from processing log implementation
 
-    who_data["who_string"] = who_data["who_code"].map(WHO_CODES)
-    who_data["who_category"] = who_data["who_code"].map(WHO_CODE_CATEGORIES)
+    tb_who["who_string"] = tb_who["who_code"].map(WHO_CODES)
+    tb_who["who_category"] = tb_who["who_code"].map(WHO_CODE_CATEGORIES)
 
     # filter summary data to relevant columns:
-    sum_data = sum_data.rename(columns=SUM_COL_DICT)
-    sum_data = sum_data[["case_id", "age", "gender", "year", "final_weight", "final_weight_2020"]]
+    tb_sum = tb_sum.rename(columns=SUM_COL_DICT)
+    tb_sum = tb_sum[["case_id", "age", "gender", "year", "final_weight", "final_weight_2020"]]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    who_data = who_data.reset_index().format(["index"], short_name="atus_who")
-    act_data = act_data.reset_index().format(["index"], short_name="atus_act")
-    sum_data = sum_data.format(["case_id"], short_name="atus_sum")
+    tb_who = tb_who.reset_index().format(["index"], short_name="atus_who")
+    tb_act = tb_act.reset_index().format(["index"], short_name="atus_act")
+    tb_sum = tb_sum.format(["case_id"], short_name="atus_sum")
+
+    # drop level_0 (is index)
+    tb_who = tb_who.drop(columns=["level_0"])
+    tb_act = tb_act.drop(columns=["level_0"])
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
-        tables=[who_data, act_data, sum_data],
-        check_variables_metadata=True,
-        default_metadata=snap_who.metadata,
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(
+        tables=[tb_who, tb_act, tb_sum], check_variables_metadata=True, default_metadata=snap_who.metadata, repack=False
     )
 
-    # Save changes in the new meadow dataset.
+    # Save meadow dataset.
     ds_meadow.save()
-
-
-def load_data_and_add_meta(snap, file_name):
-    zf = ZipFile(snap.path)
-    tb = pr.read_csv(zf.open(file_name), origin=snap.metadata.origin)
-
-    for col in tb.columns:
-        tb[col].metadata.origins = [snap.metadata.origin]
-
-    tb.metadata.title = snap.metadata.origin.title
-    tb.metadata.description = snap.metadata.origin.description
-
-    return tb
