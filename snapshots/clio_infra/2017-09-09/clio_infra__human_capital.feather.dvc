@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Universities founded (Foldvari 2015)
+    description: |-
+      Additional information: Author's note: The quantity and quality of available information on universities vary by period and geographical area. Even the definition of university is not universal: in some countries even colleges offering undergradute programmes can be named universities (Latin America, Japan, Near East). Please see source for further information.
+    url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW
+    date_accessed: 2017-09-09
+    published_by: Clio-Infra
+  name: Clio-Infra - Human Capital
+  description: This is a dataset imported by the automated fetcher
+outs:
+  - md5: c163e93ca9f1cfd5046e9c10ee4bcebd
+    size: 262122
+    path: clio_infra__human_capital.feather

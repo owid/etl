@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2724
-    date_accessed: 2023-08-10 09:22:53.795353
+    url: https://admin.owid.io/admin/datasets/2724
+    date_accessed: 2026-03-10 08:04:11.026661+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2724_time_use_across_activities__oecd_gender_data__2020
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 434d93d60a3d5f655d319664e035b1e4
-  size: 19480
-  path: dataset_2724_time_use_across_activities__oecd_gender_data__2020_config.json
+  - md5: 39f8ad55a3d1bf343e21ff3d3b348604
+    size: 20912
+    path: dataset_2724_time_use_across_activities__oecd_gender_data__2020_config.json

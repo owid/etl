@@ -1,0 +1,35 @@
+dataset:
+  title: Child Labor Italy (historic) - Toniolo, G., & Vecchi, G. (2007)
+tables:
+  child_labor_italy__historic__toniolo__g__and__vecchi__g__2007:
+    variables:
+      child_labor_italy__all__historic__toniolo__g__and__vecchi__g__2007:
+        title: Child labor Italy (all, historic) (Toniolo, G., & Vecchi, G. (2007))
+        unit: '%  of children ages 10-14'
+        short_unit: '%'
+        display:
+          unit: Individual cases
+        description: Incidence of children labor in Italy aged 10-14.
+      child_labor_italy__boys__historic__toniolo__g__and__vecchi__g__2007:
+        title: Child labor Italy (boys, historic) (Toniolo, G., & Vecchi, G. (2007))
+        unit: '% boys ages 10-14'
+        short_unit: '%'
+        display:
+          unit: deaths per 1,000
+        description: Share of boys aged 10-14 in employment.
+      child_labor_italy__girls__historic__toniolo__g__and__vecchi__g__2007:
+        title: Child labor Italy (girls, historic) (Toniolo, G., & Vecchi, G. (2007))
+        unit: '% girls ages 10-14'
+        short_unit: '%'
+        display:
+          unit: Children that died before 5 years of age per woman
+        description: Share of girls aged 10-14 in employment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

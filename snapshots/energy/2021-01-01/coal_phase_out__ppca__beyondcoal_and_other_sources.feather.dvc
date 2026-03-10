@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: |-
+      Powering Past Coal Alliance; Ember Climate; Beyond Coal EU; Bloomberg Coal Countdown and other sourcesPowering Past Coal Alliance; Ember Climate; Beyond Coal EU; Bloomberg Coal Countdown and other sources
+    description: |-
+      This dataset is collated by Our World in Data based on several data sources, including:
+
+      Powering Past Coal Alliance (PPCA): https://www.poweringpastcoal.org/
+      Beyond Coal EU: https://beyond-coal.eu/coal-exit-tracker/
+      Bloomberg Global Coal Countdown: https://bloombergcoalcountdown.com/
+      EMBER Climate: https://ember-climate.org/
+      National announcements during the COP26 Climate Summit: https://ukcop26.org/global-coal-to-clean-power-transition-statement/
+
+      Where a concrete phase out date is not defined, we have allocated the final year of the target decade. For example, "Phase out in the 2040s" is given a target date of 2049.
+    date_accessed: 2026-03-10
+    published_by: Powering Past Coal Alliance; Ember Climate; Beyond Coal EU; Bloomberg Coal Countdown and other sources
+  name: Coal Phase Out (PPCA, BeyondCoal and other sources)
+  description: ''
+  is_public: false
+outs:
+  - md5: b35bb5d8af3e259b471c600e736758b0
+    size: 4994
+    path: coal_phase_out__ppca__beyondcoal_and_other_sources.feather

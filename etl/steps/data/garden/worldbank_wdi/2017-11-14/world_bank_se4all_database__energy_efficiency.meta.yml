@@ -1,0 +1,180 @@
+dataset:
+  title: World Bank SE4ALL database - Energy efficiency
+tables:
+  world_bank_se4all_database__energy_efficiency:
+    variables:
+      divisia_decomposition_analysis__activity_component_index:
+        title: Divisia Decomposition Analysis - Activity component Index
+        unit: ''
+        description: |-
+          Divisia Decomposition Analysis - Activity component Index: This Index is created from the activity component that results from the Decomposition Analysis with the DIVISIA LMDI I method.
+        sources:
+          - name: 'World Bank SE4ALL database: Divisia Decomposition Analysis - Activity component Index'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      divisia_decomposition_analysis__energy_intensity_component_index:
+        title: Divisia Decomposition Analysis - Energy Intensity component Index
+        unit: ''
+        description: |-
+          Divisia Decomposition Analysis - Energy Intensity component Index: This Index is created from the energy Intensity component that results from the Decomposition Analysis with the DIVISIA LMDI I method.
+        sources:
+          - name: 'World Bank SE4ALL database: Divisia Decomposition Analysis - Energy Intensity component Index'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_level_of_final_energy__mj_2011_usd_ppp:
+        title: Energy intensity level of final energy (MJ/2011 USD PPP)
+        unit: MJ/2011 USD PPP
+        description: |-
+          Energy intensity level of final energy (MJ/2011 USD PPP): A ratio between final energy consumption and gross domestic product measured at purchasing power parity. Energy intensity is an indication of how much energy is used to produce one unit of economic output. Lower ratio indicates that less energy is used to produce one unit of output.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity level of final energy (MJ/2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_level_of_primary_energy__mj_2011_usd_ppp:
+        title: Energy intensity level of primary energy (MJ/2011 USD PPP)
+        unit: MJ/2011 USD PPP
+        description: |-
+          Energy intensity level of primary energy (MJ/2011 USD PPP): A ratio between energy supply and gross domestic product measured at purchasing power parity. Energy intensity is an indication of how much energy is used to produce one unit of economic output. A lower ratio indicates that less energy is used to produce one unit of output.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity level of primary energy (MJ/2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_of_agricultural_sector__mj_2011_usd_ppp:
+        title: Energy intensity of agricultural sector (MJ/2011 USD PPP)
+        unit: MJ/2011 USD PPP
+        description: |-
+          Energy intensity of agricultural sector (MJ/2011 USD PPP):  A ratio between energy consumption in the agricultural sector (including forestry and fishing) and agricultural sector value added measured at purchasing power parity. Energy intensity is an indication of how much energy is used to produce one unit of economic output. A lower ratio indicates that less energy is used to produce one unit of output.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity of agricultural sector (MJ/2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_of_industrial_sector__mj_2011_usd_ppp:
+        title: Energy intensity of industrial sector (MJ/2011 USD PPP)
+        unit: MJ/2011 USD PPP
+        description: |-
+          Energy intensity of industrial sector (MJ/2011 USD PPP):  A ratio between energy consumption in industry (including energy industry own use) and industry sector value added measured at purchasing power parity. Energy intensity is an indication of how much energy is used to produce one unit of economic output. A lower ratio indicates that less energy is used to produce one unit of output.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity of industrial sector (MJ/2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_of_residential_sector__gj_household:
+        title: Energy intensity of residential sector (GJ/household)
+        unit: GJ/household
+        description: |-
+          Energy intensity of residential sector (GJ/household): A ratio between energy consumption in the residential sector and the number of households.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity of residential sector (GJ/household)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_of_service_sector__mj_2011_usd_ppp:
+        title: Energy intensity of service sector (MJ/2011 USD PPP)
+        unit: MJ/2011 USD PPP
+        description: |-
+          Energy intensity of service sector (MJ/2011 USD PPP): A ratio between energy consumption in the service sector (including commercial and public services) and service sector value added (VA) measured at purchasing power parity. Energy intensity is an indication of how much energy is used to produce one unit of economic output. A lower ratio indicates that less energy is used to produce one unit of output.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity of service sector (MJ/2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_intensity_of_transportation_sector__mj_2011_usd_ppp:
+        title: Energy intensity of transportation sector (MJ/2011 USD PPP)
+        unit: MJ/2011 USD PPP
+        description: |-
+          Energy intensity of transportation sector (MJ/2011 USD PPP): A ratio between energy consumption in the transportation sector and transportation sector value added measured at purchasing power parity  Energy intensity is an indication of how much energy is used to produce one unit of economic output. A lower ratio indicates that less energy is used to produce one unit of output.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy intensity of transportation sector (MJ/2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      energy_savings_of_primary_energy__tj:
+        title: Energy savings of primary energy (TJ)
+        unit: TJ
+        short_unit: TJ
+        description: |-
+          Energy savings of primary energy (TJ): Energy savings due to realized energy intensity improvements. Country level savings represent the difference between a hypothetical energy consumption that would have been should the energy intensity remained at its 1990 level and actual consumption. Global, regional and income group savings represent the sum of country by country savings and not calculated separately.
+        sources:
+          - name: 'World Bank SE4ALL database: Energy savings of primary energy (TJ)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      final_to_primary_energy_ratio__pct:
+        title: Final to primary energy ratio (%)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Final to primary energy ratio (%): A high-level indicator that captures the overall energy efficiency in the supply sector obtained by dividing end-use final energy over primary energy.  High ratio indicates better supply sector efficiency.
+        sources:
+          - name: 'World Bank SE4ALL database: Final to primary energy ratio (%)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      gdp__2011_usd_ppp:
+        title: GDP (2011 USD PPP)
+        unit: 2011 USD PPP
+        description: |-
+          GDP (2011 USD PPP): Gross domestic product, measured at purchasing power parity in constant 2011 US dollars. The data is obtained from the World Development Indicators (WDI) database, refer to the WDI for further details on the indicator
+        sources:
+          - name: 'World Bank SE4ALL database: GDP (2011 USD PPP)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      thermal_efficiency_in_power_supply__pct:
+        title: Thermal efficiency in power supply (%)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Thermal efficiency in power supply (%):  This supply-side energy efficiency indicator measures the efficiency of thermal plants in converting primary energy sources—such as coal, gas, and oil—into electricity. It is calculated by dividing gross electricity production from electricity and cogeneration plants by total inputs of fuels into those plants. Whether market-based or privately owned, self-generating plants that do not export their power are included in the index assessment. In the case of cogeneration plants, fuel inputs are allocated between electricity and heat production in proportion to their shares of the annual output.
+        sources:
+          - name: 'World Bank SE4ALL database: Thermal efficiency in power supply (%)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      total_final_consumption__tj:
+        title: Total final consumption (TJ)
+        unit: TJ
+        short_unit: TJ
+        description: |-
+          Total final consumption (TJ): As defined by the IEA, total final consumption represents the sum of consumption in the end-use sectors and excludes energy used for transformation processes and energy used of the energy producing industries
+        sources:
+          - name: 'World Bank SE4ALL database: Total final consumption (TJ)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      total_primary_energy_supply__tj:
+        title: Total primary energy supply (TJ)
+        unit: TJ
+        short_unit: TJ
+        description: |-
+          Total primary energy supply (TJ): As defined by the IEA, total primary energy supply is made up of production+net imports-international marine and aviation bunkers+-stock changes.
+        sources:
+          - name: 'World Bank SE4ALL database: Total primary energy supply (TJ)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+      transmission_and_distribution_losses__pct:
+        title: Transmission and distribution losses (%)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Transmission and distribution losses (%): Transmission and distribution (T&D) losses measure power lost in the transmission of (high-voltage) electricity from power generators to distributors and in the distribution of (medium- and low-voltage) electricity from distributors to end-users. T&D losses are represented as a percentage of gross electricity production. They include both technical and nontechnical (or commercial) losses. Included in the latter are unmetered, unbilled, and unpaid electricity, including theft, which could be significant in developing countries. Aggregate T&D system indicators may be dominated by factors other than losses. The location of primary energy resources (such as hydro lakes and coal seams) and large loads (cities and industries) may be more significant factors in T&D efficiency indicators than the losses or efficiency of the transmission system itself. Properly separating true losses (and hence the efficiency potential of transmission systems) from exogenous location and scale factors and non-technical losses would require detailed studies of system-dynamic interactions and real operating requirements that are not practical for global tracking purposes.
+        sources:
+          - name: 'World Bank SE4ALL database: Transmission and distribution losses (%)'
+            url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+            date_accessed: 2017-11-14
+            published_by: World Bank SE4ALL database, IEA
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
