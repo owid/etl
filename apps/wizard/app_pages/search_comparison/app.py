@@ -3,6 +3,7 @@
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from urllib.parse import urlparse, urlunparse
 
 import requests
 import streamlit as st
@@ -245,22 +246,45 @@ def get_rank_change_indicator(current_rank: int, other_rank: int | None) -> str:
         return ":gray[=]"
 
 
-def is_explorer(hit: dict) -> bool:
-    """Check if the hit is an explorer (not a chart)."""
+def get_hit_type(hit: dict) -> str:
+    """Determine the type of a search hit: 'explorer', 'mdim', or 'chart'."""
+    hit_type = hit.get("type", "")
+    if hit_type == "multiDimView":
+        return "mdim"
     url = hit.get("url", "")
-    return "/explorers/" in url
+    if "/explorers/" in url:
+        return "explorer"
+    return "chart"
+
+
+HIT_TYPE_ICONS = {
+    "chart": "📊",
+    "mdim": "🔷",
+    "explorer": "🧭",
+}
+
+HIT_TYPE_LABELS = {
+    "chart": "Chart",
+    "mdim": "Multi-dimensional indicator",
+    "explorer": "Explorer",
+}
 
 
 def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None):
     """Display a single search hit."""
     title = hit.get("title", "Untitled")
     subtitle = hit.get("subtitle", "")
-    # Use URL from API response, or fallback to current environment's site
-    url = hit.get("url")
+    # Normalize URL to use OWID_ENV.site (API may return localhost URLs)
+    raw_url = hit.get("url", "")
+    if OWID_ENV.site and raw_url:
+        parsed = urlparse(raw_url)
+        site_parsed = urlparse(OWID_ENV.site)
+        url = urlunparse((site_parsed.scheme, site_parsed.netloc, parsed.path, "", parsed.query, ""))
+    else:
+        url = raw_url
 
-    # Check if this is an explorer
-    explorer = is_explorer(hit)
-    type_icon = "🧭" if explorer else "📊"
+    hit_type = get_hit_type(hit)
+    type_icon = HIT_TYPE_ICONS.get(hit_type, "📊")
 
     # Get score based on search type
     if search_type == "semantic":
@@ -277,7 +301,13 @@ def display_hit(hit: dict, index: int, search_type: str, other_rank: int | None)
 
     with st.container(border=True):
         # Title with type icon and rank change
-        st.markdown(f"**{index}.** {type_icon} [{title}]({url}) {rank_indicator}")
+        container_title = hit.get("containerTitle", "")
+        container_suffix = f" :gray[({container_title})]" if container_title and container_title != title else ""
+        type_label = HIT_TYPE_LABELS.get(hit_type, "Chart")
+        st.markdown(
+            f"**{index}.** {type_icon} [{title}]({url}){container_suffix} {rank_indicator}",
+            help=type_label,
+        )
 
         # Subtitle
         if subtitle:
@@ -497,6 +527,13 @@ def main():
                 index=1,
                 key="hits_per_page",
             )
+            type_filter = st.multiselect(
+                label="Result type",
+                options=["Chart", "Multi-dim", "Explorer"],
+                default=["Chart", "Multi-dim", "Explorer"],
+                help="Filter results by type",
+                key="type_filter",
+            )
             topic_threshold = st.number_input(
                 "Topic threshold",
                 min_value=0.0,
@@ -549,9 +586,15 @@ def main():
             left_data, left_time = left_future.result()
             right_data, right_time = right_future.result()
 
-    # Get hits and build rank mappings
+    # Get hits, apply type filter, and build rank mappings
+    TYPE_FILTER_MAP = {"Chart": "chart", "Multi-dim": "mdim", "Explorer": "explorer"}
+    allowed_types = {TYPE_FILTER_MAP[t] for t in type_filter if t in TYPE_FILTER_MAP}
+
     left_hits = left_data.get("hits", [])
     right_hits = right_data.get("hits", [])
+    if allowed_types:
+        left_hits = [h for h in left_hits if get_hit_type(h) in allowed_types]
+        right_hits = [h for h in right_hits if get_hit_type(h) in allowed_types]
     max_hits = max(len(right_hits), len(left_hits))
 
     # Fetch pageviews and FM ranks for results that don't include them (Algolia, Agent)
