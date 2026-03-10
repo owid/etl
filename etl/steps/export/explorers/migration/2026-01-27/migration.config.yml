@@ -117,7 +117,7 @@ views:
           display:
             name: Refugees under 18 (asylum)
             colorScaleScheme: YlGnBu
-            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;100000.0,,;0
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;0
   - dimensions:
       metric: refugees_by_origin
       period_radio: total_number
@@ -165,7 +165,7 @@ views:
           display:
             name: IDPs under 18 (conflict and violence)
             colorScaleScheme: OrRd
-            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;100000.0,,;3000000.0,,;0
+            colorScaleNumericBins: 300.0,,;1000.0,,;3000.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;1000000.0,,;3000000.0,,;0
   - dimensions:
       metric: internally_displaced_persons_disaster
       period_radio: total_number
@@ -707,7 +707,7 @@ views:
           display:
             name: Share of disaster displaced population
             colorScaleScheme: OrRd
-            colorScaleNumericBins: 0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;0.0
+            colorScaleNumericBins: 1.0,,;2.0,,;5.0,,;10.0,,;20.0,,;0.0
   - dimensions:
       metric: internally_displaced_persons
       period_radio: annual_change
@@ -719,7 +719,7 @@ views:
           display:
             name: Displacements per 1,000 people
             colorScaleScheme: OrRd
-            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;0
+            colorScaleNumericBins: 1,,;2,,;5,,;10,,;20,,;50,,;0
   - dimensions:
       metric: internally_displaced_persons_conflict
       period_radio: annual_change
@@ -731,7 +731,7 @@ views:
           display:
             name: Conflict displacements per 1,000 people
             colorScaleScheme: OrRd
-            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;0
+            colorScaleNumericBins: 1,,;2,,;5,,;10,,;20,,;50,,;0
   - dimensions:
       metric: internally_displaced_persons_disaster
       period_radio: annual_change
@@ -743,4 +743,4 @@ views:
           display:
             name: Disaster displacements per 1,000 people
             colorScaleScheme: OrRd
-            colorScaleNumericBins: 0.1,,;0.2,,;0.5,,;1.0,,;2.0,,;5.0,,;0
+            colorScaleNumericBins: 1,,;2,,;5,,;10,,;20,,;50,,;0
