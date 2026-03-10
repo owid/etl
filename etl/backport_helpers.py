@@ -52,7 +52,9 @@ def load_config(short_name: str) -> GrapherConfig:
     with open(snap.path) as f:
         content = f.read()
     if not content.strip():
-        raise ValueError(f"Empty config.json for backport snapshot '{short_name}' at {snap.path}. Try re-running the backport with --force.")
+        raise ValueError(
+            f"Empty config.json for backport snapshot '{short_name}' at {snap.path}. Try re-running the backport with --force."
+        )
     return GrapherConfig.from_json(content)
 
 
