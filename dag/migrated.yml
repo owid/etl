@@ -1036,3 +1036,7 @@ steps:
     - data-private://garden/economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018
   data-private://garden/economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018:
     - snapshot-private://economics/2018-10-01/country_programmable_aid__cpa__from_2000_2019__oecd__2018.feather
+  data-private://grapher/eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day:
+    - data-private://garden/eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day
+  data-private://garden/eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day:
+    - snapshot-private://eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day.feather
