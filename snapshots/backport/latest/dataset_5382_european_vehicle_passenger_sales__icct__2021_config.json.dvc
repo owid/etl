@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5382
-    date_accessed: 2023-08-10 09:42:25.234838
+    url: https://admin.owid.io/admin/datasets/5382
+    date_accessed: 2026-03-10 08:07:40.054276+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5382_european_vehicle_passenger_sales__icct__2021
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 74c59f12293ddf7088d0902465551650
-  size: 21624
-  path: dataset_5382_european_vehicle_passenger_sales__icct__2021_config.json
+  - md5: e2ca3805f1eb6c1f29073d5a38f6c412
+    size: 24172
+    path: dataset_5382_european_vehicle_passenger_sales__icct__2021_config.json

@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3266
-    date_accessed: 2023-08-10 08:42:01.666003
+    url: https://admin.owid.io/admin/datasets/3266
+    date_accessed: 2026-03-10 08:05:54.007490+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Sex ratio at birth by birth order in S.Korea & China (Jiang et al. 2017 &
-    NSO Korea)
+  name: Sex ratio at birth by birth order in S.Korea & China (Jiang et al. 2017 & NSO Korea)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 91dc7bc2064eb504d34037077eb69e1e
-  size: 7842
-  path: 
-    dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea_values.feather
+  - md5: 7903f0aac93c4f447d02de612b20c2a3
+    size: 7978
+    path: dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea_values.feather

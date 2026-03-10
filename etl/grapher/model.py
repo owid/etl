@@ -2103,9 +2103,10 @@ class ExplorerView(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     explorerSlug: Mapped[str] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
-    explorerView: Mapped[dict] = mapped_column(JSON)
+    dimensions: Mapped[dict] = mapped_column(JSON)
     chartConfigId: Mapped[Optional[str]] = mapped_column(CHAR(36, "utf8mb4_0900_as_cs"))
     error: Mapped[Optional[str]] = mapped_column(TEXT(collation="utf8mb4_0900_as_cs"))
+    viewId: Mapped[str] = mapped_column(String(512, "utf8mb4_0900_as_cs"))
 
     chart_config: Mapped[Optional["ChartConfig"]] = relationship("ChartConfig", back_populates="explorer_viewss")
     explorer: Mapped["Explorer"] = relationship("Explorer", back_populates="explorer_viewss")

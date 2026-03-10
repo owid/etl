@@ -152,9 +152,9 @@ def migrate(
 
     if backport:
         lg.info("migrate.backport_dataset")
-        # backport to refresh snapshots in S3
-        if force or pb.needs_update():
-            pb.upload(upload, dry_run, engine)
+        # always force backport during migration to ensure config.json is fresh
+        # (stale/empty configs from previous backports cause JSONDecodeError)
+        pb.upload(upload, dry_run, engine)
 
     if dry_run:
         lg.info("migrate.dry_run", namespace=namespace, version=version, short_name=short_name)

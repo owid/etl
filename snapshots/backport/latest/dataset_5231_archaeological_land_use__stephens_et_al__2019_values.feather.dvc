@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5231
-    date_accessed: 2023-08-10 09:03:17.267477
+    url: https://admin.owid.io/admin/datasets/5231
+    date_accessed: 2026-03-10 08:06:37.750510+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Archaeological land use (Stephens et al. 2019)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9217dd4a80b744fa6f96eeb9f324b6d5
-  size: 70482
-  path: dataset_5231_archaeological_land_use__stephens_et_al__2019_values.feather
+  - md5: 03a0f860640d98c51e0394db9a24dbe4
+    size: 71842
+    path: dataset_5231_archaeological_land_use__stephens_et_al__2019_values.feather

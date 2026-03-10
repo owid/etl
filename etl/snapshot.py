@@ -855,7 +855,9 @@ class SnapshotMeta(MetaBase):
             js = json.load(f)
 
         # NOTE: this is similar to `convert_grapher_source`, DRY it when possible
-        assert len(js["sources"]) == 1
+        assert len(js["sources"]) >= 1
+        # Use only the first source for snapshot metadata; the garden step
+        # handles per-variable sources from the backport config separately.
         s = js["sources"][0]
         self.name = js["dataset"]["name"]
         self.source = Source(

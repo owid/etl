@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3177
-    date_accessed: 2023-08-10 07:46:52.132884
+    url: https://admin.owid.io/admin/datasets/3177
+    date_accessed: 2026-03-10 08:05:30.762543+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3177_aviation_accidents_and_fatalities_by_flight_phase__asn__2019
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d48128c90799db5b33c059b5571fdcec
-  size: 9515
-  path: 
-    dataset_3177_aviation_accidents_and_fatalities_by_flight_phase__asn__2019_config.json
+  - md5: 01c19774acdac0d43a336ee131644304
+    size: 10482
+    path: dataset_3177_aviation_accidents_and_fatalities_by_flight_phase__asn__2019_config.json

@@ -1,0 +1,86 @@
+dataset:
+  title: Clio-Infra - Human Capital
+tables:
+  clio_infra__human_capital:
+    variables:
+      average_years_of_education__van_leeuwen__van_leeuwen_li_2015:
+        title: Average years of education (van Leeuwen,  van Leeuwen-Li 2015)
+        unit: years of formal schooling
+        description: Average years of education for the total population aged 15 years and older.
+        sources:
+          - name: Average years of education (van Leeuwen,  van Leeuwen-Li 2015)
+            description: 'Publisher source: Central statistical agencies, historical reconstructions.'
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KCBMKI
+            date_accessed: 2017-09-09
+            published_by: Clio-Infra
+      book_titles_per_capita__fink_jensen_2015:
+        title: Book titles per capita (Fink-Jensen 2015)
+        unit: Unique booktitles per million inhabitants
+        short_unit: Unique booktitles
+        description: The number of new book titles publisher per year, per million inhabitants in a given country for the
+          period 1500 - 2010.
+        sources:
+          - name: Book titles per capita (Fink-Jensen 2015)
+            description: |-
+              Publisher source: Combination of datasets and publications that contain data on book production for different regions and periods.
+              Includes CLIO Infra data.
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/AOQMAZ
+            date_accessed: 2017-09-09
+            published_by: Clio-Infra
+      composite_wellbeing_index__rijpma_2017:
+        title: Composite wellbeing index (Rijpma 2017)
+        unit: Composite measure of wellbeing
+        description: The composite measure is a linear combination of 9 Clio-Infra variables created through a latent variable
+          model.
+        sources:
+          - name: Composite wellbeing index (Rijpma 2017)
+            description: 'Publisher source: Composite measure constructed from 9 variables from the CLIO-Infra project.'
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/QIPFQF
+            date_accessed: 2017-09-09
+            published_by: Clio-Infra
+      educational_inequality_gini_coefficient__van_leeuwen_and_van_leeuwen_li_2015:
+        title: Educational inequality gini coefficient (van Leeuwen and van Leeuwen-Li 2015)
+        unit: Gini
+        short_unit: Gini
+        description: The greater the gini coefficient, the larger the gap in educational inequality.
+        sources:
+          - name: Educational inequality gini coefficient (van Leeuwen and van Leeuwen-Li 2015)
+            description: 'Publisher source: Central statistical agencies, historical reconstructions.'
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KORKQW
+            date_accessed: 2017-09-09
+            published_by: Clio-Infra
+      numeracy__total__baten_2015:
+        title: Numeracy (total) (Baten 2015)
+        unit: ABCC index (%)
+        short_unit: '%'
+        description: |-
+          Numeracy estimates (ABCC) by birth decade and country, both before and after 1800. Use "age heaping"; that is, where age data frequently displays excess frequencies at attractive numbers, e.g. multiples of five, to measure cognitive ability in quantitative reasoning.
+        sources:
+          - name: Numeracy (total) (Baten 2015)
+            description: 'Publisher source: Reconstruction of data using a variety of sources, incl. scholarly research.'
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/GEQKCG
+            date_accessed: 2017-09-09
+            published_by: Clio-Infra
+      universities_founded__foldvari_2015:
+        title: Universities founded (Foldvari 2015)
+        unit: number of universities founded in a year
+        description: Number of universities founded within a given year, within the current borders of a particular country.
+        sources:
+          - name: Universities founded (Foldvari 2015)
+            description: |-
+              Additional information: Author's note: The quantity and quality of available information on universities vary by period and geographical area. Even the definition of university is not universal: in some countries even colleges offering undergradute programmes can be named universities (Latin America, Japan, Near East). Please see source for further information.
+
+
+              Publisher source: Central statistical agencies, historical reconstructions.
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW
+            date_accessed: 2017-09-09
+            published_by: Clio-Infra
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

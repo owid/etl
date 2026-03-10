@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: 20th century deaths in US - CDC
+    description: |-
+      Data is compiled based on the list of top 10 causes of death published by the Centre for Diseases Control (CDC). This is measured across both sexes and all ages. Death rates are reported per 100,000 and are not age-standardized.
+
+      Data for specific causes of death may be missing or intermittent where it enters or falls out of the top 10 reported causes of deaths in any year.
+    url: https://www.cdc.gov/nchs/data/dvs/lead1900_98.pdf
+    date_accessed: 2018-02-01
+    published_by: Centre for Diseases Control (CDC). Leading Causes of Death, 1900-1998.
+  name: 20th century deaths in US - CDC
+  description: ''
+outs:
+  - md5: 8be7df3ded9b09735f5983832c081f72
+    size: 71642
+    path: _20th_century_deaths_in_us__cdc.feather
