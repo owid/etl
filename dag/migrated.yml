@@ -1040,3 +1040,39 @@ steps:
     - data-private://garden/eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day
   data-private://garden/eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day:
     - snapshot-private://eat_lancet/2021-06-07/eat_lancet_diet_composition__grams_per_capita_per_day.feather
+  data://grapher/un_peacekeeping/2022-02-24/united_nations_peacekeeping:
+    - data://garden/un_peacekeeping/2022-02-24/united_nations_peacekeeping
+  data://garden/un_peacekeeping/2022-02-24/united_nations_peacekeeping:
+    - snapshot://un_peacekeeping/2022-02-24/united_nations_peacekeeping.feather
+  data://grapher/cdc/2024-01-01/drug_overdose_deaths_in_the_us__cdc_wonder:
+    - data://garden/cdc/2024-01-01/drug_overdose_deaths_in_the_us__cdc_wonder
+  data://garden/cdc/2024-01-01/drug_overdose_deaths_in_the_us__cdc_wonder:
+    - snapshot://cdc/2024-01-01/drug_overdose_deaths_in_the_us__cdc_wonder.feather
+  data://grapher/unctad/2017-10-12/number_of_parties_to_multilateral_environmental_agreements__unctad:
+    - data://garden/unctad/2017-10-12/number_of_parties_to_multilateral_environmental_agreements__unctad
+  data://garden/unctad/2017-10-12/number_of_parties_to_multilateral_environmental_agreements__unctad:
+    - snapshot://unctad/2017-10-12/number_of_parties_to_multilateral_environmental_agreements__unctad.feather
+  data://grapher/worldbank_wdi/2017-11-14/world_bank_se4all_database__energy_efficiency:
+    - data://garden/worldbank_wdi/2017-11-14/world_bank_se4all_database__energy_efficiency
+  data://garden/worldbank_wdi/2017-11-14/world_bank_se4all_database__energy_efficiency:
+    - snapshot://worldbank_wdi/2017-11-14/world_bank_se4all_database__energy_efficiency.feather
+  data://grapher/cdc/2018-02-01/_20th_century_deaths_in_us__cdc:
+    - data://garden/cdc/2018-02-01/_20th_century_deaths_in_us__cdc
+  data://garden/cdc/2018-02-01/_20th_century_deaths_in_us__cdc:
+    - snapshot://cdc/2018-02-01/_20th_century_deaths_in_us__cdc.feather
+  data://grapher/trade/2018-03-19/split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data:
+    - data://garden/trade/2018-03-19/split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data
+  data://garden/trade/2018-03-19/split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data:
+    - snapshot://trade/2018-03-19/split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data.feather
+  data-private://grapher/trade/2018-07-20/world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split:
+    - data-private://garden/trade/2018-07-20/world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split
+  data-private://garden/trade/2018-07-20/world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split:
+    - snapshot-private://trade/2018-07-20/world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split.feather
+  data://grapher/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
+    - data://garden/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017
+  data://garden/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
+    - snapshot://forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017.feather
+  data-private://grapher/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
+    - data-private://garden/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021
+  data-private://garden/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
+    - snapshot-private://fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021.feather

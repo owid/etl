@@ -1,0 +1,110 @@
+dataset:
+  title: Drivers of forest loss in Brazil Legal Amazon (Tyukavina et al. 2017)
+tables:
+  drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
+    variables:
+      commercial_crops:
+        title: commercial_crops
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Commercial crops
+          numDecimalPlaces: 0
+      fire:
+        title: fire
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Fire
+          numDecimalPlaces: 0
+      flooding_due_to_dams:
+        title: flooding_due_to_dams
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Flooding (due to dams)
+          numDecimalPlaces: 0
+      mining:
+        title: mining
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Mining
+          numDecimalPlaces: 0
+      natural_disturbances:
+        title: natural_disturbances
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Natural disturbances (e.g. wind)
+          numDecimalPlaces: 0
+      other_infrastructure:
+        title: other_infrastructure
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Other infrastructure
+          numDecimalPlaces: 0
+      pasture:
+        title: pasture
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Pasture (beef)
+          numDecimalPlaces: 0
+      roads:
+        title: roads
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Roads
+          numDecimalPlaces: 0
+      selective_logging:
+        title: selective_logging
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Selective logging
+          numDecimalPlaces: 0
+      small_scale_clearing:
+        title: small-scale_clearing
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Small-scale farming
+          numDecimalPlaces: 0
+      total_forest_loss:
+        title: total_forest_loss
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Total forest loss
+          numDecimalPlaces: 0
+      tree_plantations_including_palm:
+        title: tree_plantations_including_palm
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000000
+          name: Tree plantations (including oil palm)
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
