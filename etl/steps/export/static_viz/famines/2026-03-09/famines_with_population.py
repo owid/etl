@@ -257,7 +257,7 @@ def create_visualization(
 
     if not valid_pop.empty:
         # Plot population line
-        pop_line = ax2.plot(
+        ax2.plot(
             x_positions[plot_data["population"].notna()],
             valid_pop["population"],
             color=line_color,
