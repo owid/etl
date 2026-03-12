@@ -251,32 +251,10 @@ def run() -> None:
     snap = paths.load_snapshot("mortality_database_aggregated.feather")
     tb = snap.read()
 
-    # Aggregate UK constituent countries into "United Kingdom" before calculating rates
-    # This must be done before any population-based calculations
+    # Remove UK constituent countries since snapshot already has "United Kingdom" (aggregated)
+    # The snapshot contains both "United Kingdom" and its constituents, but we only want the aggregated version
     uk_countries = ["United Kingdom, England and Wales", "United Kingdom, Northern Ireland", "United Kingdom, Scotland"]
-
-    # Check if we have UK constituent countries
-    uk_data = tb[tb["country"].isin(uk_countries)].copy()
-    if len(uk_data) > 0:
-        # Aggregate by summing deaths and population
-        uk_aggregated = uk_data.groupby(["year", "sex", "age_group", "cause"], as_index=False, observed=True).agg(
-            {
-                "number": "sum",
-                "population": "sum",
-            }
-        )
-
-        # Set country to "United Kingdom"
-        uk_aggregated["country"] = "United Kingdom"
-
-        # Recalculate death rate after aggregation
-        uk_aggregated["death_rate_per_100_000_population"] = (
-            uk_aggregated["number"] / uk_aggregated["population"]
-        ) * 100000
-
-        # Remove constituent countries and add aggregated UK
-        tb = tb[~tb["country"].isin(uk_countries)]
-        tb = pd.concat([tb, uk_aggregated], ignore_index=True)
+    tb = tb[~tb["country"].isin(uk_countries)]
 
     # Map ICD-10 codes to cause categories
     tb["cause_category"] = tb["cause"].apply(map_icd10_to_category)
