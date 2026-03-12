@@ -392,6 +392,14 @@ steps:
   data://grapher/who/2026-03-12/mortality_database:
     - data://garden/who/2026-03-12/mortality_database
 
+  # WHO Mortality Database - aggregated from raw data
+  data://meadow/who/2026-03-12/mortality_database_aggregated:
+    - snapshot://who/2026-03-12/mortality_database_aggregated.feather
+  data://garden/who/2026-03-12/mortality_database_aggregated:
+    - data://meadow/who/2026-03-12/mortality_database_aggregated
+  data://grapher/who/2026-03-12/mortality_database_aggregated:
+    - data://garden/who/2026-03-12/mortality_database_aggregated
+
   # WHO Global Health Estimates
   data://meadow/who/2024-07-30/ghe:
     - snapshot://who/2024-07-30/ghe.feather

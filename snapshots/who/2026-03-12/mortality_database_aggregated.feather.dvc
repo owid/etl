@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: WHO Mortality Database
+    title: WHO Mortality Database - Aggregated with Calculated Rates
+    description: |-
+      Aggregated WHO mortality database with calculated metrics including:
+      - Percentage of cause-specific deaths out of total deaths
+      - Age-standardized death rate per 100,000 standard population (WHO World Standard Population 2000-2025)
+      - Crude death rate per 100,000 population
+
+      This dataset combines three WHO data sources:
+      1. Raw mortality data by ICD-10 cause codes (morticd10_part6)
+      2. Population data by age and sex (mort_pop)
+      3. Country code mappings (mort_country_codes)
+
+      The WHO mortality database is a collection death registration data including cause-of-death information from member states. Countries have reported deaths by cause of death, year, sex, and age for inclusion in the WHO Mortality Database since 1950.
+    citation_full: WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2026)
+    attribution_short: WHO
+    url_main: https://platform.who.int/mortality
+    date_accessed: '2026-03-12'
+    date_published: '2026-02-23'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: ac5666b078efd3180f27339e97504256
+    size: 17139834
+    path: mortality_database_aggregated.feather
