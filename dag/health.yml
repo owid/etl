@@ -210,7 +210,7 @@ steps:
 
   # WHO Cardiovascular diseases deaths
   data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/who/2026-03-12/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
@@ -385,6 +385,12 @@ steps:
     - data://meadow/who/2025-04-17/mortality_database
   data://grapher/who/2025-04-17/mortality_database:
     - data://garden/who/2025-04-17/mortality_database
+  data://meadow/who/2026-03-12/mortality_database:
+    - snapshot://who/2026-03-12/mortality_database.feather
+  data://garden/who/2026-03-12/mortality_database:
+    - data://meadow/who/2026-03-12/mortality_database
+  data://grapher/who/2026-03-12/mortality_database:
+    - data://garden/who/2026-03-12/mortality_database
 
   # WHO Global Health Estimates
   data://meadow/who/2024-07-30/ghe:
@@ -1218,7 +1224,7 @@ steps:
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/gapminder/2024-07-08/maternal_mortality
     - data://garden/un/2024-07-08/maternal_mortality
-    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/who/2026-03-12/mortality_database
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
