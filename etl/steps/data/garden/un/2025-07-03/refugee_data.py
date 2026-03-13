@@ -43,7 +43,7 @@ def run() -> None:
         idp = tb[(tb["country_of_origin"] != tb["country_of_asylum"]) & (tb["idps"] > 0)]
         print(len(idp), "rows with idps who have different country of origin and asylum")
 
-    # remove (for now) refugees and asylum seekers with the same country of origin and asylum
+    # set refugees and asylum seekers with the same country of origin and asylum as zero
     msk_r = (
         (tb["country_of_origin"] == tb["country_of_asylum"])
         & (tb["refugees"] > 0)
@@ -54,8 +54,9 @@ def run() -> None:
         & (tb["asylum_seekers"] > 0)
         & (tb["country_of_origin"] != "Unknown")
     )
-    tb = tb[~(msk_r)]
-    tb = tb[~(msk_a)]
+    # set refugees and asylum seekers with the same country of origin and asylum to N/A instead of removing them, as they are likely to be idps
+    tb.loc[msk_r, "refugees"] = pd.NA
+    tb.loc[msk_a, "asylum_seekers"] = pd.NA
 
     # remove (for now) china after 2020 because of weird measurements
     msk_china = (tb["country_of_asylum"] == "China") & (tb["year"] > 2020)
