@@ -12,6 +12,22 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+def map_sex(sex_code):
+    """
+    Map WHO sex codes to labels.
+    """
+    sex_code = str(sex_code).strip()
+
+    if sex_code == "1":
+        return "Male"
+    elif sex_code == "2":
+        return "Female"
+    elif sex_code == "9":
+        return "Sex unspecified"
+    else:
+        return "Unknown"
+
+
 def run() -> None:
     """
     Load meadow dataset, harmonize countries, and save as garden dataset.
@@ -22,10 +38,11 @@ def run() -> None:
 
     # Harmonize country names using the same mapping as mortality_database
     tb = paths.regions.harmonize_names(tb)
+    tb["sex"] = tb["sex"].apply(map_sex)
 
-    # Format with standard index
-    tb = tb.format(["country", "year", "sex", "age_group", "cause"], verify_integrity=True)
-
+    # Format
+    tb = tb.format(["country", "year", "sex", "age_group", "cause_category"])
+    tb = tb.drop(columns=["population"])
     # Create garden dataset
     ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, repack=False)
 

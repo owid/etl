@@ -28,70 +28,12 @@ dataset:
 tables:
   mortality_database_aggregated:
     variables:
-      icd10_codes:
-        title: ICD-10 codes
-        description_short: ICD-10 code for this cause of death.
-        description_key:
-          - "This shows the specific ICD-10 code reported in the WHO mortality database."
-        unit: ""
-
-      number:
-        title: Deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>
-        description_short: Reported total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
-        description_key:
-          [
-            "The ICD-10 code for this cause is << cause >>.",
-          ]
+      deaths:
+        title: Deaths from << cause_category.lower() >> in << sex.lower() >> aged << age_group.lower() >>
+        description_short: Reported total deaths from << cause_category.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
         unit: deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            note: |-
-              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-
-      percentage_of_cause_specific_deaths_out_of_total_deaths:
-        title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
-        description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
-        description_key:
-          [
-            "The ICD-10 code for this cause is << cause >>.",
-          ]
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            note: |-
-              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-
-      age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
-        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
-        description_key:
-          [
-            "The ICD-10 code for this cause is << cause >>.",
-            "Age-standardization uses the WHO World Standard Population 2000-2025.",
-          ]
-        unit: deaths per 100,000 people
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            note: |-
-              To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-
-      death_rate_per_100_000_population:
-        title: Deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>
-        description_short: Reported deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
-        description_key:
-          [
-            "The ICD-10 code for this cause is << cause >>.",
-          ]
-        unit: deaths per 100,000 people
-        display:
-          numDecimalPlaces: 1
         presentation:
           grapher_config:
             note: |-
