@@ -8,6 +8,7 @@ charts:
   # Key is the original Slack user ID, value is the replacement Slack user ID.
   reviewer_overrides:
     "U3E5PRWNN": "U4U46QBJ5" # Max -> Hannah
+    "U01T5MG8DTM": "U07437LD7JR" # Fiona -> Tuna
 
   llm:
     model_name: openai:gpt-5.2
