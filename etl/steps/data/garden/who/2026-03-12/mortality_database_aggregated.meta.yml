@@ -12,17 +12,6 @@ dataset:
   description: |
     Aggregated WHO mortality database calculated directly from raw WHO data files.
 
-    This dataset is generated from:
-    - WHO mortality data (morticd10_part6.zip) - ICD-10 coded deaths
-    - WHO population data (mort_pop.zip) - Population by age and sex
-    - WHO country codes (mort_country_codes.zip) - Country mappings
-
-    Calculated metrics include:
-    - Number of deaths
-    - Percentage of cause-specific deaths out of total deaths
-    - Age-standardized death rate per 100,000 (using WHO World Standard Population 2000-2025)
-    - Crude death rate per 100,000 population
-
     Coverage: 2021-2024, 108 countries with ICD-10 coded mortality data
 
 tables:

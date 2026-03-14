@@ -323,7 +323,7 @@ def map_icd10_to_category(icd_code: str) -> str:
             "X459",
         }:
             return "Neuropsychiatric conditions"
-        if num is not None and 60 <= num <= 84:
+        if num is not None and 60 <= num <= 99:
             return "Intentional injuries"
         return "Unintentional injuries"
 
