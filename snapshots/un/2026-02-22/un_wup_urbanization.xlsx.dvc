@@ -1,0 +1,29 @@
+# Learn more at:
+# http://open-numbers.github.io/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Urbanization Prospects - Annual Rate of Change of Urbanization
+    description: |-
+      Annual Rate of Change of the Percentage of Population by Degree of Urbanization by Region, Subregion, Country and Area, 1950-2050 (per cent).
+    date_published: "2025"
+
+    # Citation
+    producer: United Nations, Department of Economic and Social Affairs, Population Division
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2025). World Urbanization Prospects 2025.
+    attribution_short: UN WUP
+
+    # Files
+    url_main: https://population.un.org/wup/downloads
+    url_download: https://population.un.org/wup/assets/Download/Countries%20and%20Aggregates/WUP2025-F04-Degree-of-Urbanization_percPop_rate_by_category.xlsx
+    date_accessed: '2026-02-22'
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://population.un.org/wup/General/Copyright
+outs:
+  - md5: 3f5dbd04e675387106519c59c339e66b
+    size: 1124925
+    path: un_wup_urbanization.xlsx
